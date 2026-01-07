@@ -1,0 +1,1128 @@
+'use client';
+
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import dynamic from 'next/dynamic';
+import {
+  X,
+  Video,
+  Mic,
+  PenTool,
+  RotateCcw,
+  Download,
+  Upload,
+  Smartphone,
+  Calendar,
+  MessageCircle,
+  Facebook,
+  Instagram,
+  Twitter,
+  Square,
+  MapPin,
+  MousePointer2,
+  Hand,
+  Volume2,
+  VolumeX
+} from 'lucide-react';
+
+/* --- IMPORTACIÓN DINÁMICA DEL GLOBO --- */
+const GlobeComp = dynamic(() => import('react-globe.gl'), { ssr: false });
+
+/* --- SISTEMA DE DISEÑO NEUMÓRFICO (NO CAMBIAR) --- */
+const soft = {
+  bg: '#E0E5EC',
+  textMain: '#2D3748',
+  textBody: '#4A5568',
+  flat: {
+    backgroundColor: '#E0E5EC',
+    boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5)',
+    borderRadius: '40px',
+    border: '1px solid rgba(255,255,255,0.2)'
+  },
+  inset: {
+    backgroundColor: '#E0E5EC',
+    boxShadow:
+      'inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8)',
+    borderRadius: '30px',
+    border: '1px solid rgba(255,255,255,0.1)'
+  },
+  button: {
+    backgroundColor: '#E0E5EC',
+    boxShadow: '8px 8px 16px 0 rgba(163,177,198, 0.6), -8px -8px 16px 0 rgba(255,255,255, 0.8)',
+    borderRadius: '50px',
+    border: '1px solid rgba(255,255,255,0.2)',
+    cursor: 'pointer' as const,
+    transition: 'all 0.2s ease',
+    color: '#4A5568',
+    fontWeight: 700,
+    fontFamily: 'Avenir, Avenir Next, sans-serif'
+  },
+  recordButton: {
+    backgroundColor: '#E0E5EC',
+    boxShadow: '6px 6px 12px 0 rgba(163,177,198, 0.6), -6px -6px 12px 0 rgba(255,255,255, 0.8)',
+    borderRadius: '50%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    cursor: 'pointer' as const,
+    border: '1px solid rgba(255,255,255,0.2)'
+  },
+  input: {
+    backgroundColor: '#E0E5EC',
+    boxShadow: 'inset 4px 4px 8px 0 rgba(163,177,198, 0.6), inset -4px -4px 8px 0 rgba(255,255,255, 0.8)',
+    borderRadius: '15px',
+    border: 'none',
+    padding: '16px',
+    width: '100%',
+    outline: 'none',
+    color: '#4A5568',
+    fontFamily: 'Avenir, Avenir Next, sans-serif'
+  },
+  select: {
+    backgroundColor: '#E0E5EC',
+    boxShadow: 'inset 4px 4px 8px 0 rgba(163,177,198, 0.6), inset -4px -4px 8px 0 rgba(255,255,255, 0.8)',
+    borderRadius: '15px',
+    border: 'none',
+    padding: '16px',
+    width: '100%',
+    outline: 'none',
+    color: '#4A5568',
+    appearance: 'none' as const,
+    fontFamily: 'Avenir, Avenir Next, sans-serif',
+    backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234A5568' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 1rem center',
+    backgroundSize: '1em'
+  }
+};
+
+/* --- ESTILOS GLOBALES (NO CAMBIAR ESTÉTICA) --- */
+const globalStyles = `
+  html { scroll-behavior: smooth; }
+  @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+  .animate-float { animation: float 7s ease-in-out infinite; }
+  .pulse-red { animation: pulse-red 2s infinite; }
+  @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .engraved-text {
+    background-color: #4A5568;
+    color: transparent;
+    text-shadow: 2px 2px 4px rgba(255,255,255,0.1), -1px -1px 2px rgba(0,0,0,0.5);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+`;
+
+/* --- HOOK: bloquear scroll + cerrar con ESC --- */
+function useModalUX(isOpen: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, onClose]);
+}
+
+/* --- UTIL: edad + rango --- */
+function calcAgeGroup(isoDate: string) {
+  if (!isoDate) return { age: null as number | null, group: '' };
+  const d = new Date(isoDate);
+  if (Number.isNaN(d.getTime())) return { age: null, group: '' };
+
+  const now = new Date();
+  let age = now.getFullYear() - d.getFullYear();
+  const m = now.getMonth() - d.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < d.getDate())) age -= 1;
+  if (age < 0 || age > 120) return { age: null, group: '' };
+
+  let group = '';
+  if (age < 18) group = 'Menor de 18';
+  else if (age <= 24) group = '18–24';
+  else if (age <= 34) group = '25–34';
+  else if (age <= 44) group = '35–44';
+  else if (age <= 59) group = '45–59';
+  else group = '60+';
+
+  return { age, group };
+}
+
+/* --- VISUALIZADOR DE IMPRONTA (debounce para rendimiento) --- */
+function ImprontaVisualizer({ mode, dataTrigger }: { mode: 'Video' | 'Audio' | 'Texto'; dataTrigger?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [debouncedTrigger, setDebouncedTrigger] = useState<string>(dataTrigger ?? '');
+
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedTrigger(dataTrigger ?? ''), 250);
+    return () => clearTimeout(t);
+  }, [dataTrigger]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = '#E0E5EC';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    if (mode === 'Video') {
+      const bars = 60;
+      const barWidth = canvas.width / bars;
+      for (let i = 0; i < bars; i++) {
+        const hue = Math.random() > 0.5 ? 20 + Math.random() * 30 : 200 + Math.random() * 20;
+        const sat = 40 + Math.random() * 40;
+        const light = 30 + Math.random() * 60;
+        ctx.fillStyle = `hsl(${hue}, ${sat}%, ${light}%)`;
+        ctx.fillRect(i * barWidth, 0, barWidth, canvas.height);
+      }
+      return;
+    }
+
+    if (mode === 'Audio') {
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#F97316';
+      ctx.beginPath();
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerY = height / 2;
+      for (let x = 0; x < width; x++) {
+        const y = centerY + Math.sin(x * 0.05) * (Math.random() * 40) * Math.sin(x * 0.01);
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      return;
+    }
+
+    // Texto
+    const density = debouncedTrigger ? Math.min(debouncedTrigger.length / 10, 200) : 50;
+    const lines = Math.max(40, density);
+    const barWidth = canvas.width / lines;
+    for (let i = 0; i < lines; i++) {
+      const h = Math.random() * canvas.height * 0.8;
+      const gray = 50 + Math.random() * 100;
+      ctx.fillStyle = `rgb(${gray},${gray},${gray})`;
+      ctx.fillRect(i * barWidth, (canvas.height - h) / 2, barWidth - 1, h);
+    }
+  }, [mode, debouncedTrigger]);
+
+  return (
+    <div className="w-full h-full rounded-2xl overflow-hidden relative" style={{ boxShadow: 'inset 0 0 20px rgba(0,0,0,0.1)' }}>
+      <canvas ref={canvasRef} width={400} height={200} className="w-full h-full object-cover" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#E0E5EC]/80 to-transparent flex items-end justify-center pb-4">
+        <span className="text-xs font-bold uppercase tracking-widest text-gray-600" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+          {mode === 'Video' ? 'ADN Cromático' : mode === 'Audio' ? 'Pulso Sonoro' : 'Impronta Escrita'}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* --- TARJETA (NO CAMBIAR ESTÉTICA) --- */
+function SoftCard({
+  title,
+  subtitle,
+  children,
+  buttonLabel,
+  onClick,
+  delay
+}: {
+  title: string;
+  subtitle: string;
+  children: React.ReactNode;
+  buttonLabel: string;
+  onClick: () => void;
+  delay: string;
+}) {
+  const orangeColor = '#F97316';
+  return (
+    <div className="w-full md:w-[400px] p-4 animate-float" style={{ animationDelay: delay }}>
+      <div className="flex flex-col justify-between h-[520px] p-8 transition-transform hover:-translate-y-2" style={soft.flat}>
+        <div className="mt-2">
+          <h3 style={{ fontFamily: 'Avenir, Avenir Next, sans-serif', color: soft.textMain }} className="text-3xl font-light leading-none mb-6">
+            {title}
+            <br />
+            <span style={{ fontWeight: 700 }}>{subtitle}</span>
+          </h3>
+
+          <div className="w-24 h-1.5 rounded-full mb-8" style={{ backgroundColor: orangeColor }} />
+
+          <div style={{ fontFamily: 'Avenir, Avenir Next, sans-serif', color: soft.textBody }} className="text-lg font-normal leading-relaxed">
+            {children}
+          </div>
+        </div>
+
+        <button
+          onClick={onClick}
+          className="w-full py-5 rounded-full font-bold tracking-[0.15em] uppercase text-sm text-center mt-auto active:scale-95 hover:shadow-lg transition-all text-white"
+          style={{ backgroundColor: orangeColor, boxShadow: `0 10px 20px -10px ${orangeColor}90` }}
+        >
+          <span>{buttonLabel}</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* --- MODAL PROPÓSITO (texto editorial aprobado) --- */
+function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-gray-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="w-full max-w-4xl bg-[#E0E5EC] rounded-[40px] shadow-2xl relative flex flex-col max-h-[90vh]" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)' }}>
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 z-50 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-red-500 active:scale-95 transition-all"
+          style={soft.button}
+          aria-label="Cerrar"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="p-10 md:p-12 overflow-y-auto hide-scrollbar" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+          <div className="w-full flex justify-center">
+            <div className="w-full max-w-[560px]">
+              <h1
+                className="mb-14 leading-none"
+                style={{
+                  fontFamily: 'Avenir, Avenir Next, sans-serif',
+                  fontSize: '92px',
+                  fontWeight: 800,
+                  fontStyle: 'italic',
+                  letterSpacing: '-0.05em',
+                  lineHeight: '0.95',
+                  color: '#111'
+                }}
+              >
+                experiencia,
+              </h1>
+
+              <p style={{ fontSize: '22px', fontWeight: 600, lineHeight: 1.4, color: '#222', marginBottom: 36 }}>
+                La experiencia propia
+                <br />
+                como conocimiento.
+              </p>
+
+              <div style={{ fontSize: '15px', lineHeight: 1.75, color: '#333' }}>
+                <p style={{ marginBottom: 36 }}>Un archivo vivo de historias conectadas.</p>
+
+                <p style={{ marginBottom: 48 }}>
+                  AlmaMundi nace desde una idea simple y necesaria:
+                  <br />
+                  <strong>no todo conocimiento se estudia, parte se atraviesa.</strong>
+                </p>
+
+                <p style={{ marginBottom: 48 }}>
+                  No hablamos de teorías que se ordenan en un estante,
+                  <br />
+                  ni de definiciones que cierran la puerta con llave.
+                </p>
+
+                <p style={{ marginBottom: 48 }}>
+                  Hablamos de eso que te pasa
+                  <br />
+                  y te cambia el paso.
+                </p>
+
+                <p style={{ marginBottom: 48 }}>
+                  De ese instante mínimo
+                  <br />
+                  en que el mundo se corre un centímetro
+                  <br />
+                  y ya no vuelve a encajar igual.
+                </p>
+
+                <p style={{ marginBottom: 48 }}>
+                  Hablamos de la experiencia:
+                  <br />
+                  esa cosa terca
+                  <br />
+                  que insiste aunque no la invites.
+                </p>
+
+                <p style={{ marginBottom: 72 }}>
+                  Un espacio de escucha.
+                  <br />
+                  Un mapa vivo de historias humanas conectadas.
+                </p>
+
+                <p style={{ fontWeight: 700, fontSize: 16, color: '#111' }}>Eso es AlmaMundi.</p>
+              </div>
+
+              <div className="text-center pt-10">
+                <button
+                  onClick={onClose}
+                  className="px-10 py-4 rounded-full font-bold tracking-widest uppercase text-sm text-center active:scale-95 hover:shadow-lg transition-all text-white"
+                  style={{ backgroundColor: '#F97316', boxShadow: `0 10px 20px -10px #F9731690`, fontFamily: 'Avenir, Avenir Next, sans-serif' }}
+                >
+                  Listo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* --- MODAL HISTORIA (completo: impronta + rango de edad + form) --- */
+function StoryModal({
+  isOpen,
+  onClose,
+  mode
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  mode: 'Video' | 'Audio' | 'Texto';
+}) {
+  useModalUX(isOpen, onClose);
+
+  const [step, setStep] = useState<'intro' | 'recording' | 'form' | 'success'>('intro');
+  const [isSaved, setIsSaved] = useState(false);
+
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+
+  const [isRecording, setIsRecording] = useState(false);
+  const MAX_TIME = 300;
+  const [timer, setTimer] = useState(0);
+
+  const MAX_WORDS = 1500;
+  const [textStats, setTextStats] = useState({ words: 0 });
+
+  const [formData, setFormData] = useState({
+    title: '',
+    email: '',
+    whatsapp: '',
+    author: '',
+    location: '',
+    birthDate: '',
+    sex: '',
+    comments: '',
+    storyText: '',
+    termsAccepted: false
+  });
+
+  const ageInfo = useMemo(() => calcAgeGroup(formData.birthDate), [formData.birthDate]);
+
+  const content = useMemo(
+    () => ({
+      Video: {
+        icon: <Video size={40} />,
+        title: 'Grábalo en video',
+        desc: 'Tienes hasta 5 minutos para contar tu historia.',
+        cta: 'Encender Cámara'
+      },
+      Audio: {
+        icon: <Mic size={40} />,
+        title: 'Graba un audio',
+        desc: 'Tienes hasta 5 minutos para contar tu historia.',
+        cta: 'Encender Micrófono'
+      },
+      Texto: {
+        icon: <PenTool size={40} />,
+        title: 'Escríbelo',
+        desc: 'Máximo 3 carillas (1500 palabras).',
+        cta: 'Empezar a Escribir'
+      }
+    }),
+    []
+  );
+
+  const currentContent = content[mode];
+
+  // reset al cerrar
+  useEffect(() => {
+    if (!isOpen) {
+      setStep('intro');
+      setMediaUrl(null);
+      chunksRef.current = [];
+      setIsRecording(false);
+      setTimer(0);
+      setIsSaved(false);
+      setFormData({
+        title: '',
+        email: '',
+        whatsapp: '',
+        author: '',
+        location: '',
+        birthDate: '',
+        sex: '',
+        comments: '',
+        storyText: '',
+        termsAccepted: false
+      });
+      setTextStats({ words: 0 });
+    }
+  }, [isOpen]);
+
+  const stopRecording = useCallback(() => {
+    const mr = mediaRecorderRef.current;
+    if (mr && mr.state !== 'inactive') {
+      mr.stop();
+      setIsRecording(false);
+      mr.stream.getTracks().forEach((track) => track.stop());
+    }
+  }, []);
+
+  // timer de grabación
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | null = null;
+    if (isRecording) {
+      interval = setInterval(() => {
+        setTimer((prev) => {
+          if (prev >= MAX_TIME) {
+            stopRecording();
+            return MAX_TIME;
+          }
+          return prev + 1;
+        });
+      }, 1000);
+    }
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [isRecording, stopRecording]);
+
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    const words = val.trim().split(/\s+/).filter((w) => w.length > 0).length;
+    if (words <= MAX_WORDS) {
+      setFormData((p) => ({ ...p, storyText: val }));
+      setTextStats({ words });
+    }
+  };
+
+  const startCapture = async () => {
+    if (mode === 'Texto') {
+      setStep('form');
+      return;
+    }
+
+    try {
+      const constraints = mode === 'Audio' ? { audio: true } : { video: true, audio: true };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+
+      if (videoRef.current && mode === 'Video') {
+        videoRef.current.srcObject = stream;
+      }
+
+      setStep('recording');
+
+      const mr = new MediaRecorder(stream);
+      mediaRecorderRef.current = mr;
+      chunksRef.current = [];
+
+      mr.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) chunksRef.current.push(event.data);
+      };
+
+      mr.onstop = () => {
+        const type = mode === 'Audio' ? 'audio/webm' : 'video/webm';
+        const blob = new Blob(chunksRef.current, { type });
+        setMediaUrl(URL.createObjectURL(blob));
+        setStep('form');
+      };
+    } catch (err) {
+      alert('Permiso denegado. Revisa ajustes del navegador.');
+    }
+  };
+
+  const startRecording = () => {
+    chunksRef.current = [];
+    setTimer(0);
+    const mr = mediaRecorderRef.current;
+    if (mr) {
+      mr.start();
+      setIsRecording(true);
+    }
+  };
+
+  const handleRetake = () => {
+    setMediaUrl(null);
+    chunksRef.current = [];
+    setTimer(0);
+    startCapture();
+  };
+
+  const handleSend = () => {
+    if (!formData.title || !formData.location || !formData.birthDate || !formData.sex || !formData.termsAccepted) {
+      alert('Por favor completa los campos obligatorios (*).');
+      return;
+    }
+    if (mode === 'Texto' && !formData.storyText.trim()) {
+      alert('Por favor escribe tu historia.');
+      return;
+    }
+
+    setIsSaved(true);
+    setTimeout(() => setStep('success'), 900);
+  };
+
+  const formatRemainingTime = (secondsElapsed: number) => {
+    const remaining = MAX_TIME - secondsElapsed;
+    const mins = Math.floor(remaining / 60);
+    const secs = remaining % 60;
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col items-center justify-center bg-gray-900/60 backdrop-blur-md p-4 animate-in fade-in duration-300">
+      <div className="w-full max-w-5xl bg-[#E0E5EC] rounded-[40px] shadow-2xl overflow-hidden relative flex flex-col items-center transition-all max-h-[90vh]" style={{ boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.4)' }}>
+        <button
+          onClick={() => {
+            // asegurar detener capturas abiertas
+            stopRecording();
+            onClose();
+          }}
+          className="absolute top-6 right-6 z-50 w-10 h-10 flex items-center justify-center text-gray-500 hover:text-red-500 active:scale-95 transition-all"
+          style={soft.button}
+          aria-label="Cerrar"
+        >
+          <X size={20} />
+        </button>
+
+        {step === 'intro' && (
+          <div className="text-center py-20 px-10" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+            <div className="w-24 h-24 rounded-full mx-auto mb-8 flex items-center justify-center text-orange-500" style={soft.inset}>
+              {currentContent.icon}
+            </div>
+
+            <h2 className="text-3xl font-bold text-gray-700 mb-4">{currentContent.title}</h2>
+            <p className="text-gray-500 text-lg mb-10 max-w-md mx-auto leading-relaxed">{currentContent.desc}</p>
+
+            <div className="flex items-center justify-center gap-3 mb-10">
+              <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Impronta</span>
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/40 border border-white/40 text-gray-600">
+                {mode === 'Video' ? 'ADN Cromático' : mode === 'Audio' ? 'Pulso Sonoro' : 'Impronta Escrita'}
+              </span>
+              <span className="text-[10px] uppercase tracking-widest text-gray-500 font-bold">Rango</span>
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase bg-white/40 border border-white/40 text-gray-600">
+                Se calcula por fecha
+              </span>
+            </div>
+
+            <button onClick={startCapture} className="px-10 py-5 rounded-full bg-orange-500 text-white font-bold tracking-widest uppercase hover:bg-orange-600 transition-all shadow-lg active:scale-95">
+              {currentContent.cta}
+            </button>
+          </div>
+        )}
+
+        {step === 'recording' && (
+          <div className="w-full flex flex-col items-center p-10" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+            <div
+              className={`w-full max-w-2xl ${mode === 'Video' ? 'aspect-video' : 'h-48'} bg-black rounded-[30px] overflow-hidden mb-4 relative shadow-inner border-4 border-[#E0E5EC] flex items-center justify-center`}
+              style={soft.inset}
+            >
+              {mode === 'Video' ? (
+                <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover transform scale-x-[-1]" />
+              ) : (
+                <div className="flex flex-col items-center gap-4 animate-pulse">
+                  <div className="w-16 h-16 rounded-full bg-gray-800 flex items-center justify-center text-orange-500">
+                    <Mic size={24} />
+                  </div>
+                  <span className="text-gray-500 text-xs tracking-widest uppercase">Grabando Audio...</span>
+                </div>
+              )}
+
+              <div className="absolute top-4 right-4 bg-black/60 backdrop-blur-md px-4 py-2 rounded-full font-mono text-sm flex items-center gap-2 z-10 border border-white/10">
+                <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-red-500 animate-pulse' : 'bg-gray-400'}`} />
+                <span className="font-bold text-lg text-white">{formatRemainingTime(timer)}</span>
+              </div>
+            </div>
+
+            {!isRecording ? (
+              <div className="flex flex-col items-center gap-4">
+                <button onClick={startRecording} className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 transition-all group" style={soft.recordButton}>
+                  <div className="w-8 h-8 bg-red-500 rounded-full shadow-lg group-hover:scale-110 transition-transform" />
+                </button>
+                <span className="text-xs font-bold text-gray-500 tracking-widest uppercase">Empezar (Máx 5 min)</span>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-4">
+                <button onClick={stopRecording} className="w-20 h-20 rounded-full flex items-center justify-center active:scale-95 transition-all pulse-red" style={soft.recordButton}>
+                  <Square size={24} className="text-gray-700 fill-current" />
+                </button>
+                <span className="text-xs font-bold text-gray-500 tracking-widest uppercase">Terminar grabación</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {step === 'form' && (
+          <div className="w-full flex flex-col md:flex-row h-full overflow-hidden" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+            <div className="w-full md:w-5/12 bg-[#D1D9E6] p-8 flex flex-col items-center justify-center border-r border-white/20 relative">
+              <h3 className="text-sm font-bold text-gray-500 uppercase tracking-widest mb-6">Tu Impronta</h3>
+
+              <div className="w-full aspect-video rounded-3xl mb-6 p-2" style={soft.inset}>
+                <ImprontaVisualizer mode={mode} dataTrigger={formData.storyText} />
+              </div>
+
+              <div className="w-full max-w-xs text-center">
+                <p className="text-xs text-gray-500 mb-3">Esta es la huella única generada por tu historia.</p>
+
+                {mode !== 'Texto' && mediaUrl && (
+                  <a
+                    href={mediaUrl}
+                    download={mode === 'Audio' ? 'historia-audio.webm' : 'historia-video.webm'}
+                    className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest text-gray-600 hover:text-gray-800 border border-gray-400/30 bg-white/25"
+                  >
+                    <Download size={12} />
+                    Descargar copia
+                  </a>
+                )}
+              </div>
+
+              {mode !== 'Texto' && (
+                <button
+                  onClick={handleRetake}
+                  className="mt-6 px-6 py-2 rounded-full text-gray-600 font-bold uppercase text-[10px] tracking-widest flex items-center gap-2 hover:text-red-500 transition-all border border-gray-400/30 bg-white/20"
+                >
+                  <RotateCcw size={12} /> Regrabar
+                </button>
+              )}
+            </div>
+
+            <div className="w-full md:w-7/12 p-8 overflow-y-auto hide-scrollbar max-h-[80vh]">
+              <h3 className="text-2xl font-bold text-gray-700 mb-2">Detalles de la Historia</h3>
+              <p className="text-gray-500 text-sm mb-8">Completa estos datos obligatorios para ubicar tu historia.</p>
+
+              {mode === 'Texto' && (
+                <div className="mb-8">
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">Tu Historia (Máx. 1500 palabras / 3 carillas) *</label>
+                  <textarea
+                    className="w-full p-6 text-gray-700 leading-relaxed text-lg"
+                    placeholder="Escribe tu historia aquí..."
+                    style={{ ...soft.inset, minHeight: '400px', resize: 'vertical', fontFamily: 'Avenir, Avenir Next, sans-serif' }}
+                    value={formData.storyText}
+                    onChange={handleTextChange}
+                  />
+                  <div className="text-right mt-2 text-xs text-gray-400 font-bold tracking-widest">{textStats.words} / 1500 PALABRAS</div>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">Título *</label>
+                  <input
+                    type="text"
+                    placeholder="Ej: El día que aprendí a volar"
+                    style={soft.input}
+                    value={formData.title}
+                    onChange={(e) => setFormData((p) => ({ ...p, title: e.target.value }))}
+                  />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">Ciudad y País *</label>
+                  <div className="relative">
+                    <MapPin size={16} className="absolute left-4 top-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Ej: Santiago, Chile"
+                      style={{ ...soft.input, paddingLeft: '40px' }}
+                      value={formData.location}
+                      onChange={(e) => setFormData((p) => ({ ...p, location: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">Fecha de Nacimiento *</label>
+                  <div className="relative">
+                    <Calendar size={16} className="absolute left-4 top-4 text-gray-400 pointer-events-none" />
+                    <input
+                      type="date"
+                      style={{ ...soft.input, paddingLeft: '40px' }}
+                      value={formData.birthDate}
+                      onChange={(e) => setFormData((p) => ({ ...p, birthDate: e.target.value }))}
+                    />
+                  </div>
+                  <div className="mt-2 ml-2 text-[10px] uppercase tracking-widest font-bold text-gray-500">
+                    Rango: <span className="text-gray-700">{ageInfo.group || '—'}</span>
+                    {ageInfo.age !== null ? <span className="opacity-60"> · ({ageInfo.age} años)</span> : null}
+                  </div>
+                </div>
+
+                <div className="col-span-2 md:col-span-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">Sexo *</label>
+                  <select
+                    style={soft.select}
+                    value={formData.sex}
+                    onChange={(e) => setFormData((p) => ({ ...p, sex: e.target.value }))}
+                  >
+                    <option value="" disabled>
+                      Selecciona una opción
+                    </option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Masculino">Masculino</option>
+                    <option value="No binario">No binario</option>
+                    <option value="Prefiero no decirlo">Prefiero no decirlo</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+
+                <div className="col-span-2 md:col-span-1">
+                  <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-1 block">WhatsApp (Opcional)</label>
+                  <div className="relative">
+                    <Smartphone size={16} className="absolute left-4 top-4 text-gray-400" />
+                    <input
+                      type="tel"
+                      placeholder="Para el link"
+                      style={{ ...soft.input, paddingLeft: '40px' }}
+                      value={formData.whatsapp}
+                      onChange={(e) => setFormData((p) => ({ ...p, whatsapp: e.target.value }))}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <label className="text-xs font-bold text-gray-500 uppercase ml-2 mb-2 block">Opcional: Subir archivos</label>
+                <button
+                  type="button"
+                  className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl flex items-center justify-center gap-3 text-gray-400 bg-[#E0E5EC]/50"
+                >
+                  <Upload size={20} />
+                  <span className="text-sm font-medium">Subir fotos o documentos extra</span>
+                </button>
+              </div>
+
+              <div className="flex items-start gap-3 mb-8 bg-white/40 p-4 rounded-xl">
+                <input
+                  type="checkbox"
+                  id="terms"
+                  className="mt-1 w-5 h-5 accent-orange-500"
+                  checked={formData.termsAccepted}
+                  onChange={(e) => setFormData((p) => ({ ...p, termsAccepted: e.target.checked }))}
+                />
+                <label htmlFor="terms" className="text-sm text-gray-600 leading-tight cursor-pointer">
+                  Acepto las <strong>condiciones de uso</strong>. Entiendo que mi historia será publicada en el mapa de AlmaMundi.
+                </label>
+              </div>
+
+              <button
+                onClick={handleSend}
+                disabled={isSaved}
+                className="w-full py-5 rounded-full bg-orange-500 text-white font-bold tracking-[0.2em] uppercase text-sm hover:bg-orange-600 shadow-xl active:scale-95 transition-all flex items-center justify-center gap-2"
+              >
+                {isSaved ? '¡Guardado!' : (
+                  <>
+                    <Download size={18} /> Guardar y Obtener mi Impronta
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'success' && (
+          <div className="text-center py-12 px-8 animate-in zoom-in duration-500 max-w-lg mx-auto" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+            <h2 className="text-3xl font-light text-gray-800 mb-6">¡Historia Recibida!</h2>
+            <p className="text-gray-500 mb-8 leading-relaxed">
+              Gracias por compartir tu historia.
+              <br />
+              <br />
+              <span className="font-semibold text-orange-600">Te avisaremos</span> en cuanto esté publicada.
+            </p>
+
+            <div className="bg-white/50 rounded-2xl p-6 mb-8 border border-white/40">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Compartir</p>
+              <div className="flex justify-center gap-4">
+                <button className="w-12 h-12 rounded-full bg-[#25D366] text-white flex items-center justify-center shadow-md" type="button">
+                  <MessageCircle size={20} />
+                </button>
+                <button className="w-12 h-12 rounded-full bg-[#1877F2] text-white flex items-center justify-center shadow-md" type="button">
+                  <Facebook size={20} />
+                </button>
+                <button className="w-12 h-12 rounded-full bg-[#E4405F] text-white flex items-center justify-center shadow-md" type="button">
+                  <Instagram size={20} />
+                </button>
+                <button className="w-12 h-12 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center shadow-md" type="button">
+                  <Twitter size={20} />
+                </button>
+              </div>
+            </div>
+
+            <button onClick={onClose} className="text-orange-500 text-sm font-bold uppercase tracking-widest hover:text-orange-700 transition-colors" type="button">
+              Volver al Inicio
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* --- PÁGINA PRINCIPAL --- */
+export default function Home() {
+  const [modalMode, setModalMode] = useState<null | 'Video' | 'Audio' | 'Texto'>(null);
+  const [showPurpose, setShowPurpose] = useState(false);
+
+  const globeEl = useRef<any>(null);
+
+  // sonido del mapa
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  // globo responsivo
+  const globeWrapRef = useRef<HTMLDivElement>(null);
+  const [globeSize, setGlobeSize] = useState(900);
+
+  useEffect(() => {
+    const update = () => {
+      const w = globeWrapRef.current?.clientWidth ?? 900;
+      setGlobeSize(Math.min(900, w));
+    };
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const handleGlobeReady = () => {
+    if (globeEl.current) {
+      const controls = globeEl.current.controls();
+      controls.enableZoom = false; // libera rueda del mouse
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.5;
+    }
+  };
+
+  const toggleAudio = () => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    if (isMuted) {
+      a.volume = 0.35;
+      a.play().catch(() => {
+        // si el navegador bloquea play, no rompemos nada
+      });
+      setIsMuted(false);
+    } else {
+      a.pause();
+      setIsMuted(true);
+    }
+  };
+
+  const stories = useMemo(
+    () => [
+      { lat: -33.4489, lng: -70.6693, label: 'Santiago' },
+      { lat: 40.7128, lng: -74.006, label: 'New York' },
+      { lat: 48.8566, lng: 2.3522, label: 'Paris' },
+      { lat: 35.6762, lng: 139.6503, label: 'Tokyo' }
+    ],
+    []
+  );
+
+  return (
+    <main className="min-h-screen font-sans overflow-x-hidden relative" style={{ backgroundColor: soft.bg }}>
+      <style jsx global>{globalStyles}</style>
+
+      {/* UPDATE: audio ambiente del mapa (no autoplay agresivo) */}
+      <audio ref={audioRef} loop src="/universo.mp3" />
+
+      <StoryModal isOpen={modalMode !== null} mode={modalMode ?? 'Video'} onClose={() => setModalMode(null)} />
+      <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
+
+      {/* --- HEADER --- */}
+<header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 transition-all bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
+  <div className="flex items-center">
+    <img
+      src="/logo.png"
+      alt="AlmaMundi"
+      className="h-32 md:h-48 w-auto object-contain select-none filter drop-shadow-md"
+    />
+  </div>
+
+  <nav
+    style={{ fontFamily: 'Avenir, sans-serif' }}
+    className="hidden md:flex gap-8 text-xs font-bold text-gray-600 items-center tracking-widest uppercase"
+  >
+    {['Propósito', 'Historias', 'Mapa'].map((item) => (
+      <a
+        key={item}
+        href={`#${item.toLowerCase()}`}
+        className="px-8 py-4 active:scale-95 transition-all hover:text-orange-600"
+        style={soft.button}
+      >
+        {item}
+      </a>
+    ))}
+  </nav>
+</header>
+
+
+      {/* SECCIÓN 1 */}
+      <section id="manifiesto" className="pt-48 md:pt-64 pb-24 px-6 relative z-10 flex flex-col items-center text-center">
+        <div className="max-w-6xl animate-float">
+          <h1 style={{ fontFamily: 'Avenir, Avenir Next, sans-serif', color: soft.textMain }} className="text-4xl md:text-6xl font-light leading-tight mb-10">
+            AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que{' '}
+            <span className="font-semibold">despiertan otras historias.</span>
+          </h1>
+          <div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50 bg-orange-400" />
+          <p style={{ fontFamily: 'Avenir, Avenir Next, sans-serif', color: soft.textBody }} className="text-xl md:text-3xl font-light max-w-4xl mx-auto leading-relaxed">
+            Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
+          </p>
+        </div>
+      </section>
+
+      {/* SECCIÓN 2: TARJETAS */}
+      <section id="historias" className="w-full px-6 mb-32 flex flex-col md:flex-row gap-10 justify-center items-center relative z-10">
+        <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
+          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
+        </SoftCard>
+
+        <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('Audio')} delay="0.2s">
+          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
+        </SoftCard>
+
+        <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('Texto')} delay="0.4s">
+          Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.
+        </SoftCard>
+      </section>
+
+      {/* SECCIÓN 3: MAPA */}
+      <section
+        id="mapa"
+        className="relative w-full min-h-[1100px] flex flex-col justify-start overflow-hidden"
+        style={{ background: 'linear-gradient(to bottom, #E0E5EC 0%, #1A202C 20%, #0F172A 100%)' }}
+      >
+        <div className="relative z-20 container mx-auto px-6 pt-32 pb-10 flex flex-col items-center text-center">
+          <h2 className="text-6xl md:text-8xl font-light mb-8 drop-shadow-xl" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif', color: '#F97316' }}>
+            Mapa de AlmaMundi
+          </h2>
+
+          <p className="text-gray-300 text-xl max-w-2xl font-light leading-relaxed mb-12" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+            Un tejido vivo de memoria humana.
+            <br />
+            Cuando miles compartan, este mundo brillará.
+          </p>
+
+          <div className="inline-flex flex-wrap justify-center gap-6 md:gap-10 p-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center">
+                <MousePointer2 size={16} />
+              </div>
+              <span className="text-xs text-gray-300 uppercase tracking-widest" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+                Gira (Clic)
+              </span>
+            </div>
+
+            <div className="w-px h-8 bg-white/10" />
+
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center">
+                <Hand size={16} />
+              </div>
+              <span className="text-xs text-gray-300 uppercase tracking-widest" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+                Toca Puntos
+              </span>
+            </div>
+
+            <div className="w-px h-8 bg-white/10" />
+
+            {/* UPDATE: sonido del mapa */}
+            <button onClick={toggleAudio} className="flex items-center gap-3 hover:opacity-80 transition-opacity" type="button">
+              <div className={`w-8 h-8 rounded-full ${isMuted ? 'bg-gray-500/20 text-gray-400' : 'bg-green-500/20 text-green-400'} flex items-center justify-center`}>
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </div>
+              <span className="text-xs text-gray-300 uppercase tracking-widest" style={{ fontFamily: 'Avenir, Avenir Next, sans-serif' }}>
+                Sonido
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* GLOBO 3D (sin círculos extra) */}
+        <div ref={globeWrapRef} className="w-full flex items-center justify-center cursor-move relative z-10 -mt-20" style={{ height: '900px' }}>
+          <GlobeComp
+            ref={globeEl}
+            onGlobeReady={handleGlobeReady}
+            globeImageUrl="/mapa-mundi.jpg"
+            backgroundColor="rgba(0,0,0,0)"
+            pointsData={stories}
+            pointLat="lat"
+            pointLng="lng"
+            pointColor={() => '#F97316'}
+            pointAltitude={0}
+            pointRadius={0.4}
+            height={globeSize}
+            width={globeSize}
+          />
+        </div>
+
+        <div className="h-24 w-full" />
+      </section>
+
+      {/* --- FOOTER --- */}
+<footer className="w-full pb-20 pt-10 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]">
+  {/* ✅ ALMAMUNDI grande con relieve (como antes) */}
+  <div className="mb-24 mt-20 w-full flex justify-center select-none">
+    <h1
+      className="text-6xl md:text-9xl font-black tracking-tighter text-center engraved-text opacity-50"
+      style={{
+        color: '#E0E5EC',
+        textShadow:
+          '4px 4px 8px rgba(163,177,198,0.9), -4px -4px 8px rgba(255,255,255,0.9)'
+      }}
+    >
+      ALMAMUNDI
+    </h1>
+  </div>
+
+  {/* ✅ Barra inferior: “Una iniciativa de” + logo Precisar + menú */}
+  <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-end text-sm font-medium border-t border-gray-300 pt-8 text-gray-600">
+    <div className="mb-6 md:mb-0 flex flex-col">
+      <span className="block mb-2 opacity-70">Una iniciativa de</span>
+      <img
+        src="/logo-precisar.png"
+        alt="Precisar"
+        className="h-14 w-auto object-contain"
+      />
+    </div>
+
+    <div className="flex gap-8 opacity-80">
+      {/* ✅ Propósito como botón */}
+      <button
+        onClick={() => setShowManifesto(true)}
+        className="hover:text-gray-900 transition-colors"
+      >
+        Propósito
+      </button>
+
+      <a href="#historias" className="hover:text-gray-900 transition-colors">
+        Historias
+      </a>
+
+      <a href="#mapa" className="hover:text-gray-900 transition-colors">
+        Mapa
+      </a>
+
+      <span className="opacity-40">|</span>
+
+      <a href="#" className="hover:text-gray-900 transition-colors">
+        Política de Privacidad
+      </a>
+    </div>
+  </div>
+</footer>
+
+    </main>
+  );
+}

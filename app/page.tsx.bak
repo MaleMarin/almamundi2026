@@ -1,0 +1,927 @@
+'use client';
+
+import type { ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+import {
+  X,
+  Video,
+  Mic,
+  PenTool,
+  RotateCcw,
+  Volume2,
+  VolumeX,
+  ChevronDown,
+  Lock,
+  Unlock,
+  Search,
+  Bookmark,
+  Filter,
+  Grid,
+  Check,
+  FileText,
+  QrCode
+} from 'lucide-react';
+
+// --- IMPORTACIÓN DINÁMICA DEL GLOBO (SSR OFF) ---
+const GlobeComp = dynamic(() => import('react-globe.gl'), { ssr: false });
+
+/* ------------------------------------------------------------------ */
+/* THEME: NEUMÓRFICO (SOFT UI)                                         */
+/* ------------------------------------------------------------------ */
+const soft = {
+  bg: '#E0E5EC',
+  textMain: '#4A5568',
+  textBody: '#718096',
+  flat: {
+    backgroundColor: '#E0E5EC',
+    boxShadow:
+      '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+    border: '1px solid rgba(255,255,255,0.3)',
+    borderRadius: '40px'
+  },
+  inset: {
+    backgroundColor: '#E0E5EC',
+    boxShadow:
+      'inset 6px 6px 10px rgba(163,177,198,0.7), inset -6px -6px 10px rgba(255,255,255,0.8)',
+    border: '1px solid rgba(255,255,255,0.1)',
+    borderRadius: '30px'
+  },
+  button: {
+    backgroundColor: '#E0E5EC',
+    boxShadow:
+      '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
+    border: '1px solid rgba(255,255,255,0.3)',
+    borderRadius: '9999px',
+    cursor: 'pointer',
+    transition: 'transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
+    fontFamily: 'Avenir, sans-serif'
+  }
+} as const;
+
+const globalStyles = `
+  html { scroll-behavior: smooth; }
+  @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+  .animate-float { animation: float 6s ease-in-out infinite; }
+  @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .animate-spin-slow { animation: spin 8s linear infinite; }
+  .hide-scrollbar::-webkit-scrollbar { display: none; }
+  .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  .engraved-text { color: #E0E5EC; text-shadow: 2px 2px 5px rgba(163,177,198,0.7), -2px -2px 5px rgba(255,255,255,0.8); }
+`;
+
+/* ------------------------------------------------------------------ */
+/* TYPES                                                               */
+/* ------------------------------------------------------------------ */
+type Mode = 'Video' | 'Audio' | 'Texto';
+
+type StoryPoint = {
+  lat: number;
+  lng: number;
+  label: string;
+};
+
+type NewsRing = {
+  lat: number;
+  lng: number;
+  maxR: number;
+  propagationSpeed: number;
+  repeatPeriod: number;
+};
+
+/* ------------------------------------------------------------------ */
+/* DATA                                                                */
+/* ------------------------------------------------------------------ */
+const INSPIRATION_TOPICS = [
+  { title: '01. Un día clave', questions: ['¿Qué día cambió tu vida para siempre?', '¿Cómo amaneció ese día?', '¿Qué detalle nunca olvidas?'] },
+  { title: '02. Infancia', questions: ['¿A qué huele tu casa de la infancia?', '¿Cuál era tu escondite secreto?', '¿Qué juguete salvarías del fuego?'] },
+  { title: '03. Amor y vínculos', questions: ['¿Quién te enseñó a querer?', '¿Qué abrazo te curó?', '¿Qué palabra te dijeron que guardas como un tesoro?'] },
+  { title: '04. Pérdida y duelo', questions: ['¿A quién extrañas hoy?', '¿Qué te gustaría decirle si pudiera escucharte?', '¿Cómo honras su memoria?'] },
+  { title: '05. Orgullo', questions: ['¿De qué logro propio te sonríes?', '¿Cuándo sentiste que eras capaz de todo?', '¿Qué batalla ganaste en silencio?'] },
+  { title: '06. Miedo', questions: ['¿A qué le temías de niño?', '¿Qué miedo venciste recientemente?', '¿Qué te hace sentir vulnerable?'] },
+  { title: '07. Migración', questions: ['¿Qué dejaste atrás al partir?', '¿Qué te llevaste en la maleta?', '¿A qué sabe tu nuevo hogar?'] },
+  { title: '08. Trabajo', questions: ['¿Cuál fue tu primer sueldo?', '¿Qué aprendiste de tu oficio?', '¿Qué es lo que más te cansa y qué te motiva?'] },
+  { title: '09. Comunidad', questions: ['¿Quién es tu vecino favorito?', '¿Qué fiesta de tu barrio no te pierdes?', '¿Cómo se ayudan entre ustedes?'] },
+  { title: '10. Naturaleza', questions: ['¿Cuál es tu paisaje favorito?', '¿Qué árbol recuerdas con cariño?', '¿Te gusta más el mar o la montaña?'] },
+  { title: '11. Cultura, música y libros', questions: ['¿Qué canción es la banda sonora de tu vida?', '¿Qué libro te voló la cabeza?', '¿Qué tradición mantienes viva?'] },
+  { title: '12. Tecnología', questions: ['¿Cómo cambió tu vida internet?', '¿Qué extrañas de la época analógica?', '¿Qué invento te fascina?'] },
+  { title: '13. Historia y País', questions: ['¿Qué evento histórico viviste en carne propia?', '¿Qué esperas para el futuro de tu país?', '¿Qué significa para ti tu bandera?'] },
+  { title: '14. Tema Libre', questions: ['Cuenta lo que quieras.', 'El micrófono es tuyo.', 'Sorpréndenos.'] }
+] as const;
+
+/* ------------------------------------------------------------------ */
+/* HOOKS                                                               */
+/* ------------------------------------------------------------------ */
+function useModalUX(isOpen: boolean, onClose: () => void) {
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [isOpen, onClose]);
+}
+
+function useElementWidth<T extends HTMLElement>() {
+  const ref = useRef<T | null>(null);
+  const [width, setWidth] = useState<number>(900);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver((entries) => {
+      const w = entries[0]?.contentRect?.width ?? 900;
+      setWidth(w);
+    });
+
+    ro.observe(el);
+    setWidth(el.clientWidth || 900);
+
+    return () => ro.disconnect();
+  }, []);
+
+  return { ref, width };
+}
+
+/* ------------------------------------------------------------------ */
+/* COMPONENTS                                                          */
+/* ------------------------------------------------------------------ */
+function ImprontaVisualizer({ isActive }: { isActive: boolean }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let raf = 0;
+    let t = 0;
+
+    const draw = () => {
+      const w = canvas.width;
+      const h = canvas.height;
+
+      if (!isActive) {
+        ctx.clearRect(0, 0, w, h);
+        return;
+      }
+
+      t += 0.05;
+
+      ctx.fillStyle = soft.bg;
+      ctx.fillRect(0, 0, w, h);
+
+      // Onda 1
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      for (let x = 0; x < w; x++) {
+        const y =
+          h / 2 +
+          Math.sin(x * 0.02 + t) * 20 * Math.sin(t * 0.5) +
+          Math.cos(x * 0.05 - t) * 10;
+        ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#F97316';
+      ctx.lineWidth = 3;
+      ctx.stroke();
+
+      // Onda 2
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2);
+      for (let x = 0; x < w; x++) {
+        const y = h / 2 + Math.sin(x * 0.03 - t * 1.5) * 15;
+        ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = 'rgba(249, 115, 22, 0.35)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+    return () => cancelAnimationFrame(raf);
+  }, [isActive]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      width={400}
+      height={200}
+      className="w-full h-full object-cover opacity-80"
+    />
+  );
+}
+
+/* =========================
+   MAP TOOLBAR (CÁPSULA)
+   ========================= */
+function MapFilterBar({ onToggleView }: { onToggleView: () => void }) {
+  return (
+    <div
+      className="absolute left-0 w-full z-[80] flex justify-center px-4 pointer-events-none"
+      style={{ top: 'calc(50% - 560px)' }} // MÁS ARRIBA para mapa grande
+    >
+      <div
+        className="pointer-events-auto flex items-center gap-4 p-3 rounded-full animate-float"
+        style={{
+          backgroundColor: 'rgba(224, 229, 236, 0.82)',
+          backdropFilter: 'blur(12px)',
+          boxShadow: soft.flat.boxShadow,
+          border: '1px solid rgba(255,255,255,0.35)',
+          fontFamily: 'Avenir, sans-serif'
+        }}
+      >
+        {/* Search */}
+        <div className="relative group">
+          <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-500 transition-colors">
+            <Search size={18} />
+          </div>
+          <input
+            type="text"
+            placeholder="Buscar ciudad…"
+            className="pl-12 pr-6 py-3 rounded-full w-44 md:w-56 focus:w-80 transition-all duration-300 outline-none text-sm font-bold text-gray-600 placeholder-gray-400"
+            style={{ backgroundColor: soft.bg, boxShadow: soft.inset.boxShadow, fontFamily: 'Avenir, sans-serif' }}
+          />
+        </div>
+
+        <div className="h-8 w-px bg-gray-300/70 mx-1 hidden md:block" />
+
+        {/* Filter */}
+        <button
+          type="button"
+          className="hidden md:flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
+          style={soft.button}
+        >
+          <Filter size={18} />
+          <span className="text-sm font-bold">Temas</span>
+        </button>
+
+        {/* Explore */}
+        <button
+          type="button"
+          onClick={onToggleView}
+          className="flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
+          style={soft.button}
+        >
+          <Grid size={18} />
+          <span className="text-sm font-bold hidden md:inline">Explorar</span>
+        </button>
+
+        <div className="h-8 w-px bg-gray-300/70 mx-1" />
+
+        {/* Bookmark */}
+        <button
+          type="button"
+          className="w-12 h-12 flex items-center justify-center rounded-full text-orange-500 hover:text-orange-600 transition-colors active:scale-95 relative"
+          style={soft.button}
+          aria-label="Mis colecciones"
+        >
+          <Bookmark size={20} className="fill-current opacity-50" />
+          <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#E0E5EC]" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================
+   MAP LEGEND (CUADRO IZQ)
+   ========================= */
+function MapLegend() {
+  return (
+    <div className="absolute top-32 left-6 z-[80] pointer-events-none hidden lg:block">
+      <div
+        className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-[26px] shadow-lg max-w-xs animate-float"
+        style={{ fontFamily: 'Avenir, sans-serif' }}
+      >
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
+          <span className="text-xs font-bold text-gray-200 tracking-wide uppercase">Historias (Memoria)</span>
+        </div>
+
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-3 h-3 rounded-full border-2 border-white shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
+          <span className="text-xs font-bold text-white tracking-wide uppercase">Pulsos (Actualidad)</span>
+        </div>
+
+        <div className="h-px w-full bg-white/10 mb-3" />
+
+        <p className="text-[11px] text-gray-300 leading-relaxed font-light italic">
+          “Dos capas, un mismo mundo: lo vivido y lo que está pasando.”
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function SoftCard({
+  title,
+  subtitle,
+  children,
+  buttonLabel,
+  onClick,
+  delay
+}: {
+  title: string;
+  subtitle: string;
+  children: ReactNode;
+  buttonLabel: string;
+  onClick: () => void;
+  delay: string;
+}) {
+  return (
+    <div
+      className="relative p-8 rounded-[40px] flex flex-col items-start gap-4 transition-all duration-500 hover:-translate-y-2 group animate-float w-full md:w-1/3"
+      style={{ ...soft.flat, animationDelay: delay, fontFamily: 'Avenir, sans-serif' }}
+    >
+      <div className="mb-2">
+        <h3 className="text-2xl font-light text-gray-500">{title}</h3>
+        <h2 className="text-3xl font-bold text-gray-700 leading-none">{subtitle}</h2>
+      </div>
+
+      <p className="text-gray-500 leading-relaxed text-sm mb-6">{children}</p>
+
+      <button
+        onClick={onClick}
+        className="mt-auto px-6 py-3 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95 group-hover:text-orange-600"
+        style={soft.button}
+        type="button"
+      >
+        {buttonLabel}
+      </button>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* MODALS                                                              */
+/* ------------------------------------------------------------------ */
+function InspirationModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-gray-900/40 backdrop-blur-sm">
+      <div
+        className="w-full max-w-2xl max-h-[85vh] flex flex-col relative rounded-[40px] overflow-hidden animate-float p-8"
+        style={{ backgroundColor: soft.bg, boxShadow: soft.flat.boxShadow, border: soft.flat.border, fontFamily: 'Avenir, sans-serif' }}
+      >
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h2 className="text-3xl font-bold mb-2" style={{ color: soft.textMain }}>
+              ¿No sabes qué contar?
+            </h2>
+            <p className="text-lg" style={{ color: soft.textBody }}>
+              Elige un tema para desbloquear tus recuerdos.
+            </p>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-12 h-12 flex items-center justify-center rounded-full active:scale-95 transition-all text-gray-500 hover:text-orange-600"
+            style={soft.button}
+            aria-label="Cerrar"
+            type="button"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        <div className="overflow-y-auto space-y-4 hide-scrollbar pr-2">
+          {INSPIRATION_TOPICS.map((topic, idx) => {
+            const isActive = activeIndex === idx;
+            return (
+              <div
+                key={topic.title}
+                className={`rounded-[30px] transition-all duration-300 overflow-hidden ${isActive ? '' : 'hover:-translate-y-1'}`}
+                style={isActive ? soft.inset : {}}
+              >
+                <button
+                  onClick={() => setActiveIndex(isActive ? null : idx)}
+                  className={`w-full flex items-center justify-between p-5 text-left transition-all rounded-[30px] ${isActive ? '' : 'active:scale-[0.98]'}`}
+                  style={!isActive ? soft.button : {}}
+                  type="button"
+                >
+                  <span className={`text-lg font-bold transition-colors ${isActive ? 'text-orange-600' : 'text-gray-700'}`}>
+                    {topic.title}
+                  </span>
+                  <ChevronDown
+                    className={`transform transition-transform duration-300 text-gray-400 ${isActive ? 'rotate-180 text-orange-500' : ''}`}
+                    size={24}
+                  />
+                </button>
+
+                <div className={`transition-all duration-500 ease-in-out ${isActive ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <ul className="pb-6 px-6 pl-10 space-y-4">
+                    {topic.questions.map((q) => (
+                      <li key={q} className="relative leading-relaxed text-base pl-6" style={{ color: soft.textBody }}>
+                        <span className="absolute left-0 top-2.5 w-2 h-2 rounded-full bg-orange-400" />
+                        {q}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-gray-900/60 backdrop-blur-md">
+      <div className="bg-[#E0E5EC] w-full max-w-lg p-10 rounded-[40px] relative shadow-2xl animate-float" style={{ fontFamily: 'Avenir, sans-serif' }}>
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+          style={soft.button}
+          aria-label="Cerrar"
+          type="button"
+        >
+          <X size={24} />
+        </button>
+
+        <h2 className="text-3xl font-bold mb-6 text-gray-700">Nuestro Propósito</h2>
+
+        <p className="text-gray-600 leading-relaxed mb-6">
+          AlmaMundi no es una red social. Es un <strong>archivo vivo de la humanidad</strong>. Creemos que cada historia,
+          por pequeña que sea, merece ser preservada.
+        </p>
+
+        <div className="p-6 rounded-3xl mb-2" style={soft.inset}>
+          <p className="italic text-gray-500">“Lo que no se cuenta, se olvida. Y lo que se olvida, nunca existió.”</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StoryModal({
+  isOpen,
+  mode,
+  onClose,
+  onChooseMode
+}: {
+  isOpen: boolean;
+  mode: Mode;
+  onClose: () => void;
+  onChooseMode: (m: Mode) => void;
+}) {
+  useModalUX(isOpen, onClose);
+  const [step, setStep] = useState<'choose' | 'record' | 'received'>('choose');
+
+  useEffect(() => {
+    if (isOpen) setStep('choose');
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-[#E0E5EC]/90 backdrop-blur-xl" style={{ fontFamily: 'Avenir, sans-serif' }}>
+      <div className="w-full max-w-4xl min-h-[600px] flex relative rounded-[50px] overflow-hidden shadow-2xl bg-[#E0E5EC]">
+        <button
+          onClick={onClose}
+          className="absolute top-8 right-8 z-50 w-12 h-12 rounded-full flex items-center justify-center text-gray-500 hover:text-red-500 transition-colors active:scale-95"
+          style={soft.button}
+          aria-label="Cerrar"
+          type="button"
+        >
+          <X size={24} />
+        </button>
+
+        {/* SIDEBAR */}
+        <div className="hidden md:flex w-1/3 flex-col justify-center p-10 gap-6 border-r border-white/50">
+          <h3 className="text-gray-400 font-bold tracking-widest text-xs uppercase mb-4">Elige tu formato</h3>
+
+          {(['Video', 'Audio', 'Texto'] as Mode[]).map((m) => (
+            <button
+              key={m}
+              onClick={() => {
+                onChooseMode(m);
+                setStep('record');
+              }}
+              className={`w-full p-6 rounded-[20px] flex items-center gap-4 transition-all active:scale-[0.99] ${
+                mode === m ? 'text-orange-500 scale-[1.02]' : 'text-gray-500 hover:text-gray-700'
+              }`}
+              style={mode === m ? soft.inset : soft.button}
+              type="button"
+            >
+              {m === 'Video' && <Video size={24} />}
+              {m === 'Audio' && <Mic size={24} />}
+              {m === 'Texto' && <PenTool size={24} />}
+              <span className="font-bold text-lg">{m}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* MAIN */}
+        <div className="flex-1 flex flex-col items-center justify-center p-12 relative">
+          {step === 'choose' && (
+            <div className="text-center animate-float">
+              <h2 className="text-4xl font-bold text-gray-700 mb-4">Comparte tu historia</h2>
+              <p className="text-gray-500 mb-8">Selecciona un formato para comenzar.</p>
+              <button
+                onClick={() => setStep('record')}
+                className="px-8 py-4 rounded-full font-bold text-white bg-orange-500 shadow-lg hover:bg-orange-600 transition-all active:scale-95"
+                type="button"
+              >
+                Comenzar con {mode}
+              </button>
+            </div>
+          )}
+
+          {step === 'record' && (
+            <div className="w-full max-w-md text-center">
+              <h2 className="text-2xl font-bold text-gray-700 mb-8">
+                {mode === 'Texto' ? 'Escribiendo…' : `Grabando ${mode}…`}
+              </h2>
+
+              <div className="h-64 w-full rounded-[30px] flex items-center justify-center mb-8 text-gray-400 overflow-hidden relative" style={soft.inset}>
+                <ImprontaVisualizer isActive={true} />
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                  <span className="bg-white/55 px-4 py-2 rounded-full text-xs font-bold text-gray-600 backdrop-blur-sm">
+                    {mode === 'Texto' ? 'Escribe aquí (demo)' : 'Escuchando (demo)'}
+                  </span>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setStep('received')}
+                className="px-10 py-4 rounded-full font-bold text-white bg-orange-500 shadow-lg hover:bg-orange-600 transition-all active:scale-95"
+                type="button"
+              >
+                Finalizar y Guardar
+              </button>
+            </div>
+          )}
+
+          {step === 'received' && (
+            <div className="text-center py-12 px-8 max-w-2xl mx-auto flex flex-col items-center">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center text-orange-500 mb-6" style={soft.inset}>
+                <Check size={48} className="stroke-[3]" />
+              </div>
+
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4 leading-tight">
+                Tu historia ya es parte del <span className="text-orange-600">Archivo Vivo</span>.
+              </h2>
+
+              <p className="text-gray-500 text-lg leading-relaxed mb-10 max-w-md">
+                Quedó registrada con un ID único. Puedes guardarla y compartirla.
+              </p>
+
+              <div className="w-full space-y-4 mb-10">
+                <button
+                  className="w-full py-4 px-6 rounded-2xl flex items-center justify-between group hover:bg-white/40 transition-all border border-transparent hover:border-white/50"
+                  style={soft.flat}
+                  type="button"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-orange-100 text-orange-600 group-hover:scale-110 transition-transform">
+                      <FileText size={24} />
+                    </div>
+                    <div className="text-left">
+                      <span className="block font-bold text-gray-700 text-sm uppercase tracking-widest">Descargar constancia</span>
+                      <span className="text-xs text-gray-500">PDF con ID y huella visual</span>
+                    </div>
+                  </div>
+                </button>
+
+                <button
+                  className="w-full py-4 px-6 rounded-2xl flex items-center justify-between group hover:bg-white/40 transition-all border border-transparent hover:border-white/50"
+                  style={soft.flat}
+                  type="button"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="p-2 rounded-lg bg-gray-200 text-gray-700 group-hover:scale-110 transition-transform">
+                      <QrCode size={24} />
+                    </div>
+                    <div className="text-left">
+                      <span className="block font-bold text-gray-700 text-sm uppercase tracking-widest">Generar QR</span>
+                      <span className="text-xs text-gray-500">Para pegar en el lugar</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
+
+              <button
+                onClick={onClose}
+                className="text-gray-400 hover:text-orange-600 font-bold text-xs uppercase tracking-[0.2em] transition-colors"
+                type="button"
+              >
+                Volver al mapa
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* PAGE                                                                */
+/* ------------------------------------------------------------------ */
+export default function Home() {
+  const [modalMode, setModalMode] = useState<Mode | null>(null);
+  const [showPurpose, setShowPurpose] = useState(false);
+  const [showInspiration, setShowInspiration] = useState(false);
+
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isMuted, setIsMuted] = useState(true);
+
+  const globeEl = useRef<any>(null);
+  const { ref: globeWrapRef, width: globeWrapWidth } = useElementWidth<HTMLDivElement>();
+
+  // ✅ MÁS GRANDE: antes 900. Ahora permitimos hasta 1100.
+  const globeSize = Math.min(1100, Math.max(360, globeWrapWidth));
+
+  const [isInteractive, setIsInteractive] = useState(false);
+  const [isAutoPilot, setIsAutoPilot] = useState(false);
+
+  const stories: StoryPoint[] = useMemo(
+    () => [
+      { lat: -33.4489, lng: -70.6693, label: 'Santiago' },
+      { lat: 40.7128, lng: -74.006, label: 'New York' },
+      { lat: 48.8566, lng: 2.3522, label: 'Paris' },
+      { lat: 35.6762, lng: 139.6503, label: 'Tokyo' }
+    ],
+    []
+  );
+
+  // Pulsos (anillos) simulados
+  const [newsRings, setNewsRings] = useState<NewsRing[]>([]);
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      const r: NewsRing = {
+        lat: (Math.random() - 0.5) * 160,
+        lng: (Math.random() - 0.5) * 360,
+        maxR: Math.random() * 20 + 3,
+        propagationSpeed: (Math.random() - 0.5) * 20 + 1,
+        repeatPeriod: Math.random() * 2000 + 200
+      };
+
+      setNewsRings((prev) => {
+        const next = [...prev, r];
+        if (next.length > 15) next.shift();
+        return next;
+      });
+    }, 1500);
+
+    return () => window.clearInterval(id);
+  }, []);
+
+  const toggleAudio = useCallback(() => {
+    const a = audioRef.current;
+    if (!a) return;
+
+    if (isMuted) {
+      a.volume = 0.6;
+      a.play().catch(() => {});
+      setIsMuted(false);
+    } else {
+      a.pause();
+      setIsMuted(true);
+    }
+  }, [isMuted]);
+
+  const handleGlobeReady = useCallback(() => {
+    if (!globeEl.current) return;
+    const controls = globeEl.current.controls();
+    controls.enableZoom = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 0.5;
+  }, []);
+
+  // AutoPilot (tour)
+  useEffect(() => {
+    if (!isAutoPilot || !globeEl.current) return;
+
+    const destinations = [
+      { lat: -33.4489, lng: -70.6693, altitude: 1.8 },
+      { lat: 48.8566, lng: 2.3522, altitude: 1.8 },
+      { lat: 35.6762, lng: 139.6503, altitude: 1.8 },
+      { lat: 40.7128, lng: -74.006, altitude: 1.8 }
+    ];
+
+    let i = 0;
+    const move = () => {
+      globeEl.current.pointOfView(destinations[i], 4000);
+      i = (i + 1) % destinations.length;
+    };
+
+    move();
+    const id = window.setInterval(move, 6000);
+    return () => window.clearInterval(id);
+  }, [isAutoPilot]);
+
+  return (
+    <main className="min-h-screen overflow-x-hidden relative" style={{ backgroundColor: soft.bg, fontFamily: 'Avenir, sans-serif' }}>
+      <style jsx global>{globalStyles}</style>
+
+      <audio ref={audioRef} loop src="/universo.mp3" />
+
+      {/* MODALES */}
+      <StoryModal
+        isOpen={modalMode !== null}
+        mode={modalMode ?? 'Video'}
+        onClose={() => setModalMode(null)}
+        onChooseMode={(m) => setModalMode(m)}
+      />
+      <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
+      <InspirationModal isOpen={showInspiration} onClose={() => setShowInspiration(false)} />
+
+      {/* HEADER */}
+      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
+        <div className="flex items-center">
+          <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
+        </div>
+
+        <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
+          <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+            Propósito
+          </button>
+          <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+            Inspiración
+          </button>
+          <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+            Historias
+          </a>
+          <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+            Mapa
+          </a>
+        </nav>
+      </header>
+
+      {/* INTRO */}
+      <section id="intro" className="pt-48 md:pt-64 pb-4 px-6 relative z-10 flex flex-col items-center text-center">
+        <div className="max-w-6xl animate-float">
+          <h1 className="text-4xl md:text-6xl font-light leading-tight mb-10" style={{ color: soft.textMain }}>
+            AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que{' '}
+            <span className="font-semibold">despiertan otras historias.</span>
+          </h1>
+
+          <div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50 bg-orange-400" />
+
+          <p className="text-xl md:text-3xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
+            Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
+          </p>
+
+          <ChevronDown className="mx-auto mt-12 text-gray-400 opacity-50 animate-bounce" />
+        </div>
+      </section>
+
+      {/* CARDS */}
+      <section id="historias" className="w-full px-6 mb-32 flex flex-col md:flex-row gap-10 justify-center items-center relative z-10 -mt-12">
+        <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
+          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>.
+        </SoftCard>
+
+        <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('Audio')} delay="0.2s">
+          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong>.
+        </SoftCard>
+
+        <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('Texto')} delay="0.4s">
+          Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia</strong>.
+        </SoftCard>
+      </section>
+
+      {/* MAPA */}
+      <section
+        id="mapa"
+        className="relative w-full min-h-[90vh] md:min-h-[1400px] flex flex-col justify-start overflow-hidden"
+        style={{ background: 'linear-gradient(to bottom, #E0E5EC 0%, #1A202C 20%, #0F172A 100%)' }}
+      >
+        <div className="relative z-20 container mx-auto px-6 pt-16 md:pt-32 pb-10 flex flex-col items-center text-center">
+          <h2 className="text-6xl md:text-8xl font-light mb-8 drop-shadow-xl" style={{ color: '#F97316' }}>
+            Mapa de AlmaMundi
+          </h2>
+
+          <p className="text-gray-300 text-xl max-w-2xl font-light leading-relaxed mb-12">
+            Un tejido vivo de memoria humana.
+            <br />
+            Cuando miles compartan, este mundo brillará.
+          </p>
+
+          <div className="inline-flex flex-wrap justify-center gap-6 md:gap-10 p-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
+            <button
+              onClick={() => setIsInteractive((v) => !v)}
+              className={`flex items-center gap-3 transition-colors ${isInteractive ? 'text-orange-400' : 'text-gray-300 hover:text-white'}`}
+              type="button"
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isInteractive ? 'bg-orange-500/20' : 'bg-white/10'}`}>
+                {isInteractive ? <Unlock size={16} /> : <Lock size={16} />}
+              </div>
+              <span className="text-xs uppercase tracking-widest font-bold">{isInteractive ? 'Bloquear' : 'Activar'}</span>
+            </button>
+
+            <div className="w-px h-8 bg-white/10" />
+
+            <button
+              onClick={() => setIsAutoPilot((v) => !v)}
+              className={`flex items-center gap-3 transition-colors ${isAutoPilot ? 'text-orange-400' : 'text-gray-300 hover:text-white'}`}
+              type="button"
+            >
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAutoPilot ? 'bg-orange-500/20 animate-spin-slow' : 'bg-purple-500/20 text-purple-400'}`}>
+                <RotateCcw size={16} className={isAutoPilot ? 'animate-spin' : ''} />
+              </div>
+              <span className="text-xs uppercase tracking-widest font-bold">{isAutoPilot ? 'Detener' : 'Tour'}</span>
+            </button>
+
+            <div className="w-px h-8 bg-white/10" />
+
+            <button onClick={toggleAudio} className="flex items-center gap-3 hover:opacity-80 transition-opacity" type="button">
+              <div className={`w-8 h-8 rounded-full ${isMuted ? 'bg-gray-500/20 text-gray-400' : 'bg-green-500/20 text-green-400'} flex items-center justify-center`}>
+                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </div>
+              <span className="text-xs text-gray-300 uppercase tracking-widest">Sonido</span>
+            </button>
+          </div>
+        </div>
+
+        {/* CONTENEDOR DEL GLOBO + HUD (barra + leyenda) */}
+        <div className="relative w-full" style={{ height: 1250 }}>
+          {/* HUD (SOLO UNA VEZ) */}
+          <MapFilterBar onToggleView={() => alert('Próximamente: Vista de Tarjetas')} />
+          <MapLegend />
+
+          {/* Globe wrapper */}
+          <div
+            ref={globeWrapRef}
+            className={`w-full h-full flex items-center justify-center relative z-10 -mt-24 transition-all ${
+              isInteractive ? 'cursor-move pointer-events-auto' : 'cursor-default pointer-events-none'
+            }`}
+            style={{ touchAction: isInteractive ? 'none' : 'auto' }}
+          >
+            <GlobeComp
+              ref={globeEl}
+              onGlobeReady={handleGlobeReady}
+              globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
+              backgroundColor="rgba(0,0,0,0)"
+              pointsData={stories}
+              pointLat="lat"
+              pointLng="lng"
+              pointColor={() => '#F97316'}
+              pointAltitude={0.01}
+              pointRadius={0.24}
+              ringsData={newsRings}
+              ringColor={() => (t: number) => `rgba(255,255,255,${1 - t})`}
+              ringMaxRadius="maxR"
+              ringPropagationSpeed="propagationSpeed"
+              ringRepeatPeriod="repeatPeriod"
+              height={globeSize}
+              width={globeSize}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER (MÁS GRANDE) */}
+      <footer className="w-full pb-28 pt-20 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: 'Avenir, sans-serif' }}>
+        <div className="mb-20 mt-10 w-full flex justify-center select-none">
+          <h1 className="text-7xl md:text-[140px] font-black tracking-tighter text-center engraved-text leading-none">
+            ALMAMUNDI
+          </h1>
+        </div>
+
+        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium border-t border-gray-300 pt-10 text-gray-600 gap-10">
+          <div className="flex flex-col items-center md:items-start">
+            <span className="block mb-3 opacity-70">Una iniciativa de</span>
+            <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-8 md:gap-10 opacity-90">
+            <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
+              Propósito
+            </button>
+            <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">
+              Historias
+            </a>
+            <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
+              Mapa
+            </a>
+          </div>
+        </div>
+      </footer>
+    </main>
+  );
+}

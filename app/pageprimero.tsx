@@ -1,0 +1,283 @@
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+/* Importación completa de iconos para evitar errores */
+import { Menu, Globe, X, Twitter, Instagram, Linkedin, ArrowRight, Music, Image as ImageIcon, FileText, Mic, Video, PenTool, Square, MessageCircle, Facebook, Home as HomeIcon, Grid } from 'lucide-react';
+
+/* --- SISTEMA DE DISEÑO (NEUMORFISMO) --- */
+const soft = {
+  bg: '#E0E5EC',
+  textMain: '#2D3748',
+  textBody: '#718096',
+  flat: { backgroundColor: '#E0E5EC', boxShadow: '9px 9px 16px rgb(163,177,198,0.6), -9px -9px 16px rgba(255,255,255, 0.5)', borderRadius: '40px', border: '1px solid rgba(255,255,255,0.2)' },
+  pressed: { backgroundColor: '#E0E5EC', boxShadow: 'inset 6px 6px 10px 0 rgba(163,177,198, 0.7), inset -6px -6px 10px 0 rgba(255,255,255, 0.8)', borderRadius: '30px' },
+  button: { backgroundColor: '#E0E5EC', boxShadow: '6px 6px 10px 0 rgba(163,177,198, 0.7), -6px -6px 10px 0 rgba(255,255,255, 0.8)', borderRadius: '30px', border: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer', transition: 'all 0.2s ease' }
+};
+
+/* --- ANIMACIONES CSS --- */
+const globalStyles = `
+  @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+  .animate-float { animation: float 7s ease-in-out infinite; }
+  
+  @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.3); opacity: 0; } }
+  .animate-pulse-ring { animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+  
+  .glass-panel {
+    background: rgba(255, 255, 255, 0.15); 
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  }
+
+  /* 1. ENTRADA VIDEO (Zoom Out suave) */
+  @keyframes video-in { 0% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .anim-video-in { animation: video-in 1.5s ease-out forwards; }
+
+  /* 2. SALIDA VIDEO (Zoom In a Blanco) */
+  @keyframes video-out { 
+    0% { transform: scale(1); filter: brightness(1); opacity: 1; } 
+    100% { transform: scale(3); filter: brightness(20); opacity: 0; } 
+  }
+  .anim-video-out { animation: video-out 2s ease-in forwards; }
+
+  /* 3. ENTRADA FINAL (Zoom Out desde blanco) */
+  @keyframes final-in { 0% { transform: scale(1.1); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+  .anim-final-in { animation: final-in 1.5s ease-out forwards; }
+`;
+
+/* --- COMPONENTE TARJETA --- */
+const SoftCard = ({ title, subtitle, text, buttonLabel, onClick, delay }: any) => {
+  const orangeColor = '#F97316'; 
+  return (
+    <div className="w-full md:w-[400px] p-4 animate-float" style={{ animationDelay: delay }}>
+      <div className="flex flex-col justify-between h-[450px] p-8 transition-transform hover:-translate-y-2" style={soft.flat}>
+        <div className="mt-2">
+            <h3 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-3xl font-light leading-none mb-4">{title}<br/><span style={{fontWeight: 600}}>{subtitle}</span></h3>
+            <div className="w-20 h-0.5 rounded-full mb-6" style={{ backgroundColor: orangeColor }}></div>
+            <p style={{ fontFamily: 'Avenir, sans-serif', color: soft.textBody }} className="text-base font-light leading-relaxed">{text}</p>
+        </div>
+        <button onClick={onClick} className="w-full py-4 rounded-full font-bold tracking-[0.15em] uppercase text-xs text-center mt-auto active:scale-95 hover:shadow-lg transition-all" style={{ backgroundColor: orangeColor, color: 'white', boxShadow: `0 10px 20px -10px ${orangeColor}90` }}><span>{buttonLabel}</span></button>
+      </div>
+    </div>
+  );
+};
+
+/* --- MODAL DE HISTORIA --- */
+const StoryModal = ({ isOpen, onClose, mode, setMode }: { isOpen: boolean; onClose: () => void; mode: 'video' | 'audio' | 'text' | null; setMode: (mode: 'video' | 'audio' | 'text') => void }) => {
+  const [step, setStep] = useState('intro');
+  const [isRecording, setIsRecording] = useState(false);
+  const [timer, setTimer] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
+  const [mediaPreviewUrl, setMediaPreviewUrl] = useState<string | null>(null);
+  
+  const [storyTitle, setStoryTitle] = useState('');
+  const [storyText, setStoryText] = useState('');
+  const MAX_WORDS = 1500; 
+  const currentWords = storyText.trim() === '' ? 0 : storyText.trim().split(/\s+/).length;
+  const isOverLimit = currentWords > MAX_WORDS;
+
+  const musicInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const [uploadedMusic, setUploadedMusic] = useState<File | null>(null);
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  
+  const [finalSequenceState, setFinalSequenceState] = useState<'video' | 'transition' | 'ended'>('video');
+
+  useEffect(() => {
+    if (!isOpen) {
+      setStep('intro'); setMediaPreviewUrl(null); setRecordedChunks([]); setTimer(0); setIsRecording(false); setStoryTitle(''); setStoryText(''); setUploadedMusic(null); setUploadedImages([]); setFinalSequenceState('video');
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (step === 'success') {
+      setFinalSequenceState('video');
+      const timer1 = setTimeout(() => setFinalSequenceState('transition'), 5000); 
+      const timer2 = setTimeout(() => setFinalSequenceState('ended'), 6800); 
+      return () => { clearTimeout(timer1); clearTimeout(timer2); };
+    }
+  }, [step]);
+
+  useEffect(() => { let interval: any; if (isRecording) { interval = setInterval(() => setTimer(t => t + 1), 1000); } else { clearInterval(interval); } return () => clearInterval(interval); }, [isRecording]);
+  const formatTime = (seconds: number) => { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins}:${secs < 10 ? '0' : ''}${secs}`; };
+  
+  const startMedia = async () => { try { const constraints = mode === 'video' ? { video: true, audio: true } : { audio: true }; const stream = await navigator.mediaDevices.getUserMedia(constraints); if (mode === 'video' && videoRef.current) { videoRef.current.srcObject = stream; } startRecordingProcess(stream); } catch (err) { alert(`Necesitamos acceso a tu ${mode === 'video' ? 'cámara y micrófono' : 'micrófono'}.`); } };
+  const startRecordingProcess = (stream: MediaStream) => { const mediaRecorder = new MediaRecorder(stream); mediaRecorderRef.current = mediaRecorder; mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) setRecordedChunks((prev) => [...prev, e.data]); }; mediaRecorder.start(); setIsRecording(true); setStep('recording'); };
+  const stopRecording = () => { if (!mediaRecorderRef.current) return; mediaRecorderRef.current.stop(); setIsRecording(false); mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop()); setTimeout(() => { const type = mode === 'video' ? 'video/webm' : 'audio/webm'; const blob = new Blob(recordedChunks, { type }); const url = URL.createObjectURL(blob); setMediaPreviewUrl(url); setStep('review'); }, 500); };
+  const handleMusicUpload = (e: any) => { const file = e.target.files[0]; if (file) setUploadedMusic(file); };
+  const handleImageUpload = (e: any) => { const files = Array.from(e.target.files) as File[]; if (files.length > 0) setUploadedImages(prev => [...prev, ...files]); };
+
+  if (!isOpen) return null;
+
+  const getIntroTitle = () => { if (mode === 'video') return 'Tu historia en video'; if (mode === 'audio') return 'Tu voz cuenta'; return 'Escribe tu relato'; }
+  const getIntroDesc = () => { if (mode === 'video') return 'Comparte tu experiencia en un video de hasta 5 minutos.'; if (mode === 'audio') return 'Tu voz tiene una textura única. Cuéntanos tu historia, o incluso cántala si así lo sientes. Este espacio es tuyo.'; return 'Tómate tu tiempo. Las palabras quedan para siempre.'; }
+
+  const shareTextBase = "✨ ¡Acabo de sumar mi historia al archivo de *AlmaMundi*! 🌍\n\nTodos tenemos algo que contar. Te invito a tejer la memoria humana con nosotros.\n\nDescúbrelo aquí 👇\n";
+  const shareUrl = "https://almamundi.org";
+  const encodedText = encodeURIComponent(shareTextBase);
+  const encodedUrl = encodeURIComponent(shareUrl);
+
+  const shareLinks = {
+      whatsapp: `https://wa.me/?text=${encodedText}%20${encodedUrl}`,
+      twitter: `https://twitter.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+      bluesky: `https://bsky.app/intent/compose?text=${encodedText}%20${encodedUrl}`,
+      threads: `https://threads.net/intent/post?text=${encodedText}%20${encodedUrl}`,
+      tiktok: `https://www.tiktok.com/`, 
+      instagram: `https://www.instagram.com/` 
+  };
+
+  if (step === 'success') {
+      return (
+        <div className="fixed inset-0 z-[200] overflow-hidden bg-black">
+            {/* VIDEO DE FONDO: Único elemento que persiste y se transforma */}
+            <div className={`absolute inset-0 flex items-center justify-center overflow-hidden w-full h-full ${finalSequenceState === 'transition' ? 'anim-video-out' : 'anim-video-in'}`}>
+                <video 
+                    autoPlay 
+                    muted 
+                    loop 
+                    playsInline 
+                    className="absolute inset-0 w-full h-full object-cover z-0"
+                >
+                    <source src="/video-final.mp4" type="video/mp4" />
+                </video>
+            </div>
+
+            {/* PANTALLA FINAL: Aparece sobre el blanco */}
+            {finalSequenceState === 'ended' && (
+                <div className="absolute inset-0 bg-white z-[300] flex flex-col items-center justify-center p-4 anim-final-in overflow-hidden">
+                    <img src="/logo.png" alt="AlmaMundi" className="h-40 md:h-56 w-auto object-contain mb-6 animate-float" />
+                    <div className="w-full max-w-2xl text-center">
+                        <p style={{ fontFamily: 'Avenir, sans-serif' }} className="text-xl md:text-2xl text-gray-700 font-light mb-8 leading-relaxed">Comparte <strong>AlmaMundi</strong> con las personas,<br/> seguro todos tienen historias que contar...</p>
+                        <div className="flex flex-wrap justify-center gap-3 mb-10">
+                            <a href={shareLinks.whatsapp} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-[#25D366] rounded-full hover:scale-110 shadow-lg"><MessageCircle size={18} /></a>
+                            <a href={shareLinks.facebook} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-[#1877F2] rounded-full hover:scale-110 shadow-lg"><Facebook size={18} /></a>
+                            <a href={shareLinks.instagram} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-gradient-to-tr from-[#FFDC80] via-[#FC476B] to-[#8E5CEB] rounded-full hover:scale-110 shadow-lg"><Instagram size={18} /></a>
+                            <a href={shareLinks.tiktok} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-black rounded-full hover:scale-110 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1-.1z"/></svg></a>
+                            <a href={shareLinks.twitter} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-black rounded-full hover:scale-110 shadow-lg"><Twitter size={18} /></a>
+                            <a href={shareLinks.linkedin} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-[#0A66C2] rounded-full hover:scale-110 shadow-lg"><Linkedin size={18} /></a>
+                            <a href={shareLinks.threads} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-black rounded-full hover:scale-110 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 12c0-1.1.9-2 2-2s2 .9 2 2-.9 2-2 2-2-.9-2-2zm0-4c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0-2c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6zm7.9 6c0 2.1-1.1 3.9-2.7 4.9l-.2.1c-.9.6-1.9 1-3 1H12c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8v1c0 1.7-1.3 3-3 3h-1"/></svg></a>
+                            <a href={shareLinks.bluesky} target="_blank" className="w-10 h-10 flex items-center justify-center text-white bg-[#0085FF] rounded-full hover:scale-110 shadow-lg"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"/><path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></a>
+                        </div>
+                        <div className="flex gap-4 justify-center">
+                            <button onClick={() => window.location.reload()} className="px-6 py-3 rounded-full border-2 border-gray-300 text-gray-500 text-xs uppercase tracking-widest hover:border-gray-800 transition-colors flex items-center gap-2"><HomeIcon size={14} /> Volver al Inicio</button>
+                            <button onClick={onClose} className="px-6 py-3 rounded-full border-2 border-gray-300 text-gray-500 text-xs uppercase tracking-widest hover:border-gray-800 transition-colors flex items-center gap-2"><Grid size={14} /> Menú</button>
+                        </div>
+                    </div>
+                </div>
+            )}
+        </div>
+      );
+  }
+
+  // --- RENDERIZADO DEL MODAL (FIXED HEIGHT) ---
+  return (
+    <div className="fixed inset-0 z-[200] flex flex-col h-[100dvh] overflow-hidden" style={{ backgroundColor: soft.bg }}>
+      {/* HEADER FIJO */}
+      <div className="flex-none h-16 md:h-20 w-full flex justify-between items-center px-6 relative z-[210]">
+        <div className="h-full flex items-center"><img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-16 w-auto object-contain select-none" /></div>
+        <button onClick={onClose} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center text-gray-600 active:scale-95 hover:text-red-500 transition-colors" style={soft.button}><X size={20} strokeWidth={2} /></button>
+      </div>
+
+      {/* CONTENIDO FLEXIBLE (OCUPA EL RESTO) */}
+      <div className="flex-1 w-full flex flex-col justify-center items-center px-4 md:px-6 relative overflow-hidden">
+        
+        {step === 'intro' && (
+          <div className="text-center max-w-4xl animate-float">
+            <h3 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-3xl md:text-5xl font-light mb-4 md:mb-6 leading-tight">{getIntroTitle()}</h3>
+            <p style={{ fontFamily: 'Avenir, sans-serif', color: soft.textBody }} className="text-base md:text-xl mb-8 md:mb-10 font-light leading-relaxed max-w-xl mx-auto">{getIntroDesc()}</p>
+            <button onClick={() => mode === 'text' ? setStep('writing') : startMedia()} className="px-8 py-4 md:px-10 md:py-5 text-sm md:text-base font-bold text-gray-700 uppercase tracking-widest active:scale-95" style={soft.button}>{mode === 'text' ? 'Empezar a Escribir' : 'Comenzar Grabación'}</button>
+          </div>
+        )}
+
+        {step === 'recording' && (
+          <div className="w-full flex flex-col items-center justify-center h-full max-h-[600px] gap-6">
+            <div className={`relative w-full max-w-md ${mode === 'video' ? 'aspect-[9/16] md:aspect-video' : 'aspect-video flex items-center justify-center'} bg-gray-200 rounded-[30px] overflow-hidden p-2 shadow-inner`} style={soft.flat}>
+              {mode === 'video' ? ( <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover rounded-[20px] transform scale-x-[-1]" /> ) : ( <div className="flex flex-col items-center justify-center gap-4"><div className="relative"><div className="absolute inset-0 bg-red-400 rounded-full animate-pulse-ring"></div><div className="w-20 h-20 bg-red-500 rounded-full flex items-center justify-center text-white relative z-10 shadow-lg"><Mic size={32} /></div></div><span className="text-xl font-light text-gray-600 font-mono">{formatTime(timer)}</span></div> )}
+              {mode === 'video' && isRecording && ( <div className="absolute top-4 right-4 flex items-center gap-2 bg-red-500/80 px-3 py-1 rounded-full text-white text-xs font-mono animate-pulse shadow-md"><div className="w-2 h-2 bg-white rounded-full"></div>REC {formatTime(timer)}</div> )}
+            </div>
+            <div><button onClick={stopRecording} className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center text-gray-600 active:scale-95" style={soft.button}><Square size={24} fill="currentColor" /></button></div>
+          </div>
+        )}
+
+        {/* ESCRITURA FLEXIBLE */}
+        {step === 'writing' && (
+            <div className="w-full max-w-3xl flex flex-col gap-3 h-full max-h-[75vh] py-2">
+                <input type="text" placeholder="Ponle un título..." className="w-full py-4 px-6 text-xl md:text-2xl font-light text-gray-800 placeholder-gray-400 outline-none rounded-[20px] shrink-0" style={{...soft.pressed, backgroundColor: '#E0E5EC'}} value={storyTitle} onChange={(e) => setStoryTitle(e.target.value)} />
+                <div className="flex-1 relative min-h-0">
+                    <textarea placeholder="Escribe aquí..." className="w-full h-full py-6 px-6 text-base md:text-lg font-light text-gray-700 placeholder-gray-400 outline-none rounded-[20px] resize-none leading-relaxed" style={{...soft.pressed, backgroundColor: '#E0E5EC'}} value={storyText} onChange={(e) => setStoryText(e.target.value)}></textarea>
+                    <div className={`absolute bottom-4 right-6 text-[10px] font-bold uppercase tracking-widest pointer-events-none bg-white/70 px-3 py-1 rounded-full ${isOverLimit ? 'text-red-500' : 'text-gray-500'}`}>{currentWords} / {MAX_WORDS} palabras</div>
+                </div>
+                <div className="flex justify-end pt-2 shrink-0"><button onClick={() => setStep('review')} disabled={!storyText.trim()} className="px-10 py-4 text-sm font-bold text-gray-700 uppercase tracking-widest active:scale-95 disabled:opacity-50" style={soft.button}>Continuar</button></div>
+            </div>
+        )}
+
+        {step === 'review' && (
+          <div className="w-full max-w-lg flex flex-col gap-4 md:gap-6 items-center">
+            <h3 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-2xl md:text-3xl font-light">¿Te gusta cómo quedó?</h3>
+            <div className="w-full p-2 rounded-[25px] overflow-hidden bg-gray-200" style={soft.flat}>
+                {mode === 'video' && mediaPreviewUrl && <video src={mediaPreviewUrl} controls className="w-full h-auto max-h-[35vh] rounded-[15px] mx-auto" />}
+                {mode === 'audio' && mediaPreviewUrl && ( <div className="py-6 px-6 flex flex-col items-center gap-4 bg-gray-200 rounded-[15px]"><Music size={32} className="text-gray-400" /><audio src={mediaPreviewUrl} controls className="w-full" /></div> )}
+                {mode === 'text' && ( <div className="text-left p-6 max-h-[35vh] overflow-y-auto bg-[#E0E5EC] rounded-[15px]"><h4 className="text-lg font-bold text-gray-800 mb-2">{storyTitle}</h4><p className="text-gray-600 whitespace-pre-wrap leading-relaxed text-sm">{storyText}</p></div> )}
+            </div>
+            <div className="flex gap-4"><button onClick={() => { setRecordedChunks([]); setStep(mode === 'text' ? 'writing' : 'intro'); setIsRecording(false); }} className="px-6 py-3 text-xs uppercase tracking-widest text-gray-600 active:scale-95" style={soft.button}>{mode === 'text' ? 'Editar' : 'Repetir'}</button></div>
+            <button onClick={() => setStep('details')} className="w-full max-w-xs px-8 py-4 text-sm font-bold text-gray-700 uppercase tracking-widest active:scale-95" style={soft.button}>Continuar <ArrowRight size={16} className="inline ml-2" /></button>
+          </div>
+        )}
+
+        {step === 'details' && (
+            <div className="w-full max-w-md flex flex-col gap-3">
+             <h3 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-3xl font-light mb-2 text-center">¡Casi listo!</h3>
+             <input type="text" placeholder="¿Cómo te llamas?" className="w-full py-3 px-6 bg-transparent outline-none text-base font-light placeholder-gray-400 rounded-2xl" style={soft.pressed} />
+             <input type="email" placeholder="Tu correo" className="w-full py-3 px-6 bg-transparent outline-none text-base font-light placeholder-gray-400 rounded-2xl" style={soft.pressed} />
+             <div className="flex gap-3 my-1"><button onClick={() => musicInputRef.current?.click()} className="flex-1 py-3 flex items-center justify-center gap-2 text-gray-600 text-sm rounded-2xl active:scale-95" style={soft.button}><Music size={16}/> Música</button><button onClick={() => imageInputRef.current?.click()} className="flex-1 py-3 flex items-center justify-center gap-2 text-gray-600 text-sm rounded-2xl active:scale-95" style={soft.button}><ImageIcon size={16}/> Fotos</button></div>
+             <div className="flex items-center gap-3 ml-1"><input type="checkbox" id="terms" className="w-4 h-4 accent-gray-600" /><label htmlFor="terms" className="text-xs text-gray-500">Acepto compartir mi historia en AlmaMundi.</label></div>
+             <button onClick={() => setStep('success')} className="w-full py-4 text-sm font-bold text-white active:scale-95 rounded-full shadow-lg mt-2" style={{ backgroundColor: '#F97316' }}>¡Enviar mi historia!</button>
+            </div>
+        )}
+      </div>
+
+      {/* FOOTER FIJO (Abajo) */}
+      {step !== 'success' && (
+          <div className="flex-none h-16 w-full border-t border-gray-300/30 bg-[#E0E5EC] flex items-center justify-center px-4 relative z-[210]">
+             <div className="flex gap-4 md:gap-8 text-[10px] md:text-xs font-bold uppercase tracking-widest text-gray-500">
+                <span className="hidden md:inline text-gray-400">Cambiar modo:</span>
+                <button onClick={() => { setMode('video'); setStep('intro'); }} className={`flex items-center gap-2 ${mode === 'video' ? 'text-blue-600' : 'hover:text-gray-800'}`}><Video size={16} /> Video</button>
+                <button onClick={() => { setMode('audio'); setStep('intro'); }} className={`flex items-center gap-2 ${mode === 'audio' ? 'text-blue-600' : 'hover:text-gray-800'}`}><Mic size={16} /> Audio</button>
+                <button onClick={() => { setMode('text'); setStep('writing'); }} className={`flex items-center gap-2 ${mode === 'text' ? 'text-blue-600' : 'hover:text-gray-800'}`}><PenTool size={16} /> Texto</button>
+             </div>
+          </div>
+      )}
+    </div>
+  );
+};
+
+/* --- PÁGINA PRINCIPAL --- */
+export default function Home() {
+  const [modalMode, setModalMode] = useState<'video' | 'audio' | 'text' | null>(null);
+  const handleModeChange = (newMode: 'video' | 'audio' | 'text') => { setModalMode(newMode); };
+
+  return (
+    <main className="min-h-screen font-sans overflow-x-hidden selection:bg-gray-300 selection:text-gray-800 relative" style={{ backgroundColor: soft.bg }}>
+      <style jsx global>{globalStyles}</style>
+      <StoryModal isOpen={modalMode !== null} mode={modalMode} setMode={handleModeChange} onClose={() => setModalMode(null)} />
+      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-end px-8 h-32 transition-all" style={{ backgroundColor: soft.bg }}>
+        <div className="absolute top-0 left-8 z-[101] h-full flex items-center"><img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-16 w-auto object-contain select-none" /></div>
+        <nav style={{ fontFamily: 'Avenir, sans-serif' }} className="hidden md:flex gap-10 text-xs font-bold text-gray-600 items-center tracking-widest uppercase relative z-[101]">{['Manifiesto', 'Historias', 'Mapa'].map((item) => ( <a key={item} href={`#${item.toLowerCase()}`} className="px-8 py-4 active:scale-95 transition-all hover:text-gray-900" style={soft.button}>{item}</a> ))}</nav>
+        <button className="md:hidden relative z-[101] text-gray-600 w-12 h-12 flex items-center justify-center" style={soft.button}><Menu size={24} strokeWidth={2} /></button>
+      </header>
+      <section id="manifiesto" className="pt-48 md:pt-64 pb-32 px-6 relative z-0 flex flex-col items-center text-center"><div className="max-w-6xl animate-float"><h1 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-4xl md:text-6xl lg:text-7xl font-light leading-tight mb-12">AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que despiertan otras historias.</h1><div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50" style={soft.pressed}></div><p style={{ fontFamily: 'Avenir, sans-serif', color: soft.textBody }} className="text-xl md:text-3xl font-light normal-case max-w-4xl mx-auto leading-relaxed">Aquí, cada relato importa. Cada historia es extraordinaria.</p></div></section>
+      <section id="historias" className="w-full px-6 mb-40 flex flex-col md:flex-row gap-10 lg:gap-16 justify-center items-center mt-8 relative z-0">
+        <SoftCard title="Tu historia," subtitle="en primer plano" text="A veces, una mirada lo dice todo. Anímate a grabar ese momento que te marcó." buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('video')} delay="0s" />
+        <div id="btn-audio" onClick={() => setModalMode('audio')}><SoftCard title="Dale voz a" subtitle="tu recuerdo" text="Hay historias que se sienten mejor cuando solo se escuchan. Graba tu relato en audio." buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('audio')} delay="0.5s" /></div>
+        <div id="btn-text" onClick={() => setModalMode('text')}><SoftCard title="Ponle palabras" subtitle="a tu historia" text="Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y cuenta tu historia." buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('text')} delay="1s" /></div>
+      </section>
+      <section id="mapa" className="py-40 relative z-0 overflow-hidden" style={{ backgroundColor: soft.bg }}><div className="container mx-auto px-6 relative z-10 text-center"><div className="w-24 h-24 flex items-center justify-center mx-auto mb-12 text-gray-400" style={soft.pressed}><Globe className="w-10 h-10" strokeWidth={1} /></div><h2 style={{ fontFamily: 'Avenir, sans-serif', color: soft.textMain }} className="text-6xl font-light mb-20 tracking-tight">Conexiones</h2><div className="w-full max-w-6xl mx-auto h-[600px] relative group overflow-hidden rounded-[50px] transition-transform hover:scale-[1.01]" style={soft.flat}><div className="absolute inset-0 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center opacity-10 mix-blend-multiply"></div><div className="absolute inset-0 flex items-center justify-center"><button className="px-16 py-6 text-gray-600 text-sm font-bold tracking-[0.2em] uppercase active:scale-95" style={soft.button}>Entrar al Mapa</button></div></div></div></section>
+      <footer className="py-24 border-t border-gray-300/50" style={{ backgroundColor: soft.bg }}><div className="container mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-16"><div className="text-center md:text-left text-gray-500"><p className="text-lg font-light">AlmaMundi es un proyecto de <span className="font-bold text-gray-700">Precisar</span>.</p><p className="text-sm mt-3">© 2025 Todos los derechos reservados.</p></div><div className="flex gap-8"><button className="w-16 h-16 flex items-center justify-center text-gray-600 hover:text-blue-500 active:scale-95" style={soft.button}><Twitter size={24} /></button><button className="w-16 h-16 flex items-center justify-center text-gray-600 hover:text-pink-500 active:scale-95" style={soft.button}><Instagram size={24} /></button><button className="w-16 h-16 flex items-center justify-center text-gray-600 hover:text-blue-700 active:scale-95" style={soft.button}><Linkedin size={24} /></button></div><div className="flex items-center gap-2 text-gray-500 text-sm"><FileText size={16} /> Política de Privacidad</div></div></footer>
+    </main>
+  );
+}
