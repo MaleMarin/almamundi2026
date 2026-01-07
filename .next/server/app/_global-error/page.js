@@ -1,0 +1,11 @@
+var R=require("../../chunks/ssr/[turbopack]_runtime.js")("server/app/_global-error/page.js")
+R.c("server/chunks/ssr/[root-of-the-server]__4d5bc1f7._.js")
+R.c("server/chunks/ssr/precisar-2026_proyectos-cursor_almamundi_ok_99e07900._.js")
+R.c("server/chunks/ssr/a9eee_next_dist_74a46b29._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__4b7279e0._.js")
+R.c("server/chunks/ssr/[root-of-the-server]__453fcdea._.js")
+R.c("server/chunks/ssr/a9eee_next_dist_2eaf850f._.js")
+R.c("server/chunks/ssr/precisar-2026_proyectos-cursor_almamundi_ok_app_37898a97._.js")
+R.c("server/chunks/ssr/88663_almamundi_ok__next-internal_server_app__global-error_page_actions_f1eb0770.js")
+R.m(55879)
+module.exports=R.m(55879).exports
