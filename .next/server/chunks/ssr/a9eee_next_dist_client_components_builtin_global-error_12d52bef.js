@@ -1,3 +1,0 @@
-module.exports=[63663,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(9428);a.n(d("[project]/precisar-2026/proyectos-cursor/almamundi_ok/node_modules/next/dist/client/components/builtin/global-error.js <module evaluation>"))},32955,(a,b,c)=>{let{createClientModuleProxy:d}=a.r(9428);a.n(d("[project]/precisar-2026/proyectos-cursor/almamundi_ok/node_modules/next/dist/client/components/builtin/global-error.js"))},29343,a=>{"use strict";a.i(63663);var b=a.i(32955);a.n(b)}];
-
-//# sourceMappingURL=a9eee_next_dist_client_components_builtin_global-error_12d52bef.js.map
