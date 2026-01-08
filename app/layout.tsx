@@ -7,6 +7,8 @@ export const metadata: Metadata = {
   description: "AlmaMundi: tus historias no se pierden en el scroll.",
 };
 
+
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
