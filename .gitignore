@@ -19,3 +19,12 @@ pnpm-debug.log*
 .DS_Store
 EOF
 
+
+.next
+node_modules
+.DS_Store
+.vercel
+# Next.js
+.next/
+out/
+next-env.d.ts
