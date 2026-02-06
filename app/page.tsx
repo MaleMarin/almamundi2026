@@ -92,18 +92,13 @@ const globalStyles = `
     text-shadow: 2px 2px 5px rgba(163,177,198,0.7), -2px -2px 5px rgba(255,255,255,0.8);
   }
 
-  /* ALMAMUNDI footer (relieve neumórfico como tu imagen) */
+  /* ALMAMUNDI footer (relieve emboss/grabado, sin stroke ni negro) */
   .almamundi-footer-title{
     color: #E0E5EC;
     font-family: "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
     font-weight: 900;
     letter-spacing: -0.06em;
-    -webkit-text-stroke: 1px rgba(163,177,198,0.60);
-    text-shadow:
-      -14px -14px 28px rgba(255,255,255,0.95),
-       14px  14px 28px rgba(163,177,198,0.90),
-       -3px  -3px  6px rgba(255,255,255,0.85),
-        3px   3px  6px rgba(163,177,198,0.75);
+    text-shadow: -6px -6px 12px rgba(255,255,255,0.75), 8px 8px 16px rgba(120,130,150,0.35);
   }
 `;
 
@@ -697,7 +692,7 @@ function InspirationModal({
           <div className="mb-6">
             <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2">Inspiración</div>
             <h2 className="text-3xl font-bold text-gray-700">Elige una idea para empezar</h2>
-            <p className="text-gray-600 mt-2">Un tema, una chispa. Lo demás lo pone tu mirada.</p>
+            <p className="text-gray-600 mt-2">Un tema, una chispa. Lo demás lo pone tu vida.</p>
           </div>
 
           <div className="mb-6 md:mb-0">
