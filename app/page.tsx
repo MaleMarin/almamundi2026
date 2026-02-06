@@ -679,39 +679,44 @@ function InspirationModal({
 
   return (
     <div className="fixed inset-0 z-[210] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
-      <div className="bg-[#E0E5EC] w-full max-w-3xl p-8 md:p-10 rounded-[40px] relative shadow-2xl" style={{ fontFamily: APP_FONT }}>
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
-          style={soft.button}
-          aria-label="Cerrar"
-          type="button"
-        >
-          <X size={22} />
-        </button>
+      <div
+        className="bg-[#E0E5EC] w-full max-w-3xl md:max-w-5xl max-h-[80vh] rounded-[40px] relative shadow-2xl flex flex-col md:flex-row md:overflow-hidden"
+        style={{ fontFamily: APP_FONT }}
+      >
+        <div className="p-8 md:p-10 flex-shrink-0 md:w-[320px] md:flex md:flex-col md:pr-6">
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            style={soft.button}
+            aria-label="Cerrar"
+            type="button"
+          >
+            <X size={22} />
+          </button>
 
-        <div className="mb-6">
-          <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2">Inspiración</div>
-          <h2 className="text-3xl font-bold text-gray-700">Elige un disparador</h2>
-          <p className="text-gray-600 mt-2">Selecciona un tema y te prellenamos preguntas guía (solo si escribes).</p>
-        </div>
+          <div className="mb-6">
+            <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2">Inspiración</div>
+            <h2 className="text-3xl font-bold text-gray-700">Elige una idea para empezar</h2>
+            <p className="text-gray-600 mt-2">Un tema, una chispa. Lo demás lo pone tu mirada.</p>
+          </div>
 
-        <div className="mb-6">
-          <div className="relative">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
-              <Search size={18} />
+          <div className="mb-6 md:mb-0">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400">
+                <Search size={18} />
+              </div>
+              <input
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                placeholder="Buscar tema…"
+                className="w-full pl-12 pr-5 py-4 rounded-[18px] outline-none text-gray-700"
+                style={{ ...soft.flat, borderRadius: '18px' }}
+              />
             </div>
-            <input
-              value={q}
-              onChange={(e) => setQ(e.target.value)}
-              placeholder="Buscar tema…"
-              className="w-full pl-12 pr-5 py-4 rounded-[18px] outline-none text-gray-700"
-              style={{ ...soft.flat, borderRadius: '18px' }}
-            />
           </div>
         </div>
 
-        <div className="max-h-[52vh] overflow-y-auto hide-scrollbar pr-1">
+        <div className="flex-1 min-h-0 px-8 pb-8 md:px-0 md:pb-10 md:pr-10 overflow-y-auto hide-scrollbar md:max-h-[min(52vh,420px)]">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {filtered.map((t) => (
               <button
@@ -740,7 +745,7 @@ function InspirationModal({
                     </button>
                   ))}
                 </div>
-                <div className="mt-4 text-xs font-black tracking-widest uppercase text-orange-600">Elegir tema completo</div>
+                <div className="mt-4 text-xs font-black tracking-widest uppercase text-orange-600">QUIERO CONTAR ESTA</div>
               </button>
             ))}
           </div>
