@@ -81,6 +81,12 @@ const globalStyles = `
   .hide-scrollbar::-webkit-scrollbar { display: none; }
   .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
+  @keyframes record-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    50% { box-shadow: 0 0 0 12px rgba(239, 68, 68, 0); }
+  }
+  .record-pulse { animation: record-pulse 1.2s ease-in-out infinite; }
+
   .engraved-text {
     color: #E0E5EC;
     text-shadow: 2px 2px 5px rgba(163,177,198,0.7), -2px -2px 5px rgba(255,255,255,0.8);
@@ -257,6 +263,12 @@ function formatSeconds(s: number) {
   const mm = String(Math.floor(s / 60)).padStart(2, '0');
   const ss = String(s % 60).padStart(2, '0');
   return { mm, ss };
+}
+
+function formatTime(seconds: number) {
+  const mm = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const ss = String(seconds % 60).padStart(2, '0');
+  return `${mm}:${ss}`;
 }
 
 function isEmailLike(v: string) {
@@ -737,12 +749,26 @@ function StoryModal({
   const [secondsLeft, setSecondsLeft] = useState(300);
   const [err, setErr] = useState<string>('');
   const [saving, setSaving] = useState(false);
+  const [errType, setErrType] = useState<'permission' | 'notfound' | 'notreadable' | 'security' | 'other' | null>(null);
+
+  const [hasPreview, setHasPreview] = useState(false);
+  const [devDiag, setDevDiag] = useState<{ secure: boolean; ua: string; v: number; a: number }>({
+    secure: typeof window !== 'undefined' ? window.isSecureContext : false,
+    ua: typeof navigator !== 'undefined' ? navigator.userAgent : '',
+    v: 0,
+    a: 0
+  });
 
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const imprintIdRef = useRef<string>('');
+  const audioContextRef = useRef<AudioContext | null>(null);
+  const analyserRef = useRef<AnalyserNode | null>(null);
+  const rafIdRef = useRef<number | null>(null);
+  const audioVisualizerCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const keepPreviewOnStopRef = useRef<boolean>(true);
 
   const MAX_TEXT = 6000;
   const isTextTooLong = text.length > MAX_TEXT;
@@ -754,19 +780,183 @@ function StoryModal({
     } catch {}
   }, [mediaUrl]);
 
-  const cleanupStream = useCallback(() => {
-    try {
-      streamRef.current?.getTracks()?.forEach((t) => t.stop());
-    } catch {}
-    streamRef.current = null;
+  const countTracks = useCallback((s: MediaStream | null) => {
+    const v = s?.getVideoTracks?.().length ?? 0;
+    const a = s?.getAudioTracks?.().length ?? 0;
+    return { v, a };
+  }, []);
 
-    if (previewVideoRef.current) {
+  const updateDevDiag = useCallback(
+    (s: MediaStream | null) => {
+      if (typeof window === 'undefined') return;
+      const { v, a } = countTracks(s);
+      setDevDiag({
+        secure: window.isSecureContext,
+        ua: navigator.userAgent,
+        v,
+        a
+      });
+    },
+    [countTracks]
+  );
+
+  const isDevMode = typeof process !== 'undefined' && process.env.NODE_ENV !== 'production';
+
+  function friendlyGetUserMediaError(e: unknown): { message: string; type: 'permission' | 'notfound' | 'notreadable' | 'security' | 'other' } {
+    const err = e as { name?: string; message?: string };
+    const name = String(err?.name || '');
+    
+    // En producción, mensajes cortos y específicos
+    if (!isDevMode) {
+      if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+        return { message: 'Permiso denegado. Revisa permisos del navegador y del sistema.', type: 'permission' };
+      }
+      if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+        return { message: 'No se detectó cámara/micrófono.', type: 'notfound' };
+      }
+      if (name === 'NotReadableError' || name === 'TrackStartError') {
+        return { message: 'La cámara está en uso por otra app.', type: 'notreadable' };
+      }
+      if (name === 'SecurityError') {
+        return { message: 'El navegador bloqueó el acceso por seguridad.', type: 'security' };
+      }
+      return { message: 'Activa permisos de cámara/micrófono para grabar.', type: 'other' };
+    }
+    
+    // En desarrollo, detalles técnicos
+    const message = String(err?.message || '');
+    const base = `getUserMedia: ${name}${message ? ` — ${message}` : ''}`;
+    if (name === 'NotAllowedError' || name === 'PermissionDeniedError') {
+      return { message: `${base}\nPermiso bloqueado. En macOS: Ajustes del sistema → Privacidad y seguridad → Cámara/Micrófono → habilitar Chrome. Luego cierra y reabre Chrome.`, type: 'permission' };
+    }
+    if (name === 'NotFoundError' || name === 'DevicesNotFoundError') {
+      return { message: `${base}\nNo se encontró cámara o micrófono disponible.`, type: 'notfound' };
+    }
+    if (name === 'NotReadableError' || name === 'TrackStartError') {
+      return { message: `${base}\nEl dispositivo podría estar ocupado por otra app (Zoom/Meet/OBS). Cierra esa app e intenta de nuevo.`, type: 'notreadable' };
+    }
+    if (name === 'SecurityError') {
+      return { message: `${base}\nError de seguridad. Verifica que estés en HTTPS y que el sitio tenga permisos.`, type: 'security' };
+    }
+    if (name === 'OverconstrainedError' || name === 'ConstraintNotSatisfiedError') {
+      return { message: `${base}\nLa configuración solicitada (resolución/cámara) no se puede cumplir.`, type: 'other' };
+    }
+    return { message: `${base}\nNo se pudo acceder a cámara/micrófono. Revisa permisos.`, type: 'other' };
+  }
+
+  const stopTracks = useCallback((s: MediaStream | null) => {
+    try {
+      s?.getTracks?.().forEach((t) => t.stop());
+    } catch {}
+  }, []);
+
+  const detachPreview = useCallback(() => {
+    const v = previewVideoRef.current;
+    if (!v) return;
+    try {
+      (v as HTMLVideoElement & { srcObject: MediaStream | null }).srcObject = null;
+    } catch {}
+  }, []);
+
+  const cleanupStream = useCallback(
+    (opts?: { keepPreview?: boolean }) => {
+      const keep = opts?.keepPreview ?? false;
+      if (keep) {
+        updateDevDiag(streamRef.current);
+        return;
+      }
+      stopTracks(streamRef.current);
+      streamRef.current = null;
+      detachPreview();
+      setHasPreview(false);
+      updateDevDiag(null);
+    },
+    [detachPreview, stopTracks, updateDevDiag]
+  );
+
+  const ensurePreviewAttached = useCallback(() => {
+    if (mode !== 'Video') return;
+    const v = previewVideoRef.current;
+    const s = streamRef.current;
+    if (!v || !s) return;
+    const vEl = v as HTMLVideoElement & { srcObject: MediaStream | null };
+    if (!vEl.srcObject) {
       try {
-        // @ts-ignore
-        previewVideoRef.current.srcObject = null;
+        v.muted = true;
+        v.playsInline = true;
+        v.setAttribute('playsinline', 'true');
+        vEl.srcObject = s;
+        v.play().catch(() => {});
       } catch {}
     }
+  }, [mode]);
+
+  const streamIsLive = useCallback((s: MediaStream | null) => {
+    if (!s) return false;
+    try {
+      const tracks = s.getTracks();
+      if (!tracks.length) return false;
+      return tracks.every((t) => t.readyState === 'live');
+    } catch {
+      return false;
+    }
   }, []);
+
+  const startPreview = useCallback(async () => {
+    setErr('');
+    setErrType(null);
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setErr('Este navegador no permite grabar. Prueba en Chrome o Safari actualizado.');
+      setErrType('other');
+      return;
+    }
+    if (streamIsLive(streamRef.current)) {
+      setHasPreview(true);
+      ensurePreviewAttached();
+      updateDevDiag(streamRef.current);
+      return;
+    }
+    try {
+      const constraints: MediaStreamConstraints =
+        mode === 'Video' ? { video: true, audio: false } : mode === 'Audio' ? { audio: true } : {};
+      if (!('video' in constraints) && !('audio' in constraints)) return;
+
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      streamRef.current = stream;
+      setHasPreview(true);
+
+      if (mode === 'Video') {
+        const video = previewVideoRef.current;
+        if (video) {
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute('playsinline', 'true');
+          (video as HTMLVideoElement & { srcObject: MediaStream | null }).srcObject = stream;
+          try {
+            await video.play();
+          } catch (e) {
+            console.error('preview video.play failed', e);
+            setErr('No se pudo reproducir la vista previa de cámara. Revisa permisos o bloqueos de autoplay.');
+            setHasPreview(false);
+            updateDevDiag(null);
+            return;
+          }
+        }
+      }
+      updateDevDiag(stream);
+    } catch (e: unknown) {
+      console.error('[getUserMedia][preview]', e);
+      setHasPreview(false);
+      const errorInfo = friendlyGetUserMediaError(e);
+      setErr(errorInfo.message);
+      setErrType(errorInfo.type);
+      updateDevDiag(null);
+    }
+  }, [ensurePreviewAttached, mode, streamIsLive, updateDevDiag]);
+
+  const stopPreview = useCallback(() => {
+    cleanupStream({ keepPreview: false });
+  }, [cleanupStream]);
 
   const stopRecording = useCallback(() => {
     setIsRecording(false);
@@ -777,17 +967,25 @@ function StoryModal({
 
   const hardResetCapture = useCallback(() => {
     setErr('');
+    setErrType(null);
     setSecondsLeft(300);
-    setIsRecording(false);
     chunksRef.current = [];
+
+    if (isRecording) {
+      try {
+        recorderRef.current?.stop();
+      } catch {}
+      recorderRef.current = null;
+      return;
+    }
+
     recorderRef.current = null;
-
-    cleanupStream();
-
     setMediaBlob(null);
     revokeMediaUrl();
     setMediaUrl('');
-  }, [cleanupStream, revokeMediaUrl]);
+    // Detener tracks y limpiar preview al repetir
+    cleanupStream({ keepPreview: false });
+  }, [cleanupStream, revokeMediaUrl, isRecording]);
 
   // Reset modal when opens (or mode changes while open)
   useEffect(() => {
@@ -806,15 +1004,23 @@ function StoryModal({
     setText('');
     setAttachments([]);
     imprintIdRef.current = '';
+    setMediaBlob(null);
+    revokeMediaUrl();
+    setMediaUrl('');
+    setIsRecording(false);
+    setSecondsLeft(300);
+    setErr('');
+    setErrType(null);
+    setHasPreview(false);
 
-    hardResetCapture();
+    cleanupStream({ keepPreview: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, mode]);
 
   // Stop everything when modal closes
   useEffect(() => {
     if (isOpen) return;
-    hardResetCapture();
+    cleanupStream({ keepPreview: false });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
@@ -845,41 +1051,175 @@ function StoryModal({
     return () => window.clearInterval(id);
   }, [isRecording, stopRecording]);
 
-  const startRecording = useCallback(async () => {
-    setErr('');
-
-    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-      setErr('Este navegador no permite grabar. Prueba en Chrome o Safari actualizado.');
+  // Audio visualizer: live feedback while recording (AnalyserNode + requestAnimationFrame)
+  useEffect(() => {
+    if (!isRecording || mode !== 'Audio') {
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close().catch(() => {});
+        audioContextRef.current = null;
+      }
+      analyserRef.current = null;
       return;
     }
 
-    // clear previous
+    const stream = streamRef.current;
+    const canvas = audioVisualizerCanvasRef.current;
+    if (!stream || !canvas) return;
+
+    const parent = canvas.parentElement;
+    if (parent) {
+      const rect = parent.getBoundingClientRect();
+      canvas.width = Math.max(1, Math.floor(rect.width));
+      canvas.height = Math.max(1, Math.floor(rect.height));
+    }
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const audioContext = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+    audioContextRef.current = audioContext;
+    const source = audioContext.createMediaStreamSource(stream);
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 2048;
+    source.connect(analyser);
+    analyserRef.current = analyser;
+
+    const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+    const draw = () => {
+      rafIdRef.current = requestAnimationFrame(draw);
+      analyser.getByteFrequencyData(dataArray);
+
+      const w = canvas.width;
+      const h = canvas.height;
+      ctx.fillStyle = 'rgb(17, 24, 39)';
+      ctx.fillRect(0, 0, w, h);
+
+      const barCount = Math.min(64, Math.floor(w / 6));
+      const barWidth = (w / barCount) * 0.6;
+      const gap = w / barCount - barWidth;
+
+      for (let i = 0; i < barCount; i++) {
+        const v = dataArray[Math.floor((i / barCount) * dataArray.length)] ?? 0;
+        const barHeight = Math.max(4, (v / 255) * h * 0.7);
+        const x = i * (w / barCount) + gap / 2;
+        const y = h - barHeight;
+
+        const gradient = ctx.createLinearGradient(0, h, 0, 0);
+        gradient.addColorStop(0, '#F97316');
+        gradient.addColorStop(0.6, '#FB923C');
+        gradient.addColorStop(1, '#FDBA74');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        if (typeof ctx.roundRect === 'function') {
+          ctx.roundRect(x, y, barWidth, barHeight, 2);
+        } else {
+          ctx.rect(x, y, barWidth, barHeight);
+        }
+        ctx.fill();
+      }
+    };
+
+    draw();
+
+    return () => {
+      if (rafIdRef.current != null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
+      audioContext.close().catch(() => {});
+      audioContextRef.current = null;
+      analyserRef.current = null;
+    };
+  }, [isRecording, mode]);
+
+  const startRecording = useCallback(async () => {
+    setErr('');
+    setErrType(null);
+
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      setErr('Este navegador no permite grabar. Prueba en Chrome o Safari actualizado.');
+      setErrType('other');
+      return;
+    }
+
     setMediaBlob(null);
     revokeMediaUrl();
     setMediaUrl('');
     chunksRef.current = [];
 
     try {
-      const constraints: MediaStreamConstraints =
-        mode === 'Audio'
-          ? { audio: true }
-          : {
-              audio: true,
-              video: {
-                facingMode: 'user',
-                width: { ideal: 1280 },
-                height: { ideal: 720 }
+      let stream: MediaStream | null = streamRef.current;
+      if (!streamIsLive(stream)) stream = null;
+
+      if (!stream) {
+        if (mode === 'Audio') {
+          stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        } else {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+              audio: true
+            });
+          } catch (e1: unknown) {
+            console.error('[getUserMedia][video+audio]', e1);
+            const name1 = String((e1 as { name?: string })?.name || '');
+            if (name1 === 'OverconstrainedError' || name1 === 'ConstraintNotSatisfiedError') {
+              try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+              } catch (e2: unknown) {
+                console.error('[getUserMedia][video:true+audio:true]', e2);
+                try {
+                  stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                  setErr('⚠️ No pudimos activar el micrófono. Grabaremos video sin audio.');
+                } catch (e3: unknown) {
+                  console.error('[getUserMedia][video:true+audio:false]', e3);
+                  const errorInfo = friendlyGetUserMediaError(e3);
+                  setErr(errorInfo.message);
+                  setErrType(errorInfo.type);
+                  return;
+                }
               }
-            };
+            } else {
+              try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                setErr('⚠️ No pudimos activar el micrófono. Grabaremos video sin audio.');
+              } catch (e2: unknown) {
+                console.error('[getUserMedia][video+audio fallback]', e2);
+                const errorInfo = friendlyGetUserMediaError(e2);
+                setErr(errorInfo.message);
+                setErrType(errorInfo.type);
+                return;
+              }
+            }
+          }
+        }
+        streamRef.current = stream;
+      }
 
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      streamRef.current = stream;
+      if (!stream) {
+        setErr('No se pudo obtener stream de medios.');
+        return;
+      }
 
-      if (mode === 'Video' && previewVideoRef.current) {
-        // @ts-ignore
-        previewVideoRef.current.srcObject = stream;
-        previewVideoRef.current.muted = true;
-        previewVideoRef.current.play?.().catch?.(() => {});
+      updateDevDiag(streamRef.current);
+
+      if (mode === 'Video') {
+        const video = previewVideoRef.current;
+        if (video) {
+          video.muted = true;
+          video.playsInline = true;
+          video.setAttribute('playsinline', 'true');
+          (video as HTMLVideoElement & { srcObject: MediaStream | null }).srcObject = streamRef.current;
+          video.play().catch(() => {});
+        }
+        setHasPreview(true);
+      } else if (mode === 'Audio') {
+        setHasPreview(true);
       }
 
       const mimeType =
@@ -887,9 +1227,10 @@ function StoryModal({
           ? pickMimeType(['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4'])
           : pickMimeType(['video/webm;codecs=vp8,opus', 'video/webm', 'video/mp4']);
 
-      const rec = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+      const rec = new MediaRecorder(streamRef.current!, mimeType ? { mimeType } : undefined);
       recorderRef.current = rec;
 
+      keepPreviewOnStopRef.current = mode === 'Video';
       rec.ondataavailable = (e) => {
         if (e.data && e.data.size > 0) chunksRef.current.push(e.data);
       };
@@ -899,31 +1240,28 @@ function StoryModal({
           const type = rec.mimeType || (mode === 'Audio' ? 'audio/webm' : 'video/webm');
           const blob = new Blob(chunksRef.current, { type });
           setMediaBlob(blob);
-
           const url = URL.createObjectURL(blob);
           setMediaUrl(url);
         } catch {
           setErr('No pudimos procesar la grabación.');
         } finally {
-          cleanupStream();
+          cleanupStream({ keepPreview: keepPreviewOnStopRef.current });
         }
       };
 
       setSecondsLeft(300);
       setIsRecording(true);
       rec.start(250);
-    } catch (e: any) {
-      cleanupStream();
+    } catch (e: unknown) {
+      console.error('[getUserMedia][record]', e);
       setIsRecording(false);
-
-      const msg = String(e?.message || '');
-      if (msg.toLowerCase().includes('permission') || msg.toLowerCase().includes('denied')) {
-        setErr('No diste permisos de micrófono/cámara. Actívalos y vuelve a intentar.');
-      } else {
-        setErr('No pudimos iniciar la grabación. Revisa permisos o prueba otro navegador.');
-      }
+      setHasPreview(false);
+      const errorInfo = friendlyGetUserMediaError(e);
+      setErr(errorInfo.message);
+      setErrType(errorInfo.type);
+      cleanupStream({ keepPreview: false });
     }
-  }, [mode, cleanupStream, revokeMediaUrl]);
+  }, [cleanupStream, mode, revokeMediaUrl, streamIsLive, updateDevDiag]);
 
   const addFiles = useCallback((list: FileList | null) => {
     if (!list) return;
@@ -945,6 +1283,30 @@ function StoryModal({
     const emailOk = !wantsEmail || isEmailLike(email);
     return baseOk && emailOk && !saving;
   }, [sex, ageRange, city, country, acceptedPrivacy, wantsEmail, email, saving]);
+
+  const missingSubmitChecklist = useMemo(() => {
+    const list: string[] = [];
+    if (!sex) list.push('género');
+    if (!ageRange) list.push('rango de edad');
+    if (city.trim().length <= 1) list.push('ciudad');
+    if (country.trim().length <= 1) list.push('país');
+    if (!acceptedPrivacy) list.push('aceptar política de privacidad');
+    if (wantsEmail && !isEmailLike(email)) list.push('mail válido');
+    return list;
+  }, [sex, ageRange, city, country, acceptedPrivacy, wantsEmail, email]);
+
+  const captureChecklistText = useMemo(() => {
+    // Nunca mostrar "Te falta..." mientras se está grabando o si ya hay grabación
+    if (isRecording || mediaBlob) return null;
+    
+    if (mode === 'Texto') {
+      if (isTextTooLong) return 'Te falta: recortar el texto (máx. 6000 caracteres).';
+      if (text.trim().length < 30) return `Te falta: ${30 - text.trim().length} caracteres más (mín. 30).`;
+      return null;
+    }
+    if (!mediaBlob) return 'Te falta: grabar y detener para tener una grabación.';
+    return null;
+  }, [mode, text, isTextTooLong, mediaBlob, isRecording]);
 
   const copyHomeLink = useCallback(async () => {
     try {
@@ -1030,18 +1392,19 @@ function StoryModal({
     setErr('');
 
     if (!canSubmit) {
-      setErr('Te falta completar datos obligatorios o aceptar la política de privacidad.');
-      window.setTimeout(() => setErr(''), 2200);
+      const missing = missingSubmitChecklist;
+      setErr(missing.length ? `Para enviar te falta: ${missing.join(', ')}.` : 'Completa los datos obligatorios.');
+      window.setTimeout(() => setErr(''), 4000);
       return;
     }
 
     if (mode === 'Texto' && text.trim().length < 30) {
-      setErr('Escribe un poquito más (mínimo unas líneas).');
+      setErr('Escribe un poquito más (mínimo 30 caracteres).');
       window.setTimeout(() => setErr(''), 2200);
       return;
     }
     if (mode !== 'Texto' && !mediaBlob) {
-      setErr('Primero graba tu audio/video.');
+      setErr('Primero graba y detén para tener una grabación.');
       window.setTimeout(() => setErr(''), 2200);
       return;
     }
@@ -1060,7 +1423,7 @@ function StoryModal({
     } finally {
       setSaving(false);
     }
-  }, [canSubmit, mode, text, mediaBlob]);
+  }, [canSubmit, missingSubmitChecklist, mode, text, mediaBlob]);
 
   const resetForNewStory = useCallback(() => {
     setErr('');
@@ -1079,7 +1442,8 @@ function StoryModal({
     setCountry('');
     hardResetCapture();
     onClearChosenTopic();
-  }, [hardResetCapture, onClearChosenTopic]);
+    cleanupStream({ keepPreview: false });
+  }, [cleanupStream, hardResetCapture, onClearChosenTopic]);
 
   if (!isOpen) return null;
 
@@ -1113,10 +1477,41 @@ function StoryModal({
 
         {/* ERROR */}
         {err && (
-          <div className="px-8 pb-2">
-            <div className="p-4 rounded-3xl text-sm font-bold" style={{ ...soft.inset, color: '#C2410C' }}>
+          <div className="px-8 pb-2" role="alert" aria-live="assertive">
+            <div className="p-4 rounded-3xl text-sm font-bold whitespace-pre-line" style={{ ...soft.inset, color: '#C2410C' }}>
               {err}
             </div>
+            {isDevMode && (
+              <div className="mt-2 p-3 rounded-2xl text-[11px] text-gray-600 whitespace-pre-wrap" style={{ ...soft.flat, borderRadius: '18px' }}>
+                <div className="font-black tracking-widest uppercase text-gray-500 mb-1">Diagnóstico (dev)</div>
+                <div>secureContext: {String(devDiag.secure)}</div>
+                <div>tracks: video={devDiag.v} audio={devDiag.a}</div>
+                <div className="mt-1 opacity-70 break-all">{devDiag.ua}</div>
+              </div>
+            )}
+            {errType === 'permission' && (
+              <div className="mt-3 p-5 rounded-2xl" style={{ ...soft.flat, borderRadius: '18px' }}>
+                <div className="text-xs font-black tracking-widest uppercase text-gray-600 mb-3">Cómo habilitar permisos</div>
+                <div className="space-y-3 text-sm text-gray-700">
+                  <div>
+                    <div className="font-bold mb-1">Chrome desktop:</div>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Abrir <code className="bg-gray-200 px-1 rounded">chrome://settings/content/camera</code> y permitir</li>
+                      <li>En la URL del sitio → icono de permisos (si aparece)</li>
+                      <li>Recargar la página</li>
+                    </ol>
+                  </div>
+                  <div>
+                    <div className="font-bold mb-1">macOS:</div>
+                    <ol className="list-decimal list-inside space-y-1 ml-2">
+                      <li>Ajustes del sistema → Privacidad y seguridad → Cámara / Micrófono</li>
+                      <li>Habilitar Chrome</li>
+                      <li>Cerrar y reabrir Chrome</li>
+                    </ol>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         )}
 
@@ -1161,19 +1556,32 @@ function StoryModal({
                     placeholder="Escribe aquí…"
                     className="w-full min-h-[240px] rounded-[18px] p-5 outline-none text-gray-700"
                     style={{ ...soft.flat, borderRadius: '18px' }}
+                    aria-label="Escribe tu historia"
+                    aria-describedby="text-char-count"
                   />
 
-                  <div className="mt-3 text-xs text-gray-500">
-                    {text.length}/{MAX_TEXT} {isTextTooLong ? '· Te pasaste un poquito. Recorta y sigue ✂️' : ''}
+                  <div id="text-char-count" className="mt-3 text-xs text-gray-500" role="status" aria-live="polite">
+                    {text.length}/{MAX_TEXT}
+                    {isTextTooLong && <span className="text-orange-600 font-bold ml-2">· Te pasaste un poquito. Recorta y sigue ✂️</span>}
+                    {!isTextTooLong && text.trim().length < 30 && (
+                      <span className="text-orange-600 font-bold ml-2">· Te faltan {30 - text.trim().length} para continuar</span>
+                    )}
+                    {!isTextTooLong && text.trim().length >= 30 && <span className="text-green-600 font-bold ml-2">· Listo para continuar</span>}
                   </div>
 
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-6 flex flex-col items-end gap-2">
+                    {!canContinueFromCapture && captureChecklistText && (
+                      <p className="text-sm font-bold text-orange-700 w-full rounded-[18px] px-4 py-3" style={soft.inset} role="status" aria-live="polite">
+                        {captureChecklistText}
+                      </p>
+                    )}
                     <button
                       type="button"
                       onClick={() => setStep('details')}
                       disabled={!canContinueFromCapture}
-                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
+                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:grayscale disabled:saturate-50"
                       style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      aria-label={canContinueFromCapture ? 'Continuar al siguiente paso' : captureChecklistText ?? 'Completa los requisitos para continuar'}
                     >
                       Continuar
                     </button>
@@ -1182,56 +1590,186 @@ function StoryModal({
               ) : (
                 <>
                   <div className="text-gray-600 text-sm leading-relaxed">
-                    Cuando quieras, aprieta <strong>Grabar</strong>. Puedes detener cuando quieras.
+                    Primero <strong>activa</strong> tu {mode === 'Video' ? 'cámara' : 'micrófono'}, luego aprieta <strong>Grabar</strong>.
                   </div>
 
-                  {mode === 'Video' && isRecording && (
-                    <div className="mt-6 h-[260px] rounded-[18px] overflow-hidden" style={soft.flat}>
-                      <video ref={previewVideoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-                    </div>
-                  )}
+                  {/* VIDEO AREA - Solo un video visible según el estado */}
+                  <div className="mt-6">
+                    {/* PREVIEW: mostrar cuando se está grabando O cuando hay preview activo */}
+                    {(isRecording || hasPreview) && (
+                      <div
+                        className={`w-full rounded-[26px] overflow-hidden bg-black/20 border-2 shadow-[0_16px_44px_rgba(20,30,60,0.16)] relative ${isRecording ? 'record-pulse border-red-500' : 'border-white/35'}`}
+                        role="region"
+                        aria-label={mode === 'Video' ? (isRecording ? 'Vista previa de cámara en vivo mientras grabas' : 'Vista previa de cámara') : isRecording ? 'Visualización de audio en vivo' : 'Área de grabación de audio'}
+                      >
+                        {mode === 'Video' ? (
+                          <video
+                            ref={previewVideoRef}
+                            autoPlay
+                            playsInline
+                            muted
+                            className="w-full aspect-video object-cover bg-black"
+                            aria-label={isRecording ? 'Vista previa de cámara en vivo mientras grabas' : 'Vista previa de cámara'}
+                          />
+                        ) : (
+                          <div className="w-full aspect-video bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center relative overflow-hidden">
+                            <canvas
+                              ref={audioVisualizerCanvasRef}
+                              className="w-full h-full object-cover"
+                              style={{ aspectRatio: '16/9', display: isRecording ? 'block' : 'none' }}
+                              aria-hidden="true"
+                            />
+                            {isRecording && (
+                              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                                <span className="text-white/90 text-base font-bold drop-shadow-lg">Te escucho</span>
+                              </div>
+                            )}
+                            {!isRecording && (
+                              <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white/60">
+                                <div className="text-sm font-medium">{hasPreview ? 'Micrófono listo' : 'Activa el micrófono para empezar'}</div>
+                              </div>
+                            )}
+                          </div>
+                        )}
 
-                  <div className="mt-5 flex flex-wrap gap-3 items-center">
-                    {!isRecording ? (
-                      <button type="button" onClick={startRecording} className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
-                        Grabar
-                      </button>
-                    ) : (
-                      <button type="button" onClick={stopRecording} className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-700 active:scale-95" style={soft.button}>
-                        Detener
-                      </button>
+                        {isRecording && (
+                          <>
+                            <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2" role="status" aria-live="polite" aria-label={`Grabando, ${formatTime(300 - secondsLeft)} transcurridos`}>
+                              <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-red-600/95 backdrop-blur-md border-2 border-red-400 shadow-lg">
+                                <span className="h-3 w-3 rounded-full bg-white animate-pulse" />
+                                <span className="text-xs tracking-[0.2em] uppercase text-white font-black">GRABANDO</span>
+                                <span className="text-sm font-mono text-white font-bold tabular-nums">{formatTime(300 - secondsLeft)}</span>
+                              </div>
+                            </div>
+                            <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-black/40" aria-hidden="true">
+                              <div
+                                className="h-full bg-red-500 transition-all duration-300"
+                                style={{ width: `${((300 - secondsLeft) / 300) * 100}%` }}
+                              />
+                            </div>
+                          </>
+                        )}
+                      </div>
                     )}
 
-                    <button
-                      type="button"
-                      onClick={hardResetCapture}
-                      className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95"
-                      style={soft.button}
-                      disabled={isRecording}
-                    >
-                      Repetir
-                    </button>
+                    {/* PLAYBACK: mostrar cuando hay grabación completada y NO se está grabando y NO hay preview */}
+                    {mediaUrl && !isRecording && !hasPreview && (
+                      <div>
+                        {mode === 'Video' ? (
+                          <video src={mediaUrl} controls className="w-full rounded-[18px]" />
+                        ) : (
+                          <div className="rounded-[26px] p-6" style={soft.inset} role="region" aria-label="Grabación lista para escuchar">
+                            <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-4">Listo para escuchar</div>
+                            <div className="flex flex-wrap items-center gap-4">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const a = document.querySelector<HTMLAudioElement>('[data-replay-audio]');
+                                  a?.play().catch(() => {});
+                                }}
+                                className="w-14 h-14 rounded-full flex items-center justify-center text-orange-600 hover:bg-orange-500/20 active:scale-95 transition-transform"
+                                style={soft.button}
+                                aria-label="Reproducir grabación"
+                              >
+                                <Volume2 size={28} />
+                              </button>
+                              <audio data-replay-audio src={mediaUrl} controls className="flex-1 min-w-0" aria-label="Reproducir grabación" />
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
 
-                    <div className="text-xs font-black tracking-widest uppercase text-gray-400">{mm}:{ss}</div>
+                    {/* PLACEHOLDER: mostrar cuando NO hay preview, NO se está grabando y NO hay grabación */}
+                    {!hasPreview && !isRecording && !mediaUrl && (
+                      <div className="w-full aspect-video rounded-[26px] overflow-hidden bg-black/20 border-2 border-white/35 shadow-[0_16px_44px_rgba(20,30,60,0.16)] flex items-center justify-center">
+                        <div className="text-white/50 text-sm font-medium">
+                          {mode === 'Video' ? 'Activa la cámara para empezar' : 'Activa el micrófono para empezar'}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
-                  {mediaUrl && !isRecording && (
-                    <div className="mt-6">
-                      {mode === 'Video' ? (
-                        <video src={mediaUrl} controls className="w-full rounded-[18px]" />
-                      ) : (
-                        <audio src={mediaUrl} controls className="w-full" />
-                      )}
-                    </div>
-                  )}
+                  <div className="mt-5 flex flex-wrap gap-3 items-center" role="group" aria-label="Controles de grabación">
+                    {isRecording ? (
+                      // Durante grabación: solo mostrar DETENER (grabación)
+                      <>
+                        <button
+                          type="button"
+                          onClick={stopRecording}
+                          className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-700 active:scale-95"
+                          style={soft.button}
+                          aria-label="Detener grabación"
+                        >
+                          DETENER
+                        </button>
+                        <div className="text-xs font-black tracking-widest uppercase text-gray-400" aria-live="polite">{mm}:{ss}</div>
+                      </>
+                    ) : (
+                      // Cuando NO se está grabando: mostrar controles según estado
+                      <>
+                        {!hasPreview ? (
+                          <button
+                            type="button"
+                            onClick={startPreview}
+                            className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-700 active:scale-95"
+                            style={soft.button}
+                            aria-label={mode === 'Video' ? 'Activar cámara' : 'Activar micrófono'}
+                          >
+                            {mode === 'Video' ? 'ACTIVAR CÁMARA' : 'ACTIVAR MICRÓFONO'}
+                          </button>
+                        ) : (
+                          <>
+                            <button
+                              type="button"
+                              onClick={stopPreview}
+                              className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95"
+                              style={soft.button}
+                              aria-label={mode === 'Video' ? 'Detener cámara' : 'Detener micrófono'}
+                            >
+                              DETENER {mode === 'Video' ? 'CÁMARA' : 'MIC'}
+                            </button>
+                            <button
+                              type="button"
+                              onClick={startRecording}
+                              className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale disabled:saturate-50"
+                              style={soft.button}
+                              disabled={!hasPreview}
+                              aria-label="Iniciar grabación"
+                            >
+                              GRABAR
+                            </button>
+                          </>
+                        )}
+                        <button
+                          type="button"
+                          onClick={hardResetCapture}
+                          className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:grayscale disabled:saturate-50"
+                          style={soft.button}
+                          disabled={isRecording}
+                          aria-label="Repetir grabación"
+                        >
+                          REPETIR
+                        </button>
+                        <div className="text-xs font-black tracking-widest uppercase text-gray-400" aria-live="polite">{mm}:{ss}</div>
+                      </>
+                    )}
+                  </div>
 
-                  <div className="mt-6 flex justify-end">
+
+                  <div className="mt-6 flex flex-col items-end gap-2">
+                    {!canContinueFromCapture && captureChecklistText && (
+                      <p className="text-sm font-bold text-orange-700 w-full rounded-[18px] px-4 py-3" style={soft.inset} role="status" aria-live="polite">
+                        {captureChecklistText}
+                      </p>
+                    )}
                     <button
                       type="button"
                       onClick={() => setStep('details')}
                       disabled={!canContinueFromCapture}
-                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
+                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:grayscale disabled:saturate-50"
                       style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      aria-label={canContinueFromCapture ? 'Continuar al siguiente paso' : captureChecklistText ?? 'Completa la grabación para continuar'}
                     >
                       Continuar
                     </button>
@@ -1398,20 +1936,28 @@ function StoryModal({
                   </div>
                 </div>
 
-                <div className="mt-6 flex flex-wrap gap-3 justify-end">
-                  <button type="button" onClick={() => setStep('capture')} className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95" style={soft.button}>
-                    Volver
-                  </button>
+                <div className="mt-6 flex flex-col items-end gap-3">
+                  {!canSubmit && missingSubmitChecklist.length > 0 && (
+                    <p className="text-sm font-bold text-orange-700 w-full rounded-[18px] px-4 py-3" style={soft.inset} role="status" aria-live="polite">
+                      Te falta: {missingSubmitChecklist.join(', ')}.
+                    </p>
+                  )}
+                  <div className="flex flex-wrap gap-3 justify-end">
+                    <button type="button" onClick={() => setStep('capture')} className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95" style={soft.button}>
+                      Volver
+                    </button>
 
-                  <button
-                    type="button"
-                    onClick={submit}
-                    disabled={!canSubmit}
-                    className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60"
-                    style={{ ...soft.button, backgroundColor: '#F97316' }}
-                  >
-                    {saving ? 'Enviando…' : 'Enviar'}
-                  </button>
+                    <button
+                      type="button"
+                      onClick={submit}
+                      disabled={!canSubmit}
+                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed disabled:grayscale disabled:saturate-50"
+                      style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      aria-label={saving ? 'Enviando formulario' : canSubmit ? 'Enviar historia' : `Te falta: ${missingSubmitChecklist.join(', ')}`}
+                    >
+                      {saving ? 'Enviando…' : 'Enviar'}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1579,96 +2125,101 @@ export default function Home() {
   }, [isAutoPilot]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden relative" style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}>
-      <style jsx global>{globalStyles}</style>
+    <main
+      className="min-h-screen overflow-x-hidden relative"
+      style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}
+    >
+        {/* capa “seguridad” anti-overlay: nada encima captura clicks */}
+        <div className="relative z-10 pointer-events-auto">
+          <style>{globalStyles}</style>
+    
+        <audio ref={audioRef} loop src="/universo.mp3" />
 
-      <audio ref={audioRef} loop src="/universo.mp3" />
+        {/* MODALES */}
+        <StoryModal
+          isOpen={modalMode !== null}
+          mode={modalMode ?? 'Video'}
+          onClose={() => setModalMode(null)}
+          onChooseMode={(m) => setModalMode(m)}
+          chosenTopic={chosenTopic}
+          onClearChosenTopic={() => setChosenTopic(null)}
+        />
 
-      {/* MODALES */}
-      <StoryModal
-        isOpen={modalMode !== null}
-        mode={modalMode ?? 'Video'}
-        onClose={() => setModalMode(null)}
-        onChooseMode={(m) => setModalMode(m)}
-        chosenTopic={chosenTopic}
-        onClearChosenTopic={() => setChosenTopic(null)}
-      />
+        <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
 
-      <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
+        <InspirationModal
+          isOpen={showInspiration}
+          onClose={() => setShowInspiration(false)}
+          topics={INSPIRATION_TOPICS}
+          onChoose={(t) => {
+            setChosenTopic(t);
+            setShowInspiration(false);
+            setModalMode('Texto');
+          }}
+        />
 
-      <InspirationModal
-        isOpen={showInspiration}
-        onClose={() => setShowInspiration(false)}
-        topics={INSPIRATION_TOPICS}
-        onChoose={(t) => {
-          setChosenTopic(t);
-          setShowInspiration(false);
-          setModalMode('Texto');
-        }}
-      />
+        {/* HEADER */}
+        <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
+          <div className="flex items-center">
+            <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
+          </div>
 
-      {/* HEADER */}
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
-        </div>
+          <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
+            <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+              Propósito
+            </button>
 
-        <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
-          <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
-            Propósito
-          </button>
+            <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
+              Inspiración
+            </button>
 
-          <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
-            Inspiración
-          </button>
+            <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+              Historias
+            </a>
+            <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+              Mapa
+            </a>
+          </nav>
+        </header>
 
-          <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
-            Historias
-          </a>
-          <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
-            Mapa
-          </a>
-        </nav>
-      </header>
+        {/* INTRO */}
+        <section id="intro" className="pt-48 md:pt-64 pb-4 px-6 relative z-10 flex flex-col items-center text-center">
+          <div className="max-w-6xl animate-float">
+            <h1 className="text-4xl md:text-6xl font-light leading-tight mb-10" style={{ color: soft.textMain }}>
+              AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
+            </h1>
 
-      {/* INTRO */}
-      <section id="intro" className="pt-48 md:pt-64 pb-4 px-6 relative z-10 flex flex-col items-center text-center">
-        <div className="max-w-6xl animate-float">
-          <h1 className="text-4xl md:text-6xl font-light leading-tight mb-10" style={{ color: soft.textMain }}>
-            AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
-          </h1>
+            <div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50 bg-orange-400" />
 
-          <div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50 bg-orange-400" />
+            <p className="text-xl md:text-3xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
+              Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
+            </p>
 
-          <p className="text-xl md:text-3xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
-            Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
-          </p>
+            <ChevronDown className="mx-auto mt-12 text-gray-400 opacity-50 animate-bounce" />
+          </div>
+        </section>
 
-          <ChevronDown className="mx-auto mt-12 text-gray-400 opacity-50 animate-bounce" />
-        </div>
-      </section>
+        {/* CARDS */}
+        <section id="historias" className="w-full px-6 mb-28 flex flex-col md:flex-row gap-12 justify-center items-stretch relative z-10 -mt-12">
+          <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
+            A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
+          </SoftCard>
 
-      {/* CARDS */}
-      <section id="historias" className="w-full px-6 mb-28 flex flex-col md:flex-row gap-12 justify-center items-stretch relative z-10 -mt-12">
-        <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
-          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
-        </SoftCard>
+          <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('Audio')} delay="0.2s">
+            Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
+          </SoftCard>
 
-        <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('Audio')} delay="0.2s">
-          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
-        </SoftCard>
+          <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('Texto')} delay="0.4s">
+            Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.
+          </SoftCard>
+        </section>
 
-        <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('Texto')} delay="0.4s">
-          Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.
-        </SoftCard>
-      </section>
-
-      {/* MAPA */}
-      <section
-        id="mapa"
-        className="relative w-full scroll-mt-[160px] min-h-[90vh] md:min-h-[1400px] flex flex-col justify-start overflow-hidden"
-        style={{ background: 'linear-gradient(to bottom, #E0E5EC 0%, #1B2333 20%, #0F1A2B 100%)' }}
-      >
+        {/* MAPA */}
+        <section
+          id="mapa"
+          className="relative w-full scroll-mt-[160px] min-h-[90vh] md:min-h-[1400px] flex flex-col justify-start overflow-hidden"
+          style={{ background: 'linear-gradient(to bottom, #E0E5EC 0%, #1B2333 20%, #0F1A2B 100%)' }}
+        >
         <div className="relative z-20 container mx-auto px-6 pt-16 md:pt-28 pb-10 flex flex-col items-center text-center">
           <h2 className="text-6xl md:text-8xl font-light mb-8 drop-shadow-xl" style={{ color: '#F97316' }}>
             Mapa de AlmaMundi
@@ -1748,37 +2299,39 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="w-full pb-28 pt-20 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-        <div className="mb-20 mt-10 w-full flex justify-center select-none">
-          <h1 className="text-7xl md:text-[140px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
-        </div>
-
-        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium border-t border-gray-300 pt-10 text-gray-600 gap-10">
-          <div className="flex flex-col items-center md:items-start">
-            <span className="block mb-3 opacity-70">Una iniciativa de</span>
-            <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
+        {/* FOOTER */}
+        <footer className="w-full pb-28 pt-20 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
+          <div className="mb-20 mt-10 w-full flex justify-center select-none">
+            <h1 className="text-7xl md:text-[140px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 md:gap-10 opacity-90">
-            <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
-              Propósito
-            </button>
+          <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium border-t border-gray-300 pt-10 text-gray-600 gap-10">
+            <div className="flex flex-col items-center md:items-start">
+              <span className="block mb-3 opacity-70">Una iniciativa de</span>
+              <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
+            </div>
 
-            <button onClick={() => setShowInspiration(true)} className="hover:text-gray-900 transition-colors font-bold flex items-center gap-2" type="button">
-              <span>Inspiración</span>
-            </button>
+            <div className="flex flex-wrap justify-center gap-8 md:gap-10 opacity-90">
+              <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
+                Propósito
+              </button>
 
-            <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">
-              Historias
-            </a>
-            <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
-              Mapa
-            </a>
+              <button onClick={() => setShowInspiration(true)} className="hover:text-gray-900 transition-colors font-bold flex items-center gap-2" type="button">
+                <span>Inspiración</span>
+              </button>
+
+              <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">
+                Historias
+              </a>
+              <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
+                Mapa
+              </a>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
     </main>
   );
 }
 
+   
