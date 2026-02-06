@@ -22,8 +22,12 @@ const cspProd = [
   "img-src 'self' data: https:",
   "font-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline' https:",
-  "script-src 'self' https:",
+  // Next.js necesita 'unsafe-inline' para scripts inline que inyecta automáticamente
+  // 'unsafe-eval' puede ser necesario para algunos casos de Next.js
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https:",
   "connect-src 'self' https:",
+  // Permitir blob: para MediaRecorder y otros APIs del navegador
+  "media-src 'self' blob:",
 ].join("; ");
 
 const securityHeaders = [
@@ -36,7 +40,8 @@ const securityHeaders = [
     ? []
     : [{ key: "Strict-Transport-Security", value: "max-age=31536000; includeSubDomains" }]),
 
-  { key: "Content-Security-Policy", value: isDev ? cspDev : cspProd },
+  // TEMPORALMENTE DESACTIVADO para validar que CSP causa los errores
+  // { key: "Content-Security-Policy", value: isDev ? cspDev : cspProd },
 ];
 
 const nextConfig: NextConfig = {
