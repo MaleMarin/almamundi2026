@@ -621,12 +621,14 @@ function InspirationModal({
   isOpen,
   onClose,
   topics,
-  onChoose
+  onChoose,
+  onPickPrompt
 }: {
   isOpen: boolean;
   onClose: () => void;
   topics: InspirationTopic[];
   onChoose: (t: InspirationTopic) => void;
+  onPickPrompt?: (promptText: string) => void;
 }) {
   useModalUX(isOpen, onClose);
   const [q, setQ] = useState('');
@@ -690,10 +692,23 @@ function InspirationModal({
                 <div className="text-lg font-black text-gray-700">{t.title}</div>
                 <div className="mt-3 text-sm text-gray-600 space-y-1">
                   {t.questions.slice(0, 3).map((q2, i) => (
-                    <div key={i}>• {q2}</div>
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (onPickPrompt) {
+                          onPickPrompt(q2);
+                        }
+                      }}
+                      className="w-full text-left hover:text-orange-600 transition-colors py-1 px-1 rounded active:scale-[0.98]"
+                      aria-label={`Usar pregunta: ${q2}`}
+                    >
+                      • {q2}
+                    </button>
                   ))}
                 </div>
-                <div className="mt-4 text-xs font-black tracking-widest uppercase text-orange-600">Elegir</div>
+                <div className="mt-4 text-xs font-black tracking-widest uppercase text-orange-600">Elegir tema completo</div>
               </button>
             ))}
           </div>
@@ -711,7 +726,8 @@ function StoryModal({
   onClose,
   onChooseMode,
   chosenTopic,
-  onClearChosenTopic
+  onClearChosenTopic,
+  prefillPrompt
 }: {
   isOpen: boolean;
   mode: Mode;
@@ -719,6 +735,7 @@ function StoryModal({
   onChooseMode: (m: Mode) => void; // (lo dejamos para que no cambie tu API, aunque no lo mostramos dentro del modal)
   chosenTopic: InspirationTopic | null;
   onClearChosenTopic: () => void;
+  prefillPrompt?: string;
 }) {
   useModalUX(isOpen, onClose);
 
@@ -742,6 +759,7 @@ function StoryModal({
 
   const [text, setText] = useState('');
   const [attachments, setAttachments] = useState<File[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [mediaUrl, setMediaUrl] = useState<string>('');
@@ -1024,16 +1042,48 @@ function StoryModal({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 
-  // Prefill from inspiration (only in Texto)
+  // Prefill from inspiration o prompt específico
   useEffect(() => {
     if (!isOpen) return;
-    if (mode !== 'Texto') return;
-    if (!chosenTopic) return;
-
-    setStoryTitle((prev) => (prev.trim().length ? prev : chosenTopic.title));
-    const guide = chosenTopic.questions.map((q) => `• ${q}`).join('\n');
-    setText((prev) => (prev.trim().length ? prev : `${guide}\n\n`));
-  }, [isOpen, mode, chosenTopic]);
+    
+    // Si hay un prompt específico, usarlo (tiene prioridad)
+    if (prefillPrompt && mode === 'Texto') {
+      setText((prev) => {
+        // Solo pre-rellenar si el campo está vacío
+        if (prev.trim().length === 0) {
+          return `${prefillPrompt}\n\n`;
+        }
+        return prev;
+      });
+      // Auto-focus en el textarea cuando hay prefill
+      setTimeout(() => {
+        textareaRef.current?.focus();
+        // Mover cursor al final del texto
+        if (textareaRef.current) {
+          const len = textareaRef.current.value.length;
+          textareaRef.current.setSelectionRange(len, len);
+        }
+      }, 100);
+      return;
+    }
+    
+    // Si hay un tema completo elegido, usar ese (solo en modo Texto)
+    if (mode === 'Texto' && chosenTopic) {
+      setStoryTitle((prev) => (prev.trim().length ? prev : chosenTopic.title));
+      const guide = chosenTopic.questions.map((q) => `• ${q}`).join('\n');
+      setText((prev) => {
+        // Solo pre-rellenar si el campo está vacío
+        if (prev.trim().length === 0) {
+          return `${guide}\n\n`;
+        }
+        return prev;
+      });
+      // Auto-focus en el textarea cuando hay tema completo
+      setTimeout(() => {
+        textareaRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen, mode, chosenTopic, prefillPrompt]);
 
   // Recording countdown
   useEffect(() => {
@@ -1551,6 +1601,7 @@ function StoryModal({
                   <div className="text-gray-600 text-sm leading-relaxed mb-4">Escribe sin pensar demasiado. Que salga, como salga.</div>
 
                   <textarea
+                    ref={textareaRef}
                     value={text}
                     onChange={(e) => setText(e.target.value)}
                     placeholder="Escribe aquí…"
@@ -2039,6 +2090,23 @@ export default function Home() {
 
   const [showInspiration, setShowInspiration] = useState(false);
   const [chosenTopic, setChosenTopic] = useState<InspirationTopic | null>(null);
+  const [prefillPrompt, setPrefillPrompt] = useState<string>('');
+
+  // Función centralizada para iniciar historia desde un prompt/pregunta
+  // Ir al selector de 3 formatos (Video/Audio/Texto) sin abrir el modal
+  const goToStoryFormats = useCallback(() => {
+    requestAnimationFrame(() => {
+      document.getElementById('cuenta-tu-historia')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, []);
+
+  // Al elegir una pregunta concreta: guardar prompt, cerrar Inspiración, ir al selector (no abrir modal)
+  const startStoryFromPrompt = useCallback((promptText: string) => {
+    setPrefillPrompt(promptText);
+    setChosenTopic(null); // una sola pregunta, no tema completo
+    setShowInspiration(false);
+    goToStoryFormats();
+  }, [goToStoryFormats]);
 
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isMuted, setIsMuted] = useState(true);
@@ -2139,10 +2207,14 @@ export default function Home() {
         <StoryModal
           isOpen={modalMode !== null}
           mode={modalMode ?? 'Video'}
-          onClose={() => setModalMode(null)}
+          onClose={() => {
+            setModalMode(null);
+            setPrefillPrompt('');
+          }}
           onChooseMode={(m) => setModalMode(m)}
           chosenTopic={chosenTopic}
           onClearChosenTopic={() => setChosenTopic(null)}
+          prefillPrompt={prefillPrompt}
         />
 
         <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
@@ -2153,9 +2225,12 @@ export default function Home() {
           topics={INSPIRATION_TOPICS}
           onChoose={(t) => {
             setChosenTopic(t);
+            setPrefillPrompt(''); // tema completo se usa vía chosenTopic
             setShowInspiration(false);
-            setModalMode('Texto');
+            setModalMode(null);
+            goToStoryFormats();
           }}
+          onPickPrompt={startStoryFromPrompt}
         />
 
         {/* HEADER */}
@@ -2173,7 +2248,7 @@ export default function Home() {
               Inspiración
             </button>
 
-            <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+            <a href="#cuenta-tu-historia" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
               Historias
             </a>
             <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
@@ -2199,8 +2274,8 @@ export default function Home() {
           </div>
         </section>
 
-        {/* CARDS */}
-        <section id="historias" className="w-full px-6 mb-28 flex flex-col md:flex-row gap-12 justify-center items-stretch relative z-10 -mt-12">
+        {/* CARDS - Selector de 3 formatos (Video / Audio / Texto) */}
+        <section id="cuenta-tu-historia" className="w-full px-6 mb-28 flex flex-col md:flex-row gap-12 justify-center items-stretch relative z-10 -mt-12 scroll-mt-28">
           <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
             A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
           </SoftCard>
@@ -2320,7 +2395,7 @@ export default function Home() {
                 <span>Inspiración</span>
               </button>
 
-              <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">
+              <a href="#cuenta-tu-historia" className="hover:text-gray-900 transition-colors font-bold">
                 Historias
               </a>
               <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
