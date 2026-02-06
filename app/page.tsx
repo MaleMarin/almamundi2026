@@ -136,52 +136,84 @@ type InspirationTopic = {
 
 const INSPIRATION_TOPICS: InspirationTopic[] = [
   {
-    title: 'Un momento que me cambió',
-    questions: ['¿Qué pasó exactamente?', '¿Qué sentiste en el cuerpo en ese momento?', '¿Qué cambió en ti después?', '¿Qué aprendiste que antes no veías?']
+    title: 'Ese momento que me cambió',
+    questions: ['¿Qué pasó, en simple?', '¿Qué sentiste en ese instante?', '¿Qué cambió en ti después?', '¿Qué te quedó claro desde ahí?']
   },
   {
-    title: 'Una decisión difícil',
-    questions: ['¿Qué opciones tenías?', '¿Qué era lo que más te daba miedo perder?', '¿Qué te ayudó a decidir?', 'Si pudieras volver atrás, ¿harías algo distinto?']
+    title: 'Una decisión que me costó',
+    questions: ['¿Qué opciones tenías?', '¿Qué era lo más difícil de soltar?', '¿Qué te ayudó a decidir?', 'Viendo hoy, ¿qué harías distinto?']
   },
   {
-    title: 'Un comienzo',
-    questions: ['¿Cómo empezó esta historia?', '¿Qué detalle pequeño te quedó grabado?', '¿Qué esperabas que pasara?', '¿Qué pasó en realidad?']
+    title: 'Cómo empezó todo',
+    questions: ['¿Dónde y cuándo empezó?', '¿Qué detalle chico lo prende en tu memoria?', '¿Qué esperabas que pasara?', '¿Qué pasó en realidad?']
   },
   {
-    title: 'Un final',
-    questions: ['¿Qué terminó (una etapa, una relación, un lugar)?', '¿Cómo te diste cuenta de que era el final?', '¿Qué se fue contigo y qué quedó?', '¿Qué te gustaría que otros entiendan de este cierre?']
+    title: 'El día que terminó',
+    questions: ['¿Qué se terminó (etapa, relación, lugar, trabajo)?', '¿Cuándo supiste que era el final?', '¿Qué quedó en ti después?', '¿Qué te gustaría que otros entiendan de ese cierre?']
   },
   {
-    title: 'Un lugar que guardo adentro',
-    questions: ['¿Dónde es? (ciudad, barrio, casa, paisaje)', '¿Qué tiene ese lugar que no se repite?', '¿Qué pasó ahí que todavía te acompaña?', '¿Qué olerías/escucharías si estuvieras ahí ahora?']
+    title: 'Un lugar que llevo conmigo',
+    questions: ['¿Qué lugar es?', '¿Qué tiene que no se repite?', '¿Qué pasó ahí que todavía te acompaña?', 'Si volvieras hoy, ¿qué mirarías primero?']
   },
   {
-    title: 'Una persona que me marcó',
-    questions: ['¿Quién era para ti?', '¿Qué hacía o decía que no olvidas?', '¿Qué parte de ti apareció gracias a esa persona?', '¿Qué le dirías hoy si la tuvieras al frente?']
+    title: 'Alguien que me dejó huella',
+    questions: ['¿Quién fue para ti?', '¿Qué hacía o decía que no olvidas?', '¿Qué aprendiste gracias a esa persona?', 'Si le hablaras hoy, ¿qué le dirías?']
   },
   {
     title: 'Una pérdida',
-    questions: ['¿Qué perdiste y qué significaba?', '¿Cómo cambió tu vida desde entonces?', '¿Qué te sostuvo en lo peor?', '¿Qué te gustaría que otros no olviden de esto?']
+    questions: ['¿Qué perdiste y qué significaba?', '¿Qué cambió desde entonces?', '¿Qué te sostuvo en los días difíciles?', '¿Qué no te gustaría que se olvide de esto?']
   },
   {
-    title: 'Un duelo (sin apuro)',
-    questions: ['¿Cómo se ve el duelo en tu día a día?', '¿Qué cosas pequeñas te lo recuerdan?', '¿Qué te ayuda aunque sea un 1%?', '¿Qué te gustaría pedirle al mundo en este momento?']
+    title: 'Un duelo, a mi ritmo',
+    questions: ['¿Cómo se ve ese duelo en tu día a día?', '¿Qué cosas te lo recuerdan?', '¿Qué te ayuda, aunque sea un poco?', '¿Qué te gustaría pedirle al mundo hoy?']
   },
   {
-    title: 'Un logro (grande o pequeño)',
-    questions: ['¿Qué lograste exactamente?', '¿Qué costo tuvo por dentro?', '¿Quién te acompañó (o quién faltó)?', '¿Qué te demuestra este logro sobre ti?']
+    title: 'Un logro (grande o chico)',
+    questions: ['¿Qué lograste?', '¿Qué te costó por dentro?', '¿Quién estuvo (o quién faltó)?', '¿Qué te demostró sobre ti?']
   },
   {
-    title: 'Un miedo',
-    questions: ['¿A qué le tienes miedo de verdad?', '¿Cuándo apareció por primera vez?', '¿Qué haces para seguir igual aunque esté ahí?', '¿Qué te gustaría que pase para sentir más calma?']
+    title: 'Un miedo que conozco',
+    questions: ['¿A qué le tienes miedo de verdad?', '¿Cuándo lo notaste por primera vez?', '¿Qué haces para seguir igual, aunque esté ahí?', '¿Qué te daría más calma hoy?']
   },
   {
-    title: 'Mi relación con la tecnología',
-    questions: ['¿Qué lugar ocupa la tecnología en tu vida?', '¿Qué te conecta y qué te satura?', '¿Qué límites te gustaría poner?', '¿Qué te gustaría recuperar (tiempo, calma, atención)?']
+    title: 'Mi vida con la tecnología',
+    questions: ['¿Qué lugar tiene en tu día?', '¿Qué te conecta y qué te satura?', '¿Qué límite te gustaría poner?', '¿Qué te gustaría recuperar (tiempo, calma, foco)?']
   },
   {
-    title: 'Un futuro que imagino',
-    questions: ['¿Qué futuro imaginas (realista, deseado, posible)?', '¿Qué te gustaría que no se repita del pasado?', '¿Qué quieres que sí exista?', '¿Qué primer paso pequeño te acercaría a eso?']
+    title: 'Un futuro que me imagino',
+    questions: ['¿Cómo se ve ese futuro?', '¿Qué te gustaría que no se repita del pasado?', '¿Qué quieres que sí exista?', '¿Cuál sería un primer paso pequeño?']
+  },
+  {
+    title: 'Un día común que recuerdo',
+    questions: ['¿Qué tenía de especial, aunque fuera normal?', '¿Qué detalle lo vuelve inolvidable?', '¿Con quién estabas (o por qué estabas solo/a)?', '¿Qué te dejó ese día?']
+  },
+  {
+    title: 'Algo que pasó en mi barrio / ciudad',
+    questions: ['¿Qué pasó y dónde fue?', '¿A quién afectó y cómo?', '¿Qué viste con tus propios ojos?', '¿Qué debería cambiar para que no se repita (o para que pase más)?']
+  },
+  {
+    title: 'Un recuerdo familiar',
+    questions: ['¿Qué escena te viene a la mente?', '¿Qué se decía o se hacía siempre?', '¿Qué aprendiste ahí sin darte cuenta?', '¿Qué te gustaría rescatar de eso?']
+  },
+  {
+    title: 'Algo histórico que viví (o me tocó de cerca)',
+    questions: ['¿Qué estaba pasando en el país o en tu comunidad?', '¿Cómo lo viviste tú, en lo personal?', '¿Qué cambió después?', '¿Qué te gustaría que se entienda de ese momento?']
+  },
+  {
+    title: 'Una canción que me marcó',
+    questions: ['¿Qué canción es y cuándo llegó a ti?', '¿Qué parte (letra/sonido) te toca más?', '¿Con qué etapa de tu vida se conecta?', 'Si esa canción fuera una escena, ¿qué se vería?']
+  },
+  {
+    title: 'Una película que no se me suelta',
+    questions: ['¿Cuál es y qué te dejó dando vueltas?', '¿Qué escena o frase te persigue?', '¿Qué te hizo ver distinto de ti o del mundo?', '¿A quién se la recomendarías y por qué?']
+  },
+  {
+    title: 'Un libro que me movió',
+    questions: ['¿Qué libro es y cómo llegó a ti?', '¿Qué idea te quedó sonando?', '¿Qué parte te incomodó o te desafió?', 'Si pudieras hablar con el autor/a, ¿qué le dirías?']
+  },
+  {
+    title: 'Una noticia que me pegó',
+    questions: ['¿Qué noticia fue y dónde la viste?', '¿Qué te provocó (rabia, alivio, miedo, esperanza)?', '¿Qué conversación abrió (con quién, dónde)?', '¿Qué te gustaría que pasara después?']
   }
 ];
 
@@ -2244,7 +2276,7 @@ export default function Home() {
               Propósito
             </button>
 
-            <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
+            <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600 transition-colors flex items-center gap-2" style={soft.button} type="button">
               Inspiración
             </button>
 
@@ -2391,7 +2423,7 @@ export default function Home() {
                 Propósito
               </button>
 
-              <button onClick={() => setShowInspiration(true)} className="hover:text-gray-900 transition-colors font-bold flex items-center gap-2" type="button">
+              <button onClick={() => setShowInspiration(true)} className="hover:text-orange-600 transition-colors font-bold flex items-center gap-2" type="button">
                 <span>Inspiración</span>
               </button>
 
