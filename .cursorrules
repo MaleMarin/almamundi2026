@@ -1,0 +1,12 @@
+# Almamundi – Reglas para Cursor/IA
+
+Lee primero PROJECT_CONTEXT.md.
+
+## REGLA ABSOLUTA
+
+- No está permitido modificar archivos page.tsx excepto para añadir clases CSS existentes.
+- No está permitido cambiar textos, headings, párrafos ni contenido.
+- No está permitido crear documentos nuevos (.md).
+- **Si cambias contenido textual, el cambio se considera incorrecto.**
+
+SOLO puedes modificar: app/globals.css, tailwind.config.js, app/layout.tsx (solo wrappers / body / font, sin tocar children). Si necesitas tocar otro archivo, debes detenerte y preguntar.
