@@ -1,6 +1,5 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
@@ -85,21 +84,70 @@ function MapLegend() {
           <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
           <span className="text-xs font-bold text-gray-200 tracking-wide uppercase">Historias</span>
         </div>
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3">
           <div className="w-3 h-3 rounded-full border-2 border-white shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
           <span className="text-xs font-bold text-white tracking-wide uppercase">Actualidad</span>
         </div>
-        <div className="h-px w-full bg-white/10 mb-3" />
-        <p className="text-[11px] text-gray-300 leading-relaxed font-light italic">
-          &ldquo;Dos capas, un mismo mundo: lo vivido y lo que está pasando.&rdquo;
-        </p>
       </div>
     </div>
   );
 }
 
-/* ----- Panel derecho: Explora el mapa + Historias / Actualidad / En vivo ----- */
-function RightPanel() {
+/* ----- Portal del dropdown Temas (solo contenido, sin franja) ----- */
+function TopicsDropdownPortal({
+  open,
+  buttonRef
+}: {
+  open: boolean;
+  buttonRef: React.RefObject<HTMLButtonElement | null>;
+}) {
+  const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
+  useEffect(() => {
+    if (!open || !buttonRef.current) return;
+    setDropdownRect(buttonRef.current.getBoundingClientRect());
+  }, [open, buttonRef]);
+
+  if (!open || typeof document === 'undefined') return null;
+  const content = (
+    <div
+      id="temas-dropdown-portal"
+      className="fixed z-[9999] min-w-[280px] max-w-[90vw] max-h-[70vh] overflow-y-auto rounded-[24px] shadow-2xl border border-white/20 bg-[#E0E5EC] p-4 hide-scrollbar"
+      style={{
+        top: dropdownRect ? dropdownRect.bottom + 8 : 0,
+        left: dropdownRect ? Math.min(dropdownRect.left, window.innerWidth - 320) : 0,
+        fontFamily: APP_FONT,
+        ...soft.flat
+      }}
+    >
+      <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-3 px-2">Temas</div>
+      {INSPIRATION_TOPICS.map((t) => (
+        <button
+          key={t.title}
+          type="button"
+          className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 active:scale-[0.99] transition-all text-gray-700 font-medium text-sm"
+        >
+          {t.title}
+        </button>
+      ))}
+    </div>
+  );
+  return createPortal(content, document.body);
+}
+
+/* ----- Panel derecho: título + búsqueda + acciones (Temas, Explorar, Colecciones, Sonido) + vistas ----- */
+function RightPanel({
+  topicsOpen,
+  onTopicsToggle,
+  topicsButtonRef,
+  isMuted,
+  onToggleAudio
+}: {
+  topicsOpen: boolean;
+  onTopicsToggle: () => void;
+  topicsButtonRef: React.RefObject<HTMLButtonElement | null>;
+  isMuted: boolean;
+  onToggleAudio: () => void;
+}) {
   const [activeView, setActiveView] = useState<'historias' | 'actualidad' | 'envivo'>('historias');
 
   const views = [
@@ -128,9 +176,59 @@ function RightPanel() {
       <h2 className="text-2xl md:text-3xl font-bold text-white mb-2 mt-4">
         Explora el mapa
       </h2>
-      <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-8">
+      <p className="text-gray-300 text-sm md:text-base leading-relaxed mb-6">
         Tres formas de mirar el mundo en AlmaMundi. Elige una y haz clic en un punto para abrirlo.
       </p>
+
+      {/* Búsqueda de ciudad dentro del panel */}
+      <div className="relative mb-6">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-gray-400">
+          <Search size={18} />
+        </div>
+        <input
+          type="text"
+          placeholder="Buscar ciudad…"
+          className="w-full pl-12 pr-5 py-3 rounded-2xl outline-none text-gray-800 placeholder-gray-500 text-sm font-medium border border-white/10 bg-white/10 focus:bg-white/15 focus:border-orange-500/50 transition-colors"
+        />
+      </div>
+
+      {/* Acciones: Temas, Explorar, Colecciones, Sonido */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        <button
+          ref={topicsButtonRef}
+          type="button"
+          onClick={onTopicsToggle}
+          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-sm font-bold transition-colors"
+        >
+          <Filter size={18} />
+          Temas
+          <ChevronDown size={16} className={topicsOpen ? 'rotate-180' : ''} />
+        </button>
+        <button
+          type="button"
+          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-sm font-bold transition-colors"
+        >
+          <Grid size={18} />
+          Explorar
+        </button>
+        <button
+          type="button"
+          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-sm font-bold transition-colors relative"
+          aria-label="Mis colecciones"
+        >
+          <Bookmark size={18} className="fill-current opacity-70" />
+          Colecciones
+          <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full" />
+        </button>
+        <button
+          type="button"
+          onClick={onToggleAudio}
+          className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/20 border border-white/10 text-white text-sm font-bold transition-colors"
+        >
+          {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+          Sonido
+        </button>
+      </div>
 
       <div className="space-y-4">
         {views.map((v) => (
@@ -154,115 +252,6 @@ function RightPanel() {
         ))}
       </div>
     </div>
-  );
-}
-
-/* ----- Toolbar: Temas dropdown con portal (sin corte) ----- */
-function MapFilterBar({
-  onToggleView,
-  topicsOpen,
-  onTopicsToggle,
-  topicsButtonRef
-}: {
-  onToggleView: () => void;
-  topicsOpen: boolean;
-  onTopicsToggle: () => void;
-  topicsButtonRef: React.RefObject<HTMLButtonElement | null>;
-}) {
-  const [dropdownRect, setDropdownRect] = useState<DOMRect | null>(null);
-
-  useEffect(() => {
-    if (!topicsOpen || !topicsButtonRef.current) return;
-    const rect = topicsButtonRef.current.getBoundingClientRect();
-    setDropdownRect(rect);
-  }, [topicsOpen, topicsButtonRef]);
-
-  const dropdownContent = topicsOpen && typeof document !== 'undefined' ? (
-    <div
-      id="temas-dropdown-portal"
-      className="fixed z-[9999] min-w-[280px] max-w-[90vw] max-h-[70vh] overflow-y-auto rounded-[24px] shadow-2xl border border-white/20 bg-[#E0E5EC] p-4 hide-scrollbar"
-      style={{
-        top: dropdownRect ? dropdownRect.bottom + 8 : 0,
-        left: dropdownRect ? Math.min(dropdownRect.left, window.innerWidth - 320) : 0,
-        fontFamily: APP_FONT,
-        ...soft.flat
-      }}
-    >
-      <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-3 px-2">Temas</div>
-      {INSPIRATION_TOPICS.map((t) => (
-        <button
-          key={t.title}
-          type="button"
-          className="w-full text-left px-4 py-3 rounded-xl hover:bg-white/60 active:scale-[0.99] transition-all text-gray-700 font-medium text-sm"
-        >
-          {t.title}
-        </button>
-      ))}
-    </div>
-  ) : null;
-
-  return (
-    <>
-      <div
-        className="absolute left-0 w-full z-[80] flex justify-center px-4 pointer-events-none"
-        style={{ top: 24 }}
-      >
-        <div
-          className="pointer-events-auto flex items-center gap-4 p-3 rounded-full animate-float"
-          style={{
-            backgroundColor: 'rgba(224, 229, 236, 0.92)',
-            backdropFilter: 'blur(12px)',
-            boxShadow: soft.flat.boxShadow,
-            border: '1px solid rgba(255,255,255,0.35)',
-            fontFamily: APP_FONT
-          }}
-        >
-          <div className="relative group">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-400 group-focus-within:text-orange-500 transition-colors">
-              <Search size={18} />
-            </div>
-            <input
-              type="text"
-              placeholder="Buscar ciudad…"
-              className="pl-12 pr-6 py-3 rounded-full w-44 md:w-56 focus:w-80 transition-all duration-300 outline-none text-sm font-bold text-gray-600 placeholder-gray-400"
-              style={{ backgroundColor: soft.bg, boxShadow: soft.inset.boxShadow, fontFamily: APP_FONT }}
-            />
-          </div>
-          <div className="h-8 w-px bg-gray-300/70 mx-1 hidden md:block" />
-          <button
-            ref={topicsButtonRef}
-            type="button"
-            onClick={onTopicsToggle}
-            className="flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
-            style={soft.button}
-          >
-            <Filter size={18} />
-            <span className="text-sm font-bold">Temas</span>
-            <ChevronDown size={16} className={topicsOpen ? 'rotate-180' : ''} />
-          </button>
-          <button
-            type="button"
-            onClick={onToggleView}
-            className="flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
-            style={soft.button}
-          >
-            <Grid size={18} />
-            <span className="text-sm font-bold hidden md:inline">Explorar</span>
-          </button>
-          <div className="h-8 w-px bg-gray-300/70 mx-1" />
-          <button
-            type="button"
-            className="w-12 h-12 flex items-center justify-center rounded-full text-orange-500 hover:text-orange-600 transition-colors active:scale-95 relative"
-            style={soft.button}
-            aria-label="Mis colecciones"
-          >
-            <Bookmark size={20} className="fill-current opacity-50" />
-            <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 rounded-full border-2 border-[#E0E5EC]" />
-          </button>
-        </div>
-      </div>
-      {dropdownContent && createPortal(dropdownContent, document.body)}
-    </>
   );
 }
 
@@ -346,25 +335,15 @@ export default function MapaPage() {
       <style dangerouslySetInnerHTML={{ __html: globalStyles }} />
       <audio ref={audioRef} loop src="/universo.mp3" />
 
-      <div className="absolute top-6 right-[calc(50%+220px)] z-[90] hidden lg:flex items-center gap-2">
-        <button
-          type="button"
-          onClick={toggleAudio}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 hover:bg-white/20 text-gray-300 text-xs font-bold uppercase tracking-widest transition-colors"
-        >
-          {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-          <span>Sonido</span>
-        </button>
-      </div>
-
-      <MapFilterBar
-        onToggleView={() => {}}
+      <TopicsDropdownPortal open={topicsOpen} buttonRef={topicsButtonRef} />
+      <MapLegend />
+      <RightPanel
         topicsOpen={topicsOpen}
         onTopicsToggle={() => setTopicsOpen((v) => !v)}
         topicsButtonRef={topicsButtonRef}
+        isMuted={isMuted}
+        onToggleAudio={toggleAudio}
       />
-      <MapLegend />
-      <RightPanel />
 
       <div
         ref={globeWrapRef}
