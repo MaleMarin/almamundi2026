@@ -7,10 +7,10 @@ import { mockWorldNow } from "@/lib/world/mockWorldNow";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-type Params = { params: { field: string } };
+type Context = { params: Promise<{ field: string }> };
 
-export async function GET(request: NextRequest, { params }: Params) {
-  const fieldSlug = params?.field;
+export async function GET(request: NextRequest, { params }: Context) {
+  const { field: fieldSlug } = await params;
 
   if (!fieldSlug || !isField(fieldSlug)) {
     return Response.json(
