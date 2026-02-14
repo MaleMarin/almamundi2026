@@ -72,27 +72,6 @@ function useElementWidth<T extends HTMLElement>() {
   return { ref, width };
 }
 
-/* ----- MapLegend: solo "Historias" y "Actualidad" (sin "Memoria" en UI) ----- */
-function MapLegend() {
-  return (
-    <div className="absolute top-8 left-6 z-[80] pointer-events-none hidden lg:block">
-      <div
-        className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-[26px] shadow-lg max-w-xs animate-float"
-        style={{ fontFamily: APP_FONT }}
-      >
-        <div className="flex items-center gap-3 mb-3">
-          <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
-          <span className="text-xs font-bold text-gray-200 tracking-wide uppercase">Historias</span>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-3 h-3 rounded-full border-2 border-white shadow-[0_0_10px_rgba(255,255,255,0.35)]" />
-          <span className="text-xs font-bold text-white tracking-wide uppercase">Actualidad</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 /* ----- Portal del dropdown Temas (solo contenido, sin franja) ----- */
 function TopicsDropdownPortal({
   open,
@@ -336,7 +315,6 @@ export default function MapaPage() {
       <audio ref={audioRef} loop src="/universo.mp3" />
 
       <TopicsDropdownPortal open={topicsOpen} buttonRef={topicsButtonRef} />
-      <MapLegend />
       <RightPanel
         topicsOpen={topicsOpen}
         onTopicsToggle={() => setTopicsOpen((v) => !v)}
