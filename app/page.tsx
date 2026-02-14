@@ -501,10 +501,26 @@ function MapFilterBar({ onToggleView }: { onToggleView: () => void }) {
 /* =========================    MAP LEGEND (CUADRO DER)    ========================= */
 function MapLegend() {
   return (
-    <div className="absolute top-32 right-6 z-[80] pointer-events-none hidden lg:block">
+    <div className="absolute top-32 right-6 z-[2] hidden lg:block w-[320px] max-w-[calc(100vw-48px)] pointer-events-auto">
+      {/* Capa base: mismo gradiente del mapa (--bg0/--bg1/--bg2) */}
       <div
-        className="bg-white/10 backdrop-blur-md border border-white/20 p-6 rounded-[26px] shadow-lg max-w-xs animate-float"
-        style={{ fontFamily: APP_FONT }}
+        className="absolute inset-0 rounded-[26px]"
+        style={{
+          background: 'linear-gradient(to bottom, var(--bg0) 0%, var(--bg1) 40%, var(--bg2) 100%)',
+          zIndex: 0,
+        }}
+      />
+      {/* Capa glass oscura (dark liquid glass), sin blanco */}
+      <div
+        className="relative p-6 rounded-[26px] border border-white/10 shadow-lg backdrop-blur-md animate-float"
+        style={{
+          fontFamily: APP_FONT,
+          background: 'rgba(0,0,0,0.35)',
+          WebkitBackdropFilter: 'blur(18px) saturate(120%)',
+          backdropFilter: 'blur(18px) saturate(120%)',
+          boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+          zIndex: 1,
+        }}
       >
         <div className="flex items-center gap-3 mb-3">
           <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
@@ -1661,11 +1677,17 @@ export default function Home() {
         </SoftCard>
       </section>
 
-      {/* MAPA */}
+      {/* MAPA — fondo oscuro por CSS vars (--bg0/--bg1/--bg2), nunca claro */}
       <section
         id="mapa"
         className="relative w-full scroll-mt-[160px] min-h-[90vh] md:min-h-[1400px] flex flex-col justify-start overflow-hidden"
-        style={{ background: 'linear-gradient(to bottom, #E0E5EC 0%, #1B2333 20%, #0F1A2B 100%)' }}
+        style={{
+          ['--bg0' as string]: '#070B14',
+          ['--bg1' as string]: '#0A1022',
+          ['--bg2' as string]: '#0F1B33',
+          background: 'linear-gradient(to bottom, var(--bg0) 0%, var(--bg1) 40%, var(--bg2) 100%)',
+          zIndex: 0,
+        }}
       >
         <div className="relative z-20 container mx-auto px-6 pt-16 md:pt-28 pb-10 flex flex-col items-center text-center">
           <h2 className="text-6xl md:text-8xl font-light mb-8 drop-shadow-xl" style={{ color: '#F97316' }}>
@@ -1714,13 +1736,13 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="relative w-full" style={{ height: 1250 }}>
+        <div className="relative w-full lg:pr-[360px]" style={{ height: 1250 }}>
           <MapFilterBar onToggleView={() => alert('Próximamente: Vista de Tarjetas')} />
           <MapLegend />
 
           <div
             ref={globeWrapRef}
-            className={`w-full h-full flex items-center justify-center relative z-10 mt-2 transition-all ${isInteractive ? 'cursor-move pointer-events-auto' : 'cursor-default pointer-events-none'}`}
+            className={`w-full h-full flex items-center justify-center relative z-[1] mt-2 transition-all ${isInteractive ? 'cursor-move pointer-events-auto' : 'cursor-default pointer-events-none'}`}
             style={{ touchAction: isInteractive ? 'none' : 'auto' }}
           >
             <GlobeComp
