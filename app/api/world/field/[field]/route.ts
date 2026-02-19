@@ -36,11 +36,11 @@ export async function GET(request: NextRequest, { params }: Context) {
   const col = getWorldCollection();
 
   if (!col) {
-    const mock = mockWorldNow(fieldSlug, mode);
+    const mock = mockWorldNow();
     return Response.json({
       mode,
       field: fieldSlug,
-      updatedAt: mock.updatedAt,
+      updatedAt: new Date(mock.generatedAt).toISOString(),
       items: mock.items,
       source: "mock",
       warning: "Firestore not configured. Returned mock data.",
@@ -58,11 +58,11 @@ export async function GET(request: NextRequest, { params }: Context) {
     });
   } catch (e) {
     console.error("[api/world/field] GET error:", e);
-    const mock = mockWorldNow(fieldSlug, mode);
+    const mock = mockWorldNow();
     return Response.json({
       mode,
       field: fieldSlug,
-      updatedAt: mock.updatedAt,
+      updatedAt: new Date(mock.generatedAt).toISOString(),
       items: mock.items,
       source: "mock",
       warning: "Firestore query failed. Returned mock data.",

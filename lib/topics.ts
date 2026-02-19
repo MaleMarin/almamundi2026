@@ -20,6 +20,5 @@ export const INSPIRATION_TOPICS: TopicItem[] = [
   { title: '10. Naturaleza', questions: ['¿Cuál es tu paisaje favorito?', '¿Qué árbol recuerdas con cariño?', '¿Te gusta más el mar o la montaña?'] },
   { title: '11. Cultura, música y libros', questions: ['¿Qué canción es la banda sonora de tu vida?', '¿Qué libro te voló la cabeza?', '¿Qué tradición mantienes viva?'] },
   { title: '12. Tecnología', questions: ['¿Cómo cambió tu vida internet?', '¿Qué extrañas de la época analógica?', '¿Qué invento te fascina?'] },
-  { title: '13. Historia y País', questions: ['¿Qué evento histórico viviste en carne propia?', '¿Qué esperas para el futuro de tu país?', '¿Qué significa para ti tu bandera?'] },
-  { title: '14. Tema Libre', questions: ['Cuenta lo que quieras.', 'El micrófono es tuyo.', 'Sorpréndenos.'] }
+  { title: '13. Historia y País', questions: ['¿Qué evento histórico viviste en carne propia?', '¿Qué esperas para el futuro de tu país?', '¿Qué significa para ti tu bandera?'] }
 ];
