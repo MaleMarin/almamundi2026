@@ -25,11 +25,14 @@ import {
   MapPin,
   Globe2,
   Users,
-  FileText
+  FileText,
+  Image as ImageIcon
 } from 'lucide-react';
 
 // --- IMPORTACIÓN DINÁMICA DEL GLOBO (SSR OFF) ---
 const GlobeComp = dynamic(() => import('react-globe.gl'), { ssr: false });
+
+import { uploadFileToStorage } from '@/lib/firebase/upload';
 
 /* ------------------------------------------------------------------ */
 /* THEME: NEUMÓRFICO (SOFT UI)                                         */
@@ -102,7 +105,7 @@ const globalStyles = `
 /* ------------------------------------------------------------------ */
 /* TYPES                                                               */
 /* ------------------------------------------------------------------ */
-type Mode = 'Video' | 'Audio' | 'Texto';
+type Mode = 'Video' | 'Audio' | 'Texto' | 'Foto';
 
 type StoryPoint = {
   lat: number;
@@ -559,22 +562,19 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative p-8 rounded-[40px] flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group animate-float w-full md:w-[380px] min-h-[520px]"
+      className="relative p-6 rounded-[40px] flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group animate-float w-full max-w-[320px] min-h-[380px] flex-1"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div className="mb-6">
-        <h3 className="text-xl font-light text-gray-500">{title}</h3>
-        <h2 className="text-3xl font-bold text-gray-700 leading-none">{subtitle}</h2>
+      <div className="mb-4">
+        <h3 className="text-lg font-light text-gray-500">{title}</h3>
+        <h2 className="text-2xl font-bold text-gray-700 leading-none">{subtitle}</h2>
       </div>
-
-      <div className="flex-1" />
-
+      <div className="flex-1 min-h-[72px]" />
       <div className="w-full">
-        <p className="text-gray-500 leading-relaxed text-base md:text-lg mb-6">{children}</p>
-
+        <p className="text-gray-500 leading-relaxed text-base mb-5">{children}</p>
         <button
           onClick={onClick}
-          className="w-full flex justify-center px-10 py-4 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95 group-hover:text-orange-600"
+          className="w-full flex justify-center px-8 py-4 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95 group-hover:text-orange-600"
           style={soft.button}
           type="button"
         >
@@ -747,6 +747,8 @@ function StoryModal({
 
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [mediaUrl, setMediaUrl] = useState<string>('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
   const [isRecording, setIsRecording] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(300);
   const [err, setErr] = useState<string>('');
@@ -789,6 +791,11 @@ function StoryModal({
     } catch {}
   }, []);
 
+  const imagePreviewUrlRef = useRef<string>('');
+  useEffect(() => {
+    imagePreviewUrlRef.current = imagePreviewUrl;
+  }, [imagePreviewUrl]);
+
   const hardResetCapture = useCallback(() => {
     setErr('');
     setSecondsLeft(300);
@@ -801,6 +808,14 @@ function StoryModal({
     setMediaBlob(null);
     revokeMediaUrl();
     setMediaUrl('');
+    setImageFile(null);
+    if (imagePreviewUrlRef.current) {
+      try {
+        URL.revokeObjectURL(imagePreviewUrlRef.current);
+      } catch {}
+      imagePreviewUrlRef.current = '';
+      setImagePreviewUrl('');
+    }
   }, [cleanupStream, revokeMediaUrl]);
 
   // Reset modal when opens (or mode changes while open)
@@ -951,8 +966,9 @@ function StoryModal({
 
   const canContinueFromCapture = useMemo(() => {
     if (mode === 'Texto') return text.trim().length >= 30 && !isTextTooLong;
+    if (mode === 'Foto') return !!imageFile;
     return !!mediaBlob && !isRecording;
-  }, [mode, text, isTextTooLong, mediaBlob, isRecording]);
+  }, [mode, text, isTextTooLong, mediaBlob, isRecording, imageFile]);
 
   const canSubmit = useMemo(() => {
     const baseOk = !!sex && !!ageRange && city.trim().length > 1 && country.trim().length > 1 && acceptedPrivacy;
@@ -1054,7 +1070,12 @@ function StoryModal({
       window.setTimeout(() => setErr(''), 2200);
       return;
     }
-    if (mode !== 'Texto' && !mediaBlob) {
+    if (mode === 'Foto' && !imageFile) {
+      setErr('Primero elige una fotografía.');
+      window.setTimeout(() => setErr(''), 2200);
+      return;
+    }
+    if (mode !== 'Texto' && mode !== 'Foto' && !mediaBlob) {
       setErr('Primero graba tu audio/video.');
       window.setTimeout(() => setErr(''), 2200);
       return;
@@ -1063,18 +1084,60 @@ function StoryModal({
     setSaving(true);
 
     try {
-      await sleep(900);
+      const formatMap = { Video: 'video', Audio: 'audio', Texto: 'text', Foto: 'image' } as const;
+      const apiFormat = formatMap[mode];
 
-      const id = imprintIdRef.current || makeId('AM');
+      const placeLabel = [city.trim(), country.trim()].filter(Boolean).join(', ') || 'Sin lugar';
+      const authorEmailVal = wantsEmail && email.trim() ? email.trim() : 'noreply@almamundi.org';
+      const titleVal = storyTitle.trim() || 'Mi historia';
+
+      let media: { audioUrl?: string; videoUrl?: string; imageUrl?: string } = {};
+
+      if (mode === 'Foto' && imageFile) {
+        const imageUrl = await uploadFileToStorage(imageFile, 'submissions', imageFile.name);
+        media = { imageUrl };
+      } else if ((mode === 'Video' || mode === 'Audio') && mediaBlob) {
+        const ext = mode === 'Video' ? 'webm' : 'webm';
+        const url = await uploadFileToStorage(mediaBlob, 'submissions', `media.${ext}`);
+        if (mode === 'Video') media = { videoUrl: url };
+        else media = { audioUrl: url };
+      }
+
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          authorEmail: authorEmailVal,
+          authorName: name.trim() || undefined,
+          title: titleVal,
+          placeLabel,
+          lat: 0,
+          lng: 0,
+          format: apiFormat,
+          text: mode === 'Texto' ? text.trim() : undefined,
+          media: Object.keys(media).length ? media : undefined,
+          tags: { themes: [], moods: [], keywords: [] },
+          consent: { termsAccepted: true, license: 'allow_publish' },
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        setErr(data.error || `Error ${res.status}. Intenta de nuevo.`);
+        return;
+      }
+
+      const id = data.id || imprintIdRef.current || makeId('AM');
       imprintIdRef.current = id;
-
       setStep('received');
-    } catch {
-      setErr('No pudimos enviar. Intenta de nuevo.');
+    } catch (e) {
+      console.error('submit', e);
+      setErr('No pudimos enviar. Revisa tu conexión e intenta de nuevo.');
     } finally {
       setSaving(false);
     }
-  }, [canSubmit, mode, text, mediaBlob]);
+  }, [canSubmit, mode, text, mediaBlob, imageFile, city, country, storyTitle, name, email, wantsEmail]);
 
   const resetForNewStory = useCallback(() => {
     setErr('');
@@ -1141,12 +1204,60 @@ function StoryModal({
             <div className="rounded-[30px] p-7" style={soft.inset}>
               <div className="flex items-center justify-between gap-4 mb-4">
                 <div className="text-sm font-black tracking-widest uppercase text-gray-500">
-                  {mode === 'Texto' ? 'Escribe' : 'Graba'} · Máximo {mode === 'Texto' ? '2 carillas aprox.' : '5:00'}
+                  {mode === 'Texto' ? 'Escribe' : mode === 'Foto' ? 'Sube una foto' : 'Graba'} · {mode === 'Texto' ? 'Máximo 2 carillas aprox.' : mode === 'Foto' ? 'JPG o PNG' : 'Máximo 5:00'}
                 </div>
-                {mode !== 'Texto' ? <div className="text-xs font-black tracking-widest uppercase text-gray-400">{mm}:{ss}</div> : null}
+                {mode !== 'Texto' && mode !== 'Foto' ? <div className="text-xs font-black tracking-widest uppercase text-gray-400">{mm}:{ss}</div> : null}
               </div>
 
-              {mode === 'Texto' ? (
+              {mode === 'Foto' ? (
+                <>
+                  <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-2">
+                    Sube una fotografía
+                  </div>
+                  <div className="text-gray-600 text-sm leading-relaxed mb-4">
+                    Elige una imagen que quieras que quede en el mapa. JPG o PNG.
+                  </div>
+                  <label className="w-full block cursor-pointer">
+                    <span className="inline-flex items-center gap-2 px-6 py-4 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
+                      <ImageIcon size={18} />
+                      Elegir foto
+                    </span>
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        if (imagePreviewUrl) {
+                          try {
+                            URL.revokeObjectURL(imagePreviewUrl);
+                          } catch {}
+                        }
+                        setImageFile(file);
+                        setImagePreviewUrl(URL.createObjectURL(file));
+                        e.target.value = '';
+                      }}
+                    />
+                  </label>
+                  {imagePreviewUrl && (
+                    <div className="mt-6 rounded-[18px] overflow-hidden bg-gray-200" style={{ maxHeight: 320 }}>
+                      <img src={imagePreviewUrl} alt="Vista previa" className="w-full h-auto object-contain max-h-[320px]" />
+                    </div>
+                  )}
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setStep('details')}
+                      disabled={!canContinueFromCapture}
+                      className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
+                      style={{ ...soft.button, backgroundColor: '#F97316' }}
+                    >
+                      Continuar
+                    </button>
+                  </div>
+                </>
+              ) : mode === 'Texto' ? (
                 <>
                   {chosenTopic ? (
                     <div className="mb-4 p-4 rounded-[18px]" style={{ ...soft.flat, borderRadius: '18px' }}>
@@ -1645,35 +1756,33 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* INTRO */}
-      <section id="intro" className="pt-48 md:pt-64 pb-4 px-6 relative z-10 flex flex-col items-center text-center">
+      {/* INTRO + CARDS: primera vista en una pantalla (sin scroll) */}
+      <section id="intro" className="pt-44 md:pt-52 pb-2 px-6 relative z-10 flex flex-col items-center text-center">
         <div className="max-w-6xl animate-float">
-          <h1 className="text-4xl md:text-6xl font-light leading-tight mb-10" style={{ color: soft.textMain }}>
+          <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
             AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
           </h1>
-
-          <div className="w-32 h-2 rounded-full mx-auto mb-12 opacity-50 bg-orange-400" />
-
-          <p className="text-xl md:text-3xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
+          <div className="w-24 h-1.5 rounded-full mx-auto mb-4 opacity-50 bg-orange-400" />
+          <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
             Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
           </p>
-
-          <ChevronDown className="mx-auto mt-12 text-gray-400 opacity-50 animate-bounce" />
+          <ChevronDown className="mx-auto mt-3 text-gray-400 opacity-50 animate-bounce w-6 h-6" />
         </div>
       </section>
 
-      {/* CARDS */}
-      <section id="historias" className="w-full px-6 mb-28 flex flex-col md:flex-row gap-12 justify-center items-stretch relative z-10 -mt-12">
+      {/* CARDS — visibles completos en la primera vista */}
+      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 -mt-2">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
-
         <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={() => setModalMode('Audio')} delay="0.2s">
           Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
         </SoftCard>
-
         <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={() => setModalMode('Texto')} delay="0.4s">
           Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.
+        </SoftCard>
+        <SoftCard title="Tu mirada," subtitle="en una fotografía" buttonLabel="SUBE UNA FOTO" onClick={() => setModalMode('Foto')} delay="0.6s">
+          A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>
       </section>
 
