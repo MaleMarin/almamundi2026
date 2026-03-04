@@ -4501,12 +4501,19 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           </>
         )}
 
-      {/* Globo a full; full page: globo termina bien arriba para no tapar la frase fecha/hora/ciudad (bottom: 60px) */}
+      {/* Globo: wrapper a altura completa para no cortar la esfera arriba; zona del canvas deja 100px abajo para la frase */}
       <div
         style={
           embedded
             ? { position: 'absolute', inset: 0, zIndex: 10 }
-            : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 280, zIndex: 10 }
+            : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 0, zIndex: 10 }
+        }
+      >
+      <div
+        style={
+          embedded
+            ? { position: 'absolute', inset: 0 }
+            : { position: 'absolute', top: 0, left: 0, right: 0, bottom: '100px' }
         }
       >
       <MapCanvas
@@ -4666,8 +4673,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      {/* HUD: Fecha/Hora/Ciudad — en el contenedor del universo, debajo del globo */}
-      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '0px', position: 'relative', marginTop: '16px' }}>
+      </div>
+      {/* HUD: Fecha/Hora/Ciudad — en el contenedor del universo, debajo del globo; z-30 por encima del canvas */}
+      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '60px' }}>
         <TimeBar
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
