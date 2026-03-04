@@ -3736,8 +3736,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       data-build="mapa-v1"
       style={{
         ...(embedded
-          ? { position: 'relative', width: '100%', height: '100%', minHeight: 0, overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingRight: 32, paddingTop: 0 }
-          : { position: 'fixed', inset: 0, width: '100vw', height: '100dvh', maxHeight: '100vh', overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT }),
+          ? { position: 'relative', width: '100%', height: '100%', minHeight: 0, overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingRight: 32, paddingTop: 0, paddingBottom: '120px' }
+          : { position: 'fixed', inset: 0, width: '100vw', height: '100dvh', maxHeight: '100vh', overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingBottom: '120px' }),
       }}
     >
       <style jsx global>{globalStyles}</style>
@@ -4666,8 +4666,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      {/* HUD: Fecha/Hora/Ciudad — en la zona de 100px bajo el globo, visible sobre fondo oscuro */}
-      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: 40 }}>
+      {/* HUD: Fecha/Hora/Ciudad — en el contenedor del universo, debajo del globo */}
+      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '60px' }}>
         <TimeBar
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
