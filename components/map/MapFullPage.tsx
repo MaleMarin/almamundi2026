@@ -3929,39 +3929,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       {!embedded && <UniverseBackground />}
       <AtmosphereOverlay soundEnabled={soundEnabled} hourOverride={hourOverride} embedded={embedded} />
 
-      {/* Full page: título arriba del degradado, luego franja (dock) y globo con aire */}
-      {!embedded && (
-        <div
-          aria-hidden
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            height: 56,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 24,
-            pointerEvents: 'none',
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              fontSize: 'clamp(1.75rem, 4vw, 2.5rem)',
-              fontWeight: 300,
-              color: '#ff4500',
-              fontFamily: APP_FONT,
-              letterSpacing: '-0.02em',
-              textShadow: '0 2px 20px rgba(0,0,0,0.4)',
-            }}
-          >
-            Mapa de AlmaMundi
-          </h1>
-        </div>
-      )}
-
       {/* Overlay oscuro sobre el globo — clic cierra el visor (absolute en home dentro del Universe) */}
       <div
         aria-hidden
@@ -4059,16 +4026,17 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         </button>
       )}
 
-      {/* Drawer: inline dentro del Universe (absolute, no fixed). Full page: controles + dock + drawer */}
+      {/* Drawer: inline dentro del Universe (absolute, no fixed). Full page: navbar flotante transparente (z-50), globo a pantalla completa */}
       {!embedded && (
           <>
-            <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={72} />
+            <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={16} navbarZIndex={50} />
             <MapDock
               activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'sounds'}
               onModeChange={handleDockModeChange}
               onResetView={handleResetView}
               drawerOpen={drawerOpen}
-              topOffset={72}
+              topOffset={16}
+              navbarZIndex={50}
             />
             <MapDrawer
               open={drawerOpen}

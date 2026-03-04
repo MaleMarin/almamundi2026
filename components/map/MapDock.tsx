@@ -9,8 +9,10 @@ type MapDockProps = {
   hidden?: boolean;
   drawerOpen?: boolean;
   embedded?: boolean;
-  /** En full page: top en px para quedar debajo del título "Mapa de AlmaMundi" */
+  /** En full page: top en px (navbar flotante sobre el globo) */
   topOffset?: number;
+  /** z-index del navbar flotante (full page) */
+  navbarZIndex?: number;
 };
 
 /** Franja (dock): pill neumórfico azul noche — estilos inline para que siempre se apliquen (sin depender del purge de Tailwind). */
@@ -60,13 +62,14 @@ const activeBtnStyle: React.CSSProperties = {
   fontWeight: 600,
 };
 
-export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerOpen, embedded, topOffset }: MapDockProps) {
+export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerOpen, embedded, topOffset, navbarZIndex }: MapDockProps) {
   if (hidden) return null;
 
   const topPx = topOffset ?? (drawerOpen ? 8 : 24);
+  const dockZ = navbarZIndex ?? 25;
   const positionStyle: React.CSSProperties = embedded
     ? { position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 25 }
-    : { position: 'fixed', top: topPx, left: '50%', transform: 'translateX(-50%)', zIndex: 25 };
+    : { position: 'fixed', top: topPx, left: '50%', transform: 'translateX(-50%)', zIndex: dockZ };
 
   /** Orden: Historias, Sonidos, Noticias, Buscar por palabras clave. */
   const buttons: { mode: MapDockMode; label: string }[] = [

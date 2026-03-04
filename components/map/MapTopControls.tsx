@@ -10,13 +10,15 @@ type MapTopControlsProps = {
   embedded?: boolean;
   /** En full page: top en px para alinear con la franja del dock */
   topOffset?: number;
+  /** z-index del navbar flotante (full page) */
+  navbarZIndex?: number;
 };
 
 const NEO_BG = 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)';
 const NEO_RAISED = '4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.04)';
 const NEO_PRESSED = 'inset 2px 2px 5px rgba(0,0,0,0.35)';
 
-export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, topOffset }: MapTopControlsProps) {
+export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, topOffset, navbarZIndex }: MapTopControlsProps) {
   if (hidden) return null;
 
   const topPx = topOffset ?? 20;
@@ -28,7 +30,7 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
     <div
       style={{
         ...positionStyle,
-        zIndex: 22,
+        zIndex: navbarZIndex ?? 22,
       }}
     >
       <button
