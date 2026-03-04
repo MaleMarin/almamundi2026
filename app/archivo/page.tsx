@@ -77,7 +77,7 @@ function archivoToStoryPoint(s: ArchivoStory): StoryPoint {
     videoUrl: s.videoUrl,
     audioUrl: s.audioUrl,
     imageUrl: s.imageUrl,
-    photos: s.photos ?? [],
+    photos: (s.photos ?? []) as { url: string; name?: string; date?: string }[],
     hasText: Boolean(s.body),
     hasAudio: Boolean(s.audioUrl),
     hasVideo: Boolean(s.videoUrl),
