@@ -10,25 +10,36 @@ const CACHE_TTL_MS = 300_000; // 5 min
 const GDELT_REQUEST_TIMEOUT_MS = 8_000;
 const RSS_FETCH_TIMEOUT_MS = 6_000;
 
-/** Feeds RSS de medios curados: titulares reales cuando GDELT no responde */
-const RSS_FEEDS: { domain: string; url: string }[] = [
-  { domain: "elpais.com", url: "https://elpais.com/rss/" },
-  { domain: "eldiario.es", url: "https://www.eldiario.es/rss/" },
-  { domain: "infobae.com", url: "https://www.infobae.com/arc/outboundfeeds/rss/" },
-  { domain: "lanacion.com.ar", url: "https://www.lanacion.com.ar/arc/outboundfeeds/rss/" },
-  { domain: "pagina12.com.ar", url: "https://www.pagina12.com.ar/rss" },
-  { domain: "elmostrador.cl", url: "https://www.elmostrador.cl/feed" },
-  { domain: "ciperchile.cl", url: "https://ciperchile.cl/feed/" },
-  { domain: "latercera.com", url: "https://www.latercera.com/feed/" },
-  { domain: "emol.com", url: "https://www.emol.com/rss/" },
-  { domain: "jornada.com.mx", url: "https://www.jornada.com.mx/rss" },
-  { domain: "animalpolitico.com", url: "https://www.animalpolitico.com/feed/" },
-  { domain: "eluniversal.com.mx", url: "https://www.eluniversal.com.mx/rss" },
-];
+// URLs RSS por dominio: todos los medios de la curaduría que tienen feed disponible
+const RSS_URL_BY_DOMAIN: Record<string, string> = {
+  "elpais.com": "https://elpais.com/rss/",
+  "eldiario.es": "https://www.eldiario.es/rss/",
+  "infobae.com": "https://www.infobae.com/arc/outboundfeeds/rss/",
+  "lanacion.com.ar": "https://www.lanacion.com.ar/arc/outboundfeeds/rss/",
+  "pagina12.com.ar": "https://www.pagina12.com.ar/rss",
+  "elmostrador.cl": "https://www.elmostrador.cl/feed",
+  "ciperchile.cl": "https://ciperchile.cl/feed/",
+  "latercera.com": "https://www.latercera.com/feed/",
+  "emol.com": "https://www.emol.com/rss/",
+  "jornada.com.mx": "https://www.jornada.com.mx/rss",
+  "animalpolitico.com": "https://www.animalpolitico.com/feed/",
+  "eluniversal.com.mx": "https://www.eluniversal.com.mx/rss",
+  "theclinic.cl": "https://www.theclinic.cl/feed/",
+  "nytimes.com": "https://rss.nytimes.com/services/xml/rss/nyt/es.xml",
+  "laopinion.com": "https://www.laopinion.com/feed/",
+  "eldiariony.com": "https://www.eldiariony.com/feed/",
+  "precisar.net": "https://precisar.net/feed/",
+  "politica-digital.com": "https://politica-digital.com/feed/",
+};
 
-/** Query GDELT por dominios de tus medios: devuelve artículos reales (titular, URL, fecha) de esos sitios */
+/** Feeds RSS derivados de la curaduría: solo medios con URL conocida */
+const RSS_FEEDS: { domain: string; url: string }[] = MEDIA_SOURCES.filter((m) =>
+  RSS_URL_BY_DOMAIN[m.domain]
+).map((m) => ({ domain: m.domain, url: RSS_URL_BY_DOMAIN[m.domain] }));
+
+/** Query GDELT por dominios de los medios curados (todos los de media-sources). */
 function buildDomainQuery(): string {
-  const domains = MEDIA_SOURCES.slice(0, 12).map((m) => `domainis:${m.domain}`).join(" OR ");
+  const domains = MEDIA_SOURCES.map((m) => `domainis:${m.domain}`).join(" OR ");
   return `(${domains})`;
 }
 
@@ -194,6 +205,15 @@ const LIVE_STREAMS: Array<{ id: string; title: string; source: string; embedUrl:
 ];
 
 // --- Normalized news shape
+export type NewsGeo = {
+  lat: number;
+  lng: number;
+  precision?: "country" | "city" | "unknown";
+  label?: string;
+  /** false = coordenadas del medio (sede); true o ausente = ubicación del hecho. El globo solo debe moverse cuando es ubicación del hecho. */
+  isEventLocation?: boolean;
+};
+
 export type NormalizedNewsItem = {
   id: string;
   title: string;
@@ -203,7 +223,129 @@ export type NormalizedNewsItem = {
   sourceCountry: string | null;
   lat: number | null;
   lng: number | null;
+  geo?: NewsGeo | null;
 };
+
+/** Origen del medio → coordenadas aproximadas (para noticias sin geo, ej. RSS). */
+const SOURCE_GEO_FALLBACK: Record<string, { lat: number; lng: number; label: string; precision: "country" | "city" }> = (() => {
+  const map: Record<string, { lat: number; lng: number; label: string; precision: "country" | "city" }> = {};
+  for (const m of MEDIA_SOURCES) {
+    const coords = coordsForCountry(m.country);
+    if (coords) map[m.name] = { lat: coords.lat, lng: coords.lng, label: m.countryName, precision: "country" };
+  }
+  // Ajustes ciudad cuando convenga (opcional)
+  map["El País"] = { lat: 40.4168, lng: -3.7038, label: "Madrid, España", precision: "city" };
+  map["elDiario.es"] = { lat: 40.4168, lng: -3.7038, label: "Madrid, España", precision: "city" };
+  map["Infobae"] = { lat: -34.6037, lng: -58.3816, label: "Buenos Aires, Argentina", precision: "city" };
+  map["La Nación"] = { lat: -34.6037, lng: -58.3816, label: "Buenos Aires, Argentina", precision: "city" };
+  map["Página/12"] = { lat: -34.6037, lng: -58.3816, label: "Buenos Aires, Argentina", precision: "city" };
+  return map;
+})();
+
+function normalizeSource(s: string): string {
+  return (s || "").trim().replace(/\s+/g, " ");
+}
+
+/** Segmentos de URL o palabras en título que indican el país/región de la noticia (no del medio). */
+const STORY_LOCATION_HINTS: Record<string, string> = {
+  "estados-unidos": "us",
+  "eeuu": "us",
+  "united-states": "us",
+  "usa": "us",
+  "mexico": "mx",
+  "méxico": "mx",
+  "argentina": "ar",
+  "chile": "cl",
+  "colombia": "co",
+  "espana": "es",
+  "españa": "es",
+  "brasil": "br",
+  "brazil": "br",
+  "venezuela": "ve",
+  "peru": "pe",
+  "perú": "pe",
+  "ecuador": "ec",
+  "bolivia": "bo",
+  "paraguay": "py",
+  "uruguay": "uy",
+  "cuba": "cu",
+  "francia": "fr",
+  "france": "fr",
+  "alemania": "de",
+  "germany": "de",
+  "reino-unido": "gb",
+  "uk": "gb",
+  "italia": "it",
+  "italy": "it",
+  "china": "cn",
+  "rusia": "ru",
+  "russia": "ru",
+  "ucrania": "ua",
+  "ukraine": "ua",
+  "israel": "il",
+  "palestina": "ps",
+  "el-mundo": "us",
+};
+
+const STORY_LOCATION_LABELS: Record<string, string> = {
+  us: "Estados Unidos", mx: "México", ar: "Argentina", cl: "Chile", es: "España", br: "Brasil",
+  fr: "Francia", de: "Alemania", gb: "Reino Unido", cn: "China", ru: "Rusia", ua: "Ucrania", co: "Colombia", ve: "Venezuela", pe: "Perú", ec: "Ecuador", bo: "Bolivia", py: "Paraguay", uy: "Uruguay", cu: "Cuba", it: "Italia", il: "Israel", ps: "Palestina",
+};
+
+/** Inferir ubicación del hecho desde URL (path) y título. Devuelve coords del país de la noticia, no del medio. */
+function getStoryLocationFromContent(url: string, title: string): { lat: number; lng: number; label: string } | null {
+  const path = (url || "").split("?")[0] || "";
+  const pathLower = path.toLowerCase();
+  const segments = path.split("/").map((s) => s.toLowerCase().trim()).filter(Boolean);
+
+  for (const seg of segments) {
+    const code = STORY_LOCATION_HINTS[seg];
+    if (code) {
+      const coords = coordsForCountry(code);
+      if (coords) return { ...coords, label: STORY_LOCATION_LABELS[code] ?? code.toUpperCase() };
+    }
+  }
+  if (/estados-unidos|eeuu|estadosunidos/i.test(pathLower) || /\b(ee\.?\s*uu\.?|estados\s*unidos|eeuu)\b/i.test(title || "")) {
+    const coords = coordsForCountry("us");
+    if (coords) return { ...coords, label: "Estados Unidos" };
+  }
+  if (/mexico|méxico/i.test(pathLower) || /\b(méxico|mexico)\b/i.test(title || "")) {
+    const coords = coordsForCountry("mx");
+    if (coords) return { ...coords, label: "México" };
+  }
+  const titleNorm = (title || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const titleWords = titleNorm.split(/\s+/);
+  const stopWords = new Set(["el", "la", "los", "las", "un", "una", "de", "en", "y", "para", "que", "con", "por", "al", "del", "ice"]);
+  for (const w of titleWords) {
+    if (w.length < 3 || stopWords.has(w)) continue;
+    const code = STORY_LOCATION_HINTS[w] ?? STORY_LOCATION_HINTS[w.replace(/\s+/g, "-")];
+    if (code) {
+      const coords = coordsForCountry(code);
+      if (coords) return { ...coords, label: STORY_LOCATION_LABELS[code] ?? code.toUpperCase() };
+    }
+  }
+  return null;
+}
+
+function applyGeoFallback(items: NormalizedNewsItem[]): NormalizedNewsItem[] {
+  return items.map((it) => {
+    const hasValidCoords = Number.isFinite(it.lat) && Number.isFinite(it.lng);
+    if (hasValidCoords && it.lat != null && it.lng != null) {
+      return { ...it, geo: it.geo ?? { lat: it.lat, lng: it.lng, precision: "unknown" as const, isEventLocation: true } };
+    }
+    const storyLoc = getStoryLocationFromContent(it.url ?? "", it.title ?? "");
+    if (storyLoc) {
+      return {
+        ...it,
+        lat: storyLoc.lat,
+        lng: storyLoc.lng,
+        geo: { lat: storyLoc.lat, lng: storyLoc.lng, label: storyLoc.label, precision: "country" as const, isEventLocation: true },
+      };
+    }
+    // Sin lugar del hecho: no usar país del medio para el mapa. Attribution (source) es solo quién publicó.
+    return { ...it, lat: null, lng: null, geo: null };
+  });
+}
 
 export type NormalizedNewsResponse = {
   generatedAt: string;
@@ -240,7 +382,6 @@ function normalizeGdeltArticles(articles: GdeltArticle[]): NormalizedNewsItem[] 
     const domain = a.domain ?? null;
     const media = getMediaByDomain(domain);
     const sourceCountry = media ? media.country : (a.sourcecountry?.trim() || null);
-    const coords = coordsForCountry(sourceCountry);
     return {
       item: {
         id: a.url ? `gdelt-${Buffer.from(a.url).toString("base64url").slice(0, 32)}` : `gdelt-${i}`,
@@ -249,8 +390,9 @@ function normalizeGdeltArticles(articles: GdeltArticle[]): NormalizedNewsItem[] 
         source: media ? media.name : (a.domain ?? null),
         publishedAt: seendateToISO(a.seendate),
         sourceCountry,
-        lat: coords?.lat ?? null,
-        lng: coords?.lng ?? null,
+        lat: null,
+        lng: null,
+        geo: undefined,
       } as NormalizedNewsItem,
       curated: !!media,
     };
@@ -322,6 +464,23 @@ function titleFromUrl(url: string): string {
   }
 }
 
+/** Normaliza texto para búsqueda (quita acentos, minúsculas). */
+function normalizeForMatch(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim();
+}
+
+/** True si el título contiene al menos una palabra del tema (query). */
+function titleMatchesTopic(title: string, topicQuery: string): boolean {
+  if (!topicQuery || !topicQuery.trim()) return true;
+  const titleNorm = normalizeForMatch(title);
+  const words = topicQuery.trim().split(/\s+/).filter(Boolean).map(normalizeForMatch);
+  return words.some((w) => w.length >= 2 && titleNorm.includes(w));
+}
+
 /** Extrae título, link y fecha de un bloque <item> o <entry> en XML (regex simple, sin dependencias). */
 function parseRssItemBlock(block: string): { title: string; link: string; pubDate: string | null } {
   const titleMatch = block.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
@@ -339,10 +498,9 @@ function parseRssItemBlock(block: string): { title: string; link: string; pubDat
 
 /**
  * Pulso global: titulares desde RSS de los medios curados.
- * Usa Promise.allSettled (no Promise.all): si un feed falla, se ignora y el resto sí pasa.
- * Timeout por feed vía AbortController para no bloquear.
+ * Si topic tiene valor, se filtran los ítems cuyo título coincida con alguna palabra del tema.
  */
-async function fetchNewsFromRss(limit: number): Promise<NormalizedNewsResponse | null> {
+async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<NormalizedNewsResponse | null> {
   const results = await Promise.allSettled(
     RSS_FEEDS.map(async ({ domain, url }) => {
       const controller = new AbortController();
@@ -360,7 +518,6 @@ async function fetchNewsFromRss(limit: number): Promise<NormalizedNewsResponse |
         const media = getMediaByDomain(domain);
         const name = media?.name ?? domain;
         const country = media?.country ?? null;
-        const coords = coordsForCountry(country);
         const items: NormalizedNewsItem[] = [];
         for (let i = 0; i < itemBlocks.length; i++) {
           const { title: rawTitle, link, pubDate } = parseRssItemBlock(itemBlocks[i]);
@@ -384,8 +541,8 @@ async function fetchNewsFromRss(limit: number): Promise<NormalizedNewsResponse |
             source: name,
             publishedAt,
             sourceCountry: country,
-            lat: coords?.lat ?? null,
-            lng: coords?.lng ?? null,
+            lat: null,
+            lng: null,
           });
         }
         return items;
@@ -405,35 +562,49 @@ async function fetchNewsFromRss(limit: number): Promise<NormalizedNewsResponse |
     const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
     return tb - ta;
   });
-  const items = allItems.slice(0, limit);
+  let items = allItems;
+  const topicTrimmed = topic.trim();
+  if (topicTrimmed.length > 0 && topicTrimmed.length <= 80 && topicTrimmed !== DEFAULT_NEWS_TOPIC_QUERY) {
+    items = items.filter((it) => titleMatchesTopic(it.title, topicTrimmed));
+  }
+  items = items.slice(0, limit);
   if (items.length === 0) return null;
   return { generatedAt: new Date().toISOString(), items, isFallback: false };
 }
 
 export async function getNews(topic: string, limit: number, lang: string = "es"): Promise<NormalizedNewsResponse> {
+  const topicTrim = topic.trim();
   const key = cacheKey(topic, limit, lang);
   const cached = getCached(key);
   if (cached) return cached;
 
-  const domainQuery = buildDomainQuery();
-  let gdelt = await fetchNewsFromGdelt(domainQuery, limit, lang, 150).catch(() => null);
-  if (gdelt && gdelt.items.length > 0) {
-    setCached(key, gdelt);
-    return gdelt;
-  }
-  gdelt = await fetchNewsFromGdelt(SIMPLE_TOPIC, limit, lang, 100).catch(() => null);
-  if (gdelt && gdelt.items.length > 0) {
-    setCached(key, gdelt);
-    return gdelt;
-  }
-  const rss = await fetchNewsFromRss(limit).catch(() => null);
+  // RSS primero (rápido, medios curados); se filtra por tema si viene en topic
+  const rss = await fetchNewsFromRss(limit, topicTrim).catch(() => null);
   if (rss && rss.items.length > 0) {
-    setCached(key, rss);
-    return rss;
+    const withGeo = { ...rss, items: applyGeoFallback(rss.items) };
+    setCached(key, withGeo);
+    return withGeo;
+  }
+
+  const domainQuery = buildDomainQuery();
+  const fullQuery = topicTrim.length > 0 ? `${topicTrim} ${domainQuery}` : domainQuery;
+
+  let gdelt = await fetchNewsFromGdelt(fullQuery, limit, lang, 150).catch(() => null);
+  if (gdelt && gdelt.items.length > 0) {
+    const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
+    setCached(key, withGeo);
+    return withGeo;
+  }
+  gdelt = await fetchNewsFromGdelt(domainQuery, limit, lang, 150).catch(() => null);
+  if (gdelt && gdelt.items.length > 0) {
+    const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
+    setCached(key, withGeo);
+    return withGeo;
   }
   const cachedNews = getAnyCachedNews();
-  if (cachedNews) return cachedNews;
-  return fallbackMediaLinks();
+  if (cachedNews) return { ...cachedNews, items: applyGeoFallback(cachedNews.items) };
+  const fallback = fallbackMediaLinks();
+  return { ...fallback, items: applyGeoFallback(fallback.items) };
 }
 
 function fallbackMediaLinks(): NormalizedNewsResponse {

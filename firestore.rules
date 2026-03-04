@@ -1,0 +1,36 @@
+rules_version = '2';
+// Nada público antes de aprobar.
+// Público: solo lee stories con status=="published"; puede crear story_submissions (pendiente), no leerlas.
+// Curadores (custom claim curator==true) o Admin SDK: leen/editan submissions, publican, mail_queue.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() { return request.auth != null; }
+    function isCurator() { return isSignedIn() && request.auth.token.curator == true; }
+
+    // PUBLICADAS: lectura pública, escritura solo curador (o solo via Admin SDK en server)
+    match /stories/{id} {
+      allow read: if resource.data.status == "published";
+      allow write: if isCurator();
+    }
+
+    // SUBMISSIONS: cualquiera puede crear, nadie puede leer salvo curador
+    match /story_submissions/{id} {
+      allow create: if true
+        && request.resource.data.status == "pending"
+        && request.resource.data.authorEmail is string
+        && request.resource.data.title is string
+        && request.resource.data.lat is number
+        && request.resource.data.lng is number
+        && request.resource.data.tags.moods is list;
+
+      allow read, update, delete: if isCurator();
+    }
+
+    // cola de mail: solo server/curador
+    match /mail_queue/{id} {
+      allow read, write: if isCurator();
+    }
+  }
+}

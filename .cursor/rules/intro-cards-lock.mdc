@@ -1,0 +1,26 @@
+---
+description: BLOQUEO — Sección intro + cards en la home. No cambiar salvo petición explícita del usuario.
+globs: app/page.tsx
+alwaysApply: false
+---
+
+# Intro + Cards en la home — NO TOCAR
+
+Esta regla bloquea la sección que contiene el headline, la frase "Aquí, cada relato importa...", la línea naranja y las cuatro cards (Tu historia / Dale voz / Ponle palabras / Tu mirada). **No modifiques estructura, espaciados, colores ni elementos** de esa zona a menos que el usuario lo pida explícitamente.
+
+## Qué está bloqueado
+
+- **Sección `#intro`** (app/page.tsx): título principal, línea naranja (var(--almamundi-orange)), frase "Aquí, cada relato importa. Cada historia es extraordinaria.", espaciados (mt-8 md:mt-10 en la frase, pb-6 md:pb-8 en la sección). **No volver a añadir** flecha/chevron de "scroll down".
+- **Sección `#historias`** (cards): margen superior (mt-4 md:mt-5), separación respecto a la frase de arriba. No bajar las cards sin que lo pida el usuario.
+- **Línea bajo el título:** color naranja fuerte (var(--almamundi-orange)), sin opacidad reducida.
+- **Cards:** cantidad, orden, textos y neomorfismo acordados. No quitar la separación entre la frase y las cards.
+
+## Cuándo sí se puede cambiar
+
+Solo cuando el usuario diga de forma explícita que quiere cambiar algo de esa zona (por ejemplo: "sube la frase", "cambia el color de la línea", "añade una card"). No "mejorar" ni "refactorizar" esa parte por iniciativa propia.
+
+## Frase clave del usuario
+
+> "Cuando yo te diga está ok el trabajo ya no lo cambias nunca más."
+
+Si el usuario confirma que el trabajo está ok, esta zona queda cerrada y no debe modificarse en el futuro sin petición explícita.

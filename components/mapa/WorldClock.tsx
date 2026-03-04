@@ -17,8 +17,9 @@ function getLocalTimeZone(): string {
   }
 }
 
-/** Nombre de ciudad a partir del id de zona (ej. America/Santiago → SANTIAGO). */
+/** Nombre de ciudad a partir del id de zona (ej. America/Santiago → TUNQUÉN). */
 function getCityFromTimeZone(timeZone: string): string {
+  if (timeZone === 'America/Santiago') return 'TUNQUÉN';
   const part = timeZone.split('/').pop();
   if (!part) return 'LOCAL';
   return part.replace(/_/g, ' ').toUpperCase();
@@ -40,9 +41,13 @@ function getTimeZoneShortName(now: Date, timeZone: string): string {
 
 type Props = {
   selectedLocation?: WorldClockLocation | null;
+  /** En true, texto gris y bloque estático (para fondo claro, ej. footer). */
+  light?: boolean;
+  /** Clases extra (ej. HUD: text-slate-300/70). Si se pasa, no se usa posición absoluta. */
+  className?: string;
 };
 
-export function WorldClock({ selectedLocation }: Props) {
+function WorldClockInner({ selectedLocation, light, className }: Props) {
   const [now, setNow] = useState<Date>(() => new Date());
 
   useEffect(() => {
@@ -87,14 +92,27 @@ export function WorldClock({ selectedLocation }: Props) {
     }
   }, [now, timeZone, cityLabel]);
 
+  const oneLine = [dateLine, timeLine].filter(Boolean).join(' · ');
+
+  const isStatic = Boolean(className);
+  const base = 'pointer-events-none select-none text-center font-mono uppercase whitespace-nowrap';
+  const resolvedClassName =
+    className != null
+      ? `${base} ${className}`
+      : light
+        ? `${base} tracking-[0.2em] text-gray-500 text-xs`
+        : `absolute left-1/2 z-30 tracking-[0.2em] text-white/70 text-xs transition-opacity duration-500 ${base}`;
+
   return (
     <div
       aria-hidden
-      className="absolute left-1/2 bottom-7 z-30 pointer-events-none select-none text-center font-mono uppercase tracking-[0.2em] text-white/70 text-xs transition-opacity duration-500"
-      style={{ transform: 'translateX(-50%)' }}
+      className={resolvedClassName}
+      style={!isStatic && !light ? { transform: 'translateX(-50%)', bottom: '0.25rem' } : undefined}
     >
-      <div className="mb-1">{dateLine}</div>
-      <div>{timeLine}</div>
+      {oneLine}
     </div>
   );
 }
+
+export { WorldClockInner as WorldClock };
+export default WorldClockInner;

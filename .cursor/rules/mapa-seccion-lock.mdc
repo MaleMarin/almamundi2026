@@ -1,0 +1,14 @@
+---
+description: Sección mapa en home — con todas las funciones acordadas. No quitar sin petición explícita.
+alwaysApply: true
+---
+
+# Mapa (home) — REGLA ESTRUCTURAL (NO NEGOCIABLE)
+
+- **Degradado**: solo la transición (gris → oscuro) bajo el título "Mapa de AlmaMundi". El Dock NO va en la franja de transición ni "arriba del mapa" como franja.
+- **UniverseStage**: contenedor único (fondo oscuro). El Dock se renderiza **dentro** de UniverseStage, nunca fuera.
+- **Dock**: overlay flotante dentro de UniverseStage, centrado arriba del globo (position absolute), glass/neumorfismo. Globo limpio; Dock "vive" dentro del universo.
+
+## HUD Fecha/Hora/Ciudad (TimeBar)
+
+- El HUD de fecha/lugar/hora es **`<TimeBar />`**. No montar en layout ni en Footer global. No usar `position: fixed`. Siempre `position: absolute` dentro del contenedor del mapa (UniverseStage).

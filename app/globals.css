@@ -3,6 +3,12 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* Mapa home: mismo gris que las cards (no usar blanco) */
+  --home-bg: #E0E5EC;
+  --universe-bg: #020617;
+  /* Naranja AlmaMundi en todo el sitio (#ff4500) */
+  --almamundi-orange: #ff4500;
+  --almamundi-orange-rgb: 255, 69, 0;
 }
 
 @theme inline {
@@ -10,6 +16,11 @@
   --color-foreground: var(--foreground);
   --font-sans: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   --font-mono: ui-monospace, monospace;
+  /* Naranja AlmaMundi: tonalidad #ff4500 en toda la web */
+  --color-orange-400: #ff6b35;
+  --color-orange-500: var(--almamundi-orange);
+  --color-orange-600: #e63e00;
+  --color-orange-700: #cc3300;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +34,38 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Mapa home: degradado muy suave entre frase "Mapa AlmaMundi" y universo (sin banding) */
+.map-section-gradient-block {
+  position: relative;
+  background: linear-gradient(
+    to bottom,
+    var(--home-bg) 0%,
+    var(--home-bg) 40%,
+    #e8ecf2 52%,
+    #dce2ea 62%,
+    #c8d0da 72%,
+    #a8b4c4 82%,
+    #7c8a9e 90%,
+    #4a5568 95%,
+    var(--universe-bg) 100%
+  );
+  min-height: 220px;
+}
+@media (min-width: 768px) {
+  .map-section-gradient-block {
+    min-height: 240px;
+  }
+}
+/* Anti-banding: ruido sutil para transición muy suave */
+.map-section-gradient-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
 /* Liquid glass + neomorphism para overlays sobre el globo (/mapa) */

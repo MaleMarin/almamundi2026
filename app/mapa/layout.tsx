@@ -1,9 +1,19 @@
 import React from 'react';
 
 /**
- * Layout propio de /mapa: solo renderiza el contenido.
- * NO incluye header/nav global del sitio (el root layout tampoco los tiene).
+ * Layout de /mapa: contenido + slot modal para intercepting route (observatorio).
  */
-export default function MapaLayout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function MapaLayout({
+  children,
+  modal,
+}: {
+  children: React.ReactNode;
+  modal: React.ReactNode;
+}) {
+  return (
+    <>
+      {children}
+      {modal}
+    </>
+  );
 }

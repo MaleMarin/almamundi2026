@@ -13,7 +13,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="antialiased min-h-screen bg-[#0F172A]" style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Avenir, sans-serif" }}>
+      <body className="antialiased min-h-screen bg-[#0F172A] text-white" style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Avenir, sans-serif" }}>
+        <noscript>
+          <div className="p-8 text-center">
+            <h1 className="text-2xl font-light text-white/95">AlmaMundi</h1>
+            <p className="mt-2 text-white/60">Necesitas JavaScript para ver el sitio.</p>
+            <a href="/" className="mt-4 inline-block text-orange-400 hover:underline">Ir al inicio</a>
+          </div>
+        </noscript>
         {children}
       </body>
     </html>

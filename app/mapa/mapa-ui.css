@@ -1,0 +1,160 @@
+/* app/mapa/mapa-ui.css */
+
+:root{
+  --glass: rgba(18, 24, 38, 0.62);
+  --glass2: rgba(20, 26, 42, 0.48);
+  --stroke: rgba(255,255,255,0.10);
+  --stroke2: rgba(255,255,255,0.14);
+  --shadow: 0 20px 60px rgba(0,0,0,0.45);
+  --orange: #ff4500;         /* naranja AlmaMundi */
+  --orange2: #ff6b2b;
+  --text: rgba(255,255,255,0.92);
+  --muted: rgba(255,255,255,0.62);
+}
+
+.mapaShell{
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.leftRail{
+  position: absolute;
+  left: 24px;
+  top: 24px;
+  bottom: 24px;
+  width: 390px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  z-index: 10;
+}
+
+.leftRail::before{
+  content:"";
+  position:absolute;
+  inset:-14px;
+  border-radius: 28px;
+  background:
+    radial-gradient(1200px 700px at 30% 10%, rgba(255,106,0,0.10), transparent 60%),
+    radial-gradient(900px 600px at 60% 80%, rgba(80,140,255,0.10), transparent 55%),
+    rgba(0,0,0,0.10);
+  filter: blur(0px);
+  z-index:-2;
+}
+
+.leftRailGlass{
+  position: relative;
+  border-radius: 26px;
+  background: linear-gradient(180deg, var(--glass), var(--glass2));
+  border: 1px solid var(--stroke);
+  box-shadow: var(--shadow);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.leftRailGlass::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    radial-gradient(600px 240px at 20% 0%, rgba(255,255,255,0.10), transparent 60%),
+    radial-gradient(420px 200px at 85% 20%, rgba(255,255,255,0.08), transparent 60%);
+  opacity: 0.9;
+}
+
+.leftScroll{
+  position: relative;
+  flex: 1;
+  overflow: auto;
+  padding: 18px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.18) transparent;
+}
+.leftScroll::-webkit-scrollbar{ width: 10px; }
+.leftScroll::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,0.16);
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+.leftScroll::-webkit-scrollbar-track{ background: transparent; }
+
+.parallaxBlock{
+  transform: translate3d(var(--px,0px), var(--py,0px), 0);
+  transition: transform 80ms linear;
+}
+
+.segTabs{
+  display:flex;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 22px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.segBtn{
+  flex:1;
+  height: 44px;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--text);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+.segBtnActive{
+  background: linear-gradient(180deg, rgba(255,106,0,0.55), rgba(255,106,0,0.24));
+  border: 1px solid rgba(255,106,0,0.55);
+  box-shadow: 0 10px 24px rgba(255,106,0,0.18);
+}
+
+.miniHint{
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.heroTitle{
+  font-size: 34px;
+  font-weight: 750;
+  letter-spacing: -0.4px;
+  color: var(--text);
+  margin: 4px 0 6px;
+}
+
+.heroSub{
+  font-size: 15px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+.orangePill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255,106,0,0.75), rgba(255,106,0,0.35));
+  border: 1px solid rgba(255,106,0,0.55);
+  color: rgba(255,255,255,0.95);
+  font-weight: 700;
+  box-shadow: 0 12px 26px rgba(255,106,0,0.18);
+}
+
+@media (max-width: 980px){
+  .leftRail{
+    left: 14px;
+    right: 14px;
+    width: auto;
+    top: 14px;
+    bottom: 14px;
+  }
+}

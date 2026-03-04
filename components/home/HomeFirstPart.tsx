@@ -1,7 +1,6 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { ChevronDown } from 'lucide-react';
 
 /**
  * Primera parte de la home del clone (header + intro + tarjetas).
@@ -129,7 +128,7 @@ export function HomeFirstPart({
       </header>
 
       {/* INTRO */}
-      <section id="intro" className="pt-44 md:pt-52 pb-2 px-6 relative z-10 flex flex-col items-center text-center">
+      <section id="intro" className="pt-44 md:pt-52 pb-4 px-6 relative z-10 flex flex-col items-center text-center">
         <div className="max-w-6xl animate-float">
           <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
             AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
@@ -138,12 +137,11 @@ export function HomeFirstPart({
           <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
             Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
           </p>
-          <ChevronDown className="mx-auto mt-3 text-gray-400 opacity-50 animate-bounce w-6 h-6" />
         </div>
       </section>
 
-      {/* CARDS — visibles completos en la primera vista */}
-      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 -mt-2">
+      {/* CARDS — más aire horizontal entre cards, subidas (sin flecha) */}
+      <section id="historias" className="w-full px-6 md:px-12 pt-4 pb-12 mb-20 flex flex-col md:flex-row flex-wrap gap-x-8 md:gap-x-12 gap-y-6 justify-center items-stretch relative z-10">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={onRecordVideo} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>

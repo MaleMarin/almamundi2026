@@ -1,0 +1,9 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Subidas del modal (foto, video, audio) desde el cliente
+    match /submissions/{allPaths=**} {
+      allow read, write: if true;
+    }
+  }
+}

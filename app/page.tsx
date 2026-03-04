@@ -3,12 +3,12 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { PROPOSITO_TITLE, PROPOSITO_SUBTITLE, PROPOSITO_PARAGRAPHS, PROPOSITO_CIERRE } from '@/lib/proposito-text';
 import {
   X,
   RotateCcw,
   Volume2,
   VolumeX,
-  ChevronDown,
   Lock,
   Unlock,
   Search,
@@ -29,8 +29,8 @@ import {
   Image as ImageIcon
 } from 'lucide-react';
 
-// --- IMPORTACIÓN DINÁMICA DEL GLOBO (SSR OFF) ---
-const GlobeComp = dynamic(() => import('react-globe.gl'), { ssr: false });
+// --- Mapa en home: dock + drawer + globo + TimeBar (todas las funciones) ---
+const HomeMap = dynamic(() => import('@/components/map/HomeMap').then((m) => m.default), { ssr: false });
 
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 
@@ -87,18 +87,19 @@ const globalStyles = `
     text-shadow: 2px 2px 5px rgba(163,177,198,0.7), -2px -2px 5px rgba(255,255,255,0.8);
   }
 
-  /* ALMAMUNDI footer (relieve neumórfico como tu imagen) */
+  /* ALMAMUNDI footer: relevo neumórfico, sin líneas negras */
   .almamundi-footer-title{
     color: #E0E5EC;
     font-family: "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
     font-weight: 900;
     letter-spacing: -0.06em;
-    -webkit-text-stroke: 1px rgba(163,177,198,0.60);
     text-shadow:
-      -14px -14px 28px rgba(255,255,255,0.95),
-       14px  14px 28px rgba(163,177,198,0.90),
-       -3px  -3px  6px rgba(255,255,255,0.85),
-        3px   3px  6px rgba(163,177,198,0.75);
+      -2px -2px 4px rgba(255,255,255,0.95),
+       2px  2px 4px rgba(163,177,198,0.85),
+      -6px -6px 12px rgba(255,255,255,0.8),
+       6px  6px 12px rgba(163,177,198,0.7),
+      -12px -12px 24px rgba(255,255,255,0.6),
+       12px  12px 24px rgba(163,177,198,0.5);
   }
 `;
 
@@ -526,7 +527,7 @@ function MapLegend() {
         }}
       >
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.6)]" />
+          <div className="w-3 h-3 rounded-full bg-orange-500 shadow-[0_0_10px_rgba(var(--almamundi-orange-rgb),0.6)]" />
           <span className="text-xs font-bold text-gray-200 tracking-wide uppercase">Historias (Memoria)</span>
         </div>
 
@@ -586,33 +587,244 @@ function SoftCard({
 }
 
 /* ------------------------------------------------------------------ */
-/* MODALS                                                              */
+/* MODALS — Propósito: mismo estilo que HowItWorksModal (texto en lib) */
 /* ------------------------------------------------------------------ */
 function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   useModalUX(isOpen, onClose);
   if (!isOpen) return null;
 
+  const purposeContent = (
+    <>
+      <p className="text-gray-600 leading-relaxed mb-4 font-semibold">
+        {PROPOSITO_TITLE}
+      </p>
+      <p className="text-gray-600 leading-relaxed mb-6">
+        {PROPOSITO_SUBTITLE.split('\n').map((line, i) => (
+          <span key={i}>{line}{i < 1 ? <br /> : null}</span>
+        ))}
+      </p>
+      {PROPOSITO_PARAGRAPHS.map((block, i) => {
+        if (typeof block === 'string') {
+          return <p key={i} className="text-gray-600 leading-relaxed mb-4">{block}</p>;
+        }
+        if ('bold' in block) {
+          return (
+            <p key={i} className="text-gray-600 leading-relaxed mb-4">
+              {block.text}
+              <br />
+              <strong>{block.bold}</strong>
+            </p>
+          );
+        }
+        const lines = (block as { lines: string[] }).lines;
+        return (
+          <p key={i} className={`text-gray-600 leading-relaxed ${i === PROPOSITO_PARAGRAPHS.length - 1 ? 'mb-6' : 'mb-4'}`}>
+            {lines.map((line, j) => (
+              <span key={j}>{line}{j < lines.length - 1 ? <br /> : null}</span>
+            ))}
+          </p>
+        );
+      })}
+      <p className="text-gray-700 font-semibold leading-relaxed">{PROPOSITO_CIERRE}</p>
+    </>
+  );
+
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
-      <div className="bg-[#E0E5EC] w-full max-w-lg p-10 rounded-[40px] relative shadow-2xl animate-float" style={{ fontFamily: APP_FONT }}>
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
-          style={soft.button}
-          aria-label="Cerrar"
-          type="button"
-        >
-          <X size={24} />
-        </button>
+      <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
+        <div className="p-10 pb-4 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            style={soft.button}
+            aria-label="Cerrar"
+            type="button"
+          >
+            <X size={24} />
+          </button>
+          <h2 className="text-3xl font-bold text-gray-700 pr-12">Nuestro propósito</h2>
+        </div>
+        <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
+          {purposeContent}
+        </div>
+      </div>
+    </div>
+  );
+}
 
-        <h2 className="text-3xl font-bold mb-6 text-gray-700">Nuestro Propósito</h2>
+function HowItWorksModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  if (!isOpen) return null;
 
-        <p className="text-gray-600 leading-relaxed mb-6">
-          AlmaMundi no es una red social. Es un <strong>archivo vivo</strong>. Un lugar donde lo vivido queda, y puede volver a aparecer en otras vidas.
+  const content = (
+    <>
+      <p className="text-gray-600 leading-relaxed mb-6">
+        AlmaMundi es un lugar para que tu historia no se pierda en el ruido.
+      </p>
+      <p className="text-gray-600 leading-relaxed mb-8">
+        Aquí puedes compartir algo que viviste, pensaste o sentiste, y verlo conectado con el mundo.
+      </p>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">1. Tú compartes (desde tu computador o tu celular)</h3>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          Participar es simple y no necesitas descargar nada.
         </p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Desde la web, en tu computador o en tu teléfono, puedes:
+        </p>
+        <ul className="list-disc pl-6 text-gray-600 leading-relaxed mb-4 space-y-1">
+          <li>Escribir tu historia.</li>
+          <li>Grabar un audio.</li>
+          <li>Subir una fotografía.</li>
+          <li>Subir un video.</li>
+          <li>Compartir un enlace (por ejemplo, una canción, una pieza musical o un documento que complemente tu relato).</li>
+        </ul>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          El proceso es guiado y toma solo unos minutos:
+        </p>
+        <ul className="list-disc pl-6 text-gray-600 leading-relaxed mb-4 space-y-1">
+          <li>Eliges el formato.</li>
+          <li>Escribes o subes tu contenido.</li>
+          <li>Indicas la ciudad relacionada con tu historia.</li>
+          <li>Dejas tu correo electrónico.</li>
+          <li>Envías.</li>
+        </ul>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          El correo se solicita únicamente para avisarte cuando tu historia haya sido publicada en el mapa. No se hace público ni se utiliza con otros fines.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Cada historia es revisada antes de aparecer, para mantener un espacio respetuoso y cuidado.
+        </p>
+        <p className="text-gray-600 leading-relaxed font-semibold mb-2">Límites de cada formato</p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Para que la experiencia sea clara y equilibrada:
+        </p>
+        <ul className="list-disc pl-6 text-gray-600 leading-relaxed mb-4 space-y-1">
+          <li>Los videos y audios pueden durar hasta 5 minutos.</li>
+          <li>Los textos pueden tener hasta 2 carillas.</li>
+          <li>Puedes subir hasta 3 fotografías por historia.</li>
+          <li>Puedes compartir todas las historias que quieras.</li>
+        </ul>
+      </section>
 
-        <div className="p-6 rounded-3xl mb-2" style={soft.inset}>
-          <p className="italic text-gray-500">“Lo que se cuenta, no se pierde.”</p>
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">2. Tu historia aparece en el mapa</h3>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Cuando tu historia es publicada, se ubica en el Mapa de AlmaMundi, conectada a la ciudad que elegiste.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Durante 15 días, tu relato forma parte del mapa vivo: personas de distintos lugares pueden descubrirlo mientras exploran el mundo.
+        </p>
+        <p className="text-gray-600 leading-relaxed">
+          Es un momento especial: tu historia dialoga con otras y se convierte en parte del tejido del mapa.
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">3. Después, tu historia permanece</h3>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Pasados los 15 días en el mapa, tu historia no desaparece.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Pasa a formar parte de las Muestras de AlmaMundi, donde queda disponible para ser encontrada por:
+        </p>
+        <ul className="list-disc pl-6 text-gray-600 leading-relaxed mb-4 space-y-1">
+          <li>Palabras clave.</li>
+          <li>Ciudad.</li>
+          <li>Tema.</li>
+          <li>Formato (texto, audio, foto o video).</li>
+        </ul>
+        <p className="text-gray-600 leading-relaxed mb-2">
+          El mapa es la experiencia viva.
+        </p>
+        <p className="text-gray-600 leading-relaxed">
+          Las muestras son el archivo que permanece.
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">4. Historias, Sonidos y Noticias</h3>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          AlmaMundi tiene tres formas de explorar el mundo:
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-2 font-semibold">Historias</p>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          Son los relatos personales que las personas comparten. Son memoria viva.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-2 font-semibold">Sonidos</p>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          No son solo ambiente. También son una forma de encontrar historias.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Cuando en un relato aparecen palabras como &quot;mar&quot;, &quot;ciudad&quot;, &quot;bosque&quot;, &quot;protesta&quot;, &quot;lluvia&quot; o &quot;mercado&quot;, esas historias pueden vincularse a ciertos paisajes sonoros.
+          Así, puedes explorar el mapa no solo por ciudad o tema, sino también por atmósfera.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-4">
+          Si eliges un sonido, descubrirás historias que conectan con ese entorno o experiencia.
+        </p>
+        <p className="text-gray-600 leading-relaxed mb-2 font-semibold">Noticias</p>
+        <p className="text-gray-600 leading-relaxed">
+          Muestran lo que está ocurriendo hoy en el mundo y permiten conectar lo íntimo con lo colectivo, lo personal con lo global.
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">5. Un espacio en movimiento</h3>
+        <p className="text-gray-600 leading-relaxed">
+          El equipo de AlmaMundi crea constantemente muestras públicas temáticas: memoria, migración, identidad, ciudad, naturaleza, cultura, educación y otros temas que atraviesan nuestra vida contemporánea.
+        </p>
+        <p className="text-gray-600 leading-relaxed mt-3">
+          Estas muestras reúnen historias desde distintos lugares y permiten mirarlas en conjunto.
+        </p>
+      </section>
+
+      <section className="mb-8">
+        <h3 className="text-xl font-bold text-gray-800 mb-3">Privacidad</h3>
+        <p className="text-gray-600 leading-relaxed mb-3">
+          Tu información es tratada con respeto y cuidado.
+          Puedes revisar nuestra Política de Privacidad aquí:{' '}
+          <a href="/privacidad" className="text-[var(--almamundi-orange)] font-semibold underline hover:no-underline">
+            Política de Privacidad
+          </a>
+        </p>
+      </section>
+
+      <p className="text-gray-700 font-semibold leading-relaxed">
+        AlmaMundi no es una red social.
+        <br />
+        Es un espacio para dejar huella.
+      </p>
+    </>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
+      <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
+        <div className="p-10 pb-4 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            style={soft.button}
+            aria-label="Cerrar"
+            type="button"
+          >
+            <X size={24} />
+          </button>
+          <h2 className="text-3xl font-bold text-gray-700 pr-12">¿Cómo funciona AlmaMundi?</h2>
+        </div>
+        <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
+          {content}
+        </div>
+        <div className="p-10 pt-4 flex-shrink-0 border-t border-gray-300/60">
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full py-3 px-6 rounded-[20px] font-bold text-gray-700 transition active:scale-[0.99]"
+            style={soft.button}
+          >
+            Listo
+          </button>
         </div>
       </div>
     </div>
@@ -1251,7 +1463,7 @@ function StoryModal({
                       onClick={() => setStep('details')}
                       disabled={!canContinueFromCapture}
                       className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
-                      style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      style={{ ...soft.button, backgroundColor: '#ff4500' }}
                     >
                       Continuar
                     </button>
@@ -1298,7 +1510,7 @@ function StoryModal({
                       onClick={() => setStep('details')}
                       disabled={!canContinueFromCapture}
                       className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
-                      style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      style={{ ...soft.button, backgroundColor: '#ff4500' }}
                     >
                       Continuar
                     </button>
@@ -1356,7 +1568,7 @@ function StoryModal({
                       onClick={() => setStep('details')}
                       disabled={!canContinueFromCapture}
                       className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-50"
-                      style={{ ...soft.button, backgroundColor: '#F97316' }}
+                      style={{ ...soft.button, backgroundColor: '#ff4500' }}
                     >
                       Continuar
                     </button>
@@ -1533,7 +1745,7 @@ function StoryModal({
                     onClick={submit}
                     disabled={!canSubmit}
                     className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60"
-                    style={{ ...soft.button, backgroundColor: '#F97316' }}
+                    style={{ ...soft.button, backgroundColor: '#ff4500' }}
                   >
                     {saving ? 'Enviando…' : 'Enviar'}
                   </button>
@@ -1615,99 +1827,12 @@ function StoryModal({
 export default function Home() {
   const [modalMode, setModalMode] = useState<Mode | null>(null);
   const [showPurpose, setShowPurpose] = useState(false);
-
-  const [showInspiration, setShowInspiration] = useState(false);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [chosenTopic, setChosenTopic] = useState<InspirationTopic | null>(null);
-
-  const audioRef = useRef<HTMLAudioElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
-
-  const globeEl = useRef<any>(null);
-  const { ref: globeWrapRef, width: globeWrapWidth } = useElementWidth<HTMLDivElement>();
-  const globeSize = Math.min(1100, Math.max(360, globeWrapWidth));
-
-  const [isInteractive, setIsInteractive] = useState(false);
-  const [isAutoPilot, setIsAutoPilot] = useState(false);
-
-  const stories: StoryPoint[] = useMemo(
-    () => [
-      { lat: -33.4489, lng: -70.6693, label: 'Santiago' },
-      { lat: 40.7128, lng: -74.006, label: 'New York' },
-      { lat: 48.8566, lng: 2.3522, label: 'Paris' },
-      { lat: 35.6762, lng: 139.6503, label: 'Tokyo' }
-    ],
-    []
-  );
-
-  const [newsRings, setNewsRings] = useState<NewsRing[]>([]);
-  useEffect(() => {
-    const id = window.setInterval(() => {
-      const r: NewsRing = {
-        lat: (Math.random() - 0.5) * 160,
-        lng: (Math.random() - 0.5) * 360,
-        maxR: Math.random() * 20 + 3,
-        propagationSpeed: (Math.random() - 0.5) * 20 + 1,
-        repeatPeriod: Math.random() * 2000 + 200
-      };
-
-      setNewsRings((prev) => {
-        const next = [...prev, r];
-        if (next.length > 15) next.shift();
-        return next;
-      });
-    }, 1500);
-
-    return () => window.clearInterval(id);
-  }, []);
-
-  const toggleAudio = useCallback(() => {
-    const a = audioRef.current;
-    if (!a) return;
-
-    if (isMuted) {
-      a.volume = 0.6;
-      a.play().catch(() => {});
-      setIsMuted(false);
-    } else {
-      a.pause();
-      setIsMuted(true);
-    }
-  }, [isMuted]);
-
-  const handleGlobeReady = useCallback(() => {
-    if (!globeEl.current) return;
-    const controls = globeEl.current.controls();
-    controls.enableZoom = false;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.5;
-  }, []);
-
-  useEffect(() => {
-    if (!isAutoPilot || !globeEl.current) return;
-
-    const destinations = [
-      { lat: -33.4489, lng: -70.6693, altitude: 1.8 },
-      { lat: 48.8566, lng: 2.3522, altitude: 1.8 },
-      { lat: 35.6762, lng: 139.6503, altitude: 1.8 },
-      { lat: 40.7128, lng: -74.006, altitude: 1.8 }
-    ];
-
-    let i = 0;
-    const move = () => {
-      globeEl.current.pointOfView(destinations[i], 4000);
-      i = (i + 1) % destinations.length;
-    };
-
-    move();
-    const id = window.setInterval(move, 6000);
-    return () => window.clearInterval(id);
-  }, [isAutoPilot]);
 
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}>
       <style jsx global>{globalStyles}</style>
-
-      <audio ref={audioRef} loop src="/universo.mp3" />
 
       {/* MODALES */}
       <StoryModal
@@ -1721,16 +1846,7 @@ export default function Home() {
 
       <PurposeModal isOpen={showPurpose} onClose={() => setShowPurpose(false)} />
 
-      <InspirationModal
-        isOpen={showInspiration}
-        onClose={() => setShowInspiration(false)}
-        topics={INSPIRATION_TOPICS}
-        onChoose={(t) => {
-          setChosenTopic(t);
-          setShowInspiration(false);
-          setModalMode('Texto');
-        }}
-      />
+      <HowItWorksModal isOpen={showHowItWorks} onClose={() => setShowHowItWorks(false)} />
 
       {/* HEADER */}
       <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
@@ -1740,11 +1856,11 @@ export default function Home() {
 
         <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
           <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
-            Propósito
+            Nuestro propósito
           </button>
 
-          <button onClick={() => setShowInspiration(true)} className="px-8 py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
-            Inspiración
+          <button onClick={() => setShowHowItWorks(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+            ¿Cómo funciona?
           </button>
 
           <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
@@ -1757,21 +1873,21 @@ export default function Home() {
       </header>
 
       {/* INTRO + CARDS: primera vista en una pantalla (sin scroll) */}
-      <section id="intro" className="pt-44 md:pt-52 pb-2 px-6 relative z-10 flex flex-col items-center text-center">
+      <section id="intro" className="pt-44 md:pt-52 pb-6 md:pb-8 px-6 relative z-10 flex flex-col items-center text-center">
         <div className="max-w-6xl animate-float">
           <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
             AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
           </h1>
-          <div className="w-24 h-1.5 rounded-full mx-auto mb-4 opacity-50 bg-orange-400" />
-          <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed" style={{ color: soft.textBody }}>
+          <div className="w-24 h-1.5 rounded-full mx-auto mb-4 bg-[var(--almamundi-orange)]" />
+          <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed mt-8 md:mt-10" style={{ color: soft.textBody }}>
             Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
           </p>
-          <ChevronDown className="mx-auto mt-3 text-gray-400 opacity-50 animate-bounce w-6 h-6" />
+          {/* NO volver a añadir flecha/chevron de "scroll down" — pedido explícito del cliente */}
         </div>
       </section>
 
-      {/* CARDS — visibles completos en la primera vista */}
-      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 -mt-2">
+      {/* CARDS — sin bajar; un poco más cerca de la frase de arriba */}
+      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 mt-4 md:mt-5">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
@@ -1786,104 +1902,28 @@ export default function Home() {
         </SoftCard>
       </section>
 
-      {/* MAPA — fondo oscuro por CSS vars (--bg0/--bg1/--bg2), nunca claro */}
-      <section
-        id="mapa"
-        className="relative w-full scroll-mt-[160px] min-h-[90vh] md:min-h-[1400px] flex flex-col justify-start overflow-hidden"
-        style={{
-          ['--bg0' as string]: '#070B14',
-          ['--bg1' as string]: '#0A1022',
-          ['--bg2' as string]: '#0F1B33',
-          background: 'linear-gradient(to bottom, var(--bg0) 0%, var(--bg1) 40%, var(--bg2) 100%)',
-          zIndex: 0,
-        }}
-      >
-        <div className="relative z-20 container mx-auto px-6 pt-16 md:pt-28 pb-10 flex flex-col items-center text-center">
-          <h2 className="text-6xl md:text-8xl font-light mb-8 drop-shadow-xl" style={{ color: '#F97316' }}>
+      {/* Sección mapa: fondo = gris de las cards (--home-bg), título + transición */}
+      <section id="mapa" className="w-full scroll-mt-[160px] bg-[var(--home-bg)]">
+        <div className="map-section-gradient-block w-full">
+          <h2 className="text-center text-[72px] md:text-[96px] leading-none py-10" style={{ color: 'var(--almamundi-orange)' }}>
             Mapa de AlmaMundi
           </h2>
-
-          <p className="text-gray-300 text-xl max-w-2xl font-light leading-relaxed mb-12">
-            Un tejido vivo de memoria humana.
-            <br />
-            Cuando miles compartan, este mundo brillará.
-          </p>
-
-          <div className="inline-flex flex-wrap justify-center gap-6 md:gap-10 p-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-md">
-            <button
-              onClick={() => setIsInteractive((v) => !v)}
-              className={`flex items-center gap-3 transition-colors ${isInteractive ? 'text-orange-400' : 'text-gray-300 hover:text-white'}`}
-              type="button"
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isInteractive ? 'bg-orange-500/20' : 'bg-white/10'}`}>
-                {isInteractive ? <Unlock size={16} /> : <Lock size={16} />}
-              </div>
-              <span className="text-xs uppercase tracking-widest font-bold">{isInteractive ? 'Bloquear' : 'Activar'}</span>
-            </button>
-
-            <div className="w-px h-8 bg-white/10" />
-
-            <button
-              onClick={() => setIsAutoPilot((v) => !v)}
-              className={`flex items-center gap-3 transition-colors ${isAutoPilot ? 'text-orange-400' : 'text-gray-300 hover:text-white'}`}
-              type="button"
-            >
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${isAutoPilot ? 'bg-orange-500/20 animate-spin-slow' : 'bg-purple-500/20 text-purple-400'}`}>
-                <RotateCcw size={16} className={isAutoPilot ? 'animate-spin' : ''} />
-              </div>
-              <span className="text-xs uppercase tracking-widest font-bold">{isAutoPilot ? 'Detener' : 'Tour'}</span>
-            </button>
-
-            <div className="w-px h-8 bg-white/10" />
-
-            <button onClick={toggleAudio} className="flex items-center gap-3 hover:opacity-80 transition-opacity" type="button">
-              <div className={`w-8 h-8 rounded-full ${isMuted ? 'bg-gray-500/20 text-gray-400' : 'bg-green-500/20 text-green-400'} flex items-center justify-center`}>
-                {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
-              </div>
-              <span className="text-xs text-gray-300 uppercase tracking-widest">Sonido</span>
-            </button>
-          </div>
+          {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. 100% neumorfismo. */}
+          <div id="map-dock-slot" className="w-full px-2 md:px-3 py-4 md:py-5" />
+          <div className="min-h-[32px] md:min-h-[40px] w-full" aria-hidden />
         </div>
-
-        <div className="relative w-full lg:pr-[360px]" style={{ height: 1250 }}>
-          <MapFilterBar onToggleView={() => alert('Próximamente: Vista de Tarjetas')} />
-          <MapLegend />
-
-          <div
-            ref={globeWrapRef}
-            className={`w-full h-full flex items-center justify-center relative z-[1] mt-2 transition-all ${isInteractive ? 'cursor-move pointer-events-auto' : 'cursor-default pointer-events-none'}`}
-            style={{ touchAction: isInteractive ? 'none' : 'auto' }}
-          >
-            <GlobeComp
-              ref={globeEl}
-              onGlobeReady={handleGlobeReady}
-              globeImageUrl="https://unpkg.com/three-globe/example/img/earth-night.jpg"
-              backgroundColor="rgba(0,0,0,0)"
-              pointsData={stories}
-              pointLat="lat"
-              pointLng="lng"
-              pointColor={() => '#F97316'}
-              pointAltitude={0.01}
-              pointRadius={0.24}
-              ringsData={newsRings}
-              ringColor={() => (t: number) => `rgba(255,255,255,${1 - t})`}
-              ringMaxRadius="maxR"
-              ringPropagationSpeed="propagationSpeed"
-              ringRepeatPeriod="repeatPeriod"
-              height={globeSize}
-              width={globeSize}
-            />
-          </div>
+        <div className="relative w-full h-[85vh] bg-[var(--universe-bg)] overflow-hidden">
+          <HomeMap />
         </div>
       </section>
 
       {/* FOOTER */}
-      <footer className="w-full pb-28 pt-20 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-        <div className="mb-20 mt-10 w-full flex justify-center select-none">
-          <h1 className="text-7xl md:text-[140px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
+      <footer className="w-full pb-28 pt-32 md:pt-40 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
+        <div className="mb-20 mt-12 w-full flex justify-center select-none">
+          <h1 className="text-8xl md:text-[160px] lg:text-[200px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
         </div>
 
-        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium border-t border-gray-300 pt-10 text-gray-600 gap-10">
+        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium pt-10 text-gray-600 gap-10">
           <div className="flex flex-col items-center md:items-start">
             <span className="block mb-3 opacity-70">Una iniciativa de</span>
             <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
@@ -1891,11 +1931,11 @@ export default function Home() {
 
           <div className="flex flex-wrap justify-center gap-8 md:gap-10 opacity-90">
             <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
-              Propósito
+              Nuestro propósito
             </button>
 
-            <button onClick={() => setShowInspiration(true)} className="hover:text-gray-900 transition-colors font-bold flex items-center gap-2" type="button">
-              <span>Inspiración</span>
+            <button onClick={() => setShowHowItWorks(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
+              ¿Cómo funciona?
             </button>
 
             <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">

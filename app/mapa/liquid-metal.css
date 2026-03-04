@@ -1,0 +1,226 @@
+/* app/mapa/liquid-metal.css — Liquid Metal / Apple (forzado) */
+
+:root{
+  --lm-bg0: #070b14;
+  --lm-bg1: rgba(16, 25, 44, .55);
+  --lm-bg2: rgba(16, 25, 44, .35);
+
+  --lm-stroke: rgba(255,255,255,.12);
+  --lm-stroke2: rgba(255,255,255,.08);
+  --lm-inset: rgba(255,255,255,.08);
+
+  --lm-text: rgba(255,255,255,.92);
+  --lm-muted: rgba(255,255,255,.62);
+  --lm-dim: rgba(255,255,255,.42);
+
+  --lm-accent: #ff6a00;
+  --lm-accent2: #ff9a3d;
+
+  --lm-shadow: 0 18px 60px rgba(0,0,0,.55);
+  --lm-shadow2: 0 10px 30px rgba(0,0,0,.35);
+
+  --lm-radius-xl: 26px;
+  --lm-radius-lg: 20px;
+  --lm-radius-md: 16px;
+  --lm-radius-sm: 12px;
+
+  --lm-blur: 18px;
+}
+
+/* =========================
+   Cards Liquid
+========================= */
+.lm-card{
+  border-radius: var(--lm-radius-xl);
+  background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+  border: 1px solid var(--lm-stroke2);
+  box-shadow: var(--lm-shadow2);
+  padding: 18px;
+}
+.lm-card + .lm-card{ margin-top: 14px; }
+
+/* =========================
+   Typography
+========================= */
+.lm-h1{
+  font-size: 40px;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  color: var(--lm-text);
+}
+.lm-p{
+  margin-top: 10px;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--lm-muted);
+}
+.lm-tip{
+  margin-top: 10px;
+  font-size: 13px;
+  color: var(--lm-dim);
+}
+
+/* =========================
+   Scroll (panel interior)
+========================= */
+.lm-scroll{
+  overflow: auto;
+  padding: 18px;
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.18) transparent;
+}
+.lm-scroll::-webkit-scrollbar{ width: 10px; }
+.lm-scroll::-webkit-scrollbar-thumb{
+  background: rgba(255,255,255,.16);
+  border-radius: 20px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+/* =========================
+   Tabs Apple-like
+========================= */
+.lm-tabs{
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.lm-tab{
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+  color: rgba(255,255,255,.88);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  letter-spacing: .01em;
+  user-select: none;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.lm-tab:hover{ transform: translateY(-1px); }
+.lm-tab--active{
+  border-color: #ff6a00 !important;
+  background: linear-gradient(180deg, rgba(255,106,0,.45), rgba(255,106,0,.18)) !important;
+  color: #fff !important;
+  box-shadow: 0 10px 30px rgba(255,106,0,.22);
+}
+
+/* =========================
+   Pills / Chips
+========================= */
+.lm-chips{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.lm-chip{
+  padding: 10px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.85);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease, border-color .2s ease;
+}
+.lm-chip:hover{ transform: translateY(-1px); }
+.lm-chip--active{
+  border-color: #ff6a00 !important;
+  background: rgba(255,106,0,.18) !important;
+  color: #fff !important;
+  box-shadow: 0 6px 20px rgba(255,106,0,.15);
+}
+
+/* =========================
+   Buttons Apple-like
+========================= */
+.lm-btn-primary{
+  height: 52px;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid rgba(255,154,61,.55);
+  background: linear-gradient(180deg, #FFB100 0%, #FF6A00 55%, #E55300 100%);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: .01em;
+  cursor: pointer;
+  box-shadow: 0 16px 45px rgba(255,106,0,.22);
+  transition: transform .12s ease, filter .2s ease;
+}
+.lm-btn-primary:hover{ transform: translateY(-1px); filter: saturate(1.15) brightness(1.05); }
+.lm-btn-primary:disabled{
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: none;
+  transform: none;
+}
+.lm-btn-ghost{
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.05);
+  color: rgba(255,255,255,.88);
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: transform .12s ease, background .2s ease;
+}
+.lm-btn-ghost:hover{
+  transform: translateY(-1px);
+  background: rgba(255,255,255,.10);
+}
+
+/* =========================
+   Apple toggle
+========================= */
+.lm-toggle{
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.lm-switch{
+  width: 74px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.16);
+  background: rgba(255,255,255,.06);
+  position: relative;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,.25);
+  transition: background .2s ease, border-color .2s ease;
+}
+.lm-switch.on{
+  border-color: rgba(255,106,0,.6);
+  background: rgba(255,106,0,.22);
+}
+.lm-knob{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  background: rgba(255,255,255,.85);
+  box-shadow: 0 10px 18px rgba(0,0,0,.35);
+  transition: transform .18s ease;
+  pointer-events: none;
+}
+.lm-switch.on .lm-knob{
+  transform: translateX(34px);
+}
+.lm-switch-label{
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: rgba(255,255,255,.85);
+}

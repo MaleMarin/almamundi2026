@@ -12,11 +12,19 @@ export async function uploadFileToStorage(
   pathPrefix: string,
   filename?: string
 ): Promise<string> {
+  if (!storage) {
+    throw new Error(
+      "Firebase Storage no está configurado. Añade NEXT_PUBLIC_FIREBASE_* en .env.local."
+    );
+  }
   const name = filename || (file instanceof File ? file.name : 'media');
   const safeName = name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
   const path = `${pathPrefix}/${Date.now()}-${safeName}`;
   const storageRef = ref(storage, path);
-  const blob = file instanceof Blob ? file : new Blob([await file.arrayBuffer()], { type: file.type });
+  const blob =
+    file instanceof File
+      ? new Blob([await file.arrayBuffer()], { type: file.type })
+      : file;
   await uploadBytes(storageRef, blob);
   return getDownloadURL(storageRef);
 }

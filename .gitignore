@@ -17,6 +17,11 @@ pnpm-debug.log*
 # OS
 .DS_Store
 
+# env local (claves y secretos; no commitear)
+.env
+.env.local
+.env*.local
+
 # Stray / noise (do not commit)
 /almamundi@0.1.0
 /next

@@ -48,7 +48,7 @@ const globalStyles = `
 
 /* --- COMPONENTE TARJETA --- */
 const SoftCard = ({ title, subtitle, text, buttonLabel, onClick, delay }: any) => {
-  const orangeColor = '#F97316'; 
+  const orangeColor = '#ff4500'; 
   return (
     <div className="w-full md:w-[400px] p-4 animate-float" style={{ animationDelay: delay }}>
       <div className="flex flex-col justify-between h-[450px] p-8 transition-transform hover:-translate-y-2" style={soft.flat}>
@@ -236,7 +236,7 @@ const StoryModal = ({ isOpen, onClose, mode, setMode }: { isOpen: boolean; onClo
              <input type="email" placeholder="Tu correo" className="w-full py-3 px-6 bg-transparent outline-none text-base font-light placeholder-gray-400 rounded-2xl" style={soft.pressed} />
              <div className="flex gap-3 my-1"><button onClick={() => musicInputRef.current?.click()} className="flex-1 py-3 flex items-center justify-center gap-2 text-gray-600 text-sm rounded-2xl active:scale-95" style={soft.button}><Music size={16}/> Música</button><button onClick={() => imageInputRef.current?.click()} className="flex-1 py-3 flex items-center justify-center gap-2 text-gray-600 text-sm rounded-2xl active:scale-95" style={soft.button}><ImageIcon size={16}/> Fotos</button></div>
              <div className="flex items-center gap-3 ml-1"><input type="checkbox" id="terms" className="w-4 h-4 accent-gray-600" /><label htmlFor="terms" className="text-xs text-gray-500">Acepto compartir mi historia en AlmaMundi.</label></div>
-             <button onClick={() => setStep('success')} className="w-full py-4 text-sm font-bold text-white active:scale-95 rounded-full shadow-lg mt-2" style={{ backgroundColor: '#F97316' }}>¡Enviar mi historia!</button>
+             <button onClick={() => setStep('success')} className="w-full py-4 text-sm font-bold text-white active:scale-95 rounded-full shadow-lg mt-2" style={{ backgroundColor: '#ff4500' }}>¡Enviar mi historia!</button>
             </div>
         )}
       </div>
