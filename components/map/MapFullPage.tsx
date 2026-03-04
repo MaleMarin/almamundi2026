@@ -4501,12 +4501,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           </>
         )}
 
-      {/* Globo a full; full page: globo termina 180px del borde (100 + 80) para no llegar al borde inferior */}
+      {/* Globo a full; full page: globo termina bien arriba para no tapar la frase fecha/hora/ciudad (bottom: 60px) */}
       <div
         style={
           embedded
             ? { position: 'absolute', inset: 0, zIndex: 10 }
-            : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 180, zIndex: 10, marginBottom: '80px' }
+            : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 280, zIndex: 10 }
         }
       >
       <MapCanvas
