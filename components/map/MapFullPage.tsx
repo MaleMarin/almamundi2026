@@ -4667,7 +4667,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       </MapCanvas>
       </div>
       {/* HUD: Fecha/Hora/Ciudad — en el contenedor del universo, debajo del globo */}
-      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '60px' }}>
+      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '0px', position: 'relative', marginTop: '16px' }}>
         <TimeBar
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
