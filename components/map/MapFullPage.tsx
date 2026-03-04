@@ -4501,12 +4501,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           </>
         )}
 
-      {/* Globo a full; Dock flota encima (embedded) */}
+      {/* Globo a full; full page: globo termina 100px del borde para dejar zona oscura abajo (fecha/hora visible) */}
       <div
         style={
           embedded
             ? { position: 'absolute', inset: 0, zIndex: 10 }
-            : { position: 'absolute', top: 136, left: 24, right: 24, bottom: 24, zIndex: 10 }
+            : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 100, zIndex: 10 }
         }
       >
       <MapCanvas
@@ -4666,11 +4666,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      {/* HUD: Fecha/Hora/Ciudad — solo aquí (UniverseStage); no layout, no footer, no fixed; siempre absolute */}
-      <TimeBar
-        selectedLocation={selectedLocation}
-        className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2 text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] z-30"
-      />
+      {/* HUD: Fecha/Hora/Ciudad — en la zona de 100px bajo el globo, visible sobre fondo oscuro */}
+      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: 40 }}>
+        <TimeBar
+          selectedLocation={selectedLocation}
+          className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
+        />
+      </div>
       </div>
     </div>
   );
