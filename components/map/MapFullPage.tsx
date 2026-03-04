@@ -4669,7 +4669,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       {/* HUD: Fecha/Hora/Ciudad — solo aquí (UniverseStage); no layout, no footer, no fixed; siempre absolute */}
       <TimeBar
         selectedLocation={selectedLocation}
-        className="pointer-events-none absolute bottom-8 left-1/2 -translate-x-1/2 text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] z-30"
+        className="pointer-events-none absolute bottom-16 left-1/2 -translate-x-1/2 text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)] z-30"
       />
       </div>
     </div>
