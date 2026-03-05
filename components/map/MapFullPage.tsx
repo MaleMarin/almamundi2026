@@ -340,9 +340,9 @@ const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
 const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
-const GLOBE_IMAGE_DAY_LOCAL = '/textures/earth-day.jpg';
-/** Si earth-day.jpg no existe, usar night para no generar 404 (misma ruta o fallback). */
-const GLOBE_IMAGE_DAY_OR_FALLBACK = '/textures/earth-day.jpg';
+const GLOBE_IMAGE_DAY_LOCAL = '/textures/earth-day.png';
+/** Fallback día: .png (8k mapa mundi) o .jpg si se sustituye. */
+const GLOBE_IMAGE_DAY_OR_FALLBACK = '/textures/earth-day.png';
 /** Bump map para relieve del terreno (topología). */
 const GLOBE_BUMP_IMAGE = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-topology.png';
 
@@ -2655,19 +2655,21 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     });
   }, []);
 
+  // En /mapa (no embedded) siempre vista día (mapa mundi: océanos, verde, nubes). En home (embedded) respetar día/noche.
+  const showDayGlobe = embedded ? !isNight : true;
+
   // Ajustar material del globo según día/noche (textura, emissiveIntensity, shininess)
   useEffect(() => {
     if (!globeMaterial || !('emissiveIntensity' in globeMaterial)) return;
     const phong = globeMaterial as import('three').MeshPhongMaterial;
     const dayTex = globeDayTexRef.current;
     const nightTex = globeNightTexRef.current;
-    if (dayTex && nightTex) {
-      phong.map = isNight ? nightTex : dayTex;
-      phong.needsUpdate = true;
-    }
-    phong.emissiveIntensity = isNight ? 0.22 : 0.18;
-    phong.shininess = isNight ? 14 : GLOBE_SHININESS;
-  }, [globeMaterial, isNight]);
+    if (dayTex) phong.map = showDayGlobe ? dayTex : (nightTex ?? dayTex);
+    else if (nightTex) phong.map = nightTex;
+    phong.needsUpdate = true;
+    phong.emissiveIntensity = showDayGlobe ? 0.18 : 0.22;
+    phong.shininess = showDayGlobe ? GLOBE_SHININESS : 14;
+  }, [globeMaterial, showDayGlobe]);
 
   const stories = useStories();
   const pulses = usePulses(activeView === 'historias');
@@ -3629,6 +3631,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           fillLight.name = 'FILL_LIGHT';
           fillLight.position.set(2, -1, -1);
           scene.add(fillLight);
+          const rimLight = new THREE.DirectionalLight(0xa0d0ff, 0.35);
+          rimLight.name = 'RIM_LIGHT';
+          rimLight.position.set(0, 0, -3);
+          scene.add(rimLight);
 
           // Capa de nubes (estilo mapa mundi / iPhone)
           const cloudGeo = new THREE.SphereGeometry(1.004, 64, 64);
@@ -4533,9 +4539,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         globeImageUrl={GLOBE_IMAGE_LOCAL}
         globeMaterial={globeMaterial}
         showAtmosphere={true}
-        isNight={isNight}
-        atmosphereColor={isNight ? '#1a2d4a' : '#6fc8ff'}
-        atmosphereAltitude={(isNight ? 0.18 : 0.32) + atmosphereBreathingOffset}
+        isNight={!showDayGlobe}
+        atmosphereColor={showDayGlobe ? '#88ccff' : '#1a2d4a'}
+        atmosphereAltitude={(showDayGlobe ? 0.42 : 0.18) + atmosphereBreathingOffset}
         backgroundColor={GLOBE_CANVAS_BG}
         pointsData={activeView === 'actualidad' ? [] : pointsForGlobe}
         pointLat="lat"
