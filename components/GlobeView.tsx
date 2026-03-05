@@ -61,7 +61,7 @@ export function GlobeView({ panelWidth, onGlobeReady, bottomReservePx, children 
         height: reserve > 0 ? `calc(100dvh - ${reserve}px)` : '100dvh',
         maxHeight: reserve > 0 ? `calc(100vh - ${reserve}px)` : '100vh',
         overflow: 'hidden',
-        zIndex: 1,
+        zIndex: 0,
       }}
     >
       <div

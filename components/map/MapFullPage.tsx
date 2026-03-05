@@ -4512,7 +4512,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       <MapCanvas
         panelWidth={0}
         embedded={embedded}
-        bottomReservePx={embedded ? undefined : 180}
+        bottomReservePx={embedded ? undefined : 200}
         globeRef={globeEl}
         onGlobeReady={handleGlobeReady}
         stageClassName="globeStage mapLeftStage w-full h-full min-w-0 min-h-0 isolate z-10 cursor-move pointer-events-auto"
@@ -4667,10 +4667,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      {/* HUD: Fecha/Hora/Ciudad — fixed al viewport en la franja reservada (180px) para no quedar bajo el globo */}
+      {/* HUD: Fecha/Hora/Ciudad — fixed al viewport en la franja reservada (200px); z-[100] siempre por encima del globo (z-0) */}
       <div
         className="pointer-events-none left-0 right-0 z-[100] flex justify-center"
-        style={embedded ? { position: 'absolute', bottom: '48px' } : { position: 'fixed', bottom: '48px', left: 0, right: 0 }}
+        style={embedded ? { position: 'absolute', bottom: '48px' } : { position: 'fixed', bottom: '56px', left: 0, right: 0 }}
       >
         <TimeBar
           selectedLocation={selectedLocation}
