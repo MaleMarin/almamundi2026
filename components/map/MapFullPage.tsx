@@ -2634,15 +2634,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           }
         }
 
-        const mapTex = night ?? day ?? null;
+        // Preferir textura día para ver océanos y tierra (estilo mapa mundi / iPhone)
+        const mapTex = day ?? night ?? null;
         const mat = new THREE.MeshPhongMaterial({
           map: mapTex ?? undefined,
           bumpMap: bumpTex ?? undefined,
           bumpScale: bumpTex ? GLOBE_BUMP_SCALE : 0,
-          emissive: new THREE.Color(0x1a2235),
-          emissiveIntensity: 0.30,
+          emissive: new THREE.Color(0x0d1520),
+          emissiveIntensity: 0.18,
           shininess: GLOBE_SHININESS,
-          specular: new THREE.Color(GLOBE_SPECULAR)
+          specular: new THREE.Color(0x88aacc)
         });
 
         if (mat && "opacity" in mat) {
@@ -2664,7 +2665,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       phong.map = isNight ? nightTex : dayTex;
       phong.needsUpdate = true;
     }
-    phong.emissiveIntensity = isNight ? 0.22 : 0.32;
+    phong.emissiveIntensity = isNight ? 0.22 : 0.18;
     phong.shininess = isNight ? 14 : GLOBE_SHININESS;
   }, [globeMaterial, isNight]);
 
@@ -3629,19 +3630,28 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           fillLight.position.set(2, -1, -1);
           scene.add(fillLight);
 
-          // Capa de nubes
-          const cloudGeo = new THREE.SphereGeometry(1.003, 64, 64);
+          // Capa de nubes (estilo mapa mundi / iPhone)
+          const cloudGeo = new THREE.SphereGeometry(1.004, 64, 64);
           const cloudLoader = new THREE.TextureLoader();
-          const cloudTex = cloudLoader.load('/textures/earth-clouds.png');
-          const cloudMat = new THREE.MeshPhongMaterial({
-            map: cloudTex,
-            transparent: true,
-            opacity: 0.35,
-            depthWrite: false,
-          });
-          const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
-          scene.add(cloudMesh);
-          cloudMeshRef.current = cloudMesh;
+          cloudLoader.load(
+            '/textures/earth-clouds.png',
+            (cloudTex) => {
+              if (cloudTex && cloudMeshRef.current === null) {
+                (cloudTex as any).colorSpace = (THREE as any).SRGBColorSpace ?? (cloudTex as any).colorSpace;
+                const cloudMat = new THREE.MeshPhongMaterial({
+                  map: cloudTex,
+                  transparent: true,
+                  opacity: 0.48,
+                  depthWrite: false,
+                });
+                const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+                scene.add(cloudMesh);
+                cloudMeshRef.current = cloudMesh;
+              }
+            },
+            undefined,
+            () => { /* fallback silencioso si no hay textura */ }
+          );
         } catch (err) {
           console.error('handleGlobeReady lights/clouds failed', err);
         }
@@ -4676,6 +4686,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
+      </div>
       </div>
     </div>
   );
