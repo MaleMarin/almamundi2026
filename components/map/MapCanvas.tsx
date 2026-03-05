@@ -124,6 +124,8 @@ export type MapCanvasProps = {
   isNight?: boolean;
   /** Reservar px abajo del viewport para HUD (GlobeView fixed no cubre esa franja). Solo cuando no embedded. */
   bottomReservePx?: number;
+  /** Reservar px arriba del viewport para barra con logo/frase (GlobeView no cubre esa franja). Solo cuando no embedded. */
+  topReservePx?: number;
   children?: ReactNode;
 };
 
@@ -287,6 +289,7 @@ export function MapCanvas({
   children,
   embedded = false,
   bottomReservePx,
+  topReservePx,
 }: MapCanvasProps) {
   const sizeHook = useElementSize<HTMLDivElement>();
   const embedWrapRef = useRef<HTMLDivElement>(null);
@@ -425,7 +428,7 @@ export function MapCanvas({
   }
 
   return (
-    <GlobeView panelWidth={panelWidth} onGlobeReady={onGlobeReady} bottomReservePx={bottomReservePx}>
+    <GlobeView panelWidth={panelWidth} onGlobeReady={onGlobeReady} bottomReservePx={bottomReservePx} topReservePx={topReservePx}>
       {({ onGlobeReady: injectedOnGlobeReady }) => {
         const block = globeBlock(injectedOnGlobeReady);
         return useInternalSize ? (

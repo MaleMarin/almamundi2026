@@ -2,16 +2,17 @@
 
 /**
  * Versión alternativa del mapa para home (dock + drawer + historias/noticias/sonidos).
- * La home actual usa HomeMapSection → MapFullPage(embedded), que tiene todas las funcionalidades
- * en un solo lugar: components/map/MapFullPage.tsx.
+ * Misma lógica que /mapa: nubes, día/noche por hora del usuario, sin arrastre, auto-rotación.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
+import * as THREE from 'three';
 import { useStories } from '@/hooks/useStories';
 import { useUserPosition } from '@/hooks/useUserPosition';
+import { isNightAtLocation } from '@/lib/sunPosition';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { getPulseConfig } from '@/lib/storyPulse';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -29,7 +30,8 @@ const MapCanvas = dynamic(
   { ssr: false }
 );
 
-const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
+const GLOBE_IMAGE_NIGHT = '/textures/earth-night.jpg';
+const GLOBE_IMAGE_DAY = '/textures/earth-day.png';
 const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 const EMBEDDED_POV = { lat: -8, lng: -28, altitude: 1.35 };
 
@@ -37,6 +39,7 @@ export default function HomeMap() {
   const router = useRouter();
   const globeEl = useRef<unknown>(null);
   const basePOVRef = useRef<{ lat: number; lng: number; altitude: number } | null>(null);
+  const cloudMeshRef = useRef<THREE.Mesh | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -48,10 +51,33 @@ export default function HomeMap() {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null);
   const [globeReady, setGlobeReady] = useState(false);
+  const [isNight, setIsNight] = useState(false);
   const userPosition = useUserPosition();
 
   useEffect(() => {
+    const updateDayNight = () => {
+      const now = new Date();
+      const lat = userPosition?.lat ?? 0;
+      const lng = userPosition?.lng ?? 0;
+      setIsNight(isNightAtLocation(lat, lng, now));
+    };
+    updateDayNight();
+    const id = setInterval(updateDayNight, 60_000);
+    return () => clearInterval(id);
+  }, [userPosition?.lat, userPosition?.lng]);
+
+  useEffect(() => {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
+  }, []);
+
+  useEffect(() => {
+    let raf = 0;
+    const tick = () => {
+      if (cloudMeshRef.current) cloudMeshRef.current.rotation.y += 0.00008;
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
   // Centrar el mapa en la posición del usuario cuando tengamos ambas: globo listo y ubicación
@@ -192,13 +218,48 @@ export default function HomeMap() {
   const handleGlobeReady = useCallback((initialPOV: { lat: number; lng: number; altitude: number }) => {
     basePOVRef.current = { ...initialPOV };
     setGlobeReady(true);
-    const g = globeEl.current as { controls?: () => { enableZoom: boolean; autoRotate: boolean; autoRotateSpeed: number } } | null;
+    const g = globeEl.current as {
+      controls?: () => { enableZoom: boolean; autoRotate: boolean; autoRotateSpeed: number; enableRotate?: boolean };
+      scene?: () => THREE.Scene;
+    } | null;
     if (g?.controls) {
       const controls = g.controls();
       controls.enableZoom = false;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
+      controls.autoRotateSpeed = 0.22;
+      if (typeof (controls as { enableRotate?: boolean }).enableRotate !== 'undefined') {
+        (controls as { enableRotate: boolean }).enableRotate = false;
+      }
     }
+    setTimeout(() => {
+      const scene = g?.scene?.() as THREE.Scene | undefined;
+      if (!scene) return;
+      try {
+        const cloudGeo = new THREE.SphereGeometry(1.004, 64, 64);
+        const cloudLoader = new THREE.TextureLoader();
+        cloudLoader.load(
+          '/textures/earth-clouds.png',
+          (cloudTex) => {
+            if (cloudTex && cloudMeshRef.current === null) {
+              (cloudTex as THREE.Texture).colorSpace = THREE.SRGBColorSpace;
+              const cloudMat = new THREE.MeshPhongMaterial({
+                map: cloudTex,
+                transparent: true,
+                opacity: 0.68,
+                depthWrite: false,
+              });
+              const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
+              scene.add(cloudMesh);
+              cloudMeshRef.current = cloudMesh;
+            }
+          },
+          undefined,
+          () => {}
+        );
+      } catch (err) {
+        console.error('HomeMap clouds failed', err);
+      }
+    }, 200);
   }, []);
 
   const handleResetView = useCallback(() => {
@@ -261,10 +322,11 @@ export default function HomeMap() {
           embedded
           globeRef={globeEl as never}
           onGlobeReady={handleGlobeReady}
-          globeImageUrl={GLOBE_IMAGE_LOCAL}
+          globeImageUrl={isNight ? GLOBE_IMAGE_NIGHT : GLOBE_IMAGE_DAY}
           backgroundColor={GLOBE_CANVAS_BG}
           showAtmosphere
-          atmosphereColor="#6fc8ff"
+          isNight={isNight}
+          atmosphereColor={isNight ? '#1a2d4a' : '#7eb8e8'}
           atmosphereAltitude={0.28}
           pointsData={pointsForGlobe}
           pointLat="lat"

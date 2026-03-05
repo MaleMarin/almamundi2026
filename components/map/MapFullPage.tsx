@@ -604,6 +604,14 @@ const globalStyles = `
     width: 100%;
     height: 100%;
     overflow: hidden;
+    border: none !important;
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  .globeStage canvas {
+    border: none !important;
+    outline: none !important;
+    border-radius: 50%;
   }
   .cinemaOverlay {
     pointer-events: none;
@@ -2546,7 +2554,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           controls.autoRotate = false;
         } else {
           controls.autoRotate = true;
-          controls.autoRotateSpeed = 0.18;
+          controls.autoRotateSpeed = 0.22;
         }
       }
       const now = performance.now();
@@ -2641,9 +2649,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           bumpMap: bumpTex ?? undefined,
           bumpScale: bumpTex ? GLOBE_BUMP_SCALE : 0,
           emissive: new THREE.Color(0x0d1520),
-          emissiveIntensity: 0.18,
-          shininess: GLOBE_SHININESS,
-          specular: new THREE.Color(0x88aacc)
+          emissiveIntensity: 0.12,
+          shininess: 18,
+          specular: new THREE.Color(0x1a2a3a)
         });
 
         if (mat && "opacity" in mat) {
@@ -2655,8 +2663,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     });
   }, []);
 
-  // En /mapa (no embedded) siempre vista día (mapa mundi: océanos, verde, nubes). En home (embedded) respetar día/noche.
-  const showDayGlobe = embedded ? !isNight : true;
+  // Día/noche según hora del usuario: de día textura clara sin luces; de noche textura con luces de ciudades.
+  const showDayGlobe = !isNight;
 
   // Ajustar material del globo según día/noche (textura, emissiveIntensity, shininess)
   useEffect(() => {
@@ -2667,8 +2675,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (dayTex) phong.map = showDayGlobe ? dayTex : (nightTex ?? dayTex);
     else if (nightTex) phong.map = nightTex;
     phong.needsUpdate = true;
-    phong.emissiveIntensity = showDayGlobe ? 0.18 : 0.22;
-    phong.shininess = showDayGlobe ? GLOBE_SHININESS : 14;
+    phong.emissiveIntensity = showDayGlobe ? 0.12 : 0.22;
+    phong.shininess = showDayGlobe ? 18 : 14;
   }, [globeMaterial, showDayGlobe]);
 
   const stories = useStories();
@@ -3311,7 +3319,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           globeEl.current?.pointOfView(base, 1100);
           setViewCenter({ lat: base.lat, lng: base.lng });
         } else {
-          globeEl.current?.pointOfView({ lat: -8, lng: -28, altitude: 2.2 }, 1100);
+          globeEl.current?.pointOfView({ lat: -18, lng: -58, altitude: 2.45 }, 1100);
         }
       } catch {}
     }, 400);
@@ -3581,57 +3589,69 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       const controls = globeEl.current.controls();
       controls.enableZoom = false;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.18;
+      controls.autoRotateSpeed = 0.22;
+      if (typeof (controls as { enableRotate?: boolean }).enableRotate !== 'undefined') {
+        (controls as { enableRotate: boolean }).enableRotate = embedded;
+      }
       const nearPOV = { lat: 0, lng: -30, altitude: 1.2 };
       basePOVRef.current = embedded ? { ...nearPOV } : { ...initialPOV };
       setViewCenter({ lat: nearPOV.lat, lng: nearPOV.lng });
 
       if (embedded) {
-        // Empezar lejos; al entrar al Universe (universeVisible) se anima a cerca en un efecto aparte
         globeEl.current.pointOfView({ lat: 0, lng: -30, altitude: 3.0 }, 0);
       } else {
         globeEl.current.pointOfView(initialPOV, 0);
       }
-      controls.addEventListener('start', () => {
-        isUserInteractingRef.current = true;
-        controls.autoRotate = false;
-        window.clearTimeout((window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout);
-        (window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout = window.setTimeout(() => {
-          if (globeEl.current) {
-            try {
-              globeEl.current.controls().autoRotate = true;
-            } catch {}
-          }
-        }, 15000);
-      });
-      controls.addEventListener('end', () => {
-        setTimeout(() => {
-          isUserInteractingRef.current = false;
-        }, 800);
-      });
+      if (embedded) {
+        controls.addEventListener('start', () => {
+          isUserInteractingRef.current = true;
+          controls.autoRotate = false;
+          window.clearTimeout((window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout);
+          (window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout = window.setTimeout(() => {
+            if (globeEl.current) {
+              try {
+                globeEl.current.controls().autoRotate = true;
+              } catch {}
+            }
+          }, 15000);
+        });
+        controls.addEventListener('end', () => {
+          setTimeout(() => {
+            isUserInteractingRef.current = false;
+          }, 800);
+        });
+      }
 
       // Reemplazar luces y agregar capa de nubes (después de que MapCanvas haya montado la escena)
       setTimeout(() => {
         const scene = globeEl.current?.scene?.() as THREE.Scene | undefined;
         if (!scene) return;
         try {
+          scene.background = null;
+          const renderer = globeEl.current?.renderer?.() as THREE.WebGLRenderer | undefined;
+          if (renderer) {
+            renderer.setClearColor(0x000000, 0);
+            if (typeof renderer.setClearAlpha === 'function') renderer.setClearAlpha(0);
+            const canvas = renderer.domElement as HTMLCanvasElement;
+            if (canvas) canvas.style.background = 'transparent';
+          }
           // Reemplazar luces existentes por la nueva iluminación
           ['AM_LIGHT', 'KEY_LIGHT', 'FILL_LIGHT', 'RIM_LIGHT'].forEach((name) => {
             const obj = scene.getObjectByName(name);
             if (obj) scene.remove(obj);
           });
-          const ambientLight = new THREE.AmbientLight(0x333355, 0.4);
+          const ambientLight = new THREE.AmbientLight(0x446644, 0.5);
           ambientLight.name = 'AM_LIGHT';
           scene.add(ambientLight);
-          const sunLight = new THREE.DirectionalLight(0xfff5e0, 1.8);
+          const sunLight = new THREE.DirectionalLight(0xffeed8, 0.95);
           sunLight.name = 'KEY_LIGHT';
           sunLight.position.set(-2, 1.5, 1);
           scene.add(sunLight);
-          const fillLight = new THREE.DirectionalLight(0x2244aa, 0.15);
+          const fillLight = new THREE.DirectionalLight(0x2244aa, 0.12);
           fillLight.name = 'FILL_LIGHT';
           fillLight.position.set(2, -1, -1);
           scene.add(fillLight);
-          const rimLight = new THREE.DirectionalLight(0xa0d0ff, 0.35);
+          const rimLight = new THREE.DirectionalLight(0x80b0dd, 0.14);
           rimLight.name = 'RIM_LIGHT';
           rimLight.position.set(0, 0, -3);
           scene.add(rimLight);
@@ -3647,7 +3667,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 const cloudMat = new THREE.MeshPhongMaterial({
                   map: cloudTex,
                   transparent: true,
-                  opacity: 0.48,
+                  opacity: 0.68,
                   depthWrite: false,
                 });
                 const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
@@ -3747,6 +3767,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     onToggleSound: () => setSoundEnabled((v) => !v),
   };
 
+  /** Altura reservada arriba en /mapa: barra con logo + frase (y safe-area). El globo no cubre esta franja. */
+  const MAP_TOP_BAR_PX = 96;
+
   return (
     <div
       data-build="mapa-v1"
@@ -3756,6 +3779,36 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           : { position: 'fixed', inset: 0, width: '100vw', height: '100dvh', maxHeight: '100vh', overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingBottom: '120px' }),
       }}
     >
+      {!embedded && (
+        <header
+          className="flex items-center justify-between px-4 md:px-6 w-full z-[60] border-b border-white/10"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            minHeight: 72,
+            paddingTop: 'env(safe-area-inset-top, 16px)',
+            paddingBottom: 12,
+            background: 'linear-gradient(180deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.92) 100%)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+          }}
+        >
+          <a href="/" className="flex items-center gap-3 min-w-0">
+            <img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-14 w-auto object-contain select-none flex-shrink-0" />
+            <span className="text-white/95 font-semibold text-lg md:text-xl truncate">
+              Mapa de AlmaMundi
+            </span>
+          </a>
+          <a
+            href="/"
+            className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition"
+          >
+            Inicio
+          </a>
+        </header>
+      )}
       <style jsx global>{globalStyles}</style>
       <style jsx global>{`
   :root{
@@ -4045,13 +4098,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       {/* Drawer: inline dentro del Universe (absolute, no fixed). Full page: navbar flotante transparente (z-50), globo a pantalla completa */}
       {!embedded && (
           <>
-            <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={16} navbarZIndex={50} />
+            <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={MAP_TOP_BAR_PX + 8} navbarZIndex={50} />
             <MapDock
               activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'sounds'}
               onModeChange={handleDockModeChange}
               onResetView={handleResetView}
               drawerOpen={drawerOpen}
-              topOffset={16}
+              topOffset={MAP_TOP_BAR_PX + 8}
               navbarZIndex={50}
             />
             <MapDrawer
@@ -4529,6 +4582,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         panelWidth={0}
         embedded={embedded}
         bottomReservePx={embedded ? undefined : 200}
+        topReservePx={embedded ? undefined : MAP_TOP_BAR_PX}
         globeRef={globeEl}
         onGlobeReady={handleGlobeReady}
         stageClassName="globeStage mapLeftStage w-full h-full min-w-0 min-h-0 isolate z-10 cursor-move pointer-events-auto"
@@ -4538,10 +4592,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         }}
         globeImageUrl={GLOBE_IMAGE_LOCAL}
         globeMaterial={globeMaterial}
-        showAtmosphere={true}
+        showAtmosphere={false}
         isNight={!showDayGlobe}
-        atmosphereColor={showDayGlobe ? '#88ccff' : '#1a2d4a'}
-        atmosphereAltitude={(showDayGlobe ? 0.42 : 0.18) + atmosphereBreathingOffset}
+        atmosphereColor={showDayGlobe ? '#7eb8e8' : '#1a2d4a'}
+        atmosphereAltitude={0}
         backgroundColor={GLOBE_CANVAS_BG}
         pointsData={activeView === 'actualidad' ? [] : pointsForGlobe}
         pointLat="lat"

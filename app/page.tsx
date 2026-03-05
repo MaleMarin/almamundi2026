@@ -1872,8 +1872,8 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* INTRO + CARDS: primera vista en una pantalla (sin scroll) */}
-      <section id="intro" className="pt-44 md:pt-52 pb-6 md:pb-8 px-6 relative z-10 flex flex-col items-center text-center">
+      {/* INTRO + CARDS: primera vista; la frase siempre visible al cargar (min-height para no quedar tapada por el mapa) */}
+      <section id="intro" className="pt-44 md:pt-52 pb-6 md:pb-8 px-6 relative z-10 flex flex-col items-center text-center min-h-[calc(100vh-8rem)] scroll-mt-28">
         <div className="max-w-6xl animate-float">
           <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
             AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
@@ -1902,8 +1902,8 @@ export default function Home() {
         </SoftCard>
       </section>
 
-      {/* Sección mapa: fondo = gris de las cards (--home-bg), título + transición */}
-      <section id="mapa" className="w-full scroll-mt-[160px] bg-[var(--home-bg)]">
+      {/* Sección mapa: debajo de intro/cards; título + dock + globo */}
+      <section id="mapa" className="w-full scroll-mt-28 bg-[var(--home-bg)]">
         <div className="map-section-gradient-block w-full">
           <h2 className="text-center text-[72px] md:text-[96px] leading-none py-10" style={{ color: 'var(--almamundi-orange)' }}>
             Mapa de AlmaMundi
@@ -1912,13 +1912,13 @@ export default function Home() {
           <div id="map-dock-slot" className="w-full px-2 md:px-3 py-4 md:py-5" />
           <div className="min-h-[32px] md:min-h-[40px] w-full" aria-hidden />
         </div>
-        <div className="relative w-full h-[85vh] bg-[var(--universe-bg)] overflow-hidden">
+        <div className="relative w-full min-h-[100vh] h-[100vh] bg-[var(--universe-bg)] overflow-hidden">
           <HomeMap />
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="w-full pb-28 pt-32 md:pt-40 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
+      {/* FOOTER: más espacio arriba para separar del globo */}
+      <footer className="w-full pb-28 pt-48 md:pt-64 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
         <div className="mb-20 mt-12 w-full flex justify-center select-none">
           <h1 className="text-8xl md:text-[160px] lg:text-[200px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
         </div>
