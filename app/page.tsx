@@ -1872,8 +1872,8 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* INTRO + CARDS: primera vista; la frase siempre visible al cargar (min-height para no quedar tapada por el mapa) */}
-      <section id="intro" className="pt-44 md:pt-52 pb-6 md:pb-8 px-6 relative z-10 flex flex-col items-center text-center min-h-[calc(100vh-8rem)] scroll-mt-28">
+      {/* INTRO: frase visible; cards justo debajo (sin forzar altura mínima para que las cards suban) */}
+      <section id="intro" className="pt-44 md:pt-52 pb-4 md:pb-6 px-6 relative z-10 flex flex-col items-center text-center scroll-mt-28">
         <div className="max-w-6xl animate-float">
           <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
             AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
@@ -1886,8 +1886,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CARDS — sin bajar; un poco más cerca de la frase de arriba */}
-      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 mt-4 md:mt-5">
+      {/* CARDS — pegadas a la frase de arriba */}
+      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 mt-6 md:mt-8">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
