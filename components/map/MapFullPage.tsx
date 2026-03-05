@@ -2543,13 +2543,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     return () => clearInterval(id);
   }, [userLocation, hourOverride]);
 
-  // Movimiento suave: autoRotate solo cuando el usuario NO interactúa; breathing del halo cada frame (state cada 100ms)
+  // Movimiento suave: autoRotate solo cuando el usuario NO interactúa; en /mapa sin arrastre (enableRotate = false cada frame)
   useEffect(() => {
     let rafId: number;
     const loop = () => {
       const globe = globeEl.current;
       const controls = globe?.controls?.();
       if (controls) {
+        if (!embedded && 'enableRotate' in controls) {
+          (controls as { enableRotate: boolean }).enableRotate = false;
+        }
         if (isUserInteractingRef.current) {
           controls.autoRotate = false;
         } else {
@@ -2567,7 +2570,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     };
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, []);
+  }, [embedded]);
 
   useEffect(() => {
     const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'music';
@@ -3590,7 +3593,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       controls.enableZoom = false;
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.22;
-      if (typeof (controls as { enableRotate?: boolean }).enableRotate !== 'undefined') {
+      if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = embedded;
       }
       const nearPOV = { lat: 0, lng: -30, altitude: 1.2 };

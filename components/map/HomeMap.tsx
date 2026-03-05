@@ -74,6 +74,13 @@ export default function HomeMap() {
     let raf = 0;
     const tick = () => {
       if (cloudMeshRef.current) cloudMeshRef.current.rotation.y += 0.00008;
+      const g = globeEl.current as { controls?: () => { enableRotate?: boolean; autoRotate: boolean; autoRotateSpeed: number } } | null;
+      const ctrl = g?.controls?.();
+      if (ctrl) {
+        if ('enableRotate' in ctrl) (ctrl as { enableRotate: boolean }).enableRotate = false;
+        ctrl.autoRotate = true;
+        ctrl.autoRotateSpeed = 0.22;
+      }
       raf = requestAnimationFrame(tick);
     };
     raf = requestAnimationFrame(tick);
@@ -227,7 +234,7 @@ export default function HomeMap() {
       controls.enableZoom = false;
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.22;
-      if (typeof (controls as { enableRotate?: boolean }).enableRotate !== 'undefined') {
+      if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = false;
       }
     }
