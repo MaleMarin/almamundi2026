@@ -30,13 +30,16 @@ export type GlobeViewInjected = {
 type GlobeViewProps = {
   panelWidth: number;
   onGlobeReady: (initialPOV: { lat: number; lng: number; altitude: number }) => void;
+  /** Reservar px en la parte inferior del viewport para no tapar HUD (ej. fecha/hora). El área fixed del globo no cubre esa franja. */
+  bottomReservePx?: number;
   children: (injected: GlobeViewInjected) => ReactNode;
 };
 
 /**
  * Contenedor del globo: a la derecha del panel izquierdo con un hueco; composición vía POV (cámara).
+ * Si bottomReservePx está definido, el bloque fixed no llega al borde inferior (para dejar espacio al HUD).
  */
-export function GlobeView({ panelWidth, onGlobeReady, children }: GlobeViewProps) {
+export function GlobeView({ panelWidth, onGlobeReady, bottomReservePx, children }: GlobeViewProps) {
   const injectedOnGlobeReady = () => {
     const initialPOV = computeInitialPOV(panelWidth);
     onGlobeReady(initialPOV);
@@ -44,6 +47,7 @@ export function GlobeView({ panelWidth, onGlobeReady, children }: GlobeViewProps
 
   const hasPanel = panelWidth > 0;
   const leftOffset = hasPanel ? panelWidth + GAP_PANEL_GLOBE_PX : 0;
+  const reserve = bottomReservePx ?? 0;
 
   return (
     <main
@@ -51,11 +55,11 @@ export function GlobeView({ panelWidth, onGlobeReady, children }: GlobeViewProps
         position: 'fixed',
         top: 0,
         right: 0,
-        bottom: 0,
+        bottom: reserve > 0 ? reserve : 0,
         left: leftOffset,
         width: hasPanel ? `calc(100vw - ${leftOffset}px)` : '100vw',
-        height: '100dvh',
-        maxHeight: '100vh',
+        height: reserve > 0 ? `calc(100dvh - ${reserve}px)` : '100dvh',
+        maxHeight: reserve > 0 ? `calc(100vh - ${reserve}px)` : '100vh',
         overflow: 'hidden',
         zIndex: 1,
       }}

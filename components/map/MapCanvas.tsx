@@ -122,6 +122,8 @@ export type MapCanvasProps = {
   onStageMouseMove?: (e: React.MouseEvent<HTMLDivElement>) => void;
   /** When false, increase lighting and exposure so the globe looks brighter (day). When true or undefined, use base night values. */
   isNight?: boolean;
+  /** Reservar px abajo del viewport para HUD (GlobeView fixed no cubre esa franja). Solo cuando no embedded. */
+  bottomReservePx?: number;
   children?: ReactNode;
 };
 
@@ -284,6 +286,7 @@ export function MapCanvas({
   isNight,
   children,
   embedded = false,
+  bottomReservePx,
 }: MapCanvasProps) {
   const sizeHook = useElementSize<HTMLDivElement>();
   const embedWrapRef = useRef<HTMLDivElement>(null);
@@ -359,7 +362,7 @@ export function MapCanvas({
         style={
           embedded
             ? { width: '100%', height: '100%' }
-            : { width, height, transform: 'scale(1.05)' }
+            : { width, height }
         }
         className="pointer-events-auto"
       >
@@ -422,7 +425,7 @@ export function MapCanvas({
   }
 
   return (
-    <GlobeView panelWidth={panelWidth} onGlobeReady={onGlobeReady}>
+    <GlobeView panelWidth={panelWidth} onGlobeReady={onGlobeReady} bottomReservePx={bottomReservePx}>
       {({ onGlobeReady: injectedOnGlobeReady }) => {
         const block = globeBlock(injectedOnGlobeReady);
         return useInternalSize ? (

@@ -4501,7 +4501,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           </>
         )}
 
-      {/* Globo: wrapper a altura completa para no cortar la esfera arriba; zona del canvas deja 100px abajo para la frase */}
+      {/* Globo: full page usa GlobeView con bottomReservePx para no tapar la frase y no cortar la esfera arriba */}
       <div
         style={
           embedded
@@ -4509,16 +4509,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 0, zIndex: 10 }
         }
       >
-      <div
-        style={
-          embedded
-            ? { position: 'absolute', inset: 0 }
-            : { position: 'absolute', top: 0, left: 0, right: 0, bottom: '100px' }
-        }
-      >
       <MapCanvas
         panelWidth={0}
         embedded={embedded}
+        bottomReservePx={embedded ? undefined : 180}
         globeRef={globeEl}
         onGlobeReady={handleGlobeReady}
         stageClassName="globeStage mapLeftStage w-full h-full min-w-0 min-h-0 isolate z-10 cursor-move pointer-events-auto"
@@ -4673,14 +4667,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      </div>
-      {/* HUD: Fecha/Hora/Ciudad — en el contenedor del universo, debajo del globo; z-30 por encima del canvas */}
-      <div className="pointer-events-none absolute left-0 right-0 z-30 flex justify-center" style={{ bottom: '60px' }}>
+      {/* HUD: Fecha/Hora/Ciudad — fixed al viewport en la franja reservada (180px) para no quedar bajo el globo */}
+      <div
+        className="pointer-events-none left-0 right-0 z-[100] flex justify-center"
+        style={embedded ? { position: 'absolute', bottom: '48px' } : { position: 'fixed', bottom: '48px', left: 0, right: 0 }}
+      >
         <TimeBar
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
-      </div>
       </div>
     </div>
   );
