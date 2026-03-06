@@ -21,6 +21,7 @@ import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
+import { VideoGlobe } from '@/components/map/VideoGlobe';
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
@@ -68,6 +69,11 @@ export default function HomeMap() {
 
   useEffect(() => {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
+  }, []);
+
+  // Con VideoGlobe no hay onGlobeReady; marcar listo al montar para que el resto del UI funcione
+  useEffect(() => {
+    setGlobeReady(true);
   }, []);
 
   useEffect(() => {
@@ -324,36 +330,12 @@ export default function HomeMap() {
   const TIME_STRIP_HEIGHT = 64;
   return (
     <div className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%' }}>
-      {/* Globo 3D: contenido en universo, nubes, día/noche, auto-rotación */}
+      {/* Globo en vídeo: NASA Blue Marble 1280x720, buena calidad en movimiento */}
       <div
         className="relative overflow-hidden px-2 py-6 md:px-4 md:py-10 shrink-0 flex items-center justify-center"
         style={{ height: `calc(100% - ${TIME_STRIP_HEIGHT}px)`, maxHeight: `calc(100% - ${TIME_STRIP_HEIGHT}px)` }}
       >
-        <MapCanvas
-          panelWidth={0}
-          embedded
-          globeRef={globeEl as never}
-          onGlobeReady={handleGlobeReady}
-          globeImageUrl={isNight ? GLOBE_IMAGE_NIGHT : GLOBE_IMAGE_DAY}
-          backgroundColor={GLOBE_CANVAS_BG}
-          showAtmosphere
-          isNight={isNight}
-          atmosphereColor={isNight ? '#1a2d4a' : '#7eb8e8'}
-          atmosphereAltitude={0.28}
-          pointsData={pointsForGlobe}
-          pointLat="lat"
-          pointLng="lng"
-          pointColor={pointColorFn}
-          pointAltitude={() => 0.01}
-          pointRadius={pointRadiusFn}
-          pointsMerge={false}
-          onPointClick={(point: { id?: string }) => router.push(point?.id ? `/mapa?story=${point.id}` : '/mapa')}
-          ringsData={ringsData}
-          ringColor={ringColorFn}
-          ringMaxRadius="maxR"
-          ringPropagationSpeed="propagationSpeed"
-          ringRepeatPeriod="repeatPeriod"
-        />
+        <VideoGlobe />
       </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div

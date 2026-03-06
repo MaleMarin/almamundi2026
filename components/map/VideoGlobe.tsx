@@ -3,13 +3,12 @@
 import { useRef, useEffect } from 'react';
 
 /**
- * Globo del mapa mundi usando el vídeo rotate_hd_1280_lossless.mp4.
- * Mismo lugar que el globo, velocidad reducida para rotación más suave.
+ * Globo del mapa mundi con vídeo de alta calidad (NASA Blue Marble, 1280x720).
+ * Fuente: NASA SVS phytoBlue_30fps — dominio público.
  */
-/** Vídeo en public/rotate_hd_1280_lossless.mp4 → se sirve como /rotate_hd_1280_lossless.mp4. ?v=2 evita caché antigua. */
-const GLOBE_VIDEO_SRC = '/rotate_hd_1280_lossless.mp4?v=2';
-/** Velocidad de reproducción: 1 = normal; 0.5 = mitad; más bajo = más lento */
-const PLAYBACK_RATE = 0.45;
+const GLOBE_VIDEO_SRC = '/earth-blue-marble-720p.mp4';
+/** Velocidad de reproducción: más bajo = rotación más lenta y suave */
+const PLAYBACK_RATE = 0.4;
 
 export function VideoGlobe() {
   const videoRef = useRef<HTMLVideoElement>(null);
