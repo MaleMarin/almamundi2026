@@ -6,7 +6,8 @@ import { useRef, useEffect } from 'react';
  * Globo del mapa mundi usando el vídeo rotate_hd_1280_lossless.mp4.
  * Mismo lugar que el globo, velocidad reducida para rotación más suave.
  */
-const GLOBE_VIDEO_SRC = '/rotate_hd_1280_lossless.mp4';
+/** Vídeo en public/rotate_hd_1280_lossless.mp4 → se sirve como /rotate_hd_1280_lossless.mp4. ?v=2 evita caché antigua. */
+const GLOBE_VIDEO_SRC = '/rotate_hd_1280_lossless.mp4?v=2';
 /** Velocidad de reproducción: 1 = normal; 0.5 = mitad; más bajo = más lento */
 const PLAYBACK_RATE = 0.45;
 
@@ -20,7 +21,7 @@ export function VideoGlobe() {
   }, []);
 
   return (
-    <div className="w-full h-full flex items-center justify-center min-h-0">
+    <div className="w-full h-full flex items-center justify-center min-h-0" data-globe="video">
       <div
         className="relative rounded-full overflow-hidden bg-[var(--universe-bg)] flex-shrink-0"
         style={{
@@ -37,6 +38,7 @@ export function VideoGlobe() {
           loop
           muted
           playsInline
+          preload="auto"
           className="absolute inset-0 w-full h-full object-cover"
           aria-label="Mapa mundi en rotación"
         />
