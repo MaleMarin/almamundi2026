@@ -1,22 +1,33 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 
 /**
- * Globo del mapa mundi con vídeo de alta calidad (NASA Blue Marble, 1280x720).
- * Fuente: NASA SVS phytoBlue_30fps — dominio público.
+ * Globo del mapa mundi con vídeo de alta calidad (NASA Blue Marble).
+ * Usa versión 60fps para rotación suave sin tiritar. Fuente: NASA SVS 3639 — dominio público.
  */
-const GLOBE_VIDEO_SRC = '/earth-blue-marble-720p.mp4';
-/** Velocidad de reproducción: más bajo = rotación más lenta y suave */
-const PLAYBACK_RATE = 0.4;
+const GLOBE_VIDEO_SRC = '/earth-blue-marble-720p-60fps.mp4';
+/** Velocidad de reproducción: más bajo = rotación más lenta y suave (60fps permite fluidez) */
+const PLAYBACK_RATE = 0.35;
 
 export function VideoGlobe() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const playbackSetRef = useRef(false);
+
+  const applySmoothPlayback = useCallback(() => {
+    const video = videoRef.current;
+    if (!video || playbackSetRef.current) return;
+    video.playbackRate = PLAYBACK_RATE;
+    playbackSetRef.current = true;
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
-    video.playbackRate = PLAYBACK_RATE;
+    if (video.readyState >= 2) {
+      video.playbackRate = PLAYBACK_RATE;
+      playbackSetRef.current = true;
+    }
   }, []);
 
   return (
@@ -28,6 +39,9 @@ export function VideoGlobe() {
           aspectRatio: '1',
           maxHeight: '100%',
           boxShadow: '0 0 80px rgba(100, 150, 255, 0.15), inset 0 0 60px rgba(0,0,0,0.3)',
+          willChange: 'transform',
+          transform: 'translateZ(0)',
+          backfaceVisibility: 'hidden' as const,
         }}
       >
         <video
@@ -38,7 +52,14 @@ export function VideoGlobe() {
           muted
           playsInline
           preload="auto"
+          onCanPlay={applySmoothPlayback}
+          onLoadedData={applySmoothPlayback}
           className="absolute inset-0 w-full h-full object-cover"
+          style={{
+            imageRendering: 'auto',
+            transform: 'translateZ(0)',
+            backfaceVisibility: 'hidden',
+          }}
           aria-label="Mapa mundi en rotación"
         />
       </div>
