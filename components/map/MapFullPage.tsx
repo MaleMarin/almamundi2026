@@ -4573,7 +4573,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           </>
         )}
 
-      {/* Globo: full page usa GlobeView con bottomReservePx para no tapar la frase y no cortar la esfera arriba */}
+      {/* Globo 3D: mapa mundi con nubes, día/noche, auto-rotación */}
       <div
         style={
           embedded

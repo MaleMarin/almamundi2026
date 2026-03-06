@@ -324,7 +324,7 @@ export default function HomeMap() {
   const TIME_STRIP_HEIGHT = 64;
   return (
     <div className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%' }}>
-      {/* Globo: contenido en el universo con espacio oscuro arriba/abajo (estilo referencia); no invade la franja fecha/hora */}
+      {/* Globo 3D: contenido en universo, nubes, día/noche, auto-rotación */}
       <div
         className="relative overflow-hidden px-2 py-6 md:px-4 md:py-10 shrink-0 flex items-center justify-center"
         style={{ height: `calc(100% - ${TIME_STRIP_HEIGHT}px)`, maxHeight: `calc(100% - ${TIME_STRIP_HEIGHT}px)` }}
