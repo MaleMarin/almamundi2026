@@ -1912,7 +1912,8 @@ export default function Home() {
           <div id="map-dock-slot" className="w-full px-2 md:px-3 py-4 md:py-5" />
           <div className="min-h-[32px] md:min-h-[40px] w-full" aria-hidden />
         </div>
-        <div className="relative w-full min-h-[100vh] h-[100vh] bg-[var(--universe-bg)] overflow-hidden">
+        {/* Universo: globo contenido + franja fecha/hora debajo sobre fondo oscuro (HomeMap hace el layout) */}
+        <div className="relative w-full min-h-[100vh] h-[100vh] bg-[var(--universe-bg)] flex flex-col overflow-hidden">
           <HomeMap />
         </div>
       </section>

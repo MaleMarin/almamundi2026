@@ -322,8 +322,9 @@ export default function HomeMap() {
   };
 
   return (
-    <div className="relative w-full h-full">
-      <div className="absolute inset-0">
+    <div className="relative flex flex-col w-full h-full min-h-0">
+      {/* Globo: contenido en zona superior, no se corta (padding para que la esfera quede dentro) */}
+      <div className="flex-1 min-h-0 relative overflow-hidden py-2 md:py-3">
         <MapCanvas
           panelWidth={0}
           embedded
@@ -349,7 +350,10 @@ export default function HomeMap() {
           ringPropagationSpeed="propagationSpeed"
           ringRepeatPeriod="repeatPeriod"
         />
-        <TimeBar className="pointer-events-none absolute bottom-4 left-1/2 -translate-x-1/2 text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]" />
+      </div>
+      {/* Franja fecha/hora: siempre debajo del globo, 100% legible sobre fondo oscuro antes del footer blanco */}
+      <div className="flex-shrink-0 h-14 md:h-16 w-full flex items-center justify-center bg-[var(--universe-bg)]">
+        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
       </div>
 
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}
