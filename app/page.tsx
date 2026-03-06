@@ -1917,13 +1917,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER: bajo y compacto para dar más espacio al globo */}
-      <footer className="w-full pb-10 pt-12 md:pt-16 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-        <div className="mb-6 mt-0 w-full flex justify-center select-none">
-          <h1 className="text-5xl md:text-[90px] lg:text-[120px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
+      {/* FOOTER: crece hacia abajo (más padding y título); el globo sigue con 100vh y no pierde espacio */}
+      <footer className="w-full pb-24 pt-20 md:pt-28 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
+        <div className="mb-14 mt-6 w-full flex justify-center select-none">
+          <h1 className="text-6xl md:text-[120px] lg:text-[180px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
         </div>
 
-        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium pt-4 text-gray-600 gap-8">
+        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium pt-10 pb-4 text-gray-600 gap-10">
           <div className="flex flex-col items-center md:items-start">
             <span className="block mb-3 opacity-70">Una iniciativa de</span>
             <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
