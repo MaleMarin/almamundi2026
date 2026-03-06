@@ -2557,7 +2557,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           controls.autoRotate = false;
         } else {
           controls.autoRotate = true;
-          controls.autoRotateSpeed = 0.22;
+          controls.autoRotateSpeed = 0.45;
         }
       }
       const now = performance.now();
@@ -3592,7 +3592,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       const controls = globeEl.current.controls();
       controls.enableZoom = false;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.22;
+      controls.autoRotateSpeed = 0.45;
       if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = embedded;
       }

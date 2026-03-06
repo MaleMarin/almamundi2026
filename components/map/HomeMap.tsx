@@ -79,7 +79,7 @@ export default function HomeMap() {
       if (ctrl) {
         if ('enableRotate' in ctrl) (ctrl as { enableRotate: boolean }).enableRotate = false;
         ctrl.autoRotate = true;
-        ctrl.autoRotateSpeed = 0.22;
+        ctrl.autoRotateSpeed = 0.45;
       }
       raf = requestAnimationFrame(tick);
     };
@@ -233,7 +233,7 @@ export default function HomeMap() {
       const controls = g.controls();
       controls.enableZoom = false;
       controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.22;
+      controls.autoRotateSpeed = 0.45;
       if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = false;
       }
@@ -321,10 +321,14 @@ export default function HomeMap() {
     onToggleSound: () => setSoundEnabled((v) => !v),
   };
 
+  const TIME_STRIP_HEIGHT = 64;
   return (
-    <div className="relative flex flex-col w-full h-full min-h-0">
-      {/* Globo: contenido en zona superior, no se corta (padding para que la esfera quede dentro) */}
-      <div className="flex-1 min-h-0 relative overflow-hidden py-2 md:py-3">
+    <div className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%' }}>
+      {/* Globo: contenido en el universo con espacio oscuro arriba/abajo (estilo referencia); no invade la franja fecha/hora */}
+      <div
+        className="relative overflow-hidden px-2 py-6 md:px-4 md:py-10 shrink-0 flex items-center justify-center"
+        style={{ height: `calc(100% - ${TIME_STRIP_HEIGHT}px)`, maxHeight: `calc(100% - ${TIME_STRIP_HEIGHT}px)` }}
+      >
         <MapCanvas
           panelWidth={0}
           embedded
@@ -351,8 +355,11 @@ export default function HomeMap() {
           ringRepeatPeriod="repeatPeriod"
         />
       </div>
-      {/* Franja fecha/hora: siempre debajo del globo, 100% legible sobre fondo oscuro antes del footer blanco */}
-      <div className="flex-shrink-0 h-14 md:h-16 w-full flex items-center justify-center bg-[var(--universe-bg)]">
+      {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
+      <div
+        className="flex-shrink-0 w-full flex items-center justify-center bg-[var(--universe-bg)] z-10"
+        style={{ height: `${TIME_STRIP_HEIGHT}px` }}
+      >
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
       </div>
 
