@@ -3,12 +3,16 @@
 import { useRef, useEffect, useCallback } from 'react';
 
 /**
- * Globo del mapa mundi con vídeo de alta calidad (NASA Blue Marble).
- * Usa versión 60fps para rotación suave sin tiritar. Fuente: NASA SVS 3639 — dominio público.
+ * Globo del mapa mundi con vídeo de alta definición (NASA 1080p60).
+ * Fuente: NASA SVS 5570 "Spinning Earth" — 1920×1080, 60fps, dominio público.
+ * Para aspecto tipo 4K: vídeo 1080p + render nítido (sin escalado agresivo en CSS).
  */
-const GLOBE_VIDEO_SRC = '/earth-blue-marble-720p-60fps.mp4';
-/** Velocidad de reproducción: más bajo = rotación más lenta y suave (60fps permite fluidez) */
+const GLOBE_VIDEO_SRC = '/earth-1080p60.mp4';
+/** Velocidad de reproducción: rotación lenta y suave */
 const PLAYBACK_RATE = 0.35;
+/** Resolución nativa del vídeo: evita pedir más tamaño al canvas y mantiene nitidez */
+const VIDEO_NATIVE_WIDTH = 1920;
+const VIDEO_NATIVE_HEIGHT = 1080;
 
 export function VideoGlobe() {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -38,7 +42,13 @@ export function VideoGlobe() {
           width: 'min(85vw, 85vh)',
           aspectRatio: '1',
           maxHeight: '100%',
-          boxShadow: '0 0 80px rgba(100, 150, 255, 0.15), inset 0 0 60px rgba(0,0,0,0.3)',
+          maxWidth: 'min(100%, 1920)',
+          boxShadow: [
+            '0 0 30px rgba(100, 180, 255, 0.4)',
+            '0 0 70px rgba(80, 150, 255, 0.25)',
+            '0 0 120px rgba(60, 120, 255, 0.15)',
+            'inset 0 0 60px rgba(0,0,0,0.25)',
+          ].join(', '),
           willChange: 'transform',
           transform: 'translateZ(0)',
           backfaceVisibility: 'hidden' as const,
@@ -54,11 +64,15 @@ export function VideoGlobe() {
           preload="auto"
           onCanPlay={applySmoothPlayback}
           onLoadedData={applySmoothPlayback}
+          width={VIDEO_NATIVE_WIDTH}
+          height={VIDEO_NATIVE_HEIGHT}
           className="absolute inset-0 w-full h-full object-cover"
           style={{
             imageRendering: 'auto',
-            transform: 'translateZ(0)',
+            WebkitBackfaceVisibility: 'hidden',
             backfaceVisibility: 'hidden',
+            transform: 'translateZ(0)',
+            filter: 'contrast(1.08) saturate(1.05)',
           }}
           aria-label="Mapa mundi en rotación"
         />

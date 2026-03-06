@@ -420,7 +420,7 @@ export function MapCanvas({
   if (embedded) {
     const onReady = () => onGlobeReady(EMBEDDED_POV);
     return (
-      <div ref={embedWrapRef} className="absolute inset-0 w-full h-full">
+      <div ref={embedWrapRef} className="absolute inset-0 w-full h-full min-h-0 overflow-hidden" style={{ maxHeight: '100%' }}>
         {embedSize.w > 0 && embedSize.h > 0 && globeBlock(onReady)}
         {children}
       </div>

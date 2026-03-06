@@ -1910,9 +1910,10 @@ export default function Home() {
           </h2>
           {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. 100% neumorfismo. */}
           <div id="map-dock-slot" className="w-full px-2 md:px-3 py-4 md:py-5" />
-          <div className="min-h-[32px] md:min-h-[40px] w-full" aria-hidden />
+          {/* Espacio fijo entre la barra y el globo: las palabras no tapan el mapa; el globo empieza debajo */}
+          <div className="min-h-[48px] md:min-h-[64px] w-full shrink-0" aria-hidden />
         </div>
-        {/* Universo: más altura (120vh) para que el globo y la franja fecha/hora tengan más espacio */}
+        {/* Universo: globo siempre debajo de la barra; más altura (120vh) para globo y franja fecha/hora */}
         <div className="relative w-full min-h-[120vh] h-[120vh] bg-[var(--universe-bg)] flex flex-col overflow-hidden">
           <HomeMap />
         </div>

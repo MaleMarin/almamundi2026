@@ -9,7 +9,7 @@ import { YouTubeEmbed } from '@/components/YouTubeEmbed';
 
 interface CameraObservatoryProps {
   camera: CameraPoint;
-  variant: 'page' | 'modal';
+  variant?: 'page' | 'modal';
   onClose?: () => void;
   /** Cuando true, solo se renderiza el contenido (player + acciones); el header va en ObservatoryShell. */
   contentOnly?: boolean;
@@ -17,7 +17,7 @@ interface CameraObservatoryProps {
 
 const CTA_LABEL = 'Abrir señal';
 
-export function CameraObservatory({ camera, variant, onClose, contentOnly = false }: CameraObservatoryProps) {
+export function CameraObservatory({ camera, variant = 'page', onClose, contentOnly = false }: CameraObservatoryProps) {
   const sourceUrl = getCameraSourceUrl(camera);
   const location = [camera.city, camera.country].filter(Boolean).join(', ');
   const isPage = !camera.source || camera.source.kind === 'page';

@@ -328,12 +328,19 @@ export default function HomeMap() {
   };
 
   const TIME_STRIP_HEIGHT = 64;
+  /** Margen superior para que el globo quede claramente debajo de la barra (Historias, Sonidos, etc.) y no se solape */
+  const GLOBE_TOP_PADDING = 24;
   return (
     <div className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%' }}>
-      {/* Globo en vídeo: NASA Blue Marble 1280x720, buena calidad en movimiento */}
+      {/* Globo en vídeo: siempre debajo de la barra; padding-top evita que las palabras tapen el mapa */}
       <div
-        className="relative overflow-hidden px-2 py-6 md:px-4 md:py-10 shrink-0 flex items-center justify-center"
-        style={{ height: `calc(100% - ${TIME_STRIP_HEIGHT}px)`, maxHeight: `calc(100% - ${TIME_STRIP_HEIGHT}px)` }}
+        className="relative overflow-hidden px-2 shrink-0 flex items-center justify-center"
+        style={{
+          paddingTop: GLOBE_TOP_PADDING,
+          paddingBottom: 24,
+          height: `calc(100% - ${TIME_STRIP_HEIGHT}px)`,
+          maxHeight: `calc(100% - ${TIME_STRIP_HEIGHT}px)`,
+        }}
       >
         <VideoGlobe />
       </div>

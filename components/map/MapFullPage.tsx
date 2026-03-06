@@ -4595,10 +4595,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         }}
         globeImageUrl={GLOBE_IMAGE_LOCAL}
         globeMaterial={globeMaterial}
-        showAtmosphere={false}
+        showAtmosphere={true}
         isNight={!showDayGlobe}
-        atmosphereColor={showDayGlobe ? '#7eb8e8' : '#1a2d4a'}
-        atmosphereAltitude={0}
+        atmosphereColor={showDayGlobe ? '#7eb8e8' : 'rgba(80, 140, 220, 0.7)'}
+        atmosphereAltitude={0.22}
         backgroundColor={GLOBE_CANVAS_BG}
         pointsData={activeView === 'actualidad' ? [] : pointsForGlobe}
         pointLat="lat"

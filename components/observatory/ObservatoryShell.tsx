@@ -10,8 +10,8 @@ export interface ObservatoryShellProps {
   badge?: React.ReactNode;
   actions?: React.ReactNode;
   children: React.ReactNode;
-  /** 'page' = full page with Link back; 'modal' = overlay with close button */
-  variant: 'page' | 'modal';
+  /** 'page' = full page with Link back; 'modal' = overlay with close button. Por defecto 'page' si no se pasa. */
+  variant?: 'page' | 'modal';
   backHref?: string;
   onClose?: () => void;
 }
@@ -23,7 +23,7 @@ export function ObservatoryShell({
   badge,
   actions,
   children,
-  variant,
+  variant = 'page',
   backHref = '/mapa',
   onClose,
 }: ObservatoryShellProps) {
