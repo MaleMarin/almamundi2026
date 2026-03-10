@@ -2543,15 +2543,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     return () => clearInterval(id);
   }, [userLocation, hourOverride]);
 
-  // Movimiento suave: autoRotate solo cuando el usuario NO interactúa; en /mapa sin arrastre (enableRotate = false cada frame)
+  // Movimiento suave: autoRotate cuando el usuario no arrastra; en /mapa el usuario puede girar el globo con el ratón (enableRotate = true)
   useEffect(() => {
     let rafId: number;
     const loop = () => {
       const globe = globeEl.current;
       const controls = globe?.controls?.();
       if (controls) {
-        if (!embedded && 'enableRotate' in controls) {
-          (controls as { enableRotate: boolean }).enableRotate = false;
+        if ('enableRotate' in controls) {
+          (controls as { enableRotate: boolean }).enableRotate = true;
         }
         if (isUserInteractingRef.current) {
           controls.autoRotate = false;
@@ -3594,7 +3594,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       controls.autoRotate = true;
       controls.autoRotateSpeed = 0.45;
       if ('enableRotate' in controls) {
-        (controls as { enableRotate: boolean }).enableRotate = embedded;
+        (controls as { enableRotate: boolean }).enableRotate = true;
       }
       const nearPOV = { lat: 0, lng: -30, altitude: 1.2 };
       basePOVRef.current = embedded ? { ...nearPOV } : { ...initialPOV };
@@ -3605,10 +3605,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       } else {
         globeEl.current.pointOfView(initialPOV, 0);
       }
-      if (embedded) {
-        controls.addEventListener('start', () => {
-          isUserInteractingRef.current = true;
-          controls.autoRotate = false;
+      controls.addEventListener('start', () => {
+        isUserInteractingRef.current = true;
+        controls.autoRotate = false;
+        if (embedded) {
           window.clearTimeout((window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout);
           (window as unknown as { __cineResumeTimeout?: number }).__cineResumeTimeout = window.setTimeout(() => {
             if (globeEl.current) {
@@ -3617,13 +3617,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               } catch {}
             }
           }, 15000);
-        });
-        controls.addEventListener('end', () => {
-          setTimeout(() => {
-            isUserInteractingRef.current = false;
-          }, 800);
-        });
-      }
+        }
+      });
+      controls.addEventListener('end', () => {
+        setTimeout(() => {
+          isUserInteractingRef.current = false;
+        }, 800);
+      });
 
       // Reemplazar luces y agregar capa de nubes (después de que MapCanvas haya montado la escena)
       setTimeout(() => {

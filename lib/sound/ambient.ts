@@ -90,13 +90,15 @@ function stopCurrent(atTime: number) {
   if (!state.current?.source || !state.current?.gain) return;
   const { source, gain } = state.current;
   try {
-    gain.gain.setTargetAtTime(0, atTime, 0.05);
-    source.stop(atTime + 0.15);
+    const release = 0.2;
+    gain.gain.setTargetAtTime(0, atTime, release);
+    source.stop(atTime + release + 0.1);
   } catch { /* already stopped */ }
 }
 
 export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
-  const fade = (opts?.fadeMs ?? 250) / 1000;
+  const defaultFade = key === "universo" ? 2200 : 250;
+  const fade = (opts?.fadeMs ?? defaultFade) / 1000;
   const ctx = ensureCtx();
   if (ctx.state === "suspended") await ctx.resume();
 
@@ -121,7 +123,8 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   gain.connect(state.master!);
 
   source.start(startT + 0.02);
-  gain.gain.linearRampToValueAtTime(1.0, startT + 0.02 + fade);
+  const targetGain = key === "universo" ? 0.82 : 1.0;
+  gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
 
   state.current = { key, source, gain };
 }
@@ -134,7 +137,8 @@ export function stopAmbient() {
 
 export function setAmbientEnabled(enabled: boolean) {
   if (!state.master || !state.ctx) return;
-  state.master.gain.setTargetAtTime(enabled ? AMBIENT_MASTER_VOL : 0.0, state.ctx.currentTime, 0.05);
+  const ramp = enabled ? 0.08 : 0.15;
+  state.master.gain.setTargetAtTime(enabled ? AMBIENT_MASTER_VOL : 0.0, state.ctx.currentTime, ramp);
 }
 
 export function duckAmbient(duck: boolean) {

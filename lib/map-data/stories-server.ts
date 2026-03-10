@@ -51,7 +51,17 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       })
       .filter((s): s is StoryPoint => s !== null);
   } catch (err) {
-    console.error('[getStoriesAsync] Firestore error:', err);
+    const msg = err instanceof Error ? err.message : String(err);
+    const isDecoder = /DECODER routines::\s*unsupported|1E08010C/i.test(msg);
+    if (isDecoder && typeof globalThis !== 'undefined') {
+      (globalThis as { _firestoreDecoderLogged?: boolean })._firestoreDecoderLogged ??= false;
+      if (!(globalThis as { _firestoreDecoderLogged?: boolean })._firestoreDecoderLogged) {
+        (globalThis as { _firestoreDecoderLogged?: boolean })._firestoreDecoderLogged = true;
+        console.warn('[getStoriesAsync] Firestore DECODER error (Node/OpenSSL). Usa Node 18 o 20 LTS. Historias en local: [].');
+      }
+    } else {
+      console.error('[getStoriesAsync] Firestore error:', err);
+    }
     return [];
   }
 }

@@ -11,4 +11,5 @@ alwaysApply: true
 
 ## HUD Fecha/Hora/Ciudad (TimeBar)
 
-- El HUD de fecha/lugar/hora es **`<TimeBar />`**. No montar en layout ni en Footer global. No usar `position: fixed`. Siempre `position: absolute` dentro del contenedor del mapa (UniverseStage).
+- El HUD de fecha/lugar/hora es **`<TimeBar />`**. No montar en layout ni en Footer global. No usar `position: fixed`. Siempre dentro del contenedor del mapa (UniverseStage).
+- **No solapamiento:** La fecha/hora debe ir en una **franja propia debajo del globo** (div independiente con altura fija, ej. 64px), no superpuesta al canvas. El globo debe tener altura explícita `calc(100% - 64px)` para no invadir esa franja. Así el mapa mundi nunca tapa ni corta los datos de fecha/hora.

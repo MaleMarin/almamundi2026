@@ -37,17 +37,17 @@ export function VideoGlobe() {
   return (
     <div className="w-full h-full flex items-center justify-center min-h-0" data-globe="video">
       <div
-        className="relative rounded-full overflow-hidden bg-[var(--universe-bg)] flex-shrink-0"
+        className="relative rounded-full overflow-hidden flex-shrink-0"
         style={{
           width: 'min(85vw, 85vh)',
           aspectRatio: '1',
           maxHeight: '100%',
           maxWidth: 'min(100%, 1920)',
+          background: 'transparent',
           boxShadow: [
             '0 0 30px rgba(100, 180, 255, 0.4)',
             '0 0 70px rgba(80, 150, 255, 0.25)',
             '0 0 120px rgba(60, 120, 255, 0.15)',
-            'inset 0 0 60px rgba(0,0,0,0.25)',
           ].join(', '),
           willChange: 'transform',
           transform: 'translateZ(0)',
@@ -71,7 +71,7 @@ export function VideoGlobe() {
             imageRendering: 'auto',
             WebkitBackfaceVisibility: 'hidden',
             backfaceVisibility: 'hidden',
-            transform: 'translateZ(0)',
+            transform: 'translateZ(0) scale(1.14)',
             filter: 'contrast(1.08) saturate(1.05)',
           }}
           aria-label="Mapa mundi en rotación"

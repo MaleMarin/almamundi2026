@@ -71,6 +71,16 @@ export default function HomeMap() {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
   }, []);
 
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const { mode, query } = (e as CustomEvent<{ mode: 'stories' | 'news' | 'sounds' | 'search'; query?: string }>).detail ?? {};
+      open(mode ?? 'stories');
+      if (query != null && query.trim() && mode === 'search') setExploreQuery(query.trim());
+    };
+    window.addEventListener('almamundi:voice:openDrawer', handler);
+    return () => window.removeEventListener('almamundi:voice:openDrawer', handler);
+  }, []);
+
   // Con VideoGlobe no hay onGlobeReady; marcar listo al montar para que el resto del UI funcione
   useEffect(() => {
     setGlobeReady(true);

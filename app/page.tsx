@@ -633,15 +633,15 @@ function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
       <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
         <div className="p-10 pb-4 flex-shrink-0">
-          <button
-            onClick={onClose}
-            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
-            style={soft.button}
-            aria-label="Cerrar"
-            type="button"
-          >
-            <X size={24} />
-          </button>
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+          style={soft.button}
+          aria-label="Cerrar"
+          type="button"
+        >
+          <X size={24} />
+        </button>
           <h2 className="text-3xl font-bold text-gray-700 pr-12">Nuestro propósito</h2>
         </div>
         <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
@@ -658,7 +658,7 @@ function HowItWorksModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
 
   const content = (
     <>
-      <p className="text-gray-600 leading-relaxed mb-6">
+        <p className="text-gray-600 leading-relaxed mb-6">
         AlmaMundi es un lugar para que tu historia no se pierda en el ruido.
       </p>
       <p className="text-gray-600 leading-relaxed mb-8">
@@ -1830,6 +1830,17 @@ export default function Home() {
   const [showHowItWorks, setShowHowItWorks] = useState(false);
   const [chosenTopic, setChosenTopic] = useState<InspirationTopic | null>(null);
 
+  useEffect(() => {
+    const onPurpose = () => setShowPurpose(true);
+    const onHowItWorks = () => setShowHowItWorks(true);
+    window.addEventListener('almamundi:voice:showPurpose', onPurpose);
+    window.addEventListener('almamundi:voice:showHowItWorks', onHowItWorks);
+    return () => {
+      window.removeEventListener('almamundi:voice:showPurpose', onPurpose);
+      window.removeEventListener('almamundi:voice:showHowItWorks', onHowItWorks);
+    };
+  }, []);
+
   return (
     <main className="min-h-screen overflow-x-hidden relative" style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}>
       <style jsx global>{globalStyles}</style>
@@ -1912,7 +1923,7 @@ export default function Home() {
           <div id="map-dock-slot" className="w-full px-2 md:px-3 py-4 md:py-5" />
           {/* Espacio fijo entre la barra y el globo: las palabras no tapan el mapa; el globo empieza debajo */}
           <div className="min-h-[48px] md:min-h-[64px] w-full shrink-0" aria-hidden />
-        </div>
+              </div>
         {/* Universo: globo siempre debajo de la barra; más altura (120vh) para globo y franja fecha/hora */}
         <div className="relative w-full min-h-[120vh] h-[120vh] bg-[var(--universe-bg)] flex flex-col overflow-hidden">
           <HomeMap />
