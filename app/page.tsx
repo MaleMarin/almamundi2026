@@ -87,20 +87,6 @@ const globalStyles = `
     text-shadow: 2px 2px 5px rgba(163,177,198,0.7), -2px -2px 5px rgba(255,255,255,0.8);
   }
 
-  /* ALMAMUNDI footer: relevo neumórfico, sin líneas negras */
-  .almamundi-footer-title{
-    color: #E0E5EC;
-    font-family: "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.06em;
-    text-shadow:
-      -2px -2px 4px rgba(255,255,255,0.95),
-       2px  2px 4px rgba(163,177,198,0.85),
-      -6px -6px 12px rgba(255,255,255,0.8),
-       6px  6px 12px rgba(163,177,198,0.7),
-      -12px -12px 24px rgba(255,255,255,0.6),
-       12px  12px 24px rgba(163,177,198,0.5);
-  }
 `;
 
 /* ------------------------------------------------------------------ */
@@ -217,7 +203,7 @@ function useElementWidth<T extends HTMLElement>() {
     });
 
     ro.observe(el);
-    setWidth(el.clientWidth || 900);
+    requestAnimationFrame(() => setWidth(el.clientWidth || 900));
 
     return () => ro.disconnect();
   }, []);
@@ -267,12 +253,10 @@ function isEmailLike(v: string) {
 }
 
 function pickMimeType(preferred: string[]) {
-  // @ts-ignore
   const MR = typeof window !== 'undefined' ? window.MediaRecorder : undefined;
   if (!MR?.isTypeSupported) return '';
   for (const t of preferred) {
     try {
-      // @ts-ignore
       if (MR.isTypeSupported(t)) return t;
     } catch {}
   }
@@ -282,8 +266,8 @@ function pickMimeType(preferred: string[]) {
 async function blobToAmplitudeSamples(blob: Blob, target = 160) {
   try {
     const arr = await blob.arrayBuffer();
-    // @ts-ignore
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    const w = typeof window !== 'undefined' ? window : undefined;
+    const AudioCtx = w?.AudioContext || (w as Window & { webkitAudioContext?: typeof AudioContext })?.webkitAudioContext;
     if (!AudioCtx) return Array.from({ length: target }, () => 0.2);
 
     const ctx = new AudioCtx();
@@ -313,16 +297,19 @@ async function blobToAmplitudeSamples(blob: Blob, target = 160) {
 /* ------------------------------------------------------------------ */
 /* IMPRENTA VISUALIZER                                                 */
 /* ------------------------------------------------------------------ */
+/** La impronta se dibuja con ondas y puntos. Si animate=false (ej. historia escrita), queda fija; si animate=true (ej. audio), se anima. */
 function ImprontaVisualizer({
   isActive,
   seedText,
   audioBlob,
-  canvasId
+  canvasId,
+  animate = true
 }: {
   isActive: boolean;
   seedText: string;
   audioBlob: Blob | null;
   canvasId?: string;
+  animate?: boolean;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [amps, setAmps] = useState<number[] | null>(null);
@@ -330,7 +317,7 @@ function ImprontaVisualizer({
   useEffect(() => {
     let alive = true;
     if (!audioBlob) {
-      setAmps(null);
+      queueMicrotask(() => setAmps(null));
       return;
     }
     blobToAmplitudeSamples(audioBlob).then((a) => {
@@ -366,7 +353,7 @@ function ImprontaVisualizer({
       ctx.fillStyle = soft.bg;
       ctx.fillRect(0, 0, w, hh);
 
-      t += 0.03;
+      if (animate) t += 0.03;
 
       const grad = ctx.createRadialGradient(w * 0.5, hh * 0.45, 20, w * 0.5, hh * 0.45, Math.max(w, hh));
       grad.addColorStop(0, 'rgba(249,115,22,0.15)');
@@ -423,14 +410,596 @@ function ImprontaVisualizer({
         ctx.stroke();
       }
 
-      raf = requestAnimationFrame(draw);
+      if (animate) raf = requestAnimationFrame(draw);
     };
 
     draw();
     return () => cancelAnimationFrame(raf);
-  }, [isActive, seedText, amps]);
+  }, [isActive, seedText, amps, animate]);
 
   return <canvas id={canvasId} ref={canvasRef} width={520} height={260} className="w-full h-full object-cover opacity-90" />;
+}
+
+/** Huella cuadrada: composición geométrica sólida, bordes nítidos (sin blur). */
+const HUELLA_SIZE = 400;
+const HUELLA_RADIUS = 16;
+
+function ImprontaFromVisualParams({ visualParams, canvasId }: { visualParams: { base?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; core?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; fragmentation?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; modeOverlay?: string }; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const s = HUELLA_SIZE;
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !visualParams) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = false;
+    const drawBlock = (b: { x: number; y: number; w: number; h: number; color: string }) => {
+      const left = Math.floor(b.x * s);
+      const top = Math.floor(b.y * s);
+      const bw = Math.max(1, Math.floor(b.w * s));
+      const bh = Math.max(1, Math.floor(b.h * s));
+      ctx.fillStyle = b.color;
+      ctx.fillRect(left, top, bw, bh);
+    };
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, s, s);
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, 0, 0, s, s, HUELLA_RADIUS);
+    ctx.clip();
+
+    (visualParams.base || []).forEach((b) => drawBlock(b));
+    (visualParams.core || []).forEach((b) => drawBlock(b));
+    (visualParams.fragmentation || []).forEach((b) => drawBlock(b));
+
+    if (visualParams.modeOverlay) {
+      ctx.fillStyle = visualParams.modeOverlay;
+      ctx.beginPath();
+      roundRect(ctx, 0, 0, s, s, HUELLA_RADIUS);
+      ctx.fill();
+    }
+
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(71,85,105,0.4)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    roundRect(ctx, 0, 0, s, s, HUELLA_RADIUS);
+    ctx.stroke();
+  }, [visualParams]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={s} height={s} className="w-full h-full object-cover rounded-2xl" style={{ imageRendering: 'pixelated' }} />;
+}
+
+function roundRect(ctx: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+}
+
+/** Huella: cuadrícula densa de rectángulos y píxeles, geométrica sólida, bordes nítidos (razor-sharp). Sin dispersión ni blur. */
+function ImprontaDataFingerprint({ seedText, canvasId }: { seedText: string; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const s = HUELLA_SIZE;
+  const GRID = 24;
+  const cell = s / GRID;
+
+  const basePalette = [
+    'rgba(37, 99, 235, 0.9)',
+    'rgba(88, 28, 135, 0.9)',
+    'rgba(30, 64, 175, 0.9)',
+    'rgba(109, 40, 217, 0.9)',
+  ];
+  const corePalette = [
+    'rgba(0, 212, 255, 0.95)',
+    'rgba(219, 39, 119, 0.95)',
+    'rgba(234, 88, 12, 0.95)',
+  ];
+  const fragPalette = [
+    'rgba(250, 204, 21, 0.95)',
+    'rgba(34, 197, 94, 0.95)',
+  ];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.imageSmoothingEnabled = false;
+    const h0 = hashString(seedText || 'fp');
+    const seeded = (i: number) => ((h0 * (i + 1) * 2654435761) >>> 0) / 0xffffffff;
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, s, s);
+    ctx.save();
+    ctx.beginPath();
+    roundRect(ctx, 0, 0, s, s, HUELLA_RADIUS);
+    ctx.clip();
+
+    const rect = (x: number, y: number, w: number, h: number, color: string) => {
+      const ix = Math.floor(x);
+      const iy = Math.floor(y);
+      const iw = Math.max(1, Math.floor(w));
+      const ih = Math.max(1, Math.floor(h));
+      ctx.fillStyle = color;
+      ctx.fillRect(ix, iy, iw, ih);
+    };
+
+    for (let gy = 0; gy < GRID; gy++) {
+      for (let gx = 0; gx < GRID; gx++) {
+        const i = gy * GRID + gx;
+        const t = seeded(i * 7);
+        if (t < 0.4) continue;
+        const color = basePalette[Math.floor(seeded(i * 11) * basePalette.length)]!;
+        rect(gx * cell, gy * cell, cell + 1, cell + 1, color);
+      }
+    }
+    for (let b = 0; b < 20; b++) {
+      const gx = Math.floor(seeded(b * 13) * (GRID - 2));
+      const gy = Math.floor(seeded(b * 17) * (GRID - 2));
+      const w = 2 + Math.floor(seeded(b * 19) * 3);
+      const h = 2 + Math.floor(seeded(b * 23) * 3);
+      const color = corePalette[Math.floor(seeded(b * 29) * corePalette.length)]!;
+      rect(gx * cell, gy * cell, w * cell, h * cell, color);
+    }
+    for (let p = 0; p < 80; p++) {
+      const gx = Math.floor(seeded(p * 31) * GRID);
+      const gy = Math.floor(seeded(p * 37) * GRID);
+      const color = fragPalette[Math.floor(seeded(p * 41) * fragPalette.length)]!;
+      rect(gx * cell, gy * cell, cell, cell, color);
+    }
+
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(71,85,105,0.5)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    roundRect(ctx, 0, 0, s, s, HUELLA_RADIUS);
+    ctx.stroke();
+  }, [seedText]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={s} height={s} className="w-full h-full object-cover rounded-2xl" style={{ imageRendering: 'pixelated' }} />;
+}
+
+/** Huella visual para historia por escrito: círculo con bloques de color superpuestos (azules, púrpura, amarillo, verde, rosa). */
+function ImprontaCircularBlocks({ seedText, canvasId }: { seedText: string; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const w = 520;
+  const h = 260;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = 118;
+
+  const palette = [
+    'rgba(30, 95, 116, 0.85)',   // cerulean
+    'rgba(37, 99, 235, 0.82)',   // electric blue
+    'rgba(124, 58, 237, 0.80)',  // purple
+    'rgba(234, 179, 8, 0.75)',   // warm yellow
+    'rgba(244, 114, 182, 0.78)', // soft pink
+    'rgba(22, 163, 74, 0.80)',   // green
+  ];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const h0 = hashString(seedText || 'text');
+    const seeded = (i: number) => ((h0 * (i + 1) * 2654435761) >>> 0) / 0xffffffff;
+
+    const blocks: { x: number; y: number; w: number; h: number; color: string; rot: number }[] = [];
+    const n = 48;
+    for (let i = 0; i < n; i++) {
+      const r = seeded(i * 7) * radius * 0.92;
+      const th = seeded(i * 13) * Math.PI * 2;
+      const bx = cx + Math.cos(th) * r * 0.6;
+      const by = cy + Math.sin(th) * r * 0.6;
+      const bw = 28 + seeded(i * 19) * 80;
+      const bh = 18 + seeded(i * 23) * 60;
+      const colorIdx = i < 12 ? Math.floor(seeded(i * 31) * 3) : 2 + Math.floor(seeded(i * 41) * 4);
+      blocks.push({
+        x: bx - bw / 2,
+        y: by - bh / 2,
+        w: bw,
+        h: bh,
+        color: palette[colorIdx % palette.length],
+        rot: seeded(i * 53) * 0.4 - 0.2
+      });
+    }
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, w, h);
+
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    blocks.forEach((b) => {
+      ctx.save();
+      ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.rotate(b.rot);
+      ctx.translate(-(b.x + b.w / 2), -(b.y + b.h / 2));
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    });
+
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }, [seedText]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={w} height={h} className="w-full h-full object-cover opacity-95 rounded-full" />;
+}
+
+/** Huella visual para historia en video: paleta dinámica (magenta, cyan, naranja), núcleo púrpura/verde, fragmentos amarillo/rojo/teal. */
+function ImprontaCircularBlocksVideo({ seedText, canvasId }: { seedText: string; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const w = 520;
+  const h = 260;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = 118;
+
+  const corePalette = [
+    'rgba(88, 28, 135, 0.88)',   // darker purple (narrative depth)
+    'rgba(21, 94, 67, 0.86)',    // deep green
+    'rgba(127, 0, 127, 0.82)',   // magenta
+  ];
+  const outerPalette = [
+    'rgba(0, 229, 255, 0.80)',   // electric cyan
+    'rgba(234, 88, 12, 0.84)',   // deep orange
+    'rgba(250, 204, 21, 0.78)',  // yellow (fast action)
+    'rgba(239, 68, 68, 0.82)',   // red
+    'rgba(45, 212, 191, 0.78)',  // light teal
+  ];
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const h0 = hashString(seedText || 'video');
+    const seeded = (i: number) => ((h0 * (i + 1) * 2654435761) >>> 0) / 0xffffffff;
+
+    const blocks: { x: number; y: number; w: number; h: number; color: string; rot: number }[] = [];
+    const n = 56;
+    for (let i = 0; i < n; i++) {
+      const r = seeded(i * 7) * radius * 0.95;
+      const th = seeded(i * 13) * Math.PI * 2;
+      const bx = cx + Math.cos(th) * r * 0.65;
+      const by = cy + Math.sin(th) * r * 0.65;
+      const isCore = r < radius * 0.45;
+      const isLarge = isCore || seeded(i * 17) > 0.6;
+      const bw = isLarge ? 44 + seeded(i * 19) * 72 : 16 + seeded(i * 19) * 38;
+      const bh = isLarge ? 32 + seeded(i * 23) * 52 : 12 + seeded(i * 23) * 26;
+      const palette = isCore ? corePalette : outerPalette;
+      const colorIdx = Math.floor(seeded(i * 31) * palette.length);
+      blocks.push({
+        x: bx - bw / 2,
+        y: by - bh / 2,
+        w: bw,
+        h: bh,
+        color: palette[colorIdx % palette.length]!,
+        rot: seeded(i * 53) * 0.5 - 0.25
+      });
+    }
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    blocks.forEach((b) => {
+      ctx.save();
+      ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.rotate(b.rot);
+      ctx.translate(-(b.x + b.w / 2), -(b.y + b.h / 2));
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    });
+
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }, [seedText]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={w} height={h} className="w-full h-full object-cover opacity-95 rounded-full" />;
+}
+
+/** Huella visual para historia en audio: espectrograma codificado — graves (teal/verde/azul) abajo, agudos (amarillo/magenta) arriba; tamaño por intensidad. */
+function ImprontaCircularBlocksAudio({ seedText, audioBlob, canvasId }: { seedText: string; audioBlob: Blob | null; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [amps, setAmps] = useState<number[] | null>(null);
+  const w = 520;
+  const h = 260;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = 118;
+
+  const lowFreqPalette = [
+    'rgba(20, 94, 97, 0.86)',   // deep teal
+    'rgba(21, 71, 52, 0.88)',   // forest green
+    'rgba(30, 58, 138, 0.84)',  // dark blue
+  ];
+  const highFreqPalette = [
+    'rgba(250, 204, 21, 0.82)',  // bright yellow
+    'rgba(236, 72, 153, 0.85)',  // intense magenta
+    'rgba(244, 114, 182, 0.80)', // magenta
+  ];
+
+  useEffect(() => {
+    if (!audioBlob) {
+      queueMicrotask(() => setAmps(null));
+      return;
+    }
+    let alive = true;
+    blobToAmplitudeSamples(audioBlob, 80).then((a) => {
+      if (alive) setAmps(a);
+    });
+    return () => { alive = false; };
+  }, [audioBlob]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const h0 = hashString(seedText || 'audio');
+    const seeded = (i: number) => ((h0 * (i + 1) * 2654435761) >>> 0) / 0xffffffff;
+    const amp = (i: number) => (amps && amps.length) ? (amps[Math.min(i % amps.length, amps.length - 1)] ?? 0.3) : 0.5;
+
+    const blocks: { x: number; y: number; w: number; h: number; color: string; rot: number }[] = [];
+    const n = 54;
+    for (let i = 0; i < n; i++) {
+      const r = seeded(i * 7) * radius * 0.92;
+      const th = seeded(i * 13) * Math.PI * 2;
+      const bx = cx + Math.cos(th) * r * 0.62;
+      const by = cy + Math.sin(th) * r * 0.62;
+      const isLower = by >= cy;
+      const palette = isLower ? lowFreqPalette : highFreqPalette;
+      const colorIdx = Math.floor(seeded(i * 31) * palette.length);
+      const intensity = 0.6 + amp(i) * 0.5;
+      if (isLower) {
+        const bw = 36 + seeded(i * 19) * 70 + intensity * 20;
+        const bh = 24 + seeded(i * 23) * 48 + intensity * 16;
+        blocks.push({
+          x: bx - bw / 2,
+          y: by - bh / 2,
+          w: bw,
+          h: bh,
+          color: palette[colorIdx % palette.length]!,
+          rot: seeded(i * 53) * 0.35 - 0.15
+        });
+      } else {
+        const bw = 14 + seeded(i * 19) * 32 + intensity * 12;
+        const bh = 10 + seeded(i * 23) * 24 + intensity * 10;
+        blocks.push({
+          x: bx - bw / 2,
+          y: by - bh / 2,
+          w: bw,
+          h: bh,
+          color: palette[colorIdx % palette.length]!,
+          rot: seeded(i * 53) * 0.4 - 0.2
+        });
+      }
+    }
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+
+    blocks.forEach((b) => {
+      ctx.save();
+      ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.rotate(b.rot);
+      ctx.translate(-(b.x + b.w / 2), -(b.y + b.h / 2));
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    });
+
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }, [seedText, amps]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={w} height={h} className="w-full h-full object-cover opacity-95 rounded-full" />;
+}
+
+/** Extrae paleta dominante de una imagen (warm: naranjas/rosas/amarillos; cool: verdes/teals/azules). */
+function extractPaletteFromImage(
+  ctx: CanvasRenderingContext2D,
+  img: HTMLImageElement,
+  w: number,
+  h: number
+): { palette: string[]; isWarm: boolean } {
+  ctx.drawImage(img, 0, 0, w, h);
+  const data = ctx.getImageData(0, 0, w, h).data;
+  const samples: { r: number; g: number; b: number; h: number; s: number; l: number }[] = [];
+  for (let i = 0; i < data.length; i += 4) {
+    const r = data[i]! / 255;
+    const g = data[i + 1]! / 255;
+    const b = data[i + 2]! / 255;
+    const a = data[i + 3]! / 255;
+    const l = (Math.max(r, g, b) + Math.min(r, g, b)) / 2;
+    if (l < 0.12 || l > 0.95 || a < 0.2) continue;
+    let h_ = 0;
+    const c = Math.max(r, g, b) - Math.min(r, g, b);
+    if (c > 0) {
+      if (Math.max(r, g, b) === r) h_ = ((g - b) / c) % 6;
+      else if (Math.max(r, g, b) === g) h_ = (b - r) / c + 2;
+      else h_ = (r - g) / c + 4;
+      h_ = (h_ / 6 + 1) % 1;
+    }
+    const s = l === 0 || l === 1 ? 0 : c / (1 - Math.abs(2 * l - 1));
+    samples.push({ r: data[i]!, g: data[i + 1]!, b: data[i + 2]!, h: h_ * 360, s, l });
+  }
+  if (samples.length < 10) {
+    const def = ['rgba(249,115,22,0.85)', 'rgba(251,146,60,0.82)', 'rgba(234,179,8,0.8)', 'rgba(244,114,182,0.78)', 'rgba(251,113,133,0.8)', 'rgba(34,197,94,0.78)'];
+    return { palette: def, isWarm: true };
+  }
+  const avgH = samples.reduce((a, s) => a + s.h, 0) / samples.length;
+  const isWarm = avgH >= 0 && avgH <= 70 || avgH >= 320;
+  const sorted = [...samples].sort((a, b) => (b.s * b.l) - (a.s * a.l));
+  const top = sorted.slice(0, 60);
+  const bucket = (arr: typeof samples, n: number) => {
+    const step = Math.max(1, Math.floor(arr.length / n));
+    const out: string[] = [];
+    for (let i = 0; i < n && i * step < arr.length; i++) {
+      const s = arr[i * step]!;
+      out.push(`rgba(${Math.round(s.r)},${Math.round(s.g)},${Math.round(s.b)},0.82)`);
+    }
+    return out;
+  };
+  if (isWarm) {
+    const warm = top.filter((s) => (s.h >= 0 && s.h <= 70) || s.h >= 320);
+    const palette = warm.length >= 4 ? bucket(warm, 6) : [
+      'rgba(249,115,22,0.85)', 'rgba(251,146,60,0.82)', 'rgba(234,179,8,0.8)',
+      'rgba(244,114,182,0.78)', 'rgba(251,113,133,0.8)', 'rgba(253,186,116,0.8)'
+    ];
+    return { palette, isWarm: true };
+  }
+  const cool = top.filter((s) => s.h >= 140 && s.h <= 260);
+  const palette = cool.length >= 4 ? bucket(cool, 6) : [
+    'rgba(30,95,116,0.85)', 'rgba(37,99,235,0.82)', 'rgba(20,184,166,0.8)',
+    'rgba(22,163,74,0.8)', 'rgba(59,130,246,0.78)', 'rgba(34,211,238,0.8)'
+  ];
+  return { palette, isWarm: false };
+}
+
+/** Huella circular para historia en foto: paleta extraída de la imagen, bloques superpuestos. */
+function ImprontaFromPhoto({ imageFile, seedText, canvasId }: { imageFile: File; seedText: string; canvasId?: string }) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [palette, setPalette] = useState<string[]>([]);
+  const w = 520;
+  const h = 260;
+  const cx = w / 2;
+  const cy = h / 2;
+  const radius = 118;
+
+  useEffect(() => {
+    let cancelled = false;
+    const img = new Image();
+    const url = URL.createObjectURL(imageFile);
+    img.onload = () => {
+      if (cancelled) {
+        URL.revokeObjectURL(url);
+        return;
+      }
+      const off = document.createElement('canvas');
+      off.width = 64;
+      off.height = 64;
+      const ctx = off.getContext('2d');
+      if (ctx) {
+        const { palette: p } = extractPaletteFromImage(ctx, img, 64, 64);
+        setPalette(p);
+      }
+      URL.revokeObjectURL(url);
+    };
+    img.src = url;
+    return () => {
+      cancelled = true;
+      URL.revokeObjectURL(url);
+    };
+  }, [imageFile]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, w, h);
+    if (palette.length === 0) {
+      ctx.fillStyle = 'rgba(100,116,139,0.4)';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('Generando huella…', cx, cy);
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(100,116,139,0.2)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      return;
+    }
+
+    const h0 = hashString(seedText || 'photo');
+    const seeded = (i: number) => ((h0 * (i + 1) * 2654435761) >>> 0) / 0xffffffff;
+
+    const blocks: { x: number; y: number; w: number; h: number; color: string; rot: number }[] = [];
+    const n = 52;
+    for (let i = 0; i < n; i++) {
+      const r = seeded(i * 7) * radius * 0.92;
+      const th = seeded(i * 13) * Math.PI * 2;
+      const bx = cx + Math.cos(th) * r * 0.6;
+      const by = cy + Math.sin(th) * r * 0.6;
+      const isLarge = i < 14;
+      const bw = isLarge ? 50 + seeded(i * 19) * 70 : 18 + seeded(i * 19) * 35;
+      const bh = isLarge ? 36 + seeded(i * 23) * 50 : 14 + seeded(i * 23) * 28;
+      const colorIdx = Math.floor(seeded(i * 31) * palette.length);
+      blocks.push({
+        x: bx - bw / 2,
+        y: by - bh / 2,
+        w: bw,
+        h: bh,
+        color: palette[colorIdx % palette.length]!,
+        rot: seeded(i * 53) * 0.35 - 0.15
+      });
+    }
+
+    ctx.fillStyle = soft.bg;
+    ctx.fillRect(0, 0, w, h);
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+    blocks.forEach((b) => {
+      ctx.save();
+      ctx.translate(b.x + b.w / 2, b.y + b.h / 2);
+      ctx.rotate(b.rot);
+      ctx.translate(-(b.x + b.w / 2), -(b.y + b.h / 2));
+      ctx.fillStyle = b.color;
+      ctx.fillRect(b.x, b.y, b.w, b.h);
+      ctx.restore();
+    });
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(100,116,139,0.25)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }, [palette, seedText]);
+
+  return <canvas id={canvasId} ref={canvasRef} width={w} height={h} className="w-full h-full object-cover opacity-95 rounded-full" />;
 }
 
 /* =========================    MAP TOOLBAR (CÁPSULA)    ========================= */
@@ -587,71 +1156,8 @@ function SoftCard({
 }
 
 /* ------------------------------------------------------------------ */
-/* MODALS — Propósito: mismo estilo que HowItWorksModal (texto en lib) */
+/* MODALS */
 /* ------------------------------------------------------------------ */
-function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  useModalUX(isOpen, onClose);
-  if (!isOpen) return null;
-
-  const purposeContent = (
-    <>
-      <p className="text-gray-600 leading-relaxed mb-4 font-semibold">
-        {PROPOSITO_TITLE}
-      </p>
-      <p className="text-gray-600 leading-relaxed mb-6">
-        {PROPOSITO_SUBTITLE.split('\n').map((line, i) => (
-          <span key={i}>{line}{i < 1 ? <br /> : null}</span>
-        ))}
-      </p>
-      {PROPOSITO_PARAGRAPHS.map((block, i) => {
-        if (typeof block === 'string') {
-          return <p key={i} className="text-gray-600 leading-relaxed mb-4">{block}</p>;
-        }
-        if ('bold' in block) {
-          return (
-            <p key={i} className="text-gray-600 leading-relaxed mb-4">
-              {block.text}
-              <br />
-              <strong>{block.bold}</strong>
-            </p>
-          );
-        }
-        const lines = (block as { lines: string[] }).lines;
-        return (
-          <p key={i} className={`text-gray-600 leading-relaxed ${i === PROPOSITO_PARAGRAPHS.length - 1 ? 'mb-6' : 'mb-4'}`}>
-            {lines.map((line, j) => (
-              <span key={j}>{line}{j < lines.length - 1 ? <br /> : null}</span>
-            ))}
-          </p>
-        );
-      })}
-      <p className="text-gray-700 font-semibold leading-relaxed">{PROPOSITO_CIERRE}</p>
-    </>
-  );
-
-  return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
-      <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
-        <div className="p-10 pb-4 flex-shrink-0">
-        <button
-          onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
-          style={soft.button}
-          aria-label="Cerrar"
-          type="button"
-        >
-          <X size={24} />
-        </button>
-          <h2 className="text-3xl font-bold text-gray-700 pr-12">Nuestro propósito</h2>
-        </div>
-        <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
-          {purposeContent}
-        </div>
-      </div>
-    </div>
-  );
-}
-
 function HowItWorksModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   useModalUX(isOpen, onClose);
   if (!isOpen) return null;
@@ -816,15 +1322,111 @@ function HowItWorksModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
           {content}
         </div>
-        <div className="p-10 pt-4 flex-shrink-0 border-t border-gray-300/60">
+      </div>
+    </div>
+  );
+}
+
+function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  if (!isOpen) return null;
+
+  const purposeContent = (
+    <>
+      <p className="text-gray-600 leading-relaxed mb-4 font-semibold">
+        {PROPOSITO_TITLE}
+      </p>
+      {PROPOSITO_SUBTITLE ? (
+        <p className="text-gray-600 leading-relaxed mb-6">
+          {(PROPOSITO_SUBTITLE as string).split('\n').map((line: string, i: number) => (
+            <span key={i}>{line}{i < 1 ? <br /> : null}</span>
+          ))}
+        </p>
+      ) : null}
+      {PROPOSITO_PARAGRAPHS.map((block, i) => {
+        if (typeof block === 'string') {
+          return <p key={i} className="text-gray-600 leading-relaxed mb-4">{block}</p>;
+        }
+        if (typeof block === 'object' && block !== null && 'bold' in block) {
+          const b = block as { text: string; bold: string };
+          return (
+            <p key={i} className="text-gray-600 leading-relaxed mb-4">
+              {b.text}
+              <br />
+              <strong>{b.bold}</strong>
+            </p>
+          );
+        }
+        const lines = (block as { lines: string[] }).lines;
+        return (
+          <p key={i} className={`text-gray-600 leading-relaxed ${i === PROPOSITO_PARAGRAPHS.length - 1 ? 'mb-6' : 'mb-4'}`}>
+            {lines.map((line, j) => (
+              <span key={j}>{line}{j < lines.length - 1 ? <br /> : null}</span>
+            ))}
+          </p>
+        );
+      })}
+      <p className="text-gray-700 font-semibold leading-relaxed">{PROPOSITO_CIERRE}</p>
+    </>
+  );
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
+      <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
+        <div className="p-10 pb-4 flex-shrink-0">
+        <button
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+          style={soft.button}
+          aria-label="Cerrar"
+          type="button"
+        >
+          <X size={24} />
+        </button>
+          <h2 className="text-3xl font-bold text-gray-700 pr-12">Nuestro propósito</h2>
+        </div>
+        <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
+          {purposeContent}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BitsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+  useModalUX(isOpen, onClose);
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/55 backdrop-blur-md">
+      <div className="bg-[#E0E5EC] w-full max-w-2xl max-h-[90vh] rounded-[40px] relative shadow-2xl animate-float flex flex-col" style={{ fontFamily: APP_FONT }}>
+        <div className="p-10 pb-4 flex-shrink-0">
           <button
-            type="button"
             onClick={onClose}
-            className="w-full py-3 px-6 rounded-[20px] font-bold text-gray-700 transition active:scale-[0.99]"
+            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            style={soft.button}
+            aria-label="Cerrar"
+            type="button"
+          >
+            <X size={24} />
+          </button>
+          <h2 className="text-3xl font-bold text-gray-700 pr-12">Bits</h2>
+        </div>
+        <div className="px-10 pb-10 overflow-y-auto hide-scrollbar flex-1 min-h-0">
+          <p className="text-gray-600 leading-relaxed mb-4 font-semibold">
+            Datos inesperados, vivos y sorprendentes del mundo.
+          </p>
+          <p className="text-gray-600 leading-relaxed mb-6">
+            En el mapa encontrarás pequeñas huellas: curiosidades, paradojas y formas de vivir que no conocías. Cada punto es un bit de realidad que invita a pensar.
+          </p>
+          <a
+            href="#mapa"
+            onClick={onClose}
+            className="inline-block px-6 py-3 rounded-full font-bold text-gray-700 hover:text-orange-600 transition-colors active:scale-95"
             style={soft.button}
           >
-            Listo
-          </button>
+            Ver Bits en el mapa
+          </a>
         </div>
       </div>
     </div>
@@ -971,6 +1573,7 @@ function StoryModal({
   const previewVideoRef = useRef<HTMLVideoElement | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const imprintIdRef = useRef<string>('');
+  const visualParamsRef = useRef<{ base?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; core?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; fragmentation?: Array<{ x: number; y: number; w: number; h: number; color: string; rot: number }>; modeOverlay?: string } | null>(null);
 
   const MAX_TEXT = 6000;
   const isTextTooLong = text.length > MAX_TEXT;
@@ -990,7 +1593,6 @@ function StoryModal({
 
     if (previewVideoRef.current) {
       try {
-        // @ts-ignore
         previewVideoRef.current.srcObject = null;
       } catch {}
     }
@@ -1047,6 +1649,7 @@ function StoryModal({
     setText('');
     setAttachments([]);
     imprintIdRef.current = '';
+    visualParamsRef.current = null;
 
     hardResetCapture();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1117,7 +1720,6 @@ function StoryModal({
       streamRef.current = stream;
 
       if (mode === 'Video' && previewVideoRef.current) {
-        // @ts-ignore
         previewVideoRef.current.srcObject = stream;
         previewVideoRef.current.muted = true;
         previewVideoRef.current.play?.().catch?.(() => {});
@@ -1247,6 +1849,30 @@ function StoryModal({
     [copyHomeLink]
   );
 
+  const shareAlmaMundi = useCallback((network: 'whatsapp' | 'facebook' | 'x' | 'instagram') => {
+    const url = HOME_URL;
+    const inviteText = 'Suma tu historia al mapa. Alma Mundi: ';
+    const fullText = inviteText + url;
+    const open = (u: string) => window.open(u, '_blank', 'noopener,noreferrer');
+    if (network === 'whatsapp') {
+      open(`https://wa.me/?text=${encodeURIComponent(fullText)}`);
+      return;
+    }
+    if (network === 'facebook') {
+      open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`);
+      return;
+    }
+    if (network === 'x') {
+      open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(inviteText)}&url=${encodeURIComponent(url)}`);
+      return;
+    }
+    if (network === 'instagram') {
+      copyHomeLink();
+      setErr('Link copiado. Pégalo en Instagram ✨');
+      window.setTimeout(() => setErr(''), 2200);
+    }
+  }, [copyHomeLink]);
+
   const downloadImpronta = useCallback(() => {
     const canvas = document.getElementById('impronta-canvas') as HTMLCanvasElement | null;
     if (!canvas) {
@@ -1336,12 +1962,15 @@ function StoryModal({
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok) {
-        setErr(data.error || `Error ${res.status}. Intenta de nuevo.`);
+        const raw = data.error || `Error ${res.status}. Intenta de nuevo.`;
+        const isTechnical = res.status >= 500 || /firebase|admin|config|env|FIREBASE_|required/i.test(String(raw));
+        setErr(isTechnical ? 'No pudimos guardar tu historia. Revisa tu conexión o intenta más tarde.' : raw);
         return;
       }
 
       const id = data.id || imprintIdRef.current || makeId('AM');
       imprintIdRef.current = id;
+      if (data.visualParams && typeof data.visualParams === 'object') visualParamsRef.current = data.visualParams as typeof visualParamsRef.current;
       setStep('received');
     } catch (e) {
       console.error('submit', e);
@@ -1355,6 +1984,7 @@ function StoryModal({
     setErr('');
     setStep('capture');
     imprintIdRef.current = '';
+    visualParamsRef.current = null;
     setStoryTitle('');
     setText('');
     setAttachments([]);
@@ -1381,9 +2011,6 @@ function StoryModal({
         <div className="flex items-center justify-between px-8 py-6">
           <div className="min-w-0">
             <div className="text-xs font-black tracking-widest uppercase text-gray-400">ALMAMUNDI</div>
-            <div className="text-xl font-bold text-gray-700">
-              Cuenta tu historia · <span className="text-orange-600">{mode}</span>
-            </div>
           </div>
 
           <button
@@ -1410,7 +2037,10 @@ function StoryModal({
         )}
 
         {/* BODY */}
-        <div className="px-8 pb-8 pt-4 overflow-y-auto hide-scrollbar" style={{ maxHeight: err ? 'calc(90vh - 220px)' : 'calc(90vh - 190px)' }}>
+        <div
+          className={`px-8 pb-8 hide-scrollbar ${step === 'received' ? 'pt-1 overflow-hidden' : 'pt-4 overflow-y-auto'}`}
+          style={{ maxHeight: err ? 'calc(90vh - 220px)' : 'calc(90vh - 190px)' }}
+        >
           {/* STEP 1: CAPTURE */}
           {step === 'capture' && (
             <div className="rounded-[30px] p-7" style={soft.inset}>
@@ -1423,11 +2053,8 @@ function StoryModal({
 
               {mode === 'Foto' ? (
                 <>
-                  <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-2">
-                    Sube una fotografía
-                  </div>
                   <div className="text-gray-600 text-sm leading-relaxed mb-4">
-                    Elige una imagen que quieras que quede en el mapa. JPG o PNG.
+                    Muéstrale a las personas un instante de tu mirada.
                   </div>
                   <label className="w-full block cursor-pointer">
                     <span className="inline-flex items-center gap-2 px-6 py-4 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
@@ -1641,7 +2268,7 @@ function StoryModal({
                       <span className="text-orange-500">
                         <Users size={14} />
                       </span>
-                      Género
+                      Género <span className="text-orange-500" aria-hidden>*</span>
                     </div>
                     <select value={sex} onChange={(e) => setSex(e.target.value as Sex)} className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }}>
                       <option value="">Selecciona</option>
@@ -1658,7 +2285,7 @@ function StoryModal({
                       <span className="text-orange-500">
                         <Users size={14} />
                       </span>
-                      Rango de edad
+                      Rango de edad <span className="text-orange-500" aria-hidden>*</span>
                     </div>
                     <select value={ageRange} onChange={(e) => setAgeRange(e.target.value as AgeRange)} className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }}>
                       <option value="">Selecciona</option>
@@ -1678,9 +2305,9 @@ function StoryModal({
                       <span className="text-orange-500">
                         <MapPin size={14} />
                       </span>
-                      Ciudad
+                      Ciudad <span className="text-orange-500" aria-hidden>*</span>
                     </div>
-                    <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ej: Santiago" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} />
+                    <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ej: Santiago" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} aria-required="true" />
                   </div>
 
                   <div>
@@ -1688,9 +2315,9 @@ function StoryModal({
                       <span className="text-orange-500">
                         <Globe2 size={14} />
                       </span>
-                      País
+                      País <span className="text-orange-500" aria-hidden>*</span>
                     </div>
-                    <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Ej: Chile" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} />
+                    <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Ej: Chile" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} aria-required="true" />
                   </div>
 
                   <div>
@@ -1716,7 +2343,7 @@ function StoryModal({
                         <span className="text-orange-500">
                           <Mail size={14} />
                         </span>
-                        Mail
+                        Mail <span className="text-orange-500" aria-hidden>*</span>
                       </div>
                       <input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="tu@mail.com" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} />
                       {email.trim().length > 0 && !isEmailLike(email) ? <div className="mt-2 text-xs font-bold text-red-600">Revisa el formato del mail.</div> : null}
@@ -1724,13 +2351,13 @@ function StoryModal({
                   )}
 
                   <div className="md:col-span-2 flex items-start gap-3 pt-2">
-                    <input id="privacy" type="checkbox" checked={acceptedPrivacy} onChange={(e) => setAcceptedPrivacy(e.target.checked)} className="w-5 h-5 mt-1" />
+                    <input id="privacy" type="checkbox" checked={acceptedPrivacy} onChange={(e) => setAcceptedPrivacy(e.target.checked)} className="w-5 h-5 mt-1" aria-required="true" />
                     <label htmlFor="privacy" className="text-sm text-gray-600 font-bold leading-relaxed">
                       Leí y acepto la{' '}
                       <a className="text-orange-600 underline" href={PRIVACY_URL} target="_blank" rel="noreferrer">
                         política de privacidad
                       </a>
-                      .
+                      <span className="text-orange-500" aria-hidden> *</span>
                     </label>
                   </div>
                 </div>
@@ -1754,65 +2381,73 @@ function StoryModal({
             </div>
           )}
 
-          {/* STEP 3: RECEIVED */}
+          {/* STEP 3: RECEIVED — Todo en una pantalla sin scroll */}
           {step === 'received' && (
-            <div className="flex flex-col items-center text-center py-4">
-              <div className="w-20 h-20 rounded-full flex items-center justify-center text-orange-500 mb-4" style={soft.inset}>
-                <Check size={40} className="stroke-[3]" />
+            <div className="flex flex-col items-center text-center pt-0 pb-2 px-2 overflow-hidden" style={{ maxHeight: 'calc(90vh - 160px)' }}>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-orange-500 mb-0.5 flex-shrink-0" style={soft.inset}>
+                <Check size={20} className="stroke-[3]" />
               </div>
-
-              <h2 className="text-3xl font-bold text-gray-800 mb-3 leading-tight">
-                Gracias. Tu historia ya dejó una <span className="text-orange-600">Impronta</span>.
+              <h2 className="text-lg font-bold text-gray-800 mb-0 leading-tight flex-shrink-0">
+                Tu <span className="text-orange-600">Huella Visual</span>
               </h2>
-
-              <p className="text-gray-500 text-lg leading-relaxed mb-7 max-w-xl">
-                Lo vivido queda guardado y listo para <strong>conectar</strong> con otras historias.
+              <p className="text-gray-500 text-xs leading-tight mb-1 max-w-sm flex-shrink-0">
+                Tu historia se ha codificado en esta impronta única.
               </p>
 
-              <div className="w-full max-w-2xl space-y-4 mb-8">
-                <div className="p-6 rounded-[28px] text-left" style={soft.inset}>
-                  <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2">ID / Impronta</div>
-                  <div className="text-2xl font-black text-gray-700">{imprintIdRef.current}</div>
-                  <div className="text-sm text-gray-500 mt-2">Guárdalo si quieres volver a esta historia.</div>
+              <div className="w-full max-w-[360px] mx-auto flex flex-col items-center gap-1.5 flex-shrink-0">
+                {String(imprintIdRef.current).startsWith('dev-') && (
+                  <p className="text-[10px] text-amber-700 font-medium flex-shrink-0">Modo desarrollo.</p>
+                )}
+                {/* Huella cuadrada + franja fecha/URL */}
+                <div className="relative w-full max-w-[260px] flex flex-col rounded-2xl overflow-hidden flex-shrink-0 border border-gray-200/80" style={soft.flat}>
+                  <div className="relative aspect-square w-full">
+                    {visualParamsRef.current ? (
+                      <ImprontaFromVisualParams visualParams={visualParamsRef.current} canvasId="impronta-canvas" />
+                    ) : (
+                      <ImprontaDataFingerprint
+                        seedText={seedForImpronta + imprintIdRef.current + (storyTitle ? `-${storyTitle}` : '') + (mode ?? '')}
+                        canvasId="impronta-canvas"
+                      />
+                    )}
+                  </div>
+                  <div className="min-h-[52px] w-full py-2 px-3 bg-gradient-to-t from-black/80 to-black/60 flex flex-col justify-end rounded-b-2xl pointer-events-none">
+                    <p className="text-[10px] text-white/95 leading-tight">
+                      Fecha de entrega: <span className="text-orange-300 font-semibold">{new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                    </p>
+                    <a href="https://www.almamundi.org" target="_blank" rel="noopener noreferrer" className="text-xs font-bold text-orange-300 hover:text-orange-200 no-underline pointer-events-auto inline-block mt-0.5">
+                      www.almamundi.org
+                    </a>
+                  </div>
                 </div>
 
-                <div className="h-[220px] rounded-[28px] overflow-hidden" style={soft.flat}>
-                  <ImprontaVisualizer
-                    isActive={true}
-                    seedText={seedForImpronta + imprintIdRef.current + (storyTitle ? `-${storyTitle}` : '')}
-                    audioBlob={mode === 'Audio' ? mediaBlob : null}
-                    canvasId="impronta-canvas"
-                  />
+                <div className="flex flex-wrap gap-1.5 justify-center flex-shrink-0">
+                  <button type="button" onClick={downloadImpronta} className="py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 font-black tracking-widest uppercase text-[10px] text-gray-600 hover:text-gray-800 active:scale-95 border-2 border-gray-400/50 bg-transparent hover:bg-gray-200/30" style={{ fontFamily: APP_FONT }}>
+                    <Download size={12} />
+                    Descargar Huella
+                  </button>
+                  <button type="button" onClick={resetForNewStory} className="py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 font-black tracking-widest uppercase text-[10px] text-white hover:opacity-95 active:scale-95 bg-orange-500 hover:bg-orange-600 border-0" style={{ fontFamily: APP_FONT }}>
+                    <RefreshCcw size={12} />
+                    Otra Historia
+                  </button>
+                  <a href="/mapa" className="py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 font-black tracking-widest uppercase text-[10px] text-gray-600 hover:text-gray-800 active:scale-95 border-2 border-gray-400/50 bg-transparent hover:bg-gray-200/30 no-underline" style={{ fontFamily: APP_FONT }}>
+                    <MapPin size={12} />
+                    Volver al Mapa
+                  </a>
                 </div>
+                <a href="#historias" onClick={(e) => { e.preventDefault(); onClose(); setTimeout(() => document.getElementById('historias')?.scrollIntoView({ behavior: 'smooth' }), 100); }} className="text-xs font-bold text-orange-600 hover:text-orange-700 underline underline-offset-1 flex-shrink-0">
+                  Conoce otras historias
+                </a>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <button type="button" onClick={downloadImpronta} className="py-4 px-6 rounded-2xl flex items-center justify-center gap-3 font-black tracking-widest uppercase text-xs text-gray-600 hover:text-gray-800 active:scale-95" style={soft.button}>
-                    <Download size={16} />
-                    Descargar
-                  </button>
-
-                  <button type="button" onClick={() => openShare('copy')} className="py-4 px-6 rounded-2xl flex items-center justify-center gap-3 font-black tracking-widest uppercase text-xs text-gray-600 hover:text-gray-800 active:scale-95" style={soft.button}>
-                    <Share2 size={16} />
-                    Copiar link
-                  </button>
-
-                  <button type="button" onClick={resetForNewStory} className="py-4 px-6 rounded-2xl flex items-center justify-center gap-3 font-black tracking-widest uppercase text-xs text-gray-600 hover:text-gray-800 active:scale-95" style={soft.button}>
-                    <RefreshCcw size={16} />
-                    Otra historia
-                  </button>
+                <div className="w-full pt-1 border-t border-gray-300/50 flex-shrink-0">
+                  <p className="text-[10px] font-bold text-gray-600 mb-0.5">Comparte Alma Mundi</p>
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    <button type="button" onClick={() => shareAlmaMundi('whatsapp')} className="py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 font-bold text-[10px] text-white bg-[#25D366] hover:opacity-90 active:scale-95" aria-label="WhatsApp"><Share2 size={12} /></button>
+                    <button type="button" onClick={() => shareAlmaMundi('facebook')} className="py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 font-bold text-[10px] text-white bg-[#1877F2] hover:opacity-90 active:scale-95" aria-label="Facebook"><Share2 size={12} /></button>
+                    <button type="button" onClick={() => shareAlmaMundi('x')} className="py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 font-bold text-[10px] text-white bg-black hover:opacity-90 active:scale-95" aria-label="X"><Share2 size={12} /></button>
+                    <button type="button" onClick={() => shareAlmaMundi('instagram')} className="py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 font-bold text-[10px] text-white bg-gradient-to-r from-[#F58529] via-[#DD2A7B] to-[#8134AF] hover:opacity-90 active:scale-95" aria-label="Instagram"><Share2 size={12} /></button>
+                  </div>
                 </div>
               </div>
-
-              <button
-                onClick={() => {
-                  onClose();
-                }}
-                className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 hover:text-orange-700 active:scale-95"
-                style={soft.button}
-                type="button"
-              >
-                Volver al mapa
-              </button>
             </div>
           )}
         </div>
@@ -1828,16 +2463,23 @@ export default function Home() {
   const [modalMode, setModalMode] = useState<Mode | null>(null);
   const [showPurpose, setShowPurpose] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
+  const [showBits, setShowBits] = useState(false);
   const [chosenTopic, setChosenTopic] = useState<InspirationTopic | null>(null);
 
   useEffect(() => {
     const onPurpose = () => setShowPurpose(true);
     const onHowItWorks = () => setShowHowItWorks(true);
+    const onOpenStoryModal = (e: Event) => {
+      const mode = (e as CustomEvent<{ mode?: 'Video' | 'Audio' | 'Texto' | 'Foto' }>).detail?.mode ?? 'Texto';
+      setModalMode(mode);
+    };
     window.addEventListener('almamundi:voice:showPurpose', onPurpose);
     window.addEventListener('almamundi:voice:showHowItWorks', onHowItWorks);
+    window.addEventListener('almamundi:openStoryModal', onOpenStoryModal);
     return () => {
       window.removeEventListener('almamundi:voice:showPurpose', onPurpose);
       window.removeEventListener('almamundi:voice:showHowItWorks', onHowItWorks);
+      window.removeEventListener('almamundi:openStoryModal', onOpenStoryModal);
     };
   }, []);
 
@@ -1859,21 +2501,20 @@ export default function Home() {
 
       <HowItWorksModal isOpen={showHowItWorks} onClose={() => setShowHowItWorks(false)} />
 
+      <BitsModal isOpen={showBits} onClose={() => setShowBits(false)} />
+
       {/* HEADER */}
       <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
         <div className="flex items-center">
           <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
         </div>
-
         <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
           <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
             Nuestro propósito
           </button>
-
           <button onClick={() => setShowHowItWorks(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
             ¿Cómo funciona?
           </button>
-
           <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
             Historias
           </a>
@@ -1883,7 +2524,7 @@ export default function Home() {
         </nav>
       </header>
 
-      {/* INTRO: frase visible; cards justo debajo (sin forzar altura mínima para que las cards suban) */}
+      {/* INTRO: frase visible; cards justo debajo */}
       <section id="intro" className="pt-44 md:pt-52 pb-4 md:pb-6 px-6 relative z-10 flex flex-col items-center text-center scroll-mt-28">
         <div className="max-w-6xl animate-float">
           <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
@@ -1893,12 +2534,11 @@ export default function Home() {
           <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed mt-8 md:mt-10" style={{ color: soft.textBody }}>
             Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
           </p>
-          {/* NO volver a añadir flecha/chevron de "scroll down" — pedido explícito del cliente */}
         </div>
       </section>
 
-      {/* CARDS — pegadas a la frase de arriba */}
-      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-5 justify-center items-stretch relative z-10 mt-6 md:mt-8">
+      {/* CARDS */}
+      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-y-5 gap-x-10 md:gap-x-14 justify-center items-stretch relative z-10 mt-6 md:mt-8">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
@@ -1924,8 +2564,8 @@ export default function Home() {
           {/* Espacio fijo entre la barra y el globo: las palabras no tapan el mapa; el globo empieza debajo */}
           <div className="min-h-[48px] md:min-h-[64px] w-full shrink-0" aria-hidden />
               </div>
-        {/* Universo: globo siempre debajo de la barra; más altura (120vh) para globo y franja fecha/hora */}
-        <div className="relative w-full min-h-[120vh] h-[120vh] bg-[var(--universe-bg)] flex flex-col overflow-hidden">
+        {/* Universo: globo debajo de la barra; fondo negro al final de la sección. */}
+        <div className="relative w-full min-h-[120vh] h-[120vh] flex flex-col overflow-hidden bg-[var(--universe-bg)]" style={{ minHeight: '120vh' }}>
           <HomeMap />
         </div>
       </section>
