@@ -31,6 +31,7 @@
   "workflow": {
     "plan_before_execution": true,
     "explain_for_non_coders": true,
-    "verify_digital_rights": true
+    "verify_digital_rights": true,
+    "commits": "Cuando el usuario pida hacer commit, SIEMPRE hacer commit de toda la página: git add -A y git commit con mensaje descriptivo (respetando .gitignore)."
   }
 }

@@ -16,7 +16,7 @@ import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
-import { VideoGlobe, type VideoGlobePoint } from '@/components/map/VideoGlobe';
+import { NASAEpicEarthVideo } from '@/components/NASAEpicEarthVideo';
 import { BITS_DATA } from '@/lib/bits-data';
 import type { HuellaPunto } from '@/lib/huellas';
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
@@ -50,18 +50,6 @@ export default function HomeMap() {
         color: '#f59e0b',
         titulo: b.titulo ?? b.lugar,
         historia: b.historia ?? '',
-      })),
-    [BITS_DATA]
-  );
-  const huellasPoints = useMemo<VideoGlobePoint[]>(
-    () =>
-      BITS_DATA.map((b) => ({
-        lat: b.lat,
-        lng: b.lon,
-        id: b.id,
-        titulo: b.titulo ?? b.lugar,
-        lugar: b.lugar,
-        pais: b.pais,
       })),
     [BITS_DATA]
   );
@@ -209,17 +197,6 @@ export default function HomeMap() {
     setDrawerOpen(false);
   }
 
-  const handleBitPointClick = useCallback(
-    (point: VideoGlobePoint) => {
-      const bit = huellasPuntos.find((p) => String(p.id) === String(point.id ?? ''));
-      if (bit) {
-        setSelectedBit(bit);
-        open('bits');
-      }
-    },
-    [huellasPuntos]
-  );
-
   const handleSubirMiHistoria = useCallback(() => {
     close();
     router.push('/');
@@ -254,20 +231,17 @@ export default function HomeMap() {
   const GLOBE_TOP_PADDING = 24;
   return (
     <div ref={globeContainerRef} className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%', minHeight: '80vh' }}>
-      {/* Globo NASA (vídeo Blue Marble): rotación izquierda→derecha, norte arriba, más grande que el círculo. */}
+      {/* Vídeo NASA un poco oval (máscara circular + zoom), fondo negro. */}
       <div
-        className="relative overflow-hidden px-2 flex-1 flex items-center justify-center min-h-[60vh] w-full"
+        className="relative overflow-hidden flex-1 flex flex-col justify-center items-center min-h-[55vh] w-full bg-black"
         style={{
           paddingTop: GLOBE_TOP_PADDING,
           paddingBottom: 24,
-          minHeight: '60vh',
+          minHeight: '55vh',
+          backgroundColor: '#000',
         }}
       >
-        <VideoGlobe
-          points={huellasPoints}
-          onPointClick={handleBitPointClick}
-          highlightedPointId={selectedBit?.id ?? undefined}
-        />
+        <NASAEpicEarthVideo className="w-full max-w-7xl" source="spinning" fallbackImage="" />
       </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
