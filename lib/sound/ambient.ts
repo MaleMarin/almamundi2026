@@ -1,4 +1,4 @@
-export type AmbientKey = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas";
+export type AmbientKey = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas" | "radio" | "lluvia" | "mercado";
 
 type PlayerState = {
   ctx: AudioContext | null;
@@ -21,13 +21,16 @@ const state: PlayerState = {
 };
 
 const URLS: Record<AmbientKey, string[]> = {
-  mar: ["/audio/ambients/ocean.wav", "/audio/ambients/ocean.mp3", "/audio/mar.m4a"],
+  mar: ["/audio/mar.m4a", "/audio/ambients/ocean.wav", "/audio/ambients/ocean.mp3"],
   ciudad: ["/audio/ambients/city.wav", "/audio/ambients/city.mp3"],
   bosque: ["/audio/ambients/forest.wav", "/audio/ambients/forest.mp3"],
   viento: ["/audio/ambients/wind.mp3", "/audio/ambients/wind.wav", "/audio/neblina.mp3"],
   animales: ["/audio/ambients/animals.wav", "/audio/ambients/animals.mp3"],
   universo: ["/audio/ambients/universe.mp3", "/universo.mp3", "/audio/ambients/universe.wav"],
   personas: ["/audio/ambients/people.wav", "/audio/ambients/people.mp3"],
+  radio: ["/audio/ambients/radio.mp3", "/audio/ambients/radio.wav"],
+  lluvia: ["/audio/ambients/lluvia.mp3", "/audio/ambients/rain-city.mp3", "/audio/ambients/lluvia.wav"],
+  mercado: ["/audio/ambients/mercado.mp3", "/audio/ambients/market.mp3", "/audio/ambients/mercado.wav"],
 };
 
 const FALLBACK_URL = "/audio/mar.m4a";
@@ -38,22 +41,30 @@ const AMBIENT_MASTER_VOL = 1.0;
 /** Volumen base actual (0–1) para la atmósfera temporal. */
 let ambientBaseVolume = 0.85;
 
-function ensureCtx() {
-  if (!state.ctx)
-    state.ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
-  if (!state.master) {
-    state.master = state.ctx.createGain();
-    state.master.gain.value = AMBIENT_MASTER_VOL;
-    state.master.connect(state.ctx.destination);
+/** Crea el contexto solo tras un gesto del usuario (evita el aviso de AudioContext en consola). */
+export function initFromUserGesture(): void {
+  if (state.ctx) {
+    if (state.ctx.state === "suspended") state.ctx.resume();
+    return;
   }
+  state.ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+  state.master = state.ctx.createGain();
+  state.master.gain.value = AMBIENT_MASTER_VOL;
+  state.master.connect(state.ctx.destination);
+  state.ctx.resume();
+}
+
+function ensureCtx(): AudioContext | null {
   return state.ctx;
 }
 
 async function loadBuffer(key: AmbientKey): Promise<AudioBuffer> {
   if (state.buffers[key]) return state.buffers[key]!;
   const ctx = ensureCtx();
+  if (!ctx) throw new Error("AudioContext not initialized");
 
   async function tryLoad(url: string): Promise<AudioBuffer> {
+    if (!ctx) throw new Error("AudioContext not initialized");
     const res = await fetch(url);
     if (!res.ok) throw new Error(`fetch ${url}: ${res.status}`);
     const arr = await res.arrayBuffer();
@@ -74,6 +85,7 @@ async function loadBuffer(key: AmbientKey): Promise<AudioBuffer> {
 
 export async function unlockAmbientAudio() {
   const ctx = ensureCtx();
+  if (!ctx) return;
   if (ctx.state === "suspended") await ctx.resume();
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
@@ -83,7 +95,6 @@ export async function unlockAmbientAudio() {
   osc.start();
   osc.stop(ctx.currentTime + 0.02);
   state.unlocked = true;
-  return true;
 }
 
 function stopCurrent(atTime: number) {
@@ -97,10 +108,10 @@ function stopCurrent(atTime: number) {
 }
 
 export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
+  const ctx = ensureCtx();
+  if (!ctx || ctx.state === "suspended") return;
   const defaultFade = key === "universo" ? 2200 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;
-  const ctx = ensureCtx();
-  if (ctx.state === "suspended") await ctx.resume();
 
   let buf: AudioBuffer;
   try {

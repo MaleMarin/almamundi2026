@@ -69,7 +69,7 @@ function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; 
 export function useNewsLayer(
   selectedTopicId: string | null,
   topicQuery: string,
-  activeView: 'historias' | 'actualidad' | 'music' | 'musica',
+  activeView: 'historias' | 'actualidad' | 'music' | 'musica' | 'bits',
   fetchNews: FetchNewsFn
 ) {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
@@ -89,8 +89,10 @@ export function useNewsLayer(
     const controller = new AbortController();
     const t = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
 
-    setLoading(true);
-    setError(null);
+    queueMicrotask(() => {
+      if (!cancelled) setLoading(true);
+      if (!cancelled) setError(null);
+    });
     fetchNews(topicQuery, controller.signal)
       .then((result) => {
         if (cancelled || !mountedRef.current) return;

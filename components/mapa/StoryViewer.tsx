@@ -27,18 +27,15 @@ function KenBurnsViewer({
   const [phase, setPhase] = useState<'enter' | 'hold' | 'exit'>('enter');
 
   useEffect(() => {
-    let t1: ReturnType<typeof setTimeout>;
-    let t2: ReturnType<typeof setTimeout>;
-    let t3: ReturnType<typeof setTimeout>;
-
-    setPhase('enter');
-    t1 = setTimeout(() => setPhase('hold'), 1500);
-    t2 = setTimeout(() => setPhase('exit'), 5500);
-    t3 = setTimeout(() => {
+    const id = requestAnimationFrame(() => setPhase('enter'));
+    const t1 = setTimeout(() => setPhase('hold'), 1500);
+    const t2 = setTimeout(() => setPhase('exit'), 5500);
+    const t3 = setTimeout(() => {
       setCurrent((c) => (c + 1) % photos.length);
     }, 6500);
 
     return () => {
+      cancelAnimationFrame(id);
       clearTimeout(t1);
       clearTimeout(t2);
       clearTimeout(t3);
@@ -291,7 +288,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
   }, []);
 
   useEffect(() => {
-    let interval: ReturnType<typeof setInterval>;
     const ping = async () => {
       try {
         const headers: HeadersInit = {};
@@ -303,7 +299,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
       } catch {}
     };
     void ping();
-    interval = setInterval(() => void ping(), 15_000);
+    const interval = setInterval(() => void ping(), 15_000);
     return () => {
       clearInterval(interval);
       const id = readerIdRef.current;

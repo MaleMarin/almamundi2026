@@ -35,7 +35,7 @@ type ArchivoStory = {
   videoUrl?: string;
   audioUrl?: string;
   imageUrl?: string;
-  photos?: { url: string; name?: string; date?: string }[];
+  photos?: { url: string; name: string; date: string }[];
 };
 
 type MuestraTopic = {
@@ -77,7 +77,7 @@ function archivoToStoryPoint(s: ArchivoStory): StoryPoint {
     videoUrl: s.videoUrl,
     audioUrl: s.audioUrl,
     imageUrl: s.imageUrl,
-    photos: (s.photos ?? []) as { url: string; name?: string; date?: string }[],
+    photos: (s.photos ?? []).map((p) => ({ url: p.url, name: p.name ?? '', date: p.date ?? '' })),
     hasText: Boolean(s.body),
     hasAudio: Boolean(s.audioUrl),
     hasVideo: Boolean(s.videoUrl),
@@ -193,9 +193,10 @@ export default function ArchivoPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    Promise.all([fetchArchivo(), fetchMuestras()]).finally(() => {
-      if (!cancelled) setLoading(false);
+    queueMicrotask(() => {
+      Promise.all([fetchArchivo(), fetchMuestras()]).finally(() => {
+        if (!cancelled) setLoading(false);
+      });
     });
     return () => { cancelled = true; };
   }, [fetchArchivo, fetchMuestras]);

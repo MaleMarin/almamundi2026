@@ -29,14 +29,18 @@ import { MapTopControls } from '@/components/map/MapTopControls';
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
+import { BitsPanel } from '@/components/map/panels/BitsPanel';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import { useAmbientEngine } from '@/components/music/useAmbientEngine';
 import { INSPIRATION_TOPICS } from '@/lib/topics';
 import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
+import { BITS_DATA, type BitEntry } from '@/lib/bits-data';
+import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
 import type { MapView } from '@/lib/map-data/types';
 import { getStoriesReadIds, startSessionTimer } from '@/lib/sessionTracker';
 import { getApproxLocation } from '@/lib/userLocation';
+import { fetchHuellas, hexToRgba, type HuellaPunto } from '@/lib/huellas';
 import { isNightAtLocation } from '@/lib/sunPosition';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
@@ -339,12 +343,12 @@ const RIM_INTENSITY = 1.9;
 const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
-const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
-const GLOBE_IMAGE_DAY_LOCAL = '/textures/earth-day.png';
-/** Fallback día: .png (8k mapa mundi) o .jpg si se sustituye. */
-const GLOBE_IMAGE_DAY_OR_FALLBACK = '/textures/earth-day.png';
-/** Bump map para relieve del terreno (topología). */
-const GLOBE_BUMP_IMAGE = 'https://unpkg.com/three-globe@2.31.0/example/img/earth-topology.png';
+/** Texturas vía API para evitar /textures/* pending en dev. */
+const GLOBE_IMAGE_LOCAL = '/api/globe-texture?name=earth-night.jpg';
+const GLOBE_IMAGE_DAY_LOCAL = '/api/globe-texture?name=earth-day.jpg';
+const GLOBE_IMAGE_DAY_OR_FALLBACK = '/api/globe-texture?name=earth-day.jpg';
+/** Bump map deshabilitado (unpkg puede dar CORS y deja el globo en círculo oscuro). */
+const GLOBE_BUMP_IMAGE: string | null = null;
 
 const STARFIELD_DEBUG = false;
 
@@ -603,6 +607,7 @@ const globalStyles = `
     position: relative;
     width: 100%;
     height: 100%;
+    min-height: 600px;
     overflow: hidden;
     border: none !important;
     outline: none !important;
@@ -1064,6 +1069,9 @@ const MOOD_LABELS: Record<SoundMood, string> = {
   animales: "Animales",
   universo: "Universo",
   personas: "Personas",
+  radio: "Radios comunitarias",
+  lluvia: "Lluvia en ciudades",
+  mercado: "Mercados",
 };
 
 // --- Sonidos del mundo: audio engine (HTMLAudioElement) ---
@@ -1075,6 +1083,9 @@ const AMBIENT_SOURCES: Record<SoundMood, string> = {
   animales: "/audio/ambients/animals.mp3",
   universo: "/audio/ambients/universe.mp3",
   personas: "/audio/mar.m4a",
+  radio: "/audio/ambients/radio.mp3",
+  lluvia: "/audio/ambients/lluvia.mp3",
+  mercado: "/audio/ambients/mercado.mp3",
 };
 const AMBIENT_BASE_VOL = 0.6;
 const AMBIENT_STORY_VOL = 0.15;
@@ -1184,8 +1195,8 @@ function RightPanel({
   topicsButtonRef: React.RefObject<HTMLButtonElement | null>;
   isMuted: boolean;
   onToggleAudio: () => void;
-  activeView: 'historias' | 'actualidad' | 'musica';
-  onActiveViewChange: (view: 'historias' | 'actualidad' | 'musica') => void;
+  activeView: 'historias' | 'actualidad' | 'musica' | 'bits';
+  onActiveViewChange: (view: 'historias' | 'actualidad' | 'musica' | 'bits') => void;
   /** Vista interna del mapa (stories | news | music); para depuración. */
   view?: 'stories' | 'news' | 'music';
   selectedTopic: string | null;
@@ -1291,7 +1302,7 @@ function RightPanel({
     actualidad: "Noticias",
   };
 
-  const views = ["historias", "musica", "actualidad"] as const;
+  const views = ["historias", "musica", "actualidad", "bits"] as const;
 
   return (
     <div
@@ -2106,6 +2117,9 @@ const AMBIENT_OPTS = [
   { id: 'mar' as const, label: 'Mar', desc: 'Olas, calma' },
   { id: 'ciudad' as const, label: 'Ciudad', desc: 'Urbano, presente' },
   { id: 'viento' as const, label: 'Viento', desc: 'Aire, naturaleza' },
+  { id: 'radio' as const, label: 'Radios comunitarias', desc: 'Voces y transmisiones' },
+  { id: 'lluvia' as const, label: 'Lluvia en ciudades', desc: 'Lluvia en distintas ciudades' },
+  { id: 'mercado' as const, label: 'Mercados', desc: 'Ambiente de mercado' },
 ];
 
 function SonidosPanel({
@@ -2163,6 +2177,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const [isMuted, setIsMuted] = useState(false);
   const globeEl = useRef<any>(null);
   const cloudMeshRef = useRef<THREE.Mesh | null>(null);
+  const earthMeshRef = useRef<THREE.Mesh | null>(null);
+  const earthMarkersRef = useRef<THREE.Object3D[]>([]);
+  /** Drag con momentum: solo rotación Y. */
+  const isDraggingRef = useRef(false);
+  const velocityYRef = useRef(0);
+  const prevMouseXRef = useRef(0);
+  const didDragThisPointerRef = useRef(false);
   /** POV base para “return to base” al cerrar historia (shot 1). */
   const basePOVRef = useRef<{ lat: number; lng: number; altitude: number } | null>(null);
   const isUserInteractingRef = useRef(false);
@@ -2180,10 +2201,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const [activeView, setActiveView] = useState<'historias' | 'actualidad' | 'musica'>(() => {
+  const [activeView, setActiveView] = useState<'historias' | 'actualidad' | 'musica' | 'bits'>(() => {
     const tab = searchParams.get('tab');
     if (tab === 'actualidad') return 'actualidad';
     if (tab === 'sonidos') return 'musica';
+    if (tab === 'bits') return 'bits';
     if (tab === 'historias') return 'historias';
     return searchParams.get('view') === 'music' ? 'musica' : 'historias';
   });
@@ -2209,6 +2231,25 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   /** Dock + Drawer UI: drawer abierto y modo (stories | news | sounds | search). */
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
+  /** Bit seleccionado al hacer click en un dot del globo; abre panel derecho y resalta el dot. */
+  const [selectedBit, setSelectedBit] = useState<BitEntry | null>(null);
+  const selectedBitIdRef = useRef<number | null>(null);
+  useEffect(() => {
+    selectedBitIdRef.current = selectedBit?.id ?? null;
+  }, [selectedBit]);
+
+  /** Al seleccionar un bit en el panel (ej. Camboya), girar el globo para centrar esa ubicación. */
+  useEffect(() => {
+    if (!selectedBit || !globeEl.current) return;
+    try {
+      globeEl.current.pointOfView(
+        { lat: selectedBit.lat, lng: selectedBit.lon, altitude: 1.55 },
+        900
+      );
+      setViewCenter({ lat: selectedBit.lat, lng: selectedBit.lon });
+    } catch { /* ignore */ }
+  }, [selectedBit]);
+
   /** Preferencia de sonido ambiente (music): persistida en localStorage */
   const [soundEnabled, setSoundEnabled] = useState<boolean>(() => {
     if (typeof window === 'undefined') return true;
@@ -2346,7 +2387,37 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             (mesh.material as THREE.MeshBasicMaterial).opacity = 0.45 * (1 - phase);
           }
         });
-        if (cloudMeshRef.current) cloudMeshRef.current.rotation.y += 0.00008;
+        const globe = earthMeshRef.current;
+        if (globe) {
+          // Forzar orientación cada frame: 180° en X para norte arriba (North America top).
+          globe.rotation.x = Math.PI;
+          globe.rotation.z = 0.41;
+          const isDragging = isDraggingRef.current;
+          const velocityY = velocityYRef.current;
+          // Rotación oeste→este (izquierda a derecha), norte arriba.
+          if (!isDragging && Math.abs(velocityY) < 0.0001) {
+            globe.rotation.y += 0.0008;
+          } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
+            globe.rotation.y += velocityY;
+            velocityYRef.current = velocityY * 0.95;
+          }
+          const cam = globeEl.current?.camera?.();
+          if (cam && earthMarkersRef.current.length > 0) {
+            const camPos = new THREE.Vector3();
+            cam.getWorldPosition(camPos);
+            const wp = new THREE.Vector3();
+            earthMarkersRef.current.forEach((dot) => {
+              dot.getWorldPosition(wp);
+              const toDot = wp.clone().normalize();
+              dot.visible = toDot.dot(camPos.clone().normalize()) > 0;
+            });
+            const sid = selectedBitIdRef.current;
+            earthMarkersRef.current.forEach((dot) => {
+              const scale = dot.userData.bitId === sid ? 1.5 : 1;
+              dot.scale.setScalar(scale);
+            });
+          }
+        }
       }
       raf = requestAnimationFrame(tick);
     };
@@ -2377,7 +2448,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   /** Hover preview: punto bajo el mouse y posición en pantalla */
   const [hovered, setHovered] = useState<{
-    kind: 'stories' | 'music' | 'news';
+    kind: 'stories' | 'music' | 'news' | 'huella';
     id: string;
     title: string;
     subtitle: string;
@@ -2389,9 +2460,21 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     hasAudio?: boolean;
     hasVideo?: boolean;
     hasText?: boolean;
+    /** Solo para kind === 'huella' */
+    historia?: string;
+    categoria?: string;
   } | null>(null);
+  const [huellasPuntos, setHuellasPuntos] = useState<HuellaPunto[]>([]);
   const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
   const hoverPosRef = useRef<{ x: number; y: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchHuellas()
+      .then((d) => { if (!cancelled) setHuellasPuntos(d.puntos ?? []); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   /** Al entrar a Sonidos del mundo, mood por defecto para no mostrar "—" */
   /** music_logic_make_it_obvious_v1: estado inicial sin mood; el usuario elige un chip. */
@@ -2500,18 +2583,25 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     } catch {}
   }, [embedded, universeVisible, globeReady]);
 
-  // Abrir drawer y fijar modo según ?tab= (home dock navega con ?tab=historias|actualidad|sonidos). Solo abrir si el Universo está visible (evitar abrir en hero).
+  // Abrir drawer y fijar modo según ?tab= (home dock navega con ?tab=historias|actualidad|sonidos|bits). Solo abrir si el Universo está visible (evitar abrir en hero).
   useEffect(() => {
     if (embedded && !universeVisible) return;
     const tab = searchParams.get('tab');
     if (tab === 'historias') {
+      setActiveView('historias');
       setDrawerMode('stories');
       setDrawerOpen(true);
     } else if (tab === 'actualidad') {
+      setActiveView('actualidad');
       setDrawerMode('news');
       setDrawerOpen(true);
     } else if (tab === 'sonidos') {
+      setActiveView('musica');
       setDrawerMode('sounds');
+      setDrawerOpen(true);
+    } else if (tab === 'bits') {
+      setActiveView('bits');
+      setDrawerMode('bits');
       setDrawerOpen(true);
     }
   }, [searchParams, embedded, universeVisible]);
@@ -2573,7 +2663,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   }, [embedded]);
 
   useEffect(() => {
-    const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'music';
+    const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'stories' : 'music';
     setView(nextView);
     console.log("[MAPA] view =", nextView, "| activeView =", activeView);
     if (activeView === 'musica') setLiveOverlay(null);
@@ -2632,7 +2722,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       Promise.all([
         loadTex(GLOBE_IMAGE_LOCAL),
         loadTex(GLOBE_IMAGE_DAY_LOCAL),
-        loadTex(GLOBE_BUMP_IMAGE)
+        GLOBE_BUMP_IMAGE ? loadTex(GLOBE_BUMP_IMAGE) : Promise.resolve(null)
       ]).then(([nightTex, dayTex, bumpTex]) => {
         const night = nightTex ?? null;
         const day = dayTex ?? null;
@@ -2645,12 +2735,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           }
         }
 
-        // Preferir textura día para ver océanos y tierra (estilo mapa mundi / iPhone)
+        // Preferir textura día para ver océanos y tierra (estilo mapa mundi / iPhone). Sin bump para evitar CORS y warning.
         const mapTex = day ?? night ?? null;
         const mat = new THREE.MeshPhongMaterial({
           map: mapTex ?? undefined,
-          bumpMap: bumpTex ?? undefined,
-          bumpScale: bumpTex ? GLOBE_BUMP_SCALE : 0,
+          ...(bumpTex ? { bumpMap: bumpTex, bumpScale: GLOBE_BUMP_SCALE } : {}),
           emissive: new THREE.Color(0x0d1520),
           emissiveIntensity: 0.12,
           shininess: 18,
@@ -2669,6 +2758,20 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   // Día/noche según hora del usuario: de día textura clara sin luces; de noche textura con luces de ciudades.
   const showDayGlobe = !isNight;
 
+  // Textura del globo: voltear para norte arriba (North America top, South America bottom).
+  const flipGlobeTexture = useCallback((tex: THREE.Texture | null) => {
+    if (!tex) return;
+    const wrap = (THREE as typeof import('three')).RepeatWrapping ?? 1000;
+    tex.wrapS = wrap;
+    tex.wrapT = wrap;
+    tex.repeat.y = -1;
+    tex.offset.y = 1;
+    if ('center' in tex && typeof (tex as THREE.Texture).center?.set === 'function') {
+      (tex as THREE.Texture).center.set(0.5, 0.5);
+    }
+    tex.needsUpdate = true;
+  }, []);
+
   // Ajustar material del globo según día/noche (textura, emissiveIntensity, shininess)
   useEffect(() => {
     if (!globeMaterial || !('emissiveIntensity' in globeMaterial)) return;
@@ -2677,10 +2780,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     const nightTex = globeNightTexRef.current;
     if (dayTex) phong.map = showDayGlobe ? dayTex : (nightTex ?? dayTex);
     else if (nightTex) phong.map = nightTex;
+    flipGlobeTexture(phong.map);
     phong.needsUpdate = true;
     phong.emissiveIntensity = showDayGlobe ? 0.12 : 0.22;
     phong.shininess = showDayGlobe ? 18 : 14;
-  }, [globeMaterial, showDayGlobe]);
+  }, [globeMaterial, showDayGlobe, flipGlobeTexture]);
 
   const stories = useStories();
   const pulses = usePulses(activeView === 'historias');
@@ -2822,7 +2926,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     isFallback: newsIsFallback,
     newsPoints,
     newsObjectsForGlobe,
-  } = useNewsLayer(selectedTopicId, topicQuery, activeView, fetchNews);
+  } = useNewsLayer(selectedTopicId, topicQuery, activeView as 'historias' | 'actualidad' | 'music' | 'musica' | 'bits', fetchNews);
   /** Fuente canónica: en vista actualidad effectiveNewsItems ya incluye fallback si loading/error/vacío. */
   const newsItems = effectiveNewsItems;
 
@@ -3174,19 +3278,66 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   /** En music mostramos solo puntos de historias filtradas, sin arcos. */
   const journeyArcs = useMemo(() => (view === 'music' ? [] : []), [view]);
 
-  /** Puntos que ve el globo: siempre con lat, lng, altitude y radius para que click/hover funcionen (pointsMerge=false). */
+  /** Capa Huellas (Bits): puntos con lat/lon del JSON, bien visibles en el mapa. */
+  const huellasForGlobe = useMemo(() => {
+    return huellasPuntos
+      .filter((p) => Number.isFinite(p.lat) && Number.isFinite(p.lon))
+      .map((p) => ({
+        kind: 'huella' as const,
+        id: `huella:${p.id}`,
+        lat: p.lat,
+        lng: p.lon,
+        titulo: p.titulo,
+        historia: p.historia,
+        categoria: p.categoria,
+        color: p.color,
+        lugar: p.lugar,
+        pais: p.pais,
+        altitude: 0.02,
+        radius: 0.2,
+      }));
+  }, [huellasPuntos]);
+
+  /** Puntos que ve el globo: en Actualidad/Bits solo Huellas; en Historias/Música, historias + Huellas. */
   const pointsForGlobe = useMemo(() => {
-    if (view === 'music') {
-      return musicPointsData.map((p) => ({ ...p, lat: p.lat, lng: p.lng, altitude: 0.01, radius: 0.22 }));
-    }
-    return pointsData.map((p) => ({
-      ...p,
-      lat: (p as { lat?: number }).lat ?? 0,
-      lng: (p as { lng?: number }).lng ?? 0,
-      altitude: (p as { altitude?: number }).altitude ?? 0.01,
-      radius: (p as { kind?: string; radius?: number }).kind === 'news' ? 0.3 : 0.22,
-    }));
-  }, [view, pointsData, musicPointsData]);
+    if (activeView === 'actualidad' || activeView === 'bits') return huellasForGlobe;
+    const base =
+      view === 'music'
+        ? musicPointsData.map((p) => ({ ...p, lat: p.lat, lng: p.lng, altitude: 0.01, radius: 0.22 }))
+        : pointsData.map((p) => ({
+            ...p,
+            lat: (p as { lat?: number }).lat ?? 0,
+            lng: (p as { lng?: number }).lng ?? 0,
+            altitude: (p as { altitude?: number }).altitude ?? 0.01,
+            radius: (p as { kind?: string; radius?: number }).kind === 'news' ? 0.3 : 0.22,
+          }));
+    return [...base, ...huellasForGlobe];
+  }, [activeView, view, pointsData, musicPointsData, huellasForGlobe]);
+
+  // BITS_DATA: misma fórmula que three-globe (polar2Cartesian) para que los bits coincidan con la textura.
+  const GLOBE_RADIUS = 100;
+  useEffect(() => {
+    const globe = earthMeshRef.current;
+    if (!globe || !globeReady) return;
+    earthMarkersRef.current.forEach((m) => {
+      globe.remove(m);
+      if (m instanceof THREE.Mesh && m.geometry) m.geometry.dispose();
+      if (m instanceof THREE.Mesh && m.material) (m.material as THREE.Material).dispose();
+    });
+    earthMarkersRef.current = [];
+    const R = GLOBE_RADIUS + 0.5;
+    BITS_DATA.forEach((bit) => {
+      const { x, y, z } = latLngToCartesianThreeGlobe(bit.lat, bit.lon, R);
+      const dotGeo = new THREE.SphereGeometry(2, 8, 8);
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xff9944 });
+      const dot = new THREE.Mesh(dotGeo, dotMat);
+      dot.name = 'ALMAMUNDI_MARKER';
+      dot.userData = { bitId: bit.id };
+      dot.position.set(x, -y, z);
+      globe.add(dot);
+      earthMarkersRef.current.push(dot);
+    });
+  }, [globeReady]);
 
   const goToChapter = useCallback((index: number) => {
     const s = journey[index];
@@ -3372,6 +3523,17 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const handlePointClick = useCallback((point: object) => {
     const p = point as StoryPoint & { id?: string; newsId?: string; newsIds?: string[]; kind?: string; lat?: number; lng?: number; chapterIndex?: number };
+    if ((p as { kind?: string }).kind === 'huella') {
+      const lat = (p as { lat?: number }).lat ?? 0;
+      const lng = (p as { lng?: number }).lng ?? 0;
+      if (globeEl.current && (lat !== 0 || lng !== 0)) {
+        try {
+          globeEl.current.pointOfView({ lat, lng, altitude: 1.6 }, 800);
+        } catch {}
+      }
+      setViewCenter({ lat, lng });
+      return;
+    }
     if (view === 'music' && p?.id) {
       openStoryFromMusic(p.id);
       return;
@@ -3402,9 +3564,23 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         setHoverPos(null);
         return;
       }
-      const p = point as StoryPoint & { newsIds?: string[]; newsId?: string; chapterIndex?: number; lat?: number; lng?: number; label?: string; placeLabel?: string; hasText?: boolean; hasAudio?: boolean; hasVideo?: boolean };
+      const p = point as StoryPoint & { kind?: string; newsIds?: string[]; newsId?: string; chapterIndex?: number; lat?: number; lng?: number; label?: string; placeLabel?: string; hasText?: boolean; hasAudio?: boolean; hasVideo?: boolean; titulo?: string; historia?: string; categoria?: string; lugar?: string; pais?: string };
       const lat = p.lat ?? 0;
       const lng = p.lng ?? 0;
+      if ((p as { kind?: string }).kind === 'huella') {
+        setHovered({
+          kind: 'huella',
+          id: (p as { id?: string }).id ?? '',
+          title: (p as { titulo?: string }).titulo ?? 'Huella',
+          subtitle: [(p as { lugar?: string }).lugar, (p as { pais?: string }).pais].filter(Boolean).join(', ') || '—',
+          lat,
+          lng,
+          historia: (p as { historia?: string }).historia,
+          categoria: (p as { categoria?: string }).categoria,
+        });
+        setHoverPos(hoverPosRef.current);
+        return;
+      }
       if (view === 'music' && p?.id) {
         setHovered({
           kind: 'music',
@@ -3526,6 +3702,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const pointRadiusFn = useCallback((point: object) => {
     const p = point as { id?: string; kind?: string };
+    if (p.kind === 'huella') return 0.2;
     if (view === 'music') return 0.22;
     if (p.kind === 'news' || (typeof p.id === 'string' && p.id.startsWith('news:'))) {
       return 0.18;
@@ -3543,7 +3720,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   }, [view, storyPulseConfigs, storyPhaseOffsets, pulseFrame]);
 
   const pointColorFn = useCallback((point: object) => {
-    const p = point as { id?: string; kind?: string; newsIds?: string[]; newsId?: string };
+    const p = point as { id?: string; kind?: string; newsIds?: string[]; newsId?: string; color?: string };
+    if (p.kind === 'huella' && p.color) return hexToRgba(p.color, 0.75);
     if (view === 'music') {
       if (p.id === highlightedStoryId) return 'rgba(255,200,100,0.98)';
       const active = typeof (p as { chapterIndex?: number }).chapterIndex === 'number' && (p as { chapterIndex?: number }).chapterIndex === currentChapterIndex;
@@ -3587,14 +3765,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const handleGlobeReady = useCallback((initialPOV: { lat: number; lng: number; altitude: number }) => {
     if (!globeEl.current) return;
-    setGlobeReady(true);
     try {
       const controls = globeEl.current.controls();
       controls.enableZoom = false;
-      controls.autoRotate = true;
+      controls.autoRotate = false;
       controls.autoRotateSpeed = 0.45;
       if ('enableRotate' in controls) {
-        (controls as { enableRotate: boolean }).enableRotate = true;
+        (controls as { enableRotate: boolean }).enableRotate = false;
       }
       const nearPOV = { lat: 0, lng: -30, altitude: 1.2 };
       basePOVRef.current = embedded ? { ...nearPOV } : { ...initialPOV };
@@ -3625,19 +3802,125 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         }, 800);
       });
 
-      // Reemplazar luces y agregar capa de nubes (después de que MapCanvas haya montado la escena)
+      // Reemplazar luces, encontrar earth mesh (rotación correcta), capa de nubes. setGlobeReady al final para que los dots se creen con el mesh ya asignado.
       setTimeout(() => {
         const scene = globeEl.current?.scene?.() as THREE.Scene | undefined;
         if (!scene) return;
         try {
+          // Buscar el mesh del globo: el que tiene SphereGeometry + material con textura (map). No confundir con nubes.
+          scene.traverse((o: THREE.Object3D) => {
+            if (earthMeshRef.current) return;
+            const mesh = o as THREE.Mesh;
+            const geom = mesh.geometry as THREE.BufferGeometry & { type?: string };
+            const mat = mesh.material as THREE.MeshPhongMaterial | undefined;
+            const hasMap = mat && 'map' in mat && mat.map != null;
+            if (geom?.type === 'SphereGeometry' && hasMap) {
+              earthMeshRef.current = mesh;
+            }
+          });
+          // Fallback: __globeObjType o radio ~100
+          if (!earthMeshRef.current) {
+            scene.traverse((o: THREE.Object3D) => {
+              if (earthMeshRef.current) return;
+              const group = o as THREE.Object3D & { __globeObjType?: string };
+              if (group.__globeObjType === 'globe' && group.children?.length) {
+                const first = group.children[0];
+                if (first && first instanceof THREE.Mesh && first.geometry) {
+                  earthMeshRef.current = first;
+                }
+              }
+            });
+          }
+          if (!earthMeshRef.current) {
+            scene.traverse((o: THREE.Object3D) => {
+              if (earthMeshRef.current) return;
+              const mesh = o as THREE.Mesh;
+              const geom = mesh.geometry as THREE.BufferGeometry & { type?: string; parameters?: { radius?: number } };
+              const r = geom?.parameters?.radius;
+              if (geom?.type === 'SphereGeometry' && r != null && r >= 95 && r <= 105) {
+                earthMeshRef.current = mesh;
+              }
+            });
+          }
+          if (earthMeshRef.current) {
+            const globeMesh = earthMeshRef.current;
+            // Voltear la TEXTURA verticalmente (norte arriba): así no depende de qué mesh rotemos.
+            const mat = globeMesh.material as THREE.MeshPhongMaterial & { map?: THREE.Texture };
+            if (mat?.map) {
+              const wrap = (THREE as typeof import('three')).RepeatWrapping ?? 1000;
+              mat.map.wrapS = wrap;
+              mat.map.wrapT = wrap;
+              mat.map.repeat.y = -1;
+              mat.map.offset.y = 1;
+              if (mat.map.center) mat.map.center.set(0.5, 0.5);
+              mat.map.needsUpdate = true;
+            }
+            // Norte arriba: 180° en X (North America top, South America bottom). Y inicial centra Américas/Atlántico.
+            globeMesh.rotation.x = Math.PI;
+            globeMesh.rotation.z = 0.41;
+            globeMesh.rotation.y = -1.8;
+          }
           scene.background = null;
           const renderer = globeEl.current?.renderer?.() as THREE.WebGLRenderer | undefined;
           if (renderer) {
             renderer.setClearColor(0x000000, 0);
             if (typeof renderer.setClearAlpha === 'function') renderer.setClearAlpha(0);
             const canvas = renderer.domElement as HTMLCanvasElement;
-            if (canvas) canvas.style.background = 'transparent';
+            if (canvas) {
+              canvas.style.background = 'transparent';
+              const getClientX = (e: PointerEvent | TouchEvent) => ('clientX' in e ? e.clientX : e.touches[0]?.clientX ?? 0);
+              const onPointerDown = (e: PointerEvent | TouchEvent) => {
+                isDraggingRef.current = true;
+                didDragThisPointerRef.current = false;
+                velocityYRef.current = 0;
+                prevMouseXRef.current = getClientX(e);
+              };
+              const onPointerMove = (e: PointerEvent | TouchEvent) => {
+                if (!isDraggingRef.current || !earthMeshRef.current) return;
+                const clientX = getClientX(e);
+                const delta = clientX - prevMouseXRef.current;
+                if (Math.abs(delta) > 2) didDragThisPointerRef.current = true;
+                // Arrastrar a la derecha = globo gira como si lo agarras (el mapa sigue el dedo). Sentido coherente con la Tierra.
+                earthMeshRef.current.rotation.y -= delta * 0.005;
+                velocityYRef.current = -delta * 0.005;
+                prevMouseXRef.current = clientX;
+              };
+              const onPointerUp = () => {
+                isDraggingRef.current = false;
+              };
+              canvas.addEventListener('pointerdown', onPointerDown as (e: PointerEvent) => void);
+              canvas.addEventListener('pointermove', onPointerMove as (e: PointerEvent) => void);
+              canvas.addEventListener('pointerup', onPointerUp);
+              canvas.addEventListener('pointerleave', onPointerUp);
+              canvas.addEventListener('touchstart', onPointerDown as (e: TouchEvent) => void, { passive: true });
+              canvas.addEventListener('touchmove', onPointerMove as (e: TouchEvent) => void, { passive: true });
+              canvas.addEventListener('touchend', onPointerUp);
+              const raycaster = new THREE.Raycaster();
+              const mouse = new THREE.Vector2();
+              const onCanvasClick = (e: MouseEvent) => {
+                if (didDragThisPointerRef.current) return;
+                const rect = canvas.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                const camera = globeEl.current?.camera?.();
+                if (!camera || earthMarkersRef.current.length === 0) return;
+                raycaster.setFromCamera(mouse, camera);
+                const hits = raycaster.intersectObjects(earthMarkersRef.current);
+                if (hits.length > 0) {
+                  const bitId = hits[0].object.userData.bitId as number;
+                  const bit = BITS_DATA.find((b) => b.id === bitId);
+                  if (bit) {
+                    setSelectedBit(bit);
+                    setDrawerOpen(true);
+                    setDrawerMode('bits');
+                    setActiveView('bits');
+                  }
+                }
+              };
+              canvas.addEventListener('click', onCanvasClick);
+            }
           }
+          setGlobeReady(true);
           // Reemplazar luces existentes por la nueva iluminación
           ['AM_LIGHT', 'KEY_LIGHT', 'FILL_LIGHT', 'RIM_LIGHT'].forEach((name) => {
             const obj = scene.getObjectByName(name);
@@ -3660,7 +3943,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           scene.add(rimLight);
 
           // Capa de nubes (estilo mapa mundi / iPhone)
-          const cloudGeo = new THREE.SphereGeometry(1.004, 64, 64);
+          const cloudGeo = new THREE.SphereGeometry(100.4, 64, 64);
           const cloudLoader = new THREE.TextureLoader();
           cloudLoader.load(
             '/textures/earth-clouds.png',
@@ -3705,11 +3988,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (mode === 'stories' || mode === 'search') setActiveView('historias');
     else if (mode === 'news') setActiveView('actualidad');
     else if (mode === 'sounds') setActiveView('musica');
+    else if (mode === 'bits') setActiveView('bits');
     setDrawerMode(mode);
     setDrawerOpen((prev) => (prev && drawerMode === mode ? false : true));
   }, [drawerMode, embedded, universeVisible]);
 
-  /** Centrar el globo en la ubicación del usuario (ej. Tunquén). Actualiza base orbit para return-to-base. */
+  /** Centrar el globo en la ubicación del usuario (ej. Región Metropolitana). Actualiza base orbit para return-to-base. */
   useEffect(() => {
     if (!globeReady || !globeEl.current) return;
     getApproxLocation().then((loc) => {
@@ -4103,7 +4387,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           <>
             <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={MAP_TOP_BAR_PX + 8} navbarZIndex={50} />
             <MapDock
-              activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'sounds'}
+              activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
               onModeChange={handleDockModeChange}
               onResetView={handleResetView}
               drawerOpen={drawerOpen}
@@ -4113,7 +4397,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             <MapDrawer
               open={drawerOpen}
               mode={drawerMode}
-              onClose={() => setDrawerOpen(false)}
+              onClose={() => {
+                setDrawerOpen(false);
+                if (drawerMode === 'bits') setSelectedBit(null);
+              }}
               isMobile={isMobile}
             >
               {drawerMode === 'stories' || drawerMode === 'search' ? (
@@ -4126,6 +4413,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 />
               ) : drawerMode === 'news' ? (
                 <NewsPanel {...noticiasProps} />
+              ) : drawerMode === 'bits' ? (
+                <BitsPanel
+                  bits={BITS_DATA}
+                  selectedBit={selectedBit}
+                  onSelectBit={(bit) => setSelectedBit(bit as BitEntry | null)}
+                  onSubirMiHistoria={() => {
+                    setDrawerOpen(false);
+                    router.push('/#historias');
+                  }}
+                />
               ) : (
                 <SoundsPanel {...sonidosProps} />
               )}
@@ -4269,6 +4566,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               { id: 'historias',  label: 'Historias' },
               { id: 'musica',     label: 'Sonidos'   },
               { id: 'actualidad', label: 'Noticias'  },
+              { id: 'bits',       label: 'Bits'      },
             ].map(tab => {
               const isActive = activeView === tab.id;
               return (
@@ -4386,6 +4684,29 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 </p>
               </>
             )}
+            {activeView === 'bits' && (
+              <>
+                <p style={{
+                  fontSize: 18,
+                  fontWeight: 300,
+                  color: 'rgba(255,255,255,0.90)',
+                  margin: '0 0 5px',
+                  lineHeight: 1.3,
+                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                }}>
+                  Datos inesperados del mundo.
+                </p>
+                <p style={{
+                  fontSize: 13,
+                  color: 'rgba(255,255,255,0.38)',
+                  margin: 0,
+                  lineHeight: 1.55,
+                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                }}>
+                  Cada punto es una huella: curiosidades, paradojas y formas de vivir. Toca un punto para leer.
+                </p>
+              </>
+            )}
           </div>
 
           {/* ── CONTENIDO ─────────────────────────────────────────────── */}
@@ -4393,6 +4714,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'historias' && <HistoriasPanel {...historiasProps} />}
             {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} />}
             {activeView === 'musica' && <SonidosPanel {...sonidosProps} />}
+            {activeView === 'bits' && (
+              <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+                <p className="mb-4">Los puntos en el mapa son Bits: datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
+                <p className="text-white/50 text-xs">Categorías: Dato insólito, Vivir distinto, Paradoja moderna, Para pensar.</p>
+              </div>
+            )}
           </div>
 
         </div>
@@ -4539,7 +4866,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-30 flex justify-center w-full [&>*]:pointer-events-auto pointer-events-none">
               <div className="max-w-[980px] w-[min(980px,calc(100vw-48px))]">
                 <MapDock
-                activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : 'sounds'}
+                activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
                 onModeChange={handleDockModeChange}
                 onResetView={handleResetView}
                 drawerOpen={drawerOpen}
@@ -4553,7 +4880,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             <MapDrawer
               open={drawerOpen}
               mode={drawerMode}
-              onClose={() => setDrawerOpen(false)}
+              onClose={() => {
+                setDrawerOpen(false);
+                if (drawerMode === 'bits') setSelectedBit(null);
+              }}
               isMobile={isMobile}
             >
               {drawerMode === 'stories' || drawerMode === 'search' ? (
@@ -4566,6 +4896,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 />
               ) : drawerMode === 'news' ? (
                 <NewsPanel {...noticiasProps} />
+              ) : drawerMode === 'bits' ? (
+                <BitsPanel
+                  bits={BITS_DATA}
+                  selectedBit={selectedBit}
+                  onSelectBit={(bit) => setSelectedBit(bit as BitEntry | null)}
+                  onSubirMiHistoria={() => {
+                    setDrawerOpen(false);
+                    router.push('/#historias');
+                  }}
+                />
               ) : (
                 <SoundsPanel {...sonidosProps} />
               )}
@@ -4600,7 +4940,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         atmosphereColor={showDayGlobe ? '#7eb8e8' : 'rgba(80, 140, 220, 0.7)'}
         atmosphereAltitude={0.22}
         backgroundColor={GLOBE_CANVAS_BG}
-        pointsData={activeView === 'actualidad' ? [] : pointsForGlobe}
+        pointsData={[]}
         pointLat="lat"
         pointLng="lng"
         pointColor={pointColorFn}
@@ -4674,14 +5014,27 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         <div className="grainOverlay" aria-hidden="true" />
         {hovered && hoverPos && (
           <div
-            className={`glassPanel fixed z-[100] max-w-[260px] px-3 py-2 rounded-xl shadow-lg ${hovered.kind === 'news' && hovered.url ? 'pointer-events-auto' : 'pointer-events-none'}`}
+            className={`glassPanel fixed z-[100] max-w-[280px] px-3 py-2.5 rounded-xl shadow-lg ${hovered.kind === 'news' && hovered.url ? 'pointer-events-auto' : 'pointer-events-none'}`}
             style={{
-              left: typeof window !== 'undefined' ? Math.min(hoverPos.x + 14, window.innerWidth - 280) : hoverPos.x + 14,
+              left: typeof window !== 'undefined' ? Math.min(hoverPos.x + 14, window.innerWidth - 300) : hoverPos.x + 14,
               top: hoverPos.y + 14,
             }}
             aria-hidden={hovered.kind !== 'news' || !hovered.url}
           >
-            {hovered.kind === 'news' ? (
+            {hovered.kind === 'huella' ? (
+              <>
+                {hovered.categoria && (
+                  <span className="text-[10px] font-medium tracking-wide text-white/50 uppercase block mb-1">{hovered.categoria}</span>
+                )}
+                <p className="text-sm font-semibold text-white/95 leading-snug">{hovered.title}</p>
+                <p className="text-[11px] text-white/60 mt-0.5">{hovered.subtitle}</p>
+                {hovered.historia && (
+                  <p className="text-[12px] text-white/75 mt-2 line-clamp-3 leading-relaxed">
+                    {hovered.historia.slice(0, 140)}{hovered.historia.length > 140 ? '…' : ''}
+                  </p>
+                )}
+              </>
+            ) : hovered.kind === 'news' ? (
               <>
                 <p className="text-[11px] text-white/70 truncate">{hovered.subtitle}</p>
                 <p className="text-sm font-semibold text-white truncate mt-0.5">{hovered.title}</p>

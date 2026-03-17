@@ -34,8 +34,6 @@ export default function MuestrasListPage() {
 
   useEffect(() => {
     let cancelled = false;
-    setLoading(true);
-    setError('');
     fetch('/api/muestras')
       .then((res) => res.json())
       .then((data) => {

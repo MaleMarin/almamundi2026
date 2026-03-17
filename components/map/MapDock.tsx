@@ -1,6 +1,6 @@
 'use client';
 
-export type MapDockMode = 'stories' | 'news' | 'sounds' | 'search';
+export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search';
 
 type MapDockProps = {
   activeMode: MapDockMode;
@@ -71,11 +71,12 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
     ? { position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 25 }
     : { position: 'fixed', top: topPx, left: '50%', transform: 'translateX(-50%)', zIndex: dockZ };
 
-  /** Orden: Historias, Sonidos, Noticias, Buscar por palabras clave. */
+  /** Orden: Historias, Sonidos, Noticias, Bits, Buscar por palabras clave. */
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
     { mode: 'sounds', label: 'Sonidos' },
     { mode: 'news', label: 'Noticias' },
+    { mode: 'bits', label: 'Bits' },
     { mode: 'search', label: 'Buscar por palabras clave' },
   ];
 

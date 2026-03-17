@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import type { NewsItem } from '@/components/NewsLayer';
 import { NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 
@@ -59,9 +60,19 @@ function NewsRow({
   onClick: () => void;
   dimmed?: boolean;
 }) {
-  const timeAgo = (date: string | null) => {
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const raf = requestAnimationFrame(() => setNow(Date.now()));
+    const id = setInterval(() => setNow(Date.now()), 60000);
+    return () => {
+      cancelAnimationFrame(raf);
+      clearInterval(id);
+    };
+  }, []);
+
+  const timeAgo = (date: string | null, currentTime: number) => {
     if (!date) return '';
-    const diff = Date.now() - new Date(date).getTime();
+    const diff = currentTime - new Date(date).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 60) return `hace ${mins}m`;
     const hrs = Math.floor(mins / 60);
@@ -109,7 +120,7 @@ function NewsRow({
           {news.source ?? news.outletName ?? '—'}
         </span>
         <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }} title={news.publishedAt ?? undefined}>
-          {timeAgo(news.publishedAt ?? null)}
+          {timeAgo(news.publishedAt ?? null, now)}
         </span>
       </div>
     </button>

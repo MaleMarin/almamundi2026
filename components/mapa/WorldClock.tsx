@@ -19,7 +19,7 @@ function getLocalTimeZone(): string {
 
 /** Nombre de ciudad a partir del id de zona (fallback cuando no hay geolocalización). */
 function getCityFromTimeZone(timeZone: string): string {
-  if (timeZone === 'America/Santiago') return 'TUNQUÉN';
+  if (timeZone === 'America/Santiago') return 'REGIÓN METROPOLITANA';
   const part = timeZone.split('/').pop();
   if (!part) return 'LOCAL';
   return part.replace(/_/g, ' ').toUpperCase();

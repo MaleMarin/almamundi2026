@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { StorySubmission, StoryFormat, StoryMood, Consent } from "@/lib/firebase/types";
+import { analyzeStory } from "@/lib/huella/analyze";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const FORMATS: StoryFormat[] = ["text", "audio", "video", "image"];
-const MOODS: StoryMood[] = ["mar", "ciudad", "bosque", "animales", "universo", "personas"];
+const MOODS: StoryMood[] = ["mar", "ciudad", "bosque", "animales", "universo", "personas", "radio", "lluvia", "mercado"];
 
 function validConsent(c: unknown): c is Consent {
   return (
@@ -77,14 +79,53 @@ export async function POST(request: NextRequest) {
     if (text) doc.text = text;
     if (Object.keys(media).length) doc.media = media;
 
-    const db = getAdminDb();
-    const ref = await db.collection("story_submissions").add(doc);
+    let ref: DocumentReference;
+    try {
+      const db = getAdminDb();
+      ref = await db.collection("story_submissions").add(doc);
+      console.log("[submit] Historia guardada en Firestore:", ref.id, "|", title);
+    } catch (dbError) {
+      const msg = dbError instanceof Error ? dbError.message : "";
+      if (/Firebase Admin|FIREBASE_|config/i.test(msg)) {
+        console.warn("submit: Firebase no configurado; respuesta de desarrollo. Configura FIREBASE_* en .env.local para guardar en Firestore.");
+        return NextResponse.json({ ok: true, id: `dev-${Date.now()}` });
+      }
+      throw dbError;
+    }
 
-    return NextResponse.json({ ok: true, id: ref.id });
+    let visualParams: unknown = undefined;
+    let transcription: string | undefined = undefined;
+    if (process.env.OPENAI_API_KEY) {
+      try {
+        const result = await analyzeStory({
+          text,
+          audioUrl: media.audioUrl,
+          videoUrl: media.videoUrl,
+          format,
+        });
+        visualParams = result.visualParams;
+        transcription = result.transcription;
+        if (ref && (visualParams != null || transcription != null)) {
+          const update: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
+          if (visualParams != null) update.huellaVisualParams = visualParams;
+          if (transcription != null) update.transcription = transcription;
+          await ref.update(update);
+        }
+      } catch (e) {
+        console.warn("[submit] Análisis huella (Whisper/GPT) falló:", e);
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      id: ref.id,
+      ...(visualParams != null && { visualParams }),
+      ...(transcription != null && { transcription }),
+    });
   } catch (e) {
     console.error("submit", e);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Submit failed" },
+      { error: "No pudimos guardar tu historia. Intenta más tarde o revisa tu conexión." },
       { status: 500 }
     );
   }

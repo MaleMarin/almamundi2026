@@ -12,6 +12,24 @@ export type StoriesPanelProps = {
   onContarMiHistoria?: () => void;
 };
 
+function formatStoryType(s: StoryPoint): string {
+  if (s.hasVideo) return 'video';
+  if (s.hasAudio) return 'audio';
+  if (s.body || s.hasText) return 'texto';
+  if (s.imageUrl || (s.photos?.length ?? 0) > 0) return 'foto';
+  return 'texto';
+}
+
+function timeAgo(publishedAt: string | undefined): string {
+  if (!publishedAt) return '';
+  const diff = Date.now() - new Date(publishedAt).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `hace ${mins}m`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `hace ${hrs}h`;
+  return `hace ${Math.floor(hrs / 24)}d`;
+}
+
 function StoryRow({
   story,
   isActive,
@@ -21,6 +39,8 @@ function StoryRow({
   isActive: boolean;
   onClick: () => void;
 }) {
+  const tipo = formatStoryType(story);
+  const ago = timeAgo(story.publishedAt);
   return (
     <button
       type="button"
@@ -50,9 +70,14 @@ function StoryRow({
       }}>
         {story.title ?? story.label}
       </p>
-      <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-        {[story.city, story.country].filter(Boolean).join(', ')}
-      </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+          {[story.city, story.country].filter(Boolean).join(', ')}
+        </span>
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
+          {tipo}{ago ? ` · ${ago}` : ''}
+        </span>
+      </div>
     </button>
   );
 }

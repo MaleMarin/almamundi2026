@@ -20,8 +20,10 @@ function useElementSize<T extends HTMLElement>() {
       setHeight(r?.height ?? 700);
     });
     ro.observe(el);
-    setWidth(el.clientWidth || 900);
-    setHeight(el.clientHeight || 700);
+    requestAnimationFrame(() => {
+      setWidth(el.clientWidth || 900);
+      setHeight(el.clientHeight || 700);
+    });
     return () => ro.disconnect();
   }, []);
   return { ref, width, height };
@@ -50,6 +52,8 @@ const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
 
 export type MapCanvasGlobeRef = {
   pointOfView: (pov: { lat: number; lng: number; altitude: number }, t?: number) => void;
+  /** Convierte lat/lng a posición 3D en la escena (x, y, z). Útil para fijar puntos al globo. */
+  getCoords?: (lat: number, lng: number, altitude?: number) => { x: number; y: number; z: number };
   controls: () => {
     enableZoom: boolean;
     autoRotate: boolean;
@@ -135,10 +139,10 @@ function setupRendererAndLights(
 ) {
   const g = globeRef.current;
   if (!g) return;
-  const renderer = g.renderer?.() as any;
+  const renderer = g.renderer?.() as (import('three').WebGLRenderer & { alpha?: boolean }) | undefined;
   if (!renderer) return;
   try {
-    if (typeof renderer.alpha !== 'undefined') renderer.alpha = true;
+    if (typeof (renderer as { alpha?: boolean }).alpha !== 'undefined') (renderer as { alpha?: boolean }).alpha = true;
     renderer.setPixelRatio?.(Math.min(2, typeof window !== 'undefined' ? window.devicePixelRatio || 1 : 1));
     if (typeof renderer.toneMapping !== 'undefined') {
       renderer.toneMapping = 4;
@@ -179,10 +183,11 @@ function setupRendererAndLights(
             rim.position.set(0.0, 2.4, -3.2);
             scene.add(rim);
           }
-          const maxAnisotropy = (renderer as any)?.capabilities?.maxAnisotropy ?? 1;
+          const caps = renderer?.capabilities as { maxAnisotropy?: number; getMaxAnisotropy?: () => number } | undefined;
+          const maxAnisotropy = caps?.maxAnisotropy ?? (typeof caps?.getMaxAnisotropy === 'function' ? caps.getMaxAnisotropy() : 1);
           scene.traverse((mesh: import('three').Object3D) => {
             if (mesh instanceof THREE.Mesh) {
-              const mat = (mesh as any)?.material;
+              const mat = (mesh as import('three').Mesh).material;
               if (mat && 'opacity' in mat) {
                 const phongMat = mat as import('three').MeshPhongMaterial;
                 if (phongMat?.map) {
@@ -291,6 +296,9 @@ export function MapCanvas({
   bottomReservePx,
   topReservePx,
 }: MapCanvasProps) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   const sizeHook = useElementSize<HTMLDivElement>();
   const embedWrapRef = useRef<HTMLDivElement>(null);
   const [embedSize, setEmbedSize] = useState({ w: 0, h: 0 });
@@ -314,10 +322,12 @@ export function MapCanvas({
   }, [embedded]);
 
   const useInternalSize = widthProp == null || heightProp == null;
+  const measured = sizeHook.width > 0 && sizeHook.height > 0;
+  const fallback = typeof window !== 'undefined' ? Math.max(minGlobeSize, Math.min(window.innerWidth, window.innerHeight) - 300) : minGlobeSize;
   const width =
-    embedded ? embedSize.w : (widthProp ?? (sizeHook.width && sizeHook.height ? Math.max(minGlobeSize, Math.min(sizeHook.width, sizeHook.height)) : minGlobeSize));
+    embedded ? embedSize.w : (widthProp ?? (measured ? Math.max(minGlobeSize, Math.min(sizeHook.width, sizeHook.height)) : fallback));
   const height =
-    embedded ? embedSize.h : (heightProp ?? (sizeHook.width && sizeHook.height ? Math.max(minGlobeSize, Math.min(sizeHook.width, sizeHook.height)) : minGlobeSize));
+    embedded ? embedSize.h : (heightProp ?? (measured ? Math.max(minGlobeSize, Math.min(sizeHook.width, sizeHook.height)) : fallback));
   const pointColorFn = useCallback(
     (d: object) => (pointColor ? pointColor(d) : '#ff4500'),
     [pointColor]
@@ -359,13 +369,13 @@ export function MapCanvas({
   const globeBlock = (injectedOnGlobeReady: () => void) => (
     <div
       className="relative z-[2] w-full h-full flex items-center justify-center min-w-0 min-h-0 pointer-events-none"
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
+      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', minWidth: 400, minHeight: 620 }}
     >
       <div
         style={
           embedded
-            ? { width: '100%', height: '100%' }
-            : { width, height }
+            ? { width: '100%', height: '100%', minWidth: 200, minHeight: 200 }
+            : { width: Math.max(400, width), height: Math.max(400, height) }
         }
         className="pointer-events-auto"
       >
@@ -416,6 +426,20 @@ export function MapCanvas({
       </div>
     </div>
   );
+
+  if (!mounted)
+    return (
+      <div
+        style={{
+          width: '100%',
+          height: '100%',
+          minHeight: 600,
+          background: '#0F172A',
+          borderRadius: '50%',
+        }}
+        aria-hidden
+      />
+    );
 
   if (embedded) {
     const onReady = () => onGlobeReady(EMBEDDED_POV);

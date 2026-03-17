@@ -1,0 +1,182 @@
+'use client';
+
+/**
+ * /historias/[id] — Historia individual. Neumorfismo fuerte.
+ * Texto a la izquierda, vídeo/audio/imagen a la derecha, CTA "Subir mi historia", Más historias de [país].
+ */
+import { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+import { neu } from '@/lib/historias-neumorph';
+import type { StoryPoint } from '@/lib/map-data/stories';
+
+type SimilarStory = {
+  id: string;
+  title: string;
+  label?: string;
+  description?: string;
+  city?: string | null;
+  country?: string | null;
+  format?: string;
+  publishedAt?: string | null;
+};
+
+function formatPlace(s: StoryPoint): string {
+  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '—';
+}
+
+function timeAgo(publishedAt: string | undefined): string {
+  if (!publishedAt) return '—';
+  const d = new Date(publishedAt);
+  const now = new Date();
+  const diff = now.getTime() - d.getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days === 0) return 'hoy';
+  if (days === 1) return 'ayer';
+  if (days < 7) return `hace ${days} días`;
+  if (days < 14) return 'hace 1 semana';
+  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+}
+
+export default function HistoriasIdPage() {
+  const params = useParams();
+  const id = params?.id as string;
+  const [story, setStory] = useState<StoryPoint | null>(null);
+  const [similar, setSimilar] = useState<SimilarStory[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    fetch(`/api/stories/${id}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { story?: StoryPoint } | null) => {
+        if (!cancelled && data?.story) setStory(data.story);
+      })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
+  }, [id]);
+
+  useEffect(() => {
+    if (!id) return;
+    let cancelled = false;
+    fetch(`/api/stories/${id}/similar`)
+      .then((r) => (r.ok ? r.json() : { similar: [] }))
+      .then((data: { similar?: SimilarStory[] }) => {
+        if (!cancelled && Array.isArray(data.similar)) setSimilar(data.similar.filter((s) => s.id !== id));
+      });
+    return () => { cancelled = true; };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+        <p style={{ color: neu.textBody }}>Cargando…</p>
+      </main>
+    );
+  }
+  if (!story) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+        <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
+        <Link href="/historias" className="px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>← Historias</Link>
+      </main>
+    );
+  }
+
+  const place = formatPlace(story);
+  const hasVideo = Boolean(story.videoUrl || story.hasVideo);
+  const hasAudio = Boolean(story.audioUrl || story.hasAudio);
+  const hasImage = Boolean(story.imageUrl);
+
+  return (
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-lg font-light tracking-wide" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <div className="flex items-center gap-2">
+          <Link href="/historias" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>← Historias</Link>
+          <Link href="/#intro" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <Link href="/#mapa" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+        </div>
+      </nav>
+
+      <section className="px-6 md:px-12 py-8 max-w-6xl mx-auto">
+        <Link href="/historias" className="inline-flex items-center gap-2 text-sm mb-8" style={{ color: neu.textBody }}>← Historias</Link>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
+          <div>
+            <div className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-3">{place} · {hasVideo ? 'Video' : hasAudio ? 'Audio' : hasImage ? 'Foto' : 'Texto'} · {timeAgo(story.publishedAt)}</div>
+            <h1 className="font-serif text-3xl md:text-4xl font-light leading-tight mb-4" style={{ color: neu.textMain }}>{story.title || 'Sin título'}</h1>
+            {story.body && (
+              <div className="text-base leading-relaxed mb-8" style={{ color: neu.textBody }}>
+                {story.body}
+              </div>
+            )}
+            <div className="rounded-2xl p-6 mb-8" style={neu.cardInset}>
+              <p className="font-serif text-xl italic mb-2" style={{ color: neu.textMain }}>¿Estuviste aquí o conocés algo de este lugar?</p>
+              <p className="text-sm mb-4" style={{ color: neu.textBody }}>Contá tu historia o experiencia.</p>
+              <Link
+                href="/#historias"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors"
+              >
+                + Subir mi historia
+              </Link>
+            </div>
+          </div>
+          <div>
+            <div className="rounded-2xl overflow-hidden aspect-video flex items-center justify-center" style={neu.card}>
+              {hasVideo && story.videoUrl ? (
+                <video src={story.videoUrl} controls className="w-full h-full object-contain" />
+              ) : hasAudio && story.audioUrl ? (
+                <div className="p-8 w-full">
+                  <audio src={story.audioUrl} controls className="w-full" />
+                </div>
+              ) : hasImage && story.imageUrl ? (
+                <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-20 h-20 rounded-full flex items-center justify-center" style={neu.cardInset}>
+                  <span className="text-4xl opacity-50">📖</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-300/40 pt-8">
+          <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">
+            {story.country ? `Más historias de ${story.country}` : 'Más historias'}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mb-6">
+            {similar.slice(0, 3).map((s) => (
+              <Link
+                key={s.id}
+                href={`/historias/${s.id}`}
+                className="block p-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.99]"
+                style={neu.card}
+              >
+                <div className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-1">
+                  {[s.city, s.country].filter(Boolean).join(', ') || '—'}
+                </div>
+                <h3 className="font-serif font-medium text-gray-800 line-clamp-2 text-sm">{s.title || 'Sin título'}</h3>
+              </Link>
+            ))}
+          </div>
+          <Link href="/historias" className="inline-block px-5 py-2.5 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Ver todas las historias</Link>
+        </div>
+      </section>
+
+      <footer className="py-8 px-6 border-t border-gray-300/40 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div>
+          <div className="font-medium mb-1" style={{ color: neu.textMain }}>AlmaMundi</div>
+          <div className="text-xs" style={{ color: neu.textBody }}>Una iniciativa de PRECISAR</div>
+        </div>
+        <div className="flex gap-6">
+          <Link href="/#intro" className="text-sm" style={{ color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#mapa" className="text-sm" style={{ color: neu.textBody }}>Mapa</Link>
+          <Link href="/historias" className="text-sm font-medium" style={{ color: neu.textMain }}>Historias</Link>
+        </div>
+      </footer>
+    </main>
+  );
+}

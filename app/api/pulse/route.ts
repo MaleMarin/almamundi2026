@@ -44,18 +44,32 @@ export async function POST(req: NextRequest) {
   }
 }
 
+const PULSE_TIMEOUT_MS = 8000;
+
+function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error('Pulse timeout')), ms)
+    ),
+  ]);
+}
+
 export async function GET(req: NextRequest) {
   try {
     const db = getAdminDb();
     const storyId = new URL(req.url ?? '', 'http://localhost').searchParams.get('storyId');
 
     if (storyId) {
-      const snap = await db
-        .collection('pulses')
-        .where('storyId', '==', storyId)
-        .orderBy('createdAt', 'desc')
-        .limit(50)
-        .get();
+      const snap = await withTimeout(
+        db
+          .collection('pulses')
+          .where('storyId', '==', storyId)
+          .orderBy('createdAt', 'desc')
+          .limit(50)
+          .get(),
+        PULSE_TIMEOUT_MS
+      );
 
       const pulses = snap.docs.map((doc) => {
         const d = doc.data();
@@ -65,12 +79,15 @@ export async function GET(req: NextRequest) {
     }
 
     const fiveMinAgo = new Date(Date.now() - 5 * 60 * 1000);
-    const snap = await db
-      .collection('pulses')
-      .where('createdAt', '>=', fiveMinAgo)
-      .orderBy('createdAt', 'desc')
-      .limit(100)
-      .get();
+    const snap = await withTimeout(
+      db
+        .collection('pulses')
+        .where('createdAt', '>=', fiveMinAgo)
+        .orderBy('createdAt', 'desc')
+        .limit(100)
+        .get(),
+      PULSE_TIMEOUT_MS
+    );
 
     const pulses = snap.docs.map((doc) => {
       const d = doc.data();
@@ -89,6 +106,6 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ pulses });
   } catch (err) {
     console.error('[GET /api/pulse]', err);
-    return NextResponse.json({ pulses: [] }, { status: 500 });
+    return NextResponse.json({ pulses: [] }, { status: 200 });
   }
 }

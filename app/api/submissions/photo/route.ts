@@ -59,7 +59,7 @@ export async function POST(req: Request) {
       },
     });
 
-    let publicUrl = `https://storage.googleapis.com/${bucket.name}/${objectPath}`;
+    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${objectPath}`;
     try {
       await obj.makePublic();
     } catch {

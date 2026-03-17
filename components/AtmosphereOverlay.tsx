@@ -56,13 +56,18 @@ export function AtmosphereOverlay({
   );
 }
 
+// Reserved for overlay labels; unused in current UI
+// eslint-disable-next-line @typescript-eslint/no-unused-vars -- kept for future use
 function AtmosphereLabel({ label }: { label: string }) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    setVisible(true);
-    const id = setTimeout(() => setVisible(false), 4000);
-    return () => clearTimeout(id);
+    const id = requestAnimationFrame(() => setVisible(true));
+    const id2 = setTimeout(() => setVisible(false), 4000);
+    return () => {
+      cancelAnimationFrame(id);
+      clearTimeout(id2);
+    };
   }, [label]);
 
   if (!label) return null;

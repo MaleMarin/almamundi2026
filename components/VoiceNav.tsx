@@ -66,7 +66,7 @@ export function VoiceNav() {
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
 
   useEffect(() => {
-    setSupported(Boolean(SpeechRecognition));
+    requestAnimationFrame(() => setSupported(Boolean(SpeechRecognition)));
   }, []);
 
   const startListening = useCallback(() => {

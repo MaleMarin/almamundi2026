@@ -26,6 +26,7 @@ export function GlobeLive({ cameras, width = 800, height = 600 }: Props) {
     }));
   }, [cameras]);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- react-globe.gl point type
   const handlePointClick = useCallback((point: any) => {
     const camera = cameras.find(
       (c) => Math.abs(c.lat - point.lat) < 0.1 && Math.abs(c.lng - point.lng) < 0.1

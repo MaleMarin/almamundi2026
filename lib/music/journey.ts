@@ -1,7 +1,7 @@
 import type { SoundMood, StoryMeta } from "@/lib/map-data/story-meta";
 
 /** Target de intensidad por mood (para scoring +1 si cercano) */
-const MOOD_TARGET_INTENSITY = {
+const MOOD_TARGET_INTENSITY: Record<SoundMood, number> = {
   mar: 0.4,
   ciudad: 0.3,
   bosque: 0.5,
@@ -9,7 +9,10 @@ const MOOD_TARGET_INTENSITY = {
   animales: 0.2,
   viento: 0.3,
   universo: 0.4,
-} satisfies Record<SoundMood, number>;
+  radio: 0.3,
+  lluvia: 0.3,
+  mercado: 0.3,
+};
 
 /** Keywords de sonido asociados a cada mood (para +2 por match) */
 const MOOD_SOUND_TAGS: Record<SoundMood, string[]> = {
@@ -20,6 +23,9 @@ const MOOD_SOUND_TAGS: Record<SoundMood, string[]> = {
   animales: ["aves", "insectos", "cantos", "naturaleza"],
   universo: ["estático", "vacio", "noche"],
   personas: ["multitud", "mercado", "voces", "metro"],
+  radio: ["radio", "música", "voces"],
+  lluvia: ["lluvia", "goteo", "tormenta"],
+  mercado: ["mercado", "voces", "multitud"],
 };
 
 function scoreStory(story: StoryMeta, mood: SoundMood): number {

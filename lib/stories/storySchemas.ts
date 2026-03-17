@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const StoryMood = z.enum(["mar", "ciudad", "bosque", "animales", "universo", "personas"]);
+export const StoryMood = z.enum(["mar", "ciudad", "bosque", "animales", "universo", "personas", "radio", "lluvia", "mercado"]);
 export type StoryMood = z.infer<typeof StoryMood>;
 
 export const StoryFormat = z.enum(["text", "audio", "video"]);

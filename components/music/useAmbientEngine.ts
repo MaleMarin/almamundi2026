@@ -7,6 +7,7 @@ export type { SoundMood };
 
 export function useAmbientEngine() {
   const ctxRef = useRef<AudioContext | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- audio node graph is dynamic
   const nodesRef = useRef<any>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -17,7 +18,7 @@ export function useAmbientEngine() {
   async function start(mood: SoundMood) {
     if (isRunning) return;
 
-    const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const ctx = new (window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext)();
     ctxRef.current = ctx;
 
     // Asegurar AudioContext: resume si está suspendido (gesto de usuario); si falla, el caller muestra "Activar sonido"
@@ -37,7 +38,7 @@ export function useAmbientEngine() {
     const whooshBufferSize = Math.ceil(ctx.sampleRate * whooshDuration);
     const whooshBuffer = ctx.createBuffer(1, whooshBufferSize, ctx.sampleRate);
     const whooshData = whooshBuffer.getChannelData(0);
-    for (let i = 0; i < whooshBufferSize; i++) whooshData[i] = (Math.random() * 2 - 1) * 0.6;
+    for (let i = 0; i < whooshBufferSize; i++) whooshData[i] = (Math.sin(i * 7.1) * Math.cos(i * 13.3) * 2 - 1) * 0.6;
     const whooshSource = ctx.createBufferSource();
     whooshSource.buffer = whooshBuffer;
     const whooshBp = ctx.createBiquadFilter();
@@ -79,7 +80,7 @@ export function useAmbientEngine() {
     const bufferSize = ctx.sampleRate * 2;
     const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const data = noiseBuffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.5;
+    for (let i = 0; i < bufferSize; i++) data[i] = (Math.sin(i * 5.7) * Math.cos(i * 11.3) * 2 - 1) * 0.5;
     const noise = ctx.createBufferSource();
     noise.buffer = noiseBuffer;
     noise.loop = true;
@@ -198,13 +199,15 @@ export function useAmbientEngine() {
       lp.frequency.value = 1400;
       lp.connect(mix);
       fb.gain.value = 0.2;
+      let rainTick = 0;
       rainIntervalId = setInterval(() => {
         const n = nodesRef.current;
         if (!n?.ctx || !(n as { rainGain?: GainNode }).rainGain) return;
         const t = n.ctx.currentTime;
-        const target = 0.025 + Math.random() * 0.08;
+        rainTick += 1;
+        const target = 0.025 + (rainTick % 9) * 0.009;
         (n as { rainGain: GainNode }).rainGain.gain.setTargetAtTime(target, t, 0.04);
-      }, 50 + Math.random() * 70);
+      }, 85);
     } else if (mood === "bosque") {
       // Bosque: ruido suave + gotas aleatorias (chirps muy bajos) + lowpass más abierto
       lp.frequency.value = 2200;
@@ -221,22 +224,24 @@ export function useAmbientEngine() {
       noiseGain.connect(lp);
       lp.connect(mix);
       fb.gain.value = 0.1;
+      let bosqueTick = 0;
       bosqueChirpIntervalId = setInterval(() => {
         const n = nodesRef.current;
         if (!n?.ctx || !n.mix) return;
+        bosqueTick += 1;
         const ctx = n.ctx;
         const mixNode = n.mix;
         const chirp = ctx.createOscillator();
         const chirpG = ctx.createGain();
         chirp.type = "sine";
-        chirp.frequency.value = 320 + Math.random() * 200;
+        chirp.frequency.value = 320 + (bosqueTick % 200);
         chirpG.gain.setValueAtTime(0.028, ctx.currentTime);
         chirpG.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.07);
         chirp.connect(chirpG);
         chirpG.connect(mixNode);
         chirp.start(ctx.currentTime);
         chirp.stop(ctx.currentTime + 0.08);
-      }, 1800 + Math.random() * 2200);
+      }, 2900);
     } else if (mood === "animales") {
       // Animales: insectos/chirps 2–4 kHz muy sutiles + fondo selva (noise filtrado)
       osc3 = ctx.createOscillator();
@@ -281,6 +286,24 @@ export function useAmbientEngine() {
       noise.connect(noiseGain);
       noiseGain.connect(lp);
       osc1.connect(lp);
+      lp.connect(delay);
+      delay.connect(mix);
+      lp.connect(mix);
+    } else if (mood === "radio" || mood === "lluvia" || mood === "mercado") {
+      // Radio, lluvia, mercado: capa generativa muy sutil; el sonido principal viene del buffer (ambient.ts)
+      droneGain.gain.value = 0.03;
+      noiseGain.gain.value = 0.018;
+      osc1.frequency.value = 88;
+      osc2.frequency.value = 176;
+      lp.frequency.value = 1000;
+      lp.Q.value = 0.7;
+      lfo.frequency.value = 0.06;
+      lfoGain.gain.value = 120;
+      fb.gain.value = 0.12;
+      noise.connect(noiseGain);
+      noiseGain.connect(lp);
+      osc1.connect(lp);
+      osc2.connect(lp);
       lp.connect(delay);
       delay.connect(mix);
       lp.connect(mix);
@@ -425,6 +448,21 @@ export function useAmbientEngine() {
       n.fb.gain.setTargetAtTime(0.38, t, ramp);
       n.delay.delayTime.setTargetAtTime(0.36, t, ramp);
       if (n.bp) { n.bp.frequency.setTargetAtTime(420, t, ramp); n.bp.Q.setTargetAtTime(0.9, t, ramp); }
+      if (n.osc3Gain) n.osc3Gain.gain.setTargetAtTime(0, t, ramp);
+    } else if (mood === "radio" || mood === "lluvia" || mood === "mercado") {
+      // Radios comunitarias, lluvia, mercados: perfil similar a ciudad (el audio principal viene del buffer en ambient.ts)
+      n.lp.frequency.setTargetAtTime(1200, t, ramp);
+      n.lp.Q.setTargetAtTime(0.75, t, ramp);
+      n.drone.frequency.setTargetAtTime(55, t, ramp);
+      n.droneGain.gain.setTargetAtTime(0.04, t, ramp);
+      n.noiseGain.gain.setTargetAtTime(0.02, t, ramp);
+      n.osc1.frequency.setTargetAtTime(88, t, ramp);
+      n.osc2.frequency.setTargetAtTime(176, t, ramp);
+      n.lfo.frequency.setTargetAtTime(0.08, t, ramp);
+      n.lfoGain.gain.setTargetAtTime(180, t, ramp);
+      n.fb.gain.setTargetAtTime(0.15, t, ramp);
+      n.delay.delayTime.setTargetAtTime(0.22, t, ramp);
+      if (n.bp) { n.bp.frequency.setTargetAtTime(500, t, ramp); n.bp.Q.setTargetAtTime(0.8, t, ramp); }
       if (n.osc3Gain) n.osc3Gain.gain.setTargetAtTime(0, t, ramp);
     } else {
       // personas

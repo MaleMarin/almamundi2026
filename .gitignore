@@ -22,6 +22,9 @@ pnpm-debug.log*
 .env.local
 .env*.local
 
+# JSON de cuenta de servicio (solo para setup; no commitear)
+firebase-service-account.json
+
 # Stray / noise (do not commit)
 /almamundi@0.1.0
 /next

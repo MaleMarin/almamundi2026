@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import type { MapDockMode } from './MapDock';
 
 const DRAWER_WIDTH_DESKTOP = 360;
 const DRAWER_HEIGHT_MOBILE = '70vh';
+
+const DRAWER_TRANSITION = 'transform 280ms cubic-bezier(0.32, 0.72, 0, 1)';
 
 type MapDrawerProps = {
   open: boolean;
@@ -19,6 +21,18 @@ type MapDrawerProps = {
 };
 
 export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawerProps) {
+  const [animatingIn, setAnimatingIn] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      const t = requestAnimationFrame(() => {
+        setAnimatingIn(false);
+        requestAnimationFrame(() => setAnimatingIn(true));
+      });
+      return () => cancelAnimationFrame(t);
+    }
+  }, [open]);
+
   useEffect(() => {
     if (open) {
       const onEscape = (e: KeyboardEvent) => {
@@ -32,7 +46,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   if (!open) return null;
 
   const title =
-    mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : 'Buscar por palabras clave';
+    mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'Bits' : 'Buscar por palabras clave';
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
   if (isMobile) {
@@ -74,7 +88,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
     );
   }
 
-  // DESKTOP: drawer derecho ABSOLUTE dentro del contenedor Universe (NO fixed)
+  // DESKTOP: drawer derecho, slide in from right (misma animación que Noticias)
   return (
     <div className="absolute inset-0 z-30 pointer-events-none">
       <div
@@ -87,6 +101,10 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         aria-modal="true"
         aria-label={title}
         className="pointer-events-auto absolute right-6 top-6 bottom-6 w-[360px] flex flex-col overflow-hidden rounded-[28px] border border-white/10 bg-[#071225]/70 shadow-[0_18px_60px_rgba(0,0,0,0.55)] backdrop-blur-xl"
+        style={{
+          transform: animatingIn ? 'translateX(0)' : 'translateX(100%)',
+          transition: DRAWER_TRANSITION,
+        }}
       >
         <div className="flex flex-shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
           <span className="text-lg font-medium text-white/95" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>

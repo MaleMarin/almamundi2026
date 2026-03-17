@@ -3,10 +3,10 @@
  * Matching por sonido: moods, soundTags, themes, intensity.
  * Tipo único de mood para UI, journey y motor de audio.
  */
-export type SoundMood = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas";
+export type SoundMood = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas" | "radio" | "lluvia" | "mercado";
 
 /** Lista ordenada de todos los moods; usar en UI y donde se necesite iterar. */
-export const SOUND_MOODS: SoundMood[] = ["mar", "ciudad", "bosque", "viento", "animales", "universo", "personas"];
+export const SOUND_MOODS: SoundMood[] = ["mar", "ciudad", "bosque", "viento", "animales", "universo", "personas", "radio", "lluvia", "mercado"];
 
 /** Alias: mismo tipo que SoundMood (para StoryMeta.moods). */
 export type StoryMood = SoundMood;

@@ -24,7 +24,10 @@ export type StoryMood =
   | "bosque"
   | "animales"
   | "universo"
-  | "personas";
+  | "personas"
+  | "radio"
+  | "lluvia"
+  | "mercado";
 
 export interface SubmissionMedia {
   audioUrl?: string;
@@ -65,6 +68,10 @@ export interface StorySubmission {
   tags: SubmissionTags;
   consent: Consent;
   curatorNotes?: string;
+  /** Transcripción (Whisper) cuando format es audio/video. */
+  transcription?: string;
+  /** Parámetros visuales de la huella (análisis IA → geometría). */
+  huellaVisualParams?: unknown;
 }
 
 /** stories: solo existen cuando están publicadas (master). */

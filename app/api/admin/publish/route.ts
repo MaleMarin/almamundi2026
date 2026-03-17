@@ -46,6 +46,14 @@ export async function POST(req: Request) {
   if (status !== "pending" && status !== "approved") {
     return NextResponse.json({ ok: false, error: "bad status" }, { status: 400 });
   }
+  const lat = sub.lat != null ? Number(sub.lat) : null;
+  const lng = sub.lng != null ? Number(sub.lng) : null;
+  if (lat == null || lng == null || !Number.isFinite(lat) || !Number.isFinite(lng)) {
+    return NextResponse.json(
+      { ok: false, error: "Falta ciudad/país o ubicación. Añade lat y lng al envío en Firestore." },
+      { status: 400 }
+    );
+  }
 
   const now = FieldValue.serverTimestamp();
   const storyRef = db.collection("stories").doc();
@@ -68,6 +76,16 @@ export async function POST(req: Request) {
   };
 
   await storyRef.set(story);
+  const publishedSnap = await db
+    .collection("stories")
+    .where("status", "==", "published")
+    .orderBy("publishedAt", "asc")
+    .limit(31)
+    .get();
+  if (publishedSnap.docs.length > 30) {
+    const oldest = publishedSnap.docs[0];
+    await oldest.ref.update({ status: "archived", updatedAt: now });
+  }
   await subRef.update({
     status: "approved",
     updatedAt: now,

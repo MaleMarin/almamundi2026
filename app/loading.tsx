@@ -1,11 +1,14 @@
+/** Pantalla de carga al recargar/navegar: mismo fondo que la home para evitar destello de "página antigua". */
 export default function Loading() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#0F172A] text-white">
-      <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-      <p className="text-lg font-medium text-white/90">Cargando AlmaMundi…</p>
-      <a href="/mapa" className="text-orange-400 hover:text-orange-300 underline text-sm">
-        Ir al mapa
-      </a>
+    <div
+      className="fixed inset-0 min-h-screen flex flex-col items-center justify-center gap-4 z-[9999]"
+      style={{ background: 'var(--home-bg, #E0E5EC)' }}
+      aria-live="polite"
+      aria-busy="true"
+    >
+      <div className="w-8 h-8 border-2 border-[var(--almamundi-orange,#ff4500)] border-t-transparent rounded-full animate-spin opacity-70" />
+      <p className="text-sm font-medium text-gray-600">Cargando…</p>
     </div>
   );
 }

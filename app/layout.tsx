@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -18,7 +19,7 @@ export default function RootLayout({
           <div className="p-8 text-center">
             <h1 className="text-2xl font-light text-white/95">AlmaMundi</h1>
             <p className="mt-2 text-white/60">Necesitas JavaScript para ver el sitio.</p>
-            <a href="/" className="mt-4 inline-block text-orange-400 hover:underline">Ir al inicio</a>
+            <Link href="/" className="mt-4 inline-block text-orange-400 hover:underline">Ir al inicio</Link>
           </div>
         </noscript>
         {children}

@@ -1,5 +1,7 @@
 'use client';
 
+import Link from 'next/link';
+
 export default function GlobalError({
   error,
   reset,
@@ -22,12 +24,12 @@ export default function GlobalError({
           >
             Intentar de nuevo
           </button>
-          <a
+          <Link
             href="/"
             style={{ padding: '8px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', fontWeight: 500 }}
           >
             Ir al inicio
-          </a>
+          </Link>
         </div>
       </body>
     </html>
