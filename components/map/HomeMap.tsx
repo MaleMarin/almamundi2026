@@ -227,21 +227,11 @@ export default function HomeMap() {
   };
 
   const TIME_STRIP_HEIGHT = 64;
-  /** Margen superior para que el globo quede claramente debajo de la barra (Historias, Sonidos, etc.) y no se solape */
-  const GLOBE_TOP_PADDING = 24;
   return (
     <div ref={globeContainerRef} className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%', minHeight: '80vh' }}>
-      {/* Vídeo NASA un poco oval (máscara circular + zoom), fondo negro. */}
-      <div
-        className="relative overflow-hidden flex-1 flex flex-col justify-center items-center min-h-[55vh] w-full bg-black"
-        style={{
-          paddingTop: GLOBE_TOP_PADDING,
-          paddingBottom: 24,
-          minHeight: '55vh',
-          backgroundColor: '#000',
-        }}
-      >
-        <NASAEpicEarthVideo className="w-full max-w-7xl" source="spinning" fallbackImage="" />
+      {/* Globo NASA: sin contenedor extra; redondo y girando. */}
+      <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black">
+        <NASAEpicEarthVideo source="spinning" fallbackImage="" fallbackImages={[]} />
       </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div

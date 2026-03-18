@@ -26,7 +26,8 @@ const URLS: Record<AmbientKey, string[]> = {
   bosque: ["/audio/ambients/forest.wav", "/audio/ambients/forest.mp3"],
   viento: ["/audio/ambients/wind.mp3", "/audio/ambients/wind.wav", "/audio/neblina.mp3"],
   animales: ["/audio/ambients/animals.wav", "/audio/ambients/animals.mp3"],
-  universo: ["/audio/ambients/universe.mp3", "/universo.mp3", "/audio/ambients/universe.wav"],
+  // Sonido del universo: primero universe.mp3 (sustituir por grabación real/CMB si se tiene)
+  universo: ["/audio/ambients/universe.mp3", "/audio/ambients/universe.wav", "/universo.mp3"],
   personas: ["/audio/ambients/people.wav", "/audio/ambients/people.mp3"],
   radio: ["/audio/ambients/radio.mp3", "/audio/ambients/radio.wav"],
   lluvia: ["/audio/ambients/lluvia.mp3", "/audio/ambients/rain-city.mp3", "/audio/ambients/lluvia.wav"],
@@ -39,7 +40,7 @@ const FALLBACK_URL = "/audio/mar.m4a";
 const AMBIENT_MASTER_VOL = 1.0;
 
 /** Volumen base actual (0–1) para la atmósfera temporal. */
-let ambientBaseVolume = 0.85;
+let ambientBaseVolume = 0.95;
 
 /** Crea el contexto solo tras un gesto del usuario (evita el aviso de AudioContext en consola). */
 export function initFromUserGesture(): void {
@@ -134,7 +135,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   gain.connect(state.master!);
 
   source.start(startT + 0.02);
-  const targetGain = key === "universo" ? 0.82 : 1.0;
+  const targetGain = key === "universo" ? 1.0 : 1.0;
   gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
 
   state.current = { key, source, gain };

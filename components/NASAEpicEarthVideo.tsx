@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { ImageCrossfade } from '@/components/ImageCrossfade';
 
 /**
  * Vídeo NASA fotorrealista: atmósfera, nubes, fondo espacio.
@@ -36,8 +37,10 @@ export type NASAEpicEarthVideoProps = {
    * 'epic-timelapse-clean' = versión sin títulos ni créditos.
    */
   source?: 'spinning' | 'epic-highlights' | 'epic-year' | 'epic-timelapse-clean' | 'epic-blue-marble-50' | 'clouds' | string;
-  /** Imagen de fondo mientras carga. */
+  /** Imagen de fondo mientras carga (una sola). */
   fallbackImage?: string;
+  /** Varias imágenes que se funden entre sí mientras carga o si falla el vídeo (sensación de video). */
+  fallbackImages?: string[];
   /** Clases extra para el contenedor. */
   className?: string;
 };
@@ -62,67 +65,123 @@ function getVideoSrc(source: NASAEpicEarthVideoProps['source']): string {
   }
 }
 
+const DEFAULT_FALLBACK_IMAGES = ['/textures/earth-day.jpg', '/textures/earth-night.jpg', '/textures/earth-clouds.png'];
+
 export function NASAEpicEarthVideo({
   source = 'spinning',
   fallbackImage = FALLBACK_IMAGE,
+  fallbackImages,
   className = '',
 }: NASAEpicEarthVideoProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const src = getVideoSrc(source);
+  const showFallback = error || !loaded;
+  const imagesForCrossfade = fallbackImages?.length ? fallbackImages : null;
+  const useCrossfade = showFallback && (imagesForCrossfade?.length ?? 0) > 0;
+  const useSingleImage = showFallback && !useCrossfade && fallbackImage;
+
+  const seekToTimeOfDay = (video: HTMLVideoElement) => {
+    const now = new Date();
+    const fractionOfDay = (now.getHours() + now.getMinutes() / 60) / 24;
+    if (Number.isFinite(video.duration) && video.duration > 0) {
+      video.currentTime = fractionOfDay * video.duration;
+    }
+  };
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
-    const onCanPlay = () => setLoaded(true);
+    if (!video || !src) return;
+    const play = () => video.play().catch(() => {});
+    const onLoadedMetadata = () => seekToTimeOfDay(video);
+    const onLoadedData = () => {
+      seekToTimeOfDay(video);
+      play();
+    };
+    const onCanPlay = () => {
+      setLoaded(true);
+      seekToTimeOfDay(video);
+      play();
+      requestAnimationFrame(() => play());
+    };
     const onError = () => setError(true);
+    const onPause = () => {
+      if (!video.ended && video.readyState >= 2) play();
+    };
+    const onStalled = () => play();
+    video.addEventListener('loadedmetadata', onLoadedMetadata);
+    video.addEventListener('loadeddata', onLoadedData);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('error', onError);
-    if (video.readyState >= 2) setLoaded(true);
+    video.addEventListener('pause', onPause);
+    video.addEventListener('stalled', onStalled);
+    if (video.readyState >= 1) seekToTimeOfDay(video);
+    if (video.readyState >= 2) {
+      setLoaded(true);
+      seekToTimeOfDay(video);
+      play();
+    }
     return () => {
+      video.removeEventListener('loadedmetadata', onLoadedMetadata);
+      video.removeEventListener('loadeddata', onLoadedData);
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('error', onError);
+      video.removeEventListener('pause', onPause);
+      video.removeEventListener('stalled', onStalled);
     };
   }, [src]);
 
+  useEffect(() => {
+    if (!loaded) return;
+    const video = videoRef.current;
+    if (!video) return;
+    const id = setInterval(() => {
+      if (video.paused && video.readyState >= 2) video.play().catch(() => {});
+    }, 400);
+    return () => clearInterval(id);
+  }, [loaded]);
+
   return (
     <div
-      className={`relative w-full overflow-hidden aspect-video max-h-[70vh] ${className}`}
-      style={{ backgroundColor: '#000', clipPath: 'circle(50% at 50% 50%)' }}
+      className={`relative aspect-square w-full h-full max-w-[min(88vh,100%)] max-h-[88vh] mx-auto ${className}`}
+      style={{
+        backgroundColor: '#000',
+        clipPath: 'circle(50% at 50% 50%)',
+        WebkitClipPath: 'circle(50% at 50% 50%)',
+      }}
     >
-      {/* Fondo negro; overflow-hidden recorta zoom y cualquier texto en bordes */}
       <div className="absolute inset-0 bg-black" aria-hidden />
-      {/* Fallback: imagen hasta que el vídeo cargue o si falla (omitir si fallbackImage vacío) */}
-      {fallbackImage ? (
+      {useCrossfade && (
+        <div className="absolute inset-0 w-full h-full" style={{ opacity: 1, pointerEvents: 'none' }}>
+          <ImageCrossfade
+            images={imagesForCrossfade ?? DEFAULT_FALLBACK_IMAGES}
+            intervalMs={3500}
+            fadeDurationMs={1800}
+            className="w-full h-full"
+          />
+        </div>
+      )}
+      {useSingleImage && (
         <div
-          className="absolute inset-0 bg-cover bg-center transition-opacity duration-700"
-          style={{
-            backgroundImage: `url(${fallbackImage})`,
-            opacity: error || !loaded ? 1 : 0,
-            pointerEvents: error || !loaded ? 'auto' : 'none',
-          }}
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${fallbackImage})`, opacity: 1, pointerEvents: 'none' }}
           aria-hidden
         />
-      ) : null}
-      {/* scale-110: zoom ligero para recortar títulos/créditos en los bordes */}
-      <div className="absolute inset-0 w-full h-full scale-110">
-        <video
-          ref={videoRef}
-          src={src}
-          autoPlay
-          loop
-          muted
-          playsInline
-          preload="auto"
-          className="relative w-full h-full object-cover transition-opacity duration-700"
-          style={{
-            opacity: error ? 0 : loaded ? 1 : 0,
-          }}
-          poster={fallbackImage || undefined}
-          aria-label="Vídeo de la Tierra (NASA)"
-        />
-      </div>
+      )}
+      <video
+        ref={videoRef}
+        src={src}
+        autoPlay
+        loop
+        muted
+        playsInline
+        preload="auto"
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
+        style={{ opacity: showFallback ? 0 : 1 }}
+        poster={fallbackImage || undefined}
+        aria-label="Vídeo de la Tierra (NASA)"
+      />
     </div>
   );
 }
