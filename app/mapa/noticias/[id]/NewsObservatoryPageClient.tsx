@@ -81,7 +81,7 @@ export function NewsObservatoryPageClient({ newsId }: { newsId: string }) {
       <main className="min-h-screen bg-[#0F172A] flex flex-col items-center justify-center gap-6 p-6">
         <p className="text-white/80">Noticia no encontrada.</p>
         <Link
-          href="/mapa?view=actualidad"
+          href="/#mapa"
           className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
         >
           Volver al globo
@@ -98,7 +98,7 @@ export function NewsObservatoryPageClient({ newsId }: { newsId: string }) {
         title={item.title}
         subtitleLeft={subtitleStr}
         variant="page"
-        backHref="/mapa?view=actualidad"
+        backHref="/#mapa"
         actions={
           <SaveToCollectionButton
             kind="news"
@@ -111,7 +111,7 @@ export function NewsObservatoryPageClient({ newsId }: { newsId: string }) {
         <NewsObservatory item={item} />
         <div className="mt-8">
           <Link
-            href="/mapa?view=actualidad"
+            href="/#mapa"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
           >
             Volver al globo

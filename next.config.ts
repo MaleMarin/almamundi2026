@@ -3,10 +3,10 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   devIndicators: false,
-  // La primera vista es la home (header + headline + 4 cards). El mapa está en /mapa.
-  // async redirects() {
-  //   return [{ source: "/", destination: "/mapa", permanent: false }];
-  // },
+  // El mapa vive en la home (#mapa). /mapa ya no existe: redirigir a home para evitar doble globo.
+  async redirects() {
+    return [{ source: '/mapa', destination: '/#mapa', permanent: false }];
+  },
 };
 
 export default nextConfig;

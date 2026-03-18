@@ -2429,7 +2429,7 @@ function StoryModal({
                     <RefreshCcw size={12} />
                     Otra Historia
                   </button>
-                  <a href="/mapa" className="py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 font-black tracking-widest uppercase text-[10px] text-gray-600 hover:text-gray-800 active:scale-95 border-2 border-gray-400/50 bg-transparent hover:bg-gray-200/30 no-underline" style={{ fontFamily: APP_FONT }}>
+                  <a href="#mapa" className="py-2 px-3 rounded-xl flex items-center justify-center gap-1.5 font-black tracking-widest uppercase text-[10px] text-gray-600 hover:text-gray-800 active:scale-95 border-2 border-gray-400/50 bg-transparent hover:bg-gray-200/30 no-underline" style={{ fontFamily: APP_FONT }}>
                     <MapPin size={12} />
                     Volver al Mapa
                   </a>

@@ -112,7 +112,7 @@ export default function ExposicionDetailPage() {
           <Link href="/exposiciones" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Exposiciones
           </Link>
-          <Link href="/mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>
@@ -134,7 +134,7 @@ export default function ExposicionDetailPage() {
 
         <div className="flex flex-wrap gap-3 mb-10">
           <Link
-            href={slug ? `/mapa?expo=${encodeURIComponent(slug)}` : '/mapa'}
+            href={slug ? `/?expo=${encodeURIComponent(slug)}#mapa` : '/#mapa'}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-orange-600 hover:bg-orange-500/10 transition"
             style={soft.button}
           >

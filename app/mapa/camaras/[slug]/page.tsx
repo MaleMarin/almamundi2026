@@ -28,12 +28,12 @@ export default async function ObservatorioPage({ params }: PageProps) {
         subtitleRight={camera.provider ?? undefined}
         badge={badge}
         variant="page"
-        backHref="/mapa?view=cameras"
+        backHref="/#mapa"
       >
         <CameraObservatory camera={camera} variant="page" contentOnly />
         <div className="mt-8 flex justify-center">
           <Link
-            href="/mapa?view=cameras"
+            href="/#mapa"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
           >
             Volver al globo

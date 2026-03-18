@@ -67,7 +67,7 @@ export default function RecorridoDetailPage() {
           <Link href="/" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Inicio
           </Link>
-          <Link href="/mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>
@@ -102,7 +102,7 @@ export default function RecorridoDetailPage() {
             Modo recorrido
           </button>
           <Link
-            href="/mapa"
+            href="/#mapa"
             className="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full hover:text-orange-600 active:scale-95"
             style={soft.button}
           >

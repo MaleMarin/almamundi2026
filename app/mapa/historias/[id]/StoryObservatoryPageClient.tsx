@@ -17,7 +17,7 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const fromMusic = searchParams.get('from') === 'music';
-  const backHref = fromMusic ? '/mapa?view=music' : '/mapa?view=historias';
+  const backHref = '/#mapa';
   const subtitleLeft = [story.city, story.country].filter(Boolean).join(', ') || undefined;
 
   const [currentEmotion, setCurrentEmotion] = useState<EmotionVisual>(EMOTION_VISUALS.silence);

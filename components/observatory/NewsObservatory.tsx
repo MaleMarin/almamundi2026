@@ -57,7 +57,7 @@ export function NewsObservatory({ item }: NewsObservatoryProps) {
       </a>
 
       <Link
-        href="/mapa?view=actualidad"
+        href="/#mapa"
         className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition"
       >
         <Tag size={16} />

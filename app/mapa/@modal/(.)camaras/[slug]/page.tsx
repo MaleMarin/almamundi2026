@@ -45,7 +45,7 @@ export default function ObservatorioCamarasModalPage() {
         subtitleRight={camera.provider ?? undefined}
         badge={badge}
         variant="modal"
-        backHref="/mapa?view=cameras"
+        backHref="/#mapa"
         onClose={handleClose}
       >
         <CameraObservatory camera={camera} variant="modal" contentOnly />

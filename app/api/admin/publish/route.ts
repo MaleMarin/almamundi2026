@@ -58,7 +58,7 @@ export async function POST(req: Request) {
   const now = FieldValue.serverTimestamp();
   const storyRef = db.collection("stories").doc();
 
-  const story = {
+  const story: Record<string, unknown> = {
     status: "published",
     sourceSubmissionId: submissionId,
     createdAt: sub.createdAt ?? now,
@@ -74,6 +74,9 @@ export async function POST(req: Request) {
     tags: sub.tags ?? { themes: [], moods: [], keywords: [] },
     excerpt: typeof sub.title === "string" ? sub.title.slice(0, 160) : undefined,
   };
+  if (sub.authorName) story.authorName = sub.authorName;
+  if (sub.city) story.city = sub.city;
+  if (sub.country) story.country = sub.country;
 
   await storyRef.set(story);
   const publishedSnap = await db

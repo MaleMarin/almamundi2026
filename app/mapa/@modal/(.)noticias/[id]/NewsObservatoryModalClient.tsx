@@ -104,7 +104,7 @@ export function NewsObservatoryModalClient({ newsId }: { newsId: string }) {
         title={item.title}
         subtitleLeft={subtitleStr}
         variant="modal"
-        backHref="/mapa?view=actualidad"
+        backHref="/#mapa"
         onClose={handleClose}
         actions={
           <SaveToCollectionButton

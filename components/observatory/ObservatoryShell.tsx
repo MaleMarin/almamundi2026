@@ -24,7 +24,7 @@ export function ObservatoryShell({
   actions,
   children,
   variant = 'page',
-  backHref = '/mapa',
+  backHref = '/#mapa',
   onClose,
 }: ObservatoryShellProps) {
   const isModal = variant === 'modal';

@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu } from '@/lib/historias-neumorph';
+import { Footer } from '@/components/layout/Footer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 type SimilarStory = {
@@ -166,17 +167,7 @@ export default function HistoriasIdPage() {
         </div>
       </section>
 
-      <footer className="py-8 px-6 border-t border-gray-300/40 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <div className="font-medium mb-1" style={{ color: neu.textMain }}>AlmaMundi</div>
-          <div className="text-xs" style={{ color: neu.textBody }}>Una iniciativa de PRECISAR</div>
-        </div>
-        <div className="flex gap-6">
-          <Link href="/#intro" className="text-sm" style={{ color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#mapa" className="text-sm" style={{ color: neu.textBody }}>Mapa</Link>
-          <Link href="/historias" className="text-sm font-medium" style={{ color: neu.textMain }}>Historias</Link>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

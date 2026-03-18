@@ -13,6 +13,8 @@ export type StoryPoint = {
   lat: number;
   lng: number;
   label: string;
+  /** Nombre de la persona que cuenta la historia (autor). */
+  authorName?: string;
   title?: string;
   topic?: string;
   description?: string;

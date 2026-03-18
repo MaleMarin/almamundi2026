@@ -8,6 +8,7 @@ import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { neu } from '@/lib/historias-neumorph';
+import { Footer } from '@/components/layout/Footer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function formatPlace(s: StoryPoint): string {
@@ -212,6 +213,13 @@ export default function HistoriasPage() {
         </p>
 
         <div className="flex flex-wrap items-center gap-2 mb-4">
+          <Link
+            href="/historias/videos"
+            className="px-4 py-2 rounded-full text-sm flex items-center gap-2 transition-all border-2 border-amber-500/50 hover:border-amber-500 text-amber-700"
+            style={neu.button}
+          >
+            🎬 Vista rueda (videos)
+          </Link>
           {(['all', 'video', 'audio', 'text', 'photo'] as const).map((f) => (
             <button
               key={f}
@@ -292,18 +300,7 @@ export default function HistoriasPage() {
         </div>
       </section>
 
-      <footer className="py-12 px-6 border-t border-gray-300/40 flex flex-col md:flex-row justify-between items-center gap-6">
-        <div>
-          <div className="font-medium mb-1" style={{ color: neu.textMain }}>AlmaMundi</div>
-          <div className="text-xs" style={{ color: neu.textBody }}>Una iniciativa de PRECISAR</div>
-        </div>
-        <div className="flex gap-6">
-          <Link href="/#intro" className="text-sm" style={{ color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/temas" className="text-sm" style={{ color: neu.textBody }}>Temas</Link>
-          <Link href="/#mapa" className="text-sm" style={{ color: neu.textBody }}>Mapa</Link>
-          <span className="text-sm font-medium" style={{ color: neu.textMain }}>Historias</span>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

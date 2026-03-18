@@ -42,6 +42,7 @@ export async function POST(
       tags: data.tags,
       excerpt: data.title.slice(0, 160),
     };
+    if (data.authorName) storyData.authorName = data.authorName;
     if (data.text !== undefined) storyData.text = data.text;
     if (data.media !== undefined) storyData.media = data.media;
 

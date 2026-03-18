@@ -75,7 +75,7 @@ export default function HomeMap() {
   soundEnabledRef.current = soundEnabled;
   selectedMoodRef.current = selectedMood;
 
-  // Al hacer scroll y llegar al globo: activar sonido del universo.
+  // Al hacer scroll y llegar al mapa: arranca el sonido del universo y se dispara el evento para que el vídeo del globo gire.
   useEffect(() => {
     const el = globeContainerRef.current;
     if (!el) return;
@@ -83,8 +83,9 @@ export default function HomeMap() {
       (entries) => {
         if (!entries[0]?.isIntersecting) return;
         setSoundEnabled(true);
+        window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
       },
-      { threshold: 0.15, rootMargin: '0px' }
+      { threshold: 0.2, rootMargin: '0px' }
     );
     io.observe(el);
     return () => io.disconnect();
@@ -230,8 +231,10 @@ export default function HomeMap() {
   return (
     <div ref={globeContainerRef} className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%', minHeight: '80vh' }}>
       {/* Globo NASA: sin contenedor extra; redondo y girando. */}
-      <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black">
-        <NASAEpicEarthVideo source="spinning" fallbackImage="" fallbackImages={[]} />
+      <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black overflow-visible">
+        <div className="w-full h-full min-h-[300px] flex items-center justify-center">
+          <NASAEpicEarthVideo source="spinning" />
+        </div>
       </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div

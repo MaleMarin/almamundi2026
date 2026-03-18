@@ -92,7 +92,7 @@ export function HomeFirstPart({
   basePath = ''
 }: HomeFirstPartProps) {
   const historiasHref = basePath ? `${basePath}#historias` : '#historias';
-  const mapaHref = basePath ? `${basePath.replace(/\/$/, '')}/mapa` : '/mapa';
+  const mapaHref = basePath ? `${basePath.replace(/\/$/, '')}#mapa` : '#mapa';
 
   return (
     <>

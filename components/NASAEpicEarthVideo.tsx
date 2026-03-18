@@ -10,8 +10,9 @@ import { ImageCrossfade } from '@/components/ImageCrossfade';
  * - Blue Marble 50 Years: EPIC 2022.
  */
 
-/** SVS 5570: Globo girando con nubes, atmósfera y luces nocturnas (Blue Marble, MODIS). 1080p. */
-const NASA_SPINNING_EARTH_1080 =
+/** SVS 5570: Globo girando con nubes, atmósfera y luces nocturnas. Local primero para evitar CORS y que el play arranque. */
+const SPINNING_LOCAL = '/Earth_wAtmos_spin_02_1080p60.mp4';
+const SPINNING_FALLBACK_REMOTE =
   'https://svs.gsfc.nasa.gov/vis/a000000/a005500/a005570/Earth_wAtmos_spin_02_1080p60.mp4';
 /** EPIC Earth Highlights: imágenes reales DSCOVR, 45s. */
 const NASA_EPIC_HIGHLIGHTS_MP4 =
@@ -61,7 +62,7 @@ function getVideoSrc(source: NASAEpicEarthVideoProps['source']): string {
       return NASA_EPIC_HIGHLIGHTS_MP4;
     case 'spinning':
     default:
-      return NASA_SPINNING_EARTH_1080;
+      return SPINNING_LOCAL;
   }
 }
 
@@ -75,51 +76,101 @@ export function NASAEpicEarthVideo({
 }: NASAEpicEarthVideoProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
+  const [playing, setPlaying] = useState(false);
+  /** Para 'spinning': intentar local primero; si falla, pasar a URL NASA. */
+  const [videoSrc, setVideoSrc] = useState(() => getVideoSrc(source));
   const videoRef = useRef<HTMLVideoElement>(null);
-  const src = getVideoSrc(source);
+  const containerRef = useRef<HTMLDivElement>(null);
+  /** El usuario ya llegó al mapa (scroll o evento); intentar play cuando el vídeo esté listo. */
+  const mapInViewRef = useRef(false);
+  /** Si el navegador bloqueó autoplay, no seguir llamando play() en intervalos (solo con clic). */
+  const autoplayBlockedRef = useRef(false);
+  /** El usuario ya hizo clic y el vídeo llegó a reproducirse; si después se pausa (ej. cambiar pestaña), sí reintentar. */
+  const userStartedPlayRef = useRef(false);
+  /** Seek a la hora local del usuario una sola vez al cargar: globo diurno o nocturno según dónde está. */
+  const hasSeekedToTimeRef = useRef(false);
+
+  const seekToUserTimeOfDay = (video: HTMLVideoElement) => {
+    if (hasSeekedToTimeRef.current) return;
+    const now = new Date();
+    const fractionOfDay = (now.getHours() + now.getMinutes() / 60 + now.getSeconds() / 3600) / 24;
+    if (Number.isFinite(video.duration) && video.duration > 0) {
+      video.currentTime = fractionOfDay * video.duration;
+      hasSeekedToTimeRef.current = true;
+    }
+  };
+
+  useEffect(() => {
+    setVideoSrc(getVideoSrc(source));
+  }, [source]);
   const showFallback = error || !loaded;
   const imagesForCrossfade = fallbackImages?.length ? fallbackImages : null;
   const useCrossfade = showFallback && (imagesForCrossfade?.length ?? 0) > 0;
   const useSingleImage = showFallback && !useCrossfade && fallbackImage;
 
-  const seekToTimeOfDay = (video: HTMLVideoElement) => {
-    const now = new Date();
-    const fractionOfDay = (now.getHours() + now.getMinutes() / 60) / 24;
-    if (Number.isFinite(video.duration) && video.duration > 0) {
-      video.currentTime = fractionOfDay * video.duration;
-    }
+  const play = (fromUserGesture = false) => {
+    const video = videoRef.current;
+    if (!video) return;
+    if (video.readyState < 2) return;
+    if (autoplayBlockedRef.current && !fromUserGesture) return;
+    video
+      .play()
+      .then(() => {
+        autoplayBlockedRef.current = false;
+        if (fromUserGesture) userStartedPlayRef.current = true;
+        setPlaying(true);
+      })
+      .catch(() => {
+        autoplayBlockedRef.current = true;
+      });
   };
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || !src) return;
-    const play = () => video.play().catch(() => {});
-    const onLoadedMetadata = () => seekToTimeOfDay(video);
+    if (!video || !videoSrc) return;
+    const onLoadedMetadata = () => {
+      seekToUserTimeOfDay(video);
+      play();
+    };
     const onLoadedData = () => {
-      seekToTimeOfDay(video);
+      if (!hasSeekedToTimeRef.current) seekToUserTimeOfDay(video);
+      setLoaded(true);
       play();
     };
     const onCanPlay = () => {
+      if (!hasSeekedToTimeRef.current) seekToUserTimeOfDay(video);
       setLoaded(true);
-      seekToTimeOfDay(video);
       play();
       requestAnimationFrame(() => play());
     };
-    const onError = () => setError(true);
-    const onPause = () => {
-      if (!video.ended && video.readyState >= 2) play();
+    const onError = () => {
+      if (source === 'spinning' && videoSrc === SPINNING_LOCAL) {
+        setVideoSrc(SPINNING_FALLBACK_REMOTE);
+        setError(false);
+        return;
+      }
+      setError(true);
     };
+    const onPause = () => {
+      setPlaying(false);
+      if (!userStartedPlayRef.current) {
+        autoplayBlockedRef.current = true;
+      } else if (!video.ended && video.readyState >= 2) {
+        play();
+      }
+    };
+    const onPlaying = () => setPlaying(true);
     const onStalled = () => play();
     video.addEventListener('loadedmetadata', onLoadedMetadata);
     video.addEventListener('loadeddata', onLoadedData);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('error', onError);
     video.addEventListener('pause', onPause);
+    video.addEventListener('playing', onPlaying);
     video.addEventListener('stalled', onStalled);
-    if (video.readyState >= 1) seekToTimeOfDay(video);
     if (video.readyState >= 2) {
+      if (!hasSeekedToTimeRef.current) seekToUserTimeOfDay(video);
       setLoaded(true);
-      seekToTimeOfDay(video);
       play();
     }
     return () => {
@@ -128,32 +179,99 @@ export function NASAEpicEarthVideo({
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('error', onError);
       video.removeEventListener('pause', onPause);
+      video.removeEventListener('playing', onPlaying);
       video.removeEventListener('stalled', onStalled);
     };
-  }, [src]);
+  }, [videoSrc, source]);
+
+  useEffect(() => {
+    hasSeekedToTimeRef.current = false;
+  }, [videoSrc]);
 
   useEffect(() => {
     if (!loaded) return;
     const video = videoRef.current;
     if (!video) return;
     const id = setInterval(() => {
-      if (video.paused && video.readyState >= 2) video.play().catch(() => {});
+      if (autoplayBlockedRef.current) return;
+      if (video.paused && video.readyState >= 2) play();
     }, 400);
     return () => clearInterval(id);
   }, [loaded]);
 
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          mapInViewRef.current = true;
+          play();
+        }
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  // Cuando el usuario hace scroll y llega al mapa (evento desde HomeMap): marcar y arrancar el vídeo.
+  useEffect(() => {
+    const onMapInView = () => {
+      mapInViewRef.current = true;
+      play();
+    };
+    window.addEventListener('almamundi:mapInView', onMapInView);
+    return () => window.removeEventListener('almamundi:mapInView', onMapInView);
+  }, []);
+
+  // Si el mapa ya estuvo en vista y el vídeo se hace listo después (carga diferida), arrancar.
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video || !mapInViewRef.current) return;
+    const onCanPlayLate = () => {
+      if (mapInViewRef.current && video.readyState >= 2) play();
+    };
+    video.addEventListener('canplay', onCanPlayLate);
+    if (video.readyState >= 2) play();
+    return () => video.removeEventListener('canplay', onCanPlayLate);
+  }, [videoSrc]);
+
+  // Intentar play al cargar la fuente; si el navegador bloquea, no insistir en bucle (solo con clic).
+  useEffect(() => {
+    const t1 = setTimeout(() => play(), 100);
+    const t2 = setTimeout(() => play(), 600);
+    const id = setInterval(() => {
+      if (autoplayBlockedRef.current) return;
+      const v = videoRef.current;
+      if (v && v.paused && v.readyState >= 2) play();
+    }, 500);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearInterval(id);
+    };
+  }, [videoSrc]);
+
   return (
     <div
-      className={`relative aspect-square w-full h-full max-w-[min(88vh,100%)] max-h-[88vh] mx-auto ${className}`}
+      ref={containerRef}
+      role="button"
+      tabIndex={0}
+      onClick={() => play(true)}
+      onKeyDown={(e) => e.key === 'Enter' && play(true)}
+      className={`relative aspect-square w-full h-full max-w-[min(88vh,100%)] max-h-[88vh] mx-auto cursor-default ${className}`}
       style={{
-        backgroundColor: '#000',
+        backgroundColor: '#0a0a0a',
         clipPath: 'circle(50% at 50% 50%)',
         WebkitClipPath: 'circle(50% at 50% 50%)',
+        minWidth: 'min(280px, 50vmin)',
+        minHeight: 'min(280px, 50vmin)',
       }}
     >
-      <div className="absolute inset-0 bg-black" aria-hidden />
+      <div className="absolute inset-0 z-0 bg-black pointer-events-none" aria-hidden />
       {useCrossfade && (
-        <div className="absolute inset-0 w-full h-full" style={{ opacity: 1, pointerEvents: 'none' }}>
+        <div className="absolute inset-0 z-0 w-full h-full" style={{ opacity: 1, pointerEvents: 'none' }}>
           <ImageCrossfade
             images={imagesForCrossfade ?? DEFAULT_FALLBACK_IMAGES}
             intervalMs={3500}
@@ -164,24 +282,39 @@ export function NASAEpicEarthVideo({
       )}
       {useSingleImage && (
         <div
-          className="absolute inset-0 bg-cover bg-center"
+          className="absolute inset-0 z-0 bg-cover bg-center"
           style={{ backgroundImage: `url(${fallbackImage})`, opacity: 1, pointerEvents: 'none' }}
           aria-hidden
         />
       )}
       <video
+        key={videoSrc}
         ref={videoRef}
-        src={src}
+        src={videoSrc}
         autoPlay
         loop
         muted
         playsInline
         preload="auto"
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-        style={{ opacity: showFallback ? 0 : 1 }}
+        disablePictureInPicture
+        disableRemotePlayback
+        width={1920}
+        height={1080}
+        className="absolute inset-0 z-[1] w-full h-full object-cover pointer-events-none"
+        style={{ opacity: error ? 0 : 1 }}
         poster={fallbackImage || undefined}
-        aria-label="Vídeo de la Tierra (NASA)"
+        aria-label="Vídeo de la Tierra (NASA) girando"
       />
+      {loaded && !playing && !error && (
+        <div
+          className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
+          aria-hidden
+        >
+          <span className="text-white/70 text-sm tracking-widest uppercase px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm">
+            Toca el globo para que gire
+          </span>
+        </div>
+      )}
     </div>
   );
 }

@@ -14,7 +14,7 @@ export default function ObservatorioHistoriaModalPage() {
   const story = getStoryById(id);
 
   useEffect(() => {
-    if (!story) router.replace('/mapa?view=historias');
+    if (!story) router.replace('/#mapa');
   }, [story, router]);
 
   const handleClose = () => router.back();
@@ -29,7 +29,7 @@ export default function ObservatorioHistoriaModalPage() {
         title={story.label}
         subtitleLeft={subtitleLeft}
         variant="modal"
-        backHref="/mapa?view=historias"
+        backHref="/#mapa"
         onClose={handleClose}
         actions={
           <SaveToCollectionButton

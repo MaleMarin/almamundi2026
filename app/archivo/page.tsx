@@ -250,7 +250,7 @@ export default function ArchivoPage() {
             ← AlmaMundi
           </Link>
           <nav style={{ display: 'flex', gap: 8 }}>
-            <Link href="/mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
+            <Link href="/#mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
               Mapa
             </Link>
           </nav>

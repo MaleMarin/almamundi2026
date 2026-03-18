@@ -24,7 +24,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
   const isYoutube = camera.source?.kind === 'youtube';
   const isHls = camera.source?.kind === 'hls';
 
-  const backHref = '/mapa?view=cameras';
+  const backHref = '/#mapa';
   const isModal = variant === 'modal';
 
   const playerBlock = (

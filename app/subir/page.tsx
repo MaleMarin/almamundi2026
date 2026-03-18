@@ -197,7 +197,7 @@ export default function SubirPage() {
           <Link href="/" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Inicio
           </Link>
-          <Link href="/mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>
