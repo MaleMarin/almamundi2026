@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
-import { VideoPlayer, type Historia } from '@/components/historia/VideoPlayer';
+import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 

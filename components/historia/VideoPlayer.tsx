@@ -7,6 +7,7 @@
  * Acto 3: Fin (cita con acento dorado, tarjeta autor con pulso, Ver de nuevo / Más historias).
  */
 import { useState, useRef, useEffect, useCallback } from 'react';
+import ReactDOM from 'react-dom';
 import Link from 'next/link';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -30,6 +31,7 @@ export interface Historia {
 
 interface VideoPlayerProps {
   historia: Historia;
+  onClose?: () => void;
 }
 
 function formatTime(secs: number): string {
@@ -98,7 +100,7 @@ function MinimizeIcon() {
   );
 }
 
-export default function VideoPlayer({ historia }: VideoPlayerProps) {
+export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
   const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>('intertitle');
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -118,6 +120,12 @@ export default function VideoPlayer({ historia }: VideoPlayerProps) {
     document.body.style.overflow = 'hidden';
     return () => { document.body.style.overflow = ''; };
   }, []);
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose?.(); };
+    window.addEventListener('keydown', fn);
+    return () => window.removeEventListener('keydown', fn);
+  }, [onClose]);
 
   useEffect(() => {
     if (stage !== 'intertitle') return;
@@ -198,8 +206,33 @@ export default function VideoPlayer({ historia }: VideoPlayerProps) {
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  return (
-    <>
+  const overlay = (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Cerrar"
+          style={{
+            position: 'absolute',
+            top: '1.5rem',
+            right: '1.5rem',
+            zIndex: 10010,
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(201,169,110,0.3)',
+            borderRadius: '50%',
+            width: 40,
+            height: 40,
+            color: '#f5f0e8',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          ×
+        </button>
+      )}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
 
@@ -802,6 +835,11 @@ export default function VideoPlayer({ historia }: VideoPlayerProps) {
           </div>
         )}
       </div>
-    </>
+    </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return ReactDOM.createPortal(overlay, document.body);
+  }
+  return overlay;
 }

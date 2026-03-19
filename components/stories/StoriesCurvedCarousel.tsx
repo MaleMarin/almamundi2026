@@ -6,7 +6,14 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
+import VideoPlayer from '@/components/historia/VideoPlayer';
 import type { StoryPoint } from '@/lib/map-data/stories';
+
+function defaultAvatar(name: string): string {
+  const initial = (name || '?').trim().charAt(0).toUpperCase();
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#8b6914" opacity="0.25"/><text x="50" y="62" font-family="sans-serif" font-size="44" font-weight="300" fill="#c9a96e" text-anchor="middle">${initial}</text></svg>`;
+  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
+}
 
 const RADIUS = 420;
 const ITEM_ANGLE = 18;
@@ -29,10 +36,29 @@ export type StoriesCurvedCarouselProps = {
   onSelectStory?: (story: StoryPoint) => void;
 };
 
+type ActiveVideoHistoria = {
+  id: string;
+  titulo: string;
+  subtitulo?: string;
+  videoUrl: string;
+  thumbnailUrl: string;
+  duracion: number;
+  fecha: string;
+  autor: {
+    nombre: string;
+    avatar: string;
+    ubicacion?: string;
+    bio?: string;
+  };
+  tags?: string[];
+  citaDestacada?: string;
+};
+
 export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedCarouselProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [dragStartY, setDragStartY] = useState<number | null>(null);
   const [startIndex, setStartIndex] = useState(0);
+  const [activeVideo, setActiveVideo] = useState<ActiveVideoHistoria | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const selected = stories[selectedIndex] ?? null;
@@ -184,13 +210,42 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               </h1>
               <p className="text-sm text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
 
-              <Link
-                href={selected.videoUrl ? `/historias/${selected.id}/video` : `/historias/${selected.id}`}
-                className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
-                aria-label={selected.videoUrl ? 'Ver en cine' : 'Reproducir'}
-              >
-                <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
-              </Link>
+              {selected.videoUrl ? (
+                <button
+                  type="button"
+                  onClick={() =>
+                    setActiveVideo({
+                      id: selected.id,
+                      titulo: selected.title ?? 'Sin título',
+                      subtitulo: [selected.city, selected.country].filter(Boolean).join(', ') || undefined,
+                      videoUrl: selected.videoUrl ?? '',
+                      thumbnailUrl: selected.imageUrl ?? selected.videoUrl ?? '',
+                      duracion: 0,
+                      fecha: selected.publishedAt ?? '',
+                      autor: {
+                        nombre: selected.authorName ?? 'Anónimo',
+                        avatar: selected.imageUrl ?? defaultAvatar(selected.authorName ?? ''),
+                        ubicacion: [selected.city, selected.country].filter(Boolean).join(', ') || undefined,
+                        bio: selected.description,
+                      },
+                      tags: selected.topic ? [selected.topic] : [],
+                      citaDestacada: undefined,
+                    })
+                  }
+                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
+                  aria-label="Ver en cine"
+                >
+                  <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
+                </button>
+              ) : (
+                <Link
+                  href={`/historias/${selected.id}`}
+                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
+                  aria-label="Reproducir"
+                >
+                  <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
+                </Link>
+              )}
 
               <div className="flex items-center gap-4 text-gray-600">
                 <button type="button" className="flex items-center gap-1.5 hover:text-gray-900 transition-colors" aria-label="Compartir">
@@ -222,6 +277,10 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
           )}
         </div>
       </div>
+
+      {activeVideo && (
+        <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} />
+      )}
     </div>
   );
 }
