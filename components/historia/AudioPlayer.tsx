@@ -3,6 +3,12 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
+const FILM = '#0d0b09';
+const CREAM = '#f5f0e8';
+const SEPIA = '#c9a96e';
+const SEPIA_DK = '#8b6914';
+const BAR_COUNT = 16;
+
 export interface HistoriaAudio {
   id: string;
   titulo: string;
@@ -33,36 +39,77 @@ function formatTime(secs: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-const BAR_COUNT = 15;
-const WARM_DARK = '#0d0a08';
-const SEPIA = '#c9a96e';
-const CREAM = '#f5f0e8';
+const PlayIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="5,3 19,12 5,21" />
+  </svg>
+);
+const PauseIcon = () => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
+  </svg>
+);
+const SkipBackIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <polygon points="19,20 9,12 19,4" />
+    <line x1="5" y1="19" x2="5" y2="5" />
+  </svg>
+);
+const SkipFwdIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+    <polygon points="5,4 15,12 5,20" />
+    <line x1="19" y1="5" x2="19" y2="19" />
+  </svg>
+);
+const VolumeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+  </svg>
+);
+const MutedIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
+    <line x1="23" y1="9" x2="17" y2="15" />
+    <line x1="17" y1="9" x2="23" y2="15" />
+  </svg>
+);
 
 export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(historia.duracion);
+  const [duration, setDuration] = useState(historia.duracion || 0);
   const [isMuted, setIsMuted] = useState(false);
   const [ended, setEnded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [titleVisible, setTitleVisible] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
-    const fn = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose?.();
-    };
+    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose?.(); };
     window.addEventListener('keydown', fn);
     return () => window.removeEventListener('keydown', fn);
   }, [onClose]);
+
+  useEffect(() => {
+    setTitleVisible(true);
+  }, []);
 
   useEffect(() => {
     const audio = new Audio(historia.audioUrl);
     audioRef.current = audio;
     const onLoadedMetadata = () => setDuration(audio.duration);
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onEnded = () => {
-      setEnded(true);
-      setIsPlaying(false);
-    };
+    const onEnded = () => { setEnded(true); setIsPlaying(false); };
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
@@ -81,75 +128,76 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
 
   const togglePlay = () => {
     if (!audioRef.current) return;
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
+    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
+    else { audioRef.current.play(); setIsPlaying(true); }
   };
 
   const toggleMute = () => setIsMuted(!isMuted);
 
   const seek = (e: React.ChangeEvent<HTMLInputElement>) => {
     const t = Number(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.currentTime = t;
-      setCurrentTime(t);
-    }
+    if (audioRef.current) { audioRef.current.currentTime = t; setCurrentTime(t); }
+  };
+
+  const skip = (delta: number) => {
+    if (!audioRef.current) return;
+    const t = Math.max(0, Math.min(audioRef.current.duration, audioRef.current.currentTime + delta));
+    audioRef.current.currentTime = t;
+    setCurrentTime(t);
+  };
+
+  const restart = () => {
+    setEnded(false);
+    setCurrentTime(0);
+    if (audioRef.current) { audioRef.current.currentTime = 0; audioRef.current.play(); setIsPlaying(true); }
   };
 
   const frases = historia.frases ?? [];
-  const phraseThreshold = frases.length > 0 ? historia.duracion / frases.length : 0;
-  const currentPhraseIndex = frases.length === 0 ? -1 : Math.min(
-    Math.floor(currentTime / phraseThreshold),
-    frases.length - 1
-  );
-  const barHeights = useMemo(
-    () => Array.from({ length: BAR_COUNT }, () => 8 + Math.random() * 32),
-    []
-  );
+  const phraseThreshold = frases.length > 0 ? duration / frases.length : 0;
+  const currentPhraseIndex = frases.length === 0 ? -1 : Math.min(Math.floor(currentTime / phraseThreshold), frases.length - 1);
+  const currentPhrase = currentPhraseIndex >= 0 ? frases[currentPhraseIndex] : null;
+
+  const barHeights = useMemo(() => Array.from({ length: BAR_COUNT }, () => 8 + Math.random() * 28), []);
+  const barDurations = useMemo(() => Array.from({ length: BAR_COUNT }, () => 0.6 + Math.random() * 0.5), []);
+
+  const avatarSize = isMobile ? 120 : typeof window !== 'undefined' && window.innerWidth < 1024 ? 160 : 200;
+  const waveformWidth = isMobile ? 'calc(100% - 48px)' : '360px';
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   const content = (
     <>
       <style>{`
-        :root {
-          --cream: ${CREAM};
-          --sepia: ${SEPIA};
-          --sepia-dk: #8b6914;
-          --film: #111009;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { background: ${WARM_DARK}; font-family: 'Jost', sans-serif; overflow: hidden; }
-        @keyframes halo {
-          0%, 100% { transform: scale(1); box-shadow: 0 0 30px 10px rgba(201,169,110,0.25); }
-          50% { transform: scale(1.02); box-shadow: 0 0 50px 20px rgba(201,169,110,0.4); }
+        @keyframes haloPulse {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.3); }
+          50% { box-shadow: 0 0 0 20px rgba(201,169,110,0); }
         }
-        .avatar-halo { animation: halo 2.5s ease-in-out infinite; }
-        @keyframes barWave {
-          0%, 100% { transform: scaleY(0.25); }
-          50% { transform: scaleY(1); }
+        @keyframes waveAnim {
+          from { transform: scaleY(0.2); }
+          to { transform: scaleY(1); }
         }
-        .wave-bar { transform-origin: center bottom; }
+        .ap-halo-pulse { animation: haloPulse 2s ease-in-out infinite; }
+        .ap-wave-bar { transform-origin: center bottom; }
         @keyframes endReveal {
           from { opacity: 0; transform: scale(0.96); }
           to { opacity: 1; transform: scale(1); }
         }
-        .end-reveal { animation: endReveal 0.8s cubic-bezier(0.22,1,0.36,1) forwards; }
-        @keyframes phraseIn {
+        .ap-end-reveal { animation: endReveal 0.8s cubic-bezier(0.22,1,0.36,1) forwards; }
+        @keyframes phraseFadeIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
         }
-        .phrase-in { animation: phraseIn 0.5s ease forwards; }
-        input[type='range'] {
-          -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer;
+        .ap-phrase-in { animation: phraseFadeIn 0.6s ease forwards; }
+        input[type="range"].ap-range {
+          -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; width: 100%;
         }
-        input[type='range']::-webkit-slider-thumb {
+        input[type="range"].ap-range::-webkit-slider-thumb {
           -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%;
-          background: var(--sepia);
+          background: ${SEPIA}; margin-top: -4px;
         }
-        input[type='range']::-webkit-slider-runnable-track {
-          height: 3px; border-radius: 2px; background: rgba(255,255,255,0.15);
+        input[type="range"].ap-range::-webkit-slider-runnable-track {
+          height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12);
         }
       `}</style>
 
@@ -158,14 +206,19 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           style={{
             position: 'fixed',
             inset: 0,
-            background: WARM_DARK,
+            background: FILM,
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'center',
-            padding: '2rem',
+            justifyContent: 'flex-start',
+            paddingTop: '3rem',
+            paddingLeft: '1.5rem',
+            paddingRight: '1.5rem',
+            paddingBottom: '1rem',
+            zIndex: 9999,
           }}
         >
+          {/* ZONA 1 — TOP: X + título */}
           {onClose && (
             <button
               type="button"
@@ -178,181 +231,234 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                border: '1px solid rgba(201,169,110,0.3)',
-                background: 'rgba(0,0,0,0.3)',
-                color: CREAM,
-                fontSize: '1.25rem',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(201,169,110,0.25)',
+                color: 'rgba(245,240,232,0.6)',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                zIndex: 10,
               }}
             >
-              ×
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
             </button>
           )}
-
-          <div
-            className="avatar-halo"
-            style={{
-              width: '200px',
-              height: '200px',
-              borderRadius: '50%',
-              overflow: 'hidden',
-              marginBottom: '2rem',
-              border: '3px solid rgba(201,169,110,0.35)',
-            }}
-          >
-            <img
-              src={historia.autor.avatar}
-              alt={historia.autor.nombre}
-              style={{
-                width: '100%',
-                height: '100%',
-                objectFit: 'cover',
-              }}
-            />
-          </div>
-
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'flex-end',
-              gap: '4px',
-              height: '40px',
-              marginBottom: '2rem',
-            }}
-          >
-            {barHeights.map((h, i) => (
-              <div
-                key={i}
-                className="wave-bar"
-                style={{
-                  width: '6px',
-                  height: `${h}px`,
-                  background: SEPIA,
-                  borderRadius: '2px',
-                  animation: 'barWave 1.2s ease-in-out infinite',
-                  animationDelay: `${i * 0.06}s`,
-                }}
-              />
-            ))}
-          </div>
-
           <h1
             style={{
               fontFamily: "'Cormorant Garamond', serif",
               fontStyle: 'italic',
+              fontWeight: 300,
               fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
               color: CREAM,
               textAlign: 'center',
               maxWidth: '90%',
               marginBottom: '2rem',
               lineHeight: 1.3,
+              opacity: titleVisible ? 1 : 0,
+              transition: 'opacity 0.6s ease',
             }}
           >
             {historia.titulo}
           </h1>
 
-          {frases.length > 0 && (
-            <div
-              style={{
-                minHeight: '4rem',
-                maxWidth: '480px',
-                textAlign: 'center',
-                marginBottom: '2rem',
-              }}
-            >
-              {frases.map((frase, i) => {
-                const show = currentTime >= i * phraseThreshold;
-                if (!show) return null;
-                const isCurrent = i === currentPhraseIndex;
-                return (
-                  <p
-                    key={i}
-                    className={isCurrent ? 'phrase-in' : ''}
-                    style={{
-                      fontFamily: "'Cormorant Garamond', serif",
-                      fontStyle: 'italic',
-                      fontSize: '1.1rem',
-                      color: 'rgba(245,240,232,0.9)',
-                      lineHeight: 1.6,
-                      margin: 0,
-                    }}
-                  >
-                    {frase}
-                  </p>
-                );
-              })}
-            </div>
+          {/* ZONA 2 — CENTER: avatar + waveform + frases */}
+          <div
+            className={isPlaying ? 'ap-halo-pulse' : ''}
+            style={{
+              width: avatarSize,
+              height: avatarSize,
+              borderRadius: '50%',
+              overflow: 'hidden',
+              border: '2px solid rgba(201,169,110,0.4)',
+              marginBottom: '1.5rem',
+              flexShrink: 0,
+            }}
+          >
+            <img
+              src={historia.autor.avatar}
+              alt={historia.autor.nombre}
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+          <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.95rem', color: CREAM, marginBottom: '0.25rem' }}>
+            {historia.autor.nombre}
+          </p>
+          {historia.autor.ubicacion && (
+            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 200, fontSize: '0.8rem', color: SEPIA, letterSpacing: '0.12em', marginBottom: '2rem' }}>
+              {historia.autor.ubicacion}
+            </p>
           )}
 
           <div
             style={{
-              position: 'absolute',
-              bottom: '2rem',
-              left: '1.5rem',
-              right: '1.5rem',
               display: 'flex',
-              flexDirection: 'column',
-              gap: '0.75rem',
+              alignItems: 'flex-end',
+              justifyContent: 'center',
+              gap: '4px',
+              height: '36px',
+              width: waveformWidth,
+              maxWidth: '100%',
+              marginBottom: '1.5rem',
             }}
           >
-            <input
-              type="range"
-              min={0}
-              max={duration || 100}
-              value={currentTime}
-              onChange={seek}
-              style={{ width: '100%' }}
-            />
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                gap: '1rem',
-              }}
-            >
+            {barHeights.map((h, i) => (
+              <div
+                key={i}
+                className="ap-wave-bar"
+                style={{
+                  width: '3px',
+                  height: `${h}px`,
+                  background: SEPIA,
+                  borderRadius: '2px',
+                  animation: isPlaying ? `waveAnim ${barDurations[i]}s ease-in-out infinite alternate` : 'none',
+                  animationDelay: `${i * 0.06}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {frases.length > 0 && currentPhrase && (
+            <div style={{ minHeight: '4rem', maxWidth: '480px', textAlign: 'center', marginBottom: '1.5rem' }}>
+              <p
+                className="ap-phrase-in"
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontStyle: 'italic',
+                  fontSize: '1.1rem',
+                  color: 'rgba(245,240,232,0.7)',
+                  lineHeight: 1.6,
+                  margin: 0,
+                }}
+              >
+                {currentPhrase}
+              </p>
+            </div>
+          )}
+
+          {/* ZONA 3 — BOTTOM: controles */}
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 0,
+              left: 0,
+              right: 0,
+              padding: '2rem 2.5rem',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '1rem',
+            }}
+          >
+            <div style={{ position: 'relative', width: '100%', maxWidth: '480px', marginBottom: '0.5rem' }}>
+              <div
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: 0,
+                  width: `${progress}%`,
+                  height: '3px',
+                  background: SEPIA,
+                  borderRadius: '2px',
+                  transform: 'translateY(-50%)',
+                  pointerEvents: 'none',
+                }}
+              />
+              <input
+                type="range"
+                className="ap-range"
+                min={0}
+                max={duration || 100}
+                value={currentTime}
+                onChange={seek}
+              />
+            </div>
+            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(245,240,232,0.6)', letterSpacing: '0.08em' }}>
+              {formatTime(currentTime)} · · · {formatTime(duration)}
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
+              <button
+                type="button"
+                onClick={() => skip(-10)}
+                aria-label="Atrás 10 s"
+                style={{
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  border: '1px solid rgba(201,169,110,0.35)',
+                  background: 'rgba(255,255,255,0.06)',
+                  color: CREAM,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <SkipBackIcon />
+              </button>
               <button
                 type="button"
                 onClick={togglePlay}
                 style={{
-                  width: '48px',
-                  height: '48px',
+                  width: '64px',
+                  height: '64px',
                   borderRadius: '50%',
-                  border: `1px solid ${SEPIA}`,
+                  border: `2px solid ${SEPIA}`,
                   background: 'rgba(201,169,110,0.1)',
                   color: SEPIA,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.25rem',
                 }}
               >
-                {isPlaying ? '‖' : '▶'}
+                {isPlaying ? <PauseIcon /> : <PlayIcon />}
               </button>
-              <span style={{ fontFamily: "'Jost', sans-serif", fontSize: '0.85rem', color: 'rgba(245,240,232,0.7)' }}>
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
               <button
                 type="button"
-                onClick={toggleMute}
+                onClick={() => skip(10)}
+                aria-label="Adelante 10 s"
                 style={{
-                  width: '36px',
-                  height: '36px',
+                  width: '40px',
+                  height: '40px',
                   borderRadius: '50%',
-                  border: '1px solid rgba(201,169,110,0.3)',
-                  background: 'transparent',
+                  border: '1px solid rgba(201,169,110,0.35)',
+                  background: 'rgba(255,255,255,0.06)',
                   color: CREAM,
                   cursor: 'pointer',
-                  fontSize: '0.9rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
                 }}
               >
-                {isMuted ? '🔇' : '🔊'}
+                <SkipFwdIcon />
               </button>
             </div>
+            <button
+              type="button"
+              onClick={toggleMute}
+              aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+              style={{
+                position: 'absolute',
+                bottom: '2rem',
+                right: '2.5rem',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                border: '1px solid rgba(201,169,110,0.3)',
+                background: 'transparent',
+                color: CREAM,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {isMuted ? <MutedIcon /> : <VolumeIcon />}
+            </button>
           </div>
         </div>
       ) : (
@@ -360,11 +466,12 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           style={{
             position: 'fixed',
             inset: 0,
-            background: '#111009',
+            background: FILM,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             overflow: 'hidden',
+            zIndex: 9999,
           }}
         >
           <div
@@ -379,7 +486,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
             }}
           />
           <div
-            className="end-reveal"
+            className="ap-end-reveal"
             style={{
               position: 'relative',
               zIndex: 2,
@@ -410,7 +517,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               </blockquote>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', padding: '1.2rem 1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(201,169,110,0.1)', borderRadius: '3px', width: '100%', marginBottom: '2.5rem' }}>
-              <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,169,110,0.35)', flexShrink: 0 }} />
+              <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,169,110,0.35)', flexShrink: 0 }} className="ap-halo-pulse" />
               <div style={{ textAlign: 'left' }}>
                 <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '0.95rem', color: CREAM, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{historia.autor.nombre}</p>
                 {historia.autor.ubicacion && (
@@ -418,23 +525,18 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 )}
               </div>
             </div>
-            {historia.tags && historia.tags.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', justifyContent: 'center', marginBottom: '2.5rem' }}>
-                {historia.tags.map(tag => (
-                  <span key={tag} style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.68rem', letterSpacing: '0.22em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.6)', border: '1px solid rgba(201,169,110,0.2)', padding: '0.25rem 0.8rem', borderRadius: '2px' }}>{tag}</span>
-                ))}
-              </div>
-            )}
             <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
               <button
-                onClick={() => { setEnded(false); setCurrentTime(0); setIsPlaying(false); if (audioRef.current) { audioRef.current.currentTime = 0; } }}
+                type="button"
+                onClick={restart}
                 style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(201,169,110,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Escuchar de nuevo
               </button>
               <button
+                type="button"
                 onClick={onClose}
-                style={{ flex: 1, padding: '0.85rem', background: 'linear-gradient(135deg, #8b6914, ' + SEPIA + ')', border: 'none', borderRadius: '3px', color: '#111009', fontFamily: "'Jost', sans-serif", fontWeight: 500, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '0.85rem', background: `linear-gradient(135deg, ${SEPIA_DK}, ${SEPIA})`, border: 'none', borderRadius: '3px', color: FILM, fontFamily: "'Jost', sans-serif", fontWeight: 500, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Más historias
               </button>
