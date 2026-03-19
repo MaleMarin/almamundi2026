@@ -102,7 +102,9 @@ export default function HistoriasIdPage() {
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <img src="/logo.png" alt="AlmaMundi" className="h-10 md:h-12 w-auto object-contain select-none" />
+        </Link>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
           <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
@@ -116,7 +118,7 @@ export default function HistoriasIdPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
           <div>
-            <div className="text-xs font-semibold tracking-[0.12em] uppercase text-amber-700 mb-3">{place} · {hasVideo ? 'Video' : hasAudio ? 'Audio' : hasImage ? 'Foto' : 'Texto'} · {timeAgo(story.publishedAt)}</div>
+            <div className="text-xs font-semibold tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--almamundi-orange)' }}>{place} · {hasVideo ? 'Video' : hasAudio ? 'Audio' : hasImage ? 'Foto' : 'Texto'} · {timeAgo(story.publishedAt)}</div>
             <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>{story.title || 'Sin título'}</h1>
             {story.body && (
               <>
@@ -125,7 +127,8 @@ export default function HistoriasIdPage() {
                 </div>
                 <Link
                   href={`/historias/${story.id}/texto`}
-                  className="inline-block px-4 py-2 rounded-full text-xs font-medium text-amber-700 border border-amber-500/50 hover:bg-amber-50 mb-8"
+                  className="inline-block px-4 py-2 rounded-full text-xs font-medium border border-orange-500/50 hover:bg-orange-50 mb-8"
+                  style={{ color: 'var(--almamundi-orange)' }}
                 >
                   Leer en modo lectura →
                 </Link>
@@ -136,7 +139,8 @@ export default function HistoriasIdPage() {
               <p className="text-sm mb-4" style={{ color: neu.textBody }}>Contá tu historia o experiencia.</p>
               <Link
                 href="/#historias"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-medium text-white bg-amber-600 hover:bg-amber-700 transition-colors"
+                className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-medium text-white transition-colors hover:opacity-90"
+                style={{ backgroundColor: 'var(--almamundi-orange)' }}
               >
                 + Subir mi historia
               </Link>
@@ -149,7 +153,8 @@ export default function HistoriasIdPage() {
                   <video src={story.videoUrl} controls className="w-full h-full object-contain" />
                   <Link
                     href={`/historias/${story.id}/video`}
-                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                    style={{ backgroundColor: 'var(--almamundi-orange)' }}
                   >
                     Ver en cine
                   </Link>
@@ -159,7 +164,8 @@ export default function HistoriasIdPage() {
                   <audio src={story.audioUrl} controls className="w-full max-w-md" />
                   <Link
                     href={`/historias/${story.id}/audio`}
-                    className="px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                    className="px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                    style={{ backgroundColor: 'var(--almamundi-orange)' }}
                   >
                     Abrir reproductor
                   </Link>
@@ -175,7 +181,8 @@ export default function HistoriasIdPage() {
                   )}
                   <Link
                     href={`/historias/${story.id}/foto`}
-                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                    style={{ backgroundColor: 'var(--almamundi-orange)' }}
                   >
                     Ver álbum
                   </Link>
@@ -201,7 +208,7 @@ export default function HistoriasIdPage() {
                 className="block p-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.99]"
                 style={neu.card}
               >
-                <div className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-1">
+                <div className="text-[10px] font-semibold tracking-widest uppercase mb-1" style={{ color: 'var(--almamundi-orange)' }}>
                   {[s.city, s.country].filter(Boolean).join(', ') || '—'}
                 </div>
                 <h3 className="font-semibold tracking-tight text-gray-800 line-clamp-2 text-sm">{s.title || 'Sin título'}</h3>

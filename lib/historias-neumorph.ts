@@ -11,8 +11,9 @@ export const neu = {
   bg: '#E0E5EC',
   textMain: '#4A5568',
   textBody: '#718096',
-  orange: '#E8490A',
-  gold: '#C4A035',
+  /** Naranja fuerte como la home (--almamundi-orange) */
+  orange: '#ff4500',
+  gold: '#ff4500',
   /** Card elevada (relieve hacia fuera) */
   card: {
     position: 'relative' as const,

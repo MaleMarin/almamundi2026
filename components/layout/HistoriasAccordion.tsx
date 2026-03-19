@@ -11,8 +11,8 @@ const ITEMS = [
   { label: 'Mi colección', href: '/historias/mi-coleccion' },
   { label: 'Videos', href: '/historias/videos' },
   { label: 'Audio', href: '/historias/audios' },
-  { label: 'Escrito', href: '/historias/videos' },
-  { label: 'Fotografía', href: '/historias/videos' },
+  { label: 'Escrito', href: '/historias/escrito' },
+  { label: 'Fotografía', href: '/historias/fotos' },
 ] as const;
 
 type Variant = 'header' | 'footer';

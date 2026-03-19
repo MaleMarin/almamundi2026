@@ -30,18 +30,24 @@ export default function MiColeccionPage() {
   return (
     <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <Link href="/" className="flex items-center flex-shrink-0">
+          <img src="/logo.png" alt="AlmaMundi" className="h-10 md:h-12 w-auto object-contain select-none" />
+        </Link>
         <div className="flex items-center gap-2 flex-wrap justify-end">
           <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Mi colección</span>
+          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold" style={{ ...neu.cardInset, color: 'var(--almamundi-orange)' }}>Mi colección</span>
+          <Link href="/historias/videos" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Videos</Link>
+          <Link href="/historias/audios" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Audio</Link>
+          <Link href="/historias/escrito" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Escrito</Link>
+          <Link href="/historias/fotos" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Fotografía</Link>
           <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
       <header className="flex-shrink-0 px-6 md:px-12 pt-8 md:pt-12 pb-4 md:pb-6">
-        <p className="text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase mb-2">
+        <p className="text-xs font-semibold tracking-[0.18em] uppercase mb-2" style={{ color: 'var(--almamundi-orange)' }}>
           Tu colección
         </p>
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] text-gray-800">
@@ -71,7 +77,7 @@ export default function MiColeccionPage() {
                   )}
                 </Link>
                 <div className="p-4">
-                  <p className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-1">
+                  <p className="text-[10px] font-semibold tracking-widest uppercase mb-1" style={{ color: 'var(--almamundi-orange)' }}>
                     {[s.city, s.country].filter(Boolean).join(', ') || '—'} · {formatLabel(s.format)}
                   </p>
                   <Link href={`/historias/${s.id}`}>
@@ -82,7 +88,8 @@ export default function MiColeccionPage() {
                     <button
                       type="button"
                       onClick={() => shareStory(s)}
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-amber-600/40 text-amber-700 hover:bg-amber-50"
+                      style={{ color: 'var(--almamundi-orange)', borderColor: 'rgba(255, 69, 0, 0.5)' }}
+                      className="text-xs font-medium px-3 py-1.5 rounded-full border hover:bg-orange-50"
                     >
                       {copiedId === s.id ? 'Copiado' : 'Compartir'}
                     </button>
