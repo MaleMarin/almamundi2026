@@ -8,8 +8,9 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 
 const ITEMS = [
+  { label: 'Mi colección', href: '/historias/mi-coleccion' },
   { label: 'Videos', href: '/historias/videos' },
-  { label: 'Audio', href: '/historias/videos' },
+  { label: 'Audio', href: '/historias/audios' },
   { label: 'Escrito', href: '/historias/videos' },
   { label: 'Fotografía', href: '/historias/videos' },
 ] as const;

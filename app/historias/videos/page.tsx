@@ -8,6 +8,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useStories } from '@/hooks/useStories';
+import { useMiColeccion } from '@/hooks/useMiColeccion';
 import { StoriesFanCarousel } from '@/components/stories/StoriesFanCarousel';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
@@ -21,6 +22,7 @@ function isVideoStory(s: StoryPoint): boolean {
 
 export default function HistoriasVideosPage() {
   const allStories = useStories();
+  const { add: saveToCollection, isSaved: isSavedInCollection } = useMiColeccion();
   const videoStories = useMemo(() => {
     const fromApi = allStories.filter(
       (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s)
@@ -39,6 +41,7 @@ export default function HistoriasVideosPage() {
           <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
           <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Videos</span>
+          <Link href="/historias/audios" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Audio</Link>
           <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
@@ -56,7 +59,11 @@ export default function HistoriasVideosPage() {
       </header>
 
       <section className="flex-1 min-h-0">
-        <StoriesFanCarousel stories={videoStories} />
+        <StoriesFanCarousel
+          stories={videoStories}
+          onSaveToCollection={saveToCollection}
+          isSavedInCollection={isSavedInCollection}
+        />
       </section>
 
       <Footer />

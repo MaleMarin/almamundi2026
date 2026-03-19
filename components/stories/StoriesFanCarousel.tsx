@@ -33,7 +33,13 @@ function formatLabel(fmt: string): string {
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type StoriesFanCarouselProps = {
   stories: StoryPoint[]
+  /** Si es 'audio', al hacer clic se llama onSelectStory y no se abre VideoPlayer. */
+  mode?: 'video' | 'audio'
   onSelectStory?: (story: StoryPoint) => void
+  /** Para "Mi colección": guardar la historia actual. */
+  onSaveToCollection?: (story: StoryPoint) => void
+  /** Indica si la historia ya está guardada (muestra "En tu colección"). */
+  isSavedInCollection?: (id: string) => boolean
 }
 
 type ActiveVideo = {
@@ -60,7 +66,7 @@ function getPos(index: number, active: number) {
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export function StoriesFanCarousel({ stories, onSelectStory }: StoriesFanCarouselProps) {
+export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onSaveToCollection, isSavedInCollection }: StoriesFanCarouselProps) {
   const [active, setActive] = useState(Math.floor(stories.length / 2))
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
   const [mounted, setMounted] = useState(false)
@@ -229,6 +235,10 @@ export function StoriesFanCarousel({ stories, onSelectStory }: StoriesFanCarouse
                   className={`sfc-card ${p.isCenter ? 'sfc-center' : ''} ${fmt === 'audio' ? 'sfc-audio' : ''}`}
                   onClick={() => {
                     if (!p.isCenter) { goTo(i); return }
+                    if (mode === 'audio') {
+                      onSelectStory?.(s)
+                      return
+                    }
                     if (s.videoUrl) openCinema(s)
                   }}
                   style={{
@@ -336,13 +346,45 @@ export function StoriesFanCarousel({ stories, onSelectStory }: StoriesFanCarouse
         </div>
 
         {/* ── CTA ── */}
-        <button
-          className="sfc-cta"
-          onClick={() => current && openCinema(current)}
-          style={{ marginTop: '1.5rem', padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: "'Jost',sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
-        >
-          Ver esta historia →
-        </button>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', alignItems: 'center', marginTop: '1.5rem' }}>
+          <button
+            className="sfc-cta"
+            onClick={() => {
+              if (!current) return
+              if (mode === 'audio') {
+                onSelectStory?.(current)
+                return
+              }
+              openCinema(current)
+            }}
+            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: "'Jost',sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
+          >
+            {mode === 'audio' ? 'Escuchar →' : 'Ver esta historia →'}
+          </button>
+          {current && onSaveToCollection && (
+            <button
+              type="button"
+              onClick={() => onSaveToCollection(current)}
+              disabled={isSavedInCollection?.(current.id)}
+              style={{
+                padding: '0.6rem 1.4rem',
+                borderRadius: '3px',
+                border: '1px solid rgba(26,20,14,0.2)',
+                background: isSavedInCollection?.(current.id) ? 'rgba(139,105,20,0.15)' : 'transparent',
+                color: isSavedInCollection?.(current.id) ? '#6b4f10' : '#5a4a3a',
+                fontFamily: "'Jost',sans-serif",
+                fontWeight: 400,
+                fontSize: '11px',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                cursor: isSavedInCollection?.(current.id) ? 'default' : 'pointer',
+                opacity: isSavedInCollection?.(current.id) ? 0.9 : 1,
+              }}
+            >
+              {isSavedInCollection?.(current.id) ? 'En tu colección' : 'Guardar en mi colección'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* ── Cinema overlay ── */}

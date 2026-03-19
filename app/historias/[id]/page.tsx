@@ -146,8 +146,14 @@ export default function HistoriasIdPage() {
                   </Link>
                 </>
               ) : hasAudio && story.audioUrl ? (
-                <div className="p-8 w-full">
-                  <audio src={story.audioUrl} controls className="w-full" />
+                <div className="p-8 w-full flex flex-col items-center gap-4">
+                  <audio src={story.audioUrl} controls className="w-full max-w-md" />
+                  <Link
+                    href={`/historias/${story.id}/audio`}
+                    className="px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                  >
+                    Abrir reproductor
+                  </Link>
                 </div>
               ) : hasImage && story.imageUrl ? (
                 <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
