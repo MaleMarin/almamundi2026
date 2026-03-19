@@ -3,35 +3,9 @@
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { THEME_LIST } from '@/lib/themes';
-
-const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
-
-const soft = {
-  bg: '#E0E5EC',
-  textMain: '#4A5568',
-  textBody: '#718096',
-  flat: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
-    border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '40px',
-  },
-  inset: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: 'inset 6px 6px 10px rgba(163,177,198,0.7), inset -6px -6px 10px rgba(255,255,255,0.8)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '24px',
-  },
-  button: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-    border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '9999px',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
-    fontFamily: APP_FONT,
-  },
-} as const;
+import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { neu } from '@/lib/historias-neumorph';
 
 const MAX_MB = 8;
 
@@ -107,46 +81,31 @@ export default function SubirFotoPage() {
   }, [canContinuePhoto]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}>
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-24 bg-[#E0E5EC]/80 backdrop-blur-lg border-b border-white/20">
-        <Link href="/" className="flex items-center min-h-[60px]">
-          <img
-            src="/logo.png"
-            alt="AlmaMundi"
-            className="h-20 md:h-24 w-auto object-contain select-none"
-            onError={(e) => {
-              const t = e.currentTarget;
-              if (t.nextElementSibling) return;
-              const span = document.createElement('span');
-              span.className = 'text-xl font-light text-gray-600';
-              span.textContent = 'AlmaMundi';
-              t.style.display = 'none';
-              t.parentElement?.appendChild(span);
-            }}
-          />
-        </Link>
-        <nav className="flex gap-4 text-sm font-bold text-gray-600 items-center">
-          <Link href="/" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
-            Inicio
-          </Link>
-          <Link href="/#mapa" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
-            Mapa
-          </Link>
-        </nav>
-      </header>
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <Link href="/subir" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>← Subir</Link>
+          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Foto</span>
+          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+        </div>
+      </nav>
 
-      <div className="pt-28 pb-16 px-6 md:px-12 max-w-xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: soft.textMain }}>
+      <div className="pt-10 pb-16 px-6 md:px-12 max-w-xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
           Subir una foto
         </h1>
-        <p className="text-base font-light mb-8" style={{ color: soft.textBody }}>
+        <p className="text-base font-light mb-8" style={{ color: neu.textBody }}>
           {step === 'photo' ? 'Primero elige la imagen. Luego completarás los datos.' : 'Completa los datos. Quedará en curaduría.'}
         </p>
 
         {step === 'photo' && (
           <section className="space-y-6">
-            <div style={soft.inset} className="p-6 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-6 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Foto (obligatorio) * — máx. {MAX_MB} MB, JPG/PNG/WebP
               </label>
               <input
@@ -154,10 +113,10 @@ export default function SubirFotoPage() {
                 accept="image/jpeg,image/png,image/webp"
                 onChange={onFileChange}
                 className="w-full text-sm"
-                style={{ color: soft.textBody }}
+                style={{ color: neu.textBody }}
               />
               {file && (
-                <p className="mt-2 text-sm" style={{ color: soft.textBody }}>
+                <p className="mt-2 text-sm" style={{ color: neu.textBody }}>
                   {file.name}
                   {file.size > MAX_MB * 1024 * 1024 && (
                     <span className="text-amber-700 ml-2">Máximo {MAX_MB} MB</span>
@@ -186,18 +145,18 @@ export default function SubirFotoPage() {
         )}
 
         {step === 'enviado' ? (
-          <section className="p-8 rounded-[40px] text-center" style={soft.flat}>
-            <p className="text-xl font-semibold mb-2" style={{ color: soft.textMain }}>
+          <section className="p-8 rounded-[40px] text-center" style={neu.card}>
+            <p className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
               Enviado
             </p>
-            <p className="text-base font-light mb-6" style={{ color: soft.textBody }}>
+            <p className="text-base font-light mb-6" style={{ color: neu.textBody }}>
               Quedó en curaduría. Te avisaremos por email.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/subir/foto" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={soft.button}>
+              <Link href="/subir/foto" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
                 Subir otra
               </Link>
-              <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...soft.button, color: soft.textMain }}>
+              <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
                 Ir al inicio
               </Link>
             </div>
@@ -205,27 +164,27 @@ export default function SubirFotoPage() {
         ) : step === 'form' ? (
           <form onSubmit={onSubmit} className="space-y-6">
             {file && (
-              <div style={soft.inset} className="p-4 rounded-3xl flex items-center gap-3">
+              <div style={neu.cardInset} className="p-4 rounded-3xl flex items-center gap-3">
                 {previewUrl && (
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-200 flex-shrink-0">
                     <img src={previewUrl} alt="" className="w-full h-full object-cover" />
                   </div>
                 )}
-                <p className="text-sm font-medium" style={{ color: soft.textMain }}>
+                <p className="text-sm font-medium" style={{ color: neu.textMain }}>
                   Foto: {file.name}
                 </p>
                 <button
                   type="button"
                   onClick={() => setStep('photo')}
                   className="text-sm ml-auto"
-                  style={{ color: soft.textBody }}
+                  style={{ color: neu.textBody }}
                 >
                   Cambiar
                 </button>
               </div>
             )}
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Alias (obligatorio) *
               </label>
               <input
@@ -234,15 +193,15 @@ export default function SubirFotoPage() {
                 onChange={(e) => setAlias(e.target.value)}
                 placeholder="Cómo quieres aparecer"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
               {alias.trim().length > 0 && alias.trim().length < 2 && (
                 <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
               )}
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Email (obligatorio) *
               </label>
               <input
@@ -251,12 +210,12 @@ export default function SubirFotoPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Tema (obligatorio) *
               </label>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -267,8 +226,8 @@ export default function SubirFotoPage() {
                     onClick={() => setTopic(t.id)}
                     className="px-3 py-1.5 rounded-full text-sm font-medium transition"
                     style={{
-                      ...soft.button,
-                      color: topic === t.id ? '#ff4500' : soft.textBody,
+                      ...neu.button,
+                      color: topic === t.id ? '#ff4500' : neu.textBody,
                     }}
                   >
                     {t.label}
@@ -277,8 +236,8 @@ export default function SubirFotoPage() {
               </div>
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Fecha (opcional)
               </label>
               <input
@@ -287,12 +246,12 @@ export default function SubirFotoPage() {
                 onChange={(e) => setDateTaken(e.target.value)}
                 placeholder="Ej: 2024-03-15"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Contexto (opcional)
               </label>
               <textarea
@@ -301,12 +260,12 @@ export default function SubirFotoPage() {
                 placeholder="Breve descripción del momento..."
                 rows={3}
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50 resize-y"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600 font-medium p-3 rounded-2xl" style={soft.inset}>
+              <p className="text-sm text-red-600 font-medium p-3 rounded-2xl" style={neu.cardInset}>
                 {error}
               </p>
             )}
@@ -324,6 +283,10 @@ export default function SubirFotoPage() {
             </button>
           </form>
         ) : null}
+      </div>
+
+      <div className="border-t border-gray-400/50 pt-10 md:pt-14">
+        <Footer />
       </div>
     </main>
   );

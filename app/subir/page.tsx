@@ -5,35 +5,9 @@ import Link from 'next/link';
 import { Video, Mic, FileText, Image as ImageIcon } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { THEME_LIST } from '@/lib/themes';
-
-const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
-
-const soft = {
-  bg: '#E0E5EC',
-  textMain: '#4A5568',
-  textBody: '#718096',
-  flat: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
-    border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '40px',
-  },
-  inset: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: 'inset 6px 6px 10px rgba(163,177,198,0.7), inset -6px -6px 10px rgba(255,255,255,0.8)',
-    border: '1px solid rgba(255,255,255,0.1)',
-    borderRadius: '24px',
-  },
-  button: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-    border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '9999px',
-    cursor: 'pointer',
-    transition: 'transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
-    fontFamily: APP_FONT,
-  },
-} as const;
+import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { neu } from '@/lib/historias-neumorph';
 
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -175,39 +149,23 @@ export default function SubirPage() {
   }, []);
 
   return (
-    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: soft.bg, fontFamily: APP_FONT }}>
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-24 bg-[#E0E5EC]/80 backdrop-blur-lg border-b border-white/20">
-        <Link href="/" className="flex items-center min-h-[60px]">
-          <img
-            src="/logo.png"
-            alt="AlmaMundi"
-            className="h-20 md:h-24 w-auto object-contain select-none"
-            onError={(e) => {
-              const t = e.currentTarget;
-              if (t.nextElementSibling) return;
-              const span = document.createElement('span');
-              span.className = 'text-xl font-light text-gray-600';
-              span.textContent = 'AlmaMundi';
-              t.style.display = 'none';
-              t.parentElement?.appendChild(span);
-            }}
-          />
-        </Link>
-        <nav className="flex gap-4 text-sm font-bold text-gray-600 items-center">
-          <Link href="/" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
-            Inicio
-          </Link>
-          <Link href="/#mapa" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
-            Mapa
-          </Link>
-        </nav>
-      </header>
+    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Subir</span>
+          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+        </div>
+      </nav>
 
-      <div className="pt-28 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: soft.textMain }}>
+      <div className="pt-10 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
+        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
           Subir
         </h1>
-        <p className="text-base font-light mb-10" style={{ color: soft.textBody }}>
+        <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
           Elige el formato. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
         </p>
 
@@ -222,19 +180,19 @@ export default function SubirPage() {
                   setStep('form');
                 }}
                 className="p-6 rounded-[40px] flex flex-col items-start gap-3 transition-all hover:-translate-y-1 active:scale-[0.99] text-left"
-                style={soft.flat}
+                style={neu.card}
               >
                 {f === 'video' && <Video size={32} className="text-orange-500" />}
                 {f === 'audio' && <Mic size={32} className="text-orange-500" />}
                 {f === 'texto' && <FileText size={32} className="text-orange-500" />}
                 {f === 'foto' && <ImageIcon size={32} className="text-orange-500" />}
-                <span className="font-semibold text-lg" style={{ color: soft.textMain }}>
+                <span className="font-semibold text-lg" style={{ color: neu.textMain }}>
                   {FORMAT_LABELS[f]}
                 </span>
-                <p className="text-sm font-light" style={{ color: soft.textBody }}>
+                <p className="text-sm font-light" style={{ color: neu.textBody }}>
                   {FORMAT_PHRASES[f]}
                 </p>
-                <span className="mt-2 px-4 py-2 rounded-full text-sm font-semibold text-orange-600" style={soft.button}>
+                <span className="mt-2 px-4 py-2 rounded-full text-sm font-semibold text-orange-600" style={neu.button}>
                   Empezar
                 </span>
               </button>
@@ -248,16 +206,16 @@ export default function SubirPage() {
               type="button"
               onClick={backToCards}
               className="text-sm font-medium"
-              style={{ color: soft.textBody }}
+              style={{ color: neu.textBody }}
             >
               ← Cambiar formato
             </button>
-            <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: soft.textBody }}>
+            <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
               {FORMAT_LABELS[format]}
             </p>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Alias (público) *
               </label>
               <input
@@ -266,15 +224,15 @@ export default function SubirPage() {
                 onChange={(e) => setAlias(e.target.value)}
                 placeholder="Cómo quieres aparecer"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
               {alias.trim().length > 0 && alias.trim().length < 2 && (
                 <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
               )}
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Email (privado; solo notificaciones) *
               </label>
               <input
@@ -283,12 +241,12 @@ export default function SubirPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Tema *
               </label>
               <div className="flex flex-wrap gap-2 mt-2">
@@ -299,8 +257,8 @@ export default function SubirPage() {
                     onClick={() => setThemeId(t.id)}
                     className="px-3 py-1.5 rounded-full text-sm font-medium transition"
                     style={{
-                      ...soft.button,
-                      color: themeId === t.id ? '#ff4500' : soft.textBody,
+                      ...neu.button,
+                      color: themeId === t.id ? '#ff4500' : neu.textBody,
                     }}
                   >
                     {t.label}
@@ -309,8 +267,8 @@ export default function SubirPage() {
               </div>
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Fecha *
               </label>
               <input
@@ -319,16 +277,16 @@ export default function SubirPage() {
                 onChange={(e) => setFecha(e.target.value)}
                 placeholder="Ej: 2024-03-15 o marzo 2024"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
-              <label className="mt-2 flex items-center gap-2 text-sm" style={{ color: soft.textBody }}>
+              <label className="mt-2 flex items-center gap-2 text-sm" style={{ color: neu.textBody }}>
                 <input type="checkbox" checked={fechaAprox} onChange={(e) => setFechaAprox(e.target.checked)} className="accent-orange-500" />
                 Aproximada
               </label>
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Lugar *
               </label>
               <input
@@ -337,12 +295,12 @@ export default function SubirPage() {
                 onChange={(e) => setLugar(e.target.value)}
                 placeholder="Ciudad, región o lugar"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
             </div>
 
-            <div style={soft.inset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Contexto (1–5 líneas) *
               </label>
               <textarea
@@ -351,7 +309,7 @@ export default function SubirPage() {
                 placeholder="Describe el momento, el lugar o el contexto..."
                 rows={4}
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50 resize-y"
-                style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
               {contexto.trim().length > 0 && contexto.trim().length < 30 && (
                 <p className="mt-1 text-xs text-amber-700">Mínimo 30 caracteres</p>
@@ -359,8 +317,8 @@ export default function SubirPage() {
             </div>
 
             {format === 'texto' && (
-              <div style={soft.inset} className="p-4 rounded-3xl">
-                <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+              <div style={neu.cardInset} className="p-4 rounded-3xl">
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   Texto *
                 </label>
                 <textarea
@@ -369,14 +327,14 @@ export default function SubirPage() {
                   placeholder="Tu historia..."
                   rows={8}
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50 resize-y"
-                  style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
               </div>
             )}
 
             {format === 'video' && (
-              <div style={soft.inset} className="p-4 rounded-3xl">
-                <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+              <div style={neu.cardInset} className="p-4 rounded-3xl">
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   URL del video (YouTube o Vimeo) *
                 </label>
                 <input
@@ -385,7 +343,7 @@ export default function SubirPage() {
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://www.youtube.com/..."
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
                 {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
                   <p className="mt-1 text-xs text-amber-700">Indica un enlace de YouTube o Vimeo</p>
@@ -394,8 +352,8 @@ export default function SubirPage() {
             )}
 
             {format === 'foto' && (
-              <div style={soft.inset} className="p-4 rounded-3xl space-y-3">
-                <label className="block text-sm font-medium mb-2" style={{ color: soft.textMain }}>
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   Foto (JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB) *
                 </label>
                 <input
@@ -416,9 +374,9 @@ export default function SubirPage() {
                     setPhotoFile(f);
                   }}
                   className="w-full text-sm"
-                  style={{ color: soft.textBody }}
+                  style={{ color: neu.textBody }}
                 />
-                <p className="text-xs" style={{ color: soft.textBody }}>
+                <p className="text-xs" style={{ color: neu.textBody }}>
                   Si no tienes cómo subir archivo, pega la URL de la imagen abajo (fallback temporal).
                 </p>
                 <input
@@ -427,15 +385,15 @@ export default function SubirPage() {
                   onChange={(e) => setPhotoUrl(e.target.value)}
                   placeholder="O pega aquí la URL de la imagen"
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
-                {(photoFile || photoUrl.trim()) && <p className="text-sm" style={{ color: soft.textBody }}>✓ Listo</p>}
+                {(photoFile || photoUrl.trim()) && <p className="text-sm" style={{ color: neu.textBody }}>✓ Listo</p>}
               </div>
             )}
 
             {format === 'audio' && (
-              <div style={soft.inset} className="p-4 rounded-3xl space-y-3">
-                <label className="block text-sm font-medium" style={{ color: soft.textMain }}>
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
                   Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
                 </label>
                 <input
@@ -456,7 +414,7 @@ export default function SubirPage() {
                     setAudioFile(f);
                   }}
                   className="w-full text-sm"
-                  style={{ color: soft.textBody }}
+                  style={{ color: neu.textBody }}
                 />
                 <input
                   type="url"
@@ -464,22 +422,22 @@ export default function SubirPage() {
                   onChange={(e) => setAudioUrl(e.target.value)}
                   placeholder="O pega aquí la URL del audio"
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: soft.textMain, fontFamily: APP_FONT }}
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
-                {(audioFile || audioUrl.trim()) && <p className="text-sm" style={{ color: soft.textBody }}>✓ Listo</p>}
+                {(audioFile || audioUrl.trim()) && <p className="text-sm" style={{ color: neu.textBody }}>✓ Listo</p>}
               </div>
             )}
 
             <div className="space-y-3">
-              <label className="flex items-start gap-3 text-sm" style={{ color: soft.textBody }}>
+              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
                 <input type="checkbox" checked={consentRights} onChange={(e) => setConsentRights(e.target.checked)} className="mt-1 accent-orange-500" />
                 <span>Tengo derechos para compartir este contenido.</span>
               </label>
-              <label className="flex items-start gap-3 text-sm" style={{ color: soft.textBody }}>
+              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
                 <input type="checkbox" checked={consentCurate} onChange={(e) => setConsentCurate(e.target.checked)} className="mt-1 accent-orange-500" />
                 <span>Acepto que pasa por curaduría antes de publicarse.</span>
               </label>
-              <label className="flex items-start gap-3 text-sm" style={{ color: soft.textBody }}>
+              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
                 <input type="checkbox" checked={consentPostales} onChange={(e) => setConsentPostales(e.target.checked)} className="mt-1 accent-orange-500" />
                 <span>Postales: mantener autoría, no modificar.</span>
               </label>
@@ -503,23 +461,27 @@ export default function SubirPage() {
         )}
 
         {step === 'received' && (
-          <section className="p-8 rounded-[40px] text-center" style={soft.flat}>
-            <p className="text-xl font-semibold mb-2" style={{ color: soft.textMain }}>
+          <section className="p-8 rounded-[40px] text-center" style={neu.card}>
+            <p className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
               Listo
             </p>
-            <p className="text-base font-light mb-6" style={{ color: soft.textBody }}>
+            <p className="text-base font-light mb-6" style={{ color: neu.textBody }}>
               Quedó en revisión. Te avisaremos por email.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={soft.button}>
+              <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
                 Subir otro
               </Link>
-              <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...soft.button, color: soft.textMain }}>
+              <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
                 Ir al inicio
               </Link>
             </div>
           </section>
         )}
+      </div>
+
+      <div className="border-t border-gray-400/50 pt-10 md:pt-14">
+        <Footer />
       </div>
     </main>
   );

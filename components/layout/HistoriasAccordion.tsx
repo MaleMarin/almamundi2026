@@ -70,6 +70,7 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
+        data-active={open ? 'true' : undefined}
         className="px-4 py-2 rounded-full text-sm transition-all"
         style={buttonStyle}
         aria-expanded={open}

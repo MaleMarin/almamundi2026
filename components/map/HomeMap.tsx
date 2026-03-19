@@ -330,7 +330,7 @@ function DockButtonLight({
       type="button"
       onClick={onClick}
       data-active={active ? 'true' : undefined}
-      className="btn-almamundi whitespace-nowrap min-w-[128px] px-10 py-5 text-[0.9375rem] font-medium text-gray-600 active:scale-95 transition-colors"
+      className="btn-almamundi whitespace-nowrap min-w-[148px] px-12 py-6 text-base font-medium text-gray-600 active:scale-95 transition-colors"
       style={dockButtonStyle}
     >
       {children}
@@ -343,7 +343,7 @@ function DockSearchLight({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="btn-almamundi whitespace-nowrap min-w-[280px] px-10 py-5 text-[0.9375rem] font-medium text-gray-600 active:scale-95 transition-colors"
+      className="btn-almamundi whitespace-nowrap min-w-[320px] px-12 py-6 text-base font-medium text-gray-600 active:scale-95 transition-colors"
       style={dockButtonStyle}
     >
       Buscar por palabras clave
