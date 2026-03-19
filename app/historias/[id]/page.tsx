@@ -96,7 +96,7 @@ export default function HistoriasIdPage() {
   const place = formatPlace(story);
   const hasVideo = Boolean(story.videoUrl || story.hasVideo);
   const hasAudio = Boolean(story.audioUrl || story.hasAudio);
-  const hasImage = Boolean(story.imageUrl);
+  const hasImage = Boolean(story.imageUrl || (story as StoryPoint & { images?: string[] }).images?.length);
   const hasText = Boolean(story.body || story.hasText);
 
   return (
@@ -164,8 +164,22 @@ export default function HistoriasIdPage() {
                     Abrir reproductor
                   </Link>
                 </div>
-              ) : hasImage && story.imageUrl ? (
-                <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
+              ) : hasImage ? (
+                <>
+                  {story.imageUrl ? (
+                    <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" style={neu.cardInset}>
+                      <span className="text-4xl opacity-50">📷</span>
+                    </div>
+                  )}
+                  <Link
+                    href={`/historias/${story.id}/foto`}
+                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                  >
+                    Ver álbum
+                  </Link>
+                </>
               ) : (
                 <div className="w-20 h-20 rounded-full flex items-center justify-center" style={neu.cardInset}>
                   <span className="text-4xl opacity-50">📖</span>
