@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { neu } from '@/lib/historias-neumorph';
 import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { TEMAS } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -42,7 +43,7 @@ export default function TemasPage() {
         <div className="flex items-center gap-2">
           <Link href="/#intro" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-          <Link href="/historias" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>Historias</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} />
           <span className="px-4 py-2 rounded-full text-sm font-medium text-amber-700" style={neu.cardInset}>Temas</span>
           <Link href="/#mapa" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>

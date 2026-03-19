@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu } from '@/lib/historias-neumorph';
 import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -102,7 +103,7 @@ export default function HistoriasIdPage() {
       <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
         <Link href="/" className="text-lg font-light tracking-wide" style={{ color: neu.textMain }}>AlmaMundi</Link>
         <div className="flex items-center gap-2">
-          <Link href="/historias" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>← Historias</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} />
           <Link href="/#intro" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <Link href="/#mapa" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
@@ -133,9 +134,17 @@ export default function HistoriasIdPage() {
             </div>
           </div>
           <div>
-            <div className="rounded-2xl overflow-hidden aspect-video flex items-center justify-center" style={neu.card}>
+            <div className="relative rounded-2xl overflow-hidden aspect-video flex items-center justify-center" style={neu.card}>
               {hasVideo && story.videoUrl ? (
-                <video src={story.videoUrl} controls className="w-full h-full object-contain" />
+                <>
+                  <video src={story.videoUrl} controls className="w-full h-full object-contain" />
+                  <Link
+                    href={`/historias/${story.id}/video`}
+                    className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white bg-amber-600/90 hover:bg-amber-600 border border-amber-500/50"
+                  >
+                    Ver en cine
+                  </Link>
+                </>
               ) : hasAudio && story.audioUrl ? (
                 <div className="p-8 w-full">
                   <audio src={story.audioUrl} controls className="w-full" />

@@ -185,9 +185,9 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               <p className="text-sm text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
 
               <Link
-                href={`/historias/${selected.id}`}
+                href={selected.videoUrl ? `/historias/${selected.id}/video` : `/historias/${selected.id}`}
                 className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
-                aria-label="Reproducir"
+                aria-label={selected.videoUrl ? 'Ver en cine' : 'Reproducir'}
               >
                 <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
               </Link>

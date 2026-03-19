@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { PROPOSITO_TITLE, PROPOSITO_SUBTITLE, PROPOSITO_PARAGRAPHS, PROPOSITO_CIERRE } from '@/lib/proposito-text';
 import {
   X,
@@ -33,6 +34,7 @@ import {
 const HomeMap = dynamic(() => import('@/components/map/HomeMap').then((m) => m.default), { ssr: false });
 
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 
 /* ------------------------------------------------------------------ */
 /* THEME: NEUMÓRFICO (SOFT UI)                                         */
@@ -2515,9 +2517,7 @@ export default function Home() {
           <button onClick={() => setShowHowItWorks(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
             ¿Cómo funciona?
           </button>
-          <a href="#historias" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
-            Historias
-          </a>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...soft.button, padding: '1rem 2rem', fontSize: '0.875rem', fontWeight: 700 }} className="[&_button]:hover:text-orange-600 [&_button]:active:scale-95" />
           <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
             Mapa
           </a>
@@ -2571,18 +2571,18 @@ export default function Home() {
       </section>
 
       {/* FOOTER: crece hacia abajo (más padding y título); el globo sigue con 100vh y no pierde espacio */}
-      <footer className="w-full pb-24 pt-20 md:pt-28 px-6 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-        <div className="mb-14 mt-6 w-full flex justify-center select-none">
-          <h1 className="text-6xl md:text-[120px] lg:text-[180px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
+      <footer className="w-full pb-32 pt-28 md:pt-36 px-8 md:px-12 flex flex-col items-center relative z-20 bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
+        <div className="mb-20 mt-8 w-full flex justify-center select-none">
+          <h1 className="text-7xl md:text-[140px] lg:text-[200px] text-center leading-none almamundi-footer-title">ALMAMUNDI</h1>
         </div>
 
-        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-base font-medium pt-10 pb-4 text-gray-600 gap-10">
+        <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-lg font-medium pt-14 pb-8 text-gray-600 gap-12">
           <div className="flex flex-col items-center md:items-start">
-            <span className="block mb-3 opacity-70">Una iniciativa de</span>
-            <img src="/logo-precisar.png" alt="Precisar" className="h-14 w-auto object-contain" />
+            <span className="block mb-4 opacity-70 text-base">Una iniciativa de</span>
+            <img src="/logo-precisar.png" alt="Precisar" className="h-16 w-auto object-contain" />
           </div>
 
-          <div className="flex flex-wrap justify-center gap-8 md:gap-10 opacity-90">
+          <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
             <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
               Nuestro propósito
             </button>
@@ -2591,9 +2591,10 @@ export default function Home() {
               ¿Cómo funciona?
             </button>
 
-            <a href="#historias" className="hover:text-gray-900 transition-colors font-bold">
-              Historias
-            </a>
+            <HistoriasAccordion variant="footer" />
+            <Link href="/archivo" className="hover:text-gray-900 transition-colors font-bold">
+              Archivo
+            </Link>
             <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
               Mapa
             </a>

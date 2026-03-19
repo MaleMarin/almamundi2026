@@ -101,12 +101,13 @@ body {
      12px  12px 24px rgba(163,177,198,0.5);
 }
 
-/* Borde naranja persistente: al hacer clic el botón/enlace se queda con el anillo hasta perder foco */
+/* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */
 button:focus,
 a:focus,
 [role="button"]:focus {
   outline: 2px solid rgba(249, 115, 22, 0.55);
-  outline-offset: 2px;
+  outline-offset: 0;
+  border-color: transparent;
 }
 
 /* Liquid glass + neomorphism para overlays sobre el globo (/mapa) */

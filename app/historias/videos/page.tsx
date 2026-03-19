@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { StoriesCurvedCarousel } from '@/components/stories/StoriesCurvedCarousel';
 import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -31,7 +32,7 @@ export default function HistoriasVideosPage() {
         </Link>
         <div className="flex items-center gap-2">
           <Link
-            href="/historias"
+            href="/"
             className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
             style={{
               backgroundColor: '#E0E5EC',
@@ -39,8 +40,18 @@ export default function HistoriasVideosPage() {
               border: '1px solid rgba(255,255,255,0.35)',
             }}
           >
-            Todas las historias
+            Inicio
           </Link>
+          <HistoriasAccordion
+            variant="header"
+            buttonStyle={{
+              backgroundColor: '#E0E5EC',
+              boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
+              border: '1px solid rgba(255,255,255,0.35)',
+              color: '#4A5568',
+              fontFamily: APP_FONT,
+            }}
+          />
           <Link
             href="/#mapa"
             className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
