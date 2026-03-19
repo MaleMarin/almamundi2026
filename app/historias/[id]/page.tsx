@@ -97,6 +97,7 @@ export default function HistoriasIdPage() {
   const hasVideo = Boolean(story.videoUrl || story.hasVideo);
   const hasAudio = Boolean(story.audioUrl || story.hasAudio);
   const hasImage = Boolean(story.imageUrl);
+  const hasText = Boolean(story.body || story.hasText);
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -118,9 +119,17 @@ export default function HistoriasIdPage() {
             <div className="text-xs font-semibold tracking-[0.12em] uppercase text-amber-700 mb-3">{place} · {hasVideo ? 'Video' : hasAudio ? 'Audio' : hasImage ? 'Foto' : 'Texto'} · {timeAgo(story.publishedAt)}</div>
             <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>{story.title || 'Sin título'}</h1>
             {story.body && (
-              <div className="text-base leading-relaxed mb-8" style={{ color: neu.textBody }}>
-                {story.body}
-              </div>
+              <>
+                <div className="text-base leading-relaxed mb-4" style={{ color: neu.textBody }}>
+                  {story.body}
+                </div>
+                <Link
+                  href={`/historias/${story.id}/texto`}
+                  className="inline-block px-4 py-2 rounded-full text-xs font-medium text-amber-700 border border-amber-500/50 hover:bg-amber-50 mb-8"
+                >
+                  Leer en modo lectura →
+                </Link>
+              </>
             )}
             <div className="rounded-2xl p-6 mb-8" style={neu.cardInset}>
               <p className="text-xl font-semibold tracking-tight mb-2" style={{ color: neu.textMain }}>¿Estuviste aquí o conocés algo de este lugar?</p>

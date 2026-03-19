@@ -1,6 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+
+const PAPEL = '#faf8f4';
+const TINTA = '#2a2218';
+const TINTA_SOFT = '#4a3f32';
+const SEPIA = '#c9a96e';
+const SEPIA_DK = '#8b6914';
 
 export interface HistoriaTexto {
   id: string;
@@ -23,235 +29,458 @@ interface TextoReaderProps {
   onClose?: () => void;
 }
 
-const PAPER = '#faf8f4';
-const INK = '#2a2520';
-const DROP_CAP = '#c9a96e';
+function formatFecha(fecha: string): string {
+  if (!fecha) return '';
+  try {
+    const d = new Date(fecha);
+    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  } catch {
+    return fecha;
+  }
+}
+
+function getFirstParagraphDropAndRest(contenido: string): { drop: string; rest: string; otherParrafos: string[] } {
+  const parrafos = splitParrafos(contenido);
+  if (parrafos.length === 0) return { drop: '', rest: '', otherParrafos: [] };
+  const first = parrafos[0].trim();
+  const words = first.split(/\s+/);
+  const drop = words.length <= 2 ? first : words.slice(0, 2).join(' ');
+  const rest = words.length <= 2 ? '' : words.slice(2).join(' ');
+  return { drop, rest, otherParrafos: parrafos.slice(1) };
+}
+
+function splitParrafos(contenido: string): string[] {
+  const trimmed = contenido.trim();
+  if (!trimmed) return [];
+  return trimmed.split(/\n\n+/).map((p) => p.trim()).filter((p) => p.length > 0);
+}
 
 export default function TextoReader({ historia, onClose }: TextoReaderProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [visibleLines, setVisibleLines] = useState<Set<number>>(new Set([0]));
+  const [readProgress, setReadProgress] = useState(0);
+  const [isMobile, setIsMobile] = useState(false);
+  const paragraphRefs = useRef<(HTMLParagraphElement | null)[]>([]);
+  const [visibleParrafos, setVisibleParrafos] = useState<boolean[]>([]);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
+
+  useEffect(() => {
     const onScroll = () => {
-      const { scrollTop, scrollHeight, clientHeight } = el;
-      const max = scrollHeight - clientHeight;
-      setScrollProgress(max <= 0 ? 1 : Math.min(scrollTop / max, 1));
+      const el = document.documentElement;
+      const max = el.scrollHeight - el.clientHeight;
+      const pct = max > 0 ? (el.scrollTop / max) * 100 : 0;
+      setReadProgress(pct);
     };
-    el.addEventListener('scroll', onScroll);
+    window.addEventListener('scroll', onScroll);
     onScroll();
-    return () => el.removeEventListener('scroll', onScroll);
-  }, [historia.contenido]);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [historia.id]);
 
-  const lines = historia.contenido.split('\n').filter(Boolean);
-  const firstLine = lines[0] ?? '';
-  const firstTwoWords = firstLine.split(/\s+/).slice(0, 2).join(' ');
-  const restOfFirstLine = firstLine.slice(firstTwoWords.length).trim();
-  const remainingLines = lines.slice(1);
+  const { drop, rest: restOfFirst, otherParrafos } = getFirstParagraphDropAndRest(historia.contenido);
+  const totalParrafos = (drop || restOfFirst ? 1 : 0) + otherParrafos.length;
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const observers: IntersectionObserver[] = [];
-    const lineEls = el.querySelectorAll('[data-line-index]');
+    const refs = paragraphRefs.current;
+    if (totalParrafos === 0) return;
     const observer = new IntersectionObserver(
       (entries) => {
-        setVisibleLines((prev) => {
-          const next = new Set(prev);
-          entries.forEach((entry) => {
-            const idx = Number((entry.target as HTMLElement).dataset.lineIndex);
-            if (entry.isIntersecting) next.add(idx);
+        setVisibleParrafos((prev) => {
+          const next = [...prev];
+          entries.forEach((e) => {
+            const i = refs.indexOf(e.target as HTMLParagraphElement);
+            if (i >= 0 && e.isIntersecting) next[i] = true;
           });
           return next;
         });
       },
-      { root: el, rootMargin: '-10% 0px -10% 0px', threshold: 0 }
+      { rootMargin: '0px 0px -80px 0px', threshold: 0.1 }
     );
-    lineEls.forEach((node) => observer.observe(node));
+    refs.forEach((r) => r && observer.observe(r));
+    setVisibleParrafos((prev) => {
+      const next = new Array(totalParrafos).fill(false);
+      prev.forEach((v, i) => { if (i < totalParrafos) next[i] = v; });
+      return next;
+    });
     return () => observer.disconnect();
-  }, [historia.contenido]);
+  }, [totalParrafos, historia.id]);
+
+  const maxWidth = isMobile ? '100%' : '640px';
+  const maxWidthDesktop = '720px';
+  const paddingX = isMobile ? 20 : 24;
+  const displayTags = (historia.tags ?? []).slice(0, isMobile ? 3 : undefined);
+  const avatarSize = isMobile ? 48 : 64;
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: PAPER,
-        overflow: 'auto',
-        fontFamily: "'Jost', sans-serif",
-      }}
-    >
-      {/* Progress bar */}
+    <>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap"
+        rel="stylesheet"
+      />
+
+      {/* Barra de progreso */}
       <div
         style={{
           position: 'fixed',
           top: 0,
           left: 0,
           right: 0,
-          height: '3px',
-          background: 'rgba(201,169,110,0.2)',
-          zIndex: 10,
+          height: 3,
+          background: `linear-gradient(90deg, ${SEPIA_DK}, ${SEPIA})`,
+          width: `${readProgress}%`,
+          zIndex: 1000,
+          transition: 'width 0.15s ease-out',
         }}
-      >
-        <div
-          style={{
-            height: '100%',
-            width: `${scrollProgress * 100}%`,
-            background: DROP_CAP,
-            transition: 'width 0.15s ease',
-          }}
-        />
-      </div>
+      />
 
+      {/* Botón Volver */}
+      {onClose && (
+        <button
+          type="button"
+          onClick={onClose}
+          style={{
+            position: 'fixed',
+            top: '1.2rem',
+            left: '1.5rem',
+            zIndex: 100,
+            fontFamily: "'Jost', sans-serif",
+            fontWeight: 300,
+            fontSize: '0.75rem',
+            color: SEPIA,
+            background: 'transparent',
+            border: 'none',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+          }}
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+            <polyline points="15,18 9,12 15,6" />
+          </svg>
+          {isMobile ? '←' : '← Volver'}
+        </button>
+      )}
+
+      {/* Contenedor principal */}
       <div
         style={{
-          maxWidth: '680px',
+          background: PAPEL,
+          minHeight: '100vh',
+          paddingTop: '5rem',
+          paddingBottom: '6rem',
+          paddingLeft: paddingX,
+          paddingRight: paddingX,
+          maxWidth: isMobile ? '100%' : maxWidthDesktop,
           margin: '0 auto',
-          padding: '3rem 2rem 4rem',
+          boxSizing: 'border-box',
         }}
       >
-        {onClose && (
-          <button
-            type="button"
-            onClick={onClose}
-            style={{
-              marginBottom: '2rem',
-              background: 'none',
-              border: 'none',
-              fontFamily: "'Jost', sans-serif",
-              fontSize: '0.9rem',
-              color: INK,
-              cursor: 'pointer',
-              opacity: 0.7,
-            }}
-          >
-            ← Volver
-          </button>
-        )}
-
+        {/* Fecha */}
         <p
           style={{
             fontFamily: "'Jost', sans-serif",
-            fontSize: '0.8rem',
-            color: 'rgba(42,37,32,0.6)',
+            fontWeight: 200,
+            fontSize: '0.7rem',
+            letterSpacing: '0.3em',
+            textTransform: 'uppercase',
+            color: SEPIA,
             marginBottom: '1.5rem',
           }}
         >
-          {historia.tiempoLectura ?? 0} min de lectura
+          {formatFecha(historia.fecha)}
         </p>
 
+        {/* Título */}
         <h1
           style={{
             fontFamily: "'Cormorant Garamond', serif",
-            fontWeight: 600,
-            fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-            color: INK,
-            lineHeight: 1.2,
-            marginBottom: '0.5rem',
+            fontWeight: 300,
+            fontStyle: 'italic',
+            fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+            color: TINTA,
+            lineHeight: 1.15,
+            marginBottom: '0.8rem',
           }}
         >
           {historia.titulo}
         </h1>
+
+        {/* Subtítulo */}
         {historia.subtitulo && (
           <p
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
-              fontStyle: 'italic',
-              fontSize: '1.1rem',
-              color: 'rgba(42,37,32,0.7)',
-              marginBottom: '2rem',
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize: '1rem',
+              color: TINTA_SOFT,
+              lineHeight: 1.6,
+              marginBottom: '1.5rem',
             }}
           >
             {historia.subtitulo}
           </p>
         )}
 
-        <article
-          style={{
-            fontFamily: "'Cormorant Garamond', serif",
-            fontSize: '1.15rem',
-            lineHeight: 2,
-            color: INK,
-          }}
-        >
-          <p style={{ marginBottom: '1.5em' }}>
-            <span
-              style={{
-                float: 'left',
-                fontSize: '3rem',
-                lineHeight: 1.1,
-                color: DROP_CAP,
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 600,
-                marginRight: '0.25rem',
-                marginTop: '-0.1em',
-              }}
-            >
-              {firstTwoWords}
-            </span>
-            {restOfFirstLine && (
-              <span
-                data-line-index={0}
-                style={{
-                  opacity: visibleLines.has(0) ? 1 : 0.3,
-                  transition: 'opacity 0.5s ease',
-                }}
-              >
-                {restOfFirstLine}
-              </span>
-            )}
-          </p>
-          {remainingLines.map((line, i) => (
-            <p
-              key={i}
-              data-line-index={i + 1}
-              style={{
-                marginBottom: '1.5em',
-                opacity: visibleLines.has(i + 1) ? 1 : 0.3,
-                transition: 'opacity 0.5s ease',
-              }}
-            >
-              {line}
-            </p>
-          ))}
-        </article>
-
+        {/* Línea separadora */}
         <div
           style={{
-            marginTop: '3rem',
-            paddingTop: '2rem',
-            borderTop: '1px solid rgba(42,37,32,0.1)',
+            width: 60,
+            height: 1,
+            background: `linear-gradient(90deg, ${SEPIA_DK}, transparent)`,
+            marginBottom: '1.5rem',
+          }}
+        />
+
+        {/* Metadatos: avatar + nombre + tiempo */}
+        <div
+          style={{
             display: 'flex',
+            gap: '1.5rem',
             alignItems: 'center',
-            gap: '1rem',
+            marginBottom: '3rem',
           }}
         >
           <img
             src={historia.autor.avatar}
-            alt={historia.autor.nombre}
+            alt=""
             style={{
-              width: '56px',
-              height: '56px',
+              width: 36,
+              height: 36,
               borderRadius: '50%',
               objectFit: 'cover',
-              border: '2px solid rgba(201,169,110,0.3)',
             }}
           />
-          <div>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 500, fontSize: '0.95rem', color: INK, margin: 0 }}>
+          <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
+            {historia.autor.nombre}
+          </span>
+          <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
+          {historia.tiempoLectura != null && (
+            <span
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 200,
+                fontSize: '0.8rem',
+                color: SEPIA,
+              }}
+            >
+              {historia.tiempoLectura} min de lectura
+            </span>
+          )}
+        </div>
+
+        {/* Cuerpo: drop cap + párrafos con fade-in */}
+        <article>
+          {(drop || restOfFirst) && (
+            <p
+              ref={(el) => { paragraphRefs.current[0] = el; }}
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontSize: 'clamp(1rem, 2vw, 1.15rem)',
+                lineHeight: 2,
+                color: TINTA,
+                marginBottom: '1.6rem',
+                letterSpacing: '0.01em',
+                opacity: visibleParrafos[0] ? 1 : 0,
+                transform: visibleParrafos[0] ? 'translateY(0)' : 'translateY(16px)',
+                transition: 'opacity 0.7s ease, transform 0.7s ease',
+              }}
+            >
+              {drop && (
+                <span
+                  style={{
+                    fontFamily: "'Cormorant Garamond', serif",
+                    fontStyle: 'italic',
+                    fontSize: isMobile ? '2.5rem' : 'clamp(2.5rem, 6vw, 4rem)',
+                    color: SEPIA,
+                    float: 'left',
+                    lineHeight: 0.85,
+                    marginRight: 8,
+                    marginTop: 6,
+                  }}
+                >
+                  {drop}
+                </span>
+              )}
+              {restOfFirst}
+            </p>
+          )}
+
+          {otherParrafos.map((texto, i) => {
+            const idx = (drop || restOfFirst ? 1 : 0) + i;
+            const isVisible = visibleParrafos[idx] ?? false;
+            return (
+              <p
+                key={idx}
+                ref={(el) => { paragraphRefs.current[idx] = el; }}
+                style={{
+                  fontFamily: "'Cormorant Garamond', serif",
+                  fontSize: 'clamp(1rem, 2vw, 1.15rem)',
+                  lineHeight: 2,
+                  color: TINTA,
+                  marginBottom: '1.6rem',
+                  letterSpacing: '0.01em',
+                  opacity: isVisible ? 1 : 0,
+                  transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
+                  transition: 'opacity 0.7s ease, transform 0.7s ease',
+                }}
+              >
+                {texto}
+              </p>
+            );
+          })}
+        </article>
+
+        {/* Firma del autor */}
+        <div style={{ marginTop: '4rem' }}>
+          <div
+            style={{
+              width: 40,
+              height: 1,
+              background: SEPIA,
+              margin: '0 auto 2rem',
+            }}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <img
+              src={historia.autor.avatar}
+              alt=""
+              style={{
+                width: avatarSize,
+                height: avatarSize,
+                borderRadius: '50%',
+                objectFit: 'cover',
+                border: `1.5px solid ${SEPIA}`,
+                marginBottom: '0.75rem',
+              }}
+            />
+            <p
+              style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+                fontSize: '1.3rem',
+                color: TINTA,
+                marginBottom: '0.25rem',
+              }}
+            >
               {historia.autor.nombre}
             </p>
             {historia.autor.ubicacion && (
-              <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '0.8rem', color: 'rgba(42,37,32,0.6)', margin: '0.2rem 0 0 0' }}>
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 200,
+                  fontSize: '0.75rem',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.15em',
+                  color: SEPIA,
+                  marginBottom: '0.5rem',
+                }}
+              >
                 {historia.autor.ubicacion}
               </p>
             )}
+            {historia.autor.bio && (
+              <p
+                style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.85rem',
+                  color: TINTA_SOFT,
+                  maxWidth: 360,
+                  marginBottom: '1rem',
+                  display: '-webkit-box',
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                }}
+              >
+                {historia.autor.bio}
+              </p>
+            )}
+            {displayTags.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
+                {displayTags.map((tag) => (
+                  <span
+                    key={tag}
+                    style={{
+                      fontFamily: "'Jost', sans-serif",
+                      fontWeight: 200,
+                      fontSize: '0.65rem',
+                      padding: '4px 10px',
+                      border: `1px solid rgba(201,169,110,0.5)`,
+                      borderRadius: 999,
+                      color: SEPIA_DK,
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* Navegación final */}
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            gap: '1rem',
+            justifyContent: 'center',
+            marginTop: '3rem',
+          }}
+        >
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              style={{
+                fontFamily: "'Jost', sans-serif",
+                fontWeight: 400,
+                fontSize: '0.875rem',
+                padding: '0.6rem 1.2rem',
+                border: `1px solid ${SEPIA}`,
+                background: 'transparent',
+                color: SEPIA_DK,
+                cursor: 'pointer',
+                borderRadius: 4,
+              }}
+            >
+              ← Volver a las historias
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              const url = typeof window !== 'undefined' ? `${window.location.origin}/historias/${historia.id}/texto` : '';
+              if (typeof navigator !== 'undefined' && navigator.share) {
+                navigator.share({ title: historia.titulo, url, text: historia.subtitulo }).catch(() => {
+                  navigator.clipboard?.writeText(url);
+                });
+              } else {
+                navigator.clipboard?.writeText(url);
+              }
+            }}
+            style={{
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 400,
+              fontSize: '0.875rem',
+              padding: '0.6rem 1.2rem',
+              border: `1px solid ${TINTA_SOFT}`,
+              background: 'transparent',
+              color: TINTA_SOFT,
+              cursor: 'pointer',
+              borderRadius: 4,
+            }}
+          >
+            Compartir esta historia
+          </button>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
