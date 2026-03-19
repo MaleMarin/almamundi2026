@@ -8,7 +8,7 @@
 import Link from 'next/link';
 import { useMemo } from 'react';
 import { useStories } from '@/hooks/useStories';
-import { CinemaGallery } from '@/components/stories/CinemaGallery';
+import { StoriesFanCarousel } from '@/components/stories/StoriesFanCarousel';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
@@ -79,15 +79,15 @@ export default function HistoriasVideosPage() {
           Historias en video
         </p>
         <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] text-gray-800">
-          Mira y escucha
+          El mundo tiene millones de historias que nadie conoce.
         </h1>
         <p className="text-gray-600 text-base md:text-lg mt-2 max-w-2xl">
-          Explora el carrusel, elige una historia y reproduce el video.
+          Estas son algunas.
         </p>
       </header>
 
       <section className="flex-1 min-h-0">
-        <CinemaGallery stories={videoStories} />
+        <StoriesFanCarousel stories={videoStories} />
       </section>
 
       <Footer />

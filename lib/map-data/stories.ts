@@ -35,6 +35,22 @@ export type StoryPoint = {
   publishedAt?: string;
   /** Una imagen (visión Ken Burns en observatorio) */
   imageUrl?: string;
+  /** Thumbnail / imagen de portada (carrusel, reproductor) */
+  thumbnailUrl?: string;
+  /** Formato: video | audio | texto | foto */
+  format?: string;
+  /** Extracto o descripción corta */
+  excerpt?: string;
+  /** Subtítulo */
+  subtitle?: string;
+  /** Autor con nombre, avatar, bio (carrusel / API) */
+  author?: { name?: string; avatar?: string; bio?: string };
+  /** URL avatar (alternativa a author.avatar) */
+  authorAvatar?: string;
+  /** Etiquetas */
+  tags?: string[];
+  /** Cita destacada */
+  quote?: string;
   /** Varias imágenes: presentación Ken Burns, una por vez (roadmap 1B) */
   images?: string[];
   /** Fotos con nombre y fecha para Ken Burns en StoryViewer */
