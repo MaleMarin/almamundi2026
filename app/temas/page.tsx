@@ -7,6 +7,7 @@
 import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { neu } from '@/lib/historias-neumorph';
+import { Footer } from '@/components/layout/Footer';
 import { TEMAS } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -47,16 +48,16 @@ export default function TemasPage() {
         </div>
       </nav>
 
-      <section className="px-6 md:px-12 py-12 max-w-5xl mx-auto">
+      <section className="px-6 md:px-12 pt-12 pb-20 md:pb-28 max-w-5xl mx-auto">
         <p className="text-[10px] font-semibold tracking-[0.2em] text-amber-700 uppercase mb-3">Explorar por tema</p>
         <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3" style={{ color: neu.textMain }}>
-          ¿Qué querés <em className="italic opacity-70">encontrar?</em>
+          ¿Qué quieres <em className="italic opacity-70">encontrar?</em>
         </h1>
         <p className="text-lg max-w-xl mb-10" style={{ color: neu.textBody }}>
           Cada experiencia humana tiene su lugar aquí.
         </p>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-5">
           {TEMAS.map((tema) => {
             const count = countByTema(baseList, tema.slug);
             return (
@@ -70,9 +71,14 @@ export default function TemasPage() {
                   className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl opacity-70 transition-opacity group-hover:opacity-100"
                   style={{ backgroundColor: tema.color }}
                 />
-                <div className="font-serif text-xl md:text-2xl font-normal mb-1" style={{ color: neu.textMain }}>
+                <div className="font-serif text-lg md:text-xl font-normal mb-2 line-clamp-2" style={{ color: neu.textMain }}>
                   {tema.name}
                 </div>
+                {tema.description && (
+                  <p className="text-sm leading-snug line-clamp-3 mb-2" style={{ color: neu.textBody }}>
+                    {tema.description}
+                  </p>
+                )}
                 <div className="text-[10px] font-medium tracking-wider uppercase" style={{ color: neu.textBody }}>
                   {count} {count === 1 ? 'historia' : 'historias'}
                 </div>
@@ -82,17 +88,9 @@ export default function TemasPage() {
         </div>
       </section>
 
-      <footer className="py-10 px-6 border-t border-gray-300/40 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <div className="font-medium mb-1" style={{ color: neu.textMain }}>AlmaMundi</div>
-          <div className="text-xs" style={{ color: neu.textBody }}>Una iniciativa de PRECISAR</div>
-        </div>
-        <div className="flex gap-6">
-          <Link href="/#intro" className="text-sm" style={{ color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/historias" className="text-sm" style={{ color: neu.textBody }}>Historias</Link>
-          <Link href="/#mapa" className="text-sm" style={{ color: neu.textBody }}>Mapa</Link>
-        </div>
-      </footer>
+      <div className="border-t border-gray-400/50 pt-10 md:pt-14">
+        <Footer />
+      </div>
     </main>
   );
 }

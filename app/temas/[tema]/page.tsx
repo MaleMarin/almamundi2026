@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
 import { neu } from '@/lib/historias-neumorph';
+import { Footer } from '@/components/layout/Footer';
 import { getTemaBySlug } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -87,6 +88,9 @@ export default function TemaPage() {
         <Link href="/temas" className="inline-flex items-center gap-2 text-sm mb-6" style={{ color: neu.textBody }}>← Temas</Link>
         <div className="rounded-2xl p-6 mb-10" style={{ ...neu.card, borderTop: `3px solid ${tema.color}` }}>
           <h1 className="font-serif text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>{tema.name}</h1>
+          {tema.description && (
+            <p className="text-base leading-relaxed mb-3" style={{ color: neu.textBody }}>{tema.description}</p>
+          )}
           <p className="text-sm" style={{ color: neu.textBody }}>
             {list.length} {list.length === 1 ? 'historia' : 'historias'} en este tema
           </p>
@@ -120,17 +124,7 @@ export default function TemaPage() {
         )}
       </section>
 
-      <footer className="py-8 px-6 border-t border-gray-300/40 flex flex-col md:flex-row justify-between items-center gap-4">
-        <div>
-          <div className="font-medium mb-1" style={{ color: neu.textMain }}>AlmaMundi</div>
-          <div className="text-xs" style={{ color: neu.textBody }}>Una iniciativa de PRECISAR</div>
-        </div>
-        <div className="flex gap-6">
-          <Link href="/historias" className="text-sm" style={{ color: neu.textBody }}>Historias</Link>
-          <Link href="/temas" className="text-sm font-medium" style={{ color: neu.textMain }}>Temas</Link>
-          <Link href="/#mapa" className="text-sm" style={{ color: neu.textBody }}>Mapa</Link>
-        </div>
-      </footer>
+      <Footer />
     </main>
   );
 }

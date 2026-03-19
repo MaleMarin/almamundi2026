@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { StoriesCurvedCarousel } from '@/components/stories/StoriesCurvedCarousel';
 import { Footer } from '@/components/layout/Footer';
+import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
@@ -18,7 +19,9 @@ function isVideoStory(s: StoryPoint): boolean {
 
 export default function HistoriasVideosPage() {
   const allStories = useStories();
-  const videoStories = allStories.filter((s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s));
+  const fromApi = allStories.filter((s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s));
+  /** Para el prototipo: si no hay historias con video desde la API, se muestran las de demostración. */
+  const videoStories = fromApi.length > 0 ? fromApi : DEMO_VIDEO_STORIES;
 
   return (
     <main className="min-h-screen flex flex-col bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>

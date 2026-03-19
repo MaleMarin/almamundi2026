@@ -2315,7 +2315,7 @@ function StoryModal({
                       <span className="text-orange-500">
                         <Globe2 size={14} />
                       </span>
-                      País <span className="text-orange-500" aria-hidden>*</span>
+                      Región <span className="text-orange-500" aria-hidden>*</span>
                     </div>
                     <input value={country} onChange={(e) => setCountry(e.target.value)} placeholder="Ej: Chile" className="w-full px-5 py-4 rounded-[18px] outline-none text-gray-700" style={{ ...soft.flat, borderRadius: '18px' }} aria-required="true" />
                   </div>

@@ -166,7 +166,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
         </p>
       </div>
 
-        {/* Centro-derecha: detalle de la historia seleccionada — persona, país, ciudad, nombre historia, fecha */}
+        {/* Centro-derecha: detalle de la historia seleccionada — persona, región, ciudad, nombre historia, fecha */}
       <div className="flex-1 flex flex-col md:flex-row min-w-0 p-6 md:p-10 gap-6">
         <div className="flex flex-col flex-1 min-w-0">
           {selected && (
@@ -193,10 +193,6 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               </Link>
 
               <div className="flex items-center gap-4 text-gray-600">
-                <button type="button" className="flex items-center gap-1.5 hover:text-gray-900 transition-colors" aria-label="Me gusta">
-                  <span className="text-lg">♡</span>
-                  <span className="text-xs">Me gusta</span>
-                </button>
                 <button type="button" className="flex items-center gap-1.5 hover:text-gray-900 transition-colors" aria-label="Compartir">
                   <span className="text-lg">↗</span>
                   <span className="text-xs">Compartir</span>

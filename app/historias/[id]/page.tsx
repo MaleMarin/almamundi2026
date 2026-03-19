@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu } from '@/lib/historias-neumorph';
 import { Footer } from '@/components/layout/Footer';
+import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 type SimilarStory = {
@@ -52,7 +53,13 @@ export default function HistoriasIdPage() {
     fetch(`/api/stories/${id}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((data: { story?: StoryPoint } | null) => {
-        if (!cancelled && data?.story) setStory(data.story);
+        if (cancelled) return;
+        if (data?.story) {
+          setStory(data.story);
+        } else if (id.startsWith('demo-video-')) {
+          const demo = DEMO_VIDEO_STORIES.find((s) => s.id === id);
+          if (demo) setStory(demo as StoryPoint);
+        }
       })
       .finally(() => { if (!cancelled) setLoading(false); });
     return () => { cancelled = true; };

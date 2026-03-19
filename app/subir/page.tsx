@@ -335,7 +335,7 @@ export default function SubirPage() {
                 type="text"
                 value={lugar}
                 onChange={(e) => setLugar(e.target.value)}
-                placeholder="Ciudad, país o lugar"
+                placeholder="Ciudad, región o lugar"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: soft.textMain, fontFamily: APP_FONT }}
               />
