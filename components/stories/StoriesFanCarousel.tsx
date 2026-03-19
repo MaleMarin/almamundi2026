@@ -189,8 +189,7 @@ export function StoriesFanCarousel({ stories, onSelectStory }: StoriesFanCarouse
       <div
         className="sfc-root"
         style={{
-          background: '#f0ece4',
-          borderRadius: '16px',
+          background: 'transparent',
           padding: '2.5rem 1rem 2rem',
           display: 'flex',
           flexDirection: 'column',
@@ -199,19 +198,6 @@ export function StoriesFanCarousel({ stories, onSelectStory }: StoriesFanCarouse
           width: '100%',
         }}
       >
-        {/* ── Header ── */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 200, fontSize: '9px', letterSpacing: '0.55em', textTransform: 'uppercase', color: '#8b6914', marginBottom: '0.7rem' }}>
-            AlmaMundi · Historias
-          </p>
-          <h2 style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 400, fontSize: 'clamp(1.3rem,3vw,1.9rem)', color: '#1a140e', letterSpacing: '0.01em', lineHeight: 1.25 }}>
-            El mundo tiene millones de historias<br />que nadie conoce.
-          </h2>
-          <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '12px', color: '#8b7a6a', marginTop: '0.5rem', letterSpacing: '0.08em' }}>
-            Estas son algunas.
-          </p>
-        </div>
-
         {/* ── Stage ── */}
         <div style={{ position: 'relative', width: '100%' }}>
           {/* Prev */}

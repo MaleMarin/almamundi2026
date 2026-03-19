@@ -2,7 +2,7 @@
 
 /**
  * /historias/videos — Página interior de historias en video con carrusel curvo.
- * Interior: E0E5EC, sans moderna (system UI). Footer unificado.
+ * Interior: E0E5EC, sans moderna (system UI). Mismo navbar y footer que home/temas.
  * Lista = historias con video de la API + demos locales (public/), sin duplicar id.
  */
 import Link from 'next/link';
@@ -11,10 +11,9 @@ import { useStories } from '@/hooks/useStories';
 import { StoriesFanCarousel } from '@/components/stories/StoriesFanCarousel';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { neu } from '@/lib/historias-neumorph';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
-
-const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 
 function isVideoStory(s: StoryPoint): boolean {
   return Boolean(s.videoUrl || s.hasVideo);
@@ -32,45 +31,15 @@ export default function HistoriasVideosPage() {
   }, [allStories]);
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-      <nav className="flex-shrink-0 flex items-center justify-between px-6 md:px-12 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-white/20 bg-[#E0E5EC]/90 backdrop-blur-lg">
-        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight text-gray-700 hover:text-gray-900 transition-colors">
-          AlmaMundi
-        </Link>
+    <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
         <div className="flex items-center gap-2 flex-wrap justify-end">
-          <Link
-            href="/"
-            className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-medium text-gray-600 transition-colors"
-            style={{
-              backgroundColor: '#E0E5EC',
-              boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-              border: '1px solid rgba(255,255,255,0.35)',
-            }}
-          >
-            Inicio
-          </Link>
-          <HistoriasAccordion
-            variant="header"
-            className="[&_button]:btn-almamundi"
-            buttonStyle={{
-              backgroundColor: '#E0E5EC',
-              boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-              border: '1px solid rgba(255,255,255,0.35)',
-              color: '#4A5568',
-              fontFamily: APP_FONT,
-            }}
-          />
-          <Link
-            href="/#mapa"
-            className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-medium text-gray-600 transition-colors"
-            style={{
-              backgroundColor: '#E0E5EC',
-              boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-              border: '1px solid rgba(255,255,255,0.35)',
-            }}
-          >
-            Mapa
-          </Link>
+          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Videos</span>
+          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
