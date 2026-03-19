@@ -2,17 +2,19 @@
 
 /**
  * /historias/videos — Página interior de historias en video con carrusel curvo.
- * Estética igual que la home (E0E5EC, Avenir). Footer unificado.
+ * Interior: E0E5EC, sans moderna (system UI). Footer unificado.
+ * Lista = historias con video de la API + demos locales (public/), sin duplicar id.
  */
 import Link from 'next/link';
+import { useMemo } from 'react';
 import { useStories } from '@/hooks/useStories';
-import { StoriesCurvedCarousel } from '@/components/stories/StoriesCurvedCarousel';
+import { CinemaGallery } from '@/components/stories/CinemaGallery';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
-const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
+const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 
 function isVideoStory(s: StoryPoint): boolean {
   return Boolean(s.videoUrl || s.hasVideo);
@@ -20,20 +22,25 @@ function isVideoStory(s: StoryPoint): boolean {
 
 export default function HistoriasVideosPage() {
   const allStories = useStories();
-  const fromApi = allStories.filter((s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s));
-  /** Para el prototipo: si no hay historias con video desde la API, se muestran las de demostración. */
-  const videoStories = fromApi.length > 0 ? fromApi : DEMO_VIDEO_STORIES;
+  const videoStories = useMemo(() => {
+    const fromApi = allStories.filter(
+      (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s)
+    );
+    const apiIds = new Set(fromApi.map((s) => s.id));
+    const demos = DEMO_VIDEO_STORIES.filter((d) => !apiIds.has(d.id));
+    return [...fromApi, ...demos];
+  }, [allStories]);
 
   return (
     <main className="min-h-screen flex flex-col bg-[#E0E5EC]" style={{ fontFamily: APP_FONT }}>
-      <nav className="flex-shrink-0 flex items-center justify-between px-6 md:px-12 py-4 border-b border-white/20 bg-[#E0E5EC]/90 backdrop-blur-lg">
-        <Link href="/" className="text-gray-600 hover:text-gray-900 transition-colors font-medium">
+      <nav className="flex-shrink-0 flex items-center justify-between px-6 md:px-12 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-white/20 bg-[#E0E5EC]/90 backdrop-blur-lg">
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight text-gray-700 hover:text-gray-900 transition-colors">
           AlmaMundi
         </Link>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap justify-end">
           <Link
             href="/"
-            className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
+            className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-medium text-gray-600 transition-colors"
             style={{
               backgroundColor: '#E0E5EC',
               boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
@@ -44,6 +51,7 @@ export default function HistoriasVideosPage() {
           </Link>
           <HistoriasAccordion
             variant="header"
+            className="[&_button]:btn-almamundi"
             buttonStyle={{
               backgroundColor: '#E0E5EC',
               boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
@@ -54,7 +62,7 @@ export default function HistoriasVideosPage() {
           />
           <Link
             href="/#mapa"
-            className="px-4 py-2 rounded-full text-sm font-medium text-gray-600 hover:text-orange-600 transition-colors"
+            className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-medium text-gray-600 transition-colors"
             style={{
               backgroundColor: '#E0E5EC',
               boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
@@ -66,20 +74,20 @@ export default function HistoriasVideosPage() {
         </div>
       </nav>
 
-      <header className="flex-shrink-0 px-6 pt-6 pb-2">
-        <p className="text-[10px] font-semibold tracking-[0.2em] text-amber-700 uppercase mb-1">
+      <header className="flex-shrink-0 px-6 md:px-12 pt-8 md:pt-12 pb-4 md:pb-6">
+        <p className="text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase mb-2">
           Historias en video
         </p>
-        <h1 className="text-2xl md:text-4xl font-serif font-light leading-tight text-gray-800">
+        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] text-gray-800">
           Mira y escucha
         </h1>
-        <p className="text-gray-600 text-sm mt-1">
-          Gira la rueda para explorar. Toca una historia para ver el detalle y reproducir.
+        <p className="text-gray-600 text-base md:text-lg mt-2 max-w-2xl">
+          Explora el carrusel, elige una historia y reproduce el video.
         </p>
       </header>
 
       <section className="flex-1 min-h-0">
-        <StoriesCurvedCarousel stories={videoStories} />
+        <CinemaGallery stories={videoStories} />
       </section>
 
       <Footer />

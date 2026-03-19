@@ -64,10 +64,10 @@ export default function RecorridoDetailPage() {
           />
         </Link>
         <nav className="flex gap-4 text-sm font-bold text-gray-600 items-center">
-          <Link href="/" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Inicio
           </Link>
-          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>
@@ -95,7 +95,7 @@ export default function RecorridoDetailPage() {
         <div className="flex flex-wrap gap-4">
           <button
             type="button"
-            className="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full hover:text-orange-600 active:scale-95"
+            className="btn-almamundi inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full active:scale-95"
             style={soft.button}
           >
             <Route className="w-4 h-4" />
@@ -103,7 +103,7 @@ export default function RecorridoDetailPage() {
           </button>
           <Link
             href="/#mapa"
-            className="inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full hover:text-orange-600 active:scale-95"
+            className="btn-almamundi inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full active:scale-95"
             style={soft.button}
           >
             <MapPin className="w-4 h-4" />

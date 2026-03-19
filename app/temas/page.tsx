@@ -38,23 +38,23 @@ export default function TemasPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-lg font-light tracking-wide" style={{ color: neu.textMain }}>AlmaMundi</Link>
-        <div className="flex items-center gap-2">
-          <Link href="/#intro" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} />
-          <span className="px-4 py-2 rounded-full text-sm font-medium text-amber-700" style={neu.cardInset}>Temas</span>
-          <Link href="/#mapa" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Temas</span>
+          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
-      <section className="px-6 md:px-12 pt-12 pb-20 md:pb-28 max-w-5xl mx-auto">
-        <p className="text-[10px] font-semibold tracking-[0.2em] text-amber-700 uppercase mb-3">Explorar por tema</p>
-        <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3" style={{ color: neu.textMain }}>
-          ¿Qué quieres <em className="italic opacity-70">encontrar?</em>
+      <section className="px-6 md:px-12 pt-10 md:pt-14 pb-20 md:pb-28 max-w-5xl mx-auto">
+        <p className="text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase mb-3">Explorar por tema</p>
+        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>
+          ¿Qué quieres <span className="font-medium text-gray-500">encontrar?</span>
         </h1>
-        <p className="text-lg max-w-xl mb-10" style={{ color: neu.textBody }}>
+        <p className="text-base md:text-lg max-w-xl mb-10" style={{ color: neu.textBody }}>
           Cada experiencia humana tiene su lugar aquí.
         </p>
 
@@ -72,7 +72,7 @@ export default function TemasPage() {
                   className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl opacity-70 transition-opacity group-hover:opacity-100"
                   style={{ backgroundColor: tema.color }}
                 />
-                <div className="font-serif text-lg md:text-xl font-normal mb-2 line-clamp-2" style={{ color: neu.textMain }}>
+                <div className="text-lg md:text-xl font-semibold tracking-tight mb-2 line-clamp-2" style={{ color: neu.textMain }}>
                   {tema.name}
                 </div>
                 {tema.description && (

@@ -69,26 +69,26 @@ export default function TemaPage() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
         <p style={{ color: neu.textBody }}>Tema no encontrado.</p>
-        <Link href="/temas" className="px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>← Temas</Link>
+        <Link href="/temas" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>← Temas</Link>
       </main>
     );
   }
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-lg font-light tracking-wide" style={{ color: neu.textMain }}>AlmaMundi</Link>
-        <div className="flex items-center gap-2">
-          <Link href="/temas" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textBody }}>← Temas</Link>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} />
-          <Link href="/#mapa" className="px-4 py-2 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
+        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
+        <div className="flex items-center gap-2 flex-wrap justify-end">
+          <Link href="/temas" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>← Temas</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
-      <section className="px-6 md:px-12 py-10 max-w-5xl mx-auto">
-        <Link href="/temas" className="inline-flex items-center gap-2 text-sm mb-6" style={{ color: neu.textBody }}>← Temas</Link>
-        <div className="rounded-2xl p-6 mb-10" style={{ ...neu.card, borderTop: `3px solid ${tema.color}` }}>
-          <h1 className="font-serif text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>{tema.name}</h1>
+      <section className="px-6 md:px-12 py-10 md:py-12 max-w-5xl mx-auto">
+        <Link href="/temas" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>← Temas</Link>
+        <div className="rounded-2xl p-6 md:p-8 mb-10" style={{ ...neu.card, borderTop: `3px solid ${tema.color}` }}>
+          <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-3" style={{ color: neu.textMain }}>{tema.name}</h1>
           {tema.description && (
             <p className="text-base leading-relaxed mb-3" style={{ color: neu.textBody }}>{tema.description}</p>
           )}
@@ -111,7 +111,7 @@ export default function TemaPage() {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-1">{formatPlace(s)}</div>
-                    <h2 className="font-serif text-lg font-medium text-gray-800 line-clamp-2">{s.title || 'Sin título'}</h2>
+                    <h2 className="text-lg font-semibold tracking-tight text-gray-800 line-clamp-2">{s.title || 'Sin título'}</h2>
                     {s.description && <p className="text-sm text-gray-600 line-clamp-1 mt-1">{s.description}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">

@@ -1040,7 +1040,7 @@ function MapFilterBar({ onToggleView }: { onToggleView: () => void }) {
 
         <button
           type="button"
-          className="hidden md:flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
+          className="btn-almamundi hidden md:flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 transition-colors active:scale-95"
           style={soft.button}
         >
           <Filter size={18} />
@@ -1050,7 +1050,7 @@ function MapFilterBar({ onToggleView }: { onToggleView: () => void }) {
         <button
           type="button"
           onClick={onToggleView}
-          className="flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 hover:text-orange-600 transition-colors active:scale-95"
+          className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full text-gray-600 transition-colors active:scale-95 md:hidden"
           style={soft.button}
         >
           <Grid size={18} />
@@ -1061,7 +1061,7 @@ function MapFilterBar({ onToggleView }: { onToggleView: () => void }) {
 
         <button
           type="button"
-          className="w-12 h-12 flex items-center justify-center rounded-full text-orange-500 hover:text-orange-600 transition-colors active:scale-95 relative"
+          className="btn-almamundi w-12 h-12 flex items-center justify-center rounded-full text-orange-500 transition-colors active:scale-95 relative"
           style={soft.button}
           aria-label="Mis colecciones"
         >
@@ -1134,19 +1134,19 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative p-6 rounded-[40px] flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group animate-float w-full max-w-[320px] min-h-[380px] flex-1"
+      className="relative p-8 md:p-10 rounded-[40px] flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group animate-float w-full max-w-[380px] md:max-w-[400px] min-h-[440px] md:min-h-[460px] flex-1"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div className="mb-4">
-        <h3 className="text-lg font-light text-gray-500">{title}</h3>
-        <h2 className="text-2xl font-bold text-gray-700 leading-none">{subtitle}</h2>
+      <div className="mb-5">
+        <h3 className="text-xl md:text-2xl font-light text-gray-500">{title}</h3>
+        <h2 className="text-3xl md:text-4xl font-bold text-gray-700 leading-tight">{subtitle}</h2>
       </div>
-      <div className="flex-1 min-h-[72px]" />
+      <div className="flex-1 min-h-[80px]" />
       <div className="w-full">
-        <p className="text-gray-500 leading-relaxed text-base mb-5">{children}</p>
+        <p className="text-gray-500 leading-relaxed text-lg md:text-xl mb-6 md:mb-7">{children}</p>
         <button
           onClick={onClick}
-          className="w-full flex justify-center px-8 py-4 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95 group-hover:text-orange-600"
+          className="btn-almamundi w-full flex justify-center px-8 py-5 rounded-full text-sm font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95"
           style={soft.button}
           type="button"
         >
@@ -1312,7 +1312,7 @@ function HowItWorksModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => 
         <div className="p-10 pb-4 flex-shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            className="btn-almamundi absolute top-6 right-6 p-2 rounded-full text-gray-500 transition-colors active:scale-95"
             style={soft.button}
             aria-label="Cerrar"
             type="button"
@@ -1378,7 +1378,7 @@ function PurposeModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
         <div className="p-10 pb-4 flex-shrink-0">
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 transition-colors active:scale-95 btn-almamundi"
           style={soft.button}
           aria-label="Cerrar"
           type="button"
@@ -1405,7 +1405,7 @@ function BitsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
         <div className="p-10 pb-4 flex-shrink-0">
           <button
             onClick={onClose}
-            className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+            className="btn-almamundi absolute top-6 right-6 p-2 rounded-full text-gray-500 transition-colors active:scale-95"
             style={soft.button}
             aria-label="Cerrar"
             type="button"
@@ -1424,7 +1424,7 @@ function BitsModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }
           <a
             href="#mapa"
             onClick={onClose}
-            className="inline-block px-6 py-3 rounded-full font-bold text-gray-700 hover:text-orange-600 transition-colors active:scale-95"
+            className="btn-almamundi inline-block px-6 py-3 rounded-full font-bold text-gray-700 transition-colors active:scale-95"
             style={soft.button}
           >
             Ver Bits en el mapa
@@ -1466,7 +1466,7 @@ function InspirationModal({
       <div className="bg-[#E0E5EC] w-full max-w-3xl p-8 md:p-10 rounded-[40px] relative shadow-2xl" style={{ fontFamily: APP_FONT }}>
         <button
           onClick={onClose}
-          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 hover:text-orange-600 transition-colors active:scale-95"
+          className="absolute top-6 right-6 p-2 rounded-full text-gray-500 transition-colors active:scale-95 btn-almamundi"
           style={soft.button}
           aria-label="Cerrar"
           type="button"
@@ -2059,7 +2059,7 @@ function StoryModal({
                     Muéstrale a las personas un instante de tu mirada.
                   </div>
                   <label className="w-full block cursor-pointer">
-                    <span className="inline-flex items-center gap-2 px-6 py-4 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
+                    <span className="btn-almamundi inline-flex items-center gap-2 px-6 py-4 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
                       <ImageIcon size={18} />
                       Elegir foto
                     </span>
@@ -2159,11 +2159,11 @@ function StoryModal({
 
                   <div className="mt-5 flex flex-wrap gap-3 items-center">
                     {!isRecording ? (
-                      <button type="button" onClick={startRecording} className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
+                      <button type="button" onClick={startRecording} className="btn-almamundi px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-orange-600 active:scale-95" style={soft.button}>
                         Grabar
                       </button>
                     ) : (
-                      <button type="button" onClick={stopRecording} className="px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-700 active:scale-95" style={soft.button}>
+                      <button type="button" onClick={stopRecording} className="btn-almamundi px-8 py-3 rounded-full text-xs font-black tracking-widest uppercase text-gray-700 active:scale-95" style={soft.button}>
                         Detener
                       </button>
                     )}
@@ -2365,7 +2365,7 @@ function StoryModal({
                 </div>
 
                 <div className="mt-6 flex flex-wrap gap-3 justify-end">
-                  <button type="button" onClick={() => setStep('capture')} className="px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95" style={soft.button}>
+                  <button type="button" onClick={() => setStep('capture')} className="btn-almamundi px-8 py-4 rounded-full text-xs font-black tracking-widest uppercase text-gray-600 active:scale-95" style={soft.button}>
                     Volver
                   </button>
 
@@ -2505,40 +2505,45 @@ export default function Home() {
 
       <BitsModal isOpen={showBits} onClose={() => setShowBits(false)} />
 
-      {/* HEADER */}
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-32 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
+      {/* HEADER — escala fija home (no reducir sin acuerdo explícito) */}
+      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-36 md:h-40 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
         <div className="flex items-center">
-          <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
+          <img src="/logo.png" alt="AlmaMundi" className="h-32 md:h-44 w-auto object-contain select-none filter drop-shadow-md" />
         </div>
-        <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
-          <button onClick={() => setShowPurpose(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+        <nav className="hidden md:flex gap-8 text-base md:text-lg font-bold text-gray-600 items-center">
+          <button onClick={() => setShowPurpose(true)} className="btn-almamundi px-10 py-5 active:scale-95" style={soft.button} type="button">
             Nuestro propósito
           </button>
-          <button onClick={() => setShowHowItWorks(true)} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+          <button onClick={() => setShowHowItWorks(true)} className="btn-almamundi px-10 py-5 active:scale-95" style={soft.button} type="button">
             ¿Cómo funciona?
           </button>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...soft.button, padding: '1rem 2rem', fontSize: '0.875rem', fontWeight: 700 }} className="[&_button]:hover:text-orange-600 [&_button]:active:scale-95" />
-          <a href="#mapa" className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...soft.button, padding: '1.125rem 2.25rem', fontSize: '1rem', fontWeight: 700 }} className="[&_button]:btn-almamundi [&_button]:active:scale-95" />
+          <a href="#mapa" className="btn-almamundi px-10 py-5 active:scale-95" style={soft.button}>
             Mapa
           </a>
+          <Link href="/privacidad" className="btn-almamundi px-10 py-5 active:scale-95" style={soft.button}>
+            Privacidad
+          </Link>
         </nav>
       </header>
 
-      {/* INTRO: frase visible; cards justo debajo */}
-      <section id="intro" className="pt-44 md:pt-52 pb-4 md:pb-6 px-6 relative z-10 flex flex-col items-center text-center scroll-mt-28">
-        <div className="max-w-6xl animate-float">
-          <h1 className="text-3xl md:text-5xl font-light leading-tight mb-4" style={{ color: soft.textMain }}>
-            AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
-          </h1>
-          <div className="w-24 h-1.5 rounded-full mx-auto mb-4 bg-[var(--almamundi-orange)]" />
-          <p className="text-lg md:text-2xl font-light max-w-4xl mx-auto leading-relaxed mt-8 md:mt-10" style={{ color: soft.textBody }}>
-            Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
-          </p>
-        </div>
-      </section>
+      {/* Bloque hero + cards: altura mínima = 1 viewport para que "Mapa de AlmaMundi" no entre a primera vista */}
+      <div className="relative z-10 min-h-[100svh] flex flex-col">
+        {/* INTRO: frase visible; cards justo debajo */}
+        <section id="intro" className="pt-48 md:pt-56 pb-6 md:pb-8 px-6 flex flex-col items-center text-center scroll-mt-32">
+          <div className="max-w-6xl animate-float">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-light leading-[1.12] mb-5 md:mb-6" style={{ color: soft.textMain }}>
+              AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que <span className="font-semibold">despiertan otras historias.</span>
+            </h1>
+            <div className="w-32 h-2 rounded-full mx-auto mb-5 md:mb-6 bg-[var(--almamundi-orange)]" />
+            <p className="text-xl md:text-3xl lg:text-4xl font-light max-w-5xl mx-auto leading-relaxed mt-8 md:mt-12" style={{ color: soft.textBody }}>
+              Aquí, cada relato importa. <strong>Cada historia es extraordinaria.</strong>
+            </p>
+          </div>
+        </section>
 
-      {/* CARDS */}
-      <section id="historias" className="w-full px-4 md:px-6 pb-6 mb-20 flex flex-col md:flex-row flex-wrap gap-y-5 gap-x-10 md:gap-x-14 justify-center items-stretch relative z-10 mt-6 md:mt-8">
+        {/* CARDS */}
+        <section id="historias" className="w-full px-4 md:px-8 pb-10 mb-0 flex flex-col md:flex-row flex-wrap gap-y-6 gap-x-12 md:gap-x-16 justify-center items-stretch flex-1 mt-8 md:mt-10">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={() => setModalMode('Video')} delay="0s">
           A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
@@ -2551,12 +2556,13 @@ export default function Home() {
         <SoftCard title="Tu mirada," subtitle="en una fotografía" buttonLabel="SUBE UNA FOTO" onClick={() => setModalMode('Foto')} delay="0.6s">
           A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>
-      </section>
+        </section>
+      </div>
 
-      {/* Sección mapa: debajo de intro/cards; título + dock + globo */}
-      <section id="mapa" className="w-full scroll-mt-28 bg-[var(--home-bg)]">
+      {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
+      <section id="mapa" className="w-full scroll-mt-32 bg-[var(--home-bg)]">
         <div className="map-section-gradient-block w-full">
-          <h2 className="text-center text-[72px] md:text-[96px] leading-none py-10" style={{ color: 'var(--almamundi-orange)' }}>
+          <h2 className="text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14" style={{ color: 'var(--almamundi-orange)' }}>
             Mapa de AlmaMundi
           </h2>
           {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. 100% neumorfismo. */}
@@ -2583,21 +2589,22 @@ export default function Home() {
           </div>
 
           <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
-            <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
+            <button onClick={() => setShowPurpose(true)} className="hover:text-gray-900 transition-colors font-bold rounded-full border border-transparent hover:border-orange-500/50 px-4 py-2" type="button">
               Nuestro propósito
             </button>
-
-            <button onClick={() => setShowHowItWorks(true)} className="hover:text-gray-900 transition-colors font-bold" type="button">
+            <button onClick={() => setShowHowItWorks(true)} className="hover:text-gray-900 transition-colors font-bold rounded-full border border-transparent hover:border-orange-500/50 px-4 py-2" type="button">
               ¿Cómo funciona?
             </button>
-
             <HistoriasAccordion variant="footer" />
-            <Link href="/archivo" className="hover:text-gray-900 transition-colors font-bold">
+            <Link href="/archivo" className="hover:text-gray-900 transition-colors font-bold rounded-full border border-transparent hover:border-orange-500/50 px-4 py-2">
               Archivo
             </Link>
-            <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold">
+            <a href="#mapa" className="hover:text-gray-900 transition-colors font-bold rounded-full border border-transparent hover:border-orange-500/50 px-4 py-2">
               Mapa
             </a>
+            <Link href="/privacidad" className="hover:text-gray-900 transition-colors font-bold rounded-full border border-transparent hover:border-orange-500/50 px-4 py-2">
+              Política de privacidad
+            </Link>
           </div>
         </div>
       </footer>

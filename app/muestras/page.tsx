@@ -82,10 +82,10 @@ export default function MuestrasListPage() {
           />
         </Link>
         <nav className="flex gap-4 text-sm font-bold text-gray-600 items-center">
-          <Link href="/" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Inicio
           </Link>
-          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>

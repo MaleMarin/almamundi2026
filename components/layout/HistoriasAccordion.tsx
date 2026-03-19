@@ -41,7 +41,7 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="hover:text-gray-900 transition-colors font-bold"
+          className="hover:text-gray-900 transition-colors font-normal"
           aria-expanded={open}
           aria-haspopup="true"
         >

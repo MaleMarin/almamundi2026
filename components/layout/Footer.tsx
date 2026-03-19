@@ -1,12 +1,12 @@
 'use client';
 
 /**
- * Footer unificado para páginas internas: misma estética que la home (E0E5EC, Avenir, ALMAMUNDI).
+ * Footer unificado para páginas internas (E0E5EC, sans moderna, ALMAMUNDI).
  */
 import Link from 'next/link';
 import { HistoriasAccordion } from './HistoriasAccordion';
 
-const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
+const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 
 export function Footer() {
   return (
@@ -20,25 +20,28 @@ export function Footer() {
         </h1>
       </div>
 
-      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-lg font-medium pt-14 pb-8 text-gray-600 gap-12">
+      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-lg font-normal pt-14 pb-8 text-gray-600 gap-12">
         <div className="flex flex-col items-center md:items-start">
           <span className="block mb-4 opacity-70 text-base">Una iniciativa de</span>
           <img src="/logo-precisar.png" alt="Precisar" className="h-16 w-auto object-contain" />
         </div>
 
         <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
-          <Link href="/#intro" className="hover:text-gray-900 transition-colors font-bold">
+          <Link href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
             Nuestro propósito
           </Link>
-          <Link href="/#como-funciona" className="hover:text-gray-900 transition-colors font-bold">
+          <Link href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
             ¿Cómo funciona?
           </Link>
           <HistoriasAccordion variant="footer" />
-          <Link href="/archivo" className="hover:text-gray-900 transition-colors font-bold">
+          <Link href="/archivo" className="hover:text-gray-900 transition-colors font-normal">
             Archivo
           </Link>
-          <Link href="/#mapa" className="hover:text-gray-900 transition-colors font-bold">
+          <Link href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
             Mapa
+          </Link>
+          <Link href="/privacidad" className="hover:text-gray-900 transition-colors font-normal">
+            Política de privacidad
           </Link>
         </div>
       </div>

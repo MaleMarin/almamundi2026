@@ -1,11 +1,13 @@
 /**
  * Neumorfismo fuerte para páginas /historias y /temas.
  * Misma paleta que home (soft UI) pero sombras más marcadas.
+ *
+ * Tipografía interior: sans moderna (sin serif clásicas).
  */
-export const APP_FONT = `'Avenir Light', Avenir, sans-serif`;
+export const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 
 export const neu = {
-  APP_FONT: `'Avenir Light', Avenir, sans-serif`,
+  APP_FONT,
   bg: '#E0E5EC',
   textMain: '#4A5568',
   textBody: '#718096',

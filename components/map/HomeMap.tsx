@@ -329,11 +329,9 @@ function DockButtonLight({
     <button
       type="button"
       onClick={onClick}
-      className="whitespace-nowrap min-w-[108px] px-8 py-4 font-medium text-gray-600 hover:text-orange-600 active:scale-95 transition-colors"
-      style={{
-        ...dockButtonStyle,
-        ...(active ? { border: '2px solid var(--almamundi-orange, #f97316)', boxShadow: `${dockButtonStyle.boxShadow}, 0 0 0 1px rgba(249,115,22,0.4)` } : {}),
-      }}
+      data-active={active ? 'true' : undefined}
+      className="btn-almamundi whitespace-nowrap min-w-[128px] px-10 py-5 text-[0.9375rem] font-medium text-gray-600 active:scale-95 transition-colors"
+      style={dockButtonStyle}
     >
       {children}
     </button>
@@ -345,7 +343,7 @@ function DockSearchLight({ onClick }: { onClick?: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="whitespace-nowrap min-w-[240px] px-8 py-4 font-medium text-gray-600 hover:text-orange-600 active:scale-95 transition-colors"
+      className="btn-almamundi whitespace-nowrap min-w-[280px] px-10 py-5 text-[0.9375rem] font-medium text-gray-600 active:scale-95 transition-colors"
       style={dockButtonStyle}
     >
       Buscar por palabras clave

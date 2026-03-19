@@ -60,7 +60,7 @@ function SoftCard({
         <p className="text-gray-500 leading-relaxed text-base mb-5">{children}</p>
         <button
           onClick={onClick}
-          className="w-full flex justify-center px-8 py-4 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95 group-hover:text-orange-600"
+          className="btn-almamundi w-full flex justify-center px-8 py-4 rounded-full text-xs font-black tracking-widest text-orange-500 uppercase transition-all active:scale-95"
           style={soft.button}
           type="button"
         >
@@ -112,16 +112,16 @@ export function HomeFirstPart({
           <img src="/logo.png" alt="AlmaMundi" className="h-28 md:h-36 w-auto object-contain select-none filter drop-shadow-md" />
         </div>
         <nav className="hidden md:flex gap-6 text-sm font-bold text-gray-600 items-center">
-          <button onClick={onShowPurpose} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button} type="button">
+          <button onClick={onShowPurpose} className="btn-almamundi px-8 py-4 active:scale-95" style={soft.button} type="button">
             Propósito
           </button>
           <button onClick={onShowInspiration} className="px-8 py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
             Inspiración
           </button>
-          <a href={historiasHref} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+          <a href={historiasHref} className="btn-almamundi px-8 py-4 active:scale-95" style={soft.button}>
             Historias
           </a>
-          <a href={mapaHref} className="px-8 py-4 active:scale-95 hover:text-orange-600" style={soft.button}>
+          <a href={mapaHref} className="btn-almamundi px-8 py-4 active:scale-95" style={soft.button}>
             Mapa
           </a>
         </nav>

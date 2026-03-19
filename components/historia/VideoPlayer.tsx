@@ -1,43 +1,36 @@
-'use client';
+'use client'
 
-/**
- * El Cine Personal de AlmaMundi — 3 actos como una película real.
- * Acto 1: Intertítulo (pantalla negra, Cormorant Garamond itálica, línea dorada, autor, fade out).
- * Acto 2: Proyección (iris wipe, fondo desenfocado, viñeta, controles a 2.8s, barra dorada).
- * Acto 3: Fin (cita con acento dorado, tarjeta autor con pulso, Ver de nuevo / Más historias).
- */
-import { useState, useRef, useEffect, useCallback } from 'react';
-import ReactDOM from 'react-dom';
-import Link from 'next/link';
+import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Historia {
-  id: string;
-  titulo: string;
-  subtitulo?: string;
+  id: string
+  titulo: string
+  subtitulo?: string
   autor: {
-    nombre: string;
-    avatar: string;
-    ubicacion?: string;
-    bio?: string;
-  };
-  videoUrl: string;
-  thumbnailUrl: string;
-  duracion: number;
-  fecha: string;
-  tags?: string[];
-  citaDestacada?: string;
+    nombre: string
+    avatar: string
+    ubicacion?: string
+    bio?: string
+  }
+  videoUrl: string
+  thumbnailUrl: string
+  duracion: number // segundos
+  fecha: string
+  tags?: string[]
+  citaDestacada?: string
 }
 
 interface VideoPlayerProps {
-  historia: Historia;
-  onClose?: () => void;
+  historia: Historia
+  onClose?: () => void
 }
 
+// ─── Utils ────────────────────────────────────────────────────────────────────
 function formatTime(secs: number): string {
-  const m = Math.floor(secs / 60);
-  const s = Math.floor(secs % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  const m = Math.floor(secs / 60)
+  const s = Math.floor(secs % 60)
+  return `${m}:${s.toString().padStart(2, '0')}`
 }
 
 const btnStyle: React.CSSProperties = {
@@ -50,189 +43,155 @@ const btnStyle: React.CSSProperties = {
   justifyContent: 'center',
   color: 'rgba(245,240,232,0.75)',
   transition: 'color 0.15s',
-};
-
-function PlayIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <polygon points="5,3 19,12 5,21" />
-    </svg>
-  );
-}
-function PauseIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-      <rect x="6" y="4" width="4" height="16" rx="1" />
-      <rect x="14" y="4" width="4" height="16" rx="1" />
-    </svg>
-  );
-}
-function VolumeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
-      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
-      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
-    </svg>
-  );
-}
-function MutedIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
-      <line x1="23" y1="9" x2="17" y2="15" />
-      <line x1="17" y1="9" x2="23" y2="15" />
-    </svg>
-  );
-}
-function FullscreenIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-    </svg>
-  );
-}
-function MinimizeIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-      <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-    </svg>
-  );
 }
 
+const PlayIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <polygon points="5,3 19,12 5,21" />
+  </svg>
+)
+const PauseIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+    <rect x="6" y="4" width="4" height="16" rx="1" />
+    <rect x="14" y="4" width="4" height="16" rx="1" />
+  </svg>
+)
+const VolumeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
+    <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+    <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+  </svg>
+)
+const MutedIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" />
+    <line x1="23" y1="9" x2="17" y2="15" />
+    <line x1="17" y1="9" x2="23" y2="15" />
+  </svg>
+)
+const FullscreenIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+  </svg>
+)
+const MinimizeIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+  </svg>
+)
+
+// ─── Component ────────────────────────────────────────────────────────────────
 export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
-  const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>('intertitle');
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(historia.duracion);
-  const [showControls, setShowControls] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [intertitlePhase, setIntertitlePhase] = useState<'in' | 'hold' | 'out'>('in');
-  const [irisOpen, setIrisOpen] = useState(false);
+  // Stages: 'intertitle' → 'playing' → 'ended'
+  const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>('intertitle')
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(historia.duracion)
+  const [showControls, setShowControls] = useState(true)
+  const [isMuted, setIsMuted] = useState(false)
+  const [volume, setVolume] = useState(1)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [intertitlePhase, setIntertitlePhase] = useState<'in' | 'hold' | 'out'>('in')
+  const [irisOpen, setIrisOpen] = useState(false)
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  // ── Escape to close ───────────────────────────────────────────────────────
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
-  }, []);
+    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose?.() }
+    window.addEventListener('keydown', fn)
+    return () => window.removeEventListener('keydown', fn)
+  }, [onClose])
 
+  // ── Intertitle sequence ────────────────────────────────────────────────────
   useEffect(() => {
-    const fn = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose?.(); };
-    window.addEventListener('keydown', fn);
-    return () => window.removeEventListener('keydown', fn);
-  }, [onClose]);
-
-  useEffect(() => {
-    if (stage !== 'intertitle') return;
-    const t1 = setTimeout(() => setIntertitlePhase('hold'), 600);
-    const t2 = setTimeout(() => setIntertitlePhase('out'), 3200);
+    if (stage !== 'intertitle') return
+    const t1 = setTimeout(() => setIntertitlePhase('hold'), 600)
+    const t2 = setTimeout(() => setIntertitlePhase('out'), 3200)
     const t3 = setTimeout(() => {
-      setIrisOpen(true);
-      setTimeout(() => setStage('playing'), 800);
-    }, 4000);
-    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
-  }, [stage]);
+      setIrisOpen(true)
+      setTimeout(() => setStage('playing'), 800)
+    }, 4000)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, [stage])
 
+  // ── Auto-play when stage switches to playing ───────────────────────────────
   useEffect(() => {
     if (stage === 'playing' && videoRef.current) {
-      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {});
+      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
     }
-  }, [stage]);
+  }, [stage])
 
+  // ── Controls auto-hide ─────────────────────────────────────────────────────
   const resetControlsTimer = useCallback(() => {
-    setShowControls(true);
-    if (controlsTimer.current) clearTimeout(controlsTimer.current);
+    setShowControls(true)
+    if (controlsTimer.current) clearTimeout(controlsTimer.current)
     if (isPlaying) {
-      controlsTimer.current = setTimeout(() => setShowControls(false), 2800);
+      controlsTimer.current = setTimeout(() => setShowControls(false), 2800)
     }
-  }, [isPlaying]);
+  }, [isPlaying])
 
   useEffect(() => {
-    resetControlsTimer();
-  }, [isPlaying, resetControlsTimer]);
+    resetControlsTimer()
+  }, [isPlaying, resetControlsTimer])
 
+  // ── Video events ───────────────────────────────────────────────────────────
   const handleTimeUpdate = () => {
-    if (videoRef.current) setCurrentTime(videoRef.current.currentTime);
-  };
+    if (videoRef.current) setCurrentTime(videoRef.current.currentTime)
+  }
   const handleLoadedMetadata = () => {
-    if (videoRef.current) setDuration(videoRef.current.duration);
-  };
+    if (videoRef.current) setDuration(videoRef.current.duration)
+  }
   const handleEnded = () => {
-    setIsPlaying(false);
-    setShowControls(true);
-    setStage('ended');
-  };
+    setIsPlaying(false)
+    setShowControls(true)
+    setStage('ended')
+  }
 
   const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (isPlaying) { videoRef.current.pause(); setIsPlaying(false); }
-    else { videoRef.current.play(); setIsPlaying(true); }
-  };
+    if (!videoRef.current) return
+    if (isPlaying) { videoRef.current.pause(); setIsPlaying(false) }
+    else { videoRef.current.play(); setIsPlaying(true) }
+  }
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const t = parseFloat(e.target.value);
-    if (videoRef.current) { videoRef.current.currentTime = t; setCurrentTime(t); }
-  };
+    const t = parseFloat(e.target.value)
+    if (videoRef.current) { videoRef.current.currentTime = t; setCurrentTime(t) }
+  }
 
   const handleVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const v = parseFloat(e.target.value);
-    setVolume(v);
-    if (videoRef.current) videoRef.current.volume = v;
-    setIsMuted(v === 0);
-  };
+    const v = parseFloat(e.target.value)
+    setVolume(v)
+    if (videoRef.current) videoRef.current.volume = v
+    setIsMuted(v === 0)
+  }
 
   const toggleMute = () => {
-    if (!videoRef.current) return;
-    const next = !isMuted;
-    setIsMuted(next);
-    videoRef.current.volume = next ? 0 : volume;
-  };
+    if (!videoRef.current) return
+    const next = !isMuted
+    setIsMuted(next)
+    videoRef.current.volume = next ? 0 : volume
+  }
 
   const toggleFullscreen = () => {
-    if (!containerRef.current) return;
+    if (!containerRef.current) return
     if (!document.fullscreenElement) {
-      containerRef.current.requestFullscreen();
-      setIsFullscreen(true);
+      containerRef.current.requestFullscreen()
+      setIsFullscreen(true)
     } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
+      document.exitFullscreen()
+      setIsFullscreen(false)
     }
-  };
+  }
 
-  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0
 
-  const overlay = (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 9999 }}>
-      {onClose && (
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Cerrar"
-          style={{
-            position: 'absolute',
-            top: '1.5rem',
-            right: '1.5rem',
-            zIndex: 10010,
-            background: 'rgba(255,255,255,0.08)',
-            border: '1px solid rgba(201,169,110,0.3)',
-            borderRadius: '50%',
-            width: 40,
-            height: 40,
-            color: '#f5f0e8',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          ×
-        </button>
-      )}
+  return (
+    <>
+      {/* ── Global Fonts ── */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
 
@@ -245,7 +204,15 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           --film:     #111009;
         }
 
-        /* Iris Wipe */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+          background: var(--film);
+          font-family: 'Jost', sans-serif;
+          overflow: hidden;
+        }
+
+        /* ── Iris Wipe ── */
         @keyframes irisExpand {
           from { clip-path: circle(0% at 50% 50%); }
           to   { clip-path: circle(150% at 50% 50%); }
@@ -254,7 +221,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           animation: irisExpand 0.85s cubic-bezier(0.77, 0, 0.18, 1) forwards;
         }
 
-        /* Intertitle */
+        /* ── Intertitle ── */
         @keyframes titleIn {
           from { opacity: 0; transform: translateY(18px); letter-spacing: 0.35em; }
           to   { opacity: 1; transform: translateY(0);    letter-spacing: 0.15em; }
@@ -266,28 +233,28 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
         .title-in  { animation: titleIn  0.9s cubic-bezier(0.22,1,0.36,1) forwards; }
         .title-out { animation: titleOut 0.7s ease-in forwards; }
 
-        /* Controls */
+        /* ── Controls ── */
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(12px); }
           to   { opacity: 1; transform: translateY(0); }
         }
         .controls-enter { animation: fadeUp 0.3s ease forwards; }
 
-        /* End card */
+        /* ── End card ── */
         @keyframes endReveal {
           from { opacity: 0; transform: scale(0.96); }
           to   { opacity: 1; transform: scale(1); }
         }
         .end-reveal { animation: endReveal 0.8s cubic-bezier(0.22,1,0.36,1) forwards; }
 
-        /* Seekbar */
-        .cine-player input[type='range'] {
+        /* ── Seekbar ── */
+        input[type='range'] {
           -webkit-appearance: none;
           appearance: none;
           background: transparent;
           cursor: pointer;
         }
-        .cine-player input[type='range']::-webkit-slider-thumb {
+        input[type='range']::-webkit-slider-thumb {
           -webkit-appearance: none;
           width: 14px; height: 14px;
           border-radius: 50%;
@@ -295,16 +262,16 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           margin-top: -5px;
           transition: transform 0.15s;
         }
-        .cine-player input[type='range']:hover::-webkit-slider-thumb {
+        input[type='range']:hover::-webkit-slider-thumb {
           transform: scale(1.4);
         }
-        .cine-player input[type='range']::-webkit-slider-runnable-track {
+        input[type='range']::-webkit-slider-runnable-track {
           height: 3px;
           border-radius: 2px;
           background: rgba(255,255,255,0.15);
         }
 
-        /* Grain overlay */
+        /* ── Grain overlay ── */
         .grain::after {
           content: '';
           position: absolute; inset: 0;
@@ -314,532 +281,619 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           mix-blend-mode: overlay;
         }
 
-        /* Author pulse */
+        /* ── Scrollbar hide ── */
+        ::-webkit-scrollbar { display: none; }
+
+        /* ── Author pulse ── */
         @keyframes pulse {
           0%,100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.4); }
           50%      { box-shadow: 0 0 0 10px rgba(201,169,110,0); }
         }
         .avatar-pulse { animation: pulse 2.4s ease infinite; }
+
+        /* ── Waveform ── */
+        @keyframes wave {
+          0%,100% { transform: scaleY(0.3); }
+          50%      { transform: scaleY(1); }
+        }
       `}</style>
 
-      <div className="cine-player">
-        {/* Acto 1 — Intertítulo */}
-        {stage === 'intertitle' && (
-          <div
-            style={{
-              position: 'fixed', inset: 0,
-              background: 'var(--film)',
-              display: 'flex', flexDirection: 'column',
-              alignItems: 'center', justifyContent: 'center',
-              zIndex: 100,
-            }}
-            className={`grain ${irisOpen ? 'iris-expand' : ''}`}
-          >
-            <div style={{
-              width: intertitlePhase === 'hold' ? '280px' : '0px',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
-              transition: 'width 1.2s ease',
-              marginBottom: '3rem',
-            }} />
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/*  STAGE 1 — INTERTITLE                                                 */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {stage === 'intertitle' && (
+        <div
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'var(--film)',
+            display: 'flex', flexDirection: 'column',
+            alignItems: 'center', justifyContent: 'center',
+            zIndex: 100,
+          }}
+          className={`grain ${irisOpen ? 'iris-expand' : ''}`}
+        >
+          {/* X close button */}
+          {onClose && (
+            <button
+              onClick={onClose}
+              style={{
+                position: 'absolute', top: '1.5rem', right: '1.5rem',
+                width: '40px', height: '40px', borderRadius: '50%',
+                background: 'rgba(255,255,255,0.06)',
+                border: '1px solid rgba(201,169,110,0.25)',
+                color: 'rgba(245,240,232,0.6)',
+                cursor: 'pointer', display: 'flex',
+                alignItems: 'center', justifyContent: 'center',
+                zIndex: 200, transition: 'background 0.2s, color 0.2s',
+              }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(201,169,110,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = '#c9a96e'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.6)'; }}
+              aria-label="Cerrar"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+              </svg>
+            </button>
+          )}
+          {/* Ornamental top line */}
+          <div style={{
+            width: intertitlePhase === 'hold' ? '280px' : '0px',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
+            transition: 'width 1.2s ease',
+            marginBottom: '3rem',
+          }} />
 
+          {/* AlmaMundi wordmark */}
+          <p style={{
+            fontFamily: "'Jost', sans-serif",
+            fontWeight: 200,
+            fontSize: '0.7rem',
+            letterSpacing: '0.55em',
+            color: 'var(--sepia)',
+            textTransform: 'uppercase',
+            opacity: intertitlePhase === 'hold' ? 1 : 0,
+            transition: 'opacity 0.8s ease 0.3s',
+            marginBottom: '2rem',
+          }}>
+            AlmaMundi · Historia Personal
+          </p>
+
+          {/* Title */}
+          <h1
+            className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
+            style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
+              fontWeight: 300,
+              fontStyle: 'italic',
+              color: 'var(--cream)',
+              textAlign: 'center',
+              letterSpacing: '0.15em',
+              lineHeight: 1.15,
+              maxWidth: '72vw',
+              opacity: intertitlePhase === 'in' ? 0 : 1,
+              padding: '0 2rem',
+            }}
+          >
+            {historia.titulo}
+          </h1>
+
+          {historia.subtitulo && (
             <p style={{
               fontFamily: "'Jost', sans-serif",
-              fontWeight: 200,
-              fontSize: '0.7rem',
-              letterSpacing: '0.55em',
-              color: 'var(--sepia)',
-              textTransform: 'uppercase',
+              fontWeight: 300,
+              fontSize: '0.95rem',
+              letterSpacing: '0.12em',
+              color: 'rgba(245,240,232,0.45)',
+              marginTop: '1.4rem',
               opacity: intertitlePhase === 'hold' ? 1 : 0,
-              transition: 'opacity 0.8s ease 0.3s',
-              marginBottom: '2rem',
+              transition: 'opacity 0.8s ease 0.6s',
             }}>
-              AlmaMundi · Historia personal
+              {historia.subtitulo}
             </p>
+          )}
 
-            <h1
-              className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
+          {/* Ornamental bottom line */}
+          <div style={{
+            width: intertitlePhase === 'hold' ? '280px' : '0px',
+            height: '1px',
+            background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
+            transition: 'width 1.2s ease',
+            marginTop: '3rem',
+          }} />
+
+          {/* Author pre-credit */}
+          <div style={{
+            position: 'absolute', bottom: '3.5rem',
+            display: 'flex', alignItems: 'center', gap: '1rem',
+            opacity: intertitlePhase === 'hold' ? 1 : 0,
+            transition: 'opacity 0.8s ease 0.9s',
+          }}>
+            <img
+              src={historia.autor.avatar}
+              alt={historia.autor.nombre}
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
-                fontWeight: 300,
-                fontStyle: 'italic',
-                color: 'var(--cream)',
-                textAlign: 'center',
-                letterSpacing: '0.15em',
-                lineHeight: 1.15,
-                maxWidth: '72vw',
-                opacity: intertitlePhase === 'in' ? 0 : 1,
-                padding: '0 2rem',
+                width: '36px', height: '36px',
+                borderRadius: '50%',
+                border: '1px solid rgba(201,169,110,0.4)',
+                objectFit: 'cover',
               }}
-            >
-              {historia.titulo}
-            </h1>
-
-            {historia.subtitulo && (
-              <p style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize: '0.95rem',
-                letterSpacing: '0.12em',
-                color: 'rgba(245,240,232,0.45)',
-                marginTop: '1.4rem',
-                opacity: intertitlePhase === 'hold' ? 1 : 0,
-                transition: 'opacity 0.8s ease 0.6s',
-              }}>
-                {historia.subtitulo}
-              </p>
-            )}
-
-            <div style={{
-              width: intertitlePhase === 'hold' ? '280px' : '0px',
-              height: '1px',
-              background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
-              transition: 'width 1.2s ease',
-              marginTop: '3rem',
-            }} />
-
-            <div style={{
-              position: 'absolute', bottom: '3.5rem',
-              display: 'flex', alignItems: 'center', gap: '1rem',
-              opacity: intertitlePhase === 'hold' ? 1 : 0,
-              transition: 'opacity 0.8s ease 0.9s',
-            }}>
-              <img
-                src={historia.autor.avatar}
-                alt={historia.autor.nombre}
-                style={{
-                  width: '36px', height: '36px',
-                  borderRadius: '50%',
-                  border: '1px solid rgba(201,169,110,0.4)',
-                  objectFit: 'cover',
-                }}
-              />
-              <span style={{
-                fontFamily: "'Jost', sans-serif",
-                fontWeight: 300,
-                fontSize: '0.8rem',
-                letterSpacing: '0.2em',
-                color: 'rgba(245,240,232,0.5)',
-                textTransform: 'uppercase',
-              }}>
-                {historia.autor.nombre}
-              </span>
-            </div>
-          </div>
-        )}
-
-        {/* Acto 2 — Proyección */}
-        {stage === 'playing' && (
-          <div
-            ref={containerRef}
-            onMouseMove={resetControlsTimer}
-            onClick={togglePlay}
-            style={{
-              position: 'fixed', inset: 0,
-              background: 'var(--film)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: showControls ? 'default' : 'none',
-              overflow: 'hidden',
-            }}
-            className="grain iris-expand"
-          >
-            <div style={{
-              position: 'absolute', inset: '-5%',
-              backgroundImage: `url(${historia.thumbnailUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(40px) brightness(0.2) saturate(0.5)',
-              transform: 'scale(1.1)',
-              zIndex: 0,
-            }} />
-
-            <div style={{
-              position: 'absolute', inset: 0,
-              background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%)',
-              zIndex: 1,
-              pointerEvents: 'none',
-            }} />
-
-            <video
-              ref={videoRef}
-              src={historia.videoUrl}
-              onTimeUpdate={handleTimeUpdate}
-              onLoadedMetadata={handleLoadedMetadata}
-              onEnded={handleEnded}
-              style={{
-                position: 'relative', zIndex: 2,
-                width: '100%', height: '100%',
-                objectFit: 'contain',
-                maxHeight: '100vh',
-              }}
-              playsInline
             />
-
-            <div style={{
-              position: 'absolute', top: 0, left: 0, right: 0,
-              padding: '2rem 2.5rem 4rem',
-              background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)',
-              zIndex: 10,
-              opacity: showControls ? 1 : 0,
-              transition: 'opacity 0.5s ease',
-              pointerEvents: 'none',
+            <span style={{
+              fontFamily: "'Jost', sans-serif",
+              fontWeight: 300,
+              fontSize: '0.8rem',
+              letterSpacing: '0.2em',
+              color: 'rgba(245,240,232,0.5)',
+              textTransform: 'uppercase',
             }}>
+              {historia.autor.nombre}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/*  STAGE 2 — PLAYING                                                    */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {stage === 'playing' && (
+        <div
+          ref={containerRef}
+          onMouseMove={resetControlsTimer}
+          onClick={togglePlay}
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'var(--film)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            cursor: showControls ? 'default' : 'none',
+            overflow: 'hidden',
+          }}
+          className="grain iris-expand"
+        >
+          {/* ── Blurred background (ambiance) ── */}
+          <div style={{
+            position: 'absolute', inset: '-5%',
+            backgroundImage: `url(${historia.thumbnailUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(40px) brightness(0.2) saturate(0.5)',
+            transform: 'scale(1.1)',
+            zIndex: 0,
+          }} />
+
+          {/* ── Vignette ── */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%)',
+            zIndex: 1,
+            pointerEvents: 'none',
+          }} />
+
+          {/* ── Video ── */}
+          <video
+            ref={videoRef}
+            src={historia.videoUrl}
+            onTimeUpdate={handleTimeUpdate}
+            onLoadedMetadata={handleLoadedMetadata}
+            onEnded={handleEnded}
+            style={{
+              position: 'relative', zIndex: 2,
+              width: '100%', height: '100%',
+              objectFit: 'contain',
+              maxHeight: '100vh',
+            }}
+            playsInline
+          />
+
+          {/* ── Top bar: title + close ── */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0,
+            padding: '2rem 2.5rem 4rem',
+            background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%)',
+            zIndex: 10,
+            opacity: showControls ? 1 : 0,
+            transition: 'opacity 0.5s ease',
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+          }}>
+            <div style={{ pointerEvents: 'none' }}>
               <p style={{
                 fontFamily: "'Jost', sans-serif",
                 fontWeight: 200,
                 fontSize: '0.65rem',
                 letterSpacing: '0.5em',
-                color: 'var(--sepia)',
-                textTransform: 'uppercase',
-                marginBottom: '0.4rem',
-              }}>
-                AlmaMundi
-              </p>
-              <h2 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 400,
-                fontStyle: 'italic',
-                fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
-                color: 'var(--cream)',
-                letterSpacing: '0.05em',
-              }}>
-                {historia.titulo}
-              </h2>
+              color: 'var(--sepia)',
+              textTransform: 'uppercase',
+              marginBottom: '0.4rem',
+            }}>
+              AlmaMundi
+            </p>
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 400,
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
+              color: 'var(--cream)',
+              letterSpacing: '0.05em',
+            }}>
+              {historia.titulo}
+            </h2>
+            </div>
+            {/* X close button */}
+            {onClose && (
+              <button
+                onClick={(e) => { e.stopPropagation(); onClose(); }}
+                style={{
+                  width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(201,169,110,0.25)',
+                  color: 'rgba(245,240,232,0.7)',
+                  cursor: 'pointer', display: 'flex',
+                  alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.2s, color 0.2s',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(201,169,110,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = '#c9a96e'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.7)'; }}
+                aria-label="Cerrar"
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+              </button>
+            )}
+          </div>
+
+          {/* ── Center play/pause big indicator ── */}
+          {!isPlaying && (
+            <div style={{
+              position: 'absolute', zIndex: 10,
+              width: '80px', height: '80px',
+              borderRadius: '50%',
+              background: 'rgba(201,169,110,0.15)',
+              border: '1px solid rgba(201,169,110,0.5)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              backdropFilter: 'blur(8px)',
+            }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--sepia)">
+                <polygon points="5,3 19,12 5,21" />
+              </svg>
+            </div>
+          )}
+
+          {/* ── Bottom controls bar ── */}
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className={showControls ? 'controls-enter' : ''}
+            style={{
+              position: 'absolute', bottom: 0, left: 0, right: 0,
+              padding: '4rem 2.5rem 2rem',
+              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)',
+              zIndex: 10,
+              opacity: showControls ? 1 : 0,
+              transition: 'opacity 0.5s ease',
+            }}
+          >
+            {/* Progress bar */}
+            <div style={{ position: 'relative', marginBottom: '1rem' }}>
+              {/* Filled track (visual) */}
+              <div style={{
+                position: 'absolute', top: '50%', left: 0,
+                width: `${progress}%`, height: '3px',
+                background: 'linear-gradient(90deg, var(--sepia-dk), var(--sepia))',
+                borderRadius: '2px',
+                transform: 'translateY(-50%)',
+                pointerEvents: 'none',
+                zIndex: 1,
+              }} />
+              <input
+                type="range"
+                min={0}
+                max={duration}
+                value={currentTime}
+                step={0.1}
+                onChange={handleSeek}
+                style={{ width: '100%', position: 'relative', zIndex: 2 }}
+              />
             </div>
 
-            {!isPlaying && (
-              <div style={{
-                position: 'absolute', zIndex: 10,
-                width: '80px', height: '80px',
-                borderRadius: '50%',
-                background: 'rgba(201,169,110,0.15)',
-                border: '1px solid rgba(201,169,110,0.5)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backdropFilter: 'blur(8px)',
-              }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--sepia)">
-                  <polygon points="5,3 19,12 5,21" />
-                </svg>
-              </div>
-            )}
+            {/* Controls row */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            }}>
+              {/* Left: play + volume + time */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                {/* Play/Pause */}
+                <button onClick={togglePlay} style={btnStyle}>
+                  {isPlaying
+                    ? <PauseIcon />
+                    : <PlayIcon />
+                  }
+                </button>
 
-            <div
-              onClick={(e) => e.stopPropagation()}
-              className={showControls ? 'controls-enter' : ''}
-              style={{
-                position: 'absolute', bottom: 0, left: 0, right: 0,
-                padding: '4rem 2.5rem 2rem',
-                background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)',
-                zIndex: 10,
-                opacity: showControls ? 1 : 0,
-                transition: 'opacity 0.5s ease',
-              }}
-            >
-              <div style={{ position: 'relative', marginBottom: '1rem' }}>
-                <div style={{
-                  position: 'absolute', top: '50%', left: 0,
-                  width: `${progress}%`, height: '3px',
-                  background: 'linear-gradient(90deg, var(--sepia-dk), var(--sepia))',
-                  borderRadius: '2px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
-                  zIndex: 1,
-                }} />
+                {/* Mute */}
+                <button onClick={toggleMute} style={btnStyle}>
+                  {isMuted ? <MutedIcon /> : <VolumeIcon />}
+                </button>
+
+                {/* Volume slider (compact) */}
                 <input
                   type="range"
-                  min={0}
-                  max={duration}
-                  value={currentTime}
-                  step={0.1}
-                  onChange={handleSeek}
-                  style={{ width: '100%', position: 'relative', zIndex: 2 }}
+                  min={0} max={1} step={0.05}
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolume}
+                  style={{ width: '72px' }}
                 />
+
+                {/* Time */}
+                <span style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontSize: '0.78rem',
+                  fontWeight: 300,
+                  color: 'rgba(245,240,232,0.6)',
+                  letterSpacing: '0.08em',
+                  whiteSpace: 'nowrap',
+                }}>
+                  {formatTime(currentTime)} / {formatTime(duration)}
+                </span>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                  <button type="button" onClick={togglePlay} style={btnStyle} aria-label={isPlaying ? 'Pausar' : 'Reproducir'}>
-                    {isPlaying ? <PauseIcon /> : <PlayIcon />}
-                  </button>
-                  <button type="button" onClick={toggleMute} style={btnStyle} aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}>
-                    {isMuted ? <MutedIcon /> : <VolumeIcon />}
-                  </button>
-                  <input
-                    type="range"
-                    min={0} max={1} step={0.05}
-                    value={isMuted ? 0 : volume}
-                    onChange={handleVolume}
-                    style={{ width: '72px' }}
-                    aria-label="Volumen"
+              {/* Right: author chip + fullscreen */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                  <img
+                    src={historia.autor.avatar}
+                    style={{
+                      width: '28px', height: '28px',
+                      borderRadius: '50%',
+                      border: '1px solid rgba(201,169,110,0.35)',
+                      objectFit: 'cover',
+                    }}
+                    alt={historia.autor.nombre}
                   />
                   <span style={{
                     fontFamily: "'Jost', sans-serif",
-                    fontSize: '0.78rem',
+                    fontSize: '0.75rem',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.6)',
-                    letterSpacing: '0.08em',
-                    whiteSpace: 'nowrap',
-                  }}>
-                    {formatTime(currentTime)} / {formatTime(duration)}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <img
-                      src={historia.autor.avatar}
-                      alt=""
-                      style={{
-                        width: '28px', height: '28px',
-                        borderRadius: '50%',
-                        border: '1px solid rgba(201,169,110,0.35)',
-                        objectFit: 'cover',
-                      }}
-                    />
-                    <span style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontSize: '0.75rem',
-                      fontWeight: 300,
-                      color: 'rgba(245,240,232,0.55)',
-                      letterSpacing: '0.12em',
-                    }}>
-                      {historia.autor.nombre}
-                    </span>
-                  </div>
-                  <button type="button" onClick={toggleFullscreen} style={btnStyle} aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}>
-                    {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Acto 3 — Fin */}
-        {stage === 'ended' && (
-          <div
-            style={{
-              position: 'fixed', inset: 0,
-              background: 'var(--film)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              overflow: 'hidden',
-            }}
-            className="grain"
-          >
-            <div style={{
-              position: 'absolute', inset: '-5%',
-              backgroundImage: `url(${historia.thumbnailUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(60px) brightness(0.1) saturate(0.3)',
-              transform: 'scale(1.1)',
-            }} />
-
-            <div
-              className="end-reveal"
-              style={{
-                position: 'relative', zIndex: 2,
-                display: 'flex', flexDirection: 'column', alignItems: 'center',
-                maxWidth: '520px', width: '90%',
-                padding: '3.5rem 3rem',
-                background: 'rgba(245,240,232,0.04)',
-                border: '1px solid rgba(201,169,110,0.15)',
-                borderRadius: '4px',
-                backdropFilter: 'blur(20px)',
-                textAlign: 'center',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
-                <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
-                <span style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontStyle: 'italic',
-                  fontSize: '0.85rem',
-                  color: 'var(--sepia)',
-                  letterSpacing: '0.3em',
-                }}>Fin</span>
-                <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
-              </div>
-
-              <h2 style={{
-                fontFamily: "'Cormorant Garamond', serif",
-                fontWeight: 300,
-                fontStyle: 'italic',
-                fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)',
-                color: 'var(--cream)',
-                letterSpacing: '0.05em',
-                lineHeight: 1.2,
-                marginBottom: '1.8rem',
-              }}>
-                {historia.titulo}
-              </h2>
-
-              {historia.citaDestacada && (
-                <blockquote style={{
-                  fontFamily: "'Cormorant Garamond', serif",
-                  fontStyle: 'italic',
-                  fontWeight: 400,
-                  fontSize: '1.05rem',
-                  color: 'rgba(245,240,232,0.55)',
-                  lineHeight: 1.7,
-                  letterSpacing: '0.03em',
-                  borderLeft: '2px solid rgba(201,169,110,0.3)',
-                  paddingLeft: '1.2rem',
-                  marginBottom: '2.5rem',
-                  textAlign: 'left',
-                }}>
-                  &quot;{historia.citaDestacada}&quot;
-                </blockquote>
-              )}
-
-              <div style={{
-                display: 'flex', alignItems: 'center', gap: '1.2rem',
-                padding: '1.2rem 1.5rem',
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(201,169,110,0.1)',
-                borderRadius: '3px',
-                width: '100%',
-                marginBottom: '2.5rem',
-              }}>
-                <img
-                  src={historia.autor.avatar}
-                  alt=""
-                  className="avatar-pulse"
-                  style={{
-                    width: '54px', height: '54px',
-                    borderRadius: '50%',
-                    objectFit: 'cover',
-                    border: '2px solid rgba(201,169,110,0.35)',
-                    flexShrink: 0,
-                  }}
-                />
-                <div style={{ textAlign: 'left' }}>
-                  <p style={{
-                    fontFamily: "'Jost', sans-serif",
-                    fontWeight: 400,
-                    fontSize: '0.95rem',
-                    color: 'var(--cream)',
-                    letterSpacing: '0.05em',
-                    marginBottom: '0.2rem',
+                    color: 'rgba(245,240,232,0.55)',
+                    letterSpacing: '0.12em',
                   }}>
                     {historia.autor.nombre}
-                  </p>
-                  {historia.autor.ubicacion && (
-                    <p style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.75rem',
-                      color: 'var(--sepia)',
-                      letterSpacing: '0.15em',
-                      textTransform: 'uppercase',
-                    }}>
-                      {historia.autor.ubicacion}
-                    </p>
-                  )}
-                  {historia.autor.bio && (
-                    <p style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.8rem',
-                      color: 'rgba(245,240,232,0.4)',
-                      marginTop: '0.4rem',
-                      lineHeight: 1.5,
-                    }}>
-                      {historia.autor.bio}
-                    </p>
-                  )}
+                  </span>
                 </div>
-              </div>
-
-              {historia.tags && historia.tags.length > 0 && (
-                <div style={{
-                  display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
-                  justifyContent: 'center',
-                  marginBottom: '2.5rem',
-                }}>
-                  {historia.tags.map((tag) => (
-                    <span key={tag} style={{
-                      fontFamily: "'Jost', sans-serif",
-                      fontWeight: 300,
-                      fontSize: '0.68rem',
-                      letterSpacing: '0.22em',
-                      textTransform: 'uppercase',
-                      color: 'rgba(201,169,110,0.6)',
-                      border: '1px solid rgba(201,169,110,0.2)',
-                      padding: '0.25rem 0.8rem',
-                      borderRadius: '2px',
-                    }}>
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setStage('intertitle');
-                    setIntertitlePhase('in');
-                    setIrisOpen(false);
-                    setCurrentTime(0);
-                    if (videoRef.current) videoRef.current.currentTime = 0;
-                  }}
-                  style={{
-                    flex: 1,
-                    padding: '0.85rem',
-                    background: 'transparent',
-                    border: '1px solid rgba(201,169,110,0.3)',
-                    borderRadius: '3px',
-                    color: 'var(--sepia)',
-                    fontFamily: "'Jost', sans-serif",
-                    fontWeight: 300,
-                    fontSize: '0.78rem',
-                    letterSpacing: '0.25em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    transition: 'background 0.2s, border-color 0.2s',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.background = 'rgba(201,169,110,0.08)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; }}
-                >
-                  Ver de nuevo
+                <button onClick={toggleFullscreen} style={btnStyle}>
+                  {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
                 </button>
-                <Link
-                  href="/historias"
-                  style={{
-                    flex: 1,
-                    padding: '0.85rem',
-                    background: 'linear-gradient(135deg, var(--sepia-dk), var(--sepia))',
-                    border: 'none',
-                    borderRadius: '3px',
-                    color: 'var(--film)',
-                    fontFamily: "'Jost', sans-serif",
-                    fontWeight: 500,
-                    fontSize: '0.78rem',
-                    letterSpacing: '0.25em',
-                    textTransform: 'uppercase',
-                    cursor: 'pointer',
-                    transition: 'opacity 0.2s',
-                    textDecoration: 'none',
-                    textAlign: 'center',
-                    display: 'block',
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.opacity = '0.85'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.opacity = '1'; }}
-                >
-                  Más historias
-                </Link>
               </div>
             </div>
           </div>
-        )}
-      </div>
-    </div>
-  );
+        </div>
+      )}
 
-  if (typeof document !== 'undefined') {
-    return ReactDOM.createPortal(overlay, document.body);
-  }
-  return overlay;
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {/*  STAGE 3 — END SCREEN                                                 */}
+      {/* ══════════════════════════════════════════════════════════════════════ */}
+      {stage === 'ended' && (
+        <div
+          style={{
+            position: 'fixed', inset: 0,
+            background: 'var(--film)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            overflow: 'hidden',
+          }}
+          className="grain"
+        >
+          {/* Blurred thumbnail bg */}
+          <div style={{
+            position: 'absolute', inset: '-5%',
+            backgroundImage: `url(${historia.thumbnailUrl})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            filter: 'blur(60px) brightness(0.1) saturate(0.3)',
+            transform: 'scale(1.1)',
+          }} />
+
+          {/* Card */}
+          <div
+            className="end-reveal"
+            style={{
+              position: 'relative', zIndex: 2,
+              display: 'flex', flexDirection: 'column', alignItems: 'center',
+              maxWidth: '520px', width: '90%',
+              padding: '3.5rem 3rem',
+              background: 'rgba(245,240,232,0.04)',
+              border: '1px solid rgba(201,169,110,0.15)',
+              borderRadius: '4px',
+              backdropFilter: 'blur(20px)',
+              textAlign: 'center',
+            }}
+          >
+            {/* Fin ornament */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
+              <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
+              <span style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+                fontSize: '0.85rem',
+                color: 'var(--sepia)',
+                letterSpacing: '0.3em',
+              }}>Fin</span>
+              <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
+            </div>
+
+            {/* Title recap */}
+            <h2 style={{
+              fontFamily: "'Cormorant Garamond', serif",
+              fontWeight: 300,
+              fontStyle: 'italic',
+              fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)',
+              color: 'var(--cream)',
+              letterSpacing: '0.05em',
+              lineHeight: 1.2,
+              marginBottom: '1.8rem',
+            }}>
+              {historia.titulo}
+            </h2>
+
+            {/* Cita destacada */}
+            {historia.citaDestacada && (
+              <blockquote style={{
+                fontFamily: "'Cormorant Garamond', serif",
+                fontStyle: 'italic',
+                fontWeight: 400,
+                fontSize: '1.05rem',
+                color: 'rgba(245,240,232,0.55)',
+                lineHeight: 1.7,
+                letterSpacing: '0.03em',
+                borderLeft: '2px solid rgba(201,169,110,0.3)',
+                paddingLeft: '1.2rem',
+                marginBottom: '2.5rem',
+                textAlign: 'left',
+              }}>
+                &quot;{historia.citaDestacada}&quot;
+              </blockquote>
+            )}
+
+            {/* Author card */}
+            <div style={{
+              display: 'flex', alignItems: 'center', gap: '1.2rem',
+              padding: '1.2rem 1.5rem',
+              background: 'rgba(255,255,255,0.03)',
+              border: '1px solid rgba(201,169,110,0.1)',
+              borderRadius: '3px',
+              width: '100%',
+              marginBottom: '2.5rem',
+            }}>
+              <img
+                src={historia.autor.avatar}
+                alt={historia.autor.nombre}
+                className="avatar-pulse"
+                style={{
+                  width: '54px', height: '54px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '2px solid rgba(201,169,110,0.35)',
+                  flexShrink: 0,
+                }}
+              />
+              <div style={{ textAlign: 'left' }}>
+                <p style={{
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 400,
+                  fontSize: '0.95rem',
+                  color: 'var(--cream)',
+                  letterSpacing: '0.05em',
+                  marginBottom: '0.2rem',
+                }}>
+                  {historia.autor.nombre}
+                </p>
+                {historia.autor.ubicacion && (
+                  <p style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.75rem',
+                    color: 'var(--sepia)',
+                    letterSpacing: '0.15em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {historia.autor.ubicacion}
+                  </p>
+                )}
+                {historia.autor.bio && (
+                  <p style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.8rem',
+                    color: 'rgba(245,240,232,0.4)',
+                    marginTop: '0.4rem',
+                    lineHeight: 1.5,
+                  }}>
+                    {historia.autor.bio}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Tags */}
+            {historia.tags && historia.tags.length > 0 && (
+              <div style={{
+                display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
+                justifyContent: 'center',
+                marginBottom: '2.5rem',
+              }}>
+                {historia.tags.map(tag => (
+                  <span key={tag} style={{
+                    fontFamily: "'Jost', sans-serif",
+                    fontWeight: 300,
+                    fontSize: '0.68rem',
+                    letterSpacing: '0.22em',
+                    textTransform: 'uppercase',
+                    color: 'rgba(201,169,110,0.6)',
+                    border: '1px solid rgba(201,169,110,0.2)',
+                    padding: '0.25rem 0.8rem',
+                    borderRadius: '2px',
+                  }}>
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
+              <button
+                onClick={() => {
+                  setStage('intertitle')
+                  setIntertitlePhase('in')
+                  setIrisOpen(false)
+                  setCurrentTime(0)
+                  if (videoRef.current) videoRef.current.currentTime = 0
+                }}
+                style={{
+                  flex: 1,
+                  padding: '0.85rem',
+                  background: 'transparent',
+                  border: '1px solid rgba(201,169,110,0.3)',
+                  borderRadius: '3px',
+                  color: 'var(--sepia)',
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 300,
+                  fontSize: '0.78rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s, border-color 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(201,169,110,0.08)')}
+                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
+              >
+                Ver de nuevo
+              </button>
+              <button
+                onClick={onClose}
+                style={{
+                  flex: 1,
+                  padding: '0.85rem',
+                  background: 'linear-gradient(135deg, var(--sepia-dk), var(--sepia))',
+                  border: 'none',
+                  borderRadius: '3px',
+                  color: 'var(--film)',
+                  fontFamily: "'Jost', sans-serif",
+                  fontWeight: 500,
+                  fontSize: '0.78rem',
+                  letterSpacing: '0.25em',
+                  textTransform: 'uppercase',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+                onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
+              >
+                Más historias
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
+  )
 }

@@ -36,6 +36,21 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Botones neumórficos: borde y color unificados al hover y al estar activo (naranja) */
+.btn-almamundi {
+  border-radius: 9999px;
+  border-width: 1px;
+  border-style: solid;
+}
+.btn-almamundi:hover,
+.btn-almamundi:focus-visible,
+.btn-almamundi:active,
+.btn-almamundi-active,
+.btn-almamundi[data-active="true"] {
+  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
+  color: var(--almamundi-orange) !important;
+}
+
 /* Mapa home: degradado entre frase "Mapa AlmaMundi" y universo (negro al fondo) */
 .map-section-gradient-block {
   position: relative;

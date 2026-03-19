@@ -109,10 +109,10 @@ export default function ExposicionDetailPage() {
           />
         </Link>
         <nav className="flex gap-4 text-sm font-bold text-gray-600 items-center">
-          <Link href="/exposiciones" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/exposiciones" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Exposiciones
           </Link>
-          <Link href="/#mapa" className="px-6 py-3 active:scale-95 hover:text-orange-600 rounded-full" style={soft.button}>
+          <Link href="/#mapa" className="btn-almamundi px-6 py-3 active:scale-95 rounded-full" style={soft.button}>
             Mapa
           </Link>
         </nav>
@@ -135,7 +135,7 @@ export default function ExposicionDetailPage() {
         <div className="flex flex-wrap gap-3 mb-10">
           <Link
             href={slug ? `/?expo=${encodeURIComponent(slug)}#mapa` : '/#mapa'}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-orange-600 hover:bg-orange-500/10 transition"
+            className="btn-almamundi inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-orange-600 hover:bg-orange-500/10 transition"
             style={soft.button}
           >
             <MapPin size={18} />
@@ -144,7 +144,7 @@ export default function ExposicionDetailPage() {
           <button
             type="button"
             onClick={() => { setPostalOpen((o) => !o); setPostalBlob(null); }}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-orange-600 hover:bg-orange-500/10 transition"
+            className="btn-almamundi inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-orange-600 hover:bg-orange-500/10 transition"
             style={soft.button}
           >
             <ImageIcon size={18} />
@@ -185,10 +185,10 @@ export default function ExposicionDetailPage() {
               </>
             ) : (
               <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={onDescargarPostal} className="px-5 py-2.5 rounded-full font-semibold text-sm" style={soft.button}>
+                <button type="button" onClick={onDescargarPostal} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-sm" style={soft.button}>
                   Descargar PNG
                 </button>
-                <button type="button" onClick={onCopiarEnlace} className="px-5 py-2.5 rounded-full font-semibold text-sm" style={soft.button}>
+                <button type="button" onClick={onCopiarEnlace} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-sm" style={soft.button}>
                   Copiar enlace
                 </button>
                 <button type="button" onClick={() => setPostalBlob(null)} className="text-sm" style={{ color: soft.textBody }}>
@@ -226,7 +226,7 @@ export default function ExposicionDetailPage() {
                   type="button"
                   onClick={goPrev}
                   disabled={!hasPrev}
-                  className="flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
+                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
                   style={soft.button}
                   aria-label="Pieza anterior"
                 >
@@ -240,7 +240,7 @@ export default function ExposicionDetailPage() {
                   type="button"
                   onClick={goNext}
                   disabled={!hasNext}
-                  className="flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
+                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
                   style={soft.button}
                   aria-label="Pieza siguiente"
                 >
