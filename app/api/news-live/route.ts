@@ -3,7 +3,7 @@ import Parser from "rss-parser";
 import type { Item } from "rss-parser";
 import { ALMA_FEED_SOURCES } from "@/lib/feedSourcesAlma";
 
-/** Alias para pruebas / nombres cortos → id de NEWS_TOPIC_GROUPS. */
+/** Alias para pruebas / nombres cortos → id de NEWS_TOPIC_GROUPS. Incluye temas del NewsStrip. */
 const TOPIC_ALIASES: Record<string, string> = {
   conflictos: "poder-gobernanza",
   general: "poder-gobernanza",
@@ -12,6 +12,11 @@ const TOPIC_ALIASES: Record<string, string> = {
   economia: "finanzas-salud",
   salud: "finanzas-salud",
   migracion: "migracion-derechos",
+  cine: "arte-cultura",
+  musica: "arte-cultura",
+  viajes: "arte-cultura",
+  historias: "arte-cultura",
+  literatura: "arte-cultura",
 };
 
 const parser = new Parser({

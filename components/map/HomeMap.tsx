@@ -23,6 +23,7 @@ import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel, type BitLike } from '@/components/map/panels/BitsPanel';
+import NewsStrip from '@/components/news/NewsStrip';
 import { initFromUserGesture, unlockAmbientAudio, playAmbient, stopAmbient } from '@/lib/sound/ambient';
 
 export default function HomeMap() {
@@ -229,9 +230,15 @@ export default function HomeMap() {
 
   const TIME_STRIP_HEIGHT = 64;
   return (
-    <div ref={globeContainerRef} className="relative flex flex-col w-full h-full min-h-0" style={{ height: '100%', minHeight: '80vh' }}>
-      {/* Globo NASA: sin contenedor extra; redondo y girando. */}
-      <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black overflow-visible">
+    <div style={{ display: 'flex', width: '100%', height: '100%', position: 'relative' }}>
+      {/* Globo — ocupa el espacio restante */}
+      <div
+        ref={globeContainerRef}
+        className="relative flex flex-col w-full h-full min-h-0"
+        style={{ flex: 1, position: 'relative', height: '100%', minHeight: '80vh' }}
+      >
+        {/* Globo NASA: sin contenedor extra; redondo y girando. */}
+        <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black overflow-visible">
         <div className="w-full h-full min-h-[300px] flex items-center justify-center">
           <NASAEpicEarthVideo source="spinning" />
         </div>
@@ -302,6 +309,12 @@ export default function HomeMap() {
             <SoundsPanel {...sonidosProps} />
           )}
       </MapDrawer>
+      </div>
+
+      {/* Franja de noticias — solo desktop */}
+      <div style={{ display: 'none' }} className="news-strip-desktop">
+        <NewsStrip />
+      </div>
     </div>
   );
 }
