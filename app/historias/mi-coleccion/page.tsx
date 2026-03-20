@@ -95,7 +95,7 @@ export default function MiColeccionPage() {
                       {copiedId === s.id ? 'Copiado' : 'Compartir'}
                     </button>
                     <Link
-                      href="/subir"
+                      href="/#historias"
                       className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50"
                     >
                       Crear inspirado en esta

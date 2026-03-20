@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { THEME_LIST } from '@/lib/themes';
 import { Footer } from '@/components/layout/Footer';
@@ -25,13 +26,6 @@ const FORMAT_LABELS: Record<Format, string> = {
   foto: 'Foto',
 };
 
-const FORMAT_PHRASES: Record<Format, string> = {
-  video: `Comparte un video (YouTube o Vimeo). Duración máxima: ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`,
-  audio: `Comparte un audio o enlace. Duración máxima: ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`,
-  texto: 'Comparte tu historia escrita.',
-  foto: 'Comparte una foto tuya.',
-};
-
 const PHOTO_MAX_MB = 5;
 const AUDIO_MAX_MB = 10;
 /** Foto de perfil opcional (solo identificación del autor; distinta de la foto de la historia). */
@@ -46,8 +40,10 @@ function isVideoUrl(url: string): boolean {
   }
 }
 
-export default function SubirPage() {
-  const [step, setStep] = useState<'cards' | 'form' | 'received'>('cards');
+function SubirPageInner() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [step, setStep] = useState<'form' | 'received'>('form');
   const [format, setFormat] = useState<Format | null>(null);
 
   const [alias, setAlias] = useState('');
@@ -76,8 +72,6 @@ export default function SubirPage() {
   /** Audio: archivo o URL no supera 5 min (o URL no verificable por CORS). */
   const [audioFileWithinMax, setAudioFileWithinMax] = useState(true);
   const [audioUrlWithinMax, setAudioUrlWithinMax] = useState(true);
-  /** Video: confirmación explícita (YouTube no expone duración sin API). Vimeo se valida aparte. */
-  const [videoMax5Confirm, setVideoMax5Confirm] = useState(false);
   const [videoVimeoTooLong, setVideoVimeoTooLong] = useState(false);
 
   const canSubmit =
@@ -96,7 +90,7 @@ export default function SubirPage() {
     (format === 'foto' ? (photoFile != null || (photoUrl.trim().length > 0 && /^https?:\/\//.test(photoUrl))) : true) &&
     (format === 'audio' ? (audioFile != null || (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl))) : true) &&
     (format !== 'audio' || (audioFileWithinMax && audioUrlWithinMax)) &&
-    (format !== 'video' || (videoMax5Confirm && !videoVimeoTooLong));
+    (format !== 'video' || !videoVimeoTooLong);
 
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
@@ -212,17 +206,19 @@ export default function SubirPage() {
     };
   }, []);
 
-  const backToCards = useCallback(() => {
-    setStep('cards');
-    setFormat(null);
-    setPhotoFile(null);
-    setAudioFile(null);
-    setAudioFileWithinMax(true);
-    setAudioUrlWithinMax(true);
-    setVideoMax5Confirm(false);
-    setVideoVimeoTooLong(false);
-    clearProfilePhoto();
-  }, [clearProfilePhoto]);
+  /** El formato viene de la home (`/subir?format=…`). Sin parámetro válido → vuelta a las cards del inicio. */
+  useEffect(() => {
+    const raw = searchParams.get('format')?.toLowerCase();
+    if (raw === 'video' || raw === 'audio' || raw === 'texto' || raw === 'foto') {
+      setFormat(raw);
+      return;
+    }
+    router.replace('/#historias');
+  }, [searchParams, router]);
+
+  const backToHomeHistorias = useCallback(() => {
+    router.push('/#historias');
+  }, [router]);
 
   useEffect(() => {
     if (format !== 'audio' || audioFile != null) {
@@ -269,9 +265,29 @@ export default function SubirPage() {
     };
   }, [format, videoUrl]);
 
-  useEffect(() => {
-    setVideoMax5Confirm(false);
-  }, [videoUrl]);
+  if (format === null) {
+    return (
+      <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+        <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+          <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
+            <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
+          </Link>
+          <div className={historiasInterior.navLinksRowClassName}>
+            <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+            <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+            <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+            <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Subir</span>
+            <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+          </div>
+        </nav>
+        <div className="flex-1 flex items-center justify-center px-6">
+          <p className="text-sm font-light" style={{ color: neu.textBody }}>
+            Cargando…
+          </p>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -292,54 +308,53 @@ export default function SubirPage() {
         <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
           Subir
         </h1>
-        <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
-          Elige el formato. Audio y video: máximo {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
-        </p>
-
-        {step === 'cards' && (
-          <section className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {(['video', 'audio', 'texto', 'foto'] as const).map((f) => (
-              <button
-                key={f}
-                type="button"
-                onClick={() => {
-                  setFormat(f);
-                  setStep('form');
-                }}
-                className="p-6 rounded-[40px] flex flex-col items-start gap-3 transition-all hover:-translate-y-1 active:scale-[0.99] text-left"
-                style={neu.card}
-              >
-                {f === 'video' && <Video size={32} className="text-orange-500" />}
-                {f === 'audio' && <Mic size={32} className="text-orange-500" />}
-                {f === 'texto' && <FileText size={32} className="text-orange-500" />}
-                {f === 'foto' && <ImageIcon size={32} className="text-orange-500" />}
-                <span className="font-semibold text-lg" style={{ color: neu.textMain }}>
-                  {FORMAT_LABELS[f]}
-                </span>
-                <p className="text-sm font-light" style={{ color: neu.textBody }}>
-                  {FORMAT_PHRASES[f]}
-                </p>
-                <span className="mt-2 px-4 py-2 rounded-full text-sm font-semibold text-orange-600" style={neu.button}>
-                  Empezar
-                </span>
-              </button>
-            ))}
-          </section>
+        {step === 'form' && (
+          <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
+            Has elegido <strong style={{ color: neu.textMain }}>{FORMAT_LABELS[format]}</strong> desde el inicio. Completa el formulario. Audio y video: máximo{' '}
+            {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
+          </p>
         )}
 
-        {step === 'form' && format && (
+        {step === 'form' && (
           <section className="space-y-6">
             <button
               type="button"
-              onClick={backToCards}
+              onClick={backToHomeHistorias}
               className="text-sm font-medium"
               style={{ color: neu.textBody }}
             >
-              ← Cambiar formato
+              ← Volver al inicio y elegir otro formato
             </button>
             <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
               {FORMAT_LABELS[format]}
             </p>
+
+            {format === 'video' && (
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                  URL del video (YouTube o Vimeo) *
+                </label>
+                <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
+                </p>
+                <input
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/..."
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+                {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
+                  <p className="mt-1 text-[11px] text-amber-700">Indica un enlace de YouTube o Vimeo</p>
+                )}
+                {videoVimeoTooLong && (
+                  <p className="text-[11px] text-red-600 font-medium">
+                    Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
+                  </p>
+                )}
+              </div>
+            )}
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
               <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
@@ -531,42 +546,6 @@ export default function SubirPage() {
               </div>
             )}
 
-            {format === 'video' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  URL del video (YouTube o Vimeo) *
-                </label>
-                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
-                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente; en YouTube marca la casilla de confirmación.
-                </p>
-                <input
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/..."
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                />
-                {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
-                  <p className="mt-1 text-xs text-amber-700">Indica un enlace de YouTube o Vimeo</p>
-                )}
-                {videoVimeoTooLong && (
-                  <p className="text-xs text-red-600 font-medium">
-                    Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
-                  </p>
-                )}
-                <label className="flex items-start gap-2 text-sm" style={{ color: neu.textBody }}>
-                  <input
-                    type="checkbox"
-                    checked={videoMax5Confirm}
-                    onChange={(e) => setVideoMax5Confirm(e.target.checked)}
-                    className="mt-0.5 accent-orange-500 shrink-0"
-                  />
-                  <span>Confirmo que el video no supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.</span>
-                </label>
-              </div>
-            )}
-
             {format === 'foto' && (
               <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
                 <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
@@ -706,7 +685,7 @@ export default function SubirPage() {
         )}
 
         {step === 'received' && (
-          <section className="p-8 rounded-[40px] text-center" style={neu.card}>
+          <section className="mt-4 p-8 rounded-[40px] text-center" style={neu.card}>
             <p className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
               Listo
             </p>
@@ -714,7 +693,7 @@ export default function SubirPage() {
               Quedó en revisión. Te avisaremos por email.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
+              <Link href="/#historias" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
                 Subir otro
               </Link>
               <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
@@ -729,5 +708,19 @@ export default function SubirPage() {
         <Footer />
       </div>
     </main>
+  );
+}
+
+export default function SubirPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#E0E5EC' }}>
+          <p className="text-sm text-gray-500">Cargando…</p>
+        </main>
+      }
+    >
+      <SubirPageInner />
+    </Suspense>
   );
 }

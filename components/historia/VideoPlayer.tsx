@@ -25,6 +25,8 @@ export interface Historia {
 interface VideoPlayerProps {
   historia: Historia
   onClose?: () => void
+  /** Si true, va directo al video (sin secuencia de intertítulo). Carruseles / listados. */
+  skipIntertitle?: boolean
 }
 
 // ─── Utils ────────────────────────────────────────────────────────────────────
@@ -83,9 +85,11 @@ const MinimizeIcon = () => (
 )
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
-  // Stages: 'intertitle' → 'playing' → 'ended'
-  const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>('intertitle')
+export default function VideoPlayer({ historia, onClose, skipIntertitle = false }: VideoPlayerProps) {
+  // Stages: 'intertitle' → 'playing' → 'ended' (skipIntertitle: entra en 'playing' al instante)
+  const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>(() =>
+    skipIntertitle ? 'playing' : 'intertitle'
+  )
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(historia.duracion)
@@ -841,11 +845,15 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
             <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
               <button
                 onClick={() => {
-                  setStage('intertitle')
                   setIntertitlePhase('in')
                   setIrisOpen(false)
                   setCurrentTime(0)
                   if (videoRef.current) videoRef.current.currentTime = 0
+                  if (skipIntertitle) {
+                    setStage('playing')
+                  } else {
+                    setStage('intertitle')
+                  }
                 }}
                 style={{
                   flex: 1,

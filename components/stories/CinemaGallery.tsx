@@ -570,6 +570,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
         <VideoPlayer
           historia={activeVideo}
           onClose={() => setActiveVideo(null)}
+          skipIntertitle
         />,
         document.body
       )}

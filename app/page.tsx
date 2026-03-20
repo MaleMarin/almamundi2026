@@ -22,10 +22,10 @@ export default function Home() {
       <HomeFirstPart
         onShowPurpose={() => scrollToId('intro')}
         onShowInspiration={() => scrollToId('mapa')}
-        onRecordVideo={() => router.push('/subir')}
-        onRecordAudio={() => router.push('/subir')}
-        onWriteStory={() => router.push('/subir')}
-        onUploadPhoto={() => router.push('/subir')}
+        onRecordVideo={() => router.push('/subir?format=video')}
+        onRecordAudio={() => router.push('/subir?format=audio')}
+        onWriteStory={() => router.push('/subir?format=texto')}
+        onUploadPhoto={() => router.push('/subir?format=foto')}
         basePath="/"
       />
       <MapSectionLocked />

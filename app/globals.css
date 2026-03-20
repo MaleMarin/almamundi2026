@@ -111,13 +111,14 @@ body {
   font-family: var(--font-sans);
   font-weight: 900;
   letter-spacing: -0.06em;
+  /* Sombras en `em` para que el relieve neumórfico escale con el font-size */
   text-shadow:
-    -2px -2px 4px rgba(255,255,255,0.95),
-     2px  2px 4px rgba(163,177,198,0.85),
-    -6px -6px 12px rgba(255,255,255,0.8),
-     6px  6px 12px rgba(163,177,198,0.7),
-    -12px -12px 24px rgba(255,255,255,0.6),
-     12px  12px 24px rgba(163,177,198,0.5);
+    -0.01em -0.01em 0.02em rgba(255, 255, 255, 0.95),
+    0.01em 0.01em 0.02em rgba(163, 177, 198, 0.85),
+    -0.03em -0.03em 0.06em rgba(255, 255, 255, 0.8),
+    0.03em 0.03em 0.06em rgba(163, 177, 198, 0.7),
+    -0.06em -0.06em 0.12em rgba(255, 255, 255, 0.6),
+    0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
 }
 
 /* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */

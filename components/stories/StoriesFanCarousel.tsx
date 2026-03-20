@@ -174,6 +174,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   return (
     <>
       <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
+
         .sfc-root * { box-sizing: border-box; }
 
         .sfc-card {
@@ -194,16 +196,35 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           position:absolute; top:12px; left:12px;
           background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
           border-radius:20px; padding:3px 10px;
-          font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-weight:300; font-size:9px;
+          font-family:'Jost',sans-serif; font-weight:300; font-size:9px;
           letter-spacing:0.22em; text-transform:uppercase; color:#fff;
         }
 
+        .sfc-photo-theme {
+          position:absolute; top:38px; left:12px; right:12px;
+          font-family:'Jost',sans-serif; font-weight:300; font-size:11px; line-height:1.25;
+          color:rgba(255,255,255,0.95); text-shadow:0 1px 3px rgba(0,0,0,0.55);
+          max-height:2.6em; overflow:hidden;
+        }
+
         .sfc-bottom { position:absolute; bottom:0; left:0; right:0; padding:14px 13px; }
-        .sfc-title { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-style:italic; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
+        .sfc-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
         .sfc-divider { width:24px; height:1px; background:rgba(201,169,110,0.6); margin-bottom:7px; }
-        .sfc-author { display:flex; align-items:center; gap:6px; }
-        .sfc-avatar { width:20px; height:20px; border-radius:50%; border:1px solid rgba(201,169,110,0.5); object-fit:cover; flex-shrink:0; }
-        .sfc-meta { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-weight:300; font-size:10px; color:rgba(245,240,232,0.7); line-height:1.4; }
+        .sfc-author { display:flex; align-items:center; gap:8px; }
+        .sfc-avatar-wrap {
+          position:relative; flex-shrink:0;
+          width:22px; height:22px;
+          border-radius:50%;
+          box-shadow:
+            0 0 0 1px rgba(201,169,110,0.45),
+            0 0 0 3px rgba(201,169,110,0.12);
+        }
+        .sfc-avatar { width:22px; height:22px; border-radius:50%; border:1px solid rgba(201,169,110,0.55); object-fit:cover; display:block; }
+        .sfc-huella {
+          flex-shrink:0; opacity:0.85;
+          filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
+        }
+        .sfc-meta { font-family:'Jost',sans-serif; font-weight:300; font-size:10px; color:rgba(245,240,232,0.7); line-height:1.4; }
         .sfc-meta strong { display:block; font-weight:400; color:#f5f0e8; font-size:11px; }
 
         .sfc-play {
@@ -222,8 +243,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         @keyframes sfcWave { from{transform:scaleY(0.25)} to{transform:scaleY(1)} }
 
         .sfc-text-inner { position:absolute; inset:0; background:#faf7f2; padding:18px 14px 0; overflow:hidden; }
-        .sfc-text-drop { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-size:56px; font-weight:300; font-style:italic; color:#c9a96e; line-height:1; float:left; margin-right:3px; margin-top:2px; }
-        .sfc-text-body { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-size:11.5px; line-height:1.75; color:#3a3028; }
+        .sfc-text-drop { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:300; font-style:italic; color:#c9a96e; line-height:1; float:left; margin-right:3px; margin-top:2px; }
+        .sfc-text-body { font-family:'Cormorant Garamond',serif; font-size:11px; line-height:1.75; color:#3a3028; }
         .sfc-text-fade { position:absolute; bottom:0; left:0; right:0; height:120px; background:linear-gradient(to top,#faf7f2 30%,transparent 100%); }
 
         .sfc-photo-inner { position:absolute; inset:0; background:#ede8e0; display:flex; align-items:center; justify-content:center; }
@@ -245,7 +266,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
       <div
         className="sfc-root"
         style={{
-          background: 'transparent',
+          background: '#f0ece4',
+          borderRadius: '16px',
           padding: '2.5rem 1rem 2rem',
           display: 'flex',
           flexDirection: 'column',
@@ -336,6 +358,9 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                   )}
 
                   <div className="sfc-format">{formatLabel(fmt)}</div>
+                  {fmt === 'foto' && (s.topic || s.subtitle) && (
+                    <div className="sfc-photo-theme">{String(s.topic ?? s.subtitle)}</div>
+                  )}
 
                   {/* Waveform for audio */}
                   {fmt === 'audio' && (
@@ -357,7 +382,18 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                     <div className="sfc-title">{s.title ?? s.label}</div>
                     <div className="sfc-divider" />
                     <div className="sfc-author">
-                      <img className="sfc-avatar" src={avatar} alt="" />
+                      <div className="sfc-avatar-wrap">
+                        <img className="sfc-avatar" src={avatar} alt="" />
+                      </div>
+                      <svg className="sfc-huella" width="16" height="16" viewBox="0 0 32 32" aria-hidden>
+                        <g fill="none" stroke="rgba(201,169,110,0.72)" strokeWidth="0.85" strokeLinecap="round">
+                          <path d="M16 6c-4 1.5-6.5 5-6 9 .3 2.8 2 5 4 6" />
+                          <path d="M18 7c3 2 4.5 5.5 4 9-.4 3-2.5 5.5-5 6.5" />
+                          <path d="M12 14c2 1.2 4.5 1.5 7 .5" />
+                          <path d="M11 19c2.5 1 5.5.8 8-.5" />
+                          <ellipse cx="16" cy="15" rx="5.5" ry="7" opacity="0.55" />
+                        </g>
+                      </svg>
                       <div className="sfc-meta">
                         <strong>{name}</strong>
                         {place}
@@ -461,7 +497,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
 
       {/* ── Cinema overlay ── */}
       {mounted && activeVideo && ReactDOM.createPortal(
-        <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} />,
+        <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} skipIntertitle />,
         document.body
       )}
 

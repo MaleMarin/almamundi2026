@@ -15,7 +15,7 @@ export function Footer() {
       style={{ fontFamily: APP_FONT }}
     >
       <div className="mb-20 mt-8 w-full flex justify-center select-none">
-        <h1 className="text-7xl md:text-[140px] lg:text-[200px] text-center leading-none almamundi-footer-title">
+        <h1 className="text-8xl sm:text-9xl md:text-[170px] lg:text-[240px] text-center leading-none almamundi-footer-title">
           ALMAMUNDI
         </h1>
       </div>

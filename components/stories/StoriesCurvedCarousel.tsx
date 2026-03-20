@@ -279,7 +279,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
       </div>
 
       {activeVideo && (
-        <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} />
+        <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} skipIntertitle />
       )}
     </div>
   );
