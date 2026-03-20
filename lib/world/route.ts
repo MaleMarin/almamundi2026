@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import Parser from "rss-parser";
 import { mockWorldNow } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
 import { DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
@@ -8,7 +9,11 @@ export const runtime = "nodejs";
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 const CACHE_TTL_MS = 300_000; // 5 min
 const GDELT_REQUEST_TIMEOUT_MS = 8_000;
-const RSS_FETCH_TIMEOUT_MS = 6_000;
+
+const rssParser = new Parser({
+  timeout: 8_000,
+  headers: { "User-Agent": "AlmaMundi/1.0 (News aggregator)" },
+});
 
 // URLs RSS por dominio: todos los medios de la curaduría que tienen feed disponible
 const RSS_URL_BY_DOMAIN: Record<string, string> = {
@@ -481,19 +486,51 @@ function titleMatchesTopic(title: string, topicQuery: string): boolean {
   return words.some((w) => w.length >= 2 && titleNorm.includes(w));
 }
 
-/** Extrae título, link y fecha de un bloque <item> o <entry> en XML (regex simple, sin dependencias). */
-function parseRssItemBlock(block: string): { title: string; link: string; pubDate: string | null } {
-  const titleMatch = block.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
-  const title = titleMatch ? titleMatch[1].replace(/<[^>]+>/g, "").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').trim() : "";
-  let link = "";
-  const linkTag = block.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
-  if (linkTag) link = linkTag[1].trim();
-  const hrefMatch = block.match(/<link[^>]+href=["']([^"']+)["']/i);
-  if (hrefMatch) link = hrefMatch[1].trim();
-  if (!link && linkTag) link = linkTag[1].replace(/<[^>]+>/g, "").trim();
-  const pubMatch = block.match(/<(?:pubDate|updated|dc:date)[^>]*>([^<]+)</i);
-  const pubDate = pubMatch ? pubMatch[1].trim() : null;
-  return { title, link, pubDate };
+/**
+ * Titulares desde un feed RSS curado (rss-parser: Atom/RSS con CDATA y namespaces).
+ * Misma forma que el flujo anterior: NormalizedNewsItem sin campos extra.
+ */
+async function fetchRssFeedCurated(domain: string, feedUrl: string): Promise<NormalizedNewsItem[]> {
+  try {
+    const feed = await rssParser.parseURL(feedUrl);
+    const media = getMediaByDomain(domain);
+    const name = media?.name ?? domain;
+    const country = media?.country ?? null;
+    const items: NormalizedNewsItem[] = [];
+    const slice = feed.items.slice(0, 30);
+    for (let i = 0; i < slice.length; i++) {
+      const item = slice[i];
+      const link = typeof item.link === "string" ? item.link.trim() : "";
+      const rawTitle = item.title != null ? String(item.title).trim() : "";
+      let title = rawTitle.length > 0 ? rawTitle : link ? titleFromUrl(link) : "";
+      if (!title && link) title = name;
+      if (!title && !link) continue;
+      const pubRaw = item.pubDate ?? (item as { isoDate?: string }).isoDate;
+      let publishedAt: string | null = null;
+      if (pubRaw) {
+        try {
+          publishedAt = new Date(pubRaw).toISOString();
+        } catch {
+          publishedAt = null;
+        }
+      }
+      const id = link ? `rss-${Buffer.from(link).toString("base64url").slice(0, 28)}` : `rss-${domain}-${i}`;
+      items.push({
+        id,
+        title,
+        url: link,
+        source: name,
+        publishedAt,
+        sourceCountry: country,
+        lat: null,
+        lng: null,
+      });
+    }
+    return items;
+  } catch (err) {
+    console.error(`[world] RSS error ${domain}:`, err);
+    return [];
+  }
 }
 
 /**
@@ -502,55 +539,7 @@ function parseRssItemBlock(block: string): { title: string; link: string; pubDat
  */
 async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<NormalizedNewsResponse | null> {
   const results = await Promise.allSettled(
-    RSS_FEEDS.map(async ({ domain, url }) => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), RSS_FETCH_TIMEOUT_MS);
-      try {
-        const res = await fetch(url, {
-          signal: controller.signal,
-          next: { revalidate: 0 },
-          headers: { "User-Agent": "AlmaMundi/1.0 (News aggregator)" },
-        });
-        clearTimeout(timeoutId);
-        if (!res.ok) return [];
-        const xml = await res.text();
-        const itemBlocks = xml.match(/<item[\s\S]*?<\/item>/gi) ?? xml.match(/<entry[\s\S]*?<\/entry>/gi) ?? [];
-        const media = getMediaByDomain(domain);
-        const name = media?.name ?? domain;
-        const country = media?.country ?? null;
-        const items: NormalizedNewsItem[] = [];
-        for (let i = 0; i < itemBlocks.length; i++) {
-          const { title: rawTitle, link, pubDate } = parseRssItemBlock(itemBlocks[i]);
-          const hasRealTitle = rawTitle != null && String(rawTitle).trim().length > 0;
-          let title = hasRealTitle ? rawTitle.trim() : (link ? titleFromUrl(link) : "");
-          if (!title && link) title = name;
-          if (!title && !link) continue;
-          const id = link ? `rss-${Buffer.from(link).toString("base64url").slice(0, 28)}` : `rss-${domain}-${i}`;
-          let publishedAt: string | null = null;
-          if (pubDate) {
-            try {
-              publishedAt = new Date(pubDate).toISOString();
-            } catch {
-              publishedAt = null;
-            }
-          }
-          items.push({
-            id,
-            title,
-            url: link,
-            source: name,
-            publishedAt,
-            sourceCountry: country,
-            lat: null,
-            lng: null,
-          });
-        }
-        return items;
-      } catch {
-        clearTimeout(timeoutId);
-        return [];
-      }
-    })
+    RSS_FEEDS.map(({ domain, url }) => fetchRssFeedCurated(domain, url))
   );
 
   const allItems: NormalizedNewsItem[] = [];
