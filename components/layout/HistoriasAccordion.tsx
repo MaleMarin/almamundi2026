@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Acordeón "Historias": al hacer clic se despliegan Videos, Audio, Escrito, Fotografía.
+ * Acordeón "Historias": al hacer clic se despliegan Videos, Audios, Escritos, Fotografías.
  * Para header (neumórfico) y footer (links).
  */
 import { useState, useRef, useEffect } from 'react';
@@ -10,9 +10,9 @@ import Link from 'next/link';
 const ITEMS = [
   { label: 'Mi colección', href: '/historias/mi-coleccion' },
   { label: 'Videos', href: '/historias/videos' },
-  { label: 'Audio', href: '/historias/audios' },
-  { label: 'Escrito', href: '/historias/escrito' },
-  { label: 'Fotografía', href: '/historias/fotos' },
+  { label: 'Audios', href: '/historias/audios' },
+  { label: 'Escritos', href: '/historias/escrito' },
+  { label: 'Fotografías', href: '/historias/fotos' },
 ] as const;
 
 type Variant = 'header' | 'footer';

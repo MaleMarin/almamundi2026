@@ -1,13 +1,20 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Video, Mic, FileText, Image as ImageIcon } from 'lucide-react';
+import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { THEME_LIST } from '@/lib/themes';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { neu } from '@/lib/historias-neumorph';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import {
+  MAX_AUDIO_VIDEO_DURATION_SECONDS,
+  probeAudioFileDurationSeconds,
+  probeAudioUrlDurationSeconds,
+  fetchVimeoVideoDurationSeconds,
+  isDurationWithinMax,
+} from '@/lib/media-duration-rules';
 
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -19,14 +26,16 @@ const FORMAT_LABELS: Record<Format, string> = {
 };
 
 const FORMAT_PHRASES: Record<Format, string> = {
-  video: 'Comparte un video (YouTube o Vimeo).',
-  audio: 'Comparte un audio o enlace.',
+  video: `Comparte un video (YouTube o Vimeo). Duración máxima: ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`,
+  audio: `Comparte un audio o enlace. Duración máxima: ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`,
   texto: 'Comparte tu historia escrita.',
   foto: 'Comparte una foto tuya.',
 };
 
 const PHOTO_MAX_MB = 5;
 const AUDIO_MAX_MB = 10;
+/** Foto de perfil opcional (solo identificación del autor; distinta de la foto de la historia). */
+const PROFILE_PHOTO_MAX_MB = 2;
 
 function isVideoUrl(url: string): boolean {
   try {
@@ -58,9 +67,18 @@ export default function SubirPage() {
   const [photoUrl, setPhotoUrl] = useState('');
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
+  const profileObjectUrlRef = useRef<string | null>(null);
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  /** Audio: archivo o URL no supera 5 min (o URL no verificable por CORS). */
+  const [audioFileWithinMax, setAudioFileWithinMax] = useState(true);
+  const [audioUrlWithinMax, setAudioUrlWithinMax] = useState(true);
+  /** Video: confirmación explícita (YouTube no expone duración sin API). Vimeo se valida aparte. */
+  const [videoMax5Confirm, setVideoMax5Confirm] = useState(false);
+  const [videoVimeoTooLong, setVideoVimeoTooLong] = useState(false);
 
   const canSubmit =
     alias.trim().length >= 2 &&
@@ -76,13 +94,24 @@ export default function SubirPage() {
     (format === 'texto' ? textBody.trim().length > 0 : true) &&
     (format === 'video' ? videoUrl.trim().length > 0 && isVideoUrl(videoUrl) : true) &&
     (format === 'foto' ? (photoFile != null || (photoUrl.trim().length > 0 && /^https?:\/\//.test(photoUrl))) : true) &&
-    (format === 'audio' ? (audioFile != null || (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl))) : true);
+    (format === 'audio' ? (audioFile != null || (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl))) : true) &&
+    (format !== 'audio' || (audioFileWithinMax && audioUrlWithinMax)) &&
+    (format !== 'video' || (videoMax5Confirm && !videoVimeoTooLong));
 
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
     setError('');
     setSaving(true);
     try {
+      let profilePhotoUrl: string | undefined;
+      if (profilePhotoFile) {
+        profilePhotoUrl = await uploadFileToStorage(
+          profilePhotoFile,
+          'submissions/avatars',
+          `avatar-${profilePhotoFile.name}`
+        );
+      }
+
       let payload: { textBody?: string; photoUrl?: string; audioUrl?: string; videoUrl?: string } = {};
       if (format === 'texto') {
         payload = { textBody: textBody.trim() };
@@ -90,6 +119,12 @@ export default function SubirPage() {
         payload = { videoUrl: videoUrl.trim() };
       } else if (format === 'audio') {
         if (audioFile) {
+          const sec = await probeAudioFileDurationSeconds(audioFile);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setError(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            setSaving(false);
+            return;
+          }
           const url = await uploadFileToStorage(audioFile, 'submissions', `audio.${audioFile.name.split('.').pop() || 'mp3'}`);
           payload = { audioUrl: url };
         } else {
@@ -120,6 +155,7 @@ export default function SubirPage() {
           consentRights: true,
           consentCurate: true,
           consentPostales: true,
+          ...(profilePhotoUrl ? { profilePhotoUrl } : {}),
         }),
       });
 
@@ -139,20 +175,111 @@ export default function SubirPage() {
     } finally {
       setSaving(false);
     }
-  }, [canSubmit, format, alias, email, themeId, fecha, fechaAprox, lugar, contexto, textBody, videoUrl, audioUrl, photoUrl, audioFile, photoFile]);
+  }, [
+    canSubmit,
+    format,
+    alias,
+    email,
+    themeId,
+    fecha,
+    fechaAprox,
+    lugar,
+    contexto,
+    textBody,
+    videoUrl,
+    audioUrl,
+    photoUrl,
+    audioFile,
+    photoFile,
+    profilePhotoFile,
+  ]);
+
+  const clearProfilePhoto = useCallback(() => {
+    if (profileObjectUrlRef.current) {
+      URL.revokeObjectURL(profileObjectUrlRef.current);
+      profileObjectUrlRef.current = null;
+    }
+    setProfilePhotoFile(null);
+    setProfilePhotoPreview(null);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (profileObjectUrlRef.current) {
+        URL.revokeObjectURL(profileObjectUrlRef.current);
+        profileObjectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   const backToCards = useCallback(() => {
     setStep('cards');
     setFormat(null);
     setPhotoFile(null);
     setAudioFile(null);
-  }, []);
+    setAudioFileWithinMax(true);
+    setAudioUrlWithinMax(true);
+    setVideoMax5Confirm(false);
+    setVideoVimeoTooLong(false);
+    clearProfilePhoto();
+  }, [clearProfilePhoto]);
+
+  useEffect(() => {
+    if (format !== 'audio' || audioFile != null) {
+      setAudioUrlWithinMax(true);
+      return;
+    }
+    const url = audioUrl.trim();
+    if (!/^https?:\/\//i.test(url)) {
+      setAudioUrlWithinMax(true);
+      return;
+    }
+    let cancelled = false;
+    const t = setTimeout(() => {
+      void probeAudioUrlDurationSeconds(url).then((sec) => {
+        if (cancelled) return;
+        if (sec != null && !isDurationWithinMax(sec)) setAudioUrlWithinMax(false);
+        else setAudioUrlWithinMax(true);
+      });
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [format, audioFile, audioUrl]);
+
+  useEffect(() => {
+    if (format !== 'video') {
+      setVideoVimeoTooLong(false);
+      return;
+    }
+    const url = videoUrl.trim();
+    setVideoVimeoTooLong(false);
+    if (!isVideoUrl(url)) return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      void fetchVimeoVideoDurationSeconds(url).then((sec) => {
+        if (cancelled || sec == null) return;
+        if (!isDurationWithinMax(sec)) setVideoVimeoTooLong(true);
+      });
+    }, 500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [format, videoUrl]);
+
+  useEffect(() => {
+    setVideoMax5Confirm(false);
+  }, [videoUrl]);
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
+          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
+        </Link>
+        <div className={historiasInterior.navLinksRowClassName}>
           <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
@@ -166,7 +293,7 @@ export default function SubirPage() {
           Subir
         </h1>
         <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
-          Elige el formato. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
+          Elige el formato. Audio y video: máximo {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
         </p>
 
         {step === 'cards' && (
@@ -243,6 +370,78 @@ export default function SubirPage() {
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
+            </div>
+
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <div className="flex items-start gap-3 mb-3">
+                <UserCircle className="w-6 h-6 shrink-0 text-orange-500 mt-0.5" aria-hidden />
+                <div>
+                  <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                    Foto personal / de perfil (opcional)
+                  </label>
+                  <p className="text-xs leading-relaxed mb-3" style={{ color: neu.textBody }}>
+                    Si quieres, sube una imagen tuya para acompañar tu alias cuando se publique. No es la foto de tu historia (eso va en el bloque del formato que elegiste).
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div
+                      className="w-20 h-20 rounded-full border-2 border-white/40 overflow-hidden bg-white/30 flex items-center justify-center shrink-0"
+                      style={{ borderColor: 'rgba(255,255,255,0.35)' }}
+                    >
+                      {profilePhotoPreview ? (
+                        <img src={profilePhotoPreview} alt="" className="w-full h-full object-cover" />
+                      ) : (
+                        <UserCircle className="w-10 h-10 text-gray-400" aria-hidden />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <input
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) {
+                            clearProfilePhoto();
+                            return;
+                          }
+                          if (f.size > PROFILE_PHOTO_MAX_MB * 1024 * 1024) {
+                            setError(`La foto de perfil: máximo ${PROFILE_PHOTO_MAX_MB} MB`);
+                            e.target.value = '';
+                            return;
+                          }
+                          if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
+                            setError('Formato: JPG, PNG o WebP.');
+                            e.target.value = '';
+                            return;
+                          }
+                          setError('');
+                          if (profileObjectUrlRef.current) {
+                            URL.revokeObjectURL(profileObjectUrlRef.current);
+                            profileObjectUrlRef.current = null;
+                          }
+                          const url = URL.createObjectURL(f);
+                          profileObjectUrlRef.current = url;
+                          setProfilePhotoPreview(url);
+                          setProfilePhotoFile(f);
+                        }}
+                        className="w-full max-w-xs text-sm file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-orange-500/15 file:text-orange-700"
+                        style={{ color: neu.textBody }}
+                      />
+                      {profilePhotoFile && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            clearProfilePhoto();
+                          }}
+                          className="text-xs font-medium text-left w-fit hover:underline"
+                          style={{ color: neu.textBody }}
+                        >
+                          Quitar foto de perfil
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
@@ -333,10 +532,13 @@ export default function SubirPage() {
             )}
 
             {format === 'video' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
                 <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   URL del video (YouTube o Vimeo) *
                 </label>
+                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente; en YouTube marca la casilla de confirmación.
+                </p>
                 <input
                   type="url"
                   value={videoUrl}
@@ -348,6 +550,20 @@ export default function SubirPage() {
                 {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
                   <p className="mt-1 text-xs text-amber-700">Indica un enlace de YouTube o Vimeo</p>
                 )}
+                {videoVimeoTooLong && (
+                  <p className="text-xs text-red-600 font-medium">
+                    Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
+                  </p>
+                )}
+                <label className="flex items-start gap-2 text-sm" style={{ color: neu.textBody }}>
+                  <input
+                    type="checkbox"
+                    checked={videoMax5Confirm}
+                    onChange={(e) => setVideoMax5Confirm(e.target.checked)}
+                    className="mt-0.5 accent-orange-500 shrink-0"
+                  />
+                  <span>Confirmo que el video no supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.</span>
+                </label>
               </div>
             )}
 
@@ -396,22 +612,42 @@ export default function SubirPage() {
                 <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
                   Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
                 </label>
+                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
+                </p>
                 <input
                   type="file"
                   accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
                   onChange={(e) => {
-                    const f = e.target.files?.[0];
+                    const inputEl = e.target;
+                    const f = inputEl.files?.[0];
                     if (!f) {
                       setAudioFile(null);
+                      setAudioFileWithinMax(true);
                       return;
                     }
                     if (f.size > AUDIO_MAX_MB * 1024 * 1024) {
                       setError(`Máximo ${AUDIO_MAX_MB} MB`);
                       setAudioFile(null);
+                      setAudioFileWithinMax(true);
+                      inputEl.value = '';
                       return;
                     }
                     setError('');
-                    setAudioFile(f);
+                    void (async () => {
+                      const sec = await probeAudioFileDurationSeconds(f);
+                      if (sec != null && !isDurationWithinMax(sec)) {
+                        setError(
+                          `El audio dura más de ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Acorta el archivo e intenta de nuevo.`
+                        );
+                        setAudioFileWithinMax(false);
+                        setAudioFile(null);
+                        inputEl.value = '';
+                        return;
+                      }
+                      setAudioFileWithinMax(true);
+                      setAudioFile(f);
+                    })();
                   }}
                   className="w-full text-sm"
                   style={{ color: neu.textBody }}
@@ -424,7 +660,16 @@ export default function SubirPage() {
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
-                {(audioFile || audioUrl.trim()) && <p className="text-sm" style={{ color: neu.textBody }}>✓ Listo</p>}
+                {!audioUrlWithinMax && (
+                  <p className="text-xs text-red-600 font-medium">
+                    Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
+                  </p>
+                )}
+                {(audioFile || audioUrl.trim()) && audioFileWithinMax && audioUrlWithinMax && (
+                  <p className="text-sm" style={{ color: neu.textBody }}>
+                    ✓ Listo
+                  </p>
+                )}
               </div>
             )}
 

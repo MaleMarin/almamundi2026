@@ -10,6 +10,7 @@ import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { ShareStoryModal } from '@/components/mapa/ShareStoryModal';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
   story: StoryPoint;
@@ -125,7 +126,7 @@ function KenBurnsViewer({
               fontWeight: 300,
               color: 'rgba(255,255,255,0.92)',
               margin: '0 0 3px',
-              fontFamily: 'Georgia, serif',
+              fontFamily: SITE_FONT_STACK,
               fontStyle: 'italic',
             }}
           >
@@ -136,7 +137,7 @@ function KenBurnsViewer({
               fontSize: 11,
               color: 'rgba(255,255,255,0.40)',
               margin: 0,
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               letterSpacing: '0.06em',
             }}
           >
@@ -150,7 +151,7 @@ function KenBurnsViewer({
             right: 14,
             fontSize: 10,
             color: 'rgba(255,255,255,0.35)',
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
             letterSpacing: '0.08em',
             zIndex: 2,
           }}
@@ -419,7 +420,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     textTransform: 'uppercase',
                     color: 'rgba(249,115,22,0.70)',
                     margin: '0 0 6px',
-                    fontFamily: "'Avenir Light', Avenir, sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   {[story.city, story.country].filter(Boolean).join(', ')}
@@ -432,7 +433,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     margin: '0 0 4px',
                     letterSpacing: '-0.02em',
                     lineHeight: 1.2,
-                    fontFamily: "'Avenir Light', Avenir, sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   {story.title ?? story.label}
@@ -443,7 +444,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     color: 'rgba(255,255,255,0.35)',
                     margin: 0,
                     fontStyle: 'italic',
-                    fontFamily: "'Avenir Light', Avenir, sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   — {story.label}
@@ -454,7 +455,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       fontSize: 11,
                       color: 'rgba(255,255,255,0.28)',
                       margin: '6px 0 0',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       fontStyle: 'italic',
                     }}
                   >
@@ -573,7 +574,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     fontSize: 'clamp(15px, 2vw, 18px)',
                     lineHeight: 1.85,
                     color: 'rgba(255,255,255,0.78)',
-                    fontFamily: 'Georgia, serif',
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   {story.body
@@ -616,7 +617,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                       cursor: 'pointer',
                       fontSize: 13,
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       outline: 'none',
                       transition: 'all 180ms ease',
                     }}
@@ -650,7 +651,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       cursor: 'pointer',
                       fontSize: 13,
                       outline: 'none',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       transition: 'all 180ms ease',
                     }}
                   >
@@ -663,7 +664,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       fontSize: 12,
                       color: 'rgba(249,115,22,0.60)',
                       margin: 0,
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       fontStyle: 'italic',
                     }}
                   >
@@ -701,7 +702,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   fontSize: 14,
                   color: 'rgba(255,255,255,0.70)',
                   margin: '0 0 12px',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   lineHeight: 1.4,
                 }}
               >
@@ -738,7 +739,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   fontSize: 14,
                   color: 'rgba(255,255,255,0.65)',
                   margin: '0 0 4px',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 ¿Hay algo que no dijiste en esta historia?
@@ -748,7 +749,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   fontSize: 11,
                   color: 'rgba(255,255,255,0.28)',
                   margin: '0 0 14px',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 El autor lo recibirá. Máximo dos líneas.
@@ -768,7 +769,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   border: '1px solid rgba(255,255,255,0.10)',
                   color: 'rgba(255,255,255,0.82)',
                   fontSize: 13,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   resize: 'none',
                   outline: 'none',
                   boxSizing: 'border-box',
@@ -776,7 +777,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                 }}
               />
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontFamily: SITE_FONT_STACK }}>
                   {180 - lastSecondText.length} caracteres restantes
                 </span>
                 <div style={{ display: 'flex', gap: 8 }}>
@@ -792,7 +793,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       cursor: 'pointer',
                       fontSize: 12,
                       outline: 'none',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                     }}
                   >
                     No, gracias
@@ -820,7 +821,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                       cursor: lastSecondText.trim() ? 'pointer' : 'not-allowed',
                       fontSize: 12,
                       outline: 'none',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       transition: 'all 180ms ease',
                     }}
                   >
@@ -850,7 +851,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   fontWeight: 300,
                   color: 'rgba(255,255,255,0.82)',
                   margin: '0 0 6px',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   lineHeight: 1.35,
                 }}
               >
@@ -861,7 +862,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                   fontSize: 13,
                   color: 'rgba(255,255,255,0.40)',
                   margin: '0 0 18px',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 ¿Hay algo tuyo que podría vivir en este mapa?
@@ -885,7 +886,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     cursor: 'pointer',
                     fontSize: 13,
                     outline: 'none',
-                    fontFamily: "'Avenir Light', Avenir, sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   Sí, quiero contarlo
@@ -902,7 +903,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     cursor: 'pointer',
                     fontSize: 13,
                     outline: 'none',
-                    fontFamily: "'Avenir Light', Avenir, sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                   }}
                 >
                   Ahora no
@@ -945,7 +946,7 @@ function ActionButton({
         color: accent ? '#fdba74' : 'rgba(255,255,255,0.55)',
         cursor: 'pointer',
         fontSize: 13,
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         outline: 'none',
         transition: 'all 180ms ease',
       }}

@@ -79,6 +79,9 @@ export async function POST(req: NextRequest) {
     createdAt: now,
   };
   if (data.dateApprox) (doc as SubmissionDoc).dateApprox = true;
+  if (data.profilePhotoUrl?.trim()) {
+    (doc as SubmissionDoc).profilePhotoUrl = data.profilePhotoUrl.trim();
+  }
 
   try {
     const db = getAdminDb();

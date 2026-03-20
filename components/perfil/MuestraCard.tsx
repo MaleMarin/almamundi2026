@@ -1,6 +1,7 @@
 'use client';
 
 import type { Muestra } from '@/lib/almamundi/perfil-queries';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const SH_DARK = 'rgba(163,177,198,0.6)';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -75,7 +76,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
             position: 'absolute',
             bottom: 6,
             left: 10,
-            fontFamily: 'Jost, sans-serif',
+            fontFamily: SITE_FONT_STACK,
             fontWeight: 200,
             fontSize: '0.6rem',
             textTransform: 'uppercase',
@@ -91,7 +92,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
         <h3
           style={{
             margin: 0,
-            fontFamily: 'Fraunces, serif',
+            fontFamily: SITE_FONT_STACK,
             fontStyle: 'italic',
             fontSize: '0.88rem',
             color: TEXT_1,

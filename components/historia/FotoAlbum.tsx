@@ -1,5 +1,6 @@
 'use client';
 
+import { SITE_FONT_STACK } from '@/lib/typography';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -99,10 +100,6 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
 
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap"
-        rel="stylesheet"
-      />
       <style>{`
         .fotoalbum-kenburns { animation: fotoalbumKenBurns 10s ease-in-out infinite alternate; }
         .fotoalbum-kenburns-alt { animation: fotoalbumKenBurnsAlt 12s ease-in-out infinite alternate; }
@@ -148,7 +145,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 type="button"
                 onClick={onClose}
                 style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.75rem',
                   color: CREAM_SOFT,
@@ -167,10 +164,10 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
               </button>
             )}
           </div>
-          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.95rem', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.95rem', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {historia.titulo}
           </div>
-          <div style={{ fontFamily: "'Jost', sans-serif", fontWeight: 200, fontSize: '0.75rem', letterSpacing: '0.2em', color: CREAM_MUTED }}>
+          <div style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.75rem', letterSpacing: '0.2em', color: CREAM_MUTED }}>
             {fotoActivaIdx + 1} / {imagenes.length}
           </div>
         </header>
@@ -235,7 +232,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                     {fotoActivaIdx === i && (
                       <p
                         style={{
-                          fontFamily: "'Jost', sans-serif",
+                          fontFamily: SITE_FONT_STACK,
                           fontWeight: 300,
                           fontSize: '0.78rem',
                           color: '#3a3028',
@@ -266,7 +263,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
                   {img.caption && (
-                    <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
+                    <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
                       {img.caption}
                     </p>
                   )}
@@ -285,7 +282,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                     }}
                   />
                   {img.caption && (
-                    <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
+                    <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
                       {img.caption}
                     </p>
                   )}
@@ -320,15 +317,15 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 marginBottom: '1rem',
               }}
             />
-            <p style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '1.4rem', color: CREAM, marginBottom: '0.25rem' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '1.4rem', color: CREAM, marginBottom: '0.25rem' }}>
               {historia.autor.nombre}
             </p>
             {historia.autor.ubicacion && (
-              <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 200, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: SEPIA, marginBottom: '0.5rem' }}>
+              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: SEPIA, marginBottom: '0.5rem' }}>
                 {historia.autor.ubicacion}
               </p>
             )}
-            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.9rem', color: CREAM_MUTED, marginBottom: '1rem' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.9rem', color: CREAM_MUTED, marginBottom: '1rem' }}>
               Fin del álbum · {imagenes.length} fotografías
             </p>
             {(historia.tags ?? []).length > 0 && (
@@ -337,7 +334,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                   <span
                     key={tag}
                     style={{
-                      fontFamily: "'Jost', sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       fontWeight: 200,
                       fontSize: '0.65rem',
                       padding: '4px 10px',
@@ -357,7 +354,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                   type="button"
                   onClick={onClose}
                   style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 400,
                     fontSize: '0.875rem',
                     padding: '0.6rem 1.2rem',
@@ -382,7 +379,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                   }
                 }}
                 style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 400,
                   fontSize: '0.875rem',
                   padding: '0.6rem 1.2rem',

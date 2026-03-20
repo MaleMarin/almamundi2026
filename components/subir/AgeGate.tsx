@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type AgeGroup = 'adult' | 'minor';
@@ -117,7 +118,7 @@ export function AgeGate({ onChange }: Props) {
         border: '1.5px solid #e5e7eb',
         borderRadius: '12px',
         overflow: 'hidden',
-        fontFamily: "'Jost', sans-serif",
+        fontFamily: SITE_FONT_STACK,
       }}
     >
       {/* ── Header ── */}
@@ -134,7 +135,7 @@ export function AgeGate({ onChange }: Props) {
         <div>
           <p
             style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 500,
               fontSize: '0.88rem',
               color: '#f5f0e8',
@@ -146,7 +147,7 @@ export function AgeGate({ onChange }: Props) {
           </p>
           <p
             style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 300,
               fontSize: '0.75rem',
               color: 'rgba(245,240,232,0.5)',
@@ -363,7 +364,7 @@ export function AgeGate({ onChange }: Props) {
                     border: 'none',
                     background: '#0d0b09',
                     color: '#f5f0e8',
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 500,
                     fontSize: '0.85rem',
                     letterSpacing: '0.08em',

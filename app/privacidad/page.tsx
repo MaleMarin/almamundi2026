@@ -5,6 +5,7 @@
 
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
   title: 'Política de privacidad · AlmaMundi',
@@ -43,7 +44,7 @@ function Section({
       <h2
         style={{
           margin: '0 0 1rem',
-          fontFamily: 'Fraunces, serif',
+          fontFamily: SITE_FONT_STACK,
           fontStyle: 'italic',
           fontWeight: 600,
           fontSize: '1.1rem',
@@ -54,7 +55,7 @@ function Section({
       </h2>
       <div
         style={{
-          fontFamily: '"Plus Jakarta Sans", sans-serif',
+          fontFamily: SITE_FONT_STACK,
           fontSize: '0.9rem',
           lineHeight: 1.65,
           color: TEXT_2,
@@ -73,7 +74,7 @@ export default function PrivacidadPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3rem',
-        fontFamily: '"Plus Jakarta Sans", sans-serif',
+        fontFamily: SITE_FONT_STACK,
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -92,7 +93,7 @@ export default function PrivacidadPage() {
         <h1
           style={{
             margin: '0 0 0.5rem',
-            fontFamily: 'Fraunces, serif',
+            fontFamily: SITE_FONT_STACK,
             fontStyle: 'italic',
             fontWeight: 600,
             fontSize: '1.75rem',

@@ -11,6 +11,7 @@ import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlay
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
 import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 export default function HistoriasIdAudioPage() {
   const params = useParams();
@@ -69,7 +70,7 @@ export default function HistoriasIdAudioPage() {
   if (loading) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#111009', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: "'Jost', sans-serif", fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.8)' }}>Cargando…</p>
+        <p style={{ fontFamily: SITE_FONT_STACK, fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.8)' }}>Cargando…</p>
       </div>
     );
   }
@@ -77,7 +78,7 @@ export default function HistoriasIdAudioPage() {
   if (!historia) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#111009', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', padding: '1.5rem' }}>
-        <p style={{ fontFamily: "'Jost', sans-serif", color: 'rgba(245,240,232,0.7)' }}>No encontramos esta historia o no tiene audio.</p>
+        <p style={{ fontFamily: SITE_FONT_STACK, color: 'rgba(245,240,232,0.7)' }}>No encontramos esta historia o no tiene audio.</p>
         <Link
           href="/historias"
           style={{

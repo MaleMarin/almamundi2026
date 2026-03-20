@@ -12,7 +12,7 @@
  * Una vez publicada, la historia aparece automáticamente en:
  *   /historias/video | audio | texto | foto
  *   /temas/[slug]    para cada tema asignado
- *   /mapa            si tiene ubicación
+ *   /#mapa (home)    si tiene ubicación
  */
 
 import { useState } from 'react';
@@ -398,7 +398,7 @@ export function CurationPanel({ story, curadorId, onDone }: Props) {
           ))}
           {(ciudad || pais || story.ubicacion) && (
             <span>
-              · <strong>/mapa</strong>
+              · <strong>/#mapa</strong>
             </span>
           )}
         </div>

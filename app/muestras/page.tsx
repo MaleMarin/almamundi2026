@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { neu } from '@/lib/historias-neumorph';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 export default function MuestrasListPage() {
   const [topics, setTopics] = useState<MuestrasByTopic[]>([]);
@@ -44,9 +44,11 @@ export default function MuestrasListPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="text-xl md:text-2xl font-semibold tracking-tight" style={{ color: neu.textMain }}>AlmaMundi</Link>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
+      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
+          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
+        </Link>
+        <div className={historiasInterior.navLinksRowClassName}>
           <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />

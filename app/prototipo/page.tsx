@@ -6,6 +6,7 @@ import AudioPlayer from '@/components/historia/AudioPlayer';
 import TextoReader from '@/components/historia/TextoReader';
 import FotoAlbum from '@/components/historia/FotoAlbum';
 import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type ActiveFormat = 'video' | 'audio' | 'texto' | 'fotos' | null;
 
@@ -21,21 +22,18 @@ export default function PrototipoPage() {
 
   return (
     <>
-      <link
-        rel="stylesheet"
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap"
-      />
     <div
+      className="font-sans"
       style={{
         minHeight: '100vh',
         background: '#f5f3ef',
-        fontFamily: "'Jost', sans-serif",
+        fontFamily: SITE_FONT_STACK,
         padding: '3rem 2rem',
       }}
     >
       <h1
         style={{
-          fontFamily: "'Cormorant Garamond', serif",
+          fontFamily: SITE_FONT_STACK,
           fontSize: '2.5rem',
           fontWeight: 600,
           color: '#2a2520',
@@ -80,7 +78,7 @@ export default function PrototipoPage() {
                 border: 'none',
                 borderRadius: '4px',
                 color: '#fff',
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontSize: '0.9rem',
                 fontWeight: 500,
                 cursor: 'pointer',

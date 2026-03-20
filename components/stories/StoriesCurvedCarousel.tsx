@@ -120,7 +120,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
   }
 
   return (
-    <div className="flex w-full h-full min-h-[80vh] bg-[#E0E5EC] text-gray-800 overflow-hidden" style={{ fontFamily: `'Avenir Light', Avenir, sans-serif` }}>
+    <div className="flex w-full h-full min-h-[80vh] bg-[#E0E5EC] text-gray-800 overflow-hidden font-sans">
       {/* Columna izquierda: rueda curva de thumbnails */}
       <div
         ref={containerRef}

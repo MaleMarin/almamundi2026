@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Pulse = { lat: number; lng: number };
 
@@ -60,7 +61,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.22)',
           margin: '0 0 10px',
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         Esta historia llegó a
@@ -87,7 +88,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
             fontSize: 10,
             color: 'rgba(255,255,255,0.20)',
             margin: 0,
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
           }}
         >
           {pulses.length} {pulses.length === 1 ? 'lugar' : 'lugares'}

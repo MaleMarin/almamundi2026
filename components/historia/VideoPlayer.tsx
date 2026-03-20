@@ -1,5 +1,6 @@
 'use client'
 
+import { SITE_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -193,8 +194,6 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
     <>
       {/* ── Global Fonts ── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
-
         :root {
           --cream:    #f5f0e8;
           --sepia:    #c9a96e;
@@ -208,7 +207,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
 
         body {
           background: var(--film);
-          font-family: 'Jost', sans-serif;
+          font-family: var(--font-sans);
           overflow: hidden;
         }
 
@@ -346,7 +345,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
 
           {/* AlmaMundi wordmark */}
           <p style={{
-            fontFamily: "'Jost', sans-serif",
+            fontFamily: SITE_FONT_STACK,
             fontWeight: 200,
             fontSize: '0.7rem',
             letterSpacing: '0.55em',
@@ -363,7 +362,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           <h1
             className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: SITE_FONT_STACK,
               fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
               fontWeight: 300,
               fontStyle: 'italic',
@@ -381,7 +380,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
 
           {historia.subtitulo && (
             <p style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 300,
               fontSize: '0.95rem',
               letterSpacing: '0.12em',
@@ -421,7 +420,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
               }}
             />
             <span style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 300,
               fontSize: '0.8rem',
               letterSpacing: '0.2em',
@@ -498,7 +497,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
           }}>
             <div style={{ pointerEvents: 'none' }}>
               <p style={{
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 200,
                 fontSize: '0.65rem',
                 letterSpacing: '0.5em',
@@ -509,7 +508,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
               AlmaMundi
             </p>
             <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 400,
               fontStyle: 'italic',
               fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
@@ -626,7 +625,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
 
                 {/* Time */}
                 <span style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontSize: '0.78rem',
                   fontWeight: 300,
                   color: 'rgba(245,240,232,0.6)',
@@ -651,7 +650,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
                     alt={historia.autor.nombre}
                   />
                   <span style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontSize: '0.75rem',
                     fontWeight: 300,
                     color: 'rgba(245,240,232,0.55)',
@@ -711,7 +710,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
               <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
               <span style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: SITE_FONT_STACK,
                 fontStyle: 'italic',
                 fontSize: '0.85rem',
                 color: 'var(--sepia)',
@@ -722,7 +721,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
 
             {/* Title recap */}
             <h2 style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 300,
               fontStyle: 'italic',
               fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)',
@@ -737,7 +736,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
             {/* Cita destacada */}
             {historia.citaDestacada && (
               <blockquote style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: SITE_FONT_STACK,
                 fontStyle: 'italic',
                 fontWeight: 400,
                 fontSize: '1.05rem',
@@ -777,7 +776,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
               />
               <div style={{ textAlign: 'left' }}>
                 <p style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 400,
                   fontSize: '0.95rem',
                   color: 'var(--cream)',
@@ -788,7 +787,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
                 </p>
                 {historia.autor.ubicacion && (
                   <p style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 300,
                     fontSize: '0.75rem',
                     color: 'var(--sepia)',
@@ -800,7 +799,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
                 )}
                 {historia.autor.bio && (
                   <p style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 300,
                     fontSize: '0.8rem',
                     color: 'rgba(245,240,232,0.4)',
@@ -822,7 +821,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
               }}>
                 {historia.tags.map(tag => (
                   <span key={tag} style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 300,
                     fontSize: '0.68rem',
                     letterSpacing: '0.22em',
@@ -855,7 +854,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
                   border: '1px solid rgba(201,169,110,0.3)',
                   borderRadius: '3px',
                   color: 'var(--sepia)',
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.78rem',
                   letterSpacing: '0.25em',
@@ -877,7 +876,7 @@ export default function VideoPlayer({ historia, onClose }: VideoPlayerProps) {
                   border: 'none',
                   borderRadius: '3px',
                   color: 'var(--film)',
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 500,
                   fontSize: '0.78rem',
                   letterSpacing: '0.25em',

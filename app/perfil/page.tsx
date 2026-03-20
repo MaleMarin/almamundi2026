@@ -11,6 +11,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { getDoc, doc } from 'firebase/firestore';
 import { auth } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 export default function PerfilRedirectPage() {
   const router = useRouter();
@@ -57,7 +58,7 @@ export default function PerfilRedirectPage() {
           alignItems: 'center',
           justifyContent: 'center',
           background: '#e8ecf0',
-          fontFamily: '"Plus Jakarta Sans", sans-serif',
+          fontFamily: SITE_FONT_STACK,
           color: '#4a5568',
         }}
       >

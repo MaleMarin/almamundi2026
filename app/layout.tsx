@@ -14,7 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es">
-      <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800" style={{ fontFamily: "system-ui, -apple-system, Segoe UI, Avenir, sans-serif" }}>
+      <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
         <noscript>
           <div className="p-8 text-center">
             <h1 className="text-2xl font-light text-white/95">AlmaMundi</h1>

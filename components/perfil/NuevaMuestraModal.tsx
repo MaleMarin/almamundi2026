@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { Muestra } from '@/lib/almamundi/perfil-queries';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -136,7 +137,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           width: 360,
           maxWidth: '92vw',
           animation: 'slideUp 0.3s cubic-bezier(0.22,1,0.36,1) forwards',
-          fontFamily: '"Plus Jakarta Sans", sans-serif',
+          fontFamily: SITE_FONT_STACK,
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -256,7 +257,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.8rem',
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                fontFamily: SITE_FONT_STACK,
                 background: isPublic ? `linear-gradient(135deg, ${ORANGE}, #ff8c55)` : BG,
                 color: isPublic ? '#fff' : TEXT_2,
                 boxShadow: isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
@@ -274,7 +275,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.8rem',
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                fontFamily: SITE_FONT_STACK,
                 background: !isPublic ? `linear-gradient(135deg, ${ORANGE}, #ff8c55)` : BG,
                 color: !isPublic ? '#fff' : TEXT_2,
                 boxShadow: !isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
@@ -299,7 +300,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 border: 'none',
                 cursor: 'pointer',
                 fontSize: '0.9rem',
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                fontFamily: SITE_FONT_STACK,
                 background: BG,
                 color: TEXT_2,
                 boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
@@ -317,7 +318,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '0.9rem',
-                fontFamily: '"Plus Jakarta Sans", sans-serif',
+                fontFamily: SITE_FONT_STACK,
                 background: `linear-gradient(135deg, ${ORANGE}, #ff8c55)`,
                 color: '#fff',
                 boxShadow: `5px 5px 12px rgba(255,107,43,0.4), -2px -2px 6px ${SH_LIGHT}`,

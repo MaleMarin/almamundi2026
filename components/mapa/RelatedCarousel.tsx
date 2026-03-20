@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from 'react';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
   currentStoryId: string;
@@ -61,7 +62,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.25)',
           margin: '0 0 20px',
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         También podría resonar contigo
@@ -163,7 +164,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                         ? 'rgba(249,115,22,0.70)'
                         : 'rgba(255,255,255,0.25)',
                       margin: '0 0 4px',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                     }}
                   >
                     {[s.city, s.country].filter(Boolean).join(', ')}
@@ -182,7 +183,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      fontFamily: "'Avenir Light', Avenir, sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                     }}
                   >
                     {s.title ?? s.label}
@@ -194,7 +195,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                         fontSize: 10,
                         color: 'rgba(249,115,22,0.60)',
                         margin: '8px 0 0',
-                        fontFamily: "'Avenir Light', Avenir, sans-serif",
+                        fontFamily: SITE_FONT_STACK,
                         letterSpacing: '0.04em',
                       }}
                     >

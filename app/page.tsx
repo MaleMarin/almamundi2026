@@ -1,45 +1,35 @@
 'use client';
 
-import { useMemo } from 'react';
-import Link from 'next/link';
-import { getAllContent, getHomeCollections } from '@/lib/content';
-import { HomeV2Sections } from '@/components/politica-v2/HomeV2Sections';
+import { useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
+import { Footer } from '@/components/layout/Footer';
 
 /**
- * Home V2 — Política Digital.
- * Contenido desde metadatos; mapa intacto (MapSectionLocked); escenas de scroll.
+ * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa), footer.
+ * No sustituir por otras plantillas; ajustes de UI en `HomeFirstPart` / sección mapa acordados.
  */
 export default function Home() {
-  const collections = useMemo(() => {
-    const all = getAllContent();
-    return getHomeCollections(all);
+  const router = useRouter();
+
+  const scrollToId = useCallback((id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
   return (
-    <main className="min-h-screen overflow-x-hidden relative bg-[#0a0a0f]">
-      <style jsx global>{`
-        html { scroll-behavior: smooth; }
-      `}</style>
-
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-12 h-16 md:h-20 bg-[#0a0a0f]/80 backdrop-blur-md border-b border-white/5">
-        <span className="text-sm font-medium tracking-widest text-[var(--almamundi-orange)] uppercase">
-          Política Digital
-        </span>
-        <nav className="flex gap-6 md:gap-8 text-sm text-white/70">
-          <a href="#mapa" className="hover:text-[var(--almamundi-orange)] transition-colors">
-            México por estado
-          </a>
-          <Link href="/privacidad" className="hover:text-[var(--almamundi-orange)] transition-colors">
-            Privacidad
-          </Link>
-        </nav>
-      </header>
-
-      <HomeV2Sections
-        collections={collections}
-        mapSection={<MapSectionLocked />}
+    <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+      <HomeFirstPart
+        onShowPurpose={() => scrollToId('intro')}
+        onShowInspiration={() => scrollToId('mapa')}
+        onRecordVideo={() => router.push('/subir')}
+        onRecordAudio={() => router.push('/subir')}
+        onWriteStory={() => router.push('/subir')}
+        onUploadPhoto={() => router.push('/subir')}
+        basePath="/"
       />
+      <MapSectionLocked />
+      <Footer />
     </main>
   );
 }

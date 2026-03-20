@@ -2,7 +2,7 @@
 
 /**
  * Panel Admin AlmaMundi — protegido con Firebase Auth.
- * Solo usuarios con email en lib/adminEmails.ts pueden entrar; el resto → redirect /mapa.
+ * Solo usuarios con email en lib/adminEmails.ts pueden entrar; el resto → redirect al mapa home (/#mapa).
  */
 
 import { useEffect, useState, useCallback } from 'react';
@@ -30,9 +30,11 @@ import {
   Video,
   FolderOpen,
 } from 'lucide-react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const BG = '#0a0f24';
-const APP_FONT = "'Avenir Light', Avenir, sans-serif";
+
+const APP_FONT = SITE_FONT_STACK;
 
 const glassCard = {
   background: 'linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04))',

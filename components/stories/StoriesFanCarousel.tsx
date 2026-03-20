@@ -6,12 +6,13 @@
  * Reemplaza CinemaGallery en app/historias/videos/page.tsx
  */
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
 import { useRouter } from 'next/navigation'
 import VideoPlayer from '@/components/historia/VideoPlayer'
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer'
 import type { StoryPoint } from '@/lib/map-data/stories'
+import { SITE_FONT_STACK } from '@/lib/typography'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function formatPlace(s: StoryPoint): string {
@@ -29,7 +30,26 @@ const PLACEHOLDER_THUMB =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="#e8e4dc" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#8b7a6a">Sin imagen</text></svg>'
   )
 function formatLabel(fmt: string): string {
-  return { video: 'Video', audio: 'Audio', texto: 'Escritura', foto: 'Fotografía' }[fmt] ?? fmt
+  return { video: 'Videos', audio: 'Audios', texto: 'Escritos', foto: 'Fotografías' }[fmt] ?? fmt
+}
+
+/**
+ * Ondas del waveform: alturas/duraciones deterministas por historia + barra.
+ * (No usar Math.random() en el render: rompe la hidratación SSR/cliente.)
+ */
+function audioWaveBarStyle(storyId: string, barIndex: number): CSSProperties {
+  let h = 2166136261
+  for (let i = 0; i < storyId.length; i++) {
+    h = Math.imul(h ^ storyId.charCodeAt(i), 16777619)
+  }
+  const heightPx = 8 + (((h >>> 0) * (barIndex + 1) * 2654435761) >>> 0) % 28
+  const durT = (((h + barIndex * 9973) >>> 0) % 1000) / 1000
+  const durationSec = 0.65 + durT * 0.4
+  return {
+    height: `${heightPx}px`,
+    animationDelay: `${barIndex * 0.08}s`,
+    animationDuration: `${durationSec}s`,
+  }
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -142,7 +162,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   }
 
   if (!stories.length) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8b6914', fontFamily: "'Jost', sans-serif", fontSize: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#8b6914', fontFamily: SITE_FONT_STACK, fontSize: '1rem' }}>
       No hay historias por ahora.
     </div>
   )
@@ -154,8 +174,6 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;1,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
-
         .sfc-root * { box-sizing: border-box; }
 
         .sfc-card {
@@ -176,16 +194,16 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           position:absolute; top:12px; left:12px;
           background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
           border-radius:20px; padding:3px 10px;
-          font-family:'Jost',sans-serif; font-weight:300; font-size:9px;
+          font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-weight:300; font-size:9px;
           letter-spacing:0.22em; text-transform:uppercase; color:#fff;
         }
 
         .sfc-bottom { position:absolute; bottom:0; left:0; right:0; padding:14px 13px; }
-        .sfc-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
+        .sfc-title { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-style:italic; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
         .sfc-divider { width:24px; height:1px; background:rgba(201,169,110,0.6); margin-bottom:7px; }
         .sfc-author { display:flex; align-items:center; gap:6px; }
         .sfc-avatar { width:20px; height:20px; border-radius:50%; border:1px solid rgba(201,169,110,0.5); object-fit:cover; flex-shrink:0; }
-        .sfc-meta { font-family:'Jost',sans-serif; font-weight:300; font-size:10px; color:rgba(245,240,232,0.7); line-height:1.4; }
+        .sfc-meta { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-weight:300; font-size:10px; color:rgba(245,240,232,0.7); line-height:1.4; }
         .sfc-meta strong { display:block; font-weight:400; color:#f5f0e8; font-size:11px; }
 
         .sfc-play {
@@ -204,8 +222,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         @keyframes sfcWave { from{transform:scaleY(0.25)} to{transform:scaleY(1)} }
 
         .sfc-text-inner { position:absolute; inset:0; background:#faf7f2; padding:18px 14px 0; overflow:hidden; }
-        .sfc-text-drop { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:300; font-style:italic; color:#c9a96e; line-height:1; float:left; margin-right:3px; margin-top:2px; }
-        .sfc-text-body { font-family:'Cormorant Garamond',serif; font-size:11.5px; line-height:1.75; color:#3a3028; }
+        .sfc-text-drop { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-size:56px; font-weight:300; font-style:italic; color:#c9a96e; line-height:1; float:left; margin-right:3px; margin-top:2px; }
+        .sfc-text-body { font-family:system-ui,-apple-system,"Segoe UI",Avenir,sans-serif; font-size:11.5px; line-height:1.75; color:#3a3028; }
         .sfc-text-fade { position:absolute; bottom:0; left:0; right:0; height:120px; background:linear-gradient(to top,#faf7f2 30%,transparent 100%); }
 
         .sfc-photo-inner { position:absolute; inset:0; background:#ede8e0; display:flex; align-items:center; justify-content:center; }
@@ -232,7 +250,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
-          minHeight: '580px',
+          minHeight: 'min(72vh, 760px)',
           width: '100%',
         }}
       >
@@ -323,7 +341,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                   {fmt === 'audio' && (
                     <div className="sfc-wave">
                       {Array.from({ length: 12 }, (_, k) => (
-                        <div key={k} className="sfc-bar" style={{ height: `${8 + Math.floor(Math.random() * 28)}px`, animationDelay: `${k * 0.08}s`, animationDuration: `${0.65 + Math.random() * 0.4}s` }} />
+                        <div key={k} className="sfc-bar" style={audioWaveBarStyle(String(s.id), k)} />
                       ))}
                     </div>
                   )}
@@ -365,10 +383,10 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         {/* ── Info ── */}
         {current && (
           <div className="sfc-info" key={active}>
-            <p style={{ fontFamily: "'Cormorant Garamond',serif", fontStyle: 'italic', fontWeight: 300, fontSize: '1.45rem', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontWeight: 300, fontSize: '1.45rem', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
               {current.title ?? current.label}
             </p>
-            <p style={{ fontFamily: "'Jost',sans-serif", fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               {authorName}
               <span style={{ display: 'inline-block', width: '1px', height: '10px', background: '#c9a96e', margin: '0 8px', verticalAlign: 'middle', opacity: 0.5 }} />
               {formatPlace(current)}
@@ -411,7 +429,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 router.push(`/historias/${current.id}`)
               }
             }}
-            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: "'Jost',sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             {mode === 'audio' ? 'Escuchar →' : 'Ver esta historia →'}
           </button>
@@ -426,7 +444,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 border: '1px solid rgba(26,20,14,0.2)',
                 background: isSavedInCollection?.(current.id) ? 'rgba(139,105,20,0.15)' : 'transparent',
                 color: isSavedInCollection?.(current.id) ? '#6b4f10' : '#5a4a3a',
-                fontFamily: "'Jost',sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 400,
                 fontSize: '11px',
                 letterSpacing: '0.12em',

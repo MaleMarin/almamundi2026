@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import type { StoryData } from '@/lib/story-schema';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const SH_DARK = 'rgba(163,177,198,0.6)';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -41,7 +42,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
   }, [historias, filter]);
 
   return (
-    <div style={{ fontFamily: '"Plus Jakarta Sans", sans-serif' }}>
+    <div style={{ fontFamily: SITE_FONT_STACK }}>
       <div
         style={{
           display: 'flex',
@@ -126,7 +127,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
                 <p
                   style={{
                     margin: '2px 0 0',
-                    fontFamily: 'Fraunces, serif',
+                    fontFamily: SITE_FONT_STACK,
                     fontStyle: 'italic',
                     fontSize: '0.72rem',
                     color: '#1a2332',

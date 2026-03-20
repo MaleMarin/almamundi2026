@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type SimilarStory = {
   id: string;
@@ -47,7 +48,7 @@ export function SimilarStories({ storyId }: { storyId: string }) {
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.28)',
           marginBottom: 20,
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         También podría resonar contigo
@@ -73,7 +74,7 @@ export function SimilarStories({ storyId }: { storyId: string }) {
               border: '1px solid rgba(255,255,255,0.08)',
               cursor: 'pointer',
               transition: 'all 250ms ease',
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               animation: `storyFadeIn 500ms ease-out ${i * 100}ms both`,
             }}
             onMouseEnter={(e) => {

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
@@ -116,11 +117,6 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
 
   return (
     <>
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap"
-        rel="stylesheet"
-      />
-
       {/* Barra de progreso */}
       <div
         style={{
@@ -146,7 +142,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             top: '1.2rem',
             left: '1.5rem',
             zIndex: 100,
-            fontFamily: "'Jost', sans-serif",
+            fontFamily: SITE_FONT_STACK,
             fontWeight: 300,
             fontSize: '0.75rem',
             color: SEPIA,
@@ -182,7 +178,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         {/* Fecha */}
         <p
           style={{
-            fontFamily: "'Jost', sans-serif",
+            fontFamily: SITE_FONT_STACK,
             fontWeight: 200,
             fontSize: '0.7rem',
             letterSpacing: '0.3em',
@@ -197,7 +193,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         {/* Título */}
         <h1
           style={{
-            fontFamily: "'Cormorant Garamond', serif",
+            fontFamily: SITE_FONT_STACK,
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: 'clamp(2rem, 5vw, 3.2rem)',
@@ -213,7 +209,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         {historia.subtitulo && (
           <p
             style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 300,
               fontSize: '1rem',
               color: TINTA_SOFT,
@@ -254,14 +250,14 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               objectFit: 'cover',
             }}
           />
-          <span style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
+          <span style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
             {historia.autor.nombre}
           </span>
           <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
           {historia.tiempoLectura != null && (
             <span
               style={{
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 200,
                 fontSize: '0.8rem',
                 color: SEPIA,
@@ -278,7 +274,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             <p
               ref={(el) => { paragraphRefs.current[0] = el; }}
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: SITE_FONT_STACK,
                 fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                 lineHeight: 2,
                 color: TINTA,
@@ -292,7 +288,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               {drop && (
                 <span
                   style={{
-                    fontFamily: "'Cormorant Garamond', serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontStyle: 'italic',
                     fontSize: isMobile ? '2.5rem' : 'clamp(2.5rem, 6vw, 4rem)',
                     color: SEPIA,
@@ -317,7 +313,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
                 key={idx}
                 ref={(el) => { paragraphRefs.current[idx] = el; }}
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                   lineHeight: 2,
                   color: TINTA,
@@ -359,7 +355,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             />
             <p
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: SITE_FONT_STACK,
                 fontStyle: 'italic',
                 fontSize: '1.3rem',
                 color: TINTA,
@@ -371,7 +367,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             {historia.autor.ubicacion && (
               <p
                 style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 200,
                   fontSize: '0.75rem',
                   textTransform: 'uppercase',
@@ -386,7 +382,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             {historia.autor.bio && (
               <p
                 style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.85rem',
                   color: TINTA_SOFT,
@@ -407,7 +403,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
                   <span
                     key={tag}
                     style={{
-                      fontFamily: "'Jost', sans-serif",
+                      fontFamily: SITE_FONT_STACK,
                       fontWeight: 200,
                       fontSize: '0.65rem',
                       padding: '4px 10px',
@@ -439,7 +435,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               type="button"
               onClick={onClose}
               style={{
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 400,
                 fontSize: '0.875rem',
                 padding: '0.6rem 1.2rem',
@@ -466,7 +462,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               }
             }}
             style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 400,
               fontSize: '0.875rem',
               padding: '0.6rem 1.2rem',

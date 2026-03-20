@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 import type { MapDockMode } from './MapDock';
 
 const DRAWER_WIDTH_DESKTOP = 360;
@@ -68,7 +69,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           }}
         >
           <div className="flex flex-shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
-            <span className="text-lg font-medium text-white/95" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+            <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
               {title}
             </span>
             <button
@@ -107,7 +108,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         }}
       >
         <div className="flex flex-shrink-0 items-center justify-between border-b border-white/10 px-5 py-4">
-          <span className="text-lg font-medium text-white/95" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+          <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
             {title}
           </span>
           <button

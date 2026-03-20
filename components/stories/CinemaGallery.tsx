@@ -15,6 +15,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import ReactDOM from 'react-dom';
 import VideoPlayer from '@/components/historia/VideoPlayer';
+import { SITE_FONT_STACK } from '@/lib/typography';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -136,10 +137,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
 
   return (
     <>
-      {/* ── Google Fonts ── */}
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400;1,600&family=Jost:wght@200;300;400&display=swap');
-
         .cg-root * { box-sizing: border-box; }
 
         /* BG crossfade */
@@ -199,7 +197,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
           minHeight: '100vh',
           overflow: 'hidden',
           background: '#090807',
-          fontFamily: "'Jost', sans-serif",
+          fontFamily: SITE_FONT_STACK,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -262,7 +260,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
             key={`count-${activeIdx}`}
             className="cg-count"
             style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 200,
               fontSize: '0.65rem',
               letterSpacing: '0.5em',
@@ -297,7 +295,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               />
               <div>
                 <p style={{
-                  fontFamily: "'Jost', sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.82rem',
                   color: 'rgba(245,240,232,0.85)',
@@ -307,7 +305,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                 </p>
                 {formatPlace(story) && (
                   <p style={{
-                    fontFamily: "'Jost', sans-serif",
+                    fontFamily: SITE_FONT_STACK,
                     fontWeight: 200,
                     fontSize: '0.68rem',
                     letterSpacing: '0.2em',
@@ -327,7 +325,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               key={`title-${activeIdx}`}
               className="cg-hero-content"
               style={{
-                fontFamily: "'Cormorant Garamond', serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 300,
                 fontStyle: 'italic',
                 fontSize: 'clamp(2rem, 5.5vw, 4.2rem)',
@@ -350,7 +348,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               key={`date-${activeIdx}`}
               className="cg-hero-content"
               style={{
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 200,
                 fontSize: '0.75rem',
                 letterSpacing: '0.2em',
@@ -388,7 +386,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
             <a
               href={`/historias/${story?.id}`}
               style={{
-                fontFamily: "'Jost', sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 fontWeight: 300,
                 fontSize: '0.75rem',
                 letterSpacing: '0.3em',
@@ -552,7 +550,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
         }}>
           {['←', '→', 'Enter'].map(k => (
             <span key={k} style={{
-              fontFamily: "'Jost', sans-serif",
+              fontFamily: SITE_FONT_STACK,
               fontWeight: 200,
               fontSize: '0.6rem',
               letterSpacing: '0.15em',

@@ -1,5 +1,6 @@
 'use client';
 
+import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -54,7 +55,7 @@ function StoryRow({
         borderLeft: isActive ? '3px solid rgba(249,115,22,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
       }}
     >
@@ -114,7 +115,7 @@ export function StoriesPanel({
               background: 'rgba(255,255,255,0.06)',
               color: '#fff',
               fontSize: 13,
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               outline: 'none',
             }}
           />
@@ -142,7 +143,7 @@ export function StoriesPanel({
               color: 'rgba(255,255,255,0.85)',
               margin: '0 0 12px',
               lineHeight: 1.5,
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
             }}>
               Todavía no hay historias públicas aquí. Cuando aparezca la primera, se verá en el mapa.
             </p>
@@ -159,7 +160,7 @@ export function StoriesPanel({
                   fontSize: 14,
                   fontWeight: 600,
                   cursor: 'pointer',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   transition: 'all 200ms ease',
                 }}
               >
@@ -169,7 +170,7 @@ export function StoriesPanel({
           </div>
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               Últimas historias
             </p>
             {stories.map((s, i) => (

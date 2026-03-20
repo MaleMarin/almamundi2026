@@ -1,5 +1,6 @@
 'use client';
 
+import { SITE_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -167,7 +168,6 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
   const content = (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@200;300;400;500&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes haloPulse {
           0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.3); }
@@ -248,7 +248,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           )}
           <h1
             style={{
-              fontFamily: "'Cormorant Garamond', serif",
+              fontFamily: SITE_FONT_STACK,
               fontStyle: 'italic',
               fontWeight: 300,
               fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
@@ -283,11 +283,11 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               style={{ width: '100%', height: '100%', objectFit: 'cover' }}
             />
           </div>
-          <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.95rem', color: CREAM, marginBottom: '0.25rem' }}>
+          <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.95rem', color: CREAM, marginBottom: '0.25rem' }}>
             {historia.autor.nombre}
           </p>
           {historia.autor.ubicacion && (
-            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 200, fontSize: '0.8rem', color: SEPIA, letterSpacing: '0.12em', marginBottom: '2rem' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.8rem', color: SEPIA, letterSpacing: '0.12em', marginBottom: '2rem' }}>
               {historia.autor.ubicacion}
             </p>
           )}
@@ -313,8 +313,24 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                   height: `${h}px`,
                   background: SEPIA,
                   borderRadius: '2px',
-                  animation: isPlaying ? `waveAnim ${barDurations[i]}s ease-in-out infinite alternate` : 'none',
-                  animationDelay: `${i * 0.06}s`,
+                  // Longhand only: mezclar `animation` (shorthand) con `animationDelay` provoca el warning de React.
+                  ...(isPlaying
+                    ? {
+                        animationName: 'waveAnim',
+                        animationDuration: `${barDurations[i]}s`,
+                        animationTimingFunction: 'ease-in-out',
+                        animationIterationCount: 'infinite',
+                        animationDirection: 'alternate',
+                        animationDelay: `${i * 0.06}s`,
+                      }
+                    : {
+                        animationName: 'none',
+                        animationDuration: '0s',
+                        animationTimingFunction: 'ease',
+                        animationIterationCount: 1,
+                        animationDirection: 'normal',
+                        animationDelay: '0s',
+                      }),
                 }}
               />
             ))}
@@ -325,7 +341,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               <p
                 className="ap-phrase-in"
                 style={{
-                  fontFamily: "'Cormorant Garamond', serif",
+                  fontFamily: SITE_FONT_STACK,
                   fontStyle: 'italic',
                   fontSize: '1.1rem',
                   color: 'rgba(245,240,232,0.7)',
@@ -376,7 +392,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 onChange={seek}
               />
             </div>
-            <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.8rem', color: 'rgba(245,240,232,0.6)', letterSpacing: '0.08em' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(245,240,232,0.6)', letterSpacing: '0.08em' }}>
               {formatTime(currentTime)} · · · {formatTime(duration)}
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -505,23 +521,23 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
               <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
-              <span style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontSize: '0.85rem', color: SEPIA, letterSpacing: '0.3em' }}>Fin</span>
+              <span style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.85rem', color: SEPIA, letterSpacing: '0.3em' }}>Fin</span>
               <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
             </div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)', color: CREAM, letterSpacing: '0.05em', lineHeight: 1.2, marginBottom: '1.8rem' }}>
+            <h2 style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)', color: CREAM, letterSpacing: '0.05em', lineHeight: 1.2, marginBottom: '1.8rem' }}>
               {historia.titulo}
             </h2>
             {historia.citaDestacada && (
-              <blockquote style={{ fontFamily: "'Cormorant Garamond', serif", fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.7, borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '1.2rem', marginBottom: '2.5rem', textAlign: 'left' }}>
+              <blockquote style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.7, borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '1.2rem', marginBottom: '2.5rem', textAlign: 'left' }}>
                 &quot;{historia.citaDestacada}&quot;
               </blockquote>
             )}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', padding: '1.2rem 1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(201,169,110,0.1)', borderRadius: '3px', width: '100%', marginBottom: '2.5rem' }}>
               <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,169,110,0.35)', flexShrink: 0 }} className="ap-halo-pulse" />
               <div style={{ textAlign: 'left' }}>
-                <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 400, fontSize: '0.95rem', color: CREAM, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{historia.autor.nombre}</p>
+                <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.95rem', color: CREAM, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{historia.autor.nombre}</p>
                 {historia.autor.ubicacion && (
-                  <p style={{ fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.75rem', color: SEPIA, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{historia.autor.ubicacion}</p>
+                  <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.75rem', color: SEPIA, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{historia.autor.ubicacion}</p>
                 )}
               </div>
             </div>
@@ -529,14 +545,14 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               <button
                 type="button"
                 onClick={restart}
-                style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(201,169,110,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: "'Jost', sans-serif", fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(201,169,110,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Escuchar de nuevo
               </button>
               <button
                 type="button"
                 onClick={onClose}
-                style={{ flex: 1, padding: '0.85rem', background: `linear-gradient(135deg, ${SEPIA_DK}, ${SEPIA})`, border: 'none', borderRadius: '3px', color: FILM, fontFamily: "'Jost', sans-serif", fontWeight: 500, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '0.85rem', background: `linear-gradient(135deg, ${SEPIA_DK}, ${SEPIA})`, border: 'none', borderRadius: '3px', color: FILM, fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Más historias
               </button>

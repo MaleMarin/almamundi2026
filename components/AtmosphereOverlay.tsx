@@ -94,7 +94,7 @@ function AtmosphereLabel({ label }: { label: string }) {
         color: 'rgba(255,255,255,0.75)',
         margin: 0,
         letterSpacing: '-0.01em',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: 'var(--font-sans)',
         textShadow: '0 2px 40px rgba(0,0,0,0.9)',
       }}>
         {label}

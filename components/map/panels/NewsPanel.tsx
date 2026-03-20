@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { NewsItem } from '@/components/NewsLayer';
 import { NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 function chipStyle(active: boolean) {
   if (active) return {
@@ -11,7 +12,7 @@ function chipStyle(active: boolean) {
     cursor: 'pointer' as const,
     fontSize: 13,
     whiteSpace: 'nowrap' as const,
-    fontFamily: "'Avenir Light', Avenir, sans-serif",
+    fontFamily: SITE_FONT_STACK,
     outline: 'none',
     WebkitTapHighlightColor: 'transparent',
     transition: 'all 180ms ease',
@@ -26,7 +27,7 @@ function chipStyle(active: boolean) {
     cursor: 'pointer' as const,
     fontSize: 13,
     whiteSpace: 'nowrap' as const,
-    fontFamily: "'Avenir Light', Avenir, sans-serif",
+    fontFamily: SITE_FONT_STACK,
     outline: 'none',
     WebkitTapHighlightColor: 'transparent',
     transition: 'all 180ms ease',
@@ -98,7 +99,7 @@ function NewsRow({
         borderLeft: isActive ? '3px solid rgba(96,165,250,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
         opacity: dimmed ? 0.5 : 1,
       }}
@@ -192,7 +193,7 @@ export function NewsPanel({
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {withLocation.length > 0 && (
           <>
-            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>◎ En el mapa</p>
+            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
             {withLocation.map((n, i) => (
               <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} />
             ))}

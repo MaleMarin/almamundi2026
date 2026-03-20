@@ -46,7 +46,7 @@ export async function POST(
       to: email,
       subject: 'Alguien pensó en ti cuando leyó esto',
       html: `
-        <div style="font-family:'Avenir Light',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:48px 32px;max-width:520px;margin:0 auto;border-radius:16px">
+        <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:48px 32px;max-width:520px;margin:0 auto;border-radius:16px">
           <p style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(249,115,22,0.7);margin:0 0 16px">
             ${[story.city, story.country].filter(Boolean).join(', ')}
           </p>

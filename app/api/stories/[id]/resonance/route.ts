@@ -46,7 +46,7 @@ export async function POST(
           to: authorEmail,
           subject: 'Tu historia llegó a alguien',
           html: `
-          <div style="font-family:'Avenir Light',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:40px;border-radius:12px;max-width:520px;margin:0 auto">
+          <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:40px;border-radius:12px;max-width:520px;margin:0 auto">
             <p style="font-size:22px;font-weight:300;margin:0 0 16px;color:#fff">"${title}"</p>
             <p style="font-size:15px;color:rgba(255,255,255,0.65);line-height:1.6;margin:0 0 24px">
               Alguien leyó tu historia y quiso que lo supieras.<br/>

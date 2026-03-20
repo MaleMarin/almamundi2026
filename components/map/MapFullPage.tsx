@@ -35,6 +35,7 @@ import { useAmbientEngine } from '@/components/music/useAmbientEngine';
 import { INSPIRATION_TOPICS } from '@/lib/topics';
 import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { BITS_DATA, type BitEntry } from '@/lib/bits-data';
+import { SITE_FONT_STACK } from '@/lib/typography';
 import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
 import type { MapView } from '@/lib/map-data/types';
@@ -220,7 +221,7 @@ function chipStyle(active: boolean) {
     cursor:         'pointer',
     fontSize:        13,
     whiteSpace:     'nowrap' as const,
-    fontFamily:     "'Avenir Light', Avenir, sans-serif",
+    fontFamily:     SITE_FONT_STACK,
     outline:        'none',
     WebkitTapHighlightColor: 'transparent',
     transition:     'all 180ms ease',
@@ -240,7 +241,7 @@ function chipStyle(active: boolean) {
     cursor:         'pointer',
     fontSize:        13,
     whiteSpace:     'nowrap' as const,
-    fontFamily:     "'Avenir Light', Avenir, sans-serif",
+    fontFamily:     SITE_FONT_STACK,
     outline:        'none',
     WebkitTapHighlightColor: 'transparent',
     transition:     'all 180ms ease',
@@ -326,7 +327,7 @@ function makeNewsSignalObject(glowTex: THREE.Texture): THREE.Group {
   return group;
 }
 
-const APP_FONT = 'Avenir, sans-serif';
+const APP_FONT = SITE_FONT_STACK;
 const GLOBE_PAGE_BG = 'linear-gradient(135deg, #0F172A 0%, #1A202C 50%, #0F172A 100%)';
 
 // === GLOBE LIGHTING (liquid glass: más claro, sin quemar) ===
@@ -1785,7 +1786,7 @@ function PulseIndicator({
           fontSize: 14,
           color: 'rgba(255,255,255,0.55)',
           margin: 0,
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}>
           {storiesCount > 0
             ? `${storiesCount} historias en el mapa`
@@ -1796,7 +1797,7 @@ function PulseIndicator({
             fontSize: 11,
             color: '#f97316',
             margin: '2px 0 0',
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
           }}>
             {newbornCount} nuevas hoy
           </p>
@@ -1846,7 +1847,7 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
         borderLeft: isActive ? '3px solid rgba(249,115,22,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
       }}
     >
@@ -1904,7 +1905,7 @@ function NewsRow({ news, isActive, onClick, dimmed = false }: { news: NewsItem; 
         borderLeft: isActive ? '3px solid rgba(96,165,250,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
         opacity: dimmed ? 0.5 : 1,
       }}
@@ -1962,7 +1963,7 @@ function HistoriasPanel({
               background: 'rgba(255,255,255,0.06)',
               color: '#fff',
               fontSize: 13,
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               outline: 'none',
             }}
           />
@@ -1988,7 +1989,7 @@ function HistoriasPanel({
           ))
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               Últimas historias
             </p>
             {ULTIMAS_HISTORIAS_EJEMPLO.map((h, i) => (
@@ -2000,7 +2001,7 @@ function HistoriasPanel({
                   borderRadius: 14,
                   background: 'rgba(255,255,255,0.04)',
                   border: '1px solid rgba(255,255,255,0.07)',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   width: '100%',
                 }}
               >
@@ -2094,7 +2095,7 @@ function NoticiasPanel({
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {withLocation.length > 0 && (
           <>
-            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>◎ En el mapa</p>
+            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
             {withLocation.map((n, i) => (
               <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} />
             ))}
@@ -2147,13 +2148,13 @@ function SonidosPanel({
             cursor: 'pointer',
             opacity: 1,
             transition: 'all 200ms ease',
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
             width: '100%',
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
           }}
         >
-          <p style={{ fontSize: 15, fontWeight: currentMood === m.id ? 500 : 300, color: currentMood === m.id ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.65)', margin: 0, fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+          <p style={{ fontSize: 15, fontWeight: currentMood === m.id ? 500 : 300, color: currentMood === m.id ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.65)', margin: 0, fontFamily: SITE_FONT_STACK }}>
             {m.label}
           </p>
         </button>
@@ -2502,11 +2503,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     } catch {}
   }, [view, selectedMood, filteredStoriesForMusic]);
 
-  /** Al volver a /mapa desde una historia: subir volumen del ambiente de nuevo. */
+  /** Al volver al mapa (home #mapa o ruta /mapa) desde una historia: subir volumen del ambiente de nuevo. */
   useEffect(() => {
-    if (typeof window === 'undefined' || pathname !== '/mapa') return;
+    if (typeof window === 'undefined') return;
+    const onMapSurface = embedded || pathname === '/' || pathname === '/mapa';
+    if (!onMapSurface) return;
     setAmbientVolumeDuringStory(false);
-  }, [pathname, setAmbientVolumeDuringStory]);
+  }, [pathname, embedded, setAmbientVolumeDuringStory]);
 
   const handleMusicMouseMove = useCallback(
     (e: React.MouseEvent<HTMLDivElement>) => {
@@ -4336,7 +4339,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             zIndex: 15,
             padding: '15px 32px',
             fontSize: 15,
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
             color: '#fff',
             cursor: 'pointer',
             outline: 'none',
@@ -4526,7 +4529,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               color: 'rgba(255,255,255,0.97)',
               margin: '0 0 3px',
               letterSpacing: '-0.025em',
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               lineHeight: 1,
             }}>
               AlmaMundi
@@ -4535,7 +4538,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               fontSize: 13,
               color: 'rgba(255,255,255,0.32)',
               margin: 0,
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               letterSpacing: '0.05em',
             }}>
               Historias que importan
@@ -4579,7 +4582,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                     borderRadius:    12,
                     cursor:         'pointer',
                     fontSize:        14,
-                    fontFamily:     "'Avenir Light', Avenir, sans-serif",
+                    fontFamily:     SITE_FONT_STACK,
                     outline:        'none',
                     WebkitTapHighlightColor: 'transparent',
                     transition:     'all 220ms ease',
@@ -4597,7 +4600,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                     borderRadius:    12,
                     cursor:         'pointer',
                     fontSize:        14,
-                    fontFamily:     "'Avenir Light', Avenir, sans-serif",
+                    fontFamily:     SITE_FONT_STACK,
                     outline:        'none',
                     WebkitTapHighlightColor: 'transparent',
                     transition:     'all 220ms ease',
@@ -4623,7 +4626,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Alguien, en algún lugar, vivió esto.
                 </p>
@@ -4632,7 +4635,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   En video, audio, texto o fotos. Toca un punto para conocer la historia.
                 </p>
@@ -4646,7 +4649,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   El mundo no para.
                 </p>
@@ -4655,7 +4658,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Toca una noticia y el mapa te lleva ahí.
                 </p>
@@ -4669,7 +4672,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Otra forma de encontrar historias.
                 </p>
@@ -4678,7 +4681,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Elige un sonido y el mapa te muestra las historias que viven en él.
                 </p>
@@ -4692,7 +4695,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Datos inesperados del mundo.
                 </p>
@@ -4701,7 +4704,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}>
                   Cada punto es una huella: curiosidades, paradojas y formas de vivir. Toca un punto para leer.
                 </p>
@@ -4715,7 +4718,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} />}
             {activeView === 'musica' && <SonidosPanel {...sonidosProps} />}
             {activeView === 'bits' && (
-              <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+              <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
                 <p className="mb-4">Los puntos en el mapa son Bits: datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
                 <p className="text-white/50 text-xs">Categorías: Dato insólito, Vivir distinto, Paradoja moderna, Para pensar.</p>
               </div>
@@ -4790,7 +4793,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 fontWeight: 300,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 8px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               Escribe. Anímate. Cuenta una historia.
@@ -4800,7 +4803,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 fontSize: 13,
                 color: 'rgba(255,255,255,0.40)',
                 margin: '0 0 20px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.5,
               }}
             >
@@ -4819,7 +4822,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   cursor: 'pointer',
                   fontSize: 13,
                   outline: 'none',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 Cerrar
@@ -4839,7 +4842,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   cursor: 'pointer',
                   fontSize: 13,
                   outline: 'none',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 Ir a las 4 formas
@@ -5109,9 +5112,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 }
 
 /**
- * Mapa con todas las funcionalidades: una sola fuente de verdad para / (home) y /mapa.
- * - /mapa: MapFullPage() a pantalla completa.
- * - Home: HomeMapSection → MapFullPage(embedded) con las mismas funciones (dock, drawer, historias, noticias, sonidos, buscar, controles, tours).
+ * Mapa con todas las funcionalidades: fuente de verdad en la home (sección #mapa).
+ * - Home: HomeMapSection → MapFullPage(embedded): dock, drawer, historias, noticias, sonidos, buscar, controles, tours.
+ * La ruta `/mapa` sola redirige a `/#mapa` (no hay página duplicada a pantalla completa).
  * Solo renderiza en el cliente (Three/Globe/APIs).
  */
 export default function MapFullPage({

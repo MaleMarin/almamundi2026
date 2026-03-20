@@ -1,5 +1,6 @@
 'use client';
 
+import { SITE_FONT_STACK } from '@/lib/typography';
 import type { HuellaPunto } from '@/lib/huellas';
 import type { BitEntry } from '@/lib/bits-data';
 
@@ -33,7 +34,7 @@ const categoryPillStyle: React.CSSProperties = {
   color: '#FFC84A',
   background: 'rgba(255,200,74,0.12)',
   border: '1px solid rgba(255,200,74,0.35)',
-  fontFamily: "'Avenir Light', Avenir, sans-serif",
+  fontFamily: SITE_FONT_STACK,
 };
 
 function BitCard({
@@ -60,7 +61,7 @@ function BitCard({
         borderLeft: isActive ? '3px solid rgba(255,200,74,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
       }}
     >
@@ -84,13 +85,13 @@ function BitDetail({ bit, onSubirMiHistoria }: { bit: BitLike | HuellaPunto; onS
   const historia = bit.historia ?? '—';
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <p style={{ fontSize: 11, color: '#FFC84A', letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0, fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+      <p style={{ fontSize: 11, color: '#FFC84A', letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0, fontFamily: SITE_FONT_STACK }}>
         BIT #{num}
       </p>
-      <h2 style={{ fontSize: 24, fontWeight: 700, color: '#fff', margin: 0, fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+      <h2 style={{ fontSize: 24, fontWeight: 700, color: '#fff', margin: 0, fontFamily: SITE_FONT_STACK }}>
         {bit.lugar}
       </h2>
-      <p style={{ fontSize: 11, letterSpacing: '0.05em', color: 'rgba(136,153,170,0.8)', margin: '0 0 2px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+      <p style={{ fontSize: 11, letterSpacing: '0.05em', color: 'rgba(136,153,170,0.8)', margin: '0 0 2px', fontFamily: SITE_FONT_STACK }}>
         PAÍS / REGIÓN
       </p>
       <p style={{ fontSize: 13, color: '#8899AA', margin: 0 }}>
@@ -100,18 +101,18 @@ function BitDetail({ bit, onSubirMiHistoria }: { bit: BitLike | HuellaPunto; onS
         <span style={categoryPillStyle}>{categoria}</span>
       </div>
       <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: 0 }} />
-      <p style={{ fontSize: 17, fontWeight: 500, color: '#F0F4FF', lineHeight: 1.5, margin: 0, fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+      <p style={{ fontSize: 17, fontWeight: 500, color: '#F0F4FF', lineHeight: 1.5, margin: 0, fontFamily: SITE_FONT_STACK }}>
         {titulo}
       </p>
-      <p style={{ fontSize: 14, color: '#8899AA', lineHeight: 1.7, margin: 0, fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+      <p style={{ fontSize: 14, color: '#8899AA', lineHeight: 1.7, margin: 0, fontFamily: SITE_FONT_STACK }}>
         {historia}
       </p>
       <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '16px 0 0' }} />
       <div style={{ padding: '24px 0 0', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, margin: '0 0 4px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, margin: '0 0 4px', fontFamily: SITE_FONT_STACK }}>
           ¿Estuviste aquí o conocés algo de este lugar?
         </p>
-        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, margin: '0 0 16px', fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, margin: '0 0 16px', fontFamily: SITE_FONT_STACK }}>
           Contá tu historia o experiencia.
         </p>
         <button
@@ -121,7 +122,7 @@ function BitDetail({ bit, onSubirMiHistoria }: { bit: BitLike | HuellaPunto; onS
             padding: '12px 24px',
             borderRadius: 999,
             cursor: 'pointer',
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
             color: '#fff',
@@ -157,7 +158,7 @@ export function BitsPanel({ bits, selectedBit, onSelectBit, onSubirMiHistoria }:
               background: 'none',
               border: 'none',
               cursor: 'pointer',
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
               padding: 0,
               marginBottom: 4,
             }}

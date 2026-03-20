@@ -8,6 +8,7 @@ import {
   type EmotionVisual,
 } from '@/lib/audioEmotion';
 import { registerPulse } from '@/lib/userLocation';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
   audioUrl:  string;
@@ -241,7 +242,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay 
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
               color:         `${vis.particleColor}0.7)`,
-              fontFamily:    "'Avenir Light', Avenir, sans-serif",
+              fontFamily:    SITE_FONT_STACK,
               transition:    'color 600ms ease',
             }}
           >
@@ -329,7 +330,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay 
             fontSize:    12,
             color:       'rgba(255,255,255,0.40)',
             flexShrink:  0,
-            fontFamily:  "'Avenir Light', Avenir, sans-serif",
+            fontFamily:  SITE_FONT_STACK,
             minWidth:    '4.5ch',
             textAlign:   'right',
           }}

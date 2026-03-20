@@ -51,7 +51,7 @@ export async function POST(
       to: email,
       subject: 'Una postal para ti — AlmaMundi',
       html: `
-        <div style="font-family:'Avenir Light',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:0;max-width:520px;margin:0 auto;border-radius:16px;overflow:hidden">
+        <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:0;max-width:520px;margin:0 auto;border-radius:16px;overflow:hidden">
           ${imageUrl ? `<div style="width:100%;height:240px;background:center/cover no-repeat url(${imageUrl});background-color:#1e293b"></div>` : ''}
           <div style="padding:32px 28px">
             <p style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(249,115,22,0.7);margin:0 0 12px">

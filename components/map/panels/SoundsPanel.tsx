@@ -1,6 +1,7 @@
 'use client';
 
 import { Play, Square } from 'lucide-react';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 const AMBIENT_OPTS = [
   { id: 'universo' as const, label: 'Universo', desc: 'Sonido del espacio', place: 'Espacio', country: '—' },
@@ -43,7 +44,7 @@ function SoundRow({
         borderLeft: isActive ? '3px solid rgba(96,165,250,0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
-        fontFamily: "'Avenir Light', Avenir, sans-serif",
+        fontFamily: SITE_FONT_STACK,
         width: '100%',
         outline: 'none',
         WebkitTapHighlightColor: 'transparent',
@@ -103,7 +104,7 @@ export function SoundsPanel({
             color: soundEnabled ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)',
             cursor: 'pointer',
             fontSize: 13,
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
             outline: 'none',
             transition: 'all 200ms ease',
           }}

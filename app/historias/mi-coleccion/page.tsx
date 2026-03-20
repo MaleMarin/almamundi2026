@@ -9,10 +9,10 @@ import Link from 'next/link';
 import { useMiColeccion, type SavedStory } from '@/hooks/useMiColeccion';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { neu } from '@/lib/historias-neumorph';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 function formatLabel(format?: string): string {
-  return { video: 'Video', audio: 'Audio', texto: 'Escritura', foto: 'Fotografía' }[format ?? ''] ?? format ?? '—';
+  return { video: 'Videos', audio: 'Audios', texto: 'Escritos', foto: 'Fotografías' }[format ?? ''] ?? format ?? '—';
 }
 
 export default function MiColeccionPage() {
@@ -28,25 +28,26 @@ export default function MiColeccionPage() {
   };
 
   return (
-    <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="flex items-center flex-shrink-0">
-          <img src="/logo.png" alt="AlmaMundi" className="h-10 md:h-12 w-auto object-contain select-none" />
+    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
+          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </Link>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold" style={{ ...neu.cardInset, color: 'var(--almamundi-orange)' }}>Mi colección</span>
-          <Link href="/historias/videos" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Videos</Link>
-          <Link href="/historias/audios" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Audio</Link>
-          <Link href="/historias/escrito" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Escrito</Link>
-          <Link href="/historias/fotos" className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Fotografía</Link>
-          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+        <div className={historiasInterior.navLinksRowClassName}>
+          <Link href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi [&_button]:text-base [&_button]:md:text-lg [&_button]:px-5 [&_button]:py-3 [&_button]:md:px-6" />
+          <span className={historiasInterior.navActiveClassName} style={{ ...neu.cardInset, color: 'var(--almamundi-orange)' }}>Mi colección</span>
+          <Link href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Videos</Link>
+          <Link href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Audios</Link>
+          <Link href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Escritos</Link>
+          <Link href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Fotografías</Link>
+          <Link href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
-      <header className="flex-shrink-0 px-6 md:px-12 pt-8 md:pt-12 pb-4 md:pb-6">
+      <div className={historiasInterior.contentWrapClassName}>
+      <header className={historiasInterior.headerClassName}>
         <p className="text-xs font-semibold tracking-[0.18em] uppercase mb-2" style={{ color: 'var(--almamundi-orange)' }}>
           Tu colección
         </p>
@@ -58,11 +59,11 @@ export default function MiColeccionPage() {
         </p>
       </header>
 
-      <section className="flex-1 px-6 md:px-12 pb-12">
+      <section className={`flex-1 px-6 md:px-12 pb-16 md:pb-20 ${historiasInterior.sectionGrowClassName}`}>
         {saved.length === 0 ? (
           <div className="rounded-2xl p-8 text-center" style={neu.cardInset}>
             <p className="text-gray-600 mb-4">Aún no guardaste ninguna historia.</p>
-            <p className="text-sm text-gray-500 mb-6">En Videos o Audio, elegí una historia y hacé clic en &quot;Guardar en mi colección&quot;.</p>
+            <p className="text-sm text-gray-500 mb-6">En Videos o Audios, elegí una historia y hacé clic en &quot;Guardar en mi colección&quot;.</p>
             <Link href="/historias/videos" className="inline-block px-5 py-2.5 rounded-full text-sm font-medium" style={{ ...neu.button, color: neu.textMain }}>Ir a Historias</Link>
           </div>
         ) : (
@@ -114,6 +115,7 @@ export default function MiColeccionPage() {
           </ul>
         )}
       </section>
+      </div>
 
       <Footer />
     </main>

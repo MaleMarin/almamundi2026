@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Mode = 'share' | 'postal';
 
@@ -70,7 +71,7 @@ export function ShareStoryModal({
                 fontWeight: 300,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 8px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               {mode === 'share' ? 'Enviado.' : 'Postal enviada.'}
@@ -80,7 +81,7 @@ export function ShareStoryModal({
                 fontSize: 13,
                 color: 'rgba(255,255,255,0.40)',
                 margin: '0 0 20px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               {mode === 'share'
@@ -99,7 +100,7 @@ export function ShareStoryModal({
                 cursor: 'pointer',
                 fontSize: 13,
                 outline: 'none',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               Cerrar
@@ -113,7 +114,7 @@ export function ShareStoryModal({
                 fontWeight: 300,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 6px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               {mode === 'share'
@@ -125,7 +126,7 @@ export function ShareStoryModal({
                 fontSize: 12,
                 color: 'rgba(255,255,255,0.35)',
                 margin: '0 0 20px',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.5,
               }}
             >
@@ -149,7 +150,7 @@ export function ShareStoryModal({
                 fontSize: 13,
                 outline: 'none',
                 boxSizing: 'border-box',
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
                 marginBottom: 12,
               }}
               onFocus={(e) =>
@@ -167,7 +168,7 @@ export function ShareStoryModal({
                 gap: 10,
                 cursor: 'pointer',
                 marginBottom: 20,
-                fontFamily: "'Avenir Light', Avenir, sans-serif",
+                fontFamily: SITE_FONT_STACK,
               }}
             >
               <input
@@ -197,7 +198,7 @@ export function ShareStoryModal({
                   cursor: 'pointer',
                   fontSize: 13,
                   outline: 'none',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                 }}
               >
                 Cancelar
@@ -222,7 +223,7 @@ export function ShareStoryModal({
                   cursor: email.trim() ? 'pointer' : 'not-allowed',
                   fontSize: 13,
                   outline: 'none',
-                  fontFamily: "'Avenir Light', Avenir, sans-serif",
+                  fontFamily: SITE_FONT_STACK,
                   transition: 'all 180ms ease',
                 }}
               >

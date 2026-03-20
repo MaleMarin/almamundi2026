@@ -1,26 +1,31 @@
 ---
-description: BLOQUEO — Sección intro + cards en la home. No cambiar salvo petición explícita del usuario.
-globs: app/page.tsx
-alwaysApply: false
+description: BLOQUEO — Estética completa de la home (/). No cambiar salvo petición explícita del usuario.
+globs: app/page.tsx, components/home/HomeFirstPart.tsx, components/politica-v2/MapSectionLocked.tsx, components/layout/Footer.tsx
+alwaysApply: true
 ---
 
-# Intro + Cards en la home — NO TOCAR
+# Home AlmaMundi — estética cerrada (NO TOCAR por iniciativa propia)
 
-Esta regla bloquea la sección que contiene el headline, la frase "Aquí, cada relato importa...", la línea naranja y las cuatro cards (Tu historia / Dale voz / Ponle palabras / Tu mirada). **No modifiques estructura, espaciados, colores ni elementos** de esa zona a menos que el usuario lo pida explícitamente.
+La **home** (`/`) es el layout acordado: fondo neumórfico `#E0E5EC`, `HomeFirstPart` (header fijo + `#intro` + `#historias`), sección de mapa `MapSectionLocked` (`#mapa`) y `Footer`. **No modifiques estructura, tipografía, espaciados, tamaños de logo, colores, textos, animaciones ni orden de bloques** salvo que el usuario lo pida **explícitamente** (p. ej. "cambia el logo", "sube el hero"). No "mejorar", "unificar" ni "refactorizar" la home por cuenta propia.
 
-## Qué está bloqueado
+## Archivos donde aplica el candado visual de la home
 
-- **Sección `#intro`** (app/page.tsx): título principal, línea naranja (var(--almamundi-orange)), frase "Aquí, cada relato importa. Cada historia es extraordinaria.", espaciados (mt-8 md:mt-10 en la frase, pb-6 md:pb-8 en la sección). **No volver a añadir** flecha/chevron de "scroll down".
-- **Sección `#historias`** (cards): margen superior (mt-4 md:mt-5), separación respecto a la frase de arriba. No bajar las cards sin que lo pida el usuario.
-- **Línea bajo el título:** color naranja fuerte (var(--almamundi-orange)), sin opacidad reducida.
-- **Cards:** cantidad, orden, textos y neomorfismo acordados. No quitar la separación entre la frase y las cards.
+- `app/page.tsx` — composición del `main` de la home.
+- `components/home/HomeFirstPart.tsx` — hero, barra superior, cards, DM Sans en intro, neumorfismo de cards/botones.
+- `components/politica-v2/MapSectionLocked.tsx` — mapa embebido en la home (respeta también `mapa-seccion-lock.mdc`).
+- `components/layout/Footer.tsx` — si el cambio solo persigue alterar el aspecto de la home sin petición, no hacerlo.
+
+## Qué queda bloqueado (resumen)
+
+- **Header:** logo AlmaMundi, altura de barra, nav, enlaces.
+- **`#intro`:** titular, línea naranja `var(--almamundi-orange)`, frase "Aquí, cada relato importa…", espaciados y tipografía del hero.
+- **`#historias`:** las cuatro cards (orden, textos, neumorfismo, CTAs).
+- **Mapa en home:** no sustituir por otras secciones ni romper la regla estructural del mapa.
 
 ## Cuándo sí se puede cambiar
 
-Solo cuando el usuario diga de forma explícita que quiere cambiar algo de esa zona (por ejemplo: "sube la frase", "cambia el color de la línea", "añade una card"). No "mejorar" ni "refactorizar" esa parte por iniciativa propia.
+Solo con **instrucción explícita** del usuario sobre un elemento concreto. Si el usuario dice que el trabajo está aceptado o "no lo cambies más", tratar esa zona como **cerrada** hasta nueva orden.
 
-## Frase clave del usuario
+## Frase de referencia
 
-> "Cuando yo te diga está ok el trabajo ya no lo cambias nunca más."
-
-Si el usuario confirma que el trabajo está ok, esta zona queda cerrada y no debe modificarse en el futuro sin petición explícita.
+> La estética de la home no se cambia salvo que yo lo pida.

@@ -13,7 +13,7 @@ export default function PreviewHomePage() {
   const add = (msg: string) => setLog((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
 
   return (
-    <main className="min-h-screen bg-[#E0E5EC]" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+    <main className="min-h-screen bg-[#E0E5EC] font-sans">
       <HomeFirstPart
         onShowPurpose={() => add('Propósito')}
         onShowInspiration={() => add('Inspiración')}

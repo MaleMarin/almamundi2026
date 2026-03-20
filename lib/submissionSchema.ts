@@ -30,6 +30,8 @@ export const CreateSubmissionBody = z.object({
   consentRights: z.literal(true),
   consentCurate: z.literal(true),
   consentPostales: z.literal(true),
+  /** Foto personal opcional (avatar) para mostrar junto al alias si se aprueba. */
+  profilePhotoUrl: z.string().url().optional(),
 });
 export type CreateSubmissionBodyType = z.infer<typeof CreateSubmissionBody>;
 
@@ -45,6 +47,8 @@ export interface SubmissionDoc {
   dateApprox?: boolean;
   placeLabel: string;
   context: string;
+  /** Imagen de perfil opcional subida con el envío. */
+  profilePhotoUrl?: string;
   payload: {
     textBody?: string;
     photoUrl?: string;

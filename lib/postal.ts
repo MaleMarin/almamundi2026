@@ -3,6 +3,8 @@
  * Siempre incluye: Alias + fecha + AlmaMundi.org + "No modificar. Mantener autoría."
  */
 
+import { SITE_FONT_STACK } from '@/lib/typography';
+
 const W = 1200;
 const H = 630;
 const BG = '#E0E5EC';
@@ -23,22 +25,22 @@ export async function generatePostalPNG(alias: string, fecha: string): Promise<B
   let y = pad + 60;
 
   ctx.fillStyle = TEXT_MAIN;
-  ctx.font = '400 48px "Avenir Light", Avenir, sans-serif';
+  ctx.font = `400 48px ${SITE_FONT_STACK}`;
   ctx.textAlign = 'center';
   ctx.fillText(alias || '—', W / 2, y);
   y += 72;
 
-  ctx.font = '400 36px "Avenir Light", Avenir, sans-serif';
+  ctx.font = `400 36px ${SITE_FONT_STACK}`;
   ctx.fillText(fecha || '—', W / 2, y);
   y += 100;
 
   ctx.fillStyle = ACCENT;
-  ctx.font = '600 42px "Avenir Light", Avenir, sans-serif';
+  ctx.font = `600 42px ${SITE_FONT_STACK}`;
   ctx.fillText('AlmaMundi.org', W / 2, y);
   y += 80;
 
   ctx.fillStyle = TEXT_MAIN;
-  ctx.font = '400 28px "Avenir Light", Avenir, sans-serif';
+  ctx.font = `400 28px ${SITE_FONT_STACK}`;
   ctx.fillText('No modificar. Mantener autoría.', W / 2, y);
 
   return new Promise((resolve, reject) => {

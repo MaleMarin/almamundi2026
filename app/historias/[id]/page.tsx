@@ -7,7 +7,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { neu } from '@/lib/historias-neumorph';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
@@ -100,25 +100,26 @@ export default function HistoriasIdPage() {
   const hasText = Boolean(story.body || story.hasText);
 
   return (
-    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className="sticky top-0 z-50 flex items-center justify-between px-6 md:px-10 py-5 md:py-6 min-h-[4.25rem] md:min-h-[4.75rem] border-b border-gray-300/50" style={{ backgroundColor: 'rgba(224,229,236,0.95)', boxShadow: '0 4px 24px rgba(163,177,198,0.3)' }}>
-        <Link href="/" className="flex items-center flex-shrink-0">
-          <img src="/logo.png" alt="AlmaMundi" className="h-10 md:h-12 w-auto object-contain select-none" />
+    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
+          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </Link>
-        <div className="flex items-center gap-2 flex-wrap justify-end">
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+        <div className={historiasInterior.navLinksRowClassName}>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi [&_button]:text-base [&_button]:md:text-lg [&_button]:px-5 [&_button]:py-3 [&_button]:md:px-6" />
+          <Link href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
+          <Link href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <Link href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
-      <section className="px-6 md:px-12 py-10 md:py-12 max-w-6xl mx-auto">
+      <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
+      <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">
         <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>← Historias</Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
           <div>
-            <div className="text-xs font-semibold tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--almamundi-orange)' }}>{place} · {hasVideo ? 'Video' : hasAudio ? 'Audio' : hasImage ? 'Foto' : 'Texto'} · {timeAgo(story.publishedAt)}</div>
+            <div className="text-xs font-semibold tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--almamundi-orange)' }}>{place} · {hasVideo ? 'Videos' : hasAudio ? 'Audios' : hasImage ? 'Fotografías' : 'Escritos'} · {timeAgo(story.publishedAt)}</div>
             <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>{story.title || 'Sin título'}</h1>
             {story.body && (
               <>
@@ -215,9 +216,10 @@ export default function HistoriasIdPage() {
               </Link>
             ))}
           </div>
-          <Link href="/historias" className="btn-almamundi inline-block px-5 py-2.5 rounded-full text-sm" style={{ ...neu.button, color: neu.textMain }}>Ver todas las historias</Link>
+          <Link href="/historias" className={`btn-almamundi inline-block ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Ver todas las historias</Link>
         </div>
       </section>
+      </div>
 
       <Footer />
     </main>

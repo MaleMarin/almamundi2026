@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { getStoriesRead } from '@/lib/sessionTracker';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
   onInvite: () => void;
@@ -52,7 +53,7 @@ export function StoryInvitation({ onInvite }: Props) {
           margin: '0 0 12px',
           letterSpacing: '-0.01em',
           lineHeight: 1.3,
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         ¿Hay algo tuyo que podría vivir aquí?
@@ -63,7 +64,7 @@ export function StoryInvitation({ onInvite }: Props) {
           fontSize: 14,
           color: 'rgba(255,255,255,0.35)',
           margin: '0 0 28px',
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         Cada historia que llega a AlmaMundi viene de alguien real.
@@ -85,7 +86,7 @@ export function StoryInvitation({ onInvite }: Props) {
           fontSize: 14,
           fontWeight: 600,
           letterSpacing: '0.02em',
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
           transition: 'all 250ms ease',
         }}
         onMouseEnter={(e) => {

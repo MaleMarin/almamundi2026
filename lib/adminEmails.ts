@@ -1,6 +1,6 @@
 /**
  * Emails autorizados para el panel admin (/admin).
- * Solo estos usuarios pueden entrar; el resto es redirigido a /mapa.
+ * Solo estos usuarios pueden entrar; el resto es redirigido al mapa de la home (/#mapa).
  */
 export const ADMIN_EMAILS = ['equipo@almamundi.org'];
 

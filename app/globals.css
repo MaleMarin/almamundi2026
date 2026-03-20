@@ -30,10 +30,14 @@
   }
 }
 
+html {
+  font-family: var(--font-sans);
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: inherit;
 }
 
 /* Botones neumórficos: borde y color unificados al hover y al estar activo (naranja) */
@@ -104,7 +108,7 @@ body {
 /* Footer home: relevo neumórfico; en globals para evitar destello de "footer antiguo" (texto negro) al cargar */
 .almamundi-footer-title {
   color: #E0E5EC;
-  font-family: "Avenir Next", Avenir, system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   font-weight: 900;
   letter-spacing: -0.06em;
   text-shadow:

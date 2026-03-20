@@ -1,5 +1,6 @@
 'use client';
 
+import { SITE_FONT_STACK } from '@/lib/typography';
 import { useRef, useState } from 'react';
 
 export function EcoRecorder({
@@ -75,7 +76,7 @@ export function EcoRecorder({
           fontSize: 13,
           color: 'rgba(249,115,22,0.80)',
           margin: 0,
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         Eco enviado. Gracias.
@@ -90,7 +91,7 @@ export function EcoRecorder({
           fontSize: 13,
           color: 'rgba(255,255,255,0.40)',
           margin: 0,
-          fontFamily: "'Avenir Light', Avenir, sans-serif",
+          fontFamily: SITE_FONT_STACK,
         }}
       >
         Enviando...
@@ -157,7 +158,7 @@ export function EcoRecorder({
               fontSize: 11,
               color: 'rgba(255,255,255,0.35)',
               margin: '4px 0 0',
-              fontFamily: "'Avenir Light', Avenir, sans-serif",
+              fontFamily: SITE_FONT_STACK,
             }}
           >
             {10 - seconds}s restantes · toca para terminar
@@ -171,7 +172,7 @@ export function EcoRecorder({
             fontSize: 12,
             color: 'rgba(255,255,255,0.35)',
             margin: 0,
-            fontFamily: "'Avenir Light', Avenir, sans-serif",
+            fontFamily: SITE_FONT_STACK,
           }}
         >
           Toca para grabar

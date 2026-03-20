@@ -90,7 +90,7 @@ export default function CuraduriaPage() {
   }, [token, tokenInput]);
 
   return (
-    <main className="min-h-screen bg-[#0a0f24] text-white p-8" style={{ fontFamily: "'Avenir Light', Avenir, sans-serif" }}>
+    <main className="min-h-screen bg-[#0a0f24] text-white p-8 font-sans">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-2">Curaduría Alma Mundi</h1>
         <p className="text-white/70 text-sm mb-6">
