@@ -1,0 +1,69 @@
+'use client';
+
+/**
+ * /perfil — Redirige al perfil propio si estás autenticado.
+ * Si no hay sesión → redirect('/').
+ */
+
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { onAuthStateChanged } from 'firebase/auth';
+import { getDoc, doc } from 'firebase/firestore';
+import { auth } from '@/lib/firebase/client';
+import { db } from '@/lib/firebase/client';
+
+export default function PerfilRedirectPage() {
+  const router = useRouter();
+  const [status, setStatus] = useState<'loading' | 'redirect' | 'done'>('loading');
+
+  useEffect(() => {
+    if (!auth) {
+      router.replace('/');
+      return;
+    }
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        router.replace('/');
+        setStatus('done');
+        return;
+      }
+      if (!db) {
+        router.replace('/');
+        setStatus('done');
+        return;
+      }
+      try {
+        const userSnap = await getDoc(doc(db, 'users', user.uid));
+        const username = userSnap.exists() ? (userSnap.data()?.username as string) : null;
+        if (username) {
+          router.replace(`/u/${username}`);
+        } else {
+          router.replace('/');
+        }
+      } catch {
+        router.replace('/');
+      }
+      setStatus('done');
+    });
+    return () => unsub();
+  }, [router]);
+
+  if (status === 'loading') {
+    return (
+      <div
+        style={{
+          minHeight: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: '#e8ecf0',
+          fontFamily: '"Plus Jakarta Sans", sans-serif',
+          color: '#4a5568',
+        }}
+      >
+        Cargando...
+      </div>
+    );
+  }
+  return null;
+}

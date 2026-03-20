@@ -6,7 +6,7 @@
  * Lista = historias con video de la API + demos locales (public/), sin duplicar id.
  */
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useStories } from '@/hooks/useStories';
 import { useMiColeccion } from '@/hooks/useMiColeccion';
 import { StoriesFanCarousel } from '@/components/stories/StoriesFanCarousel';
@@ -23,7 +23,6 @@ function isVideoStory(s: StoryPoint): boolean {
 export default function HistoriasVideosPage() {
   const allStories = useStories();
   const { add: saveToCollection, isSaved: isSavedInCollection } = useMiColeccion();
-  const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const videoStories = useMemo(() => {
     const fromApi = allStories.filter(
       (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s)
@@ -32,14 +31,6 @@ export default function HistoriasVideosPage() {
     const demos = DEMO_VIDEO_STORIES.filter((d) => !apiIds.has(d.id));
     return [...fromApi, ...demos];
   }, [allStories]);
-  const countries = useMemo(() => {
-    const set = new Set(videoStories.map((s) => s.country).filter(Boolean)) as Set<string>;
-    return Array.from(set).sort();
-  }, [videoStories]);
-  const filteredStories = useMemo(() => {
-    if (!selectedCountry) return videoStories;
-    return videoStories.filter((s) => s.country === selectedCountry);
-  }, [videoStories, selectedCountry]);
 
   return (
     <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -69,42 +60,11 @@ export default function HistoriasVideosPage() {
         <p className="text-gray-600 text-base md:text-lg mt-2 max-w-2xl">
           Estas son algunas.
         </p>
-        {countries.length > 0 && (
-          <div className="flex flex-wrap gap-2 mt-4">
-            <button
-              type="button"
-              onClick={() => setSelectedCountry(null)}
-              className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: !selectedCountry ? 'var(--almamundi-orange)' : 'transparent',
-                color: !selectedCountry ? '#fff' : 'var(--almamundi-orange)',
-                border: '1px solid rgba(255, 69, 0, 0.5)',
-              }}
-            >
-              Todos
-            </button>
-            {countries.map((c) => (
-              <button
-                key={c}
-                type="button"
-                onClick={() => setSelectedCountry(c)}
-                className="px-3 py-1.5 rounded-full text-xs font-medium transition-colors"
-                style={{
-                  backgroundColor: selectedCountry === c ? 'var(--almamundi-orange)' : 'transparent',
-                  color: selectedCountry === c ? '#fff' : 'var(--almamundi-orange)',
-                  border: '1px solid rgba(255, 69, 0, 0.5)',
-                }}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        )}
       </header>
 
       <section className="flex-1 min-h-0">
         <StoriesFanCarousel
-          stories={filteredStories}
+          stories={videoStories}
           onSaveToCollection={saveToCollection}
           isSavedInCollection={isSavedInCollection}
         />
