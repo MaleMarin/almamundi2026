@@ -8,7 +8,9 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import ReactDOM from 'react-dom'
+import { useRouter } from 'next/navigation'
 import VideoPlayer from '@/components/historia/VideoPlayer'
+import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer'
 import type { StoryPoint } from '@/lib/map-data/stories'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -49,6 +51,8 @@ type ActiveVideo = {
   tags?: string[]; citaDestacada?: string
 }
 
+type ActiveAudio = HistoriaAudio
+
 // ─── Card position calculator ─────────────────────────────────────────────────
 function getPos(index: number, active: number) {
   const off = index - active
@@ -67,8 +71,10 @@ function getPos(index: number, active: number) {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onSaveToCollection, isSavedInCollection }: StoriesFanCarouselProps) {
+  const router = useRouter()
   const [active, setActive] = useState(Math.floor(stories.length / 2))
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
+  const [activeAudio, setActiveAudio] = useState<ActiveAudio | null>(null)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
 
@@ -78,13 +84,13 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
 
   useEffect(() => {
     const fn = (e: KeyboardEvent) => {
-      if (activeVideo) return
+      if (activeVideo || activeAudio) return
       if (e.key === 'ArrowLeft')  goTo(active - 1)
       if (e.key === 'ArrowRight') goTo(active + 1)
     }
     window.addEventListener('keydown', fn)
     return () => window.removeEventListener('keydown', fn)
-  }, [active, goTo, activeVideo])
+  }, [active, goTo, activeVideo, activeAudio])
 
   const openCinema = (s: StoryPoint) => {
     onSelectStory?.(s)
@@ -106,6 +112,32 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
       },
       tags: s.tags,
       citaDestacada: s.quote,
+    })
+  }
+
+  const openAudio = (s: StoryPoint) => {
+    onSelectStory?.(s)
+    const raw = s.imageUrl ?? s.thumbnailUrl ?? (s as Record<string, unknown>).image ?? (s as Record<string, unknown>).thumbnail ?? ''
+    const thumb = (String(raw).trim() || PLACEHOLDER_THUMB) as string
+    const duration = (s as Record<string, unknown>).duration ?? (s as Record<string, unknown>).duracion ?? 0
+    const frases = (s as Record<string, unknown>).frases ?? (s as Record<string, unknown>).quotes
+    setActiveAudio({
+      id: s.id,
+      titulo: s.title ?? s.label ?? 'Historia',
+      subtitulo: s.subtitle ?? s.description ?? (formatPlace(s) || undefined),
+      audioUrl: (s.audioUrl ?? '').trim() || '#',
+      thumbnailUrl: thumb,
+      duracion: typeof duration === 'number' ? duration : 0,
+      fecha: s.publishedAt ?? '',
+      frases: Array.isArray(frases) ? frases : undefined,
+      citaDestacada: s.quote ?? (s as Record<string, unknown>).citaDestacada as string | undefined,
+      autor: {
+        nombre: s.authorName ?? s.author?.name ?? '',
+        avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(s.authorName ?? ''),
+        ubicacion: formatPlace(s) || undefined,
+        bio: s.author?.bio,
+      },
+      tags: s.tags,
     })
   }
 
@@ -237,9 +269,20 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                     if (!p.isCenter) { goTo(i); return }
                     if (mode === 'audio') {
                       onSelectStory?.(s)
+                      if (s.audioUrl) openAudio(s)
                       return
                     }
-                    if (s.videoUrl) openCinema(s)
+                    if (s.videoUrl) {
+                      openCinema(s)
+                    } else if (s.audioUrl) {
+                      openAudio(s)
+                    } else if (s.body || (s as Record<string, unknown>).texto || (s as Record<string, unknown>).content || (s as Record<string, unknown>).contenido) {
+                      router.push(`/historias/${s.id}/texto`)
+                    } else if (s.imageUrl || (s.images && s.images.length > 0)) {
+                      router.push(`/historias/${s.id}/foto`)
+                    } else {
+                      router.push(`/historias/${s.id}`)
+                    }
                   }}
                   style={{
                     transform: `translateX(${p.x}px) translateZ(${p.z}px) rotateY(${p.rotY}deg) scale(${p.scale})`,
@@ -353,9 +396,20 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
               if (!current) return
               if (mode === 'audio') {
                 onSelectStory?.(current)
+                if (current.audioUrl) openAudio(current)
                 return
               }
-              openCinema(current)
+              if (current.videoUrl) {
+                openCinema(current)
+              } else if (current.audioUrl) {
+                openAudio(current)
+              } else if (current.body || (current as Record<string, unknown>).texto || (current as Record<string, unknown>).content) {
+                router.push(`/historias/${current.id}/texto`)
+              } else if (current.imageUrl || (current.images && current.images.length > 0)) {
+                router.push(`/historias/${current.id}/foto`)
+              } else {
+                router.push(`/historias/${current.id}`)
+              }
             }}
             style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: "'Jost',sans-serif", fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
@@ -390,6 +444,15 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
       {/* ── Cinema overlay ── */}
       {mounted && activeVideo && ReactDOM.createPortal(
         <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} />,
+        document.body
+      )}
+
+      {/* ── Audio overlay ── */}
+      {mounted && activeAudio && ReactDOM.createPortal(
+        <AudioPlayer
+          historia={activeAudio}
+          onClose={() => setActiveAudio(null)}
+        />,
         document.body
       )}
     </>
