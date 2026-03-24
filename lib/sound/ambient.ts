@@ -36,6 +36,75 @@ const URLS: Record<AmbientKey, string[]> = {
 
 const FALLBACK_URL = "/audio/mar.m4a";
 
+const TRACK_VOL_STORAGE = "almamundi_ambient_track_vol";
+
+/** Volumen nominal máximo de cada pista antes del multiplicador por mood (0–1). */
+const TRACK_GAIN_NOMINAL = 1.0;
+
+function ambientKeys(): AmbientKey[] {
+  return Object.keys(URLS) as AmbientKey[];
+}
+
+function defaultTrackVolumes(): Record<AmbientKey, number> {
+  return Object.fromEntries(ambientKeys().map((k) => [k, 1])) as Record<AmbientKey, number>;
+}
+
+function readTrackVolumesFromStorage(): Partial<Record<AmbientKey, number>> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(TRACK_VOL_STORAGE);
+    if (!raw) return {};
+    const o = JSON.parse(raw) as Record<string, unknown>;
+    const out: Partial<Record<AmbientKey, number>> = {};
+    for (const k of ambientKeys()) {
+      const v = o[k];
+      if (typeof v === "number" && Number.isFinite(v)) {
+        out[k] = Math.max(0, Math.min(1, v));
+      }
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writeTrackVolumesToStorage(all: Record<AmbientKey, number>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(TRACK_VOL_STORAGE, JSON.stringify(all));
+  } catch { /* quota / private mode */ }
+}
+
+/** Volumen guardado del ambiente `key` (0–1). Por defecto 1. */
+export function getAmbientTrackVolume(key: AmbientKey): number {
+  const merged = { ...defaultTrackVolumes(), ...readTrackVolumesFromStorage() };
+  const v = merged[key];
+  return typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 1;
+}
+
+/**
+ * Ajusta el volumen de un ambiente (0–1). Se persiste y, si esa pista suena ahora, se aplica al vuelo.
+ */
+export function setAmbientTrackVolume(key: AmbientKey, vol: number): void {
+  const clamped = Math.max(0, Math.min(1, vol));
+  const all = { ...defaultTrackVolumes(), ...readTrackVolumesFromStorage() };
+  all[key] = clamped;
+  writeTrackVolumesToStorage(all);
+
+  if (state.current?.key !== key || !state.current.gain || !state.ctx) return;
+  const ctx = state.ctx;
+  const g = state.current.gain.gain;
+  const t = ctx.currentTime;
+  const target = TRACK_GAIN_NOMINAL * clamped;
+  try {
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(target, t + 0.06);
+  } catch {
+    g.value = target;
+  }
+}
+
 /** Volumen base nominal del master. Más alto para que el sonido del universo se oiga bien. */
 const AMBIENT_MASTER_VOL = 1.0;
 
@@ -135,7 +204,8 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   gain.connect(state.master!);
 
   source.start(startT + 0.02);
-  const targetGain = key === "universo" ? 1.0 : 1.0;
+  const userVol = getAmbientTrackVolume(key);
+  const targetGain = TRACK_GAIN_NOMINAL * userVol;
   gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
 
   state.current = { key, source, gain };

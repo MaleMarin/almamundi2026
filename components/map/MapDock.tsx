@@ -75,7 +75,7 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
     { mode: 'sounds', label: 'Sonidos' },
-    { mode: 'news', label: 'Noticias' },
+    { mode: 'news', label: 'Noticias en vivo' },
     { mode: 'bits', label: 'Bits' },
     { mode: 'search', label: 'Buscar por palabras clave' },
   ];

@@ -34,9 +34,6 @@ export function Footer() {
             ¿Cómo funciona?
           </Link>
           <HistoriasAccordion variant="footer" />
-          <Link href="/archivo" className="hover:text-gray-900 transition-colors font-normal">
-            Archivo
-          </Link>
           <Link href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
             Mapa
           </Link>

@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AlmaMundi 🌍
 
-## Getting Started
+**AlmaMundi** es una plataforma digital que visualiza historias, noticias y sonidos globales sobre un mapa interactivo y un globo 3D. Es un espacio para explorar la huella humana y el pulso del mundo en tiempo real, combinando tecnología moderna y derechos digitales.
 
-First, run the development server:
+Este repositorio contiene la aplicación full-stack construida con Next.js (App Router), React 19, y Tailwind CSS v4.
+
+---
+
+## 🚀 Empezando
+
+### Prerrequisitos
+
+- Node.js 18.x o superior.
+- Pnpm (o npm/yarn si prefieres).
+- Variables de entorno: Solicita el archivo `.env.local` al equipo de desarrollo.
+
+### Instalación
+
+1. Clona el repositorio:
+   ```bash
+   git clone https://github.com/tu-usuario/almamundi.git
+   cd almamundi
+   ```
+2. Instala las dependencias:
+   ```bash
+   pnpm install
+   ```
+   *(O `npm install` si usas npm.)*
+
+### Desarrollo
+
+Para iniciar el servidor de desarrollo, ejecuta:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+El servidor estará disponible en:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+**🔗 http://127.0.0.1:3005**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Otros Scripts Útiles
 
-## Learn More
+| Comando | Descripción |
+|--------|-------------|
+| `pnpm build` | Prepara la aplicación para producción. |
+| `pnpm start` | Inicia el servidor de producción. |
+| `pnpm lint` | Ejecuta el linter de ESLint. |
+| `pnpm seed:stories` | Sube datos de prueba para las historias (requiere permisos de Firebase). |
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🛠️ Stack Tecnológico
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Área | Tecnología |
+|------|------------|
+| Framework | Next.js (App Router, TypeScript, Tailwind 4) |
+| Base de Datos / Auth | Firebase (Admin SDK, Auth, Firestore, Storage) |
+| Visualización | react-globe.gl, three.js |
+| Animaciones | framer-motion |
+| Integraciones | OpenAI, Resend, rss-parser |
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 📝 Reglas del Proyecto y Documentación
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Este proyecto se rige por reglas y directrices específicas para mantener la calidad y consistencia del código. Consulta la carpeta **`.cursor/rules/`** y la documentación adicional en **`docs/`** para más detalles.

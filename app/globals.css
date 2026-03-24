@@ -159,14 +159,6 @@ a:focus,
   animation-delay: 0.4s;
 }
 
-/* Panel lateral noticias: visible solo en desktop */
-@media (min-width: 1024px) {
-  .news-strip-desktop {
-    display: flex !important;
-    height: 100%;
-  }
-}
-
 /* Liquid glass + neomorphism para overlays sobre el globo (/mapa) */
 .glassPanel {
   background: rgba(255, 255, 255, 0.08);

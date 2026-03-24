@@ -53,8 +53,8 @@ export async function POST(req: NextRequest) {
   if (type === "texto" && !(payload.textBody?.trim())) {
     return NextResponse.json({ error: "Texto requerido" }, { status: 400 });
   }
-  if (type === "foto" && !payload.photoUrl) {
-    return NextResponse.json({ error: "Imagen requerida" }, { status: 400 });
+  if (type === "foto" && !payload.photoUrl && !(payload.photoUrls && payload.photoUrls.length > 0)) {
+    return NextResponse.json({ error: "Al menos una imagen requerida" }, { status: 400 });
   }
   if (type === "audio" && !payload.audioUrl) {
     return NextResponse.json({ error: "Audio requerido (sube archivo o indica URL)" }, { status: 400 });
@@ -64,6 +64,7 @@ export async function POST(req: NextRequest) {
   const doc: Omit<SubmissionDoc, "id"> = {
     type,
     status: "pending",
+    storyTitle: data.storyTitle.trim(),
     alias: data.alias.trim(),
     email: data.email.trim(),
     themeId: data.themeId,
@@ -73,6 +74,7 @@ export async function POST(req: NextRequest) {
     payload: {
       ...(payload.textBody && { textBody: payload.textBody.trim() }),
       ...(payload.photoUrl && { photoUrl: payload.photoUrl }),
+      ...(payload.photoUrls?.length ? { photoUrls: payload.photoUrls } : {}),
       ...(payload.audioUrl && { audioUrl: payload.audioUrl }),
       ...(payload.videoUrl && { videoUrl: payload.videoUrl }),
     },
@@ -81,6 +83,18 @@ export async function POST(req: NextRequest) {
   if (data.dateApprox) (doc as SubmissionDoc).dateApprox = true;
   if (data.profilePhotoUrl?.trim()) {
     (doc as SubmissionDoc).profilePhotoUrl = data.profilePhotoUrl.trim();
+  }
+  if (data.countryLabel?.trim()) {
+    (doc as SubmissionDoc).countryLabel = data.countryLabel.trim();
+  }
+  if (data.birthDate?.trim()) {
+    (doc as SubmissionDoc).birthDate = data.birthDate.trim();
+  }
+  if (data.sex) {
+    (doc as SubmissionDoc).sex = data.sex;
+  }
+  if (data.extraAttachmentUrls?.length) {
+    (doc as SubmissionDoc).extraAttachmentUrls = data.extraAttachmentUrls;
   }
 
   try {

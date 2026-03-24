@@ -1,11 +1,12 @@
 'use client';
 
 /**
- * Versión alternativa del mapa para home (dock + drawer + historias/noticias/sonidos).
- * Globo NASA (vídeo con nubes): arrastre para girar y auto-rotación, mismo movimiento que el mapa 3D.
+ * Mapa en home (dock + drawer + historias/noticias/sonidos).
+ * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
@@ -16,15 +17,37 @@ import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
-import { NASAEpicEarthVideo } from '@/components/NASAEpicEarthVideo';
 import { BITS_DATA } from '@/lib/bits-data';
-import type { HuellaPunto } from '@/lib/huellas';
+import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
+
+function huellasFallbackDesdeBitsData(): HuellaPunto[] {
+  return BITS_DATA.map((b) => ({
+    id: b.id,
+    lugar: b.lugar,
+    pais: b.pais,
+    lat: b.lat,
+    lon: b.lon,
+    categoria: b.categoria ?? 'Bit',
+    color: '#f59e0b',
+    titulo: b.titulo ?? b.lugar,
+    historia: b.historia ?? '',
+  }));
+}
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel, type BitLike } from '@/components/map/panels/BitsPanel';
 import NewsStrip from '@/components/news/NewsStrip';
 import { initFromUserGesture, unlockAmbientAudio, playAmbient, stopAmbient } from '@/lib/sound/ambient';
+
+const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
+  ssr: false,
+  loading: () => (
+    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-[#02040a] text-sm text-white/40">
+      Cargando mapa…
+    </div>
+  ),
+});
 
 export default function HomeMap() {
   const router = useRouter();
@@ -38,23 +61,34 @@ export default function HomeMap() {
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null);
-  // Bits fijos en sus latitudes (BITS_DATA): globo y panel usan los mismos 100 puntos. useMemo para que cambios en BITS_DATA se reflejen al recargar.
-  const huellasPuntos = useMemo<HuellaPunto[]>(
+  /** Textos curiosos y categorías: `public/huellas2.json`. Fallback = BITS_DATA (solo lugar/país) si falla la carga. */
+  const [huellasPuntos, setHuellasPuntos] = useState<HuellaPunto[]>(huellasFallbackDesdeBitsData);
+  const [selectedBit, setSelectedBit] = useState<HuellaPunto | BitLike | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchHuellas()
+      .then((data) => {
+        if (cancelled) return;
+        const sorted = [...data.puntos].sort((a, b) => a.id - b.id);
+        setHuellasPuntos(sorted);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const globeBitsMarkers = useMemo(
     () =>
-      BITS_DATA.map((b) => ({
+      huellasPuntos.map((b) => ({
         id: b.id,
-        lugar: b.lugar,
-        pais: b.pais,
         lat: b.lat,
         lon: b.lon,
-        categoria: b.categoria ?? 'Bit',
-        color: '#f59e0b',
-        titulo: b.titulo ?? b.lugar,
-        historia: b.historia ?? '',
+        color: b.color,
       })),
-    [BITS_DATA]
+    [huellasPuntos]
   );
-  const [selectedBit, setSelectedBit] = useState<HuellaPunto | BitLike | null>(null);
 
   useEffect(() => {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
@@ -201,8 +235,11 @@ export default function HomeMap() {
 
   const handleSubirMiHistoria = useCallback(() => {
     close();
-    router.push('/');
-    setTimeout(() => window.dispatchEvent(new CustomEvent('almamundi:openStoryModal', { detail: { mode: 'Texto' } })), 400);
+    requestAnimationFrame(() => {
+      const hero = document.getElementById('historias');
+      if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      else router.push('/#historias');
+    });
   }, [router]);
 
   const historiasProps = {
@@ -237,12 +274,23 @@ export default function HomeMap() {
         className="relative flex flex-col w-full h-full min-h-0"
         style={{ flex: 1, position: 'relative', height: '100%', minHeight: '80vh' }}
       >
-        {/* Globo NASA: sin contenedor extra; redondo y girando. */}
-        <div className="flex-1 flex items-center justify-center w-full min-h-[70vh] pt-6 pb-6 bg-black overflow-visible">
-        <div className="w-full h-full min-h-[300px] flex items-center justify-center">
-          <NASAEpicEarthVideo source="spinning" />
+        {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
+        <div className="relative flex w-full min-h-[70vh] flex-1 flex-col overflow-hidden bg-[#02040a] pt-6 pb-6">
+          <div className="relative min-h-[300px] w-full min-h-0 flex-1">
+            <GlobeV2Home
+              embedded
+              bits={globeBitsMarkers}
+              selectedBitId={selectedBit?.id ?? null}
+              onBitClick={(id) => {
+                const bit = huellasPuntos.find((h) => h.id === id);
+                if (!bit) return;
+                setSelectedBit(bit);
+                setDrawerMode('bits');
+                setDrawerOpen(true);
+              }}
+            />
+          </div>
         </div>
-      </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
         className="flex-shrink-0 w-full flex items-center justify-center z-10"
@@ -262,7 +310,7 @@ export default function HomeMap() {
               Sonidos
             </DockButtonLight>
             <DockButtonLight active={drawerMode === 'news'} onClick={() => open('news')}>
-              Noticias
+              Noticias en vivo
             </DockButtonLight>
             <DockButtonLight
               active={drawerMode === 'bits'}
@@ -293,13 +341,14 @@ export default function HomeMap() {
               {...historiasProps}
               onContarMiHistoria={() => {
                 close();
-                router.push('/#historias');
+                router.push('/subir');
               }}
             />
           ) : drawerMode === 'news' ? (
             <NewsPanel {...noticiasProps} />
           ) : drawerMode === 'bits' ? (
             <BitsPanel
+              showIndexList={false}
               bits={huellasPuntos}
               selectedBit={selectedBit}
               onSelectBit={setSelectedBit}
@@ -311,10 +360,12 @@ export default function HomeMap() {
       </MapDrawer>
       </div>
 
-      {/* Franja de noticias — solo desktop */}
-      <div style={{ display: 'none' }} className="news-strip-desktop">
-        <NewsStrip />
-      </div>
+      {/* Noticias en vivo: franja lateral solo con el panel de noticias abierto (desktop). */}
+      {drawerOpen && drawerMode === 'news' ? (
+        <div className="hidden h-full min-h-0 shrink-0 lg:flex">
+          <NewsStrip />
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -2,12 +2,12 @@
 
 import { SITE_FONT_STACK } from '@/lib/typography';
 import type { HuellaPunto } from '@/lib/huellas';
-import type { BitEntry } from '@/lib/bits-data';
 
 export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais'> & {
   categoria?: string;
   titulo?: string;
   historia?: string;
+  color?: string;
 };
 
 export type BitsPanelProps = {
@@ -15,6 +15,11 @@ export type BitsPanelProps = {
   selectedBit: BitLike | HuellaPunto | null;
   onSelectBit: (bit: BitLike | HuellaPunto | null) => void;
   onSubirMiHistoria: () => void;
+  /**
+   * Si es false: no se lista todos los lugares; solo la ficha del bit elegido (p. ej. tras clic en el globo).
+   * @default true
+   */
+  showIndexList?: boolean;
 };
 
 function getBitAt(list: HuellaPunto[], index: number): HuellaPunto {
@@ -25,19 +30,24 @@ function ensureHuellaPunto(x: unknown): HuellaPunto {
   return x as HuellaPunto;
 }
 
-const categoryPillStyle: React.CSSProperties = {
-  display: 'inline-block',
-  padding: '6px 12px',
-  borderRadius: 999,
-  fontSize: 12,
-  fontWeight: 500,
-  color: '#FFC84A',
-  background: 'rgba(255,200,74,0.12)',
-  border: '1px solid rgba(255,200,74,0.35)',
+function idLabel(id: number): string {
+  return id < 100 ? String(id).padStart(2, '0') : String(id);
+}
+
+const rowBase: React.CSSProperties = {
+  display: 'block',
+  width: '100%',
+  textAlign: 'left',
+  cursor: 'pointer',
   fontFamily: SITE_FONT_STACK,
+  border: 'none',
+  borderRadius: 8,
+  padding: '5px 6px',
+  marginBottom: 2,
+  transition: 'background 160ms ease, border-color 160ms ease',
 };
 
-function BitCard({
+function BitIndexRow({
   bit,
   isActive,
   onClick,
@@ -46,147 +56,312 @@ function BitCard({
   isActive: boolean;
   onClick: () => void;
 }) {
-  const num = String(bit.id).padStart(2, '0');
-  const titulo = bit.titulo ?? bit.lugar;
+  const num = idLabel(bit.id);
   return (
     <button
       type="button"
       onClick={onClick}
       style={{
-        textAlign: 'left',
-        padding: '14px 16px',
-        borderRadius: 14,
-        background: isActive ? 'rgba(255,200,74,0.08)' : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${isActive ? 'rgba(255,200,74,0.25)' : 'rgba(255,255,255,0.07)'}`,
-        borderLeft: isActive ? '3px solid rgba(255,200,74,0.6)' : '3px solid transparent',
-        cursor: 'pointer',
-        transition: 'all 200ms ease',
-        fontFamily: SITE_FONT_STACK,
-        width: '100%',
+        ...rowBase,
+        background: isActive ? 'rgba(255,200,74,0.12)' : 'transparent',
+        borderLeft: isActive ? '2px solid rgba(255,200,74,0.75)' : '2px solid transparent',
       }}
     >
-      <p style={{ fontSize: 11, color: '#FFC84A', letterSpacing: '0.2em', textTransform: 'uppercase', margin: '0 0 6px' }}>
-        Bit #{num}
-      </p>
-      <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.9)', margin: '0 0 4px', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+      <span style={{ fontSize: 9, color: 'rgba(255,200,74,0.85)', letterSpacing: '0.12em', display: 'block' }}>
+        #{num}
+      </span>
+      <span
+        style={{
+          fontSize: 10,
+          color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
+          lineHeight: 1.25,
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          marginTop: 2,
+        }}
+      >
         {bit.lugar}
-      </p>
-      <p style={{ fontSize: 13, color: '#8899AA', margin: 0, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-        {titulo}
-      </p>
+      </span>
     </button>
   );
 }
 
-function BitDetail({ bit, onSubirMiHistoria }: { bit: BitLike | HuellaPunto; onSubirMiHistoria: () => void }) {
-  const num = String(bit.id).padStart(2, '0');
-  const categoria = bit.categoria ?? 'Bit';
-  const titulo = bit.titulo ?? bit.lugar;
-  const historia = bit.historia ?? '—';
+type BitDetailDensity = 'compact' | 'readable';
+
+/** Ficha del Bit: en `readable` (solo clic en globo) tipografía amplia y aire; en `compact` cabe junto al índice. */
+function BitDetailCompact({
+  bit,
+  onSubirMiHistoria,
+  relaxedHeight,
+}: {
+  bit: BitLike | HuellaPunto;
+  onSubirMiHistoria: () => void;
+  relaxedHeight?: boolean;
+}) {
+  const density: BitDetailDensity = relaxedHeight ? 'readable' : 'compact';
+  const num = idLabel(bit.id);
+  const titulo = (bit.titulo ?? '').trim() || bit.lugar;
+  const historia = (bit.historia ?? '').trim();
+
+  const s =
+    density === 'readable'
+      ? {
+          maxHeight: 'min(78vh, 620px)' as const,
+          padding: '22px 20px 26px',
+          radius: 16,
+          meta: 11,
+          metaMb: 10,
+          metaTrack: '0.1em' as const,
+          lugar: 19,
+          lugarMb: 18,
+          lugarLh: 1.3,
+          label: 11,
+          labelMb: 8,
+          labelTrack: '0.08em' as const,
+          titulo: 17,
+          tituloMb: 18,
+          tituloLh: 1.42,
+          historia: 15,
+          historiaLh: 1.68,
+          historiaMb: 8,
+          historiaColor: 'rgba(212, 220, 232, 0.98)' as const,
+          emptyFs: 14,
+          emptyLh: 1.55,
+          btnSectionMt: 48,
+          btnPy: 12,
+          btnPx: 22,
+          btnFs: 14,
+          btnRadius: 999,
+        }
+      : {
+          maxHeight: 'min(52vh, 320px)' as const,
+          padding: '12px 11px 14px',
+          radius: 11,
+          meta: 9,
+          metaMb: 6,
+          metaTrack: '0.12em' as const,
+          lugar: 13,
+          lugarMb: 12,
+          lugarLh: 1.3,
+          label: 9,
+          labelMb: 5,
+          labelTrack: '0.1em' as const,
+          titulo: 12,
+          tituloMb: 10,
+          tituloLh: 1.45,
+          historia: 11,
+          historiaLh: 1.58,
+          historiaMb: 6,
+          historiaColor: 'rgba(190, 202, 218, 0.96)' as const,
+          emptyFs: 11,
+          emptyLh: 1.5,
+          btnSectionMt: 36,
+          btnPy: 9,
+          btnPx: 16,
+          btnFs: 12,
+          btnRadius: 999,
+        };
+
+  const boxStyle: React.CSSProperties = {
+    maxWidth: '100%',
+    maxHeight: s.maxHeight,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: s.padding,
+    borderRadius: s.radius,
+    border: '1px solid rgba(255,255,255,0.14)',
+    background: 'rgba(0,10,24,0.5)',
+    boxSizing: 'border-box',
+    fontFamily: SITE_FONT_STACK,
+    scrollbarWidth: 'thin',
+  };
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-      <p style={{ fontSize: 11, color: '#FFC84A', letterSpacing: '0.2em', textTransform: 'uppercase', margin: 0, fontFamily: SITE_FONT_STACK }}>
-        BIT #{num}
+    <div style={boxStyle}>
+      <p
+        style={{
+          fontSize: s.meta,
+          color: 'rgba(255,210,120,0.82)',
+          letterSpacing: s.metaTrack,
+          textTransform: 'uppercase',
+          margin: `0 0 ${s.metaMb}px`,
+          lineHeight: 1.35,
+        }}
+      >
+        Bit #{num} · {bit.pais}
       </p>
-      <h2 style={{ fontSize: 24, fontWeight: 700, color: '#fff', margin: 0, fontFamily: SITE_FONT_STACK }}>
+      <p
+        style={{
+          fontSize: s.lugar,
+          fontWeight: 600,
+          color: 'rgba(255,255,255,0.94)',
+          margin: `0 0 ${s.lugarMb}px`,
+          lineHeight: s.lugarLh,
+        }}
+      >
         {bit.lugar}
-      </h2>
-      <p style={{ fontSize: 11, letterSpacing: '0.05em', color: 'rgba(136,153,170,0.8)', margin: '0 0 2px', fontFamily: SITE_FONT_STACK }}>
-        PAÍS / REGIÓN
       </p>
-      <p style={{ fontSize: 13, color: '#8899AA', margin: 0 }}>
-        {bit.pais}
+
+      <p
+        style={{
+          fontSize: s.label,
+          color: 'rgba(255,255,255,0.48)',
+          letterSpacing: s.labelTrack,
+          textTransform: 'uppercase',
+          margin: `0 0 ${s.labelMb}px`,
+          lineHeight: 1.35,
+        }}
+      >
+        Qué pasó aquí
       </p>
-      <div>
-        <span style={categoryPillStyle}>{categoria}</span>
-      </div>
-      <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: 0 }} />
-      <p style={{ fontSize: 17, fontWeight: 500, color: '#F0F4FF', lineHeight: 1.5, margin: 0, fontFamily: SITE_FONT_STACK }}>
+      <p
+        style={{
+          fontSize: s.titulo,
+          fontWeight: 600,
+          color: 'rgba(240,245,255,0.96)',
+          lineHeight: s.tituloLh,
+          margin: `0 0 ${s.tituloMb}px`,
+        }}
+      >
         {titulo}
       </p>
-      <p style={{ fontSize: 14, color: '#8899AA', lineHeight: 1.7, margin: 0, fontFamily: SITE_FONT_STACK }}>
-        {historia}
-      </p>
-      <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '16px 0 0' }} />
-      <div style={{ padding: '24px 0 0', textAlign: 'center', borderTop: '1px solid rgba(255,255,255,0.06)' }}>
-        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', lineHeight: 1.5, margin: '0 0 4px', fontFamily: SITE_FONT_STACK }}>
-          ¿Estuviste aquí o conocés algo de este lugar?
+
+      {historia ? (
+        <p
+          style={{
+            fontSize: s.historia,
+            color: s.historiaColor,
+            lineHeight: s.historiaLh,
+            margin: `0 0 ${s.historiaMb}px`,
+            whiteSpace: 'pre-wrap',
+          }}
+        >
+          {historia}
         </p>
-        <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)', lineHeight: 1.5, margin: '0 0 16px', fontFamily: SITE_FONT_STACK }}>
-          Contá tu historia o experiencia.
+      ) : (
+        <p
+          style={{
+            fontSize: s.emptyFs,
+            color: 'rgba(255,255,255,0.42)',
+            lineHeight: s.emptyLh,
+            margin: `0 0 ${s.historiaMb}px`,
+          }}
+        >
+          Aún no hay relato cargado para este lugar.
         </p>
+      )}
+
+      <div style={{ marginTop: s.btnSectionMt }}>
         <button
           type="button"
           onClick={onSubirMiHistoria}
           style={{
-            padding: '12px 24px',
-            borderRadius: 999,
+            padding: `${s.btnPy}px ${s.btnPx}px`,
+            borderRadius: s.btnRadius,
             cursor: 'pointer',
             fontFamily: SITE_FONT_STACK,
             outline: 'none',
             WebkitTapHighlightColor: 'transparent',
-            color: '#fff',
-            fontSize: 13,
+            color: '#ffffff',
+            fontSize: s.btnFs,
             fontWeight: 600,
-            whiteSpace: 'nowrap',
-            background: 'linear-gradient(180deg, rgba(249,115,22,0.28) 0%, rgba(249,115,22,0.16) 100%)',
-            border: '1px solid rgba(255,155,60,0.45)',
-            boxShadow: 'inset 0 1.5px 0 rgba(255,185,70,0.45), inset 0 -1px 0 rgba(180,55,0,0.20), 0 0 12px rgba(249,115,22,0.15), 0 4px 8px rgba(0,0,0,0.25)',
-            transition: 'all 200ms ease',
+            letterSpacing: '0.04em',
+            width: '100%',
+            background: 'var(--almamundi-orange, #ff4500)',
+            border: '1px solid rgba(255, 255, 255, 0.22)',
+            boxShadow: '0 6px 24px rgba(255, 69, 0, 0.35)',
           }}
         >
-          + Subir mi historia
+          Contar tu historia
         </button>
       </div>
     </div>
   );
 }
 
-export function BitsPanel({ bits, selectedBit, onSelectBit, onSubirMiHistoria }: BitsPanelProps) {
+export function BitsPanel({
+  bits,
+  selectedBit,
+  onSelectBit,
+  onSubirMiHistoria,
+  showIndexList = true,
+}: BitsPanelProps) {
+  if (!showIndexList) {
+    return (
+      <div className="flex h-full min-h-0 flex-1 flex-col" style={{ fontFamily: SITE_FONT_STACK }}>
+        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+          {selectedBit ? (
+            <BitDetailCompact
+              bit={selectedBit}
+              onSubirMiHistoria={onSubirMiHistoria}
+              relaxedHeight
+            />
+          ) : (
+            <p
+              style={{
+                fontSize: 15,
+                color: 'rgba(255,255,255,0.58)',
+                lineHeight: 1.65,
+                margin: '8px 4px 0',
+                letterSpacing: '0.01em',
+              }}
+            >
+              Tocá un punto <span style={{ color: 'rgba(255,234,0,0.95)', fontWeight: 600 }}>amarillo</span> en el
+              globo para leer la historia de ese Bit.
+            </p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   const bitsList = bits as unknown as HuellaPunto[];
+  const count = bitsList.length;
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
-      {selectedBit ? (
-        <>
-          <button
-            type="button"
-            onClick={() => onSelectBit(null)}
-            style={{
-              alignSelf: 'flex-start',
-              fontSize: 12,
-              color: 'rgba(255,255,255,0.6)',
-              background: 'none',
-              border: 'none',
-              cursor: 'pointer',
-              fontFamily: SITE_FONT_STACK,
-              padding: 0,
-              marginBottom: 4,
-            }}
-          >
-            ← Todos los Bits
-          </button>
-          <div style={{ flex: 1, overflowY: 'auto', minHeight: 0 }}>
-            <BitDetail bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
-          </div>
-        </>
-      ) : (
-        <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, scrollbarWidth: 'thin' }}>
+    <div
+      className="flex h-full min-h-0 flex-1 flex-col gap-2 md:flex-row md:gap-0"
+      style={{ fontFamily: SITE_FONT_STACK }}
+    >
+      <div className="flex max-h-[min(40vh,300px)] min-h-0 shrink-0 flex-col border-white/10 md:max-h-none md:w-[112px] md:flex-none md:border-r md:pr-2">
+        <p
+          style={{
+            fontSize: 9,
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            color: 'rgba(255,255,255,0.45)',
+            margin: '0 0 6px',
+            flexShrink: 0,
+          }}
+        >
+          {count} lugares
+        </p>
+        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden md:max-h-none" style={{ scrollbarWidth: 'thin' }}>
           {bitsList.map((_bit, index) => {
             const item = ensureHuellaPunto(getBitAt(bitsList, index));
             return (
-              <BitCard
+              <BitIndexRow
                 key={item.id ?? index}
                 bit={item}
-                isActive={
-                  // @ts-expect-error - bits inferred as never[] at call site
-                  selectedBit?.id === item.id
-                }
+                isActive={selectedBit?.id === item.id}
                 onClick={() => onSelectBit(item)}
               />
             );
           })}
         </div>
-      )}
+      </div>
+
+      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto md:pl-2" style={{ scrollbarWidth: 'thin' }}>
+        {selectedBit ? (
+          <BitDetailCompact bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
+        ) : (
+          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, margin: '6px 0 0' }}>
+            Elegí un lugar en la lista o un punto en el globo para leer el hecho curioso de ese sitio.
+          </p>
+        )}
+      </div>
     </div>
   );
 }

@@ -1,11 +1,10 @@
 'use client';
 
-import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { UserCircle } from 'lucide-react';
+import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
-import { THEME_LIST } from '@/lib/themes';
 import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
@@ -16,6 +15,14 @@ import {
   fetchVimeoVideoDurationSeconds,
   isDurationWithinMax,
 } from '@/lib/media-duration-rules';
+import { StoryCaptureStep, type CaptureOutcome } from '@/components/subir/StoryCaptureStep';
+import { ImprontaStep } from '@/components/subir/ImprontaStep';
+import {
+  SUBIR_AV_MAX_MINUTES,
+  SUBIR_PHOTO_MAX,
+  SUBIR_PHOTO_MIN,
+  SUBIR_TEXT_MAX_CHARS,
+} from '@/lib/subir-limits';
 
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -26,10 +33,37 @@ const FORMAT_LABELS: Record<Format, string> = {
   foto: 'Foto',
 };
 
+const FORMAT_PHRASES: Record<Format, string> = {
+  video: `Video: hasta ${SUBIR_AV_MAX_MINUTES} minutos (grabación o enlace). Luego tu huella en formas y colores.`,
+  audio: `Audio: hasta ${SUBIR_AV_MAX_MINUTES} minutos. Tu voz se traduce en una huella geométrica única.`,
+  texto: `Texto: máximo ~2 carillas (${SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres). Cada relato, otra huella.`,
+  foto: `Fotos: entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes. Palabras clave refinan la huella.`,
+};
+
+/** Texto para curación cuando ya no hay campos separados “Contexto” / “Texto” en el paso datos. */
+function buildSubmissionContext(
+  format: Format,
+  textBody: string,
+  storyTitle: string,
+  ciudad: string,
+  pais: string
+): string {
+  const tb = textBody.trim();
+  if (tb.length >= 30) return tb.slice(0, 2000);
+  const geo = [ciudad.trim(), pais.trim()].filter(Boolean).join(', ');
+  const pieces = [storyTitle.trim(), geo, `Formato: ${FORMAT_LABELS[format]}`].filter(Boolean);
+  let out = pieces.join(' · ');
+  if (tb.length > 0) out = `${tb}\n\n${out}`;
+  if (out.trim().length >= 30) return out.slice(0, 2000);
+  return `${out}\n(Envío AlmaMundi — sin descripción ampliada.)`.slice(0, 2000);
+}
+
 const PHOTO_MAX_MB = 5;
 const AUDIO_MAX_MB = 10;
 /** Foto de perfil opcional (solo identificación del autor; distinta de la foto de la historia). */
 const PROFILE_PHOTO_MAX_MB = 2;
+const EXTRA_FILE_MAX_MB = 8;
+const EXTRA_FILES_MAX = 8;
 
 function isVideoUrl(url: string): boolean {
   try {
@@ -43,16 +77,51 @@ function isVideoUrl(url: string): boolean {
 function SubirPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [step, setStep] = useState<'form' | 'received'>('form');
+  /** Flujo: tarjetas → captura (cámara/texto/foto) → impronta → datos → recibido. */
+  const [step, setStep] = useState<'cards' | 'capture' | 'impronta' | 'form' | 'received'>('cards');
   const [format, setFormat] = useState<Format | null>(null);
+  const [capture, setCapture] = useState<CaptureOutcome | null>(null);
+  const captureRef = useRef<CaptureOutcome | null>(null);
+  captureRef.current = capture;
 
+  useLayoutEffect(() => {
+    if (searchParams.get('sent') === '1') {
+      setStep('received');
+      return;
+    }
+    const raw = searchParams.get('format')?.toLowerCase();
+    const ok = raw === 'video' || raw === 'audio' || raw === 'texto' || raw === 'foto';
+    const st = searchParams.get('step')?.toLowerCase();
+    if (!ok) {
+      setFormat(null);
+      setCapture(null);
+      setStep('cards');
+      return;
+    }
+    setFormat(raw as Format);
+    if (st === 'impronta' || st === 'datos') {
+      if (!captureRef.current) {
+        setStep('capture');
+        router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
+        return;
+      }
+      setStep(st === 'impronta' ? 'impronta' : 'form');
+      return;
+    }
+    setStep('capture');
+    if (st && st !== 'capture') {
+      router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
+    }
+  }, [searchParams, router]);
+
+  const [storyTitle, setStoryTitle] = useState('');
   const [alias, setAlias] = useState('');
   const [email, setEmail] = useState('');
-  const [themeId, setThemeId] = useState('');
-  const [fecha, setFecha] = useState('');
-  const [fechaAprox, setFechaAprox] = useState(false);
-  const [lugar, setLugar] = useState('');
-  const [contexto, setContexto] = useState('');
+  const [ciudad, setCiudad] = useState('');
+  const [pais, setPais] = useState('');
+  const [birthDate, setBirthDate] = useState('');
+  const [sex, setSex] = useState<'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | ''>('');
+  const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [consentRights, setConsentRights] = useState(false);
   const [consentCurate, setConsentCurate] = useState(false);
   const [consentPostales, setConsentPostales] = useState(false);
@@ -61,7 +130,7 @@ function SubirPageInner() {
   const [videoUrl, setVideoUrl] = useState('');
   const [audioUrl, setAudioUrl] = useState('');
   const [photoUrl, setPhotoUrl] = useState('');
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
   const [profilePhotoPreview, setProfilePhotoPreview] = useState<string | null>(null);
@@ -74,23 +143,43 @@ function SubirPageInner() {
   const [audioUrlWithinMax, setAudioUrlWithinMax] = useState(true);
   const [videoVimeoTooLong, setVideoVimeoTooLong] = useState(false);
 
+  const hasVideoSource =
+    capture?.recordedBlob != null ||
+    (Boolean(capture?.videoUrl) && isVideoUrl(capture!.videoUrl)) ||
+    (videoUrl.trim().length > 0 && isVideoUrl(videoUrl));
+
+  const effectiveAudioFile = audioFile ?? capture?.audioFile ?? null;
+  const effectiveAudioUrl = (audioUrl.trim() || capture?.audioUrl?.trim() || '').trim();
+
+  const hasAudioSource =
+    capture?.recordedBlob != null ||
+    effectiveAudioFile != null ||
+    (effectiveAudioUrl.length > 0 && /^https?:\/\//i.test(effectiveAudioUrl));
+
   const canSubmit =
+    step === 'form' &&
+    Boolean(format) &&
+    storyTitle.trim().length >= 2 &&
     alias.trim().length >= 2 &&
     email.trim().length > 0 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
-    THEME_LIST.some((t) => t.id === themeId) &&
-    fecha.trim().length > 0 &&
-    lugar.trim().length > 0 &&
-    contexto.trim().length >= 30 &&
+    ciudad.trim().length >= 1 &&
+    pais.trim().length >= 2 &&
     consentRights &&
     consentCurate &&
     consentPostales &&
-    (format === 'texto' ? textBody.trim().length > 0 : true) &&
-    (format === 'video' ? videoUrl.trim().length > 0 && isVideoUrl(videoUrl) : true) &&
-    (format === 'foto' ? (photoFile != null || (photoUrl.trim().length > 0 && /^https?:\/\//.test(photoUrl))) : true) &&
-    (format === 'audio' ? (audioFile != null || (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl))) : true) &&
+    (format === 'texto'
+      ? textBody.trim().length > 0 && textBody.trim().length <= SUBIR_TEXT_MAX_CHARS
+      : true) &&
+    (format === 'video' ? hasVideoSource : true) &&
+    (format === 'foto'
+      ? (photoFiles.length >= SUBIR_PHOTO_MIN &&
+          photoFiles.length <= SUBIR_PHOTO_MAX) ||
+        (photoUrl.trim().length > 0 && /^https?:\/\//.test(photoUrl))
+      : true) &&
+    (format === 'audio' ? hasAudioSource : true) &&
     (format !== 'audio' || (audioFileWithinMax && audioUrlWithinMax)) &&
-    (format !== 'video' || !videoVimeoTooLong);
+    (format !== 'video' || capture?.recordedBlob != null || !videoVimeoTooLong);
 
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
@@ -106,28 +195,77 @@ function SubirPageInner() {
         );
       }
 
-      let payload: { textBody?: string; photoUrl?: string; audioUrl?: string; videoUrl?: string } = {};
+      const extraAttachmentUrls: string[] = [];
+      for (let i = 0; i < extraFiles.length; i++) {
+        const f = extraFiles[i]!;
+        const url = await uploadFileToStorage(f, 'submissions/extras', `extra-${i}-${f.name}`);
+        extraAttachmentUrls.push(url);
+      }
+
+      const placeCombined = `${ciudad.trim()}, ${pais.trim()}`;
+
+      let payload: {
+        textBody?: string;
+        photoUrl?: string;
+        photoUrls?: string[];
+        audioUrl?: string;
+        videoUrl?: string;
+      } = {};
       if (format === 'texto') {
         payload = { textBody: textBody.trim() };
       } else if (format === 'video') {
-        payload = { videoUrl: videoUrl.trim() };
+        if (capture?.recordedBlob) {
+          const ext = capture.recordedMime.includes('mp4') ? 'mp4' : 'webm';
+          const url = await uploadFileToStorage(
+            capture.recordedBlob,
+            'submissions',
+            `video-grabado.${ext}`
+          );
+          payload = { videoUrl: url };
+        } else {
+          const vu = (videoUrl.trim() || capture?.videoUrl?.trim() || '').trim();
+          payload = { videoUrl: vu };
+        }
       } else if (format === 'audio') {
-        if (audioFile) {
-          const sec = await probeAudioFileDurationSeconds(audioFile);
+        const blobRec = capture?.recordedBlob;
+        const fileUse = audioFile ?? capture?.audioFile ?? null;
+        if (blobRec) {
+          const af = new File([blobRec], 'grabacion.webm', { type: capture.recordedMime || 'audio/webm' });
+          const sec = await probeAudioFileDurationSeconds(af);
           if (sec != null && !isDurationWithinMax(sec)) {
             setError(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
             setSaving(false);
             return;
           }
-          const url = await uploadFileToStorage(audioFile, 'submissions', `audio.${audioFile.name.split('.').pop() || 'mp3'}`);
+          const ext = capture.recordedMime.includes('mp4') ? 'm4a' : 'webm';
+          const url = await uploadFileToStorage(blobRec, 'submissions', `audio-grabado.${ext}`);
+          payload = { audioUrl: url };
+        } else if (fileUse) {
+          const sec = await probeAudioFileDurationSeconds(fileUse);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setError(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            setSaving(false);
+            return;
+          }
+          const url = await uploadFileToStorage(
+            fileUse,
+            'submissions',
+            `audio.${fileUse.name.split('.').pop() || 'mp3'}`
+          );
           payload = { audioUrl: url };
         } else {
-          payload = { audioUrl: audioUrl.trim() };
+          const au = (audioUrl.trim() || capture?.audioUrl?.trim() || '').trim();
+          payload = { audioUrl: au };
         }
       } else if (format === 'foto') {
-        if (photoFile) {
-          const url = await uploadFileToStorage(photoFile, 'submissions', photoFile.name);
-          payload = { photoUrl: url };
+        if (photoFiles.length > 0) {
+          const urls = await Promise.all(
+            photoFiles.map((f, i) =>
+              uploadFileToStorage(f, 'submissions', `photo-${i}-${f.name}`)
+            )
+          );
+          const first = urls[0];
+          if (first) payload = { photoUrl: first, photoUrls: urls };
         } else if (photoUrl.trim() && /^https?:\/\//.test(photoUrl)) {
           payload = { photoUrl: photoUrl.trim() };
         }
@@ -138,18 +276,23 @@ function SubirPageInner() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           type: format,
+          storyTitle: storyTitle.trim(),
           alias: alias.trim(),
           email: email.trim(),
-          themeId,
-          date: fecha.trim(),
-          dateApprox: fechaAprox,
-          placeLabel: lugar.trim(),
-          context: contexto.trim(),
+          themeId: '',
+          date: '',
+          dateApprox: false,
+          placeLabel: placeCombined,
+          countryLabel: pais.trim(),
+          context: buildSubmissionContext(format, textBody, storyTitle, ciudad, pais),
           payload,
           consentRights: true,
           consentCurate: true,
           consentPostales: true,
           ...(profilePhotoUrl ? { profilePhotoUrl } : {}),
+          ...(birthDate.trim() ? { birthDate: birthDate.trim() } : {}),
+          ...(sex ? { sex } : {}),
+          ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
         }),
       });
 
@@ -159,6 +302,7 @@ function SubirPageInner() {
         return;
       }
       setStep('received');
+      router.replace('/subir?sent=1', { scroll: false });
     } catch (e) {
       console.error('submit', e);
       setError(
@@ -172,20 +316,23 @@ function SubirPageInner() {
   }, [
     canSubmit,
     format,
+    capture,
+    storyTitle,
     alias,
     email,
-    themeId,
-    fecha,
-    fechaAprox,
-    lugar,
-    contexto,
+    ciudad,
+    pais,
+    birthDate,
+    sex,
     textBody,
     videoUrl,
     audioUrl,
     photoUrl,
     audioFile,
-    photoFile,
+    photoFiles,
     profilePhotoFile,
+    extraFiles,
+    router,
   ]);
 
   const clearProfilePhoto = useCallback(() => {
@@ -206,26 +353,47 @@ function SubirPageInner() {
     };
   }, []);
 
-  /** El formato viene de la home (`/subir?format=…`). Sin parámetro válido → vuelta a las cards del inicio. */
+  const selectFormat = useCallback(
+    (f: Format) => {
+      setCapture(null);
+      setFormat(f);
+      setStep('capture');
+      router.replace(`/subir?format=${f}&step=capture`, { scroll: false });
+    },
+    [router]
+  );
+
+  const backToCards = useCallback(() => {
+    setPhotoFiles([]);
+    setAudioFile(null);
+    setAudioFileWithinMax(true);
+    setAudioUrlWithinMax(true);
+    setVideoVimeoTooLong(false);
+    clearProfilePhoto();
+    setCapture(null);
+    setExtraFiles([]);
+    setFormat(null);
+    setStep('cards');
+    router.replace('/subir', { scroll: false });
+  }, [router, clearProfilePhoto]);
+
   useEffect(() => {
-    const raw = searchParams.get('format')?.toLowerCase();
-    if (raw === 'video' || raw === 'audio' || raw === 'texto' || raw === 'foto') {
-      setFormat(raw);
-      return;
+    if (step !== 'form' || !capture || !format) return;
+    if (format === 'video' && capture.videoUrl) setVideoUrl(capture.videoUrl);
+    if (format === 'audio') {
+      if (capture.audioUrl) setAudioUrl(capture.audioUrl);
+      if (capture.audioFile) setAudioFile(capture.audioFile);
     }
-    router.replace('/#historias');
-  }, [searchParams, router]);
-
-  const backToHomeHistorias = useCallback(() => {
-    router.push('/#historias');
-  }, [router]);
+    if (format === 'texto' && capture.narrativeText) setTextBody(capture.narrativeText);
+    if (format === 'foto' && capture.photoFiles?.length) setPhotoFiles(capture.photoFiles);
+  }, [step, capture, format]);
 
   useEffect(() => {
-    if (format !== 'audio' || audioFile != null) {
+    if (format !== 'audio' || audioFile != null || capture?.audioFile != null || capture?.recordedBlob != null) {
       setAudioUrlWithinMax(true);
       return;
     }
-    const url = audioUrl.trim();
+    const url = (audioUrl.trim() || capture?.audioUrl?.trim() || '').trim();
     if (!/^https?:\/\//i.test(url)) {
       setAudioUrlWithinMax(true);
       return;
@@ -242,14 +410,14 @@ function SubirPageInner() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [format, audioFile, audioUrl]);
+  }, [format, audioFile, audioUrl, capture]);
 
   useEffect(() => {
     if (format !== 'video') {
       setVideoVimeoTooLong(false);
       return;
     }
-    const url = videoUrl.trim();
+    const url = (videoUrl.trim() || capture?.videoUrl?.trim() || '').trim();
     setVideoVimeoTooLong(false);
     if (!isVideoUrl(url)) return;
     let cancelled = false;
@@ -263,31 +431,7 @@ function SubirPageInner() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [format, videoUrl]);
-
-  if (format === null) {
-    return (
-      <main className="min-h-screen overflow-x-hidden flex flex-col" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-        <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-          <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
-            <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-          </Link>
-          <div className={historiasInterior.navLinksRowClassName}>
-            <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-            <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-            <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-            <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Subir</span>
-            <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
-          </div>
-        </nav>
-        <div className="flex-1 flex items-center justify-center px-6">
-          <p className="text-sm font-light" style={{ color: neu.textBody }}>
-            Cargando…
-          </p>
-        </div>
-      </main>
-    );
-  }
+  }, [format, videoUrl, capture]);
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -299,40 +443,147 @@ function SubirPageInner() {
           <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
           <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <span className="px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem] font-semibold text-amber-700" style={neu.cardInset}>Subir</span>
           <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
         </div>
       </nav>
 
-      <div className="pt-10 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
-          Subir
-        </h1>
-        {step === 'form' && (
-          <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
-            Has elegido <strong style={{ color: neu.textMain }}>{FORMAT_LABELS[format]}</strong> desde el inicio. Completa el formulario. Audio y video: máximo{' '}
-            {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Tu envío queda en revisión; te notificamos por email cuando se apruebe.
-          </p>
+      <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
+        {step === 'cards' && (
+          <>
+            <header className="mb-10 md:mb-14 space-y-4">
+              <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
+              <h1 className="sr-only">Elegir formato de participación</h1>
+              <p className="text-xl md:text-3xl lg:text-4xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
+                Elige cómo participar; en segundos verás una <strong style={{ color: neu.textMain }}>huella única</strong> hecha de
+                cuadrados y color. Después completas tus datos. Video y audio: hasta {SUBIR_AV_MAX_MINUTES} minutos. Texto: hasta ~2
+                carillas. Fotos: {SUBIR_PHOTO_MIN} a {SUBIR_PHOTO_MAX} imágenes.
+              </p>
+            </header>
+            <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10 mb-12">
+              {(['video', 'audio', 'texto', 'foto'] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => selectFormat(f)}
+                  className="p-8 md:p-10 rounded-[2.5rem] flex flex-col items-start gap-4 transition-all hover:-translate-y-1 active:scale-[0.99] text-left"
+                  style={{
+                    ...neu.card,
+                    boxShadow: `${neu.card.boxShadow}, 0 24px 48px rgba(163,177,198,0.28)`,
+                  }}
+                >
+                  {f === 'video' && <Video size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'audio' && <Mic size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'texto' && <FileText size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'foto' && <ImageIcon size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  <span className="font-semibold text-2xl md:text-3xl" style={{ color: neu.textMain }}>
+                    {FORMAT_LABELS[f]}
+                  </span>
+                  <p className="text-base md:text-xl font-light leading-relaxed" style={{ color: neu.textBody }}>
+                    {FORMAT_PHRASES[f]}
+                  </p>
+                  <span
+                    className="mt-3 px-8 py-3.5 rounded-full text-base md:text-lg font-bold text-white"
+                    style={{
+                      background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
+                      boxShadow: '0 10px 28px rgba(255,69,0,0.38)',
+                    }}
+                  >
+                    Empezar
+                  </span>
+                </button>
+              ))}
+            </section>
+            <p className="text-center">
+              <Link href="/#historias" className="text-sm font-medium underline-offset-4 hover:underline" style={{ color: neu.textBody }}>
+                ← Volver a las tarjetas del inicio
+              </Link>
+            </p>
+          </>
         )}
 
-        {step === 'form' && (
-          <section className="space-y-6">
-            <button
-              type="button"
-              onClick={backToHomeHistorias}
-              className="text-sm font-medium"
-              style={{ color: neu.textBody }}
-            >
-              ← Volver al inicio y elegir otro formato
-            </button>
+        {step === 'capture' && format && (
+          <StoryCaptureStep
+            format={format}
+            onContinue={(out) => {
+              setCapture(out);
+              setStep('impronta');
+              router.replace(`/subir?format=${format}&step=impronta`, { scroll: false });
+            }}
+          />
+        )}
+
+        {step === 'impronta' && format && capture && (
+          <ImprontaStep
+            format={format}
+            narrativeText={capture.narrativeText}
+            onBack={() => {
+              setStep('capture');
+              router.replace(`/subir?format=${format}&step=capture`, { scroll: false });
+            }}
+            onContinue={() => {
+              setStep('form');
+              router.replace(`/subir?format=${format}&step=datos`, { scroll: false });
+            }}
+          />
+        )}
+
+        {step === 'form' && format && (
+          <>
+            <header className="mb-10 space-y-4">
+              <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">Paso 3 · Tus datos · {FORMAT_LABELS[format]}</p>
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-[1.1]" style={{ color: neu.textMain }}>
+                Completa y envía · {FORMAT_LABELS[format]}
+              </h1>
+              <p className="text-lg md:text-xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
+                {format === 'video' && (
+                  <>Video: hasta {SUBIR_AV_MAX_MINUTES} min si ajustas el archivo o el enlace. Ya tienes tu huella; estos datos son para curación y el mapa.</>
+                )}
+                {format === 'audio' && (
+                  <>Audio: hasta {SUBIR_AV_MAX_MINUTES} min. Revisa archivo o URL. Tu huella ya está lista; aquí va lo que verá curación.</>
+                )}
+                {format === 'texto' && (
+                  <>
+                    Texto: máximo {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres (~2 carillas). Confirma o edita el cuerpo si hace falta.
+                  </>
+                )}
+                {format === 'foto' && (
+                  <>
+                    Fotos: entre {SUBIR_PHOTO_MIN} y {SUBIR_PHOTO_MAX} imágenes. Ajusta la galería o la URL de respaldo antes de enviar.
+                  </>
+                )}
+              </p>
+            </header>
+            <section className="space-y-6">
+            <div className="flex flex-wrap gap-4 items-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setStep('impronta');
+                  router.replace(`/subir?format=${format}&step=impronta`, { scroll: false });
+                }}
+                className="text-sm font-medium"
+                style={{ color: neu.textBody }}
+              >
+                ← Volver a la huella
+              </button>
+              <button type="button" onClick={backToCards} className="text-sm font-medium underline" style={{ color: neu.textBody }}>
+                Empezar de cero
+              </button>
+            </div>
             <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
               {FORMAT_LABELS[format]}
             </p>
 
             {format === 'video' && (
               <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                {capture?.recordedBlob ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo abajo.
+                  </p>
+                ) : null}
                 <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  URL del video (YouTube o Vimeo) *
+                  URL del video (YouTube o Vimeo){capture?.recordedBlob ? '' : ' *'}
                 </label>
                 <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
                   Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
@@ -358,13 +609,30 @@ function SubirPageInner() {
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
               <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Alias (público) *
+                Nombre de la historia *
+              </label>
+              <input
+                type="text"
+                value={storyTitle}
+                onChange={(e) => setStoryTitle(e.target.value)}
+                placeholder="Título que verán en el mapa si se publica"
+                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              />
+              {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
+                <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
+              )}
+            </div>
+
+            <div style={neu.cardInset} className="p-4 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                Nombre de la persona (cómo aparecerás) *
               </label>
               <input
                 type="text"
                 value={alias}
                 onChange={(e) => setAlias(e.target.value)}
-                placeholder="Cómo quieres aparecer"
+                placeholder="Tu nombre o cómo quieres figurar públicamente"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
@@ -385,6 +653,46 @@ function SubirPageInner() {
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
               />
+              <p className="mt-2 text-xs" style={{ color: neu.textBody }}>
+                Te avisamos por aquí cuando tu historia pase la curación y se publique en el mapa.
+              </p>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                  Fecha de nacimiento (opcional)
+                </label>
+                <input
+                  type="text"
+                  value={birthDate}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                  placeholder="Ej: 1990-04-12 o aproximada"
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                  Sexo (opcional)
+                </label>
+                <select
+                  value={sex}
+                  onChange={(e) =>
+                    setSex(
+                      e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
+                    )
+                  }
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                >
+                  <option value="">Prefiero no indicar</option>
+                  <option value="femenino">Femenino</option>
+                  <option value="masculino">Masculino</option>
+                  <option value="no-binario">No binario</option>
+                  <option value="prefiero-no-decir">Otro / no decir</option>
+                </select>
+              </div>
             </div>
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
@@ -395,7 +703,7 @@ function SubirPageInner() {
                     Foto personal / de perfil (opcional)
                   </label>
                   <p className="text-xs leading-relaxed mb-3" style={{ color: neu.textBody }}>
-                    Si quieres, sube una imagen tuya para acompañar tu alias cuando se publique. No es la foto de tu historia (eso va en el bloque del formato que elegiste).
+                    Si quieres, sube una imagen tuya para acompañar tu nombre cuando se publique. No es la foto de tu historia (eso va en el bloque del formato que elegiste).
                   </p>
                   <div className="flex flex-wrap items-center gap-4">
                     <div
@@ -459,135 +767,120 @@ function SubirPageInner() {
               </div>
             </div>
 
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Tema *
-              </label>
-              <div className="flex flex-wrap gap-2 mt-2">
-                {THEME_LIST.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setThemeId(t.id)}
-                    className="px-3 py-1.5 rounded-full text-sm font-medium transition"
-                    style={{
-                      ...neu.button,
-                      color: themeId === t.id ? '#ff4500' : neu.textBody,
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Fecha *
-              </label>
-              <input
-                type="text"
-                value={fecha}
-                onChange={(e) => setFecha(e.target.value)}
-                placeholder="Ej: 2024-03-15 o marzo 2024"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-              />
-              <label className="mt-2 flex items-center gap-2 text-sm" style={{ color: neu.textBody }}>
-                <input type="checkbox" checked={fechaAprox} onChange={(e) => setFechaAprox(e.target.checked)} className="accent-orange-500" />
-                Aproximada
-              </label>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Lugar *
-              </label>
-              <input
-                type="text"
-                value={lugar}
-                onChange={(e) => setLugar(e.target.value)}
-                placeholder="Ciudad, región o lugar"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-              />
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Contexto (1–5 líneas) *
-              </label>
-              <textarea
-                value={contexto}
-                onChange={(e) => setContexto(e.target.value)}
-                placeholder="Describe el momento, el lugar o el contexto..."
-                rows={4}
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50 resize-y"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-              />
-              {contexto.trim().length > 0 && contexto.trim().length < 30 && (
-                <p className="mt-1 text-xs text-amber-700">Mínimo 30 caracteres</p>
-              )}
-            </div>
-
-            {format === 'texto' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl">
+            <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  Texto *
+                  Ciudad o localidad *
                 </label>
-                <textarea
-                  value={textBody}
-                  onChange={(e) => setTextBody(e.target.value)}
-                  placeholder="Tu historia..."
-                  rows={8}
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50 resize-y"
+                <input
+                  type="text"
+                  value={ciudad}
+                  onChange={(e) => setCiudad(e.target.value)}
+                  placeholder="Ej: Santiago"
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
               </div>
-            )}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                  País *
+                </label>
+                <input
+                  type="text"
+                  value={pais}
+                  onChange={(e) => setPais(e.target.value)}
+                  placeholder="Ej: Chile"
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+              </div>
+            </div>
 
             {format === 'foto' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  Foto (JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB) *
+              <div style={neu.cardInset} className="p-6 md:p-8 rounded-[2rem] space-y-4">
+                <label className="block text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
+                  Fotos ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}; JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB c/u) *
                 </label>
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
+                  multiple
                   onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (!f) {
-                      setPhotoFile(null);
-                      return;
-                    }
-                    if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
-                      setError(`Máximo ${PHOTO_MAX_MB} MB`);
-                      setPhotoFile(null);
-                      return;
-                    }
-                    setError('');
-                    setPhotoFile(f);
+                    const list = e.target.files;
+                    if (!list?.length) return;
+                    setPhotoFiles((prev) => {
+                      const next = [...prev];
+                      for (const f of Array.from(list)) {
+                        if (next.length >= SUBIR_PHOTO_MAX) break;
+                        if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
+                          setError(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
+                          return prev;
+                        }
+                        if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
+                          setError('Formato: JPG, PNG o WebP.');
+                          return prev;
+                        }
+                        next.push(f);
+                      }
+                      setError('');
+                      return next;
+                    });
+                    e.target.value = '';
                   }}
-                  className="w-full text-sm"
+                  className="w-full text-base"
                   style={{ color: neu.textBody }}
                 />
-                <p className="text-xs" style={{ color: neu.textBody }}>
-                  Si no tienes cómo subir archivo, pega la URL de la imagen abajo (fallback temporal).
+                {photoFiles.length > 0 && (
+                  <ul className="space-y-2 text-base">
+                    {photoFiles.map((f, i) => (
+                      <li
+                        key={`${f.name}-${i}`}
+                        className="flex items-center justify-between gap-2 rounded-xl px-3 py-2"
+                        style={neu.card}
+                      >
+                        <span className="truncate" style={{ color: neu.textMain }}>
+                          {f.name}
+                        </span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full px-3 py-1.5 text-sm font-bold text-white"
+                          style={{
+                            background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
+                          }}
+                          onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
+                        >
+                          Quitar
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-sm" style={{ color: neu.textBody }}>
+                  Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos. Si no puedes subir archivos, usa la URL abajo (una imagen).
                 </p>
                 <input
                   type="url"
                   value={photoUrl}
                   onChange={(e) => setPhotoUrl(e.target.value)}
-                  placeholder="O pega aquí la URL de la imagen"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  placeholder="O pega aquí la URL de una imagen"
+                  className="w-full px-5 py-4 rounded-2xl outline-none bg-white/55 border border-white/60 text-base"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                 />
-                {(photoFile || photoUrl.trim()) && <p className="text-sm" style={{ color: neu.textBody }}>✓ Listo</p>}
+                {(photoFiles.length > 0 || photoUrl.trim()) && (
+                  <p className="text-base font-medium" style={{ color: neu.textBody }}>
+                    ✓ {photoFiles.length > 0 ? `${photoFiles.length} foto(s)` : 'URL lista'}
+                  </p>
+                )}
               </div>
             )}
 
             {format === 'audio' && (
               <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                {capture?.recordedBlob ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
+                  </p>
+                ) : null}
                 <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
                   Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
                 </label>
@@ -644,7 +937,13 @@ function SubirPageInner() {
                     Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
                   </p>
                 )}
-                {(audioFile || audioUrl.trim()) && audioFileWithinMax && audioUrlWithinMax && (
+                {(audioFile ||
+                  audioUrl.trim() ||
+                  capture?.recordedBlob ||
+                  capture?.audioFile ||
+                  (capture?.audioUrl?.trim() ?? '')) &&
+                  audioFileWithinMax &&
+                  audioUrlWithinMax && (
                   <p className="text-sm" style={{ color: neu.textBody }}>
                     ✓ Listo
                   </p>
@@ -652,7 +951,53 @@ function SubirPageInner() {
               </div>
             )}
 
+            <div style={neu.cardInset} className="p-4 rounded-3xl space-y-2">
+              <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
+                Completar la historia (opcional)
+              </label>
+              <p className="text-xs" style={{ color: neu.textBody }}>
+                Hasta {EXTRA_FILES_MAX} archivos (PDF, imágenes, audio corto… máx. {EXTRA_FILE_MAX_MB} MB c/u) para que curación tenga más contexto.
+              </p>
+              <input
+                type="file"
+                multiple
+                onChange={(e) => {
+                  const list = Array.from(e.target.files ?? []);
+                  const next: File[] = [];
+                  for (const f of list) {
+                    if (f.size > EXTRA_FILE_MAX_MB * 1024 * 1024) {
+                      setError(`Cada archivo extra: máximo ${EXTRA_FILE_MAX_MB} MB`);
+                      e.target.value = '';
+                      return;
+                    }
+                    next.push(f);
+                  }
+                  if (next.length > EXTRA_FILES_MAX) {
+                    setError(`Máximo ${EXTRA_FILES_MAX} archivos extra`);
+                    e.target.value = '';
+                    return;
+                  }
+                  setError('');
+                  setExtraFiles(next);
+                }}
+                className="w-full text-sm"
+                style={{ color: neu.textBody }}
+              />
+              {extraFiles.length > 0 && (
+                <p className="text-xs" style={{ color: neu.textBody }}>
+                  {extraFiles.length} archivo(s) adjunto(s)
+                </p>
+              )}
+            </div>
+
             <div className="space-y-3">
+              <p className="text-xs" style={{ color: neu.textBody }}>
+                Al enviar confirmas haber leído la{' '}
+                <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
+                  política de privacidad
+                </Link>
+                .
+              </p>
               <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
                 <input type="checkbox" checked={consentRights} onChange={(e) => setConsentRights(e.target.checked)} className="mt-1 accent-orange-500" />
                 <span>Tengo derechos para compartir este contenido.</span>
@@ -682,6 +1027,7 @@ function SubirPageInner() {
               {saving ? 'Enviando…' : 'Enviar'}
             </button>
           </section>
+          </>
         )}
 
         {step === 'received' && (
@@ -693,7 +1039,7 @@ function SubirPageInner() {
               Quedó en revisión. Te avisaremos por email.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/#historias" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
+              <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
                 Subir otro
               </Link>
               <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>

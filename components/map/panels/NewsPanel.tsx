@@ -7,10 +7,10 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 
 function chipStyle(active: boolean) {
   if (active) return {
-    padding: '7px 14px',
+    padding: '8px 16px',
     borderRadius: 999,
     cursor: 'pointer' as const,
-    fontSize: 13,
+    fontSize: 14,
     whiteSpace: 'nowrap' as const,
     fontFamily: SITE_FONT_STACK,
     outline: 'none',
@@ -22,10 +22,10 @@ function chipStyle(active: boolean) {
     boxShadow: 'inset 0 1.5px 0 rgba(255,185,70,0.45), inset 0 -1px 0 rgba(180,55,0,0.20), 0 0 12px rgba(249,115,22,0.15), 0 4px 8px rgba(0,0,0,0.25)',
   };
   return {
-    padding: '7px 14px',
+    padding: '8px 16px',
     borderRadius: 999,
     cursor: 'pointer' as const,
-    fontSize: 13,
+    fontSize: 14,
     whiteSpace: 'nowrap' as const,
     fontFamily: SITE_FONT_STACK,
     outline: 'none',
@@ -92,7 +92,7 @@ function NewsRow({
       onClick={handleClick}
       style={{
         textAlign: 'left',
-        padding: '14px 16px',
+        padding: '12px 14px',
         borderRadius: 14,
         background: isActive ? 'rgba(96,165,250,0.08)' : 'rgba(255,255,255,0.04)',
         border: `1px solid ${isActive ? 'rgba(96,165,250,0.25)' : 'rgba(255,255,255,0.07)'}`,
@@ -104,23 +104,29 @@ function NewsRow({
         opacity: dimmed ? 0.5 : 1,
       }}
     >
-      <p style={{
-        fontSize: 14,
-        color: 'rgba(255,255,255,0.85)',
-        margin: '0 0 6px',
-        lineHeight: 1.4,
-        display: '-webkit-box',
-        WebkitLineClamp: 2,
-        WebkitBoxOrient: 'vertical',
-        overflow: 'hidden',
-      }}>
+      <p
+        style={{
+          fontSize: 17,
+          fontWeight: 600,
+          color: 'rgba(240,245,255,0.96)',
+          margin: '0 0 8px',
+          lineHeight: 1.42,
+          display: '-webkit-box',
+          WebkitLineClamp: 3,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+        }}
+      >
         {news.title}
       </p>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
+        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.48)', lineHeight: 1.35 }}>
           {news.source ?? news.outletName ?? '—'}
         </span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }} title={news.publishedAt ?? undefined}>
+        <span
+          style={{ fontSize: 12, color: 'rgba(212,220,232,0.82)', lineHeight: 1.35 }}
+          title={news.publishedAt ?? undefined}
+        >
           {timeAgo(news.publishedAt ?? null, now)}
         </span>
       </div>
@@ -193,7 +199,19 @@ export function NewsPanel({
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {withLocation.length > 0 && (
           <>
-            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
+            <p
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.08em',
+                textTransform: 'uppercase',
+                color: 'rgba(255,255,255,0.48)',
+                margin: '6px 0 4px 2px',
+                fontFamily: SITE_FONT_STACK,
+                lineHeight: 1.35,
+              }}
+            >
+              ◎ En el mapa
+            </p>
             {withLocation.map((n, i) => (
               <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} />
             ))}

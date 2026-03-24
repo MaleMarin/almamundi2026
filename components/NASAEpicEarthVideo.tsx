@@ -8,6 +8,9 @@ import { ImageCrossfade } from '@/components/ImageCrossfade';
  * - SVS 5570: Spinning Earth with clouds, atmosphere, and night lights (Blue Marble + MODIS).
  * - EPIC: imágenes reales DSCOVR.
  * - Blue Marble 50 Years: EPIC 2022.
+ *
+ * La home usa GlobeV2; este componente se conserva intacto para volver al vídeo si hace falta
+ * (en HomeMap: importar y sustituir el bloque del globo por <NASAEpicEarthVideo source="spinning" />).
  */
 
 /** SVS 5570: Globo girando con nubes, atmósfera y luces nocturnas. Local primero para evitar CORS y que el play arranque. */
