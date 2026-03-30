@@ -12,6 +12,7 @@ import { getDoc, doc } from 'firebase/firestore';
 import { auth } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 
 export default function PerfilRedirectPage() {
   const router = useRouter();
@@ -19,17 +20,17 @@ export default function PerfilRedirectPage() {
 
   useEffect(() => {
     if (!auth) {
-      router.replace('/');
+      hardNavigateTo('/');
       return;
     }
     const unsub = onAuthStateChanged(auth, async (user) => {
       if (!user) {
-        router.replace('/');
+        hardNavigateTo('/');
         setStatus('done');
         return;
       }
       if (!db) {
-        router.replace('/');
+        hardNavigateTo('/');
         setStatus('done');
         return;
       }
@@ -39,10 +40,10 @@ export default function PerfilRedirectPage() {
         if (username) {
           router.replace(`/u/${username}`);
         } else {
-          router.replace('/');
+          hardNavigateTo('/');
         }
       } catch {
-        router.replace('/');
+        hardNavigateTo('/');
       }
       setStatus('done');
     });

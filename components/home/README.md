@@ -13,10 +13,11 @@ import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 // En tu página:
 <HomeFirstPart
   onShowPurpose={() => setShowPurpose(true)}
-  onShowInspiration={() => setShowInspiration(true)}
+  onShowComoFunciona={() => setComoFuncionaOpen(true)}
   onRecordVideo={() => setModalMode('Video')}
   onRecordAudio={() => setModalMode('Audio')}
   onWriteStory={() => setModalMode('Texto')}
+  onUploadPhoto={() => setModalMode('Foto')}
   basePath=""   // o "/" si los enlaces #historias / Mapa deben ir a la misma app
 />
 ```

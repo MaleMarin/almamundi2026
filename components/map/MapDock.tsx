@@ -1,5 +1,7 @@
 'use client';
 
+import type { CSSProperties } from 'react';
+
 export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search';
 
 type MapDockProps = {
@@ -16,14 +18,16 @@ type MapDockProps = {
 };
 
 /** Franja (dock): pill neumórfico azul noche — estilos inline para que siempre se apliquen (sin depender del purge de Tailwind). */
-const dockWrapperStyle: React.CSSProperties = {
+const dockWrapperStyle: CSSProperties = {
   pointerEvents: 'auto',
-  display: 'inline-flex',
+  display: 'flex',
   flexWrap: 'wrap',
-  alignItems: 'center',
+  alignItems: 'stretch',
   justifyContent: 'center',
-  gap: 8,
-  padding: '10px 14px',
+  gap: 12,
+  padding: '12px 14px',
+  maxWidth: 'min(100vw - 24px, 960px)',
+  width: '100%',
   borderRadius: 9999,
   background: 'rgba(10,18,32,0.42)',
   backdropFilter: 'blur(24px)',
@@ -34,10 +38,19 @@ const dockWrapperStyle: React.CSSProperties = {
   outlineOffset: -1,
 };
 
-const baseBtnStyle: React.CSSProperties = {
-  padding: '8px 16px',
+const baseBtnStyle: CSSProperties = {
+  flex: '1 1 140px',
+  minWidth: 120,
+  minHeight: 56,
+  maxWidth: '100%',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  textAlign: 'center',
+  padding: '12px 14px',
   borderRadius: 9999,
-  fontSize: 14,
+  fontSize: 15,
+  lineHeight: 1.25,
   color: 'rgba(255,255,255,0.85)',
   background: 'rgba(255,255,255,0.06)',
   backdropFilter: 'blur(12px)',
@@ -48,13 +61,12 @@ const baseBtnStyle: React.CSSProperties = {
   boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)',
   cursor: 'pointer',
   fontFamily: 'inherit',
-  fontWeight: 400,
+  fontWeight: 600,
   transition: 'background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
-  whiteSpace: 'nowrap',
-  minWidth: 'min-content',
+  whiteSpace: 'normal',
 };
 
-const activeBtnStyle: React.CSSProperties = {
+const activeBtnStyle: CSSProperties = {
   borderColor: 'rgba(249,115,22,0.5)',
   boxShadow: '0 0 0 1px rgba(249,115,22,0.35), 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)',
   outline: '1px solid rgba(249,115,22,0.55)',
@@ -67,7 +79,7 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
 
   const topPx = topOffset ?? (drawerOpen ? 8 : 24);
   const dockZ = navbarZIndex ?? 25;
-  const positionStyle: React.CSSProperties = embedded
+  const positionStyle: CSSProperties = embedded
     ? { position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 25 }
     : { position: 'fixed', top: topPx, left: '50%', transform: 'translateX(-50%)', zIndex: dockZ };
 

@@ -17,6 +17,7 @@ import {
 import { TopicsModal, type TopicsModalStory } from '@/components/mapa/TopicsModal';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 import { TimeBar } from '@/components/map/TimeBar';
+import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 import { UniverseBackground } from '@/components/UniverseBackground';
 import { AtmosphereOverlay } from '@/components/AtmosphereOverlay';
 import { useAtmosphere } from '@/hooks/useAtmosphere';
@@ -34,22 +35,29 @@ import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import { useAmbientEngine } from '@/components/music/useAmbientEngine';
 import { INSPIRATION_TOPICS } from '@/lib/topics';
 import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
+import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 import { BITS_DATA, type BitEntry } from '@/lib/bits-data';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
 import type { MapView } from '@/lib/map-data/types';
 import { getStoriesReadIds, startSessionTimer } from '@/lib/sessionTracker';
 import { getApproxLocation } from '@/lib/userLocation';
-import { fetchHuellas, hexToRgba, type HuellaPunto } from '@/lib/huellas';
-import { isNightAtLocation } from '@/lib/sunPosition';
+import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
+import { isNightAtLocation, sunDirectionUtc, terminatorCssGradientAngleDeg } from '@/lib/sunPosition';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { STORIES_MOCK, SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
+import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT } from '@/lib/map-data/globe-pov';
+import { MAP_HEADER_GRADIENT, MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
+import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
+import { useViewportBelow } from '@/hooks/useViewportBelow';
 import { buildJourney } from '@/lib/music/journey';
 import {
   playAmbient as webPlayAmbient,
+  playAmbientFromPublicUrl,
   stopAmbient as webStopAmbient,
   setAmbientEnabled as webSetAmbientEnabled,
   unlockAmbientAudio,
@@ -59,6 +67,11 @@ import {
   stopGenerativeLayer,
   type AmbientKey,
 } from '@/lib/sound/ambient';
+import {
+  displayLabelForPublicOrPreset,
+  isPresetSoundMood,
+  publicAudioPathFromMoodId,
+} from '@/lib/public-audio-mood';
 import type { Material } from 'three';
 import * as THREE from 'three';
 
@@ -81,7 +94,10 @@ class MapErrorBoundary extends React.Component<
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#0F172A] text-white p-6">
+        <div
+          className="min-h-screen flex flex-col items-center justify-center gap-6 text-white p-6"
+          style={{ background: MAP_STAGE_GRADIENT }}
+        >
           <h1 className="text-xl font-semibold text-white/95">Algo salió mal en el mapa</h1>
           <p className="text-white/60 text-sm text-center max-w-md">
             No se pudo cargar esta vista. Recarga la página o vuelve al inicio.
@@ -328,7 +344,6 @@ function makeNewsSignalObject(glowTex: THREE.Texture): THREE.Group {
 }
 
 const APP_FONT = SITE_FONT_STACK;
-const GLOBE_PAGE_BG = 'linear-gradient(135deg, #0F172A 0%, #1A202C 50%, #0F172A 100%)';
 
 // === GLOBE LIGHTING (liquid glass: más claro, sin quemar) ===
 const GLOBE_EXPOSURE = 2.65;
@@ -344,10 +359,10 @@ const RIM_INTENSITY = 1.9;
 const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
-/** Texturas vía API para evitar /textures/* pending en dev. */
-const GLOBE_IMAGE_LOCAL = '/api/globe-texture?name=earth-night.jpg';
-const GLOBE_IMAGE_DAY_LOCAL = '/api/globe-texture?name=earth-day.jpg';
-const GLOBE_IMAGE_DAY_OR_FALLBACK = '/api/globe-texture?name=earth-day.jpg';
+/** Texturas estáticas (mismo origen, más rápido que /api/globe-texture en primera carga). */
+const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
+const GLOBE_IMAGE_DAY_LOCAL = '/textures/earth-day.jpg';
+const GLOBE_IMAGE_DAY_OR_FALLBACK = '/textures/earth-day.jpg';
 /** Bump map deshabilitado (unpkg puede dar CORS y deja el globo en círculo oscuro). */
 const GLOBE_BUMP_IMAGE: string | null = null;
 
@@ -393,9 +408,9 @@ const globalStyles = `
   z-index: 3;
   background: radial-gradient(ellipse 120% 100% at 50% 50%,
     rgba(0,0,0,0) 0%,
-    rgba(0,0,0,0.35) 65%,
-    rgba(0,0,0,0.70) 100%);
-  opacity: 0.85;
+    rgba(0,20,40,0.16) 62%,
+    rgba(5,25,48,0.32) 100%);
+  opacity: 0.4;
   }
 
   .mapLeftStage{
@@ -627,9 +642,9 @@ const globalStyles = `
     background:
       radial-gradient(80% 70% at 50% 45%,
         rgba(0,0,0,0) 0%,
-        rgba(0,0,0,0.08) 55%,
-        rgba(0,0,0,0.22) 80%,
-        rgba(0,0,0,0.35) 100%);
+        rgba(0,0,0,0.04) 55%,
+        rgba(0,0,0,0.12) 80%,
+        rgba(0,0,0,0.22) 100%);
   }
   .grainOverlay {
     pointer-events: none;
@@ -1214,7 +1229,7 @@ function RightPanel({
   liveOverlay?: { embedUrl: string; title: string } | null;
   onCloseLive?: () => void;
   onOpenLive?: (overlay: { embedUrl: string; title: string }) => void;
-  selectedMood: SoundMood | null;
+  selectedMood: string | null;
   onMoodSelect: (mood: SoundMood) => void;
   journey: StoryMeta[];
   currentChapterIndex: number;
@@ -1594,7 +1609,9 @@ function RightPanel({
               {/* 2) Toggle Audio ON/OFF — Apple toggle Liquid Metal */}
               <div className="lm-toggle flex items-center justify-between gap-2 flex-wrap">
                 <span className="lm-switch-label truncate">
-                  {!selectedMood ? 'Elige un sonido.' : `${MOOD_LABELS[selectedMood]} · ${filteredStoriesForMusic?.length ?? 0} historias`}
+                  {!selectedMood
+                    ? 'Elige un sonido.'
+                    : `${displayLabelForPublicOrPreset(selectedMood, MOOD_LABELS)} · ${filteredStoriesForMusic?.length ?? 0} historias`}
                 </span>
                 <button
                   type="button"
@@ -2113,56 +2130,6 @@ function NoticiasPanel({
   );
 }
 
-/** Sonidos disponibles en Historias, Noticias y Sonidos (Universo por defecto). */
-const AMBIENT_OPTS = [
-  { id: 'mar' as const, label: 'Mar', desc: 'Olas, calma' },
-  { id: 'ciudad' as const, label: 'Ciudad', desc: 'Urbano, presente' },
-  { id: 'viento' as const, label: 'Viento', desc: 'Aire, naturaleza' },
-  { id: 'radio' as const, label: 'Radios comunitarias', desc: 'Voces y transmisiones' },
-  { id: 'lluvia' as const, label: 'Lluvia en ciudades', desc: 'Lluvia en distintas ciudades' },
-  { id: 'mercado' as const, label: 'Mercados', desc: 'Ambiente de mercado' },
-];
-
-function SonidosPanel({
-  currentMood, onMoodChange, soundEnabled, onToggleSound,
-}: {
-  currentMood: string;
-  onMoodChange: (m: string) => void;
-  soundEnabled: boolean;
-  onToggleSound: () => void;
-}) {
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {AMBIENT_OPTS.map((m) => (
-        <button
-          key={m.id}
-          type="button"
-          onClick={() => onMoodChange(m.id)}
-          style={{
-            textAlign: 'left',
-            padding: '14px 16px',
-            borderRadius: 12,
-            background: currentMood === m.id ? 'rgba(249,115,22,0.12)' : 'rgba(255,255,255,0.04)',
-            border: `1px solid ${currentMood === m.id ? 'rgba(249,115,22,0.30)' : 'rgba(255,255,255,0.07)'}`,
-            borderLeft: currentMood === m.id ? '3px solid rgba(249,115,22,0.6)' : '3px solid transparent',
-            cursor: 'pointer',
-            opacity: 1,
-            transition: 'all 200ms ease',
-            fontFamily: SITE_FONT_STACK,
-            width: '100%',
-            outline: 'none',
-            WebkitTapHighlightColor: 'transparent',
-          }}
-        >
-          <p style={{ fontSize: 15, fontWeight: currentMood === m.id ? 500 : 300, color: currentMood === m.id ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.65)', margin: 0, fontFamily: SITE_FONT_STACK }}>
-            {m.label}
-          </p>
-        </button>
-      ))}
-    </div>
-  );
-}
-
 type MapaPageContentProps = {
   embedded?: boolean;
   /** Donde empieza el universo (sección oscura) para recortar el drawer */
@@ -2191,7 +2158,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const panelCanvasRef = useRef<HTMLCanvasElement>(null);
   const [globeReady, setGlobeReady] = useState(false);
   const [topicsOpen, setTopicsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const isMobile = useViewportBelow(MAP_LAYOUT_MOBILE_MAX_WIDTH_PX);
   const topicsButtonRef = useRef<HTMLButtonElement | null>(null);
   const [globeMaterial, setGlobeMaterial] = useState<Material | null>(null);
   const [isNight, setIsNight] = useState(false);
@@ -2200,6 +2167,19 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const globeDayTexRef = useRef<import('three').Texture | null>(null);
   const globeNightTexRef = useRef<import('three').Texture | null>(null);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  /** Recalcula vector sol y velo del terminador cada 30 s (UTC en vivo). */
+  const [solarTick, setSolarTick] = useState(0);
+  useEffect(() => {
+    const id = window.setInterval(() => setSolarTick((t) => t + 1), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
+  const solarFrame = useMemo(() => {
+    const d = new Date();
+    return {
+      sun: sunDirectionUtc(d),
+      gradientDeg: terminatorCssGradientAngleDeg(d),
+    };
+  }, [solarTick]);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const [activeView, setActiveView] = useState<'historias' | 'actualidad' | 'musica' | 'bits'>(() => {
@@ -2214,11 +2194,14 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
   const [selectedStory, setSelectedStory] = useState<StoryPoint | null>(null);
   /** Centro aproximado de la cámara del globo; para filtrar lista de noticias por lo que se ve. */
-  const [viewCenter, setViewCenter] = useState<{ lat: number; lng: number }>({ lat: -10, lng: -60 });
+  const [viewCenter, setViewCenter] = useState<{ lat: number; lng: number }>({
+    lat: GLOBE_PACIFIC_POV.lat,
+    lng: GLOBE_PACIFIC_POV.lng,
+  });
   /** Ruta Ahora: tour de 6–8 noticias con flyTo cada X segundos. */
   const [newsTour, setNewsTour] = useState<{ items: NewsItem[]; idx: number; running: boolean }>({ items: [], idx: 0, running: false });
   /** Por defecto Universo: el sonido del universo suena al entrar (si el audio está ON). */
-  const [selectedMood, setSelectedMood] = useState<SoundMood | null>('universo');
+  const [selectedMood, setSelectedMood] = useState<string | null>('universo');
   const [journey, setJourney] = useState<StoryMeta[]>([]);
   const [currentChapterIndex, setCurrentChapterIndex] = useState(0);
   const [isTourRunning, setIsTourRunning] = useState(false);
@@ -2287,13 +2270,18 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     }
   });
 
-  const playAmbientDirect = useCallback(async (mood: SoundMood) => {
+  const playAmbientDirect = useCallback(async (mood: string) => {
     try {
       if (!getAmbientUnlocked()) {
         await unlockAmbientAudio();
         setAmbientUnlocked(true);
       }
-      await webPlayAmbient(mood as AmbientKey);
+      const pub = publicAudioPathFromMoodId(mood);
+      if (pub != null) {
+        await playAmbientFromPublicUrl(pub);
+      } else {
+        await webPlayAmbient(mood as AmbientKey);
+      }
       startGenerativeLayer(new Date().getHours(), storyCountRef.current);
       setAudioBlocked(false);
     } catch {
@@ -2414,7 +2402,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             });
             const sid = selectedBitIdRef.current;
             earthMarkersRef.current.forEach((dot) => {
-              const scale = dot.userData.bitId === sid ? 1.5 : 1;
+              const scale = dot.userData.bitId === sid ? 1.14 : 1;
               dot.scale.setScalar(scale);
             });
           }
@@ -2482,7 +2470,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   /** Historias filtradas por sonido (mood); orden: con audio/video primero, luego por título. */
   const filteredStoriesForMusic = useMemo(() => {
-    if (!selectedMood) return [];
+    if (!selectedMood || !isPresetSoundMood(selectedMood)) return [];
     return [...STORIES_MOCK]
       .filter((s) => s.moods.includes(selectedMood))
       .sort((a, b) => {
@@ -2581,8 +2569,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (!embedded || !universeVisible || !globeReady || globeEntrancePlayedRef.current || !globeEl.current) return;
     globeEntrancePlayedRef.current = true;
     try {
-      globeEl.current.pointOfView({ lat: 0, lng: -30, altitude: 3.0 }, 0);
-      globeEl.current.pointOfView({ lat: 0, lng: -30, altitude: 1.2 }, 1400);
+      globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_FAR }, 0);
+      globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_ORBIT }, 1400);
     } catch {}
   }, [embedded, universeVisible, globeReady]);
 
@@ -2709,6 +2697,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const [exploreQuery, setExploreQuery] = useState('');
   const router = useRouter();
 
+  /** Solo para re-sincronizar material cuando termina de cargar la textura nocturna (sin bloquear el día). */
+  const [globeNightLoadTick, setGlobeNightLoadTick] = useState(0);
+
   useEffect(() => {
     import('three').then((THREE) => {
       const loader = new THREE.TextureLoader();
@@ -2722,38 +2713,46 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           );
         });
 
-      Promise.all([
-        loadTex(GLOBE_IMAGE_LOCAL),
-        loadTex(GLOBE_IMAGE_DAY_LOCAL),
-        GLOBE_BUMP_IMAGE ? loadTex(GLOBE_BUMP_IMAGE) : Promise.resolve(null)
-      ]).then(([nightTex, dayTex, bumpTex]) => {
-        const night = nightTex ?? null;
+      const bumpP = GLOBE_BUMP_IMAGE ? loadTex(GLOBE_BUMP_IMAGE) : Promise.resolve(null);
+
+      Promise.all([loadTex(GLOBE_IMAGE_DAY_LOCAL), bumpP]).then(([dayTex, bumpTex]) => {
         const day = dayTex ?? null;
-        globeNightTexRef.current = night;
         globeDayTexRef.current = day;
-        for (const t of [night, day]) {
-          if (t) {
-            (t as any).colorSpace = (THREE as any).SRGBColorSpace ?? (t as any).colorSpace;
-            t.needsUpdate = true;
-          }
+        if (day) {
+          (day as import('three').Texture & { colorSpace?: string }).colorSpace =
+            (THREE as unknown as { SRGBColorSpace?: string }).SRGBColorSpace ??
+            (day as import('three').Texture & { colorSpace?: string }).colorSpace;
+          day.needsUpdate = true;
         }
 
-        // Preferir textura día para ver océanos y tierra (estilo mapa mundi / iPhone). Sin bump para evitar CORS y warning.
-        const mapTex = day ?? night ?? null;
+        const mapTex = day;
         const mat = new THREE.MeshPhongMaterial({
           map: mapTex ?? undefined,
           ...(bumpTex ? { bumpMap: bumpTex, bumpScale: GLOBE_BUMP_SCALE } : {}),
-          emissive: new THREE.Color(0x0d1520),
-          emissiveIntensity: 0.12,
-          shininess: 18,
-          specular: new THREE.Color(0x1a2a3a)
+          color: new THREE.Color(0.74, 0.88, 1.14),
+          emissive: new THREE.Color(0x032d50),
+          emissiveIntensity: 0.095,
+          shininess: 42,
+          specular: new THREE.Color(0x4cb0ff),
         });
 
-        if (mat && "opacity" in mat) {
-          (mat as any).transparent = true;
-          (mat as any).opacity = 0.92;
+        if (mat && 'opacity' in mat) {
+          (mat as import('three').Material & { transparent?: boolean; opacity?: number }).transparent = true;
+          (mat as import('three').Material & { transparent?: boolean; opacity?: number }).opacity = 0.92;
         }
         setGlobeMaterial(mat);
+      });
+
+      loadTex(GLOBE_IMAGE_LOCAL).then((nightTex) => {
+        const night = nightTex ?? null;
+        globeNightTexRef.current = night;
+        if (night) {
+          (night as import('three').Texture & { colorSpace?: string }).colorSpace =
+            (THREE as unknown as { SRGBColorSpace?: string }).SRGBColorSpace ??
+            (night as import('three').Texture & { colorSpace?: string }).colorSpace;
+          night.needsUpdate = true;
+        }
+        setGlobeNightLoadTick((n) => n + 1);
       });
     });
   }, []);
@@ -2775,19 +2774,32 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     tex.needsUpdate = true;
   }, []);
 
-  // Ajustar material del globo según día/noche (textura, emissiveIntensity, shininess)
+  // Textura siempre “día” para océanos azules; día/noche solo ajusta brillo (luces / atmósfera).
   useEffect(() => {
     if (!globeMaterial || !('emissiveIntensity' in globeMaterial)) return;
     const phong = globeMaterial as import('three').MeshPhongMaterial;
     const dayTex = globeDayTexRef.current;
     const nightTex = globeNightTexRef.current;
-    if (dayTex) phong.map = showDayGlobe ? dayTex : (nightTex ?? dayTex);
-    else if (nightTex) phong.map = nightTex;
-    flipGlobeTexture(phong.map);
+    const mapTex = showDayGlobe ? (dayTex ?? nightTex) : (nightTex ?? dayTex);
+    if (mapTex) {
+      phong.map = mapTex;
+      flipGlobeTexture(phong.map);
+    }
     phong.needsUpdate = true;
-    phong.emissiveIntensity = showDayGlobe ? 0.12 : 0.22;
-    phong.shininess = showDayGlobe ? 18 : 14;
-  }, [globeMaterial, showDayGlobe, flipGlobeTexture]);
+    if (showDayGlobe) {
+      phong.color.setRGB(0.74, 0.88, 1.14);
+      phong.emissive.setHex(0x033a5c);
+      phong.emissiveIntensity = 0.072;
+      phong.shininess = 38;
+      phong.specular.setHex(0x4cb0ff);
+    } else {
+      phong.color.setRGB(0.94, 0.97, 1.02);
+      phong.emissive.setHex(0x051a28);
+      phong.emissiveIntensity = 0.11;
+      phong.shininess = 22;
+      phong.specular.setHex(0x6ec0ff);
+    }
+  }, [globeMaterial, showDayGlobe, flipGlobeTexture, globeNightLoadTick]);
 
   const stories = useStories();
   const pulses = usePulses(activeView === 'historias');
@@ -2864,7 +2876,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const fetchNews = useCallback(
     async (topic: string, signal: AbortSignal): Promise<{ items: NewsItem[]; isFallback?: boolean }> => {
-      const url = `/api/world?kind=news&topic=${encodeURIComponent(topic)}&limit=20&lang=es`;
+      const { tz, day } = getUserCalendarDayForNewsApi();
+      const q = new URLSearchParams({
+        kind: 'news',
+        topic,
+        limit: '20',
+        lang: 'es',
+        tz,
+        day,
+      });
+      const url = `/api/world?${q.toString()}`;
       try {
         const res = await fetch(url, { signal });
         if (!res.ok) {
@@ -2912,9 +2933,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         });
         return { items, isFallback: Boolean(data.isFallback) };
       } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          return { items: [] };
-        }
+        if (err instanceof Error && err.name === 'AbortError') throw err;
         console.error('[Mapa] fetchNews error:', err);
         throw err;
       }
@@ -2929,7 +2948,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     isFallback: newsIsFallback,
     newsPoints,
     newsObjectsForGlobe,
-  } = useNewsLayer(selectedTopicId, topicQuery, activeView as 'historias' | 'actualidad' | 'music' | 'musica' | 'bits', fetchNews);
+  } = useNewsLayer(selectedTopicId, topicQuery, activeView as 'historias' | 'actualidad' | 'music' | 'musica' | 'bits', fetchNews, {
+    refreshIntervalMs: activeView === 'actualidad' ? 120_000 : 0,
+  });
   /** Fuente canónica: en vista actualidad effectiveNewsItems ya incluye fallback si loading/error/vacío. */
   const newsItems = effectiveNewsItems;
 
@@ -3297,7 +3318,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         lugar: p.lugar,
         pais: p.pais,
         altitude: 0.02,
-        radius: 0.2,
+        radius: 0.062,
       }));
   }, [huellasPuntos]);
 
@@ -3331,8 +3352,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     const R = GLOBE_RADIUS + 0.5;
     BITS_DATA.forEach((bit) => {
       const { x, y, z } = latLngToCartesianThreeGlobe(bit.lat, bit.lon, R);
-      const dotGeo = new THREE.SphereGeometry(2, 8, 8);
-      const dotMat = new THREE.MeshBasicMaterial({ color: 0xff9944 });
+      const dotGeo = new THREE.SphereGeometry(0.32, 12, 12);
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xffcc4d });
       const dot = new THREE.Mesh(dotGeo, dotMat);
       dot.name = 'ALMAMUNDI_MARKER';
       dot.userData = { bitId: bit.id };
@@ -3390,7 +3411,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (!selectedMood) return;
     setAudioBlocked(false);
     tourUsesMockStoriesRef.current = true;
-    const nextJourney = buildJourney(selectedMood, STORIES_MOCK, 8);
+    const journeyMood: SoundMood = isPresetSoundMood(selectedMood) ? selectedMood : 'universo';
+    const nextJourney = buildJourney(journeyMood, STORIES_MOCK, 8);
     setJourney(nextJourney);
     setCurrentChapterIndex(0);
     setIsTourRunning(true);
@@ -3476,7 +3498,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           globeEl.current?.pointOfView(base, 1100);
           setViewCenter({ lat: base.lat, lng: base.lng });
         } else {
-          globeEl.current?.pointOfView({ lat: -18, lng: -58, altitude: 2.45 }, 1100);
+          globeEl.current?.pointOfView({ ...GLOBE_PACIFIC_POV }, 1100);
         }
       } catch {}
     }, 400);
@@ -3705,7 +3727,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const pointRadiusFn = useCallback((point: object) => {
     const p = point as { id?: string; kind?: string };
-    if (p.kind === 'huella') return 0.2;
+    if (p.kind === 'huella') return 0.062;
     if (view === 'music') return 0.22;
     if (p.kind === 'news' || (typeof p.id === 'string' && p.id.startsWith('news:'))) {
       return 0.18;
@@ -3724,7 +3746,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const pointColorFn = useCallback((point: object) => {
     const p = point as { id?: string; kind?: string; newsIds?: string[]; newsId?: string; color?: string };
-    if (p.kind === 'huella' && p.color) return hexToRgba(p.color, 0.75);
+    if (p.kind === 'huella') {
+      return 'rgba(255, 200, 90, 0.96)';
+    }
     if (view === 'music') {
       if (p.id === highlightedStoryId) return 'rgba(255,200,100,0.98)';
       const active = typeof (p as { chapterIndex?: number }).chapterIndex === 'number' && (p as { chapterIndex?: number }).chapterIndex === currentChapterIndex;
@@ -3776,12 +3800,16 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = false;
       }
-      const nearPOV = { lat: 0, lng: -30, altitude: 1.2 };
-      basePOVRef.current = embedded ? { ...nearPOV } : { ...initialPOV };
-      setViewCenter({ lat: nearPOV.lat, lng: nearPOV.lng });
+      const pacificOrbit = { ...GLOBE_PACIFIC_POV_ORBIT };
+      basePOVRef.current = embedded ? { ...pacificOrbit } : { ...initialPOV };
+      setViewCenter(
+        embedded
+          ? { lat: pacificOrbit.lat, lng: pacificOrbit.lng }
+          : { lat: initialPOV.lat, lng: initialPOV.lng }
+      );
 
       if (embedded) {
-        globeEl.current.pointOfView({ lat: 0, lng: -30, altitude: 3.0 }, 0);
+        globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_FAR }, 0);
       } else {
         globeEl.current.pointOfView(initialPOV, 0);
       }
@@ -3929,20 +3957,20 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             const obj = scene.getObjectByName(name);
             if (obj) scene.remove(obj);
           });
-          const ambientLight = new THREE.AmbientLight(0x446644, 0.5);
+          const ambientLight = new THREE.AmbientLight(0xd2ebff, 0.78);
           ambientLight.name = 'AM_LIGHT';
           scene.add(ambientLight);
-          const sunLight = new THREE.DirectionalLight(0xffeed8, 0.95);
+          const sunLight = new THREE.DirectionalLight(0xfffaf5, 1.12);
           sunLight.name = 'KEY_LIGHT';
-          sunLight.position.set(-2, 1.5, 1);
+          sunLight.position.set(-2.25, 1.55, 1.05);
           scene.add(sunLight);
-          const fillLight = new THREE.DirectionalLight(0x2244aa, 0.12);
+          const fillLight = new THREE.DirectionalLight(0x2e9de8, 0.62);
           fillLight.name = 'FILL_LIGHT';
-          fillLight.position.set(2, -1, -1);
+          fillLight.position.set(2.2, -0.4, -1.4);
           scene.add(fillLight);
-          const rimLight = new THREE.DirectionalLight(0x80b0dd, 0.14);
+          const rimLight = new THREE.DirectionalLight(0xd8f0ff, 0.44);
           rimLight.name = 'RIM_LIGHT';
-          rimLight.position.set(0, 0, -3);
+          rimLight.position.set(0, 0.55, -3.1);
           scene.add(rimLight);
 
           // Capa de nubes (estilo mapa mundi / iPhone)
@@ -3955,8 +3983,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 (cloudTex as any).colorSpace = (THREE as any).SRGBColorSpace ?? (cloudTex as any).colorSpace;
                 const cloudMat = new THREE.MeshPhongMaterial({
                   map: cloudTex,
+                  color: new THREE.Color(0xeaf6ff),
                   transparent: true,
-                  opacity: 0.68,
+                  opacity: 0.78,
                   depthWrite: false,
                 });
                 const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
@@ -3970,7 +3999,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         } catch (err) {
           console.error('handleGlobeReady lights/clouds failed', err);
         }
-      }, 200);
+      }, 72);
     } catch (e) {
       console.error('handleGlobeReady failed', e);
     }
@@ -3999,6 +4028,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   /** Centrar el globo en la ubicación del usuario (ej. Región Metropolitana). Actualiza base orbit para return-to-base. */
   useEffect(() => {
     if (!globeReady || !globeEl.current) return;
+    if (embedded) return;
     getApproxLocation().then((loc) => {
       if (!loc || !globeEl.current) return;
       try {
@@ -4008,7 +4038,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         setViewCenter({ lat: loc.lat, lng: loc.lng });
       } catch {}
     });
-  }, [globeReady]);
+  }, [globeReady, embedded]);
 
   useEffect(() => {
     if (activeView !== 'actualidad') {
@@ -4023,14 +4053,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       setSelectedTopic(null);
     }
   }, [activeView]);
-
-  /* Responsive */
-  useEffect(() => {
-    const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 900);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
 
   const historiasProps = {
     stories: storiesForView,
@@ -4049,12 +4071,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const sonidosProps = {
     currentMood: selectedMood ?? 'universo',
     onMoodChange: (m: string) => {
-      setSelectedMood(m as SoundMood);
+      setSelectedMood(m);
       setSoundEnabled(true);
-      void playAmbientDirect(m as SoundMood);
+      try {
+        window.localStorage.setItem('almamundi_sound_enabled', 'true');
+      } catch { /* ignore */ }
+      void playAmbientDirect(m);
     },
     soundEnabled,
-    onToggleSound: () => setSoundEnabled((v) => !v),
+    onToggleSound: toggleSound,
   };
 
   /** Altura reservada arriba en /mapa: barra con logo + frase (y safe-area). El globo no cubre esta franja. */
@@ -4065,8 +4090,29 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       data-build="mapa-v1"
       style={{
         ...(embedded
-          ? { position: 'relative', width: '100%', height: '100%', minHeight: 0, overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingRight: 32, paddingTop: 0, paddingBottom: '120px' }
-          : { position: 'fixed', inset: 0, width: '100vw', height: '100dvh', maxHeight: '100vh', overflow: 'hidden', background: '#0F172A', fontFamily: APP_FONT, paddingBottom: '120px' }),
+          ? {
+              position: 'relative',
+              width: '100%',
+              height: '100%',
+              minHeight: 0,
+              overflow: 'hidden',
+              background: MAP_STAGE_GRADIENT,
+              fontFamily: APP_FONT,
+              paddingRight: 32,
+              paddingTop: 0,
+              paddingBottom: '120px',
+            }
+          : {
+              position: 'fixed',
+              inset: 0,
+              width: '100vw',
+              height: '100dvh',
+              maxHeight: '100vh',
+              overflow: 'hidden',
+              background: MAP_STAGE_GRADIENT,
+              fontFamily: APP_FONT,
+              paddingBottom: '120px',
+            }),
       }}
     >
       {!embedded && (
@@ -4080,7 +4126,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             minHeight: 72,
             paddingTop: 'env(safe-area-inset-top, 16px)',
             paddingBottom: 12,
-            background: 'linear-gradient(180deg, rgba(15,23,42,0.97) 0%, rgba(15,23,42,0.92) 100%)',
+            background: MAP_HEADER_GRADIENT,
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
           }}
@@ -4331,7 +4377,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       {!openStory && (
         <button
           type="button"
-          onClick={() => router.push('/#historias')}
+          onClick={() => hardNavigateTo('/#historias')}
           style={{
             position: embedded ? 'absolute' : 'fixed',
             bottom: 28,
@@ -4411,7 +4457,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   {...historiasProps}
                   onContarMiHistoria={() => {
                     setDrawerOpen(false);
-                    router.push('/#historias');
+                    hardNavigateTo('/#historias');
                   }}
                 />
               ) : drawerMode === 'news' ? (
@@ -4423,7 +4469,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   onSelectBit={(bit) => setSelectedBit(bit as BitEntry | null)}
                   onSubirMiHistoria={() => {
                     setDrawerOpen(false);
-                    router.push('/#historias');
+                    hardNavigateTo('/#historias');
                   }}
                 />
               ) : (
@@ -4716,7 +4762,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
             {activeView === 'historias' && <HistoriasPanel {...historiasProps} />}
             {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} />}
-            {activeView === 'musica' && <SonidosPanel {...sonidosProps} />}
+            {activeView === 'musica' && <SoundsPanel {...sonidosProps} />}
             {activeView === 'bits' && (
               <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
                 <p className="mb-4">Los puntos en el mapa son Bits: datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
@@ -4831,7 +4877,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 type="button"
                 onClick={() => {
                   setStoryModalOpen(false);
-                  router.push('/#historias');
+                  hardNavigateTo('/#historias');
                 }}
                 style={{
                   padding: '10px 22px',
@@ -4894,7 +4940,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   {...historiasProps}
                   onContarMiHistoria={() => {
                     setDrawerOpen(false);
-                    router.push('/#historias');
+                    hardNavigateTo('/#historias');
                   }}
                 />
               ) : drawerMode === 'news' ? (
@@ -4906,7 +4952,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   onSelectBit={(bit) => setSelectedBit(bit as BitEntry | null)}
                   onSubirMiHistoria={() => {
                     setDrawerOpen(false);
-                    router.push('/#historias');
+                    hardNavigateTo('/#historias');
                   }}
                 />
               ) : (
@@ -4924,6 +4970,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             : { position: 'absolute', top: 0, left: 24, right: 24, bottom: 0, zIndex: 10 }
         }
       >
+      {/* Luces ciudad: noche local del usuario o ventana 20:00–06:00 (TZ navegador o cityLightsTimeZone) */}
       <MapCanvas
         panelWidth={0}
         embedded={embedded}
@@ -4936,14 +4983,19 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           hoverPosRef.current = { x: e.clientX, y: e.clientY };
           if (view === 'music') handleMusicMouseMove(e);
         }}
-        globeImageUrl={GLOBE_IMAGE_LOCAL}
+        globeImageUrl={GLOBE_IMAGE_DAY_LOCAL}
         globeMaterial={globeMaterial}
         showAtmosphere={true}
         isNight={!showDayGlobe}
-        atmosphereColor={showDayGlobe ? '#7eb8e8' : 'rgba(80, 140, 220, 0.7)'}
-        atmosphereAltitude={0.22}
+        cityLightsNightImageUrl={GLOBE_IMAGE_LOCAL}
+        sunDirectionUtc={solarFrame.sun}
+        terminatorGradientDeg={solarFrame.gradientDeg}
+        atmosphereColor={
+          showDayGlobe ? 'rgba(120, 200, 255, 0.52)' : 'rgba(140, 210, 255, 0.48)'
+        }
+        atmosphereAltitude={0.3}
         backgroundColor={GLOBE_CANVAS_BG}
-        pointsData={[]}
+        pointsData={pointsForGlobe}
         pointLat="lat"
         pointLng="lng"
         pointColor={pointColorFn}
@@ -4976,6 +5028,23 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         arcDashAnimateTime={2200}
         arcsTransitionDuration={600}
       >
+        {embedded && (
+          <div
+            className="absolute left-1/2 -translate-x-1/2 z-[14] pointer-events-none flex flex-wrap items-center justify-center gap-x-7 gap-y-1 px-3 max-w-[min(100%,520px)]"
+            style={{ top: 'max(5.25rem, 11vh)' }}
+            aria-hidden
+          >
+            <span className="font-mono text-[9px] md:text-[10px] tracking-[0.24em] uppercase text-slate-200/50 tabular-nums">
+              Pacífico · vista HD
+            </span>
+            <span className="font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-cyan-100/45 tabular-nums">
+              26°C · índice UV 4
+            </span>
+            <span className="font-mono text-[9px] md:text-[10px] tracking-[0.18em] text-slate-300/45 tabular-nums">
+              Pobl. 8.1B · sync
+            </span>
+          </div>
+        )}
         {activeView === 'actualidad' && <div aria-hidden className="hudOverlayBg" />}
         {activeView === 'musica' && (
           <div className="absolute top-3 right-3 z-[15] px-3 py-2 rounded-xl glassPanel text-right min-w-[160px] max-w-[min(90vw,320px)] pointer-events-none">
@@ -5098,13 +5167,14 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       </div>
       {/* HUD: Fecha/Hora/Ciudad — fixed al viewport en la franja reservada (200px); z-[100] siempre por encima del globo (z-0) */}
       <div
-        className="pointer-events-none left-0 right-0 z-[100] flex justify-center"
+        className="pointer-events-none left-0 right-0 z-[100] flex flex-col items-center justify-end"
         style={embedded ? { position: 'absolute', bottom: '48px' } : { position: 'fixed', bottom: '56px', left: 0, right: 0 }}
       >
         <TimeBar
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
+        <MapRealtimeSyncLine userLat={userLocation?.lat} userLng={userLocation?.lng} />
       </div>
       </div>
     </div>
@@ -5112,9 +5182,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 }
 
 /**
- * Mapa con todas las funcionalidades: fuente de verdad en la home (sección #mapa).
- * - Home: HomeMapSection → MapFullPage(embedded): dock, drawer, historias, noticias, sonidos, buscar, controles, tours.
- * La ruta `/mapa` sola redirige a `/#mapa` (no hay página duplicada a pantalla completa).
+ * Mapa principal (react-globe.gl) + Luna en escena Three (`MapCanvas` / `map-gl-moon`).
+ * - Home `#mapa`: `MapSectionLocked` → `HomeMap` / GlobeV2 + `MoonSatellite` (checkpoint).
+ * - `/mapa`: `app/mapa/page.tsx` → este componente `embedded={false}`.
  * Solo renderiza en el cliente (Three/Globe/APIs).
  */
 export default function MapFullPage({
@@ -5129,18 +5199,6 @@ export default function MapFullPage({
   /** Solo en home: false cuando el usuario está en el hero (Universe no visible) */
   universeVisible?: boolean;
 }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-  if (!mounted) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-black text-white">
-        <div className="w-10 h-10 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
-        <p className="text-white/90">Cargando mapa…</p>
-      </div>
-    );
-  }
   return (
     <MapErrorBoundary>
       <MapaPageContent

@@ -26,6 +26,8 @@ type Props = {
   story: StoryData;
   curadorId: string;
   onDone: (storyId: string, action: 'published' | 'rejected') => void;
+  /** Cabeceras Authorization (Firebase ID token) para rutas /api/curate/*. */
+  getAuthHeaders?: () => HeadersInit;
 };
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -37,7 +39,17 @@ const FORMATO_LABEL: Record<string, string> = {
 };
 
 // ─── Component ───────────────────────────────────────────────────────────────
-export function CurationPanel({ story, curadorId, onDone }: Props) {
+function mergeHeaders(base: Record<string, string>, extra?: HeadersInit): Record<string, string> {
+  const out = { ...base };
+  if (!extra) return out;
+  const h = new Headers(extra);
+  h.forEach((v, k) => {
+    out[k] = v;
+  });
+  return out;
+}
+
+export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Props) {
   // Temas: pre-sugeridos por IA, el curador confirma/edita
   const sugeridos = detectarTemas(
     `${story.titulo} ${story.subtitulo ?? ''} ${story.descripcion ?? ''} ${story.tags?.join(' ') ?? ''}`
@@ -69,11 +81,10 @@ export function CurationPanel({ story, curadorId, onDone }: Props) {
     try {
       const res = await fetch('/api/curate/publish', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: mergeHeaders({ 'Content-Type': 'application/json' }, getAuthHeaders?.()),
         body: JSON.stringify({
           storyId: story.id,
           temas: temasSeleccionados,
-          curadorId,
           curadorNota: nota || undefined,
           quote: quote || undefined,
           ubicacion:
@@ -98,8 +109,8 @@ export function CurationPanel({ story, curadorId, onDone }: Props) {
     try {
       await fetch('/api/curate/reject', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ storyId: story.id, curadorId, nota }),
+        headers: mergeHeaders({ 'Content-Type': 'application/json' }, getAuthHeaders?.()),
+        body: JSON.stringify({ storyId: story.id, nota }),
       });
       setState('done');
       onDone(story.id, 'rejected');

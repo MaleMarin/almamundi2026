@@ -1,4 +1,4 @@
-import Link from 'next/link';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { notFound } from 'next/navigation';
 import { getCameraBySlug } from '@/lib/map-data/cameras';
 import { ObservatoryShell } from '@/components/observatory/ObservatoryShell';
@@ -32,12 +32,12 @@ export default async function ObservatorioPage({ params }: PageProps) {
       >
         <CameraObservatory camera={camera} variant="page" contentOnly />
         <div className="mt-8 flex justify-center">
-          <Link
+          <HomeHardLink
             href="/#mapa"
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
           >
             Volver al globo
-          </Link>
+          </HomeHardLink>
         </div>
       </ObservatoryShell>
     </main>

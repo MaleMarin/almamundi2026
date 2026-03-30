@@ -1,6 +1,6 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
-import Link from 'next/link';
 
 export default function GlobalError({
   error,
@@ -24,12 +24,12 @@ export default function GlobalError({
           >
             Intentar de nuevo
           </button>
-          <Link
+          <HomeHardLink
             href="/"
             style={{ padding: '8px 16px', borderRadius: 12, background: 'rgba(255,255,255,0.1)', color: '#fff', textDecoration: 'none', fontWeight: 500 }}
           >
             Ir al inicio
-          </Link>
+          </HomeHardLink>
         </div>
       </body>
     </html>

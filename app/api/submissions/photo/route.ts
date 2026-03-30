@@ -1,14 +1,41 @@
 import { NextResponse } from "next/server";
-import { getAdminDb, getAdminBucket } from "@/lib/firebase/admin";
+import { getAdminDb } from "@/lib/firebase/admin";
 import { randomUUID } from "crypto";
+import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
+import { savePrivateSubmissionObject } from "@/lib/server-storage";
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from "@/lib/rate-limit";
+import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
-const MAX_BYTES = 8 * 1024 * 1024; // 8MB
+const MAX_BYTES = 8 * 1024 * 1024;
+
+const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(req: Request) {
+  const ip = clientIpFromRequest(req);
+  const rl = getRateLimiter("submissions-photo", 20, 3600);
+  const blocked = await enforceRateLimit(rl, `photo:${ip}`, {
+    max: 20,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
+
   try {
     const form = await req.formData();
+
+    const turnstile = form.get("cf-turnstile-response");
+    const captcha = await verifyTurnstileIfConfigured(
+      typeof turnstile === "string" ? turnstile : null,
+      ip
+    );
+    if (!captcha.ok) {
+      return NextResponse.json({ error: "captcha_required" }, { status: 400 });
+    }
 
     const alias = String(form.get("alias") || "").trim();
     const email = String(form.get("email") || "").trim();
@@ -28,43 +55,24 @@ export async function POST(req: Request) {
     if (file.size > MAX_BYTES) {
       return NextResponse.json({ error: "file_too_large" }, { status: 413 });
     }
-    if (!file.type.startsWith("image/")) {
+
+    const mime = file.type.split(";")[0]?.trim().toLowerCase() ?? "";
+    if (!ALLOWED.has(mime)) {
       return NextResponse.json({ error: "invalid_type" }, { status: 400 });
     }
 
+    const buf = Buffer.from(await file.arrayBuffer());
+    if (!bufferMatchesDeclaredMime(buf, mime)) {
+      return NextResponse.json({ error: "content_type_mismatch" }, { status: 400 });
+    }
+
     const submissionId = randomUUID();
-    const ext = file.type === "image/png" ? "png" : "jpg";
-    const objectPath = `submissions/${submissionId}/original.${ext}`;
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    let bucket;
-    try {
-      bucket = getAdminBucket();
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
-      return NextResponse.json(
-        { error: "firebase_config", detail: msg },
-        { status: 500 }
-      );
-    }
-
-    const obj = bucket.file(objectPath);
-    await obj.save(buffer, {
-      contentType: file.type,
-      resumable: false,
-      metadata: {
-        cacheControl: "public, max-age=31536000, immutable",
-      },
+    const ext = mime === "image/png" ? ".png" : mime === "image/webp" ? ".webp" : ".jpg";
+    const { storagePath, signedReadUrl } = await savePrivateSubmissionObject({
+      buffer: buf,
+      originalName: `${submissionId}${ext}`,
+      contentType: mime,
     });
-
-    const publicUrl = `https://storage.googleapis.com/${bucket.name}/${objectPath}`;
-    try {
-      await obj.makePublic();
-    } catch {
-      // Objeto subido; makePublic puede fallar por permisos IAM. La URL queda guardada igual.
-    }
 
     const db = getAdminDb();
     await db.collection("submissions").doc(submissionId).set({
@@ -72,29 +80,15 @@ export async function POST(req: Request) {
       alias,
       email,
       topic,
-      ...(context && { context }),
-      ...(dateTaken && { dateTaken }),
-      storagePath: objectPath,
-      publicUrl,
+      context,
+      dateTaken,
+      storagePath,
       status: "pending",
       createdAt: new Date().toISOString(),
     });
 
-    return NextResponse.json({ ok: true, submissionId, publicUrl });
-  } catch (e: unknown) {
-    const message = e instanceof Error ? e.message : String(e);
-    const isCredential = /credential|private|invalid|unauthorized|auth/i.test(message);
-    return NextResponse.json(
-      {
-        error: "server_error",
-        detail: message,
-        hint: isCredential
-          ? "Revisa FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL y FIREBASE_PRIVATE_KEY en .env.local (sin coma al final, con \\n en la clave)."
-          : message.includes("bucket") || message.includes("Bucket")
-            ? "Revisa FIREBASE_STORAGE_BUCKET en .env.local (ej: almamundi-6d294.appspot.com o .firebasestorage.app)."
-            : undefined,
-      },
-      { status: 500 }
-    );
+    return NextResponse.json({ ok: true, submissionId, readUrl: signedReadUrl, storagePath });
+  } catch {
+    return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }

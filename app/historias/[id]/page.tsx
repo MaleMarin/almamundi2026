@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
@@ -102,14 +103,14 @@ export default function HistoriasIdPage() {
   return (
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
+        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </Link>
+        </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi [&_button]:text-base [&_button]:md:text-lg [&_button]:px-5 [&_button]:py-3 [&_button]:md:px-6" />
-          <Link href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
-          <Link href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <HomeHardLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</HomeHardLink>
+          <HomeHardLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</HomeHardLink>
+          <HomeHardLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</HomeHardLink>
         </div>
       </nav>
 
@@ -138,13 +139,13 @@ export default function HistoriasIdPage() {
             <div className="rounded-2xl p-6 mb-8" style={neu.cardInset}>
               <p className="text-xl font-semibold tracking-tight mb-2" style={{ color: neu.textMain }}>¿Estuviste aquí o conocés algo de este lugar?</p>
               <p className="text-sm mb-4" style={{ color: neu.textBody }}>Contá tu historia o experiencia.</p>
-              <Link
+              <HomeHardLink
                 href="/#historias"
                 className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-medium text-white transition-colors hover:opacity-90"
                 style={{ backgroundColor: 'var(--almamundi-orange)' }}
               >
                 + Subir mi historia
-              </Link>
+              </HomeHardLink>
             </div>
           </div>
           <div>

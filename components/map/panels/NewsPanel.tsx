@@ -16,10 +16,13 @@ function chipStyle(active: boolean) {
     outline: 'none',
     WebkitTapHighlightColor: 'transparent',
     transition: 'all 180ms ease',
-    color: '#fff',
-    background: 'linear-gradient(180deg, rgba(249,115,22,0.28) 0%, rgba(249,115,22,0.16) 100%)',
-    border: '1px solid rgba(255,155,60,0.45)',
-    boxShadow: 'inset 0 1.5px 0 rgba(255,185,70,0.45), inset 0 -1px 0 rgba(180,55,0,0.20), 0 0 12px rgba(249,115,22,0.15), 0 4px 8px rgba(0,0,0,0.25)',
+    color: '#ffffff',
+    background: 'linear-gradient(180deg, rgba(255, 69, 0, 0.62) 0%, rgba(255, 85, 20, 0.38) 100%)',
+    backdropFilter: 'blur(12px) saturate(1.35)',
+    WebkitBackdropFilter: 'blur(12px) saturate(1.35)',
+    border: '1px solid rgba(255, 140, 70, 0.95)',
+    boxShadow:
+      'inset 0 2px 0 rgba(255, 210, 160, 0.55), inset 0 -1px 0 rgba(180, 40, 0, 0.35), 0 0 20px rgba(255, 69, 0, 0.45), 0 4px 14px rgba(0,0,0,0.25)',
   };
   return {
     padding: '8px 16px',
@@ -31,10 +34,12 @@ function chipStyle(active: boolean) {
     outline: 'none',
     WebkitTapHighlightColor: 'transparent',
     transition: 'all 180ms ease',
-    color: 'rgba(255,255,255,0.55)',
-    background: 'rgba(255,255,255,0.05)',
-    border: '1px solid rgba(255,255,255,0.10)',
-    boxShadow: 'none',
+    color: 'rgba(255,255,255,0.62)',
+    background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
+    backdropFilter: 'blur(14px) saturate(1.2)',
+    WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
+    border: '1px solid rgba(255,255,255,0.28)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28)',
   };
 }
 
@@ -93,10 +98,17 @@ function NewsRow({
       style={{
         textAlign: 'left',
         padding: '12px 14px',
-        borderRadius: 14,
-        background: isActive ? 'rgba(96,165,250,0.08)' : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${isActive ? 'rgba(96,165,250,0.25)' : 'rgba(255,255,255,0.07)'}`,
-        borderLeft: isActive ? '3px solid rgba(96,165,250,0.6)' : '3px solid transparent',
+        borderRadius: 16,
+        background: isActive
+          ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.35) 0%, rgba(255, 95, 35, 0.16) 100%)'
+          : 'linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)',
+        backdropFilter: 'blur(14px) saturate(1.2)',
+        WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
+        border: `1px solid ${isActive ? 'rgba(255, 110, 55, 0.65)' : 'rgba(255,255,255,0.22)'}`,
+        borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
+        boxShadow: isActive
+          ? 'inset 0 1px 0 rgba(255, 200, 150, 0.35), 0 0 12px rgba(255, 69, 0, 0.2)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.2)',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
@@ -204,7 +216,7 @@ export function NewsPanel({
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: 'rgba(255,255,255,0.48)',
+                color: '#ff5f1a',
                 margin: '6px 0 4px 2px',
                 fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.35,

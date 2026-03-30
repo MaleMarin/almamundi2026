@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 /** Geo = siempre lugar del hecho (event location). No se usa país del medio para ubicar. */
 export type NewsGeo = { lat: number; lng: number; label?: string };
@@ -40,6 +40,11 @@ export const NEWS_FALLBACK_ITEMS: NewsItem[] = [
 
 export type FetchNewsFn = (topic: string, signal: AbortSignal) => Promise<{ items: NewsItem[]; isFallback?: boolean }>;
 
+export type UseNewsLayerOptions = {
+  /** Vista actualidad: volver a pedir noticias cada N ms (día calendario + lista al día). 0 = solo al cambiar tema. */
+  refreshIntervalMs?: number;
+};
+
 /** Solo items con geo (lugar del hecho) van al globo. */
 function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; kind: 'news'; title: string; source: string | null; publishedAt: string | null; url: string; topic?: string | null; geoLabel?: string; weight: number; altitude: number; radius?: number } | null {
   const geo = n.geo ?? null;
@@ -70,12 +75,16 @@ export function useNewsLayer(
   selectedTopicId: string | null,
   topicQuery: string,
   activeView: 'historias' | 'actualidad' | 'music' | 'musica' | 'bits',
-  fetchNews: FetchNewsFn
+  fetchNews: FetchNewsFn,
+  options?: UseNewsLayerOptions
 ) {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshTick, setRefreshTick] = useState(0);
   const mountedRef = useRef(true);
+  const topicQueryRef = useRef(topicQuery);
+  topicQueryRef.current = topicQuery;
 
   useEffect(() => {
     mountedRef.current = true;
@@ -84,19 +93,40 @@ export function useNewsLayer(
     };
   }, []);
 
+  /**
+   * Al cambiar tema, la lista anterior suele tener topicId distinto (p. ej. null en "Todas").
+   * Un frame con loading=false + filtro estricto dejaba el panel vacío hasta que llegaba el fetch.
+   */
+  useLayoutEffect(() => {
+    if (activeView !== 'actualidad') return;
+    setNewsItems([]);
+    setLoading(true);
+    setError(null);
+  }, [topicQuery, activeView]);
+
+  useEffect(() => {
+    if (activeView !== 'actualidad') return;
+    const ms = options?.refreshIntervalMs ?? 0;
+    if (ms <= 0) return;
+    const id = window.setInterval(() => setRefreshTick((n) => n + 1), ms);
+    return () => window.clearInterval(id);
+  }, [activeView, options?.refreshIntervalMs]);
+
   useEffect(() => {
     let cancelled = false;
     const controller = new AbortController();
     const t = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
 
+    const requestTopic = topicQuery;
     queueMicrotask(() => {
       if (!cancelled) setLoading(true);
       if (!cancelled) setError(null);
     });
-    fetchNews(topicQuery, controller.signal)
+    fetchNews(requestTopic, controller.signal)
       .then((result) => {
         if (cancelled || !mountedRef.current) return;
-        if (result.items.length > 0) setNewsItems(result.items);
+        if (topicQueryRef.current !== requestTopic) return;
+        setNewsItems(result.items);
         setLoading(false);
         setError(null);
       })
@@ -113,20 +143,22 @@ export function useNewsLayer(
       window.clearTimeout(t);
       controller.abort();
     };
-  }, [topicQuery, fetchNews]);
+  }, [topicQuery, fetchNews, refreshTick]);
 
   /** Filtro estricto por tema: item.topicId === selectedTopicId (o todos si null). */
   const effectiveNewsItems = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-    const raw = loading || error || newsItems.length === 0 ? NEWS_FALLBACK_ITEMS : newsItems;
+    if (loading) return NEWS_FALLBACK_ITEMS;
+    if (error) return NEWS_FALLBACK_ITEMS;
+    const raw = newsItems;
     const byTopic =
       selectedTopicId == null
         ? raw
         : raw.filter((n) => n.topicId === selectedTopicId);
-    return byTopic.length > 0 ? byTopic : NEWS_FALLBACK_ITEMS;
+    return byTopic;
   }, [activeView, loading, error, newsItems, selectedTopicId]);
 
-  const isFallback = activeView === 'actualidad' && (loading || error !== null || newsItems.length === 0);
+  const isFallback = activeView === 'actualidad' && (loading || error != null);
 
   /** Solo items con geo (lugar del hecho) van al globo. */
   const newsPoints = useMemo(() => {

@@ -15,6 +15,7 @@ function StarfieldCanvas({
 }) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const starsRef = useRef<Array<{ x: number; y: number; r: number; a: number; v: number }>>([]);
+  const clustersRef = useRef<Array<{ x: number; y: number; r: number; a: number; v: number; cool: boolean }>>([]);
   const mouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const rafRef = useRef<number | null>(null);
   const lastFrameRef = useRef<number>(0);
@@ -59,6 +60,30 @@ function StarfieldCanvas({
     }
     starsRef.current = stars;
 
+    const clusterCenters = [
+      { cx: 0.06, cy: 0.14 },
+      { cx: 0.91, cy: 0.2 },
+      { cx: 0.2, cy: 0.82 },
+      { cx: 0.76, cy: 0.58 },
+      { cx: 0.48, cy: 0.06 },
+      { cx: 0.14, cy: 0.48 },
+    ];
+    const clusters: Array<{ x: number; y: number; r: number; a: number; v: number; cool: boolean }> = [];
+    for (const c of clusterCenters) {
+      const n = 28 + Math.floor(Math.random() * 16);
+      for (let i = 0; i < n; i++) {
+        clusters.push({
+          x: c.cx * w + (Math.random() - 0.5) * w * 0.16,
+          y: c.cy * h + (Math.random() - 0.5) * h * 0.14,
+          r: 0.35 + Math.random() * 0.9,
+          a: 0.52 + Math.random() * 0.38,
+          v: 0.0002 + Math.random() * 0.001,
+          cool: Math.random() > 0.65,
+        });
+      }
+    }
+    clustersRef.current = clusters;
+
     const loop = (ts: number) => {
       const last = lastFrameRef.current || ts;
       const dt = Math.min(80, ts - last);
@@ -82,6 +107,19 @@ function StarfieldCanvas({
         ctx.arc(px, py, s.r, 0, Math.PI * 2);
         ctx.fill();
       }
+      for (const s of clustersRef.current) {
+        s.x -= s.v * dt;
+        if (s.x < -2) s.x = w + 2;
+        const px = s.x + ox * 0.6;
+        const py = s.y + oy * 0.6;
+        if (px < -24 || px > w + 24 || py < -24 || py > h + 24) continue;
+        ctx.beginPath();
+        ctx.fillStyle = s.cool
+          ? `rgba(210,230,255,${s.a})`
+          : `rgba(255,252,248,${s.a})`;
+        ctx.arc(px, py, s.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
       rafRef.current = requestAnimationFrame(loop);
     };
     rafRef.current = requestAnimationFrame(loop);
@@ -97,7 +135,7 @@ function StarfieldCanvas({
       ref={canvasRef}
       aria-hidden
       className="absolute inset-0 w-full h-full pointer-events-none"
-      style={{ opacity: 0.75 }}
+      style={{ opacity: 0.82 }}
     />
   );
 }
@@ -129,7 +167,7 @@ export function UniverseBackground({ enabled = true }: { enabled?: boolean }) {
         zIndex: UNIVERSE_Z_INDEX,
         pointerEvents: 'none',
         overflow: 'hidden',
-        background: '#0a0e17',
+        background: 'radial-gradient(ellipse 140% 100% at 50% 100%, #0b1020 0%, #06080f 55%)',
       }}
     >
       <StarfieldCanvas width={size.w} height={size.h} enabled={enabled} />

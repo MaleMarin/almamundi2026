@@ -1,0 +1,169 @@
+{
+  "historias": [
+    {
+      "id": "res_01",
+      "nombre": "Valentina Rojas",
+      "titulo_historia": "El lienzo que sobrevivió al incendio",
+      "cita_textual": "Pinté de nuevo sobre las cenizas: el color no olvida, solo pide otra capa de verdad.",
+      "ubicación": "Valparaíso, Chile",
+      "foto_perfil": "https://picsum.photos/seed/res01pr/200/200",
+      "fecha": "Marzo 2026",
+      "imagen_principal": "https://picsum.photos/seed/res01main/567/567",
+      "tags": ["arte", "resiliencia", "memoria"]
+    },
+    {
+      "id": "res_02",
+      "nombre": "Omar Haddad",
+      "titulo_historia": "Panadería al alba",
+      "cita_textual": "El horno no discrimina: el mismo calor amasa el pan del que llegó ayer y del que lleva veinte años aquí.",
+      "ubicación": "Beirut, Líbano",
+      "foto_perfil": "https://picsum.photos/seed/res02pr/200/200",
+      "fecha": "Enero 2026",
+      "imagen_principal": "https://picsum.photos/seed/res02main/567/567",
+      "tags": ["emprendimiento", "comunidad", "oficio"]
+    },
+    {
+      "id": "res_03",
+      "nombre": "Yuki Okamoto",
+      "titulo_historia": "Cerámica y tiempo quieto",
+      "cita_textual": "El barro enseña paciencia: si apuras el fuego, el cuenco se quiebra por dentro.",
+      "ubicación": "Kanazawa, Japón",
+      "foto_perfil": "https://picsum.photos/seed/res03pr/200/200",
+      "fecha": "Noviembre 2025",
+      "imagen_principal": "https://picsum.photos/seed/res03main/567/567",
+      "tags": ["artesanía", "calma", "tradición"]
+    },
+    {
+      "id": "res_04",
+      "nombre": "Amara Okafor",
+      "titulo_historia": "Código abierto, puertas abiertas",
+      "cita_textual": "Enseñé a tres vecinas a leer datos públicos; la ciudad dejó de ser un archivo cerrado.",
+      "ubicación": "Lagos, Nigeria",
+      "foto_perfil": "https://picsum.photos/seed/res04pr/200/200",
+      "fecha": "Febrero 2026",
+      "imagen_principal": "https://picsum.photos/seed/res04main/567/567",
+      "tags": ["tecnología", "emprendimiento", "justicia"]
+    },
+    {
+      "id": "res_05",
+      "nombre": "Mateo Ibáñez",
+      "titulo_historia": "La orquesta del barrio",
+      "cita_textual": "Presté mi viola a quien no tenía instrumento; ahora somos doce y el ensayo es cada jueves.",
+      "ubicación": "Montevideo, Uruguay",
+      "foto_perfil": "https://picsum.photos/seed/res05pr/200/200",
+      "fecha": "Diciembre 2025",
+      "imagen_principal": "https://picsum.photos/seed/res05main/567/567",
+      "tags": ["música", "colectivo", "cultura"]
+    },
+    {
+      "id": "res_06",
+      "nombre": "Sofía Delgado",
+      "titulo_historia": "Biblioteca en la vereda",
+      "cita_textual": "Una caja de libros bajo el árbol creció en tres estanterías; la lectura no pidió permiso al ayuntamiento.",
+      "ubicación": "Córdoba, Argentina",
+      "foto_perfil": "https://picsum.photos/seed/res06pr/200/200",
+      "fecha": "Agosto 2026",
+      "imagen_principal": "https://picsum.photos/seed/res06main/567/567",
+      "tags": ["educación", "vecindad", "esperanza"]
+    },
+    {
+      "id": "res_07",
+      "nombre": "Henrik Lindström",
+      "titulo_historia": "Reforestación en el pueblo fantasma",
+      "cita_textual": "Sembramos abedules donde hubo fábricas; el viento ahora suena distinto entre las ramas.",
+      "ubicación": "Östersund, Suecia",
+      "foto_perfil": "https://picsum.photos/seed/res07pr/200/200",
+      "fecha": "Mayo 2026",
+      "imagen_principal": "https://picsum.photos/seed/res07main/567/567",
+      "tags": ["ecología", "territorio", "futuro"]
+    },
+    {
+      "id": "res_08",
+      "nombre": "Nour El-Sayed",
+      "titulo_historia": "Radio desde el garaje",
+      "cita_textual": "Transmitimos en FM baja potencia; bastó para que los ancianos supieran que no estaban solos.",
+      "ubicación": "Alejandría, Egipto",
+      "foto_perfil": "https://picsum.photos/seed/res08pr/200/200",
+      "fecha": "Julio 2026",
+      "imagen_principal": "https://picsum.photos/seed/res08main/567/567",
+      "tags": ["medios", "cuidado", "voz"]
+    },
+    {
+      "id": "res_09",
+      "nombre": "Lucía Fernández",
+      "titulo_historia": "Danza en silla de ruedas",
+      "cita_textual": "El escenario no mide piernas; mide si te atreves a girar con el miedo en los hombros.",
+      "ubicación": "Sevilla, España",
+      "foto_perfil": "https://picsum.photos/seed/res09pr/200/200",
+      "fecha": "Abril 2026",
+      "imagen_principal": "https://picsum.photos/seed/res09main/567/567",
+      "tags": ["danza", "diversidad", "arte vivo"]
+    },
+    {
+      "id": "res_10",
+      "nombre": "Kwame Asante",
+      "titulo_historia": "Taller de bicis recicladas",
+      "cita_textual": "Cada chatarra con pedales es un contrato: te llevo al trabajo si me cuidas los frenos.",
+      "ubicación": "Accra, Ghana",
+      "foto_perfil": "https://picsum.photos/seed/res10pr/200/200",
+      "fecha": "Junio 2026",
+      "imagen_principal": "https://picsum.photos/seed/res10main/567/567",
+      "tags": ["movilidad", "economía circular", "oficio"]
+    },
+    {
+      "id": "res_11",
+      "nombre": "Irina Volkov",
+      "titulo_historia": "Fotografía bajo tierra",
+      "cita_textual": "En el metro encontré rostros que el día no alcanza a ver; la oscuridad también es lente.",
+      "ubicación": "San Petersburgo, Rusia",
+      "foto_perfil": "https://picsum.photos/seed/res11pr/200/200",
+      "fecha": "Octubre 2025",
+      "imagen_principal": "https://picsum.photos/seed/res11main/567/567",
+      "tags": ["fotografía", "mirada", "urbano"]
+    },
+    {
+      "id": "res_12",
+      "nombre": "Diego Huamán",
+      "titulo_historia": "Semillas en la azotea",
+      "cita_textual": "Mi abuela decía que el maíz crece hacia el cielo; ahora entiendo que también buscaba aire limpio.",
+      "ubicación": "Cusco, Perú",
+      "foto_perfil": "https://picsum.photos/seed/res12pr/200/200",
+      "fecha": "Septiembre 2026",
+      "imagen_principal": "https://picsum.photos/seed/res12main/567/567",
+      "tags": ["agricultura urbana", "familia", "raíces"]
+    },
+    {
+      "id": "res_13",
+      "nombre": "Hannah Müller",
+      "titulo_historia": "Archivo de cartas de refugiados",
+      "cita_textual": "Digitalizar no es borrar el sobre arrugado; es dejar que el sello siga contando la frontera.",
+      "ubicación": "Berlín, Alemania",
+      "foto_perfil": "https://picsum.photos/seed/res13pr/200/200",
+      "fecha": "Enero 2026",
+      "imagen_principal": "https://picsum.photos/seed/res13main/567/567",
+      "tags": ["memoria", "archivo", "dignidad"]
+    },
+    {
+      "id": "res_14",
+      "nombre": "Élise Martin",
+      "titulo_historia": "Teatro en la prisión",
+      "cita_textual": "Ensayamos un clásico; al final el público fuimos nosotros frente al espejo del otro.",
+      "ubicación": "Lyon, Francia",
+      "foto_perfil": "https://picsum.photos/seed/res14pr/200/200",
+      "fecha": "Marzo 2025",
+      "imagen_principal": "https://picsum.photos/seed/res14main/567/567",
+      "tags": ["teatro", "reinserción", "empatía"]
+    },
+    {
+      "id": "res_15",
+      "nombre": "Jordan Blake",
+      "titulo_historia": "Skate y mural en el estacionamiento",
+      "cita_textual": "Pintamos donde nadie quería estacionar; ahora hay conciertos y el asfalto ya no ladra vacío.",
+      "ubicación": "Detroit, EE. UU.",
+      "foto_perfil": "https://picsum.photos/seed/res15pr/200/200",
+      "fecha": "Agosto 2026",
+      "imagen_principal": "https://picsum.photos/seed/res15main/567/567",
+      "tags": ["arte urbano", "juventud", "espacio público"]
+    }
+  ]
+}

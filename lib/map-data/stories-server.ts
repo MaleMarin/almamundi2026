@@ -10,6 +10,7 @@
  */
 import 'server-only';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { isPublicStoryDocumentStatus } from '@/lib/story-public';
 
 export async function getStoriesAsync(): Promise<StoryPoint[]> {
   try {
@@ -80,7 +81,7 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
   }
 }
 
-/** Obtiene una historia por id desde Firestore (published o archived). */
+/** Obtiene una historia por id solo si está en estado público (`published`). */
 export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> {
   if (!id) return null;
   try {
@@ -89,6 +90,7 @@ export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> 
     const doc = await db.collection('stories').doc(id).get();
     if (!doc.exists) return null;
     const d = doc.data()!;
+    if (!isPublicStoryDocumentStatus(d.status)) return null;
     const lat = d.lat != null ? Number(d.lat) : null;
     const lng = d.lng != null ? Number(d.lng) : null;
     const title = (d.title as string) ?? 'Historia';

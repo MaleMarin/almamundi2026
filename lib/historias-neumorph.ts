@@ -33,11 +33,11 @@ export const neu = {
     border: '1px solid rgba(255,255,255,0.15)',
     borderRadius: '20px',
   },
-  /** Botón / CTA */
+  /** Botón / CTA (nav interiores: sombras acordes a píldoras más compactas) */
   button: {
     backgroundColor: '#E0E5EC',
     boxShadow:
-      '10px 10px 20px rgba(163,177,198,0.6), -10px -10px 20px rgba(255,255,255,0.8)',
+      '6px 6px 12px rgba(163,177,198,0.55), -6px -6px 12px rgba(255,255,255,0.78)',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '9999px',
     cursor: 'pointer',
@@ -63,23 +63,28 @@ export const historiasInterior = {
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',
   navClassName:
-    'sticky top-0 z-50 flex items-center justify-between gap-3 px-6 md:px-12 py-4 md:py-5 min-h-[6.5rem] md:min-h-[7.75rem] border-b border-gray-300/50',
+    'sticky top-0 z-50 flex items-center justify-between gap-3 px-6 md:px-12 py-2.5 md:py-3 min-h-[5.5rem] md:min-h-[6.5rem] border-b border-gray-300/50',
   navBarStyle: {
     backgroundColor: 'rgba(224,229,236,0.95)',
     boxShadow: '0 4px 24px rgba(163,177,198,0.3)',
   } as const,
   /** Marca gráfica oficial (PNG en /public). No usar logo.svg de texto plano. */
   logoSrc: '/logo.png' as const,
-  /** Logo original — tamaño destacado en interiores (coherente con home, más presencia que texto) */
+  /** Logo original — tamaño destacado en interiores (más presencia para lectura cómoda) */
   logoClassName:
-    'h-[4.75rem] sm:h-[5.5rem] md:h-24 lg:h-[6.5rem] w-auto max-w-[min(380px,72vw)] md:max-w-[min(520px,78vw)] object-contain object-left select-none drop-shadow-[0_2px_12px_rgba(0,0,0,0.12)]',
+    'h-[5.75rem] sm:h-[6.75rem] md:h-28 lg:h-[7.75rem] xl:h-[8.5rem] w-auto max-w-[min(440px,80vw)] md:max-w-[min(600px,82vw)] object-contain object-left select-none drop-shadow-[0_2px_12px_rgba(0,0,0,0.12)]',
   navLinkClassName:
-    'px-5 py-3 md:px-6 md:py-3.5 rounded-full text-base md:text-lg font-medium leading-tight',
+    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base font-medium leading-tight',
   navActiveClassName:
-    'px-5 py-3 md:px-6 md:py-3.5 rounded-full text-base md:text-lg font-semibold leading-tight',
-  /** Fila de botones del menú superior: más aire horizontal entre cada ítem */
+    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base font-semibold leading-tight',
+  /**
+   * Botón «Historias ▼» del acordeón: misma escala que navLinkClassName (antes forzaba text-lg + py-3).
+   */
+  navHistoriasAccordionClassName:
+    '[&_button]:btn-almamundi [&_button]:text-sm [&_button]:md:text-base [&_button]:font-medium [&_button]:px-3 [&_button]:py-1.5 [&_button]:md:px-4 [&_button]:md:py-2 [&_button]:leading-tight [&_button]:rounded-full',
+  /** Fila de botones del menú superior */
   navLinksRowClassName:
-    'flex items-center flex-wrap justify-end gap-x-4 gap-y-2.5 sm:gap-x-5 md:gap-x-6 lg:gap-x-8',
+    'flex items-center flex-wrap justify-end gap-x-2.5 gap-y-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-5',
   /** Contenedor header + sección principal */
   contentWrapClassName: 'flex-1 flex flex-col w-full min-h-0',
   headerClassName: 'flex-shrink-0 px-6 md:px-12 pt-10 md:pt-14 pb-6 md:pb-10',

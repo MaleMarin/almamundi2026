@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import Link from 'next/link';
 import { Home, MapPin, Video, CornerDownLeft } from 'lucide-react';
@@ -20,7 +21,7 @@ export default function NotFound() {
           </p>
         </header>
         <nav className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12">
-          <Link
+          <HomeHardLink
             href="/#mapa"
             className="group flex items-center gap-5 p-6 rounded-3xl transition-all duration-300 shadow-[8px_8px_16px_#bfc6cc,-8px_-8px_16px_#ffffff] hover:shadow-[4px_4px_8px_#bfc6cc,-4px_-4px_8px_#ffffff] bg-[#E0E5EC] text-slate-800 hover:text-[#ff4500]"
           >
@@ -32,7 +33,7 @@ export default function NotFound() {
               <span className="block text-sm text-slate-700">Reinicia tu exploración del mundo</span>
             </div>
             <CornerDownLeft className="ml-auto size-6 text-slate-500/60 group-hover:text-[#ff4500] transition-colors" />
-          </Link>
+          </HomeHardLink>
           <Link
             href="/historias/videos"
             className="group flex items-center gap-5 p-6 rounded-3xl transition-all duration-300 shadow-[8px_8px_16px_#bfc6cc,-8px_-8px_16px_#ffffff] hover:shadow-[4px_4px_8px_#bfc6cc,-4px_-4px_8px_#ffffff] bg-[#E0E5EC] text-slate-800 hover:text-[#ff4500]"
@@ -48,13 +49,13 @@ export default function NotFound() {
           </Link>
         </nav>
         <footer className="mt-14 text-center border-t border-slate-300 pt-8">
-          <Link
+          <HomeHardLink
             href="/"
             className="inline-flex items-center gap-2.5 text-slate-700 hover:text-[#ff4500] group transition-colors"
           >
             <Home size={18} className="text-slate-500 group-hover:text-[#ff4500]" />
             Ir al inicio
-          </Link>
+          </HomeHardLink>
         </footer>
       </div>
     </main>

@@ -1,21 +1,19 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 
 /**
- * Vista previa: redirige a /preview-home.
- * Client-side para que siempre funcione aunque el deploy sea antiguo.
+ * Alias de acceso al inicio real (`/`). Navegación completa para no servir una home en caché antigua.
  */
 export default function VistaPreviaPage() {
-  const router = useRouter();
   useEffect(() => {
-    router.replace('/preview-home');
-  }, [router]);
+    hardNavigateTo('/');
+  }, []);
 
   return (
     <main className="min-h-screen bg-[#E0E5EC] flex items-center justify-center">
-      <p className="text-gray-500">Redirigiendo a vista previa…</p>
+      <p className="text-gray-500">Redirigiendo al inicio…</p>
     </main>
   );
 }

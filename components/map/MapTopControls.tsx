@@ -26,6 +26,9 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
     ? { position: 'absolute' as const, top: 20, right: 20 }
     : { position: 'fixed' as const, top: topPx, right: 20 };
 
+  /** Misma escala que DockButtonLight en HomeMap (min-h 52px → sm 56px); forma circular como pills. */
+  const iconSize = embedded ? 22 : 24;
+
   return (
     <div
       style={{
@@ -38,14 +41,16 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
         onClick={onToggleSound}
         title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
         aria-label={soundEnabled ? 'Cortar sonido' : 'Activar sonido'}
+        className={
+          embedded
+            ? 'shrink-0 rounded-full border border-solid border-white/10 h-[52px] w-[52px] sm:h-14 sm:w-14 active:scale-[0.98]'
+            : 'rounded-[14px] border border-solid border-white/10 h-12 w-12'
+        }
         style={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          width: 48,
-          height: 48,
-          borderRadius: 14,
-          border: soundEnabled ? '1px solid rgba(249,115,22,0.5)' : '1px solid rgba(255,255,255,0.08)',
+          border: soundEnabled ? '1px solid rgba(249,115,22,0.5)' : undefined,
           background: soundEnabled
             ? 'linear-gradient(145deg, rgba(249,115,22,0.45) 0%, rgba(249,115,22,0.22) 100%)'
             : NEO_BG,
@@ -56,7 +61,7 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
           boxShadow: soundEnabled ? NEO_PRESSED : NEO_RAISED,
         }}
       >
-        {soundEnabled ? <Volume2 size={24} /> : <VolumeX size={24} />}
+        {soundEnabled ? <Volume2 size={iconSize} /> : <VolumeX size={iconSize} />}
       </button>
     </div>
   );

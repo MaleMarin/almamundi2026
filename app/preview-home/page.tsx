@@ -16,7 +16,7 @@ export default function PreviewHomePage() {
     <main className="min-h-screen bg-[#E0E5EC] font-sans">
       <HomeFirstPart
         onShowPurpose={() => add('Propósito')}
-        onShowInspiration={() => add('Inspiración')}
+        onShowComoFunciona={() => add('¿Cómo funciona?')}
         onRecordVideo={() => add('Graba video')}
         onRecordAudio={() => add('Graba audio')}
         onWriteStory={() => add('Escribe historia')}

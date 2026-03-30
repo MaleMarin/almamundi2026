@@ -1,9 +1,28 @@
 rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
-    // Subidas del modal (foto, video, audio) desde el cliente
+    /**
+     * Contenido publicado (solo lectura pública). Las escrituras las hace
+     * exclusivamente Firebase Admin SDK (bypass de reglas).
+     */
+    match /published/{allPaths=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    /**
+     * Envíos pendientes, borradores y material privado: sin acceso cliente.
+     * Subida vía rutas API (Admin SDK) con validación server-side.
+     */
     match /submissions/{allPaths=**} {
-      allow read, write: if true;
+      allow read, write: if false;
+    }
+
+    /**
+     * Cualquier otra ruta: denegado por defecto.
+     */
+    match /{allPaths=**} {
+      allow read, write: if false;
     }
   }
 }

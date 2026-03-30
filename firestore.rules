@@ -1,6 +1,7 @@
 rules_version = '2';
 // Nada público antes de aprobar.
-// Público: solo lee stories con status=="published"; puede crear story_submissions (pendiente), no leerlas.
+// Público: solo lee stories con status=="published".
+// story_submissions: solo Admin SDK en servidor (p. ej. /api/submit); sin create cliente para evitar spam directo.
 // Curadores (custom claim curator==true) o Admin SDK: leen/editan submissions, publican, mail_queue.
 
 service cloud.firestore {
@@ -15,15 +16,9 @@ service cloud.firestore {
       allow write: if isCurator();
     }
 
-    // SUBMISSIONS: cualquiera puede crear, nadie puede leer salvo curador
+    // SUBMISSIONS: alta solo vía Firebase Admin en API; cliente no crea documentos.
     match /story_submissions/{id} {
-      allow create: if true
-        && request.resource.data.status == "pending"
-        && request.resource.data.authorEmail is string
-        && request.resource.data.title is string
-        && request.resource.data.lat is number
-        && request.resource.data.lng is number
-        && request.resource.data.tags.moods is list;
+      allow create: if false;
 
       allow read, update, delete: if isCurator();
     }

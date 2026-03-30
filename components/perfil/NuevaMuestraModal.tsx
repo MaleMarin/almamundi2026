@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import type { Muestra } from '@/lib/almamundi/perfil-queries';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { auth } from '@/lib/firebase/client';
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -63,9 +64,19 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
     if (!validate()) return;
     setLoading(true);
     try {
+      const user = auth?.currentUser;
+      if (!user) {
+        setError('Debes iniciar sesión para crear una muestra.');
+        setLoading(false);
+        return;
+      }
+      const idToken = await user.getIdToken();
       const res = await fetch('/api/perfil/muestras', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${idToken}`,
+        },
         body: JSON.stringify({
           autorId,
           autorNombre,

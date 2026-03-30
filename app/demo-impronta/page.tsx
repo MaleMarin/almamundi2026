@@ -1,7 +1,7 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { Download } from 'lucide-react';
 
 const SOFT_BG = '#E0E5EC';
@@ -211,9 +211,9 @@ export default function DemoImprontaPage() {
     <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 px-4 py-10">
       <div>
         <p className="text-sm text-gray-500">
-          <Link href="/" className="text-orange-600 underline hover:text-orange-700">
+          <HomeHardLink href="/" className="text-orange-600 underline hover:text-orange-700">
             Volver al inicio
-          </Link>
+          </HomeHardLink>
         </p>
         <h1 className="mt-2 text-2xl font-bold text-gray-800">Vista previa de la Impronta (histórica)</h1>
         <p className="mt-2 text-gray-600">

@@ -3,12 +3,46 @@
 import { SITE_FONT_STACK } from '@/lib/typography';
 import type { HuellaPunto } from '@/lib/huellas';
 
-export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais'> & {
+export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais' | 'lat' | 'lon'> & {
   categoria?: string;
   titulo?: string;
   historia?: string;
   color?: string;
+  fuenteUrl?: string;
 };
+
+function openStreetMapUrl(lat: number, lon: number): string {
+  const z = lat === 0 && lon === 0 ? 2 : 7;
+  return `https://www.openstreetmap.org/#map=${z}/${lat}/${lon}`;
+}
+
+function isAllowedExternalHref(href: string): boolean {
+  try {
+    const u = new URL(href);
+    return u.protocol === 'https:' || u.protocol === 'http:';
+  } catch {
+    return false;
+  }
+}
+
+const linkButtonStyle = (density: 'compact' | 'readable'): React.CSSProperties => ({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  width: '100%',
+  padding: density === 'readable' ? '11px 18px' : '8px 14px',
+  borderRadius: 999,
+  fontFamily: SITE_FONT_STACK,
+  fontSize: density === 'readable' ? 13 : 11,
+  fontWeight: 600,
+  letterSpacing: '0.04em',
+  textDecoration: 'none',
+  border: '1px solid rgba(120, 180, 255, 0.45)',
+  background: 'rgba(30, 70, 120, 0.35)',
+  color: 'rgba(200, 230, 255, 0.98)',
+  boxShadow: '0 4px 18px rgba(0, 40, 90, 0.25)',
+  transition: 'background 160ms ease, border-color 160ms ease',
+});
 
 export type BitsPanelProps = {
   bits: BitLike[] | HuellaPunto[];
@@ -63,11 +97,17 @@ function BitIndexRow({
       onClick={onClick}
       style={{
         ...rowBase,
-        background: isActive ? 'rgba(255,200,74,0.12)' : 'transparent',
-        borderLeft: isActive ? '2px solid rgba(255,200,74,0.75)' : '2px solid transparent',
+        background: isActive
+          ? 'linear-gradient(90deg, rgba(255, 69, 0, 0.38) 0%, rgba(255, 95, 30, 0.18) 100%)'
+          : 'linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
+        backdropFilter: 'blur(12px) saturate(1.2)',
+        WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
+        border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.2)'}`,
+        borderLeft: isActive ? '2px solid #ff4500' : '2px solid transparent',
+        boxShadow: isActive ? 'inset 0 1px 0 rgba(255, 200, 150, 0.35), 0 0 12px rgba(255, 69, 0, 0.2)' : 'inset 0 1px 0 rgba(255,255,255,0.15)',
       }}
     >
-      <span style={{ fontSize: 9, color: 'rgba(255,200,74,0.85)', letterSpacing: '0.12em', display: 'block' }}>
+      <span style={{ fontSize: 9, color: '#ff5719', letterSpacing: '0.12em', display: 'block' }}>
         #{num}
       </span>
       <span
@@ -171,8 +211,12 @@ function BitDetailCompact({
     overflowX: 'hidden',
     padding: s.padding,
     borderRadius: s.radius,
-    border: '1px solid rgba(255,255,255,0.14)',
-    background: 'rgba(0,10,24,0.5)',
+    border: '1px solid rgba(255,255,255,0.4)',
+    background:
+      'linear-gradient(168deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.07) 75%, rgba(210, 228, 255, 0.12) 100%)',
+    backdropFilter: 'blur(32px) saturate(1.5)',
+    WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
+    boxShadow: '0 12px 44px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.5)',
     boxSizing: 'border-box',
     fontFamily: SITE_FONT_STACK,
     scrollbarWidth: 'thin',
@@ -183,7 +227,7 @@ function BitDetailCompact({
       <p
         style={{
           fontSize: s.meta,
-          color: 'rgba(255,210,120,0.82)',
+          color: '#ff5a14',
           letterSpacing: s.metaTrack,
           textTransform: 'uppercase',
           margin: `0 0 ${s.metaMb}px`,
@@ -253,6 +297,41 @@ function BitDetailCompact({
         </p>
       )}
 
+      <div
+        style={{
+          marginTop: density === 'readable' ? 20 : 14,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: density === 'readable' ? 10 : 8,
+        }}
+      >
+        <a
+          href={openStreetMapUrl(bit.lat, bit.lon)}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={linkButtonStyle(density)}
+        >
+          Ver ubicación en mapa (OpenStreetMap)
+        </a>
+        {typeof bit.fuenteUrl === 'string' &&
+          bit.fuenteUrl.trim() &&
+          isAllowedExternalHref(bit.fuenteUrl.trim()) && (
+            <a
+              href={bit.fuenteUrl.trim()}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                ...linkButtonStyle(density),
+                border: '1px solid rgba(255, 100, 40, 0.65)',
+                background: 'linear-gradient(180deg, rgba(255, 85, 30, 0.35) 0%, rgba(255, 69, 0, 0.22) 100%)',
+                color: '#fff3e8',
+              }}
+            >
+              Abrir fuente / referencia
+            </a>
+          )}
+      </div>
+
       <div style={{ marginTop: s.btnSectionMt }}>
         <button
           type="button"
@@ -269,9 +348,9 @@ function BitDetailCompact({
             fontWeight: 600,
             letterSpacing: '0.04em',
             width: '100%',
-            background: 'var(--almamundi-orange, #ff4500)',
-            border: '1px solid rgba(255, 255, 255, 0.22)',
-            boxShadow: '0 6px 24px rgba(255, 69, 0, 0.35)',
+            background: 'linear-gradient(180deg, #ff5f1a 0%, #e63e00 100%)',
+            border: '1px solid rgba(255, 170, 110, 0.9)',
+            boxShadow: '0 8px 28px rgba(255, 69, 0, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
           }}
         >
           Contar tu historia
@@ -290,8 +369,8 @@ export function BitsPanel({
 }: BitsPanelProps) {
   if (!showIndexList) {
     return (
-      <div className="flex h-full min-h-0 flex-1 flex-col" style={{ fontFamily: SITE_FONT_STACK }}>
-        <div className="min-h-0 min-w-0 flex-1 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+      <div className="flex flex-col" style={{ fontFamily: SITE_FONT_STACK }}>
+        <div className="min-w-0 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
           {selectedBit ? (
             <BitDetailCompact
               bit={selectedBit}
@@ -308,7 +387,7 @@ export function BitsPanel({
                 letterSpacing: '0.01em',
               }}
             >
-              Tocá un punto <span style={{ color: 'rgba(255,234,0,0.95)', fontWeight: 600 }}>amarillo</span> en el
+              Tocá un punto <span style={{ color: '#ff4500', fontWeight: 700 }}>brillante</span> en el
               globo para leer la historia de ese Bit.
             </p>
           )}
@@ -322,7 +401,7 @@ export function BitsPanel({
 
   return (
     <div
-      className="flex h-full min-h-0 flex-1 flex-col gap-2 md:flex-row md:gap-0"
+      className="flex min-h-[min(360px,52vh)] w-full flex-col gap-2 md:min-h-[min(400px,58vh)] md:flex-row md:gap-0"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
       <div className="flex max-h-[min(40vh,300px)] min-h-0 shrink-0 flex-col border-white/10 md:max-h-none md:w-[112px] md:flex-none md:border-r md:pr-2">

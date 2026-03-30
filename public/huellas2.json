@@ -1102,6 +1102,18 @@
       "color": "#F5C800",
       "titulo": "El 71% de la Tierra es océano y el 95% de él no ha sido explorado",
       "historia": "Sabemos más del lado oscuro de la Luna que del fondo de nuestros océanos. La fosa de las Marianas tiene especies que descubrimos hace menos de 20 años. Hay criaturas ahí abajo que nunca hemos visto. El mayor misterio del planeta no está en el espacio: está debajo del agua."
+    },
+    {
+      "id": 101,
+      "lugar": "Región Metropolitana",
+      "pais": "Chile",
+      "lat": -33.4489,
+      "lon": -70.6693,
+      "categoria": "Vivir distinto",
+      "color": "#F5820D",
+      "titulo": "Santiago queda a poco más de una hora del mar o de la nieve en los Andes",
+      "historia": "Desde el centro urbano se puede llegar al borde costero del Pacífico o a sectores de montaña con nieve en temporadas frías en trayectos que, sin congestión, rondan la hora. Esa cercanía entre océano y cordillera marca el ritmo de la ciudad: alertas de calidad del aire, microclimas y escapadas de fin de semana muy distintas según el destino.",
+      "fuenteUrl": "https://es.wikipedia.org/wiki/Regi%C3%B3n_Metropolitana_de_Santiago"
     }
   ],
   "categorias": [

@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
@@ -152,15 +153,15 @@ export default function MuestraDetailPage() {
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
+        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </Link>
+        </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
           <Link href="/muestras" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>← Muestras</Link>
-          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HomeHardLink href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</HomeHardLink>
+          <HomeHardLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</HomeHardLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+          <HomeHardLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</HomeHardLink>
         </div>
       </nav>
 
@@ -207,14 +208,14 @@ export default function MuestraDetailPage() {
             <LayoutGrid className="w-4 h-4" />
             Modo muestra
           </button>
-          <Link
+          <HomeHardLink
             href="/#mapa"
             className="btn-almamundi inline-flex items-center gap-2 px-6 py-3 font-semibold rounded-full active:scale-95"
             style={neu.button}
           >
             <MapPin className="w-4 h-4" />
             Ver en el mapa
-          </Link>
+          </HomeHardLink>
         </div>
       </div>
 

@@ -4,6 +4,9 @@ import type { ReactNode } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { GlobeView } from '@/components/GlobeView';
+import { GLOBE_PACIFIC_POV } from '@/lib/map-data/globe-pov';
+import { MAP_STAGE_SOLID } from '@/lib/map-data/stage-theme';
+import { ensureGlobeGlMoon, updateGlobeGlMoon } from '@/lib/map-gl-moon';
 
 const GlobeComp = dynamic(() => import('react-globe.gl'), { ssr: false });
 
@@ -30,25 +33,48 @@ function useElementSize<T extends HTMLElement>() {
 }
 
 /* Globe constants (lighting, textures) — single source for mapa and home */
-const GLOBE_EXPOSURE = 2.65;
+const GLOBE_EXPOSURE = 2.82;
 const GLOBE_BUMP_SCALE = 0.26;
 const AMBIENT_INTENSITY = 1.35;
 const KEY_INTENSITY = 3.2;
 const FILL_INTENSITY = 1.15;
+/** Luz de relleno más cobalto; mismo factor al crear y al actualizar día/noche. */
+const FILL_INTENSITY_BLUE = FILL_INTENSITY * 1.08;
 const RIM_INTENSITY = 1.9;
 /** Day: much brighter; night: darker. Contrast so the difference is obvious. */
-const DAY_EXPOSURE_MULT = 1.85;
+const DAY_EXPOSURE_MULT = 1.96;
 const DAY_AMBIENT_MULT = 2.0;
 const DAY_KEY_MULT = 1.9;
 const DAY_FILL_MULT = 1.7;
 const DAY_RIM_MULT = 1.6;
-const NIGHT_EXPOSURE_MULT = 0.65;
-const NIGHT_AMBIENT_MULT = 0.6;
-const NIGHT_KEY_MULT = 0.65;
-const NIGHT_FILL_MULT = 0.6;
-const NIGHT_RIM_MULT = 0.7;
+const NIGHT_EXPOSURE_MULT = 0.82;
+const NIGHT_AMBIENT_MULT = 0.78;
+const NIGHT_KEY_MULT = 0.78;
+const NIGHT_FILL_MULT = 0.88;
+const NIGHT_RIM_MULT = 0.82;
 const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
-const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
+const GLOBE_IMAGE_LOCAL = '/textures/earth-day.jpg';
+
+/** Hora local 0–23 en una zona IANA (p. ej. America/Santiago). */
+function getHourInTimeZone(date: Date, timeZone: string): number {
+  try {
+    const parts = new Intl.DateTimeFormat('en-GB', {
+      hour: 'numeric',
+      hour12: false,
+      timeZone,
+    }).formatToParts(date);
+    const h = parts.find((p) => p.type === 'hour')?.value;
+    if (h != null) return parseInt(h, 10);
+  } catch {
+    /* invalid TZ */
+  }
+  return date.getHours();
+}
+
+function isNightWindowWallClock20to6(date: Date, timeZone: string): boolean {
+  const h = getHourInTimeZone(date, timeZone);
+  return h >= 20 || h <= 6;
+}
 
 export type MapCanvasGlobeRef = {
   pointOfView: (pov: { lat: number; lng: number; altitude: number }, t?: number) => void;
@@ -64,9 +90,11 @@ export type MapCanvasGlobeRef = {
   scene: () => unknown;
 } | null;
 
-const DEFAULT_POV = { lat: -8, lng: -28, altitude: 2.2 } as const;
-/** Embedded (home): más distancia; mismo lat/lng, mayor altitude = globo más lejano. */
-const EMBEDDED_POV = { ...DEFAULT_POV, altitude: 2.5 };
+/** Embedded (home): ligeramente más lejos; vista full usa GlobeView + globe-pov. */
+const EMBEDDED_POV = { ...GLOBE_PACIFIC_POV, altitude: 2.48 } as const;
+
+/** Vector sol en UTC (eje Y = norte), misma convención que `@/lib/sunPosition`. */
+export type SunDirectionUtc = { x: number; y: number; z: number };
 
 export type MapCanvasProps = {
   panelWidth: number;
@@ -126,16 +154,36 @@ export type MapCanvasProps = {
   onStageMouseMove?: (e: React.MouseEvent<HTMLDivElement>) => void;
   /** When false, increase lighting and exposure so the globe looks brighter (day). When true or undefined, use base night values. */
   isNight?: boolean;
+  /** Alinea la luz principal del escenario con el sol real (terminador). */
+  sunDirectionUtc?: SunDirectionUtc | null;
+  /** Grados para el velo CSS que refuerza el terminador (~crepúsculo + penumbra). */
+  terminatorGradientDeg?: number | null;
+  /** Capa multiply sobre el globo (aprox. esfera); default true. */
+  showTerminatorVeil?: boolean;
+  /**
+   * Textura nocturna (luces): capa HTML con mix-blend-mode screen sobre el globo.
+   * Se enciende de noche para el usuario (`isNight`) o en ventana 20:00–06:00 (zona del navegador o `cityLightsTimeZone`).
+   * Con textura Phong nocturna se usa intensidad reducida (`city-lights--phong-night`) para no quemar el mapa.
+   */
+  cityLightsNightImageUrl?: string | null;
+  /**
+   * Zona IANA para la ventana 20:00–06:00. Si se omite, se usa la zona horaria del navegador.
+   * Ej.: `America/Santiago` para sincronizar con Chile.
+   */
+  cityLightsTimeZone?: string;
   /** Reservar px abajo del viewport para HUD (GlobeView fixed no cubre esa franja). Solo cuando no embedded. */
   bottomReservePx?: number;
   /** Reservar px arriba del viewport para barra con logo/frase (GlobeView no cubre esa franja). Solo cuando no embedded. */
   topReservePx?: number;
+  /** Luna en órbita en la escena three.js de react-globe.gl (misma textura que GlobeV2). */
+  showOrbitalMoon?: boolean;
   children?: ReactNode;
 };
 
 function setupRendererAndLights(
   globeRef: React.RefObject<MapCanvasGlobeRef | null>,
-  onLightsReady?: () => void
+  onLightsReady?: () => void,
+  showOrbitalMoon = true
 ) {
   const g = globeRef.current;
   if (!g) return;
@@ -172,7 +220,7 @@ function setupRendererAndLights(
             scene.add(key);
           }
           if (!scene.getObjectByName('FILL_LIGHT')) {
-            const fill = new THREE.DirectionalLight(0x9bdcff, FILL_INTENSITY);
+            const fill = new THREE.DirectionalLight(0x6ec8ff, FILL_INTENSITY_BLUE);
             fill.name = 'FILL_LIGHT';
             fill.position.set(-2.0, 0.5, -1.6);
             scene.add(fill);
@@ -201,6 +249,13 @@ function setupRendererAndLights(
               }
             }
           });
+          if (showOrbitalMoon) {
+            try {
+              ensureGlobeGlMoon(scene);
+            } catch (moonErr) {
+              console.error('MapCanvas ensureGlobeGlMoon failed', moonErr);
+            }
+          }
           onLightsReady?.();
         } catch (err) {
           console.error('MapCanvas setupRendererAndLights scene failed', err);
@@ -234,13 +289,27 @@ function updateLightsForDayNight(
   const key = scene.getObjectByName('KEY_LIGHT') as { intensity?: number } | undefined;
   if (key && typeof key.intensity === 'number') key.intensity = KEY_INTENSITY * keyMult;
   const fill = scene.getObjectByName('FILL_LIGHT') as { intensity?: number } | undefined;
-  if (fill && typeof fill.intensity === 'number') fill.intensity = FILL_INTENSITY * fillMult;
+  if (fill && typeof fill.intensity === 'number') fill.intensity = FILL_INTENSITY_BLUE * fillMult;
   const rim = scene.getObjectByName('RIM_LIGHT') as { intensity?: number } | undefined;
   if (rim && typeof rim.intensity === 'number') rim.intensity = RIM_INTENSITY * rimMult;
 
   if (renderer && typeof renderer.toneMappingExposure === 'number') {
     renderer.toneMappingExposure = GLOBE_EXPOSURE * expMult;
   }
+}
+
+function updateKeyLightFromSun(
+  globeRef: React.RefObject<MapCanvasGlobeRef | null>,
+  sun: SunDirectionUtc | null | undefined
+) {
+  const g = globeRef.current;
+  if (!g || !sun) return;
+  const scene = g.scene?.() as import('three').Scene | undefined;
+  if (!scene) return;
+  const key = scene.getObjectByName('KEY_LIGHT') as import('three').DirectionalLight | undefined;
+  if (!key) return;
+  const k = 24;
+  key.position.set(sun.x * k, sun.y * k, sun.z * k);
 }
 
 export function MapCanvas({
@@ -283,7 +352,7 @@ export function MapCanvas({
   globeImageUrl = GLOBE_IMAGE_LOCAL,
   globeMaterial,
   showAtmosphere = true,
-  atmosphereColor = '#6fc8ff',
+  atmosphereColor = '#3d9fe8',
   atmosphereAltitude = 0.28,
   backgroundColor = GLOBE_CANVAS_BG,
   onPointClick,
@@ -291,13 +360,52 @@ export function MapCanvas({
   stageClassName,
   onStageMouseMove,
   isNight,
+  sunDirectionUtc = null,
+  terminatorGradientDeg = null,
+  showTerminatorVeil = true,
+  cityLightsNightImageUrl = null,
+  cityLightsTimeZone,
   children,
   embedded = false,
   bottomReservePx,
   topReservePx,
+  showOrbitalMoon = true,
 }: MapCanvasProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!mounted || !showOrbitalMoon) return;
+    let raf = 0;
+    let last = performance.now();
+    const tick = () => {
+      const g = globeRef.current;
+      const scene = g?.scene?.() as import('three').Scene | undefined;
+      if (scene) {
+        const now = performance.now();
+        updateGlobeGlMoon(scene, (now - last) / 1000);
+        last = now;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [mounted, showOrbitalMoon, globeRef]);
+
+  const [cityLightsNightWindow, setCityLightsNightWindow] = useState(false);
+  useEffect(() => {
+    if (!cityLightsNightImageUrl) return;
+    const tz =
+      cityLightsTimeZone?.trim() ||
+      (typeof Intl !== 'undefined' ? Intl.DateTimeFormat().resolvedOptions().timeZone : 'UTC');
+    const tick = () => setCityLightsNightWindow(isNightWindowWallClock20to6(new Date(), tz));
+    tick();
+    const id = window.setInterval(tick, 60_000);
+    return () => window.clearInterval(id);
+  }, [cityLightsNightImageUrl, cityLightsTimeZone]);
+
+  const cityLightsOn =
+    !!cityLightsNightImageUrl && (cityLightsNightWindow || isNight === true);
 
   const sizeHook = useElementSize<HTMLDivElement>();
   const embedWrapRef = useRef<HTMLDivElement>(null);
@@ -353,18 +461,27 @@ export function MapCanvas({
   const handleGlobeReady = useCallback(
     (injectedOnGlobeReady: () => void) => {
       return () => {
-        setupRendererAndLights(globeRef, () => {
-          updateLightsForDayNight(globeRef, isNight);
-          injectedOnGlobeReady();
-        });
+        setupRendererAndLights(
+          globeRef,
+          () => {
+            updateLightsForDayNight(globeRef, isNight);
+            updateKeyLightFromSun(globeRef, sunDirectionUtc ?? null);
+            injectedOnGlobeReady();
+          },
+          showOrbitalMoon
+        );
       };
     },
-    [globeRef, isNight]
+    [globeRef, isNight, sunDirectionUtc, showOrbitalMoon]
   );
 
   useEffect(() => {
     updateLightsForDayNight(globeRef, isNight);
   }, [isNight, globeRef]);
+
+  useEffect(() => {
+    updateKeyLightFromSun(globeRef, sunDirectionUtc ?? null);
+  }, [sunDirectionUtc, globeRef]);
 
   const globeBlock = (injectedOnGlobeReady: () => void) => (
     <div
@@ -372,57 +489,95 @@ export function MapCanvas({
       style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', minWidth: 400, minHeight: 620 }}
     >
       <div
+        className="pointer-events-auto globe-halo-wrap"
         style={
           embedded
-            ? { width: '100%', height: '100%', minWidth: 200, minHeight: 200 }
-            : { width: Math.max(400, width), height: Math.max(400, height) }
+            ? {
+                width: '100%',
+                height: '100%',
+                minWidth: 200,
+                minHeight: 200,
+                filter:
+                  'drop-shadow(0 0 1px rgba(255,255,255,0.92)) drop-shadow(0 0 12px rgba(255,255,255,0.38)) drop-shadow(0 0 32px rgba(190,220,255,0.28))',
+              }
+            : {
+                width: Math.max(400, width),
+                height: Math.max(400, height),
+                filter:
+                  'drop-shadow(0 0 1px rgba(255,255,255,0.9)) drop-shadow(0 0 18px rgba(255,255,255,0.28)) drop-shadow(0 0 36px rgba(180,210,255,0.22))',
+              }
         }
-        className="pointer-events-auto"
       >
-        <GlobeComp
-          ref={globeRef as never}
-          onGlobeReady={handleGlobeReady(injectedOnGlobeReady)}
-          globeImageUrl={globeImageUrl}
-          {...(globeMaterial != null ? { globeMaterial: globeMaterial as import('three').Material } : {})}
-          showAtmosphere={showAtmosphere}
-          atmosphereColor={atmosphereColor}
-          atmosphereAltitude={atmosphereAltitude}
-          backgroundColor={backgroundColor}
-          pointsData={pointsData}
-          pointLat={pointLat}
-          pointLng={pointLng}
-          pointColor={pointColorFn}
-          pointAltitude={pointAltitudeFn}
-          pointRadius={pointRadiusFn}
-          pointsMerge={pointsMerge}
-          objectsData={objectsData}
-          objectLat={objectLat}
-          objectLng={objectLng}
-          objectAltitude={objectAltitude}
-          objectThreeObject={objectThreeObject as never}
-          onObjectClick={onObjectClick}
-          onObjectHover={onObjectHover}
-          onPointClick={onPointClick}
-          onPointHover={onPointHover}
-          ringsData={ringsData}
-          ringColor={ringColorFn}
-          ringMaxRadius={ringMaxRadius}
-          ringPropagationSpeed={ringPropagationSpeed}
-          ringRepeatPeriod={ringRepeatPeriod}
-          arcsData={arcsData}
-          arcStartLat={arcStartLat}
-          arcStartLng={arcStartLng}
-          arcEndLat={arcEndLat}
-          arcEndLng={arcEndLng}
-          arcColor={arcColor}
-          arcAltitude={arcAltitude}
-          arcDashLength={arcDashLength}
-          arcDashGap={arcDashGap}
-          arcDashAnimateTime={arcDashAnimateTime}
-          arcsTransitionDuration={arcsTransitionDuration}
-          height={height}
-          width={width}
-        />
+        <div className="relative h-full w-full">
+          <GlobeComp
+            ref={globeRef as never}
+            onGlobeReady={handleGlobeReady(injectedOnGlobeReady)}
+            globeImageUrl={globeImageUrl}
+            {...(globeMaterial != null ? { globeMaterial: globeMaterial as import('three').Material } : {})}
+            showAtmosphere={showAtmosphere}
+            atmosphereColor={atmosphereColor}
+            atmosphereAltitude={atmosphereAltitude}
+            backgroundColor={backgroundColor}
+            pointsData={pointsData}
+            pointLat={pointLat}
+            pointLng={pointLng}
+            pointColor={pointColorFn}
+            pointAltitude={pointAltitudeFn}
+            pointRadius={pointRadiusFn}
+            pointsMerge={pointsMerge}
+            objectsData={objectsData}
+            objectLat={objectLat}
+            objectLng={objectLng}
+            objectAltitude={objectAltitude}
+            objectThreeObject={objectThreeObject as never}
+            onObjectClick={onObjectClick}
+            onObjectHover={onObjectHover}
+            onPointClick={onPointClick}
+            onPointHover={onPointHover}
+            ringsData={ringsData}
+            ringColor={ringColorFn}
+            ringMaxRadius={ringMaxRadius}
+            ringPropagationSpeed={ringPropagationSpeed}
+            ringRepeatPeriod={ringRepeatPeriod}
+            arcsData={arcsData}
+            arcStartLat={arcStartLat}
+            arcStartLng={arcStartLng}
+            arcEndLat={arcEndLat}
+            arcEndLng={arcEndLng}
+            arcColor={arcColor}
+            arcAltitude={arcAltitude}
+            arcDashLength={arcDashLength}
+            arcDashGap={arcDashGap}
+            arcDashAnimateTime={arcDashAnimateTime}
+            arcsTransitionDuration={arcsTransitionDuration}
+            height={height}
+            width={width}
+          />
+          {cityLightsNightImageUrl ? (
+            <div
+              className={`city-lights absolute inset-0 z-[3] rounded-full bg-cover bg-center${cityLightsOn ? ' city-lights--on' : ''}${cityLightsOn && isNight === true ? ' city-lights--phong-night' : ''}`}
+              style={{ backgroundImage: `url(${cityLightsNightImageUrl})` }}
+              aria-hidden
+            />
+          ) : null}
+          {showTerminatorVeil && terminatorGradientDeg != null ? (
+            <div
+              className="pointer-events-none absolute inset-0 z-[4] rounded-full"
+              style={{
+                mixBlendMode: 'multiply',
+                background: `linear-gradient(${terminatorGradientDeg}deg,
+                  transparent 0%,
+                  rgba(255, 130, 70, 0.12) 38%,
+                  rgba(95, 55, 135, 0.2) 45%,
+                  rgba(5, 5, 16, 0.7) 50%,
+                  rgba(95, 55, 135, 0.2) 55%,
+                  rgba(255, 130, 70, 0.12) 62%,
+                  transparent 100%)`,
+              }}
+              aria-hidden
+            />
+          ) : null}
+        </div>
       </div>
     </div>
   );
@@ -434,7 +589,7 @@ export function MapCanvas({
           width: '100%',
           height: '100%',
           minHeight: 600,
-          background: '#0F172A',
+          background: MAP_STAGE_SOLID,
           borderRadius: '50%',
         }}
         aria-hidden

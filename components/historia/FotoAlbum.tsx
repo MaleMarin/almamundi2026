@@ -6,7 +6,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const CREAM = 'rgba(245,240,232,0.85)';
 const CREAM_SOFT = 'rgba(245,240,232,0.7)';
 const CREAM_MUTED = 'rgba(245,240,232,0.5)';
-const SEPIA = '#c9a96e';
+const SEPIA = '#ff4500';
 const DEFAULT_BG = '#1a1410';
 
 export interface HistoriaFoto {
@@ -338,7 +338,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                       fontWeight: 200,
                       fontSize: '0.65rem',
                       padding: '4px 10px',
-                      border: `1px solid rgba(201,169,110,0.5)`,
+                      border: `1px solid rgba(255,69,0,0.5)`,
                       borderRadius: 999,
                       color: SEPIA,
                     }}

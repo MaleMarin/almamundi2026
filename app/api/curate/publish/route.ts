@@ -13,6 +13,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+import { requireAdmin } from '@/lib/adminAuth';
 import { getAdminDb } from '@/lib/firebase/admin';
 import {
   FIRESTORE_COLLECTION,
@@ -26,22 +27,25 @@ import { TEMAS_MAP } from '@/lib/temas';
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
+  const curadorId = auth.email;
+
   try {
     const body = (await req.json()) as {
       storyId: string;
       temas: string[];
-      curadorId: string;
       curadorNota?: string;
       ubicacion?: StoryData['ubicacion'];
       quote?: string;
     };
 
-    const { storyId, temas, curadorId, curadorNota, ubicacion, quote } = body;
+    const { storyId, temas, curadorNota, ubicacion, quote } = body;
 
     // ── Validar input ────────────────────────────────────────────────────────
-    if (!storyId || !curadorId) {
+    if (!storyId) {
       return NextResponse.json(
-        { error: 'storyId y curadorId son requeridos' },
+        { error: 'storyId es requerido' },
         { status: 400 }
       );
     }

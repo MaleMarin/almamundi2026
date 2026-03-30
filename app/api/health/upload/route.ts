@@ -3,22 +3,34 @@ import { getAdminDb, getAdminBucket } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 
-/** GET /api/health/upload — diagnóstico: ¿Firebase Admin y Storage funcionan? */
+/**
+ * GET /api/health/upload — diagnóstico público mínimo (sin nombres de bucket ni mensajes internos).
+ */
 export async function GET() {
-  const steps: Record<string, string> = {};
+  let dbOk = false;
+  let storageOk = false;
   try {
     const db = getAdminDb();
-    steps.db = "ok";
-  } catch (e) {
-    steps.db = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, steps }, { status: 500 });
+    await db.collection("stories").limit(1).get();
+    dbOk = true;
+  } catch {
+    dbOk = false;
   }
   try {
     const bucket = getAdminBucket();
-    steps.bucket = `ok (${bucket.name})`;
-  } catch (e) {
-    steps.bucket = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ ok: false, steps }, { status: 500 });
+    await bucket.getMetadata();
+    storageOk = true;
+  } catch {
+    storageOk = false;
   }
-  return NextResponse.json({ ok: true, steps });
+
+  const ok = dbOk && storageOk;
+  return NextResponse.json(
+    {
+      ok,
+      firestore: dbOk ? "ok" : "error",
+      storage: storageOk ? "ok" : "error",
+    },
+    { status: ok ? 200 : 503 }
+  );
 }

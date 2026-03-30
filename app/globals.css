@@ -5,7 +5,8 @@
   --foreground: #171717;
   /* Mapa home: mismo gris que las cards (no usar blanco) */
   --home-bg: #E0E5EC;
-  --universe-bg: #020617;
+  /* Espacio detrás del globo: negro neutro (sin tinte azul) */
+  --universe-bg: #000000;
   /* Naranja AlmaMundi en todo el sitio (#ff4500) */
   --almamundi-orange: #ff4500;
   --almamundi-orange-rgb: 255, 69, 0;
@@ -53,6 +54,38 @@ body {
 .btn-almamundi[data-active="true"] {
   border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
   color: var(--almamundi-orange) !important;
+}
+
+/* Home: header + dock (Mapa de AlmaMundi) — misma píldora, neumorfismo muy marcado */
+.home-map-neu-pill {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.28s ease,
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+.home-map-neu-pill:hover {
+  box-shadow:
+    16px 16px 36px rgba(120, 135, 155, 0.52),
+    -16px -16px 40px rgba(255, 255, 255, 1),
+    inset 3px 3px 7px rgba(255, 255, 255, 0.88),
+    inset -4px -4px 14px rgba(163, 177, 198, 0.26) !important;
+}
+.home-map-neu-pill:active {
+  /* Sin scale: el activo y el clic no deben cambiar tamaño de la píldora */
+  box-shadow:
+    inset 8px 8px 18px rgba(163, 177, 198, 0.42),
+    inset -5px -5px 14px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Dentro de PillNavButton (misma altura/padding que el resto): una sola línea, font-size fluido */
+.pill-nav-long-line {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1;
+  letter-spacing: -0.045em;
+  font-size: clamp(0.625rem, 0.3rem + 1.35vw, 0.875rem);
 }
 
 /* Mapa home: degradado entre frase "Mapa AlmaMundi" y universo (negro al fondo) */

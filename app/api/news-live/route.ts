@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import Parser from "rss-parser";
 import type { Item } from "rss-parser";
 import { ALMA_FEED_SOURCES } from "@/lib/feedSourcesAlma";
+import { isPublishedOnCalendarDay, sanitizeDayYmd, sanitizeTimeZone } from "@/lib/news-calendar-day";
+
+/** rss-parser + fetch a feeds externos: Node completo (evita fallos en Edge / Buffer). */
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 /** Alias para pruebas / nombres cortos → id de NEWS_TOPIC_GROUPS. Incluye temas del NewsStrip. */
 const TOPIC_ALIASES: Record<string, string> = {
@@ -20,8 +25,12 @@ const TOPIC_ALIASES: Record<string, string> = {
 };
 
 const parser = new Parser({
-  timeout: 8000,
-  headers: { "User-Agent": "AlmaMundi-Bot/1.0" },
+  timeout: 15_000,
+  headers: {
+    "User-Agent":
+      "Mozilla/5.0 (compatible; AlmaMundi/1.0; +https://almamundi.org) AppleWebKit/537.36 (KHTML, like Gecko)",
+    Accept: "application/rss+xml, application/xml, text/xml, */*",
+  },
   customFields: {
     item: [
       ["media:thumbnail", "mediaThumbnail"],
@@ -32,7 +41,7 @@ const parser = new Parser({
 });
 
 const cache = new Map<string, { items: NewsLiveItem[]; fetchedAt: number }>();
-const CACHE_TTL_MS = 10 * 60 * 1000;
+const CACHE_TTL_MS = 3 * 60 * 1000;
 
 export interface NewsLiveItem {
   id: string;
@@ -85,17 +94,28 @@ function extractGeo(item: AlmaItem): { lat: number | null; lng: number | null } 
   return { lat: null, lng: null };
 }
 
+/** Id estable sin Buffer (compatible Edge / cualquier runtime). */
+function hashLinkFragment(link: string): string {
+  let h = 2166136261;
+  for (let i = 0; i < link.length; i++) {
+    h ^= link.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return (h >>> 0).toString(36);
+}
+
 function stableItemId(item: AlmaItem, fallback: string): string {
   const g = item.guid;
   if (typeof g === "string" && g.trim()) return `guid:${g.trim().slice(0, 200)}`;
   if (typeof item.link === "string" && item.link.trim())
-    return `link:${Buffer.from(item.link).toString("base64url").slice(0, 48)}`;
+    return `link:${hashLinkFragment(item.link.trim())}`;
   return fallback;
 }
 
 async function fetchTopic(topic: string): Promise<NewsLiveItem[]> {
   const cached = cache.get(topic);
-  if (cached && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
+  /* No reutilizar listas vacías: si todos los RSS fallaron, el siguiente request reintenta. */
+  if (cached && cached.items.length > 0 && Date.now() - cached.fetchedAt < CACHE_TTL_MS) {
     return cached.items;
   }
 
@@ -149,7 +169,9 @@ async function fetchTopic(topic: string): Promise<NewsLiveItem[]> {
     return new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime();
   });
 
-  cache.set(topic, { items: allItems, fetchedAt: Date.now() });
+  if (allItems.length > 0) {
+    cache.set(topic, { items: allItems, fetchedAt: Date.now() });
+  }
 
   return allItems;
 }
@@ -170,13 +192,25 @@ export async function GET(req: NextRequest) {
       items = items.filter((i) => i.lat !== null && i.lng !== null);
     }
 
+    const dayParam = sanitizeDayYmd(searchParams.get("day"));
+    const tzParam = sanitizeTimeZone(searchParams.get("tz"));
+    if (dayParam && tzParam) {
+      const dayFiltered = items.filter((i) =>
+        isPublishedOnCalendarDay(i.publishedAt, dayParam, tzParam)
+      );
+      // Solo aplicar día si hay resultados; si no, los RSS suelen traer ayer o sin pubDate válido
+      if (dayFiltered.length > 0) {
+        items = dayFiltered;
+      }
+    }
+
     items = items.slice(0, limit);
 
     return NextResponse.json(
       { items, topic, count: items.length },
       {
         headers: {
-          "Cache-Control": "s-maxage=300, stale-while-revalidate=600",
+          "Cache-Control": "private, max-age=0, must-revalidate",
         },
       }
     );

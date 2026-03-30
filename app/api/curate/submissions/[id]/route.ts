@@ -1,25 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { requireAdmin } from "@/lib/adminAuth";
 import { getAdminDb } from "@/lib/firebase/admin";
 
 export const runtime = "nodejs";
 
-const ADMIN_TOKEN = process.env.ADMIN_PUBLISH_TOKEN ?? "";
 const ALLOWED_STATUSES = ["pending", "needs_changes", "approved", "rejected"] as const;
 
-function checkAuth(req: NextRequest): boolean {
-  const token = req.headers.get("x-admin-token") ?? "";
-  return Boolean(ADMIN_TOKEN && token === ADMIN_TOKEN);
-}
-
-/** GET /api/curate/submissions/[id] — Header: x-admin-token. */
+/** GET /api/curate/submissions/[id] */
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 });
-  }
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
     const db = getAdminDb();
@@ -29,30 +24,29 @@ export async function GET(
       return NextResponse.json({ error: "Not found" }, { status: 404 });
     }
     const data = snap.data() ?? {};
-    const createdAt = data.createdAt && typeof (data.createdAt as { toDate?: () => Date }).toDate === "function"
-      ? (data.createdAt as { toDate: () => Date }).toDate().toISOString()
-      : null;
-    const updatedAt = data.updatedAt && typeof (data.updatedAt as { toDate?: () => Date }).toDate === "function"
-      ? (data.updatedAt as { toDate: () => Date }).toDate().toISOString()
-      : null;
+    const createdAt =
+      data.createdAt && typeof (data.createdAt as { toDate?: () => Date }).toDate === "function"
+        ? (data.createdAt as { toDate: () => Date }).toDate().toISOString()
+        : null;
+    const updatedAt =
+      data.updatedAt && typeof (data.updatedAt as { toDate?: () => Date }).toDate === "function"
+        ? (data.updatedAt as { toDate: () => Date }).toDate().toISOString()
+        : null;
     return NextResponse.json({ id: snap.id, ...data, createdAt, updatedAt });
   } catch (e) {
     console.error("curate submission get", e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Get failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Get failed" }, { status: 500 });
   }
 }
 
-/** PATCH /api/curate/submissions/[id] — body: { status?, curatorNotes? }. Header: x-admin-token. */
+/** PATCH /api/curate/submissions/[id] */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!checkAuth(request)) {
-    return NextResponse.json({ error: "No autorizado." }, { status: 401 });
-  }
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { id } = await params;
     let body: { status?: string; curatorNotes?: string };
@@ -85,9 +79,6 @@ export async function PATCH(
     return NextResponse.json({ id: updated.id, ...updated.data() });
   } catch (e) {
     console.error("curate submission patch", e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Update failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
   }
 }

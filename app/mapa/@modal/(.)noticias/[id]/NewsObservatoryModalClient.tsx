@@ -7,6 +7,7 @@ import { NewsObservatory, type NewsItemObservatory } from '@/components/observat
 import { SaveToCollectionButton } from '@/components/collection/SaveToCollectionButton';
 import { getMediaByDomain } from '@/lib/media-sources';
 import { DEFAULT_NEWS_TOPIC_QUERY } from '@/lib/news-topics';
+import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 
 function normalizeDomain(hostname: string): string {
   return hostname.replace(/^www\./, '').toLowerCase();
@@ -36,39 +37,59 @@ export function NewsObservatoryModalClient({ newsId }: { newsId: string }) {
   useEffect(() => {
     let cancelled = false;
     const topic = DEFAULT_NEWS_TOPIC_QUERY;
-    const url = `/api/world?kind=news&topic=${encodeURIComponent(topic)}&limit=50&lang=es`;
-    fetch(url)
-      .then((res) => res.ok ? res.json() : Promise.reject(new Error('fetch failed')))
-      .then((data: { items?: unknown[] }) => {
-        if (cancelled) return;
-        const raw = Array.isArray(data.items) ? data.items : [];
-        const found = raw.find((i: unknown) => String((i as Record<string, unknown>).id) === newsId) as Record<string, unknown> | undefined;
-        if (!found) {
-          setNotFound(true);
-          setLoading(false);
-          return;
-        }
-        const rawUrl = typeof found.url === 'string' ? found.url : '';
-        const rawSource = found.source != null ? String(found.source) : null;
-        const source = getCuratedSourceName(rawUrl || null, rawSource);
-        setItem({
-          id: String(found.id),
-          title: typeof found.title === 'string' ? found.title : '',
-          url: rawUrl,
-          source,
-          publishedAt: found.publishedAt != null ? String(found.publishedAt) : null,
-          sourceCountry: found.sourceCountry != null ? String(found.sourceCountry) : null,
-          topic: typeof found.topic === 'string' ? found.topic : 'Actualidad',
-        });
-        setLoading(false);
-      })
-      .catch(() => {
-        if (!cancelled) {
-          setNotFound(true);
-          setLoading(false);
-        }
+
+    const load = () => {
+      const { tz, day } = getUserCalendarDayForNewsApi();
+      const q = new URLSearchParams({
+        kind: 'news',
+        topic,
+        limit: '50',
+        lang: 'es',
+        tz,
+        day,
       });
-    return () => { cancelled = true; };
+      return fetch(`/api/world?${q.toString()}`)
+        .then((res) => (res.ok ? res.json() : Promise.reject(new Error('fetch failed'))))
+        .then((data: { items?: unknown[] }) => {
+          if (cancelled) return;
+          const raw = Array.isArray(data.items) ? data.items : [];
+          const found = raw.find((i: unknown) => String((i as Record<string, unknown>).id) === newsId) as
+            | Record<string, unknown>
+            | undefined;
+          if (!found) {
+            setNotFound(true);
+            setLoading(false);
+            return;
+          }
+          const rawUrl = typeof found.url === 'string' ? found.url : '';
+          const rawSource = found.source != null ? String(found.source) : null;
+          const source = getCuratedSourceName(rawUrl || null, rawSource);
+          setItem({
+            id: String(found.id),
+            title: typeof found.title === 'string' ? found.title : '',
+            url: rawUrl,
+            source,
+            publishedAt: found.publishedAt != null ? String(found.publishedAt) : null,
+            sourceCountry: found.sourceCountry != null ? String(found.sourceCountry) : null,
+            topic: typeof found.topic === 'string' ? found.topic : 'Actualidad',
+          });
+          setLoading(false);
+          setNotFound(false);
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setNotFound(true);
+            setLoading(false);
+          }
+        });
+    };
+
+    void load();
+    const interval = window.setInterval(load, 120_000);
+    return () => {
+      cancelled = true;
+      window.clearInterval(interval);
+    };
   }, [newsId]);
 
   if (loading) {

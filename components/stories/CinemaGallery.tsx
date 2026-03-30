@@ -31,9 +31,9 @@ function formatPlace(s: StoryPoint): string {
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
   const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-    <circle cx="50" cy="50" r="50" fill="#8b6914" opacity="0.3"/>
+    <circle cx="50" cy="50" r="50" fill="#c23600" opacity="0.3"/>
     <text x="50" y="64" font-family="serif" font-size="46" font-weight="300"
-          fill="#c9a96e" text-anchor="middle">${initial}</text>
+          fill="#ff4500" text-anchor="middle">${initial}</text>
   </svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
@@ -125,7 +125,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
 
   if (!stories.length) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#c9a96e', fontFamily: 'Georgia, serif', fontSize: '1.1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#ff4500', fontFamily: 'Georgia, serif', fontSize: '1.1rem' }}>
         No hay historias en video por ahora.
       </div>
     );
@@ -154,12 +154,12 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
 
         /* Play button pulse */
         @keyframes ringPulse {
-          0%,100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.35); }
-          50%      { box-shadow: 0 0 0 18px rgba(201,169,110,0); }
+          0%,100% { box-shadow: 0 0 0 0 rgba(255,69,0,0.35); }
+          50%      { box-shadow: 0 0 0 18px rgba(255,69,0,0); }
         }
         .cg-play-btn:not(:hover) { animation: ringPulse 2.8s ease infinite; }
         .cg-play-btn { transition: transform 0.2s, background 0.2s; }
-        .cg-play-btn:hover { transform: scale(1.1) !important; background: rgba(201,169,110,0.25) !important; }
+        .cg-play-btn:hover { transform: scale(1.1) !important; background: rgba(255,69,0,0.25) !important; }
 
         /* Filmstrip */
         .cg-film::-webkit-scrollbar { height: 0; }
@@ -264,7 +264,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               fontWeight: 200,
               fontSize: '0.65rem',
               letterSpacing: '0.5em',
-              color: 'rgba(201,169,110,0.55)',
+              color: 'rgba(255,69,0,0.55)',
               textTransform: 'uppercase',
               marginBottom: '2rem',
             }}
@@ -290,7 +290,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                   width: '34px', height: '34px',
                   borderRadius: '50%',
                   objectFit: 'cover',
-                  border: '1px solid rgba(201,169,110,0.3)',
+                  border: '1px solid rgba(255,69,0,0.3)',
                 }}
               />
               <div>
@@ -310,7 +310,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                     fontSize: '0.68rem',
                     letterSpacing: '0.2em',
                     textTransform: 'uppercase',
-                    color: 'rgba(201,169,110,0.55)',
+                    color: 'rgba(255,69,0,0.55)',
                   }}>
                     {formatPlace(story)}
                   </p>
@@ -371,14 +371,14 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               style={{
                 width: '88px', height: '88px',
                 borderRadius: '50%',
-                background: 'rgba(201,169,110,0.12)',
-                border: '1.5px solid rgba(201,169,110,0.5)',
+                background: 'rgba(255,69,0,0.12)',
+                border: '1.5px solid rgba(255,69,0,0.5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 cursor: 'pointer',
                 animationDelay: '0.25s',
               }}
             >
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="#c9a96e">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="#ff4500">
                 <polygon points="6,3 20,12 6,21" />
               </svg>
             </button>
@@ -391,8 +391,8 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                 fontSize: '0.75rem',
                 letterSpacing: '0.3em',
                 textTransform: 'uppercase',
-                color: '#c9a96e',
-                border: '1px solid rgba(201,169,110,0.3)',
+                color: '#ff4500',
+                border: '1px solid rgba(255,69,0,0.3)',
                 padding: '0.7rem 2rem',
                 textDecoration: 'none',
                 borderRadius: '2px',
@@ -422,13 +422,13 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               position: 'absolute', left: '1.5rem', top: '50%',
               transform: 'translateY(-50%)',
               background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(201,169,110,0.2)',
+              border: '1px solid rgba(255,69,0,0.2)',
               borderRadius: '50%',
               width: '38px', height: '38px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: activeIdx === 0 ? 'default' : 'pointer',
               opacity: activeIdx === 0 ? 0.2 : 0.7,
-              color: '#c9a96e',
+              color: '#ff4500',
               zIndex: 2,
             }}
           >
@@ -468,7 +468,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                     borderRadius: '3px',
                     overflow: 'hidden',
                     border: isActive
-                      ? '2px solid rgba(201,169,110,0.8)'
+                      ? '2px solid rgba(255,69,0,0.8)'
                       : '1px solid rgba(255,255,255,0.08)',
                     cursor: 'pointer',
                     opacity: isActive ? 1 : filmHover === i ? 0.85 : 0.4,
@@ -496,7 +496,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                       background: 'linear-gradient(135deg, #1a1612, #2a2016)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(201,169,110,0.4)">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="rgba(255,69,0,0.4)">
                         <polygon points="5,3 19,12 5,21" />
                       </svg>
                     </div>
@@ -507,7 +507,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
                       transform: 'translateX(-50%)',
                       width: '4px', height: '4px',
                       borderRadius: '50%',
-                      background: '#c9a96e',
+                      background: '#ff4500',
                     }} />
                   )}
                 </button>
@@ -525,13 +525,13 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               position: 'absolute', right: '1.5rem', top: '50%',
               transform: 'translateY(-50%)',
               background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(201,169,110,0.2)',
+              border: '1px solid rgba(255,69,0,0.2)',
               borderRadius: '50%',
               width: '38px', height: '38px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               cursor: activeIdx === stories.length - 1 ? 'default' : 'pointer',
               opacity: activeIdx === stories.length - 1 ? 0.2 : 0.7,
-              color: '#c9a96e',
+              color: '#ff4500',
               zIndex: 2,
             }}
           >

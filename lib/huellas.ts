@@ -13,6 +13,8 @@ export type HuellaPunto = {
   color: string;
   titulo: string;
   historia: string;
+  /** Opcional: enlace editorial verificable (https). Se muestra en el panel del Bit. */
+  fuenteUrl?: string;
 };
 
 export type HuellaCategoria = {

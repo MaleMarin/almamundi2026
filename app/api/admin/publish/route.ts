@@ -1,8 +1,10 @@
 import "server-only";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { requireAdmin } from "@/lib/adminAuth";
 import { Resend } from "resend";
+import { escapeHtml, safeHrefForEmail, isValidRecipientEmail } from "@/lib/email-html";
 
 export const runtime = "nodejs";
 
@@ -12,12 +14,22 @@ function getResend(): Resend | null {
   return new Resend(key);
 }
 
-/** POST /api/admin/publish — publicar submission + enviar email al autor. Body: { submissionId }. Header: x-admin-token. */
-export async function POST(req: Request) {
-  const token = req.headers.get("x-admin-token");
-  if (!process.env.ADMIN_PUBLISH_TOKEN || token !== process.env.ADMIN_PUBLISH_TOKEN) {
-    return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+function siteOrigin(): string {
+  const u =
+    process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+    process.env.PUBLIC_SITE_URL?.trim() ||
+    "https://www.almamundi.org";
+  try {
+    return new URL(u.endsWith("/") ? u.slice(0, -1) : u).hostname;
+  } catch {
+    return "www.almamundi.org";
   }
+}
+
+/** POST /api/admin/publish — publicar submission + email al autor. Requiere Firebase ID token (admin). */
+export async function POST(req: NextRequest) {
+  const auth = await requireAdmin(req);
+  if (auth instanceof NextResponse) return auth;
 
   let body: { submissionId?: string };
   try {
@@ -43,7 +55,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false, error: "already published" }, { status: 400 });
   }
   const status = sub.status as string;
-  if (status !== "pending" && status !== "approved") {
+  if (status !== "pending" && status !== "approved" && status !== "needs_changes") {
     return NextResponse.json({ ok: false, error: "bad status" }, { status: 400 });
   }
   const lat = sub.lat != null ? Number(sub.lat) : null;
@@ -95,23 +107,32 @@ export async function POST(req: Request) {
     publishedStoryId: storyRef.id,
   });
 
-  const to = sub.authorEmail as string;
-  const site = process.env.PUBLIC_SITE_URL || "https://www.almamundi.org";
-  const link = `${site}/mapa/historias/${storyRef.id}`;
+  const to = String(sub.authorEmail ?? "").trim();
+  if (!isValidRecipientEmail(to)) {
+    return NextResponse.json({ ok: true, storyId: storyRef.id, mailSent: false, mailSkipped: "invalid_author_email" });
+  }
+
+  const site = process.env.PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_APP_URL || "https://www.almamundi.org";
+  const rawLink = `${site.replace(/\/$/, "")}/mapa/historias/${storyRef.id}`;
+  const link = safeHrefForEmail(rawLink, [siteOrigin(), "almamundi.org"]);
 
   let mailSent = false;
   const resend = getResend();
   if (resend) {
     try {
+      const nameHtml =
+        sub.authorName && typeof sub.authorName === "string"
+          ? escapeHtml(String(sub.authorName).slice(0, 120))
+          : "";
       await resend.emails.send({
         from: process.env.MAIL_FROM || "AlmaMundi <hola@almamundi.org>",
         to,
         subject: "Tu historia ya está publicada en AlmaMundi",
         html: `
       <div style="font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;line-height:1.5">
-        <p>Hola${sub.authorName ? ` ${String(sub.authorName)}` : ""},</p>
+        <p>Hola${nameHtml ? ` ${nameHtml}` : ""},</p>
         <p>Tu historia ya fue revisada y publicada en AlmaMundi.</p>
-        <p><a href="${link}">Ver tu historia publicada</a></p>
+        <p><a href="${link.replace(/"/g, "")}">Ver tu historia publicada</a></p>
         <p style="color:#666;font-size:12px">Gracias por compartir tu mirada del mundo.</p>
       </div>
     `,

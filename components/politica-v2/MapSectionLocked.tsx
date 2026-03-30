@@ -17,7 +17,10 @@ export function MapSectionLocked() {
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
       <section id="mapa" className="w-full scroll-mt-32 bg-[var(--home-bg)]">
         <div className="map-section-gradient-block w-full">
-          <h2 className="text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14" style={{ color: 'var(--almamundi-orange)' }}>
+          <h2
+            className="text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14"
+            style={{ color: 'var(--almamundi-orange)' }}
+          >
             Mapa de AlmaMundi
           </h2>
           {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. 100% neumorfismo. */}
@@ -26,7 +29,10 @@ export function MapSectionLocked() {
           <div className="min-h-[48px] md:min-h-[64px] w-full shrink-0" aria-hidden />
         </div>
         {/* Universo: globo debajo de la barra; fondo negro al final de la sección. */}
-        <div className="relative w-full min-h-[120vh] h-[120vh] flex flex-col overflow-hidden bg-[var(--universe-bg)]" style={{ minHeight: '120vh' }}>
+        <div
+          className="relative flex w-full min-h-[120vh] flex-col overflow-hidden bg-[var(--universe-bg)]"
+          style={{ minHeight: '120vh' }}
+        >
           <HomeMap />
         </div>
       </section>

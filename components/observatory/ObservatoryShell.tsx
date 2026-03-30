@@ -2,6 +2,8 @@
 
 import Link from 'next/link';
 import { ArrowLeft, X } from 'lucide-react';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { isHomeHardNavHref } from '@/lib/home-hard-nav';
 
 export interface ObservatoryShellProps {
   title: string;
@@ -54,6 +56,14 @@ export function ObservatoryShell({
             >
               <X size={22} strokeWidth={2} />
             </button>
+          ) : isHomeHardNavHref(backHref) ? (
+            <HomeHardLink
+              href={backHref}
+              className="shrink-0 p-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition"
+              aria-label="Volver al globo"
+            >
+              <ArrowLeft size={isModal ? 20 : 24} strokeWidth={2} />
+            </HomeHardLink>
           ) : (
             <Link
               href={backHref}

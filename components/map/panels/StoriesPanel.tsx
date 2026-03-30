@@ -49,10 +49,17 @@ function StoryRow({
       style={{
         textAlign: 'left',
         padding: '15px 16px',
-        borderRadius: 14,
-        background: isActive ? 'rgba(249,115,22,0.10)' : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${isActive ? 'rgba(249,115,22,0.30)' : 'rgba(255,255,255,0.07)'}`,
-        borderLeft: isActive ? '3px solid rgba(249,115,22,0.6)' : '3px solid transparent',
+        borderRadius: 16,
+        background: isActive
+          ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.42) 0%, rgba(255, 85, 25, 0.2) 100%)'
+          : 'linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
+        backdropFilter: 'blur(14px) saturate(1.25)',
+        WebkitBackdropFilter: 'blur(14px) saturate(1.25)',
+        border: `1px solid ${isActive ? 'rgba(255, 100, 45, 0.75)' : 'rgba(255,255,255,0.22)'}`,
+        borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
+        boxShadow: isActive
+          ? 'inset 0 1px 0 rgba(255, 210, 160, 0.45), 0 0 14px rgba(255, 69, 0, 0.25)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.22)',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
@@ -100,7 +107,7 @@ export function StoriesPanel({
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
       <div style={{ flexShrink: 0 }}>
         <div style={{ position: 'relative' }}>
-          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255,255,255,0.35)', pointerEvents: 'none' }} />
+          <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 90, 35, 0.92)', pointerEvents: 'none' }} />
           <input
             type="search"
             value={exploreQuery}
@@ -110,9 +117,12 @@ export function StoriesPanel({
             style={{
               width: '100%',
               padding: '10px 12px 10px 36px',
-              borderRadius: 12,
-              border: '1px solid rgba(255,255,255,0.12)',
-              background: 'rgba(255,255,255,0.06)',
+              borderRadius: 14,
+              border: '1px solid rgba(255,255,255,0.32)',
+              background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)',
+              backdropFilter: 'blur(18px) saturate(1.35)',
+              WebkitBackdropFilter: 'blur(18px) saturate(1.35)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.38)',
               color: '#fff',
               fontSize: 13,
               fontFamily: SITE_FONT_STACK,
@@ -134,9 +144,12 @@ export function StoriesPanel({
           <div style={{
             padding: '24px 20px',
             textAlign: 'center',
-            background: 'rgba(255,255,255,0.03)',
-            borderRadius: 16,
-            border: '1px solid rgba(255,255,255,0.06)',
+            background: 'linear-gradient(160deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.1) 100%)',
+            backdropFilter: 'blur(22px) saturate(1.3)',
+            WebkitBackdropFilter: 'blur(22px) saturate(1.3)',
+            borderRadius: 18,
+            border: '1px solid rgba(255,255,255,0.32)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)',
           }}>
             <p style={{
               fontSize: 15,
@@ -154,9 +167,10 @@ export function StoriesPanel({
                 style={{
                   padding: '12px 24px',
                   borderRadius: 999,
-                  background: 'rgba(249,115,22,0.2)',
-                  border: '1px solid rgba(249,115,22,0.4)',
-                  color: '#fdba74',
+                  background: 'linear-gradient(180deg, #ff5f1a 0%, #ff4500 100%)',
+                  border: '1px solid rgba(255, 160, 100, 0.85)',
+                  color: '#ffffff',
+                  boxShadow: '0 6px 22px rgba(255, 69, 0, 0.5), inset 0 1px 0 rgba(255, 200, 160, 0.35)',
                   fontSize: 14,
                   fontWeight: 600,
                   cursor: 'pointer',
@@ -170,7 +184,7 @@ export function StoriesPanel({
           </div>
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
+            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#ff5f1a', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               Últimas historias
             </p>
             {stories.map((s, i) => (

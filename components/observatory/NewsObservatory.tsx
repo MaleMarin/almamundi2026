@@ -1,7 +1,7 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { ExternalLink, Tag } from 'lucide-react';
-import Link from 'next/link';
 
 export type NewsItemObservatory = {
   id: string;
@@ -56,13 +56,13 @@ export function NewsObservatory({ item }: NewsObservatoryProps) {
         Abrir fuente
       </a>
 
-      <Link
+      <HomeHardLink
         href="/#mapa"
         className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition"
       >
         <Tag size={16} />
         Más de este tema
-      </Link>
+      </HomeHardLink>
     </div>
   );
 }

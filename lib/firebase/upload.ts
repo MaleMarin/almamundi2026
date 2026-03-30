@@ -1,30 +1,46 @@
 'use client';
 
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '@/lib/firebase/client';
-
 /**
- * Sube un archivo o blob a Firebase Storage y devuelve la URL pública.
- * pathPrefix ej: "submissions" → path será submissions/{timestamp}-{filename}
+ * Subida server-side vía /api/submissions/story-media (Admin SDK, objeto privado).
+ * Devuelve URL firmada temporal y path interno para auditoría / curación.
  */
+export type StoryMediaUploadResult = {
+  readUrl: string;
+  storagePath: string;
+};
+
 export async function uploadFileToStorage(
   file: File | Blob,
-  pathPrefix: string,
+  _pathPrefix: string,
   filename?: string
-): Promise<string> {
-  if (!storage) {
-    throw new Error(
-      "Firebase Storage no está configurado. Añade NEXT_PUBLIC_FIREBASE_* en .env.local."
-    );
-  }
-  const name = filename || (file instanceof File ? file.name : 'media');
-  const safeName = name.replace(/[^a-zA-Z0-9._-]/g, '_').slice(0, 80);
-  const path = `${pathPrefix}/${Date.now()}-${safeName}`;
-  const storageRef = ref(storage, path);
+): Promise<StoryMediaUploadResult> {
+  const name =
+    filename ||
+    (file instanceof File ? file.name : 'media');
   const blob =
     file instanceof File
-      ? new Blob([await file.arrayBuffer()], { type: file.type })
-      : file;
-  await uploadBytes(storageRef, blob);
-  return getDownloadURL(storageRef);
+      ? file
+      : new File([await file.arrayBuffer()], name, {
+          type: file.type || 'application/octet-stream',
+        });
+
+  const fd = new FormData();
+  fd.append('file', blob);
+
+  const res = await fetch('/api/submissions/story-media', {
+    method: 'POST',
+    body: fd,
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    error?: string;
+    signedReadUrl?: string;
+    storagePath?: string;
+  };
+  if (!res.ok || !data.signedReadUrl || !data.storagePath) {
+    throw new Error(data.error || `upload_${res.status}`);
+  }
+  return {
+    readUrl: data.signedReadUrl,
+    storagePath: data.storagePath,
+  };
 }

@@ -12,6 +12,7 @@ export type BitEntry = {
   categoria?: string;
   titulo?: string;
   historia?: string;
+  fuenteUrl?: string;
 };
 
 export const BITS_DATA: BitEntry[] = [
@@ -76,13 +77,24 @@ export const BITS_DATA: BitEntry[] = [
   { id: 59, lat: -22.3285, lon: 24.6849, lugar: 'Botsuana', pais: 'Botsuana' },
   { id: 60, lat: 15.7835, lon: -90.2308, lugar: 'Guatemala', pais: 'Guatemala' },
   { id: 61, lat: -13.7590, lon: -172.1046, lugar: 'Samoa', pais: 'Samoa' },
-  { id: 62, lat: 31.6295, lon: -7.9811, lugar: 'Marruecos', pais: 'Marruecos' },
+  { id: 62, lat: 31.7917, lon: -7.0926, lugar: 'Marruecos', pais: 'Marruecos' },
   { id: 63, lat: 7.5150, lon: 134.5825, lugar: 'Palau', pais: 'Palau' },
   { id: 64, lat: 38.4192, lon: 27.1287, lugar: 'Turquía', pais: 'Turquía' },
   { id: 65, lat: -9.6457, lon: 160.1562, lugar: 'Islas Salomón', pais: 'Pacífico' },
   { id: 66, lat: 15.1794, lon: 39.7823, lugar: 'Eritrea', pais: 'Eritrea' },
   { id: 67, lat: -35.6751, lon: -71.5430, lugar: 'Chile', pais: 'Chile' },
-  { id: 101, lat: -33.4489, lon: -70.6693, lugar: 'Región Metropolitana', pais: 'Chile' },
+  {
+    id: 101,
+    lat: -33.4489,
+    lon: -70.6693,
+    lugar: 'Región Metropolitana',
+    pais: 'Chile',
+    categoria: 'Vivir distinto',
+    titulo: 'Santiago queda a poco más de una hora del mar o de la nieve en los Andes',
+    historia:
+      'Desde el centro urbano se puede llegar al borde costero del Pacífico o a sectores de montaña con nieve en temporadas frías en trayectos que, sin congestión, rondan la hora. Esa cercanía entre océano y cordillera marca el ritmo de la ciudad.',
+    fuenteUrl: 'https://es.wikipedia.org/wiki/Regi%C3%B3n_Metropolitana_de_Santiago',
+  },
   { id: 68, lat: 33.9391, lon: 67.7100, lugar: 'Afganistán', pais: 'Afganistán' },
   { id: 69, lat: 58.5953, lon: 25.0136, lugar: 'Estonia', pais: 'Estonia' },
   { id: 70, lat: 6.4238, lon: -66.5897, lugar: 'Venezuela', pais: 'Venezuela' },

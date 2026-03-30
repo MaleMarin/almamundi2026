@@ -13,12 +13,16 @@ import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
+import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
 import { BITS_DATA } from '@/lib/bits-data';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
+import { PillNavButton } from '@/components/home/PillNavButton';
+import { MAP_HOME_DOCK_NAV_CLASS } from '@/lib/map-home-neu-button';
 
 function huellasFallbackDesdeBitsData(): HuellaPunto[] {
   return BITS_DATA.map((b) => ({
@@ -31,6 +35,7 @@ function huellasFallbackDesdeBitsData(): HuellaPunto[] {
     color: '#f59e0b',
     titulo: b.titulo ?? b.lugar,
     historia: b.historia ?? '',
+    ...(b.fuenteUrl ? { fuenteUrl: b.fuenteUrl } : {}),
   }));
 }
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
@@ -38,12 +43,22 @@ import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel, type BitLike } from '@/components/map/panels/BitsPanel';
 import NewsStrip from '@/components/news/NewsStrip';
-import { initFromUserGesture, unlockAmbientAudio, playAmbient, stopAmbient } from '@/lib/sound/ambient';
+import { isPublicAudioMoodId, publicAudioPathFromMoodId } from '@/lib/public-audio-mood';
+import {
+  initFromUserGesture,
+  unlockAmbientAudio,
+  playAmbient,
+  playAmbientFromPublicUrl,
+  stopAmbient,
+  type AmbientKey,
+} from '@/lib/sound/ambient';
+import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
+import { useViewportBelow } from '@/hooks/useViewportBelow';
 
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-[#02040a] text-sm text-white/40">
+    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-black text-sm text-white/40">
       Cargando mapa…
     </div>
   ),
@@ -60,10 +75,15 @@ export default function HomeMap() {
   const [highlightedStoryId, setHighlightedStoryId] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  /** Portal del dock neumórfico bajo el título (`#map-dock-slot` en MapSectionLocked). */
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null);
   /** Textos curiosos y categorías: `public/huellas2.json`. Fallback = BITS_DATA (solo lugar/país) si falla la carga. */
   const [huellasPuntos, setHuellasPuntos] = useState<HuellaPunto[]>(huellasFallbackDesdeBitsData);
   const [selectedBit, setSelectedBit] = useState<HuellaPunto | BitLike | null>(null);
+
+  useEffect(() => {
+    setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -89,10 +109,6 @@ export default function HomeMap() {
       })),
     [huellasPuntos]
   );
-
-  useEffect(() => {
-    setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
-  }, []);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -133,9 +149,15 @@ export default function HomeMap() {
       return;
     }
     if (!selectedMood) return;
-    const mood = selectedMood as import('@/lib/sound/ambient').AmbientKey;
     unlockAmbientAudio()
-      .then(() => playAmbient(mood, { fadeMs: 2200 }))
+      .then(async () => {
+        if (isPublicAudioMoodId(selectedMood)) {
+          const path = publicAudioPathFromMoodId(selectedMood);
+          if (path) await playAmbientFromPublicUrl(path);
+          return;
+        }
+        await playAmbient(selectedMood as AmbientKey, { fadeMs: 2200 });
+      })
       .catch(() => {});
   }, [soundEnabled, selectedMood]);
 
@@ -143,9 +165,18 @@ export default function HomeMap() {
   useEffect(() => {
     const onFirstGesture = () => {
       initFromUserGesture();
-      if (soundEnabledRef.current) {
-        const mood = selectedMoodRef.current as import('@/lib/sound/ambient').AmbientKey;
-        unlockAmbientAudio().then(() => playAmbient(mood, { fadeMs: 2200 })).catch(() => {});
+      if (soundEnabledRef.current && selectedMoodRef.current) {
+        const m = selectedMoodRef.current;
+        unlockAmbientAudio()
+          .then(async () => {
+            if (isPublicAudioMoodId(m)) {
+              const path = publicAudioPathFromMoodId(m);
+              if (path) await playAmbientFromPublicUrl(path);
+              return;
+            }
+            await playAmbient(m as AmbientKey, { fadeMs: 2200 });
+          })
+          .catch(() => {});
       }
       document.removeEventListener('click', onFirstGesture);
       document.removeEventListener('touchstart', onFirstGesture);
@@ -165,7 +196,7 @@ export default function HomeMap() {
     });
   }, []);
 
-  const isMobile = false;
+  const isMobile = useViewportBelow(MAP_LAYOUT_MOBILE_MAX_WIDTH_PX);
 
   const stories = useStories();
 
@@ -176,7 +207,16 @@ export default function HomeMap() {
 
   const fetchNews = useCallback(
     async (topic: string, signal: AbortSignal): Promise<{ items: NewsItem[]; isFallback?: boolean }> => {
-      const url = `/api/world?kind=news&topic=${encodeURIComponent(topic)}&limit=20&lang=es`;
+      const { tz, day } = getUserCalendarDayForNewsApi();
+      const q = new URLSearchParams({
+        kind: 'news',
+        topic,
+        limit: '20',
+        lang: 'es',
+        tz,
+        day,
+      });
+      const url = `/api/world?${q.toString()}`;
       try {
         const res = await fetch(url, { signal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -210,14 +250,17 @@ export default function HomeMap() {
         });
         return { items, isFallback: Boolean(data.isFallback) };
       } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return { items: [] };
+        /* No resolver con []: useNewsLayer ignoraría el abort y podía dejar lista vacía por carrera. */
+        if (err instanceof Error && err.name === 'AbortError') throw err;
         throw err;
       }
     },
     [selectedTopicId]
   );
 
-  const { effectiveNewsItems } = useNewsLayer(selectedTopicId, topicQuery, 'actualidad', fetchNews);
+  const { effectiveNewsItems } = useNewsLayer(selectedTopicId, topicQuery, 'actualidad', fetchNews, {
+    refreshIntervalMs: 120_000,
+  });
   const filteredNewsItems = effectiveNewsItems;
 
   const handleStoryFocus = useCallback((story: StoryPoint) => {
@@ -238,9 +281,9 @@ export default function HomeMap() {
     requestAnimationFrame(() => {
       const hero = document.getElementById('historias');
       if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      else router.push('/#historias');
+      else hardNavigateTo('/#historias');
     });
-  }, [router]);
+  }, []);
 
   const historiasProps = {
     stories,
@@ -275,10 +318,11 @@ export default function HomeMap() {
         style={{ flex: 1, position: 'relative', height: '100%', minHeight: '80vh' }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[70vh] flex-1 flex-col overflow-hidden bg-[#02040a] pt-6 pb-6">
+        <div className="relative flex w-full min-h-[70vh] flex-1 flex-col overflow-hidden bg-black pt-6 pb-6">
           <div className="relative min-h-[300px] w-full min-h-0 flex-1">
             <GlobeV2Home
               embedded
+              forceDaylight
               bits={globeBitsMarkers}
               selectedBitId={selectedBit?.id ?? null}
               onBitClick={(id) => {
@@ -302,17 +346,17 @@ export default function HomeMap() {
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}
       {dockSlot &&
         createPortal(
-          <div className="flex flex-wrap items-center justify-center gap-2 md:gap-3 w-full">
-            <DockButtonLight active={drawerMode === 'stories'} onClick={() => open('stories')}>
+          <div className={MAP_HOME_DOCK_NAV_CLASS}>
+            <PillNavButton active={drawerMode === 'stories'} onClick={() => open('stories')}>
               Historias
-            </DockButtonLight>
-            <DockButtonLight active={drawerMode === 'sounds'} onClick={() => open('sounds')}>
+            </PillNavButton>
+            <PillNavButton active={drawerMode === 'sounds'} onClick={() => open('sounds')}>
               Sonidos
-            </DockButtonLight>
-            <DockButtonLight active={drawerMode === 'news'} onClick={() => open('news')}>
+            </PillNavButton>
+            <PillNavButton active={drawerMode === 'news'} onClick={() => open('news')}>
               Noticias en vivo
-            </DockButtonLight>
-            <DockButtonLight
+            </PillNavButton>
+            <PillNavButton
               active={drawerMode === 'bits'}
               onClick={() => {
                 setSelectedBit(null);
@@ -320,8 +364,15 @@ export default function HomeMap() {
               }}
             >
               Bits
-            </DockButtonLight>
-            <DockSearchLight onClick={() => open('search')} />
+            </PillNavButton>
+            <PillNavButton
+              active={drawerMode === 'search'}
+              onClick={() => open('search')}
+              longSingleLine
+              title="Buscar por palabras clave"
+            >
+              Buscar por palabras clave
+            </PillNavButton>
           </div>,
           dockSlot
         )}
@@ -370,47 +421,3 @@ export default function HomeMap() {
   );
 }
 
-/* Mismo estilo que los botones de arriba a la derecha (Propósito, Inspiración, Historias, Mapa): soft.button */
-const dockButtonStyle: React.CSSProperties = {
-  backgroundColor: '#E0E5EC',
-  boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
-  border: '1px solid rgba(255,255,255,0.3)',
-  borderRadius: 9999,
-  cursor: 'pointer',
-  transition: 'transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease',
-};
-
-function DockButtonLight({
-  children,
-  active,
-  onClick,
-}: {
-  children: React.ReactNode;
-  active?: boolean;
-  onClick?: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      data-active={active ? 'true' : undefined}
-      className="btn-almamundi whitespace-nowrap min-w-[148px] px-12 py-6 text-base font-medium text-gray-600 active:scale-95 transition-colors"
-      style={dockButtonStyle}
-    >
-      {children}
-    </button>
-  );
-}
-
-function DockSearchLight({ onClick }: { onClick?: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="btn-almamundi whitespace-nowrap min-w-[320px] px-12 py-6 text-base font-medium text-gray-600 active:scale-95 transition-colors"
-      style={dockButtonStyle}
-    >
-      Buscar por palabras clave
-    </button>
-  );
-}

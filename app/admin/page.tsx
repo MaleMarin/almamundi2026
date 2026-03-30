@@ -15,6 +15,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   Check,
   X,
@@ -164,7 +165,7 @@ export default function AdminPage() {
       const token = await u.getIdToken();
       setIdToken(token);
       if (!isAdminEmail(u.email ?? null)) {
-        router.replace('/#mapa');
+        hardNavigateTo('/#mapa');
         return;
       }
       setIsAdmin(true);
@@ -206,7 +207,7 @@ export default function AdminPage() {
   const fetchPending = useCallback(async () => {
     const res = await fetch('/api/admin/stories?status=pending', { headers: getAuthHeaders() });
     if (res.status === 401 || res.status === 403) {
-      router.replace('/#mapa');
+      hardNavigateTo('/#mapa');
       return;
     }
     const data = (await res.json()) as { stories?: Story[] };
@@ -216,7 +217,7 @@ export default function AdminPage() {
   const fetchActive = useCallback(async () => {
     const res = await fetch('/api/admin/stories?status=active', { headers: getAuthHeaders() });
     if (res.status === 401 || res.status === 403) {
-      router.replace('/#mapa');
+      hardNavigateTo('/#mapa');
       return;
     }
     const data = (await res.json()) as { stories?: Story[] };
@@ -226,7 +227,7 @@ export default function AdminPage() {
   const fetchArchived = useCallback(async () => {
     const res = await fetch('/api/admin/stories?status=archived', { headers: getAuthHeaders() });
     if (res.status === 401 || res.status === 403) {
-      router.replace('/#mapa');
+      hardNavigateTo('/#mapa');
       return;
     }
     const data = (await res.json()) as { stories?: Story[] };
@@ -236,7 +237,7 @@ export default function AdminPage() {
   const fetchCollections = useCallback(async () => {
     const res = await fetch('/api/admin/collections', { headers: getAuthHeaders() });
     if (res.status === 401 || res.status === 403) {
-      router.replace('/#mapa');
+      hardNavigateTo('/#mapa');
       return;
     }
     const data = (await res.json()) as { collections?: Collection[] };
@@ -246,7 +247,7 @@ export default function AdminPage() {
   const fetchStats = useCallback(async () => {
     const res = await fetch('/api/admin/stats', { headers: getAuthHeaders() });
     if (res.status === 401 || res.status === 403) {
-      router.replace('/#mapa');
+      hardNavigateTo('/#mapa');
       return;
     }
     const data = (await res.json()) as Stats & { error?: string };

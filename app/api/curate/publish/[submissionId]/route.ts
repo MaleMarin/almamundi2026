@@ -1,15 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { requireAdmin } from "@/lib/adminAuth";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { StorySubmission } from "@/lib/firebase/types";
 
 export const runtime = "nodejs";
 
-/** POST /api/curate/publish/[submissionId] — crea story desde envío aprobado, cola correo, marca envío publicado. */
+/** POST /api/curate/publish/[submissionId] — crea story desde envío aprobado (solo admin). */
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ submissionId: string }> }
 ) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
   try {
     const { submissionId } = await params;
     const db = getAdminDb();
@@ -78,7 +82,7 @@ export async function POST(
   } catch (e) {
     console.error("curate publish", e);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Publish failed" },
+      { error: "Publish failed" },
       { status: 500 }
     );
   }

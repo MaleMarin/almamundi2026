@@ -1,9 +1,14 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { GLOBE_PACIFIC_POV } from '@/lib/map-data/globe-pov';
 
-/** Vista inicial: estilo iPhone wallpaper — Sudamérica al centro, océanos azules, nubes, halo sutil. */
-const POV_BASE = { lat: -18, lng: -58, altitude: 2.45 } as const;
+/** Vista inicial: Pacífico + costa oeste NA; el panel desplaza lng si aplica. */
+const POV_BASE = {
+  lat: GLOBE_PACIFIC_POV.lat,
+  lng: GLOBE_PACIFIC_POV.lng,
+  altitude: GLOBE_PACIFIC_POV.altitude,
+} as const;
 const POV_LNG_OFFSET_DEG_PER_PANEL = 50;
 /** Espacio entre el panel izquierdo y el globo (solo escritorio). */
 const GAP_PANEL_GLOBE_PX = 24;

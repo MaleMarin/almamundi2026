@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 
 interface NewsItem {
   id: string;
@@ -47,9 +48,15 @@ export default function NewsStrip() {
   const fetchNews = useCallback(async (topic: string) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/news-live?topic=${encodeURIComponent(topic)}&limit=15`);
-      const data = await res.json();
-      setItems(data.items ?? []);
+      const { tz, day } = getUserCalendarDayForNewsApi();
+      const q = new URLSearchParams({ topic, limit: '15', tz, day });
+      const res = await fetch(`/api/news-live?${q.toString()}`, { cache: 'no-store' });
+      if (!res.ok) {
+        setItems([]);
+        return;
+      }
+      const data = (await res.json()) as { items?: NewsItem[] };
+      setItems(Array.isArray(data.items) ? data.items : []);
     } catch {
       setItems([]);
     } finally {
@@ -61,6 +68,11 @@ export default function NewsStrip() {
     fetchNews(activeTopic);
   }, [activeTopic, fetchNews]);
 
+  useEffect(() => {
+    const id = window.setInterval(() => fetchNews(activeTopic), 120_000);
+    return () => window.clearInterval(id);
+  }, [activeTopic, fetchNews]);
+
   return (
     <div
       style={{
@@ -69,17 +81,26 @@ export default function NewsStrip() {
         flexShrink: 0,
         display: 'flex',
         flexDirection: 'column',
-        background: 'rgba(0,0,0,0.75)',
-        backdropFilter: 'blur(12px)',
-        WebkitBackdropFilter: 'blur(12px)',
-        borderLeft: '1px solid rgba(255,255,255,0.08)',
+        background:
+          'linear-gradient(205deg, rgba(255,255,255,0.36) 0%, rgba(255,255,255,0.16) 48%, rgba(255,255,255,0.07) 72%, rgba(200, 220, 255, 0.12) 100%)',
+        backdropFilter: 'blur(38px) saturate(1.55)',
+        WebkitBackdropFilter: 'blur(38px) saturate(1.55)',
+        borderLeft: '1px solid rgba(255,255,255,0.46)',
+        boxShadow:
+          '-14px 0 48px rgba(0,0,0,0.36), inset 1px 0 0 rgba(255,255,255,0.45), inset 0 1px 0 rgba(255,255,255,0.2)',
+        borderTopLeftRadius: 20,
+        borderBottomLeftRadius: 20,
+        overflow: 'hidden',
       }}
     >
       {/* Header */}
       <div
         style={{
           padding: '14px 16px 10px',
-          borderBottom: '1px solid rgba(255,255,255,0.08)',
+          borderBottom: '1px solid rgba(255,255,255,0.28)',
+          background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
         }}
       >
         <div
@@ -88,8 +109,9 @@ export default function NewsStrip() {
             fontWeight: 600,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.4)',
+            color: '#ff5a14',
             marginBottom: '10px',
+            textShadow: '0 0 18px rgba(255, 69, 0, 0.45)',
           }}
         >
           Noticias en vivo
@@ -116,10 +138,19 @@ export default function NewsStrip() {
                 borderRadius: '20px',
                 border:
                   activeTopic === t.id
-                    ? '1px solid rgba(255,255,255,0.6)'
-                    : '1px solid rgba(255,255,255,0.15)',
-                background: activeTopic === t.id ? 'rgba(255,255,255,0.12)' : 'transparent',
-                color: activeTopic === t.id ? '#fff' : 'rgba(255,255,255,0.4)',
+                    ? '1px solid rgba(255, 100, 40, 0.95)'
+                    : '1px solid rgba(255,255,255,0.22)',
+                background:
+                  activeTopic === t.id
+                    ? 'linear-gradient(180deg, rgba(255, 69, 0, 0.55) 0%, rgba(255, 85, 20, 0.32) 100%)'
+                    : 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%)',
+                backdropFilter: 'blur(12px)',
+                WebkitBackdropFilter: 'blur(12px)',
+                boxShadow:
+                  activeTopic === t.id
+                    ? 'inset 0 1px 0 rgba(255, 200, 150, 0.45), 0 0 16px rgba(255, 69, 0, 0.35)'
+                    : 'inset 0 1px 0 rgba(255,255,255,0.18)',
+                color: activeTopic === t.id ? '#ffffff' : 'rgba(255,255,255,0.52)',
                 fontSize: '11px',
                 cursor: 'pointer',
                 transition: 'all 0.15s',
@@ -243,7 +274,7 @@ export default function NewsStrip() {
           textAlign: 'center',
         }}
       >
-        Actualiza cada 10 min
+        Hoy (tu zona) · actualiza cada 2 min
       </div>
     </div>
   );

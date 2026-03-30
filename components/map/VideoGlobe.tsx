@@ -92,6 +92,8 @@ function bitPositionOnSphere(lat: number, lon: number) {
 
 /** Sin rotación: textura equirectangular estándar tiene Norte arriba. Overlay con el mismo transform que vídeo/img. */
 const VIDEO_TRANSFORM = 'none';
+/** Refuerzo de azules en océanos (imagen/vídeo); ligero para no teñir demasiado la tierra. */
+const GLOBE_OCEAN_FILTER = 'saturate(1.28) hue-rotate(-11deg) contrast(1.08) brightness(1.05)';
 /** Globo más grande que el círculo para que no se vea anillo negro. Regla: no cambiar. */
 const GLOBE_SCALE = 1.3;
 
@@ -131,15 +133,15 @@ function getPulseStyle(index: number) {
   };
 }
 
-/** Puntos de luz: 4 capas como antes (core → inner bloom → mid glow → outer atmosphere), tamaño menor */
+/** Puntos dorados pequeños: núcleo claro + halos ámbar/oro. */
 const BIT_BACKGROUND = [
-  'radial-gradient(circle, #FFFAED 0%, transparent 2px)',
-  'radial-gradient(circle, rgba(255,200,74,0.7) 0%, transparent 6px)',
-  'radial-gradient(circle, rgba(255,154,0,0.25) 0%, transparent 14px)',
-  'radial-gradient(circle, rgba(255,102,0,0.06) 0%, transparent 28px)',
+  'radial-gradient(circle, #fff8e7 0%, transparent 1px)',
+  'radial-gradient(circle, rgba(255,215,120,0.85) 0%, transparent 3px)',
+  'radial-gradient(circle, rgba(230,180,40,0.35) 0%, transparent 7px)',
+  'radial-gradient(circle, rgba(180,130,20,0.08) 0%, transparent 14px)',
 ].join(', ');
 
-const DOT_SIZE_PX = 40;
+const DOT_SIZE_PX = 20;
 const HALF = DOT_SIZE_PX / 2;
 
 const DAY_ATMOSPHERE = [
@@ -148,7 +150,7 @@ const DAY_ATMOSPHERE = [
   '0 0 120px rgba(60, 120, 255, 0.15)',
 ].join(', ');
 
-const NIGHT_BG = '#03050F';
+const NIGHT_BG = '#0c2840';
 
 export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId }: VideoGlobeProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -446,6 +448,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                 transform: 'none',
                 transformOrigin: '50% 50%',
                 zIndex: 0,
+                filter: GLOBE_OCEAN_FILTER,
               }}
             />
             {/* Vídeo encima solo cuando está listo; opacity 0 + visibility hidden evitan frame negro hasta que cargue. */}
@@ -468,6 +471,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                 transform: 'none',
                 transformOrigin: '50% 50%',
                 zIndex: 1,
+                filter: GLOBE_OCEAN_FILTER,
               }}
               aria-hidden
             />
@@ -526,9 +530,9 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                       style={{
                         background: BIT_BACKGROUND,
                         boxShadow: isHighlighted
-                          ? '0 0 0 2px rgba(255,200,74,0.9), 0 0 24px rgba(255,200,74,0.5), 0 0 40px rgba(255,154,0,0.25)'
+                          ? '0 0 0 1.5px rgba(255,200,90,0.95), 0 0 12px rgba(255,190,60,0.55), 0 0 22px rgba(212,160,30,0.35)'
                           : undefined,
-                        filter: isHighlighted ? 'brightness(1.35)' : undefined,
+                        filter: isHighlighted ? 'brightness(1.28) saturate(1.15)' : undefined,
                         ...pulseStyles[index],
                       }}
                     />

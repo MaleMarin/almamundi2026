@@ -1,8 +1,9 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { EmotionVisual } from '@/lib/audioEmotion';
 import { EMOTION_VISUALS } from '@/lib/audioEmotion';
@@ -14,7 +15,6 @@ import { StoryObservatory } from '@/components/observatory/StoryObservatory';
 import { SaveToCollectionButton } from '@/components/collection/SaveToCollectionButton';
 
 export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const fromMusic = searchParams.get('from') === 'music';
   const backHref = '/#mapa';
@@ -80,14 +80,14 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
       >
         <StoryObservatory story={story} onEmotionChange={setCurrentEmotion} />
         <SimilarStories storyId={story.id} />
-        <StoryInvitation onInvite={() => router.push('/?openModal=true')} />
+        <StoryInvitation onInvite={() => hardNavigateTo('/?openModal=true')} />
         <div className="mt-8">
-          <Link
+          <HomeHardLink
             href={backHref}
             className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
           >
             Volver al globo
-          </Link>
+          </HomeHardLink>
         </div>
       </ObservatoryShell>
       </div>

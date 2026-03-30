@@ -1,6 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { Menu, X } from 'lucide-react';
+import { PillNavButton } from '@/components/home/PillNavButton';
+import { MAP_HOME_HEADER_NAV_CLASS } from '@/lib/map-home-neu-button';
 import { DM_Sans } from 'next/font/google';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
@@ -92,7 +96,8 @@ function SoftCard({
 
 export type HomeFirstPartProps = {
   onShowPurpose: () => void;
-  onShowInspiration: () => void;
+  /** Explicación del sitio y enlace a política de privacidad (modal). */
+  onShowComoFunciona: () => void;
   onRecordVideo: () => void;
   onRecordAudio: () => void;
   onWriteStory: () => void;
@@ -103,7 +108,7 @@ export type HomeFirstPartProps = {
 
 export function HomeFirstPart({
   onShowPurpose,
-  onShowInspiration,
+  onShowComoFunciona,
   onRecordVideo,
   onRecordAudio,
   onWriteStory,
@@ -113,6 +118,18 @@ export function HomeFirstPart({
   const historiasHref = basePath ? `${basePath}#historias` : '#historias';
   const baseNorm = basePath.replace(/\/$/, '');
   const mapaHref = basePath ? (baseNorm ? `${baseNorm}#mapa` : '/#mapa') : '/#mapa';
+
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  useEffect(() => {
+    if (!mobileNavOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeMobileNav();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [mobileNavOpen, closeMobileNav]);
 
   return (
     <>
@@ -152,34 +169,80 @@ export function HomeFirstPart({
       `}</style>
 
       {/* HEADER */}
-      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
-        <div className="flex items-center shrink-0">
+      <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
+        <div className="flex items-center shrink-0 min-w-0">
           <img
             src="/logo.png"
             alt="AlmaMundi"
             className="h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md"
           />
         </div>
-        <nav className="hidden md:flex gap-4 lg:gap-6 text-base font-bold text-gray-600 items-center">
-          <button onClick={onShowPurpose} className="btn-almamundi home-neu-btn px-8 py-3.5 md:px-10 md:py-4 active:scale-95" style={soft.button} type="button">
-            Propósito
+        <div className="flex items-center justify-end shrink-0">
+          <button
+            type="button"
+            className="md:hidden flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"
+            style={soft.button}
+            aria-expanded={mobileNavOpen}
+            aria-controls="home-header-mobile-nav"
+            aria-label={mobileNavOpen ? 'Cerrar menú' : 'Abrir menú'}
+            onClick={() => setMobileNavOpen((o) => !o)}
+          >
+            {mobileNavOpen ? <X size={22} strokeWidth={2} aria-hidden /> : <Menu size={22} strokeWidth={2} aria-hidden />}
           </button>
-          <button onClick={onShowInspiration} className="home-neu-btn px-8 py-3.5 md:px-10 md:py-4 active:scale-95 hover:text-gray-700 flex items-center gap-2" style={soft.button} type="button">
-            Inspiración
-          </button>
-          <a href={historiasHref} className="btn-almamundi home-neu-btn px-8 py-3.5 md:px-10 md:py-4 active:scale-95" style={soft.button}>
-            Historias
-          </a>
-          <a href={mapaHref} className="btn-almamundi home-neu-btn px-8 py-3.5 md:px-10 md:py-4 active:scale-95" style={soft.button}>
-            Mapa
-          </a>
-        </nav>
+          <nav className={MAP_HOME_HEADER_NAV_CLASS} aria-label="Navegación principal">
+            <PillNavButton onClick={onShowPurpose}>Propósito</PillNavButton>
+            <PillNavButton onClick={onShowComoFunciona}>¿Cómo funciona?</PillNavButton>
+            <PillNavButton href={historiasHref}>Historias</PillNavButton>
+            <PillNavButton href={mapaHref}>Mapa</PillNavButton>
+          </nav>
+        </div>
+
+        {mobileNavOpen ? (
+          <>
+            <button
+              type="button"
+              className="fixed left-0 right-0 bottom-0 z-[98] bg-black/25 md:hidden"
+              style={{ top: '8rem' }}
+              aria-label="Cerrar menú"
+              onClick={closeMobileNav}
+            />
+            <div
+              id="home-header-mobile-nav"
+              className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-3 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-lg md:hidden"
+              role="navigation"
+              aria-label="Navegación principal"
+            >
+              <PillNavButton
+                onClick={() => {
+                  onShowPurpose();
+                  closeMobileNav();
+                }}
+              >
+                Propósito
+              </PillNavButton>
+              <PillNavButton
+                onClick={() => {
+                  onShowComoFunciona();
+                  closeMobileNav();
+                }}
+              >
+                ¿Cómo funciona?
+              </PillNavButton>
+              <PillNavButton href={historiasHref} onAfterClick={closeMobileNav}>
+                Historias
+              </PillNavButton>
+              <PillNavButton href={mapaHref} onAfterClick={closeMobileNav}>
+                Mapa
+              </PillNavButton>
+            </div>
+          </>
+        ) : null}
       </header>
 
       {/* INTRO — DM Sans: sans geométrica minimalista (solo esta franja) */}
       <section
         id="intro"
-        className={`${homeHeroPhrase.className} pt-48 sm:pt-52 md:pt-60 lg:pt-72 pb-8 md:pb-12 px-6 md:px-10 relative z-10 flex flex-col items-center text-center`}
+        className={`${homeHeroPhrase.className} pt-48 sm:pt-52 md:pt-60 lg:pt-72 pb-10 md:pb-14 px-6 md:px-10 relative z-10 flex flex-col items-center text-center`}
       >
         <div className="max-w-5xl lg:max-w-6xl animate-float">
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.12] mb-5 md:mb-6" style={{ color: soft.textMain }}>
@@ -187,23 +250,23 @@ export function HomeFirstPart({
             <span className="font-medium">despiertan otras historias.</span>
           </h1>
           <div
-            className="w-28 md:w-32 h-1.5 md:h-2 rounded-full mx-auto mb-5 md:mb-6"
-            style={{ backgroundColor: 'var(--almamundi-orange, #ff4500)', boxShadow: '0 0 12px rgba(255, 69, 0, 0.45)' }}
+            className="mx-auto mb-5 h-px w-28 rounded-none md:mb-6 md:w-32"
+            style={{ backgroundColor: 'var(--almamundi-orange, #ff4500)' }}
             aria-hidden
           />
-          <p className="pt-3 md:pt-4 text-lg md:text-xl lg:text-2xl font-light tracking-wide max-w-4xl mx-auto leading-[1.65]" style={{ color: soft.textBody }}>
+          <p className="pt-3 md:pt-4 text-xl md:text-2xl lg:text-3xl font-light tracking-wide max-w-4xl mx-auto leading-[1.65]" style={{ color: soft.textBody }}>
             Aquí, cada relato importa. <span className="font-normal">Cada historia es extraordinaria.</span>
           </p>
         </div>
       </section>
 
-      {/* CARDS — un poco más arriba que antes; más hueco entre tarjetas */}
-      <section id="historias" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-8 md:pt-10 lg:pt-12 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-10 md:gap-y-12 gap-x-8 md:gap-x-10 lg:gap-x-14 justify-center items-stretch relative z-10">
+      {/* CARDS — más aire bajo el hero y mayor separación entre tarjetas */}
+      <section id="historias" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-14 md:pt-20 lg:pt-24 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10">
         <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={onRecordVideo} delay="0s">
-          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó. <em className="text-gray-500 not-italic">(Video de hasta 5 minutos.)</em>
+          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
         </SoftCard>
         <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={onRecordAudio} delay="0.2s">
-          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto. <em className="text-gray-500 not-italic">(Audio de hasta 5 minutos.)</em>
+          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
         </SoftCard>
         <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={onWriteStory} delay="0.4s">
           Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.

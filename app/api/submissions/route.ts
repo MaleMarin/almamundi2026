@@ -1,33 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema";
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from "@/lib/rate-limit";
+import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 5;
-const rateMap = new Map<string, number[]>();
-
-function getClientIp(req: NextRequest): string {
-  return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? req.headers.get("x-real-ip") ?? "unknown";
-}
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now();
-  let times = rateMap.get(ip) ?? [];
-  times = times.filter((t) => now - t < RATE_LIMIT_WINDOW_MS);
-  if (times.length >= RATE_LIMIT_MAX) return false;
-  times.push(now);
-  rateMap.set(ip, times);
-  return true;
-}
-
-/** POST /api/submissions — crear submission (status pending). Validación + rate limit. */
+/** POST /api/submissions — crear submission (status pending). Rate limit + validación. */
 export async function POST(req: NextRequest) {
-  const ip = getClientIp(req);
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json({ error: "Demasiados envíos. Espera un minuto." }, { status: 429 });
-  }
+  const ip = clientIpFromRequest(req);
+  const rl = getRateLimiter("submissions-post", 8, 3600);
+  const blocked = await enforceRateLimit(rl, `submissions:${ip}`, {
+    max: 8,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
 
   let body: unknown;
   try {
@@ -45,7 +36,11 @@ export async function POST(req: NextRequest) {
 
   const data = parsed.data;
 
-  // Validar payload según tipo
+  const captcha = await verifyTurnstileIfConfigured(data.captchaToken, ip);
+  if (!captcha.ok) {
+    return NextResponse.json({ error: "Verificación anti-bot requerida." }, { status: 400 });
+  }
+
   const { type, payload } = data;
   if (type === "video" && !payload.videoUrl) {
     return NextResponse.json({ error: "URL de video requerida (YouTube/Vimeo)" }, { status: 400 });
@@ -96,6 +91,9 @@ export async function POST(req: NextRequest) {
   if (data.extraAttachmentUrls?.length) {
     (doc as SubmissionDoc).extraAttachmentUrls = data.extraAttachmentUrls;
   }
+  if (data.privateMediaPaths?.length) {
+    (doc as SubmissionDoc).privateMediaPaths = data.privateMediaPaths;
+  }
 
   try {
     const db = getAdminDb();
@@ -104,7 +102,7 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     console.error("submissions POST", e);
     return NextResponse.json(
-      { error: e instanceof Error ? e.message : "Error al guardar" },
+      { error: "Error al guardar" },
       { status: 500 }
     );
   }

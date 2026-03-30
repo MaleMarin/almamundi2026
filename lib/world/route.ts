@@ -3,11 +3,13 @@ import Parser from "rss-parser";
 import { mockWorldNow } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
 import { DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
+import { isPublishedOnCalendarDay, sanitizeDayYmd, sanitizeTimeZone } from "@/lib/news-calendar-day";
 
 export const runtime = "nodejs";
 
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
-const CACHE_TTL_MS = 300_000; // 5 min
+/** Caché corta para que el polling del cliente vea títulos nuevos sin esperar demasiado. */
+const CACHE_TTL_MS = 120_000; // 2 min
 const GDELT_REQUEST_TIMEOUT_MS = 8_000;
 
 const rssParser = new Parser({
@@ -53,12 +55,12 @@ function isMode(x: string): x is Mode {
   return x === "now" || x === "today";
 }
 
-// --- In-memory cache for news (key = cacheKey(topic, limit), value = { at, data })
+// --- In-memory cache for news (key incluye día+zona si aplica)
 type CacheEntry = { at: number; data: NormalizedNewsResponse };
 const newsCache = new Map<string, CacheEntry>();
 
-function cacheKey(topic: string, limit: number, lang: string): string {
-  return `${topic}|${limit}|${lang}`;
+function cacheKey(topic: string, limit: number, lang: string, dayKey: string): string {
+  return `${topic}|${limit}|${lang}|${dayKey}`;
 }
 
 function getCached(key: string): NormalizedNewsResponse | null {
@@ -416,14 +418,20 @@ function isLikelySpanish(article: GdeltArticle): boolean {
   return false;
 }
 
-async function fetchNewsFromGdelt(topic: string, limit: number, lang: string, maxRecords = 150): Promise<NormalizedNewsResponse | null> {
+async function fetchNewsFromGdelt(
+  topic: string,
+  limit: number,
+  lang: string,
+  maxRecords = 150,
+  timespan: string = "6h"
+): Promise<NormalizedNewsResponse | null> {
   const queryStr = topic.trim().length > 0 ? (lang === "es" ? `${topic.trim()} sourcelang:spanish` : topic.trim()) : "news";
   const params = new URLSearchParams({
     query: queryStr,
     mode: "artlist",
     format: "json",
     sort: "datedesc",
-    timespan: "1day",
+    timespan,
     maxrecords: String(Math.min(250, maxRecords)),
   });
   const url = `${GDELT_BASE}?${params.toString()}`;
@@ -440,10 +448,16 @@ async function fetchNewsFromGdelt(topic: string, limit: number, lang: string, ma
       if (spanishOnly.length > 0) articles = spanishOnly;
     }
     const items = normalizeGdeltArticles(articles).slice(0, limit);
+    if (items.length === 0 && timespan === "6h") {
+      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day");
+    }
     if (items.length === 0) return null;
     return { generatedAt: new Date().toISOString(), items, isFallback: false };
   } catch {
     clearTimeout(timeoutId);
+    if (timespan === "6h") {
+      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day");
+    }
     return null;
   }
 }
@@ -561,13 +575,78 @@ async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<Norm
   return { generatedAt: new Date().toISOString(), items, isFallback: false };
 }
 
-export async function getNews(topic: string, limit: number, lang: string = "es"): Promise<NormalizedNewsResponse> {
+function dedupeNewsItems(items: NormalizedNewsItem[]): NormalizedNewsItem[] {
+  const seenUrl = new Set<string>();
+  const seenId = new Set<string>();
+  const out: NormalizedNewsItem[] = [];
+  for (const it of items) {
+    const u = (it.url ?? "").trim();
+    const id = (it.id ?? "").trim();
+    if (u && seenUrl.has(u)) continue;
+    if (!u && id && seenId.has(id)) continue;
+    if (u) seenUrl.add(u);
+    if (id) seenId.add(id);
+    out.push(it);
+  }
+  return out;
+}
+
+function sortByPublishedDesc(items: NormalizedNewsItem[]): NormalizedNewsItem[] {
+  return [...items].sort((a, b) => {
+    const ta = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
+    const tb = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
+    return tb - ta;
+  });
+}
+
+export type NewsCalendarFilter = { dayYmd: string; timeZone: string };
+
+export async function getNews(
+  topic: string,
+  limit: number,
+  lang: string = "es",
+  calendar: NewsCalendarFilter | null = null
+): Promise<NormalizedNewsResponse> {
   const topicTrim = topic.trim();
-  const key = cacheKey(topic, limit, lang);
+  const dayKey = calendar ? `${calendar.dayYmd}|${calendar.timeZone}` : "all";
+  const key = cacheKey(topic, limit, lang, dayKey);
   const cached = getCached(key);
   if (cached) return cached;
 
-  // RSS primero (rápido, medios curados); se filtra por tema si viene en topic
+  if (calendar) {
+    const applyDay = (items: NormalizedNewsItem[]) =>
+      items.filter((it) => isPublishedOnCalendarDay(it.publishedAt, calendar.dayYmd, calendar.timeZone));
+
+    const rssLimit = Math.min(250, Math.max(limit * 8, 60));
+    const rss = await fetchNewsFromRss(rssLimit, topicTrim).catch(() => null);
+    let merged: NormalizedNewsItem[] = rss && rss.items.length ? applyDay(rss.items) : [];
+    merged = sortByPublishedDesc(merged);
+
+    if (merged.length < limit) {
+      const domainQuery = buildDomainQuery();
+      const fullQuery = topicTrim.length > 0 ? `${topicTrim} ${domainQuery}` : domainQuery;
+      const g = await fetchNewsFromGdelt(fullQuery, Math.max(limit * 2, 40), lang, 250, "6h").catch(() => null);
+      if (g && g.items.length) merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...applyDay(g.items)]));
+    }
+    if (merged.length < limit) {
+      const domainQuery = buildDomainQuery();
+      const g = await fetchNewsFromGdelt(domainQuery, Math.max(limit * 2, 40), lang, 250, "6h").catch(() => null);
+      if (g && g.items.length) merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...applyDay(g.items)]));
+    }
+
+    merged = merged.slice(0, limit);
+    merged = applyGeoFallback(merged);
+
+    if (merged.length > 0) {
+      const data: NormalizedNewsResponse = { generatedAt: new Date().toISOString(), items: merged, isFallback: false };
+      setCached(key, data);
+      return data;
+    }
+    // Nada encaja en el día calendario (feeds retrasados o sin pubDate): mismas fuentes sin filtro de día
+    return getNews(topic, limit, lang, null);
+  }
+
+  // RSS primero (rápido, medios curados); GDELT ventana corta (6h) para titulares más frescos
   const rss = await fetchNewsFromRss(limit, topicTrim).catch(() => null);
   if (rss && rss.items.length > 0) {
     const withGeo = { ...rss, items: applyGeoFallback(rss.items) };
@@ -578,13 +657,13 @@ export async function getNews(topic: string, limit: number, lang: string = "es")
   const domainQuery = buildDomainQuery();
   const fullQuery = topicTrim.length > 0 ? `${topicTrim} ${domainQuery}` : domainQuery;
 
-  let gdelt = await fetchNewsFromGdelt(fullQuery, limit, lang, 150).catch(() => null);
+  let gdelt = await fetchNewsFromGdelt(fullQuery, limit, lang, 150, "6h").catch(() => null);
   if (gdelt && gdelt.items.length > 0) {
     const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
     setCached(key, withGeo);
     return withGeo;
   }
-  gdelt = await fetchNewsFromGdelt(domainQuery, limit, lang, 150).catch(() => null);
+  gdelt = await fetchNewsFromGdelt(domainQuery, limit, lang, 150, "6h").catch(() => null);
   if (gdelt && gdelt.items.length > 0) {
     const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
     setCached(key, withGeo);
@@ -624,9 +703,18 @@ export async function GET(request: NextRequest) {
       const limitParam = request.nextUrl.searchParams.get("limit");
       const limit = limitParam ? Math.min(250, Math.max(1, parseInt(limitParam, 10) || 10)) : 20;
       const lang = request.nextUrl.searchParams.get("lang")?.trim() ?? "es";
-      let data = await getNews(topic, limit, lang);
-      if (!data.items || data.items.length === 0) data = fallbackMediaLinks();
-      return Response.json(data);
+      const dayParam = sanitizeDayYmd(request.nextUrl.searchParams.get("day"));
+      const tzParam = sanitizeTimeZone(request.nextUrl.searchParams.get("tz"));
+      const calendar = dayParam && tzParam ? { dayYmd: dayParam, timeZone: tzParam } : null;
+      let data = await getNews(topic, limit, lang, calendar);
+      if ((!data.items || data.items.length === 0) && !calendar) {
+        data = fallbackMediaLinks();
+      }
+      return Response.json(data, {
+        headers: {
+          "Cache-Control": "private, max-age=0, must-revalidate",
+        },
+      });
     }
 
     if (kind === "live") {

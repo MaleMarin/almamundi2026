@@ -7,6 +7,9 @@ import { z } from "zod";
 import { THEME_IDS } from "@/lib/themes";
 import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 
+const privatePathRegex =
+  /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
+
 export const SubmissionType = z.enum(["video", "audio", "texto", "foto"]);
 export type SubmissionType = z.infer<typeof SubmissionType>;
 
@@ -40,6 +43,8 @@ export const CreateSubmissionBody = z.object({
   consentRights: z.literal(true),
   consentCurate: z.literal(true),
   consentPostales: z.literal(true),
+  /** Cloudflare Turnstile (opcional si TURNSTILE_SECRET_KEY está definida). */
+  captchaToken: z.string().max(4000).optional(),
   /** Foto personal opcional (avatar) para mostrar junto al nombre público si se aprueba. */
   profilePhotoUrl: z.string().url().optional(),
   /** País (además de placeLabel, que suele incluir ciudad). */
@@ -48,6 +53,8 @@ export const CreateSubmissionBody = z.object({
   sex: sexSchema.optional(),
   /** Documentos o fotos extra para curadores. */
   extraAttachmentUrls: z.array(z.string().url()).max(8).optional(),
+  /** Paths en Storage (privados) asociados a esta solicitud; para re-firmar URLs en curación. */
+  privateMediaPaths: z.array(z.string().regex(privatePathRegex)).max(24).optional(),
 });
 export type CreateSubmissionBodyType = z.infer<typeof CreateSubmissionBody>;
 
@@ -71,6 +78,7 @@ export interface SubmissionDoc {
   birthDate?: string;
   sex?: "femenino" | "masculino" | "no-binario" | "prefiero-no-decir";
   extraAttachmentUrls?: string[];
+  privateMediaPaths?: string[];
   payload: {
     textBody?: string;
     photoUrl?: string;

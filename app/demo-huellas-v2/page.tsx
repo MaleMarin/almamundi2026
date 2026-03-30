@@ -1,7 +1,7 @@
 'use client';
 
 import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   drawHuellaV2OnCanvas,
   getHuellaV2DrawStats,
@@ -61,6 +61,8 @@ function metaFromForm(texto: string, storyId: string, submitHour: number): Huell
     format,
     charCount: texto.length,
     submitHour,
+    embedSiteFooter: true,
+    footerAt: new Date(),
   };
 }
 
@@ -147,7 +149,7 @@ export default function DemoHuellasV2Page() {
         <p className="mb-10 max-w-3xl text-sm leading-relaxed text-[#8A8A7A]">
           Los colores nacen de las palabras de la historia — no del formato.
           <br />
-          Más líneas, más densidad, más color. Cada huella es irrepetible. Código en{' '}
+          Más líneas, más densidad, más color. Cada huella es irrepetible. Implementación en{' '}
           <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">lib/huella/huellaV2.ts</code>
           .
         </p>
@@ -158,15 +160,97 @@ export default function DemoHuellasV2Page() {
           </div>
           <p className="mb-2 text-[1.05rem] font-semibold">Cada palabra tiene un color propio. La historia compone la paleta.</p>
           <p className="mb-4 max-w-3xl text-[0.83rem] leading-relaxed text-[#8A8A7A]">
-            Se extraen palabras significativas del contenido (o del nombre del archivo en fotos). Cada palabra genera un color HSL:
-            la suma de caracteres define el matiz, las vocales la saturación, las consonantes la luminosidad. El canvas superpone
-            trazos curvos con semilla fija por <code className="font-mono text-[11px]">storyId</code>.
+            Se extraen hasta 14 palabras significativas del contenido (o del nombre del archivo en el caso de fotos). Cada palabra
+            genera un color HSL a partir de su valor numérico: suma de caracteres → matiz; vocales → saturación; consonantes →
+            luminosidad. El resultado es una paleta de hasta 14 colores irrepetible para esa historia. La tabla describe el export
+            SVG (<code className="font-mono text-[11px]">generateHuella</code> / <code className="font-mono text-[11px]">generateHuellaSvg</code>
+            ); la vista previa de abajo usa canvas con más líneas y trazos Bézier.
+          </p>
+          <div className="mb-4 overflow-x-auto rounded-xl border border-[#D4D4C4] bg-white">
+            <table className="w-full min-w-[520px] border-collapse text-[0.82rem]">
+              <thead>
+                <tr>
+                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                    Propiedad visual
+                  </th>
+                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                    Fuente
+                  </th>
+                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                    Cálculo
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="[&_tr:last-child_td]:border-b-0">
+                <DocRow
+                  prop="Matiz (hue 0–360°)"
+                  fuente="Suma de códigos de caracteres de la palabra"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">charSum % 360</code>}
+                />
+                <DocRow
+                  prop="Saturación (60–100%)"
+                  fuente="Número de vocales en la palabra"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">60 + (vocales / largo) × 40</code>}
+                />
+                <DocRow
+                  prop="Luminosidad (30–65%)"
+                  fuente="Número de consonantes"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">30 + (consonantes / largo) × 35</code>}
+                />
+                <DocRow
+                  prop="Número de líneas"
+                  fuente="Longitud total del contenido"
+                  calc={
+                    <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">
+                      80 + (charCount / 4500) × 120 (80–200 líneas, SVG)
+                    </code>
+                  }
+                />
+                <DocRow
+                  prop="Ángulo de cada línea"
+                  fuente="Semilla del storyId + índice"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">anguloBase ± variación aleatoria seeded</code>}
+                />
+                <DocRow
+                  prop="Ancho de línea"
+                  fuente="Posición de la palabra en el texto"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">1.5 – 18px según importancia</code>}
+                />
+                <DocRow
+                  prop="Opacidad"
+                  fuente="Frecuencia de la palabra"
+                  calc={<code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">0.35 – 1.0</code>}
+                />
+              </tbody>
+            </table>
+          </div>
+          <p className="max-w-3xl text-[0.8rem] leading-relaxed text-[#8A8A7A]">
+            Canvas (esta página y el modal de confirmación):{' '}
+            <code className="font-mono text-[11px]">⌊150 + (charCount / 4500) × 150⌋</code> líneas, ángulo base{' '}
+            <code className="font-mono text-[11px]">((hora/23) − 0.5) × 22</code>, pasadas gruesas/medias/finas y acentos anchos; con{' '}
+            <code className="font-mono text-[11px]">embedSiteFooter</code> se dibuja la franja con URL y fecha.
           </p>
         </section>
 
         <section className="mb-10">
           <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
-            02 · Generador interactivo
+            02 · Fotos: el nombre del archivo como texto
+          </div>
+          <p className="mb-2 text-[1.05rem] font-semibold">Para imágenes, las palabras vienen del nombre del archivo</p>
+          <p className="mb-1 max-w-3xl text-[0.83rem] leading-relaxed text-[#8A8A7A]">
+            Si el archivo se llama{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">cumpleanos_abuela_Mar_del_Plata_2019.jpg</code>
+            , las palabras son <strong className="font-medium text-[#141D26]">cumpleanos, abuela, Mar, del, Plata, 2019</strong> — y las
+            que pasan el filtro (más de tres letras y no stop-word) entran en la paleta. Si el nombre es genérico como{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">IMG_4521.jpg</code>, se usa el{' '}
+            <code className="font-mono text-[11px]">storyId</code> como texto base. Siempre se limpia el nombre: se eliminan extensiones,
+            guiones y tokens genéricos (IMG, DSC, DCIM, números largos).
+          </p>
+        </section>
+
+        <section className="mb-10">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+            03 · Generador interactivo
           </div>
 
           <div className="mb-4 rounded-xl border border-[#D4D4C4] bg-white p-5">
@@ -259,8 +343,14 @@ export default function DemoHuellasV2Page() {
                   <InfoRow k="Story ID" v={stats.storyId} />
                   <InfoRow k="Palabras clave" v={stats.palabrasPreview} />
                   <InfoRow k="Colores generados" v={`${stats.numColores} colores únicos`} />
-                  <InfoRow k="Número de líneas" v={`${stats.numLineas}`} />
-                  <InfoRow k="Ángulo base" v={`${stats.anguloBase.toFixed(1)}°`} />
+                  <InfoRow
+                    k="Número de líneas"
+                    v={`${stats.numLineas} (canvas) · ${stats.numLineasSvg} (SVG)`}
+                  />
+                  <InfoRow
+                    k="Ángulo base"
+                    v={`${stats.anguloBase.toFixed(1)}° (canvas) · ${stats.anguloBaseSvg.toFixed(1)}° (SVG)`}
+                  />
                   <InfoRow k="Semilla" v={String(stats.seed)} />
                 </>
               ) : (
@@ -272,7 +362,7 @@ export default function DemoHuellasV2Page() {
 
         <section>
           <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
-            03 · Galería de ejemplos
+            04 · Ejemplos — historias reales generan huellas diferentes
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3.5">
             {EXAMPLES.map((m) => (
@@ -280,8 +370,34 @@ export default function DemoHuellasV2Page() {
             ))}
           </div>
         </section>
+
+        <section className="mt-12 border-t border-[#D4D4C4] pt-10">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+            05 · Código para Cursor —{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px] text-[#141D26]">lib/huella/huellaV2.ts</code>
+          </div>
+          <p className="max-w-3xl text-[0.83rem] leading-relaxed text-[#8A8A7A]">
+            Equivalente TypeScript al snippet <code className="font-mono text-[11px]">utils/huella.js</code> de la spec:{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">drawHuellaV2OnCanvas</code>,{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">generateHuellaSvg</code>, alias{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">generateHuella</code>,{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">buildPaletteFromMeta</code>,{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">extraerPalabras</code>,{' '}
+            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">limpiarNombreFoto</code>, etc.
+          </p>
+        </section>
       </div>
     </div>
+  );
+}
+
+function DocRow({ prop, fuente, calc }: { prop: string; fuente: string; calc: ReactNode }) {
+  return (
+    <tr className="even:bg-white odd:bg-[#F0EFE9]/60">
+      <td className="border-b border-[#D4D4C4] px-3 py-2 align-top leading-snug">{prop}</td>
+      <td className="border-b border-[#D4D4C4] px-3 py-2 align-top leading-snug">{fuente}</td>
+      <td className="border-b border-[#D4D4C4] px-3 py-2 align-top leading-snug">{calc}</td>
+    </tr>
   );
 }
 

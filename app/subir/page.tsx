@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -186,9 +187,16 @@ function SubirPageInner() {
     setError('');
     setSaving(true);
     try {
+      const privateMediaPaths: string[] = [];
+      const trackUpload = async (file: File | Blob, prefix: string, name: string) => {
+        const r = await uploadFileToStorage(file, prefix, name);
+        privateMediaPaths.push(r.storagePath);
+        return r.readUrl;
+      };
+
       let profilePhotoUrl: string | undefined;
       if (profilePhotoFile) {
-        profilePhotoUrl = await uploadFileToStorage(
+        profilePhotoUrl = await trackUpload(
           profilePhotoFile,
           'submissions/avatars',
           `avatar-${profilePhotoFile.name}`
@@ -198,7 +206,7 @@ function SubirPageInner() {
       const extraAttachmentUrls: string[] = [];
       for (let i = 0; i < extraFiles.length; i++) {
         const f = extraFiles[i]!;
-        const url = await uploadFileToStorage(f, 'submissions/extras', `extra-${i}-${f.name}`);
+        const url = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`);
         extraAttachmentUrls.push(url);
       }
 
@@ -216,7 +224,7 @@ function SubirPageInner() {
       } else if (format === 'video') {
         if (capture?.recordedBlob) {
           const ext = capture.recordedMime.includes('mp4') ? 'mp4' : 'webm';
-          const url = await uploadFileToStorage(
+          const url = await trackUpload(
             capture.recordedBlob,
             'submissions',
             `video-grabado.${ext}`
@@ -238,7 +246,7 @@ function SubirPageInner() {
             return;
           }
           const ext = capture.recordedMime.includes('mp4') ? 'm4a' : 'webm';
-          const url = await uploadFileToStorage(blobRec, 'submissions', `audio-grabado.${ext}`);
+          const url = await trackUpload(blobRec, 'submissions', `audio-grabado.${ext}`);
           payload = { audioUrl: url };
         } else if (fileUse) {
           const sec = await probeAudioFileDurationSeconds(fileUse);
@@ -247,7 +255,7 @@ function SubirPageInner() {
             setSaving(false);
             return;
           }
-          const url = await uploadFileToStorage(
+          const url = await trackUpload(
             fileUse,
             'submissions',
             `audio.${fileUse.name.split('.').pop() || 'mp3'}`
@@ -261,7 +269,7 @@ function SubirPageInner() {
         if (photoFiles.length > 0) {
           const urls = await Promise.all(
             photoFiles.map((f, i) =>
-              uploadFileToStorage(f, 'submissions', `photo-${i}-${f.name}`)
+              trackUpload(f, 'submissions', `photo-${i}-${f.name}`)
             )
           );
           const first = urls[0];
@@ -293,6 +301,7 @@ function SubirPageInner() {
           ...(birthDate.trim() ? { birthDate: birthDate.trim() } : {}),
           ...(sex ? { sex } : {}),
           ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
+          ...(privateMediaPaths.length ? { privateMediaPaths } : {}),
         }),
       });
 
@@ -436,14 +445,14 @@ function SubirPageInner() {
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <Link href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
+        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </Link>
+        </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <Link href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</Link>
-          <Link href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</Link>
+          <HomeHardLink href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</HomeHardLink>
+          <HomeHardLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</HomeHardLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
-          <Link href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</Link>
+          <HomeHardLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</HomeHardLink>
         </div>
       </nav>
 
@@ -494,9 +503,9 @@ function SubirPageInner() {
               ))}
             </section>
             <p className="text-center">
-              <Link href="/#historias" className="text-sm font-medium underline-offset-4 hover:underline" style={{ color: neu.textBody }}>
+              <HomeHardLink href="/#historias" className="text-sm font-medium underline-offset-4 hover:underline" style={{ color: neu.textBody }}>
                 ← Volver a las tarjetas del inicio
-              </Link>
+              </HomeHardLink>
             </p>
           </>
         )}
@@ -1042,9 +1051,9 @@ function SubirPageInner() {
               <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
                 Subir otro
               </Link>
-              <Link href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
+              <HomeHardLink href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
                 Ir al inicio
-              </Link>
+              </HomeHardLink>
             </div>
           </section>
         )}

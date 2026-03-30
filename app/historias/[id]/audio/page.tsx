@@ -70,7 +70,7 @@ export default function HistoriasIdAudioPage() {
   if (loading) {
     return (
       <div style={{ position: 'fixed', inset: 0, background: '#111009', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: SITE_FONT_STACK, fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(201,169,110,0.8)' }}>Cargando…</p>
+        <p style={{ fontFamily: SITE_FONT_STACK, fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,69,0,0.8)' }}>Cargando…</p>
       </div>
     );
   }
@@ -86,8 +86,8 @@ export default function HistoriasIdAudioPage() {
             borderRadius: '9999px',
             fontSize: '0.875rem',
             fontWeight: 500,
-            color: '#c9a96e',
-            border: '1px solid rgba(201,169,110,0.4)',
+            color: '#ff4500',
+            border: '1px solid rgba(255,69,0,0.4)',
             textDecoration: 'none',
           }}
         >

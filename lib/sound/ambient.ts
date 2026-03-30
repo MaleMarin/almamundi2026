@@ -1,14 +1,17 @@
+import { isPublicAudioMoodId, publicAudioPathFromMoodId } from "@/lib/public-audio-mood";
+
 export type AmbientKey = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas" | "radio" | "lluvia" | "mercado";
+
+type CurrentPlayback =
+  | { mode: "preset"; key: AmbientKey; source: AudioBufferSourceNode; gain: GainNode }
+  | { mode: "public"; path: string; source: AudioBufferSourceNode; gain: GainNode };
 
 type PlayerState = {
   ctx: AudioContext | null;
   master: GainNode | null;
-  current: {
-    key: AmbientKey;
-    source: AudioBufferSourceNode | null;
-    gain: GainNode | null;
-  } | null;
+  current: CurrentPlayback | null;
   buffers: Partial<Record<AmbientKey, AudioBuffer>>;
+  publicBuffers: Map<string, AudioBuffer>;
   unlocked: boolean;
 };
 
@@ -17,11 +20,19 @@ const state: PlayerState = {
   master: null,
   current: null,
   buffers: {},
+  publicBuffers: new Map(),
   unlocked: false,
 };
 
+/**
+ * Mar: audio desde este vídeo en `public/` (solo pista sonora vía Web Audio).
+ * Archivo: `WhatsApp Video 2026-03-27 at 16.57.58.mp4`
+ */
+const MAR_SEA_VIDEO_FILENAME = "WhatsApp Video 2026-03-27 at 16.57.58.mp4";
+const MAR_VIDEO_AUDIO_URL = `/${encodeURIComponent(MAR_SEA_VIDEO_FILENAME)}`;
+
 const URLS: Record<AmbientKey, string[]> = {
-  mar: ["/audio/mar.m4a", "/audio/ambients/ocean.wav", "/audio/ambients/ocean.mp3"],
+  mar: [MAR_VIDEO_AUDIO_URL, "/audio/mar.m4a", "/audio/ambients/ocean.wav", "/audio/ambients/ocean.mp3"],
   ciudad: ["/audio/ambients/city.wav", "/audio/ambients/city.mp3"],
   bosque: ["/audio/ambients/forest.wav", "/audio/ambients/forest.mp3"],
   viento: ["/audio/ambients/wind.mp3", "/audio/ambients/wind.wav", "/audio/neblina.mp3"],
@@ -37,9 +48,20 @@ const URLS: Record<AmbientKey, string[]> = {
 const FALLBACK_URL = "/audio/mar.m4a";
 
 const TRACK_VOL_STORAGE = "almamundi_ambient_track_vol";
+const PUBLIC_TRACK_VOL_STORAGE = "almamundi_ambient_public_track_vol";
 
 /** Volumen nominal máximo de cada pista antes del multiplicador por mood (0–1). */
 const TRACK_GAIN_NOMINAL = 1.0;
+
+/**
+ * Archivos en `public/` suelen estar más bajos (p. ej. -14 LUFS) que los ambients del sitio.
+ * Se aplica solo a modo `public`; el slider del panel sigue siendo 0–100 % sobre esta base.
+ */
+const PUBLIC_TRACK_OUTPUT_GAIN = 1.28;
+
+function publicTrackTargetGain(userVol01: number): number {
+  return TRACK_GAIN_NOMINAL * userVol01 * PUBLIC_TRACK_OUTPUT_GAIN;
+}
 
 function ambientKeys(): AmbientKey[] {
   return Object.keys(URLS) as AmbientKey[];
@@ -91,9 +113,9 @@ export function setAmbientTrackVolume(key: AmbientKey, vol: number): void {
   all[key] = clamped;
   writeTrackVolumesToStorage(all);
 
-  if (state.current?.key !== key || !state.current.gain || !state.ctx) return;
-  const ctx = state.ctx;
+  if (state.current?.mode !== "preset" || state.current.key !== key || !state.ctx) return;
   const g = state.current.gain.gain;
+  const ctx = state.ctx;
   const t = ctx.currentTime;
   const target = TRACK_GAIN_NOMINAL * clamped;
   try {
@@ -103,6 +125,71 @@ export function setAmbientTrackVolume(key: AmbientKey, vol: number): void {
   } catch {
     g.value = target;
   }
+}
+
+function readPublicTrackVolumes(): Record<string, number> {
+  if (typeof window === "undefined") return {};
+  try {
+    const raw = window.localStorage.getItem(PUBLIC_TRACK_VOL_STORAGE);
+    if (!raw) return {};
+    const o = JSON.parse(raw) as Record<string, unknown>;
+    const out: Record<string, number> = {};
+    for (const [k, v] of Object.entries(o)) {
+      if (typeof v === "number" && Number.isFinite(v)) out[k] = Math.max(0, Math.min(1, v));
+    }
+    return out;
+  } catch {
+    return {};
+  }
+}
+
+function writePublicTrackVolumes(all: Record<string, number>) {
+  if (typeof window === "undefined") return;
+  try {
+    window.localStorage.setItem(PUBLIC_TRACK_VOL_STORAGE, JSON.stringify(all));
+  } catch { /* quota */ }
+}
+
+export function getPublicAmbientVolume(path: string): number {
+  const v = readPublicTrackVolumes()[path];
+  return typeof v === "number" && Number.isFinite(v) ? v : 1;
+}
+
+export function setPublicAmbientVolume(path: string, vol: number): void {
+  const clamped = Math.max(0, Math.min(1, vol));
+  const all = { ...readPublicTrackVolumes(), [path]: clamped };
+  writePublicTrackVolumes(all);
+
+  if (state.current?.mode !== "public" || state.current.path !== path || !state.ctx) return;
+  const g = state.current.gain.gain;
+  const ctx = state.ctx;
+  const t = ctx.currentTime;
+  const target = publicTrackTargetGain(clamped);
+  try {
+    g.cancelScheduledValues(t);
+    g.setValueAtTime(g.value, t);
+    g.linearRampToValueAtTime(target, t + 0.06);
+  } catch {
+    g.value = target;
+  }
+}
+
+/** Volumen para id de fila del panel: preset (`AmbientKey`) o `__pub__:/ruta…`. */
+export function getAmbientOrPublicTrackVolume(id: string): number {
+  if (isPublicAudioMoodId(id)) {
+    const p = publicAudioPathFromMoodId(id);
+    return p != null ? getPublicAmbientVolume(p) : 1;
+  }
+  return getAmbientTrackVolume(id as AmbientKey);
+}
+
+export function setAmbientOrPublicTrackVolume(id: string, vol: number): void {
+  if (isPublicAudioMoodId(id)) {
+    const p = publicAudioPathFromMoodId(id);
+    if (p) setPublicAmbientVolume(p, vol);
+    return;
+  }
+  setAmbientTrackVolume(id as AmbientKey, vol);
 }
 
 /** Volumen base nominal del master. Más alto para que el sonido del universo se oiga bien. */
@@ -153,6 +240,57 @@ async function loadBuffer(key: AmbientKey): Promise<AudioBuffer> {
   throw new Error(`No audio found for ${key}`);
 }
 
+async function loadPublicBuffer(urlPath: string): Promise<AudioBuffer> {
+  const cached = state.publicBuffers.get(urlPath);
+  if (cached) return cached;
+  const ctx = ensureCtx();
+  if (!ctx) throw new Error("AudioContext not initialized");
+  const res = await fetch(urlPath);
+  if (!res.ok) throw new Error(`fetch ${urlPath}: ${res.status}`);
+  const arr = await res.arrayBuffer();
+  if (arr.byteLength < 100) throw new Error(`file too small: ${urlPath}`);
+  const buf = await ctx.decodeAudioData(arr);
+  state.publicBuffers.set(urlPath, buf);
+  return buf;
+}
+
+/**
+ * Reproduce en bucle un archivo bajo `public/` (ruta URL desde raíz, p. ej. `/audio/dia.mp3`).
+ */
+export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?: number }) {
+  const pathNorm = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
+  const ctx = ensureCtx();
+  if (!ctx || ctx.state === "suspended") return;
+  const fade = (opts?.fadeMs ?? 800) / 1000;
+
+  let buf: AudioBuffer;
+  try {
+    buf = await loadPublicBuffer(pathNorm);
+  } catch (e) {
+    console.warn("[ambient] failed to load public", pathNorm, e);
+    return;
+  }
+
+  const startT = ctx.currentTime;
+  stopCurrent(startT);
+
+  const source = ctx.createBufferSource();
+  source.buffer = buf;
+  source.loop = true;
+
+  const gain = ctx.createGain();
+  gain.gain.value = 0;
+  source.connect(gain);
+  gain.connect(state.master!);
+
+  source.start(startT + 0.02);
+  const userVol = getPublicAmbientVolume(pathNorm);
+  const targetGain = publicTrackTargetGain(userVol);
+  gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
+
+  state.current = { mode: "public", path: pathNorm, source, gain };
+}
+
 export async function unlockAmbientAudio() {
   const ctx = ensureCtx();
   if (!ctx) return;
@@ -168,12 +306,12 @@ export async function unlockAmbientAudio() {
 }
 
 function stopCurrent(atTime: number) {
-  if (!state.current?.source || !state.current?.gain) return;
-  const { source, gain } = state.current;
+  const cur = state.current;
+  if (!cur) return;
   try {
     const release = 0.2;
-    gain.gain.setTargetAtTime(0, atTime, release);
-    source.stop(atTime + release + 0.1);
+    cur.gain.gain.setTargetAtTime(0, atTime, release);
+    cur.source.stop(atTime + release + 0.1);
   } catch { /* already stopped */ }
 }
 
@@ -208,7 +346,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   const targetGain = TRACK_GAIN_NOMINAL * userVol;
   gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
 
-  state.current = { key, source, gain };
+  state.current = { mode: "preset", key, source, gain };
 }
 
 export function stopAmbient() {
@@ -233,7 +371,7 @@ export function getAmbientUnlocked() {
 }
 
 export function getCurrentKey(): AmbientKey | null {
-  return state.current?.key ?? null;
+  return state.current?.mode === "preset" ? state.current.key : null;
 }
 
 export function getAudioContext(): AudioContext | null {

@@ -1,0 +1,78 @@
+Haz un hardening completo de este proyecto. No describas solamente: aplica cambios reales archivo por archivo.
+
+Objetivo:
+- cerrar exposición de datos personales
+- impedir publicación/rechazo no autorizado
+- evitar abuso de correos y uploads
+- mejorar resiliencia y monitoreo
+- dejar el sitio listo para producción seria
+
+Cambios obligatorios:
+
+1. Firebase Storage
+- Reescribe `storage.rules` para que NO exista `allow read, write: if true`.
+- Las subidas públicas deben ir a un flujo seguro: preferentemente signed uploads o route handler con validación y subida server-side.
+- Ningún archivo privado o pendiente debe quedar público por defecto.
+
+2. Curaduría y publicación
+- En `app/api/curate/publish/route.ts`, `app/api/curate/publish/[submissionId]/route.ts` y `app/api/curate/reject/route.ts` aplica la misma protección de `requireAdmin()` usada en `/api/admin/*`.
+- Elimina cualquier dependencia de `x-admin-token` y `ADMIN_PUBLISH_TOKEN` para flujos de curaduría.
+- Unifica todo en Firebase Auth + verificación server-side + allowlist/claims.
+
+3. Página `/curaduria`
+- No quiero más el patrón de pegar token manual en frontend ni guardarlo en `sessionStorage`.
+- Conviértela a un flujo real de autenticación admin reutilizando el login protegido del panel admin.
+
+4. Rate limiting y anti-abuso
+- Implementa rate limiting serio en:
+  - `/api/stories/[id]/share`
+  - `/api/stories/[id]/postal`
+  - `/api/stories/[id]/resonance`
+  - `/api/submit`
+  - `/api/submissions/photo`
+  - `/api/submissions/upload`
+  - `/api/perfil/muestras`
+- No uses solo un `Map` en memoria como solución final.
+- Añade protección anti-bot/captcha donde corresponda.
+
+5. Exposición de historias
+- Corrige `getStoryByIdAsync()` para que no devuelva historias pendientes o rechazadas.
+- Define exactamente qué estados son públicos y respétalos server-side.
+
+6. Emails
+- Sanitiza/escapa todos los campos interpolados en HTML de correos.
+- Añade validación fuerte del email destinatario.
+- Añade límites para evitar spam/cost abuse.
+
+7. Robustez de build
+- Quita `typescript.ignoreBuildErrors` de `next.config.ts`.
+- Corrige los errores que aparezcan hasta que build y typecheck queden limpios.
+
+8. Healthchecks
+- `health/firebase` debe fallar cuando falle Firestore.
+- `health/upload` no debe exponer bucket names, detalles de credenciales ni mensajes sensibles en entorno público.
+- Separa health público de health interno si hace falta.
+
+9. Integridad de envíos
+- En `/api/submit`, elimina el fallback que responde éxito si Firestore no está configurado.
+- Si no guarda, debe fallar claramente.
+
+10. Security headers
+- Añade headers de seguridad en Next:
+  - Content-Security-Policy
+  - X-Frame-Options / frame-ancestors
+  - X-Content-Type-Options
+  - Referrer-Policy
+  - Permissions-Policy
+- Hazlo de forma compatible con el sitio actual.
+
+11. Validación y uploads
+- Fortalece validación de inputs con esquema consistente.
+- Verifica MIME y extensión.
+- Considera inspección básica del archivo y nombres seguros.
+- No hagas `makePublic()` por defecto para material enviado por usuarios.
+
+Entrega esperada:
+- lista de archivos modificados
+- resumen de qué se corrigió y por qué
+- código final aplicado, no solo recomendaciones

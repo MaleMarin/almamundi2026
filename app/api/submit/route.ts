@@ -3,12 +3,28 @@ import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { StorySubmission, StoryFormat, StoryMood, Consent } from "@/lib/firebase/types";
 import { analyzeStory } from "@/lib/huella/analyze";
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from "@/lib/rate-limit";
+import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const FORMATS: StoryFormat[] = ["text", "audio", "video", "image"];
-const MOODS: StoryMood[] = ["mar", "ciudad", "bosque", "animales", "universo", "personas", "radio", "lluvia", "mercado"];
+const MOODS: StoryMood[] = [
+  "mar",
+  "ciudad",
+  "bosque",
+  "animales",
+  "universo",
+  "personas",
+  "radio",
+  "lluvia",
+  "mercado",
+];
 
 function validConsent(c: unknown): c is Consent {
   return (
@@ -21,112 +37,126 @@ function validConsent(c: unknown): c is Consent {
 
 /** POST /api/submit — crear story_submission (envío desde formulario). */
 export async function POST(request: NextRequest) {
+  const ip = clientIpFromRequest(request);
+  const rl = getRateLimiter("submit-story", 5, 3600);
+  const blocked = await enforceRateLimit(rl, `submit:${ip}`, {
+    max: 5,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
+
+  let body: Record<string, unknown>;
   try {
-    const body = await request.json();
+    body = (await request.json()) as Record<string, unknown>;
+  } catch {
+    return NextResponse.json({ error: "JSON inválido" }, { status: 400 });
+  }
 
-    const authorEmail = typeof body.authorEmail === "string" ? body.authorEmail.trim() : "";
-    const authorName = typeof body.authorName === "string" ? body.authorName.trim() : undefined;
-    const title = typeof body.title === "string" ? body.title.trim() : "";
-    const placeLabel = typeof body.placeLabel === "string" ? body.placeLabel.trim() : "";
-    const lat = typeof body.lat === "number" ? body.lat : Number(body.lat);
-    const lng = typeof body.lng === "number" ? body.lng : Number(body.lng);
-    const format = FORMATS.includes(body.format) ? body.format : "text";
-    const text = typeof body.text === "string" ? body.text.trim() : undefined;
-    const tags = body.tags;
-    const consent = body.consent;
+  const captcha = await verifyTurnstileIfConfigured(
+    typeof body.captchaToken === "string" ? body.captchaToken : undefined,
+    ip
+  );
+  if (!captcha.ok) {
+    return NextResponse.json({ error: "Verificación anti-bot requerida." }, { status: 400 });
+  }
 
-    if (!authorEmail || !title || !placeLabel || Number.isNaN(lat) || Number.isNaN(lng)) {
-      return NextResponse.json(
-        { error: "Missing or invalid: authorEmail, title, placeLabel, lat, lng" },
-        { status: 400 }
-      );
-    }
-    if (!validConsent(consent)) {
-      return NextResponse.json(
-        { error: "consent.termsAccepted and consent.license required" },
-        { status: 400 }
-      );
-    }
+  const authorEmail = typeof body.authorEmail === "string" ? body.authorEmail.trim() : "";
+  const authorName = typeof body.authorName === "string" ? body.authorName.trim() : undefined;
+  const title = typeof body.title === "string" ? body.title.trim() : "";
+  const placeLabel = typeof body.placeLabel === "string" ? body.placeLabel.trim() : "";
+  const lat = typeof body.lat === "number" ? body.lat : Number(body.lat);
+  const lng = typeof body.lng === "number" ? body.lng : Number(body.lng);
+  const format = FORMATS.includes(body.format as StoryFormat) ? (body.format as StoryFormat) : "text";
+  const text = typeof body.text === "string" ? body.text.trim() : undefined;
+  const tags = body.tags as Record<string, unknown> | undefined;
+  const consent = body.consent;
 
-    const themes = Array.isArray(tags?.themes) ? tags.themes.filter((t: unknown) => typeof t === "string") : [];
-    const moods = Array.isArray(tags?.moods) ? tags.moods.filter((m: unknown) => MOODS.includes(m as StoryMood)) : [];
-    const keywords = Array.isArray(tags?.keywords) ? tags.keywords.filter((k: unknown) => typeof k === "string") : [];
-
-    const media: StorySubmission["media"] = {};
-    if (typeof body.media?.audioUrl === "string") media.audioUrl = body.media.audioUrl;
-    if (typeof body.media?.videoUrl === "string") media.videoUrl = body.media.videoUrl;
-    if (typeof body.media?.coverImageUrl === "string") media.coverImageUrl = body.media.coverImageUrl;
-    if (typeof body.media?.imageUrl === "string") media.imageUrl = body.media.imageUrl;
-
-    const now = FieldValue.serverTimestamp();
-    const doc: Omit<StorySubmission, "createdAt" | "updatedAt"> & {
-      createdAt: ReturnType<typeof FieldValue.serverTimestamp>;
-      updatedAt: ReturnType<typeof FieldValue.serverTimestamp>;
-    } = {
-      status: "pending",
-      createdAt: now,
-      updatedAt: now,
-      authorEmail,
-      title,
-      placeLabel,
-      lat,
-      lng,
-      format,
-      tags: { themes, moods, keywords },
-      consent: { termsAccepted: true, license: "allow_publish" },
-    };
-    if (authorName) doc.authorName = authorName;
-    if (text) doc.text = text;
-    if (Object.keys(media).length) doc.media = media;
-
-    let ref: DocumentReference;
-    try {
-      const db = getAdminDb();
-      ref = await db.collection("story_submissions").add(doc);
-      console.log("[submit] Historia guardada en Firestore:", ref.id, "|", title);
-    } catch (dbError) {
-      const msg = dbError instanceof Error ? dbError.message : "";
-      if (/Firebase Admin|FIREBASE_|config/i.test(msg)) {
-        console.warn("submit: Firebase no configurado; respuesta de desarrollo. Configura FIREBASE_* en .env.local para guardar en Firestore.");
-        return NextResponse.json({ ok: true, id: `dev-${Date.now()}` });
-      }
-      throw dbError;
-    }
-
-    let visualParams: unknown = undefined;
-    let transcription: string | undefined = undefined;
-    if (process.env.OPENAI_API_KEY) {
-      try {
-        const result = await analyzeStory({
-          text,
-          audioUrl: media.audioUrl,
-          videoUrl: media.videoUrl,
-          format,
-        });
-        visualParams = result.visualParams;
-        transcription = result.transcription;
-        if (ref && (visualParams != null || transcription != null)) {
-          const update: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
-          if (visualParams != null) update.huellaVisualParams = visualParams;
-          if (transcription != null) update.transcription = transcription;
-          await ref.update(update);
-        }
-      } catch (e) {
-        console.warn("[submit] Análisis huella (Whisper/GPT) falló:", e);
-      }
-    }
-
-    return NextResponse.json({
-      ok: true,
-      id: ref.id,
-      ...(visualParams != null && { visualParams }),
-      ...(transcription != null && { transcription }),
-    });
-  } catch (e) {
-    console.error("submit", e);
+  if (!authorEmail || !title || !placeLabel || Number.isNaN(lat) || Number.isNaN(lng)) {
     return NextResponse.json(
-      { error: "No pudimos guardar tu historia. Intenta más tarde o revisa tu conexión." },
-      { status: 500 }
+      { error: "Missing or invalid: authorEmail, title, placeLabel, lat, lng" },
+      { status: 400 }
     );
   }
+  if (!validConsent(consent)) {
+    return NextResponse.json(
+      { error: "consent.termsAccepted and consent.license required" },
+      { status: 400 }
+    );
+  }
+
+  const themes = Array.isArray(tags?.themes) ? tags.themes.filter((t: unknown) => typeof t === "string") : [];
+  const moods = Array.isArray(tags?.moods) ? tags.moods.filter((m: unknown) => MOODS.includes(m as StoryMood)) : [];
+  const keywords = Array.isArray(tags?.keywords) ? tags.keywords.filter((k: unknown) => typeof k === "string") : [];
+
+  const media: StorySubmission["media"] = {};
+  if (typeof body.media === "object" && body.media !== null) {
+    const m = body.media as Record<string, unknown>;
+    if (typeof m.audioUrl === "string") media.audioUrl = m.audioUrl;
+    if (typeof m.videoUrl === "string") media.videoUrl = m.videoUrl;
+    if (typeof m.coverImageUrl === "string") media.coverImageUrl = m.coverImageUrl;
+    if (typeof m.imageUrl === "string") media.imageUrl = m.imageUrl;
+  }
+
+  const now = FieldValue.serverTimestamp();
+  const doc: Omit<StorySubmission, "createdAt" | "updatedAt"> & {
+    createdAt: ReturnType<typeof FieldValue.serverTimestamp>;
+    updatedAt: ReturnType<typeof FieldValue.serverTimestamp>;
+  } = {
+    status: "pending",
+    createdAt: now,
+    updatedAt: now,
+    authorEmail,
+    title,
+    placeLabel,
+    lat,
+    lng,
+    format,
+    tags: { themes, moods, keywords },
+    consent: { termsAccepted: true, license: "allow_publish" },
+  };
+  if (authorName) doc.authorName = authorName;
+  if (text) doc.text = text;
+  if (Object.keys(media).length) doc.media = media;
+
+  let ref: DocumentReference;
+  try {
+    const db = getAdminDb();
+    ref = await db.collection("story_submissions").add(doc);
+  } catch (dbError) {
+    console.error("[submit] Firestore error", dbError);
+    return NextResponse.json(
+      { error: "No pudimos guardar tu historia. Intenta más tarde." },
+      { status: 503 }
+    );
+  }
+
+  let visualParams: unknown = undefined;
+  let transcription: string | undefined = undefined;
+  if (process.env.OPENAI_API_KEY) {
+    try {
+      const result = await analyzeStory({
+        text,
+        audioUrl: media.audioUrl,
+        videoUrl: media.videoUrl,
+        format,
+      });
+      visualParams = result.visualParams;
+      transcription = result.transcription;
+      if (ref && (visualParams != null || transcription != null)) {
+        const update: Record<string, unknown> = { updatedAt: FieldValue.serverTimestamp() };
+        if (visualParams != null) update.huellaVisualParams = visualParams;
+        if (transcription != null) update.transcription = transcription;
+        await ref.update(update);
+      }
+    } catch (e) {
+      console.warn("[submit] Análisis huella (Whisper/GPT) falló:", e);
+    }
+  }
+
+  return NextResponse.json({
+    ok: true,
+    id: ref.id,
+    ...(visualParams != null && { visualParams }),
+    ...(transcription != null && { transcription }),
+  });
 }

@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 /**
  * Página pública Archivo AlmaMundi.
@@ -245,16 +246,16 @@ export default function ArchivoPage() {
 
       <div style={{ position: 'relative', zIndex: 10, padding: '24px 16px', fontFamily: APP_FONT, color: 'rgba(255,255,255,0.92)' }}>
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
-          <Link
+          <HomeHardLink
             href="/"
             style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: 18, fontWeight: 600 }}
           >
             ← AlmaMundi
-          </Link>
+          </HomeHardLink>
           <nav style={{ display: 'flex', gap: 8 }}>
-            <Link href="/#mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
+            <HomeHardLink href="/#mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
               Mapa
-            </Link>
+            </HomeHardLink>
           </nav>
         </header>
 

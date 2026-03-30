@@ -1,7 +1,8 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useEffect } from 'react';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { getStoryById } from '@/lib/map-data/stories';
 import { ObservatoryShell } from '@/components/observatory/ObservatoryShell';
 import { StoryObservatory } from '@/components/observatory/StoryObservatory';
@@ -9,15 +10,16 @@ import { SaveToCollectionButton } from '@/components/collection/SaveToCollection
 
 export default function ObservatorioHistoriaModalPage() {
   const params = useParams();
-  const router = useRouter();
   const id = typeof params.id === 'string' ? params.id : '';
   const story = getStoryById(id);
 
   useEffect(() => {
-    if (!story) router.replace('/#mapa');
-  }, [story, router]);
+    if (!story) hardNavigateTo('/#mapa');
+  }, [story]);
 
-  const handleClose = () => router.back();
+  const handleClose = () => {
+    if (typeof window !== 'undefined') window.history.back();
+  };
 
   if (!story) return null;
 

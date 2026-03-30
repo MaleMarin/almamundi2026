@@ -71,11 +71,14 @@ type Props = {
 };
 
 function WorldClockInner({ selectedLocation, light, className }: Props) {
-  const [now, setNow] = useState<Date>(() => new Date());
+  /** null hasta el primer tick en cliente: evita hydration mismatch (SSR vs cliente difieren en el segundo). */
+  const [now, setNow] = useState<Date | null>(null);
   const [geoCity, setGeoCity] = useState<string | null>(null);
 
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 1000);
+    const tick = () => setNow(new Date());
+    tick();
+    const id = window.setInterval(tick, 1000);
     return () => window.clearInterval(id);
   }, []);
 
@@ -106,6 +109,7 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
   );
 
   const dateLine = useMemo(() => {
+    if (!now) return '';
     try {
       return new Intl.DateTimeFormat('es-CL', {
         timeZone,
@@ -122,6 +126,7 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
   }, [now, timeZone]);
 
   const timeLine = useMemo(() => {
+    if (!now) return '';
     try {
       const parts = new Intl.DateTimeFormat('es-CL', {
         timeZone,
@@ -156,7 +161,8 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
       className={resolvedClassName}
       style={!isStatic && !light ? { transform: 'translateX(-50%)', bottom: '0.25rem' } : undefined}
     >
-      {oneLine}
+      {/* Espacio reservado: mismo alto que una línea para evitar salto al montar la hora. */}
+      {oneLine || '\u00A0'}
     </div>
   );
 }

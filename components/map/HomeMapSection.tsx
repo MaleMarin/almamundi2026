@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import '@/app/mapa/mapa-ui.css';
 import '@/app/mapa/liquid-metal.css';
+import { MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
 
 const MapFullPage = dynamic(
   () => import('@/components/map/MapFullPage').then((mod) => mod.default),
@@ -69,7 +70,8 @@ export default function HomeMapSection() {
   return (
     <div
       ref={sectionRef}
-      className="relative w-full h-full min-h-0 overflow-hidden bg-[#0F172A]"
+      className="relative w-full h-full min-h-0 overflow-hidden"
+      style={{ background: MAP_STAGE_GRADIENT }}
       data-map-embed="home"
     >
       <MapFullPage

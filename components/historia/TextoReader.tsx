@@ -6,8 +6,8 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
 const TINTA_SOFT = '#4a3f32';
-const SEPIA = '#c9a96e';
-const SEPIA_DK = '#8b6914';
+const SEPIA = '#ff4500';
+const SEPIA_DK = '#c23600';
 
 export interface HistoriaTexto {
   id: string;
@@ -407,7 +407,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
                       fontWeight: 200,
                       fontSize: '0.65rem',
                       padding: '4px 10px',
-                      border: `1px solid rgba(201,169,110,0.5)`,
+                      border: `1px solid rgba(255,69,0,0.5)`,
                       borderRadius: 999,
                       color: SEPIA_DK,
                     }}

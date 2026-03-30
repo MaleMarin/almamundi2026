@@ -1,14 +1,31 @@
 import { NextResponse } from 'next/server';
 import { createMuestra, type Muestra } from '@/lib/almamundi/perfil-queries';
+import { requireFirebaseUser } from '@/lib/require-user';
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 type Body = Omit<Muestra, 'id' | 'createdAt'>;
 
 /**
- * POST /api/perfil/muestras — crea una muestra (requiere auth en el futuro).
+ * POST /api/perfil/muestras — requiere Firebase Auth; autorId debe coincidir con el uid del token.
  */
 export async function POST(request: Request) {
+  const ip = clientIpFromRequest(request);
+  const rl = getRateLimiter('perfil-muestras', 20, 3600);
+  const blocked = await enforceRateLimit(rl, `muestras:${ip}`, {
+    max: 20,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
+
+  const user = await requireFirebaseUser(request);
+  if (user instanceof NextResponse) return user;
+
   try {
     const body = (await request.json()) as Partial<Body>;
     const {
@@ -26,6 +43,9 @@ export async function POST(request: Request) {
         { error: 'Faltan campos obligatorios: autorId, autorNombre, titulo, sentido' },
         { status: 400 }
       );
+    }
+    if (autorId !== user.uid) {
+      return NextResponse.json({ error: 'No autorizado para este perfil.' }, { status: 403 });
     }
     if (sentido.trim().length < 20) {
       return NextResponse.json(
@@ -48,7 +68,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ id });
   } catch (e) {
     console.error('POST /api/perfil/muestras', e);
-    const message = e instanceof Error ? e.message : String(e);
-    return NextResponse.json({ error: 'server_error', detail: message }, { status: 500 });
+    return NextResponse.json({ error: 'server_error' }, { status: 500 });
   }
 }

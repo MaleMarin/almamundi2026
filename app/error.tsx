@@ -1,7 +1,7 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { useEffect } from 'react';
-import Link from 'next/link';
 
 export default function RootError({
   error,
@@ -28,12 +28,12 @@ export default function RootError({
         >
           Intentar de nuevo
         </button>
-        <Link
+        <HomeHardLink
           href="/"
           className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors"
         >
           Ir al inicio
-        </Link>
+        </HomeHardLink>
       </div>
     </div>
   );

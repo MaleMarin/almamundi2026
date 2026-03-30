@@ -1,3 +1,8 @@
+'use client';
+
+/**
+ * Solo cliente (Firebase JS SDK). No importar desde Route Handlers ni Server Components.
+ */
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";

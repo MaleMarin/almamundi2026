@@ -1,10 +1,10 @@
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 /**
  * /privacidad — Política de privacidad de AlmaMundi.
  * Enlazada desde AgeGate (#s5) y footer. Estilo neumórfico.
  */
 
 import type { Metadata } from 'next';
-import Link from 'next/link';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
@@ -78,7 +78,7 @@ export default function PrivacidadPage() {
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <Link
+        <HomeHardLink
           href="/"
           style={{
             display: 'inline-block',
@@ -89,7 +89,7 @@ export default function PrivacidadPage() {
           }}
         >
           ← Volver al inicio
-        </Link>
+        </HomeHardLink>
         <h1
           style={{
             margin: '0 0 0.5rem',

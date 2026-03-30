@@ -1,5 +1,6 @@
 'use client';
 
+import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   X,
@@ -31,6 +32,22 @@ import {
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
 } from '@/lib/subir-limits';
+import {
+  drawHuellaV2OnCanvas,
+  limpiarNombreFoto,
+  type HuellaV2Format,
+} from '@/lib/huella/huellaV2';
+
+const jakartaHuella = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+});
+
+const frauncesHuella = Fraunces({
+  subsets: ['latin'],
+  weight: ['300', '400', '600', '700'],
+  style: ['normal', 'italic'],
+});
 
 export type StoryModalMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -177,92 +194,97 @@ function probeVideoBlobDurationSeconds(blob: Blob): Promise<number | null> {
   });
 }
 
-function hashString(str: string): number {
-  let h = 2166136261;
-  for (let i = 0; i < str.length; i++) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 16777619);
-  }
-  return (h >>> 0) || 1;
+function modalModeToHuellaFormat(mode: StoryModalMode): HuellaV2Format {
+  return mode;
 }
 
-const IMPRINT_SITE_URL = 'www.almamundi.org';
+/** Texto y longitud que alimentan la huella v2 (palabras → colores; charCount → densidad). */
+function imprintHuellaSource(args: {
+  mode: StoryModalMode;
+  textBody: string;
+  storyTitle: string;
+  extraText: string;
+  photoFiles: File[];
+  mediaBlob: Blob | null;
+}): { content: string; charCount: number } {
+  const { mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
+  const titleBlock = [storyTitle, extraText].filter((s) => s.trim()).join('\n').trim();
 
-function wrapCanvasLines(ctx: CanvasRenderingContext2D, text: string, maxWidth: number): string[] {
-  const words = text.split(/\s+/);
-  const lines: string[] = [];
-  let line = '';
-  for (const word of words) {
-    const test = line ? `${line} ${word}` : word;
-    if (ctx.measureText(test).width <= maxWidth) {
-      line = test;
-    } else {
-      if (line) lines.push(line);
-      line = word;
-    }
+  if (mode === 'texto') {
+    const content = textBody.trim() || titleBlock || storyTitle;
+    return { content, charCount: Math.max(content.length, 1) };
   }
-  if (line) lines.push(line);
-  return lines;
+
+  if (mode === 'foto') {
+    const fromNames = photoFiles.map((f) => limpiarNombreFoto(f.name)).filter(Boolean).join(' ');
+    const content = fromNames || titleBlock || textBody.trim() || storyTitle;
+    const rawLen = photoFiles.map((f) => f.name).join(' ').length;
+    return {
+      content,
+      charCount: Math.max(rawLen + titleBlock.length, content.length, 400),
+    };
+  }
+
+  const content = titleBlock || storyTitle.trim() || 'historia';
+  const avBonus = Math.min(Math.floor((mediaBlob?.size ?? 0) / 120), 14000);
+  return {
+    content,
+    charCount: Math.max(content.length + avBonus, 900),
+  };
 }
 
-function drawImprintPreview(canvas: HTMLCanvasElement, seed: string, receivedAt: Date): void {
-  const w = 520;
-  const h = 420;
-  canvas.width = w;
-  canvas.height = h;
+type ImprintDrawArgs = {
+  storyId: string;
+  receivedAt: Date;
+  mode: StoryModalMode;
+  textBody: string;
+  storyTitle: string;
+  extraText: string;
+  photoFiles: File[];
+  mediaBlob: Blob | null;
+};
+
+const HUELLA_EXPORT_SIZE = 600;
+
+function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
+  const { storyId, receivedAt, mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
+  canvas.width = HUELLA_EXPORT_SIZE;
+  canvas.height = HUELLA_EXPORT_SIZE;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-  const hh = hashString(seed);
-  ctx.fillStyle = soft.bg;
-  ctx.fillRect(0, 0, w, h);
 
-  const pad = 12;
-  const footerH = 148;
-  const artTop = pad;
-  const artBottom = h - pad - footerH;
-  const artW = w - pad * 2;
-  const artH = artBottom - artTop;
-
-  const n = 14;
-  for (let i = 0; i < n; i++) {
-    const x = ((hh * (i + 3)) % 100) / 100;
-    const y = ((hh * (i + 7)) % 100) / 100;
-    const rw = 30 + ((hh >> i) % 40);
-    const rh = 20 + ((hh >> (i + 2)) % 35);
-    ctx.fillStyle = `hsl(${(hh + i * 37) % 360} 70% 52% / 0.55)`;
-    ctx.fillRect(pad + x * (artW - rw), artTop + y * (artH - rh), rw, rh);
-  }
-
-  ctx.strokeStyle = 'rgba(249,115,22,0.4)';
-  ctx.lineWidth = 3;
-  ctx.strokeRect(8, 8, w - 16, h - 16);
-
-  const dateStr = receivedAt.toLocaleDateString('es', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
+  const { content, charCount } = imprintHuellaSource({
+    mode,
+    textBody,
+    storyTitle,
+    extraText,
+    photoFiles,
+    mediaBlob,
   });
-  const colorExpl =
-    'Los tonos salen de codificar tu relato en números (texto y datos del envío): cada cuadrado usa un matiz distinto para que la huella sea única, sin mostrar el texto.';
 
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'top';
-  let ty = h - pad - footerH + 10;
-  ctx.fillStyle = '#1f2937';
-  ctx.font = '600 13px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillText(IMPRINT_SITE_URL, w / 2, ty);
-  ty += 22;
-  ctx.font = '400 12px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillStyle = '#4b5563';
-  ctx.fillText(dateStr, w / 2, ty);
-  ty += 24;
-  ctx.font = '400 11px ui-sans-serif, system-ui, sans-serif';
-  ctx.fillStyle = '#6b7280';
-  const explLines = wrapCanvasLines(ctx, colorExpl, w - 32);
-  for (const ln of explLines) {
-    ctx.fillText(ln, w / 2, ty);
-    ty += 15;
+  drawHuellaV2OnCanvas(ctx, {
+    storyId,
+    content,
+    format: modalModeToHuellaFormat(mode),
+    charCount,
+    submitHour: receivedAt.getHours(),
+    embedSiteFooter: true,
+    footerAt: receivedAt,
+    embedStoryTitle: storyTitle.trim() || undefined,
+  });
+}
+
+function huellaPngFilename(storyTitle: string, imprintId: string): string {
+  const t = storyTitle
+    .trim()
+    .replace(/[/\\?%*:|"<>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (t) {
+    const part = t.replace(/\s/g, '-').slice(0, 88);
+    return `AlmaMundi-${part}.png`;
   }
+  return `AlmaMundi-huella-${imprintId}.png`;
 }
 
 export type StoryModalProps = {
@@ -313,6 +335,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   /** Fecha del envío mostrada en la huella (canvas y descarga). */
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -381,6 +405,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setSaving(false);
       setImprintId('');
       setImprintReceivedAt(null);
+      setLinkCopied(false);
+      if (linkCopiedTimerRef.current) {
+        clearTimeout(linkCopiedTimerRef.current);
+        linkCopiedTimerRef.current = null;
+      }
       return;
     }
     if (!wasOpenRef.current) {
@@ -720,28 +749,59 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   }, [saving, validateDetails]);
 
   useEffect(() => {
-    if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt) return;
-    const seed =
-      mode === 'texto'
-        ? textBody.slice(0, 400)
-        : `${imprintId}-${storyTitle.trim()}-${mediaBlob?.size ?? 0}-${photoFiles.length}`;
-    drawImprintPreview(imprintCanvasRef.current, seed, imprintReceivedAt);
-  }, [step, imprintId, imprintReceivedAt, mode, textBody, storyTitle, mediaBlob, photoFiles.length]);
+    if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
+    drawImprintPreview(imprintCanvasRef.current, {
+      storyId: imprintId,
+      receivedAt: imprintReceivedAt,
+      mode,
+      textBody,
+      storyTitle,
+      extraText,
+      photoFiles,
+      mediaBlob,
+    });
+  }, [
+    step,
+    imprintId,
+    imprintReceivedAt,
+    mode,
+    textBody,
+    storyTitle,
+    extraText,
+    photoFiles,
+    mediaBlob,
+  ]);
 
   const downloadImprint = useCallback(() => {
     const c = imprintCanvasRef.current;
     if (!c) return;
     const a = document.createElement('a');
     a.href = c.toDataURL('image/png');
-    a.download = `AlmaMundi-huella-${imprintId}.png`;
+    a.download = huellaPngFilename(storyTitle, imprintId);
     a.click();
-  }, [imprintId]);
+  }, [imprintId, storyTitle]);
 
   const copyLink = useCallback(() => {
-    void navigator.clipboard.writeText(`${typeof window !== 'undefined' ? window.location.origin : ''}/`);
-  }, []);
+    if (typeof window === 'undefined' || !imprintId) return;
+    const base =
+      (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '') || window.location.origin;
+    const url = `${base}/historias/${encodeURIComponent(imprintId)}`;
+    if (linkCopiedTimerRef.current) clearTimeout(linkCopiedTimerRef.current);
+    void navigator.clipboard.writeText(url).then(() => {
+      setLinkCopied(true);
+      linkCopiedTimerRef.current = setTimeout(() => {
+        setLinkCopied(false);
+        linkCopiedTimerRef.current = null;
+      }, 2200);
+    });
+  }, [imprintId]);
 
   const anotherStory = useCallback(() => {
+    setLinkCopied(false);
+    if (linkCopiedTimerRef.current) {
+      clearTimeout(linkCopiedTimerRef.current);
+      linkCopiedTimerRef.current = null;
+    }
     resetCaptureMedia();
     setStep('capture');
     setTextBody(mode === 'texto' && chosenTopic ? chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n') : '');
@@ -802,7 +862,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           </button>
         </header>
 
-        <div className="min-h-0 flex-1 overflow-y-auto px-5 py-5 md:px-8 md:py-6" style={{ backgroundColor: soft.bg }}>
+        <div
+          className="min-h-0 flex-1 overflow-y-auto px-5 py-5 md:px-8 md:py-6"
+          style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
+        >
           {step === 'capture' && (
             <div className="mb-6 space-y-3 px-1">
               <h3 className="text-2xl font-light leading-snug text-gray-800 md:text-3xl md:leading-snug">
@@ -1448,51 +1511,99 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
 
           {step === 'received' && (
-            <div className="space-y-5 text-center">
-              <div
-                className="mx-auto flex h-16 w-16 items-center justify-center rounded-full text-orange-500"
-                style={soft.inset}
+            <div
+              className={`mx-auto max-w-[480px] space-y-5 text-center ${jakartaHuella.className}`}
+            >
+              <div className="flex justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[#D4D4C4] bg-white text-[#E8400A]">
+                  <Check size={22} strokeWidth={2.2} aria-hidden />
+                </div>
+              </div>
+              <h3
+                className={`text-[clamp(1.6rem,5vw,2rem)] font-semibold leading-[1.15] text-[#141D26] ${frauncesHuella.className}`}
               >
-                <Check size={32} strokeWidth={2.5} aria-hidden />
-              </div>
-              <h3 className="text-3xl font-light text-gray-800 md:text-4xl">Gracias</h3>
-              <p className="text-base text-gray-600 md:text-lg">
-                Tu historia dejó una huella. ID: <strong className="text-gray-800">{imprintId}</strong>
+                {alias.trim() ? (
+                  <>
+                    {alias.trim()},<br />
+                    esta es <em className="italic font-light text-[#E8400A]">tu huella.</em>
+                  </>
+                ) : (
+                  <>
+                    Una historia nueva
+                    <br />
+                    ya está <em className="italic font-light text-[#E8400A]">en el mapa.</em>
+                  </>
+                )}
+              </h3>
+              <p
+                className="max-w-full truncate px-1 text-[0.9375rem] font-medium leading-tight tracking-tight text-[#111418]"
+                style={{
+                  fontFamily:
+                    'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                }}
+                title={storyTitle.trim() || 'Tu historia'}
+              >
+                {storyTitle.trim() || 'Tu historia'}
               </p>
-              <div className="mx-auto max-w-md overflow-hidden rounded-2xl" style={soft.inset}>
-                <canvas ref={imprintCanvasRef} className="h-auto w-full" aria-label="Vista previa de huella" />
+              <div className="aspect-square w-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F0EFE9]">
+                <canvas
+                  ref={imprintCanvasRef}
+                  className="h-full w-full object-cover"
+                  aria-label="Huella generada"
+                />
               </div>
-              <div className="flex flex-wrap justify-center gap-3">
+              <p className="text-[10px] leading-relaxed tracking-wide text-[#8A8A7A]">
+                {imprintReceivedAt
+                  ? imprintReceivedAt.toLocaleDateString('es', {
+                      day: 'numeric',
+                      month: 'long',
+                      year: 'numeric',
+                    })
+                  : ''}
+              </p>
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={downloadImprint}
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-bold text-white md:text-lg"
-                  style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)' }}
+                  className="inline-flex min-w-[120px] flex-1 items-center justify-center gap-2 rounded-full bg-[#E8400A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#c73308]"
                   aria-label="Descargar imagen de huella"
                 >
-                  <Download size={18} aria-hidden />
+                  <Download size={15} strokeWidth={1.6} aria-hidden />
                   Descargar
                 </button>
                 <button
                   type="button"
                   onClick={copyLink}
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-bold text-gray-700 md:text-lg"
-                  style={soft.button}
-                  aria-label="Copiar enlace"
+                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#243447] hover:text-[#243447]"
+                  aria-label="Copiar enlace a la historia"
                 >
-                  <Share2 size={18} aria-hidden />
+                  <Share2 size={14} aria-hidden />
                   Copiar enlace
                 </button>
                 <button
                   type="button"
                   onClick={anotherStory}
-                  className="inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-bold text-gray-700 md:text-lg"
-                  style={soft.button}
+                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#243447] hover:text-[#243447]"
                   aria-label="Contar otra historia"
                 >
-                  <RefreshCw size={18} aria-hidden />
+                  <RefreshCw size={14} aria-hidden />
                   Otra historia
                 </button>
+              </div>
+              <p
+                className={`h-[18px] text-center text-[0.78rem] font-medium text-[#E8400A] transition-opacity ${linkCopied ? 'opacity-100' : 'opacity-0'}`}
+                aria-live="polite"
+              >
+                ¡Enlace copiado!
+              </p>
+              <div className="rounded-[10px] border border-[#D4D4C4] bg-[#F0EFE9] p-4 text-left">
+                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A8A7A]">
+                  ¿Cómo se genera esta imagen?
+                </p>
+                <p className="text-[0.8rem] font-light leading-relaxed text-[#8A8A7A]">
+                  Cada color viene de una palabra de tu historia. AlmaMundi analiza las palabras que usaste y les asigna un color
+                  único según su sonido y su forma. Ninguna historia genera la misma combinación — la tuya es irrepetible.
+                </p>
               </div>
             </div>
           )}

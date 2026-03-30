@@ -6,8 +6,9 @@ import ReactDOM from 'react-dom';
 
 const FILM = '#0d0b09';
 const CREAM = '#f5f0e8';
-const SEPIA = '#c9a96e';
-const SEPIA_DK = '#8b6914';
+/** Acento naranja AlmaMundi (antes sepia). */
+const SEPIA = '#ff4500';
+const SEPIA_DK = '#c23600';
 const BAR_COUNT = 16;
 
 export interface HistoriaAudio {
@@ -170,8 +171,8 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes haloPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(201,169,110,0.3); }
-          50% { box-shadow: 0 0 0 20px rgba(201,169,110,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(255,69,0,0.3); }
+          50% { box-shadow: 0 0 0 20px rgba(255,69,0,0); }
         }
         @keyframes waveAnim {
           from { transform: scaleY(0.2); }
@@ -232,7 +233,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 height: '40px',
                 borderRadius: '50%',
                 background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(201,169,110,0.25)',
+                border: '1px solid rgba(255,69,0,0.25)',
                 color: 'rgba(245,240,232,0.6)',
                 cursor: 'pointer',
                 display: 'flex',
@@ -272,7 +273,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               height: avatarSize,
               borderRadius: '50%',
               overflow: 'hidden',
-              border: '2px solid rgba(201,169,110,0.4)',
+              border: '2px solid rgba(255,69,0,0.4)',
               marginBottom: '1.5rem',
               flexShrink: 0,
             }}
@@ -404,7 +405,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  border: '1px solid rgba(201,169,110,0.35)',
+                  border: '1px solid rgba(255,69,0,0.35)',
                   background: 'rgba(255,255,255,0.06)',
                   color: CREAM,
                   cursor: 'pointer',
@@ -423,7 +424,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                   height: '64px',
                   borderRadius: '50%',
                   border: `2px solid ${SEPIA}`,
-                  background: 'rgba(201,169,110,0.1)',
+                  background: 'rgba(255,69,0,0.1)',
                   color: SEPIA,
                   cursor: 'pointer',
                   display: 'flex',
@@ -441,7 +442,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                   width: '40px',
                   height: '40px',
                   borderRadius: '50%',
-                  border: '1px solid rgba(201,169,110,0.35)',
+                  border: '1px solid rgba(255,69,0,0.35)',
                   background: 'rgba(255,255,255,0.06)',
                   color: CREAM,
                   cursor: 'pointer',
@@ -464,7 +465,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 width: '36px',
                 height: '36px',
                 borderRadius: '50%',
-                border: '1px solid rgba(201,169,110,0.3)',
+                border: '1px solid rgba(255,69,0,0.3)',
                 background: 'transparent',
                 color: CREAM,
                 cursor: 'pointer',
@@ -513,27 +514,27 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               width: '90%',
               padding: '3.5rem 3rem',
               background: 'rgba(245,240,232,0.04)',
-              border: '1px solid rgba(201,169,110,0.15)',
+              border: '1px solid rgba(255,69,0,0.15)',
               borderRadius: '4px',
               backdropFilter: 'blur(20px)',
               textAlign: 'center',
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
+              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
               <span style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.85rem', color: SEPIA, letterSpacing: '0.3em' }}>Fin</span>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(201,169,110,0.4)' }} />
+              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
             </div>
             <h2 style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)', color: CREAM, letterSpacing: '0.05em', lineHeight: 1.2, marginBottom: '1.8rem' }}>
               {historia.titulo}
             </h2>
             {historia.citaDestacada && (
-              <blockquote style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.7, borderLeft: '2px solid rgba(201,169,110,0.3)', paddingLeft: '1.2rem', marginBottom: '2.5rem', textAlign: 'left' }}>
+              <blockquote style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.7, borderLeft: '2px solid rgba(255,69,0,0.3)', paddingLeft: '1.2rem', marginBottom: '2.5rem', textAlign: 'left' }}>
                 &quot;{historia.citaDestacada}&quot;
               </blockquote>
             )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', padding: '1.2rem 1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(201,169,110,0.1)', borderRadius: '3px', width: '100%', marginBottom: '2.5rem' }}>
-              <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(201,169,110,0.35)', flexShrink: 0 }} className="ap-halo-pulse" />
+            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', padding: '1.2rem 1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,69,0,0.1)', borderRadius: '3px', width: '100%', marginBottom: '2.5rem' }}>
+              <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,69,0,0.35)', flexShrink: 0 }} className="ap-halo-pulse" />
               <div style={{ textAlign: 'left' }}>
                 <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.95rem', color: CREAM, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{historia.autor.nombre}</p>
                 {historia.autor.ubicacion && (
@@ -545,7 +546,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               <button
                 type="button"
                 onClick={restart}
-                style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(201,169,110,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
+                style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(255,69,0,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
               >
                 Escuchar de nuevo
               </button>

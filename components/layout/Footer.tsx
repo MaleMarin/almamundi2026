@@ -1,4 +1,5 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 /**
  * Footer unificado para páginas internas (E0E5EC, sans moderna, ALMAMUNDI).
@@ -27,16 +28,16 @@ export function Footer() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
-          <Link href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
+          <HomeHardLink href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
             Nuestro propósito
-          </Link>
-          <Link href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
+          </HomeHardLink>
+          <HomeHardLink href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
             ¿Cómo funciona?
-          </Link>
+          </HomeHardLink>
           <HistoriasAccordion variant="footer" />
-          <Link href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
+          <HomeHardLink href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
             Mapa
-          </Link>
+          </HomeHardLink>
           <Link href="/privacidad" className="hover:text-gray-900 transition-colors font-normal">
             Política de privacidad
           </Link>
