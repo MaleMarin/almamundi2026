@@ -5,7 +5,7 @@ import {
   GLOBE_V2_LAND_MASK_SPEC_LOW,
   GLOBE_V2_NORMAL_SCALE_CITY_LIGHTS,
 } from '@/lib/globe/globe-v2-assets';
-import { sunDirectionUtc } from '@/lib/sunPosition';
+import { sunUnitVectorTowardSunEcef } from '@/lib/sunPosition';
 
 type CityLightsUniforms = {
   uMap: { value: THREE.Texture | null };
@@ -122,10 +122,10 @@ export function createCityLightsOverlayMaterial(
       mat3 mGlobeTbn = mat3(vTw, vBw, vNw);
       vec3 n = normalize(mGlobeTbn * normalize(tmap));
       float ndl = dot(n, normalize(uSunDir));
-      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.44, 0.22, ndl));
-      night = pow(clamp(night, 0.0, 1.0), 0.76);
-      float dayLeak = smoothstep(-0.08, 0.14, ndl);
-      night *= 1.0 - dayLeak * 0.92;
+      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.36, 0.26, ndl));
+      night = pow(clamp(night, 0.0, 1.0), 0.92);
+      float dayLeak = smoothstep(-0.02, 0.18, ndl);
+      night *= 1.0 - dayLeak * 0.82;
       float poleFade = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
 
       float e = 0.00042;
@@ -134,28 +134,22 @@ export function createCityLightsOverlayMaterial(
       vec3 Lxm = texture2D(uMap, vUv - vec2(e, 0.0)).rgb;
       vec3 Ly = texture2D(uMap, vUv + vec2(0.0, e)).rgb;
       vec3 Lym = texture2D(uMap, vUv - vec2(0.0, e)).rgb;
-      vec3 L = (Lc * 2.2 + Lx + Lxm + Ly + Lym) * 0.2;
+      vec3 L = (Lc * 2.0 + Lx + Lxm + Ly + Lym) * 0.2;
       float pk = max(L.r, max(L.g, L.b));
-      L *= smoothstep(0.045, 0.12, pk);
-      float pkLift = pow(clamp(pk * 1.18, 0.0, 1.0), 0.68);
-      float dense = smoothstep(0.28, 0.94, pkLift);
-      vec3 boosted = L * mix(vec3(1.0), vec3(1.24, 1.18, 1.1), dense);
-      boosted = boosted / (vec3(1.0) + boosted * 0.34);
-      boosted = min(boosted, vec3(1.02));
+      L *= smoothstep(0.08, 0.22, pk);
+      float pkLift = pow(clamp(pk * 0.95, 0.0, 1.0), 0.88);
+      float dense = smoothstep(0.35, 0.92, pkLift);
+      vec3 boosted = L * mix(vec3(1.0), vec3(1.06, 1.04, 1.02), dense);
+      boosted = boosted / (vec3(1.0) + boosted * 0.55);
+      boosted = min(boosted, vec3(0.72));
 
-      vec3 actionGold = vec3(0.98, 0.8, 0.36);
-      vec3 coreGold = vec3(1.0, 0.92, 0.58);
-      vec3 whiteHot = vec3(1.0, 0.99, 0.96);
+      vec3 warmLow = vec3(0.88, 0.84, 0.78);
+      vec3 warmMid = vec3(0.92, 0.9, 0.86);
 
-      vec3 cityTint = mix(actionGold, coreGold, smoothstep(0.18, 0.86, pkLift));
-      cityTint = mix(cityTint, whiteHot, smoothstep(0.48, 0.99, pkLift));
+      vec3 cityTint = mix(warmLow, warmMid, smoothstep(0.25, 0.88, pkLift));
 
       vec3 emit = boosted * cityTint * uStrength * night * poleFade;
-      emit *= mix(1.0, 1.22, dense * dense);
-      float bloomWide = smoothstep(0.14, 0.82, pkLift) * pkLift;
-      emit += boosted * vec3(1.0, 0.78, 0.45) * bloomWide * 0.28 * uStrength * night * poleFade;
-      float bloomCore = smoothstep(0.38, 0.99, pkLift) * pkLift;
-      emit += boosted * coreGold * bloomCore * 0.42 * uStrength * night * poleFade;
+      emit *= mix(1.0, 1.03, dense);
 
       gl_FragColor = vec4(emit, 1.0);
     }
@@ -183,10 +177,10 @@ export function createAtmosphereGlowMaterial(): THREE.ShaderMaterial {
   const uniforms = {
     uCamPos: { value: new THREE.Vector3(0, 0, 5) },
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
-    uInner: { value: new THREE.Color(0xd8eefc) },
-    uOuter: { value: new THREE.Color(0x5c94b8) },
-    uIntensity: { value: 0.138 },
-    uPower: { value: 2.92 },
+    uInner: { value: new THREE.Color(0xc8dce8) },
+    uOuter: { value: new THREE.Color(0x4a7088) },
+    uIntensity: { value: 0.088 },
+    uPower: { value: 3.15 },
     uFullDay: { value: 0 },
   };
 
@@ -219,9 +213,9 @@ export function createAtmosphereGlowMaterial(): THREE.ShaderMaterial {
       float ndv = clamp(dot(N, viewDir), -1.0, 1.0);
       float rim = pow(1.0 - abs(ndv), uPower);
       float sunF = clamp(dot(N, normalize(uSunDir)) * 0.5 + 0.5, 0.0, 1.0);
-      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.22, 1.0, pow(sunF, 0.72));
+      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.18, 0.88, pow(sunF, 0.78));
       vec3 glow = mix(uInner, uOuter, rim) * rim * uIntensity * sunLit;
-      gl_FragColor = vec4(glow, clamp(rim * 0.36 * sunLit, 0.0, 1.0));
+      gl_FragColor = vec4(glow, clamp(rim * 0.24 * sunLit, 0.0, 0.55));
     }
   `;
 
@@ -241,9 +235,23 @@ export function createAtmosphereGlowMaterial(): THREE.ShaderMaterial {
   return mat;
 }
 
-export function computeSunDirection(date: Date) {
-  const s = sunDirectionUtc(date);
-  return new THREE.Vector3(s.x, s.y, s.z);
+const _axisSunX = new THREE.Vector3(1, 0, 0);
+
+/**
+ * Dirección Tierra → Sol en **espacio mundial** (antes del giro GMST del mesh).
+ * El vector está en el marco del hijo de la oblicuidad (eje Y = rotación diaria); solo se aplica `R_x(obliquity)`.
+ * La rotación `planetSpinRef` (GMST) va **solo** en la corteza: si rotáramos también la luz con Y, el terminador quedaría fijo en la textura.
+ */
+export function computeSunDirection(
+  date: Date,
+  obliquityXRad: number,
+  target?: THREE.Vector3
+): THREE.Vector3 {
+  const ecef = sunUnitVectorTowardSunEcef(date);
+  const v = target ?? new THREE.Vector3();
+  v.set(ecef.x, ecef.y, ecef.z);
+  v.applyAxisAngle(_axisSunX, obliquityXRad);
+  return v.normalize();
 }
 
 /*

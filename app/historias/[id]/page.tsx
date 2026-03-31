@@ -1,5 +1,6 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
@@ -108,9 +109,9 @@ export default function HistoriasIdPage() {
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <HomeHardLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</HomeHardLink>
-          <HomeHardLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</HomeHardLink>
-          <HomeHardLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</HomeHardLink>
+          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

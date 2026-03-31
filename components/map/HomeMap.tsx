@@ -308,21 +308,19 @@ export default function HomeMap() {
     onToggleSound: handleToggleSound,
   };
 
-  const TIME_STRIP_HEIGHT = 64;
+  const TIME_STRIP_HEIGHT = 48;
   return (
-    <div style={{ display: 'flex', width: '100%', height: '100%', position: 'relative' }}>
-      {/* Globo — ocupa el espacio restante */}
+    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col">
+      {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
       <div
         ref={globeContainerRef}
-        className="relative flex flex-col w-full h-full min-h-0"
-        style={{ flex: 1, position: 'relative', height: '100%', minHeight: '80vh' }}
+        className="relative flex min-h-0 w-full flex-1 flex-col"
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[70vh] flex-1 flex-col overflow-hidden bg-black pt-6 pb-6">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-black pt-8 pb-2">
           <div className="relative min-h-[300px] w-full min-h-0 flex-1">
             <GlobeV2Home
               embedded
-              forceDaylight
               bits={globeBitsMarkers}
               selectedBitId={selectedBit?.id ?? null}
               onBitClick={(id) => {
@@ -337,10 +335,10 @@ export default function HomeMap() {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="flex-shrink-0 w-full flex items-center justify-center z-10"
+        className="flex-shrink-0 w-full flex items-end justify-center z-10 pb-1"
         style={{ height: `${TIME_STRIP_HEIGHT}px`, backgroundColor: 'transparent' }}
       >
-        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/90 drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)]" />
+        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
       </div>
 
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}

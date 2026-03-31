@@ -5,7 +5,9 @@
  * Para header (neumórfico) y footer (links).
  */
 import { useState, useRef, useEffect } from 'react';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import { ACTIVE_NAV_CLASS, isHistoriasSectionPath } from '@/lib/internal-nav-active';
 
 const ITEMS = [
   { label: 'Mi colección', href: '/historias/mi-coleccion' },
@@ -25,6 +27,8 @@ type HistoriasAccordionProps = {
 };
 
 export function HistoriasAccordion({ variant, buttonStyle, className = '' }: HistoriasAccordionProps) {
+  const pathname = usePathname() ?? '';
+  const historiasActive = isHistoriasSectionPath(pathname);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -42,7 +46,7 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="hover:text-gray-900 transition-colors font-normal"
+          className={`hover:text-gray-900 transition-colors font-normal ${historiasActive ? ACTIVE_NAV_CLASS : ''}`}
           aria-expanded={open}
           aria-haspopup="true"
         >
@@ -51,14 +55,14 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
         {open && (
           <div className="absolute bottom-full left-0 mb-2 py-2 min-w-[180px] bg-[#E0E5EC] rounded-xl shadow-lg border border-gray-200/60 z-50">
             {ITEMS.map((item) => (
-              <Link
+              <ActiveInternalNavLink
                 key={item.label}
                 href={item.href}
                 className="block px-4 py-2.5 text-base text-gray-700 hover:bg-gray-200/50 hover:text-gray-900 first:rounded-t-xl last:rounded-b-xl"
                 onClick={() => setOpen(false)}
               >
                 {item.label}
-              </Link>
+              </ActiveInternalNavLink>
             ))}
           </div>
         )}
@@ -66,8 +70,13 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
     );
   }
 
+  const headerWrapperClass = [className, historiasActive ? '[&_button]:!text-blue-600 [&_button]:font-semibold' : '']
+    .filter(Boolean)
+    .join(' ')
+    .trim();
+
   return (
-    <div ref={ref} className={`relative ${className}`}>
+    <div ref={ref} className={headerWrapperClass}>
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -82,14 +91,14 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
       {open && (
         <div className="absolute top-full left-0 mt-1 py-2 min-w-[160px] bg-[#E0E5EC] rounded-xl shadow-lg border border-gray-200/60 z-50">
           {ITEMS.map((item) => (
-            <Link
+            <ActiveInternalNavLink
               key={item.label}
               href={item.href}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200/50 hover:text-gray-900 first:rounded-t-xl last:rounded-b-xl"
               onClick={() => setOpen(false)}
             >
               {item.label}
-            </Link>
+            </ActiveInternalNavLink>
           ))}
         </div>
       )}

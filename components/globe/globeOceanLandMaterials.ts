@@ -106,25 +106,25 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 L = uUseSunOverride > 0.5 ? normalize(uSunDirOverride) : normalize(uSunDir);
       float mu = dot(N, L);
       float ndlRaw = max(mu, 0.0);
-      /* Con uFullDay la textura debe leerse en todo el disco (sin “media esfera a oscuras”). */
-      float ndl = uFullDay > 0.5 ? clamp(0.5 + 0.5 * ndlRaw, 0.72, 1.0) : ndlRaw;
+      /* Con uFullDay: disco legible sin empujar el centro a blanco puro (menos “continentes quemados”). */
+      float ndl = uFullDay > 0.5 ? clamp(0.5 + 0.5 * ndlRaw, 0.58, 0.9) : ndlRaw;
       float ndv = clamp(dot(N, V), 0.0, 1.0);
       float openWater = smoothstep(0.36, 0.92, specSample);
 
       vec3 deep = vec3(0.04, 0.1, 0.2);
       vec3 mid = vec3(0.07, 0.16, 0.32);
       float bathy = 0.5 + 0.5 * sin(vUv.x * 18.0 + vUv.y * 11.0);
-      bathy = bathy * 0.12 + 0.88;
-      vec3 base = mix(deep, mid, bathy * 0.18 + 0.12);
+      bathy = bathy * 0.06 + 0.94;
+      vec3 base = mix(deep, mid, bathy * 0.12 + 0.1);
 
       /* Fresnel solo en limbo (ndv bajo). Sin término extra que suba el centro del disco. */
       float rim = pow(1.0 - ndv, 6.2);
       vec3 fresTint = vec3(0.28, 0.42, 0.55);
       float fresAmt = rim * 0.055;
 
-      /* Difuso: hemisferio diurno muy legible (mar “Blue Marble” claro). */
-      float diff = 0.48 + 0.62 * pow(ndl, 1.05);
-      vec3 colDay = base * diff * 1.22;
+      /* Difuso contenido: océano profundo y limpio (estilo imágenes NASA procesadas con suavidad). */
+      float diff = 0.36 + 0.44 * pow(ndl, 1.12);
+      vec3 colDay = base * diff * 0.98;
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
       vec3 H = normalize(L + V);
@@ -135,12 +135,12 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.07, 0.09, 0.14) + vec3(0.006, 0.012, 0.028);
-      colNight += fresTint * rim * 0.028 * (0.2 + 0.45 * openWater);
+      vec3 colNight = base * vec3(0.08, 0.1, 0.16) + vec3(0.008, 0.014, 0.032);
+      colNight += fresTint * rim * 0.032 * (0.22 + 0.48 * openWater);
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.2, 0.2, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.42, 0.36, mu);
       vec3 col = mix(colNight, colDay, dayW);
-      col = pow(clamp(col, 0.0, 1.0), vec3(0.94));
+      col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -283,42 +283,45 @@ export function createLandSphereMaterial(
 
       float landMask = 1.0 - smoothstep(0.32, 0.68, sp0);
 
-      /* Albedo más vivo: saturación + contraste suave (verdes/cafés/montaña sin apagar océanos en costa). */
+      /* Albedo casi directo del mapa: poco “grade” en shader (menos aspecto videojuego). */
       float y = dot(d0, vec3(0.299, 0.587, 0.114));
       vec3 gray = vec3(y);
-      d0 = clamp(mix(gray, d0, 1.28), 0.0, 1.0);
-      d0 = clamp((d0 - 0.5) * 1.04 + 0.52, 0.0, 1.0);
+      d0 = clamp(mix(gray, d0, 1.02), 0.0, 1.0);
+      d0 = clamp((d0 - 0.5) * 0.88 + 0.5, 0.0, 1.0);
 
       vec3 tmap = texture2D(uNormalTex, vUv).xyz * 2.0 - 1.0;
-      float landScale = mix(0.62, 1.72, landMask);
+      float landScale = mix(0.82, 1.22, landMask);
       tmap.xy *= uNormalScale * landScale;
 
       mat3 mTbn = mat3(vTw, vBw, vNw);
       vec3 n = normalize(mTbn * normalize(tmap));
       vec3 s = normalize(uSunDir);
       float ndlRaw = max(dot(n, s), 0.0);
-      float ndl = uFullDay > 0.5 ? clamp(0.48 + 0.52 * ndlRaw, 0.68, 1.0) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.42 + 0.58 * ndlRaw, 0.52, 0.82) : ndlRaw;
 
       vec3 geomN = normalize(vNw);
       float mu = dot(geomN, s);
 
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
-      float mountainPop = 1.0 + landMask * slope * 1.05;
+      float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = 0.38;
-      float dif = 1.12 * pow(ndl, 0.82);
-      vec3 litDay = d0 * (amb + dif) * mountainPop * 1.12;
+      float amb = 0.2;
+      float dif = 0.68 * pow(ndl, 0.94);
+      vec3 litDay = d0 * (amb + dif) * mountainPop;
+      /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
+      float luma = dot(d0, vec3(0.299, 0.587, 0.114));
+      float hot = smoothstep(0.5, 0.86, luma);
+      litDay *= mix(1.0, 0.78, hot);
 
-      vec3 litNight = d0 * vec3(0.16, 0.17, 0.22) * (0.34 + 0.66 * mountainPop * 0.9);
-      litNight += vec3(0.03, 0.036, 0.048) * landMask;
+      vec3 litNight = d0 * vec3(0.1, 0.12, 0.17) * (0.38 + 0.5 * mountainPop);
+      litNight += vec3(0.02, 0.024, 0.038) * landMask;
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.12, 0.28, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.38, 0.34, mu);
       vec3 lit = mix(litNight, litDay, dayW);
-      /* Piso desde albedo: la cara nocturna no se vuelve negro puro (relieve siempre legible). */
       if (uFullDay < 0.5) {
-        lit = max(lit, d0 * 0.14);
+        lit = max(lit, d0 * 0.11);
       }
-      lit = pow(clamp(lit, 0.0, 1.0), vec3(0.94));
+      lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));
 
       gl_FragColor = vec4(lit, 1.0);
     }

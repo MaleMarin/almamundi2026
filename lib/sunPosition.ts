@@ -1,7 +1,9 @@
 /**
- * Posición solar aproximada (UTC) y terminador coherente con el globo (eje Y = norte).
- * Sin dependencias pesadas: declinación + ángulo horario, suficiente para HUD y luces del mapa.
+ * Posición solar (UTC) y terminador alineados con el globo Three.js / `latLngToCartesianThreeJS`.
+ * GMST + Sol (Meeus, baja precisión) → subsolar geográfico → vector ECEF hacia el Sol.
  */
+
+import { latLngToCartesianThreeJS } from '@/lib/globe-coords';
 
 export type SunVector3 = { x: number; y: number; z: number };
 
@@ -9,37 +11,98 @@ function clamp01Cos(v: number): number {
   return Math.max(-1, Math.min(1, v));
 }
 
-/** Vector unitario sol → convención compartida con shaders del globo (Three / GlobeV2). */
+const DEG2RAD = Math.PI / 180;
+const RAD2DEG = 180 / Math.PI;
+
+/** Día juliano UTC (fraccionario) a partir del instante `Date` (ms desde epoch). */
+export function julianDateUtc(date: Date): number {
+  return date.getTime() / 86400000 + 2440587.5;
+}
+
+/**
+ * Tiempo sidéreo medio de Greenwich (rad), 0..2π.
+ * IAU-style polinomio en T respecto a J2000 (Meeus cap. 12; precisión ~1″ para UI).
+ */
+export function greenwichMeanSiderealTimeRad(date: Date): number {
+  const jd = julianDateUtc(date);
+  const T = (jd - 2451545.0) / 36525;
+  let gmstDeg =
+    280.46061837 +
+    360.98564736629 * (jd - 2451545.0) +
+    0.000387933 * T * T -
+    (T * T * T) / 38710000;
+  gmstDeg = ((gmstDeg % 360) + 360) % 360;
+  return gmstDeg * DEG2RAD;
+}
+
+/** Ascensión recta y declinación medias del Sol (rad). */
+export function sunRightAscensionDeclinationRad(date: Date): { raRad: number; decRad: number } {
+  const jd = julianDateUtc(date);
+  const T = (jd - 2451545.0) / 36525;
+  let L0 = 280.46646 + 36000.76983 * T + 0.0003032 * T * T;
+  L0 = ((L0 % 360) + 360) % 360;
+  let M = 357.52911 + 35999.05029 * T - 0.0001537 * T * T;
+  M = ((M % 360) + 360) % 360;
+  const Mrad = M * DEG2RAD;
+  const C =
+    (1.914602 - 0.004817 * T - 0.000014 * T * T) * Math.sin(Mrad) +
+    (0.019993 - 0.000101 * T) * Math.sin(2 * Mrad) +
+    0.000289 * Math.sin(3 * Mrad);
+  const lambda = ((L0 + C) % 360) * DEG2RAD;
+  const eps =
+    (23.439291111111 - 0.0130041666667 * T - 1.6388888889e-7 * T * T + 5.0361111111e-10 * T * T * T) *
+    DEG2RAD;
+  const raRad = Math.atan2(Math.cos(eps) * Math.sin(lambda), Math.cos(lambda));
+  const decRad = Math.asin(clamp01Cos(Math.sin(eps) * Math.sin(lambda)));
+  return { raRad, decRad };
+}
+
+function wrapPi(r: number): number {
+  let x = r;
+  while (x > Math.PI) x -= 2 * Math.PI;
+  while (x < -Math.PI) x += 2 * Math.PI;
+  return x;
+}
+
+/** Subsolar geográfico (rad): lat = declinación, lon este desde Greenwich. */
+export function subsolarGeographicRad(date: Date): { latRad: number; lonRad: number } {
+  const gmst = greenwichMeanSiderealTimeRad(date);
+  const { raRad, decRad } = sunRightAscensionDeclinationRad(date);
+  const ha = wrapPi(gmst - raRad);
+  const lonRad = wrapPi(-ha);
+  return { latRad: decRad, lonRad };
+}
+
+/**
+ * Vector unitario Tierra → Sol en el marco fijo al cuerpo terrestre,
+ * misma convención que `latLngToCartesianThreeJS` (textura / bits / GlobeV2).
+ */
+export function sunUnitVectorTowardSunEcef(date: Date): SunVector3 {
+  const { latRad, lonRad } = subsolarGeographicRad(date);
+  const latDeg = latRad * RAD2DEG;
+  const lonDeg = lonRad * RAD2DEG;
+  const p = latLngToCartesianThreeJS(latDeg, lonDeg, 1);
+  const len = Math.hypot(p.x, p.y, p.z) || 1;
+  return { x: p.x / len, y: p.y / len, z: p.z / len };
+}
+
+/**
+ * Rotación Y del grupo `planetSpin` (rad): alinea el meridiano 0 de la textura con GMST.
+ * `textureMeridianOffsetRad` corrige desfase textura vs meridiano astronómico (típ. 0).
+ */
+export function earthGreenwichSpinYRadFromUtc(date: Date, textureMeridianOffsetRad = 0): number {
+  return greenwichMeanSiderealTimeRad(date) + textureMeridianOffsetRad;
+}
+
+/** @deprecated nombre histórico — equivale a `sunUnitVectorTowardSunEcef` (marco textura / ECEF). */
 export function sunDirectionUtc(date: Date): SunVector3 {
-  const d = new Date(date.getTime());
-  const utcHours = d.getUTCHours() + d.getUTCMinutes() / 60 + d.getUTCSeconds() / 3600;
-  const start = Date.UTC(d.getUTCFullYear(), 0, 0);
-  const dayOfYear = (d.getTime() - start) / 86400000;
-  const gamma = (2 * Math.PI / 365) * (dayOfYear - 1 + (utcHours - 12) / 24);
-  const decl =
-    0.006918
-    - 0.399912 * Math.cos(gamma)
-    + 0.070257 * Math.sin(gamma)
-    - 0.006758 * Math.cos(2 * gamma)
-    + 0.000907 * Math.sin(2 * gamma)
-    - 0.002697 * Math.cos(3 * gamma)
-    + 0.00148 * Math.sin(3 * gamma);
-  // Hora solar en el meridiano de referencia: al avanzar UTC tras el mediodía en Greenwich,
-  // el subsolar se desplaza hacia el oeste (América). (utcHours - 12) invertía longitud ~180°.
-  const ha = (Math.PI / 12) * (12 - utcHours);
-  const x = Math.cos(decl) * Math.cos(ha);
-  const y = Math.sin(decl);
-  const z = Math.cos(decl) * Math.sin(ha);
-  const len = Math.sqrt(x * x + y * y + z * z) || 1;
-  return { x: x / len, y: y / len, z: z / len };
+  return sunUnitVectorTowardSunEcef(date);
 }
 
 /** Punto subsolar (lat/lng grados) donde el sol está en el cenit en este instante. */
 export function subsolarGeographicDegrees(date: Date): { lat: number; lng: number } {
-  const s = sunDirectionUtc(date);
-  const lat = (Math.asin(clamp01Cos(s.y)) * 180) / Math.PI;
-  const lng = (Math.atan2(s.z, s.x) * 180) / Math.PI;
-  return { lat, lng };
+  const { latRad, lonRad } = subsolarGeographicRad(date);
+  return { lat: latRad * RAD2DEG, lng: lonRad * RAD2DEG };
 }
 
 /**
@@ -56,25 +119,17 @@ export function terminatorCssGradientAngleDeg(date: Date): number {
  * Coordenadas en grados; convención del globo Y = norte.
  */
 export function isNightAtLocation(lat: number, lng: number, date: Date): boolean {
-  const sun = sunDirectionUtc(date);
-  const latRad = (lat * Math.PI) / 180;
-  const lngRad = (lng * Math.PI) / 180;
-  const nx = Math.cos(latRad) * Math.cos(lngRad);
-  const ny = Math.sin(latRad);
-  const nz = Math.cos(latRad) * Math.sin(lngRad);
-  const dot = sun.x * nx + sun.y * ny + sun.z * nz;
+  const sun = sunUnitVectorTowardSunEcef(date);
+  const n = latLngToCartesianThreeJS(lat, lng, 1);
+  const dot = sun.x * n.x + sun.y * n.y + sun.z * n.z;
   return dot <= 0;
 }
 
 /** Coeficiente cívulo [-1..1]: -1 noche, +1 mediodía, bandas crepusculares cerca de 0. */
 export function sunElevationCosineAt(lat: number, lng: number, date: Date): number {
-  const sun = sunDirectionUtc(date);
-  const latRad = (lat * Math.PI) / 180;
-  const lngRad = (lng * Math.PI) / 180;
-  const nx = Math.cos(latRad) * Math.cos(lngRad);
-  const ny = Math.sin(latRad);
-  const nz = Math.cos(latRad) * Math.sin(lngRad);
-  return sun.x * nx + sun.y * ny + sun.z * nz;
+  const sun = sunUnitVectorTowardSunEcef(date);
+  const n = latLngToCartesianThreeJS(lat, lng, 1);
+  return sun.x * n.x + sun.y * n.y + sun.z * n.z;
 }
 
 export type MapSyncCaption = {

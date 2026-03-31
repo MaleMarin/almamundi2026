@@ -49,14 +49,17 @@ export const GLOBE_V2_LAND_RADIUS = GLOBE_V2_OCEAN_RADIUS + GLOBE_V2_LAND_OUTSET
 /** Luces urbanas: misma esfera que la tierra + epsilon. */
 export const GLOBE_V2_CITY_LIGHTS_SCALE = GLOBE_V2_LAND_RADIUS * 1.0008;
 
-/** Nubes por encima del relieve continental. */
-export const GLOBE_V2_CLOUD_ROOT_SCALE = 1.016;
+/** Nubes: por encima de `GLOBE_V2_LAND_RADIUS` (1.02); capa exterior fina. */
+export const GLOBE_V2_CLOUD_ROOT_SCALE = 1.021;
 
-/** Halo atmosférico (AtmosphereSphere). */
-export const GLOBE_V2_ATMOSPHERE_SCALE = 1.02;
+/** Halo atmosférico: anillo fino fuera de la corteza (intensidad baja en shader). */
+export const GLOBE_V2_ATMOSPHERE_SCALE = 1.023;
 
-/** Bits anclados a la superficie continental aproximada. */
-export const GLOBE_V2_BIT_SURFACE_RADIUS = GLOBE_V2_LAND_RADIUS + 0.013;
+/**
+ * Bits: por encima de la capa exterior de nubes (no entre tierra ~1.02 y nubes ~1.021).
+ * Evita que los marcadores queden “encajados” en el sandwich del globo.
+ */
+export const GLOBE_V2_BIT_SURFACE_RADIUS = GLOBE_V2_CLOUD_ROOT_SCALE + 0.007;
 
 /**
  * Máscara tierra desde `earth_specular` (canal R): mar ≈ alto, tierra ≈ bajo.
@@ -116,29 +119,29 @@ export const GLOBE_V2_NIGHT_LIGHTS_PIPELINE_NOTE =
 
 // ——— Valores congelados (no compensar falta de resolucion subiendo opacidad al azar) ———
 
-/** Opacidad capa exterior de nubes; hay segunda capa interior en GlobeV2 (fracción de esta opacidad). */
-export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.9;
-export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.64;
+/** Opacidad capa exterior de nubes (fina; evitar “torta” blanca). */
+export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.78;
+export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.56;
 
-/** Multiplicador de opacidad para la esfera interior de nubes (misma textura, radio menor). */
-export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.55;
+/** Multiplicador opacidad esfera interior (velo ligero sobre océano, sin duplicar peso). */
+export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.4;
 
 /** Radio interior = `GLOBE_V2_CLOUD_ROOT_SCALE` − este delta (unidades de escena). */
-export const GLOBE_V2_CLOUD_UNDERLAY_RADIUS_DELTA = 0.008;
+export const GLOBE_V2_CLOUD_UNDERLAY_RADIUS_DELTA = 0.009;
 
-/** Segmentos esfera nubes: subir a 160–192 al pasar a nube 4k si notas faceting en el borde. */
+/** Segmentos esfera nubes. */
 export const GLOBE_V2_CLOUD_SPHERE_SEGMENTS = 112;
 
-/** Intensidad overlay luces urbanas (no maquillar mas el PNG 2048). */
-export const GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY = 0.52;
-export const GLOBE_V2_CITY_LIGHTS_STRENGTH_NIGHT = 0.72;
+/** Luces urbanas: muy discretas (documental, no mapa nocturno recargado). */
+export const GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY = 0.2;
+export const GLOBE_V2_CITY_LIGHTS_STRENGTH_NIGHT = 0.3;
 
-/** Normal map: escala tangencial en shader; independiente de 2k vs 4k (ajustar solo tras cambiar asset). */
-export const GLOBE_V2_NORMAL_SCALE_SURFACE = 1.92;
-export const GLOBE_V2_NORMAL_SCALE_CITY_LIGHTS = 0.58;
+/** Normal / displacement: relieve perceptible pero no “inflado”. */
+export const GLOBE_V2_NORMAL_SCALE_SURFACE = 1.38;
+export const GLOBE_V2_NORMAL_SCALE_CITY_LIGHTS = 0.42;
 
-/** Displacement radial (radio esfera 1). Proxy specular/DEM; subir = relieve/montañas más legibles. */
-export const GLOBE_V2_DISPLACEMENT_SCALE_DEFAULT = 0.004;
+/** Displacement radial (radio esfera 1). Bajo = superficie más serena. */
+export const GLOBE_V2_DISPLACEMENT_SCALE_DEFAULT = 0.0028;
 
 export function isGlobeV2ElevationActive(
   urls: Pick<GlobeV2TextureUrls, 'heightMap'>,

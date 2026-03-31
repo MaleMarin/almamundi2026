@@ -1,28 +1,31 @@
 'use client';
 
 /**
- * Luna en órbita geocéntrica, trayectoria elíptica (e ≈ 0,055), plano ligeramente inclinado (~5,1°).
- *
- * **Escenario docente (GlobeV2):** resonancia rotación–órbita por acoplamiento de mareas *mutuo*:
- * órbita sidérea ~47 d (véase `MOON_MUTUAL_LOCK_SIDEREAL_DAYS`) frente a ~27,3 d actuales (`MOON_SIDEREAL_ORBIT_DAYS`);
- * la Tierra usa la misma ω y el mismo `clock.elapsedTime` que ν en la elipse; la fase en Y la fija
- * `globeV2TidalLockEarthRotationY` en `GlobeV2` (+ν si `orbitYawRad===0`, π+ν si el yaw es π), con `zOrbit = −r sin ν`.
+ * Luna en órbita geocéntrica: elipse (e ≈ 0,055), plano con inclinación ~5,145° (eclíptica) y yaw opcional.
+ * Posición: anomalía media M con n = 2π/T y ecuación de Kepler → E → coords perifocales (mismo `dt` que la Tierra).
+ * Traslación en sentido progrado (antihorario visto desde el polo norte / +Y).
+ * Orientación: +Z local hacia la Tierra → misma cara visible (1 giro propio por órbita sideral, sin spin libre).
+ * `makeBasis` + eje mundial estable evita twist; `setFromUnitVectors` dejaba roll arbitrario sobre el radial.
  */
 
-import { useLayoutEffect, useRef } from 'react';
+import { useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { GLOBE_V2_TEXTURE_BASE } from '@/lib/globe/globe-v2-assets';
 
-/** Período sidéreo actual (una vuelta respecto a las estrellas), en días terrestres. */
+/** Período sidéreo lunar (una órbita respecto a las estrellas), en días solares medios. */
 export const MOON_SIDEREAL_ORBIT_DAYS = 27.321661;
 
+/** Día sideral terrestre: 23 h 56 min 4 s (referencia para proporciones con la órbita lunar). */
+export const EARTH_SIDEREAL_DAY_S = 23 * 3600 + 56 * 60 + 4;
+
 /**
- * Órbita sidérea en el escenario de bloqueo mareal mutuo (Tierra–Luna siempre la misma cara),
- * en días terrestres (~47 d frente a ~27,3 d actuales). Solo referencia narrativa + proporción en GlobeV2.
+ * Rotaciones siderales de la Tierra durante una órbita sidereal completa de la Luna.
+ * Tiempo transcurrido ≈ MOON_SIDEREAL_ORBIT_DAYS × 86400 s; cada rotación sideral dura EARTH_SIDEREAL_DAY_S.
  */
-export const MOON_MUTUAL_LOCK_SIDEREAL_DAYS = 47;
+export const EARTH_SIDEREAL_ROTATIONS_PER_LUNAR_ORBIT =
+  (MOON_SIDEREAL_ORBIT_DAYS * 86400) / EARTH_SIDEREAL_DAY_S;
 
 /** Excentricidad media de la órbita lunar (elipse). */
 export const MOON_ORBIT_ECCENTRICITY = 0.0549;
@@ -34,6 +37,15 @@ export const MOON_ORBIT_INCLINATION_DEG = 5.145;
 export const MOON_RADIUS_RATIO = 0.2725;
 
 const MOON_MAP_URL = `${GLOBE_V2_TEXTURE_BASE}/moon_1024.jpg`;
+
+/** Precarga la textura en el bundle cliente para reducir el hueco hasta que la Luna aparezca al montar el Canvas. */
+if (typeof window !== 'undefined') {
+  try {
+    useTexture.preload(MOON_MAP_URL);
+  } catch {
+    /* noop: preload es best-effort */
+  }
+}
 
 export type MoonSatelliteProps = {
   /** Radio terrestre en unidades de escena (GlobeV2 ≈ 1). */
@@ -55,6 +67,8 @@ export type MoonSatelliteProps = {
    * la Luna al lado izquierdo del encuadre respecto a la fase inicial de la elipse.
    */
   orbitYawRad?: number;
+  /** Inclinación del plano orbital (grados); más grados = más barrido en Y y lectura 3D frente a cámara en +Z. */
+  orbitInclinationDeg?: number;
 };
 
 export function MoonSatellite({
@@ -63,9 +77,24 @@ export function MoonSatellite({
   orbitPeriodSeconds = 140,
   moonRadiusScale = 1,
   orbitYawRad = 0,
+  orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
 }: MoonSatelliteProps) {
-  const groupRef = useRef<THREE.Group>(null);
+  const moonOrbitRootRef = useRef<THREE.Group>(null);
+  /** Anomalía media M (rad): dM/dt = n = 2π/T; ν y r vía Kepler (elipse coherente con el período sidereal). */
+  const meanAnomalyRef = useRef(0);
   const moonMap = useTexture(MOON_MAP_URL);
+
+  const aux = useMemo(
+    () => ({
+      dirToEarth: new THREE.Vector3(),
+      side: new THREE.Vector3(),
+      moonUp: new THREE.Vector3(),
+      mat: new THREE.Matrix4(),
+      worldY: new THREE.Vector3(0, 1, 0),
+      worldX: new THREE.Vector3(1, 0, 0),
+    }),
+    []
+  );
 
   useLayoutEffect(() => {
     moonMap.colorSpace = THREE.SRGBColorSpace;
@@ -75,19 +104,30 @@ export function MoonSatellite({
 
   const moonRadius = earthRadius * MOON_RADIUS_RATIO * moonRadiusScale;
   const e = MOON_ORBIT_ECCENTRICITY;
-  const inc = (MOON_ORBIT_INCLINATION_DEG * Math.PI) / 180;
-  const omega = (2 * Math.PI) / Math.max(orbitPeriodSeconds, 1);
+  const inc = (orbitInclinationDeg * Math.PI) / 180;
+  const meanMotion = (2 * Math.PI) / Math.max(orbitPeriodSeconds, 1);
+  const a = orbitSemiMajor;
+  const sqrt1me2 = Math.sqrt(Math.max(0, 1 - e * e));
 
-  useFrame(({ clock }) => {
-    const g = groupRef.current;
-    if (!g) return;
+  useFrame((_state, dt) => {
+    const root = moonOrbitRootRef.current;
+    if (!root) return;
 
-    const nu = omega * clock.elapsedTime;
-    const r = (orbitSemiMajor * (1 - e * e)) / (1 + e * Math.cos(nu));
+    meanAnomalyRef.current += meanMotion * dt;
+    let M = meanAnomalyRef.current;
+    const twoPi = 2 * Math.PI;
+    M = ((M % twoPi) + twoPi) % twoPi;
 
-    /* −sin ν: órbita prograde (vista desde el norte celeste) coherente con giro terrestre oeste→este en GlobeV2. */
-    const xOrbit = r * Math.cos(nu);
-    const zOrbit = -r * Math.sin(nu);
+    /* E - e sin E = M (Newton); plano orbital: eje x hacia periapsis, progrado. */
+    let E = M;
+    for (let i = 0; i < 14; i++) {
+      const f = E - e * Math.sin(E) - M;
+      const fp = 1 - e * Math.cos(E);
+      E -= f / fp;
+    }
+
+    const xOrbit = a * (Math.cos(E) - e);
+    const zOrbit = a * sqrt1me2 * Math.sin(E);
     let x = xOrbit;
     const y = zOrbit * Math.sin(inc);
     let z = zOrbit * Math.cos(inc);
@@ -101,13 +141,43 @@ export function MoonSatellite({
       z = zr;
     }
 
-    g.position.set(x, y, z);
-    g.lookAt(0, 0, 0);
+    root.position.set(x, y, z);
+
+    /* Luna → Tierra (normalizado); +Z local del grupo apunta a la Tierra. */
+    aux.dirToEarth.set(-x, -y, -z);
+    const lenSq = aux.dirToEarth.lengthSq();
+    if (lenSq < 1e-24) return;
+    aux.dirToEarth.multiplyScalar(1 / Math.sqrt(lenSq));
+
+    /*
+     * Base ortonormal estable: “side” ⟂ dirToEarth usando world Y (o X si el radio ≈ paralelo al polo).
+     * Así no hay grado de libertad de roll arbitrario frame a frame (problema de setFromUnitVectors).
+     */
+    aux.side.crossVectors(aux.worldY, aux.dirToEarth);
+    if (aux.side.lengthSq() < 1e-12) {
+      aux.side.crossVectors(aux.worldX, aux.dirToEarth);
+    }
+    aux.side.normalize();
+    aux.moonUp.crossVectors(aux.dirToEarth, aux.side).normalize();
+
+    aux.mat.makeBasis(aux.side, aux.moonUp, aux.dirToEarth);
+    root.quaternion.setFromRotationMatrix(aux.mat);
   });
 
   return (
-    <group ref={groupRef}>
-      <mesh renderOrder={6} name="Moon">
+    <group ref={moonOrbitRootRef} name="AM_moonOrbitRoot">
+      {/*
+        renderOrder bajo: la Luna se dibuja antes que la Tierra (órdenes ≥ 0 en EarthGroup).
+        Así el z-buffer de océano/tierra tapa la Luna cuando va detrás del disco; si se pintara
+        después, capas transparentes (nubes sin depthWrite) podían dejar ver la Luna a través del globo.
+      */}
+      <mesh
+        ref={(m) => {
+          if (m) m.raycast = () => {};
+        }}
+        name="AM_moonMesh"
+        renderOrder={-20}
+      >
         <sphereGeometry args={[moonRadius, 40, 40]} />
         <meshStandardMaterial
           map={moonMap}
@@ -115,6 +185,8 @@ export function MoonSatellite({
           metalness={0}
           emissive="#0a0a12"
           emissiveIntensity={0.04}
+          depthTest
+          depthWrite
         />
       </mesh>
     </group>

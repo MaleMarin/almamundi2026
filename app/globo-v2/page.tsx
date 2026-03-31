@@ -21,7 +21,6 @@ export default function GloboV2Page() {
     <div className="relative min-h-[100dvh] w-full overflow-hidden bg-black">
       <GlobeV2
         className="fixed inset-0 z-0 h-[100dvh] w-full min-h-0 bg-black [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none"
-        forceDaylight
       />
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 flex justify-between gap-4 p-4 text-white/80">
         <span className="text-xs font-semibold uppercase tracking-[0.2em]">GlobeV2 · Beta</span>

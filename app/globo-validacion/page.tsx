@@ -314,7 +314,6 @@ export default function GloboValidacionPage() {
       <div className="relative min-h-0 flex-1">
         <GlobeV2
           className="absolute inset-0 z-0 h-full w-full min-h-0 bg-black [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none"
-          forceDaylight
           visualStage={stage}
           layerBuildStage={layerBuildStage}
           oceanSunDebug={oceanSunDebug}

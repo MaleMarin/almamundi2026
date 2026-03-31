@@ -1,10 +1,9 @@
 'use client';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
  * Footer unificado para páginas internas (E0E5EC, sans moderna, ALMAMUNDI).
  */
-import Link from 'next/link';
 import { HistoriasAccordion } from './HistoriasAccordion';
 
 const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
@@ -28,19 +27,19 @@ export function Footer() {
         </div>
 
         <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
-          <HomeHardLink href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
+          <ActiveInternalNavLink href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
             Nuestro propósito
-          </HomeHardLink>
-          <HomeHardLink href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
             ¿Cómo funciona?
-          </HomeHardLink>
+          </ActiveInternalNavLink>
           <HistoriasAccordion variant="footer" />
-          <HomeHardLink href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
+          <ActiveInternalNavLink href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
             Mapa
-          </HomeHardLink>
-          <Link href="/privacidad" className="hover:text-gray-900 transition-colors font-normal">
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/privacidad" className="hover:text-gray-900 transition-colors font-normal">
             Política de privacidad
-          </Link>
+          </ActiveInternalNavLink>
         </div>
       </div>
     </footer>

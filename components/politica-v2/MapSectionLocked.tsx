@@ -28,11 +28,8 @@ export function MapSectionLocked() {
           {/* Espacio fijo entre la barra y el globo: las palabras no tapan el mapa; el globo empieza debajo */}
           <div className="min-h-[48px] md:min-h-[64px] w-full shrink-0" aria-hidden />
         </div>
-        {/* Universo: globo debajo de la barra; fondo negro al final de la sección. */}
-        <div
-          className="relative flex w-full min-h-[120vh] flex-col overflow-hidden bg-[var(--universe-bg)]"
-          style={{ minHeight: '120vh' }}
-        >
+        {/* Universo: globo debajo de la barra. Altura acotada (antes 120vh dejaba mucho negro vacío bajo la fecha). */}
+        <div className="relative flex w-full min-h-[88vh] flex-col overflow-hidden bg-[var(--universe-bg)]">
           <HomeMap />
         </div>
       </section>

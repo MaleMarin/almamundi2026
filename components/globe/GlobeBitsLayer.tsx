@@ -23,14 +23,19 @@ export type GlobeBitMarker = {
 const BIT_SURFACE_RADIUS = GLOBE_V2_BIT_SURFACE_RADIUS;
 
 /** Escala: puntos tipo lucernas / luces de ciudad vistas desde órbita. */
-const STAR_PLANE_SCALE = 0.0068;
-const STAR_PLANE_SCALE_OUTER = 0.0088;
-const CORE_SCALE = 0.00022;
-const HIT_SCALE = 0.0056;
+const STAR_PLANE_SCALE = 0.0127;
+const STAR_PLANE_SCALE_OUTER = 0.0165;
+const CORE_SCALE = 0.00043;
+/** Picking: OrbitControls comparte el canvas; el disco debe ser fácil de acertar. */
+const HIT_SCALE = 0.0205;
+/** >0 oculta el hemisferio oculto; 0.04 dejaba demasiados puntos en el limbo sin clic estable. */
+const HEMI_DOT_MIN = 0;
 
 function disableMeshRaycast(obj: THREE.Object3D | null) {
   if (obj instanceof THREE.Mesh) obj.raycast = () => {};
 }
+
+const noopMeshRaycast: THREE.Mesh['raycast'] = () => {};
 
 function BitDot({
   bit,
@@ -54,19 +59,60 @@ function BitDot({
     return { surfacePos: s, flareBump: b };
   }, [bit.lat, bit.lon]);
 
+  const rootRef = useRef<THREE.Group>(null);
+  const hitRef = useRef<THREE.Mesh>(null);
+  const hitRaycastRef = useRef<THREE.Mesh['raycast'] | null>(null);
   const faceCamRef = useRef<THREE.Group>(null);
   const { camera } = useThree();
+  const bitWorld = useMemo(() => new THREE.Vector3(), []);
+  const camWorld = useMemo(() => new THREE.Vector3(), []);
+  const toCam = useMemo(() => new THREE.Vector3(), []);
+  const outNormal = useMemo(() => new THREE.Vector3(), []);
+
   useFrame(() => {
-    const g = faceCamRef.current;
-    if (g) g.quaternion.copy(camera.quaternion);
+    const face = faceCamRef.current;
+    if (face) face.quaternion.copy(camera.quaternion);
+
+    const root = rootRef.current;
+    if (!root) return;
+    root.getWorldPosition(bitWorld);
+    camera.getWorldPosition(camWorld);
+    toCam.subVectors(camWorld, bitWorld);
+    const len = toCam.length();
+    if (len < 1e-8) {
+      root.visible = false;
+      const hm = hitRef.current;
+      if (hm) hm.raycast = noopMeshRaycast;
+      return;
+    }
+    toCam.multiplyScalar(1 / len);
+    outNormal.copy(bitWorld);
+    if (outNormal.lengthSq() < 1e-12) {
+      root.visible = false;
+      const hm = hitRef.current;
+      if (hm) hm.raycast = noopMeshRaycast;
+      return;
+    }
+    outNormal.normalize();
+    /* Solo hemisferio visible: billboards aditivos no escriben depth y se filtraban a través del disco. */
+    const front = outNormal.dot(toCam) > HEMI_DOT_MIN;
+    root.visible = front;
+    const hm = hitRef.current;
+    if (hm) {
+      if (!hitRaycastRef.current) {
+        hitRaycastRef.current = THREE.Mesh.prototype.raycast.bind(hm);
+      }
+      hm.raycast = front ? hitRaycastRef.current : noopMeshRaycast;
+    }
   });
 
   const starMat = selected ? starMatSelected : starMatNormal;
   const sel = selected ? 1.08 : 1.0;
 
   return (
-    <group position={surfacePos}>
+    <group ref={rootRef} position={surfacePos}>
       <mesh
+        ref={hitRef}
         scale={HIT_SCALE}
         onClick={
           onSelect
@@ -76,7 +122,15 @@ function BitDot({
               }
             : undefined
         }
-        onPointerDown={onSelect ? (e) => e.stopPropagation() : undefined}
+        onPointerDown={
+          onSelect
+            ? (e) => {
+                /* OrbitControls escucha pointerdown en el mismo canvas; R3F stopPropagation no lo bloquea. */
+                e.nativeEvent.stopImmediatePropagation();
+                e.stopPropagation();
+              }
+            : undefined
+        }
         onPointerOver={(e) => {
           e.stopPropagation();
           onHoverChange(bit.id);
