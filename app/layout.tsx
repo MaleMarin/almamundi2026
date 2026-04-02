@@ -1,6 +1,10 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import type { Metadata } from "next";
-import "./globals.css";
+import { LocaleProvider } from '@/components/i18n/LocaleProvider';
+import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
+import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
+import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import './globals.css';
 
 function defaultMetadataBase(): URL {
   const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
@@ -24,22 +28,28 @@ export const metadata: Metadata = {
   description: "Explora el mapa",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const jar = await cookies();
+  const locale = parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
+  const ns = NOSCRIPT_BY_LOCALE[locale];
+
   return (
-    <html lang="es">
+    <html lang={locale}>
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
         <noscript>
           <div className="p-8 text-center">
-            <h1 className="text-2xl font-light text-white/95">AlmaMundi</h1>
-            <p className="mt-2 text-white/60">Necesitas JavaScript para ver el sitio.</p>
-            <HomeHardLink href="/" className="mt-4 inline-block text-orange-400 hover:underline">Ir al inicio</HomeHardLink>
+            <h1 className="text-2xl font-light text-white/95">{ns.title}</h1>
+            <p className="mt-2 text-white/60">{ns.p}</p>
+            <HomeHardLink href="/" className="mt-4 inline-block text-orange-400 hover:underline">
+              {ns.link}
+            </HomeHardLink>
           </div>
         </noscript>
-        {children}
+        <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
       </body>
     </html>
   );

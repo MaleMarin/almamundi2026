@@ -1,8 +1,10 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Menu, X } from 'lucide-react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { MAP_HOME_HEADER_NAV_CLASS } from '@/lib/map-home-neu-button';
 import { DM_Sans } from 'next/font/google';
@@ -126,108 +128,13 @@ export function HomeFirstPart({
   onUploadPhoto,
   basePath = ''
 }: HomeFirstPartProps) {
+  const { t } = useHomeLocale();
   const historiasHref = basePath ? `${basePath}#historias` : '#historias';
   const baseNorm = basePath.replace(/\/$/, '');
   const mapaHref = basePath ? (baseNorm ? `${baseNorm}#mapa` : '/#mapa') : '/#mapa';
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animId = 0;
-
-    const particles: { x: number; y: number; r: number; vy: number; vx: number; o: number }[] = [];
-
-    function init() {
-      const parent = canvas.parentElement;
-      if (!parent) return;
-      const W = parent.offsetWidth || window.innerWidth;
-      const H = parent.offsetHeight || 400;
-      canvas.width = W;
-      canvas.height = H;
-      particles.length = 0;
-      for (let i = 0; i < 60; i++) {
-        particles.push({
-          x: Math.random() * W,
-          y: Math.random() * H,
-          r: Math.random() * 1.3 + 0.3,
-          vy: -(Math.random() * 0.22 + 0.07),
-          vx: (Math.random() - 0.5) * 0.1,
-          o: Math.random() * 0.1 + 0.035,
-        });
-      }
-    }
-
-    function drawBokeh(W: number, H: number) {
-      const spots = [
-        { x: W * 0.28, y: H * 0.35, r: 90, c: [255, 175, 90] as [number, number, number], a: 0.055 },
-        { x: W * 0.3, y: H * 0.7, r: 65, c: [255, 155, 70] as [number, number, number], a: 0.04 },
-        { x: W * 0.72, y: H * 0.4, r: 75, c: [130, 185, 235] as [number, number, number], a: 0.04 },
-        { x: W * 0.12, y: H * 0.55, r: 55, c: [255, 205, 130] as [number, number, number], a: 0.035 },
-        { x: W * 0.88, y: H * 0.65, r: 60, c: [170, 210, 245] as [number, number, number], a: 0.035 },
-        { x: W * 0.5, y: H * 0.2, r: 45, c: [220, 190, 160] as [number, number, number], a: 0.025 },
-      ];
-      spots.forEach((s) => {
-        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
-        g.addColorStop(0, `rgba(${s.c[0]},${s.c[1]},${s.c[2]},${s.a})`);
-        g.addColorStop(1, 'rgba(0,0,0,0)');
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = g;
-        ctx.fill();
-      });
-    }
-
-    function loop() {
-      const W = canvas.width;
-      const H = canvas.height;
-      if (W === 0 || H === 0) {
-        animId = requestAnimationFrame(loop);
-        return;
-      }
-      ctx.clearRect(0, 0, W, H);
-      drawBokeh(W, H);
-      particles.forEach((p) => {
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(120,130,155,${p.o})`;
-        ctx.fill();
-        p.y += p.vy;
-        p.x += p.vx;
-        if (p.y < -3) {
-          p.y = H + 3;
-          p.x = Math.random() * W;
-        }
-        if (p.x < -3) p.x = W + 3;
-        if (p.x > W + 3) p.x = -3;
-      });
-      animId = requestAnimationFrame(loop);
-    }
-
-    const parentEl = canvas.parentElement;
-    const ro = new ResizeObserver(() => {
-      init();
-    });
-    if (parentEl) ro.observe(parentEl);
-
-    const t = setTimeout(() => {
-      init();
-    }, 50);
-
-    loop();
-
-    return () => {
-      cancelAnimationFrame(animId);
-      ro.disconnect();
-      clearTimeout(t);
-    };
-  }, []);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -249,24 +156,25 @@ export function HomeFirstPart({
             className="h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md"
           />
         </div>
-        <div className="flex items-center justify-end shrink-0">
+        <div className="flex items-center justify-end gap-2 shrink-0 md:gap-3">
           <button
             type="button"
             className="md:hidden flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"
             style={soft.button}
             aria-expanded={mobileNavOpen}
             aria-controls="home-header-mobile-nav"
-            aria-label={mobileNavOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-label={mobileNavOpen ? t.ariaCloseMenu : t.ariaOpenMenu}
             onClick={() => setMobileNavOpen((o) => !o)}
           >
             {mobileNavOpen ? <X size={22} strokeWidth={2} aria-hidden /> : <Menu size={22} strokeWidth={2} aria-hidden />}
           </button>
-          <nav className={MAP_HOME_HEADER_NAV_CLASS} aria-label="Navegación principal">
-            <PillNavButton onClick={onShowPurpose}>Propósito</PillNavButton>
-            <PillNavButton onClick={onShowComoFunciona}>¿Cómo funciona?</PillNavButton>
-            <PillNavButton href={historiasHref}>Historias</PillNavButton>
-            <PillNavButton href={mapaHref}>Mapa</PillNavButton>
+          <nav className={MAP_HOME_HEADER_NAV_CLASS} aria-label={t.ariaMainNav}>
+            <PillNavButton onClick={onShowPurpose}>{t.navPurpose}</PillNavButton>
+            <PillNavButton onClick={onShowComoFunciona}>{t.navHow}</PillNavButton>
+            <PillNavButton href={historiasHref}>{t.navStories}</PillNavButton>
+            <PillNavButton href={mapaHref}>{t.navMap}</PillNavButton>
           </nav>
+          <HomeLanguageSwitcher className="hidden md:flex" />
         </div>
 
         {mobileNavOpen ? (
@@ -275,14 +183,14 @@ export function HomeFirstPart({
               type="button"
               className="fixed left-0 right-0 bottom-0 z-[98] bg-black/25 md:hidden"
               style={{ top: '8rem' }}
-              aria-label="Cerrar menú"
+              aria-label={t.ariaCloseMenuBackdrop}
               onClick={closeMobileNav}
             />
             <div
               id="home-header-mobile-nav"
               className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-3 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-lg md:hidden"
               role="navigation"
-              aria-label="Navegación principal"
+              aria-label={t.ariaMainNav}
             >
               <PillNavButton
                 onClick={() => {
@@ -290,7 +198,7 @@ export function HomeFirstPart({
                   closeMobileNav();
                 }}
               >
-                Propósito
+                {t.navPurpose}
               </PillNavButton>
               <PillNavButton
                 onClick={() => {
@@ -298,14 +206,17 @@ export function HomeFirstPart({
                   closeMobileNav();
                 }}
               >
-                ¿Cómo funciona?
+                {t.navHow}
               </PillNavButton>
               <PillNavButton href={historiasHref} onAfterClick={closeMobileNav}>
-                Historias
+                {t.navStories}
               </PillNavButton>
               <PillNavButton href={mapaHref} onAfterClick={closeMobileNav}>
-                Mapa
+                {t.navMap}
               </PillNavButton>
+              <div className="flex justify-center pt-1 md:hidden">
+                <HomeLanguageSwitcher />
+              </div>
             </div>
           </>
         ) : null}
@@ -314,15 +225,10 @@ export function HomeFirstPart({
       {/* INTRO — DM Sans: sans geométrica minimalista (solo esta franja) */}
       <section
         id="intro"
-        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center overflow-hidden pt-48 text-center sm:pt-52 md:pt-60 md:pb-14 lg:pt-72 pb-10 px-6 md:px-10`}
+        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-14 lg:pt-80 pb-10 px-6 md:px-10`}
       >
-        <div className="relative w-full max-w-5xl overflow-hidden lg:max-w-6xl">
-          <canvas
-            ref={canvasRef}
-            className="pointer-events-none absolute inset-0 z-0 block h-full w-full"
-            aria-hidden
-          />
-          <div className="home-first-part-float relative z-[1]">
+        <div className="w-full max-w-5xl lg:max-w-6xl">
+          <div className="home-first-part-float relative">
             <h1
               className="mb-5 font-light leading-[1.12] md:mb-6"
               style={{
@@ -331,8 +237,8 @@ export function HomeFirstPart({
                 letterSpacing: '-0.02em',
               }}
             >
-              AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que{' '}
-              <span className="font-extrabold">despiertan otras historias.</span>
+              {t.heroBeforeBold}{' '}
+              <span className="font-extrabold">{t.heroBold}</span>
             </h1>
             <svg
               width="360"
@@ -343,41 +249,73 @@ export function HomeFirstPart({
               aria-hidden
             >
               <path
+                pathLength={1}
                 d="M4 8 Q90 12 180 8 Q270 4 356 8"
                 stroke="#FF4A1C"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
-                strokeDasharray={360}
-                strokeDashoffset={360}
+                strokeDasharray={1}
+                strokeDashoffset={1}
                 style={{
-                  animation: 'drawUnderline 1.3s cubic-bezier(0.4,0,0.2,1) forwards 0.2s',
+                  animation: 'drawUnderline 2.75s linear forwards 0.4s',
                 }}
               />
             </svg>
             <p
-              className="mx-auto max-w-4xl pt-3 font-light leading-[1.65] md:pt-4 text-xl tracking-wide md:text-2xl lg:text-3xl"
+              className="mx-auto max-w-4xl pt-6 font-light leading-[1.65] md:pt-8 text-xl tracking-wide md:text-2xl lg:pt-9 lg:text-3xl"
               style={{ color: soft.textBody }}
             >
-              Aquí, cada relato importa. <span className="font-normal">Cada historia es extraordinaria.</span>
+              {t.heroSubBefore}{' '}
+              <span className="font-normal">{t.heroSubBold}</span>
             </p>
           </div>
         </div>
       </section>
 
       {/* CARDS — más aire bajo el hero y mayor separación entre tarjetas */}
-      <section id="historias" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-14 md:pt-20 lg:pt-24 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10">
-        <SoftCard title="Tu historia," subtitle="en primer plano" buttonLabel="GRABA TU VIDEO" onClick={onRecordVideo} delay="0s">
-          A veces, una mirada lo dice todo. Anímate a <strong>grabar ese momento que te marcó</strong>, una experiencia que viviste o que alguien más te contó.
+      <section id="historias" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10">
+        <SoftCard
+          title={t.cardVideoTitle}
+          subtitle={t.cardVideoSubtitle}
+          buttonLabel={t.cardVideoCta}
+          onClick={onRecordVideo}
+          delay="0s"
+        >
+          {t.cardVideoBefore}
+          <strong>{t.cardVideoStrong}</strong>
+          {t.cardVideoAfter}
         </SoftCard>
-        <SoftCard title="Dale voz" subtitle="a tu recuerdo" buttonLabel="GRABA TU AUDIO" onClick={onRecordAudio} delay="0.2s">
-          Hay historias que se sienten mejor cuando solo se escuchan. <strong>Graba tu relato en audio</strong> y deja que tu voz haga el resto.
+        <SoftCard
+          title={t.cardAudioTitle}
+          subtitle={t.cardAudioSubtitle}
+          buttonLabel={t.cardAudioCta}
+          onClick={onRecordAudio}
+          delay="0.2s"
+        >
+          {t.cardAudioBefore}
+          <strong>{t.cardAudioStrong}</strong>
+          {t.cardAudioAfter}
         </SoftCard>
-        <SoftCard title="Ponle palabras" subtitle="a tu historia" buttonLabel="ESCRIBE TU HISTORIA" onClick={onWriteStory} delay="0.4s">
-          Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y <strong>cuenta tu historia a tu ritmo</strong>, palabra por palabra.
+        <SoftCard
+          title={t.cardWriteTitle}
+          subtitle={t.cardWriteSubtitle}
+          buttonLabel={t.cardWriteCta}
+          onClick={onWriteStory}
+          delay="0.4s"
+        >
+          {t.cardWriteBefore}
+          <strong>{t.cardWriteStrong}</strong>
+          {t.cardWriteAfter}
         </SoftCard>
-        <SoftCard title="Tu mirada," subtitle="en una fotografía" buttonLabel="SUBE UNA FOTO" onClick={onUploadPhoto} delay="0.6s">
-          A veces, una imagen guarda lo que las palabras no alcanzan.
+        <SoftCard
+          title={t.cardPhotoTitle}
+          subtitle={t.cardPhotoSubtitle}
+          buttonLabel={t.cardPhotoCta}
+          onClick={onUploadPhoto}
+          delay="0.6s"
+        >
+          {t.cardPhotoBody}
         </SoftCard>
       </section>
     </>

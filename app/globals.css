@@ -33,6 +33,7 @@
 
 html {
   font-family: var(--font-sans);
+  scroll-behavior: smooth;
 }
 
 body {
@@ -41,10 +42,42 @@ body {
   font-family: inherit;
 }
 
+/* pathLength="1" en el <path>: el trazo avanza sin saltos (dash alineado a la curva real). */
 @keyframes drawUnderline {
   to {
     stroke-dashoffset: 0;
   }
+}
+
+/* HomeFirstPart: sin styled-jsx (evita mismatch de hidratación jsx-* en Turbopack) */
+@keyframes home-first-part-float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.home-first-part-float {
+  animation: home-first-part-float 6s ease-in-out infinite;
+}
+
+.home-neu-card {
+  transition:
+    box-shadow 0.35s ease,
+    transform 0.5s ease;
+}
+
+.home-neu-card:hover {
+  box-shadow:
+    18px 18px 42px rgba(120, 135, 155, 0.42),
+    -18px -18px 46px rgba(255, 255, 255, 1),
+    inset 2px 2px 5px rgba(255, 255, 255, 0.85),
+    inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
 }
 
 /* Enlaces: color por defecto del navegador (azul) → naranja AlmaMundi. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
@@ -93,6 +126,23 @@ a:hover {
   box-shadow:
     inset 8px 8px 18px rgba(163, 177, 198, 0.42),
     inset -5px -5px 14px rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Píldoras <a> (Historias, Mapa, dock): mismo gris que los <button>; naranja solo hover/focus/active vía .btn-almamundi */
+a.home-map-neu-pill.btn-almamundi,
+a.home-map-neu-pill.btn-almamundi:visited {
+  color: #4b5563 !important;
+}
+
+/* Dock bajo «Mapa de AlmaMundi»: misma píldora neumórfica que el header (sin naranja fijo al activo). */
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  color: #4b5563 !important;
+  border-color: rgba(255, 255, 255, 0.48) !important;
+}
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:hover,
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:focus-visible {
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
 }
 
 /* Dentro de PillNavButton (misma altura/padding que el resto): una sola línea, font-size fluido */
