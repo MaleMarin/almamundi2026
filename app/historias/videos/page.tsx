@@ -1,23 +1,25 @@
 'use client';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
  * /historias/videos — Historias en video: carrusel exposición + reproductor en la misma página.
- * Layout compartido: `HistoriasFormatListPageLayout` (mismo shell que audios / escrito / fotos).
- * Ancho máx. 860px, espaciado hero/filtros/carrusel y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
-import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
-import { useStories } from '@/hooks/useStories';
+import { Footer } from '@/components/layout/Footer';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import {
-  HISTORIAS_LIST_EXPO_LABEL,
-  historiasListFormatOrangeKicker,
-} from '@/lib/historias/historias-format-list-ui';
+  EthicalShareFlow,
+  EthicalShareTriggerButton,
+} from '@/components/stories/EthicalShareFlow';
+import { HistoricalExhibitionCarousel } from '@/components/stories/HistoricalExhibitionCarousel';
+import { useStories } from '@/hooks/useStories';
 import { storyPointToHistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-from-story';
-import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function isVideoStory(s: StoryPoint): boolean {
@@ -89,6 +91,15 @@ export default function HistoriasVideosPage() {
     return [...fromApi, ...demos];
   }, [allStories]);
 
+  const countryOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const s of videoStoriesAll) {
+      const c = (s.country || '').trim();
+      if (c) set.add(c);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b, 'es'));
+  }, [videoStoriesAll]);
+
   const yearOptions = useMemo(() => {
     const set = new Set<number>();
     for (const s of videoStoriesAll) {
@@ -118,25 +129,18 @@ export default function HistoriasVideosPage() {
     });
   }, [videoStoriesAll, filterCountry, filterYear, filterKeywords]);
 
-  const hasActiveFilters = Boolean(filterCountry || filterYear || filterKeywords.trim());
-
-  const { carouselStories: videoStoriesForCarousel, showingUnfilteredBecauseNoMatches } = useMemo(
-    () => pickStoriesForEmbeddedCarousel(videoStories, videoStoriesAll, hasActiveFilters),
-    [videoStories, videoStoriesAll, hasActiveFilters]
-  );
-
   useEffect(() => {
     setActiveVideo(null);
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
-    () => videoStoriesForCarousel.map(storyPointToHistoricalExhibitionStory),
-    [videoStoriesForCarousel]
+    () => videoStories.map(storyPointToHistoricalExhibitionStory),
+    [videoStories]
   );
 
   const shareListResetKey = useMemo(
-    () => videoStoriesForCarousel.map((s) => s.id).join('|'),
-    [videoStoriesForCarousel]
+    () => videoStories.map((s) => s.id).join('|'),
+    [videoStories]
   );
 
   useEffect(() => {
@@ -160,11 +164,11 @@ export default function HistoriasVideosPage() {
 
   const openVideo = useCallback(
     (index: number) => {
-      const s = videoStoriesForCarousel[index];
+      const s = videoStories[index];
       if (!s?.videoUrl?.trim()) return;
       setActiveVideo(storyToVideoHistoria(s));
     },
-    [videoStoriesForCarousel]
+    [videoStories]
   );
 
   const clearFilters = useCallback(() => {
@@ -173,40 +177,162 @@ export default function HistoriasVideosPage() {
     setFilterKeywords('');
   }, []);
 
+  const hasActiveFilters = Boolean(filterCountry || filterYear || filterKeywords.trim());
+
   return (
-    <>
-      <HistoriasFormatListPageLayout
-        activeTab="videos"
-        orangeKicker={historiasListFormatOrangeKicker.video}
-        filterCountry={filterCountry}
-        setFilterCountry={setFilterCountry}
-        filterYear={filterYear}
-        setFilterYear={setFilterYear}
-        filterKeywords={filterKeywords}
-        setFilterKeywords={setFilterKeywords}
-        yearOptions={yearOptions}
-        hasActiveFilters={hasActiveFilters}
-        showingUnfilteredBecauseNoMatches={showingUnfilteredBecauseNoMatches}
-        filteredStoryCount={videoStories.length}
-        allStoryCount={videoStoriesAll.length}
-        shareTarget={shareTarget}
-        ethicalShareOpen={ethicalShareOpen}
-        setEthicalShareOpen={setEthicalShareOpen}
-        shareUrlForFlow={shareUrlForFlow}
-        expoLabel={HISTORIAS_LIST_EXPO_LABEL}
-        clearFilters={clearFilters}
-        exhibitionHistorias={exhibitionHistorias}
-        contentMode="video"
-        onOpenContent={openVideo}
-        onSlideChange={setShareSlideIndex}
-        disableKeyboardNav={Boolean(activeVideo)}
-      />
+    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
+        <HomeHardLink href="/" className="flex min-w-0 flex-shrink-0 items-center pr-2">
+          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
+        </HomeHardLink>
+        <div className={historiasInterior.navLinksRowClassName}>
+          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <ActiveInternalNavLink href="/historias/videos" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Videos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Audios</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Escritos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Fotografías</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
+        </div>
+      </nav>
+
+      <div className={historiasInterior.contentWrapClassName}>
+        <header className={historiasInterior.headerClassName}>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--almamundi-orange)' }}>
+            Historias en video
+          </p>
+          <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
+            El mundo tiene millones de historias que nadie conoce.
+          </h1>
+          <p className="mt-2 max-w-2xl text-base text-gray-600 md:text-lg">
+            Estas son algunas.
+          </p>
+        </header>
+
+        <div
+          className="flex-shrink-0 px-6 md:px-12 pb-6"
+          aria-label="Filtros de historias con video"
+        >
+          <div
+            className="mx-auto w-full max-w-[min(100%,96rem)] rounded-3xl p-5 md:p-6"
+            style={neu.cardInset}
+          >
+            <p className="mb-4 text-sm font-semibold uppercase tracking-[0.12em] text-gray-500">
+              Buscar por país, año o palabras clave
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:items-end">
+              <label className="flex min-w-0 flex-col gap-1.5 text-sm font-medium text-gray-600">
+                País
+                <select
+                  value={filterCountry}
+                  onChange={(e) => setFilterCountry(e.target.value)}
+                  className="w-full rounded-2xl border border-gray-300/40 bg-[#E0E5EC] px-3 py-2.5 text-base text-gray-800 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.45),inset_-3px_-3px_8px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/40"
+                  style={{ fontFamily: neu.APP_FONT }}
+                >
+                  <option value="">Todos los países</option>
+                  {countryOptions.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex min-w-0 flex-col gap-1.5 text-sm font-medium text-gray-600">
+                Año
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="w-full rounded-2xl border border-gray-300/40 bg-[#E0E5EC] px-3 py-2.5 text-base text-gray-800 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.45),inset_-3px_-3px_8px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/40"
+                  style={{ fontFamily: neu.APP_FONT }}
+                >
+                  <option value="">Cualquier año</option>
+                  {yearOptions.map((y) => (
+                    <option key={y} value={String(y)}>
+                      {y}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="flex min-w-0 flex-col gap-1.5 text-sm font-medium text-gray-600 sm:col-span-2 lg:col-span-1">
+                Palabras clave
+                <input
+                  type="search"
+                  value={filterKeywords}
+                  onChange={(e) => setFilterKeywords(e.target.value)}
+                  placeholder="Ej. migración familia"
+                  autoComplete="off"
+                  className="w-full rounded-2xl border border-gray-300/40 bg-[#E0E5EC] px-3 py-2.5 text-base text-gray-800 placeholder:text-gray-400 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.45),inset_-3px_-3px_8px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/40"
+                  style={{ fontFamily: neu.APP_FONT }}
+                />
+              </label>
+              <div className="flex flex-wrap items-end justify-end gap-3">
+                {shareTarget ? (
+                  <EthicalShareTriggerButton
+                    onClick={() => setEthicalShareOpen(true)}
+                    className="min-h-[44px] min-w-[44px] shrink-0 rounded-full border border-gray-300/35 bg-[#E0E5EC] text-gray-700 shadow-[3px_3px_8px_rgba(163,177,198,0.45),-3px_-3px_8px_rgba(255,255,255,0.85)] hover:bg-[#d8dde6]"
+                  />
+                ) : null}
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  disabled={!hasActiveFilters}
+                  className="w-full rounded-full px-5 py-2.5 text-sm font-semibold text-gray-600 transition disabled:cursor-not-allowed disabled:opacity-40 sm:w-auto"
+                  style={neu.button}
+                >
+                  Limpiar filtros
+                </button>
+              </div>
+            </div>
+            {hasActiveFilters ? (
+              <p className="mt-3 text-sm text-gray-500" role="status">
+                Mostrando {videoStories.length} de {videoStoriesAll.length} historias con video.
+              </p>
+            ) : null}
+          </div>
+        </div>
+
+        <section className={`${historiasInterior.sectionGrowClassName} min-h-0`}>
+          <HistoricalExhibitionCarousel
+            embedded
+            className="shadow-xl"
+            contentMode="video"
+            historias={exhibitionHistorias}
+            spatialVariant="light-gallery"
+            expoPaddingTopClassName="pt-10 sm:pt-14"
+            expoMaxWidthClassName="max-w-[min(100%,96rem)]"
+            tituloExposicion="alma.mundi / historias en video"
+            onOpenContent={openVideo}
+            onSlideChange={setShareSlideIndex}
+            shareInGalleryChrome={false}
+            disableKeyboardNav={Boolean(activeVideo)}
+          />
+        </section>
+      </div>
+
+      <Footer />
+
+      {shareTarget ? (
+        <EthicalShareFlow
+          key={shareTarget.id}
+          open={ethicalShareOpen}
+          onClose={() => setEthicalShareOpen(false)}
+          authorName={shareTarget.nombre}
+          storyTitle={shareTarget.titulo}
+          quote={shareTarget.cita}
+          imageUrl={shareTarget.imagen_principal}
+          shareUrl={shareUrlForFlow}
+          exhibitionLabel="alma.mundi / historias en video"
+          themeTag={shareTarget.tags[0] ?? 'resiliencia'}
+        />
+      ) : null}
+
       {mounted && activeVideo
         ? ReactDOM.createPortal(
             <VideoPlayer historia={activeVideo} onClose={() => setActiveVideo(null)} skipIntertitle />,
             document.body
           )
         : null}
-    </>
+    </main>
   );
 }

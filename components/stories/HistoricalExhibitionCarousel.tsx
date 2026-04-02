@@ -144,8 +144,6 @@ export function HistoricalExhibitionCarousel({
 }: HistoricalExhibitionCarouselProps) {
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
-  /** Listados /historias/* (layout comparte filtros y carrusel sin chrome de compartir en la expo). */
-  const historiasListEmbedded = embedded && isLightHall && !shareInGalleryChrome;
   const swiperRef = useRef<SwiperType | null>(null);
   const n = historias.length;
   const initialSlide = useMemo(
@@ -158,10 +156,6 @@ export function HistoricalExhibitionCarousel({
   const [ethicalShareOpen, setEthicalShareOpen] = useState(false);
 
   const active = historias[activeIndex] ?? null;
-
-  /** Listas /historias/* (embebidas, sala clara): flechas siempre visibles; con 1 sola tarjeta quedan deshabilitadas. */
-  const showExpoNavArrows = (embedded && isLightHall) || n > 1;
-  const expoNavArrowsDisabled = n <= 1;
 
   useEffect(() => {
     if (n === 0) {
@@ -190,7 +184,7 @@ export function HistoricalExhibitionCarousel({
 
   const shellClass = embedded
     ? isLightHall
-      ? `relative isolate w-full overflow-hidden rounded-2xl text-gray-900${historiasListEmbedded ? ' flex min-h-0 flex-1 flex-col' : ''}`
+      ? 'relative isolate w-full overflow-hidden rounded-2xl text-gray-900'
       : 'relative isolate w-full overflow-hidden rounded-2xl text-white'
     : isLightHall
       ? 'relative isolate min-h-screen w-full overflow-hidden text-gray-900'
@@ -201,10 +195,10 @@ export function HistoricalExhibitionCarousel({
   if (n === 0) {
     return (
       <div
-        className={`flex min-h-[40vh] items-center justify-center px-6 text-center text-base ${embedded && isLightHall ? 'text-gray-600' : 'text-white/70'} ${className}`}
+        className={`flex min-h-[40vh] items-center justify-center text-white/70 ${className}`}
         role="status"
       >
-        No hay historias para mostrar en este formato.
+        No hay historias para mostrar.
       </div>
     );
   }
@@ -305,33 +299,25 @@ export function HistoricalExhibitionCarousel({
         Capa 2 — The Expo (z-10): carrusel, flechas y ficha de autor; paralaje más marcado.
       */}
       <div
-        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}${historiasListEmbedded ? ' min-h-0 flex-1 justify-center pb-2 sm:px-2' : ''}`}
+        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}`}
       >
         <div
-          className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 flex-1 flex-col items-center justify-center' : ''}`}
+          className="relative w-full"
           style={{
             perspective: '1500px',
             perspectiveOrigin: 'center center',
           }}
         >
-          <div
-            className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 max-h-full flex-1 items-center justify-center' : ''}`}
-            style={
-              embedded && isLightHall && !historiasListEmbedded
-                ? { minHeight: 'min(92vw, 620px)' }
-                : undefined
-            }
-          >
-            {showExpoNavArrows ? (
+          <div className="relative w-full">
+            {n > 1 ? (
               <>
                 <button
                   type="button"
-                  disabled={expoNavArrowsDisabled}
                   onClick={() => swiperRef.current?.slidePrev()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute left-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:left-3 md:left-4'
-                      : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/45 sm:left-1 md:left-2'
+                      ? 'pointer-events-auto absolute left-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] sm:left-3 md:left-4'
+                      : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] sm:left-1 md:left-2'
                   }
                   aria-label="Historia anterior"
                 >
@@ -342,12 +328,11 @@ export function HistoricalExhibitionCarousel({
                 </button>
                 <button
                   type="button"
-                  disabled={expoNavArrowsDisabled}
                   onClick={() => swiperRef.current?.slideNext()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute right-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:right-3 md:right-4'
-                      : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/50 sm:right-1 md:right-2'
+                      ? 'pointer-events-auto absolute right-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] sm:right-3 md:right-4'
+                      : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] sm:right-1 md:right-2'
                   }
                   aria-label="Próxima historia"
                 >
@@ -388,17 +373,10 @@ export function HistoricalExhibitionCarousel({
           {historias.map((h, slideIdx) => (
             <SwiperSlide
               key={h.id}
-              style={
-                historiasListEmbedded
-                  ? {
-                      width: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
-                      height: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
-                    }
-                  : {
-                      width: `min(92vw, ${SLIDE_PX}px)`,
-                      height: `min(92vw, ${SLIDE_PX}px)`,
-                    }
-              }
+              style={{
+                width: `min(92vw, ${SLIDE_PX}px)`,
+                height: `min(92vw, ${SLIDE_PX}px)`,
+              }}
             >
               <ExpoCardTiltShell>
                 <div
