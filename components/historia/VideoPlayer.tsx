@@ -20,6 +20,8 @@ export interface Historia {
   fecha: string
   tags?: string[]
   citaDestacada?: string
+  /** URL de archivo de subtítulos (WebVTT) para `<track kind="captions">`. */
+  subtitulos?: string
 }
 
 interface VideoPlayerProps {
@@ -319,6 +321,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
           {/* X close button */}
           {onClose && (
             <button
+              type="button"
               onClick={onClose}
               style={{
                 position: 'absolute', top: '1.5rem', right: '1.5rem',
@@ -444,6 +447,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
       {stage === 'playing' && (
         <div
           ref={containerRef}
+          role="region"
+          aria-label="Reproductor de video"
           onMouseMove={resetControlsTimer}
           onClick={togglePlay}
           style={{
@@ -481,6 +486,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleEnded}
+            aria-label={`Reproducir video: ${historia.titulo}`}
             style={{
               position: 'relative', zIndex: 2,
               width: '100%', height: '100%',
@@ -488,7 +494,11 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
               maxHeight: '100vh',
             }}
             playsInline
-          />
+          >
+            {historia.subtitulos ? (
+              <track kind="captions" src={historia.subtitulos} label="Español" srcLang="es" default />
+            ) : null}
+          </video>
 
           {/* ── Top bar: title + close ── */}
           <div style={{
@@ -526,6 +536,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
             {/* X close button */}
             {onClose && (
               <button
+                type="button"
                 onClick={(e) => { e.stopPropagation(); onClose(); }}
                 style={{
                   width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
@@ -549,15 +560,18 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
 
           {/* ── Center play/pause big indicator ── */}
           {!isPlaying && (
-            <div style={{
-              position: 'absolute', zIndex: 10,
-              width: '80px', height: '80px',
-              borderRadius: '50%',
-              background: 'rgba(255,69,0,0.15)',
-              border: '1px solid rgba(255,69,0,0.5)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              backdropFilter: 'blur(8px)',
-            }}>
+            <div
+              aria-hidden="true"
+              style={{
+                position: 'absolute', zIndex: 10,
+                width: '80px', height: '80px',
+                borderRadius: '50%',
+                background: 'rgba(255,69,0,0.15)',
+                border: '1px solid rgba(255,69,0,0.5)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                backdropFilter: 'blur(8px)',
+              }}
+            >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--sepia)">
                 <polygon points="5,3 19,12 5,21" />
               </svg>
@@ -607,7 +621,13 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
               {/* Left: play + volume + time */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
                 {/* Play/Pause */}
-                <button onClick={togglePlay} style={btnStyle}>
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  style={btnStyle}
+                  aria-pressed={isPlaying}
+                  aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+                >
                   {isPlaying
                     ? <PauseIcon />
                     : <PlayIcon />
@@ -615,7 +635,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
                 </button>
 
                 {/* Mute */}
-                <button onClick={toggleMute} style={btnStyle}>
+                <button type="button" onClick={toggleMute} style={btnStyle} aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}>
                   {isMuted ? <MutedIcon /> : <VolumeIcon />}
                 </button>
 
@@ -664,7 +684,12 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
                     {historia.autor.nombre}
                   </span>
                 </div>
-                <button onClick={toggleFullscreen} style={btnStyle}>
+                <button
+                  type="button"
+                  onClick={toggleFullscreen}
+                  style={btnStyle}
+                  aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+                >
                   {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
                 </button>
               </div>
@@ -845,6 +870,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
             {/* Actions */}
             <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
               <button
+                type="button"
                 onClick={() => {
                   setIntertitlePhase('in')
                   setIrisOpen(false)
@@ -877,6 +903,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
                 Ver de nuevo
               </button>
               <button
+                type="button"
                 onClick={onClose}
                 style={{
                   flex: 1,

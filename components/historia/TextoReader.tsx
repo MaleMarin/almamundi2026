@@ -160,6 +160,8 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
 
       {/* Contenedor principal */}
       <div
+        role="article"
+        aria-label={`Historia: ${historia.titulo}`}
         style={{
           background: PAPEL,
           minHeight: '100vh',
@@ -239,7 +241,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         >
           <img
             src={historia.autor.avatar}
-            alt=""
+            alt={`Retrato de ${historia.autor.nombre}`}
             style={{
               width: 36,
               height: 36,
@@ -266,7 +268,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         </div>
 
         {/* Cuerpo: drop cap + párrafos con fade-in */}
-        <article>
+        <div lang="es">
           {(drop || restOfFirst) && (
             <p
               ref={(el) => { paragraphRefs.current[0] = el; }}
@@ -325,7 +327,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               </p>
             );
           })}
-        </article>
+        </div>
 
         {/* Firma del autor */}
         <div style={{ marginTop: '4rem' }}>
@@ -340,7 +342,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <img
               src={historia.autor.avatar}
-              alt=""
+              alt={`Retrato de ${historia.autor.nombre}`}
               style={{
                 width: avatarSize,
                 height: avatarSize,

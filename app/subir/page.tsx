@@ -469,7 +469,11 @@ function SubirPageInner() {
                 carillas. Fotos: {SUBIR_PHOTO_MIN} a {SUBIR_PHOTO_MAX} imágenes.
               </p>
             </header>
-            <section className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10 mb-12">
+            <section
+              className="grid grid-cols-1 sm:grid-cols-2 gap-8 md:gap-10 mb-12"
+              aria-label="Paso 1 de 4: elegir formato de historia"
+              aria-current="step"
+            >
               {(['video', 'audio', 'texto', 'foto'] as const).map((f) => (
                 <button
                   key={f}
@@ -564,7 +568,7 @@ function SubirPageInner() {
                 )}
               </p>
             </header>
-            <section className="space-y-6">
+            <section className="space-y-6" aria-label="Paso 4 de 4: datos y envío" aria-current="step">
             <div className="flex flex-wrap gap-4 items-center">
               <button
                 type="button"
@@ -592,25 +596,38 @@ function SubirPageInner() {
                     Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo abajo.
                   </p>
                 ) : null}
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-video-url" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   URL del video (YouTube o Vimeo){capture?.recordedBlob ? '' : ' *'}
                 </label>
                 <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
                   Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
                 </p>
                 <input
+                  id="subir-datos-video-url"
                   type="url"
                   value={videoUrl}
                   onChange={(e) => setVideoUrl(e.target.value)}
                   placeholder="https://www.youtube.com/..."
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required={!capture?.recordedBlob}
+                  aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
+                  aria-describedby={
+                    [
+                      videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'subir-datos-video-url-format' : '',
+                      videoVimeoTooLong ? 'subir-datos-video-vimeo-len' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ') || undefined
+                  }
                 />
                 {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
-                  <p className="mt-1 text-[11px] text-amber-700">Indica un enlace de YouTube o Vimeo</p>
+                  <p id="subir-datos-video-url-format" className="mt-1 text-[11px] text-amber-700" role="alert">
+                    Indica un enlace de YouTube o Vimeo
+                  </p>
                 )}
                 {videoVimeoTooLong && (
-                  <p className="text-[11px] text-red-600 font-medium">
+                  <p id="subir-datos-video-vimeo-len" className="text-[11px] text-red-600 font-medium" role="alert">
                     Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
                   </p>
                 )}
@@ -618,62 +635,83 @@ function SubirPageInner() {
             )}
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+              <label htmlFor="subir-datos-titulo" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Nombre de la historia *
               </label>
               <input
+                id="subir-datos-titulo"
                 type="text"
                 value={storyTitle}
                 onChange={(e) => setStoryTitle(e.target.value)}
                 placeholder="Título que verán en el mapa si se publica"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                aria-required="true"
+                aria-invalid={storyTitle.trim().length > 0 && storyTitle.trim().length < 2}
+                aria-describedby={
+                  storyTitle.trim().length > 0 && storyTitle.trim().length < 2 ? 'subir-datos-titulo-error' : undefined
+                }
               />
               {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
-                <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
+                <p id="subir-datos-titulo-error" className="mt-1 text-xs text-amber-700" role="alert">
+                  Mínimo 2 caracteres
+                </p>
               )}
             </div>
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+              <label htmlFor="subir-datos-alias" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Nombre de la persona (cómo aparecerás) *
               </label>
               <input
+                id="subir-datos-alias"
                 type="text"
                 value={alias}
                 onChange={(e) => setAlias(e.target.value)}
                 placeholder="Tu nombre o cómo quieres figurar públicamente"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                aria-required="true"
+                aria-invalid={alias.trim().length > 0 && alias.trim().length < 2}
+                aria-describedby={
+                  alias.trim().length > 0 && alias.trim().length < 2 ? 'subir-datos-alias-error' : undefined
+                }
               />
               {alias.trim().length > 0 && alias.trim().length < 2 && (
-                <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
+                <p id="subir-datos-alias-error" className="mt-1 text-xs text-amber-700" role="alert">
+                  Mínimo 2 caracteres
+                </p>
               )}
             </div>
 
             <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+              <label htmlFor="subir-datos-email" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                 Email (privado; solo notificaciones) *
               </label>
               <input
+                id="subir-datos-email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="tu@email.com"
                 className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                aria-required="true"
+                aria-invalid={email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())}
+                aria-describedby="subir-datos-email-hint"
               />
-              <p className="mt-2 text-xs" style={{ color: neu.textBody }}>
+              <p id="subir-datos-email-hint" className="mt-2 text-xs" style={{ color: neu.textBody }}>
                 Te avisamos por aquí cuando tu historia pase la curación y se publique en el mapa.
               </p>
             </div>
 
             <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   Fecha de nacimiento (opcional)
                 </label>
                 <input
+                  id="subir-datos-nacimiento"
                   type="text"
                   value={birthDate}
                   onChange={(e) => setBirthDate(e.target.value)}
@@ -683,10 +721,11 @@ function SubirPageInner() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   Sexo (opcional)
                 </label>
                 <select
+                  id="subir-datos-sexo"
                   value={sex}
                   onChange={(e) =>
                     setSex(
@@ -709,7 +748,7 @@ function SubirPageInner() {
               <div className="flex items-start gap-3 mb-3">
                 <UserCircle className="w-6 h-6 shrink-0 text-orange-500 mt-0.5" aria-hidden />
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  <label htmlFor="subir-datos-foto-perfil" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
                     Foto personal / de perfil (opcional)
                   </label>
                   <p className="text-xs leading-relaxed mb-3" style={{ color: neu.textBody }}>
@@ -721,15 +760,21 @@ function SubirPageInner() {
                       style={{ borderColor: 'rgba(255,255,255,0.35)' }}
                     >
                       {profilePhotoPreview ? (
-                        <img src={profilePhotoPreview} alt="" className="w-full h-full object-cover" />
+                        <img
+                          src={profilePhotoPreview}
+                          alt="Vista previa de tu foto de perfil"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <UserCircle className="w-10 h-10 text-gray-400" aria-hidden />
                       )}
                     </div>
                     <div className="flex flex-col gap-2 min-w-0">
                       <input
+                        id="subir-datos-foto-perfil"
                         type="file"
                         accept="image/jpeg,image/png,image/webp"
+                        aria-label="Seleccionar imagen de perfil (JPG, PNG o WebP)"
                         onChange={(e) => {
                           const f = e.target.files?.[0];
                           if (!f) {
@@ -779,42 +824,49 @@ function SubirPageInner() {
 
             <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-ciudad" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   Ciudad o localidad *
                 </label>
                 <input
+                  id="subir-datos-ciudad"
                   type="text"
                   value={ciudad}
                   onChange={(e) => setCiudad(e.target.value)}
                   placeholder="Ej: Santiago"
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-pais" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
                   País *
                 </label>
                 <input
+                  id="subir-datos-pais"
                   type="text"
                   value={pais}
                   onChange={(e) => setPais(e.target.value)}
                   placeholder="Ej: Chile"
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
                 />
               </div>
             </div>
 
             {format === 'foto' && (
               <div style={neu.cardInset} className="p-6 md:p-8 rounded-[2rem] space-y-4">
-                <label className="block text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-fotos-historia" className="block text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
                   Fotos ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}; JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB c/u) *
                 </label>
                 <input
+                  id="subir-datos-fotos-historia"
                   type="file"
                   accept="image/jpeg,image/png,image/webp"
                   multiple
+                  aria-label={`Seleccionar archivos de fotos de la historia (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX} imágenes)`}
+                  aria-required="true"
                   onChange={(e) => {
                     const list = e.target.files;
                     if (!list?.length) return;
@@ -868,7 +920,11 @@ function SubirPageInner() {
                 <p className="text-sm" style={{ color: neu.textBody }}>
                   Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos. Si no puedes subir archivos, usa la URL abajo (una imagen).
                 </p>
+                <label htmlFor="subir-datos-foto-url" className="sr-only">
+                  URL de imagen alternativa
+                </label>
                 <input
+                  id="subir-datos-foto-url"
                   type="url"
                   value={photoUrl}
                   onChange={(e) => setPhotoUrl(e.target.value)}
@@ -891,15 +947,17 @@ function SubirPageInner() {
                     Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
                   </p>
                 ) : null}
-                <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-datos-audio-file" className="block text-sm font-medium" style={{ color: neu.textMain }}>
                   Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
                 </label>
                 <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
                   Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
                 </p>
                 <input
+                  id="subir-datos-audio-file"
                   type="file"
                   accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
+                  aria-label="Seleccionar archivo de audio (MP3, WAV o M4A)"
                   onChange={(e) => {
                     const inputEl = e.target;
                     const f = inputEl.files?.[0];
@@ -934,16 +992,22 @@ function SubirPageInner() {
                   className="w-full text-sm"
                   style={{ color: neu.textBody }}
                 />
+                <label htmlFor="subir-datos-audio-url" className="sr-only">
+                  URL del audio
+                </label>
                 <input
+                  id="subir-datos-audio-url"
                   type="url"
                   value={audioUrl}
                   onChange={(e) => setAudioUrl(e.target.value)}
                   placeholder="O pega aquí la URL del audio"
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-invalid={!audioUrlWithinMax}
+                  aria-describedby={!audioUrlWithinMax ? 'subir-datos-audio-url-error' : undefined}
                 />
                 {!audioUrlWithinMax && (
-                  <p className="text-xs text-red-600 font-medium">
+                  <p id="subir-datos-audio-url-error" className="text-xs text-red-600 font-medium" role="alert">
                     Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
                   </p>
                 )}
@@ -962,15 +1026,17 @@ function SubirPageInner() {
             )}
 
             <div style={neu.cardInset} className="p-4 rounded-3xl space-y-2">
-              <label className="block text-sm font-medium" style={{ color: neu.textMain }}>
+              <label htmlFor="subir-datos-archivos-extra" className="block text-sm font-medium" style={{ color: neu.textMain }}>
                 Completar la historia (opcional)
               </label>
               <p className="text-xs" style={{ color: neu.textBody }}>
                 Hasta {EXTRA_FILES_MAX} archivos (PDF, imágenes, audio corto… máx. {EXTRA_FILE_MAX_MB} MB c/u) para que curación tenga más contexto.
               </p>
               <input
+                id="subir-datos-archivos-extra"
                 type="file"
                 multiple
+                aria-label={`Seleccionar archivos complementarios (máximo ${EXTRA_FILES_MAX} archivos)`}
                 onChange={(e) => {
                   const list = Array.from(e.target.files ?? []);
                   const next: File[] = [];
@@ -1008,25 +1074,52 @@ function SubirPageInner() {
                 </Link>
                 .
               </p>
-              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input type="checkbox" checked={consentRights} onChange={(e) => setConsentRights(e.target.checked)} className="mt-1 accent-orange-500" />
+              <label htmlFor="subir-consent-rights" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
+                <input
+                  id="subir-consent-rights"
+                  type="checkbox"
+                  checked={consentRights}
+                  onChange={(e) => setConsentRights(e.target.checked)}
+                  className="mt-1 accent-orange-500"
+                  aria-required="true"
+                />
                 <span>Tengo derechos para compartir este contenido.</span>
               </label>
-              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input type="checkbox" checked={consentCurate} onChange={(e) => setConsentCurate(e.target.checked)} className="mt-1 accent-orange-500" />
+              <label htmlFor="subir-consent-curate" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
+                <input
+                  id="subir-consent-curate"
+                  type="checkbox"
+                  checked={consentCurate}
+                  onChange={(e) => setConsentCurate(e.target.checked)}
+                  className="mt-1 accent-orange-500"
+                  aria-required="true"
+                />
                 <span>Acepto que pasa por curaduría antes de publicarse.</span>
               </label>
-              <label className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input type="checkbox" checked={consentPostales} onChange={(e) => setConsentPostales(e.target.checked)} className="mt-1 accent-orange-500" />
+              <label htmlFor="subir-consent-postales" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
+                <input
+                  id="subir-consent-postales"
+                  type="checkbox"
+                  checked={consentPostales}
+                  onChange={(e) => setConsentPostales(e.target.checked)}
+                  className="mt-1 accent-orange-500"
+                  aria-required="true"
+                />
                 <span>Postales: mantener autoría, no modificar.</span>
               </label>
             </div>
 
-            {error && <p className="text-sm text-red-600 font-medium">{error}</p>}
+            {error && (
+              <p id="subir-form-error-global" className="text-sm text-red-600 font-medium" role="alert">
+                {error}
+              </p>
+            )}
 
             <button
               type="button"
               disabled={!canSubmit || saving}
+              aria-busy={saving}
+              aria-disabled={!canSubmit || saving}
               onClick={submit}
               className="w-full py-4 rounded-full font-bold text-white text-sm uppercase tracking-wider disabled:opacity-50 disabled:cursor-not-allowed transition"
               style={{

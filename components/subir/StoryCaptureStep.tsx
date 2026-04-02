@@ -272,23 +272,32 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
     audioFile,
   ]);
 
-  const renderNarrativeBox = (label: string, hint: string) => (
+  const narrativeTooShort =
+    narrativeExtra.trim().length > 0 && narrativeExtra.trim().length < NARRATIVE_MIN;
+
+  const renderNarrativeBox = (label: string, hint: string, fieldId: string) => (
     <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-      <label className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
+      <label htmlFor={fieldId} className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
         {label}
       </label>
       <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
         {hint}
       </p>
       <textarea
+        id={fieldId}
         value={narrativeExtra}
         onChange={(e) => setNarrativeExtra(e.target.value)}
         rows={5}
+        aria-required="true"
+        aria-invalid={narrativeTooShort}
+        aria-describedby={narrativeTooShort ? `${fieldId}-error` : undefined}
         className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[140px]"
         style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
       />
-      {narrativeExtra.trim().length > 0 && narrativeExtra.trim().length < NARRATIVE_MIN && (
-        <p className="text-sm text-amber-700">Mínimo {NARRATIVE_MIN} caracteres.</p>
+      {narrativeTooShort && (
+        <p id={`${fieldId}-error`} className="text-sm text-amber-700" role="alert">
+          Mínimo {NARRATIVE_MIN} caracteres.
+        </p>
       )}
     </div>
   );
@@ -316,7 +325,7 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
             };
 
   return (
-    <section className="space-y-8 md:space-y-10">
+    <section className="space-y-8 md:space-y-10" aria-label="Paso 2 de 4: captura de tu historia" aria-current="step">
       <header className="space-y-4 md:space-y-5">
         <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
         <h1 className="sr-only">{pageCopy.a11yTitle}</h1>
@@ -325,24 +334,40 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
         </p>
       </header>
 
-      {localErr && <p className="text-base text-red-600 font-medium">{localErr}</p>}
+      {localErr && (
+        <p className="text-base text-red-600 font-medium" role="alert">
+          {localErr}
+        </p>
+      )}
 
       {format === 'texto' && (
         <div style={neoSurface} className="p-6 md:p-8 space-y-3">
+          <label htmlFor="capture-texto-relato" className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
+            Relato (obligatorio)
+          </label>
           <textarea
+            id="capture-texto-relato"
             value={textStory}
             onChange={(e) => setTextStory(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
             rows={14}
             placeholder="Escribe aquí…"
             className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[280px]"
             style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-            aria-label="Relato (obligatorio)"
+            aria-required="true"
+            aria-invalid={textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN}
+            aria-describedby={
+              textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN
+                ? 'capture-texto-relato-error'
+                : 'capture-texto-relato-count'
+            }
           />
-          <p className="text-base md:text-lg" style={{ color: neu.textBody }}>
+          <p id="capture-texto-relato-count" className="text-base md:text-lg" style={{ color: neu.textBody }}>
             {textStory.length.toLocaleString('es')} / {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres
           </p>
           {textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN && (
-            <p className="text-sm text-amber-700">Mínimo {NARRATIVE_MIN} caracteres.</p>
+            <p id="capture-texto-relato-error" className="text-sm text-amber-700" role="alert">
+              Mínimo {NARRATIVE_MIN} caracteres.
+            </p>
           )}
         </div>
       )}
@@ -350,15 +375,18 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
       {format === 'foto' && (
         <>
           <div style={neoSurface} className="p-6 md:p-8 space-y-4">
-            <label className="flex items-center gap-3 text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
+            <label htmlFor="capture-foto-files" className="flex items-center gap-3 text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
               <Camera className="h-8 w-8 text-orange-500 shrink-0" aria-hidden />
               Imágenes ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}) *
             </label>
             <input
+              id="capture-foto-files"
               type="file"
               accept="image/jpeg,image/png,image/webp"
               multiple
               capture="environment"
+              aria-label={`Seleccionar archivos de imagen para la historia (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX} fotos)`}
+              aria-required="true"
               onChange={(e) => {
                 const list = e.target.files;
                 if (!list?.length) return;
@@ -412,13 +440,14 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
             </p>
           </div>
           <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-            <label className="block text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
+            <label htmlFor="capture-foto-caption" className="block text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
               Palabras clave o pie (opcional)
             </label>
             <p className="text-base md:text-lg" style={{ color: neu.textBody }}>
               15+ caracteres ayudan a personalizar la huella.
             </p>
             <textarea
+              id="capture-foto-caption"
               value={fotoCaption}
               onChange={(e) => setFotoCaption(e.target.value)}
               rows={4}
@@ -530,26 +559,35 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
 
           {videoMode === 'enlace' && (
             <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-              <label className="block text-xl font-semibold" style={{ color: neu.textMain }}>
+              <label htmlFor="capture-video-url" className="block text-xl font-semibold" style={{ color: neu.textMain }}>
                 URL del video *
               </label>
               <input
+                id="capture-video-url"
                 type="url"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 placeholder="https://www.youtube.com/..."
                 className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60"
                 style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                aria-required="true"
+                aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
+                aria-describedby={
+                  videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'capture-video-url-error' : undefined
+                }
               />
               {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
-                <p className="text-xs text-amber-700">Usa un enlace de YouTube o Vimeo</p>
+                <p id="capture-video-url-error" className="text-xs text-amber-700" role="alert">
+                  Usa un enlace de YouTube o Vimeo
+                </p>
               )}
             </div>
           )}
 
           {renderNarrativeBox(
             'Texto para tu impronta *',
-            'Resume o describe lo que cuentas en el video (temas, emociones). Lo usamos para dibujar la composición y las etiquetas.'
+            'Resume o describe lo que cuentas en el video (temas, emociones). Lo usamos para dibujar la composición y las etiquetas.',
+            'capture-narrative-video'
           )}
         </>
       )}
@@ -635,12 +673,14 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
 
           {audioMode === 'archivo' && (
             <div style={neoSurface} className="p-6 md:p-8 space-y-4">
-              <label className="block text-xl font-semibold" style={{ color: neu.textMain }}>
+              <label htmlFor="capture-audio-file" className="block text-xl font-semibold" style={{ color: neu.textMain }}>
                 Audio en tu equipo (máx. {AUDIO_MAX_MB} MB)
               </label>
               <input
+                id="capture-audio-file"
                 type="file"
                 accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
+                aria-label="Seleccionar archivo de audio desde tu equipo"
                 onChange={(e) => {
                   const f = e.target.files?.[0];
                   if (!f) {
@@ -665,7 +705,11 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                 className="w-full text-base md:text-lg"
                 style={{ color: neu.textBody }}
               />
+              <label htmlFor="capture-audio-url" className="sr-only">
+                URL del audio (opcional)
+              </label>
               <input
+                id="capture-audio-url"
                 type="url"
                 value={audioUrl}
                 onChange={(e) => setAudioUrl(e.target.value)}
@@ -678,7 +722,8 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
 
           {renderNarrativeBox(
             'Texto para tu impronta *',
-            'Transcribe o resume lo que dices en el audio; así personalizamos la composición.'
+            'Transcribe o resume lo que dices en el audio; así personalizamos la composición.',
+            'capture-narrative-audio'
           )}
         </>
       )}

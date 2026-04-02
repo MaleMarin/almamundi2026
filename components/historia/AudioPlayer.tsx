@@ -1,7 +1,7 @@
 'use client';
 
 import { SITE_FONT_STACK } from '@/lib/typography';
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
 const FILM = '#0d0b09';
@@ -28,6 +28,9 @@ export interface HistoriaAudio {
     bio?: string;
   };
   tags?: string[];
+  /** Texto accesible del audio (sinónimo API: `transcript`). */
+  transcripcion?: string;
+  transcript?: string;
 }
 
 interface AudioPlayerProps {
@@ -106,32 +109,47 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
     setTitleVisible(true);
   }, []);
 
-  useEffect(() => {
-    const audio = new Audio(historia.audioUrl);
-    audioRef.current = audio;
-    const onLoadedMetadata = () => setDuration(audio.duration);
+  useLayoutEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    const onLoadedMetadata = () => {
+      const d = audio.duration;
+      setDuration(Number.isFinite(d) && d > 0 ? d : historia.duracion || 0);
+    };
     const onTimeUpdate = () => setCurrentTime(audio.currentTime);
-    const onEnded = () => { setEnded(true); setIsPlaying(false); };
+    const onEnded = () => {
+      setEnded(true);
+      setIsPlaying(false);
+    };
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
     audio.addEventListener('loadedmetadata', onLoadedMetadata);
     audio.addEventListener('timeupdate', onTimeUpdate);
     audio.addEventListener('ended', onEnded);
+    audio.addEventListener('play', onPlay);
+    audio.addEventListener('pause', onPause);
     return () => {
       audio.pause();
       audio.removeEventListener('loadedmetadata', onLoadedMetadata);
       audio.removeEventListener('timeupdate', onTimeUpdate);
       audio.removeEventListener('ended', onEnded);
-      audioRef.current = null;
+      audio.removeEventListener('play', onPlay);
+      audio.removeEventListener('pause', onPause);
     };
-  }, [historia.audioUrl]);
+  }, [historia.audioUrl, historia.duracion]);
 
   useEffect(() => {
     if (audioRef.current) audioRef.current.muted = isMuted;
   }, [isMuted]);
 
   const togglePlay = () => {
-    if (!audioRef.current) return;
-    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
-    else { audioRef.current.play(); setIsPlaying(true); }
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (isPlaying) {
+      audio.pause();
+    } else {
+      void audio.play().catch(() => setIsPlaying(false));
+    }
   };
 
   const toggleMute = () => setIsMuted(!isMuted);
@@ -154,6 +172,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
     if (audioRef.current) { audioRef.current.currentTime = 0; audioRef.current.play(); setIsPlaying(true); }
   };
 
+  const transcripcionText = historia.transcripcion ?? historia.transcript;
   const frases = historia.frases ?? [];
   const phraseThreshold = frases.length > 0 ? duration / frases.length : 0;
   const currentPhraseIndex = frases.length === 0 ? -1 : Math.min(Math.floor(currentTime / phraseThreshold), frases.length - 1);
@@ -419,6 +438,8 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               <button
                 type="button"
                 onClick={togglePlay}
+                aria-pressed={isPlaying}
+                aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                 style={{
                   width: '64px',
                   height: '64px',
@@ -476,6 +497,53 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
             >
               {isMuted ? <MutedIcon /> : <VolumeIcon />}
             </button>
+            <audio
+              ref={audioRef}
+              src={historia.audioUrl}
+              controls
+              preload="metadata"
+              aria-label={`Reproducir audio: ${historia.titulo}`}
+              style={{
+                width: '100%',
+                maxWidth: '480px',
+                marginTop: '8px',
+              }}
+            />
+            {transcripcionText ? (
+              <details style={{ marginTop: '24px', width: '100%', maxWidth: '480px' }}>
+                <summary
+                  style={{
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: 600,
+                    letterSpacing: '0.08em',
+                    textTransform: 'uppercase',
+                    color: '#FF4A1C',
+                    listStyle: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                  }}
+                >
+                  <span aria-hidden="true">▶</span>
+                  Leer transcripción
+                </summary>
+                <div
+                  role="region"
+                  aria-label="Transcripción del audio"
+                  style={{
+                    marginTop: '16px',
+                    fontSize: '15px',
+                    lineHeight: '1.8',
+                    color: 'inherit',
+                    borderLeft: '3px solid #FF4A1C',
+                    paddingLeft: '16px',
+                  }}
+                >
+                  {transcripcionText}
+                </div>
+              </details>
+            ) : null}
           </div>
         </div>
       ) : (

@@ -14,7 +14,7 @@ export interface HistoriaFoto {
   titulo: string;
   subtitulo?: string;
   fecha: string;
-  imagenes: { url: string; caption?: string }[];
+  imagenes: { url: string; caption?: string; descripcion?: string; titulo?: string }[];
   autor: {
     nombre: string;
     avatar: string;
@@ -77,8 +77,23 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
   }, [fotoActivaIdx, imagenes]);
 
   const scrollToPhoto = useCallback((i: number) => {
-    sectionRefs.current[i]?.scrollIntoView({ behavior: 'smooth' });
-  }, []);
+    const next = Math.max(0, Math.min(imagenes.length - 1, i));
+    sectionRefs.current[next]?.scrollIntoView({ behavior: 'smooth' });
+  }, [imagenes.length]);
+
+  const photoAlt = useCallback(
+    (img: HistoriaFoto['imagenes'][number]) =>
+      img.descripcion?.trim() ||
+      img.caption?.trim() ||
+      img.titulo?.trim() ||
+      `Fotografía de ${historia.titulo}`,
+    [historia.titulo]
+  );
+
+  const photoAriaLabel = useCallback(
+    (img: HistoriaFoto['imagenes'][number]) => img.descripcion?.trim() || img.caption?.trim() || img.titulo?.trim() || `Foto del álbum: ${historia.titulo}`,
+    [historia.titulo]
+  );
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -190,6 +205,8 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
             >
               {isDesktop ? (
                 <div
+                  role="figure"
+                  aria-label={photoAriaLabel(img)}
                   style={{
                     position: 'relative',
                     overflow: 'hidden',
@@ -200,7 +217,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 >
                   <img
                     src={img.url}
-                    alt=""
+                    alt={photoAlt(img)}
                     className={i % 2 === 0 ? 'fotoalbum-kenburns' : 'fotoalbum-kenburns-alt'}
                     style={{
                       width: '100%',
@@ -249,10 +266,14 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 </div>
               ) : isTablet ? (
                 <div style={{ width: '85%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                  <div style={{ position: 'relative', overflow: 'hidden', width: '100%', height: 'calc(80vh - 100px)', maxWidth: 600 }}>
+                  <div
+                    role="figure"
+                    aria-label={photoAriaLabel(img)}
+                    style={{ position: 'relative', overflow: 'hidden', width: '100%', height: 'calc(80vh - 100px)', maxWidth: 600 }}
+                  >
                     <img
                       src={img.url}
-                      alt=""
+                      alt={photoAlt(img)}
                     className="fotoalbum-kenburns"
                     style={{
                       width: '100%',
@@ -269,10 +290,14 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                   )}
                 </div>
               ) : (
-                <div style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <div
+                  role="figure"
+                  aria-label={photoAriaLabel(img)}
+                  style={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                >
                   <img
                     src={img.url}
-                    alt=""
+                    alt={photoAlt(img)}
                     className="fotoalbum-kenburns"
                     style={{
                       width: '100%',
@@ -306,7 +331,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
             <div style={{ width: 40, height: 1, background: SEPIA, marginBottom: '2rem' }} />
             <img
               src={historia.autor.avatar}
-              alt=""
+              alt={`Retrato de ${historia.autor.nombre}`}
               style={{
                 width: 72,
                 height: 72,
@@ -411,6 +436,25 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
               alignItems: 'center',
             }}
           >
+            <button
+              type="button"
+              onClick={() => scrollToPhoto(fotoActivaIdx - 1)}
+              disabled={fotoActivaIdx <= 0}
+              aria-label="Foto anterior"
+              style={{
+                padding: '6px 10px',
+                borderRadius: 8,
+                border: '1px solid rgba(245,240,232,0.35)',
+                background: 'rgba(0,0,0,0.25)',
+                color: CREAM_SOFT,
+                fontFamily: SITE_FONT_STACK,
+                fontSize: '11px',
+                cursor: fotoActivaIdx <= 0 ? 'not-allowed' : 'pointer',
+                opacity: fotoActivaIdx <= 0 ? 0.45 : 1,
+              }}
+            >
+              ← Ant.
+            </button>
             {imagenes.map((_, i) => (
               <button
                 key={i}
@@ -429,6 +473,25 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 }}
               />
             ))}
+            <button
+              type="button"
+              onClick={() => scrollToPhoto(fotoActivaIdx + 1)}
+              disabled={fotoActivaIdx >= imagenes.length - 1}
+              aria-label="Foto siguiente"
+              style={{
+                padding: '6px 10px',
+                borderRadius: 8,
+                border: '1px solid rgba(245,240,232,0.35)',
+                background: 'rgba(0,0,0,0.25)',
+                color: CREAM_SOFT,
+                fontFamily: SITE_FONT_STACK,
+                fontSize: '11px',
+                cursor: fotoActivaIdx >= imagenes.length - 1 ? 'not-allowed' : 'pointer',
+                opacity: fotoActivaIdx >= imagenes.length - 1 ? 0.45 : 1,
+              }}
+            >
+              Sig. →
+            </button>
           </div>
         )}
       </div>

@@ -186,7 +186,7 @@ export function ImprontaStep({
     'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)' as const;
 
   return (
-    <section className="space-y-8 md:space-y-10">
+    <section className="space-y-8 md:space-y-10" aria-label="Paso 3 de 4: impronta visual" aria-current="step">
       <button
         type="button"
         onClick={onBack}
@@ -233,7 +233,11 @@ export function ImprontaStep({
             ))}
           </div>
         )}
-        {err && <p className="text-sm text-amber-800">{err}</p>}
+        {err && (
+          <p id="impronta-step-error" className="text-sm text-amber-800" role="alert">
+            {err}
+          </p>
+        )}
       </div>
 
       <div
@@ -253,6 +257,8 @@ export function ImprontaStep({
           type="button"
           onClick={downloadPng}
           disabled={loading}
+          aria-busy={loading}
+          aria-disabled={loading}
           className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide text-white disabled:opacity-50"
           style={{
             background: loading ? '#9ca3af' : orangeCta,
@@ -266,6 +272,8 @@ export function ImprontaStep({
           type="button"
           onClick={() => void shareImage()}
           disabled={loading}
+          aria-busy={loading}
+          aria-disabled={loading}
           className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide disabled:opacity-50"
           style={{ ...neu.button, color: neu.orange }}
         >

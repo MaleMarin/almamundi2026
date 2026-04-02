@@ -1,4 +1,5 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
@@ -40,6 +41,12 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-bold"
+        >
+          Saltar al contenido principal
+        </a>
         <noscript>
           <div className="p-8 text-center">
             <h1 className="text-2xl font-light text-white/95">{ns.title}</h1>
@@ -49,7 +56,12 @@ export default async function RootLayout({
             </HomeHardLink>
           </div>
         </noscript>
-        <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+        <LocaleProvider initialLocale={locale}>
+          <div id="main-content" tabIndex={-1}>
+            {children}
+          </div>
+        </LocaleProvider>
+        <HighContrastToggle />
       </body>
     </html>
   );

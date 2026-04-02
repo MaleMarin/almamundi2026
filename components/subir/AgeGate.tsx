@@ -164,6 +164,7 @@ export function AgeGate({ onChange }: Props) {
         {!confirmed && (
           <>
             <p
+              role="alert"
               style={{
                 fontWeight: 400,
                 fontSize: '0.9rem',
@@ -326,6 +327,7 @@ export function AgeGate({ onChange }: Props) {
                 {/* ── Aviso menor ── */}
                 {selected === 'minor' && (
                   <div
+                    role="alert"
                     style={{
                       background: '#fffbeb',
                       border: '1px solid #fde68a',
@@ -357,6 +359,7 @@ export function AgeGate({ onChange }: Props) {
                 <button
                   type="button"
                   onClick={handleConfirm}
+                  autoFocus={Boolean(selected)}
                   style={{
                     width: '100%',
                     padding: '0.85rem',

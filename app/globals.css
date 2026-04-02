@@ -279,3 +279,54 @@ footer a.almamundi-footer-link:visited {
 footer a.almamundi-footer-link:hover {
   color: #1f2937 !important;
 }
+
+/* Modo alto contraste AlmaMundi */
+[data-high-contrast="true"] {
+  --color-bg: #000000 !important;
+  --color-surface: #111111 !important;
+  --color-text-primary: #ffffff !important;
+  --color-text-secondary: #eeeeee !important;
+  --color-accent: #ff4a1c !important;
+  --color-border: #ffffff !important;
+  background-color: #000000 !important;
+  color: #ffffff !important;
+}
+
+[data-high-contrast="true"] * {
+  background-color: inherit;
+  color: inherit;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+[data-high-contrast="true"] button,
+[data-high-contrast="true"] a {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+[data-high-contrast="true"] input,
+[data-high-contrast="true"] textarea,
+[data-high-contrast="true"] select {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+
+/* Foco visible global — aplica siempre, no solo en alto contraste */
+:focus-visible {
+  outline: 3px solid #ff4a1c;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Reducir movimiento */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -73,11 +73,12 @@ function SoftCard({
 }) {
   return (
     <div
+      role="article"
       className="home-first-part-float home-neu-card group relative flex min-h-[450px] w-full max-w-[400px] flex-1 flex-col items-start rounded-[40px] p-8 transition-all duration-500 hover:-translate-y-2"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
       <div className="mb-5 shrink-0">
-        <h3 className="text-xl md:text-2xl font-light text-gray-500 leading-tight">{title}</h3>
+        <p className="text-xl md:text-2xl font-light text-gray-500 leading-tight m-0">{title}</p>
         <h2 className="text-2xl md:text-3xl font-bold text-gray-700 leading-tight mt-1">{subtitle}</h2>
       </div>
       <div className="flex-1 min-h-[80px] w-full" />
@@ -246,7 +247,7 @@ export function HomeFirstPart({
               viewBox="0 0 360 12"
               className="mx-auto block"
               style={{ margin: '14px auto 22px' }}
-              aria-hidden
+              aria-hidden="true"
             >
               <path
                 pathLength={1}
@@ -274,7 +275,11 @@ export function HomeFirstPart({
       </section>
 
       {/* CARDS — más aire bajo el hero y mayor separación entre tarjetas */}
-      <section id="historias" className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10">
+      <section
+        id="historias"
+        aria-label="Formatos para compartir tu historia"
+        className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10"
+      >
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
