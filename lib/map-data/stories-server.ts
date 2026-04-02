@@ -9,6 +9,7 @@
  *   firebase deploy --only firestore:indexes
  */
 import 'server-only';
+import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { isPublicStoryDocumentStatus } from '@/lib/story-public';
 
@@ -88,7 +89,7 @@ export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> 
     const { getAdminDb } = await import('@/lib/firebase/admin');
     const db = getAdminDb();
     const doc = await db.collection('stories').doc(id).get();
-    if (!doc.exists) return null;
+    if (!doc.exists) return getDemoStoryPointById(id);
     const d = doc.data()!;
     if (!isPublicStoryDocumentStatus(d.status)) return null;
     const lat = d.lat != null ? Number(d.lat) : null;
@@ -122,6 +123,8 @@ export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> 
     } as StoryPoint;
   } catch (err) {
     console.error('[getStoryByIdAsync]', err);
+    const demo = getDemoStoryPointById(id);
+    if (demo) return demo;
     return null;
   }
 }

@@ -348,7 +348,8 @@ export default function HomeMap() {
     onToggleSound: handleToggleSound,
   };
 
-  const TIME_STRIP_HEIGHT = 48;
+  /** Altura mínima de la franja fecha/hora; el padding inferior añade negro bajo el texto antes del gris. */
+  const TIME_STRIP_HEIGHT = 56;
   return (
     <div className="relative flex min-h-[88vh] w-full flex-1 flex-col">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
@@ -383,8 +384,8 @@ export default function HomeMap() {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="flex-shrink-0 w-full flex items-end justify-center z-10 pb-1"
-        style={{ height: `${TIME_STRIP_HEIGHT}px`, backgroundColor: 'transparent' }}
+        className="flex-shrink-0 w-full flex items-end justify-center z-10 bg-black pb-4 pt-1.5"
+        style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
       </div>

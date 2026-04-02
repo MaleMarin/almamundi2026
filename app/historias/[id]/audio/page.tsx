@@ -10,8 +10,7 @@ import { useParams, useRouter } from 'next/navigation';
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
-import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 
 export default function HistoriasIdAudioPage() {
   const params = useParams();
@@ -33,21 +32,10 @@ export default function HistoriasIdAudioPage() {
             return;
           }
           setHistoria(storyToHistoriaAudio(data.story));
-        } else if (id === 'demo-audio-1') {
-          const m = MOCK_STORIES.audio;
-          setHistoria({
-            id: m.id,
-            titulo: m.titulo,
-            subtitulo: m.subtitulo,
-            audioUrl: m.audioUrl,
-            thumbnailUrl: m.thumbnailUrl,
-            duracion: m.duracion,
-            fecha: m.fecha,
-            citaDestacada: m.citaDestacada,
-            frases: m.frases,
-            autor: { nombre: m.autor.nombre, avatar: m.autor.avatar, ubicacion: m.autor.ubicacion, bio: (m.autor as { bio?: string }).bio } as HistoriaAudio['autor'],
-            tags: m.tags,
-          });
+        } else if (id.startsWith('demo-audio-')) {
+          const sp = getDemoStoryPointById(id);
+          if (sp?.audioUrl) setHistoria(storyToHistoriaAudio(sp));
+          else setHistoria(null);
         } else {
           setHistoria(null);
         }
@@ -56,40 +44,21 @@ export default function HistoriasIdAudioPage() {
     return () => { cancelled = true; };
   }, [id, router]);
 
-  useEffect(() => {
-    if (historia) {
-      document.title = `${historia.titulo} · AlmaMundi`;
-      if (historia.subtitulo) {
-        const meta = document.querySelector('meta[name="description"]');
-        if (meta) meta.setAttribute('content', historia.subtitulo);
-      }
-    }
-    return () => { document.title = 'AlmaMundi'; };
-  }, [historia]);
-
   if (loading) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#111009', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <p style={{ fontFamily: SITE_FONT_STACK, fontSize: '0.75rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255,69,0,0.8)' }}>Cargando…</p>
+      <div className="fixed inset-0 bg-[#111009] flex items-center justify-center">
+        <p className="font-sans text-sm tracking-widest uppercase text-[#ff4500]/80">Cargando…</p>
       </div>
     );
   }
 
   if (!historia) {
     return (
-      <div style={{ position: 'fixed', inset: 0, background: '#111009', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', padding: '1.5rem' }}>
-        <p style={{ fontFamily: SITE_FONT_STACK, color: 'rgba(245,240,232,0.7)' }}>No encontramos esta historia o no tiene audio.</p>
+      <div className="fixed inset-0 bg-[#111009] flex flex-col items-center justify-center gap-6 px-6">
+        <p className="font-sans text-[#f5f0e8]/70">No encontramos esta historia o no tiene audio.</p>
         <Link
           href="/historias"
-          style={{
-            padding: '0.75rem 1.5rem',
-            borderRadius: '9999px',
-            fontSize: '0.875rem',
-            fontWeight: 500,
-            color: '#ff4500',
-            border: '1px solid rgba(255,69,0,0.4)',
-            textDecoration: 'none',
-          }}
+          className="px-6 py-3 rounded-full text-sm font-medium text-[#ff4500] border border-[#ff4500]/40 hover:bg-[#ff4500]/10 transition-colors"
         >
           Ver historias
         </Link>
@@ -97,10 +66,6 @@ export default function HistoriasIdAudioPage() {
     );
   }
 
-  return (
-    <AudioPlayer
-      historia={historia}
-      onClose={() => router.push(`/historias/${id}`)}
-    />
-  );
+  /** Misma presentación que `/historias/[id]/video`: experiencia a pantalla completa, sin volver al detalle neumórfico. */
+  return <AudioPlayer historia={historia} />;
 }

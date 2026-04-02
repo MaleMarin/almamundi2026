@@ -56,11 +56,10 @@ export default async function RootLayout({
             </HomeHardLink>
           </div>
         </noscript>
-        <LocaleProvider initialLocale={locale}>
-          <div id="main-content" tabIndex={-1}>
-            {children}
-          </div>
-        </LocaleProvider>
+        {/* #main-content en el servidor: evita desajuste de hidratación (Suspense) al cruzar RSC → LocaleProvider */}
+        <div id="main-content" tabIndex={-1}>
+          <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+        </div>
         <HighContrastToggle />
       </body>
     </html>

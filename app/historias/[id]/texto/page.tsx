@@ -58,5 +58,5 @@ export default async function HistoriasIdTextoPage({ params }: PageProps) {
   const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
   if (!contenido) redirect(`/historias/${id}`);
   const historia = storyToHistoriaTexto(story, contenido);
-  return <TextoReaderClient historia={historia} id={id} />;
+  return <TextoReaderClient historia={historia} />;
 }

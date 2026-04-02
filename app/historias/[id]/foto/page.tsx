@@ -67,5 +67,5 @@ export default async function HistoriasIdFotoPage({ params }: PageProps) {
   const imagenes = buildImagenes(story);
   if (imagenes.length === 0) redirect(`/historias/${id}`);
   const historia = storyToHistoriaFoto(story, imagenes);
-  return <FotoAlbumClient historia={historia} id={id} />;
+  return <FotoAlbumClient historia={historia} />;
 }

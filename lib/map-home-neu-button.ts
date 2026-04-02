@@ -28,11 +28,11 @@ export const MAP_HOME_NEU_BUTTON_CLASS =
 export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-600 lg:gap-4';
 
 /**
- * Nav superior (md+): cuatro píldoras, bloque pegado a la derecha del header.
- * Sin `w-full` + `mx-auto` del dock: eso centraba el grupo en todo el hueco entre logo y borde.
+ * Nav superior (md+): cuatro píldoras del mismo ancho y alto (grid 4×1fr + ancho total acotado).
+ * Sin esto, `max-content` dejaba «Historias» más chica que Propósito / ¿Cómo funciona? / Mapa.
  */
 export const MAP_HOME_HEADER_NAV_CLASS =
-  'hidden text-gray-600 md:grid md:ml-auto md:w-max md:shrink-0 gap-3 lg:gap-4 md:[grid-template-columns:repeat(4,max-content)]';
+  'hidden text-gray-600 md:grid md:ml-auto md:shrink-0 md:min-w-0 gap-3 lg:gap-4 md:w-[min(48rem,calc(100vw-14rem))] md:grid-cols-4 md:justify-items-stretch';
 
 /** Dock: misma base que el header; ancho por contenido (max-content) y grupo centrado, no celdas 1fr estiradas. */
 export const MAP_HOME_DOCK_NAV_CLASS = `mx-auto ${MAP_HOME_PILL_ROW_LAYOUT} justify-center justify-items-stretch [grid-template-columns:repeat(1,minmax(0,1fr))] sm:[grid-template-columns:repeat(3,max-content)] lg:[grid-template-columns:repeat(5,max-content)] px-2 md:px-3`;

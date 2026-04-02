@@ -157,6 +157,10 @@ export function HistoricalExhibitionCarousel({
 
   const active = historias[activeIndex] ?? null;
 
+  /** Listas /historias/* (embebidas, sala clara): flechas siempre visibles; con 1 sola tarjeta quedan deshabilitadas. */
+  const showExpoNavArrows = (embedded && isLightHall) || n > 1;
+  const expoNavArrowsDisabled = n <= 1;
+
   useEffect(() => {
     if (n === 0) {
       setActiveIndex(0);
@@ -195,10 +199,10 @@ export function HistoricalExhibitionCarousel({
   if (n === 0) {
     return (
       <div
-        className={`flex min-h-[40vh] items-center justify-center text-white/70 ${className}`}
+        className={`flex min-h-[40vh] items-center justify-center px-6 text-center text-base ${embedded && isLightHall ? 'text-gray-600' : 'text-white/70'} ${className}`}
         role="status"
       >
-        No hay historias para mostrar.
+        No hay historias para mostrar en este formato.
       </div>
     );
   }
@@ -308,16 +312,24 @@ export function HistoricalExhibitionCarousel({
             perspectiveOrigin: 'center center',
           }}
         >
-          <div className="relative w-full">
-            {n > 1 ? (
+          <div
+            className="relative w-full"
+            style={
+              embedded && isLightHall
+                ? { minHeight: 'min(92vw, 620px)' }
+                : undefined
+            }
+          >
+            {showExpoNavArrows ? (
               <>
                 <button
                   type="button"
+                  disabled={expoNavArrowsDisabled}
                   onClick={() => swiperRef.current?.slidePrev()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute left-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] sm:left-3 md:left-4'
-                      : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] sm:left-1 md:left-2'
+                      ? 'pointer-events-auto absolute left-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:left-3 md:left-4'
+                      : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/45 sm:left-1 md:left-2'
                   }
                   aria-label="Historia anterior"
                 >
@@ -328,11 +340,12 @@ export function HistoricalExhibitionCarousel({
                 </button>
                 <button
                   type="button"
+                  disabled={expoNavArrowsDisabled}
                   onClick={() => swiperRef.current?.slideNext()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute right-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] sm:right-3 md:right-4'
-                      : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] sm:right-1 md:right-2'
+                      ? 'pointer-events-auto absolute right-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:right-3 md:right-4'
+                      : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/50 sm:right-1 md:right-2'
                   }
                   aria-label="Próxima historia"
                 >

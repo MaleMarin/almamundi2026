@@ -25,6 +25,10 @@ export function isInternalNavActive(href: string, pathname: string, hash: string
 
   if (pathname === pathOnly) return true;
   if (pathname.startsWith(`${pathOnly}/`)) return true;
+
+  /** `/historias` reutiliza la página de videos; el tab «Videos» debe verse activo. */
+  if (pathOnly === '/historias/videos' && pathname === '/historias') return true;
+
   return false;
 }
 

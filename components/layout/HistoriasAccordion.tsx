@@ -26,6 +26,15 @@ type HistoriasAccordionProps = {
   className?: string;
   /** Enlaces del desplegable (footer): clase con `almamundi-footer-link` para color negro forzado */
   footerLinkClassName?: string;
+  /** Texto del botón desplegable (p. ej. i18n en la home). Por defecto «Historias». */
+  triggerLabel?: string;
+  /** Tras elegir un enlace del menú (p. ej. cerrar nav móvil en la home). */
+  onItemNavigate?: () => void;
+  /**
+   * Clases del `<button>` en variant `header`. Si no se pasa, se usa el tamaño compacto de interiores.
+   * En la home, pasar `MAP_HOME_NEU_BUTTON_CLASS` para igualar `PillNavButton`.
+   */
+  headerButtonClassName?: string;
 };
 
 export function HistoriasAccordion({
@@ -33,11 +42,19 @@ export function HistoriasAccordion({
   buttonStyle,
   className = '',
   footerLinkClassName = 'almamundi-footer-link font-normal transition-colors',
+  triggerLabel = 'Historias',
+  onItemNavigate,
+  headerButtonClassName,
 }: HistoriasAccordionProps) {
   const pathname = usePathname() ?? '';
   const historiasActive = isHistoriasSectionPath(pathname);
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const afterNavigate = () => {
+    setOpen(false);
+    onItemNavigate?.();
+  };
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -57,7 +74,7 @@ export function HistoriasAccordion({
           aria-expanded={open}
           aria-haspopup="true"
         >
-          Historias {open ? '▼' : '▲'}
+          {triggerLabel} {open ? '▼' : '▲'}
         </button>
         {open && (
           <div className="absolute bottom-full left-0 mb-2 py-2 min-w-[180px] bg-[#E0E5EC] rounded-xl shadow-lg border border-gray-200/60 z-50">
@@ -67,7 +84,7 @@ export function HistoriasAccordion({
                 href={item.href}
                 className={`block px-4 py-2.5 text-base hover:bg-gray-200/50 first:rounded-t-xl last:rounded-b-xl ${footerLinkClassName}`}
                 activeClassName="!text-black font-semibold"
-                onClick={() => setOpen(false)}
+                onClick={afterNavigate}
               >
                 {item.label}
               </ActiveInternalNavLink>
@@ -78,10 +95,15 @@ export function HistoriasAccordion({
     );
   }
 
-  const headerWrapperClass = [className, historiasActive ? '[&_button]:!text-orange-500 [&_button]:font-semibold' : '']
+  const headerBtnClass = [
+    headerButtonClassName ?? 'px-4 py-2 rounded-full text-sm transition-all',
+    historiasActive ? '!text-orange-500 font-semibold' : '',
+  ]
     .filter(Boolean)
     .join(' ')
     .trim();
+
+  const headerWrapperClass = ['relative', className].filter(Boolean).join(' ').trim();
 
   return (
     <div ref={ref} className={headerWrapperClass}>
@@ -89,21 +111,21 @@ export function HistoriasAccordion({
         type="button"
         onClick={() => setOpen((o) => !o)}
         data-active={open ? 'true' : undefined}
-        className="px-4 py-2 rounded-full text-sm transition-all"
+        className={headerBtnClass}
         style={buttonStyle}
         aria-expanded={open}
         aria-haspopup="true"
       >
-        Historias {open ? '▲' : '▼'}
+        {triggerLabel} {open ? '▲' : '▼'}
       </button>
       {open && (
-        <div className="absolute top-full left-0 mt-1 py-2 min-w-[160px] bg-[#E0E5EC] rounded-xl shadow-lg border border-gray-200/60 z-50">
+        <div className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-xl border border-gray-200/60 bg-[#E0E5EC] py-2 shadow-lg">
           {ITEMS.map((item) => (
             <ActiveInternalNavLink
               key={item.label}
               href={item.href}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-200/50 hover:text-gray-900 first:rounded-t-xl last:rounded-b-xl"
-              onClick={() => setOpen(false)}
+              className="block px-4 py-3 text-lg font-medium text-[#c23600] hover:bg-gray-200/55 hover:text-[#a02d00] first:rounded-t-xl last:rounded-b-xl md:text-[1.125rem] md:leading-snug"
+              onClick={afterNavigate}
             >
               {item.label}
             </ActiveInternalNavLink>

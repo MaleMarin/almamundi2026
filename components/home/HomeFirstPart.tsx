@@ -6,7 +6,8 @@ import { Menu, X } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import { PillNavButton } from '@/components/home/PillNavButton';
-import { MAP_HOME_HEADER_NAV_CLASS } from '@/lib/map-home-neu-button';
+import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { MAP_HOME_HEADER_NAV_CLASS, MAP_HOME_NEU_BUTTON_CLASS, MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
 import { DM_Sans } from 'next/font/google';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
@@ -130,7 +131,6 @@ export function HomeFirstPart({
   basePath = ''
 }: HomeFirstPartProps) {
   const { t } = useHomeLocale();
-  const historiasHref = basePath ? `${basePath}#historias` : '#historias';
   const baseNorm = basePath.replace(/\/$/, '');
   const mapaHref = basePath ? (baseNorm ? `${baseNorm}#mapa` : '/#mapa') : '/#mapa';
 
@@ -172,7 +172,13 @@ export function HomeFirstPart({
           <nav className={MAP_HOME_HEADER_NAV_CLASS} aria-label={t.ariaMainNav}>
             <PillNavButton onClick={onShowPurpose}>{t.navPurpose}</PillNavButton>
             <PillNavButton onClick={onShowComoFunciona}>{t.navHow}</PillNavButton>
-            <PillNavButton href={historiasHref}>{t.navStories}</PillNavButton>
+            <HistoriasAccordion
+              variant="header"
+              triggerLabel={t.navStories}
+              buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
+              headerButtonClassName={MAP_HOME_NEU_BUTTON_CLASS}
+              className="w-full min-w-0"
+            />
             <PillNavButton href={mapaHref}>{t.navMap}</PillNavButton>
           </nav>
           <HomeLanguageSwitcher className="hidden md:flex" />
@@ -209,9 +215,14 @@ export function HomeFirstPart({
               >
                 {t.navHow}
               </PillNavButton>
-              <PillNavButton href={historiasHref} onAfterClick={closeMobileNav}>
-                {t.navStories}
-              </PillNavButton>
+              <HistoriasAccordion
+                variant="header"
+                triggerLabel={t.navStories}
+                buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
+                headerButtonClassName={`${MAP_HOME_NEU_BUTTON_CLASS} w-full max-w-none`}
+                className="w-full"
+                onItemNavigate={closeMobileNav}
+              />
               <PillNavButton href={mapaHref} onAfterClick={closeMobileNav}>
                 {t.navMap}
               </PillNavButton>

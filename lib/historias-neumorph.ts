@@ -74,14 +74,14 @@ export const historiasInterior = {
   logoClassName:
     'h-[5.75rem] sm:h-[6.75rem] md:h-28 lg:h-[7.75rem] xl:h-[8.5rem] w-auto max-w-[min(440px,80vw)] md:max-w-[min(600px,82vw)] object-contain object-left select-none drop-shadow-[0_2px_12px_rgba(0,0,0,0.12)]',
   navLinkClassName:
-    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base font-medium leading-tight',
+    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-base md:text-lg font-medium leading-tight',
   navActiveClassName:
-    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-sm md:text-base font-semibold leading-tight',
+    'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-base md:text-lg font-semibold leading-tight',
   /**
    * Botón «Historias ▼» del acordeón: misma escala que navLinkClassName (antes forzaba text-lg + py-3).
    */
   navHistoriasAccordionClassName:
-    '[&_button]:btn-almamundi [&_button]:text-sm [&_button]:md:text-base [&_button]:font-medium [&_button]:px-3 [&_button]:py-1.5 [&_button]:md:px-4 [&_button]:md:py-2 [&_button]:leading-tight [&_button]:rounded-full',
+    '[&_button]:btn-almamundi [&_button]:text-base [&_button]:md:text-lg [&_button]:font-medium [&_button]:px-3 [&_button]:py-1.5 [&_button]:md:px-4 [&_button]:md:py-2 [&_button]:leading-tight [&_button]:rounded-full',
   /** Fila de botones del menú superior */
   navLinksRowClassName:
     'flex items-center flex-wrap justify-end gap-x-2.5 gap-y-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-5',
