@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { Menu, X } from 'lucide-react';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { MAP_HOME_HEADER_NAV_CLASS } from '@/lib/map-home-neu-button';
@@ -11,7 +11,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 /** Tipografía minimalista solo para el hero (frase principal + subtítulo). */
 const homeHeroPhrase = DM_Sans({
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
+  weight: ['300', '400', '500', '600', '800'],
   display: 'swap',
 });
 
@@ -83,8 +83,19 @@ function SoftCard({
         <p className="text-gray-500 leading-relaxed text-base md:text-lg mb-6">{children}</p>
         <button
           onClick={onClick}
-          className="btn-almamundi home-neu-btn w-full flex justify-center px-8 py-4 md:py-5 rounded-full text-sm font-black tracking-[0.2em] text-orange-500 uppercase transition-all active:scale-95"
-          style={soft.button}
+          className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
+          style={{
+            background: '#FF4A1C',
+            color: 'white',
+            border: 'none',
+            borderRadius: '100px',
+            padding: '10px 16px',
+            fontSize: '11px',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            fontFamily: APP_FONT,
+            transition: 'opacity 0.2s',
+          }}
           type="button"
         >
           {buttonLabel}
@@ -121,6 +132,88 @@ export function HomeFirstPart({
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animId = 0;
+
+    const particles: { x: number; y: number; r: number; vy: number; vx: number; o: number }[] = [];
+
+    function init() {
+      const W = canvas.offsetWidth;
+      const H = canvas.offsetHeight;
+      canvas.width = W;
+      canvas.height = H;
+      particles.length = 0;
+      for (let i = 0; i < 60; i++) {
+        particles.push({
+          x: Math.random() * W,
+          y: Math.random() * H,
+          r: Math.random() * 1.3 + 0.3,
+          vy: -(Math.random() * 0.22 + 0.07),
+          vx: (Math.random() - 0.5) * 0.1,
+          o: Math.random() * 0.1 + 0.035,
+        });
+      }
+    }
+
+    function drawBokeh(W: number, H: number) {
+      const spots = [
+        { x: W * 0.28, y: H * 0.35, r: 90, c: [255, 175, 90] as [number, number, number], a: 0.055 },
+        { x: W * 0.3, y: H * 0.7, r: 65, c: [255, 155, 70] as [number, number, number], a: 0.04 },
+        { x: W * 0.72, y: H * 0.4, r: 75, c: [130, 185, 235] as [number, number, number], a: 0.04 },
+        { x: W * 0.12, y: H * 0.55, r: 55, c: [255, 205, 130] as [number, number, number], a: 0.035 },
+        { x: W * 0.88, y: H * 0.65, r: 60, c: [170, 210, 245] as [number, number, number], a: 0.035 },
+        { x: W * 0.5, y: H * 0.2, r: 45, c: [220, 190, 160] as [number, number, number], a: 0.025 },
+      ];
+      spots.forEach((s) => {
+        const g = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, s.r);
+        g.addColorStop(0, `rgba(${s.c[0]},${s.c[1]},${s.c[2]},${s.a})`);
+        g.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = g;
+        ctx.fill();
+      });
+    }
+
+    function loop() {
+      const W = canvas.width;
+      const H = canvas.height;
+      ctx.clearRect(0, 0, W, H);
+      drawBokeh(W, H);
+      particles.forEach((p) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(120,130,155,${p.o})`;
+        ctx.fill();
+        p.y += p.vy;
+        p.x += p.vx;
+        if (p.y < -3) {
+          p.y = H + 3;
+          p.x = Math.random() * W;
+        }
+        if (p.x < -3) p.x = W + 3;
+        if (p.x > W + 3) p.x = -3;
+      });
+      animId = requestAnimationFrame(loop);
+    }
+
+    init();
+    loop();
+
+    const onResize = () => init();
+    window.addEventListener('resize', onResize);
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -150,21 +243,6 @@ export function HomeFirstPart({
             -18px -18px 46px rgba(255, 255, 255, 1),
             inset 2px 2px 5px rgba(255, 255, 255, 0.85),
             inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
-        }
-        .home-neu-btn {
-          transition: box-shadow 0.25s ease, transform 0.2s ease;
-        }
-        .home-neu-btn:hover {
-          box-shadow:
-            13px 13px 30px rgba(120, 135, 155, 0.4),
-            -13px -13px 30px rgba(255, 255, 255, 1),
-            inset 2px 2px 4px rgba(255, 255, 255, 0.75),
-            inset -2px -2px 7px rgba(163, 177, 198, 0.15) !important;
-        }
-        .home-neu-btn:active {
-          box-shadow:
-            inset 6px 6px 14px rgba(163, 177, 198, 0.45),
-            inset -4px -4px 12px rgba(255, 255, 255, 0.85) !important;
         }
       `}</style>
 
@@ -242,21 +320,54 @@ export function HomeFirstPart({
       {/* INTRO — DM Sans: sans geométrica minimalista (solo esta franja) */}
       <section
         id="intro"
-        className={`${homeHeroPhrase.className} pt-48 sm:pt-52 md:pt-60 lg:pt-72 pb-10 md:pb-14 px-6 md:px-10 relative z-10 flex flex-col items-center text-center`}
+        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center overflow-hidden pt-48 text-center sm:pt-52 md:pt-60 md:pb-14 lg:pt-72 pb-10 px-6 md:px-10`}
       >
-        <div className="max-w-5xl lg:max-w-6xl animate-float">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light tracking-tight leading-[1.12] mb-5 md:mb-6" style={{ color: soft.textMain }}>
-            AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que{' '}
-            <span className="font-medium">despiertan otras historias.</span>
-          </h1>
-          <div
-            className="mx-auto mb-5 h-px w-28 rounded-none md:mb-6 md:w-32"
-            style={{ backgroundColor: 'var(--almamundi-orange, #ff4500)' }}
+        <div className="relative w-full max-w-5xl overflow-hidden lg:max-w-6xl">
+          <canvas
+            ref={canvasRef}
+            className="pointer-events-none absolute inset-0 h-full w-full"
             aria-hidden
           />
-          <p className="pt-3 md:pt-4 text-xl md:text-2xl lg:text-3xl font-light tracking-wide max-w-4xl mx-auto leading-[1.65]" style={{ color: soft.textBody }}>
-            Aquí, cada relato importa. <span className="font-normal">Cada historia es extraordinaria.</span>
-          </p>
+          <div className="animate-float relative z-[1]">
+            <h1
+              className="mb-5 font-light leading-[1.12] md:mb-6"
+              style={{
+                color: soft.textMain,
+                fontSize: '50px',
+                letterSpacing: '-0.02em',
+              }}
+            >
+              AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que{' '}
+              <span className="font-extrabold">despiertan otras historias.</span>
+            </h1>
+            <svg
+              width="360"
+              height="12"
+              viewBox="0 0 360 12"
+              className="mx-auto block"
+              style={{ margin: '14px auto 22px' }}
+              aria-hidden
+            >
+              <path
+                d="M4 8 Q90 12 180 8 Q270 4 356 8"
+                stroke="#FF4A1C"
+                strokeWidth="2.5"
+                fill="none"
+                strokeLinecap="round"
+                strokeDasharray={360}
+                strokeDashoffset={360}
+                style={{
+                  animation: 'drawUnderline 1.3s cubic-bezier(0.4,0,0.2,1) forwards 0.2s',
+                }}
+              />
+            </svg>
+            <p
+              className="mx-auto max-w-4xl pt-3 font-light leading-[1.65] md:pt-4 text-xl tracking-wide md:text-2xl lg:text-3xl"
+              style={{ color: soft.textBody }}
+            >
+              Aquí, cada relato importa. <span className="font-normal">Cada historia es extraordinaria.</span>
+            </p>
+          </div>
         </div>
       </section>
 

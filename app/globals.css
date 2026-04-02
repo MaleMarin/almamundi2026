@@ -41,6 +41,12 @@ body {
   font-family: inherit;
 }
 
+@keyframes drawUnderline {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 /* Enlaces: color por defecto del navegador (azul) → naranja AlmaMundi. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
 a {
   color: var(--almamundi-orange);
