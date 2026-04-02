@@ -144,6 +144,8 @@ export function HistoricalExhibitionCarousel({
 }: HistoricalExhibitionCarouselProps) {
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
+  /** Listados /historias/* (layout comparte filtros y carrusel sin chrome de compartir en la expo). */
+  const historiasListEmbedded = embedded && isLightHall && !shareInGalleryChrome;
   const swiperRef = useRef<SwiperType | null>(null);
   const n = historias.length;
   const initialSlide = useMemo(
@@ -188,7 +190,7 @@ export function HistoricalExhibitionCarousel({
 
   const shellClass = embedded
     ? isLightHall
-      ? 'relative isolate w-full overflow-hidden rounded-2xl text-gray-900'
+      ? `relative isolate w-full overflow-hidden rounded-2xl text-gray-900${historiasListEmbedded ? ' flex min-h-0 flex-1 flex-col' : ''}`
       : 'relative isolate w-full overflow-hidden rounded-2xl text-white'
     : isLightHall
       ? 'relative isolate min-h-screen w-full overflow-hidden text-gray-900'
@@ -303,19 +305,19 @@ export function HistoricalExhibitionCarousel({
         Capa 2 — The Expo (z-10): carrusel, flechas y ficha de autor; paralaje más marcado.
       */}
       <div
-        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}`}
+        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}${historiasListEmbedded ? ' min-h-0 flex-1 justify-center pb-2 sm:px-2' : ''}`}
       >
         <div
-          className="relative w-full"
+          className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 flex-1 flex-col items-center justify-center' : ''}`}
           style={{
             perspective: '1500px',
             perspectiveOrigin: 'center center',
           }}
         >
           <div
-            className="relative w-full"
+            className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 max-h-full flex-1 items-center justify-center' : ''}`}
             style={
-              embedded && isLightHall
+              embedded && isLightHall && !historiasListEmbedded
                 ? { minHeight: 'min(92vw, 620px)' }
                 : undefined
             }
@@ -386,10 +388,17 @@ export function HistoricalExhibitionCarousel({
           {historias.map((h, slideIdx) => (
             <SwiperSlide
               key={h.id}
-              style={{
-                width: `min(92vw, ${SLIDE_PX}px)`,
-                height: `min(92vw, ${SLIDE_PX}px)`,
-              }}
+              style={
+                historiasListEmbedded
+                  ? {
+                      width: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
+                      height: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
+                    }
+                  : {
+                      width: `min(92vw, ${SLIDE_PX}px)`,
+                      height: `min(92vw, ${SLIDE_PX}px)`,
+                    }
+              }
             >
               <ExpoCardTiltShell>
                 <div

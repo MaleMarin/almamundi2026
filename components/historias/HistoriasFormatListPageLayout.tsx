@@ -83,7 +83,10 @@ export function HistoriasFormatListPageLayout({
   disableKeyboardNav,
 }: HistoriasFormatListPageLayoutProps) {
   return (
-    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+    <main
+      className="flex min-h-svh flex-col overflow-x-hidden"
+      style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+    >
       <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
         <HomeHardLink href="/" className="flex min-w-0 flex-shrink-0 items-center pr-2">
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
@@ -100,25 +103,26 @@ export function HistoriasFormatListPageLayout({
         </div>
       </nav>
 
-      <div className={historiasInterior.contentWrapClassName}>
-        <header className={historiasInterior.headerClassName}>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: 'var(--almamundi-orange)' }}>
-            {orangeKicker}
-          </p>
-          <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
-            {HISTORIAS_LIST_HERO_TITLE}
-          </h1>
-          <p className="mt-2 max-w-2xl text-base text-gray-600 md:text-lg">
-            {HISTORIAS_LIST_HERO_SUBTITLE}
-          </p>
-        </header>
+      <div className="flex min-h-0 w-full flex-1 flex-col">
+        <div className="mx-auto flex w-full max-w-[860px] flex-1 flex-col px-6 min-h-0">
+          <header className="flex flex-shrink-0 flex-col pt-[28px]">
+            <p
+              className="mb-1.5 text-xs font-semibold uppercase tracking-[0.18em]"
+              style={{ color: 'var(--almamundi-orange)' }}
+            >
+              {orangeKicker}
+            </p>
+            <h1 className="mb-1 text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
+              {HISTORIAS_LIST_HERO_TITLE}
+            </h1>
+            <p className="max-w-2xl text-base text-gray-600 md:text-lg">
+              {HISTORIAS_LIST_HERO_SUBTITLE}
+            </p>
+          </header>
 
-        <div
-          className="flex-shrink-0 px-6 pb-4 md:px-12"
-          aria-label="Filtros de historias"
-        >
+        <div className="mt-5 flex-shrink-0" aria-label="Filtros de historias">
           <div
-            className="mx-auto w-full max-w-[min(100%,96rem)] overflow-visible rounded-2xl px-3 py-3 md:px-4 md:py-3.5"
+            className="w-full overflow-visible rounded-2xl px-4 py-4"
             style={neu.cardInset}
           >
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-gray-500">
@@ -196,23 +200,26 @@ export function HistoriasFormatListPageLayout({
         <section
           id="historias-carrusel"
           aria-label={HISTORIAS_CAROUSEL_ARIA_LABEL}
-          className={`${historiasInterior.sectionGrowClassName} min-h-0 scroll-mt-28 border-t border-gray-300/50 pt-6 md:scroll-mt-32 md:pt-8`}
+          className="mt-5 flex h-[calc(100vh-280px)] min-h-[320px] w-full flex-shrink-0 flex-col overflow-hidden border-t border-gray-300/50 scroll-mt-28"
         >
-          <HistoricalExhibitionCarousel
-            embedded
-            className="shadow-xl"
-            contentMode={contentMode}
-            historias={exhibitionHistorias}
-            spatialVariant="light-gallery"
-            expoPaddingTopClassName="pt-10 sm:pt-14"
-            expoMaxWidthClassName="max-w-[min(100%,96rem)]"
-            tituloExposicion={expoLabel}
-            onOpenContent={onOpenContent}
-            onSlideChange={onSlideChange}
-            shareInGalleryChrome={false}
-            disableKeyboardNav={disableKeyboardNav}
-          />
+          <div className="flex h-full w-full min-h-0 flex-col items-center justify-center">
+            <HistoricalExhibitionCarousel
+              embedded
+              className="shadow-xl flex h-full min-h-0 w-full max-w-full flex-1 flex-col"
+              contentMode={contentMode}
+              historias={exhibitionHistorias}
+              spatialVariant="light-gallery"
+              expoPaddingTopClassName="pt-0"
+              expoMaxWidthClassName="max-w-full"
+              tituloExposicion={expoLabel}
+              onOpenContent={onOpenContent}
+              onSlideChange={onSlideChange}
+              shareInGalleryChrome={false}
+              disableKeyboardNav={disableKeyboardNav}
+            />
+          </div>
         </section>
+        </div>
       </div>
 
       <Footer />

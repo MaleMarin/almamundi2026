@@ -3,6 +3,7 @@
 /**
  * /historias/escrito — Carrusel exposición + TextoReader en la misma página.
  * Layout compartido: `HistoriasFormatListPageLayout` (mismo shell que videos / audios / fotos).
+ * Ancho máx. 860px, espaciado hero/filtros/carrusel y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
