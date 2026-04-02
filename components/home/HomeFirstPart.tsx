@@ -71,7 +71,7 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[450px] flex-1 rounded-[40px] p-8 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group animate-float home-neu-card"
+      className="home-first-part-float home-neu-card group relative flex min-h-[450px] w-full max-w-[400px] flex-1 flex-col items-start rounded-[40px] p-8 transition-all duration-500 hover:-translate-y-2"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
       <div className="mb-5 shrink-0">
@@ -145,8 +145,10 @@ export function HomeFirstPart({
     const particles: { x: number; y: number; r: number; vy: number; vx: number; o: number }[] = [];
 
     function init() {
-      const W = canvas.offsetWidth;
-      const H = canvas.offsetHeight;
+      const parent = canvas.parentElement;
+      if (!parent) return;
+      const W = parent.offsetWidth || window.innerWidth;
+      const H = parent.offsetHeight || 400;
       canvas.width = W;
       canvas.height = H;
       particles.length = 0;
@@ -185,6 +187,10 @@ export function HomeFirstPart({
     function loop() {
       const W = canvas.width;
       const H = canvas.height;
+      if (W === 0 || H === 0) {
+        animId = requestAnimationFrame(loop);
+        return;
+      }
       ctx.clearRect(0, 0, W, H);
       drawBokeh(W, H);
       particles.forEach((p) => {
@@ -204,14 +210,22 @@ export function HomeFirstPart({
       animId = requestAnimationFrame(loop);
     }
 
-    init();
+    const parentEl = canvas.parentElement;
+    const ro = new ResizeObserver(() => {
+      init();
+    });
+    if (parentEl) ro.observe(parentEl);
+
+    const t = setTimeout(() => {
+      init();
+    }, 50);
+
     loop();
 
-    const onResize = () => init();
-    window.addEventListener('resize', onResize);
     return () => {
       cancelAnimationFrame(animId);
-      window.removeEventListener('resize', onResize);
+      ro.disconnect();
+      clearTimeout(t);
     };
   }, []);
 
@@ -226,26 +240,6 @@ export function HomeFirstPart({
 
   return (
     <>
-      <style jsx global>{`
-        html { scroll-behavior: smooth; }
-        @keyframes float {
-          0% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-          100% { transform: translateY(0px); }
-        }
-        .animate-float { animation: float 6s ease-in-out infinite; }
-        .home-neu-card {
-          transition: box-shadow 0.35s ease, transform 0.5s ease;
-        }
-        .home-neu-card:hover {
-          box-shadow:
-            18px 18px 42px rgba(120, 135, 155, 0.42),
-            -18px -18px 46px rgba(255, 255, 255, 1),
-            inset 2px 2px 5px rgba(255, 255, 255, 0.85),
-            inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
-        }
-      `}</style>
-
       {/* HEADER */}
       <header className="fixed top-0 left-0 w-full z-[100] flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20">
         <div className="flex items-center shrink-0 min-w-0">
@@ -325,10 +319,10 @@ export function HomeFirstPart({
         <div className="relative w-full max-w-5xl overflow-hidden lg:max-w-6xl">
           <canvas
             ref={canvasRef}
-            className="pointer-events-none absolute inset-0 h-full w-full"
+            className="pointer-events-none absolute inset-0 z-0 block h-full w-full"
             aria-hidden
           />
-          <div className="animate-float relative z-[1]">
+          <div className="home-first-part-float relative z-[1]">
             <h1
               className="mb-5 font-light leading-[1.12] md:mb-6"
               style={{
