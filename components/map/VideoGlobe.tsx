@@ -150,7 +150,7 @@ const DAY_ATMOSPHERE = [
   '0 0 120px rgba(60, 120, 255, 0.15)',
 ].join(', ');
 
-const NIGHT_BG = '#0c2840';
+const NIGHT_BG = '#140c0a';
 
 export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId }: VideoGlobeProps) {
   const videoRef = useRef<HTMLVideoElement>(null);

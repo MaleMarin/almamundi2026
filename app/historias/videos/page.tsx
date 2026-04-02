@@ -5,7 +5,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 /**
  * /historias/videos — Historias en video: carrusel exposición + reproductor en la misma página.
  */
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
@@ -213,7 +212,7 @@ export default function HistoriasVideosPage() {
 
         <div
           className="flex-shrink-0 px-6 md:px-12 pb-6"
-          aria-label="Filtros de historias en video"
+          aria-label="Filtros de historias con video"
         >
           <div
             className="mx-auto w-full max-w-[min(100%,96rem)] rounded-3xl p-5 md:p-6"

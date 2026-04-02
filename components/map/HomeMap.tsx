@@ -5,7 +5,7 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
@@ -50,6 +50,7 @@ import {
   playAmbient,
   playAmbientFromPublicUrl,
   stopAmbient,
+  hasActiveAmbientPlayback,
   type AmbientKey,
 } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
@@ -126,73 +127,112 @@ export default function HomeMap() {
   soundEnabledRef.current = soundEnabled;
   selectedMoodRef.current = selectedMood;
 
-  // Al hacer scroll y llegar al mapa: arranca el sonido del universo y se dispara el evento para que el vídeo del globo gire.
-  useEffect(() => {
-    const el = globeContainerRef.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting) return;
-        setSoundEnabled(true);
-        window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
-      },
-      { threshold: 0.2, rootMargin: '0px' }
-    );
-    io.observe(el);
+  /** Primera vez que la sección del mapa entra en vista: fijar ambiente «universo» (luego el usuario puede cambiarlo en Sonidos). */
+  const hasPrimedUniverseForMapRef = useRef(false);
+  /** True solo si la persona apagó el sonido con el botón del mapa (no reactivar con IO ni con clics en #mapa). */
+  const userSilencedMapAmbientRef = useRef(false);
+
+  const startMapAmbientFromRefs = useCallback(() => {
+    initFromUserGesture();
+    const m = selectedMoodRef.current;
+    if (!m) return Promise.resolve();
+    return unlockAmbientAudio()
+      .then(async () => {
+        if (isPublicAudioMoodId(m)) {
+          const path = publicAudioPathFromMoodId(m);
+          if (path) await playAmbientFromPublicUrl(path);
+          return;
+        }
+        // «universo»: dejar el fade por defecto del motor (~2.2 s) al entrar al globo; otros presets, entrada más rápida.
+        await playAmbient(m as AmbientKey, m === 'universo' ? undefined : { fadeMs: 900 });
+      })
+      .catch(() => {});
+  }, []);
+
+  // Entrada al mapa: observer al globo y respaldo a #mapa (si el flex deja altura 0 al globo, el IO del contenedor nunca disparaba → soundEnabled quedaba false y el audio no arrancaba nunca).
+  useLayoutEffect(() => {
+    const globe = globeContainerRef.current;
+    const section = typeof document !== 'undefined' ? document.getElementById('mapa') : null;
+    if (!globe && !section) return;
+
+    const onIntersect: IntersectionObserverCallback = (entries) => {
+      const hit = entries.some((en) => en.isIntersecting);
+      if (!hit) return;
+      if (userSilencedMapAmbientRef.current) return;
+      if (!hasPrimedUniverseForMapRef.current) {
+        hasPrimedUniverseForMapRef.current = true;
+        setSelectedMood('universo');
+      }
+      setSoundEnabled(true);
+      window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
+    };
+
+    const io = new IntersectionObserver(onIntersect, {
+      threshold: [0, 0.08, 0.2],
+      rootMargin: '0px',
+    });
+    if (globe) io.observe(globe);
+    if (section && section !== globe) io.observe(section);
     return () => io.disconnect();
   }, []);
 
-  // Reproducir o cortar el ambient según soundEnabled. El AudioContext se crea solo tras el primer gesto (clic/touch) para no disparar aviso en consola.
+  // Reproducir o cortar el ambient según soundEnabled. Hace falta AudioContext (creado en el primer gesto: pointerdown/tecla).
   useEffect(() => {
     if (!soundEnabled) {
       stopAmbient();
       return;
     }
     if (!selectedMood) return;
-    unlockAmbientAudio()
-      .then(async () => {
-        if (isPublicAudioMoodId(selectedMood)) {
-          const path = publicAudioPathFromMoodId(selectedMood);
-          if (path) await playAmbientFromPublicUrl(path);
-          return;
-        }
-        await playAmbient(selectedMood as AmbientKey, { fadeMs: 2200 });
-      })
-      .catch(() => {});
-  }, [soundEnabled, selectedMood]);
+    void startMapAmbientFromRefs();
+  }, [soundEnabled, selectedMood, startMapAmbientFromRefs]);
 
-  // Primer gesto del usuario en la página: crear AudioContext (sin aviso). Si el sonido ya estaba activado por scroll, empezar a reproducir.
+  /**
+   * Gesto en #mapa: activar sonido aunque el IntersectionObserver no hubiera puesto soundEnabled (p. ej. layout del globo).
+   * Respeta silencio explícito del usuario (`userSilencedMapAmbientRef`).
+   */
   useEffect(() => {
-    const onFirstGesture = () => {
+    const tryPlayInMap = () => {
+      if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
+      soundEnabledRef.current = true;
+      setSoundEnabled(true);
+      if (hasActiveAmbientPlayback()) return;
+      void startMapAmbientFromRefs();
+    };
+
+    const onPointerDown = (e: PointerEvent) => {
       initFromUserGesture();
-      if (soundEnabledRef.current && selectedMoodRef.current) {
-        const m = selectedMoodRef.current;
-        unlockAmbientAudio()
-          .then(async () => {
-            if (isPublicAudioMoodId(m)) {
-              const path = publicAudioPathFromMoodId(m);
-              if (path) await playAmbientFromPublicUrl(path);
-              return;
-            }
-            await playAmbient(m as AmbientKey, { fadeMs: 2200 });
-          })
-          .catch(() => {});
-      }
-      document.removeEventListener('click', onFirstGesture);
-      document.removeEventListener('touchstart', onFirstGesture);
+      const node = e.target;
+      if (!(node instanceof Node)) return;
+      const root =
+        node instanceof Element ? node : node.parentElement != null ? node.parentElement : null;
+      if (root == null || !root.closest('#mapa')) return;
+      tryPlayInMap();
     };
-    document.addEventListener('click', onFirstGesture, { once: true });
-    document.addEventListener('touchstart', onFirstGesture, { once: true });
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      initFromUserGesture();
+      const ae = document.activeElement;
+      if (!(ae instanceof Element) || !ae.closest('#mapa')) return;
+      tryPlayInMap();
+    };
+    document.addEventListener('pointerdown', onPointerDown, { capture: true, passive: true });
+    document.addEventListener('keydown', onKeyDown, { capture: true });
     return () => {
-      document.removeEventListener('click', onFirstGesture);
-      document.removeEventListener('touchstart', onFirstGesture);
+      document.removeEventListener('pointerdown', onPointerDown, { capture: true });
+      document.removeEventListener('keydown', onKeyDown, { capture: true });
     };
-  }, []);
+  }, [startMapAmbientFromRefs]);
 
   const handleToggleSound = useCallback(() => {
     setSoundEnabled((v) => {
-      if (!v) initFromUserGesture();
-      return !v;
+      const next = !v;
+      if (next) {
+        userSilencedMapAmbientRef.current = false;
+        initFromUserGesture();
+      } else {
+        userSilencedMapAmbientRef.current = true;
+      }
+      return next;
     });
   }, []);
 
@@ -315,6 +355,13 @@ export default function HomeMap() {
       <div
         ref={globeContainerRef}
         className="relative flex min-h-0 w-full flex-1 flex-col"
+        onPointerDownCapture={() => {
+          if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
+          initFromUserGesture();
+          soundEnabledRef.current = true;
+          setSoundEnabled(true);
+          if (!hasActiveAmbientPlayback()) void startMapAmbientFromRefs();
+        }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
         <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-black pt-8 pb-2">
@@ -323,6 +370,7 @@ export default function HomeMap() {
               embedded
               bits={globeBitsMarkers}
               selectedBitId={selectedBit?.id ?? null}
+              pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}
               onBitClick={(id) => {
                 const bit = huellasPuntos.find((h) => h.id === id);
                 if (!bit) return;

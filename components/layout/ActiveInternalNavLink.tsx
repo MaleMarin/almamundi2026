@@ -17,7 +17,7 @@ export type ActiveInternalNavLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorEle
 };
 
 /**
- * Enlace de navegación que resalta en azul cuando coincide con la ruta o el hash actual (en `/`).
+ * Enlace de navegación que resalta en naranja marca cuando coincide con la ruta o el hash actual (en `/`).
  */
 export function ActiveInternalNavLink({
   href,

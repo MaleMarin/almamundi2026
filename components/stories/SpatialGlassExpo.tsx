@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 export type HistoriaSpatial = {
@@ -53,9 +54,8 @@ function formatPlaceStory(s: StoryPoint): string {
 
 function formatPublishedAt(iso: string | undefined): string | undefined {
   if (!iso) return undefined;
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return undefined;
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  const s = formatPublishedAtEsStable(iso);
+  return s === '—' ? undefined : s;
 }
 
 /** Convierte un punto del mapa / API al formato de tarjeta espacial (listados de video). */

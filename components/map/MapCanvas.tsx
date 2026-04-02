@@ -352,7 +352,7 @@ export function MapCanvas({
   globeImageUrl = GLOBE_IMAGE_LOCAL,
   globeMaterial,
   showAtmosphere = true,
-  atmosphereColor = '#3d9fe8',
+  atmosphereColor = '#c8d0dc',
   atmosphereAltitude = 0.28,
   backgroundColor = GLOBE_CANVAS_BG,
   onPointClick,

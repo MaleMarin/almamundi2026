@@ -41,6 +41,17 @@ body {
   font-family: inherit;
 }
 
+/* Enlaces: color por defecto del navegador (azul) → naranja AlmaMundi. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
+a {
+  color: var(--almamundi-orange);
+}
+a:visited {
+  color: #cc3300;
+}
+a:hover {
+  color: #ff6b35;
+}
+
 /* Botones neumórficos: borde y color unificados al hover y al estar activo (naranja) */
 .btn-almamundi {
   border-radius: 9999px;
@@ -201,5 +212,14 @@ a:focus,
   box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    0 0 0 1px rgba(100, 200, 255, 0.04);
+    0 0 0 1px rgba(var(--almamundi-orange-rgb), 0.08);
+}
+
+/* Enlaces del footer interno: siempre negro (anula `a`/`a:hover` globales y `!text-orange` de ruta activa). No afecta al h1 ALMAMUNDI (no es <a>). */
+footer a.almamundi-footer-link,
+footer a.almamundi-footer-link:visited {
+  color: #0a0a0a !important;
+}
+footer a.almamundi-footer-link:hover {
+  color: #1f2937 !important;
 }

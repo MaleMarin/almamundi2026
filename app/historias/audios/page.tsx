@@ -5,7 +5,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 /**
  * /historias/audios — Carrusel exposición + AudioPlayer en la misma página (sin navegar).
  */
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer';
@@ -190,8 +189,8 @@ export default function HistoriasAudiosPage() {
           <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/audios" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Audios</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Videos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/audios" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Audios</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Escritos</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Fotografías</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
@@ -204,33 +203,16 @@ export default function HistoriasAudiosPage() {
             Historias en audio
           </p>
           <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
-            Voces que cuentan.
+            El mundo tiene millones de historias que nadie conoce.
           </h1>
           <p className="mt-2 max-w-2xl text-base text-gray-600 md:text-lg">
-            Estas son algunas — escucha sin salir de esta página.
+            Estas son algunas.
           </p>
-          {audioStories.length > 0 && (
-            <button
-              type="button"
-              onClick={() => {
-                const i = Math.floor(Math.random() * audioStories.length);
-                openAudio(i);
-              }}
-              className="mt-6 rounded-full px-6 py-3 text-base font-medium transition-colors"
-              style={{
-                border: '1px solid var(--almamundi-orange)',
-                color: 'var(--almamundi-orange)',
-                background: 'transparent',
-              }}
-            >
-              Escuchar al azar
-            </button>
-          )}
         </header>
 
         <div
           className="flex-shrink-0 px-6 md:px-12 pb-6"
-          aria-label="Filtros de historias en audio"
+          aria-label="Filtros de historias con audio"
         >
           <div
             className="mx-auto w-full max-w-[min(100%,96rem)] rounded-3xl p-5 md:p-6"
@@ -304,7 +286,7 @@ export default function HistoriasAudiosPage() {
             </div>
             {hasActiveFilters ? (
               <p className="mt-3 text-sm text-gray-500" role="status">
-                Mostrando {audioStories.length} de {audioStoriesAll.length} historias en audio.
+                Mostrando {audioStories.length} de {audioStoriesAll.length} historias con audio.
               </p>
             ) : null}
           </div>

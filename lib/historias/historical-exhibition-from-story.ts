@@ -1,4 +1,5 @@
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-demo';
+import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 const PLACEHOLDER_THUMB =
@@ -15,13 +16,6 @@ function defaultAvatar(name: string): string {
 
 function formatPlace(s: StoryPoint): string {
   return [s.city, s.country].filter(Boolean).join(', ') || s.label || '';
-}
-
-function formatPublishedAt(iso: string | undefined): string {
-  if (!iso) return '—';
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return '—';
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function tagsFromStory(s: StoryPoint): string[] {
@@ -61,7 +55,7 @@ export function storyPointToHistoricalExhibitionStory(
     nombre: name,
     titulo: s.title ?? s.label ?? 'Historia',
     cita,
-    fecha: formatPublishedAt(s.publishedAt),
+    fecha: formatPublishedAtEsStable(s.publishedAt),
     lugar: lugar || '—',
     foto_perfil: foto,
     imagen_principal: imagen,

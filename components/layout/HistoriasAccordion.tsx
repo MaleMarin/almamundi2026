@@ -24,9 +24,16 @@ type HistoriasAccordionProps = {
   /** Estilos inline para el botón (header neumórfico) */
   buttonStyle?: React.CSSProperties;
   className?: string;
+  /** Enlaces del desplegable (footer): clase con `almamundi-footer-link` para color negro forzado */
+  footerLinkClassName?: string;
 };
 
-export function HistoriasAccordion({ variant, buttonStyle, className = '' }: HistoriasAccordionProps) {
+export function HistoriasAccordion({
+  variant,
+  buttonStyle,
+  className = '',
+  footerLinkClassName = 'almamundi-footer-link font-normal transition-colors',
+}: HistoriasAccordionProps) {
   const pathname = usePathname() ?? '';
   const historiasActive = isHistoriasSectionPath(pathname);
   const [open, setOpen] = useState(false);
@@ -46,7 +53,7 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={`hover:text-gray-900 transition-colors font-normal ${historiasActive ? ACTIVE_NAV_CLASS : ''}`}
+          className={`text-black hover:text-gray-800 transition-colors ${historiasActive ? 'font-semibold' : 'font-normal'}`}
           aria-expanded={open}
           aria-haspopup="true"
         >
@@ -58,7 +65,8 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
               <ActiveInternalNavLink
                 key={item.label}
                 href={item.href}
-                className="block px-4 py-2.5 text-base text-gray-700 hover:bg-gray-200/50 hover:text-gray-900 first:rounded-t-xl last:rounded-b-xl"
+                className={`block px-4 py-2.5 text-base hover:bg-gray-200/50 first:rounded-t-xl last:rounded-b-xl ${footerLinkClassName}`}
+                activeClassName="!text-black font-semibold"
                 onClick={() => setOpen(false)}
               >
                 {item.label}
@@ -70,7 +78,7 @@ export function HistoriasAccordion({ variant, buttonStyle, className = '' }: His
     );
   }
 
-  const headerWrapperClass = [className, historiasActive ? '[&_button]:!text-blue-600 [&_button]:font-semibold' : '']
+  const headerWrapperClass = [className, historiasActive ? '[&_button]:!text-orange-500 [&_button]:font-semibold' : '']
     .filter(Boolean)
     .join(' ')
     .trim();

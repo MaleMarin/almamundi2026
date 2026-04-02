@@ -1574,7 +1574,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <button
                   type="button"
                   onClick={copyLink}
-                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#243447] hover:text-[#243447]"
+                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
                   aria-label="Copiar enlace a la historia"
                 >
                   <Share2 size={14} aria-hidden />
@@ -1583,7 +1583,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <button
                   type="button"
                   onClick={anotherStory}
-                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#243447] hover:text-[#243447]"
+                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
                   aria-label="Contar otra historia"
                 >
                   <RefreshCw size={14} aria-hidden />

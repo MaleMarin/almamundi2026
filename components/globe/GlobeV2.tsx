@@ -8,7 +8,7 @@
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
  *
- * `embedded`: home. Página completa: /globo-v2 sin `embedded`.
+ * `embedded`: home `#mapa` — por defecto `forceDaylight` (disco luminoso, sin terminador). Página completa: /globo-v2 sin `embedded`.
  */
 
 import type { RefObject } from 'react';
@@ -54,12 +54,21 @@ import {
   earthGreenwichSpinYRadFromUtc,
   isNightAtLocation,
 } from '@/lib/sunPosition';
+import {
+  AUTO_ROTATE_HOVER_SPEED,
+  AUTO_ROTATE_IDLE_SPEED,
+  AUTO_ROTATE_PANEL_SPEED,
+  AUTO_ROTATE_POINTER_SPEED,
+  MAGNETIC_SPIN_RATE_SMOOTH,
+  type GlobeBitInteractionStore,
+} from '@/lib/globe/globe-bits-magnetic-config';
 import earthNightStyles from '@/components/globe/globe-earth-night.module.css';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 /**
  * El raycaster de R3F elige el impacto más cercano; océano/tierra/nubes están delante de los bits
- * en el mismo rayo y se comían el clic. OrbitControls usa eventos DOM, no depende de esto.
+ * en el mismo rayo y se comían el clic. OrbitControls usa eventos DOM: con Tierra girando, desactivamos
+ * `enableRotate` al pasar sobre un bit y capturamos el puntero en `pointerdown` (ver `GlobeBitsLayer`).
  */
 function stripGlobeMeshRaycast(mesh: THREE.Mesh | null) {
   if (mesh) mesh.raycast = () => {};
@@ -708,6 +717,7 @@ function GlobeScene({
   forceDaylight,
   showMoon,
   earthVisualTimeScale,
+  pauseEarthSpinForUi,
 }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
@@ -724,30 +734,61 @@ function GlobeScene({
   forceDaylight: boolean;
   showMoon: boolean;
   earthVisualTimeScale: number;
+  /** Drawer / panel que debe congelar el reloj terrestre (p. ej. bits abiertos en home). */
+  pauseEarthSpinForUi: boolean;
 }) {
   const geoScale = embedded ? GLOBE_V2_EMBEDDED_GEO_SCALE : 1;
   const camDist = embedded ? 3.5 : 3.14;
   const lockView = fixedCameraPreset != null;
   const planetSpinRef = useRef<THREE.Group>(null);
-  const earthTimeAnchorRealMs = useRef<number | null>(null);
+  const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
+
+  const sceneTimeMsRef = useRef<number | null>(null);
+  const lastRealMsRef = useRef<number | null>(null);
+  const smoothedSpinRateRef = useRef(1);
+  const bitInteractionStoreRef = useRef<GlobeBitInteractionStore>({
+    pointerOnCanvas: false,
+    magneticHoverId: null,
+  });
+
+  const getEarthSceneDate = useCallback((): Date => new Date(sceneTimeMsRef.current ?? Date.now()), []);
 
   const tidalLockYawRad = embedded ? GLOBE_V2_MOON_ORBIT_YAW_RAD.embedded : GLOBE_V2_MOON_ORBIT_YAW_RAD.full;
   const moonOrbitPeriodSeconds = embedded ? GLOBE_V2_MOON_ORBIT_BASE_S.embedded : GLOBE_V2_MOON_ORBIT_BASE_S.full;
 
-  const getEarthSceneDate = useCallback((): Date => {
-    const scale = Math.max(earthVisualTimeScale, 0.0001);
-    if (earthTimeAnchorRealMs.current == null) {
-      earthTimeAnchorRealMs.current = Date.now();
+  /**
+   * Prioridad negativa: actualiza el reloj de escena antes que los materiales lean `getEarthSceneDate`.
+   * `smoothedSpinRateRef` modula cuánto avanza el tiempo (giro terrestre + terminador) según puntero/hover/panel.
+   */
+  useFrame((_, dt) => {
+    const now = Date.now();
+    if (sceneTimeMsRef.current == null) {
+      sceneTimeMsRef.current = now;
+      lastRealMsRef.current = now;
     }
-    const t0 = earthTimeAnchorRealMs.current;
-    return new Date(t0 + (Date.now() - t0) * scale);
-  }, [earthVisualTimeScale]);
+    const last = lastRealMsRef.current!;
+    const deltaMs = now - last;
+    lastRealMsRef.current = now;
 
-  useFrame(() => {
+    const st = bitInteractionStoreRef.current;
+    let target = AUTO_ROTATE_IDLE_SPEED;
+    if (pauseEarthSpinForUi) target = AUTO_ROTATE_PANEL_SPEED;
+    else if (st.magneticHoverId != null) target = AUTO_ROTATE_HOVER_SPEED;
+    else if (st.pointerOnCanvas) target = AUTO_ROTATE_POINTER_SPEED;
+
+    const k = Math.min(1, MAGNETIC_SPIN_RATE_SMOOTH * dt);
+    smoothedSpinRateRef.current += (target - smoothedSpinRateRef.current) * k;
+
+    const scale = Math.max(earthVisualTimeScale, 0.0001);
+    sceneTimeMsRef.current! += deltaMs * scale * smoothedSpinRateRef.current;
+
     const g = planetSpinRef.current;
     if (!g || lockView) return;
-    g.rotation.y = earthGreenwichSpinYRadFromUtc(getEarthSceneDate(), GLOBE_V2_GMST_TEXTURE_OFFSET_RAD);
-  });
+    g.rotation.y = earthGreenwichSpinYRadFromUtc(
+      new Date(sceneTimeMsRef.current!),
+      GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
+    );
+  }, -100);
   const starsCount = embedded
     ? viewerNight
       ? 5200
@@ -761,7 +802,9 @@ function GlobeScene({
   const exp = embedded
     ? viewerNight
       ? 1.72
-      : 2.02
+      : forceDaylight
+        ? 2.38
+        : 2.02
     : viewerNight
       ? 1.65
       : 1.95;
@@ -788,15 +831,31 @@ function GlobeScene({
         />
       )}
 
-      <hemisphereLight args={['#e8eaef', '#12151c', embedded ? (viewerNight ? 0.44 : 0.48) : viewerNight ? 0.38 : 0.44]} />
+      <hemisphereLight
+        args={[
+          '#f0f3f8',
+          '#1a1f28',
+          embedded
+            ? viewerNight
+              ? 0.44
+              : forceDaylight
+                ? 0.58
+                : 0.48
+            : viewerNight
+              ? 0.38
+              : 0.44,
+        ]}
+      />
       <ambientLight
-        intensity={embedded ? (viewerNight ? 0.16 : 0.22) : viewerNight ? 0.1 : 0.2}
-        color={viewerNight ? '#4a5568' : '#dfe3ea'}
+        intensity={
+          embedded ? (viewerNight ? 0.16 : forceDaylight ? 0.3 : 0.22) : viewerNight ? 0.1 : 0.2
+        }
+        color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
       <directionalLight
         ref={sunLightRef}
-        intensity={embedded ? (viewerNight ? 3.5 : 4.35) : viewerNight ? 3.2 : 4.05}
-        color="#f7f8fa"
+        intensity={embedded ? (viewerNight ? 3.5 : forceDaylight ? 5.1 : 4.35) : viewerNight ? 3.2 : 4.05}
+        color={forceDaylight && embedded ? '#ffffff' : '#f7f8fa'}
       />
 
       <group scale={geoScale}>
@@ -822,7 +881,14 @@ function GlobeScene({
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (
-              <GlobeBitsLayer bits={bits} selectedBitId={selectedBitId} onBitClick={onBitClick} />
+              <GlobeBitsLayer
+                bits={bits}
+                selectedBitId={selectedBitId}
+                onBitClick={onBitClick}
+                orbitControlsRef={orbitControlsRef}
+                interactionStoreRef={bitInteractionStoreRef}
+                earthSpinGroupRef={planetSpinRef}
+              />
             ) : null}
           </group>
         </group>
@@ -847,6 +913,7 @@ function GlobeScene({
 
       {/* Home embebida: sin zoom con rueda/trackpad para no bloquear el scroll de la página (OrbitControls usa preventDefault en wheel). */}
       <OrbitControls
+        ref={orbitControlsRef}
         makeDefault={lockView}
         target={[0, 0, 0]}
         enablePan={false}
@@ -857,7 +924,8 @@ function GlobeScene({
         autoRotate={false}
         enableDamping
         dampingFactor={0.09}
-        rotateSpeed={0.5}
+        /* Embebido: menos sensibilidad para no “pierder” el clic en bits frente a micro-arrastres. */
+        rotateSpeed={embedded ? 0.28 : 0.5}
         zoomSpeed={0.65}
       />
       {lockView && fixedCameraPreset ? (
@@ -891,8 +959,9 @@ export type GlobeV2Props = {
    */
   displacementScale?: number;
   /**
-   * true = todo el disco iluminado como de día (sin terminador ni luces urbanas).
-   * Por defecto false: terminador UTC + luces urbanas en capa completa.
+   * true = disco siempre como de día (sin terminador ni luces urbanas nocturnas).
+   * false = siempre terminador UTC (útil en `embedded` para volver al ciclo día/noche real).
+   * Omitido + `embedded`: se asume día (home `#mapa` legible y luminoso).
    */
   forceDaylight?: boolean;
   /**
@@ -910,6 +979,11 @@ export type GlobeV2Props = {
    * @see GLOBE_V2_EARTH_VISUAL_TIME_SCALE
    */
   earthVisualTimeScale?: number;
+  /**
+   * true = congela el avance del reloj de escena (giro + terminador) mientras un panel relevante está abierto.
+   * En home: típ. `drawerOpen && drawerMode === 'bits'`.
+   */
+  pauseEarthSpinForUi?: boolean;
 };
 
 export default function GlobeV2({
@@ -927,9 +1001,13 @@ export default function GlobeV2({
   oceanSunDebug = 'utc',
   showMoon = true,
   earthVisualTimeScale = GLOBE_V2_EARTH_VISUAL_TIME_SCALE,
+  pauseEarthSpinForUi = false,
 }: GlobeV2Props) {
-  /** Solo `forceDaylight={true}` apaga el terminador UTC; por defecto día/noche real (home y páginas de prueba). */
-  const forceDaylightOn = forceDaylight === true;
+  /**
+   * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
+   * En `embedded` (home `#mapa`), por defecto activo salvo `forceDaylight={false}` explícito.
+   */
+  const forceDaylightOn = forceDaylight === true || (embedded && forceDaylight !== false);
 
   const urls: GlobeV2TextureUrls = {
     day: textureUrls?.day ?? GLOBE_V2_DEFAULT_TEXTURES.day,
@@ -955,12 +1033,17 @@ export default function GlobeV2({
       ? 'relative z-0 h-full w-full min-h-[50vh] flex-1 overflow-hidden [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none'
       : 'fixed inset-0 z-0 h-[100dvh] w-full min-h-0 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none');
 
+  const embeddedDayChrome = embedded && forceDaylightOn && className == null;
   const rootClassName =
-    className == null ? `${wrapperClass} ${earthNightStyles.earthNightContainer}` : wrapperClass;
+    className == null
+      ? `${wrapperClass} ${embeddedDayChrome ? earthNightStyles.earthDayEmbeddedContainer : earthNightStyles.earthNightContainer}`
+      : wrapperClass;
 
   return (
     <div className={rootClassName}>
-      {className == null ? <div className={earthNightStyles.atmosphereOverlay} aria-hidden /> : null}
+      {className == null && !embeddedDayChrome ? (
+        <div className={earthNightStyles.atmosphereOverlay} aria-hidden />
+      ) : null}
       <Canvas
         shadows={false}
         camera={{ position: [0, 0, camZ], fov: 42, near: 0.1, far: 280 }}
@@ -977,8 +1060,8 @@ export default function GlobeV2({
           gl.setClearColor('#000000', 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          /* Primer frame alto; <ExposureSync/> ajusta según día/noche local. */
-          gl.toneMappingExposure = embedded ? 2.02 : 1.92;
+          /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
+          gl.toneMappingExposure = embeddedDayChrome ? 2.38 : embedded ? 2.02 : 1.92;
         }}
       >
         <Suspense fallback={null}>
@@ -998,6 +1081,7 @@ export default function GlobeV2({
             forceDaylight={forceDaylightOn}
             showMoon={showMoon}
             earthVisualTimeScale={earthVisualTimeScale}
+            pauseEarthSpinForUi={pauseEarthSpinForUi}
           />
         </Suspense>
       </Canvas>

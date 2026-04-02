@@ -16,15 +16,6 @@ function openStreetMapUrl(lat: number, lon: number): string {
   return `https://www.openstreetmap.org/#map=${z}/${lat}/${lon}`;
 }
 
-function isAllowedExternalHref(href: string): boolean {
-  try {
-    const u = new URL(href);
-    return u.protocol === 'https:' || u.protocol === 'http:';
-  } catch {
-    return false;
-  }
-}
-
 const linkButtonStyle = (density: 'compact' | 'readable'): React.CSSProperties => ({
   display: 'inline-flex',
   alignItems: 'center',
@@ -313,23 +304,6 @@ function BitDetailCompact({
         >
           Ver ubicación en mapa (OpenStreetMap)
         </a>
-        {typeof bit.fuenteUrl === 'string' &&
-          bit.fuenteUrl.trim() &&
-          isAllowedExternalHref(bit.fuenteUrl.trim()) && (
-            <a
-              href={bit.fuenteUrl.trim()}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                ...linkButtonStyle(density),
-                border: '1px solid rgba(255, 100, 40, 0.65)',
-                background: 'linear-gradient(180deg, rgba(255, 85, 30, 0.35) 0%, rgba(255, 69, 0, 0.22) 100%)',
-                color: '#fff3e8',
-              }}
-            >
-              Abrir fuente / referencia
-            </a>
-          )}
       </div>
 
       <div style={{ marginTop: s.btnSectionMt }}>

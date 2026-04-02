@@ -145,16 +145,17 @@ export function HistoricalExhibitionCarousel({
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
   const swiperRef = useRef<SwiperType | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [ethicalShareOpen, setEthicalShareOpen] = useState(false);
-
   const n = historias.length;
-  const active = historias[activeIndex] ?? null;
-
   const initialSlide = useMemo(
     () => (n === 0 ? 0 : Math.min(Math.floor(n / 2), n - 1)),
     [n]
   );
+  const [activeIndex, setActiveIndex] = useState(
+    () => (historias.length === 0 ? 0 : Math.min(Math.floor(historias.length / 2), historias.length - 1))
+  );
+  const [ethicalShareOpen, setEthicalShareOpen] = useState(false);
+
+  const active = historias[activeIndex] ?? null;
 
   useEffect(() => {
     if (n === 0) {

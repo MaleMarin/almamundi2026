@@ -3,9 +3,10 @@
 /**
  * Luna en órbita geocéntrica: elipse (e ≈ 0,055), plano con inclinación ~5,145° (eclíptica) y yaw opcional.
  * Posición: anomalía media M con n = 2π/T y ecuación de Kepler → E → coords perifocales (mismo `dt` que la Tierra).
- * Traslación en sentido progrado (antihorario visto desde el polo norte / +Y).
- * Orientación: +Z local hacia la Tierra → misma cara visible (1 giro propio por órbita sideral, sin spin libre).
- * `makeBasis` + eje mundial estable evita twist; `setFromUnitVectors` dejaba roll arbitrario sobre el radial.
+ * Traslación en sentido progrado respecto a la Tierra (coherente con el giro del globo en escena).
+ * Orientación: el grupo raíz traslada + `lookAt(0,0,0)` (eje +Z hacia la Tierra). Hijo con giro en Y a velocidad n = 2π/T:
+ * bloqueo mareal (misma cara a la Tierra) y a la vez se percibe rotación sobre el eje local como en la Tierra.
+ * Si el radio casi alinea con `up`, se usa un eje auxiliar estable (misma idea que el antiguo `makeBasis`).
  */
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
@@ -80,18 +81,17 @@ export function MoonSatellite({
   orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
 }: MoonSatelliteProps) {
   const moonOrbitRootRef = useRef<THREE.Group>(null);
+  /** Giro propio sobre Y local (polos), hijo del grupo que ya mira a la Tierra. */
+  const moonSpinAboutAxisRef = useRef<THREE.Group>(null);
   /** Anomalía media M (rad): dM/dt = n = 2π/T; ν y r vía Kepler (elipse coherente con el período sidereal). */
   const meanAnomalyRef = useRef(0);
   const moonMap = useTexture(MOON_MAP_URL);
 
   const aux = useMemo(
     () => ({
-      dirToEarth: new THREE.Vector3(),
-      side: new THREE.Vector3(),
-      moonUp: new THREE.Vector3(),
-      mat: new THREE.Matrix4(),
       worldY: new THREE.Vector3(0, 1, 0),
       worldX: new THREE.Vector3(1, 0, 0),
+      radial: new THREE.Vector3(),
     }),
     []
   );
@@ -113,7 +113,7 @@ export function MoonSatellite({
     const root = moonOrbitRootRef.current;
     if (!root) return;
 
-    meanAnomalyRef.current += meanMotion * dt;
+    meanAnomalyRef.current -= meanMotion * dt;
     let M = meanAnomalyRef.current;
     const twoPi = 2 * Math.PI;
     M = ((M % twoPi) + twoPi) % twoPi;
@@ -141,27 +141,23 @@ export function MoonSatellite({
       z = zr;
     }
 
-    root.position.set(x, y, z);
-
-    /* Luna → Tierra (normalizado); +Z local del grupo apunta a la Tierra. */
-    aux.dirToEarth.set(-x, -y, -z);
-    const lenSq = aux.dirToEarth.lengthSq();
+    const lenSq = x * x + y * y + z * z;
     if (lenSq < 1e-24) return;
-    aux.dirToEarth.multiplyScalar(1 / Math.sqrt(lenSq));
 
-    /*
-     * Base ortonormal estable: “side” ⟂ dirToEarth usando world Y (o X si el radio ≈ paralelo al polo).
-     * Así no hay grado de libertad de roll arbitrario frame a frame (problema de setFromUnitVectors).
-     */
-    aux.side.crossVectors(aux.worldY, aux.dirToEarth);
-    if (aux.side.lengthSq() < 1e-12) {
-      aux.side.crossVectors(aux.worldX, aux.dirToEarth);
+    root.position.set(x, y, z);
+    aux.radial.set(-x, -y, -z).normalize();
+    /* Evita singularidad de lookAt cuando el radio ≈ paralelo a worldY. */
+    if (Math.abs(aux.radial.dot(aux.worldY)) > 0.995) {
+      root.up.copy(aux.worldX);
+    } else {
+      root.up.copy(aux.worldY);
     }
-    aux.side.normalize();
-    aux.moonUp.crossVectors(aux.dirToEarth, aux.side).normalize();
+    root.lookAt(0, 0, 0);
 
-    aux.mat.makeBasis(aux.side, aux.moonUp, aux.dirToEarth);
-    root.quaternion.setFromRotationMatrix(aux.mat);
+    const spin = moonSpinAboutAxisRef.current;
+    if (spin) {
+      spin.rotation.y -= meanMotion * dt;
+    }
   });
 
   return (
@@ -171,24 +167,26 @@ export function MoonSatellite({
         Así el z-buffer de océano/tierra tapa la Luna cuando va detrás del disco; si se pintara
         después, capas transparentes (nubes sin depthWrite) podían dejar ver la Luna a través del globo.
       */}
-      <mesh
-        ref={(m) => {
-          if (m) m.raycast = () => {};
-        }}
-        name="AM_moonMesh"
-        renderOrder={-20}
-      >
-        <sphereGeometry args={[moonRadius, 40, 40]} />
-        <meshStandardMaterial
-          map={moonMap}
-          roughness={0.94}
-          metalness={0}
-          emissive="#0a0a12"
-          emissiveIntensity={0.04}
-          depthTest
-          depthWrite
-        />
-      </mesh>
+      <group ref={moonSpinAboutAxisRef} name="AM_moonAxisSpin">
+        <mesh
+          ref={(m) => {
+            if (m) m.raycast = () => {};
+          }}
+          name="AM_moonMesh"
+          renderOrder={-20}
+        >
+          <sphereGeometry args={[moonRadius, 40, 40]} />
+          <meshStandardMaterial
+            map={moonMap}
+            roughness={0.94}
+            metalness={0}
+            emissive="#0a0a12"
+            emissiveIntensity={0.04}
+            depthTest
+            depthWrite
+          />
+        </mesh>
+      </group>
     </group>
   );
 }

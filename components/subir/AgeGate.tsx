@@ -186,7 +186,7 @@ export function AgeGate({ onChange }: Props) {
                   group: 'adult' as AgeGroup,
                   label: '18 años o más',
                   emoji: '🧑',
-                  color: '#1428d4',
+                  color: '#ff4500',
                 },
                 {
                   group: 'minor' as AgeGroup,

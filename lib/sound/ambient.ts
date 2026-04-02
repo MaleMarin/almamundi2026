@@ -260,7 +260,15 @@ async function loadPublicBuffer(urlPath: string): Promise<AudioBuffer> {
 export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?: number }) {
   const pathNorm = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
   const ctx = ensureCtx();
-  if (!ctx || ctx.state === "suspended") return;
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    try {
+      await ctx.resume();
+    } catch {
+      /* política del navegador */
+    }
+  }
+  if (ctx.state === "suspended") return;
   const fade = (opts?.fadeMs ?? 800) / 1000;
 
   let buf: AudioBuffer;
@@ -317,7 +325,15 @@ function stopCurrent(atTime: number) {
 
 export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   const ctx = ensureCtx();
-  if (!ctx || ctx.state === "suspended") return;
+  if (!ctx) return;
+  if (ctx.state === "suspended") {
+    try {
+      await ctx.resume();
+    } catch {
+      /* política del navegador */
+    }
+  }
+  if (ctx.state === "suspended") return;
   const defaultFade = key === "universo" ? 2200 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;
 
@@ -376,6 +392,11 @@ export function getCurrentKey(): AmbientKey | null {
 
 export function getAudioContext(): AudioContext | null {
   return state.ctx;
+}
+
+/** Hay una pista en reproducción y el contexto está en ejecución (evita reiniciar en cada clic en #mapa). */
+export function hasActiveAmbientPlayback(): boolean {
+  return state.current != null && state.ctx != null && state.ctx.state === "running";
 }
 
 /** Cambia el volumen base del ambient de forma suave (para la atmósfera temporal). */

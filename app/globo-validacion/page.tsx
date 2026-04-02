@@ -175,7 +175,7 @@ export default function GloboValidacionPage() {
                   onClick={() => setLayerBuildStage(l.id)}
                   className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
                     layerBuildStage === l.id
-                      ? 'border-sky-500 bg-white/10 text-white'
+                      ? 'border-orange-500 bg-white/10 text-white'
                       : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
                   }`}
                 >

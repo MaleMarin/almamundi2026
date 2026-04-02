@@ -5,7 +5,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 /**
  * /historias/escrito — Carrusel exposición + TextoReader en la misma página.
  */
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import TextoReader, { type HistoriaTexto } from '@/components/historia/TextoReader';
@@ -174,9 +173,9 @@ export default function HistoriasEscritoPage() {
           <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/escrito" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Escritos</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Videos</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Audios</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/escrito" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Escritos</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Fotografías</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
         </div>
@@ -188,10 +187,10 @@ export default function HistoriasEscritoPage() {
             Historias escritas
           </p>
           <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
-            Palabras que cuentan.
+            El mundo tiene millones de historias que nadie conoce.
           </h1>
           <p className="mt-2 max-w-2xl text-base text-gray-600 md:text-lg">
-            Lee en esta misma página, sin cambiar de ruta.
+            Estas son algunas.
           </p>
         </header>
 

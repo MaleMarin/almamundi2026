@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const PAPEL = '#faf8f4';
@@ -32,12 +33,8 @@ interface TextoReaderProps {
 
 function formatFecha(fecha: string): string {
   if (!fecha) return '';
-  try {
-    const d = new Date(fecha);
-    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-  } catch {
-    return fecha;
-  }
+  const s = formatPublishedAtEsStable(fecha);
+  return s === '—' ? fecha : s;
 }
 
 function getFirstParagraphDropAndRest(contenido: string): { drop: string; rest: string; otherParrafos: string[] } {

@@ -38,7 +38,7 @@ export function EarthGlobe({
     <group ref={spinRef}>
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
-        <meshBasicMaterial color="#4a6fa5" />
+        <meshBasicMaterial color="#64748b" />
       </mesh>
     </group>
   );

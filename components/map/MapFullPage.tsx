@@ -1375,7 +1375,7 @@ function RightPanel({
             <input
               type="text"
               placeholder="Busca por palabras claves o fechas"
-              className="w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-white placeholder:text-white/35 text-sm font-medium border border-white/10 bg-white/5 focus:bg-white/10 focus:border-blue-400/50 focus:ring-2 focus:ring-blue-400/20 transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-white placeholder:text-white/35 text-sm font-medium border border-white/10 bg-white/5 focus:bg-white/10 focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
             />
           </div>
         </div>
@@ -5037,7 +5037,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             <span className="font-mono text-[9px] md:text-[10px] tracking-[0.24em] uppercase text-slate-200/50 tabular-nums">
               Pacífico · vista HD
             </span>
-            <span className="font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-cyan-100/45 tabular-nums">
+            <span className="font-mono text-[9px] md:text-[10px] tracking-[0.2em] text-orange-100/45 tabular-nums">
               26°C · índice UV 4
             </span>
             <span className="font-mono text-[9px] md:text-[10px] tracking-[0.18em] text-slate-300/45 tabular-nums">

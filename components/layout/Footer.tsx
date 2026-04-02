@@ -8,6 +8,9 @@ import { HistoriasAccordion } from './HistoriasAccordion';
 
 const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif`;
 
+/** Misma clase en globals.css: anula naranja global y estado activo naranja. */
+const FOOTER_LINK = 'almamundi-footer-link font-normal transition-colors';
+
 export function Footer() {
   return (
     <footer
@@ -20,24 +23,40 @@ export function Footer() {
         </h1>
       </div>
 
-      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end text-lg font-normal pt-14 pb-8 text-gray-600 gap-12">
+      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-end gap-12 pt-14 pb-8 text-lg font-normal text-black">
         <div className="flex flex-col items-center md:items-start">
-          <span className="block mb-4 opacity-70 text-base">Una iniciativa de</span>
+          <span className="mb-4 block text-base text-black">Una iniciativa de</span>
           <img src="/logo-precisar.png" alt="Precisar" className="h-16 w-auto object-contain" />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-10 md:gap-12 opacity-90 items-center">
-          <ActiveInternalNavLink href="/#intro" className="hover:text-gray-900 transition-colors font-normal">
+        <div className="flex flex-wrap items-center justify-center gap-10 md:gap-12 text-black">
+          <ActiveInternalNavLink
+            href="/#intro"
+            className={FOOTER_LINK}
+            activeClassName="!text-black font-semibold"
+          >
             Nuestro propósito
           </ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="hover:text-gray-900 transition-colors font-normal">
+          <ActiveInternalNavLink
+            href="/#como-funciona"
+            className={FOOTER_LINK}
+            activeClassName="!text-black font-semibold"
+          >
             ¿Cómo funciona?
           </ActiveInternalNavLink>
           <HistoriasAccordion variant="footer" />
-          <ActiveInternalNavLink href="/#mapa" className="hover:text-gray-900 transition-colors font-normal">
+          <ActiveInternalNavLink
+            href="/#mapa"
+            className={FOOTER_LINK}
+            activeClassName="!text-black font-semibold"
+          >
             Mapa
           </ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/privacidad" className="hover:text-gray-900 transition-colors font-normal">
+          <ActiveInternalNavLink
+            href="/privacidad"
+            className={FOOTER_LINK}
+            activeClassName="!text-black font-semibold"
+          >
             Política de privacidad
           </ActiveInternalNavLink>
         </div>

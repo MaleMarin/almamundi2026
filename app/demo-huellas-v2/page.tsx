@@ -170,13 +170,13 @@ export default function DemoHuellasV2Page() {
             <table className="w-full min-w-[520px] border-collapse text-[0.82rem]">
               <thead>
                 <tr>
-                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                  <th className="bg-[#9a3412] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
                     Propiedad visual
                   </th>
-                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                  <th className="bg-[#9a3412] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
                     Fuente
                   </th>
-                  <th className="bg-[#243447] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
+                  <th className="bg-[#9a3412] px-3 py-2 text-left text-[10px] font-medium uppercase tracking-wide text-white">
                     Cálculo
                   </th>
                 </tr>
@@ -261,7 +261,7 @@ export default function DemoHuellasV2Page() {
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               rows={5}
-              className="mb-3 w-full resize-y rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm text-[#141D26] outline-none focus:border-[#243447]"
+              className="mb-3 w-full resize-y rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm text-[#141D26] outline-none focus:border-[#9a3412]"
             />
             <div className="mb-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <div>
@@ -271,7 +271,7 @@ export default function DemoHuellasV2Page() {
                 <input
                   value={storyId}
                   onChange={(e) => setStoryId(e.target.value)}
-                  className="w-full rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm outline-none focus:border-[#243447]"
+                  className="w-full rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm outline-none focus:border-[#9a3412]"
                 />
               </div>
               <div>
@@ -281,7 +281,7 @@ export default function DemoHuellasV2Page() {
                 <select
                   value={submitHour}
                   onChange={(e) => setSubmitHour(Number(e.target.value))}
-                  className="w-full rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm outline-none focus:border-[#243447]"
+                  className="w-full rounded-lg border border-[#D4D4C4] bg-[#F0EFE9] px-2.5 py-2 text-sm outline-none focus:border-[#9a3412]"
                 >
                   <option value={3}>Madrugada (3am)</option>
                   <option value={9}>Mañana (9am)</option>
@@ -301,14 +301,14 @@ export default function DemoHuellasV2Page() {
               <button
                 type="button"
                 onClick={textoAleatorio}
-                className="rounded-lg border-[1.5px] border-[#D4D4C4] px-4 py-2 text-sm font-medium text-[#243447] hover:border-[#243447]"
+                className="rounded-lg border-[1.5px] border-[#D4D4C4] px-4 py-2 text-sm font-medium text-[#9a3412] hover:border-[#9a3412]"
               >
                 Texto aleatorio
               </button>
               <button
                 type="button"
                 onClick={nombreFoto}
-                className="rounded-lg border-[1.5px] border-[#D4D4C4] px-4 py-2 text-sm font-medium text-[#243447] hover:border-[#243447]"
+                className="rounded-lg border-[1.5px] border-[#D4D4C4] px-4 py-2 text-sm font-medium text-[#9a3412] hover:border-[#9a3412]"
               >
                 Simular nombre de foto
               </button>

@@ -94,9 +94,12 @@ export function updateGlobeGlMoon(scene: THREE.Scene, deltaSeconds: number): voi
   const y = Math.sin(a) * r * sinI;
   const z = -Math.cos(a) * r;
   root.position.set(x, y, z);
+  root.up.set(0, 1, 0);
+  root.lookAt(0, 0, 0);
 
   const mesh = root.getObjectByName(MESH_NAME) as THREE.Mesh | undefined;
   if (mesh) {
-    mesh.rotation.y = a * 0.15;
+    /* Giro propio síncrono con la órbita (bloqueo mareal + lectura del eje), coherente con MoonSatellite. */
+    mesh.rotation.y -= deltaSeconds * ((Math.PI * 2) / ORBIT_PERIOD_SEC);
   }
 }

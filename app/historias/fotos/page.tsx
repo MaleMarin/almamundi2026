@@ -5,7 +5,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 /**
  * /historias/fotos — Carrusel exposición + FotoAlbum en la misma página.
  */
-import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
 import FotoAlbum, { type HistoriaFoto } from '@/components/historia/FotoAlbum';
@@ -172,10 +171,10 @@ export default function HistoriasFotosPage() {
           <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/fotos" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Fotografías</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Videos</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Audios</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Escritos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/fotos" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Fotografías</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
@@ -186,16 +185,16 @@ export default function HistoriasFotosPage() {
             Historias en fotografía
           </p>
           <h1 className="text-3xl font-semibold leading-[1.1] tracking-tight text-gray-800 md:text-5xl">
-            Imágenes que cuentan.
+            El mundo tiene millones de historias que nadie conoce.
           </h1>
           <p className="mt-2 max-w-2xl text-base text-gray-600 md:text-lg">
-            Abre el álbum aquí mismo, sin otra URL.
+            Estas son algunas.
           </p>
         </header>
 
         <div
           className="flex-shrink-0 px-6 md:px-12 pb-6"
-          aria-label="Filtros de historias en fotografía"
+          aria-label="Filtros de historias con fotografía"
         >
           <div
             className="mx-auto w-full max-w-[min(100%,96rem)] rounded-3xl p-5 md:p-6"
@@ -269,7 +268,7 @@ export default function HistoriasFotosPage() {
             </div>
             {hasActiveFilters ? (
               <p className="mt-3 text-sm text-gray-500" role="status">
-                Mostrando {photoStories.length} de {photoStoriesAll.length} historias en fotografía.
+                Mostrando {photoStories.length} de {photoStoriesAll.length} historias con fotografía.
               </p>
             ) : null}
           </div>

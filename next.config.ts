@@ -19,6 +19,12 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  /**
+   * `/api/public-audio` solo importa un JSON pequeño; por si el trazado volviera a arrastrar `public/`.
+   */
+  outputFileTracingExcludes: {
+    "/app/api/public-audio": ["public/**/*"],
+  },
   devIndicators: false,
   /** Menos reutilización de la caché del cliente en rutas dinámicas (p. ej. vuelta a `/`). */
   experimental: {

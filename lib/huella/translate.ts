@@ -5,7 +5,7 @@
  * Geometría de precisión: bordes duros (hard-edged), sin desenfoque.
  *
  * Lógica de codificación:
- * - Paleta base → Tono emocional (ej. nostalgia = fría: azules, violetas, púrpuras).
+ * - Paleta base → Tono emocional (nostalgia = fría: violetas/teals; acentos alineados a naranja marca donde aplica).
  * - Nivel de superposición → Complejidad narrativa (más capas + transparencia = nuevos colores donde se tocan).
  * - Capa por modo → Modo de historia (audio = tinte teal/verde; video = magenta/cyan; etc.).
  * - Core → Puntos narrativos clave (píxeles densos en el centro).
@@ -31,11 +31,11 @@ const COLD = {
   base: [
     "rgba(30, 95, 116, 0.48)",   // deep cerulean
     "rgba(88, 28, 135, 0.45)",   // violet
-    "rgba(30, 64, 175, 0.42)",   // deep blue
+    "rgba(185, 47, 0, 0.42)",    // deep orange (marca)
     "rgba(20, 94, 97, 0.44)",    // teal
   ],
   core: [
-    "rgba(0, 212, 255, 0.68)",   // electric cyan
+    "rgba(255, 120, 60, 0.68)",  // naranja vivo
     "rgba(219, 39, 119, 0.70)",  // magenta
     "rgba(234, 88, 12, 0.66)",   // deep orange
     "rgba(88, 28, 135, 0.70)",   // deep purple
@@ -61,7 +61,7 @@ const WARM = {
   ],
   frag: [
     "rgba(34, 197, 94, 0.72)",   // green
-    "rgba(59, 130, 246, 0.68)",  // blue
+    "rgba(255, 107, 53, 0.68)",  // naranja medio
     "rgba(20, 184, 166, 0.70)",  // teal
   ],
 };
