@@ -331,8 +331,10 @@ footer a.almamundi-footer-link:hover {
   }
 }
 
-/* Cursor global (desktop): dot + anillo con inercia; ver CursorGlobal.tsx */
-*, *::before, *::after {
+/* Cursor global: ocultar cursor nativo solo cuando CursorGlobal activa data-cursor-global (evita “pantalla sin puntero” antes del mount). */
+html[data-cursor-global="on"] *,
+html[data-cursor-global="on"] *::before,
+html[data-cursor-global="on"] *::after {
   cursor: none !important;
 }
 
@@ -384,7 +386,9 @@ footer a.almamundi-footer-link:hover {
 }
 
 @media (pointer: coarse) {
-  *, *::before, *::after {
+  html[data-cursor-global="on"] *,
+  html[data-cursor-global="on"] *::before,
+  html[data-cursor-global="on"] *::after {
     cursor: auto !important;
   }
   .cursor-dot, .cursor-ring {

@@ -1,23 +1,40 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export function CursorGlobal() {
   const dotRef = useRef<HTMLDivElement>(null);
   const ringRef = useRef<HTMLDivElement>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-    if (!dot || !ring) return;
+    setMounted(true);
+  }, []);
 
-    let mx = -100;
-    let my = -100;
-    let cx = -100;
-    let cy = -100;
-    let rx = -100;
-    let ry = -100;
+  useEffect(() => {
+    if (!mounted) return;
+    if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) {
+      return;
+    }
+    const dotMaybe = dotRef.current;
+    const ringMaybe = ringRef.current;
+    if (!dotMaybe || !ringMaybe) return;
+    const dotEl: HTMLDivElement = dotMaybe;
+    const ringEl: HTMLDivElement = ringMaybe;
+
+    const cx0 = window.innerWidth / 2;
+    const cy0 = window.innerHeight / 2;
+    let mx = cx0;
+    let my = cy0;
+    let cx = cx0;
+    let cy = cy0;
+    let rx = cx0;
+    let ry = cy0;
     let animId: number;
+
+    dotEl.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+    ringEl.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+    document.documentElement.setAttribute('data-cursor-global', 'on');
 
     function lerp(a: number, b: number, t: number) {
       return a + (b - a) * t;
@@ -28,8 +45,8 @@ export function CursorGlobal() {
       cy = lerp(cy, my, 0.16);
       rx = lerp(rx, mx, 0.07);
       ry = lerp(ry, my, 0.07);
-      dot.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
-      ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+      dotEl.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
+      ringEl.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
       animId = requestAnimationFrame(tick);
     }
     tick();
@@ -40,13 +57,13 @@ export function CursorGlobal() {
     }
 
     function onEnterLink() {
-      dot.classList.add('cursor-hover');
-      ring.classList.add('cursor-hover');
+      dotEl.classList.add('cursor-hover');
+      ringEl.classList.add('cursor-hover');
     }
 
     function onLeaveLink() {
-      dot.classList.remove('cursor-hover');
-      ring.classList.remove('cursor-hover');
+      dotEl.classList.remove('cursor-hover');
+      ringEl.classList.remove('cursor-hover');
     }
 
     function attachHover() {
@@ -71,8 +88,11 @@ export function CursorGlobal() {
       cancelAnimationFrame(animId);
       window.removeEventListener('mousemove', onMove);
       mutObs.disconnect();
+      document.documentElement.removeAttribute('data-cursor-global');
     };
-  }, []);
+  }, [mounted]);
+
+  if (!mounted) return null;
 
   return (
     <>
