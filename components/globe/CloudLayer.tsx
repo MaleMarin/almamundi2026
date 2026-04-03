@@ -38,12 +38,12 @@ export function CloudLayer({
         transparent: true,
         opacity: 0.88,
         depthWrite: false,
-        roughness: 0.55,
-        metalness: 0.08,
-        envMapIntensity: 1.4,
+        /* Mate: sin IBL fuerte las nubes no “desaparecen” */
+        roughness: 1,
+        metalness: 0,
         color: new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0xb0bcc8),
-        emissiveIntensity: 0.012,
+        emissive: new THREE.Color(0xd8e2ee),
+        emissiveIntensity: 0.08,
         side: THREE.DoubleSide,
       }),
     [map]

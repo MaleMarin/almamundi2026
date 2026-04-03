@@ -475,12 +475,12 @@ function EarthGroup({
         depthWrite: false,
         blending: THREE.NormalBlending,
         premultipliedAlpha: false,
-        roughness: 0.55,
-        metalness: 0.08,
-        envMapIntensity: 1.4,
+        /* Sin Environment en embebido: metalness/IBL apagan el mapa; mate + emissive suave = nubes visibles */
+        roughness: 1,
+        metalness: 0,
         color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0x000000),
-        emissiveIntensity: 0,
+        emissive: new THREE.Color(0xd8e2ee),
+        emissiveIntensity: viewerNight ? 0.02 : 0.09,
       }),
     [cloudMap, cloudOpacity, viewerNight]
   );
@@ -494,12 +494,11 @@ function EarthGroup({
         depthWrite: false,
         blending: THREE.NormalBlending,
         premultipliedAlpha: false,
-        roughness: 0.55,
-        metalness: 0.08,
-        envMapIntensity: 1.4,
+        roughness: 1,
+        metalness: 0,
         color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0x000000),
-        emissiveIntensity: 0,
+        emissive: new THREE.Color(0xd8e2ee),
+        emissiveIntensity: viewerNight ? 0.015 : 0.065,
       }),
     [cloudMap, cloudOpacity, viewerNight]
   );
@@ -507,11 +506,10 @@ function EarthGroup({
   useLayoutEffect(() => {
     cloudMaterial.opacity = cloudOpacity;
     cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
-    cloudMaterial.roughness = 0.55;
-    cloudMaterial.metalness = 0.08;
-    cloudMaterial.envMapIntensity = 1.4;
-    cloudMaterial.emissive.set('#000000');
-    cloudMaterial.emissiveIntensity = 0;
+    cloudMaterial.roughness = 1;
+    cloudMaterial.metalness = 0;
+    cloudMaterial.emissive.set('#d8e2ee');
+    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : 0.09;
     cloudMaterial.needsUpdate = true;
   }, [cloudMaterial, cloudOpacity, viewerNight]);
 
@@ -519,11 +517,10 @@ function EarthGroup({
     const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
     cloudUnderlayMaterial.opacity = uo;
     cloudUnderlayMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
-    cloudUnderlayMaterial.roughness = 0.55;
-    cloudUnderlayMaterial.metalness = 0.08;
-    cloudUnderlayMaterial.envMapIntensity = 1.4;
-    cloudUnderlayMaterial.emissive.set('#000000');
-    cloudUnderlayMaterial.emissiveIntensity = 0;
+    cloudUnderlayMaterial.roughness = 1;
+    cloudUnderlayMaterial.metalness = 0;
+    cloudUnderlayMaterial.emissive.set('#d8e2ee');
+    cloudUnderlayMaterial.emissiveIntensity = viewerNight ? 0.015 : 0.065;
     cloudUnderlayMaterial.needsUpdate = true;
   }, [cloudUnderlayMaterial, cloudOpacity, viewerNight]);
 
@@ -856,7 +853,7 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.1 : forceDaylight ? 0.12 : 0.12) : viewerNight ? 0.08 : 0.12
+          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.18 : 0.18) : viewerNight ? 0.09 : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
