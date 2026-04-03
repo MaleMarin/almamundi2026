@@ -97,7 +97,7 @@ export function HistoriasAccordion({
 
   const headerBtnClass = [
     headerButtonClassName ?? 'px-4 py-2 rounded-full text-sm transition-all',
-    historiasActive ? '!text-blue-700 font-semibold' : '',
+    historiasActive ? '!text-orange-500 font-semibold' : '',
   ]
     .filter(Boolean)
     .join(' ')
@@ -124,7 +124,7 @@ export function HistoriasAccordion({
             <ActiveInternalNavLink
               key={item.label}
               href={item.href}
-              className="block px-4 py-3 text-lg font-medium text-blue-600 hover:bg-gray-200/55 hover:text-blue-800 first:rounded-t-xl last:rounded-b-xl md:text-[1.125rem] md:leading-snug"
+              className="block px-4 py-3 text-lg font-medium text-[#c23600] hover:bg-gray-200/55 hover:text-[#a02d00] first:rounded-t-xl last:rounded-b-xl md:text-[1.125rem] md:leading-snug"
               onClick={afterNavigate}
             >
               {item.label}
