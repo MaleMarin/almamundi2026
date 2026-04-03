@@ -18,6 +18,18 @@ export const HISTORIAS_CAROUSEL_ARIA_LABEL = 'Carrusel de historias';
 
 export const HISTORIAS_FILTER_BLOCK_TITLE = 'Buscar por país, año o palabras clave';
 
+/** Tooltips (title) de los dos botones junto a «Limpiar filtros» en listados de historias. Orden: compartir, carta al autor. */
+export const HISTORIAS_SHARE_ICONS_LEGEND = [
+  {
+    label: 'Compartir',
+    text: 'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
+  },
+  {
+    label: 'Carta a quien cuenta',
+    text: 'Enviar un mensaje o carta privada a la persona que narra esta historia (con moderación).',
+  },
+] as const;
+
 export type HistoriasListFormatKey = 'video' | 'audio' | 'texto' | 'foto';
 
 /**

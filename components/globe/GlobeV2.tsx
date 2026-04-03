@@ -36,6 +36,10 @@ import {
   GLOBE_V2_CITY_LIGHTS_STRENGTH_NIGHT,
   GLOBE_V2_CLOUD_OPACITY_DAY,
   GLOBE_V2_CLOUD_OPACITY_NIGHT,
+  GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY,
+  GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT,
+  GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA,
+  GLOBE_V2_CLOUD_OUTER_Y_ROT_RAD,
   GLOBE_V2_CLOUD_ROOT_SCALE,
   GLOBE_V2_CLOUD_SPHERE_SEGMENTS,
   GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR,
@@ -94,7 +98,7 @@ const GLOBE_V2_GMST_TEXTURE_OFFSET_RAD = 0;
  * `1` = tiempo real; valores altos = giro más visible (86164 s sidéreos / scale ≈ segundos reales por vuelta).
  * La Luna sigue en tiempo real (`Date.now()` en MoonSatellite).
  */
-const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1800;
+const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
 
 /**
  * Segundos de escena para 1 órbita sidereal lunar (solo `MoonSatellite`).
@@ -465,6 +469,9 @@ function EarthGroup({
   }, [gl, dayMap, cloudMap, lightsMap, normalMap]);
 
   const cloudOpacity = viewerNight ? GLOBE_V2_CLOUD_OPACITY_NIGHT : GLOBE_V2_CLOUD_OPACITY_DAY;
+  const cloudOuterOpacityFactor = viewerNight
+    ? GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT
+    : GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY;
 
   const cloudMaterial = useMemo(
     () =>
@@ -503,6 +510,24 @@ function EarthGroup({
     [cloudMap, cloudOpacity, viewerNight]
   );
 
+  const cloudOuterMaterial = useMemo(
+    () =>
+      new THREE.MeshStandardMaterial({
+        map: cloudMap,
+        transparent: true,
+        opacity: cloudOpacity * cloudOuterOpacityFactor,
+        depthWrite: false,
+        blending: THREE.NormalBlending,
+        premultipliedAlpha: false,
+        roughness: 1,
+        metalness: 0,
+        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
+        emissive: new THREE.Color(0xd8e2ee),
+        emissiveIntensity: viewerNight ? 0.018 : 0.075,
+      }),
+    [cloudMap, cloudOpacity, cloudOuterOpacityFactor, viewerNight]
+  );
+
   useLayoutEffect(() => {
     cloudMaterial.opacity = cloudOpacity;
     cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
@@ -525,11 +550,22 @@ function EarthGroup({
   }, [cloudUnderlayMaterial, cloudOpacity, viewerNight]);
 
   useLayoutEffect(() => {
+    cloudOuterMaterial.opacity = cloudOpacity * cloudOuterOpacityFactor;
+    cloudOuterMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudOuterMaterial.roughness = 1;
+    cloudOuterMaterial.metalness = 0;
+    cloudOuterMaterial.emissive.set('#d8e2ee');
+    cloudOuterMaterial.emissiveIntensity = viewerNight ? 0.018 : 0.075;
+    cloudOuterMaterial.needsUpdate = true;
+  }, [cloudOuterMaterial, cloudOpacity, cloudOuterOpacityFactor, viewerNight]);
+
+  useLayoutEffect(() => {
     return () => {
       cloudMaterial.dispose();
       cloudUnderlayMaterial.dispose();
+      cloudOuterMaterial.dispose();
     };
-  }, [cloudMaterial, cloudUnderlayMaterial]);
+  }, [cloudMaterial, cloudUnderlayMaterial, cloudOuterMaterial]);
 
   const cityLightsMapLinear = useMemo(() => cloneLightsMapLinear(lightsMap), [lightsMap]);
 
@@ -689,6 +725,17 @@ function EarthGroup({
               args={[GLOBE_V2_CLOUD_ROOT_SCALE, GLOBE_V2_CLOUD_SPHERE_SEGMENTS, GLOBE_V2_CLOUD_SPHERE_SEGMENTS]}
             />
           </mesh>
+          <group rotation={[0, GLOBE_V2_CLOUD_OUTER_Y_ROT_RAD, 0]}>
+            <mesh ref={stripGlobeMeshRaycast} material={cloudOuterMaterial} renderOrder={6}>
+              <sphereGeometry
+                args={[
+                  GLOBE_V2_CLOUD_ROOT_SCALE + GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA,
+                  GLOBE_V2_CLOUD_SPHERE_SEGMENTS,
+                  GLOBE_V2_CLOUD_SPHERE_SEGMENTS,
+                ]}
+              />
+            </mesh>
+          </group>
         </group>
       ) : null}
       <SyncSunToGlobe

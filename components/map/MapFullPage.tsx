@@ -63,6 +63,7 @@ import {
   unlockAmbientAudio,
   duckAmbient,
   getAmbientUnlocked,
+  hasActiveAmbientPlayback,
   startGenerativeLayer,
   stopGenerativeLayer,
   type AmbientKey,
@@ -1091,17 +1092,18 @@ const MOOD_LABELS: Record<SoundMood, string> = {
 };
 
 // --- Sonidos del mundo: audio engine (HTMLAudioElement) ---
+/** Alineado con archivos reales en `public/audio` y `public/audio/ambients` (ver `lib/sound/ambient.ts` URLS). */
 const AMBIENT_SOURCES: Record<SoundMood, string> = {
-  mar: "/audio/mar.m4a",
+  mar: "/audio/ambients/ocean.mp3",
   ciudad: "/audio/ambients/city.mp3",
   bosque: "/audio/ambients/forest.mp3",
   viento: "/audio/neblina.mp3",
   animales: "/audio/ambients/animals.mp3",
   universo: "/audio/ambients/universe.mp3",
-  personas: "/audio/mar.m4a",
-  radio: "/audio/ambients/radio.mp3",
-  lluvia: "/audio/ambients/lluvia.mp3",
-  mercado: "/audio/ambients/mercado.mp3",
+  personas: "/audio/ambients/people.mp3",
+  radio: `/audio/${encodeURIComponent("sonido radio.mp4")}`,
+  lluvia: `/audio/${encodeURIComponent("sonido lluvia.mp4")}`,
+  mercado: `/audio/${encodeURIComponent("sonido mercado.mp4")}`,
 };
 const AMBIENT_BASE_VOL = 0.6;
 const AMBIENT_STORY_VOL = 0.15;
@@ -2282,6 +2284,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       } else {
         await webPlayAmbient(mood as AmbientKey);
       }
+      if (!hasActiveAmbientPlayback()) return;
       startGenerativeLayer(new Date().getHours(), storyCountRef.current);
       setAudioBlocked(false);
     } catch {

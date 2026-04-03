@@ -10,10 +10,45 @@
  */
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
-import { useFrame } from '@react-three/fiber';
+import { useFrame, useThree } from '@react-three/fiber';
 import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { GLOBE_V2_TEXTURE_BASE } from '@/lib/globe/globe-v2-assets';
+import {
+  GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA,
+  GLOBE_V2_CLOUD_ROOT_SCALE,
+  GLOBE_V2_TEXTURE_BASE,
+} from '@/lib/globe/globe-v2-assets';
+
+/**
+ * ¿El segmento cámara → centro lunar atraviesa la esfera terrestre antes de llegar a la Luna?
+ * Evita “agujeros” del z-buffer (nubes/atmósfera sin depthWrite o descartes en tierra/océano).
+ */
+function isLunarCenterOccludedByEarthSphere(
+  cam: THREE.Vector3,
+  moonCenter: THREE.Vector3,
+  earthCenter: THREE.Vector3,
+  earthRadius: number,
+  scratchDir: THREE.Vector3,
+  scratchOc: THREE.Vector3,
+  eps = 0.04
+): boolean {
+  scratchDir.subVectors(moonCenter, cam);
+  const distMoon = scratchDir.length();
+  if (distMoon < 1e-8) return false;
+  scratchDir.multiplyScalar(1 / distMoon);
+
+  scratchOc.subVectors(cam, earthCenter);
+  const halfB = scratchDir.dot(scratchOc);
+  const c = scratchOc.lengthSq() - earthRadius * earthRadius;
+  const disc = halfB * halfB - c;
+  if (disc < 0) return false;
+  const s = Math.sqrt(disc);
+  const t0 = -halfB - s;
+  const t1 = -halfB + s;
+  const tNear = t0 > eps ? t0 : t1 > eps ? t1 : -1;
+  if (tNear < 0) return false;
+  return tNear < distMoon - eps;
+}
 
 /** Período sidéreo lunar (una órbita respecto a las estrellas), en días solares medios. */
 export const MOON_SIDEREAL_ORBIT_DAYS = 27.321661;
@@ -80,9 +115,11 @@ export function MoonSatellite({
   orbitYawRad = 0,
   orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
 }: MoonSatelliteProps) {
+  const { camera } = useThree();
   const moonOrbitRootRef = useRef<THREE.Group>(null);
   /** Giro propio sobre Y local (polos), hijo del grupo que ya mira a la Tierra. */
   const moonSpinAboutAxisRef = useRef<THREE.Group>(null);
+  const moonMeshRef = useRef<THREE.Mesh>(null);
   /** Anomalía media M (rad): dM/dt = n = 2π/T; ν y r vía Kepler (elipse coherente con el período sidereal). */
   const meanAnomalyRef = useRef(0);
   const moonMap = useTexture(MOON_MAP_URL);
@@ -92,6 +129,12 @@ export function MoonSatellite({
       worldY: new THREE.Vector3(0, 1, 0),
       worldX: new THREE.Vector3(1, 0, 0),
       radial: new THREE.Vector3(),
+      moonWorld: new THREE.Vector3(),
+      camWorld: new THREE.Vector3(),
+      earthWorld: new THREE.Vector3(),
+      scratchDir: new THREE.Vector3(),
+      scratchOc: new THREE.Vector3(),
+      worldScale: new THREE.Vector3(),
     }),
     []
   );
@@ -158,22 +201,46 @@ export function MoonSatellite({
     if (spin) {
       spin.rotation.y -= meanMotion * dt;
     }
+
+    const mesh = moonMeshRef.current;
+    const parent = root.parent;
+    if (mesh && parent) {
+      parent.getWorldPosition(aux.earthWorld);
+      parent.getWorldScale(aux.worldScale);
+      const worldUniform = Math.max(aux.worldScale.x, aux.worldScale.y, aux.worldScale.z);
+      const earthOcclusionRadius =
+        (GLOBE_V2_CLOUD_ROOT_SCALE + GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA) * worldUniform * 1.015;
+
+      root.getWorldPosition(aux.moonWorld);
+      camera.getWorldPosition(aux.camWorld);
+
+      const occluded = isLunarCenterOccludedByEarthSphere(
+        aux.camWorld,
+        aux.moonWorld,
+        aux.earthWorld,
+        earthOcclusionRadius,
+        aux.scratchDir,
+        aux.scratchOc
+      );
+      mesh.visible = !occluded;
+    }
   });
 
   return (
     <group ref={moonOrbitRootRef} name="AM_moonOrbitRoot">
       {/*
-        renderOrder bajo: la Luna se dibuja antes que la Tierra (órdenes ≥ 0 en EarthGroup).
-        Así el z-buffer de océano/tierra tapa la Luna cuando va detrás del disco; si se pintara
-        después, capas transparentes (nubes sin depthWrite) podían dejar ver la Luna a través del globo.
+        La Luna debe dibujarse después de la capa opaca (tierra + océano, renderOrder 0 y 1 en EarthGroup).
+        Si va antes (p. ej. -20), escribe profundidad y las nubes (transparentes, sin depthWrite) no la
+        actualizan: el z-buffer puede seguir “en la Luna” y se ven fragmentos al pasar detrás del disco.
       */}
       <group ref={moonSpinAboutAxisRef} name="AM_moonAxisSpin">
         <mesh
           ref={(m) => {
+            moonMeshRef.current = m;
             if (m) m.raycast = () => {};
           }}
           name="AM_moonMesh"
-          renderOrder={-20}
+          renderOrder={2}
         >
           <sphereGeometry args={[moonRadius, 40, 40]} />
           <meshStandardMaterial

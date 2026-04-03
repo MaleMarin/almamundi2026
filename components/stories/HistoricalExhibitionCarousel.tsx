@@ -100,7 +100,18 @@ const CARD_TILT_MAX_DEG = 12;
 /**
  * Tilt por tarjeta: el mouse es relativo al rect de esta slide; solo rotateX/Y (sin translate global).
  */
-function ExpoCardTiltShell({ children }: { children: ReactNode }) {
+function ExpoCardTiltShell({
+  children,
+  disableTilt = false,
+}: {
+  children: ReactNode;
+  /** Listados /historias/*: tarjeta estable (sin inclinación por mouse). */
+  disableTilt?: boolean;
+}) {
+  if (disableTilt) {
+    return <div className="h-full w-full">{children}</div>;
+  }
+
   const onMove = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
@@ -314,14 +325,22 @@ export function HistoricalExhibitionCarousel({
         className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}${historiasListEmbedded ? ' min-h-0 flex-1 justify-center pb-2 sm:px-2' : ''}`}
       >
         <div
-          className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 flex-1 flex-col items-center justify-center' : ''}`}
+          className={`relative w-full ${
+            historiasListEmbedded
+              ? 'flex min-h-0 flex-1 flex-col items-center justify-center gap-1.5'
+              : ''
+          }`}
           style={{
             perspective: '1500px',
             perspectiveOrigin: 'center center',
           }}
         >
           <div
-            className={`relative w-full ${historiasListEmbedded ? 'flex min-h-0 max-h-full flex-1 items-center justify-center' : ''}`}
+            className={`relative w-full ${
+              historiasListEmbedded
+                ? 'flex min-h-0 shrink-0 items-center justify-center'
+                : 'flex min-h-0 max-h-full flex-1 items-center justify-center'
+            }`}
             style={
               embedded && isLightHall && !historiasListEmbedded
                 ? { minHeight: 'min(92vw, 620px)' }
@@ -374,13 +393,11 @@ export function HistoricalExhibitionCarousel({
           initialSlide={initialSlide}
           slideToClickedSlide
           keyboard={{ enabled: !disableKeyboardNav }}
-          coverflowEffect={{
-            rotate: 45,
-            stretch: 0,
-            depth: 300,
-            modifier: 1,
-            slideShadows: true,
-          }}
+          coverflowEffect={
+            historiasListEmbedded
+              ? { rotate: 28, stretch: 0, depth: 200, modifier: 1, slideShadows: true }
+              : { rotate: 45, stretch: 0, depth: 300, modifier: 1, slideShadows: true }
+          }
           onSwiper={(s) => {
             swiperRef.current = s;
             if (typeof window === 'undefined') return;
@@ -397,8 +414,8 @@ export function HistoricalExhibitionCarousel({
               style={
                 historiasListEmbedded
                   ? {
-                      width: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
-                      height: 'min(100%, min(520px, 70dvh, calc(100vh - 380px)))',
+                      width: 'min(100%, min(520px, 68dvh, calc(100vh - 260px)))',
+                      height: 'min(100%, min(520px, 68dvh, calc(100vh - 260px)))',
                     }
                   : {
                       width: `min(92vw, ${SLIDE_PX}px)`,
@@ -406,7 +423,7 @@ export function HistoricalExhibitionCarousel({
                     }
               }
             >
-              <ExpoCardTiltShell>
+              <ExpoCardTiltShell disableTilt={historiasListEmbedded}>
                 <div
                 className={
                   isLightHall
@@ -522,9 +539,58 @@ export function HistoricalExhibitionCarousel({
           ))}
         </Swiper>
           </div>
+
+          {historiasListEmbedded && active ? (
+            <div
+              className={`pointer-events-none z-20 flex w-full shrink-0 justify-center px-2 ${isLightHall ? 'max-w-[min(92vw,720px)]' : 'max-w-[min(92vw,620px)]'}`}
+            >
+              <div
+                className={
+                  isLightHall
+                    ? 'pointer-events-auto flex max-w-md items-center gap-3 rounded-full border border-gray-300/50 bg-white/70 py-2 pl-2 pr-5 shadow-[0_12px_40px_rgba(0,0,0,0.1)] backdrop-blur-md'
+                    : 'pointer-events-auto flex max-w-md items-center gap-3 rounded-full border border-white/20 bg-white/10 py-2 pl-2 pr-5 shadow-lg backdrop-blur-md'
+                }
+              >
+                <div
+                  className={
+                    isLightHall
+                      ? 'relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-300/60 bg-gray-200/80'
+                      : 'relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/25 bg-black/30'
+                  }
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={active.foto_perfil}
+                    alt=""
+                    className="h-full w-full object-cover"
+                  />
+                </div>
+                <div className="min-w-0 text-left">
+                  <p
+                    className={
+                      isLightHall
+                        ? 'truncate font-medium text-gray-900'
+                        : 'truncate font-medium text-white'
+                    }
+                  >
+                    {active.nombre}
+                  </p>
+                  <p
+                    className={
+                      isLightHall
+                        ? 'truncate text-xs text-gray-600'
+                        : 'truncate text-xs text-white/70'
+                    }
+                  >
+                    {metaLine}
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
         </div>
 
-        {active ? (
+        {!historiasListEmbedded && active ? (
           <div
             className={`pointer-events-none z-20 mt-2 flex w-full justify-center px-2 sm:mt-3 ${isLightHall ? 'max-w-[min(92vw,720px)]' : 'max-w-[min(92vw,620px)]'}`}
           >
@@ -600,7 +666,7 @@ export function HistoricalExhibitionCarousel({
                 <EthicalShareTriggerButton
                   onClick={() => setEthicalShareOpen(true)}
                   className={
-                    isLightHall ? 'text-gray-800 hover:bg-gray-200/60' : ''
+                    isLightHall ? 'text-gray-800 hover:bg-gray-200/60' : 'text-white/90 hover:bg-white/10'
                   }
                 />
               ) : null}

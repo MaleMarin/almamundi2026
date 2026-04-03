@@ -2,7 +2,7 @@
  * Genera `lib/public-audio-manifest.json` para `/api/public-audio`.
  * Evita que Next/Vercel empaquete todo `public/` en la función serverless.
  */
-import { readdir, writeFile } from "fs/promises";
+import { readdir, stat, writeFile } from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -40,17 +40,14 @@ async function main() {
   const audioDir = path.join(publicRoot, "audio");
   const paths = new Set();
 
+  /** Solo `public/audio/**`: evita mezclar vídeos 4K de la raíz de `public/` en el panel Sonidos. */
   await walkAudioFiles(audioDir, publicRoot, paths);
 
   try {
-    const rootEntries = await readdir(publicRoot, { withFileTypes: true });
-    for (const e of rootEntries) {
-      if (!e.isFile()) continue;
-      const ext = path.extname(e.name).toLowerCase();
-      if (AUDIO_EXT.has(ext)) paths.add(`/${e.name}`);
-    }
+    await stat(path.join(publicRoot, "universo.mp3"));
+    paths.add("/universo.mp3");
   } catch {
-    /* ignore */
+    /* no hay universo.mp3 en raíz */
   }
 
   const sorted = [...paths].sort((a, b) => a.localeCompare(b, "es"));

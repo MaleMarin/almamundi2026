@@ -56,7 +56,6 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
-  const rotations = useRef(imagenes.map(() => (Math.random() - 0.5) * 3));
 
   useEffect(() => {
     const check = () => {
@@ -212,7 +211,6 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                     overflow: 'hidden',
                     width: 'min(75vw, 900px)',
                     height: 'calc(85vh - 80px)',
-                    transform: `rotate(${rotations.current[i]}deg)`,
                   }}
                 >
                   <img
@@ -426,13 +424,13 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
           <div
             style={{
               position: 'fixed',
-              right: '2rem',
+              right: '1.25rem',
               top: '50%',
               transform: 'translateY(-50%)',
               zIndex: 50,
               display: 'flex',
               flexDirection: 'column',
-              gap: 8,
+              gap: 14,
               alignItems: 'center',
             }}
           >
@@ -442,13 +440,17 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
               disabled={fotoActivaIdx <= 0}
               aria-label="Foto anterior"
               style={{
-                padding: '6px 10px',
-                borderRadius: 8,
-                border: '1px solid rgba(245,240,232,0.35)',
-                background: 'rgba(0,0,0,0.25)',
-                color: CREAM_SOFT,
+                minHeight: 48,
+                minWidth: 48,
+                padding: '12px 16px',
+                borderRadius: 12,
+                border: '2px solid rgba(245,240,232,0.45)',
+                background: 'rgba(0,0,0,0.35)',
+                color: CREAM,
                 fontFamily: SITE_FONT_STACK,
-                fontSize: '11px',
+                fontSize: '15px',
+                fontWeight: 500,
+                letterSpacing: '0.02em',
                 cursor: fotoActivaIdx <= 0 ? 'not-allowed' : 'pointer',
                 opacity: fotoActivaIdx <= 0 ? 0.45 : 1,
               }}
@@ -462,10 +464,10 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
                 onClick={() => scrollToPhoto(i)}
                 aria-label={`Ir a foto ${i + 1}`}
                 style={{
-                  width: 8,
-                  height: fotoActivaIdx === i ? 24 : 8,
-                  borderRadius: fotoActivaIdx === i ? 4 : 50,
-                  background: fotoActivaIdx === i ? SEPIA : 'rgba(245,240,232,0.2)',
+                  width: 12,
+                  height: fotoActivaIdx === i ? 44 : 12,
+                  borderRadius: fotoActivaIdx === i ? 6 : 50,
+                  background: fotoActivaIdx === i ? SEPIA : 'rgba(245,240,232,0.28)',
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
@@ -479,13 +481,17 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
               disabled={fotoActivaIdx >= imagenes.length - 1}
               aria-label="Foto siguiente"
               style={{
-                padding: '6px 10px',
-                borderRadius: 8,
-                border: '1px solid rgba(245,240,232,0.35)',
-                background: 'rgba(0,0,0,0.25)',
-                color: CREAM_SOFT,
+                minHeight: 48,
+                minWidth: 48,
+                padding: '12px 16px',
+                borderRadius: 12,
+                border: '2px solid rgba(245,240,232,0.45)',
+                background: 'rgba(0,0,0,0.35)',
+                color: CREAM,
                 fontFamily: SITE_FONT_STACK,
-                fontSize: '11px',
+                fontSize: '15px',
+                fontWeight: 500,
+                letterSpacing: '0.02em',
                 cursor: fotoActivaIdx >= imagenes.length - 1 ? 'not-allowed' : 'pointer',
                 opacity: fotoActivaIdx >= imagenes.length - 1 ? 0.45 : 1,
               }}

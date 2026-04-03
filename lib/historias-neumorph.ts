@@ -85,7 +85,7 @@ export const historiasInterior = {
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',
   navClassName:
-    'sticky top-0 z-50 flex items-center justify-between gap-3 px-6 md:px-12 py-2.5 md:py-3 min-h-[5.5rem] md:min-h-[6.5rem] border-b border-gray-300/50',
+    'sticky top-0 z-50 flex items-center justify-between gap-3 px-6 md:px-12 py-2 md:py-2.5 min-h-[5rem] md:min-h-[6rem] border-b border-gray-300/50',
   navBarStyle: {
     backgroundColor: 'rgba(224,229,236,0.95)',
     boxShadow: '0 4px 24px rgba(163,177,198,0.3)',

@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { LiquidLightBackground } from '@/components/LiquidLightBackground';
 
 export type SalaHiloMuestraInput = {
   titulo: string;
@@ -56,6 +56,59 @@ function truncThreeWords(s: string): string {
   return `${w.slice(0, 3).join(' ')}…`;
 }
 
+/** Sombra elíptica bajo esfera (contacto con “suelo”). */
+function drawGroundEllipse(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  alpha: number
+) {
+  ctx.beginPath();
+  ctx.ellipse(x, y + r * 0.36, r * 0.95, r * 0.3, 0, 0, Math.PI * 2);
+  ctx.fillStyle = `rgba(55,65,80,${alpha})`;
+  ctx.fill();
+}
+
+/** Nudo como esfera iluminada (gradiente + highlight especular). */
+function drawKnotSphere(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  r: number,
+  variant: 'idle' | 'hover' | 'done'
+) {
+  const lx = x - r * 0.38;
+  const ly = y - r * 0.4;
+  if (variant !== 'done') {
+    drawGroundEllipse(ctx, x, y, r, 0.1);
+  }
+  const g = ctx.createRadialGradient(lx, ly, Math.max(1, r * 0.08), x, y, r * 1.08);
+  if (variant === 'hover') {
+    g.addColorStop(0, 'rgba(255,255,255,0.98)');
+    g.addColorStop(0.28, '#f2f4f8');
+    g.addColorStop(0.62, '#dce1ea');
+    g.addColorStop(1, '#b9c2d0');
+  } else if (variant === 'done') {
+    g.addColorStop(0, '#f0f2f6');
+    g.addColorStop(0.45, '#e0e4ec');
+    g.addColorStop(1, '#c5ccd8');
+  } else {
+    g.addColorStop(0, '#ffffff');
+    g.addColorStop(0.32, '#eef1f7');
+    g.addColorStop(0.72, '#d8dee8');
+    g.addColorStop(1, '#c1c9d6');
+  }
+  ctx.beginPath();
+  ctx.arc(x, y, r, 0, Math.PI * 2);
+  ctx.fillStyle = g;
+  ctx.fill();
+  ctx.beginPath();
+  ctx.arc(x - r * 0.32, y - r * 0.34, Math.max(1.5, r * 0.2), 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255,255,255,0.5)';
+  ctx.fill();
+}
+
 type Particle = {
   id: string;
   left: number;
@@ -82,7 +135,6 @@ const TITLE_NEU_SHADOW =
   '14px 14px 34px rgba(125, 142, 165, 0.48), -12px -12px 30px rgba(255, 255, 255, 0.94)';
 
 export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
-  const router = useRouter();
   const uid = useId().replace(/:/g, '');
   const stories = muestra.historias;
   const total = stories.length;
@@ -94,6 +146,10 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   const [hintVisible, setHintVisible] = useState(true);
   const [discoveredCount, setDiscoveredCount] = useState(0);
   const [canvasCssH, setCanvasCssH] = useState(420);
+  const [storyOverlay, setStoryOverlay] = useState<{
+    id: string;
+    formato: string;
+  } | null>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -156,7 +212,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       const { x, y } = knots[i];
       const dx = mouse.x - x;
       const dy = mouse.y - y;
-      if (Math.hypot(dx, dy) < 26) active = i;
+      if (Math.hypot(dx, dy) < 32) active = i;
     }
     activeKnotRef.current = active;
 
@@ -169,30 +225,39 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     ctx.lineCap = 'round';
     ctx.lineJoin = 'round';
 
-    ctx.beginPath();
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      if (i === 0) ctx.moveTo(p.x, p.y + 2);
-      else ctx.lineTo(p.x, p.y + 2);
-    }
-    ctx.strokeStyle = 'rgba(180,185,195,0.4)';
-    ctx.lineWidth = 2.5;
+    const openThread = (dy: number) => {
+      ctx.beginPath();
+      for (let i = 0; i < pts.length; i++) {
+        const p = pts[i];
+        if (i === 0) ctx.moveTo(p.x, p.y + dy);
+        else ctx.lineTo(p.x, p.y + dy);
+      }
+    };
+
+    openThread(3.2);
+    ctx.strokeStyle = 'rgba(55,65,82,0.09)';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    openThread(1.6);
+    ctx.strokeStyle = 'rgba(88,98,115,0.38)';
+    ctx.lineWidth = 3.4;
     ctx.stroke();
 
     const grad = ctx.createLinearGradient(0, 0, W, 0);
-    grad.addColorStop(0, 'rgba(200,205,215,0.3)');
-    grad.addColorStop(0.1, 'rgba(150,160,175,0.9)');
-    grad.addColorStop(0.5, 'rgba(120,130,148,1)');
-    grad.addColorStop(0.9, 'rgba(150,160,175,0.9)');
-    grad.addColorStop(1, 'rgba(200,205,215,0.3)');
-    ctx.beginPath();
-    for (let i = 0; i < pts.length; i++) {
-      const p = pts[i];
-      if (i === 0) ctx.moveTo(p.x, p.y);
-      else ctx.lineTo(p.x, p.y);
-    }
+    grad.addColorStop(0, 'rgba(200,205,215,0.35)');
+    grad.addColorStop(0.1, 'rgba(135,145,162,0.95)');
+    grad.addColorStop(0.5, 'rgba(95,105,125,1)');
+    grad.addColorStop(0.9, 'rgba(135,145,162,0.95)');
+    grad.addColorStop(1, 'rgba(200,205,215,0.35)');
+    openThread(0);
     ctx.strokeStyle = grad;
-    ctx.lineWidth = 1.8;
+    ctx.lineWidth = 2.1;
+    ctx.stroke();
+
+    openThread(-1);
+    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+    ctx.lineWidth = 1.15;
     ctx.stroke();
 
     for (let i = 0; i < knots.length; i++) {
@@ -201,14 +266,13 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       const isHover = active === i && !isUnraveled;
 
       if (isUnraveled) {
+        drawKnotSphere(ctx, x, y, 12, 'done');
+        ctx.strokeStyle = 'rgba(140,150,165,0.55)';
+        ctx.lineWidth = 1.25;
         ctx.beginPath();
-        ctx.arc(x, y, 9, 0, Math.PI * 2);
-        ctx.fillStyle = '#dde0e6';
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(180,185,195,0.6)';
-        ctx.lineWidth = 1;
+        ctx.arc(x, y, 12, 0, Math.PI * 2);
         ctx.stroke();
-        ctx.font = 'bold 9px system-ui, sans-serif';
+        ctx.font = 'bold 12px system-ui, sans-serif';
         ctx.fillStyle = ACCENT;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
@@ -219,7 +283,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       }
 
       if (isHover) {
-        const r = 15;
+        const r = 18;
         ctx.beginPath();
         ctx.arc(x, y, r + 14, 0, Math.PI * 2);
         ctx.strokeStyle = 'rgba(255,74,28,0.15)';
@@ -231,82 +295,86 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        ctx.beginPath();
-        ctx.arc(x + 2, y + 2, r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(180,185,195,0.7)';
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x - 1.5, y - 1.5, r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.9)';
-        ctx.fill();
+        drawKnotSphere(ctx, x, y, r, 'hover');
         ctx.beginPath();
         ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.fillStyle = BG;
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,74,28,0.5)';
-        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255,74,28,0.55)';
+        ctx.lineWidth = 2.25;
         ctx.stroke();
 
-        ctx.font = '800 11px system-ui, sans-serif';
+        ctx.font = '800 14px system-ui, sans-serif';
         ctx.fillStyle = ACCENT;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
+        ctx.shadowColor = 'rgba(255,74,28,0.2)';
+        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 2;
         ctx.fillText(String(i + 1), x, y);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
 
         const h = stories[i];
-        ctx.font = '700 16px system-ui, sans-serif';
+        ctx.font = '700 20px system-ui, sans-serif';
         ctx.textBaseline = 'bottom';
         let title = h.titulo;
         let tw = ctx.measureText(title).width;
-        while (tw > W * 0.35 && title.length > 4) {
+        while (tw > W * 0.42 && title.length > 4) {
           title = title.slice(0, -1);
           tw = ctx.measureText(`${title}…`).width;
         }
         if (title !== h.titulo) title = `${title}…`;
         ctx.fillStyle = TEXT_PRIMARY;
-        ctx.shadowColor = SHADOW_LIGHT;
-        ctx.shadowOffsetX = 1;
-        ctx.shadowOffsetY = 1;
-        ctx.shadowBlur = 0;
-        ctx.fillText(title, x, y - r - 18);
+        ctx.shadowColor = 'rgba(100,110,130,0.22)';
+        ctx.shadowOffsetX = 0;
+        ctx.shadowOffsetY = 2;
+        ctx.shadowBlur = 4;
+        ctx.fillText(title, x, y - r - 22);
         ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
 
-        ctx.font = '500 11px system-ui, sans-serif';
+        ctx.font = '500 13px system-ui, sans-serif';
         ctx.fillStyle = ACCENT;
         ctx.textBaseline = 'bottom';
-        ctx.fillText(h.formato.toUpperCase(), x, y - r - 2);
+        ctx.shadowColor = 'rgba(255,74,28,0.15)';
+        ctx.shadowOffsetY = 1;
+        ctx.shadowBlur = 2;
+        ctx.fillText(h.formato.toUpperCase(), x, y - r - 3);
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
         ctx.textAlign = 'left';
         ctx.textBaseline = 'alphabetic';
         continue;
       }
 
-      const rn = 10;
-      ctx.beginPath();
-      ctx.arc(x + 2, y + 2, rn, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(180,185,195,0.5)';
-      ctx.fill();
-      ctx.beginPath();
-      ctx.arc(x - 1.5, y - 1.5, rn, 0, Math.PI * 2);
-      ctx.fillStyle = 'rgba(255,255,255,0.9)';
-      ctx.fill();
+      const rn = 13;
+      drawKnotSphere(ctx, x, y, rn, 'idle');
+      ctx.strokeStyle = 'rgba(160,170,185,0.35)';
+      ctx.lineWidth = 1;
       ctx.beginPath();
       ctx.arc(x, y, rn, 0, Math.PI * 2);
-      ctx.fillStyle = '#e8eaed';
-      ctx.fill();
+      ctx.stroke();
 
-      ctx.font = '600 9px system-ui, sans-serif';
-      ctx.fillStyle = '#7a8292';
+      ctx.font = '600 12px system-ui, sans-serif';
+      ctx.fillStyle = '#5a6578';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
+      ctx.shadowColor = 'rgba(255,255,255,0.55)';
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = -0.5;
+      ctx.shadowBlur = 0;
       ctx.fillText(String(i + 1), x, y);
+      ctx.shadowColor = 'transparent';
 
       const sub = truncThreeWords(stories[i].titulo);
-      ctx.font = '400 11px system-ui, sans-serif';
+      ctx.font = '400 14px system-ui, sans-serif';
       ctx.fillStyle = TEXT_MUTED;
       ctx.textBaseline = 'top';
-      ctx.fillText(sub, x, y + 16);
+      ctx.shadowColor = 'rgba(100,110,130,0.12)';
+      ctx.shadowOffsetY = 1;
+      ctx.shadowBlur = 3;
+      ctx.fillText(sub, x, y + 20);
+      ctx.shadowColor = 'transparent';
+      ctx.shadowBlur = 0;
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
     }
@@ -346,6 +414,20 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     return () => window.removeEventListener('resize', upd);
   }, []);
 
+  useEffect(() => {
+    if (!storyOverlay) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setStoryOverlay(null);
+    };
+    window.addEventListener('keydown', onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [storyOverlay]);
+
   const setPointerFromClient = (clientX: number, clientY: number) => {
     const wrap = containerRef.current;
     if (!wrap) return;
@@ -381,9 +463,9 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       const s = stories[k];
       const formato = s.formato || 'video';
       setHintVisible(false);
-      router.push(`/historias/${s.id}/${formato}`);
+      setStoryOverlay({ id: s.id, formato });
     },
-    [stories, appendParticles, router]
+    [stories, appendParticles]
   );
 
   const onCanvasClick = () => {
@@ -566,12 +648,13 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
             position: 'absolute',
             inset: 0,
             minHeight: '100vh',
-            background: BG,
+            backgroundColor: 'transparent',
             overflow: 'hidden',
             opacity: salaOpacity,
             transition: 'opacity 0.7s ease',
           }}
         >
+          <LiquidLightBackground />
           <div
             style={{
               position: 'absolute',
@@ -655,6 +738,9 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
                 height: '100%',
                 cursor: 'crosshair',
                 touchAction: 'none',
+                backgroundColor: 'transparent',
+                position: 'relative',
+                zIndex: 1,
               }}
             />
             {particles.map((p) => (
@@ -701,6 +787,67 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
           >
             toca un nudo para entrar a la historia
           </p>
+        </div>
+      )}
+
+      {storyOverlay && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="Historia en la sala"
+          style={{
+            position: 'fixed',
+            inset: 0,
+            zIndex: 60,
+            display: 'flex',
+            flexDirection: 'column',
+            background: 'rgba(26, 31, 42, 0.42)',
+            backdropFilter: 'blur(4px)',
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+              padding: '12px 20px',
+              flexShrink: 0,
+              background: BG,
+              borderBottom: `1px solid rgba(180, 185, 195, 0.45)`,
+              boxShadow: `0 4px 14px rgba(125, 142, 165, 0.2)`,
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => setStoryOverlay(null)}
+              style={{
+                background: BG,
+                border: 'none',
+                color: ACCENT,
+                padding: '10px 22px',
+                borderRadius: 100,
+                fontSize: 13,
+                fontWeight: 700,
+                letterSpacing: '0.04em',
+                cursor: 'pointer',
+                boxShadow: `4px 4px 10px ${SHADOW_DARK}, -3px -3px 8px ${SHADOW_LIGHT}`,
+              }}
+            >
+              ← Volver a la sala
+            </button>
+          </div>
+          <iframe
+            key={`${storyOverlay.id}-${storyOverlay.formato}`}
+            title="Historia"
+            src={`/historias/${storyOverlay.id}/${storyOverlay.formato}`}
+            style={{
+              flex: 1,
+              width: '100%',
+              minHeight: 0,
+              border: 'none',
+              background: '#e6e9ee',
+            }}
+          />
         </div>
       )}
     </div>

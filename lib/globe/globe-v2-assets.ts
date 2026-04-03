@@ -120,11 +120,21 @@ export const GLOBE_V2_NIGHT_LIGHTS_PIPELINE_NOTE =
 // ——— Valores congelados (no compensar falta de resolucion subiendo opacidad al azar) ———
 
 /** Opacidad capa exterior de nubes (fina; evitar “torta” blanca). */
-export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.88;
-export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.56;
+export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.93;
+export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.62;
 
 /** Multiplicador opacidad esfera interior (velo ligero sobre océano, sin duplicar peso). */
-export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.4;
+export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.52;
+
+/** Capa de nubes adicional: radio = `GLOBE_V2_CLOUD_ROOT_SCALE` + delta (volumen leve). */
+export const GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA = 0.0048;
+
+/** Opacidad de la capa exterior (× opacidad base día/noche). */
+export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY = 0.34;
+export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT = 0.24;
+
+/** Desfase Y (rad) de la textura de nubes en la capa exterior (más lectura de nubosidad). */
+export const GLOBE_V2_CLOUD_OUTER_Y_ROT_RAD = 0.38;
 
 /** Radio interior = `GLOBE_V2_CLOUD_ROOT_SCALE` − este delta (unidades de escena). */
 export const GLOBE_V2_CLOUD_UNDERLAY_RADIUS_DELTA = 0.009;

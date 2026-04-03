@@ -25,24 +25,36 @@ const state: PlayerState = {
 };
 
 /**
+ * Se incrementa en `stopAmbient()`. Las cargas async de `playAmbient` / `playAmbientFromPublicUrl`
+ * comprueban que no haya cambiado; si el usuario apaga el sonido mientras carga el buffer,
+ * no se debe volver a arrancar la pista.
+ */
+let ambientPlayGeneration = 0;
+
+/**
  * Mar: audio desde este vídeo en `public/` (solo pista sonora vía Web Audio).
  * Archivo: `WhatsApp Video 2026-03-27 at 16.57.58.mp4`
  */
 const MAR_SEA_VIDEO_FILENAME = "WhatsApp Video 2026-03-27 at 16.57.58.mp4";
 const MAR_VIDEO_AUDIO_URL = `/${encodeURIComponent(MAR_SEA_VIDEO_FILENAME)}`;
 
+/** Rutas con espacios: fetch/decodeAudioData (mismo origen). */
+const pubAudio = (name: string) => `/audio/${encodeURIComponent(name)}`;
+
 const URLS: Record<AmbientKey, string[]> = {
-  mar: [MAR_VIDEO_AUDIO_URL, "/audio/mar.m4a", "/audio/ambients/ocean.wav", "/audio/ambients/ocean.mp3"],
-  ciudad: ["/audio/ambients/city.wav", "/audio/ambients/city.mp3"],
-  bosque: ["/audio/ambients/forest.wav", "/audio/ambients/forest.mp3"],
-  viento: ["/audio/ambients/wind.mp3", "/audio/ambients/wind.wav", "/audio/neblina.mp3"],
-  animales: ["/audio/ambients/animals.wav", "/audio/ambients/animals.mp3"],
-  // Sonido del universo: primero universe.mp3 (sustituir por grabación real/CMB si se tiene)
+  /** Carpeta real: `public/audio/ambients/ocean.*` + `mar.m4a` + vídeo mar opcional */
+  mar: ["/audio/ambients/ocean.mp3", "/audio/ambients/ocean.wav", "/audio/mar.m4a", MAR_VIDEO_AUDIO_URL],
+  ciudad: ["/audio/ambients/city.mp3", "/audio/ambients/city.wav"],
+  bosque: ["/audio/ambients/forest.mp3", "/audio/ambients/forest.wav"],
+  /** No hay wind.* en repo: neblina + bosque como aire */
+  viento: ["/audio/neblina.mp3", "/audio/ambients/forest.mp3", "/audio/ambients/forest.wav"],
+  animales: ["/audio/ambients/animals.mp3", "/audio/ambients/animals.wav"],
   universo: ["/audio/ambients/universe.mp3", "/audio/ambients/universe.wav", "/universo.mp3"],
-  personas: ["/audio/ambients/people.wav", "/audio/ambients/people.mp3"],
-  radio: ["/audio/ambients/radio.mp3", "/audio/ambients/radio.wav"],
-  lluvia: ["/audio/ambients/lluvia.mp3", "/audio/ambients/rain-city.mp3", "/audio/ambients/lluvia.wav"],
-  mercado: ["/audio/ambients/mercado.mp3", "/audio/ambients/market.mp3", "/audio/ambients/mercado.wav"],
+  personas: ["/audio/ambients/people.mp3", "/audio/ambients/people.wav"],
+  /** Grabaciones en `public/audio/sonido *.mp4` (no había radio.mp3 en carpeta) */
+  radio: [pubAudio("sonido radio.mp4")],
+  lluvia: [pubAudio("sonido lluvia.mp4")],
+  mercado: [pubAudio("sonido mercado.mp4")],
 };
 
 const FALLBACK_URL = "/audio/mar.m4a";
@@ -215,6 +227,30 @@ function ensureCtx(): AudioContext | null {
   return state.ctx;
 }
 
+/** Master a volumen audible (tras `stopAmbient`, que lo deja en 0). */
+function restoreAmbientMasterGain() {
+  if (!state.master || !state.ctx) return;
+  const t = state.ctx.currentTime;
+  try {
+    state.master.gain.cancelScheduledValues(t);
+    state.master.gain.setValueAtTime(ambientBaseVolume * AMBIENT_MASTER_VOL, t);
+  } catch {
+    state.master.gain.value = ambientBaseVolume * AMBIENT_MASTER_VOL;
+  }
+}
+
+/** Corta el master del motor Web Audio (pistas preset/public van por ahí). */
+function silenceAmbientMaster() {
+  if (!state.master || !state.ctx) return;
+  const t = state.ctx.currentTime;
+  try {
+    state.master.gain.cancelScheduledValues(t);
+    state.master.gain.setValueAtTime(0, t);
+  } catch {
+    state.master.gain.value = 0;
+  }
+}
+
 async function loadBuffer(key: AmbientKey): Promise<AudioBuffer> {
   if (state.buffers[key]) return state.buffers[key]!;
   const ctx = ensureCtx();
@@ -258,6 +294,7 @@ async function loadPublicBuffer(urlPath: string): Promise<AudioBuffer> {
  * Reproduce en bucle un archivo bajo `public/` (ruta URL desde raíz, p. ej. `/audio/dia.mp3`).
  */
 export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?: number }) {
+  const myGen = ambientPlayGeneration;
   const pathNorm = urlPath.startsWith("/") ? urlPath : `/${urlPath}`;
   const ctx = ensureCtx();
   if (!ctx) return;
@@ -269,6 +306,7 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
     }
   }
   if (ctx.state === "suspended") return;
+  if (myGen !== ambientPlayGeneration) return;
   const fade = (opts?.fadeMs ?? 800) / 1000;
 
   let buf: AudioBuffer;
@@ -279,8 +317,14 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
     return;
   }
 
+  if (myGen !== ambientPlayGeneration) return;
+
+  restoreAmbientMasterGain();
+
   const startT = ctx.currentTime;
   stopCurrent(startT);
+
+  if (myGen !== ambientPlayGeneration) return;
 
   const source = ctx.createBufferSource();
   source.buffer = buf;
@@ -295,6 +339,25 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
   const userVol = getPublicAmbientVolume(pathNorm);
   const targetGain = publicTrackTargetGain(userVol);
   gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
+
+  if (myGen !== ambientPlayGeneration) {
+    try {
+      source.stop(startT + 0.03);
+    } catch {
+      /* noop */
+    }
+    try {
+      source.disconnect();
+    } catch {
+      /* noop */
+    }
+    try {
+      gain.disconnect();
+    } catch {
+      /* noop */
+    }
+    return;
+  }
 
   state.current = { mode: "public", path: pathNorm, source, gain };
 }
@@ -323,7 +386,41 @@ function stopCurrent(atTime: number) {
   } catch { /* already stopped */ }
 }
 
+/** Corta la pista actual sin fade (p. ej. al apagar desde la UI). */
+function hardStopCurrent() {
+  const cur = state.current;
+  const ctx = state.ctx;
+  if (!cur || !ctx) return;
+  const t = ctx.currentTime;
+  try {
+    cur.gain.gain.cancelScheduledValues(t);
+    cur.gain.gain.setValueAtTime(0, t);
+  } catch {
+    /* noop */
+  }
+  try {
+    cur.source.stop(t);
+  } catch {
+    try {
+      cur.source.stop();
+    } catch {
+      /* noop */
+    }
+  }
+  try {
+    cur.source.disconnect();
+  } catch {
+    /* noop */
+  }
+  try {
+    cur.gain.disconnect();
+  } catch {
+    /* noop */
+  }
+}
+
 export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
+  const myGen = ambientPlayGeneration;
   const ctx = ensureCtx();
   if (!ctx) return;
   if (ctx.state === "suspended") {
@@ -334,6 +431,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
     }
   }
   if (ctx.state === "suspended") return;
+  if (myGen !== ambientPlayGeneration) return;
   const defaultFade = key === "universo" ? 2200 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;
 
@@ -345,8 +443,14 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
     return;
   }
 
+  if (myGen !== ambientPlayGeneration) return;
+
+  restoreAmbientMasterGain();
+
   const startT = ctx.currentTime;
   stopCurrent(startT);
+
+  if (myGen !== ambientPlayGeneration) return;
 
   const source = ctx.createBufferSource();
   source.buffer = buf;
@@ -362,13 +466,34 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   const targetGain = TRACK_GAIN_NOMINAL * userVol;
   gain.gain.linearRampToValueAtTime(targetGain, startT + 0.02 + fade);
 
+  if (myGen !== ambientPlayGeneration) {
+    try {
+      source.stop(startT + 0.03);
+    } catch {
+      /* noop */
+    }
+    try {
+      source.disconnect();
+    } catch {
+      /* noop */
+    }
+    try {
+      gain.disconnect();
+    } catch {
+      /* noop */
+    }
+    return;
+  }
+
   state.current = { mode: "preset", key, source, gain };
 }
 
 export function stopAmbient() {
-  if (!state.ctx) return;
-  stopCurrent(state.ctx.currentTime);
+  ambientPlayGeneration += 1;
+  hardStopCurrent();
   state.current = null;
+  hardStopGenerativeLayer();
+  silenceAmbientMaster();
 }
 
 export function setAmbientEnabled(enabled: boolean) {
@@ -418,6 +543,31 @@ export function setAmbientBaseVolume(targetVol: number, durationMs = 3000) {
 let generativeNodes: OscillatorNode[] = [];
 let generativeGain: GainNode | null = null;
 
+function hardStopGenerativeLayer() {
+  const ctx = getAudioContext();
+  const t = ctx?.currentTime ?? 0;
+  generativeNodes.forEach((n) => {
+    try {
+      n.stop(t);
+    } catch {
+      try {
+        n.stop();
+      } catch {
+        /* noop */
+      }
+    }
+  });
+  generativeNodes = [];
+  if (generativeGain) {
+    try {
+      generativeGain.disconnect();
+    } catch {
+      /* noop */
+    }
+  }
+  generativeGain = null;
+}
+
 /**
  * Inicia osciladores suaves que varían en tiempo real.
  * Se llama DESPUÉS de que el ambient base ya está corriendo.
@@ -465,18 +615,7 @@ export function startGenerativeLayer(hour: number, storyCount: number) {
   });
 }
 
+/** Corta de inmediato los osciladores que iban a `destination` (no pasan por `master`). */
 export function stopGenerativeLayer() {
-  const ctx = getAudioContext();
-  if (!ctx || !generativeGain) return;
-
-  generativeGain.gain.linearRampToValueAtTime(0, ctx.currentTime + 2);
-  setTimeout(() => {
-    generativeNodes.forEach((n) => {
-      try {
-        n.stop();
-      } catch {}
-    });
-    generativeNodes = [];
-    generativeGain = null;
-  }, 2100);
+  hardStopGenerativeLayer();
 }

@@ -18,8 +18,12 @@ export type ResonanceMailboxProps = {
    * `inline`: solo el botón, sin posicionamiento absoluto (p. ej. barra superior junto a compartir).
    */
   triggerLayout?: ResonanceMailboxTriggerLayout;
-  /** `light`: icono y borde oscuros para barra sobre fondo claro (sala de exposición clara). */
-  triggerTone?: 'dark' | 'light';
+  /** `light`: icono y borde oscuros para barra sobre fondo claro (sala de exposición clara). `orange`: AlmaMundi en listados. */
+  triggerTone?: 'dark' | 'light' | 'orange';
+  /** Texto al pasar el cursor (p. ej. leyenda breve en barra de filtros). */
+  triggerTitle?: string;
+  /** Sustituye el aria-label del botón (p. ej. «Carta a quien cuenta» en listados). */
+  triggerAriaLabel?: string;
 };
 
 export function ResonanceMailbox({
@@ -28,7 +32,11 @@ export function ResonanceMailbox({
   className = '',
   triggerLayout = 'floating',
   triggerTone = 'dark',
+  triggerTitle,
+  triggerAriaLabel,
 }: ResonanceMailboxProps) {
+  const mailboxAria =
+    triggerAriaLabel ?? 'Mensajería de resonancia: enviar un mensaje privado al autor';
   const dialogId = useId();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -162,6 +170,31 @@ export function ResonanceMailbox({
           border-color: rgba(60, 60, 70, 0.35);
           background: rgba(255, 255, 255, 0.95);
         }
+        .boton-resonancia--orange-inline {
+          width: 40px;
+          height: 40px;
+          background: rgba(255, 255, 255, 0.92);
+          border: 2px solid var(--almamundi-orange, #ff4500);
+          color: var(--almamundi-orange, #ff4500);
+          box-shadow: 0 2px 14px rgba(255, 69, 0, 0.12);
+          animation: none;
+        }
+        .boton-resonancia--orange-inline:hover {
+          background: rgba(255, 255, 255, 1);
+          border-color: var(--almamundi-orange, #ff4500);
+          box-shadow: 0 2px 18px rgba(255, 69, 0, 0.2);
+        }
+        .boton-resonancia--orange-floating {
+          background: rgba(255, 255, 255, 0.12);
+          border: 2px solid var(--almamundi-orange, #ff4500);
+          color: var(--almamundi-orange, #ff4500);
+          animation: none;
+          box-shadow: 0 0 18px rgba(255, 69, 0, 0.25);
+        }
+        .boton-resonancia--orange-floating:hover {
+          border-color: var(--almamundi-orange, #ff4500);
+          background: rgba(255, 255, 255, 0.18);
+        }
       `}</style>
 
       {triggerLayout === 'floating' ? (
@@ -175,10 +208,11 @@ export function ResonanceMailbox({
               setError(null);
               setReformulateHint(null);
             }}
-            className={`boton-resonancia pointer-events-auto text-white/95 ${glow ? 'boton-resonancia--sent' : ''}`}
+            className={`boton-resonancia pointer-events-auto ${triggerTone === 'orange' ? 'boton-resonancia--orange-floating' : 'text-white/95'} ${glow ? 'boton-resonancia--sent' : ''}`}
             aria-expanded={open}
             aria-controls={dialogId}
-            aria-label="Mensajería de resonancia: enviar un mensaje privado al autor"
+            aria-label={mailboxAria}
+            title={triggerTitle}
           >
             <Mail className="h-7 w-7" strokeWidth={1.75} />
           </button>
@@ -191,10 +225,17 @@ export function ResonanceMailbox({
             setError(null);
             setReformulateHint(null);
           }}
-          className={`boton-resonancia boton-resonancia--inline shrink-0 ${triggerTone === 'light' ? 'boton-resonancia--light-inline' : 'text-white/95'} ${glow ? 'boton-resonancia--sent' : ''} ${className}`}
+          className={`boton-resonancia boton-resonancia--inline shrink-0 ${
+            triggerTone === 'orange'
+              ? 'boton-resonancia--orange-inline'
+              : triggerTone === 'light'
+                ? 'boton-resonancia--light-inline'
+                : 'text-white/95'
+          } ${glow ? 'boton-resonancia--sent' : ''} ${className}`}
           aria-expanded={open}
           aria-controls={dialogId}
-          aria-label="Mensajería de resonancia: enviar un mensaje privado al autor"
+          aria-label={mailboxAria}
+          title={triggerTitle}
         >
           <Mail className="h-5 w-5" strokeWidth={1.75} />
         </button>

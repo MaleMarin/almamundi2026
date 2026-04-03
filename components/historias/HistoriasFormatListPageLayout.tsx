@@ -8,10 +8,7 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import {
-  EthicalShareFlow,
-  EthicalShareTriggerWithCartaCompanion,
-} from '@/components/stories/EthicalShareFlow';
+import { EthicalShareFlow, EthicalShareTriggerButton } from '@/components/stories/EthicalShareFlow';
 import { ResonanceMailbox } from '@/components/stories/ResonanceMailbox';
 import {
   HistoricalExhibitionCarousel,
@@ -24,6 +21,7 @@ import {
   HISTORIAS_FILTER_KEYWORD_PLACEHOLDER,
   HISTORIAS_LIST_HERO_SUBTITLE,
   HISTORIAS_LIST_HERO_TITLE,
+  HISTORIAS_SHARE_ICONS_LEGEND,
 } from '@/lib/historias/historias-format-list-ui';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
@@ -105,7 +103,7 @@ export function HistoriasFormatListPageLayout({
       </nav>
 
       <div className="flex min-h-0 w-full flex-1 flex-col">
-        <div className="w-full shrink-0 px-6 pt-[28px] md:px-12 lg:px-16">
+        <div className="w-full shrink-0 px-6 pt-[16px] md:px-12 lg:px-16">
           <div className="mx-auto w-full max-w-5xl">
             <header className="flex flex-shrink-0 flex-col text-center sm:text-left">
               <p
@@ -122,7 +120,7 @@ export function HistoriasFormatListPageLayout({
               </p>
             </header>
 
-            <div className="mt-5 flex-shrink-0" aria-label="Filtros de historias">
+            <div className="mt-3 flex-shrink-0" aria-label="Filtros de historias">
               <div
                 className="w-full overflow-visible rounded-2xl px-4 py-4"
                 style={neu.cardInset}
@@ -169,18 +167,23 @@ export function HistoriasFormatListPageLayout({
                   </label>
                   <div className="flex flex-wrap items-end justify-end gap-2">
                     {shareTarget ? (
-                      <EthicalShareTriggerWithCartaCompanion
-                        onClick={() => setEthicalShareOpen(true)}
-                        buttonClassName="min-h-10 min-w-10 shrink-0 rounded-full border border-gray-300/35 bg-[#E0E5EC] text-gray-800 shadow-[2px_2px_6px_rgba(163,177,198,0.45),-2px_-2px_6px_rgba(255,255,255,0.85)] hover:bg-[#d8dde6]"
-                        betweenCartaAndShare={
-                          <ResonanceMailbox
-                            storyId={shareTarget.id}
-                            recipientName={shareTarget.nombre}
-                            triggerLayout="inline"
-                            triggerTone="light"
-                          />
-                        }
-                      />
+                      <div className="flex shrink-0 items-end gap-2">
+                        <EthicalShareTriggerButton
+                          onClick={() => setEthicalShareOpen(true)}
+                          className="min-h-10 min-w-10 shrink-0 cursor-help rounded-full border-2 border-[color:var(--almamundi-orange)] bg-[#E0E5EC] p-2.5 text-[color:var(--almamundi-orange)] shadow-[2px_2px_6px_rgba(163,177,198,0.45),-2px_-2px_6px_rgba(255,255,255,0.85)] hover:bg-[#d8dde6]"
+                          title={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
+                          ariaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
+                        />
+                        <ResonanceMailbox
+                          storyId={shareTarget.id}
+                          recipientName={shareTarget.nombre}
+                          triggerLayout="inline"
+                          triggerTone="orange"
+                          triggerTitle={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
+                          triggerAriaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
+                          className="cursor-help"
+                        />
+                      </div>
                     ) : null}
                     <button
                       type="button"
@@ -212,7 +215,7 @@ export function HistoriasFormatListPageLayout({
         <section
           id="historias-carrusel"
           aria-label={HISTORIAS_CAROUSEL_ARIA_LABEL}
-          className="mt-5 flex h-[calc(100vh-280px)] min-h-[320px] w-full flex-shrink-0 flex-col overflow-hidden border-t border-gray-300/50 scroll-mt-28 px-2 sm:px-4 md:px-6 lg:px-10"
+          className="mt-3 flex h-[calc(100vh-232px)] min-h-[300px] w-full flex-shrink-0 flex-col overflow-hidden border-t border-gray-300/50 scroll-mt-24 px-2 sm:px-4 md:px-6 lg:px-10"
         >
           <div className="flex h-full w-full min-h-0 max-w-[100vw] flex-col items-stretch justify-center">
             <HistoricalExhibitionCarousel

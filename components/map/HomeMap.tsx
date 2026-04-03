@@ -50,6 +50,7 @@ import {
   playAmbient,
   playAmbientFromPublicUrl,
   stopAmbient,
+  setAmbientEnabled,
   hasActiveAmbientPlayback,
   type AmbientKey,
 } from '@/lib/sound/ambient';
@@ -138,6 +139,7 @@ export default function HomeMap() {
     if (!m) return Promise.resolve();
     return unlockAmbientAudio()
       .then(async () => {
+        if (!soundEnabledRef.current) return;
         if (isPublicAudioMoodId(m)) {
           const path = publicAudioPathFromMoodId(m);
           if (path) await playAmbientFromPublicUrl(path);
@@ -180,9 +182,11 @@ export default function HomeMap() {
   useEffect(() => {
     if (!soundEnabled) {
       stopAmbient();
+      setAmbientEnabled(false);
       return;
     }
     if (!selectedMood) return;
+    setAmbientEnabled(true);
     void startMapAmbientFromRefs();
   }, [soundEnabled, selectedMood, startMapAmbientFromRefs]);
 
@@ -348,8 +352,8 @@ export default function HomeMap() {
     onToggleSound: handleToggleSound,
   };
 
-  /** Altura mínima de la franja fecha/hora; el padding inferior añade negro bajo el texto antes del gris. */
-  const TIME_STRIP_HEIGHT = 56;
+  /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
+  const TIME_STRIP_HEIGHT = 120;
   return (
     <div className="relative flex min-h-[88vh] w-full flex-1 flex-col">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}

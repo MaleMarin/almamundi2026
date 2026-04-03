@@ -550,17 +550,21 @@ export function EthicalShareFlow({
 export function EthicalShareTriggerButton({
   onClick,
   className = '',
+  ariaLabel = 'Llevar esta historia conmigo: compartido ético con crédito al autor o autora',
+  title: titleProp = 'Llevar esta historia conmigo',
 }: {
   onClick: () => void;
   className?: string;
+  ariaLabel?: string;
+  title?: string;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-full p-2 text-white/90 transition hover:bg-white/10 ${className}`}
-      aria-label="Llevar esta historia conmigo"
-      title="Llevar esta historia conmigo"
+      className={`rounded-full p-2 transition ${className}`}
+      aria-label={ariaLabel}
+      title={titleProp}
     >
       <HandHeart className="h-5 w-5" strokeWidth={1.75} />
     </button>
@@ -575,24 +579,51 @@ export function EthicalShareTriggerWithCartaCompanion({
   onClick,
   buttonClassName = '',
   betweenCartaAndShare,
+  companionClassName = '',
+  companionAlt = '',
+  companionTitle,
+  shareButtonTitle,
+  shareButtonAriaLabel,
 }: {
   onClick: () => void;
   buttonClassName?: string;
   /** Iconos neumórficos entre la carta y «llevar historia» (p. ej. ResonanceMailbox). */
   betweenCartaAndShare?: ReactNode;
+  companionClassName?: string;
+  /** Accesibilidad: qué es la ilustración de la carta (p. ej. en barra de filtros). */
+  companionAlt?: string;
+  /** Tooltip al pasar el cursor sobre la ilustración de la carta. */
+  companionTitle?: string;
+  shareButtonTitle?: string;
+  shareButtonAriaLabel?: string;
 }) {
+  const carta = (
+    <Image
+      src="/historias/companion-carta.png"
+      alt={companionAlt}
+      width={172}
+      height={342}
+      className={`pointer-events-none h-[52px] w-auto max-h-14 shrink-0 select-none object-contain ${companionClassName}`}
+      unoptimized
+    />
+  );
+
   return (
     <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
-      <Image
-        src="/historias/companion-carta.png"
-        alt=""
-        width={172}
-        height={342}
-        className="pointer-events-none h-[52px] w-auto max-h-14 shrink-0 select-none object-contain"
-        unoptimized
-      />
+      {companionTitle ? (
+        <span title={companionTitle} className="inline-flex shrink-0 cursor-help">
+          {carta}
+        </span>
+      ) : (
+        carta
+      )}
       {betweenCartaAndShare}
-      <EthicalShareTriggerButton onClick={onClick} className={buttonClassName} />
+      <EthicalShareTriggerButton
+        onClick={onClick}
+        className={buttonClassName}
+        title={shareButtonTitle}
+        ariaLabel={shareButtonAriaLabel}
+      />
     </div>
   );
 }
