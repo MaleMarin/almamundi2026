@@ -1,10 +1,9 @@
 'use client';
 
 /**
- * Sala «el hilo» — portal neumórfico → canvas (hilo + nudos) → card de historia.
+ * Sala «el hilo» — portal neumórfico → canvas (hilo + nudos); click en nudo → historia.
  * Estilos solo inline + keyframes locales (sin Tailwind ni CSS module).
  */
-import Link from 'next/link';
 import {
   useCallback,
   useEffect,
@@ -12,6 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
+import { useRouter } from 'next/navigation';
 
 export type SalaHiloMuestraInput = {
   titulo: string;
@@ -65,13 +65,10 @@ type Particle = {
   size: number;
 };
 
-type Phase = 'portal' | 'hilo' | 'story';
+type Phase = 'portal' | 'hilo';
 
 const BG = '#e6e9ee';
 const ACCENT = '#FF4A1C';
-/** Enlaces a rutas internas (historia): azul legible sobre fondo claro */
-const LINK_BLUE = '#2563eb';
-const LINK_BLUE_HOVER = '#1d4ed8';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_SECONDARY = '#5a6070';
 const TEXT_MUTED = '#9299a8';
@@ -85,6 +82,7 @@ const TITLE_NEU_SHADOW =
   '14px 14px 34px rgba(125, 142, 165, 0.48), -12px -12px 30px rgba(255, 255, 255, 0.94)';
 
 export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
+  const router = useRouter();
   const uid = useId().replace(/:/g, '');
   const stories = muestra.historias;
   const total = stories.length;
@@ -92,7 +90,6 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   const [phase, setPhase] = useState<Phase>('portal');
   const [portalOpacity, setPortalOpacity] = useState(1);
   const [salaOpacity, setSalaOpacity] = useState(1);
-  const [storyIndex, setStoryIndex] = useState(0);
   const [particles, setParticles] = useState<Particle[]>([]);
   const [hintVisible, setHintVisible] = useState(true);
   const [discoveredCount, setDiscoveredCount] = useState(0);
@@ -129,7 +126,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
     const wrap = containerRef.current;
-    if (!canvas || !wrap || phase === 'portal' || phase === 'story') return;
+    if (!canvas || !wrap || phase === 'portal') return;
 
     const rect = wrap.getBoundingClientRect();
     const W = rect.width;
@@ -316,7 +313,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   }, [phase, stories]);
 
   useEffect(() => {
-    if (phase === 'portal' || phase === 'story') return;
+    if (phase === 'portal') return;
 
     const loop = () => {
       tRef.current += 0.01;
@@ -367,27 +364,31 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     mouseRef.current = { x: -9999, y: -9999 };
   };
 
-  const openStory = (k: number) => {
-    if (k < 0 || k >= stories.length || unraveledRef.current.has(k)) return;
-    unraveledRef.current.add(k);
-    setDiscoveredCount(unraveledRef.current.size);
-    const wrap = containerRef.current;
-    if (wrap) {
-      const rect = wrap.getBoundingClientRect();
-      const W = rect.width;
-      const H = rect.height;
-      const knots = kpos(W, H, tRef.current, stories.length);
-      const kn = knots[k];
-      if (kn) appendParticles(kn.x, kn.y);
-    }
-    setStoryIndex(k);
-    setPhase('story');
-    setHintVisible(false);
-  };
+  const navigateToHistoriaFromKnot = useCallback(
+    (k: number) => {
+      if (k < 0 || k >= stories.length || unraveledRef.current.has(k)) return;
+      unraveledRef.current.add(k);
+      setDiscoveredCount(unraveledRef.current.size);
+      const wrap = containerRef.current;
+      if (wrap) {
+        const rect = wrap.getBoundingClientRect();
+        const W = rect.width;
+        const H = rect.height;
+        const knots = kpos(W, H, tRef.current, stories.length);
+        const kn = knots[k];
+        if (kn) appendParticles(kn.x, kn.y);
+      }
+      const s = stories[k];
+      const formato = s.formato || 'video';
+      setHintVisible(false);
+      router.push(`/historias/${s.id}/${formato}`);
+    },
+    [stories, appendParticles, router]
+  );
 
   const onCanvasClick = () => {
     drawFrame();
-    openStory(activeKnotRef.current);
+    navigateToHistoriaFromKnot(activeKnotRef.current);
   };
 
   const onCanvasTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
@@ -396,24 +397,8 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     e.preventDefault();
     setPointerFromClient(tch.clientX, tch.clientY);
     drawFrame();
-    openStory(activeKnotRef.current);
+    navigateToHistoriaFromKnot(activeKnotRef.current);
   };
-
-  const closeStory = useCallback(() => {
-    setPhase('hilo');
-  }, []);
-
-  useEffect(() => {
-    if (phase !== 'story') return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        closeStory();
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [phase, closeStory]);
 
   const enterSala = () => {
     setPortalOpacity(0);
@@ -431,12 +416,9 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       setDiscoveredCount(0);
       setHintVisible(true);
       setParticles([]);
-      setStoryIndex(0);
       setSalaOpacity(1);
     }, 700);
   };
-
-  const current = stories[storyIndex];
 
   const styleTag = (
     <style
@@ -445,22 +427,6 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
 @keyframes salaHiloParticle_${uid} {
   from { opacity: 0.7; transform: translate(0,0) scale(1); }
   to { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.1); }
-}
-@keyframes salaCardSlide_${uid} {
-  from { transform: translateY(100%); }
-  to { transform: translateY(0); }
-}
-@keyframes salaCardTitle_${uid} {
-  from { opacity: 0; transform: translateY(14px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes salaCardQuote_${uid} {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-@keyframes salaCardFade_${uid} {
-  from { opacity: 0; }
-  to { opacity: 1; }
 }
 `,
       }}
@@ -594,7 +560,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
         </div>
       )}
 
-      {(phase === 'hilo' || phase === 'story') && (
+      {phase === 'hilo' && (
         <div
           style={{
             position: 'absolute',
@@ -733,155 +699,8 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               maxWidth: '90%',
             }}
           >
-            acercate a un nudo para descubrir la historia
+            toca un nudo para entrar a la historia
           </p>
-
-          {phase === 'story' && current && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                right: 0,
-                zIndex: 20,
-                animation: `salaCardSlide_${uid} 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards`,
-              }}
-            >
-              <div
-                style={{
-                  margin: '0 28px 28px',
-                  background: BG,
-                  borderRadius: 24,
-                  boxShadow: `12px 12px 24px ${SHADOW_DARK}, -12px -12px 24px ${SHADOW_LIGHT}`,
-                  padding: '32px 36px 28px',
-                  display: 'flex',
-                  gap: 40,
-                  alignItems: 'flex-end',
-                  boxSizing: 'border-box',
-                }}
-              >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <p
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 7,
-                      fontSize: 10,
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.2em',
-                      color: ACCENT,
-                      margin: '0 0 12px',
-                    }}
-                  >
-                    <span
-                      style={{
-                        width: 5,
-                        height: 5,
-                        borderRadius: '50%',
-                        background: ACCENT,
-                        flexShrink: 0,
-                      }}
-                    />
-                    {current.formato.toUpperCase()}
-                  </p>
-                  <h2
-                    style={{
-                      margin: 0,
-                      fontSize: 36,
-                      fontWeight: 800,
-                      letterSpacing: '-0.025em',
-                      lineHeight: 1.1,
-                      color: TEXT_PRIMARY,
-                      animation: `salaCardTitle_${uid} 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both`,
-                    }}
-                  >
-                    {current.titulo}
-                  </h2>
-                  <p
-                    style={{
-                      margin: '14px 0 0',
-                      fontSize: 14,
-                      fontStyle: 'italic',
-                      color: '#7a8292',
-                      lineHeight: 1.75,
-                      animation: `salaCardQuote_${uid} 0.55s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both`,
-                    }}
-                  >
-                    “{current.quote}”
-                  </p>
-                  <p
-                    style={{
-                      margin: '12px 0 0',
-                      fontSize: 12,
-                      color: TEXT_HINT,
-                      letterSpacing: '0.04em',
-                      animation: `salaCardFade_${uid} 0.5s ease 0.42s both`,
-                    }}
-                  >
-                    {current.meta}
-                  </p>
-                </div>
-                <div
-                  style={{
-                    flexShrink: 0,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 10,
-                    animation: `salaCardFade_${uid} 0.5s ease 0.48s both`,
-                  }}
-                >
-                  <Link
-                    href={`/historias/${current.id}/${current.formato}`}
-                    style={{
-                      display: 'inline-block',
-                      background: 'transparent',
-                      color: LINK_BLUE,
-                      border: `2px solid ${LINK_BLUE}`,
-                      padding: '12px 26px',
-                      borderRadius: 100,
-                      fontSize: 12,
-                      fontWeight: 800,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      textDecoration: 'none',
-                      textAlign: 'center',
-                      transition: 'color 0.2s ease, border-color 0.2s ease, background 0.2s ease',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.color = LINK_BLUE_HOVER;
-                      e.currentTarget.style.borderColor = LINK_BLUE_HOVER;
-                      e.currentTarget.style.background = 'rgba(37, 99, 235, 0.06)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.color = LINK_BLUE;
-                      e.currentTarget.style.borderColor = LINK_BLUE;
-                      e.currentTarget.style.background = 'transparent';
-                    }}
-                  >
-                    Abrir esta historia
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={closeStory}
-                    style={{
-                      background: BG,
-                      color: TEXT_MUTED,
-                      border: 'none',
-                      padding: '13px 24px',
-                      borderRadius: 100,
-                      fontSize: 12,
-                      letterSpacing: '0.08em',
-                      textTransform: 'uppercase',
-                      boxShadow: `3px 3px 7px ${SHADOW_DARK}, -3px -3px 7px ${SHADOW_LIGHT}`,
-                      cursor: 'pointer',
-                    }}
-                  >
-                    ← Volver al hilo
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       )}
     </div>
