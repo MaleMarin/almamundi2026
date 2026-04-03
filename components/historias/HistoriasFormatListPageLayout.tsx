@@ -92,14 +92,14 @@ export function HistoriasFormatListPageLayout({
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/videos" className={activeTab === 'videos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'videos' ? neu.cardInset : { ...neu.button, color: neu.textBody }}>Videos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/audios" className={activeTab === 'audios' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'audios' ? neu.cardInset : { ...neu.button, color: neu.textBody }}>Audios</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/escrito" className={activeTab === 'escrito' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'escrito' ? neu.cardInset : { ...neu.button, color: neu.textBody }}>Escritos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/fotos" className={activeTab === 'fotos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'fotos' ? neu.cardInset : { ...neu.button, color: neu.textBody }}>Fotografías</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#intro" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <ActiveInternalNavLink href="/historias/videos" className={activeTab === 'videos' ? `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navActiveClassName}` : `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={activeTab === 'videos' ? neu.cardInset : neu.button}>Videos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/audios" className={activeTab === 'audios' ? `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navActiveClassName}` : `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={activeTab === 'audios' ? neu.cardInset : neu.button}>Audios</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/escrito" className={activeTab === 'escrito' ? `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navActiveClassName}` : `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={activeTab === 'escrito' ? neu.cardInset : neu.button}>Escritos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/fotos" className={activeTab === 'fotos' ? `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navActiveClassName}` : `${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={activeTab === 'fotos' ? neu.cardInset : neu.button}>Fotografías</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

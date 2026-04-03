@@ -36,15 +36,15 @@ export default function MiColeccionPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/mi-coleccion" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Mi colección</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Videos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Audios</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Escritos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.textBody }}>Fotografías</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#intro" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <ActiveInternalNavLink href="/historias/mi-coleccion" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Mi colección</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/videos" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Videos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/audios" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Audios</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/escrito" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Escritos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/historias/fotos" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Fotografías</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

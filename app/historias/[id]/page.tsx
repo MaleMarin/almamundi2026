@@ -108,16 +108,16 @@ export default function HistoriasIdPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <ActiveInternalNavLink href="/#intro" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className={`${historiasInterior.navInteriorPillClassName} ${historiasInterior.navLinkClassName}`} style={{ ...neu.button }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
       <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">
-        <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>← Historias</Link>
+        <Link href="/historias" className="mb-8 inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-800 md:text-base">← Historias</Link>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
           <div>

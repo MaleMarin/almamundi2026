@@ -2,7 +2,7 @@
  * Detección de enlace de navegación activo (rutas internas y anclas en `/`).
  */
 
-export const ACTIVE_NAV_CLASS = '!text-orange-500 font-semibold';
+export const ACTIVE_NAV_CLASS = '!text-blue-700 font-semibold';
 
 /**
  * @param href Destino del enlace (`/#intro`, `/temas`, `/historias/videos`, etc.)

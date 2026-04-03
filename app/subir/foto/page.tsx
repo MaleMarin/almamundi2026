@@ -89,12 +89,12 @@ export default function SubirFotoPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#historias" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>← Elegir formato en inicio</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textBody }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.textBody }} className="[&_button]:btn-almamundi" />
+          <ActiveInternalNavLink href="/#historias" className="btn-almamundi btn-almamundi-interior-nav px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button }}>← Elegir formato en inicio</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#intro" className="btn-almamundi btn-almamundi-interior-nav px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi btn-almamundi-interior-nav px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button }} className="[&_button]:btn-almamundi [&_button]:btn-almamundi-interior-nav" />
           <ActiveInternalNavLink href="/subir/foto" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Foto</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.textMain }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi btn-almamundi-interior-nav px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
