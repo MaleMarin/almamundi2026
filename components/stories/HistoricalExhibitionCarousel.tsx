@@ -64,6 +64,11 @@ export type HistoricalExhibitionCarouselProps = {
    * (útil cuando la página monta su propio compartir encima del carrusel).
    */
   shareInGalleryChrome?: boolean;
+  /**
+   * Si es false, no se muestra el buzón de resonancia en la barra superior del carrusel
+   * (p. ej. cuando el layout lo coloca junto a la carta en los filtros).
+   */
+  showMailboxInGalleryChrome?: boolean;
 };
 
 /** Ligeramente mayor que 15 cm a 96dpi; sin pasarse de ancho móvil */
@@ -141,6 +146,7 @@ export function HistoricalExhibitionCarousel({
   expoPaddingTopClassName,
   expoMaxWidthClassName,
   shareInGalleryChrome = true,
+  showMailboxInGalleryChrome = true,
 }: HistoricalExhibitionCarouselProps) {
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
@@ -573,32 +579,34 @@ export function HistoricalExhibitionCarousel({
         Capa 1 — UI overlays: barra superior (buzón + compartir); z alto para quedar por encima del coverflow 3D.
       */}
       <div className="pointer-events-none absolute inset-0 z-[500] flex flex-col">
-        <header className="pointer-events-auto flex shrink-0 items-center justify-end gap-3 px-4 pt-6 pb-2 sm:px-8">
-          <div
-            className={
-              isLightHall
-                ? 'flex shrink-0 items-center gap-1 rounded-full border border-gray-300/55 bg-white/80 p-1 shadow-sm backdrop-blur-md'
-                : 'flex shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md'
-            }
-          >
-            {active ? (
-              <ResonanceMailbox
-                storyId={active.id}
-                recipientName={active.nombre}
-                triggerLayout="inline"
-                triggerTone={isLightHall ? 'light' : 'dark'}
-              />
-            ) : null}
-            {shareInGalleryChrome ? (
-              <EthicalShareTriggerButton
-                onClick={() => setEthicalShareOpen(true)}
-                className={
-                  isLightHall ? 'text-gray-800 hover:bg-gray-200/60' : ''
-                }
-              />
-            ) : null}
-          </div>
-        </header>
+        {active && (showMailboxInGalleryChrome || shareInGalleryChrome) ? (
+          <header className="pointer-events-auto flex shrink-0 items-center justify-end gap-3 px-4 pt-6 pb-2 sm:px-8">
+            <div
+              className={
+                isLightHall
+                  ? 'flex shrink-0 items-center gap-1 rounded-full border border-gray-300/55 bg-white/80 p-1 shadow-sm backdrop-blur-md'
+                  : 'flex shrink-0 items-center gap-1 rounded-full border border-white/15 bg-white/10 p-1 backdrop-blur-md'
+              }
+            >
+              {showMailboxInGalleryChrome ? (
+                <ResonanceMailbox
+                  storyId={active.id}
+                  recipientName={active.nombre}
+                  triggerLayout="inline"
+                  triggerTone={isLightHall ? 'light' : 'dark'}
+                />
+              ) : null}
+              {shareInGalleryChrome ? (
+                <EthicalShareTriggerButton
+                  onClick={() => setEthicalShareOpen(true)}
+                  className={
+                    isLightHall ? 'text-gray-800 hover:bg-gray-200/60' : ''
+                  }
+                />
+              ) : null}
+            </div>
+          </header>
+        ) : null}
         <div className="min-h-0 flex-1" aria-hidden />
       </div>
 

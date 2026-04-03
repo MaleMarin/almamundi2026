@@ -9,7 +9,7 @@ function toSalaMuestra(muestra: Muestra): SalaHiloMuestraInput {
   return {
     titulo: muestra.title,
     descripcion: [muestra.intro, muestra.description].filter(Boolean).join('\n\n'),
-    curadora: 'Curaduría AlmaMundi',
+    curadora: 'Equipo de AlmaMundi',
     historias: muestra.items.map((it) => ({
       id: it.id,
       titulo: it.title,
@@ -41,7 +41,10 @@ export default function MuestraDetailPage() {
         }}
       >
         <p style={{ margin: 0 }}>No se encontró esta muestra.</p>
-        <Link href="/muestras" style={{ color: '#FF4A1C', textDecoration: 'none' }}>
+        <Link
+          href="/muestras"
+          className="text-blue-600 font-semibold underline underline-offset-[5px] hover:text-blue-800"
+        >
           Volver al listado
         </Link>
       </main>

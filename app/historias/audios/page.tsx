@@ -3,7 +3,7 @@
 /**
  * /historias/audios — Carrusel exposición + AudioPlayer en la misma página (sin navegar).
  * Layout compartido: `HistoriasFormatListPageLayout` (mismo shell que videos / escrito / fotos).
- * Ancho máx. 860px, espaciado hero/filtros/carrusel y alto del carrusel viven en ese layout.
+ * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';

@@ -6,7 +6,7 @@
  */
 import { HandHeart, X } from 'lucide-react';
 import Image from 'next/image';
-import { useCallback, useEffect, useId, useMemo, useState } from 'react';
+import { useCallback, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 
 import { ExhibitionCompromisoStatement } from '@/components/stories/ExhibitionCompromisoStatement';
 import { EXHIBITION_COMPROMISO_BODY } from '@/lib/historias/exhibition-compromiso';
@@ -568,17 +568,21 @@ export function EthicalShareTriggerButton({
 }
 
 /**
- * Franja visual (`/historias/companion-carta.png`) al lado del botón de compartir tarjeta (HandHeart).
+ * Franja visual (`/historias/companion-carta.png`) y botón HandHeart; `betweenCartaAndShare` inserta
+ * controles (p. ej. buzón de resonancia) entre la carta y el icono de compartir.
  */
 export function EthicalShareTriggerWithCartaCompanion({
   onClick,
   buttonClassName = '',
+  betweenCartaAndShare,
 }: {
   onClick: () => void;
   buttonClassName?: string;
+  /** Iconos neumórficos entre la carta y «llevar historia» (p. ej. ResonanceMailbox). */
+  betweenCartaAndShare?: ReactNode;
 }) {
   return (
-    <div className="flex shrink-0 items-center gap-2.5">
+    <div className="flex shrink-0 items-center gap-2 sm:gap-2.5">
       <Image
         src="/historias/companion-carta.png"
         alt=""
@@ -587,6 +591,7 @@ export function EthicalShareTriggerWithCartaCompanion({
         className="pointer-events-none h-[52px] w-auto max-h-14 shrink-0 select-none object-contain"
         unoptimized
       />
+      {betweenCartaAndShare}
       <EthicalShareTriggerButton onClick={onClick} className={buttonClassName} />
     </div>
   );

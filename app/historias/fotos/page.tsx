@@ -3,7 +3,7 @@
 /**
  * /historias/fotos — Carrusel exposición + FotoAlbum en la misma página.
  * Layout compartido: `HistoriasFormatListPageLayout` (mismo shell que videos / audios / escrito).
- * Ancho máx. 860px, espaciado hero/filtros/carrusel y alto del carrusel viven en ese layout.
+ * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';

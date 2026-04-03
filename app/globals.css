@@ -80,7 +80,7 @@ body {
     inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
 }
 
-/* Enlaces: color por defecto del navegador (azul) → naranja AlmaMundi. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
+/* Enlaces: naranja AlmaMundi por defecto. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
 a {
   color: var(--almamundi-orange);
 }

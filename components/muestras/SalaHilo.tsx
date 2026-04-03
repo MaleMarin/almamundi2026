@@ -69,12 +69,20 @@ type Phase = 'portal' | 'hilo' | 'story';
 
 const BG = '#e6e9ee';
 const ACCENT = '#FF4A1C';
+/** Enlaces a rutas internas (historia): azul legible sobre fondo claro */
+const LINK_BLUE = '#2563eb';
+const LINK_BLUE_HOVER = '#1d4ed8';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_SECONDARY = '#5a6070';
 const TEXT_MUTED = '#9299a8';
 const TEXT_HINT = '#b0b6c2';
 const SHADOW_DARK = '#c4c7cd';
 const SHADOW_LIGHT = '#ffffff';
+
+/** Superficie un poco más clara que `BG` + sombras duales para relieve neumórfico legible. */
+const TITLE_NEU_BG = '#eef1f6';
+const TITLE_NEU_SHADOW =
+  '14px 14px 34px rgba(125, 142, 165, 0.48), -12px -12px 30px rgba(255, 255, 255, 0.94)';
 
 export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   const uid = useId().replace(/:/g, '');
@@ -500,20 +508,34 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
           >
             SALA · MUESTRA CURADA
           </p>
-          <h1
+          <div
             style={{
-              margin: 0,
               marginBottom: 14,
-              fontSize: 62,
-              fontWeight: 800,
-              letterSpacing: '-0.03em',
-              lineHeight: 1.0,
-              color: TEXT_PRIMARY,
-              maxWidth: 620,
+              maxWidth: 720,
+              width: '100%',
+              padding: 'clamp(18px, 4vw, 28px) clamp(20px, 5vw, 40px)',
+              borderRadius: 28,
+              backgroundColor: TITLE_NEU_BG,
+              boxShadow: TITLE_NEU_SHADOW,
+              border: '1px solid rgba(255, 255, 255, 0.58)',
+              boxSizing: 'border-box',
             }}
           >
-            {muestra.titulo}
-          </h1>
+            <h1
+              style={{
+                margin: 0,
+                fontSize: 'clamp(2rem, 7vw, 3.875rem)',
+                fontWeight: 800,
+                letterSpacing: '-0.03em',
+                lineHeight: 1.05,
+                color: TEXT_PRIMARY,
+                textShadow:
+                  '1px 1px 0 rgba(255, 255, 255, 0.95), -1px -1px 0 rgba(163, 177, 198, 0.28)',
+              }}
+            >
+              {muestra.titulo}
+            </h1>
+          </div>
           <p
             style={{
               margin: 0,
@@ -522,7 +544,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               color: TEXT_MUTED,
             }}
           >
-            Curada por {muestra.curadora}
+            Curadas por {muestra.curadora}
           </p>
           <p
             style={{
@@ -812,10 +834,10 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
                     href={`/historias/${current.id}/${current.formato}`}
                     style={{
                       display: 'inline-block',
-                      background: ACCENT,
-                      color: '#ffffff',
-                      border: 'none',
-                      padding: '13px 28px',
+                      background: 'transparent',
+                      color: LINK_BLUE,
+                      border: `2px solid ${LINK_BLUE}`,
+                      padding: '12px 26px',
                       borderRadius: 100,
                       fontSize: 12,
                       fontWeight: 800,
@@ -823,6 +845,17 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
                       textTransform: 'uppercase',
                       textDecoration: 'none',
                       textAlign: 'center',
+                      transition: 'color 0.2s ease, border-color 0.2s ease, background 0.2s ease',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.color = LINK_BLUE_HOVER;
+                      e.currentTarget.style.borderColor = LINK_BLUE_HOVER;
+                      e.currentTarget.style.background = 'rgba(37, 99, 235, 0.06)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.color = LINK_BLUE;
+                      e.currentTarget.style.borderColor = LINK_BLUE;
+                      e.currentTarget.style.background = 'transparent';
                     }}
                   >
                     Abrir esta historia

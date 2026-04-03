@@ -13,7 +13,7 @@ export const neu = {
   bg: '#E0E5EC',
   textMain: '#4A5568',
   textBody: '#718096',
-  /** Menú superior en interiores: inactivo negro; activo = naranja (`ACTIVE_NAV_CLASS`). */
+  /** Menú superior en interiores: inactivo negro; activo / hover píldora = naranja (`ACTIVE_NAV_CLASS` + `.btn-almamundi`). */
   navLinkIdle: '#0a0a0a',
   /** Naranja fuerte como la home (--almamundi-orange) */
   orange: '#ff4500',
@@ -27,6 +27,18 @@ export const neu = {
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '24px',
   },
+  /**
+   * Misma idea que `card`, pero sobre fondo `neu.bg` idéntico el relieve casi no se ve.
+   * Fondo un poco más claro + sombras más profundas para que el neumorfismo sea legible.
+   */
+  cardProminent: {
+    position: 'relative' as const,
+    backgroundColor: '#ebeef4',
+    boxShadow:
+      '14px 14px 32px rgba(130, 148, 172, 0.48), -12px -12px 28px rgba(255, 255, 255, 0.95)',
+    border: '1px solid rgba(255, 255, 255, 0.55)',
+    borderRadius: '24px',
+  },
   /** Card hundida (inset) */
   cardInset: {
     backgroundColor: '#E0E5EC',
@@ -34,6 +46,14 @@ export const neu = {
       'inset 8px 8px 14px rgba(163,177,198,0.7), inset -8px -8px 14px rgba(255,255,255,0.85)',
     border: '1px solid rgba(255,255,255,0.15)',
     borderRadius: '20px',
+  },
+  /** Inset un poco más oscuro que `bg` para contrastar con `cardProminent` encima. */
+  cardInsetProminent: {
+    backgroundColor: '#d8dce6',
+    boxShadow:
+      'inset 10px 10px 22px rgba(150, 165, 188, 0.55), inset -8px -8px 20px rgba(255, 255, 255, 0.82)',
+    border: '1px solid rgba(255, 255, 255, 0.22)',
+    borderRadius: '24px',
   },
   /** Botón / CTA (nav interiores: sombras acordes a píldoras más compactas) */
   button: {

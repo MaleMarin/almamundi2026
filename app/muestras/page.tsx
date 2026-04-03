@@ -1,9 +1,11 @@
 'use client';
+import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
+import { getMuestras } from '@/lib/muestras';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
@@ -41,6 +43,7 @@ export default function MuestrasListPage() {
 
   const hasAnyItem = !loading && !error && topics.some((t) => t.items.length > 0);
   const showEmpty = !loading && !error && !hasAnyItem;
+  const salasDemo = useMemo(() => getMuestras(), []);
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -58,15 +61,59 @@ export default function MuestrasListPage() {
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
-          Muestras
-        </h1>
+        <header
+          className="mb-6 w-full rounded-[24px] px-6 py-5 md:px-8 md:py-6"
+          style={neu.cardProminent}
+        >
+          <h1
+            className="text-3xl font-semibold leading-tight tracking-tight md:text-4xl"
+            style={{ color: neu.textMain }}
+          >
+            Muestras
+          </h1>
+        </header>
         <p className="text-lg font-light mb-2" style={{ color: neu.textBody }}>
           Curadurías que conectan historias del mundo.
         </p>
         <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
           Solo se muestran piezas ya aprobadas por curaduría.
         </p>
+
+        <section
+          className="mb-12 rounded-[28px] px-6 py-6 md:px-8 md:py-7"
+          style={neu.cardInsetProminent}
+          aria-label="Salas de muestra de demostración"
+        >
+          <div className="mb-4 w-full rounded-[18px] px-4 py-3 md:px-5 md:py-3.5" style={neu.cardProminent}>
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em]" style={{ color: neu.textMain }}>
+              Salas curadas (demo)
+            </h2>
+            <p className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
+              Curadas por Equipo de AlmaMundi
+            </p>
+          </div>
+          <p className="text-sm mb-5 leading-relaxed" style={{ color: neu.textBody }}>
+            Tocá cada título (relieve neumórfico) para entrar a la sala, recorrer el hilo y abrir las historias de ejemplo.
+          </p>
+          <ul className="space-y-4">
+            {salasDemo.map((m) => (
+              <li key={m.slug} className="space-y-2">
+                <Link
+                  href={`/muestras/${m.slug}`}
+                  className="block rounded-[22px] px-5 py-4 text-base font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] md:text-lg"
+                  style={neu.cardProminent}
+                >
+                  {m.title}
+                </Link>
+                {m.intro ? (
+                  <p className="pl-1 text-sm font-light leading-snug" style={{ color: neu.textBody }}>
+                    {m.intro}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </section>
 
         {loading && (
           <p className="text-center py-12" style={{ color: neu.textBody }}>
@@ -75,7 +122,7 @@ export default function MuestrasListPage() {
         )}
 
         {error && (
-          <div className="p-4 rounded-2xl mb-6 text-red-600 text-sm" style={neu.card}>
+          <div className="p-4 rounded-2xl mb-6 text-red-600 text-sm" style={neu.cardProminent}>
             {error}
           </div>
         )}
@@ -83,7 +130,7 @@ export default function MuestrasListPage() {
         {showEmpty && (
           <section
             className="py-16 px-8 rounded-[40px] text-center"
-            style={neu.card}
+            style={neu.cardProminent}
           >
             <p className="text-xl font-light" style={{ color: neu.textMain }}>
               Aún no hay muestras publicadas.
@@ -108,7 +155,7 @@ export default function MuestrasListPage() {
                         <li key={item.id}>
                           <article
                             className="block overflow-hidden rounded-[40px] transition-all hover:shadow-lg active:scale-[0.99]"
-                            style={neu.card}
+                            style={neu.cardProminent}
                           >
                             <div className="relative aspect-[4/3] w-full bg-gray-300 overflow-hidden rounded-t-[40px]">
                               <img
