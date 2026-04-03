@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import {
@@ -1154,7 +1153,6 @@ function SubirPageInner() {
       </div>
 
       <div className="border-t border-gray-400/50 pt-10 md:pt-14">
-        <Footer />
       </div>
     </main>
   );

@@ -4,7 +4,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 
 import { useEffect, useState } from 'react';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
@@ -148,7 +147,6 @@ export default function MuestrasListPage() {
       </div>
 
       <div className="border-t border-gray-400/50 pt-10 md:pt-14">
-        <Footer />
       </div>
     </main>
   );

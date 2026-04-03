@@ -9,7 +9,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { TEMAS } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -94,7 +93,6 @@ export default function TemasPage() {
       </section>
 
       <div className="border-t border-gray-400/50 pt-10 md:pt-14">
-        <Footer />
       </div>
     </main>
   );

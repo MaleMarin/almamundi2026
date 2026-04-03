@@ -1,3 +1,4 @@
+import { Footer } from '@/components/layout/Footer';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
@@ -57,8 +58,19 @@ export default async function RootLayout({
           </div>
         </noscript>
         {/* #main-content en el servidor: evita desajuste de hidratación (Suspense) al cruzar RSC → LocaleProvider */}
-        <div id="main-content" tabIndex={-1}>
-          <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+        <div
+          id="main-content"
+          tabIndex={-1}
+          className="flex min-h-svh flex-col"
+        >
+          {/*
+            Altura mínima del área de página: empuja el footer fuera del primer pantallazo
+            en rutas con poco contenido; el footer sigue en el DOM en todas las rutas.
+          */}
+          <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)]">
+            <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+          </div>
+          <Footer />
         </div>
         <HighContrastToggle />
       </body>

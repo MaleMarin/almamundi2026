@@ -2,7 +2,8 @@
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
- * Footer unificado para páginas internas (E0E5EC, sans moderna, ALMAMUNDI).
+ * Footer unificado AlmaMundi (E0E5EC, sans moderna).
+ * Se monta una sola vez en `app/layout.tsx` para todas las rutas.
  */
 import { HistoriasAccordion } from './HistoriasAccordion';
 

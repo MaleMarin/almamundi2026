@@ -11,7 +11,6 @@ import { useParams } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { Footer } from '@/components/layout/Footer';
 import { getTemaBySlug } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -131,7 +130,6 @@ export default function TemaPage() {
         )}
       </section>
 
-      <Footer />
     </main>
   );
 }

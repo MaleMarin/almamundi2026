@@ -2,11 +2,10 @@
 
 /**
  * Layout compartido de /historias/videos, /audios, /escrito, /fotos.
- * Copiado de `app/historias/videos/page.tsx`: nav, hero, filtros, carrusel, footer y compartir.
+ * Nav, hero, filtros, carrusel y compartir. Footer global en `app/layout.tsx`.
  */
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import {
   EthicalShareFlow,
@@ -221,8 +220,6 @@ export function HistoriasFormatListPageLayout({
         </section>
         </div>
       </div>
-
-      <Footer />
 
       {shareTarget ? (
         <EthicalShareFlow

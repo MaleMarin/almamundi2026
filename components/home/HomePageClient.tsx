@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
-import { Footer } from '@/components/layout/Footer';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 
 /**
- * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa), footer.
+ * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
  * Las tarjetas abren StoryModal; el flujo por temas de inspiración no está en el header.
  *
  * `router.refresh()` al montar evita que, al volver desde páginas internas vía `<Link>`,
  * se reutilice una instantánea antigua de la ruta `/` en la caché del App Router.
+ * El footer global vive en `app/layout.tsx`.
  */
 export function HomePageClient() {
   const router = useRouter();
@@ -74,7 +74,6 @@ export function HomePageClient() {
         basePath="/"
       />
       <MapSectionLocked />
-      <Footer />
 
       <StoryModal
         isOpen={storyOpen}

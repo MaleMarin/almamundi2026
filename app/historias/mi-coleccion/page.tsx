@@ -9,7 +9,6 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import { useState } from 'react';
 import Link from 'next/link';
 import { useMiColeccion, type SavedStory } from '@/hooks/useMiColeccion';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
@@ -119,7 +118,6 @@ export default function MiColeccionPage() {
       </section>
       </div>
 
-      <Footer />
     </main>
   );
 }

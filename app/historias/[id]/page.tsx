@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
-import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -223,7 +222,6 @@ export default function HistoriasIdPage() {
       </section>
       </div>
 
-      <Footer />
     </main>
   );
 }
