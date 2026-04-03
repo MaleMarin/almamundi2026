@@ -12,7 +12,7 @@ import { Footer } from '@/components/layout/Footer';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import {
   EthicalShareFlow,
-  EthicalShareTriggerButton,
+  EthicalShareTriggerWithCartaCompanion,
 } from '@/components/stories/EthicalShareFlow';
 import { HistoricalExhibitionCarousel } from '@/components/stories/HistoricalExhibitionCarousel';
 import { useStories } from '@/hooks/useStories';
@@ -268,9 +268,9 @@ export default function HistoriasVideosPage() {
               </label>
               <div className="flex flex-wrap items-end justify-end gap-3">
                 {shareTarget ? (
-                  <EthicalShareTriggerButton
+                  <EthicalShareTriggerWithCartaCompanion
                     onClick={() => setEthicalShareOpen(true)}
-                    className="min-h-[44px] min-w-[44px] shrink-0 rounded-full border border-gray-300/35 bg-[#E0E5EC] text-gray-700 shadow-[3px_3px_8px_rgba(163,177,198,0.45),-3px_-3px_8px_rgba(255,255,255,0.85)] hover:bg-[#d8dde6]"
+                    buttonClassName="min-h-[44px] min-w-[44px] shrink-0 rounded-full border border-gray-300/35 bg-[#E0E5EC] text-gray-700 shadow-[3px_3px_8px_rgba(163,177,198,0.45),-3px_-3px_8px_rgba(255,255,255,0.85)] hover:bg-[#d8dde6]"
                   />
                 ) : null}
                 <button

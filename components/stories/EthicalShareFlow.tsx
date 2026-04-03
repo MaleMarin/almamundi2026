@@ -5,6 +5,7 @@
  * crédito obligatorio, tarjeta descargable y copia de enlace con ritual de 2 s.
  */
 import { HandHeart, X } from 'lucide-react';
+import Image from 'next/image';
 import { useCallback, useEffect, useId, useMemo, useState } from 'react';
 
 import { ExhibitionCompromisoStatement } from '@/components/stories/ExhibitionCompromisoStatement';
@@ -563,5 +564,30 @@ export function EthicalShareTriggerButton({
     >
       <HandHeart className="h-5 w-5" strokeWidth={1.75} />
     </button>
+  );
+}
+
+/**
+ * Franja visual (`/historias/companion-carta.png`) al lado del botón de compartir tarjeta (HandHeart).
+ */
+export function EthicalShareTriggerWithCartaCompanion({
+  onClick,
+  buttonClassName = '',
+}: {
+  onClick: () => void;
+  buttonClassName?: string;
+}) {
+  return (
+    <div className="flex shrink-0 items-center gap-2.5">
+      <Image
+        src="/historias/companion-carta.png"
+        alt=""
+        width={172}
+        height={342}
+        className="pointer-events-none h-[52px] w-auto max-h-14 shrink-0 select-none object-contain"
+        unoptimized
+      />
+      <EthicalShareTriggerButton onClick={onClick} className={buttonClassName} />
+    </div>
   );
 }
