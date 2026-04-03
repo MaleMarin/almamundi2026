@@ -1,9 +1,7 @@
 'use client';
 
 /**
- * BINARIO DEBUG (temporal): una sola esfera + MeshBasicMaterial.
- * Sin Atmosphere, sin CloudLayer, sin texturas, sin ShaderMaterial.
- * Tras diagnosticar, restaurar versión con EarthSurface + CloudLayer (+ Atmosphere si aplica).
+ * Demo mínima: esfera sin texturas; material Standard para acople con Environment en la escena demo.
  */
 
 import { useRef } from 'react';
@@ -38,7 +36,12 @@ export function EarthGlobe({
     <group ref={spinRef}>
       <mesh>
         <sphereGeometry args={[radius, 32, 32]} />
-        <meshBasicMaterial color="#64748b" />
+        <meshStandardMaterial
+          color={new THREE.Color(0x0a2a6e)}
+          roughness={0.55}
+          metalness={0.08}
+          envMapIntensity={1.4}
+        />
       </mesh>
     </group>
   );

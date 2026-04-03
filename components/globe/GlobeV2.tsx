@@ -475,9 +475,10 @@ function EarthGroup({
         depthWrite: false,
         blending: THREE.NormalBlending,
         premultipliedAlpha: false,
-        roughness: 1,
-        metalness: 0,
-        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0.97, 0.98, 1.0),
+        roughness: 0.55,
+        metalness: 0.08,
+        envMapIntensity: 1.4,
+        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
       }),
@@ -493,9 +494,10 @@ function EarthGroup({
         depthWrite: false,
         blending: THREE.NormalBlending,
         premultipliedAlpha: false,
-        roughness: 1,
-        metalness: 0,
-        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0.97, 0.98, 1.0),
+        roughness: 0.55,
+        metalness: 0.08,
+        envMapIntensity: 1.4,
+        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
         emissive: new THREE.Color(0x000000),
         emissiveIntensity: 0,
       }),
@@ -504,7 +506,10 @@ function EarthGroup({
 
   useLayoutEffect(() => {
     cloudMaterial.opacity = cloudOpacity;
-    cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#e8ecf2');
+    cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudMaterial.roughness = 0.55;
+    cloudMaterial.metalness = 0.08;
+    cloudMaterial.envMapIntensity = 1.4;
     cloudMaterial.emissive.set('#000000');
     cloudMaterial.emissiveIntensity = 0;
     cloudMaterial.needsUpdate = true;
@@ -513,7 +518,10 @@ function EarthGroup({
   useLayoutEffect(() => {
     const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
     cloudUnderlayMaterial.opacity = uo;
-    cloudUnderlayMaterial.color.set(viewerNight ? '#a8b0bc' : '#e8ecf2');
+    cloudUnderlayMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudUnderlayMaterial.roughness = 0.55;
+    cloudUnderlayMaterial.metalness = 0.08;
+    cloudUnderlayMaterial.envMapIntensity = 1.4;
     cloudUnderlayMaterial.emissive.set('#000000');
     cloudUnderlayMaterial.emissiveIntensity = 0;
     cloudUnderlayMaterial.needsUpdate = true;
@@ -848,14 +856,14 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.16 : forceDaylight ? 0.3 : 0.22) : viewerNight ? 0.1 : 0.2
+          embedded ? (viewerNight ? 0.1 : forceDaylight ? 0.12 : 0.12) : viewerNight ? 0.08 : 0.12
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
       <directionalLight
         ref={sunLightRef}
-        intensity={embedded ? (viewerNight ? 3.5 : forceDaylight ? 5.1 : 4.35) : viewerNight ? 3.2 : 4.05}
-        color={forceDaylight && embedded ? '#ffffff' : '#f7f8fa'}
+        intensity={embedded ? (viewerNight ? 3.65 : forceDaylight ? 5.25 : 4.5) : viewerNight ? 3.35 : 4.2}
+        color={forceDaylight && embedded ? '#fff5e0' : '#fff5e0'}
       />
 
       <group scale={geoScale}>

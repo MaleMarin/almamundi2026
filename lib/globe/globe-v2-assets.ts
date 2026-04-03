@@ -120,7 +120,7 @@ export const GLOBE_V2_NIGHT_LIGHTS_PIPELINE_NOTE =
 // ——— Valores congelados (no compensar falta de resolucion subiendo opacidad al azar) ———
 
 /** Opacidad capa exterior de nubes (fina; evitar “torta” blanca). */
-export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.78;
+export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.88;
 export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.56;
 
 /** Multiplicador opacidad esfera interior (velo ligero sobre océano, sin duplicar peso). */

@@ -72,9 +72,12 @@ export function Atmosphere({ radius, sunDirection, segments = 64 }: AtmospherePr
           float nds = clamp(dot(N, s), -1.0, 1.0);
           float sunSide = mix(0.5, 1.0, nds * 0.5 + 0.5);
 
-          vec3 base = vec3(0.42, 0.56, 0.74);
-          float alpha = rim * 0.068 * sunSide;
-          vec3 rgb = base * rim * 0.18 * sunSide;
+          /* Interior #1a6aff (más saturado), exterior #0a2060; opacidad ~+15% */
+          vec3 innerCol = vec3(0.102, 0.416, 1.0);
+          vec3 outerCol = vec3(0.039, 0.125, 0.376);
+          vec3 base = mix(outerCol, innerCol, pow(rim, 0.65));
+          float alpha = rim * 0.078 * sunSide;
+          vec3 rgb = base * rim * 0.207 * sunSide;
           fragColor = vec4(rgb, alpha);
         }
       `,

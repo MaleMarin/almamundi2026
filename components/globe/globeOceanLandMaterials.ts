@@ -111,8 +111,9 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       float ndv = clamp(dot(N, V), 0.0, 1.0);
       float openWater = smoothstep(0.36, 0.92, specSample);
 
-      vec3 deep = vec3(0.04, 0.1, 0.2);
-      vec3 mid = vec3(0.07, 0.16, 0.32);
+      /* Océano #0a2a6e dominante (referencia ISS) */
+      vec3 deep = vec3(0.039, 0.165, 0.431);
+      vec3 mid = vec3(0.06, 0.22, 0.48);
       float bathy = 0.5 + 0.5 * sin(vUv.x * 18.0 + vUv.y * 11.0);
       bathy = bathy * 0.06 + 0.94;
       vec3 base = mix(deep, mid, bathy * 0.12 + 0.1);
@@ -130,7 +131,8 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 H = normalize(L + V);
       float nh = max(dot(N, H), 0.0);
       float sunSpec = pow(nh, 384.0) * openWater * 0.055 * smoothstep(0.04, 0.98, ndl);
-      colDay += vec3(0.75, 0.82, 0.92) * sunSpec;
+      /* Highlight especular cálido (sol sobre el mar) */
+      colDay += vec3(0.95, 0.88, 0.72) * sunSpec;
 
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);

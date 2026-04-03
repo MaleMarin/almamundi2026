@@ -21,13 +21,13 @@ export type SunLightProps = {
 export function SunLight({
   direction,
   distance = 24,
-  intensity = 2.05,
-  color = '#fff4e8',
+  intensity = 1.8,
+  color = '#fff5e0',
   enableFill = true,
   fillSky = '#b9c6d4',
   fillGround = '#08080a',
   hemisphereIntensity = 0.28,
-  ambientIntensity = 0.055,
+  ambientIntensity = 0.12,
   ambientColor = '#5c6572',
 }: SunLightProps) {
   const position = useMemo(
