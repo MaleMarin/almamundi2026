@@ -13,6 +13,8 @@ export const neu = {
   bg: '#E0E5EC',
   textMain: '#4A5568',
   textBody: '#718096',
+  /** Menú superior en interiores: inactivo negro; activo = naranja (`ACTIVE_NAV_CLASS`). */
+  navLinkIdle: '#0a0a0a',
   /** Naranja fuerte como la home (--almamundi-orange) */
   orange: '#ff4500',
   gold: '#ff4500',
