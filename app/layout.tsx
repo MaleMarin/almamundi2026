@@ -1,3 +1,4 @@
+import { CursorGlobal } from '@/components/ui/CursorGlobal';
 import { Footer } from '@/components/layout/Footer';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
@@ -42,6 +43,7 @@ export default async function RootLayout({
   return (
     <html lang={locale}>
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
+        <CursorGlobal />
         <a
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-bold"
