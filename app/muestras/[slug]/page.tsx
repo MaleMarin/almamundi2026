@@ -30,8 +30,8 @@ export default function MuestraDetailPage() {
       <main
         style={{
           minHeight: '100vh',
-          background: '#080808',
-          color: '#fff',
+          background: '#e6e9ee',
+          color: '#1a1f2a',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
@@ -41,7 +41,7 @@ export default function MuestraDetailPage() {
         }}
       >
         <p style={{ margin: 0 }}>No se encontró esta muestra.</p>
-        <Link href="/muestras" style={{ color: '#d2aa5a', textDecoration: 'none' }}>
+        <Link href="/muestras" style={{ color: '#FF4A1C', textDecoration: 'none' }}>
           Volver al listado
         </Link>
       </main>
