@@ -37,12 +37,22 @@ function attachShaderErrorLogger(renderer: THREE.WebGLRenderer) {
   };
 }
 
-export function LiquidLightBackground() {
+type LiquidLightBackgroundProps = {
+  /**
+   * `true`: `position: absolute; inset: 0` respecto al padre posicionado (p. ej. SalaHilo).
+   * `false` (defecto): `fixed` a la ventana (comportamiento histórico si se reutiliza fuera).
+   */
+  fillParent?: boolean;
+};
+
+export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgroundProps) {
   const mountRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const mount = mountRef.current;
     if (!mount) return;
+
+    const gelCanvasPosition = fillParent ? 'absolute' : 'fixed';
 
     const targetMouse = new THREE.Vector2(0.5, 0.5);
     const prevTarget = new THREE.Vector2(0.5, 0.5);
@@ -141,10 +151,10 @@ export function LiquidLightBackground() {
           vec2 pr = vec2(co * p.x - si * p.y, si * p.x + co * p.y);
 
           float stretch = clamp(speed * 0.026, 0.0, 1.45);
-          vec2 rad = vec2(0.021 + stretch * 0.14, 0.021 / (1.0 + stretch * 0.68));
+          vec2 rad = vec2(0.013 + stretch * 0.09, 0.013 / (1.0 + stretch * 0.68));
           float dist = dot(pr / rad, pr / rad);
           float contact = exp(-dist * 1.05) * uSplatAmp * (0.35 + 0.65 * min(speed * 0.1, 1.0));
-          float atRest = exp(-dot(p, p) / (0.034 * 0.034)) * uSplatAmp * 0.065;
+          float atRest = exp(-dot(p, p) / (0.019 * 0.019)) * uSplatAmp * 0.045;
 
           float outv = clamp(c + contact + atRest * (1.0 - min(stretch * 0.85, 0.92)), 0.0, 1.0);
           fragColor = vec4(outv, outv, outv, 1.0);
@@ -190,14 +200,14 @@ export function LiquidLightBackground() {
         float metaField(vec2 uv) {
           float asp = uResolution.x / max(uResolution.y, 1.0);
           float sp = min(length(uCursorVel) * 0.018, 3.2);
-          float wHead = 0.0105 * (1.0 + sp * 0.32);
+          float wHead = 0.0068 * (1.0 + sp * 0.28);
           float M =
             metaPot(uv, uMetaA, wHead, asp)
-            + metaPot(uv, uMetaB, 0.0078, asp)
-            + metaPot(uv, uMetaC, 0.0059, asp)
-            + metaPot(uv, uMetaD, 0.0044, asp)
-            + metaPot(uv, uMetaE, 0.0034, asp);
-          float m = smoothstep(0.95, 2.55, M);
+            + metaPot(uv, uMetaB, 0.0051, asp)
+            + metaPot(uv, uMetaC, 0.0039, asp)
+            + metaPot(uv, uMetaD, 0.0029, asp)
+            + metaPot(uv, uMetaE, 0.0022, asp);
+          float m = smoothstep(1.35, 3.25, M);
           return pow(clamp(m, 0.0, 1.0), 0.64);
         }
 
@@ -340,7 +350,7 @@ export function LiquidLightBackground() {
 
     const canvas = renderer.domElement;
     Object.assign(canvas.style, {
-      position: 'fixed',
+      position: gelCanvasPosition,
       inset: '0',
       width: '100%',
       height: '100%',
@@ -509,14 +519,14 @@ export function LiquidLightBackground() {
         mount.removeChild(canvas);
       }
     };
-  }, []);
+  }, [fillParent]);
 
   return (
     <div
       ref={mountRef}
       aria-hidden
       style={{
-        position: 'fixed',
+        position: fillParent ? 'absolute' : 'fixed',
         inset: 0,
         zIndex: 0,
         pointerEvents: 'none',

@@ -1,13 +1,10 @@
 'use client';
 import Link from 'next/link';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-
 import { useEffect, useMemo, useState } from 'react';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
 import { getMuestras } from '@/lib/muestras';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import { MuestrasInteriorNav } from '@/components/muestras/MuestrasInteriorNav';
+import { neu } from '@/lib/historias-neumorph';
 
 export default function MuestrasListPage() {
   const [topics, setTopics] = useState<MuestrasByTopic[]>([]);
@@ -47,18 +44,7 @@ export default function MuestrasListPage() {
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#intro" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className="[&_button]:btn-almamundi" />
-          <ActiveInternalNavLink href="/muestras" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Muestras</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
-        </div>
-      </nav>
+      <MuestrasInteriorNav />
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
         <header

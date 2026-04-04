@@ -353,7 +353,7 @@ export default function HomeMap() {
   };
 
   /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
-  const TIME_STRIP_HEIGHT = 120;
+  const TIME_STRIP_HEIGHT = 128;
   return (
     <div className="relative flex min-h-[88vh] w-full flex-1 flex-col">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}

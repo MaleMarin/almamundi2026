@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Sala «el hilo» — portal neumórfico → canvas (hilo + nudos); click en nudo → historia.
+ * Sala «el hilo» — portal 3D (gel + perspectiva) → escena Three (hilo + nudos); click en nudo → historia.
  * Estilos solo inline + keyframes locales (sin Tailwind ni CSS module).
  */
 import {
@@ -12,6 +12,8 @@ import {
   useState,
 } from 'react';
 import { LiquidLightBackground } from '@/components/LiquidLightBackground';
+import { SalaHiloThread3D } from '@/components/muestras/SalaHiloThread3D';
+import { kpos } from '@/lib/muestras/sala-hilo-thread-math';
 
 export type SalaHiloMuestraInput = {
   titulo: string;
@@ -25,89 +27,6 @@ export type SalaHiloMuestraInput = {
     formato: string;
   }[];
 };
-
-const ty = (x: number, W: number, H: number, t: number) => {
-  const amp = 36;
-  const freq = (2 * Math.PI) / (W * 0.88);
-  return (
-    H * 0.48 +
-    Math.sin(x * freq + t * 0.5) * amp +
-    Math.sin(x * freq * 0.4 + t * 0.28) * 15
-  );
-};
-
-const kpos = (W: number, H: number, t: number, count: number) => {
-  if (count <= 0) return [];
-  if (count === 1) {
-    const x = W / 2;
-    return [{ x, y: ty(x, W, H, t) }];
-  }
-  const mg = W * 0.1;
-  const sp = (W - mg * 2) / (count - 1);
-  return Array.from({ length: count }, (_, i) => {
-    const x = mg + i * sp;
-    return { x, y: ty(x, W, H, t) };
-  });
-};
-
-function truncThreeWords(s: string): string {
-  const w = s.trim().split(/\s+/).filter(Boolean);
-  if (w.length <= 3) return w.join(' ');
-  return `${w.slice(0, 3).join(' ')}…`;
-}
-
-/** Sombra elíptica bajo esfera (contacto con “suelo”). */
-function drawGroundEllipse(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number,
-  alpha: number
-) {
-  ctx.beginPath();
-  ctx.ellipse(x, y + r * 0.36, r * 0.95, r * 0.3, 0, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(55,65,80,${alpha})`;
-  ctx.fill();
-}
-
-/** Nudo como esfera iluminada (gradiente + highlight especular). */
-function drawKnotSphere(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  r: number,
-  variant: 'idle' | 'hover' | 'done'
-) {
-  const lx = x - r * 0.38;
-  const ly = y - r * 0.4;
-  if (variant !== 'done') {
-    drawGroundEllipse(ctx, x, y, r, 0.1);
-  }
-  const g = ctx.createRadialGradient(lx, ly, Math.max(1, r * 0.08), x, y, r * 1.08);
-  if (variant === 'hover') {
-    g.addColorStop(0, 'rgba(255,255,255,0.98)');
-    g.addColorStop(0.28, '#f2f4f8');
-    g.addColorStop(0.62, '#dce1ea');
-    g.addColorStop(1, '#b9c2d0');
-  } else if (variant === 'done') {
-    g.addColorStop(0, '#f0f2f6');
-    g.addColorStop(0.45, '#e0e4ec');
-    g.addColorStop(1, '#c5ccd8');
-  } else {
-    g.addColorStop(0, '#ffffff');
-    g.addColorStop(0.32, '#eef1f7');
-    g.addColorStop(0.72, '#d8dee8');
-    g.addColorStop(1, '#c1c9d6');
-  }
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.fillStyle = g;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(x - r * 0.32, y - r * 0.34, Math.max(1.5, r * 0.2), 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255,255,255,0.5)';
-  ctx.fill();
-}
 
 type Particle = {
   id: string;
@@ -123,16 +42,10 @@ type Phase = 'portal' | 'hilo';
 const BG = '#e6e9ee';
 const ACCENT = '#FF4A1C';
 const TEXT_PRIMARY = '#1a1f2a';
-const TEXT_SECONDARY = '#5a6070';
 const TEXT_MUTED = '#9299a8';
 const TEXT_HINT = '#b0b6c2';
 const SHADOW_DARK = '#c4c7cd';
 const SHADOW_LIGHT = '#ffffff';
-
-/** Superficie un poco más clara que `BG` + sombras duales para relieve neumórfico legible. */
-const TITLE_NEU_BG = '#eef1f6';
-const TITLE_NEU_SHADOW =
-  '14px 14px 34px rgba(125, 142, 165, 0.48), -12px -12px 30px rgba(255, 255, 255, 0.94)';
 
 export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   const uid = useId().replace(/:/g, '');
@@ -150,14 +63,13 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     id: string;
     formato: string;
   } | null>(null);
+  const [threadDims, setThreadDims] = useState({ w: 640, h: 420 });
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const tRef = useRef(0);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const activeKnotRef = useRef(-1);
   const unraveledRef = useRef<Set<number>>(new Set());
-  const rafRef = useRef<number | null>(null);
 
   const appendParticles = useCallback((cx: number, cy: number) => {
     const next: Particle[] = [];
@@ -179,232 +91,22 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     }, 900);
   }, [uid]);
 
-  const drawFrame = useCallback(() => {
-    const canvas = canvasRef.current;
-    const wrap = containerRef.current;
-    if (!canvas || !wrap || phase === 'portal') return;
-
-    const rect = wrap.getBoundingClientRect();
-    const W = rect.width;
-    const H = rect.height;
-    if (W < 2 || H < 2) return;
-
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const cw = Math.floor(W * dpr);
-    const ch = Math.floor(H * dpr);
-    if (canvas.width !== cw || canvas.height !== ch) {
-      canvas.width = cw;
-      canvas.height = ch;
-    }
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-
-    const t = tRef.current;
-    const knots = kpos(W, H, t, stories.length);
-    const mouse = mouseRef.current;
-    const unraveled = unraveledRef.current;
-
-    let active = -1;
-    for (let i = 0; i < knots.length; i++) {
-      const { x, y } = knots[i];
-      const dx = mouse.x - x;
-      const dy = mouse.y - y;
-      if (Math.hypot(dx, dy) < 32) active = i;
-    }
-    activeKnotRef.current = active;
-
-    const step = 3;
-    const pts: { x: number; y: number }[] = [];
-    for (let x = 0; x <= W; x += step) {
-      pts.push({ x, y: ty(x, W, H, t) });
-    }
-
-    ctx.lineCap = 'round';
-    ctx.lineJoin = 'round';
-
-    const openThread = (dy: number) => {
-      ctx.beginPath();
-      for (let i = 0; i < pts.length; i++) {
-        const p = pts[i];
-        if (i === 0) ctx.moveTo(p.x, p.y + dy);
-        else ctx.lineTo(p.x, p.y + dy);
-      }
-    };
-
-    openThread(3.2);
-    ctx.strokeStyle = 'rgba(55,65,82,0.09)';
-    ctx.lineWidth = 6;
-    ctx.stroke();
-
-    openThread(1.6);
-    ctx.strokeStyle = 'rgba(88,98,115,0.38)';
-    ctx.lineWidth = 3.4;
-    ctx.stroke();
-
-    const grad = ctx.createLinearGradient(0, 0, W, 0);
-    grad.addColorStop(0, 'rgba(200,205,215,0.35)');
-    grad.addColorStop(0.1, 'rgba(135,145,162,0.95)');
-    grad.addColorStop(0.5, 'rgba(95,105,125,1)');
-    grad.addColorStop(0.9, 'rgba(135,145,162,0.95)');
-    grad.addColorStop(1, 'rgba(200,205,215,0.35)');
-    openThread(0);
-    ctx.strokeStyle = grad;
-    ctx.lineWidth = 2.1;
-    ctx.stroke();
-
-    openThread(-1);
-    ctx.strokeStyle = 'rgba(255,255,255,0.28)';
-    ctx.lineWidth = 1.15;
-    ctx.stroke();
-
-    for (let i = 0; i < knots.length; i++) {
-      const { x, y } = knots[i];
-      const isUnraveled = unraveled.has(i);
-      const isHover = active === i && !isUnraveled;
-
-      if (isUnraveled) {
-        drawKnotSphere(ctx, x, y, 12, 'done');
-        ctx.strokeStyle = 'rgba(140,150,165,0.55)';
-        ctx.lineWidth = 1.25;
-        ctx.beginPath();
-        ctx.arc(x, y, 12, 0, Math.PI * 2);
-        ctx.stroke();
-        ctx.font = 'bold 12px system-ui, sans-serif';
-        ctx.fillStyle = ACCENT;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('✓', x, y);
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'alphabetic';
-        continue;
-      }
-
-      if (isHover) {
-        const r = 18;
-        ctx.beginPath();
-        ctx.arc(x, y, r + 14, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,74,28,0.15)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.arc(x, y, r + 8, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,74,28,0.10)';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        drawKnotSphere(ctx, x, y, r, 'hover');
-        ctx.beginPath();
-        ctx.arc(x, y, r, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(255,74,28,0.55)';
-        ctx.lineWidth = 2.25;
-        ctx.stroke();
-
-        ctx.font = '800 14px system-ui, sans-serif';
-        ctx.fillStyle = ACCENT;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.shadowColor = 'rgba(255,74,28,0.2)';
-        ctx.shadowOffsetY = 1;
-        ctx.shadowBlur = 2;
-        ctx.fillText(String(i + 1), x, y);
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-
-        const h = stories[i];
-        ctx.font = '700 20px system-ui, sans-serif';
-        ctx.textBaseline = 'bottom';
-        let title = h.titulo;
-        let tw = ctx.measureText(title).width;
-        while (tw > W * 0.42 && title.length > 4) {
-          title = title.slice(0, -1);
-          tw = ctx.measureText(`${title}…`).width;
-        }
-        if (title !== h.titulo) title = `${title}…`;
-        ctx.fillStyle = TEXT_PRIMARY;
-        ctx.shadowColor = 'rgba(100,110,130,0.22)';
-        ctx.shadowOffsetX = 0;
-        ctx.shadowOffsetY = 2;
-        ctx.shadowBlur = 4;
-        ctx.fillText(title, x, y - r - 22);
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-
-        ctx.font = '500 13px system-ui, sans-serif';
-        ctx.fillStyle = ACCENT;
-        ctx.textBaseline = 'bottom';
-        ctx.shadowColor = 'rgba(255,74,28,0.15)';
-        ctx.shadowOffsetY = 1;
-        ctx.shadowBlur = 2;
-        ctx.fillText(h.formato.toUpperCase(), x, y - r - 3);
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'alphabetic';
-        continue;
-      }
-
-      const rn = 13;
-      drawKnotSphere(ctx, x, y, rn, 'idle');
-      ctx.strokeStyle = 'rgba(160,170,185,0.35)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.arc(x, y, rn, 0, Math.PI * 2);
-      ctx.stroke();
-
-      ctx.font = '600 12px system-ui, sans-serif';
-      ctx.fillStyle = '#5a6578';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.shadowColor = 'rgba(255,255,255,0.55)';
-      ctx.shadowOffsetX = 0;
-      ctx.shadowOffsetY = -0.5;
-      ctx.shadowBlur = 0;
-      ctx.fillText(String(i + 1), x, y);
-      ctx.shadowColor = 'transparent';
-
-      const sub = truncThreeWords(stories[i].titulo);
-      ctx.font = '400 14px system-ui, sans-serif';
-      ctx.fillStyle = TEXT_MUTED;
-      ctx.textBaseline = 'top';
-      ctx.shadowColor = 'rgba(100,110,130,0.12)';
-      ctx.shadowOffsetY = 1;
-      ctx.shadowBlur = 3;
-      ctx.fillText(sub, x, y + 20);
-      ctx.shadowColor = 'transparent';
-      ctx.shadowBlur = 0;
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'alphabetic';
-    }
-  }, [phase, stories]);
-
-  useEffect(() => {
-    if (phase === 'portal') return;
-
-    const loop = () => {
-      tRef.current += 0.01;
-      drawFrame();
-      rafRef.current = requestAnimationFrame(loop);
-    };
-    rafRef.current = requestAnimationFrame(loop);
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current);
-    };
-  }, [phase, drawFrame]);
-
   useEffect(() => {
     const el = containerRef.current;
     if (!el || phase === 'portal') return;
 
-    const ro = new ResizeObserver(() => {
-      drawFrame();
-    });
+    const measure = () => {
+      const r = el.getBoundingClientRect();
+      const w = Math.max(8, Math.floor(r.width));
+      const h = Math.max(8, Math.floor(r.height));
+      setThreadDims((d) => (d.w === w && d.h === h ? d : { w, h }));
+    };
+
+    const ro = new ResizeObserver(() => measure());
     ro.observe(el);
-    drawFrame();
+    measure();
     return () => ro.disconnect();
-  }, [phase, drawFrame]);
+  }, [phase]);
 
   useEffect(() => {
     const upd = () =>
@@ -438,11 +140,11 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     };
   };
 
-  const onCanvasMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const onThreadPointerMove = (e: React.MouseEvent<HTMLDivElement>) => {
     setPointerFromClient(e.clientX, e.clientY);
   };
 
-  const onCanvasMouseLeave = () => {
+  const onThreadPointerLeave = () => {
     mouseRef.current = { x: -9999, y: -9999 };
   };
 
@@ -468,17 +170,11 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     [stories, appendParticles]
   );
 
-  const onCanvasClick = () => {
-    drawFrame();
-    navigateToHistoriaFromKnot(activeKnotRef.current);
-  };
-
-  const onCanvasTouchStart = (e: React.TouchEvent<HTMLCanvasElement>) => {
+  const onThreadTouchStart = (e: React.TouchEvent<HTMLDivElement>) => {
     const tch = e.touches[0];
     if (!tch) return;
     e.preventDefault();
     setPointerFromClient(tch.clientX, tch.clientY);
-    drawFrame();
     navigateToHistoriaFromKnot(activeKnotRef.current);
   };
 
@@ -487,6 +183,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     window.setTimeout(() => {
       setPhase('hilo');
       setPortalOpacity(1);
+      setSalaOpacity(1);
     }, 700);
   };
 
@@ -517,14 +214,11 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
 
   return (
     <div
+      className="fixed left-0 right-0 top-20 z-40 h-[calc(100svh-5rem)] overflow-hidden md:top-24 md:h-[calc(100svh-6rem)]"
       style={{
-        position: 'fixed',
-        inset: 0,
         background: BG,
         color: TEXT_PRIMARY,
         fontFamily: 'system-ui, -apple-system, sans-serif',
-        overflow: 'hidden',
-        zIndex: 50,
       }}
     >
       {styleTag}
@@ -532,19 +226,45 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       {phase === 'portal' && (
         <div
           style={{
-            position: 'fixed',
+            position: 'absolute',
             inset: 0,
-            background: '#e6e9ee',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            padding: '0 8vw',
             zIndex: 30,
             opacity: portalOpacity,
             transition: 'opacity 0.7s ease',
             pointerEvents: portalOpacity > 0 ? 'all' : 'none',
+            overflow: 'hidden',
           }}
         >
+          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+            <LiquidLightBackground fillParent />
+          </div>
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 2,
+              minHeight: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              padding: '0 8vw',
+              perspective: '1600px',
+            }}
+          >
+            <div
+              style={{
+                transform: 'rotateX(5deg) translateZ(0)',
+                transformStyle: 'preserve-3d',
+                maxWidth: 920,
+                padding: 'clamp(22px, 4.5vw, 48px)',
+                borderRadius: 28,
+                background: 'rgba(236, 239, 244, 0.52)',
+                backdropFilter: 'blur(16px) saturate(120%)',
+                WebkitBackdropFilter: 'blur(16px) saturate(120%)',
+                boxShadow:
+                  '22px 32px 56px rgba(85, 98, 118, 0.28), -14px -20px 44px rgba(255, 255, 255, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
+                border: '1px solid rgba(255, 255, 255, 0.5)',
+              }}
+            >
           <p
             style={{
               fontSize: 10,
@@ -642,12 +362,14 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
           >
             Entrar a la sala →
           </button>
+            </div>
 
           <div
             style={{
               position: 'absolute',
               bottom: 32,
               left: '8vw',
+              zIndex: 3,
               display: 'flex',
               alignItems: 'center',
               gap: 12,
@@ -673,6 +395,7 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               AlmaMundi
             </span>
           </div>
+          </div>
         </div>
       )}
 
@@ -681,14 +404,31 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
           style={{
             position: 'absolute',
             inset: 0,
-            minHeight: '100vh',
+            height: '100%',
+            minHeight: 0,
             backgroundColor: 'transparent',
             overflow: 'hidden',
             opacity: salaOpacity,
             transition: 'opacity 0.7s ease',
           }}
         >
-          <LiquidLightBackground />
+          {/*
+            Sin segundo WebGL aquí: el gel + R3F compiten por contexto y en algunos
+            dispositivos la escena del hilo queda en negro / vacía. Fondo CSS acorde al neumorfismo.
+          */}
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: 'none',
+              background: `radial-gradient(120% 85% at 50% 12%, rgba(255,255,255,0.5) 0%, transparent 50%),
+                radial-gradient(90% 70% at 10% 90%, rgba(222,228,238,0.95) 0%, transparent 55%),
+                radial-gradient(85% 65% at 92% 75%, rgba(212,220,234,0.9) 0%, transparent 48%),
+                linear-gradient(168deg, #e2e6ee 0%, ${BG} 44%, #d8dee8 100%)`,
+            }}
+          />
           <div
             style={{
               position: 'absolute',
@@ -750,6 +490,9 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
 
           <div
             ref={containerRef}
+            onMouseMove={onThreadPointerMove}
+            onMouseLeave={onThreadPointerLeave}
+            onTouchStart={onThreadTouchStart}
             style={{
               width: '100%',
               height: canvasCssH,
@@ -758,24 +501,19 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               marginTop: 72,
               position: 'relative',
               zIndex: 1,
+              cursor: 'crosshair',
+              touchAction: 'none',
             }}
           >
-            <canvas
-              ref={canvasRef}
-              onMouseMove={onCanvasMouseMove}
-              onMouseLeave={onCanvasMouseLeave}
-              onClick={onCanvasClick}
-              onTouchStart={onCanvasTouchStart}
-              style={{
-                display: 'block',
-                width: '100%',
-                height: '100%',
-                cursor: 'crosshair',
-                touchAction: 'none',
-                backgroundColor: 'transparent',
-                position: 'relative',
-                zIndex: 1,
-              }}
+            <SalaHiloThread3D
+              width={threadDims.w}
+              height={threadDims.h}
+              stories={stories}
+              tRef={tRef}
+              mouseRef={mouseRef}
+              activeKnotRef={activeKnotRef}
+              unraveledRef={unraveledRef}
+              onKnotPick={navigateToHistoriaFromKnot}
             />
             {particles.map((p) => (
               <span
