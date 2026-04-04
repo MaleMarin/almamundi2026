@@ -66,13 +66,15 @@ export function CursorGlobal() {
       ringEl.classList.remove('cursor-hover');
     }
 
+    const hoverBound = new WeakSet<HTMLElement>();
+
     function attachHover() {
       document
         .querySelectorAll('a, button, [role="button"], [data-cursor-hover]')
         .forEach((el) => {
           if (!(el instanceof HTMLElement)) return;
-          if (el.dataset.cursorBound === '1') return;
-          el.dataset.cursorBound = '1';
+          if (hoverBound.has(el)) return;
+          hoverBound.add(el);
           el.addEventListener('mouseenter', onEnterLink);
           el.addEventListener('mouseleave', onLeaveLink);
         });
@@ -89,6 +91,13 @@ export function CursorGlobal() {
       window.removeEventListener('mousemove', onMove);
       mutObs.disconnect();
       document.documentElement.removeAttribute('data-cursor-global');
+      document
+        .querySelectorAll('a, button, [role="button"], [data-cursor-hover]')
+        .forEach((el) => {
+          if (!(el instanceof HTMLElement)) return;
+          el.removeEventListener('mouseenter', onEnterLink);
+          el.removeEventListener('mouseleave', onLeaveLink);
+        });
     };
   }, [mounted]);
 

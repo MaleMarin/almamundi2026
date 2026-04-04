@@ -532,16 +532,17 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       {phase === 'portal' && (
         <div
           style={{
-            position: 'absolute',
+            position: 'fixed',
             inset: 0,
+            background: '#e6e9ee',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            padding: '0 60px',
-            minHeight: '100vh',
-            boxSizing: 'border-box',
+            padding: '0 8vw',
+            zIndex: 30,
             opacity: portalOpacity,
             transition: 'opacity 0.7s ease',
+            pointerEvents: portalOpacity > 0 ? 'all' : 'none',
           }}
         >
           <p
@@ -549,83 +550,85 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               fontSize: 10,
               letterSpacing: '0.24em',
               textTransform: 'uppercase',
-              color: ACCENT,
-              margin: 0,
-              marginBottom: 18,
+              color: '#FF4A1C',
+              marginTop: 0,
+              marginRight: 0,
+              marginBottom: 20,
+              marginLeft: 0,
             }}
           >
-            SALA · MUESTRA CURADA
+            sala · muestra curada
           </p>
-          <div
+
+          <h1
             style={{
-              marginBottom: 14,
-              maxWidth: 720,
-              width: '100%',
-              padding: 'clamp(18px, 4vw, 28px) clamp(20px, 5vw, 40px)',
-              borderRadius: 28,
-              backgroundColor: TITLE_NEU_BG,
-              boxShadow: TITLE_NEU_SHADOW,
-              border: '1px solid rgba(255, 255, 255, 0.58)',
-              boxSizing: 'border-box',
+              fontSize: 'clamp(42px, 7vw, 80px)',
+              fontWeight: 800,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.02,
+              color: '#1a1f2a',
+              maxWidth: 700,
+              marginTop: 0,
+              marginRight: 0,
+              marginBottom: 16,
+              marginLeft: 0,
             }}
           >
-            <h1
-              style={{
-                margin: 0,
-                fontSize: 'clamp(2rem, 7vw, 3.875rem)',
-                fontWeight: 800,
-                letterSpacing: '-0.03em',
-                lineHeight: 1.05,
-                color: TEXT_PRIMARY,
-                textShadow:
-                  '1px 1px 0 rgba(255, 255, 255, 0.95), -1px -1px 0 rgba(163, 177, 198, 0.28)',
-              }}
-            >
-              {muestra.titulo}
-            </h1>
-          </div>
+            {muestra.titulo}
+          </h1>
+
           <p
             style={{
-              margin: 0,
-              marginBottom: 14,
               fontSize: 13,
-              color: TEXT_MUTED,
+              color: '#9299a8',
+              marginTop: 0,
+              marginRight: 0,
+              marginBottom: 16,
+              marginLeft: 0,
+              letterSpacing: '0.02em',
             }}
           >
-            Curadas por {muestra.curadora}
+            Curada por {muestra.curadora}
           </p>
+
           <p
             style={{
-              margin: 0,
-              marginBottom: 8,
               fontSize: 16,
-              color: TEXT_SECONDARY,
+              color: '#5a6070',
               lineHeight: 1.75,
               maxWidth: 480,
-              whiteSpace: 'pre-wrap',
+              marginTop: 0,
+              marginRight: 0,
+              marginBottom: 8,
+              marginLeft: 0,
+              whiteSpace: 'pre-line',
             }}
           >
             {muestra.descripcion}
           </p>
+
           <p
             style={{
-              margin: 0,
-              marginBottom: 40,
               fontSize: 11,
               letterSpacing: '0.18em',
               textTransform: 'uppercase',
-              color: TEXT_HINT,
+              color: '#b0b6c2',
+              marginTop: 0,
+              marginRight: 0,
+              marginBottom: 44,
+              marginLeft: 0,
             }}
           >
-            {total} historias
+            {muestra.historias.length} historias
           </p>
+
           <button
             type="button"
             onClick={enterSala}
             style={{
               alignSelf: 'flex-start',
-              background: BG,
-              color: ACCENT,
+              background: '#e6e9ee',
+              color: '#FF4A1C',
               border: 'none',
               padding: '15px 36px',
               borderRadius: 100,
@@ -633,12 +636,43 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              boxShadow: `6px 6px 12px ${SHADOW_DARK}, -6px -6px 12px ${SHADOW_LIGHT}`,
-              cursor: 'pointer',
+              cursor: 'none',
+              boxShadow: '6px 6px 12px #c4c7cd, -6px -6px 12px #ffffff',
             }}
           >
             Entrar a la sala →
           </button>
+
+          <div
+            style={{
+              position: 'absolute',
+              bottom: 32,
+              left: '8vw',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 12,
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 1,
+                background: '#b0b6c2',
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            />
+            <span
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: '#b0b6c2',
+              }}
+            >
+              AlmaMundi
+            </span>
+          </div>
         </div>
       )}
 
