@@ -12,6 +12,7 @@ import { neu, historiasInterior } from '@/lib/historias-neumorph';
 export function MuestrasInteriorNav() {
   return (
     <nav
+      id="muestras-interior-nav"
       className={historiasInterior.navClassName}
       style={historiasInterior.navBarStyle}
     >

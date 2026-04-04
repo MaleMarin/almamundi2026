@@ -123,7 +123,7 @@ function ThreadStrands({
         });
         const line = new Line2(geom, mat);
         line.frustumCulled = false;
-        line.computeLineDistances();
+        /* Sin dashed en LineMaterial: no hace falta computeLineDistances (requiere posiciones ya cargadas). */
         g.add(line);
         layers.current.push({ geom, line, mat, dy: s.dy });
       }

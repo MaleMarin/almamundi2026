@@ -1,9 +1,29 @@
 'use client';
 
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { Suspense } from 'react';
+import { useParams, useSearchParams } from 'next/navigation';
 import { SalaHilo, type SalaHiloMuestraInput } from '@/components/muestras/SalaHilo';
 import { getMuestraBySlug, type Muestra } from '@/lib/muestras';
+
+function slugFromParams(params: ReturnType<typeof useParams>): string {
+  const raw = params?.slug;
+  if (typeof raw === 'string' && raw.length > 0) {
+    try {
+      return decodeURIComponent(raw);
+    } catch {
+      return raw;
+    }
+  }
+  if (Array.isArray(raw) && raw[0]) {
+    try {
+      return decodeURIComponent(String(raw[0]));
+    } catch {
+      return String(raw[0]);
+    }
+  }
+  return '';
+}
 
 function toSalaMuestra(muestra: Muestra): SalaHiloMuestraInput {
   return {
@@ -20,10 +40,12 @@ function toSalaMuestra(muestra: Muestra): SalaHiloMuestraInput {
   };
 }
 
-export default function MuestraDetailPage() {
+function MuestraDetailBody() {
   const params = useParams();
-  const slug = typeof params.slug === 'string' ? params.slug : '';
+  const searchParams = useSearchParams();
+  const slug = slugFromParams(params);
   const muestra = getMuestraBySlug(slug);
+  const skipPortal = searchParams.get('portal') !== '1';
 
   if (!muestra) {
     return (
@@ -51,5 +73,37 @@ export default function MuestraDetailPage() {
     );
   }
 
-  return <SalaHilo muestra={toSalaMuestra(muestra)} />;
+  return (
+    <div
+      id="muestra-sala-host"
+      style={{
+        width: '100%',
+        minHeight: 'calc(100vh - 6rem)',
+        backgroundColor: '#e6e9ee',
+        color: '#1a1f2a',
+        position: 'relative',
+        zIndex: 1,
+      }}
+    >
+      <SalaHilo muestra={toSalaMuestra(muestra)} skipPortal={skipPortal} />
+    </div>
+  );
+}
+
+export default function MuestraDetailPage() {
+  return (
+    <Suspense
+      fallback={
+        <div
+          style={{
+            width: '100%',
+            minHeight: 'calc(100vh - 6rem)',
+            backgroundColor: '#e6e9ee',
+          }}
+        />
+      }
+    >
+      <MuestraDetailBody />
+    </Suspense>
+  );
 }

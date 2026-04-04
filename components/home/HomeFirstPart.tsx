@@ -20,7 +20,7 @@ const homeHeroPhrase = DM_Sans({
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
- * LOCK diseño: tamaños card ~400×450px, neumorfismo E0E5EC — no sustituir por otras plantillas (p. ej. política).
+ * LOCK diseño: tarjetas neumórficas E0E5EC; tamaño desktop ampliado por petición explícita (~512×560px).
  */
 
 const APP_FONT = SITE_FONT_STACK;
@@ -75,16 +75,22 @@ function SoftCard({
   return (
     <div
       role="article"
-      className="home-first-part-float home-neu-card group relative flex min-h-[450px] w-full max-w-[400px] flex-1 flex-col items-start rounded-[40px] p-8 transition-all duration-500 hover:-translate-y-2"
+      className="home-first-part-float home-neu-card group relative flex min-h-[500px] w-full max-w-[472px] flex-1 flex-col items-start rounded-[40px] p-10 transition-all duration-500 hover:-translate-y-2 sm:min-h-[528px] sm:max-w-[492px] md:min-h-[560px] md:max-w-[512px] md:p-12"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div className="mb-5 shrink-0">
-        <p className="text-xl md:text-2xl font-light text-gray-500 leading-tight m-0">{title}</p>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-700 leading-tight mt-1">{subtitle}</h2>
+      <div className="mb-6 shrink-0 md:mb-7">
+        <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
+          {title}
+        </p>
+        <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
+          {subtitle}
+        </h2>
       </div>
-      <div className="flex-1 min-h-[80px] w-full" />
+      <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
       <div className="w-full mt-auto">
-        <p className="text-gray-500 leading-relaxed text-base md:text-lg mb-6">{children}</p>
+        <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
+          {children}
+        </p>
         <button
           onClick={onClick}
           className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
@@ -93,8 +99,8 @@ function SoftCard({
             color: 'white',
             border: 'none',
             borderRadius: '100px',
-            padding: '10px 16px',
-            fontSize: '11px',
+            padding: '14px 22px',
+            fontSize: '13px',
             fontWeight: 700,
             letterSpacing: '0.1em',
             fontFamily: APP_FONT,
@@ -237,7 +243,7 @@ export function HomeFirstPart({
       {/* INTRO — DM Sans: sans geométrica minimalista (solo esta franja) */}
       <section
         id="intro"
-        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-14 lg:pt-80 pb-10 px-6 md:px-10`}
+        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-8 lg:pt-80 pb-6 px-6 md:px-10`}
       >
         <div className="w-full max-w-5xl lg:max-w-6xl">
           <div className="home-first-part-float relative">
@@ -289,7 +295,7 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="w-full px-4 sm:px-8 md:px-12 lg:px-16 pt-16 md:pt-24 lg:pt-28 pb-16 md:pb-20 mb-12 md:mb-16 flex flex-col md:flex-row flex-wrap gap-y-12 md:gap-y-14 gap-x-10 md:gap-x-12 lg:gap-x-16 justify-center items-stretch relative z-10"
+        className="relative z-10 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-10 sm:px-8 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-16 lg:gap-x-16 lg:px-16 lg:pt-20"
       >
         <SoftCard
           title={t.cardVideoTitle}

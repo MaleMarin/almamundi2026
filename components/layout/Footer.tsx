@@ -12,9 +12,18 @@ const APP_FONT = `ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "
 /** Misma clase en globals.css: anula naranja global y estado activo naranja. */
 const FOOTER_LINK = 'almamundi-footer-link font-normal transition-colors';
 
-export function Footer() {
+export type FooterProps = {
+  /**
+   * true = mismo diseño pero sin `data-site-footer` (p. ej. portal cinematográfico;
+   * el layout sigue ocultando solo el footer global vía CSS).
+   */
+  embedded?: boolean;
+};
+
+export function Footer({ embedded = false }: FooterProps = {}) {
   return (
     <footer
+      {...(!embedded ? { 'data-site-footer': 'global' as const } : {})}
       className="w-full pb-32 pt-28 md:pt-36 px-8 md:px-12 flex flex-col items-center relative z-20 bg-[#E0E5EC]"
       style={{ fontFamily: APP_FONT }}
     >

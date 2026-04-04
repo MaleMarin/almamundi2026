@@ -31,15 +31,22 @@
   }
 }
 
-html {
-  font-family: var(--font-sans);
-  scroll-behavior: smooth;
-}
+/**
+ * Base en @layer para que utilidades Tailwind (p. ej. bg-[#E0E5EC] en layout) ganen al body.
+ * Si body queda con var(--background) #fff, el hueco flex bajo el contenido (min-h del layout)
+ * muestra una franja blanca encima del footer.
+ */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    scroll-behavior: smooth;
+  }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: inherit;
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: inherit;
+  }
 }
 
 /* pathLength="1" en el <path>: el trazo avanza sin saltos (dash alineado a la curva real). */
@@ -342,47 +349,61 @@ html[data-cursor-global="on"] *::after {
   position: fixed;
   top: 0;
   left: 0;
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #ff4a1c;
+  background: rgba(255, 74, 28, 0.88);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.35),
+    0 0 12px rgba(255, 74, 28, 0.35),
+    0 0 28px rgba(255, 74, 28, 0.12);
   pointer-events: none;
   z-index: 99999;
   will-change: transform;
-  mix-blend-mode: multiply;
+  mix-blend-mode: normal;
   transition:
-    width 0.2s ease,
-    height 0.2s ease,
-    background 0.2s ease;
+    width 0.38s cubic-bezier(0.25, 0.85, 0.35, 1),
+    height 0.38s cubic-bezier(0.25, 0.85, 0.35, 1),
+    background 0.38s ease,
+    box-shadow 0.38s ease;
 }
 
 .cursor-ring {
   position: fixed;
   top: 0;
   left: 0;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 74, 28, 0.35);
+  border: 1px solid rgba(255, 74, 28, 0.18);
+  box-shadow:
+    0 0 24px rgba(255, 74, 28, 0.1),
+    inset 0 0 12px rgba(255, 255, 255, 0.06);
   pointer-events: none;
   z-index: 99998;
   will-change: transform;
   transition:
-    width 0.2s ease,
-    height 0.2s ease,
-    border-color 0.2s ease;
+    width 0.42s cubic-bezier(0.22, 0.9, 0.32, 1),
+    height 0.42s cubic-bezier(0.22, 0.9, 0.32, 1),
+    border-color 0.42s ease,
+    box-shadow 0.42s ease;
 }
 
 .cursor-dot.cursor-hover {
-  width: 42px;
-  height: 42px;
-  background: rgba(255, 74, 28, 0.12);
-  mix-blend-mode: normal;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 74, 28, 0.1);
+  box-shadow:
+    0 0 0 1px rgba(255, 74, 28, 0.12),
+    0 0 32px rgba(255, 74, 28, 0.18);
 }
 .cursor-ring.cursor-hover {
-  width: 52px;
-  height: 52px;
-  border-color: rgba(255, 74, 28, 0.6);
+  width: 54px;
+  height: 54px;
+  border-color: rgba(255, 74, 28, 0.28);
+  box-shadow:
+    0 0 36px rgba(255, 74, 28, 0.14),
+    inset 0 0 16px rgba(255, 255, 255, 0.08);
 }
 
 @media (pointer: coarse) {
@@ -395,3 +416,25 @@ html[data-cursor-global="on"] *::after {
     display: none !important;
   }
 }
+
+/* Canvas R3F dentro del hero cinematográfico (padre .heroRoot en /muestras) */
+.immersive-webgl-root {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.92;
+}
+
+.immersive-webgl-root canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.immersive-webgl-root--glass {
+  z-index: 1;
+  opacity: 1;
+}
+
+/* Muestras cinematográficas: hero en flujo (min 100svh); el footer global va debajo; scroll natural tras la última tarjeta. */

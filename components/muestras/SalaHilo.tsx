@@ -11,7 +11,7 @@ import {
   useRef,
   useState,
 } from 'react';
-import { LiquidLightBackground } from '@/components/LiquidLightBackground';
+import { useRouter } from 'next/navigation';
 import { SalaHiloThread3D } from '@/components/muestras/SalaHiloThread3D';
 import { kpos } from '@/lib/muestras/sala-hilo-thread-math';
 
@@ -47,12 +47,22 @@ const TEXT_HINT = '#b0b6c2';
 const SHADOW_DARK = '#c4c7cd';
 const SHADOW_LIGHT = '#ffffff';
 
-export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
+export function SalaHilo({
+  muestra,
+  skipPortal,
+}: {
+  muestra: SalaHiloMuestraInput;
+  /** Si es true, se omite la tarjeta «SALA · MUESTRA CURADA» y se entra al hilo; «Salir» vuelve al listado. Usa `?portal=1` en la URL para forzar el portal (ver página de la muestra). */
+  skipPortal: boolean;
+}) {
+  const router = useRouter();
   const uid = useId().replace(/:/g, '');
   const stories = muestra.historias;
   const total = stories.length;
 
-  const [phase, setPhase] = useState<Phase>('portal');
+  const [phase, setPhase] = useState<Phase>(() =>
+    skipPortal ? 'hilo' : 'portal'
+  );
   const [portalOpacity, setPortalOpacity] = useState(1);
   const [salaOpacity, setSalaOpacity] = useState(1);
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -188,6 +198,10 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
   };
 
   const exitToPortal = () => {
+    if (skipPortal) {
+      router.push('/muestras');
+      return;
+    }
     setSalaOpacity(0);
     window.setTimeout(() => {
       setPhase('portal');
@@ -212,10 +226,16 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
     />
   );
 
+  const portalBackdrop = `radial-gradient(120% 85% at 50% 12%, rgba(255,255,255,0.5) 0%, transparent 50%),
+    radial-gradient(90% 70% at 10% 90%, rgba(222,228,238,0.95) 0%, transparent 55%),
+    radial-gradient(85% 65% at 92% 75%, rgba(212,220,234,0.9) 0%, transparent 48%),
+    linear-gradient(168deg, #e2e6ee 0%, ${BG} 44%, #d8dee8 100%)`;
+
   return (
-    <div
-      className="fixed left-0 right-0 top-20 z-40 h-[calc(100svh-5rem)] overflow-hidden md:top-24 md:h-[calc(100svh-6rem)]"
+    <main
+      className="relative z-[45] flex w-full flex-1 shrink-0 flex-col"
       style={{
+        minHeight: 'max(32rem, calc(100dvh - 7rem))',
         background: BG,
         color: TEXT_PRIMARY,
         fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -226,23 +246,32 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       {phase === 'portal' && (
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 30,
+            position: 'relative',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            padding: '24px 0 40px',
             opacity: portalOpacity,
             transition: 'opacity 0.7s ease',
-            pointerEvents: portalOpacity > 0 ? 'all' : 'none',
-            overflow: 'hidden',
+            pointerEvents: portalOpacity > 0 ? 'auto' : 'none',
+            overflow: 'auto',
           }}
         >
-          <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-            <LiquidLightBackground fillParent />
-          </div>
+          <div
+            aria-hidden
+            style={{
+              position: 'absolute',
+              inset: 0,
+              zIndex: 0,
+              pointerEvents: 'none',
+              background: portalBackdrop,
+            }}
+          />
           <div
             style={{
               position: 'relative',
               zIndex: 2,
-              minHeight: '100%',
               display: 'flex',
               flexDirection: 'column',
               justifyContent: 'center',
@@ -366,9 +395,9 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
 
           <div
             style={{
-              position: 'absolute',
-              bottom: 32,
-              left: '8vw',
+              position: 'relative',
+              marginTop: 28,
+              left: 0,
               zIndex: 3,
               display: 'flex',
               alignItems: 'center',
@@ -402,20 +431,15 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
       {phase === 'hilo' && (
         <div
           style={{
-            position: 'absolute',
-            inset: 0,
-            height: '100%',
-            minHeight: 0,
+            position: 'relative',
+            flex: 1,
+            minHeight: 520,
             backgroundColor: 'transparent',
             overflow: 'hidden',
             opacity: salaOpacity,
             transition: 'opacity 0.7s ease',
           }}
         >
-          {/*
-            Sin segundo WebGL aquí: el gel + R3F compiten por contexto y en algunos
-            dispositivos la escena del hilo queda en negro / vacía. Fondo CSS acorde al neumorfismo.
-          */}
           <div
             aria-hidden
             style={{
@@ -423,18 +447,12 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
               inset: 0,
               zIndex: 0,
               pointerEvents: 'none',
-              background: `radial-gradient(120% 85% at 50% 12%, rgba(255,255,255,0.5) 0%, transparent 50%),
-                radial-gradient(90% 70% at 10% 90%, rgba(222,228,238,0.95) 0%, transparent 55%),
-                radial-gradient(85% 65% at 92% 75%, rgba(212,220,234,0.9) 0%, transparent 48%),
-                linear-gradient(168deg, #e2e6ee 0%, ${BG} 44%, #d8dee8 100%)`,
+              background: portalBackdrop,
             }}
           />
           <div
             style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
+              position: 'relative',
               zIndex: 10,
               padding: '20px 36px',
               display: 'grid',
@@ -540,21 +558,21 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
 
           <p
             style={{
-              position: 'absolute',
-              bottom: 22,
-              left: '50%',
-              transform: 'translateX(-50%)',
+              position: 'relative',
               zIndex: 8,
               fontSize: 10,
               letterSpacing: '0.2em',
               textTransform: 'uppercase',
               color: TEXT_HINT,
               margin: 0,
+              padding: '10px 16px 20px',
               opacity: hintVisible ? 1 : 0,
               transition: 'opacity 0.4s ease',
               pointerEvents: 'none',
               textAlign: 'center',
               maxWidth: '90%',
+              marginLeft: 'auto',
+              marginRight: 'auto',
             }}
           >
             toca un nudo para entrar a la historia
@@ -622,6 +640,6 @@ export function SalaHilo({ muestra }: { muestra: SalaHiloMuestraInput }) {
           />
         </div>
       )}
-    </div>
+    </main>
   );
 }

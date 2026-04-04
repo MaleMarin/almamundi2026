@@ -36,15 +36,20 @@ export function CursorGlobal() {
     ringEl.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
     document.documentElement.setAttribute('data-cursor-global', 'on');
 
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    /** Seguimiento más lento = movimiento más suave (punto un poco más rápido que el anillo). */
+    const dotEase = reduceMotion ? 0.42 : 0.082;
+    const ringEase = reduceMotion ? 0.32 : 0.038;
+
     function lerp(a: number, b: number, t: number) {
       return a + (b - a) * t;
     }
 
     function tick() {
-      cx = lerp(cx, mx, 0.16);
-      cy = lerp(cy, my, 0.16);
-      rx = lerp(rx, mx, 0.07);
-      ry = lerp(ry, my, 0.07);
+      cx = lerp(cx, mx, dotEase);
+      cy = lerp(cy, my, dotEase);
+      rx = lerp(rx, mx, ringEase);
+      ry = lerp(ry, my, ringEase);
       dotEl.style.transform = `translate(${cx}px, ${cy}px) translate(-50%, -50%)`;
       ringEl.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
       animId = requestAnimationFrame(tick);

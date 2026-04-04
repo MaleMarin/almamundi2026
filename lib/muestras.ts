@@ -163,6 +163,15 @@ export function getMuestrasByTema(tema: MuestraTema | null): Muestra[] {
   return MUESTRAS_MOCK.filter((m) => m.theme === tema);
 }
 
+/** Slugs alternativos para la sala tipo «hilo» (misma experiencia SalaHilo). */
+const SALA_HILO_SLUG_ALIASES = new Set(['el-hilo', 'hilo', 'sala-hilo', 'salahilo']);
+
 export function getMuestraBySlug(slug: string): Muestra | undefined {
+  const key = slug.trim().toLowerCase();
+  if (SALA_HILO_SLUG_ALIASES.has(key)) {
+    return (
+      MUESTRAS_MOCK.find((m) => m.slug === 'voces-del-desplazamiento') ?? MUESTRAS_MOCK[0]
+    );
+  }
   return MUESTRAS_MOCK.find((m) => m.slug === slug);
 }

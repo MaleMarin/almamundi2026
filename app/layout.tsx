@@ -1,3 +1,4 @@
+import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 import { CursorGlobal } from '@/components/ui/CursorGlobal';
 import { Footer } from '@/components/layout/Footer';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
@@ -63,16 +64,20 @@ export default async function RootLayout({
         <div
           id="main-content"
           tabIndex={-1}
-          className="flex min-h-svh flex-col"
+          className="flex min-h-svh flex-col bg-[var(--home-bg)]"
         >
-          {/*
-            Altura mínima del área de página: empuja el footer fuera del primer pantallazo
-            en rutas con poco contenido; el footer sigue en el DOM en todas las rutas.
-          */}
-          <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)]">
-            <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
-          </div>
-          <Footer />
+          <SmoothScrollProvider>
+            {/*
+              Altura mínima del área de página: empuja el footer fuera del primer pantallazo
+              en rutas con poco contenido; el footer sigue en el DOM en todas las rutas.
+              Mismo fondo que el footer: evita franja clara si el flex crece por min-h.
+              Lenis + ScrollTrigger (cinematic / GSAP) viven en SmoothScrollProvider.
+            */}
+            <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)] bg-[var(--home-bg)]">
+              <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+            </div>
+            <Footer />
+          </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
       </body>
