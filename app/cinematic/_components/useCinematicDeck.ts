@@ -1,27 +1,17 @@
 'use client';
 
-import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useLayoutEffect, useRef, useState, type MutableRefObject, type RefObject } from 'react';
-import { CINEMATIC_PANELS } from './panels.data';
+import {
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+  type MutableRefObject,
+  type RefObject,
+} from 'react';
+import { GLASS_CAROUSEL_COUNT } from '@/lib/muestras-glass-carousel';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+const MUESTRA_PANEL_SEL = '[data-muestra-panel]';
 
-const GLASS_SCROLL_SEL = '[data-cinematic-glass-scroll]';
-
-function findCinematicGlassScrollEl(target: EventTarget | null): HTMLElement | null {
-  if (!(target instanceof Element)) return null;
-  const el = target.closest(GLASS_SCROLL_SEL);
-  return el instanceof HTMLElement ? el : null;
-}
-
-function glassScrollHasOverflow(glass: HTMLElement): boolean {
-  return glass.scrollHeight > glass.clientHeight + 2;
-}
-
-/** deltaY en píxeles aproximados (trackpad suele venir en modo pixel). */
 function wheelDeltaYPixels(e: WheelEvent): number {
   switch (e.deltaMode) {
     case WheelEvent.DOM_DELTA_LINE:
@@ -44,15 +34,11 @@ export type CinematicDeckController = {
 
 export function useCinematicDeck(): CinematicDeckController {
   const containerRef = useRef<HTMLDivElement>(null);
-  const indexRef = useRef(0);
-  const animatingRef = useRef(false);
   const progressRef = useRef(0);
-  const sectionsRef = useRef<HTMLElement[]>([]);
-  const transitionToRef = useRef<(target: number) => void>(() => {});
   const [uiIndex, setUiIndex] = useState(0);
   const [webglOn, setWebglOn] = useState(false);
   const [reduceMotion, setReduceMotion] = useState(false);
-  const panelCount = CINEMATIC_PANELS.length;
+  const maxIdx = GLASS_CAROUSEL_COUNT - 1;
 
   useLayoutEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -71,246 +57,113 @@ export function useCinematicDeck(): CinematicDeckController {
   }, []);
 
   useLayoutEffect(() => {
-    const maxIdx = panelCount - 1;
-    progressRef.current = maxIdx > 0 ? indexRef.current / maxIdx : 0;
-  }, [uiIndex, panelCount]);
+    progressRef.current = maxIdx > 0 ? uiIndex / maxIdx : 0;
+  }, [uiIndex, maxIdx]);
+
+  const syncIndexFromScroll = useCallback(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const w = el.clientWidth;
+    if (w <= 0) return;
+    const i = Math.round(el.scrollLeft / w);
+    const clamped = Math.max(0, Math.min(maxIdx, i));
+    setUiIndex(clamped);
+  }, [maxIdx]);
 
   useLayoutEffect(() => {
-    const root = containerRef.current;
-    if (!root || panelCount === 0) return;
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const sections = gsap.utils.toArray<HTMLElement>(
-      root.querySelectorAll('[data-cinematic-panel]')
-    );
-    sectionsRef.current = sections;
-    const maxIdx = sections.length - 1;
-    if (maxIdx < 0) return;
+    const el = containerRef.current;
+    if (!el) return;
+    const onScroll = () => syncIndexFromScroll();
+    el.addEventListener('scroll', onScroll, { passive: true });
+    syncIndexFromScroll();
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [syncIndexFromScroll]);
 
-    const transitionTo = (target: number) => {
-      if (animatingRef.current) return;
-      if (target < 0 || target > maxIdx) return;
-      const cur = indexRef.current;
-      if (target === cur) return;
-      const direction: 1 | -1 = target > cur ? 1 : -1;
-      animatingRef.current = true;
-      const currentEl = sections[cur];
-      const nextEl = sections[target];
-      if (!currentEl || !nextEl) {
-        animatingRef.current = false;
-        return;
-      }
-      const tl = gsap.timeline({
-        defaults: { duration: 1.05, ease: 'power4.inOut' },
-        onComplete: () => {
-          animatingRef.current = false;
-          indexRef.current = target;
-          setUiIndex(target);
-          progressRef.current = maxIdx > 0 ? target / maxIdx : 0;
-          sections.forEach((el, j) => {
-            gsap.set(el, { zIndex: j === target ? 2 : 0 });
-          });
-        },
-      });
-      /* autoAlpha = opacity + visibility:hidden para que no se superpongan lecturas */
-      tl.to(
-        currentEl,
-        { autoAlpha: 0, yPercent: -100 * direction, scale: 0.9 },
-        0
-      ).fromTo(
-        nextEl,
-        { autoAlpha: 0, yPercent: 100 * direction, scale: 1.05, zIndex: 2 },
-        { autoAlpha: 1, yPercent: 0, scale: 1, zIndex: 2 },
-        0
-      );
-      const inner = nextEl.querySelectorAll('[data-cinematic-animate]');
-      if (inner.length) {
-        tl.from(
-          inner,
-          {
-            y: 36,
-            autoAlpha: 0,
-            stagger: 0.12,
-            duration: 0.75,
-            ease: 'power2.out',
-          },
-          '-=0.55'
-        );
-      }
-    };
-    transitionToRef.current = transitionTo;
-
-    if (reduced) {
-      sections.forEach((el, i) => {
-        gsap.set(el, {
-          autoAlpha: i === 0 ? 1 : 0,
-          yPercent: 0,
-          scale: 1,
-          zIndex: i === 0 ? 2 : 0,
-        });
-      });
-      indexRef.current = 0;
-      setUiIndex(0);
-      return;
-    }
-
-    gsap.killTweensOf(sections);
-    sections.forEach((el) => {
-      el.querySelectorAll('[data-cinematic-animate]').forEach((node) => {
-        gsap.killTweensOf(node);
-        gsap.set(node, { clearProps: 'opacity,visibility,transform' });
-      });
-      gsap.set(el, {
-        autoAlpha: 0,
-        yPercent: 100,
-        scale: 1,
-        zIndex: 0,
-      });
+  useLayoutEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(() => {
+      const w = el.clientWidth;
+      if (w <= 0) return;
+      const i = Math.round(el.scrollLeft / w);
+      el.scrollLeft = Math.max(0, Math.min(maxIdx, i)) * w;
     });
-    gsap.set(sections[0], {
-      autoAlpha: 1,
-      yPercent: 0,
-      scale: 1,
-      zIndex: 2,
-    });
-    indexRef.current = 0;
-    setUiIndex(0);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [maxIdx]);
 
-    const wheelThreshold = 16;
+  useLayoutEffect(() => {
+    if (reduceMotion) return;
     const onWheel = (e: WheelEvent) => {
-      const scrollTop =
-        window.scrollY || document.documentElement.scrollTop || 0;
-      const atPageTop = scrollTop <= 4;
+      const scrollTop = window.scrollY || document.documentElement.scrollTop || 0;
+      if (scrollTop > 4) return;
 
-      if (!atPageTop) {
-        return;
-      }
-
-      if (animatingRef.current) {
-        e.preventDefault();
-        return;
-      }
-
-      /* Hit real bajo el puntero: con listener en capture, confiar solo en e.target falla a veces. */
       const under =
         typeof document !== 'undefined' && Number.isFinite(e.clientX)
           ? document.elementFromPoint(e.clientX, e.clientY)
           : null;
-      const glass = findCinematicGlassScrollEl(under ?? e.target);
-
-      /*
-       * Scroll dentro del círculo: el wheel global en capture impide el scroll nativo fiable;
-       * aplicamos delta a scrollTop y evitamos doble desplazamiento.
-       */
-      if (glass && glassScrollHasOverflow(glass)) {
-        const dy = wheelDeltaYPixels(e);
-        const { scrollTop: st, scrollHeight, clientHeight } = glass;
-        const maxScroll = Math.max(0, scrollHeight - clientHeight);
-        const atTop = st <= 2;
-        const atBottom = st >= maxScroll - 2;
-
-        if (dy > 0 && !atBottom) {
-          e.preventDefault();
-          glass.scrollTop = Math.min(maxScroll, st + dy);
-          return;
-        }
-        if (dy < 0 && !atTop) {
-          e.preventDefault();
-          glass.scrollTop = Math.max(0, st + dy);
-          return;
-        }
-      }
-
-      const cur = indexRef.current;
-
-      if (e.deltaY > wheelThreshold) {
-        if (cur >= maxIdx) {
-          return;
-        }
-        e.preventDefault();
-        transitionToRef.current(cur + 1);
+      const el = containerRef.current;
+      if (!el || !(under instanceof Element) || !el.contains(under)) {
         return;
       }
 
-      if (e.deltaY < -wheelThreshold) {
-        if (cur <= 0) {
-          e.preventDefault();
-          return;
+      const panel = under.closest(MUESTRA_PANEL_SEL);
+      if (panel instanceof HTMLElement && el.contains(panel)) {
+        const sh = panel.scrollHeight;
+        const ch = panel.clientHeight;
+        if (sh > ch + 2) {
+          const st = panel.scrollTop;
+          const maxScroll = Math.max(0, sh - ch);
+          const atTop = st <= 2;
+          const atBottom = st >= maxScroll - 2;
+          const dyp = wheelDeltaYPixels(e);
+          if (dyp > 0 && !atBottom) {
+            e.preventDefault();
+            panel.scrollTop = Math.min(maxScroll, st + dyp);
+            return;
+          }
+          if (dyp < 0 && !atTop) {
+            e.preventDefault();
+            panel.scrollTop = Math.max(0, st + dyp);
+            return;
+          }
         }
+      }
+
+      const dy = e.deltaY;
+      const dx = e.deltaX;
+      if (Math.abs(dy) >= Math.abs(dx) && dy !== 0) {
         e.preventDefault();
-        transitionToRef.current(cur - 1);
+        el.scrollLeft += dy;
+        return;
+      }
+      if (Math.abs(dx) > Math.abs(dy) && dx !== 0) {
+        e.preventDefault();
+        el.scrollLeft += dx;
       }
     };
 
-    let touchStartY = 0;
-    let touchGlassScroll: { el: HTMLElement; top: number } | null = null;
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartY = e.touches[0]?.clientY ?? 0;
-      const g = findCinematicGlassScrollEl(e.target);
-      if (g && glassScrollHasOverflow(g)) {
-        touchGlassScroll = { el: g, top: g.scrollTop };
-      } else {
-        touchGlassScroll = null;
-      }
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      if (animatingRef.current) return;
-      if (touchGlassScroll) {
-        const moved = Math.abs(touchGlassScroll.el.scrollTop - touchGlassScroll.top);
-        touchGlassScroll = null;
-        if (moved > 8) return;
-      } else {
-        touchGlassScroll = null;
-      }
-      const y = e.changedTouches[0]?.clientY ?? touchStartY;
-      const dy = touchStartY - y;
-      if (dy > 56) transitionToRef.current(indexRef.current + 1);
-      else if (dy < -56) transitionToRef.current(indexRef.current - 1);
-    };
+    window.addEventListener('wheel', onWheel, { passive: false, capture: true });
+    return () => window.removeEventListener('wheel', onWheel, { capture: true });
+  }, [reduceMotion]);
 
-    const wheelOpts = { passive: false, capture: true } as const;
-    window.addEventListener('wheel', onWheel, wheelOpts);
-    window.addEventListener('touchstart', onTouchStart, { passive: true, capture: true });
-    window.addEventListener('touchend', onTouchEnd, { passive: true, capture: true });
-
-    return () => {
-      window.removeEventListener('wheel', onWheel, wheelOpts);
-      window.removeEventListener('touchstart', onTouchStart, { capture: true });
-      window.removeEventListener('touchend', onTouchEnd, { capture: true });
-      const els = root.querySelectorAll<HTMLElement>('[data-cinematic-panel]');
-      gsap.killTweensOf(els);
-      els.forEach((el) => {
-        el.querySelectorAll('[data-cinematic-animate]').forEach((node) => {
-          gsap.killTweensOf(node);
-        });
+  const goToIndex = useCallback(
+    (i: number) => {
+      if (i < 0 || i >= GLASS_CAROUSEL_COUNT) return;
+      const el = containerRef.current;
+      if (!el) {
+        setUiIndex(i);
+        return;
+      }
+      const w = el.clientWidth;
+      el.scrollTo({
+        left: i * w,
+        behavior: reduceMotion ? 'auto' : 'smooth',
       });
-    };
-  }, [panelCount]);
-
-  useLayoutEffect(() => {
-    if (!reduceMotion) return;
-    const sections = sectionsRef.current;
-    if (!sections.length) return;
-    sections.forEach((el, i) => {
-      gsap.set(el, {
-        autoAlpha: i === uiIndex ? 1 : 0,
-        yPercent: 0,
-        scale: 1,
-        zIndex: i === uiIndex ? 2 : 0,
-      });
-    });
-    indexRef.current = uiIndex;
-    const maxIdx = panelCount - 1;
-    progressRef.current = maxIdx > 0 ? uiIndex / maxIdx : 0;
-  }, [reduceMotion, uiIndex, panelCount]);
-
-  const goToIndex = (i: number) => {
-    if (i < 0 || i >= panelCount) return;
-    if (reduceMotion) {
       setUiIndex(i);
-      return;
-    }
-    transitionToRef.current(i);
-  };
+    },
+    [reduceMotion]
+  );
 
   return {
     containerRef,
