@@ -110,6 +110,7 @@ export function CinematicPageClient({
         aria-label="Muestras — recorrido"
         aria-live="polite"
       >
+        <div className={styles.lightWave} aria-hidden />
         <div className={styles.cinematicStage}>
           {!backdropFailed ? (
             <div className={styles.sceneBackdropWrap}>
@@ -173,7 +174,6 @@ export function CinematicPageClient({
               />
             )}
           </div>
-          <div className={styles.lightWave} aria-hidden />
           <div className={styles.shell}>
             <header className={styles.topBar}>
               <Link href="/" className={styles.brand}>

@@ -1,20 +1,17 @@
 /**
- * Entrada /muestras (cinemático): mundo neumórfico propio (#E8E4DF + ola de luz).
- * El carrusel glass (.glassCircle …) no se redefine aquí abajo.
+ * Entrada /muestras (cinemático): fondo #D6D0C8, ola de luz, glass contrastado.
+ * Carrusel interno (.muestrasSlider, paneles, swipe): sin cambiar estructura.
  */
 .muestrasCinematicPage {
+  background: #d6d0c8;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
   box-sizing: border-box;
-  width: calc(100% - clamp(16px, 4vw, 40px));
-  max-width: 1600px;
-  margin: clamp(8px, 2vw, 20px) auto;
-  min-height: calc(100dvh - clamp(16px, 4vw, 40px));
-  background: #e8e4df;
-  box-shadow:
-    20px 20px 60px #c9c5c0,
-    -20px -20px 60px #ffffff;
-  border-radius: 32px;
+  width: 100%;
   border: 0;
   outline: none;
 }
@@ -25,30 +22,29 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  min-height: 100svh;
-  height: 100svh;
+  align-self: stretch;
+  min-height: 100vh;
   min-height: 100dvh;
-  height: 100dvh;
   max-height: 100dvh;
   box-sizing: border-box;
   pointer-events: none;
   isolation: isolate;
-  background: #e8e4df;
+  background: #d6d0c8;
   border: 0;
   outline: none;
   overflow: hidden;
-  border-radius: 32px;
 }
 
 .cinematicStage {
   position: relative;
+  z-index: 1;
   flex: 1 1 auto;
   min-height: 0;
   overflow: hidden;
   pointer-events: none;
 }
 
-/* Franja inferior alineada al fondo neumórfico */
+/* Franja inferior alineada al fondo */
 .cinematicStage::after {
   content: '';
   position: absolute;
@@ -56,58 +52,39 @@
   right: 0;
   bottom: 0;
   height: clamp(6px, 1.2vw, 14px);
-  background: #e8e4df;
+  background: #d6d0c8;
   pointer-events: none;
   z-index: 3;
 }
 
 .lightWave {
   position: absolute;
-  top: 20%;
+  top: 15%;
   left: 50%;
   transform: translateX(-50%);
-  width: 70%;
-  height: 180px;
+  width: 60%;
+  height: 220px;
   background: radial-gradient(
-    ellipse 80% 60% at 50% 50%,
-    rgba(255, 240, 200, 0.9) 0%,
-    rgba(255, 220, 150, 0.5) 30%,
-    rgba(232, 228, 223, 0) 70%
+    ellipse 90% 50% at 50% 50%,
+    rgba(255, 235, 180, 1) 0%,
+    rgba(255, 210, 120, 0.7) 35%,
+    rgba(214, 208, 200, 0) 70%
   );
-  filter: blur(20px);
+  filter: blur(28px);
   pointer-events: none;
-  z-index: 2;
-  animation: muestrasWaveFloat 6s ease-in-out infinite;
+  z-index: 0;
+  animation: waveFloat 7s ease-in-out infinite;
 }
 
-.lightWave::before {
-  content: '';
-  position: absolute;
-  top: 30%;
-  left: 10%;
-  width: 80%;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 220, 150, 0.6) 20%,
-    rgba(255, 245, 200, 0.9) 50%,
-    rgba(255, 220, 150, 0.6) 80%,
-    transparent
-  );
-  filter: blur(3px);
-  border-radius: 50%;
-}
-
-@keyframes muestrasWaveFloat {
+@keyframes waveFloat {
   0%,
   100% {
-    transform: translateX(-50%) scaleY(1);
-    opacity: 0.8;
+    opacity: 0.75;
+    transform: translateX(-50%) scaleX(1) scaleY(1);
   }
   50% {
-    transform: translateX(-50%) scaleY(1.15) translateY(-10px);
     opacity: 1;
+    transform: translateX(-50%) scaleX(1.08) scaleY(1.2) translateY(-12px);
   }
 }
 
@@ -262,12 +239,12 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: #e8e4df;
+  background: #d6d0c8;
   border-radius: 50px;
   border: none;
   box-shadow:
-    8px 8px 20px #c9c5c0,
-    -8px -8px 20px #ffffff;
+    8px 8px 20px #b5afa7,
+    -8px -8px 20px #f0ebe4;
   color: #6b6762;
   padding: 14px 28px;
   transition:
@@ -278,16 +255,16 @@
 .brand:hover,
 .exit:hover {
   box-shadow:
-    12px 12px 28px #c9c5c0,
-    -12px -12px 28px #ffffff;
+    12px 12px 28px #b5afa7,
+    -12px -12px 28px #f5f0ea;
   color: #3d3a37;
 }
 
 .brand:active,
 .exit:active {
   box-shadow:
-    inset 6px 6px 14px #c9c5c0,
-    inset -6px -6px 14px #ffffff;
+    inset 6px 6px 14px #b5afa7,
+    inset -6px -6px 14px #f5f0ea;
 }
 
 /* Etapa: centra el círculo glass bajo la barra (sin tocar .topBar). */
@@ -303,27 +280,10 @@
   pointer-events: none;
 }
 
-@keyframes glassCirclePulse {
-  0%,
-  100% {
-    transform: scale(1);
-    box-shadow:
-      inset 0 0 80px rgba(255, 255, 255, 0.05),
-      0 8px 60px rgba(0, 0, 0, 0.3),
-      0 0 0 0 rgba(255, 255, 255, 0.08);
-  }
-  50% {
-    transform: scale(1.02);
-    box-shadow:
-      inset 0 0 100px rgba(255, 255, 255, 0.09),
-      0 14px 72px rgba(0, 0, 0, 0.34),
-      0 0 56px rgba(255, 140, 90, 0.18);
-  }
-}
-
 .glassCircle {
   box-sizing: border-box;
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   width: clamp(280px, 75vmin, min(94vw, 880px));
@@ -334,29 +294,21 @@
   overflow: hidden;
   pointer-events: auto;
   transform-origin: center center;
-  will-change: transform, box-shadow;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(40px) saturate(1.3);
+  -webkit-backdrop-filter: blur(40px) saturate(1.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   box-shadow:
-    inset 0 0 80px rgba(255, 255, 255, 0.05),
-    0 8px 60px rgba(0, 0, 0, 0.3);
-  backdrop-filter: blur(32px) saturate(1.2) brightness(1.1);
-  -webkit-backdrop-filter: blur(32px) saturate(1.2) brightness(1.1);
-  animation: glassCirclePulse 4.2s ease-in-out infinite;
+    0 0 0 1px rgba(255, 255, 255, 0.4),
+    20px 20px 60px rgba(0, 0, 0, 0.15),
+    -10px -10px 40px rgba(255, 255, 255, 0.8),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 @media (min-width: 768px) {
   .glassCircle {
     width: min(94vw, max(75vmin, 400px));
     height: min(94vw, max(75vmin, 400px));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .glassCircle {
-    animation: none;
-    transform: none;
-    will-change: auto;
   }
 }
 
@@ -398,7 +350,7 @@
   overflow-x: hidden;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  color: #ffffff;
+  color: rgba(60, 50, 40, 0.65);
 }
 
 .muestraPanel * {
@@ -410,7 +362,7 @@
   font-size: clamp(13px, 1.65vw, 16px);
   letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(80, 70, 60, 0.6);
   text-wrap: balance;
 }
 
@@ -418,7 +370,7 @@
   margin: 0 0 18px;
   font-size: clamp(40px, 6.8vw, 68px);
   font-weight: 700;
-  color: #ffffff;
+  color: #2c2520;
   line-height: 1.08;
   letter-spacing: -0.6px;
   text-wrap: balance;
@@ -430,7 +382,7 @@
   font-size: clamp(17px, 2.35vw, 21px);
   font-weight: 300;
   line-height: 1.68;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(60, 50, 40, 0.65);
   text-wrap: balance;
 }
 
@@ -438,7 +390,7 @@
   width: 60%;
   margin: 24px auto;
   border: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 1px solid rgba(60, 50, 40, 0.12);
   flex-shrink: 0;
 }
 
@@ -451,7 +403,7 @@
   font-size: clamp(13px, 1.55vw, 15px);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.45);
+  color: rgba(60, 50, 40, 0.4);
   line-height: 2.15;
   text-align: center;
 }
@@ -460,14 +412,13 @@
   margin: 0;
 }
 
-/* Tema TIEMPO: acento azul cielo (#7EB8C9) en CTA y puntos */
 .glassCta {
   display: inline-block;
   margin-top: 22px;
   font-size: clamp(13px, 1.5vw, 15px);
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #7eb8c9;
+  color: #c8331f;
   font-weight: 600;
   cursor: pointer;
   text-decoration: none;
@@ -477,7 +428,7 @@
 }
 
 .glassCta:hover {
-  color: #9ecad6;
+  color: #a02815;
 }
 
 .glassFooterLinks {
@@ -485,17 +436,17 @@
   font-size: clamp(12px, 1.35vw, 14px);
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(60, 50, 40, 0.45);
   text-wrap: balance;
 }
 
 .glassFooterLink {
-  color: rgba(255, 255, 255, 0.65);
+  color: rgba(60, 50, 40, 0.55);
   text-decoration: none;
 }
 
 .glassFooterLink:hover {
-  color: rgba(255, 255, 255, 0.95);
+  color: #2c2520;
 }
 
 .glassDotsRow {
@@ -515,16 +466,16 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  background: rgba(126, 184, 201, 0.35);
+  background: rgba(60, 50, 40, 0.2);
 }
 
 .glassDot:hover {
-  background: rgba(126, 184, 201, 0.55);
+  background: rgba(60, 50, 40, 0.35);
 }
 
 .glassDotActive {
-  background: #7eb8c9;
-  box-shadow: 0 0 12px rgba(126, 184, 201, 0.45);
+  background: #2c2520;
+  box-shadow: 0 0 10px rgba(44, 37, 32, 0.25);
 }
 
 .fallbackBg {
@@ -561,15 +512,20 @@
   }
 }
 
-/* Alto contraste global: vidrio + tipografía del carrusel */
+/* Alto contraste: texto oscuro sobre vidrio claro → máximo contraste */
 :global([data-high-contrast='true']) .glassEyebrow,
+:global([data-high-contrast='true']) .glassStoryList,
+:global([data-high-contrast='true']) .glassStoryList li {
+  color: #1a1410 !important;
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
 :global([data-high-contrast='true']) .glassTitle,
 :global([data-high-contrast='true']) .glassDesc,
-:global([data-high-contrast='true']) .glassStoryList,
-:global([data-high-contrast='true']) .glassStoryList li,
 :global([data-high-contrast='true']) .glassFooterLinks,
 :global([data-high-contrast='true']) .glassFooterLink {
-  color: #f0f0ec !important;
+  color: #0a0a0a !important;
   background-color: transparent !important;
   box-shadow: none !important;
 }
@@ -582,7 +538,7 @@
 }
 
 :global([data-high-contrast='true']) .glassCta {
-  color: #7eb8c9 !important;
+  color: #8b2010 !important;
 }
 
 :global([data-high-contrast='true']) .topBar {
@@ -590,9 +546,18 @@
 }
 
 :global([data-high-contrast='true']) .glassCircle {
-  background: rgba(20, 20, 20, 0.95) !important;
-  border-color: rgba(255, 255, 255, 0.35) !important;
-  box-shadow: none !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: #0a0a0a !important;
+  box-shadow: 0 0 0 2px #0a0a0a !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
+}
+
+:global([data-high-contrast='true']) .glassDot {
+  background: rgba(10, 10, 10, 0.35) !important;
+}
+
+:global([data-high-contrast='true']) .glassDotActive {
+  background: #0a0a0a !important;
+  box-shadow: none !important;
 }
