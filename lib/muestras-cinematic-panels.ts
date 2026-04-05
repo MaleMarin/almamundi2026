@@ -1,6 +1,7 @@
 import type { Muestra, MuestraTema } from '@/lib/muestras';
 
 const THEME_LABEL: Record<MuestraTema, string> = {
+  tiempo: 'Tiempo',
   memoria: 'Memoria',
   migración: 'Migración',
   ciudad: 'Ciudad',

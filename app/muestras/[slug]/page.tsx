@@ -78,6 +78,7 @@ function MuestraDetailBody() {
       id="muestra-sala-host"
       style={{
         width: '100%',
+        minWidth: 0,
         minHeight: 'calc(100vh - 6rem)',
         backgroundColor: '#e6e9ee',
         color: '#1a1f2a',

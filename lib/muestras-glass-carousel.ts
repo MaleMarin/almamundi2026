@@ -1,8 +1,6 @@
-import { getMuestras } from '@/lib/muestras';
-
 export type GlassCarouselSlide = {
   slug: string;
-  /** Texto del tema en el eyebrow (MIGRACIÓN, MEMORIA, IDENTIDAD). */
+  /** Línea secundaria del eyebrow (p. ej. INFANCIA, ESPERA). */
   temaLabel: string;
   index1Based: number;
   title: string;
@@ -10,49 +8,52 @@ export type GlassCarouselSlide = {
   storyTitles: readonly string[];
 };
 
-const M1_STORY_LABELS = [
-  'La Maleta',
-  'El Mar al Otro Lado',
-  'Primer Día en la Nueva Ciudad',
-  'Retrato en la Ventana',
-] as const;
-
-/** Tres muestras fijas para el vidrio: migración (copy fija) + datos 2 y 3 de `getMuestras()`. */
+/** Tema curatorial «TIEMPO»: tres muestras fijas en el vidrio (arquitectura del carrusel sin cambios). */
 export function getGlassCarouselSlides(): readonly GlassCarouselSlide[] {
-  const all = getMuestras();
-  const m0 = all[0];
-  const m1 = all[1];
-  const m2 = all[2];
-  if (!m0 || !m1 || !m2) {
-    return [];
-  }
-
   return [
     {
-      slug: m0.slug,
-      temaLabel: 'MIGRACIÓN',
+      slug: 'el-verano-que-duro-para-siempre',
+      temaLabel: 'INFANCIA',
       index1Based: 1,
-      title: 'Voces del desplazamiento',
-      description: [m0.intro, m0.description].filter(Boolean).join('\n\n'),
-      storyTitles: M1_STORY_LABELS,
+      title: 'El verano que duró para siempre',
+      description:
+        'Algunos veranos se quedan grabados como si fueran eternos. Historias de un tiempo que el cuerpo recuerda aunque la mente lo haya olvidado.',
+      storyTitles: [
+        'LA CASA DE LA ABUELA',
+        'EL ÚLTIMO DÍA DE CLASES',
+        'CUANDO NO HABÍA HORA',
+        'EL RITUAL DEL DESAYUNO',
+      ],
     },
     {
-      slug: m1.slug,
-      temaLabel: 'MEMORIA',
+      slug: 'lo-que-pasa-mientras-se-espera',
+      temaLabel: 'ESPERA',
       index1Based: 2,
-      title: m1.title,
-      description: [m1.intro, m1.description].filter(Boolean).join('\n\n'),
-      storyTitles: m1.items.map((it) => it.title),
+      title: 'Lo que pasa mientras se espera',
+      description:
+        'Salas de hospital, aeropuertos, filas interminables. El tiempo suspendido que a veces es el más honesto.',
+      storyTitles: [
+        'SALA DE URGENCIAS, 3 AM',
+        'EL VUELO CANCELADO',
+        'ESPERANDO EL DIAGNÓSTICO',
+        'LA FILA DEL PAN',
+      ],
     },
     {
-      slug: m2.slug,
-      temaLabel: 'IDENTIDAD',
+      slug: 'cuando-el-tiempo-se-vuelve-visible',
+      temaLabel: 'VEJEZ',
       index1Based: 3,
-      title: m2.title,
-      description: [m2.intro, m2.description].filter(Boolean).join('\n\n'),
-      storyTitles: m2.items.map((it) => it.title),
+      title: 'Cuando el tiempo se vuelve visible',
+      description:
+        'Las manos arrugadas, los pasos más lentos, la memoria que elige qué guardar. Historias de quienes han vivido mucho tiempo.',
+      storyTitles: [
+        'MIS MANOS NO SON MÁS MÍAS',
+        'EL MISMO CAMINO, DIFERENTE',
+        'LO QUE YA NO RECUERDO',
+        'LA ÚLTIMA FOTOGRAFÍA',
+      ],
     },
-  ];
+  ] as const;
 }
 
 export const GLASS_CAROUSEL_COUNT = 3;

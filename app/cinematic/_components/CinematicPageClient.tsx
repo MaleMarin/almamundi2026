@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { MuestrasSalaEntranceLink } from '@/components/muestras/MuestrasSalaEntranceLink';
 import { MUESTRAS_CINEMATIC_BACKDROP_SRC } from '@/lib/muestras-cinematic-bg';
 import { getGlassCarouselSlides } from '@/lib/muestras-glass-carousel';
 import { CINEMATIC_BRAND } from './panels.data';
@@ -210,12 +211,12 @@ export function CinematicPageClient({
                             <li key={`${slide.slug}-${t}`}>{t}</li>
                           ))}
                         </ul>
-                        <Link
+                        <MuestrasSalaEntranceLink
                           href={`/muestras/${slide.slug}`}
                           className={styles.glassCta}
                         >
                           Entrar a la sala →
-                        </Link>
+                        </MuestrasSalaEntranceLink>
                         {i === last ? (
                           <p className={styles.glassFooterLinks}>
                             <Link href="/" className={styles.glassFooterLink}>

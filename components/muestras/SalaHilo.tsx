@@ -8,6 +8,7 @@ import {
   useCallback,
   useEffect,
   useId,
+  useLayoutEffect,
   useRef,
   useState,
 } from 'react';
@@ -116,6 +117,27 @@ export function SalaHilo({
     ro.observe(el);
     measure();
     return () => ro.disconnect();
+  }, [phase]);
+
+  /* Tras navegación SPA, el layout puede estabilizarse un frame después: re-medir el canvas del hilo. */
+  useLayoutEffect(() => {
+    if (phase !== 'hilo') return;
+    let cancelled = false;
+    const id = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (cancelled) return;
+        const el = containerRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        const w = Math.max(8, Math.floor(r.width));
+        const h = Math.max(8, Math.floor(r.height));
+        setThreadDims((d) => (d.w === w && d.h === h ? d : { w, h }));
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
   }, [phase]);
 
   useEffect(() => {

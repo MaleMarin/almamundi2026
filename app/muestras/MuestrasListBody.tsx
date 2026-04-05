@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
 import { getMuestras } from '@/lib/muestras';
 import { MuestrasInteriorNav } from '@/components/muestras/MuestrasInteriorNav';
+import { MuestrasSalaEntranceLink } from '@/components/muestras/MuestrasSalaEntranceLink';
 import { neu } from '@/lib/historias-neumorph';
 
 export function MuestrasListBody() {
@@ -126,24 +127,24 @@ export function MuestrasListBody() {
           <p className="mb-5 text-sm leading-relaxed" style={{ color: neu.textBody }}>
             Tocá cada título (relieve neumórfico) para entrar a la sala, recorrer el hilo y abrir las
             historias de ejemplo.{' '}
-            <Link
+            <MuestrasSalaEntranceLink
               href="/muestras/el-hilo"
               className="font-medium text-blue-600 underline-offset-2 hover:text-blue-800 hover:underline"
             >
               Atajo: /muestras/el-hilo
-            </Link>{' '}
+            </MuestrasSalaEntranceLink>{' '}
             abre la misma sala tipo hilo (demo).
           </p>
           <ul className="space-y-4">
             {salasDemo.map((m) => (
               <li key={m.slug} className="space-y-2">
-                <Link
+                <MuestrasSalaEntranceLink
                   href={`/muestras/${m.slug}`}
                   className="block rounded-[22px] px-5 py-4 text-base font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] md:text-lg"
                   style={neu.cardProminent}
                 >
                   {m.title}
-                </Link>
+                </MuestrasSalaEntranceLink>
                 {m.intro ? (
                   <p className="pl-1 text-sm font-light leading-snug" style={{ color: neu.textBody }}>
                     {m.intro}
