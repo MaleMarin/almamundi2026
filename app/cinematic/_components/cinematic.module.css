@@ -1,21 +1,24 @@
 /**
- * Envuelve el hero en /muestras: mismo min-height que el flex del layout para que no se vea
- * el fondo neumórfico (#E0E5EC) entre el hero y el footer (franja clara).
+ * Entrada /muestras (cinemático): mundo neumórfico propio (#E8E4DF + ola de luz).
+ * El carrusel glass (.glassCircle …) no se redefine aquí abajo.
  */
 .muestrasCinematicPage {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  background-color: #000000;
-  min-height: 100dvh;
+  box-sizing: border-box;
+  width: calc(100% - clamp(16px, 4vw, 40px));
+  max-width: 1600px;
+  margin: clamp(8px, 2vw, 20px) auto;
+  min-height: calc(100dvh - clamp(16px, 4vw, 40px));
+  background: #e8e4df;
+  box-shadow:
+    20px 20px 60px #c9c5c0,
+    -20px -20px 60px #ffffff;
+  border-radius: 32px;
   border: 0;
   outline: none;
 }
 
-/**
- * Hero de /muestras: barras + círculo (vidrio). Una altura de viewport; el footer del layout
- * sigue debajo en el documento (scroll).
- */
 .heroRoot {
   position: relative;
   z-index: 1;
@@ -30,10 +33,11 @@
   box-sizing: border-box;
   pointer-events: none;
   isolation: isolate;
-  background-color: #000000;
+  background: #e8e4df;
   border: 0;
   outline: none;
   overflow: hidden;
+  border-radius: 32px;
 }
 
 .cinematicStage {
@@ -44,7 +48,7 @@
   pointer-events: none;
 }
 
-/* Tapa franja clara del PNG o línea subpíxel entre hero y negro inferior */
+/* Franja inferior alineada al fondo neumórfico */
 .cinematicStage::after {
   content: '';
   position: absolute;
@@ -52,26 +56,86 @@
   right: 0;
   bottom: 0;
   height: clamp(6px, 1.2vw, 14px);
-  background: #000000;
+  background: #e8e4df;
   pointer-events: none;
   z-index: 3;
 }
 
-/* WebGL / capa de respaldo: detrás de .shell, delante del fondo */
+.lightWave {
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 180px;
+  background: radial-gradient(
+    ellipse 80% 60% at 50% 50%,
+    rgba(255, 240, 200, 0.9) 0%,
+    rgba(255, 220, 150, 0.5) 30%,
+    rgba(232, 228, 223, 0) 70%
+  );
+  filter: blur(20px);
+  pointer-events: none;
+  z-index: 2;
+  animation: muestrasWaveFloat 6s ease-in-out infinite;
+}
+
+.lightWave::before {
+  content: '';
+  position: absolute;
+  top: 30%;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 220, 150, 0.6) 20%,
+    rgba(255, 245, 200, 0.9) 50%,
+    rgba(255, 220, 150, 0.6) 80%,
+    transparent
+  );
+  filter: blur(3px);
+  border-radius: 50%;
+}
+
+@keyframes muestrasWaveFloat {
+  0%,
+  100% {
+    transform: translateX(-50%) scaleY(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateX(-50%) scaleY(1.15) translateY(-10px);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lightWave {
+    animation: none;
+    opacity: 0.85;
+  }
+}
+
+/* WebGL / columnas: ocultos en esta entrada (mundo neumórfico); el DOM sigue por si el vidrio lo necesita. */
 .cinematicEnvLayer {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
 }
 
-/* Imagen full-bleed detrás del WebGL (misma ruta que `MUESTRAS_CINEMATIC_BACKDROP_SRC`) */
 .sceneBackdropWrap {
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   overflow: hidden;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .sceneBackdropImg {
@@ -182,9 +246,9 @@
   justify-content: space-between;
   gap: 1rem;
   padding: 0.85rem clamp(1rem, 4vw, 2.5rem);
-  background: color-mix(in oklab, #0a0a0a 55%, transparent);
-  backdrop-filter: blur(18px) saturate(1.15);
-  border-bottom: 1px solid color-mix(in oklab, #ff6b35 22%, transparent);
+  background: transparent;
+  border-bottom: none;
+  pointer-events: auto;
 }
 
 .brand,
@@ -195,12 +259,35 @@
   letter-spacing: 0.2em;
   text-transform: uppercase;
   text-decoration: none;
-  color: color-mix(in oklab, var(--color-text-light, #f0f0ec) 72%, transparent);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e4df;
+  border-radius: 50px;
+  border: none;
+  box-shadow:
+    8px 8px 20px #c9c5c0,
+    -8px -8px 20px #ffffff;
+  color: #6b6762;
+  padding: 14px 28px;
+  transition:
+    box-shadow 0.2s ease,
+    color 0.2s ease;
 }
 
 .brand:hover,
 .exit:hover {
-  color: color-mix(in oklab, #ffb380 88%, #ffffff);
+  box-shadow:
+    12px 12px 28px #c9c5c0,
+    -12px -12px 28px #ffffff;
+  color: #3d3a37;
+}
+
+.brand:active,
+.exit:active {
+  box-shadow:
+    inset 6px 6px 14px #c9c5c0,
+    inset -6px -6px 14px #ffffff;
 }
 
 /* Etapa: centra el círculo glass bajo la barra (sin tocar .topBar). */
@@ -481,12 +568,17 @@
 :global([data-high-contrast='true']) .glassStoryList,
 :global([data-high-contrast='true']) .glassStoryList li,
 :global([data-high-contrast='true']) .glassFooterLinks,
-:global([data-high-contrast='true']) .glassFooterLink,
-:global([data-high-contrast='true']) .brand,
-:global([data-high-contrast='true']) .exit {
+:global([data-high-contrast='true']) .glassFooterLink {
   color: #f0f0ec !important;
   background-color: transparent !important;
   box-shadow: none !important;
+}
+
+:global([data-high-contrast='true']) .brand,
+:global([data-high-contrast='true']) .exit {
+  color: #0a0a0a !important;
+  background-color: #f0f0ec !important;
+  box-shadow: 0 0 0 2px #0a0a0a !important;
 }
 
 :global([data-high-contrast='true']) .glassCta {
@@ -494,7 +586,7 @@
 }
 
 :global([data-high-contrast='true']) .topBar {
-  background: rgba(14, 14, 14, 0.92) !important;
+  background: transparent !important;
 }
 
 :global([data-high-contrast='true']) .glassCircle {

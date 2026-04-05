@@ -173,6 +173,7 @@ export function CinematicPageClient({
               />
             )}
           </div>
+          <div className={styles.lightWave} aria-hidden />
           <div className={styles.shell}>
             <header className={styles.topBar}>
               <Link href="/" className={styles.brand}>
