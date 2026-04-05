@@ -45,6 +45,10 @@ function MuestraDetailBody() {
   const searchParams = useSearchParams();
   const slug = slugFromParams(params);
   const muestra = getMuestraBySlug(slug);
+  /**
+   * Por defecto: entrar directo al hilo 3D (historias en el canvas), como antes.
+   * `?portal=1`: primero la tarjeta «SALA · MUESTRA CURADA» y luego «Entrar a la sala».
+   */
   const skipPortal = searchParams.get('portal') !== '1';
 
   if (!muestra) {
@@ -76,10 +80,9 @@ function MuestraDetailBody() {
   return (
     <div
       id="muestra-sala-host"
+      className="flex w-full min-w-0 flex-1 flex-col"
       style={{
-        width: '100%',
-        minWidth: 0,
-        minHeight: 'calc(100vh - 6rem)',
+        minHeight: 'max(560px, calc(100dvh - 6.5rem))',
         backgroundColor: '#e6e9ee',
         color: '#1a1f2a',
         position: 'relative',

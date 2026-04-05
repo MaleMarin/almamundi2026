@@ -53,7 +53,7 @@ export function SalaHilo({
   skipPortal,
 }: {
   muestra: SalaHiloMuestraInput;
-  /** Si es true, se omite la tarjeta «SALA · MUESTRA CURADA» y se entra al hilo; «Salir» vuelve al listado. Usa `?portal=1` en la URL para forzar el portal (ver página de la muestra). */
+  /** Si es true, se omite la tarjeta «SALA · MUESTRA CURADA» y se entra al hilo; «Salir» vuelve al listado o al portal. `?portal=1` en la URL muestra primero la tarjeta. */
   skipPortal: boolean;
 }) {
   const router = useRouter();
@@ -67,7 +67,6 @@ export function SalaHilo({
   const [portalOpacity, setPortalOpacity] = useState(1);
   const [salaOpacity, setSalaOpacity] = useState(1);
   const [particles, setParticles] = useState<Particle[]>([]);
-  const [hintVisible, setHintVisible] = useState(true);
   const [discoveredCount, setDiscoveredCount] = useState(0);
   const [canvasCssH, setCanvasCssH] = useState(420);
   const [storyOverlay, setStoryOverlay] = useState<{
@@ -182,21 +181,23 @@ export function SalaHilo({
 
   const navigateToHistoriaFromKnot = useCallback(
     (k: number) => {
-      if (k < 0 || k >= stories.length || unraveledRef.current.has(k)) return;
-      unraveledRef.current.add(k);
-      setDiscoveredCount(unraveledRef.current.size);
-      const wrap = containerRef.current;
-      if (wrap) {
-        const rect = wrap.getBoundingClientRect();
-        const W = rect.width;
-        const H = rect.height;
-        const knots = kpos(W, H, tRef.current, stories.length);
-        const kn = knots[k];
-        if (kn) appendParticles(kn.x, kn.y);
+      if (k < 0 || k >= stories.length) return;
+      const firstVisit = !unraveledRef.current.has(k);
+      if (firstVisit) {
+        unraveledRef.current.add(k);
+        setDiscoveredCount(unraveledRef.current.size);
+        const wrap = containerRef.current;
+        if (wrap) {
+          const rect = wrap.getBoundingClientRect();
+          const W = rect.width;
+          const H = rect.height;
+          const knots = kpos(W, H, tRef.current, stories.length);
+          const kn = knots[k];
+          if (kn) appendParticles(kn.x, kn.y);
+        }
       }
       const s = stories[k];
       const formato = s.formato || 'video';
-      setHintVisible(false);
       setStoryOverlay({ id: s.id, formato });
     },
     [stories, appendParticles]
@@ -229,7 +230,6 @@ export function SalaHilo({
       setPhase('portal');
       unraveledRef.current = new Set();
       setDiscoveredCount(0);
-      setHintVisible(true);
       setParticles([]);
       setSalaOpacity(1);
     }, 700);
@@ -255,7 +255,7 @@ export function SalaHilo({
 
   return (
     <main
-      className="relative z-[45] flex w-full flex-1 shrink-0 flex-col"
+      className="relative z-[45] flex w-full min-w-0 flex-1 shrink-0 flex-col"
       style={{
         minHeight: 'max(32rem, calc(100dvh - 7rem))',
         background: BG,
@@ -454,10 +454,11 @@ export function SalaHilo({
         <div
           style={{
             position: 'relative',
-            flex: 1,
-            minHeight: 520,
+            flex: '1 1 auto',
+            minHeight: 'min(90vh, 920px)',
             backgroundColor: 'transparent',
-            overflow: 'hidden',
+            overflowX: 'hidden',
+            overflowY: 'auto',
             opacity: salaOpacity,
             transition: 'opacity 0.7s ease',
           }}
@@ -535,14 +536,18 @@ export function SalaHilo({
             onTouchStart={onThreadTouchStart}
             style={{
               width: '100%',
+              maxWidth: 1100,
               height: canvasCssH,
-              minHeight: 420,
+              minHeight: 'clamp(360px, 52vh, 720px)',
               margin: '0 auto',
               marginTop: 72,
               position: 'relative',
-              zIndex: 1,
+              zIndex: 4,
               cursor: 'crosshair',
               touchAction: 'none',
+              background: 'rgba(230, 233, 238, 0.35)',
+              borderRadius: 16,
+              boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5)',
             }}
           >
             <SalaHiloThread3D
@@ -587,18 +592,78 @@ export function SalaHilo({
               textTransform: 'uppercase',
               color: TEXT_HINT,
               margin: 0,
-              padding: '10px 16px 20px',
-              opacity: hintVisible ? 1 : 0,
-              transition: 'opacity 0.4s ease',
-              pointerEvents: 'none',
+              padding: '12px 16px 8px',
               textAlign: 'center',
               maxWidth: '90%',
               marginLeft: 'auto',
               marginRight: 'auto',
             }}
           >
-            toca un nudo para entrar a la historia
+            Tocá un nudo en el hilo o elegí una historia abajo
           </p>
+
+          <div
+            style={{
+              position: 'relative',
+              zIndex: 8,
+              padding: '8px 16px 28px',
+              maxWidth: 920,
+              margin: '0 auto',
+              width: '100%',
+              boxSizing: 'border-box',
+            }}
+          >
+            <p
+              style={{
+                fontSize: 10,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: TEXT_MUTED,
+                margin: '0 0 14px',
+                textAlign: 'center',
+              }}
+            >
+              Historias en esta sala ({total})
+            </p>
+            <ul
+              style={{
+                listStyle: 'none',
+                margin: 0,
+                padding: 0,
+                display: 'flex',
+                flexWrap: 'wrap',
+                gap: 10,
+                justifyContent: 'center',
+              }}
+            >
+              {stories.map((s, i) => (
+                <li key={s.id}>
+                  <button
+                    type="button"
+                    onClick={() => navigateToHistoriaFromKnot(i)}
+                    style={{
+                      display: 'inline-block',
+                      maxWidth: 'min(100vw - 48px, 280px)',
+                      padding: '10px 16px',
+                      borderRadius: 999,
+                      border: 'none',
+                      cursor: 'pointer',
+                      fontSize: 12,
+                      fontWeight: 600,
+                      letterSpacing: '0.06em',
+                      textTransform: 'uppercase',
+                      textAlign: 'center',
+                      color: TEXT_PRIMARY,
+                      background: BG,
+                      boxShadow: `4px 4px 10px ${SHADOW_DARK}, -3px -3px 9px ${SHADOW_LIGHT}`,
+                    }}
+                  >
+                    {s.titulo}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
 
