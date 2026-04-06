@@ -16,7 +16,8 @@ export const kpos = (W: number, H: number, t: number, count: number) => {
     const x = W / 2;
     return [{ x, y: ty(x, W, H, t) }];
   }
-  const mg = W * 0.1;
+  /** Nudos de borde a borde en el ancho del canvas (márgenes mínimos). */
+  const mg = W * 0.012;
   const sp = (W - mg * 2) / (count - 1);
   return Array.from({ length: count }, (_, i) => {
     const x = mg + i * sp;

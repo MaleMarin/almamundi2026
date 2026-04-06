@@ -17,11 +17,15 @@ import {
   useState,
   type MutableRefObject,
 } from 'react';
-import { kpos, truncThreeWords, ty } from '@/lib/muestras/sala-hilo-thread-math';
+import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
 
 const ACCENT = '#FF4A1C';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_MUTED = '#9299a8';
+/** Hilo principal: amarillo/dorado (lectura clara sobre fondo claro). */
+const THREAD_GOLD = '#e6b800';
+const THREAD_GOLD_LIGHT = '#ffeb3b';
+const THREAD_GOLD_PALE = '#fffef0';
 
 export type SalaHiloThreadStory = {
   titulo: string;
@@ -103,10 +107,10 @@ function ThreadStrands({
         Math.max(1, size.height),
       );
       const specs: { dy: number; color: string; opacity: number; lw: number }[] = [
-        { dy: 3.2, color: '#556070', opacity: 0.32, lw: 8 },
-        { dy: 1.6, color: '#5f6a7c', opacity: 0.48, lw: 5.5 },
-        { dy: 0, color: '#384050', opacity: 1, lw: 4.2 },
-        { dy: -1, color: '#f0f2f8', opacity: 0.42, lw: 2.4 },
+        { dy: 0.85, color: THREAD_GOLD_PALE, opacity: 0.52, lw: 2.65 },
+        { dy: 0.42, color: THREAD_GOLD_LIGHT, opacity: 0.98, lw: 1.75 },
+        { dy: 0, color: THREAD_GOLD, opacity: 1, lw: 1.15 },
+        { dy: -0.32, color: '#ffffff', opacity: 0.88, lw: 0.62 },
       ];
 
       for (const s of specs) {
@@ -239,17 +243,17 @@ function Knots3D({
         m.metalness = 0.06;
         m.roughness = 0.52;
       } else if (isH) {
-        m.color.set('#ffffff');
-        m.emissive.set(ACCENT);
-        m.emissiveIntensity = 0.18;
-        m.metalness = 0.2;
-        m.roughness = 0.26;
+        m.color.set('#fffef8');
+        m.emissive.set(THREAD_GOLD);
+        m.emissiveIntensity = 0.35;
+        m.metalness = 0.15;
+        m.roughness = 0.28;
       } else {
-        m.color.set('#eef1f7');
-        m.emissive.set('#c8d4e2');
-        m.emissiveIntensity = 0.06;
-        m.metalness = 0.1;
-        m.roughness = 0.38;
+        m.color.set('#fff8e0');
+        m.emissive.set(THREAD_GOLD_LIGHT);
+        m.emissiveIntensity = 0.12;
+        m.metalness = 0.08;
+        m.roughness = 0.35;
       }
     }
   });
@@ -267,9 +271,11 @@ function Knots3D({
           >
             <sphereGeometry args={[13, 40, 40]} />
             <meshStandardMaterial
-              color="#eef1f7"
-              roughness={0.38}
-              metalness={0.12}
+              color="#fff4c4"
+              roughness={0.32}
+              metalness={0.1}
+              emissive={THREAD_GOLD}
+              emissiveIntensity={0.08}
             />
           </mesh>
           <mesh
@@ -327,7 +333,7 @@ function GroundShadows({
       {stories.map((_, i) => (
         <mesh key={i} ref={(el) => { refs.current[i] = el; }} rotation={[-Math.PI / 2, 0, 0]}>
           <circleGeometry args={[1, 24]} />
-          <meshBasicMaterial color="#374151" transparent opacity={0.18} depthWrite={false} />
+          <meshBasicMaterial color={THREAD_GOLD} transparent opacity={0.14} depthWrite={false} />
         </mesh>
       ))}
     </group>
@@ -366,8 +372,8 @@ function HoverLabel3D({
   if (hoverIdx < 0) return null;
   const h = stories[hoverIdx];
   if (!h) return null;
-  let title = h.titulo;
-  if (title.length > 48) title = `${title.slice(0, 46)}…`;
+  const title =
+    h.titulo.length > 72 ? `${h.titulo.slice(0, 70)}…` : h.titulo;
 
   return (
     <group ref={g}>
@@ -455,37 +461,43 @@ function IdleCaptions3D({
         <group key={i} ref={(el) => { groups.current[i] = el; }}>
           <Html
             center
-            distanceFactor={0.9}
+            distanceFactor={0.88}
             style={{
               pointerEvents: 'none',
-              width: 200,
+              width: Math.min(320, W * 0.22),
+              minWidth: 120,
               textAlign: 'center',
               fontFamily: 'system-ui, -apple-system, sans-serif',
             }}
             transform
             occlude={false}
           >
-            <div style={{ transform: 'translateY(36px)' }}>
+            <div style={{ transform: 'translateY(40px)' }}>
               <div
                 style={{
-                  fontSize: 12,
-                  fontWeight: 600,
-                  color: '#5a6578',
-                  textShadow: '0 1px 0 rgba(255,255,255,0.6)',
+                  fontSize: 15,
+                  fontWeight: 800,
+                  color: '#8a6a00',
+                  textShadow: '0 1px 0 rgba(255,255,255,0.9), 0 0 12px rgba(245,213,71,0.5)',
+                  letterSpacing: '0.04em',
                 }}
               >
                 {String(i + 1)}
               </div>
               <div
                 style={{
-                  marginTop: 4,
-                  fontSize: 12,
-                  fontWeight: 400,
-                  color: TEXT_MUTED,
-                  lineHeight: 1.25,
+                  marginTop: 6,
+                  fontSize: 11,
+                  fontWeight: 600,
+                  color: TEXT_PRIMARY,
+                  lineHeight: 1.35,
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.06em',
+                  textShadow: '0 1px 0 rgba(255,255,255,0.75)',
+                  wordBreak: 'break-word',
                 }}
               >
-                {truncThreeWords(s.titulo)}
+                {s.titulo}
               </div>
             </div>
           </Html>
@@ -567,10 +579,10 @@ function Scene(props: SalaHiloThread3DProps) {
   return (
     <>
       <CameraRig W={W} H={H} />
-      <ambientLight intensity={0.55} />
+      <ambientLight intensity={0.62} />
       <directionalLight
         position={[W * 0.35, H * 0.2, 420]}
-        intensity={1.15}
+        intensity={1.25}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
@@ -612,28 +624,78 @@ function Scene(props: SalaHiloThread3DProps) {
   );
 }
 
+/**
+ * Mide el contenedor real del hilo y asigna al <canvas> ancho/alto en px.
+ * Con solo width/height:100% el buffer WebGL a menudo queda en 0×0 en layouts flex/Next.
+ */
 export function SalaHiloThread3D(props: SalaHiloThread3DProps) {
-  const { width: W, height: H } = props;
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const { width: propW, height: propH } = props;
+  const [dims, setDims] = useState(() => ({
+    w: Math.max(64, propW),
+    h: Math.max(64, propH),
+  }));
+
+  useLayoutEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const read = () => {
+      const r = el.getBoundingClientRect();
+      const w = Math.max(64, Math.floor(r.width));
+      const h = Math.max(64, Math.floor(r.height));
+      setDims((prev) => (prev.w === w && prev.h === h ? prev : { w, h }));
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(el);
+    window.addEventListener('resize', read);
+    const t = window.setTimeout(read, 0);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener('resize', read);
+      window.clearTimeout(t);
+    };
+  }, []);
+
+  const W = dims.w;
+  const H = dims.h;
   if (W < 8 || H < 8) return null;
 
+  const sceneProps: SalaHiloThread3DProps = { ...props, width: W, height: H };
+
   return (
-    <Canvas
-      shadows
-      gl={{ antialias: true, alpha: true, powerPreference: 'high-performance' }}
-      onCreated={({ gl }) => {
-        gl.setClearColor(0x000000, 0);
-      }}
+    <div
+      ref={wrapRef}
       style={{
+        position: 'relative',
+        zIndex: 2,
         width: '100%',
         height: '100%',
-        display: 'block',
-        touchAction: 'none',
-        position: 'relative',
-        zIndex: 1,
+        minWidth: 64,
+        minHeight: 64,
       }}
-      dpr={[1, 2]}
     >
-      <Scene {...props} />
-    </Canvas>
+      <Canvas
+        shadows
+        gl={{
+          antialias: true,
+          alpha: true,
+          /* 'high-performance' a veces elige GPU que no pinta bien en algunos Mac */
+          powerPreference: 'default',
+        }}
+        onCreated={({ gl }) => {
+          gl.setClearColor(0x000000, 0);
+        }}
+        style={{
+          width: W,
+          height: H,
+          display: 'block',
+          touchAction: 'none',
+        }}
+        dpr={[1, 2]}
+      >
+        <Scene {...sceneProps} />
+      </Canvas>
+    </div>
   );
 }

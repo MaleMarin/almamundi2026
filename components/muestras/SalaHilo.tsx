@@ -4,6 +4,7 @@
  * Sala «el hilo» — portal 3D (gel + perspectiva) → escena Three (hilo + nudos); click en nudo → historia.
  * Estilos solo inline + keyframes locales (sin Tailwind ni CSS module).
  */
+import type { ComponentType } from 'react';
 import {
   useCallback,
   useEffect,
@@ -12,9 +13,85 @@ import {
   useRef,
   useState,
 } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { SalaHiloThread3D } from '@/components/muestras/SalaHiloThread3D';
-import { kpos } from '@/lib/muestras/sala-hilo-thread-math';
+import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
+import type { SalaHiloThread3DProps } from '@/components/muestras/SalaHiloThread3D';
+
+/** WebGL solo en cliente: evita hidratación con canvas 0×0 y asegura medidas reales del contenedor. */
+/** Sin `loading` distinto al SSR: evita mismatch de hidratación con Next 16 + Turbopack. */
+const SalaHiloThread3D = dynamic(
+  () =>
+    import('@/components/muestras/SalaHiloThread3D').then((m) => m.SalaHiloThread3D),
+  { ssr: false, loading: () => null }
+) as ComponentType<SalaHiloThread3DProps>;
+
+/** Curva 2D (misma fórmula que el 3D): siempre visible; animación propia por si WebGL no arranca. */
+function HiloSvgGuide({ w, h }: { w: number; h: number }) {
+  const tAnim = useRef(0);
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    let id = 0;
+    const loop = () => {
+      tAnim.current += 0.02;
+      setTick((n) => (n + 1) % 1_000_000);
+      id = requestAnimationFrame(loop);
+    };
+    id = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(id);
+  }, []);
+  if (w < 16 || h < 16) return null;
+  const t = tAnim.current;
+  const step = Math.max(3, Math.floor(w / 160));
+  const pts: string[] = [];
+  for (let x = 0; x <= w; x += step) {
+    pts.push(`${x},${ty(x, w, h, t)}`);
+  }
+  return (
+    <svg
+      width="100%"
+      height="100%"
+      viewBox={`0 0 ${w} ${h}`}
+      preserveAspectRatio="none"
+      style={{
+        position: 'absolute',
+        inset: 0,
+        zIndex: 0,
+        pointerEvents: 'none',
+        opacity: 1,
+      }}
+      aria-hidden
+    >
+      <polyline
+        fill="none"
+        stroke="#fffef5"
+        strokeWidth={Math.max(1.35, w * 0.0022)}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.48}
+        points={pts.join(' ')}
+      />
+      <polyline
+        fill="none"
+        stroke="#fff176"
+        strokeWidth={Math.max(0.85, w * 0.00115)}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.98}
+        points={pts.join(' ')}
+      />
+      <polyline
+        fill="none"
+        stroke="#ffffff"
+        strokeWidth={Math.max(0.4, w * 0.00055)}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={1}
+        points={pts.join(' ')}
+      />
+    </svg>
+  );
+}
 
 export type SalaHiloMuestraInput = {
   titulo: string;
@@ -74,6 +151,8 @@ export function SalaHilo({
     formato: string;
   } | null>(null);
   const [threadDims, setThreadDims] = useState({ w: 640, h: 420 });
+  /** Evita hidratación: no montar SVG animado + WebGL hasta el cliente (mismo HTML servidor/cliente en 1er paso). */
+  const [threadMounted, setThreadMounted] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const tRef = useRef(0);
@@ -102,6 +181,10 @@ export function SalaHilo({
   }, [uid]);
 
   useEffect(() => {
+    setThreadMounted(true);
+  }, []);
+
+  useEffect(() => {
     const el = containerRef.current;
     if (!el || phase === 'portal') return;
 
@@ -116,7 +199,7 @@ export function SalaHilo({
     ro.observe(el);
     measure();
     return () => ro.disconnect();
-  }, [phase]);
+  }, [phase, threadMounted]);
 
   /* Tras navegación SPA, el layout puede estabilizarse un frame después: re-medir el canvas del hilo. */
   useLayoutEffect(() => {
@@ -137,7 +220,7 @@ export function SalaHilo({
       cancelled = true;
       cancelAnimationFrame(id);
     };
-  }, [phase]);
+  }, [phase, threadMounted]);
 
   useEffect(() => {
     const upd = () =>
@@ -535,31 +618,57 @@ export function SalaHilo({
             onMouseLeave={onThreadPointerLeave}
             onTouchStart={onThreadTouchStart}
             style={{
-              width: '100%',
-              maxWidth: 1100,
+              width: '100vw',
+              maxWidth: '100vw',
+              left: '50%',
+              transform: 'translateX(-50%)',
               height: canvasCssH,
-              minHeight: 'clamp(360px, 52vh, 720px)',
-              margin: '0 auto',
-              marginTop: 72,
+              minHeight: 'clamp(320px, 48vh, 680px)',
+              marginTop: 56,
+              marginBottom: 0,
               position: 'relative',
               zIndex: 4,
               cursor: 'crosshair',
               touchAction: 'none',
-              background: 'rgba(230, 233, 238, 0.35)',
-              borderRadius: 16,
-              boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.5)',
+              background:
+                'linear-gradient(180deg, rgba(255,252,240,0.55) 0%, rgba(236,240,248,0.35) 45%, rgba(224,230,240,0.5) 100%)',
+              overflow: 'hidden',
+              boxSizing: 'border-box',
             }}
           >
-            <SalaHiloThread3D
-              width={threadDims.w}
-              height={threadDims.h}
-              stories={stories}
-              tRef={tRef}
-              mouseRef={mouseRef}
-              activeKnotRef={activeKnotRef}
-              unraveledRef={unraveledRef}
-              onKnotPick={navigateToHistoriaFromKnot}
-            />
+            {!threadMounted ? (
+              <div
+                style={{
+                  position: 'absolute',
+                  inset: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 12,
+                  letterSpacing: '0.14em',
+                  textTransform: 'uppercase',
+                  color: '#b0b6c2',
+                  zIndex: 3,
+                }}
+                aria-busy
+              >
+                Cargando hilo…
+              </div>
+            ) : (
+              <>
+                <HiloSvgGuide w={threadDims.w} h={threadDims.h} />
+                <SalaHiloThread3D
+                  width={threadDims.w}
+                  height={threadDims.h}
+                  stories={stories}
+                  tRef={tRef}
+                  mouseRef={mouseRef}
+                  activeKnotRef={activeKnotRef}
+                  unraveledRef={unraveledRef}
+                  onKnotPick={navigateToHistoriaFromKnot}
+                />
+              </>
+            )}
             {particles.map((p) => (
               <span
                 key={p.id}
