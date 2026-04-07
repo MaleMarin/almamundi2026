@@ -36,7 +36,9 @@ export default function HistoriasFotosPage() {
   const [shareSlideIndex, setShareSlideIndex] = useState(0);
   const [ethicalShareOpen, setEthicalShareOpen] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   const photoStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
@@ -84,7 +86,7 @@ export default function HistoriasFotosPage() {
   );
 
   useEffect(() => {
-    setFotoOpen(null);
+    queueMicrotask(() => setFotoOpen(null));
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
@@ -98,12 +100,14 @@ export default function HistoriasFotosPage() {
   );
 
   useEffect(() => {
-    const n = exhibitionHistorias.length;
-    if (n === 0) {
-      setShareSlideIndex(0);
-      return;
-    }
-    setShareSlideIndex(Math.min(Math.floor(n / 2), n - 1));
+    queueMicrotask(() => {
+      const n = exhibitionHistorias.length;
+      if (n === 0) {
+        setShareSlideIndex(0);
+        return;
+      }
+      setShareSlideIndex(Math.min(Math.floor(n / 2), n - 1));
+    });
   }, [shareListResetKey, exhibitionHistorias.length]);
 
   const shareTarget =
