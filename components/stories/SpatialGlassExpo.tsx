@@ -163,11 +163,13 @@ export function SpatialGlassExpo({
   );
 
   useEffect(() => {
-    if (n === 0) {
-      setActiveIndex(0);
-      return;
-    }
-    setActiveIndex((i) => Math.min(i, n - 1));
+    queueMicrotask(() => {
+      if (n === 0) {
+        setActiveIndex(0);
+        return;
+      }
+      setActiveIndex((i) => Math.min(i, n - 1));
+    });
   }, [n]);
 
   useEffect(() => {
