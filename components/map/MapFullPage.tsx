@@ -4,6 +4,7 @@ import '@/app/mapa/mapa-ui.css';
 import '@/app/mapa/liquid-metal.css';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import {
@@ -23,7 +24,7 @@ import { AtmosphereOverlay } from '@/components/AtmosphereOverlay';
 import { useAtmosphere } from '@/hooks/useAtmosphere';
 import { getPulseConfig, getNewsPulseConfig, type PulseConfig } from '@/lib/storyPulse';
 import { usePulseAnimation, calcPulseFactor } from '@/hooks/usePulseAnimation';
-import { MapCanvas } from '@/components/map/MapCanvas';
+import { MapCanvas, type MapCanvasGlobeRef } from '@/components/map/MapCanvas';
 import { MapDock, type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
@@ -111,12 +112,12 @@ class MapErrorBoundary extends React.Component<
             >
               Intentar de nuevo
             </button>
-            <a
+            <Link
               href="/"
               className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors"
             >
               Ir al inicio
-            </a>
+            </Link>
           </div>
         </div>
       );
@@ -1030,12 +1031,16 @@ function useElementSize<T extends HTMLElement>() {
     if (!el) return;
     const ro = new ResizeObserver((entries) => {
       const r = entries[0]?.contentRect;
-      setWidth(r?.width ?? 900);
-      setHeight(r?.height ?? 700);
+      queueMicrotask(() => {
+        setWidth(r?.width ?? 900);
+        setHeight(r?.height ?? 700);
+      });
     });
     ro.observe(el);
-    setWidth(el.clientWidth || 900);
-    setHeight(el.clientHeight || 700);
+    queueMicrotask(() => {
+      setWidth(el.clientWidth || 900);
+      setHeight(el.clientHeight || 700);
+    });
     return () => ro.disconnect();
   }, []);
   return { ref, width, height };
@@ -1052,6 +1057,12 @@ function storySearchHaystack(s: StoryPoint): string {
   return normalizeQuery(
     [s.topic, s.label, s.description, s.city, s.country].filter(Boolean).join(' ')
   );
+}
+
+function isColeccionStoredItem(v: unknown): v is { kind: string; id: string; title?: string; subtitle?: string } {
+  if (typeof v !== 'object' || v === null) return false;
+  const o = v as Record<string, unknown>;
+  return typeof o.kind === 'string' && typeof o.id === 'string';
 }
 
 /* ----- Panel derecho: título + búsqueda + acciones (Temas, Explorar, Colecciones, Sonido) + vistas ----- */
@@ -1268,7 +1279,7 @@ function RightPanel({
       if (!raw) return [];
       const parsed = JSON.parse(raw) as unknown[];
       return (Array.isArray(parsed) ? parsed : [])
-        .filter((i): i is { kind: string; id: string; title: string; subtitle: string } => typeof (i as any)?.kind === 'string' && typeof (i as any)?.id === 'string')
+        .filter(isColeccionStoredItem)
         .slice(0, 5)
         .map((i) => ({ kind: i.kind as 'stories' | 'news', id: i.id, title: i.title || '—', subtitle: i.subtitle || '—' }));
     } catch {
@@ -1286,7 +1297,7 @@ function RightPanel({
         }
         const parsed = JSON.parse(raw) as unknown[];
         const list = (Array.isArray(parsed) ? parsed : [])
-          .filter((i): i is { kind: string; id: string; title: string; subtitle: string } => typeof (i as any)?.kind === 'string' && typeof (i as any)?.id === 'string')
+          .filter(isColeccionStoredItem)
           .slice(0, 5)
           .map((i) => ({ kind: i.kind as 'stories' | 'news', id: i.id, title: i.title || '—', subtitle: i.subtitle || '—' }));
         setCollectionItems(list);
@@ -1893,10 +1904,23 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
   );
 }
 
-function NewsRow({ news, isActive, onClick, dimmed = false }: { news: NewsItem; isActive: boolean; onClick: () => void; dimmed?: boolean }) {
+function NewsRow({
+  news,
+  isActive,
+  onClick,
+  dimmed = false,
+  nowMs,
+}: {
+  news: NewsItem;
+  isActive: boolean;
+  onClick: () => void;
+  dimmed?: boolean;
+  /** Tiempo de referencia (actualizado cada minuto en el padre) para evitar Date.now() en render. */
+  nowMs: number;
+}) {
   const timeAgo = (date: string | null) => {
     if (!date) return '';
-    const diff = Date.now() - new Date(date).getTime();
+    const diff = nowMs - new Date(date).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 60) return `hace ${mins}m`;
     const hrs = Math.floor(mins / 60);
@@ -2040,13 +2064,19 @@ function HistoriasPanel({
 }
 
 function NoticiasPanel({
-  news, selectedTopicId, onTopicIdChange, onNewsFocus, selectedNews,
+  news,
+  selectedTopicId,
+  onTopicIdChange,
+  onNewsFocus,
+  selectedNews,
+  nowMs,
 }: {
   news: NewsItem[];
   selectedTopicId: string | null;
   onTopicIdChange: (id: string | null) => void;
   onNewsFocus: (n: NewsItem) => void;
   selectedNews: NewsItem | null;
+  nowMs: number;
 }) {
   const hasLocation = (n: NewsItem) => (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
   const withLocation = news.filter(hasLocation);
@@ -2116,14 +2146,14 @@ function NoticiasPanel({
           <>
             <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
             {withLocation.map((n, i) => (
-              <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} />
+              <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} nowMs={nowMs} />
             ))}
           </>
         )}
         {withoutLocation.length > 0 && (
           <>
             {withoutLocation.map((n, i) => (
-              <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} dimmed />
+              <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} dimmed nowMs={nowMs} />
             ))}
           </>
         )}
@@ -2145,7 +2175,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const audioRef = useRef<HTMLAudioElement>(null);
   /** Audio del universo: por defecto ON; la persona puede apagarlo con el botón Universo. */
   const [isMuted, setIsMuted] = useState(false);
-  const globeEl = useRef<any>(null);
+  const globeEl = useRef<MapCanvasGlobeRef>(null);
+  /** Referencia de tiempo para filas de noticias (evita Date.now() en render). */
+  const [newsListNowMs, setNewsListNowMs] = useState(() => Date.now());
+  useEffect(() => {
+    const interval = window.setInterval(() => setNewsListNowMs(Date.now()), 60_000);
+    return () => window.clearInterval(interval);
+  }, []);
   const cloudMeshRef = useRef<THREE.Mesh | null>(null);
   const earthMeshRef = useRef<THREE.Mesh | null>(null);
   const earthMarkersRef = useRef<THREE.Object3D[]>([]);
@@ -3447,9 +3483,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   }, [clearTourTimer]);
 
   const pushWithTransition = useCallback((url: string) => {
-    if (typeof document !== 'undefined' && 'startViewTransition' in document) {
-      // @ts-ignore
-      document.startViewTransition(() => router.push(url));
+    if (typeof document === 'undefined') {
+      router.push(url);
+      return;
+    }
+    const doc = document as Document & { startViewTransition?: (cb: () => void) => { finished: Promise<void> } };
+    if (typeof doc.startViewTransition === 'function') {
+      doc.startViewTransition(() => {
+        router.push(url);
+      });
     } else {
       router.push(url);
     }
@@ -3983,7 +4025,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             '/textures/earth-clouds.png',
             (cloudTex) => {
               if (cloudTex && cloudMeshRef.current === null) {
-                (cloudTex as any).colorSpace = (THREE as any).SRGBColorSpace ?? (cloudTex as any).colorSpace;
+                cloudTex.colorSpace = THREE.SRGBColorSpace;
                 const cloudMat = new THREE.MeshPhongMaterial({
                   map: cloudTex,
                   color: new THREE.Color(0xeaf6ff),
@@ -4045,15 +4087,19 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   useEffect(() => {
     if (activeView !== 'actualidad') {
-      setSelectedNews(null);
-      setNewsTour((prev) => (prev.running ? { ...prev, running: false } : prev));
+      queueMicrotask(() => {
+        setSelectedNews(null);
+        setNewsTour((prev) => (prev.running ? { ...prev, running: false } : prev));
+      });
     }
   }, [activeView]);
 
   useEffect(() => {
     if (activeView !== 'historias') {
-      setSelectedStory(null);
-      setSelectedTopic(null);
+      queueMicrotask(() => {
+        setSelectedStory(null);
+        setSelectedTopic(null);
+      });
     }
   }, [activeView]);
 
@@ -4134,18 +4180,18 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             WebkitBackdropFilter: 'blur(12px)',
           }}
         >
-          <a href="/" className="flex items-center gap-3 min-w-0">
+          <Link href="/" className="flex items-center gap-3 min-w-0">
             <img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-14 w-auto object-contain select-none flex-shrink-0" />
-            <span className="text-white/95 font-semibold text-lg md:text-xl truncate">
+            <span className="mapa-almamundi-title text-white/95 font-semibold text-lg md:text-xl truncate">
               Mapa de AlmaMundi
             </span>
-          </a>
-          <a
+          </Link>
+          <Link
             href="/"
             className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition"
           >
             Inicio
-          </a>
+          </Link>
         </header>
       )}
       <style jsx global>{globalStyles}</style>
@@ -4764,7 +4810,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           {/* ── CONTENIDO ─────────────────────────────────────────────── */}
           <div style={{ flex: 1, minHeight: 0, overflow: 'hidden' }}>
             {activeView === 'historias' && <HistoriasPanel {...historiasProps} />}
-            {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} />}
+            {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} nowMs={newsListNowMs} />}
             {activeView === 'musica' && <SoundsPanel {...sonidosProps} />}
             {activeView === 'bits' && (
               <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
