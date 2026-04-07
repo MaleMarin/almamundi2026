@@ -1,6 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
+import type { Camera, Scene } from 'three';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { GlobeView } from '@/components/GlobeView';
@@ -80,6 +81,8 @@ export type MapCanvasGlobeRef = {
   pointOfView: (pov: { lat: number; lng: number; altitude: number }, t?: number) => void;
   /** Convierte lat/lng a posición 3D en la escena (x, y, z). Útil para fijar puntos al globo. */
   getCoords?: (lat: number, lng: number, altitude?: number) => { x: number; y: number; z: number };
+  /** Expuesto por react-globe.gl para raycasting / billboard rings. */
+  camera?: () => Camera;
   controls: () => {
     enableZoom: boolean;
     autoRotate: boolean;
@@ -87,7 +90,7 @@ export type MapCanvasGlobeRef = {
     addEventListener: (event: string, fn: () => void) => void;
   };
   renderer: () => unknown;
-  scene: () => unknown;
+  scene: () => Scene;
 } | null;
 
 /** Embedded (home): ligeramente más lejos; vista full usa GlobeView + globe-pov. */
@@ -372,7 +375,9 @@ export function MapCanvas({
   showOrbitalMoon = true,
 }: MapCanvasProps) {
   const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   useEffect(() => {
     if (!mounted || !showOrbitalMoon) return;
