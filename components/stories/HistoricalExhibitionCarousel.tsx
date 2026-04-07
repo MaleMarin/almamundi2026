@@ -97,21 +97,8 @@ function canOpenPrimary(
 /** Máx. inclinación por tarjeta (solo rotación local; sin mover el carrusel entero). */
 const CARD_TILT_MAX_DEG = 12;
 
-/**
- * Tilt por tarjeta: el mouse es relativo al rect de esta slide; solo rotateX/Y (sin translate global).
- */
-function ExpoCardTiltShell({
-  children,
-  disableTilt = false,
-}: {
-  children: ReactNode;
-  /** Listados /historias/*: tarjeta estable (sin inclinación por mouse). */
-  disableTilt?: boolean;
-}) {
-  if (disableTilt) {
-    return <div className="h-full w-full">{children}</div>;
-  }
-
+/** Hooks siempre en el mismo orden: subcomponente separado (no condicional). */
+function ExpoCardTiltInteractive({ children }: { children: ReactNode }) {
   const onMove = useCallback((e: ReactMouseEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
     const r = el.getBoundingClientRect();
@@ -140,6 +127,23 @@ function ExpoCardTiltShell({
       {children}
     </div>
   );
+}
+
+/**
+ * Tilt por tarjeta: el mouse es relativo al rect de esta slide; solo rotateX/Y (sin translate global).
+ */
+function ExpoCardTiltShell({
+  children,
+  disableTilt = false,
+}: {
+  children: ReactNode;
+  /** Listados /historias/*: tarjeta estable (sin inclinación por mouse). */
+  disableTilt?: boolean;
+}) {
+  if (disableTilt) {
+    return <div className="h-full w-full">{children}</div>;
+  }
+  return <ExpoCardTiltInteractive>{children}</ExpoCardTiltInteractive>;
 }
 
 export function HistoricalExhibitionCarousel({
@@ -181,11 +185,13 @@ export function HistoricalExhibitionCarousel({
   const expoNavArrowsDisabled = n <= 1;
 
   useEffect(() => {
-    if (n === 0) {
-      setActiveIndex(0);
-      return;
-    }
-    setActiveIndex((i) => Math.min(i, n - 1));
+    queueMicrotask(() => {
+      if (n === 0) {
+        setActiveIndex(0);
+        return;
+      }
+      setActiveIndex((i) => Math.min(i, n - 1));
+    });
   }, [n]);
 
   useEffect(() => {
