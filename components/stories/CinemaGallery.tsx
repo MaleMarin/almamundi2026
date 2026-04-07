@@ -67,7 +67,9 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
   const filmRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => { setMounted(true); }, []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   const story = stories[activeIdx] ?? null;
 
@@ -87,23 +89,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
   const goPrev = useCallback(() => goTo(Math.max(0, activeIdx - 1)), [goTo, activeIdx]);
   const goNext = useCallback(() => goTo(Math.min(stories.length - 1, activeIdx + 1)), [goTo, activeIdx, stories.length]);
 
-  // ── Keyboard ─────────────────────────────────────────────────────────────
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      if (activeVideo) return;
-      if (e.key === 'ArrowLeft')  goPrev();
-      if (e.key === 'ArrowRight') goNext();
-      if ((e.key === 'Enter' || e.key === ' ') && story?.videoUrl) {
-        e.preventDefault();
-        openCinema(story);
-      }
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [goPrev, goNext, story, activeVideo]);
-
-  // ── Open cinema (mapeo desde StoryPoint; sin campos inexistentes) ────────
-  const openCinema = (s: StoryPoint) => {
+  const openCinema = useCallback((s: StoryPoint) => {
     setActiveVideo({
       id: s.id,
       titulo: s.title ?? s.label ?? 'Historia',
@@ -121,7 +107,22 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
       tags: s.topic ? [s.topic] : [],
       citaDestacada: undefined,
     });
-  };
+  }, []);
+
+  // ── Keyboard ─────────────────────────────────────────────────────────────
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (activeVideo) return;
+      if (e.key === 'ArrowLeft') goPrev();
+      if (e.key === 'ArrowRight') goNext();
+      if ((e.key === 'Enter' || e.key === ' ') && story?.videoUrl) {
+        e.preventDefault();
+        openCinema(story);
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [goPrev, goNext, story, activeVideo, openCinema]);
 
   if (!stories.length) {
     return (
