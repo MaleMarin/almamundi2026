@@ -98,10 +98,14 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
       { rootMargin: '0px 0px -80px 0px', threshold: 0.1 }
     );
     refs.forEach((r) => r && observer.observe(r));
-    setVisibleParrafos((prev) => {
-      const next = new Array(totalParrafos).fill(false);
-      prev.forEach((v, i) => { if (i < totalParrafos) next[i] = v; });
-      return next;
+    queueMicrotask(() => {
+      setVisibleParrafos((prev) => {
+        const next = new Array(totalParrafos).fill(false);
+        prev.forEach((v, i) => {
+          if (i < totalParrafos) next[i] = v;
+        });
+        return next;
+      });
     });
     return () => observer.disconnect();
   }, [totalParrafos, historia.id]);
