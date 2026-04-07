@@ -37,7 +37,7 @@ export function NASAEarthVideo({
     const onError = () => setError(true);
     video.addEventListener('canplay', onCanPlay);
     video.addEventListener('error', onError);
-    if (video.readyState >= 2) setLoaded(true);
+    if (video.readyState >= 2) queueMicrotask(() => setLoaded(true));
     return () => {
       video.removeEventListener('canplay', onCanPlay);
       video.removeEventListener('error', onError);
