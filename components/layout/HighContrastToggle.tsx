@@ -7,7 +7,7 @@ export function HighContrastToggle() {
 
   useEffect(() => {
     const saved = localStorage.getItem('am-high-contrast') === 'true';
-    setOn(saved);
+    queueMicrotask(() => setOn(saved));
     document.documentElement.setAttribute('data-high-contrast', String(saved));
   }, []);
 
