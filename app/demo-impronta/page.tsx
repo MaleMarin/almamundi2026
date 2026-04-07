@@ -71,7 +71,7 @@ function ImprontaVisualizer({
   useEffect(() => {
     let alive = true;
     if (!audioBlob) {
-      setAmps(null);
+      queueMicrotask(() => setAmps(null));
       return;
     }
     blobToAmplitudeSamples(audioBlob).then((a) => {
