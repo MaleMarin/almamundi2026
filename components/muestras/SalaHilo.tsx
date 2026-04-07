@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Sala «el hilo» — portal 3D (gel + perspectiva) → escena Three (hilo + nudos); click en nudo → historia.
+ * Sala «el hilo» — portal 3D (gel + perspectiva) → escena Three (hilo + nudos); click en nudo → panel historia en página.
  * Estilos solo inline + keyframes locales (sin Tailwind ni CSS module).
  */
 import type { ComponentType } from 'react';
@@ -121,6 +121,9 @@ export type SalaHiloMuestraInput = {
     quote: string;
     meta: string;
     formato: string;
+    context?: string;
+    alias?: string;
+    date?: string;
   }[];
 };
 
@@ -164,10 +167,8 @@ export function SalaHilo({
   const [particles, setParticles] = useState<Particle[]>([]);
   const [discoveredCount, setDiscoveredCount] = useState(0);
   const [canvasCssH, setCanvasCssH] = useState(420);
-  const [storyOverlay, setStoryOverlay] = useState<{
-    id: string;
-    formato: string;
-  } | null>(null);
+  const [selectedKnot, setSelectedKnot] = useState<number | null>(null);
+  const [knotPanelOpen, setKnotPanelOpen] = useState(false);
   const [threadDims, setThreadDims] = useState({ w: 640, h: 420 });
   /** Evita hidratación: no montar SVG animado + WebGL hasta el cliente (mismo HTML servidor/cliente en 1er paso). */
   const [threadMounted, setThreadMounted] = useState(false);
@@ -277,9 +278,9 @@ export function SalaHilo({
   }, []);
 
   useEffect(() => {
-    if (!storyOverlay) return;
+    if (selectedKnot === null) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setStoryOverlay(null);
+      if (e.key === 'Escape') setSelectedKnot(null);
     };
     window.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
@@ -288,7 +289,17 @@ export function SalaHilo({
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prevOverflow;
     };
-  }, [storyOverlay]);
+  }, [selectedKnot]);
+
+  useLayoutEffect(() => {
+    if (selectedKnot === null) setKnotPanelOpen(false);
+  }, [selectedKnot]);
+
+  useEffect(() => {
+    if (selectedKnot === null) return;
+    const id = requestAnimationFrame(() => setKnotPanelOpen(true));
+    return () => cancelAnimationFrame(id);
+  }, [selectedKnot]);
 
   const setPointerFromClient = (clientX: number, clientY: number) => {
     const wrap = containerRef.current;
@@ -308,7 +319,7 @@ export function SalaHilo({
     mouseRef.current = { x: -9999, y: -9999 };
   };
 
-  const navigateToHistoriaFromKnot = useCallback(
+  const onKnotPick = useCallback(
     (k: number) => {
       if (k < 0 || k >= stories.length) return;
       const firstVisit = !unraveledRef.current.has(k);
@@ -325,9 +336,7 @@ export function SalaHilo({
           if (kn) appendParticles(kn.x, kn.y);
         }
       }
-      const s = stories[k];
-      const formato = s.formato || 'video';
-      setStoryOverlay({ id: s.id, formato });
+      setSelectedKnot(k);
     },
     [stories, appendParticles]
   );
@@ -337,7 +346,7 @@ export function SalaHilo({
     if (!tch) return;
     e.preventDefault();
     setPointerFromClient(tch.clientX, tch.clientY);
-    navigateToHistoriaFromKnot(activeKnotRef.current);
+    onKnotPick(activeKnotRef.current);
   };
 
   const enterSala = () => {
@@ -359,6 +368,7 @@ export function SalaHilo({
       setPhase('portal');
       unraveledRef.current = new Set();
       setDiscoveredCount(0);
+      setSelectedKnot(null);
       setParticles([]);
       setSalaOpacity(1);
     }, 700);
@@ -717,7 +727,8 @@ export function SalaHilo({
                   mouseRef={mouseRef}
                   activeKnotRef={activeKnotRef}
                   unraveledRef={unraveledRef}
-                  onKnotPick={navigateToHistoriaFromKnot}
+                  onKnotPick={onKnotPick}
+                  discoveredCount={discoveredCount}
                 />
               </>
             )}
@@ -744,84 +755,188 @@ export function SalaHilo({
             ))}
           </div>
 
-          <p
-            style={{
-              position: 'relative',
-              zIndex: 8,
-              fontSize: 10,
-              letterSpacing: '0.2em',
-              textTransform: 'uppercase',
-              color: TEXT_HINT,
-              margin: 0,
-              padding: '12px 16px 24px',
-              textAlign: 'center',
-              maxWidth: '90%',
-              marginLeft: 'auto',
-              marginRight: 'auto',
-            }}
-          >
-            Al pasar el cursor sobre un punto del hilo aparecen el título y el formato; al hacer clic se abre la historia aquí
-          </p>
-        </div>
-      )}
-
-      {storyOverlay && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label="Historia en la sala"
-          style={{
-            position: 'absolute',
-            inset: 0,
-            zIndex: 60,
-            display: 'flex',
-            flexDirection: 'column',
-            background: 'rgba(26, 31, 42, 0.45)',
-            backdropFilter: 'blur(5px)',
-          }}
-        >
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 14,
-              padding: '12px 20px',
-              flexShrink: 0,
-              background: BG,
-              borderBottom: '1px solid rgba(180, 185, 195, 0.5)',
-            }}
-          >
-            <button
-              type="button"
-              onClick={() => setStoryOverlay(null)}
+          {selectedKnot === null ? (
+            <p
               style={{
-                background: 'transparent',
-                border: 'none',
-                color: ACCENT,
-                padding: '8px 4px',
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '0.03em',
-                cursor: 'pointer',
-                textDecoration: 'underline',
-                textUnderlineOffset: 4,
+                position: 'relative',
+                zIndex: 8,
+                fontSize: 10,
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: TEXT_HINT,
+                margin: 0,
+                padding: '12px 16px 24px',
+                textAlign: 'center',
+                maxWidth: '90%',
+                marginLeft: 'auto',
+                marginRight: 'auto',
               }}
             >
-              ← Volver al hilo
-            </button>
-          </div>
-          <iframe
-            key={`${storyOverlay.id}-${storyOverlay.formato}`}
-            title="Historia"
-            src={`/historias/${storyOverlay.id}/${storyOverlay.formato}`}
-            style={{
-              flex: 1,
-              width: '100%',
-              minHeight: 0,
-              border: 'none',
-              background: '#e6e9ee',
-            }}
-          />
+              Acércate a un nudo del hilo y haz clic para descubrir la historia
+            </p>
+          ) : null}
+
+          {selectedKnot !== null && stories[selectedKnot] ? (
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-label="Historia en la sala"
+              style={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                right: 0,
+                zIndex: 20,
+                background: BG,
+                borderRadius: '24px 24px 0 0',
+                boxShadow: '0 -8px 32px rgba(0,0,0,0.08)',
+                padding: '28px 36px 36px',
+                transform: knotPanelOpen ? 'translateY(0)' : 'translateY(100%)',
+                transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
+                pointerEvents: knotPanelOpen ? 'auto' : 'none',
+              }}
+            >
+              {(() => {
+                const historia = stories[selectedKnot];
+                const formatoLabel = (historia.formato || 'video').toUpperCase();
+                const quoteBody =
+                  historia.context?.trim() ||
+                  historia.quote?.trim() ||
+                  '—';
+                const metaLine =
+                  historia.alias != null &&
+                  historia.alias !== '' &&
+                  historia.date != null &&
+                  historia.date !== ''
+                    ? `${historia.alias} · ${historia.date}`
+                    : historia.meta;
+                return (
+                  <div
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'flex-start',
+                      gap: 24,
+                    }}
+                  >
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 7,
+                          marginBottom: 10,
+                        }}
+                      >
+                        <span
+                          style={{
+                            width: 5,
+                            height: 5,
+                            borderRadius: '50%',
+                            background: ACCENT,
+                            flexShrink: 0,
+                          }}
+                          aria-hidden
+                        />
+                        <span
+                          style={{
+                            fontSize: 10,
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.2em',
+                            color: ACCENT,
+                          }}
+                        >
+                          {formatoLabel}
+                        </span>
+                      </div>
+                      <h2
+                        style={{
+                          fontSize: 32,
+                          fontWeight: 800,
+                          letterSpacing: '-0.025em',
+                          lineHeight: 1.1,
+                          color: TEXT_PRIMARY,
+                          maxWidth: 520,
+                          margin: '0 0 10px 0',
+                        }}
+                      >
+                        {historia.titulo}
+                      </h2>
+                      <p
+                        style={{
+                          fontSize: 14,
+                          fontStyle: 'italic',
+                          color: '#7a8292',
+                          lineHeight: 1.75,
+                          maxWidth: 480,
+                          margin: '0 0 12px 0',
+                        }}
+                      >
+                        {quoteBody}
+                      </p>
+                      <p
+                        style={{
+                          fontSize: 12,
+                          color: '#b0b6c2',
+                          margin: 0,
+                        }}
+                      >
+                        {metaLine}
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                        paddingTop: 4,
+                        flexShrink: 0,
+                      }}
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          router.push(
+                            `/historias/${historia.id}/${historia.formato || 'video'}`
+                          )
+                        }
+                        style={{
+                          background: ACCENT,
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '12px 24px',
+                          borderRadius: 100,
+                          fontSize: 12,
+                          fontWeight: 800,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        Abrir esta historia →
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedKnot(null)}
+                        style={{
+                          background: BG,
+                          color: TEXT_MUTED,
+                          border: 'none',
+                          padding: '12px 20px',
+                          borderRadius: 100,
+                          fontSize: 12,
+                          boxShadow: `3px 3px 6px ${SHADOW_DARK}, -3px -3px 6px ${SHADOW_LIGHT}`,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        ← Cerrar
+                      </button>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          ) : null}
         </div>
       )}
     </main>

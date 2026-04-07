@@ -34,7 +34,10 @@ function toSalaMuestra(muestra: Muestra): SalaHiloMuestraInput {
       id: it.id,
       titulo: it.title,
       quote: it.context || (it.textBody ? it.textBody.slice(0, 280) : '') || '—',
+      context: it.context,
       meta: `${it.alias} · ${it.date}`,
+      alias: it.alias,
+      date: it.date,
       formato: it.type,
     })),
   };

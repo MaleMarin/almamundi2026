@@ -11,7 +11,6 @@ import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial.js';
 import {
-  useCallback,
   useLayoutEffect,
   useRef,
   useState,
@@ -41,6 +40,8 @@ export type SalaHiloThread3DProps = {
   activeKnotRef: MutableRefObject<number>;
   unraveledRef: MutableRefObject<Set<number>>;
   onKnotPick: (index: number) => void;
+  /** Solo para invalidar el render de etiquetas HTML cuando cambia el set de descubiertos (ref mutable). */
+  discoveredCount: number;
 };
 
 const STEP = 3;
@@ -172,30 +173,110 @@ function ThreadStrands({
   return <group ref={group} />;
 }
 
-function HoverSync({
-  activeKnotRef,
-  onHoverChange,
-}: {
-  activeKnotRef: MutableRefObject<number>;
-  onHoverChange: (i: number) => void;
-}) {
-  const last = useRef(-999);
-  useFrame(() => {
-    const a = activeKnotRef.current;
-    if (a !== last.current) {
-      last.current = a;
-      onHoverChange(a);
-    }
-  });
-  return null;
-}
-
 /** Radio base del nudo: punto fino sobre el hilo. */
 const KNOT_BASE_R = 10.5;
 /** Nudos delante del hilo (THREAD_LINE_Z) y con margen al trazo. */
 const KNOT_GROUP_Z = 11;
 /** Radio de detección hover (coords pantalla del contenedor). */
 const HOVER_PX = 34;
+
+function KnotStoryLabel({
+  index,
+  story,
+  unraveledRef,
+  onKnotPick,
+}: {
+  index: number;
+  story: SalaHiloThreadStory;
+  unraveledRef: MutableRefObject<Set<number>>;
+  onKnotPick: (i: number) => void;
+}) {
+  const [hover, setHover] = useState(false);
+  const unraveled = unraveledRef.current.has(index);
+  const titleTrunc =
+    story.titulo.length > 22 ? `${story.titulo.slice(0, 22)}…` : story.titulo;
+  const fmt = (story.formato || 'video').toUpperCase();
+
+  return (
+    <Billboard follow>
+      <Html
+        center
+        position={[0, KNOT_BASE_R * 2.75, 0]}
+        distanceFactor={0.88}
+        zIndexRange={[100, 0]}
+        style={{ pointerEvents: 'auto' }}
+        transform
+        occlude={false}
+      >
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={(e) => {
+            e.stopPropagation();
+            onKnotPick(index);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onKnotPick(index);
+            }
+          }}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          style={{
+            background: '#e6e9ee',
+            borderRadius: 100,
+            boxShadow: '4px 4px 8px #c4c7cd, -4px -4px 8px #ffffff',
+            padding: '6px 14px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: 2,
+            cursor: 'pointer',
+            minWidth: 90,
+            maxWidth: 160,
+            textAlign: 'center',
+            userSelect: 'none',
+            border: unraveled
+              ? '1.5px solid rgba(255,74,28,0)'
+              : hover
+                ? '1.5px solid rgba(255,74,28,0.5)'
+                : '1.5px solid rgba(255,74,28,0)',
+            opacity: unraveled ? 0.45 : 1,
+          }}
+        >
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 700,
+              color: TEXT_PRIMARY,
+              lineHeight: 1.2,
+              letterSpacing: '-0.01em',
+              overflow: 'hidden',
+              whiteSpace: 'nowrap',
+              textOverflow: 'ellipsis',
+              maxWidth: 140,
+            }}
+            title={story.titulo}
+          >
+            {titleTrunc}
+          </div>
+          <div
+            style={{
+              fontSize: 10,
+              fontWeight: 500,
+              color: ACCENT,
+              letterSpacing: '0.12em',
+              textTransform: 'uppercase',
+            }}
+          >
+            {fmt}
+          </div>
+        </div>
+      </Html>
+    </Billboard>
+  );
+}
 
 function Knots3D({
   W,
@@ -348,6 +429,12 @@ function Knots3D({
             <sphereGeometry args={[KNOT_BASE_R * 2.4, 14, 14]} />
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
+          <KnotStoryLabel
+            index={i}
+            story={stories[i]}
+            unraveledRef={unraveledRef}
+            onKnotPick={onKnotPick}
+          />
         </group>
       ))}
     </group>
@@ -397,163 +484,6 @@ function GroundShadows({
   );
 }
 
-function IdleCaptions3D({
-  W,
-  H,
-  stories,
-  tRef,
-  hoverIdx,
-  unraveledRef,
-  onKnotPick,
-}: {
-  W: number;
-  H: number;
-  stories: SalaHiloThreadStory[];
-  tRef: MutableRefObject<number>;
-  hoverIdx: number;
-  unraveledRef: MutableRefObject<Set<number>>;
-  onKnotPick: (index: number) => void;
-}) {
-  const groups = useRef<(THREE.Group | null)[]>([]);
-  useFrame(() => {
-    const t = tRef.current;
-    const knots = kpos(W, H, t, stories.length);
-    for (let i = 0; i < stories.length; i++) {
-      const gr = groups.current[i];
-      if (!gr) continue;
-      const k = knots[i];
-      if (!k) continue;
-      gr.position.set(k.x, -k.y, 21);
-      const done = unraveledRef.current.has(i);
-      gr.visible = !done && hoverIdx === i;
-    }
-  });
-
-  return (
-    <group>
-      {stories.map((s, i) => (
-        <group key={i} ref={(el) => { groups.current[i] = el; }}>
-          <Html
-            center
-            distanceFactor={0.88}
-            zIndexRange={[80, 0]}
-            style={{
-              pointerEvents: hoverIdx === i ? 'auto' : 'none',
-              width: Math.min(320, W * 0.26),
-              minWidth: 120,
-              textAlign: 'center',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-            }}
-            transform
-            occlude={false}
-          >
-            {hoverIdx === i ? (
-              <button
-                type="button"
-                onClick={(ev) => {
-                  ev.stopPropagation();
-                  onKnotPick(i);
-                }}
-                aria-label={`Abrir historia: ${s.titulo}, formato ${s.formato || 'video'}`}
-                style={{
-                  transform: 'translateY(28px)',
-                  margin: 0,
-                  padding: '8px 12px 10px',
-                  border: '1px solid rgba(184, 134, 11, 0.35)',
-                  borderRadius: 8,
-                  background: 'rgba(255, 253, 248, 0.94)',
-                  backdropFilter: 'blur(8px)',
-                  WebkitBackdropFilter: 'blur(8px)',
-                  cursor: 'pointer',
-                  textAlign: 'center',
-                  width: '100%',
-                  boxShadow: '0 4px 14px rgba(45, 55, 72, 0.08)',
-                  transition: 'box-shadow 0.18s ease, border-color 0.18s ease',
-                }}
-              >
-                <div
-                  style={{
-                    fontSize: 11,
-                    fontWeight: 600,
-                    color: TEXT_PRIMARY,
-                    lineHeight: 1.35,
-                    letterSpacing: '0.06em',
-                    textTransform: 'uppercase',
-                    wordBreak: 'break-word',
-                  }}
-                >
-                  {s.titulo}
-                </div>
-                <div
-                  style={{
-                    marginTop: 6,
-                    fontSize: 9,
-                    fontWeight: 600,
-                    color: THREAD_GOLD,
-                    letterSpacing: '0.14em',
-                    textTransform: 'uppercase',
-                    opacity: 0.92,
-                  }}
-                >
-                  {(s.formato || 'video').toUpperCase()}
-                </div>
-              </button>
-            ) : null}
-          </Html>
-        </group>
-      ))}
-    </group>
-  );
-}
-
-function DoneCheck3D({
-  W,
-  H,
-  stories,
-  tRef,
-  unraveledRef,
-}: {
-  W: number;
-  H: number;
-  stories: SalaHiloThreadStory[];
-  tRef: MutableRefObject<number>;
-  unraveledRef: MutableRefObject<Set<number>>;
-}) {
-  const groups = useRef<(THREE.Group | null)[]>([]);
-  useFrame(() => {
-    const t = tRef.current;
-    const knots = kpos(W, H, t, stories.length);
-    for (let i = 0; i < stories.length; i++) {
-      const gr = groups.current[i];
-      if (!gr) continue;
-      const k = knots[i];
-      if (!k) continue;
-      gr.position.set(k.x, -k.y, 19);
-      gr.visible = unraveledRef.current.has(i);
-    }
-  });
-  return (
-    <group>
-      {stories.map((_, i) => (
-        <group key={i} ref={(el) => { groups.current[i] = el; }}>
-          <Html center distanceFactor={0.85} style={{ pointerEvents: 'none' }} transform occlude={false}>
-            <span
-              style={{
-                fontWeight: 800,
-                fontSize: 14,
-                color: ACCENT,
-                textShadow: '0 1px 6px rgba(0,0,0,0.25)',
-              }}
-            >
-              ✓
-            </span>
-          </Html>
-        </group>
-      ))}
-    </group>
-  );
-}
-
 function Scene(props: SalaHiloThread3DProps) {
   const {
     width: W,
@@ -564,12 +494,9 @@ function Scene(props: SalaHiloThread3DProps) {
     activeKnotRef,
     unraveledRef,
     onKnotPick,
+    discoveredCount: _discoveredTick,
   } = props;
-  const [hoverIdx, setHoverIdx] = useState(-1);
-
-  const onHover = useCallback((i: number) => {
-    setHoverIdx(i);
-  }, []);
+  void _discoveredTick;
 
   return (
     <>
@@ -597,17 +524,6 @@ function Scene(props: SalaHiloThread3DProps) {
         unraveledRef={unraveledRef}
         onKnotPick={onKnotPick}
       />
-      <HoverSync activeKnotRef={activeKnotRef} onHoverChange={onHover} />
-      <IdleCaptions3D
-        W={W}
-        H={H}
-        stories={stories}
-        tRef={tRef}
-        hoverIdx={hoverIdx}
-        unraveledRef={unraveledRef}
-        onKnotPick={onKnotPick}
-      />
-      <DoneCheck3D W={W} H={H} stories={stories} tRef={tRef} unraveledRef={unraveledRef} />
     </>
   );
 }
