@@ -42,8 +42,10 @@ export function useCinematicDeck(): CinematicDeckController {
 
   useLayoutEffect(() => {
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
-    setReduceMotion(mq.matches);
-    setWebglOn(!mq.matches);
+    queueMicrotask(() => {
+      setReduceMotion(mq.matches);
+      setWebglOn(!mq.matches);
+    });
     const onChange = () => {
       setReduceMotion(mq.matches);
       setWebglOn(!mq.matches);
