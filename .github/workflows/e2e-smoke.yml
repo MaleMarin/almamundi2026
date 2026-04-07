@@ -1,0 +1,43 @@
+# Humo E2E: home, /mapa, /historias/videos (Playwright).
+name: E2E smoke
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  playwright:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium (system deps)
+        run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium --with-deps
+
+      - name: Build
+        run: npm run build
+
+      - name: Run smoke tests
+        env:
+          CI: 'true'
+          PLAYWRIGHT_WEB_SERVER_CMD: npm run start:e2e
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-failures
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore

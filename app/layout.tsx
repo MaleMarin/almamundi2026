@@ -8,6 +8,7 @@ import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
 function defaultMetadataBase(): URL {
@@ -80,6 +81,7 @@ export default async function RootLayout({
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
+        <SpeedInsights />
       </body>
     </html>
   );

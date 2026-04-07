@@ -28,3 +28,9 @@ firebase-service-account.json
 # Stray / noise (do not commit)
 /almamundi@0.1.0
 /next
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
