@@ -178,8 +178,11 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
   const currentPhraseIndex = frases.length === 0 ? -1 : Math.min(Math.floor(currentTime / phraseThreshold), frases.length - 1);
   const currentPhrase = currentPhraseIndex >= 0 ? frases[currentPhraseIndex] : null;
 
+  /* Barras decorativas: una sola aleatoriedad por montaje (useMemo estable). */
+  /* eslint-disable react-hooks/purity -- Math.random solo para alturas animación visual, no afecta lógica */
   const barHeights = useMemo(() => Array.from({ length: BAR_COUNT }, () => 8 + Math.random() * 28), []);
   const barDurations = useMemo(() => Array.from({ length: BAR_COUNT }, () => 0.6 + Math.random() * 0.5), []);
+  /* eslint-enable react-hooks/purity */
 
   const avatarSize = isMobile ? 120 : typeof window !== 'undefined' && window.innerWidth < 1024 ? 160 : 200;
   const waveformWidth = isMobile ? 'calc(100% - 48px)' : '360px';
