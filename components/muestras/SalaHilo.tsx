@@ -26,22 +26,28 @@ const SalaHiloThread3D = dynamic(
   { ssr: false, loading: () => null }
 ) as ComponentType<SalaHiloThread3DProps>;
 
-/** Curva 2D (misma fórmula que el 3D): siempre visible; animación propia por si WebGL no arranca. */
-function HiloSvgGuide({ w, h }: { w: number; h: number }) {
-  const tAnim = useRef(0);
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    let id = 0;
-    const loop = () => {
-      tAnim.current += 0.02;
-      setTick((n) => (n + 1) % 1_000_000);
-      id = requestAnimationFrame(loop);
-    };
-    id = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(id);
-  }, []);
+const LiquidLightBackground = dynamic(
+  () =>
+    import('@/components/LiquidLightBackground').then((m) => m.LiquidLightBackground),
+  { ssr: false, loading: () => null }
+);
+
+/** Curva 2D (misma fórmula y `t` que el 3D): siempre visible; puntos en `kpos`. */
+function HiloSvgGuide({
+  w,
+  h,
+  knotCount,
+  t,
+}: {
+  w: number;
+  h: number;
+  /** Puntos del hilo (mismas posiciones que `kpos` en 3D). */
+  knotCount: number;
+  /** Tiempo de animación compartido con la escena WebGL (estado en el padre). */
+  t: number;
+}) {
   if (w < 16 || h < 16) return null;
-  const t = tAnim.current;
+  const knots = knotCount > 0 ? kpos(w, h, t, knotCount) : [];
   const step = Math.max(3, Math.floor(w / 160));
   const pts: string[] = [];
   for (let x = 0; x <= w; x += step) {
@@ -56,7 +62,7 @@ function HiloSvgGuide({ w, h }: { w: number; h: number }) {
       style={{
         position: 'absolute',
         inset: 0,
-        zIndex: 0,
+        zIndex: 1,
         pointerEvents: 'none',
         opacity: 1,
       }}
@@ -64,16 +70,16 @@ function HiloSvgGuide({ w, h }: { w: number; h: number }) {
     >
       <polyline
         fill="none"
-        stroke="#fffef5"
+        stroke="#e8d5a8"
         strokeWidth={Math.max(1.35, w * 0.0022)}
         strokeLinecap="round"
         strokeLinejoin="round"
-        opacity={0.48}
+        opacity={0.55}
         points={pts.join(' ')}
       />
       <polyline
         fill="none"
-        stroke="#fff176"
+        stroke="#c9a227"
         strokeWidth={Math.max(0.85, w * 0.00115)}
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -82,13 +88,25 @@ function HiloSvgGuide({ w, h }: { w: number; h: number }) {
       />
       <polyline
         fill="none"
-        stroke="#ffffff"
+        stroke="#ffe9a6"
         strokeWidth={Math.max(0.4, w * 0.00055)}
         strokeLinecap="round"
         strokeLinejoin="round"
         opacity={1}
         points={pts.join(' ')}
       />
+      {knots.map((k, i) => (
+        <circle
+          key={`knot-${i}`}
+          cx={k.x}
+          cy={k.y}
+          r={Math.max(2.4, w * 0.0036)}
+          fill="rgba(255, 252, 246, 0.22)"
+          stroke="rgba(148, 124, 72, 0.5)"
+          strokeWidth={Math.max(0.35, w * 0.00032)}
+          opacity={1}
+        />
+      ))}
     </svg>
   );
 }
@@ -156,6 +174,8 @@ export function SalaHilo({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const tRef = useRef(0);
+  /** Replica `tRef` para el SVG sin leer refs en render (regla react-hooks/refs). */
+  const [threadCurveT, setThreadCurveT] = useState(0);
   const mouseRef = useRef({ x: -9999, y: -9999 });
   const activeKnotRef = useRef(-1);
   const unraveledRef = useRef<Set<number>>(new Set());
@@ -181,8 +201,34 @@ export function SalaHilo({
   }, [uid]);
 
   useEffect(() => {
-    setThreadMounted(true);
+    queueMicrotask(() => setThreadMounted(true));
   }, []);
+
+  useEffect(() => {
+    if (phase !== 'hilo') return;
+    tRef.current = 0;
+    let cancelled = false;
+    const id = requestAnimationFrame(() => {
+      if (!cancelled) setThreadCurveT(0);
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(id);
+    };
+  }, [phase]);
+
+  /** Mismo `t` para la guía SVG y la escena 3D (antes solo lo avanzaba R3F). */
+  useEffect(() => {
+    if (phase !== 'hilo' || !threadMounted) return;
+    let id = 0;
+    const tick = () => {
+      tRef.current += 0.01;
+      setThreadCurveT((v) => v + 0.01);
+      id = requestAnimationFrame(tick);
+    };
+    id = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(id);
+  }, [phase, threadMounted]);
 
   useEffect(() => {
     const el = containerRef.current;
@@ -631,7 +677,7 @@ export function SalaHilo({
               cursor: 'crosshair',
               touchAction: 'none',
               background:
-                'linear-gradient(180deg, rgba(255,252,240,0.55) 0%, rgba(236,240,248,0.35) 45%, rgba(224,230,240,0.5) 100%)',
+                'linear-gradient(180deg, rgba(255,252,240,0.22) 0%, rgba(236,240,248,0.14) 45%, rgba(224,230,240,0.18) 100%)',
               overflow: 'hidden',
               boxSizing: 'border-box',
             }}
@@ -656,7 +702,13 @@ export function SalaHilo({
               </div>
             ) : (
               <>
-                <HiloSvgGuide w={threadDims.w} h={threadDims.h} />
+                <LiquidLightBackground fillParent />
+                <HiloSvgGuide
+                  w={threadDims.w}
+                  h={threadDims.h}
+                  knotCount={stories.length}
+                  t={threadCurveT}
+                />
                 <SalaHiloThread3D
                   width={threadDims.w}
                   height={threadDims.h}
@@ -701,78 +753,15 @@ export function SalaHilo({
               textTransform: 'uppercase',
               color: TEXT_HINT,
               margin: 0,
-              padding: '12px 16px 8px',
+              padding: '12px 16px 24px',
               textAlign: 'center',
               maxWidth: '90%',
               marginLeft: 'auto',
               marginRight: 'auto',
             }}
           >
-            Tocá un nudo en el hilo o elegí una historia abajo
+            Al pasar el cursor sobre un punto del hilo aparecen el título y el formato; al hacer clic se abre la historia aquí
           </p>
-
-          <div
-            style={{
-              position: 'relative',
-              zIndex: 8,
-              padding: '8px 16px 28px',
-              maxWidth: 920,
-              margin: '0 auto',
-              width: '100%',
-              boxSizing: 'border-box',
-            }}
-          >
-            <p
-              style={{
-                fontSize: 10,
-                letterSpacing: '0.18em',
-                textTransform: 'uppercase',
-                color: TEXT_MUTED,
-                margin: '0 0 14px',
-                textAlign: 'center',
-              }}
-            >
-              Historias en esta sala ({total})
-            </p>
-            <ul
-              style={{
-                listStyle: 'none',
-                margin: 0,
-                padding: 0,
-                display: 'flex',
-                flexWrap: 'wrap',
-                gap: 10,
-                justifyContent: 'center',
-              }}
-            >
-              {stories.map((s, i) => (
-                <li key={s.id}>
-                  <button
-                    type="button"
-                    onClick={() => navigateToHistoriaFromKnot(i)}
-                    style={{
-                      display: 'inline-block',
-                      maxWidth: 'min(100vw - 48px, 280px)',
-                      padding: '10px 16px',
-                      borderRadius: 999,
-                      border: 'none',
-                      cursor: 'pointer',
-                      fontSize: 12,
-                      fontWeight: 600,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                      textAlign: 'center',
-                      color: TEXT_PRIMARY,
-                      background: BG,
-                      boxShadow: `4px 4px 10px ${SHADOW_DARK}, -3px -3px 9px ${SHADOW_LIGHT}`,
-                    }}
-                  >
-                    {s.titulo}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       )}
 
@@ -782,13 +771,13 @@ export function SalaHilo({
           aria-modal="true"
           aria-label="Historia en la sala"
           style={{
-            position: 'fixed',
+            position: 'absolute',
             inset: 0,
             zIndex: 60,
             display: 'flex',
             flexDirection: 'column',
-            background: 'rgba(26, 31, 42, 0.42)',
-            backdropFilter: 'blur(4px)',
+            background: 'rgba(26, 31, 42, 0.45)',
+            backdropFilter: 'blur(5px)',
           }}
         >
           <div
@@ -799,27 +788,26 @@ export function SalaHilo({
               padding: '12px 20px',
               flexShrink: 0,
               background: BG,
-              borderBottom: `1px solid rgba(180, 185, 195, 0.45)`,
-              boxShadow: `0 4px 14px rgba(125, 142, 165, 0.2)`,
+              borderBottom: '1px solid rgba(180, 185, 195, 0.5)',
             }}
           >
             <button
               type="button"
               onClick={() => setStoryOverlay(null)}
               style={{
-                background: BG,
+                background: 'transparent',
                 border: 'none',
                 color: ACCENT,
-                padding: '10px 22px',
-                borderRadius: 100,
-                fontSize: 13,
+                padding: '8px 4px',
+                fontSize: 14,
                 fontWeight: 700,
-                letterSpacing: '0.04em',
+                letterSpacing: '0.03em',
                 cursor: 'pointer',
-                boxShadow: `4px 4px 10px ${SHADOW_DARK}, -3px -3px 8px ${SHADOW_LIGHT}`,
+                textDecoration: 'underline',
+                textUnderlineOffset: 4,
               }}
             >
-              ← Volver a la sala
+              ← Volver al hilo
             </button>
           </div>
           <iframe
