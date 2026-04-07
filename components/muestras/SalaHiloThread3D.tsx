@@ -5,7 +5,7 @@
  * Coordenadas: mismo espacio que el canvas (x→X, y pantalla→-Y, Z profundidad).
  */
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Html } from '@react-three/drei';
+import { Billboard, Html } from '@react-three/drei';
 import * as THREE from 'three';
 import { Line2 } from 'three/examples/jsm/lines/Line2.js';
 import { LineGeometry } from 'three/examples/jsm/lines/LineGeometry.js';
@@ -22,10 +22,10 @@ import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
 const ACCENT = '#FF4A1C';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_MUTED = '#9299a8';
-/** Hilo principal: amarillo/dorado (lectura clara sobre fondo claro). */
-const THREAD_GOLD = '#e6b800';
-const THREAD_GOLD_LIGHT = '#ffeb3b';
-const THREAD_GOLD_PALE = '#fffef0';
+/** Hilo principal: dorado cálido (menos blanco, más metal / ámbar). */
+const THREAD_GOLD = '#b8860b';
+const THREAD_GOLD_LIGHT = '#daa520';
+const THREAD_GOLD_PALE = '#f0dfb0';
 
 export type SalaHiloThreadStory = {
   titulo: string;
@@ -44,11 +44,15 @@ export type SalaHiloThread3DProps = {
 };
 
 const STEP = 3;
+/** El hilo queda un poco detrás en Z para que los nudos no compitan en profundidad con el trazo grueso. */
+const THREAD_LINE_Z = -4;
 
 function CameraRig({ W, H }: { W: number; H: number }) {
   const { camera } = useThree();
   useLayoutEffect(() => {
     const p = camera as THREE.PerspectiveCamera;
+    /* R3F + Three: mutar la cámara en layout es el patrón habitual para alinear con el canvas. */
+    /* eslint-disable react-hooks/immutability */
     p.fov = 48;
     p.near = 0.05;
     p.far = 8000;
@@ -56,6 +60,7 @@ function CameraRig({ W, H }: { W: number; H: number }) {
     p.position.set(W / 2, -H / 2, span * 1.02);
     p.lookAt(W / 2, -H / 2, 0);
     p.updateProjectionMatrix();
+    /* eslint-enable react-hooks/immutability */
   }, [camera, W, H]);
   return null;
 }
@@ -110,7 +115,7 @@ function ThreadStrands({
         { dy: 0.85, color: THREAD_GOLD_PALE, opacity: 0.52, lw: 2.65 },
         { dy: 0.42, color: THREAD_GOLD_LIGHT, opacity: 0.98, lw: 1.75 },
         { dy: 0, color: THREAD_GOLD, opacity: 1, lw: 1.15 },
-        { dy: -0.32, color: '#ffffff', opacity: 0.88, lw: 0.62 },
+        { dy: -0.32, color: '#fff1c2', opacity: 0.92, lw: 0.62 },
       ];
 
       for (const s of specs) {
@@ -158,7 +163,7 @@ function ThreadStrands({
       for (let x = 0; x <= W; x += STEP) {
         arr[i++] = x;
         arr[i++] = -(ty(x, W, H, t) + layer.dy);
-        arr[i++] = 0;
+        arr[i++] = THREAD_LINE_Z;
       }
       layer.geom.setPositions(arr.subarray(0, i));
     }
@@ -185,6 +190,13 @@ function HoverSync({
   return null;
 }
 
+/** Radio base del nudo: punto fino sobre el hilo. */
+const KNOT_BASE_R = 10.5;
+/** Nudos delante del hilo (THREAD_LINE_Z) y con margen al trazo. */
+const KNOT_GROUP_Z = 11;
+/** Radio de detección hover (coords pantalla del contenedor). */
+const HOVER_PX = 34;
+
 function Knots3D({
   W,
   H,
@@ -203,7 +215,9 @@ function Knots3D({
   | 'unraveledRef'
   | 'onKnotPick'
 > & { W: number; H: number }) {
+  const groupRefs = useRef<(THREE.Group | null)[]>([]);
   const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const glowRefs = useRef<(THREE.Mesh | null)[]>([]);
   const hitRefs = useRef<(THREE.Mesh | null)[]>([]);
 
   useFrame(() => {
@@ -217,43 +231,51 @@ function Knots3D({
       const { x, y } = knots[i];
       const dx = mouse.x - x;
       const dy = mouse.y - y;
-      if (Math.hypot(dx, dy) < 32) active = i;
+      if (Math.hypot(dx, dy) < HOVER_PX) active = i;
     }
     activeKnotRef.current = active;
 
     for (let i = 0; i < stories.length; i++) {
+      const g = groupRefs.current[i];
       const mesh = meshRefs.current[i];
+      const glow = glowRefs.current[i];
       const hit = hitRefs.current[i];
-      if (!mesh || !hit) continue;
+      if (!g || !mesh || !glow || !hit) continue;
       const k = knots[i];
       if (!k) continue;
       const unr = unraveled.has(i);
       const isH = active === i && !unr;
-      const r = unr ? 12 : isH ? 18 : 13;
-      mesh.position.set(k.x, -k.y, 4);
-      hit.position.set(k.x, -k.y, 4);
-      mesh.scale.setScalar(r / 13);
-      hit.scale.setScalar(32 / 13);
+      const rWorld = unr ? 7.5 : isH ? 14 : KNOT_BASE_R;
+      const s = rWorld / KNOT_BASE_R;
+      g.position.set(k.x, -k.y, KNOT_GROUP_Z);
+      g.scale.setScalar(s);
 
       const m = mesh.material as THREE.MeshStandardMaterial;
+      const glowMat = glow.material as THREE.MeshBasicMaterial;
       if (unr) {
-        m.color.set('#d8dee8');
-        m.emissive.set('#98a8b8');
-        m.emissiveIntensity = 0.08;
-        m.metalness = 0.06;
-        m.roughness = 0.52;
-      } else if (isH) {
-        m.color.set('#fffef8');
-        m.emissive.set(THREAD_GOLD);
-        m.emissiveIntensity = 0.35;
-        m.metalness = 0.15;
-        m.roughness = 0.28;
-      } else {
-        m.color.set('#fff8e0');
-        m.emissive.set(THREAD_GOLD_LIGHT);
+        m.color.set('#c8d0dc');
+        m.emissive.set('#8899aa');
         m.emissiveIntensity = 0.12;
         m.metalness = 0.08;
-        m.roughness = 0.35;
+        m.roughness = 0.48;
+        glowMat.opacity = 0.12;
+        glowMat.color.set('#a8b4c4');
+      } else if (isH) {
+        m.color.set('#fffdf7');
+        m.emissive.set(THREAD_GOLD_LIGHT);
+        m.emissiveIntensity = 0.38;
+        m.metalness = 0.16;
+        m.roughness = 0.26;
+        glowMat.opacity = 0.26;
+        glowMat.color.set(THREAD_GOLD_LIGHT);
+      } else {
+        m.color.set('#f7ecd8');
+        m.emissive.set(THREAD_GOLD);
+        m.emissiveIntensity = 0.18;
+        m.metalness = 0.08;
+        m.roughness = 0.38;
+        glowMat.opacity = 0.16;
+        glowMat.color.set(THREAD_GOLD);
       }
     }
   });
@@ -261,21 +283,55 @@ function Knots3D({
   return (
     <group>
       {stories.map((_, i) => (
-        <group key={i}>
+        <group
+          key={i}
+          ref={(el) => {
+            groupRefs.current[i] = el;
+          }}
+        >
+          <Billboard follow>
+            <mesh renderOrder={0}>
+              <ringGeometry args={[KNOT_BASE_R * 0.9, KNOT_BASE_R * 1.08, 32]} />
+              <meshBasicMaterial
+                color="#7a6a42"
+                side={THREE.DoubleSide}
+                toneMapped={false}
+                transparent
+                opacity={0.55}
+                depthWrite={false}
+              />
+            </mesh>
+          </Billboard>
+          <mesh
+            ref={(el) => {
+              glowRefs.current[i] = el;
+            }}
+            renderOrder={1}
+          >
+            <sphereGeometry args={[KNOT_BASE_R * 1.22, 20, 20]} />
+            <meshBasicMaterial
+              color={THREAD_GOLD}
+              transparent
+              opacity={0.14}
+              depthWrite={false}
+              toneMapped={false}
+            />
+          </mesh>
           <mesh
             ref={(el) => {
               meshRefs.current[i] = el;
             }}
             castShadow
             receiveShadow
+            renderOrder={2}
           >
-            <sphereGeometry args={[13, 40, 40]} />
+            <sphereGeometry args={[KNOT_BASE_R, 28, 28]} />
             <meshStandardMaterial
-              color="#fff4c4"
-              roughness={0.32}
-              metalness={0.1}
+              color="#faf3e4"
+              roughness={0.36}
+              metalness={0.08}
               emissive={THREAD_GOLD}
-              emissiveIntensity={0.08}
+              emissiveIntensity={0.16}
             />
           </mesh>
           <mesh
@@ -284,11 +340,12 @@ function Knots3D({
             }}
             onPointerDown={(e) => {
               e.stopPropagation();
-              if (activeKnotRef.current === i) onKnotPick(i);
+              onKnotPick(i);
             }}
             visible={false}
+            renderOrder={3}
           >
-            <sphereGeometry args={[13, 16, 16]} />
+            <sphereGeometry args={[KNOT_BASE_R * 2.4, 14, 14]} />
             <meshBasicMaterial transparent opacity={0} depthWrite={false} />
           </mesh>
         </group>
@@ -325,7 +382,7 @@ function GroundShadows({
       const k = knots[i];
       if (!k) continue;
       m.position.set(k.x, -k.y - 0.5, 1);
-      m.scale.set(18, 5, 18);
+      m.scale.set(11, 3.2, 11);
     }
   });
   return (
@@ -340,91 +397,6 @@ function GroundShadows({
   );
 }
 
-function HoverLabel3D({
-  hoverIdx,
-  W,
-  H,
-  stories,
-  tRef,
-  unraveledRef,
-}: {
-  hoverIdx: number;
-  W: number;
-  H: number;
-  stories: SalaHiloThreadStory[];
-  tRef: MutableRefObject<number>;
-  unraveledRef: MutableRefObject<Set<number>>;
-}) {
-  const g = useRef<THREE.Group>(null);
-  useFrame(() => {
-    const gr = g.current;
-    if (!gr) return;
-    if (hoverIdx < 0 || unraveledRef.current.has(hoverIdx)) {
-      gr.visible = false;
-      return;
-    }
-    gr.visible = true;
-    const knots = kpos(W, H, tRef.current, stories.length);
-    const k = knots[hoverIdx];
-    if (k) gr.position.set(k.x, -k.y, 28);
-  });
-
-  if (hoverIdx < 0) return null;
-  const h = stories[hoverIdx];
-  if (!h) return null;
-  const title =
-    h.titulo.length > 72 ? `${h.titulo.slice(0, 70)}…` : h.titulo;
-
-  return (
-    <group ref={g}>
-      <Html
-        center
-        distanceFactor={1}
-        style={{
-          pointerEvents: 'none',
-          width: Math.min(420, W * 0.5),
-          textAlign: 'center',
-          fontFamily: 'system-ui, -apple-system, sans-serif',
-        }}
-        transform
-        occlude={false}
-      >
-        <div
-          style={{
-            transform: 'translateY(-100%) translateY(-28px)',
-            textShadow: '0 2px 14px rgba(0,0,0,0.35)',
-          }}
-        >
-          <div
-            style={{
-              fontSize: 15,
-              fontWeight: 800,
-              color: ACCENT,
-              marginBottom: 6,
-            }}
-          >
-            {String(hoverIdx + 1)}
-          </div>
-          <div
-            style={{
-              fontSize: 18,
-              fontWeight: 700,
-              color: TEXT_PRIMARY,
-              lineHeight: 1.2,
-              marginBottom: 6,
-            }}
-          >
-            {title}
-          </div>
-          <div style={{ fontSize: 12, fontWeight: 600, color: ACCENT, letterSpacing: '0.06em' }}>
-            {(h.formato || 'video').toUpperCase()}
-          </div>
-        </div>
-      </Html>
-    </group>
-  );
-}
-
 function IdleCaptions3D({
   W,
   H,
@@ -432,6 +404,7 @@ function IdleCaptions3D({
   tRef,
   hoverIdx,
   unraveledRef,
+  onKnotPick,
 }: {
   W: number;
   H: number;
@@ -439,6 +412,7 @@ function IdleCaptions3D({
   tRef: MutableRefObject<number>;
   hoverIdx: number;
   unraveledRef: MutableRefObject<Set<number>>;
+  onKnotPick: (index: number) => void;
 }) {
   const groups = useRef<(THREE.Group | null)[]>([]);
   useFrame(() => {
@@ -449,9 +423,9 @@ function IdleCaptions3D({
       if (!gr) continue;
       const k = knots[i];
       if (!k) continue;
-      gr.position.set(k.x, -k.y, 12);
-      gr.visible =
-        !unraveledRef.current.has(i) && hoverIdx !== i;
+      gr.position.set(k.x, -k.y, 21);
+      const done = unraveledRef.current.has(i);
+      gr.visible = !done && hoverIdx === i;
     }
   });
 
@@ -462,9 +436,10 @@ function IdleCaptions3D({
           <Html
             center
             distanceFactor={0.88}
+            zIndexRange={[80, 0]}
             style={{
-              pointerEvents: 'none',
-              width: Math.min(320, W * 0.22),
+              pointerEvents: hoverIdx === i ? 'auto' : 'none',
+              width: Math.min(320, W * 0.26),
               minWidth: 120,
               textAlign: 'center',
               fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -472,34 +447,58 @@ function IdleCaptions3D({
             transform
             occlude={false}
           >
-            <div style={{ transform: 'translateY(40px)' }}>
-              <div
+            {hoverIdx === i ? (
+              <button
+                type="button"
+                onClick={(ev) => {
+                  ev.stopPropagation();
+                  onKnotPick(i);
+                }}
+                aria-label={`Abrir historia: ${s.titulo}, formato ${s.formato || 'video'}`}
                 style={{
-                  fontSize: 15,
-                  fontWeight: 800,
-                  color: '#8a6a00',
-                  textShadow: '0 1px 0 rgba(255,255,255,0.9), 0 0 12px rgba(245,213,71,0.5)',
-                  letterSpacing: '0.04em',
+                  transform: 'translateY(28px)',
+                  margin: 0,
+                  padding: '8px 12px 10px',
+                  border: '1px solid rgba(184, 134, 11, 0.35)',
+                  borderRadius: 8,
+                  background: 'rgba(255, 253, 248, 0.94)',
+                  backdropFilter: 'blur(8px)',
+                  WebkitBackdropFilter: 'blur(8px)',
+                  cursor: 'pointer',
+                  textAlign: 'center',
+                  width: '100%',
+                  boxShadow: '0 4px 14px rgba(45, 55, 72, 0.08)',
+                  transition: 'box-shadow 0.18s ease, border-color 0.18s ease',
                 }}
               >
-                {String(i + 1)}
-              </div>
-              <div
-                style={{
-                  marginTop: 6,
-                  fontSize: 11,
-                  fontWeight: 600,
-                  color: TEXT_PRIMARY,
-                  lineHeight: 1.35,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  textShadow: '0 1px 0 rgba(255,255,255,0.75)',
-                  wordBreak: 'break-word',
-                }}
-              >
-                {s.titulo}
-              </div>
-            </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    fontWeight: 600,
+                    color: TEXT_PRIMARY,
+                    lineHeight: 1.35,
+                    letterSpacing: '0.06em',
+                    textTransform: 'uppercase',
+                    wordBreak: 'break-word',
+                  }}
+                >
+                  {s.titulo}
+                </div>
+                <div
+                  style={{
+                    marginTop: 6,
+                    fontSize: 9,
+                    fontWeight: 600,
+                    color: THREAD_GOLD,
+                    letterSpacing: '0.14em',
+                    textTransform: 'uppercase',
+                    opacity: 0.92,
+                  }}
+                >
+                  {(s.formato || 'video').toUpperCase()}
+                </div>
+              </button>
+            ) : null}
           </Html>
         </group>
       ))}
@@ -529,7 +528,7 @@ function DoneCheck3D({
       if (!gr) continue;
       const k = knots[i];
       if (!k) continue;
-      gr.position.set(k.x, -k.y, 14);
+      gr.position.set(k.x, -k.y, 19);
       gr.visible = unraveledRef.current.has(i);
     }
   });
@@ -567,10 +566,6 @@ function Scene(props: SalaHiloThread3DProps) {
     onKnotPick,
   } = props;
   const [hoverIdx, setHoverIdx] = useState(-1);
-
-  useFrame(() => {
-    tRef.current += 0.01;
-  }, 100);
 
   const onHover = useCallback((i: number) => {
     setHoverIdx(i);
@@ -610,14 +605,7 @@ function Scene(props: SalaHiloThread3DProps) {
         tRef={tRef}
         hoverIdx={hoverIdx}
         unraveledRef={unraveledRef}
-      />
-      <HoverLabel3D
-        hoverIdx={hoverIdx}
-        W={W}
-        H={H}
-        stories={stories}
-        tRef={tRef}
-        unraveledRef={unraveledRef}
+        onKnotPick={onKnotPick}
       />
       <DoneCheck3D W={W} H={H} stories={stories} tRef={tRef} unraveledRef={unraveledRef} />
     </>
