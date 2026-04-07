@@ -10,14 +10,14 @@
  * - No usar position: fixed
  * - Siempre position: absolute dentro de UniverseStage (contenedor con position: relative)
  *
- * Incluye nota en ~10px cursiva bajo fecha/hora (sonido en el vacío / sonificación).
+ * Incluye nota en cursiva bajo fecha/hora (sonido en el vacío / sonificación).
  * Uso: <TimeBar className="pointer-events-none ..." />
  */
 import WorldClock from '@/components/mapa/WorldClock';
 import type { WorldClockLocation } from '@/components/mapa/WorldClock';
 
 const HUD_CLASS =
-  'text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]';
+  'text-[13px] md:text-[15px] tracking-[0.28em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]';
 
 /** Nota bajo fecha/hora: sonido en el vacío y sonificación (científica). */
 const SPACE_SOUND_NOTE =
@@ -33,7 +33,7 @@ export function TimeBar({ selectedLocation, className }: Props) {
     <div className="pointer-events-none flex w-full max-w-[min(96vw,560px)] flex-col items-center gap-1.5 px-2 text-center">
       <WorldClock selectedLocation={selectedLocation} className={className ?? HUD_CLASS} />
       <p
-        className="m-0 max-w-full font-sans font-normal normal-case italic text-[10px] md:text-[11px] leading-[1.42] text-slate-400/80"
+        className="m-0 max-w-full font-sans font-normal normal-case italic text-[12px] md:text-[14px] leading-[1.48] text-slate-400/80"
       >
         {SPACE_SOUND_NOTE}
       </p>
