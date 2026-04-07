@@ -78,7 +78,9 @@ export default function HistoriasVideosPage() {
   const [shareSlideIndex, setShareSlideIndex] = useState(0);
   const [ethicalShareOpen, setEthicalShareOpen] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   const videoStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
@@ -126,7 +128,7 @@ export default function HistoriasVideosPage() {
   );
 
   useEffect(() => {
-    setActiveVideo(null);
+    queueMicrotask(() => setActiveVideo(null));
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
@@ -140,12 +142,14 @@ export default function HistoriasVideosPage() {
   );
 
   useEffect(() => {
-    const n = exhibitionHistorias.length;
-    if (n === 0) {
-      setShareSlideIndex(0);
-      return;
-    }
-    setShareSlideIndex(Math.min(Math.floor(n / 2), n - 1));
+    queueMicrotask(() => {
+      const n = exhibitionHistorias.length;
+      if (n === 0) {
+        setShareSlideIndex(0);
+        return;
+      }
+      setShareSlideIndex(Math.min(Math.floor(n / 2), n - 1));
+    });
   }, [shareListResetKey, exhibitionHistorias.length]);
 
   const shareTarget =
