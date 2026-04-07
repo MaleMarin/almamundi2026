@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ChangeEvent } from 'react';
 /* Importación completa de iconos para evitar errores */
 import { Menu, Globe, X, Twitter, Instagram, Linkedin, ArrowRight, Music, Image as ImageIcon, FileText, Mic, Video, PenTool, Square, MessageCircle, Facebook, Home as HomeIcon, Grid } from 'lucide-react';
 
@@ -47,7 +47,15 @@ const globalStyles = `
 `;
 
 /* --- COMPONENTE TARJETA --- */
-const SoftCard = ({ title, subtitle, text, buttonLabel, onClick, delay }: any) => {
+type SoftCardProps = {
+  title: string;
+  subtitle: string;
+  text: string;
+  buttonLabel: string;
+  onClick: () => void;
+  delay?: string;
+};
+const SoftCard = ({ title, subtitle, text, buttonLabel, onClick, delay }: SoftCardProps) => {
   const orangeColor = '#ff4500'; 
   return (
     <div className="w-full md:w-[400px] p-4 animate-float" style={{ animationDelay: delay }}>
@@ -88,27 +96,55 @@ const StoryModal = ({ isOpen, onClose, mode, setMode }: { isOpen: boolean; onClo
 
   useEffect(() => {
     if (!isOpen) {
-      setStep('intro'); setMediaPreviewUrl(null); setRecordedChunks([]); setTimer(0); setIsRecording(false); setStoryTitle(''); setStoryText(''); setUploadedMusic(null); setUploadedImages([]); setFinalSequenceState('video');
+      queueMicrotask(() => {
+        setStep('intro');
+        setMediaPreviewUrl(null);
+        setRecordedChunks([]);
+        setTimer(0);
+        setIsRecording(false);
+        setStoryTitle('');
+        setStoryText('');
+        setUploadedMusic(null);
+        setUploadedImages([]);
+        setFinalSequenceState('video');
+      });
     }
   }, [isOpen]);
 
   useEffect(() => {
     if (step === 'success') {
-      setFinalSequenceState('video');
-      const timer1 = setTimeout(() => setFinalSequenceState('transition'), 5000); 
-      const timer2 = setTimeout(() => setFinalSequenceState('ended'), 6800); 
-      return () => { clearTimeout(timer1); clearTimeout(timer2); };
+      queueMicrotask(() => setFinalSequenceState('video'));
+      const timer1 = setTimeout(() => setFinalSequenceState('transition'), 5000);
+      const timer2 = setTimeout(() => setFinalSequenceState('ended'), 6800);
+      return () => {
+        clearTimeout(timer1);
+        clearTimeout(timer2);
+      };
     }
   }, [step]);
 
-  useEffect(() => { let interval: any; if (isRecording) { interval = setInterval(() => setTimer(t => t + 1), 1000); } else { clearInterval(interval); } return () => clearInterval(interval); }, [isRecording]);
+  useEffect(() => {
+    let interval: ReturnType<typeof setInterval> | undefined;
+    if (isRecording) {
+      interval = setInterval(() => setTimer((t) => t + 1), 1000);
+    }
+    return () => {
+      if (interval !== undefined) clearInterval(interval);
+    };
+  }, [isRecording]);
   const formatTime = (seconds: number) => { const mins = Math.floor(seconds / 60); const secs = seconds % 60; return `${mins}:${secs < 10 ? '0' : ''}${secs}`; };
   
   const startMedia = async () => { try { const constraints = mode === 'video' ? { video: true, audio: true } : { audio: true }; const stream = await navigator.mediaDevices.getUserMedia(constraints); if (mode === 'video' && videoRef.current) { videoRef.current.srcObject = stream; } startRecordingProcess(stream); } catch (err) { alert(`Necesitamos acceso a tu ${mode === 'video' ? 'cámara y micrófono' : 'micrófono'}.`); } };
   const startRecordingProcess = (stream: MediaStream) => { const mediaRecorder = new MediaRecorder(stream); mediaRecorderRef.current = mediaRecorder; mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) setRecordedChunks((prev) => [...prev, e.data]); }; mediaRecorder.start(); setIsRecording(true); setStep('recording'); };
   const stopRecording = () => { if (!mediaRecorderRef.current) return; mediaRecorderRef.current.stop(); setIsRecording(false); mediaRecorderRef.current.stream.getTracks().forEach(track => track.stop()); setTimeout(() => { const type = mode === 'video' ? 'video/webm' : 'audio/webm'; const blob = new Blob(recordedChunks, { type }); const url = URL.createObjectURL(blob); setMediaPreviewUrl(url); setStep('review'); }, 500); };
-  const handleMusicUpload = (e: any) => { const file = e.target.files[0]; if (file) setUploadedMusic(file); };
-  const handleImageUpload = (e: any) => { const files = Array.from(e.target.files) as File[]; if (files.length > 0) setUploadedImages(prev => [...prev, ...files]); };
+  const handleMusicUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) setUploadedMusic(file);
+  };
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files ? Array.from(e.target.files) : [];
+    if (files.length > 0) setUploadedImages((prev) => [...prev, ...files]);
+  };
 
   if (!isOpen) return null;
 
