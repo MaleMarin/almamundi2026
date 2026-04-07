@@ -56,10 +56,10 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       };
       gsap.ticker.add(tickerCb);
       gsap.ticker.lagSmoothing(0);
-      setLenis(lenisInstance);
+      queueMicrotask(() => setLenis(lenisInstance));
     } catch (err) {
       console.error('[SmoothScrollProvider] Lenis / ScrollTrigger:', err);
-      setLenis(null);
+      queueMicrotask(() => setLenis(null));
     }
 
     return () => {
@@ -74,7 +74,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
       } catch {
         /* ignore */
       }
-      setLenis(null);
+      queueMicrotask(() => setLenis(null));
       try {
         ScrollTrigger.refresh();
       } catch {
