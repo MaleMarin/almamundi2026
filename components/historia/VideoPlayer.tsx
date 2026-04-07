@@ -142,8 +142,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
   }, [isPlaying])
 
   useEffect(() => {
-    resetControlsTimer()
-  }, [isPlaying, resetControlsTimer])
+    queueMicrotask(() => resetControlsTimer());
+  }, [isPlaying, resetControlsTimer]);
 
   // ── Video events ───────────────────────────────────────────────────────────
   const handleTimeUpdate = () => {
