@@ -84,7 +84,9 @@ export function useNewsLayer(
   const [refreshTick, setRefreshTick] = useState(0);
   const mountedRef = useRef(true);
   const topicQueryRef = useRef(topicQuery);
-  topicQueryRef.current = topicQuery;
+  useLayoutEffect(() => {
+    topicQueryRef.current = topicQuery;
+  }, [topicQuery]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -99,9 +101,11 @@ export function useNewsLayer(
    */
   useLayoutEffect(() => {
     if (activeView !== 'actualidad') return;
-    setNewsItems([]);
-    setLoading(true);
-    setError(null);
+    queueMicrotask(() => {
+      setNewsItems([]);
+      setLoading(true);
+      setError(null);
+    });
   }, [topicQuery, activeView]);
 
   useEffect(() => {
