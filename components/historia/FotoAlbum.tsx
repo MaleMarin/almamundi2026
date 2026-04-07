@@ -71,7 +71,7 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
   useEffect(() => {
     if (imagenes[fotoActivaIdx]) {
       extractColor(imagenes[fotoActivaIdx].url).then(setBgColor);
-      setCaption(imagenes[fotoActivaIdx].caption ?? '');
+      queueMicrotask(() => setCaption(imagenes[fotoActivaIdx].caption ?? ''));
     }
   }, [fotoActivaIdx, imagenes]);
 
