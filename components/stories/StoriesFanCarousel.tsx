@@ -96,7 +96,9 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   const [activeVideo, setActiveVideo] = useState<ActiveVideo | null>(null)
   const [activeAudio, setActiveAudio] = useState<ActiveAudio | null>(null)
   const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
+  useEffect(() => {
+    queueMicrotask(() => setMounted(true));
+  }, []);
 
   const goTo = useCallback((i: number) => {
     setActive(Math.max(0, Math.min(stories.length - 1, i)))
