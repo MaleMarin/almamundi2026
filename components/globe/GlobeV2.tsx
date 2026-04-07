@@ -8,7 +8,7 @@
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
  *
- * `embedded`: home `#mapa` — por defecto `forceDaylight` (disco luminoso, sin terminador). Página completa: /globo-v2 sin `embedded`.
+ * `embedded`: home `#mapa` — `forceDaylight` por defecto salvo `forceDaylight={false}` (terminador UTC + halo tipo referencia órbita). Página completa: /globo-v2 sin `embedded`.
  */
 
 import type { RefObject } from 'react';
@@ -82,7 +82,7 @@ function stripGlobeMeshRaycast(mesh: THREE.Mesh | null) {
  * Home embebida: escala Tierra + Luna + bits a la vez (1 = tamaño de referencia).
  * &gt;1 acerca el disco al encuadre del mapa en `#mapa`.
  */
-const GLOBE_V2_EMBEDDED_GEO_SCALE = 1.065;
+const GLOBE_V2_EMBEDDED_GEO_SCALE = 1.1;
 
 /** Oblicuidad de la eclíptica (~23,44°): eje de rotación terrestre fijo respecto al plano orbital de la Luna. */
 const GLOBE_V2_EARTH_OBLIQUITY_RAD = THREE.MathUtils.degToRad(23.439421);
@@ -105,17 +105,24 @@ const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
  */
 const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 218, full: 162 } as const;
 
-/** Semieje mayor orbital (Tierra R⊕ ≈ 1). En home, órbita muy abierta + geoScale hace que la Luna salga del recorte del canvas. */
-const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.68, full: 3.58 } as const;
+/** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: Luna en esquina superior-izquierda tipo referencia NASA. */
+const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.92, full: 3.58 } as const;
 
-/** Escala solo del disco lunar (no del radio orbital); &lt;1 reduce tamaño aparente frente a la Tierra. */
-const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.36, full: 0.6 } as const;
+/** Escala solo del disco lunar (no del radio orbital). */
+const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.44, full: 0.6 } as const;
 
 /** Inclinación del plano orbital respecto a la eclíptica (~5,145°). */
 const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
 
-/** Fase inicial del plano en Y (solo encuadre, no física). */
-const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI, full: 0 } as const;
+/** Fase inicial del plano en Y (solo encuadre: home ≈ Luna arriba-izquierda respecto al disco). */
+const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as const;
+
+/** Inclinación orbital lunar en home (más barrido vertical en encuadre cinematográfico). */
+const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 7.85;
+
+/** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). */
+const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.24, 0.34, 0];
+const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.085, -0.16, 0];
 
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
@@ -300,14 +307,30 @@ function AtmosphereGlow({
   fullDay,
   obliquityXRad,
   getEarthSceneDate,
+  homeCinematic,
 }: {
   scale: number;
   fullDay: boolean;
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
+  /** Home `#mapa`: halo azul más legible (foto órbita / NASA). */
+  homeCinematic?: boolean;
 }) {
   const { camera } = useThree();
-  const mat = useMemo(() => createAtmosphereGlowMaterial(), []);
+  const mat = useMemo(
+    () =>
+      createAtmosphereGlowMaterial(
+        homeCinematic
+          ? {
+              intensity: 0.152,
+              power: 2.82,
+              innerColor: 0x7ed4ff,
+              outerColor: 0x082458,
+            }
+          : undefined
+      ),
+    [homeCinematic]
+  );
   const camWorld = useMemo(() => new THREE.Vector3(), []);
   const sunScratch = useMemo(() => new THREE.Vector3(), []);
 
@@ -353,6 +376,7 @@ function EarthGroup({
   fullDaySurface,
   obliquityXRad,
   getEarthSceneDate,
+  embedded,
 }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
@@ -365,6 +389,7 @@ function EarthGroup({
   fullDaySurface: boolean;
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
+  embedded?: boolean;
 }) {
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
@@ -707,6 +732,7 @@ function EarthGroup({
           fullDay={fullDaySurface}
           obliquityXRad={obliquityXRad}
           getEarthSceneDate={getEarthSceneDate}
+          homeCinematic={Boolean(embedded)}
         />
       ) : null}
       {showClouds ? (
@@ -843,20 +869,22 @@ function GlobeScene({
   }, -100);
   const starsCount = embedded
     ? viewerNight
-      ? 5200
-      : 3800
+      ? 1600
+      : 1050
     : viewerNight
       ? 11000
       : 9000;
-  const starsRadius = embedded ? 420 : 520;
+  const starsRadius = embedded ? 465 : 520;
 
   /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css). */
   const exp = embedded
     ? viewerNight
-      ? 1.72
+      ? forceDaylight
+        ? 1.72
+        : 1.9
       : forceDaylight
         ? 2.38
-        : 2.02
+        : 2.16
     : viewerNight
       ? 1.65
       : 1.95;
@@ -869,10 +897,10 @@ function GlobeScene({
         radius={starsRadius}
         depth={100}
         count={starsCount}
-        factor={3}
+        factor={embedded ? 2.05 : 3}
         saturation={0}
         fade
-        speed={0.32}
+        speed={embedded ? 0.18 : 0.32}
       />
 
       {!embedded && (
@@ -906,8 +934,20 @@ function GlobeScene({
       />
       <directionalLight
         ref={sunLightRef}
-        intensity={embedded ? (viewerNight ? 3.65 : forceDaylight ? 5.25 : 4.5) : viewerNight ? 3.35 : 4.2}
-        color={forceDaylight && embedded ? '#fff5e0' : '#fff5e0'}
+        intensity={
+          embedded
+            ? viewerNight
+              ? forceDaylight
+                ? 3.65
+                : 3.95
+              : forceDaylight
+                ? 5.25
+                : 4.95
+            : viewerNight
+              ? 3.35
+              : 4.2
+        }
+        color={forceDaylight && embedded ? '#fff5e0' : '#fff8ec'}
       />
 
       <group scale={geoScale}>
@@ -930,6 +970,7 @@ function GlobeScene({
               fullDaySurface={forceDaylight}
               obliquityXRad={GLOBE_V2_EARTH_OBLIQUITY_RAD}
               getEarthSceneDate={getEarthSceneDate}
+              embedded={embedded}
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (
@@ -957,7 +998,11 @@ function GlobeScene({
               orbitPeriodSeconds={moonOrbitPeriodSeconds}
               moonRadiusScale={embedded ? GLOBE_V2_MOON_DISC_SCALE.embedded : GLOBE_V2_MOON_DISC_SCALE.full}
               orbitYawRad={tidalLockYawRad}
-              orbitInclinationDeg={GLOBE_V2_MOON_ORBIT_INCLINATION_DEG}
+              orbitInclinationDeg={
+                embedded ? GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG : GLOBE_V2_MOON_ORBIT_INCLINATION_DEG
+              }
+              roughness={embedded ? 0.81 : 0.94}
+              emissiveIntensity={embedded ? 0.07 : 0.04}
             />
           </Suspense>
         ) : null}
@@ -967,7 +1012,7 @@ function GlobeScene({
       <OrbitControls
         ref={orbitControlsRef}
         makeDefault={lockView}
-        target={[0, 0, 0]}
+        target={embedded ? GLOBE_V2_EMBEDDED_ORBIT_TARGET : [0, 0, 0]}
         enablePan={false}
         enableZoom={!embedded}
         minDistance={embedded ? 2.08 : 2.65}
@@ -1086,19 +1131,30 @@ export default function GlobeV2({
       : 'fixed inset-0 z-0 h-[100dvh] w-full min-h-0 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none');
 
   const embeddedDayChrome = embedded && forceDaylightOn && className == null;
+  const embeddedCinematicChrome = embedded && !forceDaylightOn && className == null;
   const rootClassName =
     className == null
-      ? `${wrapperClass} ${embeddedDayChrome ? earthNightStyles.earthDayEmbeddedContainer : earthNightStyles.earthNightContainer}`
+      ? `${wrapperClass} ${
+          embeddedDayChrome
+            ? earthNightStyles.earthDayEmbeddedContainer
+            : embeddedCinematicChrome
+              ? earthNightStyles.earthCinematicEmbeddedContainer
+              : earthNightStyles.earthNightContainer
+        }`
       : wrapperClass;
+
+  const camPos: [number, number, number] = embedded
+    ? [GLOBE_V2_EMBEDDED_CAM_POSITION[0], GLOBE_V2_EMBEDDED_CAM_POSITION[1], camZ]
+    : [0, 0, camZ];
 
   return (
     <div className={rootClassName}>
-      {className == null && !embeddedDayChrome ? (
+      {className == null && !embeddedDayChrome && !embeddedCinematicChrome ? (
         <div className={earthNightStyles.atmosphereOverlay} aria-hidden />
       ) : null}
       <Canvas
         shadows={false}
-        camera={{ position: [0, 0, camZ], fov: 42, near: 0.1, far: 280 }}
+        camera={{ position: camPos, fov: embedded ? 40 : 42, near: 0.1, far: 280 }}
         gl={{
           antialias: true,
           alpha: false,
@@ -1113,7 +1169,13 @@ export default function GlobeV2({
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
-          gl.toneMappingExposure = embeddedDayChrome ? 2.38 : embedded ? 2.02 : 1.92;
+          gl.toneMappingExposure = embeddedDayChrome
+            ? 2.38
+            : embeddedCinematicChrome
+              ? 2.14
+              : embedded
+                ? 2.02
+                : 1.92;
         }}
       >
         <Suspense fallback={null}>

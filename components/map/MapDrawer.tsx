@@ -126,7 +126,12 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
               ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
               : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4'
           }
-          style={{ scrollbarWidth: 'thin' }}
+          style={{
+            scrollbarWidth: 'thin',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+          }}
         >
           {children}
         </div>
@@ -185,7 +190,12 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
               ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
               : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4'
           }
-          style={{ scrollbarWidth: 'thin' }}
+          style={{
+            scrollbarWidth: 'thin',
+            overscrollBehavior: 'contain',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-y',
+          }}
         >
           {children}
         </div>

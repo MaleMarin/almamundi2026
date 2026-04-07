@@ -87,6 +87,34 @@
     inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
 }
 
+/* Cards #historias: subida al hover con curva suave (no linear). */
+.home-neu-card.home-historias-card-surface {
+  transition:
+    box-shadow 0.55s cubic-bezier(0.22, 1, 0.32, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .home-neu-card.home-historias-card-surface:hover {
+    transform: translateY(-0.5rem);
+  }
+}
+
+/* Solo cards #historias: flotación + pulso muy suave (el intro sigue con home-first-part-float). */
+@keyframes home-historias-card-motion {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-11px) scale(1.014);
+  }
+}
+
+.home-historias-card-float-wrap {
+  animation: home-historias-card-motion 5.5s ease-in-out infinite;
+}
+
 /* Enlaces: naranja AlmaMundi por defecto. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
 a {
   color: var(--almamundi-orange);
@@ -111,6 +139,17 @@ a:hover {
 .btn-almamundi[data-active="true"] {
   border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
   color: var(--almamundi-orange) !important;
+}
+
+/* Avenir: título «Mapa de AlmaMundi», cabecera /mapa y hero #intro (misma pila; fallbacks si no está instalada). */
+.mapa-almamundi-title,
+.home-intro-avenir {
+  font-family:
+    Avenir,
+    "Avenir Next",
+    "Avenir Next LT Pro",
+    "Avenir LT Std",
+    sans-serif;
 }
 
 /* Home: header + dock (Mapa de AlmaMundi) — misma píldora, neumorfismo muy marcado */

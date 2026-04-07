@@ -70,7 +70,7 @@ export function HomePageClient() {
         onRecordVideo={() => openStory('video', true)}
         onRecordAudio={() => openStory('audio', true)}
         onWriteStory={() => openStory('texto', true)}
-        onUploadPhoto={() => openStory('foto', true)}
+        onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
       <MapSectionLocked />

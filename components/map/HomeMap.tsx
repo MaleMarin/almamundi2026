@@ -373,6 +373,7 @@ export default function HomeMap() {
           <div className="relative min-h-[300px] w-full min-h-0 flex-1">
             <GlobeV2Home
               embedded
+              forceDaylight={false}
               bits={globeBitsMarkers}
               selectedBitId={selectedBit?.id ?? null}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}

@@ -179,9 +179,14 @@ export function CinematicPageClient({
               <Link href="/" className={styles.brand}>
                 {CINEMATIC_BRAND}
               </Link>
-              <Link href={exitHref} className={styles.exit}>
-                {exitLabel}
-              </Link>
+              <div className={styles.topBarNav}>
+                <Link href="/muestras/el-hilo" className={styles.exit}>
+                  Sala del hilo
+                </Link>
+                <Link href={exitHref} className={styles.exit}>
+                  {exitLabel}
+                </Link>
+              </div>
             </header>
 
             <div className={styles.glassCarouselStage}>
@@ -226,6 +231,10 @@ export function CinematicPageClient({
                             {' · '}
                             <Link href="/muestras?list=1" className={styles.glassFooterLink}>
                               Muestras (listado)
+                            </Link>
+                            {' · '}
+                            <Link href="/muestras/el-hilo" className={styles.glassFooterLink}>
+                              Sala del hilo
                             </Link>
                             {' · '}
                             <Link href="/historias" className={styles.glassFooterLink}>

@@ -16,6 +16,13 @@
   position: relative;
 }
 
+/** Home `#mapa` con terminador UTC: negro espacial + viñeta suave (referencia órbita / NASA). */
+.earthCinematicEmbeddedContainer {
+  background: #000000;
+  box-shadow: inset 0 0 140px rgba(0, 14, 32, 0.42);
+  position: relative;
+}
+
 /* Capa de neblina / partículas sutiles (no bloquea interacción) */
 .atmosphereOverlay {
   position: absolute;

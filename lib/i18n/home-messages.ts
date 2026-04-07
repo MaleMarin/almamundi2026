@@ -77,10 +77,11 @@ const es: HomeMessages = {
   cardWriteStrong: 'cuenta tu historia a tu ritmo',
   cardWriteAfter: ', palabra por palabra.',
   cardWriteCta: 'ESCRIBE TU HISTORIA',
-  cardPhotoTitle: 'Tu mirada,',
-  cardPhotoSubtitle: 'en una fotografía',
-  cardPhotoBody: 'A veces, una imagen guarda lo que las palabras no alcanzan.',
-  cardPhotoCta: 'SUBE UNA FOTO',
+  cardPhotoTitle: 'Educación mediática,',
+  cardPhotoSubtitle: 'leer el mundo con criterio',
+  cardPhotoBody:
+    'Recursos y marcos para analizar la información, cuidar la ciudadanía digital y fortalecer el pensamiento crítico con respeto a los derechos humanos —en el aula y en la comunidad.',
+  cardPhotoCta: 'IR A EDUCACIÓN MEDIÁTICA',
 };
 
 const pt: HomeMessages = {
@@ -119,10 +120,11 @@ const pt: HomeMessages = {
   cardWriteStrong: 'conte a sua história ao seu ritmo',
   cardWriteAfter: ', palavra por palavra.',
   cardWriteCta: 'ESCREVA A SUA HISTÓRIA',
-  cardPhotoTitle: 'O seu olhar,',
-  cardPhotoSubtitle: 'numa fotografia',
-  cardPhotoBody: 'Às vezes, uma imagem guarda o que as palavras não alcançam.',
-  cardPhotoCta: 'ENVIE UMA FOTO',
+  cardPhotoTitle: 'Educação mediática,',
+  cardPhotoSubtitle: 'ler o mundo com critério',
+  cardPhotoBody:
+    'Recursos e referenciais para analisar informação, cuidar da cidadania digital e fortalecer o pensamento crítico no respeito pelos direitos humanos — na sala de aula e na comunidade.',
+  cardPhotoCta: 'IR À EDUCAÇÃO MEDIÁTICA',
 };
 
 const en: HomeMessages = {
@@ -161,10 +163,11 @@ const en: HomeMessages = {
   cardWriteStrong: 'tell your story at your own pace',
   cardWriteAfter: ', word by word.',
   cardWriteCta: 'WRITE YOUR STORY',
-  cardPhotoTitle: 'Your gaze,',
-  cardPhotoSubtitle: 'in a photograph',
-  cardPhotoBody: 'Sometimes an image holds what words can’t reach.',
-  cardPhotoCta: 'UPLOAD A PHOTO',
+  cardPhotoTitle: 'Media literacy,',
+  cardPhotoSubtitle: 'read the world with judgment',
+  cardPhotoBody:
+    'Resources and frameworks to analyze information, nurture digital citizenship, and strengthen critical thinking in line with human rights—in classrooms and communities.',
+  cardPhotoCta: 'GO TO MEDIA LITERACY',
 };
 
 export const HOME_MESSAGES: Record<AlmaLocale, HomeMessages> = { es, pt, en };

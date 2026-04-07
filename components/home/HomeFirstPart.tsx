@@ -8,15 +8,7 @@ import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { MAP_HOME_HEADER_NAV_CLASS, MAP_HOME_NEU_BUTTON_CLASS, MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
-import { DM_Sans } from 'next/font/google';
 import { SITE_FONT_STACK } from '@/lib/typography';
-
-/** Tipografía minimalista solo para el hero (frase principal + subtítulo). */
-const homeHeroPhrase = DM_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '800'],
-  display: 'swap',
-});
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
@@ -74,42 +66,47 @@ function SoftCard({
 }) {
   return (
     <div
-      role="article"
-      className="home-first-part-float home-neu-card group relative flex min-h-[500px] w-full max-w-[472px] flex-1 flex-col items-start rounded-[40px] p-10 transition-all duration-500 hover:-translate-y-2 sm:min-h-[528px] sm:max-w-[492px] md:min-h-[560px] md:max-w-[512px] md:p-12"
-      style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
+      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-1 flex-col sm:max-w-[492px] md:max-w-[512px]"
+      style={{ animationDelay: delay }}
     >
-      <div className="mb-6 shrink-0 md:mb-7">
-        <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
-          {title}
-        </p>
-        <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
-          {subtitle}
-        </h2>
-      </div>
-      <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
-      <div className="w-full mt-auto">
-        <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
-          {children}
-        </p>
-        <button
-          onClick={onClick}
-          className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
-          style={{
-            background: '#FF4A1C',
-            color: 'white',
-            border: 'none',
-            borderRadius: '100px',
-            padding: '14px 22px',
-            fontSize: '13px',
-            fontWeight: 700,
-            letterSpacing: '0.1em',
-            fontFamily: APP_FONT,
-            transition: 'opacity 0.2s',
-          }}
-          type="button"
-        >
-          {buttonLabel}
-        </button>
+      <div
+        role="article"
+        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-1 flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
+        style={{ ...soft.flat, fontFamily: APP_FONT }}
+      >
+        <div className="mb-6 shrink-0 md:mb-7">
+          <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
+            {title}
+          </p>
+          <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
+            {subtitle}
+          </h2>
+        </div>
+        <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
+        <div className="w-full mt-auto">
+          <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
+            {children}
+          </p>
+          <button
+            onClick={onClick}
+            className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
+            style={{
+              background: '#FF4A1C',
+              color: 'white',
+              border: 'none',
+              borderRadius: '100px',
+              padding: '14px 22px',
+              fontSize: '13px',
+              fontWeight: 700,
+              letterSpacing: '0.1em',
+              fontFamily: APP_FONT,
+              transition: 'opacity 0.2s',
+            }}
+            type="button"
+          >
+            {buttonLabel}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -122,7 +119,8 @@ export type HomeFirstPartProps = {
   onRecordVideo: () => void;
   onRecordAudio: () => void;
   onWriteStory: () => void;
-  onUploadPhoto: () => void;
+  /** Cuarta tarjeta: Educación mediática (ruta dedicada). */
+  onMediaEducation: () => void;
   /** Historias: ancla #historias. Mapa: sección del mapa en la home `/#mapa`. */
   basePath?: string;
 };
@@ -133,7 +131,7 @@ export function HomeFirstPart({
   onRecordVideo,
   onRecordAudio,
   onWriteStory,
-  onUploadPhoto,
+  onMediaEducation,
   basePath = ''
 }: HomeFirstPartProps) {
   const { t } = useHomeLocale();
@@ -240,10 +238,10 @@ export function HomeFirstPart({
         ) : null}
       </header>
 
-      {/* INTRO — DM Sans: sans geométrica minimalista (solo esta franja) */}
+      {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className={`${homeHeroPhrase.className} relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-8 lg:pt-80 pb-6 px-6 md:px-10`}
+        className="home-intro-avenir relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-8 lg:pt-80 pb-6 px-6 md:px-10"
       >
         <div className="w-full max-w-5xl lg:max-w-6xl">
           <div className="home-first-part-float relative">
@@ -294,8 +292,8 @@ export function HomeFirstPart({
       {/* CARDS — más aire bajo el hero y mayor separación entre tarjetas */}
       <section
         id="historias"
-        aria-label="Formatos para compartir tu historia"
-        className="relative z-10 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-10 sm:px-8 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-16 lg:gap-x-16 lg:px-16 lg:pt-20"
+        aria-label="Formatos para compartir tu historia y educación mediática"
+        className="relative z-10 -mt-4 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-5 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
       >
         <SoftCard
           title={t.cardVideoTitle}
@@ -334,7 +332,7 @@ export function HomeFirstPart({
           title={t.cardPhotoTitle}
           subtitle={t.cardPhotoSubtitle}
           buttonLabel={t.cardPhotoCta}
-          onClick={onUploadPhoto}
+          onClick={onMediaEducation}
           delay="0.6s"
         >
           {t.cardPhotoBody}

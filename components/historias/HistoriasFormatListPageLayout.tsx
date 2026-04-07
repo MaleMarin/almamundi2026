@@ -199,7 +199,7 @@ export function HistoriasFormatListPageLayout({
                 {showingUnfilteredBecauseNoMatches ? (
                   <p className="mt-2 text-xs text-amber-900/85" role="status">
                     Ninguna historia coincide con los filtros. El carrusel muestra las {allStoryCount}{' '}
-                    historias disponibles. Ajustá los filtros o tocá «Limpiar filtros».
+                    historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros».
                   </p>
                 ) : null}
                 {hasActiveFilters && !showingUnfilteredBecauseNoMatches ? (

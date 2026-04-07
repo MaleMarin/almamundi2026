@@ -228,7 +228,7 @@ export function SoundsPanel({
   );
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', minHeight: 0 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
         <button
           type="button"
@@ -257,26 +257,15 @@ export function SoundsPanel({
         </button>
       </div>
       <p className="text-[11px] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
-        Cada ambiente tiene su volumen guardado en este dispositivo. Ajustá con la barra o con − / +.
+        Cada ambiente tiene su volumen guardado en este dispositivo. Ajusta con la barra o con − / +.
       </p>
       {publicListError ? (
         <p className="text-[11px] text-amber-200/80" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
           {publicListError}
         </p>
       ) : null}
-      <div
-        style={{
-          flex: 1,
-          minHeight: 0,
-          overflowY: 'auto',
-          overflowX: 'hidden',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: 14,
-          scrollbarWidth: 'thin',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
+      {/* Un solo scroll: el cuerpo del MapDrawer (evita doble capa y pérdida de rueda hacia el globo). */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
         {AMBIENT_OPTS.map((m) => (
           <SoundRow
             key={m.id}

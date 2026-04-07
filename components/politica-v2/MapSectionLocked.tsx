@@ -18,7 +18,7 @@ export function MapSectionLocked() {
       <section id="mapa" className="w-full scroll-mt-32 bg-[var(--home-bg)]">
         <div className="map-section-gradient-block w-full">
           <h2
-            className="text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14"
+            className="mapa-almamundi-title text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14"
             style={{ color: 'var(--almamundi-orange)' }}
           >
             Mapa de AlmaMundi

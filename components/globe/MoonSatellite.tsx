@@ -105,6 +105,9 @@ export type MoonSatelliteProps = {
   orbitYawRad?: number;
   /** Inclinación del plano orbital (grados); más grados = más barrido en Y y lectura 3D frente a cámara en +Z. */
   orbitInclinationDeg?: number;
+  /** Lectura de cráteres / terminador (home cinematográfica). */
+  roughness?: number;
+  emissiveIntensity?: number;
 };
 
 export function MoonSatellite({
@@ -114,6 +117,8 @@ export function MoonSatellite({
   moonRadiusScale = 1,
   orbitYawRad = 0,
   orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
+  roughness = 0.94,
+  emissiveIntensity = 0.04,
 }: MoonSatelliteProps) {
   const { camera } = useThree();
   const moonOrbitRootRef = useRef<THREE.Group>(null);
@@ -242,13 +247,13 @@ export function MoonSatellite({
           name="AM_moonMesh"
           renderOrder={2}
         >
-          <sphereGeometry args={[moonRadius, 40, 40]} />
+          <sphereGeometry args={[moonRadius, 52, 52]} />
           <meshStandardMaterial
             map={moonMap}
-            roughness={0.94}
+            roughness={roughness}
             metalness={0}
             emissive="#0a0a12"
-            emissiveIntensity={0.04}
+            emissiveIntensity={emissiveIntensity}
             depthTest
             depthWrite
           />

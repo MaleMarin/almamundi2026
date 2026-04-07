@@ -171,17 +171,25 @@ export function createCityLightsOverlayMaterial(
   return mat;
 }
 
+export type GlobeAtmosphereGlowOptions = {
+  intensity?: number;
+  power?: number;
+  innerColor?: THREE.ColorRepresentation;
+  outerColor?: THREE.ColorRepresentation;
+};
+
 /**
  * Halo orbital: más lectura a contraluz, casi apagado en sombra.
+ * `opts` permite preset «home cinematográfica» sin mutar uniforms tras crear el material.
  */
-export function createAtmosphereGlowMaterial(): THREE.ShaderMaterial {
+export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions): THREE.ShaderMaterial {
   const uniforms = {
     uCamPos: { value: new THREE.Vector3(0, 0, 5) },
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
-    uInner: { value: new THREE.Color(0x1a5fff) },
-    uOuter: { value: new THREE.Color(0x0a2060) },
-    uIntensity: { value: 0.101 },
-    uPower: { value: 3.15 },
+    uInner: { value: new THREE.Color(opts?.innerColor ?? 0x1a5fff) },
+    uOuter: { value: new THREE.Color(opts?.outerColor ?? 0x0a2060) },
+    uIntensity: { value: opts?.intensity ?? 0.101 },
+    uPower: { value: opts?.power ?? 3.15 },
     uFullDay: { value: 0 },
   };
 

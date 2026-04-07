@@ -405,9 +405,49 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       renderer.setRenderTarget(null);
     };
 
+    const onScroll = () => {
+      if (fillParent) {
+        dispUniforms.uScroll.value = 0;
+        return;
+      }
+      const y = window.scrollY || window.pageYOffset || 0;
+      dispUniforms.uScroll.value = Math.min(1, y / 1200);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (fillParent) {
+        const r = mount.getBoundingClientRect();
+        const w = Math.max(1, r.width);
+        const h = Math.max(1, r.height);
+        targetMouse.set((e.clientX - r.left) / w, 1 - (e.clientY - r.top) / h);
+        return;
+      }
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      if (w < 1 || h < 1) return;
+      targetMouse.set(e.clientX / w, 1 - e.clientY / h);
+    };
+
+    const readMountSize = () => {
+      const r = mount.getBoundingClientRect();
+      return {
+        w: Math.max(1, Math.floor(r.width)),
+        h: Math.max(1, Math.floor(r.height)),
+      };
+    };
+
     const setSize = () => {
-      const w = Math.max(1, window.innerWidth);
-      const h = Math.max(1, window.innerHeight);
+      let w: number;
+      let h: number;
+      if (fillParent) {
+        const m = readMountSize();
+        w = m.w;
+        h = m.h;
+        if (w < 16 || h < 16) return;
+      } else {
+        w = Math.max(1, window.innerWidth);
+        h = Math.max(1, window.innerHeight);
+      }
       renderer.setSize(w, h, false);
       dispUniforms.uResolution.value.set(w, h);
       const narrow = w < 768;
@@ -422,22 +462,18 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       resizeTargets(sw, sh);
     };
 
-    const onScroll = () => {
-      const y = window.scrollY || window.pageYOffset || 0;
-      dispUniforms.uScroll.value = Math.min(1, y / 1200);
-    };
-
-    const onPointerMove = (e: PointerEvent) => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      if (w < 1 || h < 1) return;
-      targetMouse.set(e.clientX / w, 1 - e.clientY / h);
-    };
+    let resizeObs: ResizeObserver | null = null;
 
     setSize();
     onScroll();
-    window.addEventListener('resize', setSize, { passive: true });
-    window.addEventListener('scroll', onScroll, { passive: true });
+    if (fillParent) {
+      resizeObs = new ResizeObserver(() => setSize());
+      resizeObs.observe(mount);
+      requestAnimationFrame(() => setSize());
+    } else {
+      window.addEventListener('resize', setSize, { passive: true });
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
     window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     const clock = new THREE.Clock();
@@ -505,8 +541,11 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
 
     return () => {
       cancelAnimationFrame(raf);
-      window.removeEventListener('resize', setSize);
-      window.removeEventListener('scroll', onScroll);
+      resizeObs?.disconnect();
+      if (!fillParent) {
+        window.removeEventListener('resize', setSize);
+        window.removeEventListener('scroll', onScroll);
+      }
       window.removeEventListener('pointermove', onPointerMove);
       renderer.debug.onShaderError = null;
       rtRead.dispose();

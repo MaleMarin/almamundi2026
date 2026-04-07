@@ -228,6 +228,15 @@
   pointer-events: auto;
 }
 
+.topBarNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
 .brand,
 .exit {
   font-family: var(--font-mono, ui-monospace, monospace);

@@ -17,7 +17,7 @@ import { HomeFirstPart } from '@/components/home/HomeFirstPart';
   onRecordVideo={() => setModalMode('Video')}
   onRecordAudio={() => setModalMode('Audio')}
   onWriteStory={() => setModalMode('Texto')}
-  onUploadPhoto={() => setModalMode('Foto')}
+  onMediaEducation={() => router.push('/educacion-mediatica')}
   basePath=""   // o "/" si los enlaces #historias / Mapa deben ir a la misma app
 />
 ```
