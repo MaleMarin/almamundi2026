@@ -1,5 +1,6 @@
 'use client';
 
+import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -11,7 +12,38 @@ export type StoriesPanelProps = {
   onStoryFocus: (s: StoryPoint) => void;
   highlightedStoryId: string | null;
   onContarMiHistoria?: () => void;
+  /**
+   * `search` = solo pestaña «Buscar por palabras clave»: no mostrar el listado completo;
+   * solo resultados cuando hay texto en el campo.
+   */
+  panelMode?: 'stories' | 'search';
 };
+
+function storyHaystack(s: StoryPoint): string {
+  return [
+    s.id,
+    s.title,
+    s.label,
+    s.city,
+    s.country,
+    s.topic,
+    s.description,
+    s.body,
+    s.authorName,
+    s.format,
+    s.excerpt,
+    s.subtitle,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+}
+
+function storiesMatchingQuery(stories: StoryPoint[], q: string): StoryPoint[] {
+  const n = q.trim().toLowerCase();
+  if (!n) return [];
+  return stories.filter((s) => storyHaystack(s).includes(n));
+}
 
 function formatStoryType(s: StoryPoint): string {
   if (s.hasVideo) return 'video';
@@ -90,9 +122,6 @@ function StoryRow({
   );
 }
 
-const isEmptyOrAllDemo = (stories: StoryPoint[]) =>
-  stories.length === 0 || stories.every((s) => (s as StoryPoint & { isDemo?: boolean }).isDemo);
-
 export function StoriesPanel({
   stories,
   exploreQuery,
@@ -100,8 +129,27 @@ export function StoriesPanel({
   onStoryFocus,
   highlightedStoryId,
   onContarMiHistoria,
+  panelMode = 'stories',
 }: StoriesPanelProps) {
-  const showEmptyState = isEmptyOrAllDemo(stories);
+  const isSearchPanel = panelMode === 'search';
+  const qTrim = exploreQuery.trim();
+  const searchMatches = useMemo(
+    () => (isSearchPanel ? storiesMatchingQuery(stories, qTrim) : []),
+    [isSearchPanel, stories, qTrim]
+  );
+
+  const showEmptyState = stories.length === 0 && !isSearchPanel;
+
+  const hintBoxStyle = {
+    padding: '20px 18px',
+    textAlign: 'center' as const,
+    background: 'linear-gradient(160deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)',
+    backdropFilter: 'blur(22px) saturate(1.3)',
+    WebkitBackdropFilter: 'blur(22px) saturate(1.3)',
+    borderRadius: 18,
+    border: '1px solid rgba(255,255,255,0.22)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28)',
+  };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
@@ -140,7 +188,62 @@ export function StoriesPanel({
         flexDirection: 'column',
         gap: 8,
       }}>
-        {showEmptyState ? (
+        {isSearchPanel ? (
+          !qTrim ? (
+            <div style={hintBoxStyle}>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(255,255,255,0.88)',
+                  margin: 0,
+                  lineHeight: 1.55,
+                  fontFamily: SITE_FONT_STACK,
+                }}
+              >
+                Escribe palabras clave para buscar entre las historias del mapa (lugar, tema o texto).
+              </p>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: 'rgba(255,255,255,0.45)',
+                  margin: '12px 0 0',
+                  lineHeight: 1.45,
+                  fontFamily: SITE_FONT_STACK,
+                }}
+              >
+                Para ver el listado completo, usa la pestaña Historias.
+              </p>
+            </div>
+          ) : searchMatches.length === 0 ? (
+            <div style={hintBoxStyle}>
+              <p
+                style={{
+                  fontSize: 14,
+                  color: 'rgba(255,255,255,0.85)',
+                  margin: 0,
+                  lineHeight: 1.5,
+                  fontFamily: SITE_FONT_STACK,
+                }}
+              >
+                No hay historias que coincidan con tu búsqueda.
+              </p>
+            </div>
+          ) : (
+            <>
+              <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#ff5f1a', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
+                Resultados
+              </p>
+              {searchMatches.map((s, i) => (
+                <StoryRow
+                  key={s.id ?? i}
+                  story={s}
+                  isActive={highlightedStoryId === s.id}
+                  onClick={() => onStoryFocus(s)}
+                />
+              ))}
+            </>
+          )
+        ) : showEmptyState ? (
           <div style={{
             padding: '24px 20px',
             textAlign: 'center',

@@ -241,7 +241,7 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-8 lg:pt-80 pb-6 px-6 md:px-10"
+        className="home-intro-avenir relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-6 lg:pt-80 pb-5 px-6 md:px-10"
       >
         <div className="w-full max-w-5xl lg:max-w-6xl">
           <div className="home-first-part-float relative">
@@ -261,7 +261,7 @@ export function HomeFirstPart({
               height="12"
               viewBox="0 0 360 12"
               className="mx-auto block"
-              style={{ margin: '14px auto 22px' }}
+              style={{ margin: '14px auto 14px' }}
               aria-hidden="true"
             >
               <path
@@ -279,7 +279,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-4xl pt-6 font-light leading-[1.65] md:pt-8 text-xl tracking-wide md:text-2xl lg:pt-9 lg:text-3xl"
+              className="mx-auto max-w-4xl pt-4 font-light leading-[1.65] md:pt-6 text-xl tracking-wide md:text-2xl lg:pt-7 lg:text-3xl"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
@@ -289,11 +289,11 @@ export function HomeFirstPart({
         </div>
       </section>
 
-      {/* CARDS — más aire bajo el hero y mayor separación entre tarjetas */}
+      {/* CARDS — un poco más arriba respecto al hero; flotación en globals (.home-historias-card-float-wrap) */}
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia y educación mediática"
-        className="relative z-10 -mt-4 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-5 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
+        className="relative z-10 -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
       >
         <SoftCard
           title={t.cardVideoTitle}

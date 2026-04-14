@@ -23,6 +23,22 @@ import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { MAP_HOME_DOCK_NAV_CLASS } from '@/lib/map-home-neu-button';
+import type { GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
+
+/** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
+const STORY_GLOBE_ID_BASE = 9_000_000;
+
+function storyHasValidGeo(s: { lat?: number; lng?: number }): boolean {
+  const { lat, lng } = s;
+  return (
+    typeof lat === 'number' &&
+    typeof lng === 'number' &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lng) <= 180
+  );
+}
 
 function huellasFallbackDesdeBitsData(): HuellaPunto[] {
   return BITS_DATA.map((b) => ({
@@ -101,6 +117,8 @@ export default function HomeMap() {
     };
   }, []);
 
+  const stories = useStories();
+
   const globeBitsMarkers = useMemo(
     () =>
       huellasPuntos.map((b) => ({
@@ -108,9 +126,26 @@ export default function HomeMap() {
         lat: b.lat,
         lon: b.lon,
         color: b.color,
+        markerKind: 'bit' as const,
       })),
     [huellasPuntos]
   );
+
+  /** Solo historias con lat/lng válidos (misma lista que usa el clic y el resaltado). */
+  const storiesOnGlobe = useMemo(
+    () => stories.filter((s) => storyHasValidGeo(s)),
+    [stories]
+  );
+
+  const globeMarkers = useMemo((): GlobeBitMarker[] => {
+    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
+      id: STORY_GLOBE_ID_BASE + i,
+      lat: s.lat,
+      lon: s.lng,
+      markerKind: 'story' as const,
+    }));
+    return [...globeBitsMarkers, ...storyLayer];
+  }, [globeBitsMarkers, storiesOnGlobe]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -242,8 +277,6 @@ export default function HomeMap() {
 
   const isMobile = useViewportBelow(MAP_LAYOUT_MOBILE_MAX_WIDTH_PX);
 
-  const stories = useStories();
-
   const topicQuery =
     selectedTopicId == null
       ? DEFAULT_NEWS_TOPIC_QUERY
@@ -311,6 +344,35 @@ export default function HomeMap() {
     setHighlightedStoryId(story.id ?? null);
   }, []);
 
+  const selectedGlobeMarkerId = useMemo(() => {
+    if (drawerMode === 'bits' && selectedBit) return selectedBit.id;
+    if (highlightedStoryId != null) {
+      const idx = storiesOnGlobe.findIndex((s) => s.id === highlightedStoryId);
+      return idx >= 0 ? STORY_GLOBE_ID_BASE + idx : null;
+    }
+    return null;
+  }, [drawerMode, selectedBit, highlightedStoryId, storiesOnGlobe]);
+
+  const handleGlobeMarkerClick = useCallback(
+    (id: number) => {
+      if (id >= STORY_GLOBE_ID_BASE) {
+        const idx = id - STORY_GLOBE_ID_BASE;
+        const story = storiesOnGlobe[idx];
+        if (!story) return;
+        setHighlightedStoryId(story.id ?? null);
+        setDrawerMode('stories');
+        setDrawerOpen(true);
+        return;
+      }
+      const bit = huellasPuntos.find((h) => h.id === id);
+      if (!bit) return;
+      setSelectedBit(bit);
+      setDrawerMode('bits');
+      setDrawerOpen(true);
+    },
+    [storiesOnGlobe, huellasPuntos]
+  );
+
   function open(mode: MapDockMode) {
     setDrawerMode(mode);
     setDrawerOpen(true);
@@ -374,16 +436,10 @@ export default function HomeMap() {
             <GlobeV2Home
               embedded
               forceDaylight={false}
-              bits={globeBitsMarkers}
-              selectedBitId={selectedBit?.id ?? null}
+              bits={globeMarkers}
+              selectedBitId={selectedGlobeMarkerId}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}
-              onBitClick={(id) => {
-                const bit = huellasPuntos.find((h) => h.id === id);
-                if (!bit) return;
-                setSelectedBit(bit);
-                setDrawerMode('bits');
-                setDrawerOpen(true);
-              }}
+              onBitClick={handleGlobeMarkerClick}
             />
           </div>
         </div>
@@ -442,6 +498,7 @@ export default function HomeMap() {
           {drawerMode === 'stories' || drawerMode === 'search' ? (
             <StoriesPanel
               {...historiasProps}
+              panelMode={drawerMode === 'search' ? 'search' : 'stories'}
               onContarMiHistoria={() => {
                 close();
                 router.push('/subir');

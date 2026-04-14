@@ -58,19 +58,17 @@
 
 /* HomeFirstPart: sin styled-jsx (evita mismatch de hidratación jsx-* en Turbopack) */
 @keyframes home-first-part-float {
-  0% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
-  }
-  100% {
-    transform: translateY(0px);
+    transform: translateY(-4px);
   }
 }
 
 .home-first-part-float {
-  animation: home-first-part-float 6s ease-in-out infinite;
+  animation: home-first-part-float 9s ease-in-out infinite;
 }
 
 .home-neu-card {
@@ -100,19 +98,19 @@
   }
 }
 
-/* Solo cards #historias: flotación + pulso muy suave (el intro sigue con home-first-part-float). */
+/* Solo cards #historias: flotación continua muy leve (el intro: home-first-part-float). */
 @keyframes home-historias-card-motion {
   0%,
   100% {
     transform: translateY(0) scale(1);
   }
   50% {
-    transform: translateY(-11px) scale(1.014);
+    transform: translateY(-6px) scale(1.004);
   }
 }
 
 .home-historias-card-float-wrap {
-  animation: home-historias-card-motion 5.5s ease-in-out infinite;
+  animation: home-historias-card-motion 7.5s ease-in-out infinite;
 }
 
 /* Enlaces: naranja AlmaMundi por defecto. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */

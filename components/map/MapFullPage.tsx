@@ -2695,7 +2695,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   useEffect(() => {
     const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'stories' : 'music';
     setView(nextView);
-    console.log("[MAPA] view =", nextView, "| activeView =", activeView);
     if (activeView === 'musica') setLiveOverlay(null);
   }, [activeView]);
 
@@ -2842,6 +2841,35 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const stories = useStories();
   const pulses = usePulses(activeView === 'historias');
+
+  /**
+   * `/mapa` arranca mirando al Pacífico; muchas historias (p. ej. Latinoamérica) quedan en el hemisferio oculto.
+   * Tras cargar historias reales desde la API, centramos el globo en su baricentro (una vez por sesión).
+   */
+  const hasAutoFramedFirestoreStoriesRef = useRef(false);
+  useEffect(() => {
+    if (embedded || pathname !== '/mapa') return;
+    if (hasAutoFramedFirestoreStoriesRef.current || activeView !== 'historias') return;
+    if (!globeReady || !globeEl.current || stories.length === 0) return;
+    const first = stories[0] as StoryPoint & { isDemo?: boolean };
+    if (first?.isDemo) return;
+    hasAutoFramedFirestoreStoriesRef.current = true;
+    let sumLat = 0;
+    let sumLng = 0;
+    for (const s of stories) {
+      sumLat += s.lat;
+      sumLng += s.lng;
+    }
+    const n = stories.length;
+    const lat = sumLat / n;
+    const lng = sumLng / n;
+    try {
+      globeEl.current.pointOfView({ lat, lng, altitude: 1.72 }, 1400);
+      setViewCenter({ lat, lng });
+    } catch {
+      /* ignore */
+    }
+  }, [embedded, pathname, globeReady, activeView, stories]);
 
   const selectedLocation = useMemo(() => {
     if (selectedStory) {
@@ -4504,6 +4532,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               {drawerMode === 'stories' || drawerMode === 'search' ? (
                 <StoriesPanel
                   {...historiasProps}
+                  panelMode={drawerMode === 'search' ? 'search' : 'stories'}
                   onContarMiHistoria={() => {
                     setDrawerOpen(false);
                     hardNavigateTo('/#historias');
@@ -4987,6 +5016,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               {drawerMode === 'stories' || drawerMode === 'search' ? (
                 <StoriesPanel
                   {...historiasProps}
+                  panelMode={drawerMode === 'search' ? 'search' : 'stories'}
                   onContarMiHistoria={() => {
                     setDrawerOpen(false);
                     hardNavigateTo('/#historias');

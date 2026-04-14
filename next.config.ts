@@ -56,6 +56,11 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      {
+        source: '/cultura-digital',
+        destination: '/educacion-mediatica',
+        permanent: false,
+      },
       { source: '/historias', destination: '/historias/videos', permanent: false },
       {
         source: '/historias/videos/exhibicion-demo',

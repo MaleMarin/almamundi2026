@@ -8,6 +8,11 @@ export type GlobeBitInteractionStore = {
   pointerOnCanvas: boolean;
   /** Bit elegido por hover magnético (pantalla + histéresis); null si ninguno. */
   magneticHoverId: number | null;
+  /**
+   * Distancia normalizada del puntero al centro del canvas del globo (0 = centro del lienzo,
+   * ~1.4 ≈ esquina). Sirve para ralentizar el giro cuando el ratón se acerca al disco.
+   */
+  pointerGlobeCenterDist: number;
 };
 
 /** Radio en píxeles (canvas): candidatos a hover si el proy. del bit cae dentro. */
@@ -21,6 +26,18 @@ export const AUTO_ROTATE_IDLE_SPEED = 1;
 
 /** Puntero en canvas, sin bit magnético: ~20 % del giro. */
 export const AUTO_ROTATE_POINTER_SPEED = 0.2;
+
+/**
+ * Con el puntero cerca del centro del canvas (encima del globo): giro más lento que en el borde.
+ * Se interpola linealmente hasta `AUTO_ROTATE_POINTER_SPEED` según `pointerGlobeCenterDist`.
+ */
+export const AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED = 0.07;
+
+/**
+ * A esta distancia normalizada desde el centro (véase `pointerGlobeCenterDist`) ya se usa
+ * toda la franja hasta `AUTO_ROTATE_POINTER_SPEED` (comportamiento “borde del lienzo”).
+ */
+export const AUTO_ROTATE_PROXIMITY_BLEND_DIST = 1.02;
 
 /** Bit magnético activo: pausa total del giro terrestre. */
 export const AUTO_ROTATE_HOVER_SPEED = 0;

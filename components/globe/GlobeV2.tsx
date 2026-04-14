@@ -61,8 +61,10 @@ import {
 import {
   AUTO_ROTATE_HOVER_SPEED,
   AUTO_ROTATE_IDLE_SPEED,
+  AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED,
   AUTO_ROTATE_PANEL_SPEED,
   AUTO_ROTATE_POINTER_SPEED,
+  AUTO_ROTATE_PROXIMITY_BLEND_DIST,
   MAGNETIC_SPIN_RATE_SMOOTH,
   type GlobeBitInteractionStore,
 } from '@/lib/globe/globe-bits-magnetic-config';
@@ -827,6 +829,7 @@ function GlobeScene({
   const bitInteractionStoreRef = useRef<GlobeBitInteractionStore>({
     pointerOnCanvas: false,
     magneticHoverId: null,
+    pointerGlobeCenterDist: 1,
   });
 
   const getEarthSceneDate = useCallback((): Date => new Date(sceneTimeMsRef.current ?? Date.now()), []);
@@ -852,7 +855,12 @@ function GlobeScene({
     let target = AUTO_ROTATE_IDLE_SPEED;
     if (pauseEarthSpinForUi) target = AUTO_ROTATE_PANEL_SPEED;
     else if (st.magneticHoverId != null) target = AUTO_ROTATE_HOVER_SPEED;
-    else if (st.pointerOnCanvas) target = AUTO_ROTATE_POINTER_SPEED;
+    else if (st.pointerOnCanvas) {
+      const u = Math.min(1, st.pointerGlobeCenterDist / AUTO_ROTATE_PROXIMITY_BLEND_DIST);
+      target =
+        AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED +
+        (AUTO_ROTATE_POINTER_SPEED - AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED) * u;
+    }
 
     const k = Math.min(1, MAGNETIC_SPIN_RATE_SMOOTH * dt);
     smoothedSpinRateRef.current += (target - smoothedSpinRateRef.current) * k;

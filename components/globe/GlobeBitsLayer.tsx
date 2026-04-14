@@ -5,6 +5,7 @@
  *
  * - Picking: esfera invisible por bit (`PICKING_SPHERE_RADIUS`), independiente del tamaño visual.
  * - Hover magnético: proyección pantalla + radio px + histéresis (`GlobeBitInteractionStore`).
+ * - Cerca del centro del canvas (disco del globo): el giro terrestre se ralentiza; encima de un marcador, casi pausa (`GlobeV2` + `pointerGlobeCenterDist`).
  * - Clic: si hay candidato magnético y el arrastre es corto, abre ese bit (no exige acierto en el mesh).
  * - Visibilidad: filtro hemisferio (normal tierra→bit · dir bit→cámara).
  *
@@ -27,7 +28,10 @@ import {
   PICKING_SPHERE_RADIUS,
   type GlobeBitInteractionStore,
 } from '@/lib/globe/globe-bits-magnetic-config';
-import { createBitStarBurstMaterial } from '@/components/globe/bitStarBurstMaterial';
+import {
+  createBitStarBurstMaterial,
+  createStoryStarBurstMaterial,
+} from '@/components/globe/bitStarBurstMaterial';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export type GlobeBitMarker = {
@@ -35,6 +39,8 @@ export type GlobeBitMarker = {
   lat: number;
   lon: number;
   color?: string;
+  /** Historias en el mapa vs bits curados (color distinto en el globo). */
+  markerKind?: 'bit' | 'story';
 };
 
 const BIT_SURFACE_RADIUS = GLOBE_V2_BIT_SURFACE_RADIUS;
@@ -88,12 +94,16 @@ function BitDot({
   magneticActive,
   starMatNormal,
   starMatSelected,
+  storyMatNormal,
+  storyMatSelected,
 }: {
   bit: GlobeBitMarker;
   selected: boolean;
   magneticActive: boolean;
   starMatNormal: THREE.ShaderMaterial;
   starMatSelected: THREE.ShaderMaterial;
+  storyMatNormal: THREE.ShaderMaterial;
+  storyMatSelected: THREE.ShaderMaterial;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
     const p = latLngToCartesianThreeJS(bit.lat, bit.lon, BIT_SURFACE_RADIUS);
@@ -143,9 +153,21 @@ function BitDot({
     root.visible = outRadial.dot(toCam) > FRONT_HEMISPHERE_MIN_DOT;
   });
 
-  const starMat = selected ? starMatSelected : starMatNormal;
+  const isStory = bit.markerKind === 'story';
+  /** Historias: más visibles que los bits (misma capa magnética en pantalla). */
+  const storyVis = isStory ? 1.38 : 1;
+  const starMat = selected
+    ? isStory
+      ? storyMatSelected
+      : starMatSelected
+    : isStory
+      ? storyMatNormal
+      : starMatNormal;
   const sel = selected ? 1.08 : 1.0;
   const mag = magneticActive && !selected ? ACTIVE_BIT_SCALE : 1;
+  const planeScale = STAR_PLANE_SCALE * storyVis;
+  const planeScaleOuter = STAR_PLANE_SCALE_OUTER * storyVis;
+  const coreScale = CORE_SCALE * storyVis;
 
   return (
     <group ref={rootRef} position={surfacePos}>
@@ -153,7 +175,7 @@ function BitDot({
         Zona de picking lógica = PICK_RADIUS_PX en pantalla (no escala 3D del dibujo).
         Esfera invisible opcional (mismo radio que config) por si en el futuro se reactiva raycast.
       */}
-      <mesh scale={PICKING_SPHERE_RADIUS} raycast={() => {}} visible={false}>
+      <mesh scale={PICKING_SPHERE_RADIUS * (isStory ? 1.25 : 1)} raycast={() => {}} visible={false}>
         <sphereGeometry args={[1, 12, 12]} />
         <meshBasicMaterial transparent opacity={0} depthWrite={false} depthTest={false} />
       </mesh>
@@ -163,8 +185,8 @@ function BitDot({
           <mesh
             ref={(m) => disableMeshRaycast(m)}
             material={starMat}
-            scale={[STAR_PLANE_SCALE * sel * mag, STAR_PLANE_SCALE * sel * mag, 1]}
-            renderOrder={10}
+            scale={[planeScale * sel * mag, planeScale * sel * mag, 1]}
+            renderOrder={isStory ? 14 : 10}
           >
             <planeGeometry args={[1, 1]} />
           </mesh>
@@ -172,8 +194,8 @@ function BitDot({
             ref={(m) => disableMeshRaycast(m)}
             material={starMat}
             rotation={[0, 0, Math.PI / 4]}
-            scale={[STAR_PLANE_SCALE_OUTER * sel * mag, STAR_PLANE_SCALE_OUTER * sel * mag, 1]}
-            renderOrder={9}
+            scale={[planeScaleOuter * sel * mag, planeScaleOuter * sel * mag, 1]}
+            renderOrder={isStory ? 13 : 9}
           >
             <planeGeometry args={[1, 1]} />
           </mesh>
@@ -181,12 +203,12 @@ function BitDot({
 
         <mesh
           ref={(m) => disableMeshRaycast(m)}
-          scale={CORE_SCALE * sel * mag}
-          renderOrder={11}
+          scale={coreScale * sel * mag}
+          renderOrder={isStory ? 15 : 11}
         >
           <sphereGeometry args={[1, 10, 10]} />
           <meshBasicMaterial
-            color="#f2f4f8"
+            color={isStory ? '#ffd4c4' : '#f2f4f8'}
             transparent
             opacity={magneticActive && !selected ? 0.88 : 0.72}
             depthWrite={false}
@@ -270,13 +292,17 @@ function GlobeBitsLayerMounted({
 
   const starMatNormal = useMemo(() => createBitStarBurstMaterial(1.05, 'GlobeBitStarBurst'), []);
   const starMatSelected = useMemo(() => createBitStarBurstMaterial(1.38, 'GlobeBitStarBurstSelected'), []);
+  const storyMatNormal = useMemo(() => createStoryStarBurstMaterial(1.05, 'GlobeStoryStarBurst'), []);
+  const storyMatSelected = useMemo(() => createStoryStarBurstMaterial(1.38, 'GlobeStoryStarBurstSelected'), []);
 
   useEffect(() => {
     return () => {
       starMatNormal.dispose();
       starMatSelected.dispose();
+      storyMatNormal.dispose();
+      storyMatSelected.dispose();
     };
-  }, [starMatNormal, starMatSelected]);
+  }, [starMatNormal, starMatSelected, storyMatNormal, storyMatSelected]);
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {
     const spin = earthSpinGroupRef.current;
@@ -320,6 +346,9 @@ function GlobeBitsLayerMounted({
     const next = resolveMagneticHover(magneticPrevRef.current, aux.distById, PICK_RADIUS_PX, HOVER_HYSTERESIS_PX);
     magneticPrevRef.current = next;
     store.magneticHoverId = next;
+    const nx = (px / w - 0.5) * 2;
+    const ny = (py / h - 0.5) * 2;
+    store.pointerGlobeCenterDist = Math.hypot(nx, ny);
     setHoverCandidateId((prev) => (prev === next ? prev : next));
   };
 
@@ -329,12 +358,14 @@ function GlobeBitsLayerMounted({
     const clearMagnetic = () => {
       interactionStoreRef.current.pointerOnCanvas = false;
       interactionStoreRef.current.magneticHoverId = null;
+      interactionStoreRef.current.pointerGlobeCenterDist = 1;
       magneticPrevRef.current = null;
       setHoverCandidateId(null);
     };
 
     const onEnter = () => {
       interactionStoreRef.current.pointerOnCanvas = true;
+      interactionStoreRef.current.pointerGlobeCenterDist = 1;
     };
 
     const onLeave = () => {
@@ -432,6 +463,8 @@ function GlobeBitsLayerMounted({
           magneticActive={hoverCandidateId === bit.id}
           starMatNormal={starMatNormal}
           starMatSelected={starMatSelected}
+          storyMatNormal={storyMatNormal}
+          storyMatSelected={storyMatSelected}
         />
       ))}
     </group>

@@ -22,7 +22,7 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       .collection('stories')
       .where('status', '==', 'published')
       .orderBy('publishedAt', 'desc')
-      .limit(30)
+      .limit(64)
       .get();
 
     return snap.docs
@@ -37,14 +37,21 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
         const publishedAt = d.publishedAt && typeof (d.publishedAt as { toDate?: () => Date }).toDate === 'function'
           ? (d.publishedAt as { toDate: () => Date }).toDate().toISOString()
           : undefined;
+        const thumb = (d.thumbnailUrl as string | undefined) ?? undefined;
+        const mediaImage = (media.imageUrl as string | undefined) ?? undefined;
+        const imageUrl = thumb || mediaImage;
         return {
           id: doc.id,
           lat,
           lng,
           label: title,
           authorName: (d.authorName as string) ?? undefined,
+          authorAvatar: (d.authorAvatar as string) ?? undefined,
           title,
           description: (d.excerpt as string) ?? (text ? String(text).slice(0, 200) : undefined),
+          excerpt: (d.excerpt as string) ?? undefined,
+          quote: (d.quote as string) ?? undefined,
+          format: (d.format as string) ?? undefined,
           city: (d.city as string) ?? undefined,
           country: (d.country as string) ?? undefined,
           topic: (d.tags as { themes?: string[] })?.themes?.[0] ?? (d.topic as string) ?? undefined,
@@ -55,6 +62,8 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
           hasAudio: Boolean(media.audioUrl),
           hasVideo: Boolean(media.videoUrl),
           publishedAt,
+          imageUrl,
+          thumbnailUrl: thumb || mediaImage,
           weatherTags: (d.weatherTags as string[] | undefined) ?? undefined,
         } as StoryPoint;
       })
@@ -100,14 +109,21 @@ export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> 
     const publishedAt = d.publishedAt && typeof (d.publishedAt as { toDate?: () => Date }).toDate === 'function'
       ? (d.publishedAt as { toDate: () => Date }).toDate().toISOString()
       : undefined;
+    const thumb = (d.thumbnailUrl as string | undefined) ?? undefined;
+    const mediaImage = (media.imageUrl as string | undefined) ?? undefined;
+    const imageUrl = thumb || mediaImage;
     return {
       id: doc.id,
       lat: lat ?? 0,
       lng: lng ?? 0,
       label: title,
       authorName: (d.authorName as string) ?? undefined,
+      authorAvatar: (d.authorAvatar as string) ?? undefined,
       title,
       description: (d.excerpt as string) ?? (text ? String(text).slice(0, 200) : undefined),
+      excerpt: (d.excerpt as string) ?? undefined,
+      quote: (d.quote as string) ?? undefined,
+      format: (d.format as string) ?? undefined,
       city: (d.city as string) ?? undefined,
       country: (d.country as string) ?? undefined,
       topic: (d.tags as { themes?: string[] })?.themes?.[0] ?? (d.topic as string) ?? undefined,
@@ -118,7 +134,8 @@ export async function getStoryByIdAsync(id: string): Promise<StoryPoint | null> 
       hasAudio: Boolean(media.audioUrl),
       hasVideo: Boolean(media.videoUrl),
       publishedAt,
-      imageUrl: media.imageUrl ?? undefined,
+      imageUrl,
+      thumbnailUrl: thumb || mediaImage,
       weatherTags: (d.weatherTags as string[] | undefined) ?? undefined,
     } as StoryPoint;
   } catch (err) {
