@@ -358,8 +358,43 @@ export function AgeGate({ onChange }: Props) {
                   </div>
                 )}
 
-                {/* ── Consentimiento explícito (antes de confirmar edad) ── */}
+                {/* ── Confirmar edad; debajo, consentimiento obligatorio antes de avanzar ── */}
+                <button
+                  type="button"
+                  onClick={handleConfirm}
+                  disabled={!consentido}
+                  autoFocus={Boolean(selected)}
+                  aria-describedby="age-gate-consent-explicito-bloque"
+                  style={{
+                    width: '100%',
+                    padding: '0.85rem',
+                    marginTop: 16,
+                    borderRadius: '8px',
+                    border: 'none',
+                    background: consentido ? '#0d0b09' : '#9ca3af',
+                    color: '#f5f0e8',
+                    fontFamily: SITE_FONT_STACK,
+                    fontWeight: 500,
+                    fontSize: '0.85rem',
+                    letterSpacing: '0.08em',
+                    cursor: consentido ? 'pointer' : 'not-allowed',
+                    transition: 'background 0.15s',
+                    opacity: consentido ? 1 : 0.85,
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!consentido) return;
+                    e.currentTarget.style.background = '#1a1612';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!consentido) return;
+                    e.currentTarget.style.background = '#0d0b09';
+                  }}
+                >
+                  Confirmar y continuar →
+                </button>
+
                 <div
+                  id="age-gate-consent-explicito-bloque"
                   style={{
                     background: 'rgba(255,74,28,0.04)',
                     border: '1px solid rgba(255,74,28,0.15)',
@@ -433,40 +468,6 @@ export function AgeGate({ onChange }: Props) {
                     </span>
                   </label>
                 </div>
-
-                {/* ── Confirm button ── */}
-                <button
-                  type="button"
-                  onClick={handleConfirm}
-                  disabled={!consentido}
-                  autoFocus={Boolean(selected)}
-                  style={{
-                    width: '100%',
-                    padding: '0.85rem',
-                    marginTop: 16,
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: consentido ? '#0d0b09' : '#9ca3af',
-                    color: '#f5f0e8',
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 500,
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.08em',
-                    cursor: consentido ? 'pointer' : 'not-allowed',
-                    transition: 'background 0.15s',
-                    opacity: consentido ? 1 : 0.85,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!consentido) return;
-                    e.currentTarget.style.background = '#1a1612';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!consentido) return;
-                    e.currentTarget.style.background = '#0d0b09';
-                  }}
-                >
-                  Confirmar y continuar →
-                </button>
               </>
             )}
           </>
