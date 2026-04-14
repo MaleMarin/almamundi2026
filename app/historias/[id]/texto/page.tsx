@@ -2,8 +2,10 @@
  * /historias/[id]/texto — Página de lectura (TextoReader).
  * Server component: carga la historia desde Firestore; si no tiene texto, redirige al detalle.
  */
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
+import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
@@ -38,17 +40,9 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const story = await getStoryByIdAsync(id);
-  if (!story) return { title: 'Historia · AlmaMundi' };
-  const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
-  const titulo = story.title ?? story.label ?? 'Historia';
-  const desc = story.subtitle ?? story.description ?? (contenido ? contenido.slice(0, 160) : undefined);
-  return {
-    title: `${titulo} · AlmaMundi`,
-    description: desc ?? undefined,
-  };
+  return buildHistoriaStoryMetadata(id);
 }
 
 export default async function HistoriasIdTextoPage({ params }: PageProps) {

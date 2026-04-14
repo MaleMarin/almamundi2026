@@ -2,8 +2,10 @@
  * /historias/[id]/foto — Álbum de fotos (FotoAlbum).
  * Server component: carga la historia desde Firestore; si no tiene imágenes, redirige al detalle.
  */
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
+import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { FotoAlbumClient } from './FotoAlbumClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
@@ -47,17 +49,9 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
 
 type PageProps = { params: Promise<{ id: string }> };
 
-export async function generateMetadata({ params }: PageProps) {
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
-  const story = await getStoryByIdAsync(id);
-  if (!story) return { title: 'Historia · AlmaMundi' };
-  const imagenes = buildImagenes(story);
-  const titulo = story.title ?? story.label ?? 'Historia';
-  const autor = story.authorName ?? story.author?.name ?? '';
-  return {
-    title: `${titulo} · AlmaMundi`,
-    description: imagenes.length > 0 ? `Álbum de ${imagenes.length} fotografías · ${autor}` : undefined,
-  };
+  return buildHistoriaStoryMetadata(id);
 }
 
 export default async function HistoriasIdFotoPage({ params }: PageProps) {
