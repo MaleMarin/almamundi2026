@@ -249,6 +249,67 @@ export default function PrivacidadPage() {
           </p>
         </Section>
 
+        <Section id="s11" title="Servicios de terceros">
+          <p style={{ marginBottom: '1rem' }}>
+            AlmaMundi utiliza los siguientes servicios externos para su funcionamiento.
+            Cada uno tiene su propia política de privacidad y puede procesar datos de
+            los usuarios:
+          </p>
+          <p style={{ marginBottom: '1rem' }}>
+            <strong>Firebase (Google)</strong>: base de datos, autenticación y almacenamiento de
+            archivos. Los servidores pueden estar ubicados en Estados Unidos y otros
+            países. Política:{' '}
+            <a
+              href="https://firebase.google.com/support/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#FF4A1C' }}
+            >
+              firebase.google.com/support/privacy
+            </a>
+          </p>
+          <p style={{ marginBottom: '1rem' }}>
+            <strong>Vercel</strong>: plataforma de hosting y despliegue. Procesa solicitudes y puede
+            registrar direcciones IP de forma temporal. Política:{' '}
+            <a
+              href="https://vercel.com/legal/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#FF4A1C' }}
+            >
+              vercel.com/legal/privacy-policy
+            </a>
+          </p>
+          <p style={{ marginBottom: '1rem' }}>
+            <strong>Resend</strong>: servicio de envío de correos electrónicos transaccionales
+            (confirmaciones y notificaciones). Política:{' '}
+            <a
+              href="https://resend.com/legal/privacy-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#FF4A1C' }}
+            >
+              resend.com/legal/privacy-policy
+            </a>
+          </p>
+          <p style={{ marginBottom: '1rem' }}>
+            <strong>Upstash</strong>: servicio de caché y limitación de velocidad de las APIs. No
+            almacena contenido de las historias. Política:{' '}
+            <a
+              href="https://upstash.com/trust/privacy.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ color: '#FF4A1C' }}
+            >
+              upstash.com/trust/privacy.pdf
+            </a>
+          </p>
+          <p>
+            Al usar AlmaMundi, el usuario acepta que sus datos pueden ser procesados por
+            estos servicios según sus propias políticas.
+          </p>
+        </Section>
+
         <Section id="s10" title="10. Contacto y reclamaciones">
           <p>
             Para cualquier pregunta sobre esta política, para ejercer tus derechos
