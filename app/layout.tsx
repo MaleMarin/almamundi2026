@@ -3,6 +3,7 @@ import { CursorGlobal } from '@/components/ui/CursorGlobal';
 import { Footer } from '@/components/layout/Footer';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
+import { CookieBanner } from '@/components/ui/CookieBanner';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
@@ -81,6 +82,7 @@ export default async function RootLayout({
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
+        <CookieBanner />
         <SpeedInsights />
       </body>
     </html>
