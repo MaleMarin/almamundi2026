@@ -1364,7 +1364,8 @@ function RightPanel({
             className="lm-btn-ghost flex items-center gap-2"
             style={soundEnabled ? { borderColor: 'rgba(255,106,0,.5)', background: 'rgba(255,106,0,.12)' } : undefined}
             title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
-            aria-label={soundEnabled ? 'Cortar sonido' : 'Activar sonido'}
+            aria-pressed={soundEnabled}
+            aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
           >
             {soundEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
           </button>
@@ -1631,7 +1632,7 @@ function RightPanel({
                   className={`lm-switch ${soundEnabled ? 'on' : ''}`}
                   onClick={onToggleSound}
                   aria-pressed={soundEnabled}
-                  aria-label={soundEnabled ? 'Sonido activado' : 'Sonido desactivado'}
+                  aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
                 >
                   <span className="lm-knob" aria-hidden />
                 </button>
@@ -4624,7 +4625,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               type="button"
               onClick={toggleSound}
               title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
-              aria-label={soundEnabled ? 'Cortar sonido' : 'Activar sonido'}
+              aria-pressed={soundEnabled}
+              aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
               style={{
                 display: 'flex',
                 alignItems: 'center',

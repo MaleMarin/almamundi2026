@@ -56,6 +56,10 @@ const NIGHT_RIM_MULT = 0.82;
 const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 const GLOBE_IMAGE_LOCAL = '/textures/earth-day.jpg';
 
+/** react-globe.gl crea el canvas dentro de la librería; el foco y la descripción van en el contenedor interactivo. */
+const MAP_GLOBE_INTERACTIVE_ARIA_LABEL =
+  'Globo terráqueo interactivo con historias del mundo. Use el ratón para rotar y hacer clic en los puntos para ver historias.';
+
 /** Hora local 0–23 en una zona IANA (p. ej. America/Santiago). */
 function getHourInTimeZone(date: Date, timeZone: string): number {
   try {
@@ -495,6 +499,9 @@ export function MapCanvas({
     >
       <div
         className="pointer-events-auto globe-halo-wrap"
+        role="img"
+        tabIndex={0}
+        aria-label={MAP_GLOBE_INTERACTIVE_ARIA_LABEL}
         style={
           embedded
             ? {

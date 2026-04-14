@@ -1156,7 +1156,12 @@ export default function GlobeV2({
     : [0, 0, camZ];
 
   return (
-    <div className={rootClassName}>
+    <div
+      className={rootClassName}
+      role="img"
+      tabIndex={0}
+      aria-label="Globo terráqueo interactivo. Explorar con el ratón."
+    >
       {className == null && !embeddedDayChrome && !embeddedCinematicChrome ? (
         <div className={earthNightStyles.atmosphereOverlay} aria-hidden />
       ) : null}

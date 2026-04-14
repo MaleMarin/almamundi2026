@@ -102,7 +102,6 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
             type="button"
             onClick={() => onModeChange(mode)}
             aria-pressed={isActive}
-            aria-label={label}
             style={{
               ...baseBtnStyle,
               ...(isActive ? activeBtnStyle : {}),

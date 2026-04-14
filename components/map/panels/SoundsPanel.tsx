@@ -234,7 +234,7 @@ export function SoundsPanel({
           type="button"
           onClick={onToggleSound}
           aria-pressed={soundEnabled}
-          aria-label={soundEnabled ? 'Cortar sonido' : 'Activar sonido'}
+          aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
           style={{
             padding: '8px 16px',
             borderRadius: 999,

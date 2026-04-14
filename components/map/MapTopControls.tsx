@@ -40,7 +40,8 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
         type="button"
         onClick={onToggleSound}
         title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
-        aria-label={soundEnabled ? 'Cortar sonido' : 'Activar sonido'}
+        aria-pressed={soundEnabled}
+        aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
         className={
           embedded
             ? 'shrink-0 rounded-full border border-solid border-white/10 h-[52px] w-[52px] sm:h-14 sm:w-14 active:scale-[0.98]'
