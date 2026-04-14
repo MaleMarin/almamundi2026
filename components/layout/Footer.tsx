@@ -73,6 +73,13 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           >
             Política de privacidad
           </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/terminos"
+            className={FOOTER_LINK}
+            activeClassName="!text-black font-semibold"
+          >
+            Términos de uso
+          </ActiveInternalNavLink>
         </div>
       </div>
     </footer>
