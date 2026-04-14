@@ -12,6 +12,7 @@
  */
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -92,6 +93,7 @@ const FORMATS_MINOR: FormatoPermitido[] = [
 export function AgeGate({ onChange }: Props) {
   const [selected, setSelected] = useState<AgeGroup | null>(null);
   const [confirmed, setConfirmed] = useState(false);
+  const [consentido, setConsentido] = useState(false);
 
   const formats =
     selected === 'adult' ? FORMATS_ADULT : selected === 'minor' ? FORMATS_MINOR : [];
@@ -99,6 +101,7 @@ export function AgeGate({ onChange }: Props) {
   const handleSelect = (group: AgeGroup) => {
     setSelected(group);
     setConfirmed(false);
+    setConsentido(false);
   };
 
   const handleConfirm = () => {
@@ -355,31 +358,112 @@ export function AgeGate({ onChange }: Props) {
                   </div>
                 )}
 
+                {/* ── Consentimiento explícito (antes de confirmar edad) ── */}
+                <div
+                  style={{
+                    background: 'rgba(255,74,28,0.04)',
+                    border: '1px solid rgba(255,74,28,0.15)',
+                    borderRadius: 12,
+                    padding: '14px 16px',
+                    marginTop: 16,
+                    fontSize: 13,
+                    color: '#5a6070',
+                    lineHeight: 1.7,
+                  }}
+                >
+                  <label
+                    htmlFor="age-gate-consent-explicito"
+                    style={{
+                      display: 'flex',
+                      alignItems: 'flex-start',
+                      gap: 14,
+                      cursor: 'pointer',
+                      margin: 0,
+                    }}
+                  >
+                    <span
+                      style={{
+                        flexShrink: 0,
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        width: 28,
+                        height: 28,
+                        marginTop: 2,
+                        borderRadius: 10,
+                        background: '#eef0f4',
+                        boxShadow:
+                          'inset 3px 3px 6px rgba(163,177,198,0.45), inset -3px -3px 6px rgba(255,255,255,0.95)',
+                        border: '1px solid rgba(255,255,255,0.55)',
+                      }}
+                    >
+                      <input
+                        id="age-gate-consent-explicito"
+                        type="checkbox"
+                        checked={consentido}
+                        onChange={(e) => setConsentido(e.target.checked)}
+                        style={{
+                          width: 16,
+                          height: 16,
+                          margin: 0,
+                          accentColor: '#FF4A1C',
+                          cursor: 'pointer',
+                        }}
+                      />
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      Al continuar, acepto que:
+                      <br />
+                      <span style={{ display: 'block', marginTop: 6 }}>
+                        — El contenido que subo es de mi autoría o tengo los derechos para compartirlo.
+                      </span>
+                      <span style={{ display: 'block', marginTop: 4 }}>
+                        — AlmaMundi puede publicar mi historia en la plataforma.
+                      </span>
+                      <span style={{ display: 'block', marginTop: 4 }}>
+                        — Mis datos serán tratados según la{' '}
+                        <Link
+                          href="/privacidad"
+                          style={{ color: '#FF4A1C', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 2 }}
+                        >
+                          política de privacidad
+                        </Link>
+                        .
+                      </span>
+                    </span>
+                  </label>
+                </div>
+
                 {/* ── Confirm button ── */}
                 <button
                   type="button"
                   onClick={handleConfirm}
+                  disabled={!consentido}
                   autoFocus={Boolean(selected)}
                   style={{
                     width: '100%',
                     padding: '0.85rem',
+                    marginTop: 16,
                     borderRadius: '8px',
                     border: 'none',
-                    background: '#0d0b09',
+                    background: consentido ? '#0d0b09' : '#9ca3af',
                     color: '#f5f0e8',
                     fontFamily: SITE_FONT_STACK,
                     fontWeight: 500,
                     fontSize: '0.85rem',
                     letterSpacing: '0.08em',
-                    cursor: 'pointer',
+                    cursor: consentido ? 'pointer' : 'not-allowed',
                     transition: 'background 0.15s',
+                    opacity: consentido ? 1 : 0.85,
                   }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background = '#1a1612')
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = '#0d0b09')
-                  }
+                  onMouseEnter={(e) => {
+                    if (!consentido) return;
+                    e.currentTarget.style.background = '#1a1612';
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!consentido) return;
+                    e.currentTarget.style.background = '#0d0b09';
+                  }}
                 >
                   Confirmar y continuar →
                 </button>
@@ -428,6 +512,7 @@ export function AgeGate({ onChange }: Props) {
                   onClick={() => {
                     setSelected(null);
                     setConfirmed(false);
+                    setConsentido(false);
                   }}
                   style={{
                     background: 'none',

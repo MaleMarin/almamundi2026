@@ -728,6 +728,18 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
         </>
       )}
 
+      <p
+        style={{
+          fontSize: 12,
+          color: '#9299a8',
+          textAlign: 'center',
+          marginTop: 12,
+          marginBottom: 0,
+          fontFamily: neu.APP_FONT,
+        }}
+      >
+        Tu historia pasará por revisión editorial antes de publicarse.
+      </p>
       <button
         type="button"
         onClick={handleContinue}
