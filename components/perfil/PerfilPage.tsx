@@ -8,6 +8,7 @@ import type { StoryData } from '@/lib/story-schema';
 import { MuestraCard } from './MuestraCard';
 import { GuardadasGrid } from './GuardadasGrid';
 import { NuevaMuestraModal } from './NuevaMuestraModal';
+import { EliminarCuentaModal } from './EliminarCuentaModal';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const BG = '#e8ecf0';
@@ -38,6 +39,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
   const [editingFrase, setEditingFrase] = useState(false);
   const [fraseInput, setFraseInput] = useState(perfil.frase ?? '');
   const [modalOpen, setModalOpen] = useState(false);
+  const [showEliminar, setShowEliminar] = useState(false);
 
   useEffect(() => {
     setMuestras(initialMuestras);
@@ -497,6 +499,60 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
         autorId={perfil.uid}
         autorNombre={perfil.nombre}
       />
+
+      {isOwner && (
+        <>
+          <div
+            style={{
+              borderTop: '1px solid rgba(0,0,0,0.08)',
+              marginTop: 48,
+              paddingTop: 32,
+              marginLeft: '1.2rem',
+              marginRight: '1.2rem',
+            }}
+          >
+            <p
+              style={{
+                fontSize: 11,
+                letterSpacing: '0.18em',
+                textTransform: 'uppercase',
+                color: '#C62828',
+                marginBottom: 12,
+                marginTop: 0,
+              }}
+            >
+              Zona de peligro
+            </p>
+            <p
+              style={{
+                fontSize: 14,
+                color: '#9299a8',
+                marginBottom: 20,
+                marginTop: 0,
+              }}
+            >
+              Una vez que se elimine la cuenta, no hay vuelta atrás.
+            </p>
+            <button
+              type="button"
+              onClick={() => setShowEliminar(true)}
+              style={{
+                background: 'transparent',
+                border: '1.5px solid #C62828',
+                color: '#C62828',
+                borderRadius: 100,
+                padding: '10px 24px',
+                fontSize: 12,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              Eliminar mi cuenta
+            </button>
+          </div>
+          {showEliminar && <EliminarCuentaModal onClose={() => setShowEliminar(false)} />}
+        </>
+      )}
     </div>
   );
 }

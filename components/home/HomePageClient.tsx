@@ -17,6 +17,7 @@ import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/
  */
 export function HomePageClient() {
   const router = useRouter();
+  const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
   const [chosenTopic, setChosenTopic] = useState<ChosenInspirationTopic | null>(null);
@@ -25,6 +26,20 @@ export function HomePageClient() {
   useEffect(() => {
     router.refresh();
   }, [router]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const u = new URL(window.location.href);
+    if (u.searchParams.get('cuenta') !== 'eliminada') return;
+    queueMicrotask(() => setCuentaEliminadaToast(true));
+    const t = window.setTimeout(() => {
+      setCuentaEliminadaToast(false);
+      u.searchParams.delete('cuenta');
+      const q = u.searchParams.toString();
+      window.history.replaceState({}, '', q ? `${u.pathname}?${q}` : u.pathname);
+    }, 4000);
+    return () => window.clearTimeout(t);
+  }, []);
 
   const closeComoFunciona = useCallback(() => {
     setComoFuncionaOpen(false);
@@ -59,6 +74,29 @@ export function HomePageClient() {
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+      {cuentaEliminadaToast ? (
+        <div
+          role="status"
+          style={{
+            position: 'fixed',
+            top: 16,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 9999,
+            padding: '10px 18px',
+            borderRadius: 12,
+            background: 'rgba(255, 140, 90, 0.22)',
+            border: '1px solid rgba(255, 107, 43, 0.35)',
+            color: '#7c2d12',
+            fontSize: 13,
+            maxWidth: 'min(420px, calc(100vw - 32px))',
+            textAlign: 'center',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
+          }}
+        >
+          Tu cuenta ha sido eliminada. Hasta pronto.
+        </div>
+      ) : null}
       {/* Ancla para enlaces /#como-funciona desde todo el sitio */}
       <div id="como-funciona" className="sr-only" aria-hidden>
         Cómo funciona AlmaMundi

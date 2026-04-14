@@ -58,3 +58,14 @@ export function removeFromCollection(kind: CollectionKind, id: string): void {
 export function isInCollection(kind: CollectionKind, id: string): boolean {
   return getCollection().some((i) => i.kind === kind && i.id === id);
 }
+
+/** Vacía la colección guardada en localStorage (p. ej. al eliminar cuenta). */
+export function clearSavedCollection(): void {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.removeItem(STORAGE_KEY);
+    window.dispatchEvent(new CustomEvent('almamundi-collection-updated'));
+  } catch {
+    /* ignore */
+  }
+}
