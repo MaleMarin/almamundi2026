@@ -1,4 +1,9 @@
 import { NextResponse } from "next/server";
+import {
+  MAX_DESCRIPCION,
+  MAX_TITULO,
+  stripHtml,
+} from "@/lib/api/input-validation";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { randomUUID } from "crypto";
 import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
@@ -16,6 +21,7 @@ const MAX_BYTES = 8 * 1024 * 1024;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(req: Request) {
+  // TODO: verificar token con Firebase Admin en v2
   const ip = clientIpFromRequest(req);
   const rl = getRateLimiter("submissions-upload-dup", 20, 3600);
   const blocked = await enforceRateLimit(rl, `upload:${ip}`, {
@@ -36,11 +42,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "captcha_required" }, { status: 400 });
     }
 
-    const alias = String(form.get("alias") || "").trim();
-    const email = String(form.get("email") || "").trim();
-    const topic = String(form.get("topic") || "").trim();
-    const context = String(form.get("context") || "").trim();
-    const dateTaken = String(form.get("dateTaken") || "").trim();
+    const alias = stripHtml(String(form.get("alias") || "")).slice(0, 120).trim();
+    const email = String(form.get("email") || "").trim().slice(0, 254);
+    const topic = stripHtml(String(form.get("topic") || ""))
+      .slice(0, MAX_TITULO)
+      .trim();
+    const context = stripHtml(String(form.get("context") || ""))
+      .slice(0, MAX_DESCRIPCION)
+      .trim();
+    const dateTaken = stripHtml(String(form.get("dateTaken") || ""))
+      .slice(0, 80)
+      .trim();
 
     const file = form.get("file");
     if (!alias) return NextResponse.json({ error: "alias_required" }, { status: 400 });

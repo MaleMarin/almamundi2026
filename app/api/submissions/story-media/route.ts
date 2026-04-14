@@ -26,6 +26,7 @@ function maxBytesForMime(mime: string): number {
 
 /** POST multipart: file (+ opcional cf-turnstile-response). Subida privada server-side. */
 export async function POST(req: NextRequest) {
+  // TODO: verificar token con Firebase Admin en v2
   const ip = clientIpFromRequest(req);
   const rl = getRateLimiter("story-media", 40, 3600);
   const blocked = await enforceRateLimit(rl, `story-media:${ip}`, {

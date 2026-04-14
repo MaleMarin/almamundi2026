@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
+import {
+  isValidMediaUrl,
+  MAX_DESCRIPCION,
+  MAX_TEXTO,
+  MAX_TITULO,
+  stripHtml,
+} from "@/lib/api/input-validation";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { StorySubmission, StoryFormat, StoryMood, Consent } from "@/lib/firebase/types";
 import { analyzeStory } from "@/lib/huella/analyze";
@@ -37,6 +44,7 @@ function validConsent(c: unknown): c is Consent {
 
 /** POST /api/submit — crear story_submission (envío desde formulario). */
 export async function POST(request: NextRequest) {
+  // TODO: verificar token con Firebase Admin en v2
   const ip = clientIpFromRequest(request);
   const rl = getRateLimiter("submit-story", 5, 3600);
   const blocked = await enforceRateLimit(rl, `submit:${ip}`, {
@@ -61,17 +69,32 @@ export async function POST(request: NextRequest) {
   }
 
   const authorEmail = typeof body.authorEmail === "string" ? body.authorEmail.trim() : "";
-  const authorName = typeof body.authorName === "string" ? body.authorName.trim() : undefined;
-  const title = typeof body.title === "string" ? body.title.trim() : "";
-  const placeLabel = typeof body.placeLabel === "string" ? body.placeLabel.trim() : "";
+  const authorNameRaw = typeof body.authorName === "string" ? body.authorName : "";
+  const authorNameSan = authorNameRaw
+    ? stripHtml(authorNameRaw).slice(0, 120).trim()
+    : "";
+  const authorName = authorNameSan || undefined;
+  const title = stripHtml(
+    typeof body.title === "string" ? body.title : ""
+  ).slice(0, MAX_TITULO);
+  const placeLabel = stripHtml(
+    typeof body.placeLabel === "string" ? body.placeLabel : ""
+  ).slice(0, MAX_DESCRIPCION);
   const lat = typeof body.lat === "number" ? body.lat : Number(body.lat);
   const lng = typeof body.lng === "number" ? body.lng : Number(body.lng);
   const format = FORMATS.includes(body.format as StoryFormat) ? (body.format as StoryFormat) : "text";
-  const text = typeof body.text === "string" ? body.text.trim() : undefined;
+  const textRaw = typeof body.text === "string" ? body.text : "";
+  const text = textRaw.trim()
+    ? stripHtml(textRaw).slice(0, MAX_TEXTO)
+    : undefined;
   const tags = body.tags as Record<string, unknown> | undefined;
   const consent = body.consent;
 
-  if (!authorEmail || !title || !placeLabel || Number.isNaN(lat) || Number.isNaN(lng)) {
+  if (!title) {
+    return NextResponse.json({ error: "El título es obligatorio" }, { status: 400 });
+  }
+
+  if (!authorEmail || !placeLabel || Number.isNaN(lat) || Number.isNaN(lng)) {
     return NextResponse.json(
       { error: "Missing or invalid: authorEmail, title, placeLabel, lat, lng" },
       { status: 400 }
@@ -84,17 +107,43 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const themes = Array.isArray(tags?.themes) ? tags.themes.filter((t: unknown) => typeof t === "string") : [];
-  const moods = Array.isArray(tags?.moods) ? tags.moods.filter((m: unknown) => MOODS.includes(m as StoryMood)) : [];
-  const keywords = Array.isArray(tags?.keywords) ? tags.keywords.filter((k: unknown) => typeof k === "string") : [];
+  const themes = Array.isArray(tags?.themes)
+    ? tags.themes
+        .filter((t: unknown) => typeof t === "string")
+        .map((t) => stripHtml(t as string).slice(0, 80).trim())
+        .filter(Boolean)
+    : [];
+  const moods = Array.isArray(tags?.moods)
+    ? tags.moods.filter((m: unknown) => MOODS.includes(m as StoryMood))
+    : [];
+  const keywords = Array.isArray(tags?.keywords)
+    ? tags.keywords
+        .filter((k: unknown) => typeof k === "string")
+        .map((k) => stripHtml(k as string).slice(0, 80).trim())
+        .filter(Boolean)
+    : [];
 
   const media: StorySubmission["media"] = {};
   if (typeof body.media === "object" && body.media !== null) {
     const m = body.media as Record<string, unknown>;
-    if (typeof m.audioUrl === "string") media.audioUrl = m.audioUrl;
-    if (typeof m.videoUrl === "string") media.videoUrl = m.videoUrl;
-    if (typeof m.coverImageUrl === "string") media.coverImageUrl = m.coverImageUrl;
-    if (typeof m.imageUrl === "string") media.imageUrl = m.imageUrl;
+    if (typeof m.audioUrl === "string") media.audioUrl = m.audioUrl.trim();
+    if (typeof m.videoUrl === "string") media.videoUrl = m.videoUrl.trim();
+    if (typeof m.coverImageUrl === "string")
+      media.coverImageUrl = m.coverImageUrl.trim();
+    if (typeof m.imageUrl === "string") media.imageUrl = m.imageUrl.trim();
+  }
+
+  if (media.audioUrl && !isValidMediaUrl(media.audioUrl)) {
+    return NextResponse.json({ error: "URL de audio no permitida" }, { status: 400 });
+  }
+  if (media.videoUrl && !isValidMediaUrl(media.videoUrl)) {
+    return NextResponse.json({ error: "URL de video no permitida" }, { status: 400 });
+  }
+  if (media.imageUrl && !isValidMediaUrl(media.imageUrl)) {
+    return NextResponse.json({ error: "URL de imagen no permitida" }, { status: 400 });
+  }
+  if (media.coverImageUrl && !isValidMediaUrl(media.coverImageUrl)) {
+    return NextResponse.json({ error: "URL de imagen no permitida" }, { status: 400 });
   }
 
   const now = FieldValue.serverTimestamp();
