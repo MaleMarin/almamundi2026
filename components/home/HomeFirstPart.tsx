@@ -67,25 +67,25 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[340px] flex-1 flex-col sm:max-w-[360px] md:max-w-[min(100%,380px)]"
+      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-1 flex-col sm:max-w-[492px] md:max-w-[512px]"
       style={{ animationDelay: delay }}
     >
       <div
         role="article"
-        className="home-neu-card home-historias-card-surface group relative flex min-h-[240px] w-full flex-1 flex-col items-start rounded-[28px] p-5 sm:min-h-[260px] md:min-h-[270px] md:p-6 lg:min-h-[280px]"
+        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-1 flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
-        <div className="mb-2 shrink-0 md:mb-3">
-          <p className="text-[0.95rem] font-light text-gray-500 leading-tight m-0 sm:text-[1rem] md:text-[1.05rem]">
+        <div className="mb-6 shrink-0 md:mb-7">
+          <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
             {title}
           </p>
-          <h2 className="mt-0.5 text-[1.15rem] font-bold leading-tight text-gray-700 sm:text-[1.2rem] md:text-lg lg:text-xl">
+          <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
             {subtitle}
           </h2>
         </div>
-        <div className="flex-1 min-h-[12px] w-full md:min-h-[16px]" />
+        <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
         <div className="w-full mt-auto">
-          <p className="mb-2 text-[0.85rem] leading-snug text-gray-500 sm:text-[0.88rem] md:mb-3 md:text-[0.92rem]">
+          <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
             {children}
           </p>
           <button
@@ -96,8 +96,8 @@ function SoftCard({
               color: 'white',
               border: 'none',
               borderRadius: '100px',
-              padding: '12px 18px',
-              fontSize: '12px',
+              padding: '14px 22px',
+              fontSize: '13px',
               fontWeight: 700,
               letterSpacing: '0.1em',
               fontFamily: APP_FONT,
@@ -120,7 +120,7 @@ export type HomeFirstPartProps = {
   onRecordVideo: () => void;
   onRecordAudio: () => void;
   onWriteStory: () => void;
-  /** Reservado por la home (p. ej. educación mediática); la cuarta card usa /subir/foto. */
+  /** Reservado por la API de la home; la cuarta card usa /subir/foto. */
   onMediaEducation: () => void;
   /** Historias: ancla #historias. Mapa: sección del mapa en la home `/#mapa`. */
   basePath?: string;
@@ -240,18 +240,18 @@ export function HomeFirstPart({
         ) : null}
       </header>
 
-      {/* INTRO + #historias: hero compacto; cards dentro del mismo bloque */}
+      {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-10 flex min-h-0 flex-col items-center pb-6 pt-40 text-center sm:pt-44 md:pb-8 md:pt-48 lg:pt-52 px-4 sm:px-6 md:px-10"
+        className="home-intro-avenir relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-6 lg:pt-80 pb-5 px-6 md:px-10"
       >
-        <div className="w-full max-w-4xl lg:max-w-5xl">
+        <div className="w-full max-w-5xl lg:max-w-6xl">
           <div className="home-first-part-float relative">
             <h1
-              className="mb-2 font-light leading-[1.2] md:mb-3"
+              className="mb-5 font-light leading-[1.12] md:mb-6"
               style={{
                 color: soft.textMain,
-                fontSize: 'clamp(1.35rem, 2.8vw, 1.95rem)',
+                fontSize: '50px',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -259,11 +259,11 @@ export function HomeFirstPart({
               <span className="font-extrabold">{t.heroBold}</span>
             </h1>
             <svg
-              width="300"
-              height="10"
+              width="360"
+              height="12"
               viewBox="0 0 360 12"
-              className="mx-auto block max-w-[min(100%,300px)]"
-              style={{ margin: '8px auto 8px' }}
+              className="mx-auto block"
+              style={{ margin: '14px auto 14px' }}
               aria-hidden="true"
             >
               <path
@@ -281,7 +281,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-3xl pt-1 font-light leading-[1.45] text-base tracking-wide md:pt-2 md:text-lg"
+              className="mx-auto max-w-4xl pt-4 font-light leading-[1.65] md:pt-6 text-xl tracking-wide md:text-2xl lg:pt-7 lg:text-3xl"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
@@ -289,12 +289,14 @@ export function HomeFirstPart({
             </p>
           </div>
         </div>
+      </section>
 
-        <section
-          id="historias"
-          aria-label="Formatos para compartir tu historia"
-          className="relative z-10 mb-4 mt-3 grid w-full max-w-[1400px] grid-cols-1 content-start items-stretch gap-x-4 gap-y-4 px-2 pb-4 pt-1 text-left sm:grid-cols-2 sm:px-4 sm:gap-x-5 sm:gap-y-5 md:mb-6 md:mt-4 md:gap-x-6 md:px-6 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-5 lg:px-8"
-        >
+      {/* CARDS — un poco más arriba respecto al hero; flotación en globals (.home-historias-card-float-wrap) */}
+      <section
+        id="historias"
+        aria-label="Formatos para compartir tu historia"
+        className="relative z-10 -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
+      >
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
@@ -337,7 +339,6 @@ export function HomeFirstPart({
         >
           A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>
-        </section>
       </section>
     </>
   );
