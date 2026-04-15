@@ -67,25 +67,25 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[400px] flex-1 flex-col sm:max-w-[420px] md:max-w-[440px]"
+      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[340px] flex-1 flex-col sm:max-w-[360px] md:max-w-[min(100%,380px)]"
       style={{ animationDelay: delay }}
     >
       <div
         role="article"
-        className="home-neu-card home-historias-card-surface group relative flex min-h-[380px] w-full flex-1 flex-col items-start rounded-[32px] p-7 sm:min-h-[400px] md:min-h-[420px] md:p-9"
+        className="home-neu-card home-historias-card-surface group relative flex min-h-[240px] w-full flex-1 flex-col items-start rounded-[28px] p-5 sm:min-h-[260px] md:min-h-[270px] md:p-6 lg:min-h-[280px]"
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
-        <div className="mb-4 shrink-0 md:mb-5">
-          <p className="text-[1.1rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.05rem] md:text-[1.2rem]">
+        <div className="mb-2 shrink-0 md:mb-3">
+          <p className="text-[0.95rem] font-light text-gray-500 leading-tight m-0 sm:text-[1rem] md:text-[1.05rem]">
             {title}
           </p>
-          <h2 className="mt-0.5 text-[1.35rem] font-bold leading-tight text-gray-700 sm:text-[1.45rem] md:text-xl lg:text-2xl">
+          <h2 className="mt-0.5 text-[1.15rem] font-bold leading-tight text-gray-700 sm:text-[1.2rem] md:text-lg lg:text-xl">
             {subtitle}
           </h2>
         </div>
-        <div className="flex-1 min-h-[36px] w-full md:min-h-[40px]" />
+        <div className="flex-1 min-h-[12px] w-full md:min-h-[16px]" />
         <div className="w-full mt-auto">
-          <p className="mb-4 text-[0.98rem] leading-relaxed text-gray-500 sm:text-[0.95rem] md:mb-5 md:text-base">
+          <p className="mb-2 text-[0.85rem] leading-snug text-gray-500 sm:text-[0.88rem] md:mb-3 md:text-[0.92rem]">
             {children}
           </p>
           <button
@@ -243,15 +243,15 @@ export function HomeFirstPart({
       {/* INTRO + #historias: hero compacto; cards dentro del mismo bloque */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-10 flex flex-col items-center pb-8 pt-44 text-center sm:pt-48 md:pb-10 md:pt-52 lg:pt-56 px-6 md:px-10"
+        className="home-intro-avenir relative z-10 flex min-h-0 flex-col items-center pb-6 pt-40 text-center sm:pt-44 md:pb-8 md:pt-48 lg:pt-52 px-4 sm:px-6 md:px-10"
       >
-        <div className="w-full max-w-5xl lg:max-w-6xl">
+        <div className="w-full max-w-4xl lg:max-w-5xl">
           <div className="home-first-part-float relative">
             <h1
-              className="mb-3 font-light leading-[1.15] md:mb-4"
+              className="mb-2 font-light leading-[1.2] md:mb-3"
               style={{
                 color: soft.textMain,
-                fontSize: 'clamp(1.65rem, 4.2vw, 2.35rem)',
+                fontSize: 'clamp(1.35rem, 2.8vw, 1.95rem)',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -281,7 +281,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-4xl pt-2 font-light leading-[1.55] text-lg tracking-wide md:pt-3 md:text-xl lg:text-2xl"
+              className="mx-auto max-w-3xl pt-1 font-light leading-[1.45] text-base tracking-wide md:pt-2 md:text-lg"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
@@ -293,7 +293,7 @@ export function HomeFirstPart({
         <section
           id="historias"
           aria-label="Formatos para compartir tu historia"
-          className="relative z-10 mb-6 mt-5 flex w-full max-w-[1600px] flex-col flex-wrap items-stretch justify-center gap-x-6 gap-y-8 px-3 pb-6 pt-2 text-left sm:px-5 md:mb-8 md:flex-row md:gap-x-8 md:gap-y-9 md:px-8 md:pb-8 md:pt-4 lg:gap-x-10 lg:px-12"
+          className="relative z-10 mb-4 mt-3 grid w-full max-w-[1400px] grid-cols-1 content-start items-stretch gap-x-4 gap-y-4 px-2 pb-4 pt-1 text-left sm:grid-cols-2 sm:px-4 sm:gap-x-5 sm:gap-y-5 md:mb-6 md:mt-4 md:gap-x-6 md:px-6 lg:grid-cols-4 lg:gap-x-5 lg:gap-y-5 lg:px-8"
         >
         <SoftCard
           title={t.cardVideoTitle}
