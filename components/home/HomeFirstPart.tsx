@@ -67,7 +67,7 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[450px] rounded-[40px] p-8 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
+      className="relative w-full max-w-[400px] min-h-[380px] rounded-[40px] p-6 md:p-7 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
       <div className="mb-5 shrink-0 min-w-0">
@@ -78,7 +78,7 @@ function SoftCard({
           {subtitle}
         </h2>
       </div>
-      <div className="flex-1 min-h-[80px] w-full" />
+      <div className="flex-1 min-h-[48px] w-full md:min-h-[56px]" />
       <p className="text-gray-500 leading-relaxed text-sm md:text-base mb-6 min-w-0">
         {children}
       </p>
@@ -230,12 +230,12 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-10 flex flex-col items-center pt-52 text-center sm:pt-56 md:pt-64 md:pb-6 lg:pt-80 pb-5 px-6 md:px-10"
+        className="home-intro-avenir relative z-10 flex flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:px-10 md:pb-6 md:pt-52 lg:pt-60 lg:pb-6"
       >
-        <div className="w-full max-w-5xl lg:max-w-6xl">
+        <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mb-5 max-w-[min(100%,42rem)] font-light leading-[1.12] md:mb-6 text-[clamp(1.625rem,2.8vw+0.6rem,3.125rem)]"
+              className="mx-auto mb-4 max-w-[min(100%,36rem)] font-light leading-[1.15] md:mb-5 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
               style={{
                 color: soft.textMain,
                 letterSpacing: '-0.02em',
@@ -248,8 +248,8 @@ export function HomeFirstPart({
               width="360"
               height="12"
               viewBox="0 0 360 12"
-              className="mx-auto block"
-              style={{ margin: '14px auto 14px' }}
+              className="mx-auto block w-[min(100%,280px)] max-w-full"
+              style={{ margin: '10px auto 10px' }}
               aria-hidden="true"
             >
               <path
@@ -267,7 +267,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-4xl pt-4 font-light leading-[1.65] md:pt-6 text-lg tracking-wide md:text-xl lg:pt-7 lg:text-2xl"
+              className="mx-auto max-w-[min(100%,34rem)] pt-3 font-light leading-[1.6] tracking-wide text-base md:pt-5 md:text-lg lg:text-xl"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
@@ -281,9 +281,9 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-5 mb-10 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:px-12 md:pb-16 md:pt-12 lg:px-16 lg:pt-14"
+        className="relative z-[18] -mt-3 mb-8 px-4 pb-10 pt-4 sm:px-8 md:-mt-5 md:mb-12 md:px-12 md:pb-12 md:pt-8 lg:px-14 lg:pt-10"
       >
-        <div className="mx-auto grid w-full max-w-[min(100%,1400px)] grid-cols-1 gap-y-12 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-0 xl:gap-x-8 2xl:gap-x-10">
+        <div className="mx-auto grid w-full max-w-[min(100%,1200px)] grid-cols-1 gap-y-8 lg:grid-cols-4 lg:gap-x-4 lg:gap-y-0 xl:gap-x-6">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
