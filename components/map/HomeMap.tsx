@@ -58,7 +58,6 @@ import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { NewsPanel } from '@/components/map/panels/NewsPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel, type BitLike } from '@/components/map/panels/BitsPanel';
-import NewsStrip from '@/components/news/NewsStrip';
 import { isPublicAudioMoodId, publicAudioPathFromMoodId } from '@/lib/public-audio-mood';
 import {
   initFromUserGesture,
@@ -417,11 +416,11 @@ export default function HomeMap() {
   /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
   const TIME_STRIP_HEIGHT = 128;
   return (
-    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col">
+    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-visible">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
       <div
         ref={globeContainerRef}
-        className="relative flex min-h-0 w-full flex-1 flex-col"
+        className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-visible"
         onPointerDownCapture={() => {
           if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
           initFromUserGesture();
@@ -431,8 +430,8 @@ export default function HomeMap() {
         }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-black pt-8 pb-2">
-          <div className="relative min-h-[300px] w-full min-h-0 flex-1">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-black pt-8 pb-2 md:pt-10 lg:pt-12">
+          <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded
               forceDaylight={false}
@@ -519,13 +518,6 @@ export default function HomeMap() {
           )}
       </MapDrawer>
       </div>
-
-      {/* Noticias en vivo: franja lateral solo con el panel de noticias abierto (desktop). */}
-      {drawerOpen && drawerMode === 'news' ? (
-        <div className="hidden h-full min-h-0 shrink-0 lg:flex">
-          <NewsStrip />
-        </div>
-      ) : null}
     </div>
   );
 }

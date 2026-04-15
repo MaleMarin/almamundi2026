@@ -295,7 +295,7 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-10 -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
+        className="relative z-[18] -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
       >
         <SoftCard
           title={t.cardVideoTitle}

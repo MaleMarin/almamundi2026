@@ -122,9 +122,9 @@ const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as con
 /** Inclinación orbital lunar en home (más barrido vertical en encuadre cinematográfico). */
 const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 7.85;
 
-/** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). */
-const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.24, 0.34, 0];
-const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.085, -0.16, 0];
+/** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
+const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];
+const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.06, -0.07, 0];
 
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
@@ -818,7 +818,7 @@ function GlobeScene({
   pauseEarthSpinForUi: boolean;
 }) {
   const geoScale = embedded ? GLOBE_V2_EMBEDDED_GEO_SCALE : 1;
-  const camDist = embedded ? 3.5 : 3.14;
+  const camDist = embedded ? 3.62 : 3.14;
   const lockView = fixedCameraPreset != null;
   const planetSpinRef = useRef<THREE.Group>(null);
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
@@ -1130,12 +1130,12 @@ export default function GlobeV2({
     typeof window !== 'undefined' ? Math.min(window.devicePixelRatio, embedded ? 1.65 : 2.2) : 2;
 
   /* Embebido: cámara más cerca para disco mayor en home (coherente con `camDist` en GlobeScene). */
-  const camZ = embedded ? 3.5 : 3.14;
+  const camZ = embedded ? 3.62 : 3.14;
 
   const wrapperClass =
     className ??
     (embedded
-      ? 'relative z-0 h-full w-full min-h-[50vh] flex-1 overflow-hidden [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none'
+      ? 'relative z-0 h-full w-full min-h-[50vh] flex-1 overflow-visible max-w-full [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none'
       : 'fixed inset-0 z-0 h-[100dvh] w-full min-h-0 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none');
 
   const embeddedDayChrome = embedded && forceDaylightOn && className == null;
