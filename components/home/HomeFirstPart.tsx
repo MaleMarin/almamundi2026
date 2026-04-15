@@ -67,47 +67,42 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-1 flex-col sm:max-w-[492px] md:max-w-[512px]"
-      style={{ animationDelay: delay }}
+      role="article"
+      className="home-first-part-float home-neu-card group relative flex min-h-[500px] w-full max-w-[472px] flex-1 flex-col items-start rounded-[40px] p-10 transition-all duration-500 hover:-translate-y-2 sm:min-h-[528px] sm:max-w-[492px] md:min-h-[560px] md:max-w-[512px] md:p-12"
+      style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div
-        role="article"
-        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-1 flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
-        style={{ ...soft.flat, fontFamily: APP_FONT }}
-      >
-        <div className="mb-6 shrink-0 md:mb-7">
-          <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
-            {title}
-          </p>
-          <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
-            {subtitle}
-          </h2>
-        </div>
-        <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
-        <div className="w-full mt-auto">
-          <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
-            {children}
-          </p>
-          <button
-            onClick={onClick}
-            className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
-            style={{
-              background: '#FF4A1C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '100px',
-              padding: '14px 22px',
-              fontSize: '13px',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              fontFamily: APP_FONT,
-              transition: 'opacity 0.2s',
-            }}
-            type="button"
-          >
-            {buttonLabel}
-          </button>
-        </div>
+      <div className="mb-6 shrink-0 md:mb-7">
+        <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
+          {title}
+        </p>
+        <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
+          {subtitle}
+        </h2>
+      </div>
+      <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
+      <div className="w-full mt-auto">
+        <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
+          {children}
+        </p>
+        <button
+          onClick={onClick}
+          className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
+          style={{
+            background: '#FF4A1C',
+            color: 'white',
+            border: 'none',
+            borderRadius: '100px',
+            padding: '14px 22px',
+            fontSize: '13px',
+            fontWeight: 700,
+            letterSpacing: '0.1em',
+            fontFamily: APP_FONT,
+            transition: 'opacity 0.2s',
+          }}
+          type="button"
+        >
+          {buttonLabel}
+        </button>
       </div>
     </div>
   );
