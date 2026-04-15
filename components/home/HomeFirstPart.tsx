@@ -67,7 +67,7 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-col sm:max-w-[492px] md:max-w-[512px]"
+      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] shrink-0 flex-col sm:max-w-[492px] md:max-w-[512px]"
       style={{ animationDelay: delay }}
     >
       <div
@@ -291,12 +291,13 @@ export function HomeFirstPart({
         </div>
       </section>
 
-      {/* CARDS — un poco más arriba respecto al hero; flotación en globals (.home-historias-card-float-wrap) */}
+      {/* CARDS — grupo centrado con ancho máximo: evita columnas al 50% del viewport (hueco enorme entre cards). */}
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-5 mb-10 grid w-full grid-cols-1 justify-items-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:grid-cols-2 md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14 min-[2200px]:mx-auto min-[2200px]:max-w-[2240px] min-[2200px]:grid-cols-4 min-[2200px]:gap-x-12"
+        className="relative z-[18] -mt-5 mb-10 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:px-12 md:pb-16 md:pt-12 lg:px-16 lg:pt-14"
       >
+        <div className="mx-auto flex w-full max-w-[1120px] flex-wrap justify-center gap-x-8 gap-y-12 sm:gap-x-9 md:gap-x-11 md:gap-y-14 lg:gap-x-16">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
@@ -339,6 +340,7 @@ export function HomeFirstPart({
         >
           A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>
+        </div>
       </section>
     </>
   );
