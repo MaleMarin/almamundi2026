@@ -33,8 +33,8 @@ export const metadata: Metadata = {
   title: "AlmaMundi",
   description: "Explora el mapa",
   icons: {
-    icon: [{ url: "/martemis.png", type: "image/png", sizes: "32x32" }],
-    apple: [{ url: "/martemis.png", sizes: "180x180" }],
+    icon: [{ url: "/artemis.ico", sizes: "48x48" }],
+    apple: [{ url: "/artemis.ico", sizes: "180x180" }],
   },
 };
 
