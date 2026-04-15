@@ -13,7 +13,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
- * LOCK diseño: tarjetas neumórficas E0E5EC; tamaño desktop ampliado por petición explícita (~512×560px).
+ * LOCK diseño: tarjetas neumórficas E0E5EC; SoftCard tamaño marzo 2026 (max-w 400px, min-h 450px).
  */
 
 const APP_FONT = SITE_FONT_STACK;
@@ -67,48 +67,35 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full min-w-0 flex-col"
-      style={{ animationDelay: delay }}
+      className="relative w-full max-w-[400px] min-h-[450px] flex-1 rounded-[40px] p-8 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface"
+      style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div
-        role="article"
-        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
-        style={{ ...soft.flat, fontFamily: APP_FONT }}
-      >
-        <div className="mb-6 shrink-0 md:mb-7">
-          <p className="text-[1.45rem] font-light text-gray-500 leading-tight m-0 sm:text-[1.35rem] md:text-[1.65rem]">
-            {title}
-          </p>
-          <h2 className="mt-1 text-[1.65rem] font-bold leading-tight text-gray-700 sm:text-[1.8rem] md:text-3xl lg:text-[2.15rem]">
-            {subtitle}
-          </h2>
-        </div>
-        <div className="flex-1 min-h-[80px] w-full md:min-h-[88px]" />
-        <div className="w-full mt-auto">
-          <p className="mb-5 text-[1.08rem] leading-relaxed text-gray-500 sm:text-[1.05rem] md:mb-7 md:text-lg lg:text-xl">
-            {children}
-          </p>
-          <button
-            onClick={onClick}
-            className="w-full flex cursor-pointer justify-center uppercase transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
-            style={{
-              background: '#FF4A1C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '100px',
-              padding: '14px 22px',
-              fontSize: '13px',
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              fontFamily: APP_FONT,
-              transition: 'opacity 0.2s',
-            }}
-            type="button"
-          >
-            {buttonLabel}
-          </button>
-        </div>
+      <div className="mb-5 shrink-0">
+        <p className="text-xl md:text-2xl font-light text-gray-500 leading-tight">
+          {title}
+        </p>
+        <h2 className="text-2xl md:text-3xl font-bold text-gray-700 leading-tight mt-1">
+          {subtitle}
+        </h2>
       </div>
+      <div className="flex-1 min-h-[80px] w-full" />
+      <p className="text-gray-500 leading-relaxed text-base md:text-lg mb-6">
+        {children}
+      </p>
+      <button
+        type="button"
+        onClick={onClick}
+        className="w-full flex cursor-pointer justify-center uppercase px-8 py-4 md:py-5 text-sm font-bold transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
+        style={{
+          background: '#FF4A1C',
+          color: 'white',
+          border: 'none',
+          borderRadius: '100px',
+          fontFamily: APP_FONT,
+        }}
+      >
+        {buttonLabel}
+      </button>
     </div>
   );
 }
