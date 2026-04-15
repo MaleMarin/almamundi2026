@@ -284,7 +284,7 @@ export function HomeFirstPart({
         aria-label="Formatos para compartir tu historia"
         className="relative z-[18] -mt-5 mb-10 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:px-12 md:pb-16 md:pt-12 lg:px-16 lg:pt-14"
       >
-        <div className="mx-auto grid w-full max-w-[min(100%,2400px)] grid-cols-1 gap-y-12 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-0 xl:gap-x-8 2xl:gap-x-10">
+        <div className="mx-auto grid w-full max-w-[min(100%,1400px)] grid-cols-1 gap-y-12 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-0 xl:gap-x-8 2xl:gap-x-10">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
