@@ -67,19 +67,19 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[450px] flex-1 rounded-[40px] p-8 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface"
+      className="relative w-full max-w-[400px] min-h-[450px] rounded-[40px] p-8 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
       style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
     >
-      <div className="mb-5 shrink-0">
-        <p className="text-xl md:text-2xl font-light text-gray-500 leading-tight">
+      <div className="mb-5 shrink-0 min-w-0">
+        <p className="text-base md:text-lg font-light text-gray-500 leading-tight">
           {title}
         </p>
-        <h2 className="text-2xl md:text-3xl font-bold text-gray-700 leading-tight mt-1">
+        <h2 className="text-lg md:text-xl font-bold text-gray-700 leading-tight mt-1">
           {subtitle}
         </h2>
       </div>
       <div className="flex-1 min-h-[80px] w-full" />
-      <p className="text-gray-500 leading-relaxed text-base md:text-lg mb-6">
+      <p className="text-gray-500 leading-relaxed text-sm md:text-base mb-6 min-w-0">
         {children}
       </p>
       <button
@@ -235,10 +235,9 @@ export function HomeFirstPart({
         <div className="w-full max-w-5xl lg:max-w-6xl">
           <div className="home-first-part-float relative">
             <h1
-              className="mb-5 font-light leading-[1.12] md:mb-6"
+              className="mb-5 max-w-[min(100%,42rem)] font-light leading-[1.12] md:mb-6 text-[clamp(1.625rem,2.8vw+0.6rem,3.125rem)]"
               style={{
                 color: soft.textMain,
-                fontSize: '50px',
                 letterSpacing: '-0.02em',
               }}
             >
@@ -268,7 +267,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-4xl pt-4 font-light leading-[1.65] md:pt-6 text-xl tracking-wide md:text-2xl lg:pt-7 lg:text-3xl"
+              className="mx-auto max-w-4xl pt-4 font-light leading-[1.65] md:pt-6 text-lg tracking-wide md:text-xl lg:pt-7 lg:text-2xl"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
