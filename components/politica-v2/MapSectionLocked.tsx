@@ -15,7 +15,7 @@ export function MapSectionLocked() {
   return (
     <>
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
-      <section id="mapa" className="w-full scroll-mt-32 bg-[var(--home-bg)]">
+      <section id="mapa" className="w-full scroll-mt-20 bg-[var(--home-bg)]">
         <div className="map-section-gradient-block w-full">
           <h2
             className="mapa-almamundi-title text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none py-12 md:py-14"
