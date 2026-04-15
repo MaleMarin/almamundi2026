@@ -32,6 +32,10 @@ export const metadata: Metadata = {
   metadataBase: defaultMetadataBase(),
   title: "AlmaMundi",
   description: "Explora el mapa",
+  icons: {
+    icon: [{ url: "/martemis.png", type: "image/png", sizes: "32x32" }],
+    apple: [{ url: "/martemis.png", sizes: "180x180" }],
+  },
 };
 
 export default async function RootLayout({
