@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
@@ -119,7 +120,7 @@ export type HomeFirstPartProps = {
   onRecordVideo: () => void;
   onRecordAudio: () => void;
   onWriteStory: () => void;
-  /** Cuarta tarjeta: Educación mediática (ruta dedicada). */
+  /** Reservado por la home (p. ej. educación mediática); la cuarta card usa /subir/foto. */
   onMediaEducation: () => void;
   /** Historias: ancla #historias. Mapa: sección del mapa en la home `/#mapa`. */
   basePath?: string;
@@ -131,9 +132,10 @@ export function HomeFirstPart({
   onRecordVideo,
   onRecordAudio,
   onWriteStory,
-  onMediaEducation,
+  onMediaEducation: _onMediaEducation,
   basePath = ''
 }: HomeFirstPartProps) {
+  const router = useRouter();
   const { t } = useHomeLocale();
   const baseNorm = basePath.replace(/\/$/, '');
   const mapaHref = basePath ? (baseNorm ? `${baseNorm}#mapa` : '/#mapa') : '/#mapa';
@@ -292,7 +294,7 @@ export function HomeFirstPart({
       {/* CARDS — un poco más arriba respecto al hero; flotación en globals (.home-historias-card-float-wrap) */}
       <section
         id="historias"
-        aria-label="Formatos para compartir tu historia y educación mediática"
+        aria-label="Formatos para compartir tu historia"
         className="relative z-10 -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
       >
         <SoftCard
@@ -329,13 +331,13 @@ export function HomeFirstPart({
           {t.cardWriteAfter}
         </SoftCard>
         <SoftCard
-          title={t.cardPhotoTitle}
-          subtitle={t.cardPhotoSubtitle}
-          buttonLabel={t.cardPhotoCta}
-          onClick={onMediaEducation}
+          title="Tu mirada,"
+          subtitle="en una fotografía"
+          buttonLabel="SUBE UNA FOTO"
+          onClick={() => router.push('/subir/foto')}
           delay="0.6s"
         >
-          {t.cardPhotoBody}
+          A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>
       </section>
     </>
