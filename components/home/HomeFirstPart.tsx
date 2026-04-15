@@ -67,12 +67,12 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-1 flex-col sm:max-w-[492px] md:max-w-[512px]"
+      className="home-historias-card-float-wrap flex min-h-0 w-full max-w-[472px] flex-col sm:max-w-[492px] md:max-w-[512px]"
       style={{ animationDelay: delay }}
     >
       <div
         role="article"
-        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-1 flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
+        className="home-neu-card home-historias-card-surface group relative flex min-h-[500px] w-full flex-col items-start rounded-[40px] p-10 sm:min-h-[528px] md:min-h-[560px] md:p-12"
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
         <div className="mb-6 shrink-0 md:mb-7">
@@ -295,7 +295,7 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-5 mb-10 flex w-full flex-col flex-wrap items-stretch justify-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:flex-row md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14"
+        className="relative z-[18] -mt-5 mb-10 grid w-full grid-cols-1 justify-items-center gap-x-9 gap-y-12 px-4 pb-14 pt-6 sm:px-8 md:-mt-7 md:mb-14 md:grid-cols-2 md:gap-x-11 md:gap-y-14 md:px-12 md:pb-16 md:pt-12 lg:gap-x-16 lg:px-16 lg:pt-14 min-[2200px]:mx-auto min-[2200px]:max-w-[2240px] min-[2200px]:grid-cols-4 min-[2200px]:gap-x-12"
       >
         <SoftCard
           title={t.cardVideoTitle}
