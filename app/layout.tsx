@@ -13,28 +13,41 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
 function defaultMetadataBase(): URL {
-  const fromEnv = process.env.NEXT_PUBLIC_SITE_URL?.trim();
-  if (fromEnv) {
+  const candidates = [
+    process.env.NEXT_PUBLIC_SITE_URL?.trim(),
+    process.env.NEXT_PUBLIC_APP_URL?.trim(),
+    process.env.PUBLIC_SITE_URL?.trim(),
+  ].filter(Boolean) as string[];
+  for (const raw of candidates) {
     try {
-      return new URL(fromEnv.endsWith("/") ? fromEnv.slice(0, -1) : fromEnv);
+      const u = raw.endsWith('/') ? raw.slice(0, -1) : raw;
+      return new URL(u);
     } catch {
-      /* fall through */
+      /* siguiente */
     }
   }
   const vercel = process.env.VERCEL_URL?.trim();
   if (vercel) {
     return new URL(`https://${vercel}`);
   }
-  return new URL("http://localhost:3000");
+  return new URL('http://localhost:3000');
 }
 
 export const metadata: Metadata = {
   metadataBase: defaultMetadataBase(),
-  title: "AlmaMundi",
-  description: "Explora el mapa",
+  title: {
+    default: 'AlmaMundi',
+    template: '%s · AlmaMundi',
+  },
+  description: 'Explora el mapa',
+  /**
+   * `app/favicon.ico` lo sirve Next en `/favicon.ico`.
+   * Mantener `icons` explícito para pestaña, atajos y Apple (mismo recurso; iOS escala).
+   */
   icons: {
-    icon: [{ url: "/artemis.ico", sizes: "48x48" }],
-    apple: [{ url: "/artemis.ico", sizes: "180x180" }],
+    icon: [{ url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' }],
+    shortcut: ['/favicon.ico'],
+    apple: [{ url: '/favicon.ico' }],
   },
 };
 

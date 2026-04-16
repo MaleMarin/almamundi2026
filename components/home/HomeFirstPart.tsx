@@ -294,16 +294,6 @@ export function HomeFirstPart({
               {t.heroSubBefore}{' '}
               <span className="font-normal">{t.heroSubBold}</span>
             </p>
-            <p className="mx-auto mt-5 max-w-[min(100%,42rem)] md:mt-6">
-              <button
-                type="button"
-                onClick={onShowPurpose}
-                className="border-b border-[#4A5568]/25 bg-transparent text-sm font-normal underline decoration-[#4A5568]/35 underline-offset-[5px] transition hover:border-[#FF4A1C]/40 hover:decoration-[#FF4A1C]/50 md:text-base"
-                style={{ color: soft.textMain }}
-              >
-                {t.heroPurposeCta}
-              </button>
-            </p>
           </div>
         </div>
       </section>
