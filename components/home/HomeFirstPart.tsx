@@ -248,12 +248,12 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-10 flex flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:px-10 md:pb-6 md:pt-52 lg:pt-60 lg:pb-6"
+        className="home-intro-avenir relative z-[20] flex flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:px-10 md:pb-6 md:pt-52 lg:pt-60 lg:pb-6"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mx-auto mb-4 max-w-[min(100%,36rem)] font-light leading-[1.15] md:mb-5 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
+              className="mx-auto mb-4 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-5 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
               style={{
                 color: soft.textMain,
                 letterSpacing: '-0.02em',
@@ -285,7 +285,7 @@ export function HomeFirstPart({
               />
             </svg>
             <p
-              className="mx-auto max-w-[min(100%,34rem)] pt-3 font-light leading-[1.6] tracking-wide text-base md:pt-5 md:text-lg lg:text-xl"
+              className="mx-auto max-w-[min(100%,42rem)] pt-3 font-light leading-[1.6] tracking-wide text-base md:pt-5 md:text-lg lg:text-xl"
               style={{ color: soft.textBody }}
             >
               {t.heroSubBefore}{' '}
