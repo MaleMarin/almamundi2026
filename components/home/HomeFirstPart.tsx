@@ -71,30 +71,31 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[360px] rounded-[14px] p-6 md:p-7 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
+      className="home-neu-card home-historias-card-surface group relative mx-auto flex aspect-square w-full min-w-0 max-w-[min(100%,22rem)] flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-all duration-500 hover:-translate-y-2 sm:max-w-[24rem] md:p-5 lg:mx-0 lg:max-w-full"
       style={{
         ...soft.flat,
-        borderRadius: '14px',
+        borderRadius: '28px',
         animationDelay: delay,
         fontFamily: APP_FONT,
       }}
     >
-      <div className="mb-4 shrink-0 min-w-0">
-        <p className="text-lg font-light leading-snug text-gray-600 md:text-xl">
+      <div className="mb-2 shrink-0 min-w-0">
+        <p className="text-base font-light leading-snug text-gray-600 md:text-lg">
           {title}
         </p>
-        <h2 className="mt-1.5 text-xl font-bold leading-snug tracking-tight text-gray-800 md:text-2xl">
+        <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl">
           {subtitle}
         </h2>
       </div>
-      <div className="min-h-[40px] w-full flex-1 md:min-h-[44px]" />
-      <p className="mb-6 min-w-0 text-base font-normal leading-[1.65] text-gray-600 md:text-[1.0625rem]">
-        {children}
-      </p>
+      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0.5">
+        <p className="text-sm font-normal leading-[1.6] text-gray-600 md:text-[0.95rem] md:leading-[1.62]">
+          {children}
+        </p>
+      </div>
       <button
         type="button"
         onClick={onClick}
-        className="w-full flex cursor-pointer justify-center px-6 py-3.5 text-[13px] font-bold uppercase tracking-[0.08em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-8 md:py-4 md:text-sm"
+        className="mt-auto flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-4 md:py-3 md:text-xs"
         style={{
           background: '#FF4A1C',
           color: 'white',
