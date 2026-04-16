@@ -71,30 +71,30 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[360px] rounded-[22px] p-5 md:p-6 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
+      className="relative w-full max-w-[400px] min-h-[360px] rounded-[14px] p-6 md:p-7 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
       style={{
         ...soft.flat,
-        borderRadius: '22px',
+        borderRadius: '14px',
         animationDelay: delay,
         fontFamily: APP_FONT,
       }}
     >
-      <div className="mb-5 shrink-0 min-w-0">
-        <p className="text-base md:text-lg font-light text-gray-500 leading-tight">
+      <div className="mb-4 shrink-0 min-w-0">
+        <p className="text-lg font-light leading-snug text-gray-600 md:text-xl">
           {title}
         </p>
-        <h2 className="text-lg md:text-xl font-bold text-gray-700 leading-tight mt-1">
+        <h2 className="mt-1.5 text-xl font-bold leading-snug tracking-tight text-gray-800 md:text-2xl">
           {subtitle}
         </h2>
       </div>
-      <div className="flex-1 min-h-[48px] w-full md:min-h-[56px]" />
-      <p className="text-gray-500 leading-relaxed text-sm md:text-base mb-6 min-w-0">
+      <div className="min-h-[40px] w-full flex-1 md:min-h-[44px]" />
+      <p className="mb-6 min-w-0 text-base font-normal leading-[1.65] text-gray-600 md:text-[1.0625rem]">
         {children}
       </p>
       <button
         type="button"
         onClick={onClick}
-        className="w-full flex cursor-pointer justify-center uppercase px-8 py-4 md:py-5 text-sm font-bold transition-opacity hover:opacity-[0.85] active:scale-[0.98]"
+        className="w-full flex cursor-pointer justify-center px-6 py-3.5 text-[13px] font-bold uppercase tracking-[0.08em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-8 md:py-4 md:text-sm"
         style={{
           background: '#FF4A1C',
           color: 'white',
