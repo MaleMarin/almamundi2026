@@ -24,6 +24,10 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
 export const MAP_HOME_NEU_BUTTON_CLASS =
   'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
 
+/** Home header: píldoras algo más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
+export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =
+  'btn-almamundi home-map-neu-pill box-border flex h-[3.125rem] min-h-[3.125rem] max-h-[3.125rem] min-w-0 w-full max-w-none items-center justify-center px-4 py-0 text-center text-sm font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+
 /** Base común: max-width y gaps idénticos. Columnas con minmax(0,1fr) = mismo ancho por celda, sin auto-width por contenido. */
 export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-600 lg:gap-4';
 
@@ -33,6 +37,10 @@ export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-6
  */
 export const MAP_HOME_HEADER_NAV_CLASS =
   'hidden text-gray-600 md:grid md:ml-auto md:shrink-0 md:min-w-0 gap-3 lg:gap-4 md:w-[min(48rem,calc(100vw-14rem))] md:grid-cols-4 md:justify-items-stretch';
+
+/** Solo `HomeFirstPart`: rejilla algo más angosta y menos hueco entre píldoras (van con `COMPACT`). */
+export const MAP_HOME_HEADER_NAV_HOME_CLASS =
+  'hidden text-gray-600 md:grid md:ml-auto md:shrink-0 md:min-w-0 gap-2 md:gap-2 lg:gap-2.5 md:w-[min(40rem,calc(100vw-12rem))] md:grid-cols-4 md:justify-items-stretch';
 
 /** Dock: misma base que el header; ancho por contenido (max-content) y grupo centrado, no celdas 1fr estiradas. */
 export const MAP_HOME_DOCK_NAV_CLASS = `mx-auto ${MAP_HOME_PILL_ROW_LAYOUT} justify-center justify-items-stretch [grid-template-columns:repeat(1,minmax(0,1fr))] sm:[grid-template-columns:repeat(3,max-content)] lg:[grid-template-columns:repeat(5,max-content)] px-2 md:px-3`;

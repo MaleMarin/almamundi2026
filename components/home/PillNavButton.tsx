@@ -1,10 +1,16 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { MAP_HOME_NEU_BUTTON_CLASS, MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
+import {
+  MAP_HOME_NEU_BUTTON_CLASS,
+  MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
+  MAP_HOME_NEU_BUTTON_STYLE,
+} from '@/lib/map-home-neu-button';
 
 export type PillNavButtonProps = {
   children: ReactNode;
+  /** Home header: píldora un poco más pequeña (`MAP_HOME_NEU_BUTTON_CLASS_COMPACT`). */
+  compact?: boolean;
   /** Estado activo (dock): solo color/borde vía `.btn-almamundi[data-active]` */
   active?: boolean;
   /** Etiqueta larga en una sola línea: tipografía más compacta (misma caja que el resto). */
@@ -25,6 +31,7 @@ export type PillNavButtonProps = {
  */
 export function PillNavButton({
   children,
+  compact,
   active,
   longSingleLine,
   title,
@@ -33,6 +40,7 @@ export function PillNavButton({
   onAfterClick,
   type = 'button',
 }: PillNavButtonProps) {
+  const pillClass = compact === true ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT : MAP_HOME_NEU_BUTTON_CLASS;
   const inner =
     longSingleLine === true ? (
       <span className="pill-nav-long-line block min-w-0 max-w-full">{children}</span>
@@ -46,7 +54,7 @@ export function PillNavButton({
     return (
       <a
         href={href}
-        className={MAP_HOME_NEU_BUTTON_CLASS}
+        className={pillClass}
         style={MAP_HOME_NEU_BUTTON_STYLE}
         data-active={active ? 'true' : undefined}
         title={tip}
@@ -64,7 +72,7 @@ export function PillNavButton({
         onClick?.();
         onAfterClick?.();
       }}
-      className={MAP_HOME_NEU_BUTTON_CLASS}
+      className={pillClass}
       style={MAP_HOME_NEU_BUTTON_STYLE}
       data-active={active ? 'true' : undefined}
       title={tip}

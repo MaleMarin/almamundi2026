@@ -8,7 +8,11 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { MAP_HOME_HEADER_NAV_CLASS, MAP_HOME_NEU_BUTTON_CLASS, MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
+import {
+  MAP_HOME_HEADER_NAV_HOME_CLASS,
+  MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
+  MAP_HOME_NEU_BUTTON_STYLE,
+} from '@/lib/map-home-neu-button';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
@@ -162,17 +166,23 @@ export function HomeFirstPart({
           >
             {mobileNavOpen ? <X size={22} strokeWidth={2} aria-hidden /> : <Menu size={22} strokeWidth={2} aria-hidden />}
           </button>
-          <nav className={MAP_HOME_HEADER_NAV_CLASS} aria-label={t.ariaMainNav}>
-            <PillNavButton onClick={onShowPurpose}>{t.navPurpose}</PillNavButton>
-            <PillNavButton onClick={onShowComoFunciona}>{t.navHow}</PillNavButton>
+          <nav className={MAP_HOME_HEADER_NAV_HOME_CLASS} aria-label={t.ariaMainNav}>
+            <PillNavButton compact onClick={onShowPurpose}>
+              {t.navPurpose}
+            </PillNavButton>
+            <PillNavButton compact onClick={onShowComoFunciona}>
+              {t.navHow}
+            </PillNavButton>
             <HistoriasAccordion
               variant="header"
               triggerLabel={t.navStories}
               buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
-              headerButtonClassName={MAP_HOME_NEU_BUTTON_CLASS}
+              headerButtonClassName={MAP_HOME_NEU_BUTTON_CLASS_COMPACT}
               className="w-full min-w-0"
             />
-            <PillNavButton href={mapaHref}>{t.navMap}</PillNavButton>
+            <PillNavButton compact href={mapaHref}>
+              {t.navMap}
+            </PillNavButton>
           </nav>
           <HomeLanguageSwitcher className="hidden md:flex" />
         </div>
@@ -193,6 +203,7 @@ export function HomeFirstPart({
               aria-label={t.ariaMainNav}
             >
               <PillNavButton
+                compact
                 onClick={() => {
                   onShowPurpose();
                   closeMobileNav();
@@ -201,6 +212,7 @@ export function HomeFirstPart({
                 {t.navPurpose}
               </PillNavButton>
               <PillNavButton
+                compact
                 onClick={() => {
                   onShowComoFunciona();
                   closeMobileNav();
@@ -212,11 +224,11 @@ export function HomeFirstPart({
                 variant="header"
                 triggerLabel={t.navStories}
                 buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
-                headerButtonClassName={`${MAP_HOME_NEU_BUTTON_CLASS} w-full max-w-none`}
+                headerButtonClassName={`${MAP_HOME_NEU_BUTTON_CLASS_COMPACT} w-full max-w-none`}
                 className="w-full"
                 onItemNavigate={closeMobileNav}
               />
-              <PillNavButton href={mapaHref} onAfterClick={closeMobileNav}>
+              <PillNavButton compact href={mapaHref} onAfterClick={closeMobileNav}>
                 {t.navMap}
               </PillNavButton>
               <div className="flex justify-center pt-1 md:hidden">
@@ -281,9 +293,9 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-3 mb-8 px-4 pb-10 pt-4 sm:px-8 md:-mt-5 md:mb-12 md:px-12 md:pb-12 md:pt-8 lg:px-14 lg:pt-10"
+        className="relative z-[18] -mt-3 mb-8 px-6 pb-10 pt-4 md:-mt-5 md:mb-12 md:px-10 md:pb-12 md:pt-8 lg:pt-10"
       >
-        <div className="mx-auto grid w-full max-w-[min(100%,1200px)] grid-cols-1 gap-y-8 lg:grid-cols-4 lg:gap-x-4 lg:gap-y-0 xl:gap-x-6">
+        <div className="mx-auto grid w-full max-w-[min(100%,1200px)] grid-cols-1 gap-y-10 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-0 xl:gap-x-8">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
