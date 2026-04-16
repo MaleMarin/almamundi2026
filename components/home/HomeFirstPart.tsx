@@ -71,7 +71,7 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-neu-card home-historias-card-surface group relative mx-auto flex aspect-square w-full min-w-0 max-w-[min(100%,22rem)] flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-all duration-500 hover:-translate-y-2 sm:max-w-[24rem] md:p-5 lg:mx-0 lg:max-w-full"
+      className="home-neu-card home-historias-card-surface group relative mx-auto flex aspect-square w-full min-w-0 max-w-[min(100%,26rem)] flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-all duration-500 hover:-translate-y-2 sm:max-w-[28rem] md:max-w-[30rem] md:p-5 lg:mx-0 lg:max-w-full"
       style={{
         ...soft.flat,
         borderRadius: '28px',
@@ -80,15 +80,15 @@ function SoftCard({
       }}
     >
       <div className="mb-2 shrink-0 min-w-0">
-        <p className="text-base font-light leading-snug text-gray-600 md:text-lg">
+        <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
           {title}
         </p>
-        <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl">
+        <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
           {subtitle}
         </h2>
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0.5">
-        <p className="text-sm font-normal leading-[1.6] text-gray-600 md:text-[0.95rem] md:leading-[1.62]">
+        <p className="text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
           {children}
         </p>
       </div>
@@ -301,7 +301,7 @@ export function HomeFirstPart({
         aria-label="Formatos para compartir tu historia"
         className="relative z-[18] -mt-3 mb-8 px-6 pb-10 pt-4 md:-mt-5 md:mb-12 md:px-10 md:pb-12 md:pt-8 lg:pt-10"
       >
-        <div className="mx-auto grid w-full max-w-[min(100%,1280px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0 xl:gap-x-12 2xl:gap-x-14">
+        <div className="mx-auto grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
