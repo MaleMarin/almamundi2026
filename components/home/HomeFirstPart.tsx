@@ -75,7 +75,7 @@ function SoftCard({
       style={{ animationDelay: delay }}
     >
       <div
-        className="home-neu-card home-historias-card-surface group relative flex aspect-square w-full min-w-0 max-w-full flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-[transform,box-shadow] duration-500 md:p-5"
+        className="home-neu-card home-historias-card-surface group relative flex min-h-0 aspect-square w-full min-w-0 max-w-full flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-[transform,box-shadow] duration-500 md:p-5"
         style={{
           ...soft.flat,
           borderRadius: '28px',
@@ -90,24 +90,26 @@ function SoftCard({
             {subtitle}
           </h2>
         </div>
-        <p className="mt-3 shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:mt-4 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
-          {children}
-        </p>
-        <div className="min-h-3 flex-1 shrink-0" aria-hidden />
-        <button
-          type="button"
-          onClick={onClick}
-          className="mt-3 flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:mt-4 md:px-4 md:py-3 md:text-xs"
-          style={{
-            background: '#FF4A1C',
-            color: 'white',
-            border: 'none',
-            borderRadius: '100px',
-            fontFamily: APP_FONT,
-          }}
-        >
-          {buttonLabel}
-        </button>
+        {/* Texto + CTA abajo: flex-1 rellena el hueco; justify-end los ancla al borde inferior */}
+        <div className="flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4">
+          <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
+            {children}
+          </p>
+          <button
+            type="button"
+            onClick={onClick}
+            className="flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-4 md:py-3 md:text-xs"
+            style={{
+              background: '#FF4A1C',
+              color: 'white',
+              border: 'none',
+              borderRadius: '100px',
+              fontFamily: APP_FONT,
+            }}
+          >
+            {buttonLabel}
+          </button>
+        </div>
       </div>
     </div>
   );
