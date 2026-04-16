@@ -41,9 +41,13 @@ export const metadata: Metadata = {
   },
   description: 'Explora el mapa',
   /**
-   * Favicon / Apple: convención de Next (`app/icon.png`, `app/apple-icon.png`).
-   * No duplicar aquí `metadata.icons`: el anterior `favicon.ico` era JPEG renombrado y fallaba.
+   * Favicon: `public/artemis.ico` → `/artemis.ico`.
+   * Apple: convención `app/apple-icon.png` (icono al guardar en pantalla de inicio).
    */
+  icons: {
+    icon: '/artemis.ico',
+    shortcut: '/artemis.ico',
+  },
 };
 
 export default async function RootLayout({
