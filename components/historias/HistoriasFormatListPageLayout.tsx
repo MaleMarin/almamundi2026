@@ -91,7 +91,7 @@ export function HistoriasFormatListPageLayout({
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
           <ActiveInternalNavLink href="/historias/videos" className={activeTab === 'videos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'videos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}>Videos</ActiveInternalNavLink>

@@ -25,15 +25,14 @@ const MESH_NAME = 'AM_GLOBEGL_MOON_MESH';
 /**
  * Semieje mayor en unidades globe.gl (R⊕ = 100).
  *
- * **Importante:** en globe.gl `pointOfView.altitude` es distancia al centro en radios − 1
- * (p. ej. 2,35 → ~3,35 R⊕ ≈ 335). Si la Luna orbita a ~2,35 R⊕ queda **detrás del disco
- * terrestre** casi medio ciclo y parece “desaparecida”. Órbita ~1,75–1,9 R⊕ deja la Luna
- * entre el horizonte del globo y la cámara → visible como en la sesión con GlobeV2.
+ * **Importante:** en globe.gl `pointOfView.altitude` es distancia al centro en radios − 1.
+ * Órbita ~1,55–1,65 R⊕ mantiene la Luna cerca del disco y reduce que se corte por los bordes
+ * del viewport frente a órbitas más amplias.
  */
-const ORBIT_SEMI_MAJOR = 1.82 * GLOBE_GL_EARTH_RADIUS;
+const ORBIT_SEMI_MAJOR = 1.58 * GLOBE_GL_EARTH_RADIUS;
 
-/** Inclinación del plano orbital (rad): evita que quede pegada al ecuador y se pierda tras el globo. */
-const ORBIT_INCLINATION_RAD = 0.22;
+/** Inclinación del plano orbital (rad): suave para no empujar la Luna fuera del encuadre. */
+const ORBIT_INCLINATION_RAD = 0.14;
 
 /** Segundos por órbita (solo lectura visual, como en EarthGlobeDemoScene). */
 const ORBIT_PERIOD_SEC = 150;

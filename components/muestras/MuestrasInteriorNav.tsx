@@ -29,7 +29,7 @@ export function MuestrasInteriorNav() {
       </HomeHardLink>
       <div className={historiasInterior.navLinksRowClassName}>
         <ActiveInternalNavLink
-          href="/#intro"
+          href="/#proposito"
           className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[0.9375rem]"
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >

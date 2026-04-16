@@ -17,6 +17,8 @@ export type HomeMessages = {
   heroBold: string;
   heroSubBefore: string;
   heroSubBold: string;
+  /** Enlace bajo el hero: abre el texto editorial del propósito. */
+  heroPurposeCta: string;
   cardVideoTitle: string;
   cardVideoSubtitle: string;
   cardVideoBefore: string;
@@ -59,6 +61,7 @@ const es: HomeMessages = {
   heroBold: 'despiertan otras historias.',
   heroSubBefore: 'Aquí, cada relato importa.',
   heroSubBold: 'Cada historia es extraordinaria.',
+  heroPurposeCta: 'Leer nuestro propósito',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBefore: 'A veces, una mirada lo dice todo. Anímate a ',
@@ -102,6 +105,7 @@ const pt: HomeMessages = {
   heroBold: 'despertam outras histórias.',
   heroSubBefore: 'Aqui, cada relato importa.',
   heroSubBold: 'Cada história é extraordinária.',
+  heroPurposeCta: 'Ler o nosso propósito',
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBefore: 'Às vezes, um olhar diz tudo. Anime-se a ',
@@ -145,6 +149,7 @@ const en: HomeMessages = {
   heroBold: 'they awaken other stories.',
   heroSubBefore: 'Here, every story matters.',
   heroSubBold: 'Every story is extraordinary.',
+  heroPurposeCta: 'Read our purpose',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBefore: 'Sometimes a look says it all. Go ahead and ',

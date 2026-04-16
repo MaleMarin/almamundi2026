@@ -71,41 +71,44 @@ function SoftCard({
 }) {
   return (
     <div
-      className="home-neu-card home-historias-card-surface group relative mx-auto flex aspect-square w-full min-w-0 max-w-[min(100%,26rem)] flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-all duration-500 hover:-translate-y-2 sm:max-w-[28rem] md:max-w-[30rem] md:p-5 lg:mx-0 lg:max-w-full"
-      style={{
-        ...soft.flat,
-        borderRadius: '28px',
-        animationDelay: delay,
-        fontFamily: APP_FONT,
-      }}
+      className="home-historias-card-float-wrap mx-auto flex h-full w-full min-w-0 max-w-[min(100%,26rem)] justify-center sm:max-w-[28rem] md:max-w-[30rem] lg:mx-0 lg:max-w-full"
+      style={{ animationDelay: delay }}
     >
-      <div className="mb-2 shrink-0 min-w-0">
-        <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
-          {title}
-        </p>
-        <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
-          {subtitle}
-        </h2>
-      </div>
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0.5">
-        <p className="text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
-          {children}
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onClick}
-        className="mt-auto flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-4 md:py-3 md:text-xs"
+      <div
+        className="home-neu-card home-historias-card-surface group relative flex aspect-square w-full min-w-0 max-w-full flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-[transform,box-shadow] duration-500 md:p-5"
         style={{
-          background: '#FF4A1C',
-          color: 'white',
-          border: 'none',
-          borderRadius: '100px',
+          ...soft.flat,
+          borderRadius: '28px',
           fontFamily: APP_FONT,
         }}
       >
-        {buttonLabel}
-      </button>
+        <div className="shrink-0 min-w-0">
+          <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
+            {title}
+          </p>
+          <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
+            {subtitle}
+          </h2>
+        </div>
+        <p className="mt-3 shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:mt-4 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
+          {children}
+        </p>
+        <div className="min-h-3 flex-1 shrink-0" aria-hidden />
+        <button
+          type="button"
+          onClick={onClick}
+          className="mt-3 flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:mt-4 md:px-4 md:py-3 md:text-xs"
+          style={{
+            background: '#FF4A1C',
+            color: 'white',
+            border: 'none',
+            borderRadius: '100px',
+            fontFamily: APP_FONT,
+          }}
+        >
+          {buttonLabel}
+        </button>
+      </div>
     </div>
   );
 }
@@ -248,7 +251,7 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:px-10 md:pb-6 md:pt-52 lg:pt-60 lg:pb-6"
+        className="home-intro-avenir relative z-[20] flex scroll-mt-32 flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:scroll-mt-40 md:px-10 md:pb-6 md:pt-52 lg:scroll-mt-44 lg:pt-60 lg:pb-6"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
@@ -291,6 +294,16 @@ export function HomeFirstPart({
               {t.heroSubBefore}{' '}
               <span className="font-normal">{t.heroSubBold}</span>
             </p>
+            <p className="mx-auto mt-5 max-w-[min(100%,42rem)] md:mt-6">
+              <button
+                type="button"
+                onClick={onShowPurpose}
+                className="border-b border-[#4A5568]/25 bg-transparent text-sm font-normal underline decoration-[#4A5568]/35 underline-offset-[5px] transition hover:border-[#FF4A1C]/40 hover:decoration-[#FF4A1C]/50 md:text-base"
+                style={{ color: soft.textMain }}
+              >
+                {t.heroPurposeCta}
+              </button>
+            </p>
           </div>
         </div>
       </section>
@@ -299,7 +312,7 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-2 mb-8 px-6 pb-10 pt-5 md:-mt-4 md:mb-12 md:px-10 md:pb-12 md:pt-9 lg:pt-11"
+        className="relative z-[18] -mt-1 mb-8 px-6 pb-10 pt-8 md:-mt-2 md:mb-12 md:px-10 md:pb-12 md:pt-12 lg:pt-14"
       >
         <div className="mx-auto grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
         <SoftCard
@@ -318,7 +331,7 @@ export function HomeFirstPart({
           subtitle={t.cardAudioSubtitle}
           buttonLabel={t.cardAudioCta}
           onClick={onRecordAudio}
-          delay="0s"
+          delay="0.45s"
         >
           {t.cardAudioBefore}
           <strong>{t.cardAudioStrong}</strong>
@@ -329,7 +342,7 @@ export function HomeFirstPart({
           subtitle={t.cardWriteSubtitle}
           buttonLabel={t.cardWriteCta}
           onClick={onWriteStory}
-          delay="0s"
+          delay="0.9s"
         >
           {t.cardWriteBefore}
           <strong>{t.cardWriteStrong}</strong>
@@ -340,7 +353,7 @@ export function HomeFirstPart({
           subtitle="en una fotografía"
           buttonLabel="SUBE UNA FOTO"
           onClick={() => router.push('/subir/foto')}
-          delay="0s"
+          delay="1.35s"
         >
           A veces, una imagen guarda lo que las palabras no alcanzan.
         </SoftCard>

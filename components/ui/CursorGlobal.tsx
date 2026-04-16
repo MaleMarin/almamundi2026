@@ -37,9 +37,12 @@ export function CursorGlobal() {
     document.documentElement.setAttribute('data-cursor-global', 'on');
 
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    /** Seguimiento más lento = movimiento más suave (punto un poco más rápido que el anillo). */
-    const dotEase = reduceMotion ? 0.42 : 0.082;
-    const ringEase = reduceMotion ? 0.32 : 0.038;
+    /**
+     * Lerp por frame hacia (mx, my): valores más altos = menos “fricción”, puntero más cerca del mouse.
+     * El punto va un poco por delante del anillo para mantener lectura suave sin arrastre excesivo.
+     */
+    const dotEase = reduceMotion ? 0.5 : 0.34;
+    const ringEase = reduceMotion ? 0.4 : 0.22;
 
     function lerp(a: number, b: number, t: number) {
       return a + (b - a) * t;

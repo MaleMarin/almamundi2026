@@ -45,7 +45,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
 
         <div className="flex flex-wrap items-center justify-center gap-10 md:gap-12 text-black">
           <ActiveInternalNavLink
-            href="/#intro"
+            href="/#proposito"
             className={FOOTER_LINK}
             activeClassName="!text-black font-semibold"
           >

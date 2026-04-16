@@ -5,9 +5,9 @@
 export const ACTIVE_NAV_CLASS = '!text-orange-500 font-semibold';
 
 /**
- * @param href Destino del enlace (`/#intro`, `/temas`, `/historias/videos`, etc.)
+ * @param href Destino del enlace (`/#proposito`, `/temas`, `/historias/videos`, etc.)
  * @param pathname `usePathname()` (sin hash)
- * @param hash `window.location.hash` en la home (p. ej. `#intro`)
+ * @param hash `window.location.hash` en la home (p. ej. `#proposito`, `#como-funciona`)
  */
 export function isInternalNavActive(href: string, pathname: string, hash: string): boolean {
   if (!pathname) return false;

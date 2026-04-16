@@ -107,11 +107,11 @@ const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
  */
 const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 218, full: 162 } as const;
 
-/** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: Luna en esquina superior-izquierda tipo referencia NASA. */
-const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.92, full: 3.58 } as const;
+/** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: más cerca del disco para que no se salga del encuadre. */
+const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.58, full: 3.58 } as const;
 
 /** Escala solo del disco lunar (no del radio orbital). */
-const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.44, full: 0.6 } as const;
+const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.48, full: 0.6 } as const;
 
 /** Inclinación del plano orbital respecto a la eclíptica (~5,145°). */
 const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
@@ -119,8 +119,8 @@ const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
 /** Fase inicial del plano en Y (solo encuadre: home ≈ Luna arriba-izquierda respecto al disco). */
 const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as const;
 
-/** Inclinación orbital lunar en home (más barrido vertical en encuadre cinematográfico). */
-const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 7.85;
+/** Inclinación orbital lunar en home: moderada para no perder la Luna arriba/abajo del canvas. */
+const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
 
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];

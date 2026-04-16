@@ -115,7 +115,7 @@ export default function HistoriasIdPageClient() {
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
           <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/#intro" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
+          <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
             Nuestro propósito
           </ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>

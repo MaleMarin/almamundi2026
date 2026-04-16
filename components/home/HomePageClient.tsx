@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
+import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 
@@ -22,6 +23,7 @@ export function HomePageClient() {
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
   const [chosenTopic, setChosenTopic] = useState<ChosenInspirationTopic | null>(null);
   const [comoFuncionaOpen, setComoFuncionaOpen] = useState(false);
+  const [propositoOpen, setPropositoOpen] = useState(false);
 
   useEffect(() => {
     router.refresh();
@@ -52,24 +54,66 @@ export function HomePageClient() {
     }
   }, []);
 
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const syncHash = () => {
-      if (window.location.hash === '#como-funciona') setComoFuncionaOpen(true);
-    };
-    syncHash();
-    window.addEventListener('hashchange', syncHash);
-    return () => window.removeEventListener('hashchange', syncHash);
-  }, []);
-
   const openStory = useCallback((mode: StoryModalMode, clearTopic: boolean) => {
     if (clearTopic) setChosenTopic(null);
     setStoryMode(mode);
     setStoryOpen(true);
   }, []);
 
-  const scrollToId = useCallback((id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+  const closeProposito = useCallback(() => {
+    setPropositoOpen(false);
+    if (typeof window !== 'undefined' && window.location.hash === '#proposito') {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}`
+      );
+    }
+  }, []);
+
+  const openProposito = useCallback(() => {
+    setComoFuncionaOpen(false);
+    setPropositoOpen(true);
+    if (typeof window !== 'undefined') {
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}#proposito`
+      );
+    }
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncFromHash = () => {
+      const h = window.location.hash;
+      if (h === '#como-funciona') {
+        setComoFuncionaOpen(true);
+        setPropositoOpen(false);
+      }
+      if (h === '#proposito') {
+        setPropositoOpen(true);
+        setComoFuncionaOpen(false);
+      }
+    };
+    syncFromHash();
+    window.addEventListener('hashchange', syncFromHash);
+
+    const voiceOpenPurpose = () => {
+      setComoFuncionaOpen(false);
+      setPropositoOpen(true);
+      window.history.replaceState(
+        null,
+        '',
+        `${window.location.pathname}${window.location.search}#proposito`
+      );
+    };
+    window.addEventListener('almamundi:voice:showPurpose', voiceOpenPurpose);
+
+    return () => {
+      window.removeEventListener('hashchange', syncFromHash);
+      window.removeEventListener('almamundi:voice:showPurpose', voiceOpenPurpose);
+    };
   }, []);
 
   return (
@@ -101,10 +145,23 @@ export function HomePageClient() {
       <div id="como-funciona" className="sr-only" aria-hidden>
         Cómo funciona AlmaMundi
       </div>
+      <div id="proposito" className="sr-only" aria-hidden>
+        Propósito AlmaMundi
+      </div>
 
       <HomeFirstPart
-        onShowPurpose={() => scrollToId('intro')}
-        onShowComoFunciona={() => setComoFuncionaOpen(true)}
+        onShowPurpose={openProposito}
+        onShowComoFunciona={() => {
+          setPropositoOpen(false);
+          setComoFuncionaOpen(true);
+          if (typeof window !== 'undefined' && window.location.hash === '#proposito') {
+            window.history.replaceState(
+              null,
+              '',
+              `${window.location.pathname}${window.location.search}`
+            );
+          }
+        }}
         onRecordVideo={() => openStory('video', true)}
         onRecordAudio={() => openStory('audio', true)}
         onWriteStory={() => openStory('texto', true)}
@@ -122,6 +179,7 @@ export function HomePageClient() {
       />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
+      <PropositoModal isOpen={propositoOpen} onClose={closeProposito} />
     </main>
   );
 }
