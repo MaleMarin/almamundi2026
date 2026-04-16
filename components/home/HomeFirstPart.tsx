@@ -71,8 +71,13 @@ function SoftCard({
 }) {
   return (
     <div
-      className="relative w-full max-w-[400px] min-h-[380px] rounded-[40px] p-6 md:p-7 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
-      style={{ ...soft.flat, animationDelay: delay, fontFamily: APP_FONT }}
+      className="relative w-full max-w-[400px] min-h-[360px] rounded-[22px] p-5 md:p-6 flex flex-col items-start transition-all duration-500 hover:-translate-y-2 group home-neu-card home-historias-card-surface min-w-0"
+      style={{
+        ...soft.flat,
+        borderRadius: '22px',
+        animationDelay: delay,
+        fontFamily: APP_FONT,
+      }}
     >
       <div className="mb-5 shrink-0 min-w-0">
         <p className="text-base md:text-lg font-light text-gray-500 leading-tight">
@@ -295,7 +300,7 @@ export function HomeFirstPart({
         aria-label="Formatos para compartir tu historia"
         className="relative z-[18] -mt-3 mb-8 px-6 pb-10 pt-4 md:-mt-5 md:mb-12 md:px-10 md:pb-12 md:pt-8 lg:pt-10"
       >
-        <div className="mx-auto grid w-full max-w-[min(100%,1200px)] grid-cols-1 gap-y-10 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-6 lg:gap-y-0 xl:gap-x-8">
+        <div className="mx-auto grid w-full max-w-[min(100%,1280px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-8 lg:gap-y-0 xl:gap-x-12 2xl:gap-x-14">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
