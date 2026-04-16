@@ -41,14 +41,9 @@ export const metadata: Metadata = {
   },
   description: 'Explora el mapa',
   /**
-   * `app/favicon.ico` lo sirve Next en `/favicon.ico`.
-   * Mantener `icons` explícito para pestaña, atajos y Apple (mismo recurso; iOS escala).
+   * Favicon / Apple: convención de Next (`app/icon.png`, `app/apple-icon.png`).
+   * No duplicar aquí `metadata.icons`: el anterior `favicon.ico` era JPEG renombrado y fallaba.
    */
-  icons: {
-    icon: [{ url: '/favicon.ico', sizes: '48x48', type: 'image/x-icon' }],
-    shortcut: ['/favicon.ico'],
-    apple: [{ url: '/favicon.ico' }],
-  },
 };
 
 export default async function RootLayout({
