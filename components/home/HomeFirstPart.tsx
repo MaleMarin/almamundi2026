@@ -299,7 +299,7 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-3 mb-8 px-6 pb-10 pt-4 md:-mt-5 md:mb-12 md:px-10 md:pb-12 md:pt-8 lg:pt-10"
+        className="relative z-[18] -mt-2 mb-8 px-6 pb-10 pt-5 md:-mt-4 md:mb-12 md:px-10 md:pb-12 md:pt-9 lg:pt-11"
       >
         <div className="mx-auto grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
         <SoftCard
