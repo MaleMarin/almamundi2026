@@ -185,14 +185,15 @@ export default function HomeMap() {
       .catch(() => {});
   }, []);
 
-  // Entrada al mapa: observer al globo y respaldo a #mapa (si el flex deja altura 0 al globo, el IO del contenedor nunca disparaba → soundEnabled quedaba false y el audio no arrancaba nunca).
+  // Sonido «universo»: solo al hacer scroll y ver de verdad la sección #mapa (no al rozar el globo ni el bloque negro antes de tiempo).
   useLayoutEffect(() => {
-    const globe = globeContainerRef.current;
     const section = typeof document !== 'undefined' ? document.getElementById('mapa') : null;
-    if (!globe && !section) return;
+    if (!section) return;
 
     const onIntersect: IntersectionObserverCallback = (entries) => {
-      const hit = entries.some((en) => en.isIntersecting);
+      const hit = entries.some(
+        (en) => en.isIntersecting && en.target === section && en.intersectionRatio >= 0.12
+      );
       if (!hit) return;
       if (userSilencedMapAmbientRef.current) return;
       if (!hasPrimedUniverseForMapRef.current) {
@@ -204,11 +205,10 @@ export default function HomeMap() {
     };
 
     const io = new IntersectionObserver(onIntersect, {
-      threshold: [0, 0.08, 0.2],
-      rootMargin: '0px',
+      threshold: [0, 0.06, 0.12, 0.18, 0.24, 0.32],
+      rootMargin: '-10% 0px -14% 0px',
     });
-    if (globe) io.observe(globe);
-    if (section && section !== globe) io.observe(section);
+    io.observe(section);
     return () => io.disconnect();
   }, []);
 
