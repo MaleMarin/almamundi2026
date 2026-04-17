@@ -28,6 +28,7 @@ import {
   AGE_RANGE_OPTIONS,
   type AgeRangeId,
 } from '@/lib/subir-author-fields';
+import { THEME_LIST, type ThemeId } from '@/lib/themes';
 
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -132,6 +133,7 @@ function SubirPageInner() {
   const [consentPostales, setConsentPostales] = useState(false);
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
   const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
+  const [themeId, setThemeId] = useState<ThemeId | ''>('');
 
   const [textBody, setTextBody] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
@@ -177,6 +179,7 @@ function SubirPageInner() {
     consentPostales &&
     consentPrivacyPolicy &&
     ageRange !== '' &&
+    THEME_LIST.some((t) => t.id === themeId) &&
     (format === 'texto'
       ? textBody.trim().length > 0 && textBody.trim().length <= SUBIR_TEXT_MAX_CHARS
       : true) &&
@@ -295,7 +298,7 @@ function SubirPageInner() {
           storyTitle: storyTitle.trim(),
           alias: alias.trim(),
           email: email.trim(),
-          themeId: '',
+          themeId: themeId as ThemeId,
           date: '',
           dateApprox: false,
           placeLabel: placeCombined,
@@ -344,6 +347,7 @@ function SubirPageInner() {
     birthDate,
     sex,
     ageRange,
+    themeId,
     textBody,
     videoUrl,
     audioUrl,
@@ -384,6 +388,7 @@ function SubirPageInner() {
   );
 
   const backToCards = useCallback(() => {
+    setThemeId('');
     setPhotoFiles([]);
     setAudioFile(null);
     setAudioFileWithinMax(true);
@@ -805,6 +810,28 @@ function SubirPageInner() {
                     </option>
                   ))}
                 </select>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                Tema (obligatorio) *
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {THEME_LIST.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setThemeId(t.id)}
+                    className="px-2.5 py-1 rounded-full text-xs font-medium transition sm:text-sm"
+                    style={{
+                      ...neu.button,
+                      color: themeId === t.id ? '#ff4500' : neu.textBody,
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
               </div>
             </div>
 
