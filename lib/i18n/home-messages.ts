@@ -17,6 +17,9 @@ export type HomeMessages = {
   heroBold: string;
   heroSubBefore: string;
   heroSubBold: string;
+  /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
+  historiasLead1: string;
+  historiasLead2: string;
   cardVideoTitle: string;
   cardVideoSubtitle: string;
   cardVideoBefore: string;
@@ -59,6 +62,8 @@ const es: HomeMessages = {
   heroBold: 'despiertan otras historias.',
   heroSubBefore: 'Aquí, cada relato importa.',
   heroSubBold: 'Cada historia es extraordinaria.',
+  historiasLead1: 'Hay historias que solo tú puedes contar.',
+  historiasLead2: 'Elige tu forma y cuéntala.',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBefore: 'A veces, una mirada lo dice todo. Anímate a ',
@@ -102,6 +107,8 @@ const pt: HomeMessages = {
   heroBold: 'despertam outras histórias.',
   heroSubBefore: 'Aqui, cada relato importa.',
   heroSubBold: 'Cada história é extraordinária.',
+  historiasLead1: 'Há histórias que só você pode contar.',
+  historiasLead2: 'Escolha a sua forma e conte.',
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBefore: 'Às vezes, um olhar diz tudo. Anime-se a ',
@@ -145,6 +152,8 @@ const en: HomeMessages = {
   heroBold: 'they awaken other stories.',
   heroSubBefore: 'Here, every story matters.',
   heroSubBold: 'Every story is extraordinary.',
+  historiasLead1: 'There are stories only you can tell.',
+  historiasLead2: 'Choose how, and tell yours.',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBefore: 'Sometimes a look says it all. Go ahead and ',

@@ -289,13 +289,6 @@ export function HomeFirstPart({
                 }}
               />
             </svg>
-            <p
-              className="mx-auto max-w-[min(100%,42rem)] pt-3 font-light leading-[1.6] tracking-wide text-base md:pt-5 md:text-lg lg:text-xl"
-              style={{ color: soft.textBody }}
-            >
-              {t.heroSubBefore}{' '}
-              <span className="font-normal">{t.heroSubBold}</span>
-            </p>
           </div>
         </div>
       </section>
@@ -304,8 +297,15 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] -mt-1 mb-8 px-6 pb-10 pt-8 md:-mt-2 md:mb-12 md:px-10 md:pb-12 md:pt-12 lg:pt-14"
+        className="relative z-[18] mb-8 px-6 pb-10 pt-14 sm:pt-16 md:mb-12 md:px-10 md:pb-12 md:pt-20 lg:pt-24"
       >
+        <p
+          className="home-intro-avenir mx-auto mb-10 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-12 md:mb-14 md:text-lg md:leading-relaxed lg:text-xl"
+          style={{ color: soft.textBody }}
+        >
+          {t.historiasLead1}{' '}
+          <span className="font-normal text-gray-700">{t.historiasLead2}</span>
+        </p>
         <div className="mx-auto grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
         <SoftCard
           title={t.cardVideoTitle}
