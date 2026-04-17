@@ -27,7 +27,7 @@ export function MapSectionLocked() {
             className="mapa-almamundi-title text-center text-[72px] md:text-[96px] lg:text-[110px] leading-none pt-12 pb-2 md:pt-14 md:pb-3"
             style={{ color: 'var(--almamundi-orange)' }}
           >
-            Mapa de AlmaMundi
+            {t.mapSectionTitle}
           </h2>
           <p
             className="home-intro-avenir relative z-[1] mx-auto max-w-[min(100%,42rem)] px-6 pb-6 text-center text-base font-light leading-[1.6] tracking-wide text-gray-600 md:pb-8 md:text-lg lg:text-xl"

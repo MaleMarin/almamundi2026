@@ -39,6 +39,7 @@ import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 import { BITS_DATA, type BitEntry } from '@/lib/bits-data';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
@@ -2173,6 +2174,7 @@ type MapaPageContentProps = {
 };
 
 function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight = 0, universeVisible = true }: MapaPageContentProps) {
+  const { t } = useHomeLocale();
   const audioRef = useRef<HTMLAudioElement>(null);
   /** Audio del universo: por defecto ON; la persona puede apagarlo con el botón Universo. */
   const [isMuted, setIsMuted] = useState(false);
@@ -4212,7 +4214,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           <Link href="/" className="flex items-center gap-3 min-w-0">
             <img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-14 w-auto object-contain select-none flex-shrink-0" />
             <span className="mapa-almamundi-title text-white/95 font-semibold text-lg md:text-xl truncate">
-              Mapa de AlmaMundi
+              {t.mapSectionTitle}
             </span>
           </Link>
           <Link
