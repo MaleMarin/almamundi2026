@@ -32,6 +32,7 @@ import {
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
 } from '@/lib/subir-limits';
+import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import {
   drawHuellaV2OnCanvas,
   limpiarNombreFoto,
@@ -131,18 +132,9 @@ const PRIVACY_URL = 'https://almamundi.org';
 const MAX_PROFILE_PHOTO_MB = 8;
 const MAX_EXTRA_FILE_MB = 15;
 
-type Sex = '' | 'Mujer' | 'Hombre' | 'No binario' | 'Otro' | 'Prefiero no decir';
+type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir';
 
-type AgeRange =
-  | ''
-  | '13-17'
-  | '18-24'
-  | '25-34'
-  | '35-44'
-  | '45-54'
-  | '55-64'
-  | '65+'
-  | 'Prefiero no decir';
+type AgeRange = '' | AgeRangeId;
 
 function formatMmSs(totalSec: number): string {
   const m = Math.floor(totalSec / 60);
@@ -308,10 +300,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const videoLiveRef = useRef<HTMLVideoElement>(null);
-  const videoPlaybackRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [textBody, setTextBody] = useState('');
+  /** Tras escribir, la persona confirma que leyó/revisó antes de Continuar (modo texto). */
+  const [textoReviewAck, setTextoReviewAck] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
@@ -326,8 +319,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [ageRange, setAgeRange] = useState<AgeRange>('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
-  const [wantsEmail, setWantsEmail] = useState(false);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -388,6 +381,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setStep('capture');
       setErr('');
       setTextBody('');
+      setTextoReviewAck(false);
       setPhotoFiles([]);
       setPhotoPreviews([]);
       setStoryTitle('');
@@ -399,8 +393,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setAgeRange('');
       setCity('');
       setCountry('');
+      setBirthDate('');
       setEmail('');
-      setWantsEmail(false);
       setAcceptedPrivacy(false);
       setSaving(false);
       setImprintId('');
@@ -447,35 +441,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setErr('No se pudo mostrar la cámara en este dispositivo. Prueba otro navegador.');
     }
   }, [isOpen, step, mode, streamReady, mediaBlob, recording]);
-
-  /** Reproducción del clip grabado: `srcObject` con el Blob + `load()` suele funcionar mejor que solo `src` con blob URL. */
-  useLayoutEffect(() => {
-    if (!isOpen || step !== 'capture' || mode !== 'video' || !mediaBlob) {
-      return;
-    }
-    const playback = videoPlaybackRef.current;
-    if (!playback) return;
-    try {
-      playback.pause();
-      playback.removeAttribute('src');
-      playback.srcObject = mediaBlob;
-      playback.muted = false;
-      playback.load();
-      void playback.play().catch(() => {});
-    } catch (e) {
-      console.error('[StoryModal] video playback preview', e);
-      setErr('No se pudo reproducir la vista previa del video.');
-    }
-    return () => {
-      try {
-        playback.pause();
-        playback.removeAttribute('src');
-        playback.srcObject = null;
-      } catch {
-        /* ignore */
-      }
-    };
-  }, [isOpen, step, mode, mediaBlob]);
 
   const startVideoCapture = useCallback(async () => {
     setErr('');
@@ -749,10 +714,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     if (mode === 'video' || mode === 'audio') return mediaBlob != null && mediaBlob.size > 0;
     if (mode === 'texto') {
       const t = textBody.trim();
-      return t.length > 0 && t.length <= SUBIR_TEXT_MAX_CHARS;
+      return (
+        t.length > 0 &&
+        t.length <= SUBIR_TEXT_MAX_CHARS &&
+        textoReviewAck
+      );
     }
     return photoFiles.length >= SUBIR_PHOTO_MIN && photoFiles.length <= SUBIR_PHOTO_MAX;
-  }, [mode, mediaBlob, textBody, photoFiles.length]);
+  }, [mode, mediaBlob, textBody, textoReviewAck, photoFiles.length]);
 
   const goDetails = useCallback(() => {
     if (!canContinueCapture()) {
@@ -768,18 +737,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setErr('Falta el nombre de la historia.');
       return false;
     }
-
-    if (!sex || !ageRange || !city.trim() || !country.trim()) {
-      setErr('Faltan datos obligatorios: género, edad, ciudad y país.');
+    if (alias.trim().length < 2) {
+      setErr('Escribe tu nombre o alias (mínimo 2 caracteres).');
       return false;
     }
 
-    if (wantsEmail && !email.trim()) {
-      setErr('Si quieres aviso por mail, escribe tu correo.');
+    if (!ageRange || !city.trim() || !country.trim()) {
+      setErr('Faltan datos obligatorios: tramo de edad, ciudad y país.');
       return false;
     }
-    if (wantsEmail && email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
-      setErr('Ese correo no parece válido.');
+
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setErr('Escribe un correo válido para recibir avisos cuando tu contenido se suba al globo.');
       return false;
     }
 
@@ -790,7 +759,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
     setErr('');
     return true;
-  }, [acceptedPrivacy, ageRange, city, country, email, sex, storyTitle, wantsEmail]);
+  }, [acceptedPrivacy, ageRange, alias, city, country, email, storyTitle]);
 
   const submitDetails = useCallback(() => {
     if (saving) return;
@@ -867,6 +836,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     resetCaptureMedia();
     setStep('capture');
     setTextBody(mode === 'texto' && chosenTopic ? chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n') : '');
+    setTextoReviewAck(false);
     setPhotoFiles([]);
     setImprintId('');
     setImprintReceivedAt(null);
@@ -879,8 +849,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     setAgeRange('');
     setCity('');
     setCountry('');
+    setBirthDate('');
     setEmail('');
-    setWantsEmail(false);
     setAcceptedPrivacy(false);
     setErr('');
   }, [resetCaptureMedia, mode, chosenTopic]);
@@ -925,7 +895,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         </header>
 
         <div
-          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 py-5 md:px-8 md:py-6"
+          className={`min-h-0 flex-1 overflow-x-hidden overscroll-contain ${
+            step === 'details'
+              ? 'flex flex-col overflow-y-auto px-3 py-2 sm:px-4 sm:py-3 md:overflow-hidden md:px-5 md:py-4'
+              : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
+          }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
           {step === 'capture' && (
@@ -1030,19 +1004,29 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               )}
               {mediaBlob && previewUrl && (
                 <div className="space-y-3">
-                  <p className="text-center text-lg text-gray-700 md:text-xl">Revisa tu video</p>
+                  <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu video</p>
+                  <p className="text-center text-sm text-gray-600 md:text-base">
+                    Comprueba el sonido y la imagen. Si no se ve bien, vuelve a grabar.
+                  </p>
                   <div
-                    className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl"
+                    className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-black/80"
                     style={soft.inset}
                   >
                     <video
                       key={previewUrl}
-                      ref={videoPlaybackRef}
-                      className="h-full max-h-[280px] w-full bg-black/5 object-contain"
+                      src={previewUrl}
+                      className="h-full max-h-[280px] w-full object-contain"
                       playsInline
                       controls
                       preload="auto"
                       aria-label="Reproducción del video grabado"
+                      onLoadedData={() => setErr('')}
+                      onError={() => {
+                        console.error('[StoryModal] video blob preview error');
+                        setErr(
+                          'Tu navegador no pudo reproducir esta vista previa. Prueba «Volver a grabar» o usa Chrome/Firefox actualizado.'
+                        );
+                      }}
                     />
                   </div>
                   <button
@@ -1123,8 +1107,27 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               )}
               {mediaBlob && previewUrl && (
                 <div className="space-y-3">
-                  <p className="text-center text-lg text-gray-700 md:text-xl">Escucha tu audio</p>
-                  <audio src={previewUrl} controls className="w-full" aria-label="Audio grabado" />
+                  <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu audio</p>
+                  <p className="text-center text-sm text-gray-600 md:text-base">
+                    Escucha el clip completo antes de continuar.
+                  </p>
+                  <div className="rounded-2xl px-3 py-2" style={soft.inset}>
+                    <audio
+                      key={previewUrl}
+                      src={previewUrl}
+                      controls
+                      preload="metadata"
+                      className="w-full"
+                      aria-label="Audio grabado"
+                      onLoadedData={() => setErr('')}
+                      onError={() => {
+                        console.error('[StoryModal] audio blob preview error');
+                        setErr(
+                          'No se pudo reproducir el audio aquí. Prueba «Volver a grabar» o abre en otro navegador.'
+                        );
+                      }}
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={discardRecording}
@@ -1162,19 +1165,71 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   </ul>
                 </div>
               )}
+              <p className="text-sm font-semibold text-gray-800 md:text-base">
+                Escribe tu relato; luego confirma que lo revisaste antes de continuar.
+              </p>
               <textarea
                 id="story-textarea"
                 value={textBody}
-                onChange={(e) => setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
-                rows={12}
+                onChange={(e) => {
+                  setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS));
+                  setTextoReviewAck(false);
+                }}
+                rows={10}
                 className="w-full resize-y rounded-2xl px-4 py-4 text-lg outline-none md:text-xl"
-                style={{ ...soft.inset, minHeight: '220px', fontFamily: APP_FONT }}
+                style={{ ...soft.inset, minHeight: '200px', fontFamily: APP_FONT }}
                 placeholder="Escribe aquí…"
                 aria-label="Relato"
               />
               <p className="text-base text-gray-600 md:text-lg" aria-live="polite">
                 {textBody.length} / {SUBIR_TEXT_MAX_CHARS} caracteres
               </p>
+              {textBody.trim().length > 0 && (
+                <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
+                  {!textoReviewAck ? (
+                    <>
+                      <p className="text-sm font-semibold text-gray-700 md:text-base">¿Listo para revisar?</p>
+                      <button
+                        type="button"
+                        onClick={() => setTextoReviewAck(true)}
+                        disabled={textBody.trim().length === 0}
+                        className="w-full rounded-full py-3 text-base font-bold text-white disabled:cursor-not-allowed disabled:opacity-50 md:text-lg"
+                        style={{
+                          background:
+                            textBody.trim().length > 0
+                              ? 'linear-gradient(180deg,#ff4500,#e63e00)'
+                              : '#9ca3af',
+                          boxShadow: textBody.trim().length > 0 ? '0 6px 20px rgba(255,69,0,0.3)' : 'none',
+                        }}
+                        aria-label="Confirmar que revisé mi texto"
+                      >
+                        He leído y revisado mi texto
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <p className="text-xs font-black uppercase tracking-widest text-gray-500 md:text-sm">
+                        Vista previa (solo lectura)
+                      </p>
+                      <div
+                        className="max-h-40 overflow-y-auto rounded-xl border border-white/40 bg-white/40 px-3 py-2 text-base leading-relaxed text-gray-800 md:text-lg"
+                        style={{ fontFamily: APP_FONT }}
+                      >
+                        {textBody.trim()}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setTextoReviewAck(false)}
+                        className="w-full rounded-full py-2.5 text-sm font-semibold text-gray-700 md:text-base"
+                        style={soft.button}
+                        aria-label="Seguir editando el texto"
+                      >
+                        Seguir editando
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           )}
 
@@ -1231,6 +1286,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               {photoFiles.length >= SUBIR_PHOTO_MAX && (
                 <p className="text-base font-medium text-orange-700 md:text-lg">Llegaste al máximo de {SUBIR_PHOTO_MAX} fotos.</p>
               )}
+              {photoPreviews.length > 0 && (
+                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">
+                  Revisa tus fotos antes de continuar
+                </p>
+              )}
               <p className="text-lg font-semibold text-gray-700 md:text-xl" aria-live="polite">
                 {photoFiles.length} / {SUBIR_PHOTO_MAX} fotos
                 {photoFiles.length > 0 && photoFiles.length < SUBIR_PHOTO_MIN && (
@@ -1259,318 +1319,279 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
 
           {step === 'details' && (
-            <div className="space-y-5">
-              <div className="space-y-2 px-1">
+            <div className="flex min-h-0 flex-1 flex-col gap-2 md:gap-3">
+              <div className="shrink-0 space-y-0.5 px-0.5">
                 <h3
                   id="story-modal-details-title"
-                  className="text-2xl font-light leading-tight text-gray-800 md:text-3xl"
+                  className="text-lg font-light leading-tight text-gray-800 md:text-xl"
                 >
                   Un par de datos más
                 </h3>
-                <p className="text-base leading-relaxed text-gray-600 md:text-lg">
-                  Solo para identificar tu historia en el mapa.
+                <p className="text-xs leading-snug text-gray-600 md:text-sm">
+                  Mismos datos que en el envío web: historia, ubicación, aviso al globo y privacidad. Sin desplazamiento en
+                  pantallas medianas o grandes.
                 </p>
               </div>
 
-              {/* Historia */}
-              <div className="rounded-[30px] p-7" style={soft.inset}>
-                <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-4 md:text-base">Historia</div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="md:col-span-2">
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <FileText size={14} />
-                      </span>
-                      Nombre de la historia (obligatorio)
-                    </div>
-                    <input
-                      value={storyTitle}
-                      onChange={(e) => setStoryTitle(e.target.value)}
-                      placeholder="Ej: El día que entendí algo"
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    />
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start">
+                {/* Historia + extras — columna izquierda */}
+                <div className="min-h-0 rounded-2xl p-3 md:p-4" style={soft.inset}>
+                  <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
+                    Historia
                   </div>
-
-                  <div className="md:col-span-2">
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <User size={14} />
-                      </span>
-                      Nombre de la persona (opcional)
+                  <div className="space-y-2">
+                    <div>
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <FileText size={12} className="text-orange-500" aria-hidden />
+                        Nombre de la historia *
+                      </div>
+                      <input
+                        value={storyTitle}
+                        onChange={(e) => setStoryTitle(e.target.value)}
+                        placeholder="Ej: El día que entendí algo"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
                     </div>
-                    <input
-                      value={alias}
-                      onChange={(e) => setAlias(e.target.value)}
-                      placeholder="Ej: tu nombre o cómo quieres que te llamen"
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    />
-                    <div className="mt-2 text-sm text-gray-500 md:text-base">
-                      Es el nombre con el que figuras como autoría; si lo dejas vacío, puedes aparecer como &quot;Anónimo/a&quot;.
+                    <div>
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <User size={12} className="text-orange-500" aria-hidden />
+                        Nombre o alias *
+                      </div>
+                      <input
+                        value={alias}
+                        onChange={(e) => setAlias(e.target.value)}
+                        placeholder="Cómo quieres aparecer"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Extras opcionales */}
-              <div className="rounded-[30px] p-7" style={soft.inset}>
-                <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-4 md:text-base">Extras (opcional)</div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div className="md:col-span-2">
-                    <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">Texto adicional (opcional)</div>
-                    <textarea
-                      value={extraText}
-                      onChange={(e) => setExtraText(e.target.value)}
-                      placeholder="Si quieres agregar contexto, detalles, nombres (si corresponde), o algo que no quedó en el video/audio/fotos..."
-                      className="w-full min-h-[140px] rounded-[18px] p-5 text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <Upload size={14} />
-                      </span>
-                      Adjuntar archivos (opcional) · hasta {MAX_EXTRA_FILE_MB}MB c/u
+                    <div>
+                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        Extras (opcional)
+                      </div>
+                      <textarea
+                        value={extraText}
+                        onChange={(e) => setExtraText(e.target.value)}
+                        placeholder="Contexto breve si hace falta…"
+                        rows={2}
+                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
                     </div>
-
-                    <label
-                      className="w-full px-5 py-4 rounded-[18px] flex items-center justify-between cursor-pointer text-gray-600"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    >
-                      <span className="text-base md:text-lg">Seleccionar archivos</span>
-                      <input type="file" multiple className="hidden" onChange={(e) => addExtraFiles(e.target.files)} />
-                    </label>
-
-                    {extraFiles.length > 0 && (
-                      <div className="mt-4 space-y-2">
-                        {extraFiles.map((f, idx) => (
-                          <div
-                            key={f.name + idx}
-                            className="flex items-center justify-between px-4 py-3 rounded-[16px]"
-                            style={{ ...soft.flat, borderRadius: '16px' }}
-                          >
-                            <div className="text-base text-gray-700 truncate md:text-lg">{f.name}</div>
+                    <div>
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <Upload size={12} className="text-orange-500" aria-hidden />
+                        Archivos · máx. {MAX_EXTRA_FILE_MB}MB c/u
+                      </div>
+                      <label
+                        className="flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-xs text-gray-600 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      >
+                        <span>Adjuntar</span>
+                        <input type="file" multiple className="hidden" onChange={(e) => addExtraFiles(e.target.files)} />
+                      </label>
+                      {extraFiles.length > 0 && (
+                        <ul className="mt-1 max-h-14 space-y-0.5 overflow-y-auto text-[10px] text-gray-700">
+                          {extraFiles.map((f, idx) => (
+                            <li key={f.name + idx} className="flex items-center justify-between gap-1">
+                              <span className="truncate">{f.name}</span>
+                              <button
+                                type="button"
+                                onClick={() => removeExtraFile(idx)}
+                                className="shrink-0 text-[9px] font-bold uppercase text-gray-500 hover:text-red-500"
+                              >
+                                ×
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </div>
+                    <div>
+                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        Foto perfil (opc.) · máx. {MAX_PROFILE_PHOTO_MB}MB
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label
+                          className="cursor-pointer rounded-xl px-2.5 py-1 text-[10px] text-gray-600 md:text-xs"
+                          style={{ ...soft.flat, borderRadius: '12px' }}
+                        >
+                          {profilePhoto ? 'Cambiar' : 'Subir'}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                        {profilePhotoUrl && (
+                          <>
+                            <div className="h-8 w-8 overflow-hidden rounded-lg" style={{ ...soft.flat, borderRadius: '8px' }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                            </div>
                             <button
                               type="button"
-                              onClick={() => removeExtraFile(idx)}
-                              className="text-xs font-black tracking-widest uppercase text-gray-500 hover:text-red-500"
+                              onClick={() => setProfilePhoto(null)}
+                              className="text-[10px] font-bold uppercase text-gray-500 hover:text-red-500"
                             >
                               Quitar
                             </button>
-                          </div>
-                        ))}
+                          </>
+                        )}
                       </div>
-                    )}
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <div className="text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      Foto tuya (opcional) · hasta {MAX_PROFILE_PHOTO_MB}MB
                     </div>
+                  </div>
+                </div>
 
-                    <label
-                      className="w-full px-5 py-4 rounded-[18px] flex items-center justify-between cursor-pointer text-gray-600"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    >
-                      <span className="text-base md:text-lg">{profilePhoto ? 'Cambiar foto' : 'Subir foto'}</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
-                      />
-                    </label>
-
-                    {profilePhotoUrl && (
-                      <div className="mt-4 flex items-center gap-4">
-                        <div className="w-20 h-20 rounded-[18px] overflow-hidden" style={{ ...soft.flat, borderRadius: '18px' }}>
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={profilePhotoUrl} alt="Foto de perfil" className="w-full h-full object-cover" />
-                        </div>
-
-                        <div className="flex-1">
-                          <div className="text-base font-bold text-gray-700 md:text-lg">{profilePhoto?.name}</div>
-                          <button
-                            type="button"
-                            onClick={() => setProfilePhoto(null)}
-                            className="mt-2 text-xs font-black tracking-widest uppercase text-gray-500 hover:text-red-500"
-                          >
-                            Quitar foto
-                          </button>
-                        </div>
+                {/* Datos persona — columna derecha (alineado con /subir) */}
+                <div className="min-h-0 rounded-2xl p-3 md:p-4" style={soft.inset}>
+                  <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
+                    Datos y avisos
+                  </div>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <div className="sm:col-span-2">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <Globe2 size={12} className="text-orange-500" aria-hidden />
+                        País *
                       </div>
-                    )}
+                      <input
+                        value={country}
+                        onChange={(e) => setCountry(e.target.value)}
+                        placeholder="Ej: Chile"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                        autoComplete="country-name"
+                      />
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <MapPin size={12} className="text-orange-500" aria-hidden />
+                        Ciudad o localidad *
+                      </div>
+                      <input
+                        value={city}
+                        onChange={(e) => setCity(e.target.value)}
+                        placeholder="Ej: Santiago"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
+                    </div>
+                    <div>
+                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        Fecha de nac. (opc.)
+                      </div>
+                      <input
+                        value={birthDate}
+                        onChange={(e) => setBirthDate(e.target.value)}
+                        placeholder="Ej: 1990-04-12"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
+                    </div>
+                    <div>
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <Users size={12} className="text-orange-500" aria-hidden />
+                        Género (opcional)
+                      </div>
+                      <select
+                        value={sex}
+                        onChange={(e) => setSex(e.target.value as Sex)}
+                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      >
+                        <option value="">Prefiero no indicar</option>
+                        <option value="femenino">Femenino</option>
+                        <option value="masculino">Masculino</option>
+                        <option value="no-binario">No binario</option>
+                        <option value="prefiero-no-decir">Prefiero no decir</option>
+                      </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        Tramo de edad *
+                      </div>
+                      <select
+                        value={ageRange}
+                        onChange={(e) => setAgeRange(e.target.value as AgeRange)}
+                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      >
+                        <option value="">Elige una opción</option>
+                        {AGE_RANGE_OPTIONS.map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                        <Mail size={12} className="text-orange-500" aria-hidden />
+                        Correo electrónico *
+                      </div>
+                      <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="tu@email.com"
+                        type="email"
+                        autoComplete="email"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
+                      <p className="mt-0.5 text-[10px] leading-tight text-gray-500 md:text-[11px]">
+                        Aviso cuando tu historia, imagen, audio o video se suba al globo (tras la revisión). No se muestra en
+                        público.
+                      </p>
+                    </div>
+                    <div className="sm:col-span-2 flex items-start gap-2 pt-0.5">
+                      <input
+                        id="privacy"
+                        type="checkbox"
+                        checked={acceptedPrivacy}
+                        onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                        className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
+                      />
+                      <label htmlFor="privacy" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
+                        Leí y acepto la{' '}
+                        <a className="text-orange-600 underline" href={PRIVACY_URL} target="_blank" rel="noreferrer">
+                          política de privacidad
+                        </a>
+                        .
+                      </label>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              {/* Datos obligatorios */}
-              <div className="rounded-[30px] p-7" style={soft.inset}>
-                <div className="text-sm font-black tracking-widest uppercase text-gray-500 mb-4 md:text-base">Datos (obligatorios)</div>
+              {err && (
+                <p className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium text-red-600 md:text-xs" role="alert">
+                  {err}
+                </p>
+              )}
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <Users size={14} />
-                      </span>
-                      Género
-                    </div>
-                    <select
-                      value={sex}
-                      onChange={(e) => setSex(e.target.value as Sex)}
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    >
-                      <option value="">Selecciona</option>
-                      <option value="Mujer">Mujer</option>
-                      <option value="Hombre">Hombre</option>
-                      <option value="No binario">No binario</option>
-                      <option value="Otro">Otro</option>
-                      <option value="Prefiero no decir">Prefiero no decir</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <Users size={14} />
-                      </span>
-                      Rango de edad
-                    </div>
-                    <select
-                      value={ageRange}
-                      onChange={(e) => setAgeRange(e.target.value as AgeRange)}
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    >
-                      <option value="">Selecciona</option>
-                      <option value="13-17">13-17</option>
-                      <option value="18-24">18-24</option>
-                      <option value="25-34">25-34</option>
-                      <option value="35-44">35-44</option>
-                      <option value="45-54">45-54</option>
-                      <option value="55-64">55-64</option>
-                      <option value="65+">65+</option>
-                      <option value="Prefiero no decir">Prefiero no decir</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <MapPin size={14} />
-                      </span>
-                      Ciudad
-                    </div>
-                    <input
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="Ej: Santiago"
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    />
-                  </div>
-
-                  <div>
-                    <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                      <span className="text-orange-500">
-                        <Globe2 size={14} />
-                      </span>
-                      País
-                    </div>
-                    <input
-                      value={country}
-                      onChange={(e) => setCountry(e.target.value)}
-                      placeholder="Ej: Chile"
-                      className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                      style={{ ...soft.flat, borderRadius: '18px' }}
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <div className="flex items-start gap-3 pt-2">
-                      <input
-                        id="wantsEmail"
-                        type="checkbox"
-                        checked={wantsEmail}
-                        onChange={(e) => setWantsEmail(e.target.checked)}
-                        className="w-5 h-5 mt-1 accent-orange-500"
-                      />
-                      <label htmlFor="wantsEmail" className="text-base text-gray-600 font-bold leading-relaxed md:text-lg">
-                        Quiero recibir un aviso por correo cuando mi historia aparezca en el mapa.
-                      </label>
-                    </div>
-
-                    {wantsEmail && (
-                      <div className="mt-4">
-                        <div className="flex items-center gap-2 text-xs font-black tracking-widest uppercase text-gray-500 mb-2 md:text-sm">
-                          <span className="text-orange-500">
-                            <Mail size={14} />
-                          </span>
-                          Correo electrónico
-                        </div>
-                        <input
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          placeholder="tu@mail.com"
-                          type="email"
-                          className="w-full px-5 py-4 rounded-[18px] text-base outline-none text-gray-700 md:text-lg"
-                          style={{ ...soft.flat, borderRadius: '18px' }}
-                        />
-                        <div className="mt-2 text-sm text-gray-500 md:text-base">
-                          Este correo se usa solo para avisarte cuando tu historia esté visible.
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="md:col-span-2 flex items-start gap-3 pt-2">
-                    <input
-                      id="privacy"
-                      type="checkbox"
-                      checked={acceptedPrivacy}
-                      onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                      className="w-5 h-5 mt-1 accent-orange-500"
-                    />
-                    <label htmlFor="privacy" className="text-base text-gray-600 font-bold leading-relaxed md:text-lg">
-                      Leí y acepto la{' '}
-                      <a className="text-orange-600 underline" href={PRIVACY_URL} target="_blank" rel="noreferrer">
-                        política de privacidad
-                      </a>
-                      .
-                    </label>
-                  </div>
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-3 justify-end">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setErr('');
-                      setStep('capture');
-                    }}
-                    className="px-8 py-4 rounded-full text-sm font-black tracking-widest uppercase text-gray-600 active:scale-95 md:text-base"
-                    style={soft.button}
-                  >
-                    Volver
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={submitDetails}
-                    disabled={saving}
-                    className="px-8 py-4 rounded-full text-sm font-black tracking-widest uppercase text-white active:scale-95 disabled:opacity-60 md:text-base"
-                    style={{ ...soft.button, backgroundColor: '#F97316' }}
-                  >
-                    {saving ? 'Enviando…' : 'Enviar'}
-                  </button>
-                </div>
+              <div className="mt-auto flex shrink-0 flex-wrap justify-end gap-2 border-t border-white/25 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setErr('');
+                    setStep('capture');
+                  }}
+                  className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-gray-600 active:scale-95 md:px-6 md:text-xs"
+                  style={soft.button}
+                >
+                  Volver
+                </button>
+                <button
+                  type="button"
+                  onClick={submitDetails}
+                  disabled={saving}
+                  className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
+                  style={{ ...soft.button, backgroundColor: '#F97316' }}
+                >
+                  {saving ? 'Enviando…' : 'Enviar'}
+                </button>
               </div>
             </div>
           )}
@@ -1673,7 +1694,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             </div>
           )}
 
-          {err && <p className="mt-4 text-base font-medium text-red-600 md:text-lg">{err}</p>}
+          {err && step !== 'details' && (
+            <p className="mt-4 text-base font-medium text-red-600 md:text-lg">{err}</p>
+          )}
         </div>
 
         {(step === 'capture' || step === 'received') && (

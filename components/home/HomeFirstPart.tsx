@@ -410,10 +410,10 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] mb-8 px-6 pb-10 pt-8 sm:pt-10 md:mb-12 md:px-10 md:pb-12 md:pt-14 lg:pt-16"
+        className="relative z-[18] mb-8 px-6 pb-10 pt-0 sm:pt-1 md:mb-12 md:px-10 md:pb-12 md:pt-2 lg:pt-3"
       >
         <p
-          className="home-intro-avenir mx-auto mb-6 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-8 md:mb-10 md:text-lg md:leading-relaxed lg:text-xl"
+          className="home-intro-avenir mx-auto mb-8 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-10 md:mb-12 md:text-lg md:leading-relaxed lg:mb-14 lg:text-xl"
           style={{ color: soft.textBody }}
         >
           {t.historiasLead1}{' '}

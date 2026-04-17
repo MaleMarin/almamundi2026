@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
+import { THEME_LIST } from '@/lib/themes';
 
 const MAX_MB = 8;
 
@@ -21,6 +22,7 @@ export default function SubirFotoPage() {
   const [sex, setSex] = useState<SexOpt>('');
   const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
+  const [topic, setTopic] = useState('');
   const [context, setContext] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -34,6 +36,7 @@ export default function SubirFotoPage() {
     pais.trim().length >= 2 &&
     ageRange !== '' &&
     consentPrivacyPolicy &&
+    THEME_LIST.some((t) => t.id === topic) &&
     file != null &&
     file.size <= MAX_MB * 1024 * 1024 &&
     file.type.startsWith('image/');
@@ -51,6 +54,7 @@ export default function SubirFotoPage() {
         form.set('pais', pais.trim());
         form.set('ageRange', ageRange);
         form.set('consentPrivacyPolicy', '1');
+        form.set('topic', topic);
         if (birthDate.trim()) form.set('birthDate', birthDate.trim());
         if (sex) form.set('sex', sex);
         if (context.trim()) form.set('context', context.trim());
@@ -74,7 +78,7 @@ export default function SubirFotoPage() {
         setStatus('error');
       }
     },
-    [canSubmit, alias, email, pais, ageRange, birthDate, sex, context, file]
+    [canSubmit, alias, email, pais, ageRange, birthDate, sex, context, file, topic]
   );
 
   const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -196,6 +200,28 @@ export default function SubirFotoPage() {
                 </button>
               </div>
             )}
+
+            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl">
+              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                Tema (obligatorio) *
+              </label>
+              <div className="flex flex-wrap gap-2">
+                {THEME_LIST.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setTopic(t.id)}
+                    className="px-2.5 py-1 rounded-full text-xs font-medium transition sm:text-sm"
+                    style={{
+                      ...neu.button,
+                      color: topic === t.id ? '#ff4500' : neu.textBody,
+                    }}
+                  >
+                    {t.label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-3 text-sm">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>

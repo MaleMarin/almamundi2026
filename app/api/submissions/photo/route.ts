@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { MAX_DESCRIPCION, stripHtml } from "@/lib/api/input-validation";
+import {
+  MAX_DESCRIPCION,
+  MAX_TITULO,
+  stripHtml,
+} from "@/lib/api/input-validation";
+import { THEME_IDS } from "@/lib/themes";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { randomUUID } from "crypto";
 import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
@@ -26,6 +31,8 @@ const SEX_OK = new Set([
   "no-binario",
   "prefiero-no-decir",
 ]);
+
+const THEME_SET = new Set<string>(THEME_IDS);
 
 export async function POST(req: Request) {
   const ip = clientIpFromRequest(req);
@@ -60,10 +67,16 @@ export async function POST(req: Request) {
     const sexRaw = String(form.get("sex") || "").trim();
     const ageRangeRaw = String(form.get("ageRange") || "").trim();
     const privacyRaw = String(form.get("consentPrivacyPolicy") || "").trim();
+    const topic = stripHtml(String(form.get("topic") || ""))
+      .slice(0, MAX_TITULO)
+      .trim();
 
     const file = form.get("file");
 
     if (!alias) return NextResponse.json({ error: "alias_required" }, { status: 400 });
+    if (!topic || !THEME_SET.has(topic)) {
+      return NextResponse.json({ error: "topic_required" }, { status: 400 });
+    }
     if (!email) return NextResponse.json({ error: "email_required" }, { status: 400 });
     if (pais.length < 2) {
       return NextResponse.json({ error: "pais_required" }, { status: 400 });
@@ -119,7 +132,7 @@ export async function POST(req: Request) {
       ...(birthDate ? { birthDate } : {}),
       ...(sex ? { sex } : {}),
       ...(context ? { context } : {}),
-      topic: "",
+      topic,
       storagePath,
       status: "pending",
       createdAt: new Date().toISOString(),
