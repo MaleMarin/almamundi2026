@@ -834,7 +834,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}
     >
       <div
-        className="flex w-full max-w-4xl max-h-[90vh] flex-col overflow-hidden"
+        className="flex min-h-0 w-full max-w-4xl max-h-[min(90vh,92dvh)] flex-col overflow-hidden"
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
         <header
@@ -863,7 +863,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         </header>
 
         <div
-          className="min-h-0 flex-1 overflow-y-auto px-5 py-5 md:px-8 md:py-6"
+          className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain px-5 py-5 md:px-8 md:py-6"
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
           {step === 'capture' && (
@@ -918,7 +918,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   {streamReady && (
                     <div className="space-y-3 text-center">
                       <div
-                        className="relative aspect-video w-full overflow-hidden rounded-3xl bg-gray-300/40"
+                        className="relative mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-gray-300/40"
                         style={soft.inset}
                       >
                         <video
@@ -969,11 +969,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               {mediaBlob && previewUrl && (
                 <div className="space-y-3">
                   <p className="text-center text-lg text-gray-700 md:text-xl">Revisa tu video</p>
-                  <div className="overflow-hidden rounded-3xl" style={soft.inset}>
+                  <div
+                    className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl"
+                    style={soft.inset}
+                  >
                     <video
                       key={previewUrl}
                       ref={videoPlaybackRef}
-                      className="max-h-[50vh] w-full min-h-[200px] bg-black/5 object-contain"
+                      className="h-full max-h-[280px] w-full bg-black/5 object-contain"
                       playsInline
                       controls
                       preload="auto"
