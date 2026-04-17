@@ -168,14 +168,14 @@ export function HomeFirstPart({
         <div className="flex items-center justify-end gap-2 shrink-0 md:gap-3">
           <button
             type="button"
-            className="md:hidden flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"
+            className="md:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"
             style={soft.button}
             aria-expanded={mobileNavOpen}
             aria-controls="home-header-mobile-nav"
             aria-label={mobileNavOpen ? t.ariaCloseMenu : t.ariaOpenMenu}
             onClick={() => setMobileNavOpen((o) => !o)}
           >
-            {mobileNavOpen ? <X size={22} strokeWidth={2} aria-hidden /> : <Menu size={22} strokeWidth={2} aria-hidden />}
+            {mobileNavOpen ? <X size={20} strokeWidth={2} aria-hidden /> : <Menu size={20} strokeWidth={2} aria-hidden />}
           </button>
           <nav className={MAP_HOME_HEADER_NAV_HOME_CLASS} aria-label={t.ariaMainNav}>
             <PillNavButton compact onClick={onShowPurpose}>

@@ -24,9 +24,9 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
 export const MAP_HOME_NEU_BUTTON_CLASS =
   'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
 
-/** Home header: píldoras algo más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
+/** Home header: píldoras más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =
-  'btn-almamundi home-map-neu-pill box-border flex h-[3.125rem] min-h-[3.125rem] max-h-[3.125rem] min-w-0 w-full max-w-none items-center justify-center px-4 py-0 text-center text-sm font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+  'btn-almamundi home-map-neu-pill box-border flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-full max-w-none items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
 
 /** Base común: max-width y gaps idénticos. Columnas con minmax(0,1fr) = mismo ancho por celda, sin auto-width por contenido. */
 export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-600 lg:gap-4';
