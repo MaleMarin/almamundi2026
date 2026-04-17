@@ -253,8 +253,7 @@ export function EthicalShareFlow({
                 id={`${dialogId}-compromiso`}
               />
               <p className="text-center text-xs leading-relaxed text-white/60">
-                Cuando cierres este aviso, podrás seguir con la opción de compartir (enlace, tarjeta o
-                apps del sistema).
+                Cuando cierre este aviso, podrá continuar con la opción de compartir.
               </p>
               <div className="flex flex-wrap justify-center gap-2">
                 <button

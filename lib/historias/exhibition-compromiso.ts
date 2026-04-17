@@ -1,5 +1,5 @@
 /** Texto único de “Compromiso de Resguardo” para exposición y compartido ético. */
-export const EXHIBITION_COMPROMISO_TITLE = 'Compromiso de Resguardo';
+export const EXHIBITION_COMPROMISO_TITLE = 'COMPROMISO DE RESGUARDO';
 
 export const EXHIBITION_COMPROMISO_BODY =
-  'Las historias aquí presentes son historias que generosamente las personas comparten. Al difundirlas, te comprometes a mantener el nombre del autor y su dignidad. Este no es un sitio de redes sociales, es un espacio de encuentro.';
+  'Cada historia que ve aquí fue confiada a AlmaMundi por alguien que decidió compartirla. Al difundirla, cuide su nombre, su voz y su dignidad. Este es un espacio de encuentro, no de viralización.';
