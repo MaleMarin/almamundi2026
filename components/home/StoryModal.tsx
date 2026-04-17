@@ -437,9 +437,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     const stream = streamRef.current;
     const el = videoLiveRef.current;
     if (!stream || !el) return;
-    if (el.srcObject !== stream) {
-      el.srcObject = stream;
-      void el.play().catch(() => {});
+    try {
+      if (el.srcObject !== stream) {
+        el.srcObject = stream;
+        void el.play().catch(() => {});
+      }
+    } catch (e) {
+      console.error('[StoryModal] video live preview', e);
+      setErr('No se pudo mostrar la cámara en este dispositivo. Prueba otro navegador.');
     }
   }, [isOpen, step, mode, streamReady, mediaBlob, recording]);
 
@@ -450,16 +455,25 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
     const playback = videoPlaybackRef.current;
     if (!playback) return;
-    playback.pause();
-    playback.removeAttribute('src');
-    playback.srcObject = mediaBlob;
-    playback.muted = false;
-    playback.load();
-    void playback.play().catch(() => {});
-    return () => {
+    try {
       playback.pause();
       playback.removeAttribute('src');
-      playback.srcObject = null;
+      playback.srcObject = mediaBlob;
+      playback.muted = false;
+      playback.load();
+      void playback.play().catch(() => {});
+    } catch (e) {
+      console.error('[StoryModal] video playback preview', e);
+      setErr('No se pudo reproducir la vista previa del video.');
+    }
+    return () => {
+      try {
+        playback.pause();
+        playback.removeAttribute('src');
+        playback.srcObject = null;
+      } catch {
+        /* ignore */
+      }
     };
   }, [isOpen, step, mode, mediaBlob]);
 
@@ -494,13 +508,24 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const startRecordingVideo = useCallback(() => {
     const stream = streamRef.current;
     if (!stream) return;
+    if (typeof MediaRecorder === 'undefined') {
+      setErr('Tu navegador no permite grabar video aquí. Prueba Chrome o Firefox actualizado.');
+      return;
+    }
     const mime = pickVideoMime();
     if (!mime) {
       setErr('Tu navegador no permite grabar video en un formato compatible.');
       return;
     }
     chunksRef.current = [];
-    const mr = new MediaRecorder(stream, { mimeType: mime });
+    let mr: MediaRecorder;
+    try {
+      mr = new MediaRecorder(stream, { mimeType: mime });
+    } catch (e) {
+      console.error('[StoryModal] MediaRecorder video', e);
+      setErr('No pudimos iniciar la grabación de video en este navegador. Prueba otro formato o actualiza el navegador.');
+      return;
+    }
     recorderRef.current = mr;
     mr.ondataavailable = (e) => {
       if (e.data.size) chunksRef.current.push(e.data);
@@ -536,20 +561,42 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         return next;
       });
     }, 1000);
-    mr.start(250);
-    setRecording(true);
+    try {
+      mr.start(250);
+      setRecording(true);
+    } catch (e) {
+      console.error('[StoryModal] MediaRecorder.start video', e);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      recorderRef.current = null;
+      setRecording(false);
+      setErr('No se pudo iniciar la grabación. Cierra otras apps que usen la cámara e inténtalo de nuevo.');
+    }
   }, [revokePreview, stopStream, stopTimer]);
 
   const startRecordingAudio = useCallback(() => {
     const stream = streamRef.current;
     if (!stream) return;
+    if (typeof MediaRecorder === 'undefined') {
+      setErr('Tu navegador no permite grabar audio aquí. Prueba Chrome o Firefox actualizado.');
+      return;
+    }
     const mime = pickAudioMime();
     if (!mime) {
       setErr('Tu navegador no permite grabar audio en un formato compatible.');
       return;
     }
     chunksRef.current = [];
-    const mr = new MediaRecorder(stream, { mimeType: mime });
+    let mr: MediaRecorder;
+    try {
+      mr = new MediaRecorder(stream, { mimeType: mime });
+    } catch (e) {
+      console.error('[StoryModal] MediaRecorder audio', e);
+      setErr('No pudimos iniciar la grabación de audio en este navegador.');
+      return;
+    }
     recorderRef.current = mr;
     mr.ondataavailable = (e) => {
       if (e.data.size) chunksRef.current.push(e.data);
@@ -582,8 +629,19 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         return next;
       });
     }, 1000);
-    mr.start(250);
-    setRecording(true);
+    try {
+      mr.start(250);
+      setRecording(true);
+    } catch (e) {
+      console.error('[StoryModal] MediaRecorder.start audio', e);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+      recorderRef.current = null;
+      setRecording(false);
+      setErr('No se pudo iniciar la grabación de audio. Revisa el micrófono e inténtalo de nuevo.');
+    }
   }, [revokePreview, stopStream, stopTimer]);
 
   const stopRecording = useCallback(() => {
@@ -750,16 +808,20 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   useEffect(() => {
     if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
-    drawImprintPreview(imprintCanvasRef.current, {
-      storyId: imprintId,
-      receivedAt: imprintReceivedAt,
-      mode,
-      textBody,
-      storyTitle,
-      extraText,
-      photoFiles,
-      mediaBlob,
-    });
+    try {
+      drawImprintPreview(imprintCanvasRef.current, {
+        storyId: imprintId,
+        receivedAt: imprintReceivedAt,
+        mode,
+        textBody,
+        storyTitle,
+        extraText,
+        photoFiles,
+        mediaBlob,
+      });
+    } catch (e) {
+      console.error('[StoryModal] drawImprintPreview', e);
+    }
   }, [
     step,
     imprintId,
