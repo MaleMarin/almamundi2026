@@ -59,59 +59,59 @@ type HistoriasCardHoverKind = 'video' | 'audio' | 'text' | 'photo';
 /** Capa decorativa al hover: visor, onda, escritura o marco álbum (pointer-events none). */
 function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
   const wrap =
-    'pointer-events-none absolute inset-[7%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100';
+    'pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
 
   if (kind === 'video') {
     return (
       <div className={wrap} aria-hidden>
         <svg
-          className="h-full w-full text-[#FF4A1C]"
+          className="h-full w-full text-[#FF4A1C] drop-shadow-[0_0_12px_rgba(255,74,28,0.35)]"
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           preserveAspectRatio="none"
         >
           <path
-            d="M6 22V6H22"
+            d="M6 24V6H24"
             stroke="currentColor"
-            strokeWidth="1.15"
+            strokeWidth="1.85"
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.42}
+            opacity={0.78}
           />
           <path
-            d="M78 6H94V22"
+            d="M76 6H94V24"
             stroke="currentColor"
-            strokeWidth="1.15"
+            strokeWidth="1.85"
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.42}
+            opacity={0.78}
           />
           <path
-            d="M6 78V94H22"
+            d="M6 76V94H24"
             stroke="currentColor"
-            strokeWidth="1.15"
+            strokeWidth="1.85"
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.42}
+            opacity={0.78}
           />
           <path
-            d="M94 78V94H78"
+            d="M94 76V94H76"
             stroke="currentColor"
-            strokeWidth="1.15"
+            strokeWidth="1.85"
             strokeLinecap="round"
             strokeLinejoin="round"
-            opacity={0.42}
+            opacity={0.78}
           />
           <rect
-            x="14"
-            y="14"
-            width="72"
-            height="72"
-            rx="2"
+            x="13"
+            y="13"
+            width="74"
+            height="74"
+            rx="3"
             stroke="currentColor"
-            strokeWidth="0.35"
-            opacity={0.12}
+            strokeWidth="0.55"
+            opacity={0.35}
           />
         </svg>
       </div>
@@ -119,16 +119,16 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
   }
 
   if (kind === 'audio') {
-    const heightsPx = [14, 24, 32, 20, 26];
+    const heightsPx = [20, 34, 44, 28, 36];
     return (
-      <div className={`${wrap} flex items-end justify-center gap-[5px] pb-[16%]`} aria-hidden>
+      <div className={`${wrap} flex items-end justify-center gap-1.5 pb-[14%]`} aria-hidden>
         {heightsPx.map((h, i) => (
           <span
             key={i}
-            className="home-historias-card-audio-bar w-[6px] rounded-full bg-[#FF4A1C]/32"
+            className="home-historias-card-audio-bar w-[8px] rounded-full bg-[#FF4A1C]/70 shadow-[0_0_14px_rgba(255,74,28,0.45)]"
             style={{
               height: h,
-              animationDelay: `${i * 0.1}s`,
+              animationDelay: `${i * 0.08}s`,
             }}
           />
         ))}
@@ -138,17 +138,17 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
 
   if (kind === 'text') {
     return (
-      <div className={`${wrap} flex flex-col items-center justify-center gap-3 pt-[8%]`} aria-hidden>
-        <div className="relative h-9 w-[78%] max-w-[220px] rounded-md border border-gray-400/15 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
-          <span className="home-historias-card-type-cursor absolute bottom-2.5 left-3 inline-block h-3 w-px bg-[#FF4A1C]/55" />
+      <div className={`${wrap} flex flex-col items-center justify-center gap-4 pt-[6%]`} aria-hidden>
+        <div className="relative h-11 w-[82%] max-w-[240px] rounded-md border-2 border-[#FF4A1C]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]">
+          <span className="home-historias-card-type-cursor absolute bottom-3 left-3.5 inline-block h-4 w-[3px] rounded-sm bg-[#FF4A1C] shadow-[0_0_10px_rgba(255,74,28,0.65)]" />
           <span
-            className="home-historias-card-type-line absolute bottom-2.5 left-3 h-px rounded-full bg-gray-500/25"
-            style={{ width: '42%' }}
+            className="home-historias-card-type-line absolute bottom-3 left-3.5 h-[2px] rounded-full bg-gray-600/45"
+            style={{ width: '48%' }}
           />
         </div>
-        <div className="flex w-[72%] max-w-[200px] flex-col gap-1.5">
-          <span className="home-historias-card-float-line h-1.5 w-[92%] rounded-full bg-gray-500/12" />
-          <span className="home-historias-card-float-line home-historias-card-float-line--delay h-1.5 w-[68%] rounded-full bg-gray-500/10" />
+        <div className="flex w-[76%] max-w-[220px] flex-col gap-2">
+          <span className="home-historias-card-float-line h-2 w-[94%] rounded-full bg-gray-600/28 shadow-sm" />
+          <span className="home-historias-card-float-line home-historias-card-float-line--delay h-2 w-[72%] rounded-full bg-gray-600/22 shadow-sm" />
         </div>
       </div>
     );
@@ -157,8 +157,8 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
   /* photo */
   return (
     <div className={wrap} aria-hidden>
-      <div className="absolute inset-[6%] rounded-xl border border-white/45 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.06)]" />
-      <div className="home-historias-card-photo-shine absolute inset-[6%] rounded-xl" />
+      <div className="absolute inset-[5%] rounded-xl border-2 border-white/75 shadow-[inset_0_0_0_2px_rgba(255,255,255,0.35),0_12px_36px_rgba(0,0,0,0.12)]" />
+      <div className="home-historias-card-photo-shine absolute inset-[5%] rounded-xl" />
     </div>
   );
 }
@@ -410,10 +410,10 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] mb-8 px-6 pb-10 pt-6 sm:pt-8 md:mb-12 md:px-10 md:pb-12 md:pt-12 lg:pt-14"
+        className="relative z-[18] mb-8 px-6 pb-10 pt-10 sm:pt-12 md:mb-12 md:px-10 md:pb-12 md:pt-16 lg:pt-20"
       >
         <p
-          className="home-intro-avenir mx-auto mb-6 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-8 md:mb-10 md:text-lg md:leading-relaxed lg:text-xl"
+          className="home-intro-avenir mx-auto mb-8 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-10 md:mb-12 md:text-lg md:leading-relaxed lg:text-xl"
           style={{ color: soft.textBody }}
         >
           {t.historiasLead1}{' '}

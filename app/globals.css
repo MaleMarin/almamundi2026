@@ -94,7 +94,12 @@
 
 @media (hover: hover) and (pointer: fine) {
   .home-neu-card.home-historias-card-surface:hover {
-    transform: translateY(-0.5rem);
+    transform: translateY(-0.65rem);
+    box-shadow:
+      18px 18px 46px rgba(120, 135, 155, 0.48),
+      -18px -18px 50px rgba(255, 255, 255, 1),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.88),
+      inset -4px -4px 12px rgba(163, 177, 198, 0.22) !important;
   }
 }
 
@@ -117,8 +122,8 @@
 @keyframes home-historias-audio-pulse {
   0%,
   100% {
-    transform: scaleY(0.38);
-    opacity: 0.65;
+    transform: scaleY(0.22);
+    opacity: 0.55;
   }
   50% {
     transform: scaleY(1);
@@ -127,21 +132,21 @@
 }
 .home-historias-card-audio-bar {
   transform-origin: bottom center;
-  animation: home-historias-audio-pulse 1.05s ease-in-out infinite;
+  animation: home-historias-audio-pulse 0.85s ease-in-out infinite;
 }
 
 @keyframes home-historias-type-blink {
   0%,
-  48% {
+  42% {
     opacity: 1;
   }
-  52%,
+  48%,
   100% {
-    opacity: 0.12;
+    opacity: 0.2;
   }
 }
 .home-historias-card-type-cursor {
-  animation: home-historias-type-blink 1.05s steps(1, end) infinite;
+  animation: home-historias-type-blink 0.9s steps(1, end) infinite;
 }
 
 @keyframes home-historias-float-y {
@@ -150,22 +155,22 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-5px);
+    transform: translateY(-9px);
   }
 }
 .home-historias-card-float-line {
-  animation: home-historias-float-y 3.4s ease-in-out infinite;
+  animation: home-historias-float-y 2.6s ease-in-out infinite;
 }
 .home-historias-card-float-line--delay {
-  animation-delay: 0.5s;
+  animation-delay: 0.35s;
 }
 
 @keyframes home-historias-photo-shine {
   0% {
-    background-position: -80% 0;
+    background-position: -100% 0;
   }
   100% {
-    background-position: 180% 0;
+    background-position: 220% 0;
   }
 }
 .home-historias-card-photo-shine {
@@ -173,12 +178,13 @@
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.35) 45%,
-    transparent 70%
+    rgba(255, 255, 255, 0.62) 42%,
+    rgba(255, 255, 255, 0.18) 52%,
+    transparent 78%
   );
-  background-size: 220% 100%;
-  animation: home-historias-photo-shine 2.3s ease-in-out infinite;
-  opacity: 0.9;
+  background-size: 260% 100%;
+  animation: home-historias-photo-shine 1.75s ease-in-out infinite;
+  opacity: 1;
 }
 
 @media (prefers-reduced-motion: reduce) {
