@@ -177,6 +177,12 @@ export async function POST(req: NextRequest) {
   if (data.sex) {
     (doc as SubmissionDoc).sex = data.sex;
   }
+  if (data.ageRange) {
+    (doc as SubmissionDoc).ageRange = data.ageRange;
+  }
+  if (data.consentPrivacyPolicy) {
+    (doc as SubmissionDoc).consentPrivacyPolicy = true;
+  }
   if (data.extraAttachmentUrls?.length) {
     (doc as SubmissionDoc).extraAttachmentUrls = data.extraAttachmentUrls
       .map((u) => u.trim())

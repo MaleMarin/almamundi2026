@@ -1,9 +1,5 @@
 import { NextResponse } from "next/server";
-import {
-  MAX_DESCRIPCION,
-  MAX_TITULO,
-  stripHtml,
-} from "@/lib/api/input-validation";
+import { MAX_DESCRIPCION, stripHtml } from "@/lib/api/input-validation";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { randomUUID } from "crypto";
 import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
@@ -14,6 +10,7 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 
 export const runtime = "nodejs";
 
@@ -21,8 +18,16 @@ const MAX_BYTES = 8 * 1024 * 1024;
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
+const AGE_SET = new Set<string>(AGE_RANGE_OPTIONS.map((o) => o.id));
+
+const SEX_OK = new Set([
+  "femenino",
+  "masculino",
+  "no-binario",
+  "prefiero-no-decir",
+]);
+
 export async function POST(req: Request) {
-  // TODO: verificar token con Firebase Admin en v2
   const ip = clientIpFromRequest(req);
   const rl = getRateLimiter("submissions-photo", 20, 3600);
   const blocked = await enforceRateLimit(rl, `photo:${ip}`, {
@@ -45,21 +50,38 @@ export async function POST(req: Request) {
 
     const alias = stripHtml(String(form.get("alias") || "")).slice(0, 120).trim();
     const email = String(form.get("email") || "").trim().slice(0, 254);
-    const topic = stripHtml(String(form.get("topic") || ""))
-      .slice(0, MAX_TITULO)
-      .trim();
+    const pais = stripHtml(String(form.get("pais") || "")).slice(0, 120).trim();
     const context = stripHtml(String(form.get("context") || ""))
       .slice(0, MAX_DESCRIPCION)
       .trim();
-    const dateTaken = stripHtml(String(form.get("dateTaken") || ""))
+    const birthDate = stripHtml(String(form.get("birthDate") || ""))
       .slice(0, 80)
       .trim();
+    const sexRaw = String(form.get("sex") || "").trim();
+    const ageRangeRaw = String(form.get("ageRange") || "").trim();
+    const privacyRaw = String(form.get("consentPrivacyPolicy") || "").trim();
 
     const file = form.get("file");
 
     if (!alias) return NextResponse.json({ error: "alias_required" }, { status: 400 });
     if (!email) return NextResponse.json({ error: "email_required" }, { status: 400 });
-    if (!topic) return NextResponse.json({ error: "topic_required" }, { status: 400 });
+    if (pais.length < 2) {
+      return NextResponse.json({ error: "pais_required" }, { status: 400 });
+    }
+    if (!ageRangeRaw || !AGE_SET.has(ageRangeRaw)) {
+      return NextResponse.json({ error: "age_range_required" }, { status: 400 });
+    }
+    if (privacyRaw !== "1" && privacyRaw !== "true" && privacyRaw !== "on") {
+      return NextResponse.json({ error: "privacy_required" }, { status: 400 });
+    }
+
+    let sex: string | undefined;
+    if (sexRaw) {
+      if (!SEX_OK.has(sexRaw)) {
+        return NextResponse.json({ error: "invalid_sex" }, { status: 400 });
+      }
+      sex = sexRaw;
+    }
 
     if (!(file instanceof File)) {
       return NextResponse.json({ error: "file_required" }, { status: 400 });
@@ -91,9 +113,13 @@ export async function POST(req: Request) {
       type: "photo",
       alias,
       email,
-      topic,
-      context,
-      dateTaken,
+      countryLabel: pais,
+      ageRange: ageRangeRaw,
+      consentPrivacyPolicy: true,
+      ...(birthDate ? { birthDate } : {}),
+      ...(sex ? { sex } : {}),
+      ...(context ? { context } : {}),
+      topic: "",
       storagePath,
       status: "pending",
       createdAt: new Date().toISOString(),

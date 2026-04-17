@@ -6,6 +6,7 @@
 import { z } from "zod";
 import { THEME_IDS } from "@/lib/themes";
 import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
+import { AGE_RANGE_OPTIONS, type AgeRangeId } from "@/lib/subir-author-fields";
 
 const privatePathRegex =
   /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
@@ -17,6 +18,10 @@ const themeIdsTuple = THEME_IDS as unknown as [string, ...string[]];
 export const ThemeIdSchema = z.enum(themeIdsTuple);
 
 const sexSchema = z.enum(["femenino", "masculino", "no-binario", "prefiero-no-decir"]);
+
+const ageRangeEnum = z.enum(
+  AGE_RANGE_OPTIONS.map((o) => o.id) as [AgeRangeId, ...AgeRangeId[]]
+);
 
 export const CreateSubmissionBody = z.object({
   type: SubmissionType,
@@ -43,6 +48,8 @@ export const CreateSubmissionBody = z.object({
   consentRights: z.literal(true),
   consentCurate: z.literal(true),
   consentPostales: z.literal(true),
+  /** Lectura y aceptación explícita de la política de privacidad. */
+  consentPrivacyPolicy: z.literal(true),
   /** Cloudflare Turnstile (opcional si TURNSTILE_SECRET_KEY está definida). */
   captchaToken: z.string().max(4000).optional(),
   /** Foto personal opcional (avatar) para mostrar junto al nombre público si se aprueba. */
@@ -51,6 +58,8 @@ export const CreateSubmissionBody = z.object({
   countryLabel: z.string().min(2).max(120).optional(),
   birthDate: z.string().max(80).optional(),
   sex: sexSchema.optional(),
+  /** Tramo de edad (incluye «prefiero no indicar»). */
+  ageRange: ageRangeEnum.optional(),
   /** Documentos o fotos extra para curadores. */
   extraAttachmentUrls: z.array(z.string().url()).max(8).optional(),
   /** Paths en Storage (privados) asociados a esta solicitud; para re-firmar URLs en curación. */
@@ -77,6 +86,8 @@ export interface SubmissionDoc {
   countryLabel?: string;
   birthDate?: string;
   sex?: "femenino" | "masculino" | "no-binario" | "prefiero-no-decir";
+  ageRange?: AgeRangeId;
+  consentPrivacyPolicy?: true;
   extraAttachmentUrls?: string[];
   privateMediaPaths?: string[];
   payload: {

@@ -24,6 +24,10 @@ import {
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
 } from '@/lib/subir-limits';
+import {
+  AGE_RANGE_OPTIONS,
+  type AgeRangeId,
+} from '@/lib/subir-author-fields';
 
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -126,6 +130,8 @@ function SubirPageInner() {
   const [consentRights, setConsentRights] = useState(false);
   const [consentCurate, setConsentCurate] = useState(false);
   const [consentPostales, setConsentPostales] = useState(false);
+  const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
+  const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
 
   const [textBody, setTextBody] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
@@ -169,6 +175,8 @@ function SubirPageInner() {
     consentRights &&
     consentCurate &&
     consentPostales &&
+    consentPrivacyPolicy &&
+    ageRange !== '' &&
     (format === 'texto'
       ? textBody.trim().length > 0 && textBody.trim().length <= SUBIR_TEXT_MAX_CHARS
       : true) &&
@@ -297,9 +305,11 @@ function SubirPageInner() {
           consentRights: true,
           consentCurate: true,
           consentPostales: true,
+          consentPrivacyPolicy: true,
           ...(profilePhotoUrl ? { profilePhotoUrl } : {}),
           ...(birthDate.trim() ? { birthDate: birthDate.trim() } : {}),
           ...(sex ? { sex } : {}),
+          ...(ageRange ? { ageRange } : {}),
           ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
           ...(privateMediaPaths.length ? { privateMediaPaths } : {}),
         }),
@@ -333,6 +343,7 @@ function SubirPageInner() {
     pais,
     birthDate,
     sex,
+    ageRange,
     textBody,
     videoUrl,
     audioUrl,
@@ -633,112 +644,166 @@ function SubirPageInner() {
               </div>
             )}
 
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label htmlFor="subir-datos-titulo" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Nombre de la historia *
-              </label>
-              <input
-                id="subir-datos-titulo"
-                type="text"
-                value={storyTitle}
-                onChange={(e) => setStoryTitle(e.target.value)}
-                placeholder="Título que verán en el mapa si se publica"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                aria-required="true"
-                aria-invalid={storyTitle.trim().length > 0 && storyTitle.trim().length < 2}
-                aria-describedby={
-                  storyTitle.trim().length > 0 && storyTitle.trim().length < 2 ? 'subir-datos-titulo-error' : undefined
-                }
-              />
-              {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
-                <p id="subir-datos-titulo-error" className="mt-1 text-xs text-amber-700" role="alert">
-                  Mínimo 2 caracteres
-                </p>
-              )}
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label htmlFor="subir-datos-alias" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Nombre de la persona (cómo aparecerás) *
-              </label>
-              <input
-                id="subir-datos-alias"
-                type="text"
-                value={alias}
-                onChange={(e) => setAlias(e.target.value)}
-                placeholder="Tu nombre o cómo quieres figurar públicamente"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                aria-required="true"
-                aria-invalid={alias.trim().length > 0 && alias.trim().length < 2}
-                aria-describedby={
-                  alias.trim().length > 0 && alias.trim().length < 2 ? 'subir-datos-alias-error' : undefined
-                }
-              />
-              {alias.trim().length > 0 && alias.trim().length < 2 && (
-                <p id="subir-datos-alias-error" className="mt-1 text-xs text-amber-700" role="alert">
-                  Mínimo 2 caracteres
-                </p>
-              )}
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <label htmlFor="subir-datos-email" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Email (privado; solo notificaciones) *
-              </label>
-              <input
-                id="subir-datos-email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="tu@email.com"
-                className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                aria-required="true"
-                aria-invalid={email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())}
-                aria-describedby="subir-datos-email-hint"
-              />
-              <p id="subir-datos-email-hint" className="mt-2 text-xs" style={{ color: neu.textBody }}>
-                Te avisamos por aquí cuando tu historia pase la curación y se publique en el mapa.
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Historia, ubicación y datos para avisos
               </p>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  Fecha de nacimiento (opcional)
+                <label htmlFor="subir-datos-titulo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Nombre de la historia *
                 </label>
                 <input
-                  id="subir-datos-nacimiento"
+                  id="subir-datos-titulo"
                   type="text"
-                  value={birthDate}
-                  onChange={(e) => setBirthDate(e.target.value)}
-                  placeholder="Ej: 1990-04-12 o aproximada"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  value={storyTitle}
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  placeholder="Título que verán en el mapa si se publica"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={storyTitle.trim().length > 0 && storyTitle.trim().length < 2}
+                  aria-describedby={
+                    storyTitle.trim().length > 0 && storyTitle.trim().length < 2 ? 'subir-datos-titulo-error' : undefined
+                  }
                 />
+                {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
+                  <p id="subir-datos-titulo-error" className="mt-1 text-xs text-amber-700" role="alert">
+                    Mínimo 2 caracteres
+                  </p>
+                )}
               </div>
               <div>
-                <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  Sexo (opcional)
+                <label htmlFor="subir-datos-alias" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Nombre o alias (obligatorio) *
+                </label>
+                <input
+                  id="subir-datos-alias"
+                  type="text"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                  placeholder="Cómo quieres aparecer"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={alias.trim().length > 0 && alias.trim().length < 2}
+                  aria-describedby={
+                    alias.trim().length > 0 && alias.trim().length < 2 ? 'subir-datos-alias-error' : undefined
+                  }
+                />
+                {alias.trim().length > 0 && alias.trim().length < 2 && (
+                  <p id="subir-datos-alias-error" className="mt-1 text-xs text-amber-700" role="alert">
+                    Mínimo 2 caracteres
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="subir-datos-email" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Correo electrónico *
+                </label>
+                <input
+                  id="subir-datos-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="tu@email.com"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())}
+                  aria-describedby="subir-datos-email-hint"
+                />
+                <p id="subir-datos-email-hint" className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
+                  Lo usamos para enviarte un aviso cuando tu historia, imagen, audio o video se suba al globo (tras la revisión). No lo mostramos en público.
+                </p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="subir-datos-pais" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    País *
+                  </label>
+                  <input
+                    id="subir-datos-pais"
+                    type="text"
+                    value={pais}
+                    onChange={(e) => setPais(e.target.value)}
+                    placeholder="Ej: Chile"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                    aria-required="true"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subir-datos-ciudad" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Ciudad o localidad *
+                  </label>
+                  <input
+                    id="subir-datos-ciudad"
+                    type="text"
+                    value={ciudad}
+                    onChange={(e) => setCiudad(e.target.value)}
+                    placeholder="Ej: Santiago"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                    aria-required="true"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Fecha de nacimiento (opcional)
+                  </label>
+                  <input
+                    id="subir-datos-nacimiento"
+                    type="text"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    placeholder="Ej: 1990-04-12 o aproximada"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Género (opcional)
+                  </label>
+                  <select
+                    id="subir-datos-sexo"
+                    value={sex}
+                    onChange={(e) =>
+                      setSex(
+                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
+                      )
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  >
+                    <option value="">Prefiero no indicar</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="no-binario">No binario</option>
+                    <option value="prefiero-no-decir">Otro / no decir</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label htmlFor="subir-datos-edad-tramo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Tramo de edad *
                 </label>
                 <select
-                  id="subir-datos-sexo"
-                  value={sex}
-                  onChange={(e) =>
-                    setSex(
-                      e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
-                    )
-                  }
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  id="subir-datos-edad-tramo"
+                  value={ageRange}
+                  onChange={(e) => setAgeRange(e.target.value as AgeRangeId | '')}
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
                 >
-                  <option value="">Prefiero no indicar</option>
-                  <option value="femenino">Femenino</option>
-                  <option value="masculino">Masculino</option>
-                  <option value="no-binario">No binario</option>
-                  <option value="prefiero-no-decir">Otro / no decir</option>
+                  <option value="">Elige una opción</option>
+                  {AGE_RANGE_OPTIONS.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -818,39 +883,6 @@ function SubirPageInner() {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="subir-datos-ciudad" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  Ciudad o localidad *
-                </label>
-                <input
-                  id="subir-datos-ciudad"
-                  type="text"
-                  value={ciudad}
-                  onChange={(e) => setCiudad(e.target.value)}
-                  placeholder="Ej: Santiago"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                />
-              </div>
-              <div>
-                <label htmlFor="subir-datos-pais" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  País *
-                </label>
-                <input
-                  id="subir-datos-pais"
-                  type="text"
-                  value={pais}
-                  onChange={(e) => setPais(e.target.value)}
-                  placeholder="Ej: Chile"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                />
               </div>
             </div>
 
@@ -1066,13 +1098,23 @@ function SubirPageInner() {
             </div>
 
             <div className="space-y-3">
-              <p className="text-xs" style={{ color: neu.textBody }}>
-                Al enviar confirmas haber leído la{' '}
-                <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
-                  política de privacidad
-                </Link>
-                .
-              </p>
+              <label htmlFor="subir-consent-privacidad" className="flex items-start gap-3 text-sm font-medium" style={{ color: neu.textMain }}>
+                <input
+                  id="subir-consent-privacidad"
+                  type="checkbox"
+                  checked={consentPrivacyPolicy}
+                  onChange={(e) => setConsentPrivacyPolicy(e.target.checked)}
+                  className="mt-1 accent-orange-500"
+                  aria-required="true"
+                />
+                <span>
+                  He leído y acepto la{' '}
+                  <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
+                    política de privacidad
+                  </Link>
+                  .
+                </span>
+              </label>
               <label htmlFor="subir-consent-rights" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
                 <input
                   id="subir-consent-rights"
