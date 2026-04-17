@@ -119,12 +119,15 @@ export function HistoriasAccordion({
         {triggerLabel} {open ? '▲' : '▼'}
       </button>
       {open && (
-        <div className="absolute top-full left-0 z-50 mt-1 min-w-[200px] rounded-xl border border-gray-200/60 bg-[#E0E5EC] py-2 shadow-lg">
+        <div
+          className="absolute top-full left-0 z-50 mt-1.5 w-max min-w-[9.25rem] max-w-[13rem] rounded-[14px] border border-white/55 bg-[#E8EBF2] py-1 shadow-[6px_8px_18px_rgba(136,150,170,0.28),-3px_-4px_14px_rgba(255,255,255,0.92)]"
+          role="menu"
+        >
           {ITEMS.map((item) => (
             <ActiveInternalNavLink
               key={item.label}
               href={item.href}
-              className="block px-4 py-3 text-lg font-medium text-[#c23600] hover:bg-gray-200/55 hover:text-[#a02d00] first:rounded-t-xl last:rounded-b-xl md:text-[1.125rem] md:leading-snug"
+              className="block whitespace-nowrap px-3 py-1.5 text-[0.8125rem] font-normal leading-snug tracking-wide text-[#b45309] transition-colors hover:bg-white/45 hover:text-[#9a3412] first:rounded-t-[12px] last:rounded-b-[12px] md:px-3.5 md:py-2 md:text-sm"
               onClick={afterNavigate}
             >
               {item.label}

@@ -65,21 +65,21 @@ const es: HomeMessages = {
   cardVideoSubtitle: 'en primer plano',
   cardVideoBody:
     'Una cámara puede guardar un gesto, una pausa, una voz, una mirada.',
-  cardVideoCta: 'graba un video',
+  cardVideoCta: 'Graba un video',
   cardAudioTitle: 'Dale voz',
   cardAudioSubtitle: 'a lo que recuerdas',
   cardAudioBody:
     'Hay historias que no necesitan verse. Solo necesitan ser escuchadas.',
-  cardAudioCta: 'graba un audio',
+  cardAudioCta: 'Graba un audio',
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
     'Escribe una escena, una carta, una despedida o algo que todavía vuelve.',
-  cardWriteCta: 'escribe una historia',
+  cardWriteCta: 'Escribe una historia',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
   cardPhotoBody: 'Sube una foto y cuenta la historia que guarda.',
-  cardPhotoCta: 'sube una foto',
+  cardPhotoCta: 'Sube una foto',
 };
 
 const pt: HomeMessages = {
@@ -107,21 +107,21 @@ const pt: HomeMessages = {
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBody:
     'Uma câmara pode guardar um gesto, uma pausa, uma voz, um olhar.',
-  cardVideoCta: 'grava um vídeo',
+  cardVideoCta: 'Grava um vídeo',
   cardAudioTitle: 'Dê voz',
   cardAudioSubtitle: 'ao que recorda',
   cardAudioBody:
     'Há histórias que não precisam de ser vistas. Só precisam de ser ouvidas.',
-  cardAudioCta: 'grava um áudio',
+  cardAudioCta: 'Grava um áudio',
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
     'Escreva uma cena, uma carta, um adeus ou algo que ainda volta.',
-  cardWriteCta: 'escreve uma história',
+  cardWriteCta: 'Escreve uma história',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
   cardPhotoBody: 'Carregue uma foto e conte a história que ela guarda.',
-  cardPhotoCta: 'envia uma foto',
+  cardPhotoCta: 'Envia uma foto',
 };
 
 const en: HomeMessages = {
@@ -149,21 +149,21 @@ const en: HomeMessages = {
   cardVideoSubtitle: 'center stage',
   cardVideoBody:
     'A camera can hold a gesture, a pause, a voice, a look.',
-  cardVideoCta: 'record a video',
+  cardVideoCta: 'Record a video',
   cardAudioTitle: 'Give voice',
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
     'Some stories don’t need to be seen. They only need to be heard.',
-  cardAudioCta: 'record audio',
+  cardAudioCta: 'Record audio',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
     'Write a scene, a letter, a farewell—or something that still comes back.',
-  cardWriteCta: 'write a story',
+  cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
   cardPhotoBody: 'Upload a photo and tell the story it holds.',
-  cardPhotoCta: 'upload a photo',
+  cardPhotoCta: 'Upload a photo',
 };
 
 export const HOME_MESSAGES: Record<AlmaLocale, HomeMessages> = { es, pt, en };
