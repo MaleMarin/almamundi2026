@@ -54,13 +54,123 @@ const soft = {
   },
 } as const;
 
+type HistoriasCardHoverKind = 'video' | 'audio' | 'text' | 'photo';
+
+/** Capa decorativa al hover: visor, onda, escritura o marco álbum (pointer-events none). */
+function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
+  const wrap =
+    'pointer-events-none absolute inset-[7%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-500 ease-out group-hover:opacity-100';
+
+  if (kind === 'video') {
+    return (
+      <div className={wrap} aria-hidden>
+        <svg
+          className="h-full w-full text-[#FF4A1C]"
+          viewBox="0 0 100 100"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+          preserveAspectRatio="none"
+        >
+          <path
+            d="M6 22V6H22"
+            stroke="currentColor"
+            strokeWidth="1.15"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.42}
+          />
+          <path
+            d="M78 6H94V22"
+            stroke="currentColor"
+            strokeWidth="1.15"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.42}
+          />
+          <path
+            d="M6 78V94H22"
+            stroke="currentColor"
+            strokeWidth="1.15"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.42}
+          />
+          <path
+            d="M94 78V94H78"
+            stroke="currentColor"
+            strokeWidth="1.15"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            opacity={0.42}
+          />
+          <rect
+            x="14"
+            y="14"
+            width="72"
+            height="72"
+            rx="2"
+            stroke="currentColor"
+            strokeWidth="0.35"
+            opacity={0.12}
+          />
+        </svg>
+      </div>
+    );
+  }
+
+  if (kind === 'audio') {
+    const heightsPx = [14, 24, 32, 20, 26];
+    return (
+      <div className={`${wrap} flex items-end justify-center gap-[5px] pb-[16%]`} aria-hidden>
+        {heightsPx.map((h, i) => (
+          <span
+            key={i}
+            className="home-historias-card-audio-bar w-[6px] rounded-full bg-[#FF4A1C]/32"
+            style={{
+              height: h,
+              animationDelay: `${i * 0.1}s`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  if (kind === 'text') {
+    return (
+      <div className={`${wrap} flex flex-col items-center justify-center gap-3 pt-[8%]`} aria-hidden>
+        <div className="relative h-9 w-[78%] max-w-[220px] rounded-md border border-gray-400/15 bg-white/[0.04] shadow-[inset_0_1px_0_rgba(255,255,255,0.35)]">
+          <span className="home-historias-card-type-cursor absolute bottom-2.5 left-3 inline-block h-3 w-px bg-[#FF4A1C]/55" />
+          <span
+            className="home-historias-card-type-line absolute bottom-2.5 left-3 h-px rounded-full bg-gray-500/25"
+            style={{ width: '42%' }}
+          />
+        </div>
+        <div className="flex w-[72%] max-w-[200px] flex-col gap-1.5">
+          <span className="home-historias-card-float-line h-1.5 w-[92%] rounded-full bg-gray-500/12" />
+          <span className="home-historias-card-float-line home-historias-card-float-line--delay h-1.5 w-[68%] rounded-full bg-gray-500/10" />
+        </div>
+      </div>
+    );
+  }
+
+  /* photo */
+  return (
+    <div className={wrap} aria-hidden>
+      <div className="absolute inset-[6%] rounded-xl border border-white/45 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.2),0_8px_24px_rgba(0,0,0,0.06)]" />
+      <div className="home-historias-card-photo-shine absolute inset-[6%] rounded-xl" />
+    </div>
+  );
+}
+
 function SoftCard({
   title,
   subtitle,
   children,
   buttonLabel,
   onClick,
-  delay
+  delay,
+  hoverKind,
 }: {
   title: string;
   subtitle: string;
@@ -68,6 +178,7 @@ function SoftCard({
   buttonLabel: string;
   onClick: () => void;
   delay: string;
+  hoverKind: HistoriasCardHoverKind;
 }) {
   return (
     <div
@@ -82,33 +193,35 @@ function SoftCard({
           fontFamily: APP_FONT,
         }}
       >
-        <div className="shrink-0 min-w-0">
-          <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
-            {title}
-          </p>
-          <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
-            {subtitle}
-          </h2>
-        </div>
-        {/* Texto + CTA abajo: flex-1 rellena el hueco; justify-end los ancla al borde inferior */}
-        <div className="flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4">
-          <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
-            {children}
-          </p>
-          <button
-            type="button"
-            onClick={onClick}
-            className="flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[11px] font-bold uppercase tracking-[0.07em] transition-opacity hover:opacity-[0.9] active:scale-[0.98] md:px-4 md:py-3 md:text-xs"
-            style={{
-              background: '#FF4A1C',
-              color: 'white',
-              border: 'none',
-              borderRadius: '100px',
-              fontFamily: APP_FONT,
-            }}
-          >
-            {buttonLabel}
-          </button>
+        <HistoriasCardHoverDecor kind={hoverKind} />
+        <div className="relative z-[1] flex min-h-0 flex-1 flex-col">
+          <div className="shrink-0 min-w-0">
+            <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
+              {title}
+            </p>
+            <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
+              {subtitle}
+            </h2>
+          </div>
+          <div className="flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4">
+            <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
+              {children}
+            </p>
+            <button
+              type="button"
+              onClick={onClick}
+              className="flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case tracking-wide transition-opacity hover:opacity-[0.92] active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
+              style={{
+                background: '#FF4A1C',
+                color: 'white',
+                border: 'none',
+                borderRadius: '100px',
+                fontFamily: APP_FONT,
+              }}
+            >
+              {buttonLabel}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -297,10 +410,10 @@ export function HomeFirstPart({
       <section
         id="historias"
         aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] mb-8 px-6 pb-10 pt-14 sm:pt-16 md:mb-12 md:px-10 md:pb-12 md:pt-20 lg:pt-24"
+        className="relative z-[18] mb-8 px-6 pb-10 pt-6 sm:pt-8 md:mb-12 md:px-10 md:pb-12 md:pt-12 lg:pt-14"
       >
         <p
-          className="home-intro-avenir mx-auto mb-10 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-12 md:mb-14 md:text-lg md:leading-relaxed lg:text-xl"
+          className="home-intro-avenir mx-auto mb-6 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-8 md:mb-10 md:text-lg md:leading-relaxed lg:text-xl"
           style={{ color: soft.textBody }}
         >
           {t.historiasLead1}{' '}
@@ -313,10 +426,9 @@ export function HomeFirstPart({
           buttonLabel={t.cardVideoCta}
           onClick={onRecordVideo}
           delay="0s"
+          hoverKind="video"
         >
-          {t.cardVideoBefore}
-          <strong>{t.cardVideoStrong}</strong>
-          {t.cardVideoAfter}
+          {t.cardVideoBody}
         </SoftCard>
         <SoftCard
           title={t.cardAudioTitle}
@@ -324,10 +436,9 @@ export function HomeFirstPart({
           buttonLabel={t.cardAudioCta}
           onClick={onRecordAudio}
           delay="0.45s"
+          hoverKind="audio"
         >
-          {t.cardAudioBefore}
-          <strong>{t.cardAudioStrong}</strong>
-          {t.cardAudioAfter}
+          {t.cardAudioBody}
         </SoftCard>
         <SoftCard
           title={t.cardWriteTitle}
@@ -335,19 +446,19 @@ export function HomeFirstPart({
           buttonLabel={t.cardWriteCta}
           onClick={onWriteStory}
           delay="0.9s"
+          hoverKind="text"
         >
-          {t.cardWriteBefore}
-          <strong>{t.cardWriteStrong}</strong>
-          {t.cardWriteAfter}
+          {t.cardWriteBody}
         </SoftCard>
         <SoftCard
-          title="Tu mirada,"
-          subtitle="en una fotografía"
-          buttonLabel="SUBE UNA FOTO"
+          title={t.cardPhotoTitle}
+          subtitle={t.cardPhotoSubtitle}
+          buttonLabel={t.cardPhotoCta}
           onClick={() => router.push('/subir/foto')}
           delay="1.35s"
+          hoverKind="photo"
         >
-          A veces, una imagen guarda lo que las palabras no alcanzan.
+          {t.cardPhotoBody}
         </SoftCard>
         </div>
       </section>

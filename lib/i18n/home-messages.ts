@@ -22,21 +22,15 @@ export type HomeMessages = {
   historiasLead2: string;
   cardVideoTitle: string;
   cardVideoSubtitle: string;
-  cardVideoBefore: string;
-  cardVideoStrong: string;
-  cardVideoAfter: string;
+  cardVideoBody: string;
   cardVideoCta: string;
   cardAudioTitle: string;
   cardAudioSubtitle: string;
-  cardAudioBefore: string;
-  cardAudioStrong: string;
-  cardAudioAfter: string;
+  cardAudioBody: string;
   cardAudioCta: string;
   cardWriteTitle: string;
   cardWriteSubtitle: string;
-  cardWriteBefore: string;
-  cardWriteStrong: string;
-  cardWriteAfter: string;
+  cardWriteBody: string;
   cardWriteCta: string;
   cardPhotoTitle: string;
   cardPhotoSubtitle: string;
@@ -66,27 +60,23 @@ const es: HomeMessages = {
   historiasLead2: 'Elige tu forma y cuéntala.',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
-  cardVideoBefore: 'A veces, una mirada lo dice todo. Anímate a ',
-  cardVideoStrong: 'grabar ese momento que te marcó',
-  cardVideoAfter: ', una experiencia que viviste o que alguien más te contó.',
-  cardVideoCta: 'GRABA TU VIDEO',
+  cardVideoBody:
+    'Una cámara puede guardar un gesto, una pausa, una voz, una mirada.',
+  cardVideoCta: 'Grabar video',
   cardAudioTitle: 'Dale voz',
-  cardAudioSubtitle: 'a tu recuerdo',
-  cardAudioBefore: 'Hay historias que se sienten mejor cuando solo se escuchan. ',
-  cardAudioStrong: 'Graba tu relato en audio',
-  cardAudioAfter: ' y deja que tu voz haga el resto.',
-  cardAudioCta: 'GRABA TU AUDIO',
+  cardAudioSubtitle: 'a lo que recuerdas',
+  cardAudioBody:
+    'Hay historias que no necesitan verse. Solo necesitan ser escuchadas.',
+  cardAudioCta: 'Grabar audio',
   cardWriteTitle: 'Ponle palabras',
-  cardWriteSubtitle: 'a tu historia',
-  cardWriteBefore: 'Si lo tuyo es escribir, este es tu lugar. Tómate un respiro y ',
-  cardWriteStrong: 'cuenta tu historia a tu ritmo',
-  cardWriteAfter: ', palabra por palabra.',
-  cardWriteCta: 'ESCRIBE TU HISTORIA',
-  cardPhotoTitle: 'Educación mediática,',
-  cardPhotoSubtitle: 'leer el mundo con criterio',
-  cardPhotoBody:
-    'Recursos y marcos para analizar la información, cuidar la ciudadanía digital y fortalecer el pensamiento crítico con respeto a los derechos humanos —en el aula y en la comunidad.',
-  cardPhotoCta: 'IR A EDUCACIÓN MEDIÁTICA',
+  cardWriteSubtitle: 'a tu memoria',
+  cardWriteBody:
+    'Escribe una escena, una carta, una despedida o algo que todavía vuelve.',
+  cardWriteCta: 'Escribir',
+  cardPhotoTitle: 'Una imagen,',
+  cardPhotoSubtitle: 'una vida',
+  cardPhotoBody: 'Sube una foto y cuenta la historia que guarda.',
+  cardPhotoCta: 'Subir foto',
 };
 
 const pt: HomeMessages = {
@@ -111,27 +101,23 @@ const pt: HomeMessages = {
   historiasLead2: 'Escolha a sua forma e conte.',
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
-  cardVideoBefore: 'Às vezes, um olhar diz tudo. Anime-se a ',
-  cardVideoStrong: 'gravar esse momento que marcou',
-  cardVideoAfter: ', uma experiência que viveu ou que alguém lhe contou.',
-  cardVideoCta: 'GRAVE O SEU VÍDEO',
+  cardVideoBody:
+    'Uma câmara pode guardar um gesto, uma pausa, uma voz, um olhar.',
+  cardVideoCta: 'Gravar vídeo',
   cardAudioTitle: 'Dê voz',
-  cardAudioSubtitle: 'à sua memória',
-  cardAudioBefore: 'Há histórias que ficam melhor quando só se ouvem. ',
-  cardAudioStrong: 'Grave o seu relato em áudio',
-  cardAudioAfter: ' e deixe a sua voz fazer o resto.',
-  cardAudioCta: 'GRAVE O SEU ÁUDIO',
+  cardAudioSubtitle: 'ao que recorda',
+  cardAudioBody:
+    'Há histórias que não precisam de ser vistas. Só precisam de ser ouvidas.',
+  cardAudioCta: 'Gravar áudio',
   cardWriteTitle: 'Dê palavras',
-  cardWriteSubtitle: 'à sua história',
-  cardWriteBefore: 'Se o seu jeito é escrever, este é o seu lugar. Respire fundo e ',
-  cardWriteStrong: 'conte a sua história ao seu ritmo',
-  cardWriteAfter: ', palavra por palavra.',
-  cardWriteCta: 'ESCREVA A SUA HISTÓRIA',
-  cardPhotoTitle: 'Educação mediática,',
-  cardPhotoSubtitle: 'ler o mundo com critério',
-  cardPhotoBody:
-    'Recursos e referenciais para analisar informação, cuidar da cidadania digital e fortalecer o pensamento crítico no respeito pelos direitos humanos — na sala de aula e na comunidade.',
-  cardPhotoCta: 'IR À EDUCAÇÃO MEDIÁTICA',
+  cardWriteSubtitle: 'à sua memória',
+  cardWriteBody:
+    'Escreva uma cena, uma carta, um adeus ou algo que ainda volta.',
+  cardWriteCta: 'Escrever',
+  cardPhotoTitle: 'Uma imagem,',
+  cardPhotoSubtitle: 'uma vida',
+  cardPhotoBody: 'Carregue uma foto e conte a história que ela guarda.',
+  cardPhotoCta: 'Enviar foto',
 };
 
 const en: HomeMessages = {
@@ -156,27 +142,23 @@ const en: HomeMessages = {
   historiasLead2: 'Choose how, and tell yours.',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
-  cardVideoBefore: 'Sometimes a look says it all. Go ahead and ',
-  cardVideoStrong: 'record that moment that stayed with you',
-  cardVideoAfter: '—something you lived through or someone shared with you.',
-  cardVideoCta: 'RECORD YOUR VIDEO',
+  cardVideoBody:
+    'A camera can hold a gesture, a pause, a voice, a look.',
+  cardVideoCta: 'Record video',
   cardAudioTitle: 'Give voice',
-  cardAudioSubtitle: 'to your memory',
-  cardAudioBefore: 'Some stories feel better when you only hear them. ',
-  cardAudioStrong: 'Record your story in audio',
-  cardAudioAfter: ' and let your voice do the rest.',
-  cardAudioCta: 'RECORD YOUR AUDIO',
-  cardWriteTitle: 'Put it into words',
-  cardWriteSubtitle: 'for your story',
-  cardWriteBefore: 'If writing is your thing, this is your place. Take a breath and ',
-  cardWriteStrong: 'tell your story at your own pace',
-  cardWriteAfter: ', word by word.',
-  cardWriteCta: 'WRITE YOUR STORY',
-  cardPhotoTitle: 'Media literacy,',
-  cardPhotoSubtitle: 'read the world with judgment',
-  cardPhotoBody:
-    'Resources and frameworks to analyze information, nurture digital citizenship, and strengthen critical thinking in line with human rights—in classrooms and communities.',
-  cardPhotoCta: 'GO TO MEDIA LITERACY',
+  cardAudioSubtitle: 'to what you remember',
+  cardAudioBody:
+    'Some stories don’t need to be seen. They only need to be heard.',
+  cardAudioCta: 'Record audio',
+  cardWriteTitle: 'Put words',
+  cardWriteSubtitle: 'to your memory',
+  cardWriteBody:
+    'Write a scene, a letter, a farewell—or something that still comes back.',
+  cardWriteCta: 'Write',
+  cardPhotoTitle: 'One image,',
+  cardPhotoSubtitle: 'one life',
+  cardPhotoBody: 'Upload a photo and tell the story it holds.',
+  cardPhotoCta: 'Upload photo',
 };
 
 export const HOME_MESSAGES: Record<AlmaLocale, HomeMessages> = { es, pt, en };

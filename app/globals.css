@@ -113,6 +113,83 @@
   animation: home-historias-card-motion 7.5s ease-in-out infinite;
 }
 
+/* Hover decor en cards #historias (visor, onda, texto, álbum) — solo visible con .group-hover */
+@keyframes home-historias-audio-pulse {
+  0%,
+  100% {
+    transform: scaleY(0.38);
+    opacity: 0.65;
+  }
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+.home-historias-card-audio-bar {
+  transform-origin: bottom center;
+  animation: home-historias-audio-pulse 1.05s ease-in-out infinite;
+}
+
+@keyframes home-historias-type-blink {
+  0%,
+  48% {
+    opacity: 1;
+  }
+  52%,
+  100% {
+    opacity: 0.12;
+  }
+}
+.home-historias-card-type-cursor {
+  animation: home-historias-type-blink 1.05s steps(1, end) infinite;
+}
+
+@keyframes home-historias-float-y {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+.home-historias-card-float-line {
+  animation: home-historias-float-y 3.4s ease-in-out infinite;
+}
+.home-historias-card-float-line--delay {
+  animation-delay: 0.5s;
+}
+
+@keyframes home-historias-photo-shine {
+  0% {
+    background-position: -80% 0;
+  }
+  100% {
+    background-position: 180% 0;
+  }
+}
+.home-historias-card-photo-shine {
+  pointer-events: none;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 45%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  animation: home-historias-photo-shine 2.3s ease-in-out infinite;
+  opacity: 0.9;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-historias-card-audio-bar,
+  .home-historias-card-type-cursor,
+  .home-historias-card-float-line,
+  .home-historias-card-photo-shine {
+    animation: none !important;
+  }
+}
+
 /* Enlaces: naranja AlmaMundi por defecto. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
 a {
   color: var(--almamundi-orange);
