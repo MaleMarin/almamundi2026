@@ -20,8 +20,20 @@ import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 export const runtime = "nodejs";
 
 const MAX_BYTES = 8 * 1024 * 1024;
+const PROFILE_MAX_BYTES = 8 * 1024 * 1024;
+const EXTRA_MAX_BYTES = 15 * 1024 * 1024;
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
+const PROFILE_ALLOWED = ALLOWED;
+/** Tipos con comprobación magic bytes en lib/file-sniff (PDF/WAV no incluidos). */
+const EXTRA_ALLOWED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "audio/mpeg",
+  "audio/mp4",
+  "audio/webm",
+]);
 
 const AGE_SET = new Set<string>(AGE_RANGE_OPTIONS.map((o) => o.id));
 
@@ -70,12 +82,27 @@ export async function POST(req: Request) {
     const topic = stripHtml(String(form.get("topic") || ""))
       .slice(0, MAX_TITULO)
       .trim();
+    const storyTitle = stripHtml(String(form.get("storyTitle") || ""))
+      .slice(0, MAX_TITULO)
+      .trim();
+    const ciudad = stripHtml(String(form.get("ciudad") || ""))
+      .slice(0, 120)
+      .trim();
 
     const file = form.get("file");
 
     if (!alias) return NextResponse.json({ error: "alias_required" }, { status: 400 });
-    if (!topic || !THEME_SET.has(topic)) {
-      return NextResponse.json({ error: "topic_required" }, { status: 400 });
+    if (topic && !THEME_SET.has(topic)) {
+      return NextResponse.json({ error: "invalid_topic" }, { status: 400 });
+    }
+    if (storyTitle.length > 0 && storyTitle.length < 2) {
+      return NextResponse.json({ error: "story_title_too_short" }, { status: 400 });
+    }
+    if (!storyTitle) {
+      return NextResponse.json({ error: "story_title_required" }, { status: 400 });
+    }
+    if (!ciudad || ciudad.length < 1) {
+      return NextResponse.json({ error: "ciudad_required" }, { status: 400 });
     }
     if (!email) return NextResponse.json({ error: "email_required" }, { status: 400 });
     if (pais.length < 2) {
@@ -113,6 +140,52 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "content_type_mismatch" }, { status: 400 });
     }
 
+    const profileRaw = form.get("profilePhoto");
+    const extraRaw = form.get("extraAttachment");
+
+    let profilePhotoPath: string | undefined;
+    let extraAttachmentPath: string | undefined;
+
+    if (profileRaw instanceof File && profileRaw.size > 0) {
+      if (profileRaw.size > PROFILE_MAX_BYTES) {
+        return NextResponse.json({ error: "profile_too_large" }, { status: 413 });
+      }
+      const pm = profileRaw.type.split(";")[0]?.trim().toLowerCase() ?? "";
+      if (!PROFILE_ALLOWED.has(pm)) {
+        return NextResponse.json({ error: "invalid_profile_type" }, { status: 400 });
+      }
+      const pbuf = Buffer.from(await profileRaw.arrayBuffer());
+      if (!bufferMatchesDeclaredMime(pbuf, pm)) {
+        return NextResponse.json({ error: "profile_content_mismatch" }, { status: 400 });
+      }
+      const pr = await savePrivateSubmissionObject({
+        buffer: pbuf,
+        originalName: `profile-${profileRaw.name}`,
+        contentType: pm,
+      });
+      profilePhotoPath = pr.storagePath;
+    }
+
+    if (extraRaw instanceof File && extraRaw.size > 0) {
+      if (extraRaw.size > EXTRA_MAX_BYTES) {
+        return NextResponse.json({ error: "extra_too_large" }, { status: 413 });
+      }
+      const em = extraRaw.type.split(";")[0]?.trim().toLowerCase() ?? "";
+      if (!EXTRA_ALLOWED.has(em)) {
+        return NextResponse.json({ error: "invalid_extra_type" }, { status: 400 });
+      }
+      const ebuf = Buffer.from(await extraRaw.arrayBuffer());
+      if (!bufferMatchesDeclaredMime(ebuf, em)) {
+        return NextResponse.json({ error: "extra_content_mismatch" }, { status: 400 });
+      }
+      const er = await savePrivateSubmissionObject({
+        buffer: ebuf,
+        originalName: `extra-${extraRaw.name}`,
+        contentType: em,
+      });
+      extraAttachmentPath = er.storagePath;
+    }
+
     const submissionId = randomUUID();
     const ext = mime === "image/png" ? ".png" : mime === "image/webp" ? ".webp" : ".jpg";
     const { storagePath, signedReadUrl } = await savePrivateSubmissionObject({
@@ -126,14 +199,18 @@ export async function POST(req: Request) {
       type: "photo",
       alias,
       email,
+      storyTitle,
       countryLabel: pais,
+      cityLabel: ciudad,
       ageRange: ageRangeRaw,
       consentPrivacyPolicy: true,
       ...(birthDate ? { birthDate } : {}),
       ...(sex ? { sex } : {}),
       ...(context ? { context } : {}),
-      topic,
+      ...(topic ? { topic } : {}),
       storagePath,
+      ...(profilePhotoPath ? { profilePhotoPath } : {}),
+      ...(extraAttachmentPath ? { extraAttachmentPath } : {}),
       status: "pending",
       createdAt: new Date().toISOString(),
     });

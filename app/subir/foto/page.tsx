@@ -4,61 +4,80 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
+import { UserCircle } from 'lucide-react';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
-import { THEME_LIST } from '@/lib/themes';
 
 const MAX_MB = 8;
+const PROFILE_MAX_MB = 8;
+const EXTRA_MAX_MB = 15;
 
 type SexOpt = 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | '';
 
 export default function SubirFotoPage() {
   const [step, setStep] = useState<'photo' | 'form' | 'enviado'>('photo');
+  const [storyTitle, setStoryTitle] = useState('');
   const [alias, setAlias] = useState('');
   const [email, setEmail] = useState('');
   const [pais, setPais] = useState('');
+  const [ciudad, setCiudad] = useState('');
   const [birthDate, setBirthDate] = useState('');
   const [sex, setSex] = useState<SexOpt>('');
   const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
-  const [topic, setTopic] = useState('');
   const [context, setContext] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [profilePhotoFile, setProfilePhotoFile] = useState<File | null>(null);
+  const [extraAttachmentFile, setExtraAttachmentFile] = useState<File | null>(null);
   const [status, setStatus] = useState<'idle' | 'subiendo' | 'error'>('idle');
   const [error, setError] = useState('');
 
   const canContinuePhoto = file != null && file.size <= MAX_MB * 1024 * 1024 && file.type.startsWith('image/');
   const canSubmit =
+    storyTitle.trim().length >= 2 &&
     alias.trim().length >= 2 &&
     /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
     pais.trim().length >= 2 &&
+    ciudad.trim().length >= 1 &&
     ageRange !== '' &&
     consentPrivacyPolicy &&
-    THEME_LIST.some((t) => t.id === topic) &&
     file != null &&
     file.size <= MAX_MB * 1024 * 1024 &&
-    file.type.startsWith('image/');
+    file.type.startsWith('image/') &&
+    (profilePhotoFile == null || profilePhotoFile.size <= PROFILE_MAX_MB * 1024 * 1024) &&
+    (extraAttachmentFile == null || extraAttachmentFile.size <= EXTRA_MAX_MB * 1024 * 1024);
 
   const onSubmit = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
       if (!canSubmit || !file) return;
       setError('');
+      if (!email.trim()) {
+        setError('El correo es necesario para avisarte cuando tu historia esté en el globo.');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+        setError('Indica un correo válido.');
+        return;
+      }
       setStatus('subiendo');
       try {
         const form = new FormData();
+        form.set('storyTitle', storyTitle.trim());
         form.set('alias', alias.trim());
         form.set('email', email.trim());
         form.set('pais', pais.trim());
+        form.set('ciudad', ciudad.trim());
         form.set('ageRange', ageRange);
         form.set('consentPrivacyPolicy', '1');
-        form.set('topic', topic);
         if (birthDate.trim()) form.set('birthDate', birthDate.trim());
         if (sex) form.set('sex', sex);
         if (context.trim()) form.set('context', context.trim());
         form.set('file', file);
+        if (profilePhotoFile) form.set('profilePhoto', profilePhotoFile);
+        if (extraAttachmentFile) form.set('extraAttachment', extraAttachmentFile);
 
         const res = await fetch('/api/submissions/photo', {
           method: 'POST',
@@ -73,12 +92,26 @@ export default function SubirFotoPage() {
           return;
         }
         setStep('enviado');
-      } catch (e) {
-        setError(e instanceof Error ? e.message : 'Error de conexión');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Error de conexión');
         setStatus('error');
       }
     },
-    [canSubmit, alias, email, pais, ageRange, birthDate, sex, context, file, topic]
+    [
+      canSubmit,
+      alias,
+      email,
+      pais,
+      ciudad,
+      ageRange,
+      birthDate,
+      sex,
+      context,
+      file,
+      storyTitle,
+      profilePhotoFile,
+      extraAttachmentFile,
+    ]
   );
 
   const onFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -201,37 +234,34 @@ export default function SubirFotoPage() {
               </div>
             )}
 
-            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Tema (obligatorio) *
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {THEME_LIST.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTopic(t.id)}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium transition sm:text-sm"
-                    style={{
-                      ...neu.button,
-                      color: topic === t.id ? '#ff4500' : neu.textBody,
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-3 text-sm">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
-                Tus datos y avisos
+                La historia
               </p>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                <label htmlFor="subir-foto-titulo" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Nombre de la historia *
+                </label>
+                <input
+                  id="subir-foto-titulo"
+                  type="text"
+                  value={storyTitle}
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  placeholder="Título que verán si se publica"
+                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  autoComplete="off"
+                />
+                {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
+                  <p className="mt-1 text-xs text-amber-700">Mínimo 2 caracteres</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="subir-foto-alias" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
                   Nombre o alias (obligatorio) *
                 </label>
                 <input
+                  id="subir-foto-alias"
                   type="text"
                   value={alias}
                   onChange={(e) => setAlias(e.target.value)}
@@ -245,28 +275,32 @@ export default function SubirFotoPage() {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                  Correo electrónico *
+                <label htmlFor="subir-foto-extras" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Extras / contexto (opcional)
                 </label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
-                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
+                <textarea
+                  id="subir-foto-extras"
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder="Breve nota sobre la imagen…"
+                  rows={2}
+                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 resize-none text-sm"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  autoComplete="email"
                 />
-                <p className="mt-1 text-[11px] leading-snug" style={{ color: neu.textBody }}>
-                  Para recibir un aviso cuando tu imagen (u otro contenido que envíes) se suba al globo, tras la revisión.
-                </p>
               </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Ubicación
+              </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  <label htmlFor="subir-foto-pais" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
                     País *
                   </label>
                   <input
+                    id="subir-foto-pais"
                     type="text"
                     value={pais}
                     onChange={(e) => setPais(e.target.value)}
@@ -277,10 +311,53 @@ export default function SubirFotoPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  <label htmlFor="subir-foto-ciudad" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                    Ciudad o localidad *
+                  </label>
+                  <input
+                    id="subir-foto-ciudad"
+                    type="text"
+                    value={ciudad}
+                    onChange={(e) => setCiudad(e.target.value)}
+                    placeholder="Ej: Santiago"
+                    className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                    autoComplete="address-level2"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Datos personales
+              </p>
+              <div>
+                <label htmlFor="subir-foto-edad" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Tramo de edad *
+                </label>
+                <select
+                  id="subir-foto-edad"
+                  value={ageRange}
+                  onChange={(e) => setAgeRange(e.target.value as AgeRangeId | '')}
+                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                >
+                  <option value="">Elige una opción</option>
+                  {AGE_RANGE_OPTIONS.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="subir-foto-nacimiento" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
                     Fecha de nacimiento (opcional)
                   </label>
                   <input
+                    id="subir-foto-nacimiento"
                     type="text"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
@@ -289,8 +366,6 @@ export default function SubirFotoPage() {
                     style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                   />
                 </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label htmlFor="subir-foto-genero" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
                     Género (opcional)
@@ -309,55 +384,137 @@ export default function SubirFotoPage() {
                     <option value="prefiero-no-decir">Otro / no decir</option>
                   </select>
                 </div>
-                <div>
-                  <label htmlFor="subir-foto-edad" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Tramo de edad *
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Contacto
+              </p>
+              <div>
+                <label htmlFor="subir-foto-email" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Correo electrónico *
+                </label>
+                <input
+                  id="subir-foto-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error === 'El correo es necesario para avisarte cuando tu historia esté en el globo.') setError('');
+                  }}
+                  placeholder="tu@email.com"
+                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  autoComplete="email"
+                />
+                <p className="mt-1 text-[11px] leading-snug" style={{ color: neu.textBody }}>
+                  Te avisaremos por correo cuando tu historia esté en el globo. No se muestra en público.
+                </p>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 sm:p-5 rounded-3xl space-y-4 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Archivos
+              </p>
+              <div>
+                <label htmlFor="subir-foto-extra" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Archivos adjuntos (máx. {EXTRA_MAX_MB}MB)
+                </label>
+                <p className="text-xs mb-2" style={{ color: neu.textBody }}>
+                  Un archivo opcional (imagen JPG/PNG/WebP o audio MP3/M4A/WebM).
+                </p>
+                <input
+                  id="subir-foto-extra"
+                  type="file"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0] ?? null;
+                    if (f && f.size > EXTRA_MAX_MB * 1024 * 1024) {
+                      setError(`El adjunto: máximo ${EXTRA_MAX_MB} MB`);
+                      e.target.value = '';
+                      setExtraAttachmentFile(null);
+                      return;
+                    }
+                    setError('');
+                    setExtraAttachmentFile(f);
+                  }}
+                  className="w-full text-sm"
+                  style={{ color: neu.textBody }}
+                />
+                {extraAttachmentFile && (
+                  <p className="mt-1 text-xs" style={{ color: neu.textBody }}>
+                    {extraAttachmentFile.name}
+                    <button
+                      type="button"
+                      className="ml-2 underline"
+                      style={{ color: neu.textMain }}
+                      onClick={() => setExtraAttachmentFile(null)}
+                    >
+                      Quitar
+                    </button>
+                  </p>
+                )}
+              </div>
+              <div className="flex items-start gap-3">
+                <UserCircle className="w-6 h-6 shrink-0 text-orange-500 mt-0.5" aria-hidden />
+                <div className="min-w-0 flex-1">
+                  <label htmlFor="subir-foto-perfil" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                    Foto de perfil (opcional, máx. {PROFILE_MAX_MB}MB)
                   </label>
-                  <select
-                    id="subir-foto-edad"
-                    value={ageRange}
-                    onChange={(e) => setAgeRange(e.target.value as AgeRangeId | '')}
-                    className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 text-sm"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  >
-                    <option value="">Elige una opción</option>
-                    {AGE_RANGE_OPTIONS.map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                  <p className="text-xs mb-2 leading-relaxed" style={{ color: neu.textBody }}>
+                    Imagen tuya para acompañar tu nombre; no sustituye la foto de la historia.
+                  </p>
+                  <input
+                    id="subir-foto-perfil"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    onChange={(e) => {
+                      const f = e.target.files?.[0] ?? null;
+                      if (f && f.size > PROFILE_MAX_MB * 1024 * 1024) {
+                        setError(`La foto de perfil: máximo ${PROFILE_MAX_MB} MB`);
+                        e.target.value = '';
+                        setProfilePhotoFile(null);
+                        return;
+                      }
+                      setError('');
+                      setProfilePhotoFile(f);
+                    }}
+                    className="w-full text-sm"
+                    style={{ color: neu.textBody }}
+                  />
+                  {profilePhotoFile && (
+                    <p className="mt-1 text-xs" style={{ color: neu.textBody }}>
+                      {profilePhotoFile.name}
+                      <button
+                        type="button"
+                        className="ml-2 underline"
+                        style={{ color: neu.textMain }}
+                        onClick={() => setProfilePhotoFile(null)}
+                      >
+                        Quitar
+                      </button>
+                    </p>
+                  )}
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                  Contexto (opcional)
-                </label>
-                <textarea
-                  value={context}
-                  onChange={(e) => setContext(e.target.value)}
-                  placeholder="Breve nota sobre la imagen…"
-                  rows={2}
-                  className="w-full px-3 py-2 rounded-xl outline-none bg-white/50 border border-white/50 resize-none text-sm"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                />
-              </div>
-              <label className="flex items-start gap-2 text-sm" style={{ color: neu.textMain }}>
-                <input
-                  type="checkbox"
-                  checked={consentPrivacyPolicy}
-                  onChange={(e) => setConsentPrivacyPolicy(e.target.checked)}
-                  className="mt-0.5 accent-orange-500 shrink-0"
-                />
-                <span>
-                  He leído y acepto la{' '}
-                  <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
-                    política de privacidad
-                  </Link>
-                  .
-                </span>
-              </label>
             </div>
+
+            <label className="flex items-start gap-2 text-sm" style={{ color: neu.textMain }}>
+              <input
+                type="checkbox"
+                checked={consentPrivacyPolicy}
+                onChange={(e) => setConsentPrivacyPolicy(e.target.checked)}
+                className="mt-0.5 accent-orange-500 shrink-0"
+              />
+              <span>
+                Leí y acepto la{' '}
+                <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
+                  política de privacidad
+                </Link>
+                .
+              </span>
+            </label>
 
             {error && (
               <p className="text-sm text-red-600 font-medium p-3 rounded-2xl" style={neu.cardInset}>
