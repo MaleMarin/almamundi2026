@@ -28,8 +28,6 @@ import {
   AGE_RANGE_OPTIONS,
   type AgeRangeId,
 } from '@/lib/subir-author-fields';
-import { THEME_LIST, type ThemeId } from '@/lib/themes';
-
 type Format = 'video' | 'audio' | 'texto' | 'foto';
 
 const FORMAT_LABELS: Record<Format, string> = {
@@ -52,9 +50,17 @@ function buildSubmissionContext(
   textBody: string,
   storyTitle: string,
   ciudad: string,
-  pais: string
+  pais: string,
+  extraContext: string
 ): string {
-  const tb = textBody.trim();
+  const ex = extraContext.trim();
+  const tbRaw = textBody.trim();
+  const tb =
+    ex && tbRaw
+      ? `${tbRaw}\n\n— Extras / contexto —\n${ex}`
+      : ex && !tbRaw
+        ? ex
+        : tbRaw;
   if (tb.length >= 30) return tb.slice(0, 2000);
   const geo = [ciudad.trim(), pais.trim()].filter(Boolean).join(', ');
   const pieces = [storyTitle.trim(), geo, `Formato: ${FORMAT_LABELS[format]}`].filter(Boolean);
@@ -67,8 +73,8 @@ function buildSubmissionContext(
 const PHOTO_MAX_MB = 5;
 const AUDIO_MAX_MB = 10;
 /** Foto de perfil opcional (solo identificación del autor; distinta de la foto de la historia). */
-const PROFILE_PHOTO_MAX_MB = 2;
-const EXTRA_FILE_MAX_MB = 8;
+const PROFILE_PHOTO_MAX_MB = 8;
+const EXTRA_FILE_MAX_MB = 15;
 const EXTRA_FILES_MAX = 8;
 
 function isVideoUrl(url: string): boolean {
@@ -128,12 +134,9 @@ function SubirPageInner() {
   const [birthDate, setBirthDate] = useState('');
   const [sex, setSex] = useState<'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | ''>('');
   const [extraFiles, setExtraFiles] = useState<File[]>([]);
-  const [consentRights, setConsentRights] = useState(false);
-  const [consentCurate, setConsentCurate] = useState(false);
-  const [consentPostales, setConsentPostales] = useState(false);
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
   const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
-  const [themeId, setThemeId] = useState<ThemeId | ''>('');
+  const [extraContext, setExtraContext] = useState('');
 
   const [textBody, setTextBody] = useState('');
   const [videoUrl, setVideoUrl] = useState('');
@@ -170,16 +173,10 @@ function SubirPageInner() {
     Boolean(format) &&
     storyTitle.trim().length >= 2 &&
     alias.trim().length >= 2 &&
-    email.trim().length > 0 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) &&
     ciudad.trim().length >= 1 &&
     pais.trim().length >= 2 &&
-    consentRights &&
-    consentCurate &&
-    consentPostales &&
     consentPrivacyPolicy &&
     ageRange !== '' &&
-    THEME_LIST.some((t) => t.id === themeId) &&
     (format === 'texto'
       ? textBody.trim().length > 0 && textBody.trim().length <= SUBIR_TEXT_MAX_CHARS
       : true) &&
@@ -196,6 +193,14 @@ function SubirPageInner() {
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
     setError('');
+    if (!email.trim()) {
+      setError('El correo es necesario para avisarte cuando tu historia esté en el globo.');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
+      setError('Indica un correo válido.');
+      return;
+    }
     setSaving(true);
     try {
       const privateMediaPaths: string[] = [];
@@ -298,12 +303,12 @@ function SubirPageInner() {
           storyTitle: storyTitle.trim(),
           alias: alias.trim(),
           email: email.trim(),
-          themeId: themeId as ThemeId,
+          themeId: '',
           date: '',
           dateApprox: false,
           placeLabel: placeCombined,
           countryLabel: pais.trim(),
-          context: buildSubmissionContext(format, textBody, storyTitle, ciudad, pais),
+          context: buildSubmissionContext(format, textBody, storyTitle, ciudad, pais, extraContext),
           payload,
           consentRights: true,
           consentCurate: true,
@@ -347,7 +352,7 @@ function SubirPageInner() {
     birthDate,
     sex,
     ageRange,
-    themeId,
+    extraContext,
     textBody,
     videoUrl,
     audioUrl,
@@ -388,7 +393,7 @@ function SubirPageInner() {
   );
 
   const backToCards = useCallback(() => {
-    setThemeId('');
+    setExtraContext('');
     setPhotoFiles([]);
     setAudioFile(null);
     setAudioFileWithinMax(true);
@@ -649,269 +654,90 @@ function SubirPageInner() {
               </div>
             )}
 
-            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
-              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
-                Historia, ubicación y datos para avisos
-              </p>
-              <div>
-                <label htmlFor="subir-datos-titulo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                  Nombre de la historia *
-                </label>
-                <input
-                  id="subir-datos-titulo"
-                  type="text"
-                  value={storyTitle}
-                  onChange={(e) => setStoryTitle(e.target.value)}
-                  placeholder="Título que verán en el mapa si se publica"
-                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                  aria-invalid={storyTitle.trim().length > 0 && storyTitle.trim().length < 2}
-                  aria-describedby={
-                    storyTitle.trim().length > 0 && storyTitle.trim().length < 2 ? 'subir-datos-titulo-error' : undefined
-                  }
-                />
-                {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
-                  <p id="subir-datos-titulo-error" className="mt-1 text-xs text-amber-700" role="alert">
-                    Mínimo 2 caracteres
+            {format === 'audio' && (
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                {capture?.recordedBlob ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
                   </p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="subir-datos-alias" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                  Nombre o alias (obligatorio) *
+                ) : null}
+                <label htmlFor="subir-datos-audio-file" className="block text-sm font-medium" style={{ color: neu.textMain }}>
+                  Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
                 </label>
-                <input
-                  id="subir-datos-alias"
-                  type="text"
-                  value={alias}
-                  onChange={(e) => setAlias(e.target.value)}
-                  placeholder="Cómo quieres aparecer"
-                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                  aria-invalid={alias.trim().length > 0 && alias.trim().length < 2}
-                  aria-describedby={
-                    alias.trim().length > 0 && alias.trim().length < 2 ? 'subir-datos-alias-error' : undefined
-                  }
-                />
-                {alias.trim().length > 0 && alias.trim().length < 2 && (
-                  <p id="subir-datos-alias-error" className="mt-1 text-xs text-amber-700" role="alert">
-                    Mínimo 2 caracteres
-                  </p>
-                )}
-              </div>
-              <div>
-                <label htmlFor="subir-datos-email" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                  Correo electrónico *
-                </label>
-                <input
-                  id="subir-datos-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="tu@email.com"
-                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                  aria-invalid={email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())}
-                  aria-describedby="subir-datos-email-hint"
-                />
-                <p id="subir-datos-email-hint" className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
-                  Lo usamos para enviarte un aviso cuando tu historia, imagen, audio o video se suba al globo (tras la revisión). No lo mostramos en público.
+                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
                 </p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="subir-datos-pais" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    País *
-                  </label>
-                  <input
-                    id="subir-datos-pais"
-                    type="text"
-                    value={pais}
-                    onChange={(e) => setPais(e.target.value)}
-                    placeholder="Ej: Chile"
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                    aria-required="true"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="subir-datos-ciudad" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Ciudad o localidad *
-                  </label>
-                  <input
-                    id="subir-datos-ciudad"
-                    type="text"
-                    value={ciudad}
-                    onChange={(e) => setCiudad(e.target.value)}
-                    placeholder="Ej: Santiago"
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                    aria-required="true"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Fecha de nacimiento (opcional)
-                  </label>
-                  <input
-                    id="subir-datos-nacimiento"
-                    type="text"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    placeholder="Ej: 1990-04-12 o aproximada"
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Género (opcional)
-                  </label>
-                  <select
-                    id="subir-datos-sexo"
-                    value={sex}
-                    onChange={(e) =>
-                      setSex(
-                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
-                      )
+                <input
+                  id="subir-datos-audio-file"
+                  type="file"
+                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
+                  aria-label="Seleccionar archivo de audio (MP3, WAV o M4A)"
+                  onChange={(e) => {
+                    const inputEl = e.target;
+                    const f = inputEl.files?.[0];
+                    if (!f) {
+                      setAudioFile(null);
+                      setAudioFileWithinMax(true);
+                      return;
                     }
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  >
-                    <option value="">Prefiero no indicar</option>
-                    <option value="femenino">Femenino</option>
-                    <option value="masculino">Masculino</option>
-                    <option value="no-binario">No binario</option>
-                    <option value="prefiero-no-decir">Otro / no decir</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label htmlFor="subir-datos-edad-tramo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                  Tramo de edad *
+                    if (f.size > AUDIO_MAX_MB * 1024 * 1024) {
+                      setError(`Máximo ${AUDIO_MAX_MB} MB`);
+                      setAudioFile(null);
+                      setAudioFileWithinMax(true);
+                      inputEl.value = '';
+                      return;
+                    }
+                    setError('');
+                    void (async () => {
+                      const sec = await probeAudioFileDurationSeconds(f);
+                      if (sec != null && !isDurationWithinMax(sec)) {
+                        setError(
+                          `El audio dura más de ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Acorta el archivo e intenta de nuevo.`
+                        );
+                        setAudioFileWithinMax(false);
+                        setAudioFile(null);
+                        inputEl.value = '';
+                        return;
+                      }
+                      setAudioFileWithinMax(true);
+                      setAudioFile(f);
+                    })();
+                  }}
+                  className="w-full text-sm"
+                  style={{ color: neu.textBody }}
+                />
+                <label htmlFor="subir-datos-audio-url" className="sr-only">
+                  URL del audio
                 </label>
-                <select
-                  id="subir-datos-edad-tramo"
-                  value={ageRange}
-                  onChange={(e) => setAgeRange(e.target.value as AgeRangeId | '')}
-                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                <input
+                  id="subir-datos-audio-url"
+                  type="url"
+                  value={audioUrl}
+                  onChange={(e) => setAudioUrl(e.target.value)}
+                  placeholder="O pega aquí la URL del audio"
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required="true"
-                >
-                  <option value="">Elige una opción</option>
-                  {AGE_RANGE_OPTIONS.map((o) => (
-                    <option key={o.id} value={o.id}>
-                      {o.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl">
-              <label className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                Tema (obligatorio) *
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {THEME_LIST.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setThemeId(t.id)}
-                    className="px-2.5 py-1 rounded-full text-xs font-medium transition sm:text-sm"
-                    style={{
-                      ...neu.button,
-                      color: themeId === t.id ? '#ff4500' : neu.textBody,
-                    }}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl">
-              <div className="flex items-start gap-3 mb-3">
-                <UserCircle className="w-6 h-6 shrink-0 text-orange-500 mt-0.5" aria-hidden />
-                <div>
-                  <label htmlFor="subir-datos-foto-perfil" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Foto personal / de perfil (opcional)
-                  </label>
-                  <p className="text-xs leading-relaxed mb-3" style={{ color: neu.textBody }}>
-                    Si quieres, sube una imagen tuya para acompañar tu nombre cuando se publique. No es la foto de tu historia (eso va en el bloque del formato que elegiste).
+                  aria-invalid={!audioUrlWithinMax}
+                  aria-describedby={!audioUrlWithinMax ? 'subir-datos-audio-url-error' : undefined}
+                />
+                {!audioUrlWithinMax && (
+                  <p id="subir-datos-audio-url-error" className="text-xs text-red-600 font-medium" role="alert">
+                    Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
                   </p>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <div
-                      className="w-20 h-20 rounded-full border-2 border-white/40 overflow-hidden bg-white/30 flex items-center justify-center shrink-0"
-                      style={{ borderColor: 'rgba(255,255,255,0.35)' }}
-                    >
-                      {profilePhotoPreview ? (
-                        <img
-                          src={profilePhotoPreview}
-                          alt="Vista previa de tu foto de perfil"
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <UserCircle className="w-10 h-10 text-gray-400" aria-hidden />
-                      )}
-                    </div>
-                    <div className="flex flex-col gap-2 min-w-0">
-                      <input
-                        id="subir-datos-foto-perfil"
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        aria-label="Seleccionar imagen de perfil (JPG, PNG o WebP)"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (!f) {
-                            clearProfilePhoto();
-                            return;
-                          }
-                          if (f.size > PROFILE_PHOTO_MAX_MB * 1024 * 1024) {
-                            setError(`La foto de perfil: máximo ${PROFILE_PHOTO_MAX_MB} MB`);
-                            e.target.value = '';
-                            return;
-                          }
-                          if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
-                            setError('Formato: JPG, PNG o WebP.');
-                            e.target.value = '';
-                            return;
-                          }
-                          setError('');
-                          if (profileObjectUrlRef.current) {
-                            URL.revokeObjectURL(profileObjectUrlRef.current);
-                            profileObjectUrlRef.current = null;
-                          }
-                          const url = URL.createObjectURL(f);
-                          profileObjectUrlRef.current = url;
-                          setProfilePhotoPreview(url);
-                          setProfilePhotoFile(f);
-                        }}
-                        className="w-full max-w-xs text-sm file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-orange-500/15 file:text-orange-700"
-                        style={{ color: neu.textBody }}
-                      />
-                      {profilePhotoFile && (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            clearProfilePhoto();
-                          }}
-                          className="text-xs font-medium text-left w-fit hover:underline"
-                          style={{ color: neu.textBody }}
-                        >
-                          Quitar foto de perfil
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
+                )}
+                {(audioFile ||
+                  audioUrl.trim() ||
+                  capture?.recordedBlob ||
+                  capture?.audioFile ||
+                  (capture?.audioUrl?.trim() ?? '')) &&
+                  audioFileWithinMax &&
+                  audioUrlWithinMax && (
+                  <p className="text-sm" style={{ color: neu.textBody }}>
+                    ✓ Listo
+                  </p>
+                )}
               </div>
-            </div>
+            )}
 
             {format === 'foto' && (
               <div style={neu.cardInset} className="p-6 md:p-8 rounded-[2rem] space-y-4">
@@ -998,130 +824,324 @@ function SubirPageInner() {
               </div>
             )}
 
-            {format === 'audio' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
-                {capture?.recordedBlob ? (
-                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
-                    Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
-                  </p>
-                ) : null}
-                <label htmlFor="subir-datos-audio-file" className="block text-sm font-medium" style={{ color: neu.textMain }}>
-                  Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                La historia
+              </p>
+              <div>
+                <label htmlFor="subir-datos-titulo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Nombre de la historia *
                 </label>
-                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
-                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
+                <input
+                  id="subir-datos-titulo"
+                  type="text"
+                  value={storyTitle}
+                  onChange={(e) => setStoryTitle(e.target.value)}
+                  placeholder="Título que verán en el mapa si se publica"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={storyTitle.trim().length > 0 && storyTitle.trim().length < 2}
+                  aria-describedby={
+                    storyTitle.trim().length > 0 && storyTitle.trim().length < 2 ? 'subir-datos-titulo-error' : undefined
+                  }
+                />
+                {storyTitle.trim().length > 0 && storyTitle.trim().length < 2 && (
+                  <p id="subir-datos-titulo-error" className="mt-1 text-xs text-amber-700" role="alert">
+                    Mínimo 2 caracteres
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="subir-datos-alias" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Nombre o alias (obligatorio) *
+                </label>
+                <input
+                  id="subir-datos-alias"
+                  type="text"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                  placeholder="Cómo quieres aparecer"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={alias.trim().length > 0 && alias.trim().length < 2}
+                  aria-describedby={
+                    alias.trim().length > 0 && alias.trim().length < 2 ? 'subir-datos-alias-error' : undefined
+                  }
+                />
+                {alias.trim().length > 0 && alias.trim().length < 2 && (
+                  <p id="subir-datos-alias-error" className="mt-1 text-xs text-amber-700" role="alert">
+                    Mínimo 2 caracteres
+                  </p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="subir-datos-extras-contexto" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Extras / contexto (opcional)
+                </label>
+                <textarea
+                  id="subir-datos-extras-contexto"
+                  value={extraContext}
+                  onChange={(e) => setExtraContext(e.target.value)}
+                  placeholder="Contexto breve si hace falta…"
+                  rows={3}
+                  className="w-full resize-y rounded-xl px-3 py-2.5 outline-none bg-white/50 border border-white/50 min-h-[4.5rem]"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Ubicación
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="subir-datos-pais" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    País *
+                  </label>
+                  <input
+                    id="subir-datos-pais"
+                    type="text"
+                    value={pais}
+                    onChange={(e) => setPais(e.target.value)}
+                    placeholder="Ej: Chile"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                    aria-required="true"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subir-datos-ciudad" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Ciudad o localidad *
+                  </label>
+                  <input
+                    id="subir-datos-ciudad"
+                    type="text"
+                    value={ciudad}
+                    onChange={(e) => setCiudad(e.target.value)}
+                    placeholder="Ej: Santiago"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                    aria-required="true"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Datos personales
+              </p>
+              <div>
+                <label htmlFor="subir-datos-edad-tramo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Tramo de edad *
+                </label>
+                <select
+                  id="subir-datos-edad-tramo"
+                  value={ageRange}
+                  onChange={(e) => setAgeRange(e.target.value as AgeRangeId | '')}
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                >
+                  <option value="">Elige una opción</option>
+                  {AGE_RANGE_OPTIONS.map((o) => (
+                    <option key={o.id} value={o.id}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Fecha de nacimiento (opcional)
+                  </label>
+                  <input
+                    id="subir-datos-nacimiento"
+                    type="text"
+                    value={birthDate}
+                    onChange={(e) => setBirthDate(e.target.value)}
+                    placeholder="Ej: 1990-04-12 o aproximada"
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                    Género (opcional)
+                  </label>
+                  <select
+                    id="subir-datos-sexo"
+                    value={sex}
+                    onChange={(e) =>
+                      setSex(
+                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
+                      )
+                    }
+                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  >
+                    <option value="">Prefiero no indicar</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="no-binario">No binario</option>
+                    <option value="prefiero-no-decir">Otro / no decir</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Contacto
+              </p>
+              <div>
+                <label htmlFor="subir-datos-email" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Correo electrónico *
+                </label>
+                <input
+                  id="subir-datos-email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error === 'El correo es necesario para avisarte cuando tu historia esté en el globo.') setError('');
+                  }}
+                  placeholder="tu@email.com"
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                  aria-invalid={email.trim().length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())}
+                  aria-describedby="subir-datos-email-hint"
+                />
+                <p id="subir-datos-email-hint" className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
+                  Te avisaremos por correo cuando tu historia esté en el globo. No se muestra en público.
+                </p>
+              </div>
+            </div>
+
+            <div style={neu.cardInset} className="p-4 rounded-3xl space-y-4">
+              <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                Archivos
+              </p>
+              <div className="space-y-2">
+                <label htmlFor="subir-datos-archivos-extra" className="block text-sm font-medium" style={{ color: neu.textMain }}>
+                  Archivos adjuntos (máx. {EXTRA_FILE_MAX_MB}MB)
+                </label>
+                <p className="text-xs" style={{ color: neu.textBody }}>
+                  Hasta {EXTRA_FILES_MAX} archivos (PDF, imágenes, audio corto… máx. {EXTRA_FILE_MAX_MB} MB c/u).
                 </p>
                 <input
-                  id="subir-datos-audio-file"
+                  id="subir-datos-archivos-extra"
                   type="file"
-                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
-                  aria-label="Seleccionar archivo de audio (MP3, WAV o M4A)"
+                  multiple
+                  aria-label={`Seleccionar archivos complementarios (máximo ${EXTRA_FILES_MAX} archivos)`}
                   onChange={(e) => {
-                    const inputEl = e.target;
-                    const f = inputEl.files?.[0];
-                    if (!f) {
-                      setAudioFile(null);
-                      setAudioFileWithinMax(true);
-                      return;
+                    const list = Array.from(e.target.files ?? []);
+                    const next: File[] = [];
+                    for (const f of list) {
+                      if (f.size > EXTRA_FILE_MAX_MB * 1024 * 1024) {
+                        setError(`Cada archivo extra: máximo ${EXTRA_FILE_MAX_MB} MB`);
+                        e.target.value = '';
+                        return;
+                      }
+                      next.push(f);
                     }
-                    if (f.size > AUDIO_MAX_MB * 1024 * 1024) {
-                      setError(`Máximo ${AUDIO_MAX_MB} MB`);
-                      setAudioFile(null);
-                      setAudioFileWithinMax(true);
-                      inputEl.value = '';
+                    if (next.length > EXTRA_FILES_MAX) {
+                      setError(`Máximo ${EXTRA_FILES_MAX} archivos extra`);
+                      e.target.value = '';
                       return;
                     }
                     setError('');
-                    void (async () => {
-                      const sec = await probeAudioFileDurationSeconds(f);
-                      if (sec != null && !isDurationWithinMax(sec)) {
-                        setError(
-                          `El audio dura más de ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Acorta el archivo e intenta de nuevo.`
-                        );
-                        setAudioFileWithinMax(false);
-                        setAudioFile(null);
-                        inputEl.value = '';
-                        return;
-                      }
-                      setAudioFileWithinMax(true);
-                      setAudioFile(f);
-                    })();
+                    setExtraFiles(next);
                   }}
                   className="w-full text-sm"
                   style={{ color: neu.textBody }}
                 />
-                <label htmlFor="subir-datos-audio-url" className="sr-only">
-                  URL del audio
-                </label>
-                <input
-                  id="subir-datos-audio-url"
-                  type="url"
-                  value={audioUrl}
-                  onChange={(e) => setAudioUrl(e.target.value)}
-                  placeholder="O pega aquí la URL del audio"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-invalid={!audioUrlWithinMax}
-                  aria-describedby={!audioUrlWithinMax ? 'subir-datos-audio-url-error' : undefined}
-                />
-                {!audioUrlWithinMax && (
-                  <p id="subir-datos-audio-url-error" className="text-xs text-red-600 font-medium" role="alert">
-                    Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
-                  </p>
-                )}
-                {(audioFile ||
-                  audioUrl.trim() ||
-                  capture?.recordedBlob ||
-                  capture?.audioFile ||
-                  (capture?.audioUrl?.trim() ?? '')) &&
-                  audioFileWithinMax &&
-                  audioUrlWithinMax && (
-                  <p className="text-sm" style={{ color: neu.textBody }}>
-                    ✓ Listo
+                {extraFiles.length > 0 && (
+                  <p className="text-xs" style={{ color: neu.textBody }}>
+                    {extraFiles.length} archivo(s) adjunto(s)
                   </p>
                 )}
               </div>
-            )}
-
-            <div style={neu.cardInset} className="p-4 rounded-3xl space-y-2">
-              <label htmlFor="subir-datos-archivos-extra" className="block text-sm font-medium" style={{ color: neu.textMain }}>
-                Completar la historia (opcional)
-              </label>
-              <p className="text-xs" style={{ color: neu.textBody }}>
-                Hasta {EXTRA_FILES_MAX} archivos (PDF, imágenes, audio corto… máx. {EXTRA_FILE_MAX_MB} MB c/u) para que curación tenga más contexto.
-              </p>
-              <input
-                id="subir-datos-archivos-extra"
-                type="file"
-                multiple
-                aria-label={`Seleccionar archivos complementarios (máximo ${EXTRA_FILES_MAX} archivos)`}
-                onChange={(e) => {
-                  const list = Array.from(e.target.files ?? []);
-                  const next: File[] = [];
-                  for (const f of list) {
-                    if (f.size > EXTRA_FILE_MAX_MB * 1024 * 1024) {
-                      setError(`Cada archivo extra: máximo ${EXTRA_FILE_MAX_MB} MB`);
-                      e.target.value = '';
-                      return;
-                    }
-                    next.push(f);
-                  }
-                  if (next.length > EXTRA_FILES_MAX) {
-                    setError(`Máximo ${EXTRA_FILES_MAX} archivos extra`);
-                    e.target.value = '';
-                    return;
-                  }
-                  setError('');
-                  setExtraFiles(next);
-                }}
-                className="w-full text-sm"
-                style={{ color: neu.textBody }}
-              />
-              {extraFiles.length > 0 && (
-                <p className="text-xs" style={{ color: neu.textBody }}>
-                  {extraFiles.length} archivo(s) adjunto(s)
-                </p>
-              )}
+              <div className="flex items-start gap-3">
+                <UserCircle className="w-6 h-6 shrink-0 text-orange-500 mt-0.5" aria-hidden />
+                <div className="min-w-0 flex-1">
+                  <label htmlFor="subir-datos-foto-perfil" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                    Foto de perfil (opcional, máx. {PROFILE_PHOTO_MAX_MB}MB)
+                  </label>
+                  <p className="text-xs leading-relaxed mb-3" style={{ color: neu.textBody }}>
+                    Si quieres, sube una imagen tuya para acompañar tu nombre cuando se publique. No es la foto de tu historia (eso va en el bloque del formato que elegiste).
+                  </p>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <div
+                      className="w-20 h-20 rounded-full border-2 border-white/40 overflow-hidden bg-white/30 flex items-center justify-center shrink-0"
+                      style={{ borderColor: 'rgba(255,255,255,0.35)' }}
+                    >
+                      {profilePhotoPreview ? (
+                        <img
+                          src={profilePhotoPreview}
+                          alt="Vista previa de tu foto de perfil"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <UserCircle className="w-10 h-10 text-gray-400" aria-hidden />
+                      )}
+                    </div>
+                    <div className="flex flex-col gap-2 min-w-0">
+                      <input
+                        id="subir-datos-foto-perfil"
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        aria-label="Seleccionar imagen de perfil (JPG, PNG o WebP)"
+                        onChange={(e) => {
+                          const f = e.target.files?.[0];
+                          if (!f) {
+                            clearProfilePhoto();
+                            return;
+                          }
+                          if (f.size > PROFILE_PHOTO_MAX_MB * 1024 * 1024) {
+                            setError(`La foto de perfil: máximo ${PROFILE_PHOTO_MAX_MB} MB`);
+                            e.target.value = '';
+                            return;
+                          }
+                          if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
+                            setError('Formato: JPG, PNG o WebP.');
+                            e.target.value = '';
+                            return;
+                          }
+                          setError('');
+                          if (profileObjectUrlRef.current) {
+                            URL.revokeObjectURL(profileObjectUrlRef.current);
+                            profileObjectUrlRef.current = null;
+                          }
+                          const url = URL.createObjectURL(f);
+                          profileObjectUrlRef.current = url;
+                          setProfilePhotoPreview(url);
+                          setProfilePhotoFile(f);
+                        }}
+                        className="w-full max-w-xs text-sm file:mr-2 file:py-1.5 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-medium file:bg-orange-500/15 file:text-orange-700"
+                        style={{ color: neu.textBody }}
+                      />
+                      {profilePhotoFile && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            clearProfilePhoto();
+                          }}
+                          className="text-xs font-medium text-left w-fit hover:underline"
+                          style={{ color: neu.textBody }}
+                        >
+                          Quitar foto de perfil
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="space-y-3">
@@ -1135,45 +1155,12 @@ function SubirPageInner() {
                   aria-required="true"
                 />
                 <span>
-                  He leído y acepto la{' '}
+                  Leí y acepto la{' '}
                   <Link href="/privacidad" className="text-orange-600 underline underline-offset-2">
                     política de privacidad
                   </Link>
                   .
                 </span>
-              </label>
-              <label htmlFor="subir-consent-rights" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input
-                  id="subir-consent-rights"
-                  type="checkbox"
-                  checked={consentRights}
-                  onChange={(e) => setConsentRights(e.target.checked)}
-                  className="mt-1 accent-orange-500"
-                  aria-required="true"
-                />
-                <span>Tengo derechos para compartir este contenido.</span>
-              </label>
-              <label htmlFor="subir-consent-curate" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input
-                  id="subir-consent-curate"
-                  type="checkbox"
-                  checked={consentCurate}
-                  onChange={(e) => setConsentCurate(e.target.checked)}
-                  className="mt-1 accent-orange-500"
-                  aria-required="true"
-                />
-                <span>Acepto que pasa por curaduría antes de publicarse.</span>
-              </label>
-              <label htmlFor="subir-consent-postales" className="flex items-start gap-3 text-sm" style={{ color: neu.textBody }}>
-                <input
-                  id="subir-consent-postales"
-                  type="checkbox"
-                  checked={consentPostales}
-                  onChange={(e) => setConsentPostales(e.target.checked)}
-                  className="mt-1 accent-orange-500"
-                  aria-required="true"
-                />
-                <span>Postales: mantener autoría, no modificar.</span>
               </label>
             </div>
 
