@@ -605,225 +605,6 @@ function SubirPageInner() {
                 Empezar de cero
               </button>
             </div>
-            <p className="text-sm font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
-              {FORMAT_LABELS[format]}
-            </p>
-
-            {format === 'video' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
-                {capture?.recordedBlob ? (
-                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
-                    Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo abajo.
-                  </p>
-                ) : null}
-                <label htmlFor="subir-datos-video-url" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  URL del video (YouTube o Vimeo){capture?.recordedBlob ? '' : ' *'}
-                </label>
-                <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
-                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
-                </p>
-                <input
-                  id="subir-datos-video-url"
-                  type="url"
-                  value={videoUrl}
-                  onChange={(e) => setVideoUrl(e.target.value)}
-                  placeholder="https://www.youtube.com/..."
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required={!capture?.recordedBlob}
-                  aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
-                  aria-describedby={
-                    [
-                      videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'subir-datos-video-url-format' : '',
-                      videoVimeoTooLong ? 'subir-datos-video-vimeo-len' : '',
-                    ]
-                      .filter(Boolean)
-                      .join(' ') || undefined
-                  }
-                />
-                {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
-                  <p id="subir-datos-video-url-format" className="mt-1 text-[11px] text-amber-700" role="alert">
-                    Indica un enlace de YouTube o Vimeo
-                  </p>
-                )}
-                {videoVimeoTooLong && (
-                  <p id="subir-datos-video-vimeo-len" className="text-[11px] text-red-600 font-medium" role="alert">
-                    Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {format === 'audio' && (
-              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
-                {capture?.recordedBlob ? (
-                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
-                    Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
-                  </p>
-                ) : null}
-                <label htmlFor="subir-datos-audio-file" className="block text-sm font-medium" style={{ color: neu.textMain }}>
-                  Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
-                </label>
-                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
-                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
-                </p>
-                <input
-                  id="subir-datos-audio-file"
-                  type="file"
-                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
-                  aria-label="Seleccionar archivo de audio (MP3, WAV o M4A)"
-                  onChange={(e) => {
-                    const inputEl = e.target;
-                    const f = inputEl.files?.[0];
-                    if (!f) {
-                      setAudioFile(null);
-                      setAudioFileWithinMax(true);
-                      return;
-                    }
-                    if (f.size > AUDIO_MAX_MB * 1024 * 1024) {
-                      setError(`Máximo ${AUDIO_MAX_MB} MB`);
-                      setAudioFile(null);
-                      setAudioFileWithinMax(true);
-                      inputEl.value = '';
-                      return;
-                    }
-                    setError('');
-                    void (async () => {
-                      const sec = await probeAudioFileDurationSeconds(f);
-                      if (sec != null && !isDurationWithinMax(sec)) {
-                        setError(
-                          `El audio dura más de ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Acorta el archivo e intenta de nuevo.`
-                        );
-                        setAudioFileWithinMax(false);
-                        setAudioFile(null);
-                        inputEl.value = '';
-                        return;
-                      }
-                      setAudioFileWithinMax(true);
-                      setAudioFile(f);
-                    })();
-                  }}
-                  className="w-full text-sm"
-                  style={{ color: neu.textBody }}
-                />
-                <label htmlFor="subir-datos-audio-url" className="sr-only">
-                  URL del audio
-                </label>
-                <input
-                  id="subir-datos-audio-url"
-                  type="url"
-                  value={audioUrl}
-                  onChange={(e) => setAudioUrl(e.target.value)}
-                  placeholder="O pega aquí la URL del audio"
-                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-invalid={!audioUrlWithinMax}
-                  aria-describedby={!audioUrlWithinMax ? 'subir-datos-audio-url-error' : undefined}
-                />
-                {!audioUrlWithinMax && (
-                  <p id="subir-datos-audio-url-error" className="text-xs text-red-600 font-medium" role="alert">
-                    Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
-                  </p>
-                )}
-                {(audioFile ||
-                  audioUrl.trim() ||
-                  capture?.recordedBlob ||
-                  capture?.audioFile ||
-                  (capture?.audioUrl?.trim() ?? '')) &&
-                  audioFileWithinMax &&
-                  audioUrlWithinMax && (
-                  <p className="text-sm" style={{ color: neu.textBody }}>
-                    ✓ Listo
-                  </p>
-                )}
-              </div>
-            )}
-
-            {format === 'foto' && (
-              <div style={neu.cardInset} className="p-6 md:p-8 rounded-[2rem] space-y-4">
-                <label htmlFor="subir-datos-fotos-historia" className="block text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
-                  Fotos ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}; JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB c/u) *
-                </label>
-                <input
-                  id="subir-datos-fotos-historia"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  multiple
-                  aria-label={`Seleccionar archivos de fotos de la historia (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX} imágenes)`}
-                  aria-required="true"
-                  onChange={(e) => {
-                    const list = e.target.files;
-                    if (!list?.length) return;
-                    setPhotoFiles((prev) => {
-                      const next = [...prev];
-                      for (const f of Array.from(list)) {
-                        if (next.length >= SUBIR_PHOTO_MAX) break;
-                        if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
-                          setError(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
-                          return prev;
-                        }
-                        if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
-                          setError('Formato: JPG, PNG o WebP.');
-                          return prev;
-                        }
-                        next.push(f);
-                      }
-                      setError('');
-                      return next;
-                    });
-                    e.target.value = '';
-                  }}
-                  className="w-full text-base"
-                  style={{ color: neu.textBody }}
-                />
-                {photoFiles.length > 0 && (
-                  <ul className="space-y-2 text-base">
-                    {photoFiles.map((f, i) => (
-                      <li
-                        key={`${f.name}-${i}`}
-                        className="flex items-center justify-between gap-2 rounded-xl px-3 py-2"
-                        style={neu.card}
-                      >
-                        <span className="truncate" style={{ color: neu.textMain }}>
-                          {f.name}
-                        </span>
-                        <button
-                          type="button"
-                          className="shrink-0 rounded-full px-3 py-1.5 text-sm font-bold text-white"
-                          style={{
-                            background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
-                          }}
-                          onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
-                        >
-                          Quitar
-                        </button>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-                <p className="text-sm" style={{ color: neu.textBody }}>
-                  Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos. Si no puedes subir archivos, usa la URL abajo (una imagen).
-                </p>
-                <label htmlFor="subir-datos-foto-url" className="sr-only">
-                  URL de imagen alternativa
-                </label>
-                <input
-                  id="subir-datos-foto-url"
-                  type="url"
-                  value={photoUrl}
-                  onChange={(e) => setPhotoUrl(e.target.value)}
-                  placeholder="O pega aquí la URL de una imagen"
-                  className="w-full px-5 py-4 rounded-2xl outline-none bg-white/55 border border-white/60 text-base"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                />
-                {(photoFiles.length > 0 || photoUrl.trim()) && (
-                  <p className="text-base font-medium" style={{ color: neu.textBody }}>
-                    ✓ {photoFiles.length > 0 ? `${photoFiles.length} foto(s)` : 'URL lista'}
-                  </p>
-                )}
-              </div>
-            )}
-
             <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
                 La historia
@@ -1022,6 +803,250 @@ function SubirPageInner() {
                 </p>
               </div>
             </div>
+
+            <p className="text-xs font-semibold uppercase tracking-wider px-0.5" style={{ color: neu.textBody }}>
+              Contenido del formato · {FORMAT_LABELS[format]}
+            </p>
+
+            {format === 'video' && (
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                {capture?.recordedBlob ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo abajo.
+                  </p>
+                ) : null}
+                <label htmlFor="subir-datos-video-url" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
+                  URL del video (YouTube o Vimeo){capture?.recordedBlob ? '' : ' *'}
+                </label>
+                <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
+                </p>
+                <input
+                  id="subir-datos-video-url"
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => setVideoUrl(e.target.value)}
+                  placeholder="https://www.youtube.com/..."
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required={!capture?.recordedBlob}
+                  aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
+                  aria-describedby={
+                    [
+                      videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'subir-datos-video-url-format' : '',
+                      videoVimeoTooLong ? 'subir-datos-video-vimeo-len' : '',
+                    ]
+                      .filter(Boolean)
+                      .join(' ') || undefined
+                  }
+                />
+                {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
+                  <p id="subir-datos-video-url-format" className="mt-1 text-[11px] text-amber-700" role="alert">
+                    Indica un enlace de YouTube o Vimeo
+                  </p>
+                )}
+                {videoVimeoTooLong && (
+                  <p id="subir-datos-video-vimeo-len" className="text-[11px] text-red-600 font-medium" role="alert">
+                    Este video de Vimeo supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Sube una versión más corta.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {format === 'audio' && (
+              <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
+                {capture?.recordedBlob ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el audio que grabaste antes. Puedes sustituirlo por archivo o URL abajo si lo necesitas.
+                  </p>
+                ) : null}
+                <label htmlFor="subir-datos-audio-file" className="block text-sm font-medium" style={{ color: neu.textMain }}>
+                  Audio (MP3, WAV o M4A; máx. {AUDIO_MAX_MB} MB) o URL
+                </label>
+                <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. Los archivos se comprueban al elegirlos; las URLs, si el servidor lo permite (a veces falla por CORS).
+                </p>
+                <input
+                  id="subir-datos-audio-file"
+                  type="file"
+                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a"
+                  aria-label="Seleccionar archivo de audio (MP3, WAV o M4A)"
+                  onChange={(e) => {
+                    const inputEl = e.target;
+                    const f = inputEl.files?.[0];
+                    if (!f) {
+                      setAudioFile(null);
+                      setAudioFileWithinMax(true);
+                      return;
+                    }
+                    if (f.size > AUDIO_MAX_MB * 1024 * 1024) {
+                      setError(`Máximo ${AUDIO_MAX_MB} MB`);
+                      setAudioFile(null);
+                      setAudioFileWithinMax(true);
+                      inputEl.value = '';
+                      return;
+                    }
+                    setError('');
+                    void (async () => {
+                      const sec = await probeAudioFileDurationSeconds(f);
+                      if (sec != null && !isDurationWithinMax(sec)) {
+                        setError(
+                          `El audio dura más de ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Acorta el archivo e intenta de nuevo.`
+                        );
+                        setAudioFileWithinMax(false);
+                        setAudioFile(null);
+                        inputEl.value = '';
+                        return;
+                      }
+                      setAudioFileWithinMax(true);
+                      setAudioFile(f);
+                    })();
+                  }}
+                  className="w-full text-sm"
+                  style={{ color: neu.textBody }}
+                />
+                <label htmlFor="subir-datos-audio-url" className="sr-only">
+                  URL del audio
+                </label>
+                <input
+                  id="subir-datos-audio-url"
+                  type="url"
+                  value={audioUrl}
+                  onChange={(e) => setAudioUrl(e.target.value)}
+                  placeholder="O pega aquí la URL del audio"
+                  className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-invalid={!audioUrlWithinMax}
+                  aria-describedby={!audioUrlWithinMax ? 'subir-datos-audio-url-error' : undefined}
+                />
+                {!audioUrlWithinMax && (
+                  <p id="subir-datos-audio-url-error" className="text-xs text-red-600 font-medium" role="alert">
+                    Ese enlace supera los {MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos. Usa un audio más corto.
+                  </p>
+                )}
+                {(audioFile ||
+                  audioUrl.trim() ||
+                  capture?.recordedBlob ||
+                  capture?.audioFile ||
+                  (capture?.audioUrl?.trim() ?? '')) &&
+                  audioFileWithinMax &&
+                  audioUrlWithinMax && (
+                  <p className="text-sm" style={{ color: neu.textBody }}>
+                    ✓ Listo
+                  </p>
+                )}
+              </div>
+            )}
+
+            {format === 'texto' && (
+              <div style={neu.cardInset} className="p-4 md:p-5 rounded-3xl space-y-3 text-sm">
+                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+                  Tu texto
+                </p>
+                <label htmlFor="subir-datos-texto-cuerpo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Texto de la historia *
+                </label>
+                <textarea
+                  id="subir-datos-texto-cuerpo"
+                  value={textBody}
+                  onChange={(e) => setTextBody(e.target.value)}
+                  placeholder="Escribe o pega aquí el relato que quieres enviar."
+                  rows={12}
+                  maxLength={SUBIR_TEXT_MAX_CHARS}
+                  className="w-full resize-y rounded-xl px-3 py-2.5 outline-none bg-white/50 border border-white/50 min-h-[12rem] text-sm leading-relaxed"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-required="true"
+                />
+                <p className="text-[11px]" style={{ color: neu.textBody }}>
+                  {textBody.length.toLocaleString('es')} / {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres
+                </p>
+              </div>
+            )}
+
+            {format === 'foto' && (
+              <div style={neu.cardInset} className="p-6 md:p-8 rounded-[2rem] space-y-4">
+                <label htmlFor="subir-datos-fotos-historia" className="block text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
+                  Fotos ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}; JPG, PNG o WebP; máx. {PHOTO_MAX_MB} MB c/u) *
+                </label>
+                <input
+                  id="subir-datos-fotos-historia"
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  multiple
+                  aria-label={`Seleccionar archivos de fotos de la historia (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX} imágenes)`}
+                  aria-required="true"
+                  onChange={(e) => {
+                    const list = e.target.files;
+                    if (!list?.length) return;
+                    setPhotoFiles((prev) => {
+                      const next = [...prev];
+                      for (const f of Array.from(list)) {
+                        if (next.length >= SUBIR_PHOTO_MAX) break;
+                        if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
+                          setError(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
+                          return prev;
+                        }
+                        if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
+                          setError('Formato: JPG, PNG o WebP.');
+                          return prev;
+                        }
+                        next.push(f);
+                      }
+                      setError('');
+                      return next;
+                    });
+                    e.target.value = '';
+                  }}
+                  className="w-full text-base"
+                  style={{ color: neu.textBody }}
+                />
+                {photoFiles.length > 0 && (
+                  <ul className="space-y-2 text-base">
+                    {photoFiles.map((f, i) => (
+                      <li
+                        key={`${f.name}-${i}`}
+                        className="flex items-center justify-between gap-2 rounded-xl px-3 py-2"
+                        style={neu.card}
+                      >
+                        <span className="truncate" style={{ color: neu.textMain }}>
+                          {f.name}
+                        </span>
+                        <button
+                          type="button"
+                          className="shrink-0 rounded-full px-3 py-1.5 text-sm font-bold text-white"
+                          style={{
+                            background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
+                          }}
+                          onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
+                        >
+                          Quitar
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <p className="text-sm" style={{ color: neu.textBody }}>
+                  Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos. Si no puedes subir archivos, usa la URL abajo (una imagen).
+                </p>
+                <label htmlFor="subir-datos-foto-url" className="sr-only">
+                  URL de imagen alternativa
+                </label>
+                <input
+                  id="subir-datos-foto-url"
+                  type="url"
+                  value={photoUrl}
+                  onChange={(e) => setPhotoUrl(e.target.value)}
+                  placeholder="O pega aquí la URL de una imagen"
+                  className="w-full px-5 py-4 rounded-2xl outline-none bg-white/55 border border-white/60 text-base"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+                {(photoFiles.length > 0 || photoUrl.trim()) && (
+                  <p className="text-base font-medium" style={{ color: neu.textBody }}>
+                    ✓ {photoFiles.length > 0 ? `${photoFiles.length} foto(s)` : 'URL lista'}
+                  </p>
+                )}
+              </div>
+            )}
 
             <div style={neu.cardInset} className="p-4 rounded-3xl space-y-4">
               <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
