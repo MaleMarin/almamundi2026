@@ -419,7 +419,7 @@ export function HomeFirstPart({
           {t.historiasLead1}{' '}
           <span className="font-normal text-gray-700">{t.historiasLead2}</span>
         </p>
-        <div className="mx-auto mt-8 grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:mt-10 sm:px-0 md:mt-12 lg:grid-cols-4 lg:mt-14 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
+        <div className="mx-auto mt-12 grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:mt-14 sm:px-0 md:mt-16 lg:grid-cols-4 lg:mt-20 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
         <SoftCard
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}

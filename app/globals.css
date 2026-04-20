@@ -398,13 +398,17 @@ a:focus,
     0 0 0 1px rgba(var(--almamundi-orange-rgb), 0.08);
 }
 
-/* Enlaces del footer interno: siempre negro (anula `a`/`a:hover` globales y `!text-orange` de ruta activa). No afecta al h1 ALMAMUNDI (no es <a>). */
+/*
+ * Enlaces del footer: misma base que píldoras del header (`#4b5563`, ver `.home-map-neu-pill`).
+ * Anula `a`/`a:hover` globales; hover naranja marca como en `.btn-almamundi:hover`.
+ * No afecta al h1 ALMAMUNDI (no es <a>).
+ */
 footer a.almamundi-footer-link,
 footer a.almamundi-footer-link:visited {
-  color: #0a0a0a !important;
+  color: #4b5563 !important;
 }
 footer a.almamundi-footer-link:hover {
-  color: #1f2937 !important;
+  color: var(--almamundi-orange) !important;
 }
 
 /* Modo alto contraste AlmaMundi */

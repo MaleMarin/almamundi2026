@@ -7,7 +7,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-import { ACTIVE_NAV_CLASS, isHistoriasSectionPath } from '@/lib/internal-nav-active';
+import { isHistoriasSectionPath } from '@/lib/internal-nav-active';
 
 const ITEMS = [
   { label: 'Mi colección', href: '/historias/mi-coleccion' },
@@ -41,7 +41,8 @@ export function HistoriasAccordion({
   variant,
   buttonStyle,
   className = '',
-  footerLinkClassName = 'almamundi-footer-link font-normal transition-colors',
+  footerLinkClassName =
+    'almamundi-footer-link text-xs font-semibold leading-snug transition-colors',
   triggerLabel = 'Historias',
   onItemNavigate,
   headerButtonClassName,
@@ -70,7 +71,7 @@ export function HistoriasAccordion({
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={`text-black hover:text-gray-800 transition-colors ${historiasActive ? 'font-semibold' : 'font-normal'}`}
+          className={`text-left text-xs font-semibold leading-none transition-colors hover:text-[var(--almamundi-orange)] ${historiasActive ? 'text-gray-900' : 'text-gray-600'}`}
           aria-expanded={open}
           aria-haspopup="true"
         >
@@ -82,8 +83,8 @@ export function HistoriasAccordion({
               <ActiveInternalNavLink
                 key={item.label}
                 href={item.href}
-                className={`block px-4 py-2.5 text-base hover:bg-gray-200/50 first:rounded-t-xl last:rounded-b-xl ${footerLinkClassName}`}
-                activeClassName="!text-black font-semibold"
+                className={`block px-4 py-2.5 text-xs font-semibold leading-snug hover:bg-gray-200/50 first:rounded-t-xl last:rounded-b-xl ${footerLinkClassName}`}
+                activeClassName="!text-gray-900 font-semibold"
                 onClick={afterNavigate}
               >
                 {item.label}
