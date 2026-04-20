@@ -5,7 +5,15 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type RefObject,
+} from 'react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
@@ -81,7 +89,15 @@ const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) 
   ),
 });
 
-export default function HomeMap() {
+export type HomeMapProps = {
+  /**
+   * Contenedor del universo (globo) desde `MapSectionLocked`.
+   * IntersectionObserver usa este nodo para arrancar/cortar el ambiente según scroll (no el globo Three.js).
+   */
+  universeSectionRef?: RefObject<HTMLDivElement | null>;
+};
+
+export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const router = useRouter();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -157,6 +173,9 @@ export default function HomeMap() {
   }, []);
 
   const globeContainerRef = useRef<HTMLDivElement>(null);
+  /** True cuando ≥20% del contenedor del universo es visible (scroll hero/footer corta reproducción). */
+  const [globeInView, setGlobeInView] = useState(false);
+  const globeInViewRef = useRef(false);
   const soundEnabledRef = useRef(soundEnabled);
   const selectedMoodRef = useRef(selectedMood);
   soundEnabledRef.current = soundEnabled;
@@ -185,35 +204,51 @@ export default function HomeMap() {
       .catch(() => {});
   }, []);
 
-  // Sonido «universo»: solo al hacer scroll y ver de verdad la sección #mapa (no al rozar el globo ni el bloque negro antes de tiempo).
+  // Sonido ambiente: solo mientras el contenedor del universo (globo) es visible; al ir a hero o footer se corta vía `stopAmbient` en el efecto de reproducción.
   useLayoutEffect(() => {
-    const section = typeof document !== 'undefined' ? document.getElementById('mapa') : null;
+    const section =
+      universeSectionRef?.current ??
+      (typeof document !== 'undefined' ? document.getElementById('mapa') : null);
     if (!section) return;
 
+    const VISIBILITY_THRESHOLD = 0.2;
+    const thresholds = Array.from({ length: 21 }, (_, i) => i / 20);
+
     const onIntersect: IntersectionObserverCallback = (entries) => {
-      const hit = entries.some(
-        (en) => en.isIntersecting && en.target === section && en.intersectionRatio >= 0.12
-      );
-      if (!hit) return;
-      if (userSilencedMapAmbientRef.current) return;
-      if (!hasPrimedUniverseForMapRef.current) {
-        hasPrimedUniverseForMapRef.current = true;
-        setSelectedMood('universo');
+      for (const en of entries) {
+        if (en.target !== section) continue;
+        const visible = en.isIntersecting && en.intersectionRatio >= VISIBILITY_THRESHOLD;
+        globeInViewRef.current = visible;
+        setGlobeInView(visible);
+
+        if (!visible) continue;
+
+        if (userSilencedMapAmbientRef.current) return;
+        if (!hasPrimedUniverseForMapRef.current) {
+          hasPrimedUniverseForMapRef.current = true;
+          setSelectedMood('universo');
+        }
+        setSoundEnabled(true);
+        window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
       }
-      setSoundEnabled(true);
-      window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
     };
 
     const io = new IntersectionObserver(onIntersect, {
-      threshold: [0, 0.06, 0.12, 0.18, 0.24, 0.32],
-      rootMargin: '-10% 0px -14% 0px',
+      threshold: thresholds,
+      root: null,
+      rootMargin: '0px',
     });
     io.observe(section);
     return () => io.disconnect();
-  }, []);
+  }, [universeSectionRef]);
 
-  // Reproducir o cortar el ambient según soundEnabled. Hace falta AudioContext (creado en el primer gesto: pointerdown/tecla).
+  // Reproducir o cortar el ambient según visibilidad del universo + soundEnabled (misma API: stopAmbient / startMapAmbientFromRefs).
   useEffect(() => {
+    if (!globeInView) {
+      stopAmbient();
+      setAmbientEnabled(false);
+      return;
+    }
     if (!soundEnabled) {
       stopAmbient();
       setAmbientEnabled(false);
@@ -222,7 +257,7 @@ export default function HomeMap() {
     if (!selectedMood) return;
     setAmbientEnabled(true);
     void startMapAmbientFromRefs();
-  }, [soundEnabled, selectedMood, startMapAmbientFromRefs]);
+  }, [globeInView, soundEnabled, selectedMood, startMapAmbientFromRefs]);
 
   /**
    * Gesto en #mapa: activar sonido aunque el IntersectionObserver no hubiera puesto soundEnabled (p. ej. layout del globo).
@@ -230,6 +265,7 @@ export default function HomeMap() {
    */
   useEffect(() => {
     const tryPlayInMap = () => {
+      if (!globeInViewRef.current) return;
       if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
       soundEnabledRef.current = true;
       setSoundEnabled(true);
@@ -422,6 +458,7 @@ export default function HomeMap() {
         ref={globeContainerRef}
         className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-visible"
         onPointerDownCapture={() => {
+          if (!globeInViewRef.current) return;
           if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
           initFromUserGesture();
           soundEnabledRef.current = true;

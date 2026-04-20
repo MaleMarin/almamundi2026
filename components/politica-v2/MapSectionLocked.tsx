@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import { useRef } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 
 /**
@@ -14,6 +15,8 @@ const HomeMap = dynamic(
 
 export function MapSectionLocked() {
   const { t } = useHomeLocale();
+  /** Contenedor del universo (globo + TimeBar): visibilidad para audio ambiente en `HomeMap` vía IntersectionObserver. */
+  const globeUniverseRef = useRef<HTMLDivElement>(null);
 
   return (
     <>
@@ -41,8 +44,11 @@ export function MapSectionLocked() {
           <div className="min-h-[64px] md:min-h-[88px] lg:min-h-[96px] w-full shrink-0" aria-hidden />
         </div>
         {/* Universo: globo debajo de la barra. Altura acotada (antes 120vh dejaba mucho negro vacío bajo la fecha). */}
-        <div className="relative flex w-full min-h-[88vh] flex-col overflow-visible bg-[var(--universe-bg)] pt-2 md:pt-3">
-          <HomeMap />
+        <div
+          ref={globeUniverseRef}
+          className="relative flex w-full min-h-[88vh] flex-col overflow-visible bg-[var(--universe-bg)] pt-2 md:pt-3"
+        >
+          <HomeMap universeSectionRef={globeUniverseRef} />
         </div>
       </section>
     </>
