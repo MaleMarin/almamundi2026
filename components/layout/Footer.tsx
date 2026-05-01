@@ -12,6 +12,9 @@ import { HistoriasAccordion } from './HistoriasAccordion';
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-none tracking-normal transition-colors';
 
+/** PDF estático en `public/` (nombre con espacios; URL codificada para compatibilidad). */
+const GUIA_CONDUCTA_PDF_HREF = '/Guia%20de%20conducta%20AlmaMundi.pdf';
+
 export type FooterProps = {
   /**
    * true = mismo diseño pero sin `data-site-footer` (p. ej. portal cinematográfico;
@@ -89,6 +92,15 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           >
             La visión de AlmaMundi
           </ActiveInternalNavLink>
+          <a
+            href={GUIA_CONDUCTA_PDF_HREF}
+            className={FOOTER_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            type="application/pdf"
+          >
+            Guía de conducta
+          </a>
         </div>
       </div>
     </footer>
