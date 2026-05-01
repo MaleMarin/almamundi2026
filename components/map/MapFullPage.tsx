@@ -51,6 +51,7 @@ import { isNightAtLocation, sunDirectionUtc, terminatorCssGradientAngleDeg } fro
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { showPublicDemoStories } from '@/lib/demo-stories-public';
 import { STORIES_MOCK, SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
 import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT } from '@/lib/map-data/globe-pov';
 import { MAP_HEADER_GRADIENT, MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
@@ -2510,17 +2511,23 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   /** Al entrar a Sonidos del mundo, mood por defecto para no mostrar "—" */
   /** music_logic_make_it_obvious_v1: estado inicial sin mood; el usuario elige un chip. */
 
+  /** Metadatos demo del viaje “Sintoniza el Mundo”: solo si `NEXT_PUBLIC_SHOW_DEMO_STORIES=true`. */
+  const publicStoriesMock = useMemo(
+    () => (showPublicDemoStories() ? STORIES_MOCK : []),
+    []
+  );
+
   /** Historias filtradas por sonido (mood); orden: con audio/video primero, luego por título. */
   const filteredStoriesForMusic = useMemo(() => {
     if (!selectedMood || !isPresetSoundMood(selectedMood)) return [];
-    return [...STORIES_MOCK]
+    return [...publicStoriesMock]
       .filter((s) => s.moods.includes(selectedMood))
       .sort((a, b) => {
         const pa = (a.hasAudio || a.hasVideo) ? 0 : 1;
         const pb = (b.hasAudio || b.hasVideo) ? 0 : 1;
         return pa - pb || (a.title || '').localeCompare(b.title || '');
       });
-  }, [selectedMood]);
+  }, [selectedMood, publicStoriesMock]);
 
   /** Music: al cambiar mood, enfocar globo al centro del conjunto de historias filtradas (map_is_the_product_v1). */
   useEffect(() => {
@@ -3071,8 +3078,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (!exploreQuery.trim() && atm?.featuredMoods?.length) {
       const listCopy = [...list];
       listCopy.sort((a, b) => {
-        const aMeta = STORIES_MOCK.find((m) => m.id === a.id);
-        const bMeta = STORIES_MOCK.find((m) => m.id === b.id);
+        const aMeta = publicStoriesMock.find((m) => m.id === a.id);
+        const bMeta = publicStoriesMock.find((m) => m.id === b.id);
         const aFeatured = atm.featuredMoods.some((m) => aMeta?.moods?.includes(m as SoundMood));
         const bFeatured = atm.featuredMoods.some((m) => bMeta?.moods?.includes(m as SoundMood));
         if (aFeatured && !bFeatured) return -1;
@@ -3082,7 +3089,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       return listCopy;
     }
     return list;
-  }, [stories, exploreQuery, atm]);
+  }, [stories, exploreQuery, atm, publicStoriesMock]);
 
   useEffect(() => {
     storyCountRef.current = storiesForView.length;
@@ -3480,9 +3487,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const startTour = useCallback(async () => {
     if (!selectedMood) return;
     setAudioBlocked(false);
-    tourUsesMockStoriesRef.current = true;
+    tourUsesMockStoriesRef.current = publicStoriesMock.length > 0;
+    if (publicStoriesMock.length === 0) return;
     const journeyMood: SoundMood = isPresetSoundMood(selectedMood) ? selectedMood : 'universo';
-    const nextJourney = buildJourney(journeyMood, STORIES_MOCK, 8);
+    const nextJourney = buildJourney(journeyMood, publicStoriesMock, 8);
+    if (nextJourney.length === 0) return;
     setJourney(nextJourney);
     setCurrentChapterIndex(0);
     setIsTourRunning(true);
@@ -3490,7 +3499,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     clearTourTimer();
     tourTimerRef.current = window.setInterval(() => nextChapterRef.current(), 8000);
     if (soundEnabled) void playAmbient();
-    const first = nextJourney[0];
+    const first = nextJourney[0]!;
     if (first && globeEl.current) {
       try {
         globeEl.current.pointOfView({ lat: first.lat, lng: first.lng, altitude: 1.55 }, 900);
@@ -3498,7 +3507,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       const place = (first.placeLabel ?? [first.city, first.country].filter(Boolean).join(', ')) || '—';
       setStoryLabelTemporary(first.title ?? '—', place, first.id);
     }
-  }, [selectedMood, soundEnabled, playAmbient, clearTourTimer, setStoryLabelTemporary]);
+  }, [selectedMood, soundEnabled, playAmbient, clearTourTimer, setStoryLabelTemporary, publicStoriesMock]);
 
   const activateAudio = useCallback(() => {
     void playAmbient();

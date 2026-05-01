@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getAdminDb } from "@/lib/firebase/admin";
-import type { StorySubmission } from "@/lib/firebase/types";
+import { editorialPublishApprovedStorySubmission } from "@/lib/editorial/service";
 
 export const runtime = "nodejs";
 
-/** POST /api/curate/publish/[submissionId] — crea story desde envío aprobado (solo admin). */
+/** POST /api/curate/publish/[submissionId] — flujo legacy (envío pre-aprobado). Delega en servicio editorial. */
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ submissionId: string }> }
@@ -17,73 +16,19 @@ export async function POST(
   try {
     const { submissionId } = await params;
     const db = getAdminDb();
-    const subRef = db.collection("story_submissions").doc(submissionId);
-    const subSnap = await subRef.get();
-    if (!subSnap.exists) {
-      return NextResponse.json({ error: "Submission not found" }, { status: 404 });
+    const r = await editorialPublishApprovedStorySubmission(db, submissionId, auth.email);
+    if (!r.ok) {
+      return NextResponse.json({ error: r.error }, { status: r.httpStatus });
     }
-
-    const data = subSnap.data() as StorySubmission;
-    if (data.status !== "approved") {
-      return NextResponse.json(
-        { error: "Submission must be approved before publishing" },
-        { status: 400 }
-      );
-    }
-
-    const now = FieldValue.serverTimestamp();
-    const storyData: Record<string, unknown> = {
-      status: "published",
-      publishedAt: now,
-      createdAt: now,
-      updatedAt: now,
-      sourceSubmissionId: submissionId,
-      title: data.title,
-      placeLabel: data.placeLabel,
-      lat: data.lat,
-      lng: data.lng,
-      format: data.format,
-      tags: data.tags,
-      excerpt: data.title.slice(0, 160),
-    };
-    if (data.authorName) storyData.authorName = data.authorName;
-    if (data.text !== undefined) storyData.text = data.text;
-    if (data.media !== undefined) storyData.media = data.media;
-
-    const storyRef = await db.collection("stories").add(storyData);
-    const storyId = storyRef.id;
-
-    await subRef.update({
-      status: "published",
-      updatedAt: FieldValue.serverTimestamp(),
-      publishedStoryId: storyId,
-    });
-
-    const mailItem: Record<string, unknown> = {
-      kind: "story_published",
-      createdAt: now,
-      to: data.authorEmail,
-      payload: {
-        storyId,
-        submissionId,
-        authorEmail: data.authorEmail,
-        title: data.title,
-        placeLabel: data.placeLabel,
-      },
-    };
-    await db.collection("mail_queue").add(mailItem);
 
     return NextResponse.json({
       ok: true,
-      storyId,
+      storyId: r.storyId,
       submissionId,
       mailQueued: true,
     });
   } catch (e) {
     console.error("curate publish", e);
-    return NextResponse.json(
-      { error: "Publish failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Publish failed" }, { status: 500 });
   }
 }

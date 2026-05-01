@@ -6,6 +6,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase/admin';
+import { isAudiencePublicStoryStatus } from '@/lib/editorial/status';
 
 export const runtime = 'nodejs';
 
@@ -63,6 +64,10 @@ export async function GET(
 
     const candidates: SimilarDoc[] = snap.docs
       .filter((doc) => doc.id !== id)
+      .filter((doc) => {
+        const d = doc.data() as Record<string, unknown>;
+        return isAudiencePublicStoryStatus(d.status);
+      })
       .map((doc) => {
         const d = doc.data() as Record<string, unknown>;
         const publishedAt =

@@ -5,13 +5,15 @@
  */
 
 import { NextResponse } from 'next/server';
+import { mergeGlobeFirestoreWithDemoFallback, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { getStoriesAsync } from '@/lib/map-data/stories-server';
 
 export const revalidate = 60;
 
 export async function GET() {
   try {
-    const stories = await getStoriesAsync();
+    const fromFs = await getStoriesAsync();
+    const stories = showPublicDemoStories() ? mergeGlobeFirestoreWithDemoFallback(fromFs) : fromFs;
     return NextResponse.json(
       { stories },
       {

@@ -5,6 +5,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
+import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { FotoAlbumClient } from './FotoAlbumClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -32,6 +33,7 @@ function buildImagenes(s: StoryPoint): { url: string; caption?: string }[] {
 function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string }[]): HistoriaFoto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -44,6 +46,7 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
       ubicacion,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(demoStory ? { demoStory } : {}),
   };
 }
 

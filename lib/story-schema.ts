@@ -39,11 +39,15 @@ export type Autor = {
 
 // ─── Estado de curación ──────────────────────────────────────────────────────
 export type EstadoCuracion =
+  | 'draft'
   | 'pending' // recién subida, esperando revisión
   | 'reviewing' // admin la está viendo
-  | 'published' // aprobada y visible
+  | 'approved' // visible público (canónico)
+  | 'featured'
+  | 'beta_demo'
+  | 'published' // @deprecated — alias legacy visible; igual que approved en política pública
   | 'rejected' // rechazada
-  | 'archived' // publicada pero archivada
+  | 'archived' // retirada; no audiencia general
 
 // ─── Historia completa ───────────────────────────────────────────────────────
 export type StoryData = {
@@ -132,7 +136,8 @@ export type PublishPayload = {
 
 export function buildPublishUpdate(payload: PublishPayload): Partial<StoryData> {
   return {
-    status: 'published',
+    /** Canon editorial: público audiencia tras curación española. Legacy `published` sigue tratándose como visible en APIs. */
+    status: 'approved',
     temas: payload.temas,
     curadorId: payload.curadorId,
     curadorNota: payload.curadorNota,

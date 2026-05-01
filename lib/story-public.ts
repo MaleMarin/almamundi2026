@@ -1,10 +1,12 @@
 /**
- * Estados de historia visibles públicamente en API y páginas.
- * No exponer borradores, pendientes de curación ni rechazados.
+ * Política de visibilidad pública para documentos historia (compatibilidad).
+ * Fuente única de verdad: `@/lib/editorial/status`.
  */
-export const PUBLIC_STORY_STATUSES = ["published"] as const;
-export type PublicStoryStatus = (typeof PUBLIC_STORY_STATUSES)[number];
-
-export function isPublicStoryDocumentStatus(status: unknown): status is PublicStoryStatus {
-  return typeof status === "string" && (PUBLIC_STORY_STATUSES as readonly string[]).includes(status);
-}
+export {
+  isAudiencePublicStoryStatus,
+  FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
+  AUDIENCE_PUBLIC_STORY_STATUSES,
+  isPublicStoryDocumentStatus,
+  isGlobePointEligibleFromFlatLatLng as isGlobeEligibleFlatCoords,
+  isBetaDemoStatus,
+} from "@/lib/editorial/status";

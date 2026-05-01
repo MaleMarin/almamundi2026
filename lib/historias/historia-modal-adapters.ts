@@ -4,6 +4,7 @@
  */
 import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
+import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function defaultAvatar(name: string): string {
@@ -37,6 +38,7 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -54,6 +56,7 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
       bio: s.author?.bio,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(demoStory ? { demoStory } : {}),
   };
 }
 
@@ -62,6 +65,7 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
   if (imagenes.length === 0) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -77,5 +81,6 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
       ubicacion,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(demoStory ? { demoStory } : {}),
   };
 }

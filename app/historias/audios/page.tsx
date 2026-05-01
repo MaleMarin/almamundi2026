@@ -15,6 +15,11 @@ import {
   HISTORIAS_LIST_EXPO_LABEL,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
+import {
+  demoStoryFieldsFromPoint,
+  isPublicGlobeFallbackDemoId,
+  showPublicDemoStories,
+} from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionAudio } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
@@ -27,6 +32,7 @@ function isAudioStory(s: StoryPoint): boolean {
 }
 
 function storyToHistoriaAudioOrDemo(s: StoryPoint): HistoriaAudio {
+  const demoStory = demoStoryFieldsFromPoint(s);
   if (s.id.startsWith('demo-audio-')) {
     const m = MOCK_STORIES.audio;
     const nombre = s.authorName ?? m.autor.nombre;
@@ -47,6 +53,7 @@ function storyToHistoriaAudioOrDemo(s: StoryPoint): HistoriaAudio {
         bio: (m.autor as { bio?: string }).bio,
       },
       tags: s.tags ?? m.tags,
+      ...(demoStory ? { demoStory } : {}),
     };
   }
   return storyToHistoriaAudio(s);
@@ -68,10 +75,13 @@ export default function HistoriasAudiosPage() {
 
   const audioStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
-      (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isAudioStory(s)
+      (s) => !isPublicGlobeFallbackDemoId(s.id) && isAudioStory(s)
     );
     const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos = DEMO_AUDIO_STORIES.filter((d) => !apiIds.has(d.id));
+    const demos =
+      showPublicDemoStories()
+        ? DEMO_AUDIO_STORIES.filter((d) => !apiIds.has(d.id))
+        : [];
     return [...fromApi, ...demos];
   }, [allStories]);
 

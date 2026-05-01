@@ -14,6 +14,7 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 
 export const runtime = "nodejs";
 
@@ -195,6 +196,15 @@ export async function POST(req: NextRequest) {
   try {
     const db = getAdminDb();
     const ref = await db.collection("submissions").add(doc);
+    try {
+      await appendEditorialAuditLog(db, "anonymous:web", "submit", {
+        submissionId: ref.id,
+        submissionCollection: "submissions",
+        toStatus: "pending",
+      });
+    } catch (auditErr) {
+      console.warn("[submissions POST] audit log omitido:", auditErr);
+    }
     return NextResponse.json({ ok: true, id: ref.id });
   } catch (e) {
     console.error("submissions POST", e);

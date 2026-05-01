@@ -16,6 +16,7 @@ import {
 import { deleteUser, getAuth } from 'firebase/auth';
 import { db } from '@/lib/firebase/client';
 import { clearSavedCollection } from '@/lib/collection';
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from '@/lib/editorial/status';
 
 const STORIES = 'stories';
 const USERS = 'users';
@@ -103,7 +104,11 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
       const pendingRefs = pendingSnap.docs.map((d) => d.ref);
 
       const publishedSnap = await getDocs(
-        query(collection(db, STORIES), where('autor.id', '==', uid), where('status', '==', 'published')),
+        query(
+          collection(db, STORIES),
+          where('autor.id', '==', uid),
+          where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]),
+        ),
       );
       const now = new Date().toISOString();
       const publishedUpdates = publishedSnap.docs.map((d) => ({

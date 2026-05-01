@@ -32,6 +32,7 @@ import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhib
 
 import { EthicalShareFlow, EthicalShareTriggerButton } from './EthicalShareFlow';
 import { ResonanceMailbox } from './ResonanceMailbox';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 
 export type ExhibitionContentMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -498,6 +499,19 @@ export function HistoricalExhibitionCarousel({
                     </div>
                   ) : null}
                 </div>
+                {h.isDemoStory ? (
+                  <div className="mt-3 shrink-0">
+                    <DemoStoryDisclosure
+                      variant="card"
+                      story={{
+                        id: h.id,
+                        isDemo: true,
+                        isRealStory: false,
+                        demoNotice: h.demoNotice,
+                      }}
+                    />
+                  </div>
+                ) : null}
                 <div className="mt-4 flex-shrink-0 space-y-2">
                   <h3
                     className={
@@ -590,6 +604,19 @@ export function HistoricalExhibitionCarousel({
                   >
                     {metaLine}
                   </p>
+                  {active.isDemoStory ? (
+                    <div className="pointer-events-auto mt-2 max-w-sm">
+                      <DemoStoryDisclosure
+                        variant="panel"
+                        story={{
+                          id: active.id,
+                          isDemo: true,
+                          isRealStory: false,
+                          demoNotice: active.demoNotice,
+                        }}
+                      />
+                    </div>
+                  ) : null}
                 </div>
               </div>
             </div>
@@ -640,6 +667,19 @@ export function HistoricalExhibitionCarousel({
                 >
                   {metaLine}
                 </p>
+                {active.isDemoStory ? (
+                  <div className="pointer-events-auto mt-2 max-w-sm">
+                    <DemoStoryDisclosure
+                      variant="panel"
+                      story={{
+                        id: active.id,
+                        isDemo: true,
+                        isRealStory: false,
+                        demoNotice: active.demoNotice,
+                      }}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
           </div>

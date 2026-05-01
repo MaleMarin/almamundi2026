@@ -13,4 +13,7 @@ export type HistoricalExhibitionStory = {
   tags: string[];
   videoUrl?: string;
   audioUrl?: string;
+  /** Historia demo / beta_demo — mostrar aviso en carrusel. */
+  isDemoStory?: boolean;
+  demoNotice?: string;
 };

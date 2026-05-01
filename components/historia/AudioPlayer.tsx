@@ -1,5 +1,7 @@
 'use client';
 
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
@@ -31,6 +33,7 @@ export interface HistoriaAudio {
   /** Texto accesible del audio (sinónimo API: `transcript`). */
   transcripcion?: string;
   transcript?: string;
+  demoStory?: DemoStoryFields;
 }
 
 interface AudioPlayerProps {
@@ -241,6 +244,18 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
             zIndex: 9999,
           }}
         >
+          {historia.demoStory ? (
+            <div
+              style={{
+                width: '100%',
+                maxWidth: 520,
+                marginBottom: '1rem',
+                flexShrink: 0,
+              }}
+            >
+              <DemoStoryDisclosure story={historia.demoStory} variant="page" />
+            </div>
+          ) : null}
           {/* ZONA 1 — TOP: X + título */}
           {onClose && (
             <button
@@ -591,6 +606,11 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               textAlign: 'center',
             }}
           >
+            {historia.demoStory ? (
+              <div style={{ width: '100%', marginBottom: '1.25rem' }}>
+                <DemoStoryDisclosure story={historia.demoStory} variant="page" />
+              </div>
+            ) : null}
             <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
               <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
               <span style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.85rem', color: SEPIA, letterSpacing: '0.3em' }}>Fin</span>

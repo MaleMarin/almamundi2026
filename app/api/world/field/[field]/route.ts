@@ -2,7 +2,7 @@ import { NextRequest } from "next/server";
 import { getWorldCollection } from "@/lib/world/db";
 import { queryWorld } from "@/lib/world/query";
 import { isField, isMode } from "@/lib/world/types";
-import { mockWorldNow } from "@/lib/world/mockWorldNow";
+import { mockWorldNow, worldMockItemsPublicFilter } from "@/lib/world/mockWorldNow";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -41,7 +41,7 @@ export async function GET(request: NextRequest, { params }: Context) {
       mode,
       field: fieldSlug,
       updatedAt: new Date(mock.generatedAt).toISOString(),
-      items: mock.items,
+      items: worldMockItemsPublicFilter(mock.items),
       source: "mock",
       warning: "Firestore not configured. Returned mock data.",
     });
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest, { params }: Context) {
       mode,
       field: fieldSlug,
       updatedAt: new Date(mock.generatedAt).toISOString(),
-      items: mock.items,
+      items: worldMockItemsPublicFilter(mock.items),
       source: "mock",
       warning: "Firestore query failed. Returned mock data.",
     });

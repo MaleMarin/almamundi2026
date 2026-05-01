@@ -1,5 +1,7 @@
 'use client'
 
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure'
+import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
@@ -22,6 +24,7 @@ export interface Historia {
   citaDestacada?: string
   /** URL de archivo de subtítulos (WebVTT) para `<track kind="captions">`. */
   subtitulos?: string
+  demoStory?: DemoStoryFields
 }
 
 interface VideoPlayerProps {
@@ -198,6 +201,25 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
 
   return (
     <>
+      {historia.demoStory ? (
+        <div
+          className="pointer-events-none"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 12000,
+            padding: '0.65rem 1rem 0',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <div className="pointer-events-auto w-full max-w-lg px-1">
+            <DemoStoryDisclosure story={historia.demoStory} variant="page" />
+          </div>
+        </div>
+      ) : null}
       {/* ── Global Fonts ── */}
       <style>{`
         :root {

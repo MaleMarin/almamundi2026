@@ -259,7 +259,7 @@ export default function CuraduriaPage() {
         )}
 
         {list.length === 0 && !loading && (
-          <p className="text-white/60">No hay envíos pendientes en story_submissions.</p>
+          <p className="text-white/60">No hay envíos pendientes para curar.</p>
         )}
 
         <ul className="space-y-6">

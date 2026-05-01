@@ -5,6 +5,7 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
+import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -21,6 +22,7 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -35,6 +37,7 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
       bio: s.author?.bio,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(demoStory ? { demoStory } : {}),
   };
 }
 

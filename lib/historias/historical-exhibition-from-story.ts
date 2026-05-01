@@ -1,5 +1,6 @@
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-demo';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import { DEMO_STORY_NOTICE, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 const PLACEHOLDER_THUMB =
@@ -50,6 +51,7 @@ export function storyPointToHistoricalExhibitionStory(
   const cita =
     (s.quote ?? s.excerpt ?? s.description ?? '').trim() || '—';
   const v = (s.videoUrl ?? '').trim();
+  const demo = storyShowsDemoDisclaimer(s);
   return {
     id: s.id,
     nombre: name,
@@ -61,6 +63,9 @@ export function storyPointToHistoricalExhibitionStory(
     imagen_principal: imagen,
     tags: tagsFromStory(s),
     videoUrl: v || undefined,
+    ...(demo
+      ? { isDemoStory: true as const, demoNotice: s.demoNotice?.trim() || DEMO_STORY_NOTICE }
+      : {}),
   };
 }
 

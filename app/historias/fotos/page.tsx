@@ -14,6 +14,7 @@ import {
   HISTORIAS_LIST_EXPO_LABEL,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
+import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaFotoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
@@ -42,10 +43,13 @@ export default function HistoriasFotosPage() {
 
   const photoStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
-      (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isPhotoStory(s)
+      (s) => !isPublicGlobeFallbackDemoId(s.id) && isPhotoStory(s)
     );
     const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos = DEMO_FOTO_STORIES.filter((d) => !apiIds.has(d.id));
+    const demos =
+      showPublicDemoStories()
+        ? DEMO_FOTO_STORIES.filter((d) => !apiIds.has(d.id))
+        : [];
     return [...fromApi, ...demos];
   }, [allStories]);
 

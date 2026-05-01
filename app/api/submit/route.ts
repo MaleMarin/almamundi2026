@@ -16,6 +16,7 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -177,6 +178,17 @@ export async function POST(request: NextRequest) {
       { error: "No pudimos guardar tu historia. Intenta más tarde." },
       { status: 503 }
     );
+  }
+
+  try {
+    const dbAudit = getAdminDb();
+    await appendEditorialAuditLog(dbAudit, "anonymous:web", "submit", {
+      submissionId: ref.id,
+      submissionCollection: "story_submissions",
+      toStatus: "pending",
+    });
+  } catch (auditErr) {
+    console.warn("[submit POST] audit log omitido:", auditErr);
   }
 
   let visualParams: unknown = undefined;

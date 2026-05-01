@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
@@ -24,6 +26,7 @@ export interface HistoriaTexto {
     bio?: string;
   };
   tags?: string[];
+  demoStory?: DemoStoryFields;
 }
 
 interface TextoReaderProps {
@@ -178,6 +181,11 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
           boxSizing: 'border-box',
         }}
       >
+        {historia.demoStory ? (
+          <div style={{ marginBottom: '1.25rem', maxWidth }}>
+            <DemoStoryDisclosure story={historia.demoStory} variant="page" onLightBackground />
+          </div>
+        ) : null}
         {/* Fecha */}
         <p
           style={{

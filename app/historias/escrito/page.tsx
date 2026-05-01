@@ -14,6 +14,7 @@ import {
   HISTORIAS_LIST_EXPO_LABEL,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
+import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaTextoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
@@ -41,10 +42,13 @@ export default function HistoriasEscritoPage() {
 
   const textStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
-      (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isTextStory(s)
+      (s) => !isPublicGlobeFallbackDemoId(s.id) && isTextStory(s)
     );
     const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos = DEMO_TEXT_STORIES.filter((d) => !apiIds.has(d.id));
+    const demos =
+      showPublicDemoStories()
+        ? DEMO_TEXT_STORIES.filter((d) => !apiIds.has(d.id))
+        : [];
     return [...fromApi, ...demos];
   }, [allStories]);
 

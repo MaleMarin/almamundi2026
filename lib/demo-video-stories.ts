@@ -5,11 +5,12 @@
  *
  * demo-video-1: recurso local. demo-video-2…12: narrativa en historias-demo-narrative-batch.
  */
+import { ensurePublicDemoStoryFields } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { DEMO_VIDEO_STORIES_EXTRA } from '@/lib/historias/historias-demo-narrative-batch';
 
-export const DEMO_VIDEO_STORIES: (StoryPoint & { isDemo?: boolean })[] = [
-  {
+export const DEMO_VIDEO_STORIES: StoryPoint[] = [
+  ensurePublicDemoStoryFields({
     id: 'demo-video-1',
     lat: -33.4489,
     lng: -70.6693,
@@ -22,6 +23,6 @@ export const DEMO_VIDEO_STORIES: (StoryPoint & { isDemo?: boolean })[] = [
     hasVideo: true,
     publishedAt: '2026-04-28T12:00:00.000Z',
     isDemo: true,
-  },
-  ...DEMO_VIDEO_STORIES_EXTRA,
+  }),
+  ...DEMO_VIDEO_STORIES_EXTRA.map((s) => ensurePublicDemoStoryFields(s)),
 ];

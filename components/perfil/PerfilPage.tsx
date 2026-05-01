@@ -10,6 +10,7 @@ import { GuardadasGrid } from './GuardadasGrid';
 import { NuevaMuestraModal } from './NuevaMuestraModal';
 import { EliminarCuentaModal } from './EliminarCuentaModal';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { isAudiencePublicStoryStatus } from '@/lib/editorial/status';
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -459,11 +460,13 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                       fontSize: '0.7rem',
                       padding: '2px 6px',
                       borderRadius: 6,
-                      background: h.status === 'published' ? 'rgba(0,212,170,0.12)' : 'rgba(255,107,43,0.15)',
-                      color: h.status === 'published' ? '#047857' : ORANGE,
+                      background: isAudiencePublicStoryStatus(h.status)
+                        ? 'rgba(0,212,170,0.12)'
+                        : 'rgba(255,107,43,0.15)',
+                      color: isAudiencePublicStoryStatus(h.status) ? '#047857' : ORANGE,
                     }}
                   >
-                    {h.status === 'published' ? 'Publicada' : 'En revisión'}
+                    {isAudiencePublicStoryStatus(h.status) ? 'Publicada' : 'En revisión'}
                   </span>
                 </div>
               </a>

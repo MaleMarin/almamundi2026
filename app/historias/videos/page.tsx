@@ -14,10 +14,12 @@ import {
   HISTORIAS_LIST_EXPO_LABEL,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
+import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
+import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function isVideoStory(s: StoryPoint): boolean {
@@ -49,6 +51,7 @@ function storyToVideoHistoria(s: StoryPoint): Historia {
     encodeURIComponent(
       '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="#e8e4dc" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#8b7a6a">Sin imagen</text></svg>'
     );
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Historia',
@@ -65,6 +68,7 @@ function storyToVideoHistoria(s: StoryPoint): Historia {
     },
     tags: s.tags,
     citaDestacada: s.quote,
+    ...(demoStory ? { demoStory } : {}),
   };
 }
 
@@ -84,10 +88,13 @@ export default function HistoriasVideosPage() {
 
   const videoStoriesAll = useMemo(() => {
     const fromApi = allStories.filter(
-      (s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo && isVideoStory(s)
+      (s) => !isPublicGlobeFallbackDemoId(s.id) && isVideoStory(s)
     );
     const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos = DEMO_VIDEO_STORIES.filter((d) => !apiIds.has(d.id));
+    const demos =
+      showPublicDemoStories()
+        ? DEMO_VIDEO_STORIES.filter((d) => !apiIds.has(d.id))
+        : [];
     return [...fromApi, ...demos];
   }, [allStories]);
 

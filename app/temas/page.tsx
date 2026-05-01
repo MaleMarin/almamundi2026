@@ -8,6 +8,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
  */
 import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
+import { isPublicGlobeFallbackDemoId } from '@/lib/demo-stories-public';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { TEMAS } from '@/lib/temas-list';
@@ -35,7 +36,7 @@ function countByTema(stories: StoryPoint[], slug: string): number {
 
 export default function TemasPage() {
   const stories = useStories();
-  const baseList = stories.filter((s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo);
+  const baseList = stories.filter((s) => !isPublicGlobeFallbackDemoId(s.id));
 
   return (
     <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>

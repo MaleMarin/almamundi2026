@@ -3,12 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
+import { appendEditorialAuditLog } from "@/lib/editorial/audit";
+import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 
 export const runtime = "nodejs";
 
 type Action = "approve" | "reject" | "feature" | "archive";
 
-/** PATCH /api/admin/stories/[id] — approve, reject, feature o archivar. Body: { action }. */
+/** PATCH /api/admin/stories/[id] — acciones moderación anglo sobre `stories`. Delegadas a transiciones canónicas. */
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -42,54 +44,44 @@ export async function PATCH(
     }
 
     const data = snap.data() as Record<string, unknown>;
-    const currentStatus = data.status as string;
+    const currentStatus = String(data.status ?? "");
 
+    const nextStatus = nextStatusAfterAdminStoryAction(currentStatus, action);
+    if (!nextStatus) {
+      return NextResponse.json(
+        { error: `transición inválida desde '${currentStatus}' con action '${action}'` },
+        { status: 400 }
+      );
+    }
+
+    const updates: Record<string, unknown> = {
+      status: nextStatus,
+      updatedAt: FieldValue.serverTimestamp(),
+    };
     if (action === "approve") {
-      if (currentStatus !== "pending") {
-        return NextResponse.json({ error: "story is not pending" }, { status: 400 });
-      }
-      await ref.update({
-        status: "active",
-        activeSince: Date.now(),
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      return NextResponse.json({ ok: true, status: "active" });
+      updates.publishedAt = FieldValue.serverTimestamp();
     }
-
-    if (action === "reject") {
-      if (currentStatus !== "pending") {
-        return NextResponse.json({ error: "story is not pending" }, { status: 400 });
-      }
-      await ref.update({
-        status: "rejected",
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      return NextResponse.json({ ok: true, status: "rejected" });
-    }
-
     if (action === "feature") {
-      if (currentStatus !== "active" && currentStatus !== "published") {
-        return NextResponse.json({ error: "story must be active to feature" }, { status: 400 });
-      }
-      await ref.update({
-        isFeatured: true,
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      return NextResponse.json({ ok: true, isFeatured: true });
+      updates.isFeatured = true;
     }
 
-    if (action === "archive") {
-      if (currentStatus !== "active" && currentStatus !== "published") {
-        return NextResponse.json({ error: "story must be active to archive" }, { status: 400 });
-      }
-      await ref.update({
-        status: "archived",
-        updatedAt: FieldValue.serverTimestamp(),
-      });
-      return NextResponse.json({ ok: true, status: "archived" });
-    }
+    await ref.update(updates);
 
-    return NextResponse.json({ error: "invalid action" }, { status: 400 });
+    const auditEvent =
+      action === "approve"
+        ? "approve"
+        : action === "reject"
+          ? "reject"
+          : action === "feature"
+            ? "feature"
+            : "archive";
+    await appendEditorialAuditLog(db, auth.email, auditEvent, {
+      storyId: id,
+      fromStatus: currentStatus,
+      toStatus: nextStatus,
+    });
+
+    return NextResponse.json({ ok: true, status: nextStatus });
   } catch (e) {
     console.error("[admin/stories PATCH]", e);
     return NextResponse.json({ error: "update failed" }, { status: 500 });

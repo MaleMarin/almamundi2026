@@ -9,6 +9,8 @@ import { useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { isPublicGlobeFallbackDemoId, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { getTemaBySlug } from '@/lib/temas-list';
@@ -55,7 +57,7 @@ export default function TemaPage() {
   const stories = useStories();
 
   const list = useMemo(() => {
-    const base = stories.filter((s) => !(s as StoryPoint & { isDemo?: boolean }).isDemo);
+    const base = stories.filter((s) => !isPublicGlobeFallbackDemoId(s.id));
     if (!slug) return base;
     const slugNorm = slug.toLowerCase();
     return base.filter((s) => {
@@ -118,6 +120,11 @@ export default function TemaPage() {
                     <div className="text-[10px] font-semibold tracking-widest uppercase text-amber-700 mb-1">{formatPlace(s)}</div>
                     <h2 className="text-lg font-semibold tracking-tight text-gray-800 line-clamp-2">{s.title || 'Sin título'}</h2>
                     {s.description && <p className="text-sm text-gray-600 line-clamp-1 mt-1">{s.description}</p>}
+                    {storyShowsDemoDisclaimer(s) ? (
+                      <div className="mt-3 pointer-events-none">
+                        <DemoStoryDisclosure story={s} variant="panel" onLightBackground />
+                      </div>
+                    ) : null}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-xs text-gray-500 capitalize">{getFormat(s)}</span>

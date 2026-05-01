@@ -1,8 +1,8 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
 
 export const runtime = "nodejs";
 
@@ -29,12 +29,19 @@ export async function GET(request: NextRequest) {
 
   try {
     const db = getAdminDb();
-    const snap = await db
-      .collection("stories")
-      .where("status", "==", status)
-      .orderBy("createdAt", "desc")
-      .limit(200)
-      .get();
+    const col = db.collection("stories");
+    const snap =
+      status === "active"
+        ? await col
+            .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
+            .orderBy("createdAt", "desc")
+            .limit(200)
+            .get()
+        : await col
+            .where("status", "==", status)
+            .orderBy("createdAt", "desc")
+            .limit(200)
+            .get();
 
     const list = snap.docs.map((doc) => {
       const d = doc.data();
@@ -42,7 +49,7 @@ export async function GET(request: NextRequest) {
       const activeSince = toMillis(d.activeSince);
       return {
         id: doc.id,
-        title: d.title ?? "",
+        title: (d.title as string | undefined) ?? (d.titulo as string | undefined) ?? "",
         alias: d.alias ?? "",
         place: d.place ?? d.placeLabel ?? "",
         lat: d.lat ?? null,

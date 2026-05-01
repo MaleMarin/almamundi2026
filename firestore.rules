@@ -1,31 +1,109 @@
 rules_version = '2';
-// Nada público antes de aprobar.
-// Público: solo lee stories con status=="published".
-// story_submissions: solo Admin SDK en servidor (p. ej. /api/submit); sin create cliente para evitar spam directo.
-// Curadores (custom claim curator==true) o Admin SDK: leen/editan submissions, publican, mail_queue.
+
+/**
+ * AlmaMundi — reglas fusionadas: editorial (stories) + perfil (users, guardadas, muestras) + colas solo servidor.
+ *
+ * - Moderación fuerte (status, audit_log, submissions): Admin SDK / API; el cliente no escribe `editorial_audit_log`.
+ * - Perfil: el cliente solo lee/actualiza/borra su propio doc `users/{uid}`; actualización limitada a `frase` (inline Perfil).
+ * - `muestras`: lectura/borrado solo del autor (`autorId`); alta/edición vía API con Admin.
+ * - Subcolecciones bajo `stories/*` (readers, addendums, …): sin acceso cliente.
+ */
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() { return request.auth != null; }
-    function isCurator() { return isSignedIn() && request.auth.token.curator == true; }
-
-    // PUBLICADAS: lectura pública, escritura solo curador (o solo via Admin SDK en server)
-    match /stories/{id} {
-      allow read: if resource.data.status == "published";
-      allow write: if isCurator();
+    function isSignedIn() {
+      return request.auth != null;
     }
 
-    // SUBMISSIONS: alta solo vía Firebase Admin en API; cliente no crea documentos.
-    match /story_submissions/{id} {
+    function isOwnerUser(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    /** Estados visibles para audiencia anónima (api pública). */
+    function storyPublicAudienceStatus() {
+      let s = resource.data.status;
+      return s == "approved"
+        || s == "featured"
+        || s == "beta_demo"
+        || s == "published"
+        || s == "active";
+    }
+
+    /** Dueño del documento historia (schema `autor.id` o `authorUid`). */
+    function ownsStoryDoc() {
+      return isSignedIn() && (
+        (resource.data.autor != null
+          && resource.data.autor.id != null
+          && resource.data.autor.id == request.auth.uid)
+        ||
+        (resource.data.authorUid != null
+          && resource.data.authorUid == request.auth.uid)
+      );
+    }
+
+    match /users/{userId} {
       allow create: if false;
 
-      allow read, update, delete: if isCurator();
+      /** Perfil propio (redirect /perfil, frase editable). Lectura de otros usuarios: solo servidor/admin. */
+      allow read: if isOwnerUser(userId);
+
+      allow delete: if isOwnerUser(userId);
+
+      /** Solo `frase` desde el cliente (PerfilPage). Contadores y demás campos vía Admin SDK. */
+      allow update: if isOwnerUser(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['frase']);
     }
 
-    // cola de mail: solo server/curador
+    match /users/{userId}/guardadas/{docId} {
+      allow create, update: if false;
+
+      /** Listado/eliminación al borrar cuenta. */
+      allow read, delete: if isOwnerUser(userId);
+    }
+
+    match /muestras/{docId} {
+      allow create, update: if false;
+
+      allow read: if isSignedIn() && resource.data.autorId == request.auth.uid;
+
+      allow delete: if isSignedIn() && resource.data.autorId == request.auth.uid;
+    }
+
+    match /stories/{id} {
+      allow create: if false;
+
+      allow read: if storyPublicAudienceStatus() || ownsStoryDoc();
+
+      /** Dueño puede anonimizar / editar sin cambiar `status` (p. ej. eliminar cuenta). */
+      allow update: if ownsStoryDoc()
+        && request.resource.data.status == resource.data.status;
+
+      allow delete: if ownsStoryDoc();
+
+      match /{document=**} {
+        allow read, write: if false;
+      }
+    }
+
+    match /story_submissions/{id} {
+      allow create, read, update, delete: if false;
+    }
+
+    match /submissions/{id} {
+      allow create, read, update, delete: if false;
+    }
+
     match /mail_queue/{id} {
-      allow read, write: if isCurator();
+      allow create, read, update, delete: if false;
+    }
+
+    match /editorial_audit_log/{id} {
+      allow create, read, update, delete: if false;
+    }
+
+    match /curation_log/{id} {
+      allow create, read, update, delete: if false;
     }
   }
 }

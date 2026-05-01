@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { Headphones, Video, FileText } from 'lucide-react';
 import { AudioEmotionVisualizer } from '@/components/mapa/AudioEmotionVisualizer';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { PhotoStoryViewer } from '@/components/observatory/PhotoStoryViewer';
 import { EMOTION_VISUALS, type EmotionVisual } from '@/lib/audioEmotion';
 import { registerPulse } from '@/lib/userLocation';
@@ -143,6 +144,7 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
 
   return (
     <div className="flex flex-col gap-6">
+      <DemoStoryDisclosure story={story} variant="page" />
       {location && (
         <p className="text-white/60 text-sm">{location}</p>
       )}

@@ -11,8 +11,11 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { showPublicDemoStories, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
+import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import type { HistoriasFormatListActiveTab } from '@/components/historias/HistoriasFormatListPageLayout';
 
 type SimilarStory = {
   id: string;
@@ -58,9 +61,9 @@ export default function HistoriasIdPageClient() {
         if (cancelled) return;
         if (data?.story) {
           setStory(data.story);
-        } else if (id.startsWith('demo-video-')) {
-          const demo = DEMO_VIDEO_STORIES.find((s) => s.id === id);
-          if (demo) setStory(demo as StoryPoint);
+        } else if (showPublicDemoStories() && id.startsWith('demo-')) {
+          const demo = getDemoStoryPointById(id);
+          if (demo) setStory(demo);
         }
       })
       .finally(() => {
@@ -105,7 +108,19 @@ export default function HistoriasIdPageClient() {
   const place = formatPlace(story);
   const hasVideo = Boolean(story.videoUrl || story.hasVideo);
   const hasAudio = Boolean(story.audioUrl || story.hasAudio);
+  const hasBody = Boolean((story.body ?? '').trim());
   const hasImage = Boolean(story.imageUrl || (story as StoryPoint & { images?: string[] }).images?.length);
+
+  /** Misma barra que `HistoriasFormatListPageLayout` (/historias/videos, …); pestaña según medio principal. */
+  const formatNavActiveTab: HistoriasFormatListActiveTab = hasVideo
+    ? 'videos'
+    : hasAudio
+      ? 'audios'
+      : hasBody
+        ? 'escrito'
+        : hasImage
+          ? 'fotos'
+          : 'videos';
 
   return (
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -114,12 +129,40 @@ export default function HistoriasIdPageClient() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
           <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
             Nuestro propósito
           </ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
             ¿Cómo funciona?
+          </ActiveInternalNavLink>
+          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
+          <ActiveInternalNavLink
+            href="/historias/videos"
+            className={formatNavActiveTab === 'videos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
+            style={formatNavActiveTab === 'videos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
+          >
+            Videos
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/historias/audios"
+            className={formatNavActiveTab === 'audios' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
+            style={formatNavActiveTab === 'audios' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
+          >
+            Audios
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/historias/escrito"
+            className={formatNavActiveTab === 'escrito' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
+            style={formatNavActiveTab === 'escrito' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
+          >
+            Escritos
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/historias/fotos"
+            className={formatNavActiveTab === 'fotos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
+            style={formatNavActiveTab === 'fotos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
+          >
+            Fotografías
           </ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
             Mapa
@@ -132,6 +175,12 @@ export default function HistoriasIdPageClient() {
           <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>
             ← Historias
           </Link>
+
+          {storyShowsDemoDisclaimer(story) ? (
+            <div className="mb-8 max-w-2xl">
+              <DemoStoryDisclosure story={story} variant="page" onLightBackground />
+            </div>
+          ) : null}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
             <div>

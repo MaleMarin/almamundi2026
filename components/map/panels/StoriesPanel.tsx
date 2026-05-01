@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 export type StoriesPanelProps = {
@@ -74,24 +76,32 @@ function StoryRow({
 }) {
   const tipo = formatStoryType(story);
   const ago = timeAgo(story.publishedAt);
+  const cardShell = {
+    borderRadius: 16,
+    background: isActive
+      ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.42) 0%, rgba(255, 85, 25, 0.2) 100%)'
+      : 'linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
+    backdropFilter: 'blur(14px) saturate(1.25)',
+    WebkitBackdropFilter: 'blur(14px) saturate(1.25)',
+    border: `1px solid ${isActive ? 'rgba(255, 100, 45, 0.75)' : 'rgba(255,255,255,0.22)'}`,
+    borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
+    boxShadow: isActive
+      ? 'inset 0 1px 0 rgba(255, 210, 160, 0.45), 0 0 14px rgba(255, 69, 0, 0.25)'
+      : 'inset 0 1px 0 rgba(255,255,255,0.22)',
+    transition: 'all 200ms ease',
+    fontFamily: SITE_FONT_STACK,
+    width: '100%' as const,
+  };
   return (
+    <div style={cardShell}>
     <button
       type="button"
       onClick={onClick}
       style={{
         textAlign: 'left',
         padding: '15px 16px',
-        borderRadius: 16,
-        background: isActive
-          ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.42) 0%, rgba(255, 85, 25, 0.2) 100%)'
-          : 'linear-gradient(145deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.06) 100%)',
-        backdropFilter: 'blur(14px) saturate(1.25)',
-        WebkitBackdropFilter: 'blur(14px) saturate(1.25)',
-        border: `1px solid ${isActive ? 'rgba(255, 100, 45, 0.75)' : 'rgba(255,255,255,0.22)'}`,
-        borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
-        boxShadow: isActive
-          ? 'inset 0 1px 0 rgba(255, 210, 160, 0.45), 0 0 14px rgba(255, 69, 0, 0.25)'
-          : 'inset 0 1px 0 rgba(255,255,255,0.22)',
+        background: 'transparent',
+        border: 'none',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
@@ -114,11 +124,18 @@ function StoryRow({
         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
           {[story.city, story.country].filter(Boolean).join(', ')}
         </span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>
-          {tipo}{ago ? ` · ${ago}` : ''}
+        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+          {tipo}
+          {ago ? ` · ${ago}` : ''}
         </span>
       </div>
     </button>
+      {storyShowsDemoDisclaimer(story) ? (
+        <div style={{ padding: '0 12px 12px' }}>
+          <DemoStoryDisclosure story={story} variant="panel" />
+        </div>
+      ) : null}
+    </div>
   );
 }
 

@@ -6,6 +6,11 @@
  * — getStories() sigue disponible y devuelve mock para compatibilidad (cuando no se usa useStories).
  */
 
+import {
+  DEMO_STORY_NOTICE,
+  showPublicDemoStories,
+  storyShowsDemoDisclaimer,
+} from '@/lib/demo-stories-public';
 import { STORIES_MOCK } from '@/lib/map-data/story-meta';
 
 export type StoryPoint = {
@@ -63,14 +68,87 @@ export type StoryPoint = {
   weatherTags?: string[];
   /** true cuando el punto es demo/fallback (sin historias en Firestore). */
   isDemo?: boolean;
+  /** Historia `beta_demo` — mostrar aviso de demostración en UI. */
+  isBetaDemo?: boolean;
+  /** Relato verificado público real (explicita ausencia de aviso demo). */
+  isRealStory?: boolean;
+  /** Texto legal corto demo (mismo que copy de producto si aplica). */
+  demoNotice?: string;
+  /** Estado Firestore bruto (auditoría / UI mínima). */
+  editorialStatus?: string;
+}
+
+const demoMeta = {
+  isDemo: true as const,
+  isRealStory: false as const,
+  demoNotice: DEMO_STORY_NOTICE,
+};
+
+const STORIES_MOCK_IDS = new Set(STORIES_MOCK.map((m) => m.id));
+
+/** Con demos desactivadas, no exponer puntos estáticos de demostración ni filas STORIES_MOCK en rutas que usan este módulo. */
+function hideStaticDemoInPublicBeta(s: StoryPoint): boolean {
+  if (showPublicDemoStories()) return false;
+  return storyShowsDemoDisclaimer(s) || STORIES_MOCK_IDS.has(s.id);
 }
 
 const STORIES: StoryPoint[] = [
-  { id: 'story-scl', lat: -33.4489, lng: -70.6693, label: 'Santiago', city: 'Santiago', country: 'Chile', timezone: 'America/Santiago', topic: 'Comunidad', body: 'Historias desde Santiago.', hasText: true, hasAudio: true },
-  { id: 'story-nyc', lat: 40.7128, lng: -74.006, label: 'New York', city: 'New York', country: 'Estados Unidos', timezone: 'America/New_York', topic: 'Migración', body: 'Historias desde New York.', hasText: true, hasVideo: true },
-  { id: 'story-par', lat: 48.8566, lng: 2.3522, label: 'Paris', city: 'Paris', country: 'Francia', timezone: 'Europe/Paris', topic: 'Arte, Cultura y Humanidades', body: 'Historias desde Paris.', hasText: true },
-  { id: 'story-tyo', lat: 35.6762, lng: 139.6503, label: 'Tokyo', city: 'Tokyo', country: 'Japón', timezone: 'Asia/Tokyo', topic: 'Tecnología', body: 'Historias desde Tokyo.', hasText: true, hasAudio: true },
-  // STORIES_MOCK integradas como puntos del mapa
+  {
+    id: 'story-scl',
+    lat: -33.4489,
+    lng: -70.6693,
+    label: 'Santiago',
+    city: 'Santiago',
+    country: 'Chile',
+    timezone: 'America/Santiago',
+    topic: 'Comunidad',
+    body: 'Historias desde Santiago.',
+    hasText: true,
+    hasAudio: true,
+    ...demoMeta,
+  },
+  {
+    id: 'story-nyc',
+    lat: 40.7128,
+    lng: -74.006,
+    label: 'New York',
+    city: 'New York',
+    country: 'Estados Unidos',
+    timezone: 'America/New_York',
+    topic: 'Migración',
+    body: 'Historias desde New York.',
+    hasText: true,
+    hasVideo: true,
+    ...demoMeta,
+  },
+  {
+    id: 'story-par',
+    lat: 48.8566,
+    lng: 2.3522,
+    label: 'Paris',
+    city: 'Paris',
+    country: 'Francia',
+    timezone: 'Europe/Paris',
+    topic: 'Arte, Cultura y Humanidades',
+    body: 'Historias desde Paris.',
+    hasText: true,
+    ...demoMeta,
+  },
+  {
+    id: 'story-tyo',
+    lat: 35.6762,
+    lng: 139.6503,
+    label: 'Tokyo',
+    city: 'Tokyo',
+    country: 'Japón',
+    timezone: 'Asia/Tokyo',
+    topic: 'Tecnología',
+    body: 'Historias desde Tokyo.',
+    hasText: true,
+    hasAudio: true,
+    ...demoMeta,
+  },
+  // STORIES_MOCK integradas como puntos del mapa (solo demostración / viaje por sonido)
   ...STORIES_MOCK.map((m) => ({
     id: m.id,
     lat: m.lat,
@@ -83,21 +161,27 @@ const STORIES: StoryPoint[] = [
     hasText: m.hasText ?? true,
     hasAudio: m.hasAudio ?? false,
     hasVideo: m.hasVideo ?? false,
+    ...demoMeta,
   })),
 ];
 
 export function getStories(): StoryPoint[] {
-  return [...STORIES];
+  if (showPublicDemoStories()) return [...STORIES];
+  return STORIES.filter((s) => !hideStaticDemoInPublicBeta(s));
 }
 
 export function getStoryById(id: string): StoryPoint | undefined {
-  return STORIES.find((s) => s.id === id);
+  const s = STORIES.find((x) => x.id === id);
+  if (!s) return undefined;
+  if (hideStaticDemoInPublicBeta(s)) return undefined;
+  return s;
 }
 
 /** Resuelve historia desde STORIES o STORIES_MOCK (music view). Para Observatorio. */
 export function getStoryForObservatory(id: string): StoryPoint | undefined {
   const fromStories = getStoryById(id);
   if (fromStories) return fromStories;
+  if (!showPublicDemoStories()) return undefined;
   const meta = STORIES_MOCK.find((s) => s.id === id);
   if (!meta) return undefined;
   return {
@@ -111,5 +195,6 @@ export function getStoryForObservatory(id: string): StoryPoint | undefined {
     hasText: meta.hasText ?? true,
     hasAudio: meta.hasAudio ?? false,
     hasVideo: meta.hasVideo ?? false,
+    ...demoMeta,
   };
 }

@@ -15,6 +15,7 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 
 export const runtime = "nodejs";
@@ -214,6 +215,16 @@ export async function POST(req: Request) {
       status: "pending",
       createdAt: new Date().toISOString(),
     });
+
+    try {
+      await appendEditorialAuditLog(db, "anonymous:web", "submit", {
+        submissionId,
+        submissionCollection: "submissions",
+        toStatus: "pending",
+      });
+    } catch (auditErr) {
+      console.warn("[submissions/photo POST] audit log omitido:", auditErr);
+    }
 
     return NextResponse.json({ ok: true, submissionId, readUrl: signedReadUrl, storagePath });
   } catch {

@@ -100,4 +100,6 @@ export interface SubmissionDoc {
   createdAt: number;
   reviewedAt?: number;
   publicId?: string;
+  /** Doc `stories` creado al publicar desde curación. */
+  publishedStoryId?: string;
 }

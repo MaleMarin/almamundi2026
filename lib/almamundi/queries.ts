@@ -21,6 +21,7 @@ import {
   type StoryData,
   type Formato,
 } from '@/lib/story-schema';
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from '@/lib/editorial/status';
 
 type QueryOptions = {
   limit?: number;
@@ -42,7 +43,7 @@ export async function getStoriesByFormato(
 
   const snap = await db
     .collection(FIRESTORE_COLLECTION)
-    .where('status', '==', 'published')
+    .where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
     .where('formato', '==', formato)
     .orderBy(orderBy, direction)
     .limit(limit)
@@ -65,7 +66,7 @@ export async function getStoriesByTema(
 
   const snap = await db
     .collection(FIRESTORE_COLLECTION)
-    .where('status', '==', 'published')
+    .where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
     .where('temas', 'array-contains', temaSlug)
     .orderBy(orderBy, direction)
     .limit(limit)
@@ -110,14 +111,26 @@ export async function getStoriesParaMapa(limit = 200): Promise<StoryData[]> {
   // Firestore no tiene "where field exists", filtramos por pais o lat
   const snap = await db
     .collection(FIRESTORE_COLLECTION)
-    .where('status', '==', 'published')
+    .where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
     .orderBy('publishedAt', 'desc')
     .limit(limit)
     .get();
 
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() } as StoryData))
-    .filter((s) => s.ubicacion?.lat != null || (s.ubicacion?.pais ?? '').length > 0);
+    .filter((s) => {
+      const raw = s as unknown as Record<string, unknown>;
+      const hasTopGeo =
+        Number.isFinite(Number(raw.lat)) &&
+        Number.isFinite(Number(raw.lng));
+      const hasSpanishGeo =
+        s.ubicacion?.lat != null &&
+        s.ubicacion?.lng != null &&
+        Number.isFinite(Number(s.ubicacion.lat)) &&
+        Number.isFinite(Number(s.ubicacion.lng));
+      const hasPaisHint = ((s.ubicacion?.pais ?? "") as string).trim().length > 0;
+      return hasTopGeo || hasSpanishGeo || hasPaisHint;
+    });
 }
 
 /*

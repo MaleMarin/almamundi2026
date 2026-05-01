@@ -3,6 +3,7 @@
  * Compartido por /historias/audios (reproductor in-place) y /historias/[id]/audio.
  */
 import type { HistoriaAudio } from '@/components/historia/AudioPlayer';
+import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 export function defaultAvatar(name: string): string {
@@ -15,6 +16,7 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
   const thumb = s.imageUrl ?? s.thumbnailUrl ?? '';
+  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? 'Sin título',
@@ -32,5 +34,6 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
       bio: s.author?.bio,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(demoStory ? { demoStory } : {}),
   };
 }

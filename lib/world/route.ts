@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import Parser from "rss-parser";
-import { mockWorldNow } from "@/lib/world/mockWorldNow";
+import { mockWorldNow, worldMockItemsPublicFilter } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
 import { DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
 import { isPublishedOnCalendarDay, sanitizeDayYmd, sanitizeTimeZone } from "@/lib/news-calendar-day";
@@ -733,10 +733,11 @@ export async function GET(request: NextRequest) {
 
     const limit = modeParam === "now" ? 20 : 40;
     const data = mockWorldNow();
+    const items = worldMockItemsPublicFilter(data.items).slice(0, limit);
     return Response.json({
       mode: modeParam,
       updatedAt: new Date().toISOString(),
-      items: data.items.slice(0, limit),
+      items,
       source: "mock",
     });
   } catch (err) {

@@ -2,6 +2,7 @@
  * Historias de demostración compartidas: carrusel (cliente) y API / servidor (getStoryByIdAsync).
  * Sin 'use client': importable desde Server Components y stories-server.
  */
+import { ensurePublicDemoStoryFields } from '@/lib/demo-stories-public';
 import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import {
@@ -12,7 +13,7 @@ import {
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 /** Demo texto — mismo contenido que en /historias/escrito. */
-export const DEMO_TEXT_STORY_POINT: StoryPoint = {
+export const DEMO_TEXT_STORY_POINT: StoryPoint = ensurePublicDemoStoryFields({
   id: 'demo-texto-1',
   lat: -34.6037,
   lng: -58.3816,
@@ -34,10 +35,10 @@ export const DEMO_TEXT_STORY_POINT: StoryPoint = {
   excerpt: `${MOCK_STORIES.texto.contenido.slice(0, 140).trim()}…`,
   quote: 'Eres un puente, no una fractura.',
   isDemo: true,
-};
+});
 
 /** Demo fotos — mismas imágenes que en /historias/fotos. */
-export const DEMO_FOTO_STORY_POINT = {
+export const DEMO_FOTO_STORY_POINT: StoryPoint = ensurePublicDemoStoryFields({
   id: 'demo-foto-1',
   lat: 20.6597,
   lng: -103.3496,
@@ -56,10 +57,10 @@ export const DEMO_FOTO_STORY_POINT = {
   thumbnailUrl: MOCK_STORIES.fotos.imagenes[0]?.url,
   imagenes: MOCK_STORIES.fotos.imagenes,
   isDemo: true,
-} as StoryPoint;
+} as StoryPoint);
 
 /** Demo audio — mismo audio que en /historias/audios. */
-export const DEMO_AUDIO_STORY_POINT: StoryPoint = {
+export const DEMO_AUDIO_STORY_POINT: StoryPoint = ensurePublicDemoStoryFields({
   id: 'demo-audio-1',
   lat: 17.0732,
   lng: -96.7266,
@@ -80,22 +81,22 @@ export const DEMO_AUDIO_STORY_POINT: StoryPoint = {
   tags: MOCK_STORIES.audio.tags,
   quote: MOCK_STORIES.audio.citaDestacada,
   isDemo: true,
-};
+});
 
 /** demo-audio-2…12: narrativa + URLs SoundHelix en historias-demo-narrative-batch. */
 export const DEMO_AUDIO_STORIES: StoryPoint[] = [
   DEMO_AUDIO_STORY_POINT,
-  ...DEMO_AUDIO_STORIES_EXTRA,
+  ...DEMO_AUDIO_STORIES_EXTRA.map((s) => ensurePublicDemoStoryFields(s)),
 ];
 
 export const DEMO_TEXT_STORIES: StoryPoint[] = [
   DEMO_TEXT_STORY_POINT,
-  ...DEMO_TEXT_STORIES_EXTRA,
+  ...DEMO_TEXT_STORIES_EXTRA.map((s) => ensurePublicDemoStoryFields(s)),
 ];
 
 export const DEMO_FOTO_STORIES: StoryPoint[] = [
   DEMO_FOTO_STORY_POINT,
-  ...DEMO_FOTO_STORIES_EXTRA,
+  ...DEMO_FOTO_STORIES_EXTRA.map((s) => ensurePublicDemoStoryFields(s)),
 ];
 
 export function getDemoStoryPointById(id: string): StoryPoint | null {

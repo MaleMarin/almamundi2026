@@ -1,6 +1,8 @@
 'use client';
 
 import { SITE_FONT_STACK } from '@/lib/typography';
+import type { DemoStoryFields } from '@/lib/demo-stories-public';
+import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -21,6 +23,7 @@ export interface HistoriaFoto {
     ubicacion?: string;
   };
   tags?: string[];
+  demoStory?: DemoStoryFields;
 }
 
 interface FotoAlbumProps {
@@ -188,6 +191,17 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
 
         {/* Scroll container */}
         <div style={{ overflowY: 'auto', height: '100vh', paddingTop: 56 }}>
+          {historia.demoStory ? (
+            <div
+              style={{
+                padding: '12px 1.25rem 8px',
+                maxWidth: 640,
+                margin: '0 auto',
+              }}
+            >
+              <DemoStoryDisclosure story={historia.demoStory} variant="page" />
+            </div>
+          ) : null}
           {imagenes.map((img, i) => (
             <section
               key={i}

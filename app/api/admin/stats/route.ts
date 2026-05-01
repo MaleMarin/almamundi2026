@@ -2,6 +2,7 @@ import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
 
 export const runtime = "nodejs";
 
@@ -14,22 +15,14 @@ export async function GET(_request: NextRequest) {
     const db = getAdminDb();
     const storiesRef = db.collection("stories");
 
-    const [pendingSnap, activeSnap, archivedSnap, rejectedSnap] = await Promise.all([
+    const [pendingSnap, visibleSnap, archivedSnap, rejectedSnap] = await Promise.all([
       storiesRef.where("status", "==", "pending").count().get(),
-      storiesRef.where("status", "==", "active").count().get(),
+      storiesRef.where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]).count().get(),
       storiesRef.where("status", "==", "archived").count().get(),
       storiesRef.where("status", "==", "rejected").count().get(),
     ]);
 
-    // Incluir "published" como activas (compatibilidad con flujo curate)
-    const publishedSnap = await storiesRef.where("status", "==", "published").count().get();
-    const activeCount = activeSnap.data().count + publishedSnap.data().count;
-
-    // Historia con más resonancias (resonances o resonancesCount)
-    const allSnap = await storiesRef
-      .where("status", "in", ["active", "published"])
-      .limit(500)
-      .get();
+    const allSnap = await storiesRef.where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]).limit(500).get();
 
     let mostResonantId: string | null = null;
     let mostResonantTitle = "";
@@ -48,13 +41,14 @@ export async function GET(_request: NextRequest) {
       if (count > maxResonances) {
         maxResonances = count;
         mostResonantId = doc.id;
-        mostResonantTitle = (d.title as string) ?? "";
+        mostResonantTitle = (d.title as string) ?? (d.titulo as string) ?? "";
       }
     });
 
     return NextResponse.json({
       pending: pendingSnap.data().count,
-      active: activeCount,
+      /** Audiencia pública (+ legacy alias en `editorial/status`). */
+      active: visibleSnap.data().count,
       archived: archivedSnap.data().count,
       rejected: rejectedSnap.data().count,
       totalResonances,
