@@ -17,16 +17,16 @@ const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';
 const TEXT_3 = '#8896a5';
 
-type RoadmapStatus = 'beta' | 'desarrollo' | 'futuro';
+type RoadmapStatus = 'disponible' | 'desarrollo' | 'futuro';
 
 const STATUS_LABEL: Record<RoadmapStatus, string> = {
-  beta: 'En beta',
+  disponible: 'Disponible',
   desarrollo: 'En desarrollo',
   futuro: 'A futuro',
 };
 
 const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
-  beta: {
+  disponible: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
     fontSize: '0.68rem',
@@ -67,12 +67,12 @@ const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
 const ROADMAP: { title: string; status: RoadmapStatus; body: string }[] = [
   {
     title: 'Historias que no se pierden',
-    status: 'beta',
+    status: 'disponible',
     body: 'Relatos en audio, texto, fotografía o video que no quedan enterrados en un feed. Cada historia se revisa, se cuida y puede encontrar un lugar dentro del archivo.',
   },
   {
     title: 'Mapa vivo',
-    status: 'beta',
+    status: 'disponible',
     body: 'Un globo donde cada historia puede aparecer como una señal humana conectada a un lugar. No es solo una ubicación: es una memoria que puede despertar otra.',
   },
   {
