@@ -83,6 +83,13 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             Mis datos personales
           </ActiveInternalNavLink>
           <ActiveInternalNavLink
+            href="/vision"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            La visión de AlmaMundi
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
             href="/terminos"
             className={FOOTER_LINK}
             activeClassName="!text-gray-900 font-semibold"
