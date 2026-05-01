@@ -89,13 +89,6 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           >
             La visión de AlmaMundi
           </ActiveInternalNavLink>
-          <ActiveInternalNavLink
-            href="/terminos"
-            className={FOOTER_LINK}
-            activeClassName="!text-gray-900 font-semibold"
-          >
-            Términos de uso
-          </ActiveInternalNavLink>
         </div>
       </div>
     </footer>
