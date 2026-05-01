@@ -1,8 +1,7 @@
 'use client';
 
 /**
- * Explicación del sitio + acceso a privacidad.
- * LOCK de contenido: no sustituir textos sin petición explícita del equipo (acuerdo editorial).
+ * Explicación del sitio + acceso a privacidad (copy acordado con el equipo editorial).
  */
 import Link from 'next/link';
 import { useEffect } from 'react';
@@ -56,7 +55,7 @@ export function ComoFuncionaModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="como-funciona-titulo"
-        className="max-h-[min(88vh,640px)] w-full max-w-lg overflow-y-auto rounded-[28px] p-6 shadow-2xl md:p-8"
+        className="max-h-[min(90vh,680px)] w-full max-w-lg overflow-y-auto rounded-[28px] p-6 shadow-2xl md:p-8"
         style={{
           ...soft.button,
           backgroundColor: soft.bg,
@@ -73,24 +72,34 @@ export function ComoFuncionaModal({
           ¿Cómo funciona?
         </h2>
         <div
-          className="mt-5 space-y-4 text-sm leading-relaxed md:text-base"
+          className="mt-5 space-y-3 text-[0.8125rem] leading-relaxed md:space-y-3.5 md:text-sm"
           style={{ color: soft.textBody }}
         >
+          <p>AlmaMundi es un mapa vivo de historias humanas.</p>
           <p>
-            <strong style={{ color: soft.textMain }}>AlmaMundi</strong> es un espacio para que las
-            historias humanas —en video, audio, texto o fotografía— tengan un lugar digno: no se
-            pierden en el scroll infinito y pueden resonar con otras personas.
+            Puedes compartir tu relato en{' '}
+            <strong style={{ color: soft.textMain }}>audio, texto o fotografía</strong>. La opción de{' '}
+            <strong style={{ color: soft.textMain }}>video es solo para personas mayores de 18 años</strong>.
+            Cada historia pasa por revisión editorial:{' '}
+            <strong style={{ color: soft.textMain }}>nada se publica automáticamente</strong>.
           </p>
           <p>
-            Puedes <strong style={{ color: soft.textMain }}>grabar o subir tu relato</strong> desde
-            las tarjetas de la página principal, explorar el <strong style={{ color: soft.textMain }}>mapa</strong>{' '}
-            para descubrir voces de distintos lugares, y compartir con intención respetando siempre
-            a quien cuenta y a quien escucha.
+            Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los
+            derechos humanos. No se aceptan contenidos con{' '}
+            <strong style={{ color: soft.textMain }}>
+              insultos, injurias, calumnias, discriminación, racismo, xenofobia, homofobia, amenazas, violencia,
+              abuso, explotación, exposición indebida de terceros, vulneración de derechos de niños, niñas y
+              adolescentes, plagio o uso no autorizado de material ajeno
+            </strong>
+            .
           </p>
           <p>
-            Los datos que nos confías al participar se tratan con cuidado. La{' '}
-            <strong style={{ color: soft.textMain }}>política de privacidad</strong> describe qué
-            recopilamos, para qué y tus derechos.
+            Para cuidar cada historia, revisamos su contenido, autoría, consentimiento y posibles riesgos para otras
+            personas. Podemos pedir ajustes, no publicar o retirar relatos cuando sea necesario.
+          </p>
+          <p>
+            No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar
+            el envío y proteger a quienes participan.
           </p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
