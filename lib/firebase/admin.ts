@@ -10,17 +10,30 @@ function initAdmin(): App {
 
   const storageBucketEnv = process.env.FIREBASE_STORAGE_BUCKET || undefined;
 
-  // Opción A (recomendada): JSON en base64 (acepta snake_case del JSON de Firebase)
-  const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
-  if (b64) {
-    const json = Buffer.from(b64, "base64").toString("utf8");
-    const svc = JSON.parse(json) as Record<string, string>;
+  // Opción A: JSON completo del service account en Base64 (recomendado en Vercel), o JSON en claro si empieza por "{".
+  const secretRaw = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64?.trim();
+  if (secretRaw) {
+    let svc: Record<string, unknown>;
+    try {
+      if (secretRaw.startsWith("{")) {
+        svc = JSON.parse(secretRaw) as Record<string, unknown>;
+      } else {
+        const compactB64 = secretRaw.replace(/\s/g, "");
+        const jsonUtf8 = Buffer.from(compactB64, "base64").toString("utf8").replace(/^\uFEFF/, "");
+        svc = JSON.parse(jsonUtf8) as Record<string, unknown>;
+      }
+    } catch {
+      throw new Error(
+        "FIREBASE_SERVICE_ACCOUNT_BASE64: valor ilegible. Debe ser (1) Base64 de una sola línea del JSON de service account, o (2) el JSON completo. Regenerar: base64 -i clave.json | tr -d '\\n'",
+      );
+    }
+    const r = svc as Record<string, string | undefined>;
     const account: ServiceAccount = {
-      projectId: svc.project_id ?? svc.projectId,
-      clientEmail: svc.client_email ?? svc.clientEmail,
-      privateKey: (svc.private_key ?? svc.privateKey)?.replace(/\\n/g, "\n"),
+      projectId: (r.project_id ?? r.projectId) as string,
+      clientEmail: (r.client_email ?? r.clientEmail) as string,
+      privateKey: String(r.private_key ?? r.privateKey ?? "").replace(/\\n/g, "\n"),
     };
-    const storageBucket = storageBucketEnv ?? svc.storage_bucket ?? svc.storageBucket;
+    const storageBucket = storageBucketEnv ?? r.storage_bucket ?? r.storageBucket;
     return initializeApp({
       credential: cert(account),
       ...(storageBucket && { storageBucket }),
