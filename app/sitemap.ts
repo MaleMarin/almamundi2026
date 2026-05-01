@@ -27,6 +27,7 @@ const STATIC_PATHS: string[] = [
   '/historias/mi-coleccion',
   '/subir',
   '/privacidad',
+  '/mis-datos-personales',
   '/muestras',
   '/exposiciones',
   '/temas',

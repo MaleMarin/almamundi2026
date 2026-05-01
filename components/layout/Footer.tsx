@@ -76,6 +76,13 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             Política de privacidad
           </ActiveInternalNavLink>
           <ActiveInternalNavLink
+            href="/mis-datos-personales"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Mis datos personales
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
             href="/terminos"
             className={FOOTER_LINK}
             activeClassName="!text-gray-900 font-semibold"
