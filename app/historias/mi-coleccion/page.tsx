@@ -1,6 +1,5 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
  * /historias/mi-coleccion — Historias guardadas por el usuario.
@@ -9,7 +8,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import { useState } from 'react';
 import Link from 'next/link';
 import { useMiColeccion, type SavedStory } from '@/hooks/useMiColeccion';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { HistoriasInteriorSiteHeader } from '@/components/historias/HistoriasInteriorSiteHeader';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 function formatLabel(format?: string): string {
@@ -29,23 +28,11 @@ export default function MiColeccionPage() {
   };
 
   return (
-    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/mi-coleccion" className={`btn-almamundi ${historiasInterior.navActiveClassName}`} style={neu.cardInset}>Mi colección</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/videos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.navLinkIdle }}>Videos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/audios" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.navLinkIdle }}>Audios</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/escrito" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.navLinkIdle }}>Escritos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/fotos" className={historiasInterior.navLinkClassName} style={{ ...neu.button, color: neu.navLinkIdle }}>Fotografías</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
-        </div>
-      </nav>
+    <main
+      className={`${historiasInterior.mainClassName} ${historiasInterior.fixedHeaderContentPadClassName}`}
+      style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+    >
+      <HistoriasInteriorSiteHeader showMiColeccionPill />
 
       <div className={historiasInterior.contentWrapClassName}>
       <header className={historiasInterior.headerClassName}>

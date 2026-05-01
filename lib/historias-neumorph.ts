@@ -81,6 +81,11 @@ export const neu = {
  * enlaces más grandes y altura mínima para que el footer no aparezca en el primer pantallazo.
  */
 export const historiasInterior = {
+  /**
+   * Padding superior cuando el menú usa header fijo al estilo home
+   * (`HistoriasInteriorSiteHeader`, mismas alturas h-32 / md:h-40 / lg:h-44).
+   */
+  fixedHeaderContentPadClassName: 'pt-32 md:pt-40 lg:pt-44',
   /** main: fuerza scroll antes del footer */
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',

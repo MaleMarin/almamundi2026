@@ -1,6 +1,6 @@
 'use client';
+import { HistoriasInteriorSiteHeader } from '@/components/historias/HistoriasInteriorSiteHeader';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
@@ -10,7 +10,6 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { showPublicDemoStories, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
@@ -87,16 +86,26 @@ export default function HistoriasIdPageClient() {
     };
   }, [id]);
 
+  const pad = historiasInterior.fixedHeaderContentPadClassName;
+
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <main
+        className={`${historiasInterior.mainClassName} ${pad} items-center justify-center`}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+      >
+        <HistoriasInteriorSiteHeader formatTabOverride={null} />
         <p style={{ color: neu.textBody }}>Cargando…</p>
       </main>
     );
   }
   if (!story) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <main
+        className={`${historiasInterior.mainClassName} ${pad} flex flex-col items-center justify-center gap-4 px-6`}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+      >
+        <HistoriasInteriorSiteHeader formatTabOverride={null} />
         <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
         <Link href="/historias" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>
           ← Historias
@@ -123,52 +132,8 @@ export default function HistoriasIdPageClient() {
           : 'videos';
 
   return (
-    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
-            Nuestro propósito
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
-            ¿Cómo funciona?
-          </ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink
-            href="/historias/videos"
-            className={formatNavActiveTab === 'videos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
-            style={formatNavActiveTab === 'videos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
-          >
-            Videos
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink
-            href="/historias/audios"
-            className={formatNavActiveTab === 'audios' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
-            style={formatNavActiveTab === 'audios' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
-          >
-            Audios
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink
-            href="/historias/escrito"
-            className={formatNavActiveTab === 'escrito' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
-            style={formatNavActiveTab === 'escrito' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
-          >
-            Escritos
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink
-            href="/historias/fotos"
-            className={formatNavActiveTab === 'fotos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName}
-            style={formatNavActiveTab === 'fotos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}
-          >
-            Fotografías
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>
-            Mapa
-          </ActiveInternalNavLink>
-        </div>
-      </nav>
+    <main className={`${historiasInterior.mainClassName} ${pad}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <HistoriasInteriorSiteHeader formatTabOverride={formatNavActiveTab} />
 
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
         <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">

@@ -5,9 +5,7 @@
  * Nav, hero y filtros en columna centrada (primera vista); carrusel a ancho completo.
  * Footer global en `app/layout.tsx`.
  */
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { HistoriasInteriorSiteHeader } from '@/components/historias/HistoriasInteriorSiteHeader';
 import { EthicalShareFlow, EthicalShareTriggerButton } from '@/components/stories/EthicalShareFlow';
 import { ResonanceMailbox } from '@/components/stories/ResonanceMailbox';
 import {
@@ -83,24 +81,10 @@ export function HistoriasFormatListPageLayout({
 }: HistoriasFormatListPageLayoutProps) {
   return (
     <main
-      className="flex min-h-svh flex-col overflow-x-hidden"
+      className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
       style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
     >
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex min-w-0 flex-shrink-0 items-center pr-2">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className={historiasInterior.navHistoriasAccordionClassName} />
-          <ActiveInternalNavLink href="/historias/videos" className={activeTab === 'videos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'videos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}>Videos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/audios" className={activeTab === 'audios' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'audios' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}>Audios</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/escrito" className={activeTab === 'escrito' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'escrito' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}>Escritos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/historias/fotos" className={activeTab === 'fotos' ? `btn-almamundi ${historiasInterior.navActiveClassName}` : historiasInterior.navLinkClassName} style={activeTab === 'fotos' ? neu.cardInset : { ...neu.button, color: neu.navLinkIdle }}>Fotografías</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className={`btn-almamundi ${historiasInterior.navLinkClassName}`} style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
-        </div>
-      </nav>
+      <HistoriasInteriorSiteHeader formatTabOverride={activeTab} />
 
       <div className="flex min-h-0 w-full flex-1 flex-col">
         <div className="w-full shrink-0 px-6 pt-[16px] md:px-12 lg:px-16">
