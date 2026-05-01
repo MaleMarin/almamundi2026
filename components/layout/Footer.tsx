@@ -12,10 +12,6 @@ import { HistoriasAccordion } from './HistoriasAccordion';
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-none tracking-normal transition-colors';
 
-/** Aviso beta pública global (solo pie; mismo tono sobrio que el resto del footer). */
-const BETA_NOTICE_MAILTO =
-  'mailto:hola@almamundi.org?subject=Feedback%20beta%20AlmaMundi';
-
 export type FooterProps = {
   /**
    * true = mismo diseño pero sin `data-site-footer` (p. ej. portal cinematográfico;
@@ -37,70 +33,55 @@ export function Footer({ embedded = false }: FooterProps = {}) {
         </h1>
       </div>
 
-      <div className="w-full max-w-6xl flex flex-col gap-10 pt-4 md:pt-6 pb-8 text-gray-600">
-        <div className="w-full flex flex-col items-center gap-3 px-1 text-center">
-          <p className="text-xs font-normal leading-relaxed text-gray-600 max-w-3xl">
-            AlmaMundi está en beta pública. Algunas historias son demostrativas y están marcadas como tales.
-            Estamos probando la experiencia antes de abrir el archivo a más relatos reales.
-          </p>
-          <a
-            href={BETA_NOTICE_MAILTO}
-            className="almamundi-footer-link text-xs font-semibold tracking-normal text-gray-600 underline decoration-gray-400/80 underline-offset-2 transition-colors hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
-          >
-            Enviar comentarios
-          </a>
+      <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-center gap-12 pt-4 md:pt-6 pb-8 text-gray-600">
+        <div className="flex flex-col items-center md:items-start">
+          <span className="mb-4 block text-xs font-semibold leading-snug text-gray-600">
+            Una iniciativa de
+          </span>
+          <img
+            src="/logo-precisar.png"
+            alt="Precisar"
+            className="h-16 w-auto object-contain"
+          />
         </div>
 
-        <div className="flex flex-col md:flex-row justify-between items-center md:items-center gap-12">
-          <div className="flex flex-col items-center md:items-start">
-            <span className="mb-4 block text-xs font-semibold leading-snug text-gray-600">
-              Una iniciativa de
-            </span>
-            <img
-              src="/logo-precisar.png"
-              alt="Precisar"
-              className="h-16 w-auto object-contain"
-            />
-          </div>
-
-          <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 lg:gap-10">
-            <ActiveInternalNavLink
-              href="/#proposito"
-              className={FOOTER_LINK}
-              activeClassName="!text-gray-900 font-semibold"
-            >
-              Nuestro propósito
-            </ActiveInternalNavLink>
-            <ActiveInternalNavLink
-              href="/#como-funciona"
-              className={FOOTER_LINK}
-              activeClassName="!text-gray-900 font-semibold"
-            >
-              ¿Cómo funciona?
-            </ActiveInternalNavLink>
-            <HistoriasAccordion variant="footer" />
-            <ActiveInternalNavLink
-              href="/#mapa"
-              className={FOOTER_LINK}
-              activeClassName="!text-gray-900 font-semibold"
-            >
-              Mapa
-            </ActiveInternalNavLink>
-            <ActiveInternalNavLink
-              href="/privacidad"
-              className={FOOTER_LINK}
-              activeClassName="!text-gray-900 font-semibold"
-            >
-              Política de privacidad
-            </ActiveInternalNavLink>
-            <ActiveInternalNavLink
-              href="/terminos"
-              className={FOOTER_LINK}
-              activeClassName="!text-gray-900 font-semibold"
-            >
-              Términos de uso
-            </ActiveInternalNavLink>
-          </div>
+        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 lg:gap-10">
+          <ActiveInternalNavLink
+            href="/#proposito"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Nuestro propósito
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/#como-funciona"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            ¿Cómo funciona?
+          </ActiveInternalNavLink>
+          <HistoriasAccordion variant="footer" />
+          <ActiveInternalNavLink
+            href="/#mapa"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Mapa
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/privacidad"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Política de privacidad
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/terminos"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Términos de uso
+          </ActiveInternalNavLink>
         </div>
       </div>
     </footer>
