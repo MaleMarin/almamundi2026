@@ -23,7 +23,8 @@ export const HISTORIAS_SHARE_ICONS_LEGEND = [
   },
   {
     label: 'Carta a quien cuenta',
-    text: 'Enviar un mensaje o carta privada a la persona que narra esta historia (con moderación).',
+    text:
+      'Escribir una carta breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
   },
 ] as const;
 

@@ -17,10 +17,10 @@ import {
 import { isInternalNavActive } from '@/lib/internal-nav-active';
 
 const HEADER_SHELL =
-  'fixed top-0 left-0 z-[100] flex h-32 w-full items-center justify-between gap-3 border-b border-white/20 bg-[#E0E5EC]/70 px-6 backdrop-blur-lg md:h-40 md:px-14 lg:h-44';
+  'fixed top-0 left-0 z-[100] flex min-h-[4.5rem] w-full items-center justify-between gap-2 border-b border-white/20 bg-[#E0E5EC]/70 px-4 py-2 backdrop-blur-lg md:min-h-[4.75rem] md:gap-3 md:px-10 md:py-2.5 lg:px-12';
 
 const LOGO_IMG_CLASS =
-  'h-28 w-auto max-w-[min(440px,70vw)] object-contain object-left select-none filter drop-shadow-md md:h-36 lg:h-40 xl:h-44 md:max-w-none';
+  'h-12 w-auto max-w-[min(260px,62vw)] object-contain object-left select-none filter drop-shadow-md md:h-14 lg:h-16 md:max-w-[min(320px,48vw)]';
 
 export type HistoriasInteriorFormatTab = 'videos' | 'audios' | 'escrito' | 'fotos';
 
@@ -160,7 +160,7 @@ export function HistoriasInteriorSiteHeader({
         </button>
 
         <nav
-          className="hidden min-w-0 max-w-[min(56rem,calc(100vw-10rem))] flex-wrap items-center justify-end gap-2 md:flex lg:gap-2.5"
+          className="hidden min-w-0 max-w-[min(56rem,calc(100vw-9rem))] flex-wrap items-center justify-end gap-1.5 md:flex lg:gap-2"
           aria-label="Navegación principal"
         >
           {navPills}
@@ -172,13 +172,13 @@ export function HistoriasInteriorSiteHeader({
           <button
             type="button"
             className="fixed bottom-0 left-0 right-0 z-[98] bg-black/25 md:hidden"
-            style={{ top: '8rem' }}
+            style={{ top: 'clamp(4.5rem, 22vw, 6rem)' }}
             aria-label="Cerrar menú"
             onClick={closeMobileNav}
           />
           <div
             id="historias-interior-mobile-nav"
-            className="absolute left-0 right-0 top-full z-[102] flex max-h-[min(70vh,calc(100dvh-8rem))] flex-col gap-2 overflow-y-auto border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-lg md:hidden"
+            className="absolute left-0 right-0 top-full z-[102] flex max-h-[min(72vh,calc(100dvh-5.5rem))] flex-col gap-1.5 overflow-y-auto border-b border-white/25 bg-[#E0E5EC]/96 px-3 py-3 shadow-[0_12px_32px_rgba(0,0,0,0.1)] backdrop-blur-lg md:hidden"
             role="navigation"
             aria-label="Navegación principal"
           >

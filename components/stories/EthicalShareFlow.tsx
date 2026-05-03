@@ -5,7 +5,11 @@
  * crédito obligatorio, tarjeta descargable y copia de enlace con ritual de 2 s.
  */
 import { X } from 'lucide-react';
-import { HISTORIAS_SHARE_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
+import {
+  HISTORIAS_FILTER_ICON_IMG_CLASS,
+  HISTORIAS_FILTER_ICON_WELL_CLASS,
+  HISTORIAS_SHARE_ICON_SRC,
+} from '@/lib/historias/historias-exhibition-icons';
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 
@@ -566,14 +570,16 @@ export function EthicalShareTriggerButton({
       aria-label={ariaLabel}
       title={titleProp}
     >
-      <img
-        src={HISTORIAS_SHARE_ICON_SRC}
-        alt=""
-        width={20}
-        height={20}
-        className="h-5 w-5 shrink-0 object-contain"
-        draggable={false}
-      />
+      <span className={HISTORIAS_FILTER_ICON_WELL_CLASS} aria-hidden>
+        <img
+          src={HISTORIAS_SHARE_ICON_SRC}
+          alt=""
+          width={18}
+          height={18}
+          className={HISTORIAS_FILTER_ICON_IMG_CLASS}
+          draggable={false}
+        />
+      </span>
     </button>
   );
 }

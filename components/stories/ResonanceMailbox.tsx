@@ -1,10 +1,15 @@
 'use client';
 
 /**
- * Buzón de resonancia: icono sobre (Mail), pulso afectivo, modal glass y envío con filtro IA (API).
+ * Buzón de resonancia: carta breve al relato; modal y envío vía API (filtro de tono + registro;
+ * el equipo puede revisar antes de acercar el mensaje a quien narra).
  */
 import { X } from 'lucide-react';
-import { HISTORIAS_MAILBOX_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
+import {
+  HISTORIAS_FILTER_ICON_IMG_CLASS,
+  HISTORIAS_FILTER_ICON_WELL_CLASS,
+  HISTORIAS_MAILBOX_ICON_SRC,
+} from '@/lib/historias/historias-exhibition-icons';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -37,7 +42,8 @@ export function ResonanceMailbox({
   triggerAriaLabel,
 }: ResonanceMailboxProps) {
   const mailboxAria =
-    triggerAriaLabel ?? 'Mensajería de resonancia: enviar un mensaje privado al autor';
+    triggerAriaLabel ??
+    'Carta de resonancia: escribir para quien narra; AlmaMundi revisa el mensaje antes de poder acercárselo';
   const dialogId = useId();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -156,8 +162,7 @@ export function ResonanceMailbox({
           width: 40px;
           height: 40px;
         }
-        .boton-resonancia--inline svg,
-        .boton-resonancia--inline img {
+        .boton-resonancia--inline > svg {
           width: 1.25rem;
           height: 1.25rem;
         }
@@ -216,14 +221,16 @@ export function ResonanceMailbox({
             aria-label={mailboxAria}
             title={triggerTitle}
           >
-            <img
-              src={HISTORIAS_MAILBOX_ICON_SRC}
-              alt=""
-              width={28}
-              height={28}
-              className="h-7 w-7 shrink-0 object-contain"
-              draggable={false}
-            />
+            <span className={`${HISTORIAS_FILTER_ICON_WELL_CLASS} h-8 w-8`} aria-hidden>
+              <img
+                src={HISTORIAS_MAILBOX_ICON_SRC}
+                alt=""
+                width={22}
+                height={22}
+                className={`${HISTORIAS_FILTER_ICON_IMG_CLASS} h-[1.25rem] w-[1.25rem]`}
+                draggable={false}
+              />
+            </span>
           </button>
         </div>
       ) : (
@@ -246,14 +253,16 @@ export function ResonanceMailbox({
           aria-label={mailboxAria}
           title={triggerTitle}
         >
-          <img
-            src={HISTORIAS_MAILBOX_ICON_SRC}
-            alt=""
-            width={20}
-            height={20}
-            className="h-5 w-5 shrink-0 object-contain"
-            draggable={false}
-          />
+          <span className={HISTORIAS_FILTER_ICON_WELL_CLASS} aria-hidden>
+            <img
+              src={HISTORIAS_MAILBOX_ICON_SRC}
+              alt=""
+              width={18}
+              height={18}
+              className={HISTORIAS_FILTER_ICON_IMG_CLASS}
+              draggable={false}
+            />
+          </span>
         </button>
       )}
 
@@ -289,11 +298,14 @@ export function ResonanceMailbox({
                   ¿Esta historia resonó contigo?
                 </h2>
                 <p className="mt-3 text-sm leading-relaxed text-white/85">
-                  Deja un mensaje de respeto y afecto para{' '}
-                  <span className="font-medium text-white">{recipientName}</span>.
+                  Escribe una carta breve de afecto y respeto pensada para{' '}
+                  <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu carta, la
+                  revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercársela a
+                  quien narró este relato. Es un camino con pausa y mirada humana: no hay envío directo sin este
+                  resguardo, y no hay plazo fijo de respuesta.
                 </p>
                 <label htmlFor={`${dialogId}-msg`} className="sr-only">
-                  Mensaje para el autor
+                  Texto de tu carta de resonancia
                 </label>
                 <textarea
                   id={`${dialogId}-msg`}

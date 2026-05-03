@@ -5,8 +5,13 @@
  * Para header (neumórfico) y footer (links).
  */
 import { useState, useRef, useEffect } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import {
+  MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
+  MAP_HOME_NEU_BUTTON_STYLE,
+} from '@/lib/map-home-neu-button';
 import { isHistoriasSectionPath } from '@/lib/internal-nav-active';
 
 const ITEMS = [
@@ -98,6 +103,7 @@ export function HistoriasAccordion({
 
   const headerBtnClass = [
     headerButtonClassName ?? 'px-4 py-2 rounded-full text-sm transition-all',
+    'inline-flex items-center justify-center gap-1',
     historiasActive ? '!text-orange-500 font-semibold' : '',
   ]
     .filter(Boolean)
@@ -105,6 +111,9 @@ export function HistoriasAccordion({
     .trim();
 
   const headerWrapperClass = ['relative', className].filter(Boolean).join(' ').trim();
+
+  const rowStyle = buttonStyle ?? MAP_HOME_NEU_BUTTON_STYLE;
+  const rowClass = `${MAP_HOME_NEU_BUTTON_CLASS_COMPACT} !w-full max-w-none justify-center gap-0`;
 
   return (
     <div ref={ref} className={headerWrapperClass}>
@@ -117,18 +126,25 @@ export function HistoriasAccordion({
         aria-expanded={open}
         aria-haspopup="true"
       >
-        {triggerLabel} {open ? '▲' : '▼'}
+        <span>{triggerLabel}</span>
+        <ChevronDown
+          size={14}
+          strokeWidth={2.25}
+          className={`shrink-0 opacity-70 transition-transform duration-200 ${open ? '-rotate-180' : ''}`}
+          aria-hidden
+        />
       </button>
       {open && (
         <div
-          className="absolute top-full left-0 z-50 mt-1.5 w-max min-w-[9.25rem] max-w-[13rem] rounded-[14px] border border-white/55 bg-[#E8EBF2] py-1 shadow-[6px_8px_18px_rgba(136,150,170,0.28),-3px_-4px_14px_rgba(255,255,255,0.92)]"
+          className="absolute top-full left-0 z-50 mt-1.5 flex w-[min(calc(100vw-2rem),11.5rem)] min-w-[10.25rem] flex-col gap-1 rounded-2xl border border-white/55 bg-[#E8EBF2]/98 p-1 shadow-[6px_10px_22px_rgba(120,132,155,0.22),-3px_-4px_14px_rgba(255,255,255,0.92)] backdrop-blur-sm"
           role="menu"
         >
           {ITEMS.map((item) => (
             <ActiveInternalNavLink
               key={item.label}
               href={item.href}
-              className="block whitespace-nowrap px-3 py-1.5 text-[0.8125rem] font-normal leading-snug tracking-wide text-[#b45309] transition-colors hover:bg-white/45 hover:text-[#9a3412] first:rounded-t-[12px] last:rounded-b-[12px] md:px-3.5 md:py-2 md:text-sm"
+              className={rowClass}
+              style={rowStyle}
               onClick={afterNavigate}
             >
               {item.label}

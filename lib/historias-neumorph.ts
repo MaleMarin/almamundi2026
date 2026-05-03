@@ -77,15 +77,14 @@ export const neu = {
 } as const;
 
 /**
- * Páginas interiores /historias: nav más alto, logo AlmaMundi visible,
- * enlaces más grandes y altura mínima para que el footer no aparezca en el primer pantallazo.
+ * Páginas interiores /historias: header fijo compacto, logo visible,
+ * enlaces alineados a pastillas home y altura mínima para scroll antes del footer.
  */
 export const historiasInterior = {
   /**
-   * Padding superior cuando el menú usa header fijo al estilo home
-   * (`HistoriasInteriorSiteHeader`, mismas alturas h-32 / md:h-40 / lg:h-44).
+   * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader`, ~4.75–5.25rem).
    */
-  fixedHeaderContentPadClassName: 'pt-32 md:pt-40 lg:pt-44',
+  fixedHeaderContentPadClassName: 'pt-[4.75rem] md:pt-[5rem] lg:pt-[5.25rem]',
   /** main: fuerza scroll antes del footer */
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',
@@ -116,5 +115,6 @@ export const historiasInterior = {
   contentWrapClassName: 'flex-1 flex flex-col w-full min-h-0',
   headerClassName: 'flex-shrink-0 px-6 md:px-12 pt-10 md:pt-14 pb-6 md:pb-10',
   /** Área de contenido (carrusel / listas): empuja el footer fuera del primer viewport */
-  sectionGrowClassName: 'flex-1 flex flex-col min-h-[calc(100svh-16rem)] md:min-h-[calc(100svh-18rem)]',
+  sectionGrowClassName:
+    'flex-1 flex flex-col min-h-[calc(100svh-6.5rem)] md:min-h-[calc(100svh-7rem)]',
 } as const;
