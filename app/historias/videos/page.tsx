@@ -11,7 +11,7 @@ import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
 import {
-  HISTORIAS_LIST_EXPO_LABEL,
+  historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
 import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
@@ -204,7 +204,7 @@ export default function HistoriasVideosPage() {
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
         shareUrlForFlow={shareUrlForFlow}
-        expoLabel={HISTORIAS_LIST_EXPO_LABEL}
+        expoLabel={historiasListFormatExpoLabel.video}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="video"

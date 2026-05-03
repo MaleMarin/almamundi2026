@@ -1,14 +1,11 @@
 /**
  * Textos compartidos de /historias/videos | audios | escrito | fotos
- * (misma composición visual y mismos copy que la página de referencia: video).
+ * (misma composición visual; kicker naranja y etiqueta de carrusel por formato).
  */
 import { historiasFormatListHero } from '@/lib/historias/historias-format-list-hero';
 
 export const HISTORIAS_LIST_HERO_TITLE = historiasFormatListHero.video.title;
 export const HISTORIAS_LIST_HERO_SUBTITLE = historiasFormatListHero.video.subtitle;
-
-/** Título de exposición del carrusel: mismo texto que en /historias/videos en las cuatro rutas. */
-export const HISTORIAS_LIST_EXPO_LABEL = 'alma.mundi / historias en video';
 
 /** Placeholder vacío: la etiqueta «Palabras clave» ya orienta al usuario. */
 export const HISTORIAS_FILTER_KEYWORD_PLACEHOLDER = '';
@@ -32,15 +29,18 @@ export const HISTORIAS_SHARE_ICONS_LEGEND = [
 
 export type HistoriasListFormatKey = 'video' | 'audio' | 'texto' | 'foto';
 
-/**
- * Línea naranja bajo el hero: misma frase que en video en todas las rutas
- * (audios / escrito / fotos usan el mismo kicker vía sus claves).
- */
-const HISTORIAS_LIST_ORANGE_KICKER_VIDEO = 'Historias en video';
-
+/** Línea naranja bajo el hero: una frase por formato de listado. */
 export const historiasListFormatOrangeKicker: Record<HistoriasListFormatKey, string> = {
-  video: HISTORIAS_LIST_ORANGE_KICKER_VIDEO,
-  audio: HISTORIAS_LIST_ORANGE_KICKER_VIDEO,
-  texto: HISTORIAS_LIST_ORANGE_KICKER_VIDEO,
-  foto: HISTORIAS_LIST_ORANGE_KICKER_VIDEO,
+  video: 'Historias en video',
+  audio: 'Historias en audio',
+  texto: 'Historias en texto',
+  foto: 'Historias en fotografía',
+};
+
+/** Título de exposición del carrusel (misma composición; texto según pestaña de formato). */
+export const historiasListFormatExpoLabel: Record<HistoriasListFormatKey, string> = {
+  video: 'alma.mundi / historias en video',
+  audio: 'alma.mundi / historias en audio',
+  texto: 'alma.mundi / historias en texto',
+  foto: 'alma.mundi / historias en fotografía',
 };

@@ -11,7 +11,7 @@ import TextoReader, { type HistoriaTexto } from '@/components/historia/TextoRead
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
 import {
-  HISTORIAS_LIST_EXPO_LABEL,
+  historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
 import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
@@ -159,7 +159,7 @@ export default function HistoriasEscritoPage() {
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
         shareUrlForFlow={shareUrlForFlow}
-        expoLabel={HISTORIAS_LIST_EXPO_LABEL}
+        expoLabel={historiasListFormatExpoLabel.texto}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="texto"

@@ -12,7 +12,7 @@ import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasF
 import { useStories } from '@/hooks/useStories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
 import {
-  HISTORIAS_LIST_EXPO_LABEL,
+  historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
 import {
@@ -193,7 +193,7 @@ export default function HistoriasAudiosPage() {
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
         shareUrlForFlow={shareUrlForFlow}
-        expoLabel={HISTORIAS_LIST_EXPO_LABEL}
+        expoLabel={historiasListFormatExpoLabel.audio}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="audio"
