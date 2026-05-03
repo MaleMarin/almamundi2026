@@ -204,4 +204,14 @@
 4. Añadir **revisión editorial** visible al inicio de `/subir` y «correo» en lugar de «email».  
 5. **Pase manual** móvil + Lighthouse accesibilidad en `/`, `/mapa`, `/historias/*`, `/subir`.
 
+---
+
+## Hallazgos cerrados
+
+Estado de correcciones ya integradas en el repositorio (el diagnóstico anterior de cada ítem se conserva arriba solo como referencia histórica).
+
+- **T1 / T2** — Kicker naranja y etiqueta del carrusel **por formato** (vídeo, audio, texto, fotografía), sin que audios / escrito / fotos muestren «video». Cerrado en commit **`482a1293`**.
+- **Buzón / carta al autor** — Copy ajustado para **no** prometer envío directo al autor: se explica revisión por parte de AlmaMundi, **filtro automático de tono** y **ausencia de plazo fijo** de respuesta. Incluye leyenda en filtros, `aria-label` por defecto y texto del modal. Cerrado en commit **`b9760064`**.
+- **Iconos y navegación de historias** — Iconos de **compartir** y **carta** con contraste usable (well + sombra sobre fondo neu); **selector de formatos** (acordeón) y **header interior** de `/historias/*` pulidos para alinearse mejor con las pastillas de la home (sin modificar la home). Cerrado en commit **`b9760064`**.
+
 *Fin del diagnóstico — sin cambios de código en el repositorio como parte de esta entrega.*
