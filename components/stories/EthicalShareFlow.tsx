@@ -4,7 +4,8 @@
  * Compartido con intención: compromiso de resguardo, elección de resonancia,
  * crédito obligatorio, tarjeta descargable y copia de enlace con ritual de 2 s.
  */
-import { HandHeart, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { HISTORIAS_SHARE_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 
@@ -565,13 +566,20 @@ export function EthicalShareTriggerButton({
       aria-label={ariaLabel}
       title={titleProp}
     >
-      <HandHeart className="h-5 w-5" strokeWidth={1.75} />
+      <img
+        src={HISTORIAS_SHARE_ICON_SRC}
+        alt=""
+        width={20}
+        height={20}
+        className="h-5 w-5 shrink-0 object-contain"
+        draggable={false}
+      />
     </button>
   );
 }
 
 /**
- * Franja visual (`/historias/companion-carta.png`) y botón HandHeart; `betweenCartaAndShare` inserta
+ * Franja visual (`/historias/companion-carta.png`) y botón con icono `/compartir icono.png`; `betweenCartaAndShare` inserta
  * controles (p. ej. buzón de resonancia) entre la carta y el icono de compartir.
  */
 export function EthicalShareTriggerWithCartaCompanion({

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Etiqueta obligatoria para relatos demo / beta_demo (Opción A, copy fijo editorial).
+ * Etiqueta obligatoria para relatos demo (no reales); copy desde `lib/demo-stories-public`.
  */
 import {
   DEMO_STORY_LABEL,

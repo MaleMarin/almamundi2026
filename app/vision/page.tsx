@@ -166,7 +166,7 @@ export default function VisionPage() {
           </p>
           <h1
             style={{
-              margin: '0 0 1.25rem',
+              margin: '0 0 0.65rem',
               fontFamily: SITE_FONT_STACK,
               fontStyle: 'italic',
               fontWeight: 600,
@@ -177,6 +177,18 @@ export default function VisionPage() {
           >
             La visión de AlmaMundi
           </h1>
+          <p
+            style={{
+              margin: '0 0 1.25rem',
+              fontSize: '0.8rem',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: '#9a3412',
+            }}
+          >
+            Beta pública — esta hoja de ruta puede actualizarse mientras el proyecto avanza.
+          </p>
           <div
             style={{
               fontFamily: SITE_FONT_STACK,

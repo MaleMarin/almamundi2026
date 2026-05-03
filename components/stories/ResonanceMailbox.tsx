@@ -3,7 +3,8 @@
 /**
  * Buzón de resonancia: icono sobre (Mail), pulso afectivo, modal glass y envío con filtro IA (API).
  */
-import { Mail, X } from 'lucide-react';
+import { X } from 'lucide-react';
+import { HISTORIAS_MAILBOX_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -155,7 +156,8 @@ export function ResonanceMailbox({
           width: 40px;
           height: 40px;
         }
-        .boton-resonancia--inline svg {
+        .boton-resonancia--inline svg,
+        .boton-resonancia--inline img {
           width: 1.25rem;
           height: 1.25rem;
         }
@@ -214,7 +216,14 @@ export function ResonanceMailbox({
             aria-label={mailboxAria}
             title={triggerTitle}
           >
-            <Mail className="h-7 w-7" strokeWidth={1.75} />
+            <img
+              src={HISTORIAS_MAILBOX_ICON_SRC}
+              alt=""
+              width={28}
+              height={28}
+              className="h-7 w-7 shrink-0 object-contain"
+              draggable={false}
+            />
           </button>
         </div>
       ) : (
@@ -237,7 +246,14 @@ export function ResonanceMailbox({
           aria-label={mailboxAria}
           title={triggerTitle}
         >
-          <Mail className="h-5 w-5" strokeWidth={1.75} />
+          <img
+            src={HISTORIAS_MAILBOX_ICON_SRC}
+            alt=""
+            width={20}
+            height={20}
+            className="h-5 w-5 shrink-0 object-contain"
+            draggable={false}
+          />
         </button>
       )}
 

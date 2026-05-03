@@ -1,5 +1,6 @@
 /**
- * Beta pública: control de demos en cliente y servidor (NEXT_PUBLIC_SHOW_DEMO_STORIES).
+ * Demos públicas: control en cliente y servidor (NEXT_PUBLIC_SHOW_DEMO_STORIES).
+ * La palabra «beta» en UI reservada a `/vision`; aquí solo copy de relatos no reales.
  */
 import type { StoryPoint } from "@/lib/map-data/stories";
 
@@ -9,10 +10,10 @@ export type DemoStoryFields = Pick<
   "id" | "isDemo" | "isBetaDemo" | "isRealStory" | "editorialStatus" | "demoNotice"
 >;
 
-export const DEMO_STORY_LABEL = "Historia demo / no real";
+export const DEMO_STORY_LABEL = "Historia de demostración / no es real";
 
 export const DEMO_STORY_NOTICE =
-  "Este relato fue creado para probar la experiencia de AlmaMundi. No corresponde a una persona real.";
+  "Este relato fue creado solo para mostrar cómo funciona AlmaMundi. No describe a una persona real ni hechos verificables.";
 
 /** true solo con env explícita; cualquier otro valor o ausencia => false */
 export function showPublicDemoStories(): boolean {
