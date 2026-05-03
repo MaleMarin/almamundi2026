@@ -28,6 +28,13 @@ export const MAP_HOME_NEU_BUTTON_CLASS =
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =
   'btn-almamundi home-map-neu-pill box-border flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-full max-w-none items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
 
+/**
+ * Misma altura/tipografía que COMPACT, pero **sin `w-full`**.
+ * En `display:flex` del header de historias, `w-full` en cada hijo fuerza barras casi a todo el ancho; en la home el nav es **grid** y ahí sigue usándose COMPACT.
+ */
+export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE =
+  'btn-almamundi home-map-neu-pill box-border inline-flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-auto max-w-none shrink-0 items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+
 /** Base común: max-width y gaps idénticos. Columnas con minmax(0,1fr) = mismo ancho por celda, sin auto-width por contenido. */
 export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-600 lg:gap-4';
 

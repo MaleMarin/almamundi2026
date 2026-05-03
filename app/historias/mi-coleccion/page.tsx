@@ -28,12 +28,12 @@ export default function MiColeccionPage() {
   };
 
   return (
-    <main
-      className={`${historiasInterior.mainClassName} ${historiasInterior.fixedHeaderContentPadClassName}`}
-      style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-    >
+    <>
       <HistoriasInteriorSiteHeader showMiColeccionPill />
-
+      <main
+        className={`${historiasInterior.mainClassName} ${historiasInterior.fixedHeaderContentPadClassName}`}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+      >
       <div className={historiasInterior.contentWrapClassName}>
       <header className={historiasInterior.headerClassName}>
         <p className="text-xs font-semibold tracking-[0.18em] uppercase mb-2" style={{ color: 'var(--almamundi-orange)' }}>
@@ -105,6 +105,7 @@ export default function MiColeccionPage() {
       </section>
       </div>
 
-    </main>
+      </main>
+    </>
   );
 }

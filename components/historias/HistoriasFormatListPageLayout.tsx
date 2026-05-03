@@ -80,12 +80,12 @@ export function HistoriasFormatListPageLayout({
   disableKeyboardNav,
 }: HistoriasFormatListPageLayoutProps) {
   return (
-    <main
-      className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
-      style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-    >
+    <>
       <HistoriasInteriorSiteHeader formatTabOverride={activeTab} />
-
+      <main
+        className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+      >
       <div className="flex min-h-0 w-full flex-1 flex-col">
         <div className="w-full shrink-0 px-6 pt-[16px] md:px-12 lg:px-16">
           <div className="mx-auto w-full max-w-5xl">
@@ -235,6 +235,7 @@ export function HistoriasFormatListPageLayout({
           themeTag={shareTarget.tags[0] ?? 'resiliencia'}
         />
       ) : null}
-    </main>
+      </main>
+    </>
   );
 }

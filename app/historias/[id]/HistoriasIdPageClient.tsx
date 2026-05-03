@@ -90,27 +90,31 @@ export default function HistoriasIdPageClient() {
 
   if (loading) {
     return (
-      <main
-        className={`${historiasInterior.mainClassName} ${pad} items-center justify-center`}
-        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-      >
+      <>
         <HistoriasInteriorSiteHeader formatTabOverride={null} />
-        <p style={{ color: neu.textBody }}>Cargando…</p>
-      </main>
+        <main
+          className={`${historiasInterior.mainClassName} ${pad} items-center justify-center`}
+          style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+        >
+          <p style={{ color: neu.textBody }}>Cargando…</p>
+        </main>
+      </>
     );
   }
   if (!story) {
     return (
-      <main
-        className={`${historiasInterior.mainClassName} ${pad} flex flex-col items-center justify-center gap-4 px-6`}
-        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-      >
+      <>
         <HistoriasInteriorSiteHeader formatTabOverride={null} />
-        <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
-        <Link href="/historias" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>
-          ← Historias
-        </Link>
-      </main>
+        <main
+          className={`${historiasInterior.mainClassName} ${pad} flex flex-col items-center justify-center gap-4 px-6`}
+          style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+        >
+          <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
+          <Link href="/historias" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>
+            ← Historias
+          </Link>
+        </main>
+      </>
     );
   }
 
@@ -132,9 +136,9 @@ export default function HistoriasIdPageClient() {
           : 'videos';
 
   return (
-    <main className={`${historiasInterior.mainClassName} ${pad}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+    <>
       <HistoriasInteriorSiteHeader formatTabOverride={formatNavActiveTab} />
-
+      <main className={`${historiasInterior.mainClassName} ${pad}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
         <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">
           <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>
@@ -260,6 +264,7 @@ export default function HistoriasIdPageClient() {
           </div>
         </section>
       </div>
-    </main>
+      </main>
+    </>
   );
 }
