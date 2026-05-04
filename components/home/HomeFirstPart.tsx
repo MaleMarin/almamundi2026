@@ -2,17 +2,12 @@
 
 import type { ReactNode } from 'react';
 import { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
-import { PillNavButton } from '@/components/home/PillNavButton';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
-import {
-  MAP_HOME_HEADER_NAV_HOME_CLASS,
-  MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
-  MAP_HOME_NEU_BUTTON_STYLE,
-} from '@/lib/map-home-neu-button';
+import { historiasListHrefFromBasePath, SITE_NAV_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
@@ -252,8 +247,7 @@ export function HomeFirstPart({
 }: HomeFirstPartProps) {
   const router = useRouter();
   const { t } = useHomeLocale();
-  const baseNorm = basePath.replace(/\/$/, '');
-  const mapaHref = basePath ? (baseNorm ? `${baseNorm}#mapa` : '/#mapa') : '/#mapa';
+  const historiasHref = historiasListHrefFromBasePath(basePath);
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
@@ -290,23 +284,22 @@ export function HomeFirstPart({
           >
             {mobileNavOpen ? <X size={20} strokeWidth={2} aria-hidden /> : <Menu size={20} strokeWidth={2} aria-hidden />}
           </button>
-          <nav className={MAP_HOME_HEADER_NAV_HOME_CLASS} aria-label={t.ariaMainNav}>
-            <PillNavButton compact onClick={onShowPurpose}>
+          <nav
+            className="hidden flex-nowrap items-center gap-x-2 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2.5 lg:gap-x-3"
+            aria-label={t.ariaMainNav}
+          >
+            <button type="button" onClick={onShowPurpose} className={SITE_NAV_LINK_CLASS}>
               {t.navPurpose}
-            </PillNavButton>
-            <PillNavButton compact onClick={onShowComoFunciona}>
+            </button>
+            <button type="button" onClick={onShowComoFunciona} className={SITE_NAV_LINK_CLASS}>
               {t.navHow}
-            </PillNavButton>
-            <HistoriasAccordion
-              variant="header"
-              triggerLabel={t.navStories}
-              buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
-              headerButtonClassName={MAP_HOME_NEU_BUTTON_CLASS_COMPACT}
-              className="w-full min-w-0"
-            />
-            <PillNavButton compact href={mapaHref}>
+            </button>
+            <Link href={historiasHref} className={SITE_NAV_LINK_CLASS}>
+              {t.navStories}
+            </Link>
+            <Link href="/mapa" className={SITE_NAV_LINK_CLASS}>
               {t.navMap}
-            </PillNavButton>
+            </Link>
           </nav>
           <HomeLanguageSwitcher className="hidden md:flex" />
         </div>
@@ -322,40 +315,45 @@ export function HomeFirstPart({
             />
             <div
               id="home-header-mobile-nav"
-              className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-3 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-4 shadow-[0_16px_40px_rgba(0,0,0,0.12)] backdrop-blur-lg md:hidden"
+              className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-3 shadow-sm backdrop-blur-lg md:hidden"
               role="navigation"
               aria-label={t.ariaMainNav}
             >
-              <PillNavButton
-                compact
+              <button
+                type="button"
+                className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
                 onClick={() => {
                   onShowPurpose();
                   closeMobileNav();
                 }}
               >
                 {t.navPurpose}
-              </PillNavButton>
-              <PillNavButton
-                compact
+              </button>
+              <button
+                type="button"
+                className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
                 onClick={() => {
                   onShowComoFunciona();
                   closeMobileNav();
                 }}
               >
                 {t.navHow}
-              </PillNavButton>
-              <HistoriasAccordion
-                variant="header"
-                triggerLabel={t.navStories}
-                buttonStyle={MAP_HOME_NEU_BUTTON_STYLE}
-                headerButtonClassName={`${MAP_HOME_NEU_BUTTON_CLASS_COMPACT} w-full max-w-none`}
-                className="w-full"
-                onItemNavigate={closeMobileNav}
-              />
-              <PillNavButton compact href={mapaHref} onAfterClick={closeMobileNav}>
+              </button>
+              <Link
+                href={historiasHref}
+                className={`${SITE_NAV_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
+                onClick={closeMobileNav}
+              >
+                {t.navStories}
+              </Link>
+              <Link
+                href="/mapa"
+                className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+                onClick={closeMobileNav}
+              >
                 {t.navMap}
-              </PillNavButton>
-              <div className="flex justify-center pt-1 md:hidden">
+              </Link>
+              <div className="flex justify-center border-t border-white/20 pt-2 md:hidden">
                 <HomeLanguageSwitcher />
               </div>
             </div>

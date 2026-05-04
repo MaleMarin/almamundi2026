@@ -585,7 +585,7 @@ export function EthicalShareTriggerButton({
 }
 
 /**
- * Franja visual (`/historias/companion-carta.png`) y botón con icono `/compartir icono.png`; `betweenCartaAndShare` inserta
+ * Franja visual (`/historias/companion-carta.png`) y botón con icono `/icons/compartir.svg`; `betweenCartaAndShare` inserta
  * controles (p. ej. buzón de resonancia) entre la carta y el icono de compartir.
  */
 export function EthicalShareTriggerWithCartaCompanion({

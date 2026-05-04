@@ -52,13 +52,13 @@ export function MisDatosPersonalesForm() {
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
-        setErrMsg(data.error ?? 'No se pudo enviar. Probá de nuevo.');
+        setErrMsg(data.error ?? 'No se pudo enviar. Prueba de nuevo.');
         setStatus('err');
         return;
       }
       setStatus('ok');
     } catch {
-      setErrMsg('Error de red. Probá de nuevo.');
+      setErrMsg('Error de red. Prueba de nuevo.');
       setStatus('err');
     }
   }
@@ -72,8 +72,12 @@ export function MisDatosPersonalesForm() {
         </h1>
         <div className="space-y-3 text-sm leading-relaxed text-gray-600 md:text-[0.9375rem]">
           <p>
-            Podés usar este formulario para solicitar información o ejercer tus derechos sobre los datos personales
-            que hayas compartido con AlmaMundi.
+            Puedes usar este formulario para solicitar información o ejercer tus derechos sobre los datos personales
+            que hayas compartido con AlmaMundi. Es el mismo canal que describe el{' '}
+            <Link href="/privacidad" className="font-semibold text-orange-600 underline underline-offset-2">
+              Aviso de Privacidad
+            </Link>
+            .
           </p>
           <p>
             Atenderemos tu solicitud con cuidado, verificando tu identidad solo cuando sea necesario para proteger tu
@@ -92,7 +96,7 @@ export function MisDatosPersonalesForm() {
             La enviamos al equipo de AlmaMundi. Si necesitamos aclarar algo, te escribiremos al correo que indicaste.
           </p>
           <p className="mt-3 text-xs text-gray-500">
-            Si el envío automático no estuviera disponible en este momento, podés escribir a{' '}
+            Si el envío automático no estuviera disponible en este momento, puedes escribir a{' '}
             <a href="mailto:hola@almamundi.org" className="font-semibold text-orange-600 underline underline-offset-2">
               hola@almamundi.org
             </a>{' '}
@@ -149,8 +153,8 @@ export function MisDatosPersonalesForm() {
                   placeholder=""
                 />
                 <p className="mt-2 text-xs leading-relaxed text-gray-500">
-                  Describí tu solicitud con el mayor detalle posible para poder ayudarte mejor. Podés indicar qué datos
-                  querés revisar, corregir o eliminar; en qué parte del sitio participaste; si enviaste una historia,
+                  Describe tu solicitud con el mayor detalle posible para poder ayudarte mejor. Puedes indicar qué datos
+                  quieres revisar, corregir o eliminar; en qué parte del sitio participaste; si enviaste una historia,
                   fotografía, audio, texto o video; y el correo que usaste al participar.
                 </p>
               </div>
@@ -199,7 +203,9 @@ export function MisDatosPersonalesForm() {
                 <input id="pais" type="text" maxLength={120} value={country} onChange={(e) => setCountry(e.target.value)} className={fieldClass} autoComplete="country-name" />
               </div>
               <fieldset>
-                <legend className={`${labelClass} mb-2`}>¿Estás haciendo esta solicitud sobre tus propios datos?</legend>
+                <legend className={`${labelClass} mb-2`}>
+                  ¿Haces esta solicitud sobre tus propios datos?
+                </legend>
                 <div className="flex flex-wrap gap-4 text-sm text-gray-800">
                   <label className="inline-flex cursor-pointer items-center gap-2">
                     <input type="radio" name="ownData" value="yes" checked={ownData === 'yes'} onChange={() => setOwnData('yes')} required className="h-4 w-4 accent-orange-600" />
@@ -213,8 +219,8 @@ export function MisDatosPersonalesForm() {
               </fieldset>
               {ownData === 'no' ? (
                 <p className="rounded-lg border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-xs leading-relaxed text-amber-950">
-                  Si actuás en representación de otra persona, podremos pedir información adicional para verificar que
-                  tenés autorización.
+                  Si actúas en representación de otra persona, podremos pedir información adicional para verificar que
+                  tienes autorización.
                 </p>
               ) : null}
             </div>
@@ -239,7 +245,7 @@ export function MisDatosPersonalesForm() {
 
           <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#e8ebf2]/90 p-5 text-xs leading-relaxed text-gray-600 md:text-sm">
             <p>
-              Al enviar esta solicitud, confirmás que la información entregada es correcta y que AlmaMundi puede
+              Al enviar esta solicitud, confirmas que la información entregada es correcta y que AlmaMundi puede
               contactarte para gestionar tu requerimiento.
             </p>
             <p>
@@ -262,7 +268,7 @@ export function MisDatosPersonalesForm() {
               {status === 'sending' ? 'Enviando…' : 'Enviar solicitud'}
             </button>
             <Link href="/privacidad" className="inline-flex justify-center rounded-full border border-gray-400/50 px-6 py-3 text-center text-sm font-semibold text-gray-800 hover:bg-white/50">
-              Política de privacidad
+              Aviso de privacidad
             </Link>
           </div>
         </form>

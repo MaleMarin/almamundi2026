@@ -6,7 +6,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 export const metadata: Metadata = {
   title: 'La visión de AlmaMundi',
   description:
-    'Hacia dónde va AlmaMundi: archivo vivo de historias, mapa y caminos futuros, con honestidad sobre lo que ya existe y lo que viene.',
+    'Hacia dónde va AlmaMundi: memoria viva de relatos, mapa y caminos futuros, con honestidad sobre lo que ya existe y lo que viene.',
 };
 
 const BG = '#e8ecf0';
@@ -68,7 +68,7 @@ const ROADMAP: { title: string; status: RoadmapStatus; body: string }[] = [
   {
     title: 'Historias que no se pierden',
     status: 'disponible',
-    body: 'Relatos en audio, texto, fotografía o video que no quedan enterrados en un feed. Cada historia se revisa, se cuida y puede encontrar un lugar dentro del archivo.',
+    body: 'Relatos en audio, texto, fotografía o video que no quedan enterrados en un feed. Cada historia se revisa, se cuida y puede encontrar un lugar en esta colección viva.',
   },
   {
     title: 'Mapa vivo',
@@ -86,7 +86,7 @@ const ROADMAP: { title: string; status: RoadmapStatus; body: string }[] = [
     body: 'Muestras curatoriales hechas a partir de historias seleccionadas. Una forma de transformar relatos dispersos en experiencias con sentido.',
   },
   {
-    title: 'Archivo sonoro',
+    title: 'Memoria sonora',
     status: 'futuro',
     body: 'Un espacio para voces, pausas, acentos y formas de contar. Porque una historia no vive solo en lo que dice, sino también en cómo suena.',
   },
@@ -118,12 +118,12 @@ const ROADMAP: { title: string; status: RoadmapStatus; body: string }[] = [
   {
     title: 'Publicaciones',
     status: 'futuro',
-    body: 'Cuadernos, informes o libros digitales basados en el archivo, cuando existan suficientes historias para leer patrones, preguntas y memorias comunes.',
+    body: 'Cuadernos, informes o libros digitales basados en las historias reunidas, cuando existan suficientes relatos para leer patrones, preguntas y memorias comunes.',
   },
   {
     title: 'Observatorio de historias humanas',
     status: 'futuro',
-    body: 'Una lectura ética de los temas, emociones y señales que emergen del archivo: no para convertir personas en datos, sino para comprender mejor lo que nos atraviesa.',
+    body: 'Una lectura ética de los temas, emociones y señales que emergen de las historias reunidas: no para convertir personas en datos, sino para comprender mejor lo que nos atraviesa.',
   },
 ];
 
@@ -205,13 +205,13 @@ export default function VisionPage() {
               una voz o una experiencia parecida en otro lugar del mundo.
             </p>
             <p style={{ margin: '0 0 1.1rem' }}>
-              Por eso estamos construyendo un archivo vivo: un espacio donde las historias no se acumulan como contenido
+              Por eso estamos construyendo una memoria viva de relatos: un espacio donde las historias no se acumulan como contenido
               pasajero, sino que se cuidan, se organizan y pueden despertar nuevas historias.
             </p>
             <p style={{ margin: '0 0 1.1rem' }}>
               En esta primera etapa, AlmaMundi permite compartir relatos en audio, texto, fotografía o video, siempre
-              con revisión editorial antes de publicarse. A futuro, queremos que este archivo crezca hacia recorridos
-              de memoria, exposiciones digitales, archivos familiares, proyectos educativos, memorias comunitarias,
+              con revisión editorial antes de publicarse. A futuro, queremos que esta colección crezca hacia recorridos
+              de memoria, exposiciones digitales, legados familiares, proyectos educativos, memorias comunitarias,
               publicaciones y herramientas para compartir con más conciencia.
             </p>
             <p style={{ margin: 0 }}>

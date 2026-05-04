@@ -82,9 +82,9 @@ export const neu = {
  */
 export const historiasInterior = {
   /**
-   * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader`, ~4–4.5rem según barra compacta).
+   * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader`, alineado a barra + logo más presente).
    */
-  fixedHeaderContentPadClassName: 'pt-[4rem] sm:pt-[4.125rem] md:pt-[4.25rem] lg:pt-[4.375rem]',
+  fixedHeaderContentPadClassName: 'pt-[5rem] sm:pt-[5.125rem] md:pt-[5.375rem] lg:pt-[5.5rem]',
   /** main: fuerza scroll antes del footer */
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',
@@ -103,11 +103,6 @@ export const historiasInterior = {
     'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-base md:text-lg font-medium leading-tight',
   navActiveClassName:
     'px-3 py-1.5 md:px-4 md:py-2 rounded-full text-base md:text-lg font-semibold leading-tight',
-  /**
-   * Botón «Historias ▼» del acordeón: misma escala que navLinkClassName (antes forzaba text-lg + py-3).
-   */
-  navHistoriasAccordionClassName:
-    '[&_button]:btn-almamundi [&_button]:text-base [&_button]:md:text-lg [&_button]:font-medium [&_button]:px-3 [&_button]:py-1.5 [&_button]:md:px-4 [&_button]:md:py-2 [&_button]:leading-tight [&_button]:rounded-full',
   /** Fila de botones del menú superior */
   navLinksRowClassName:
     'flex items-center flex-wrap justify-end gap-x-2.5 gap-y-2 sm:gap-x-3 md:gap-x-4 lg:gap-x-5',

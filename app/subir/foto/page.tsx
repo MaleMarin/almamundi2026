@@ -5,7 +5,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { UserCircle } from 'lucide-react';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 
@@ -138,9 +138,11 @@ export default function SubirFotoPage() {
           <ActiveInternalNavLink href="/#historias" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Elegir formato en inicio</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className="[&_button]:btn-almamundi" />
+          <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
+            Historias
+          </Link>
           <ActiveInternalNavLink href="/subir/foto" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Foto</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

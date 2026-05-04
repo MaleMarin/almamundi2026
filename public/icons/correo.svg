@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="t">
+  <title id="t">Escribir carta</title>
+  <defs>
+    <filter id="ml-deboss" x="-35%" y="-35%" width="170%" height="170%" color-interpolation-filters="sRGB">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="2.2" result="blur-d"/>
+      <feOffset dx="2.8" dy="2.8" in="blur-d" result="off-d"/>
+      <feComposite in="SourceAlpha" in2="off-d" operator="out" result="inv-d"/>
+      <feFlood flood-color="#000000" flood-opacity="0.2" result="flood-d"/>
+      <feComposite in="flood-d" in2="inv-d" operator="in" result="shade"/>
+
+      <feGaussianBlur in="SourceAlpha" stdDeviation="1.6" result="blur-l"/>
+      <feOffset dx="-2.2" dy="-2.2" in="blur-l" result="off-l"/>
+      <feComposite in="SourceAlpha" in2="off-l" operator="out" result="inv-l"/>
+      <feFlood flood-color="#ffffff" flood-opacity="0.62" result="flood-l"/>
+      <feComposite in="flood-l" in2="inv-l" operator="in" result="highlight"/>
+
+      <feMerge>
+        <feMergeNode in="SourceGraphic"/>
+        <feMergeNode in="shade"/>
+        <feMergeNode in="highlight"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <rect width="200" height="200" rx="40" fill="#EFEFEB"/>
+  <rect width="200" height="200" rx="40" fill="none" stroke="#000000" stroke-opacity="0.06" stroke-width="1"/>
+
+  <g filter="url(#ml-deboss)" fill="#EFEFEB" stroke="#9A9890" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="58" y="78" width="84" height="56" rx="8"/>
+    <path d="M 58 86 L 100 118 L 142 86" fill="none"/>
+  </g>
+</svg>

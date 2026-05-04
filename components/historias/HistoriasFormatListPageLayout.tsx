@@ -81,7 +81,7 @@ export function HistoriasFormatListPageLayout({
 }: HistoriasFormatListPageLayoutProps) {
   return (
     <>
-      <HistoriasInteriorSiteHeader formatTabOverride={activeTab} />
+      <HistoriasInteriorSiteHeader />
       <main
         className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}

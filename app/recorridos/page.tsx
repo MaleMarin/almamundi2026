@@ -4,7 +4,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 
 import Link from 'next/link';
 import { getRecorridos } from '@/lib/recorridos';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 const soft = {
@@ -28,9 +28,11 @@ export default function RecorridosListPage() {
         <div className={historiasInterior.navLinksRowClassName}>
           <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
           <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <HistoriasAccordion variant="header" buttonStyle={{ ...neu.button, color: neu.navLinkIdle }} className="[&_button]:btn-almamundi" />
+          <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
+            Historias
+          </Link>
           <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Recorridos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

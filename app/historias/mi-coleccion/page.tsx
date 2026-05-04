@@ -29,7 +29,7 @@ export default function MiColeccionPage() {
 
   return (
     <>
-      <HistoriasInteriorSiteHeader showMiColeccionPill />
+      <HistoriasInteriorSiteHeader />
       <main
         className={`${historiasInterior.mainClassName} ${historiasInterior.fixedHeaderContentPadClassName}`}
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}

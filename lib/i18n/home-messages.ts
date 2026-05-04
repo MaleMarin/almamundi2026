@@ -4,6 +4,11 @@ export type HomeMessages = {
   navPurpose: string;
   navHow: string;
   navStories: string;
+  /** Enlaces planos a formatos de historias (cabecera home). */
+  navHistoriasVideos: string;
+  navHistoriasAudios: string;
+  navHistoriasEscrito: string;
+  navHistoriasFotos: string;
   navMap: string;
   ariaOpenMenu: string;
   ariaCloseMenu: string;
@@ -44,6 +49,10 @@ const es: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: '¿Cómo funciona?',
   navStories: 'Historias',
+  navHistoriasVideos: 'Videos',
+  navHistoriasAudios: 'Audios',
+  navHistoriasEscrito: 'Escritos',
+  navHistoriasFotos: 'Fotografías',
   navMap: 'Mapa',
   ariaOpenMenu: 'Abrir menú',
   ariaCloseMenu: 'Cerrar menú',
@@ -86,6 +95,10 @@ const pt: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: 'Como funciona?',
   navStories: 'Histórias',
+  navHistoriasVideos: 'Vídeos',
+  navHistoriasAudios: 'Áudios',
+  navHistoriasEscrito: 'Escritos',
+  navHistoriasFotos: 'Fotografias',
   navMap: 'Mapa',
   ariaOpenMenu: 'Abrir menu',
   ariaCloseMenu: 'Fechar menu',
@@ -128,6 +141,10 @@ const en: HomeMessages = {
   navPurpose: 'Purpose',
   navHow: 'How it works',
   navStories: 'Stories',
+  navHistoriasVideos: 'Videos',
+  navHistoriasAudios: 'Audio',
+  navHistoriasEscrito: 'Written',
+  navHistoriasFotos: 'Photos',
   navMap: 'Map',
   ariaOpenMenu: 'Open menu',
   ariaCloseMenu: 'Close menu',

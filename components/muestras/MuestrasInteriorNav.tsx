@@ -2,7 +2,8 @@
 
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-import { HistoriasAccordion } from '@/components/layout/HistoriasAccordion';
+import Link from 'next/link';
+import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 /**
@@ -42,11 +43,9 @@ export function MuestrasInteriorNav() {
         >
           ¿Cómo funciona?
         </ActiveInternalNavLink>
-        <HistoriasAccordion
-          variant="header"
-          buttonStyle={{ ...neu.button, color: neu.navLinkIdle }}
-          className="[&_button]:btn-almamundi"
-        />
+        <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
+          Historias
+        </Link>
         <ActiveInternalNavLink
           href="/muestras"
           className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[0.9375rem]"
@@ -55,7 +54,7 @@ export function MuestrasInteriorNav() {
           Muestras
         </ActiveInternalNavLink>
         <ActiveInternalNavLink
-          href="/#mapa"
+          href="/mapa"
           className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[0.9375rem]"
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >

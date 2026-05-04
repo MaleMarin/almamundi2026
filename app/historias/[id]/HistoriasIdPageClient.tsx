@@ -14,8 +14,6 @@ import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { showPublicDemoStories, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import type { HistoriasFormatListActiveTab } from '@/components/historias/HistoriasFormatListPageLayout';
-
 type SimilarStory = {
   id: string;
   title: string;
@@ -91,7 +89,7 @@ export default function HistoriasIdPageClient() {
   if (loading) {
     return (
       <>
-        <HistoriasInteriorSiteHeader formatTabOverride={null} />
+        <HistoriasInteriorSiteHeader />
         <main
           className={`${historiasInterior.mainClassName} ${pad} items-center justify-center`}
           style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
@@ -104,7 +102,7 @@ export default function HistoriasIdPageClient() {
   if (!story) {
     return (
       <>
-        <HistoriasInteriorSiteHeader formatTabOverride={null} />
+        <HistoriasInteriorSiteHeader />
         <main
           className={`${historiasInterior.mainClassName} ${pad} flex flex-col items-center justify-center gap-4 px-6`}
           style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
@@ -124,20 +122,9 @@ export default function HistoriasIdPageClient() {
   const hasBody = Boolean((story.body ?? '').trim());
   const hasImage = Boolean(story.imageUrl || (story as StoryPoint & { images?: string[] }).images?.length);
 
-  /** Misma barra que `HistoriasFormatListPageLayout` (/historias/videos, …); pestaña según medio principal. */
-  const formatNavActiveTab: HistoriasFormatListActiveTab = hasVideo
-    ? 'videos'
-    : hasAudio
-      ? 'audios'
-      : hasBody
-        ? 'escrito'
-        : hasImage
-          ? 'fotos'
-          : 'videos';
-
   return (
     <>
-      <HistoriasInteriorSiteHeader formatTabOverride={formatNavActiveTab} />
+      <HistoriasInteriorSiteHeader />
       <main className={`${historiasInterior.mainClassName} ${pad}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
         <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">

@@ -6,8 +6,6 @@ import { SITE_FONT_STACK } from '@/lib/typography';
  * Footer unificado AlmaMundi (E0E5EC, sans moderna).
  * Se monta una sola vez en `app/layout.tsx` para todas las rutas.
  */
-import { HistoriasAccordion } from './HistoriasAccordion';
-
 /** Paridad con `PillNavButton` compact del header: `MAP_HOME_NEU_BUTTON_CLASS_COMPACT` (text-xs, semibold, gray-600). */
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-none tracking-normal transition-colors';
@@ -63,9 +61,15 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           >
             ¿Cómo funciona?
           </ActiveInternalNavLink>
-          <HistoriasAccordion variant="footer" />
           <ActiveInternalNavLink
-            href="/#mapa"
+            href="/historias"
+            className={FOOTER_LINK}
+            activeClassName="!text-gray-900 font-semibold"
+          >
+            Historias
+          </ActiveInternalNavLink>
+          <ActiveInternalNavLink
+            href="/mapa"
             className={FOOTER_LINK}
             activeClassName="!text-gray-900 font-semibold"
           >
@@ -76,7 +80,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             className={FOOTER_LINK}
             activeClassName="!text-gray-900 font-semibold"
           >
-            Política de privacidad
+            Aviso de privacidad
           </ActiveInternalNavLink>
           <ActiveInternalNavLink
             href="/mis-datos-personales"
@@ -98,6 +102,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             target="_blank"
             rel="noopener noreferrer"
             type="application/pdf"
+            title="Guía de conducta AlmaMundi (PDF): respeto, cuidado y uso responsable del sitio"
           >
             Guía de conducta
           </a>

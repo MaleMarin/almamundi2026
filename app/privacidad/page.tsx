@@ -11,7 +11,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 export const metadata: Metadata = {
   title: 'Aviso de Privacidad · AlmaMundi',
   description:
-    'Qué datos podemos recopilar en AlmaMundi, para qué los usamos, cómo los cuidamos y qué derechos podés ejercer.',
+    'Qué datos podemos recopilar en AlmaMundi, para qué los usamos, cómo los cuidamos y qué derechos puedes ejercer.',
 };
 
 const BG = '#e8ecf0';
@@ -126,10 +126,17 @@ export default function PrivacidadPage() {
             Este Aviso de Privacidad explica qué datos podemos recopilar, para qué los usamos, cómo los cuidamos, con
             quiénes podríamos compartirlos y qué derechos puedes ejercer sobre tu información.
           </p>
-          <p style={pLast}>
-            AlmaMundi no busca recopilar datos sensibles para identificar la autoría de una historia. Usamos solo la
+          <p style={p}>
+            AlmaMundi no busca recopilar datos sensibles para identificar a quien narra una historia. Usamos solo la
             información necesaria para revisar los envíos, comunicarnos contigo cuando sea necesario, proteger a quienes
             participan y mantener la seguridad de la plataforma.
+          </p>
+          <p style={pLast}>
+            Para las condiciones generales de uso del sitio, consulta la página de{' '}
+            <Link href="/terminos" style={{ color: LINK, fontWeight: 600 }}>
+              Términos de uso
+            </Link>
+            .
           </p>
         </Section>
 
@@ -156,8 +163,8 @@ export default function PrivacidadPage() {
         <Section id="s2" title="2. ¿Quiénes pueden operar o apoyar el tratamiento de tus datos?">
           <p style={p}>
             Para que AlmaMundi funcione, podemos usar servicios tecnológicos externos que nos ayudan a alojar el sitio,
-            guardar información, procesar archivos, enviar comunicaciones, medir funcionamiento técnico o proteger la
-            seguridad de la plataforma.
+            guardar información, gestionar los materiales que subes (fotos, audio, texto o video), enviar comunicaciones,
+            medir funcionamiento técnico o proteger la seguridad de la plataforma.
           </p>
           <p style={p}>
             Estos proveedores actúan solo para prestar servicios necesarios para AlmaMundi. No deberían usar tus datos
@@ -167,7 +174,7 @@ export default function PrivacidadPage() {
           <ul style={{ ...ul, marginBottom: '1rem' }}>
             <li style={{ marginBottom: '0.5rem' }}>alojamiento web,</li>
             <li style={{ marginBottom: '0.5rem' }}>bases de datos,</li>
-            <li style={{ marginBottom: '0.5rem' }}>almacenamiento de archivos,</li>
+            <li style={{ marginBottom: '0.5rem' }}>almacenamiento de contenidos y medios,</li>
             <li style={{ marginBottom: '0.5rem' }}>correo electrónico,</li>
             <li style={{ marginBottom: '0.5rem' }}>herramientas de seguridad,</li>
             <li style={{ marginBottom: '0.5rem' }}>analítica técnica,</li>
@@ -264,14 +271,14 @@ export default function PrivacidadPage() {
         <Section id="s8" title="8. Información proveniente de otras fuentes">
           <p style={p}>
             En algunos casos, AlmaMundi puede recibir información desde instituciones aliadas, proyectos educativos,
-            actividades culturales, archivos, comunidades o equipos de trabajo que colaboren con la plataforma.
+            actividades culturales, memorias comunitarias, comunidades o equipos de trabajo que colaboren con la plataforma.
           </p>
           <p style={p}>
             Cuando eso ocurra, procuraremos que exista autorización suficiente para usar el material, especialmente si
             contiene relatos, imágenes, voces, nombres, datos de contacto o información de terceros.
           </p>
           <p style={pLast}>
-            Si detectamos dudas sobre autoría, consentimiento, origen del material o posible afectación a una persona,
+            Si detectamos dudas sobre quién narra, consentimiento, origen del material o posible afectación a una persona,
             podremos suspender, retirar o no publicar el contenido.
           </p>
         </Section>
@@ -281,14 +288,14 @@ export default function PrivacidadPage() {
           <ul style={{ ...ul, marginBottom: '1rem' }}>
             <li style={{ marginBottom: '0.5rem' }}>recibir y revisar historias;</li>
             <li style={{ marginBottom: '0.5rem' }}>contactar a quien envía un relato;</li>
-            <li style={{ marginBottom: '0.5rem' }}>verificar autoría o consentimiento cuando sea necesario;</li>
+            <li style={{ marginBottom: '0.5rem' }}>verificar quién narra o el consentimiento cuando sea necesario;</li>
             <li style={{ marginBottom: '0.5rem' }}>publicar contenidos aprobados;</li>
             <li style={{ marginBottom: '0.5rem' }}>proteger la privacidad de las personas mencionadas;</li>
             <li style={{ marginBottom: '0.5rem' }}>evitar usos abusivos o dañinos de la plataforma;</li>
             <li style={{ marginBottom: '0.5rem' }}>responder solicitudes sobre datos personales;</li>
             <li style={{ marginBottom: '0.5rem' }}>mantener la seguridad técnica del sitio;</li>
             <li style={{ marginBottom: '0.5rem' }}>mejorar la experiencia de navegación;</li>
-            <li style={{ marginBottom: '0.5rem' }}>organizar archivos, recorridos, muestras o colecciones;</li>
+            <li style={{ marginBottom: '0.5rem' }}>organizar relatos, recorridos, muestras o colecciones;</li>
             <li style={{ marginBottom: '0.5rem' }}>cumplir obligaciones aplicables y atender solicitudes legítimas.</li>
           </ul>
           <p style={pLast}>No vendemos tus datos personales.</p>
@@ -345,7 +352,7 @@ export default function PrivacidadPage() {
             <li style={{ marginBottom: '0.5rem' }}>almacenamiento en servicios protegidos;</li>
             <li style={{ marginBottom: '0.5rem' }}>limitación de datos visibles públicamente;</li>
             <li style={{ marginBottom: '0.5rem' }}>separación entre historias pendientes y publicadas;</li>
-            <li style={{ marginBottom: '0.5rem' }}>posibilidad de retirar o archivar contenidos;</li>
+            <li style={{ marginBottom: '0.5rem' }}>posibilidad de retirar o reservar contenidos que ya no deban verse en público;</li>
             <li style={{ marginBottom: '0.5rem' }}>revisión de contenidos que puedan afectar derechos de terceros;</li>
             <li style={{ marginBottom: '0.5rem' }}>uso de proveedores tecnológicos confiables;</li>
             <li style={{ marginBottom: 0 }}>registros internos de acciones críticas cuando corresponda.</li>
