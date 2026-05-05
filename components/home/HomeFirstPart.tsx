@@ -1,13 +1,16 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Menu, X } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
-import { historiasListHrefFromBasePath, SITE_NAV_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
+import {
+  SITE_NAV_LINK_CLASS,
+  SITE_NAV_STORIES_ITEM_CLASS,
+} from '@/components/layout/siteNavLinkStyles';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
@@ -243,13 +246,15 @@ export function HomeFirstPart({
   onRecordAudio,
   onWriteStory,
   onMediaEducation: _onMediaEducation,
-  basePath = ''
+  basePath: _basePath = ''
 }: HomeFirstPartProps) {
   const router = useRouter();
   const { t } = useHomeLocale();
-  const historiasHref = historiasListHrefFromBasePath(basePath);
 
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const [desktopStoriesOpen, setDesktopStoriesOpen] = useState(false);
+  const [mobileStoriesOpen, setMobileStoriesOpen] = useState(false);
+  const storiesDesktopRef = useRef<HTMLDivElement | null>(null);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
 
   useEffect(() => {
@@ -260,6 +265,17 @@ export function HomeFirstPart({
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
   }, [mobileNavOpen, closeMobileNav]);
+
+  useEffect(() => {
+    if (!desktopStoriesOpen) return;
+    const onPointerDown = (e: MouseEvent) => {
+      if (!storiesDesktopRef.current?.contains(e.target as Node)) {
+        setDesktopStoriesOpen(false);
+      }
+    };
+    window.addEventListener('mousedown', onPointerDown);
+    return () => window.removeEventListener('mousedown', onPointerDown);
+  }, [desktopStoriesOpen]);
 
   return (
     <>
@@ -284,19 +300,43 @@ export function HomeFirstPart({
           >
             {mobileNavOpen ? <X size={20} strokeWidth={2} aria-hidden /> : <Menu size={20} strokeWidth={2} aria-hidden />}
           </button>
-          <nav
-            className="hidden flex-nowrap items-center gap-x-2 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2.5 lg:gap-x-3"
-            aria-label={t.ariaMainNav}
-          >
+          <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
             <button type="button" onClick={onShowPurpose} className={SITE_NAV_LINK_CLASS}>
               {t.navPurpose}
             </button>
             <button type="button" onClick={onShowComoFunciona} className={SITE_NAV_LINK_CLASS}>
               {t.navHow}
             </button>
-            <Link href={historiasHref} className={SITE_NAV_LINK_CLASS}>
-              {t.navStories}
-            </Link>
+            <div className="relative" ref={storiesDesktopRef}>
+              <button
+                type="button"
+                onClick={() => setDesktopStoriesOpen((o) => !o)}
+                className={SITE_NAV_LINK_CLASS}
+                aria-expanded={desktopStoriesOpen}
+                aria-controls="home-historias-desktop-list"
+              >
+                {t.navStories}
+              </button>
+              {desktopStoriesOpen ? (
+                <div id="home-historias-desktop-list" className="absolute left-0 top-[calc(100%+0.35rem)] z-[110] min-w-[8rem]">
+                  <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                    Mi colección
+                  </Link>
+                  <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                    Videos
+                  </Link>
+                  <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                    Audios
+                  </Link>
+                  <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                    Escritos
+                  </Link>
+                  <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                    Fotografías
+                  </Link>
+                </div>
+              ) : null}
+            </div>
             <Link href="/mapa" className={SITE_NAV_LINK_CLASS}>
               {t.navMap}
             </Link>
@@ -339,13 +379,34 @@ export function HomeFirstPart({
               >
                 {t.navHow}
               </button>
-              <Link
-                href={historiasHref}
+              <button
+                type="button"
                 className={`${SITE_NAV_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
-                onClick={closeMobileNav}
+                aria-expanded={mobileStoriesOpen}
+                aria-controls="home-historias-mobile-list"
+                onClick={() => setMobileStoriesOpen((o) => !o)}
               >
                 {t.navStories}
-              </Link>
+              </button>
+              {mobileStoriesOpen ? (
+                <div id="home-historias-mobile-list" className="pl-2">
+                  <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                    Mi colección
+                  </Link>
+                  <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                    Videos
+                  </Link>
+                  <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                    Audios
+                  </Link>
+                  <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                    Escritos
+                  </Link>
+                  <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                    Fotografías
+                  </Link>
+                </div>
+              ) : null}
               <Link
                 href="/mapa"
                 className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
