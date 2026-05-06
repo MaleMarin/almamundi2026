@@ -434,10 +434,10 @@ export function HomeFirstPart({
           <img
             src="/tati.png"
             alt=""
-            className="h-full w-full scale-105 object-cover object-[center_28%] opacity-[0.24] blur-[1.2px] sm:opacity-[0.28] md:opacity-[0.3]"
+            className="h-full w-full scale-110 object-cover object-[center_44%] opacity-[0.46] sm:opacity-[0.5] md:opacity-[0.54]"
             loading="eager"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#E0E5EC]/72 via-[#E0E5EC]/68 to-[#E0E5EC]/88" />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#E0E5EC]/46 via-[#E0E5EC]/42 to-[#E0E5EC]/62" />
         </div>
         <div className="relative z-[1] mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
