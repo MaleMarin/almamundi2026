@@ -5,6 +5,7 @@ import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-s
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
@@ -446,15 +447,17 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
               type="button"
               onClick={onClose}
               style={{
+                ...neu.button,
                 fontFamily: SITE_FONT_STACK,
-                fontWeight: 400,
-                fontSize: '0.875rem',
-                padding: '0.6rem 1.2rem',
-                border: `1px solid ${SEPIA}`,
-                background: 'transparent',
-                color: SEPIA_DK,
+                fontWeight: 600,
+                fontSize: '0.74rem',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                padding: '0.85rem 1.35rem',
+                color: neu.textMain,
                 cursor: 'pointer',
-                borderRadius: 4,
+                borderRadius: 999,
+                boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.82)`,
               }}
             >
               ← Volver a las historias
@@ -474,14 +477,17 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
             }}
             style={{
               fontFamily: SITE_FONT_STACK,
-              fontWeight: 400,
-              fontSize: '0.875rem',
-              padding: '0.6rem 1.2rem',
-              border: `1px solid ${TINTA_SOFT}`,
-              background: 'transparent',
-              color: TINTA_SOFT,
+              fontWeight: 700,
+              fontSize: '0.74rem',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              padding: '0.85rem 1.35rem',
+              borderRadius: 999,
+              border: `1px solid rgba(255,69,0,0.32)`,
+              color: '#fff',
               cursor: 'pointer',
-              borderRadius: 4,
+              background: `linear-gradient(165deg, #ff7138 0%, ${neu.orange} 100%)`,
+              boxShadow: '0 18px 40px rgba(255,69,0,0.18), inset 0 -1px 0 rgba(0,0,0,0.06)',
             }}
           >
             Compartir esta historia

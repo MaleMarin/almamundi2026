@@ -1,5 +1,6 @@
 'use client';
 
+import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -112,6 +113,18 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
     setTitleVisible(true);
   }, []);
 
+  /** Fondo oscuro durante la escucha; al final, misma base neumórfica que el cierre compartido. */
+  useEffect(() => {
+    const prevO = document.body.style.overflow;
+    const prevB = document.body.style.backgroundColor;
+    document.body.style.overflow = 'hidden';
+    document.body.style.backgroundColor = ended ? '#E0E5EC' : FILM;
+    return () => {
+      document.body.style.overflow = prevO;
+      document.body.style.backgroundColor = prevB;
+    };
+  }, [ended]);
+
   useLayoutEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
@@ -205,11 +218,6 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
         }
         .ap-halo-pulse { animation: haloPulse 2s ease-in-out infinite; }
         .ap-wave-bar { transform-origin: center bottom; }
-        @keyframes endReveal {
-          from { opacity: 0; transform: scale(0.96); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .ap-end-reveal { animation: endReveal 0.8s cubic-bezier(0.22,1,0.36,1) forwards; }
         @keyframes phraseFadeIn {
           from { opacity: 0; transform: translateY(8px); }
           to { opacity: 1; transform: translateY(0); }
@@ -565,92 +573,21 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           </div>
         </div>
       ) : (
-        <div
-          style={{
-            position: 'fixed',
-            inset: 0,
-            background: FILM,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            overflow: 'hidden',
-            zIndex: 9999,
+        <StoryEndScreen
+          titulo={historia.titulo}
+          subtitulo={historia.subtitulo}
+          fecha={historia.fecha}
+          citaDestacada={historia.citaDestacada}
+          autor={historia.autor}
+          tags={historia.tags}
+          thumbnailUrl={historia.thumbnailUrl}
+          demoStory={historia.demoStory}
+          replayLabel="Escuchar de nuevo"
+          onReplay={restart}
+          onMoreStories={() => {
+            void onClose?.();
           }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              inset: '-5%',
-              backgroundImage: `url(${historia.thumbnailUrl})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              filter: 'blur(60px) brightness(0.1) saturate(0.3)',
-              transform: 'scale(1.1)',
-            }}
-          />
-          <div
-            className="ap-end-reveal"
-            style={{
-              position: 'relative',
-              zIndex: 2,
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              maxWidth: '520px',
-              width: '90%',
-              padding: '3.5rem 3rem',
-              background: 'rgba(245,240,232,0.04)',
-              border: '1px solid rgba(255,69,0,0.15)',
-              borderRadius: '4px',
-              backdropFilter: 'blur(20px)',
-              textAlign: 'center',
-            }}
-          >
-            {historia.demoStory ? (
-              <div style={{ width: '100%', marginBottom: '1.25rem' }}>
-                <DemoStoryDisclosure story={historia.demoStory} variant="page" />
-              </div>
-            ) : null}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
-              <span style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.85rem', color: SEPIA, letterSpacing: '0.3em' }}>Fin</span>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
-            </div>
-            <h2 style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontStyle: 'italic', fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)', color: CREAM, letterSpacing: '0.05em', lineHeight: 1.2, marginBottom: '1.8rem' }}>
-              {historia.titulo}
-            </h2>
-            {historia.citaDestacada && (
-              <blockquote style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontWeight: 400, fontSize: '1.05rem', color: 'rgba(245,240,232,0.55)', lineHeight: 1.7, borderLeft: '2px solid rgba(255,69,0,0.3)', paddingLeft: '1.2rem', marginBottom: '2.5rem', textAlign: 'left' }}>
-                &quot;{historia.citaDestacada}&quot;
-              </blockquote>
-            )}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem', padding: '1.2rem 1.5rem', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,69,0,0.1)', borderRadius: '3px', width: '100%', marginBottom: '2.5rem' }}>
-              <img src={historia.autor.avatar} alt={historia.autor.nombre} style={{ width: '54px', height: '54px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,69,0,0.35)', flexShrink: 0 }} className="ap-halo-pulse" />
-              <div style={{ textAlign: 'left' }}>
-                <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.95rem', color: CREAM, letterSpacing: '0.05em', marginBottom: '0.2rem' }}>{historia.autor.nombre}</p>
-                {historia.autor.ubicacion && (
-                  <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.75rem', color: SEPIA, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{historia.autor.ubicacion}</p>
-                )}
-              </div>
-            </div>
-            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-              <button
-                type="button"
-                onClick={restart}
-                style={{ flex: 1, padding: '0.85rem', background: 'transparent', border: '1px solid rgba(255,69,0,0.3)', borderRadius: '3px', color: SEPIA, fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                Escuchar de nuevo
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{ flex: 1, padding: '0.85rem', background: `linear-gradient(135deg, ${SEPIA_DK}, ${SEPIA})`, border: 'none', borderRadius: '3px', color: FILM, fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.78rem', letterSpacing: '0.25em', textTransform: 'uppercase', cursor: 'pointer' }}
-              >
-                Más historias
-              </button>
-            </div>
-          </div>
-        </div>
+        />
       )}
     </>
   );

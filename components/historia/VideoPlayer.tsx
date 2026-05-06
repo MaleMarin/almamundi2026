@@ -1,6 +1,7 @@
 'use client'
 
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure'
+import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
@@ -116,17 +117,18 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
     return () => window.removeEventListener('keydown', fn)
   }, [onClose])
 
-  /** Igual que antes (fondo oscuro + sin scroll), sin `<style>` global en `*`/`body` que ensucia el masthead del sitio. */
+  /** Fondo coherentes con cada fase: cine durante reproducción / intertítulo; neumorfismo en pantalla final. */
   useEffect(() => {
     const prevOverflow = document.body.style.overflow
     const prevBg = document.body.style.backgroundColor
     document.body.style.overflow = 'hidden'
-    document.body.style.backgroundColor = 'var(--film, #111009)'
+    document.body.style.backgroundColor =
+      stage === 'ended' ? '#E0E5EC' : 'var(--film, #111009)'
     return () => {
       document.body.style.overflow = prevOverflow
       document.body.style.backgroundColor = prevBg
     }
-  }, [])
+  }, [stage])
 
   // ── Intertitle sequence ────────────────────────────────────────────────────
   useEffect(() => {
@@ -213,7 +215,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
 
   return (
     <>
-      {historia.demoStory ? (
+      {historia.demoStory && stage !== 'ended' ? (
         <div
           className="pointer-events-none"
           style={{
@@ -271,13 +273,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
           to   { opacity: 1; transform: translateY(0); }
         }
         .controls-enter { animation: fadeUp 0.3s ease forwards; }
-
-        /* ── End card ── */
-        @keyframes endReveal {
-          from { opacity: 0; transform: scale(0.96); }
-          to   { opacity: 1; transform: scale(1); }
-        }
-        .end-reveal { animation: endReveal 0.8s cubic-bezier(0.22,1,0.36,1) forwards; }
 
         /* ── Seekbar ── */
         input[type='range'] {
@@ -724,237 +719,32 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
         </div>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════════ */}
-      {/*  STAGE 3 — END SCREEN                                                 */}
-      {/* ══════════════════════════════════════════════════════════════════════ */}
-      {stage === 'ended' && (
-        <div
-          style={{
-            position: 'fixed', inset: 0,
-            background: 'var(--film)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            overflow: 'hidden',
+      {stage === 'ended' ? (
+        <StoryEndScreen
+          titulo={historia.titulo}
+          fecha={historia.fecha}
+          citaDestacada={historia.citaDestacada}
+          autor={historia.autor}
+          tags={historia.tags}
+          thumbnailUrl={historia.thumbnailUrl}
+          demoStory={historia.demoStory}
+          replayLabel="Ver de nuevo"
+          onReplay={() => {
+            setIntertitlePhase('in')
+            setIrisOpen(false)
+            setCurrentTime(0)
+            if (videoRef.current) videoRef.current.currentTime = 0
+            if (skipIntertitle) {
+              setStage('playing')
+            } else {
+              setStage('intertitle')
+            }
           }}
-          className="grain"
-        >
-          {/* Blurred thumbnail bg */}
-          <div style={{
-            position: 'absolute', inset: '-5%',
-            backgroundImage: `url(${historia.thumbnailUrl})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            filter: 'blur(60px) brightness(0.1) saturate(0.3)',
-            transform: 'scale(1.1)',
-          }} />
-
-          {/* Card */}
-          <div
-            className="end-reveal"
-            style={{
-              position: 'relative', zIndex: 2,
-              display: 'flex', flexDirection: 'column', alignItems: 'center',
-              maxWidth: '520px', width: '90%',
-              padding: '3.5rem 3rem',
-              background: 'rgba(245,240,232,0.04)',
-              border: '1px solid rgba(255,69,0,0.15)',
-              borderRadius: '4px',
-              backdropFilter: 'blur(20px)',
-              textAlign: 'center',
-            }}
-          >
-            {/* Fin ornament */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '2.5rem' }}>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
-              <span style={{
-                fontFamily: SITE_FONT_STACK,
-                fontStyle: 'italic',
-                fontSize: '0.85rem',
-                color: 'var(--sepia)',
-                letterSpacing: '0.3em',
-              }}>Fin</span>
-              <div style={{ width: '40px', height: '1px', background: 'rgba(255,69,0,0.4)' }} />
-            </div>
-
-            {/* Title recap */}
-            <h2 style={{
-              fontFamily: SITE_FONT_STACK,
-              fontWeight: 300,
-              fontStyle: 'italic',
-              fontSize: 'clamp(1.6rem, 3.5vw, 2.6rem)',
-              color: 'var(--cream)',
-              letterSpacing: '0.05em',
-              lineHeight: 1.2,
-              marginBottom: '1.8rem',
-            }}>
-              {historia.titulo}
-            </h2>
-
-            {/* Cita destacada */}
-            {historia.citaDestacada && (
-              <blockquote style={{
-                fontFamily: SITE_FONT_STACK,
-                fontStyle: 'italic',
-                fontWeight: 400,
-                fontSize: '1.05rem',
-                color: 'rgba(245,240,232,0.55)',
-                lineHeight: 1.7,
-                letterSpacing: '0.03em',
-                borderLeft: '2px solid rgba(255,69,0,0.3)',
-                paddingLeft: '1.2rem',
-                marginBottom: '2.5rem',
-                textAlign: 'left',
-              }}>
-                &quot;{historia.citaDestacada}&quot;
-              </blockquote>
-            )}
-
-            {/* Author card */}
-            <div style={{
-              display: 'flex', alignItems: 'center', gap: '1.2rem',
-              padding: '1.2rem 1.5rem',
-              background: 'rgba(255,255,255,0.03)',
-              border: '1px solid rgba(255,69,0,0.1)',
-              borderRadius: '3px',
-              width: '100%',
-              marginBottom: '2.5rem',
-            }}>
-              <img
-                src={historia.autor.avatar}
-                alt={historia.autor.nombre}
-                className="avatar-pulse"
-                style={{
-                  width: '54px', height: '54px',
-                  borderRadius: '50%',
-                  objectFit: 'cover',
-                  border: '2px solid rgba(255,69,0,0.35)',
-                  flexShrink: 0,
-                }}
-              />
-              <div style={{ textAlign: 'left' }}>
-                <p style={{
-                  fontFamily: SITE_FONT_STACK,
-                  fontWeight: 400,
-                  fontSize: '0.95rem',
-                  color: 'var(--cream)',
-                  letterSpacing: '0.05em',
-                  marginBottom: '0.2rem',
-                }}>
-                  {historia.autor.nombre}
-                </p>
-                {historia.autor.ubicacion && (
-                  <p style={{
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 300,
-                    fontSize: '0.75rem',
-                    color: 'var(--sepia)',
-                    letterSpacing: '0.15em',
-                    textTransform: 'uppercase',
-                  }}>
-                    {historia.autor.ubicacion}
-                  </p>
-                )}
-                {historia.autor.bio && (
-                  <p style={{
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 300,
-                    fontSize: '0.8rem',
-                    color: 'rgba(245,240,232,0.4)',
-                    marginTop: '0.4rem',
-                    lineHeight: 1.5,
-                  }}>
-                    {historia.autor.bio}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Tags */}
-            {historia.tags && historia.tags.length > 0 && (
-              <div style={{
-                display: 'flex', flexWrap: 'wrap', gap: '0.5rem',
-                justifyContent: 'center',
-                marginBottom: '2.5rem',
-              }}>
-                {historia.tags.map(tag => (
-                  <span key={tag} style={{
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 300,
-                    fontSize: '0.68rem',
-                    letterSpacing: '0.22em',
-                    textTransform: 'uppercase',
-                    color: 'rgba(255,69,0,0.6)',
-                    border: '1px solid rgba(255,69,0,0.2)',
-                    padding: '0.25rem 0.8rem',
-                    borderRadius: '2px',
-                  }}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Actions */}
-            <div style={{ display: 'flex', gap: '1rem', width: '100%' }}>
-              <button
-                type="button"
-                onClick={() => {
-                  setIntertitlePhase('in')
-                  setIrisOpen(false)
-                  setCurrentTime(0)
-                  if (videoRef.current) videoRef.current.currentTime = 0
-                  if (skipIntertitle) {
-                    setStage('playing')
-                  } else {
-                    setStage('intertitle')
-                  }
-                }}
-                style={{
-                  flex: 1,
-                  padding: '0.85rem',
-                  background: 'transparent',
-                  border: '1px solid rgba(255,69,0,0.3)',
-                  borderRadius: '3px',
-                  color: 'var(--sepia)',
-                  fontFamily: SITE_FONT_STACK,
-                  fontWeight: 300,
-                  fontSize: '0.78rem',
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'background 0.2s, border-color 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.background = 'rgba(255,69,0,0.08)')}
-                onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-              >
-                Ver de nuevo
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                style={{
-                  flex: 1,
-                  padding: '0.85rem',
-                  background: 'linear-gradient(135deg, var(--sepia-dk), var(--sepia))',
-                  border: 'none',
-                  borderRadius: '3px',
-                  color: 'var(--film)',
-                  fontFamily: SITE_FONT_STACK,
-                  fontWeight: 500,
-                  fontSize: '0.78rem',
-                  letterSpacing: '0.25em',
-                  textTransform: 'uppercase',
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s',
-                }}
-                onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
-                onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
-              >
-                Más historias
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+          onMoreStories={() => {
+            void onClose?.()
+          }}
+        />
+      ) : null}
     </>
   )
 }

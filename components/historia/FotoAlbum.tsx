@@ -1,6 +1,7 @@
 'use client';
 
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { neu } from '@/lib/historias-neumorph';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -328,107 +329,161 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
             </section>
           ))}
 
-          {/* Cierre del álbum */}
+          {/* Cierre del álbum — mismo criterio neumórfico claro que audio/vídeo al terminar */}
           <section
             style={{
-              minHeight: '60vh',
+              minHeight: '58vh',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               textAlign: 'center',
-              padding: '3rem 1.5rem',
+              padding: 'clamp(2rem, 5vw, 3.25rem) 1.25rem',
+              background: `linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)`,
+              fontFamily: SITE_FONT_STACK,
             }}
           >
-            <div style={{ width: 40, height: 1, background: SEPIA, marginBottom: '2rem' }} />
-            <img
-              src={historia.autor.avatar}
-              alt={`Retrato de ${historia.autor.nombre}`}
+            <div
               style={{
-                width: 72,
-                height: 72,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: `1.5px solid ${SEPIA}`,
-                boxShadow: `0 0 24px ${SEPIA}40`,
-                marginBottom: '1rem',
+                ...neu.cardProminent,
+                width: '100%',
+                maxWidth: 520,
+                padding: '2.25rem clamp(1.25rem, 4vw, 2.5rem)',
+                borderRadius: 28,
+                boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(163,177,198,0.22)`,
               }}
-            />
-            <p style={{ fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '1.4rem', color: CREAM, marginBottom: '0.25rem' }}>
-              {historia.autor.nombre}
-            </p>
-            {historia.autor.ubicacion && (
-              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.7rem', textTransform: 'uppercase', letterSpacing: '0.15em', color: SEPIA, marginBottom: '0.5rem' }}>
-                {historia.autor.ubicacion}
-              </p>
-            )}
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.9rem', color: CREAM_MUTED, marginBottom: '1rem' }}>
-              Fin del álbum · {imagenes.length} fotografías
-            </p>
-            {(historia.tags ?? []).length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: '1.5rem' }}>
-                {historia.tags!.map((tag) => (
-                  <span
-                    key={tag}
-                    style={{
-                      fontFamily: SITE_FONT_STACK,
-                      fontWeight: 200,
-                      fontSize: '0.65rem',
-                      padding: '4px 10px',
-                      border: `1px solid rgba(255,69,0,0.5)`,
-                      borderRadius: 999,
-                      color: SEPIA,
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', justifyContent: 'center' }}>
-              {onClose && (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  style={{
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 400,
-                    fontSize: '0.875rem',
-                    padding: '0.6rem 1.2rem',
-                    border: `1px solid ${SEPIA}`,
-                    background: 'transparent',
-                    color: SEPIA,
-                    cursor: 'pointer',
-                    borderRadius: 4,
-                  }}
-                >
-                  ← Ver más historias
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  const url = typeof window !== 'undefined' ? `${window.location.origin}/historias/${historia.id}/foto` : '';
-                  if (typeof navigator !== 'undefined' && navigator.share) {
-                    navigator.share({ title: historia.titulo, url }).catch(() => navigator.clipboard?.writeText(url));
-                  } else {
-                    navigator.clipboard?.writeText(url);
-                  }
-                }}
+            >
+              <p
                 style={{
-                  fontFamily: SITE_FONT_STACK,
-                  fontWeight: 400,
-                  fontSize: '0.875rem',
-                  padding: '0.6rem 1.2rem',
-                  border: `1px solid rgba(245,240,232,0.4)`,
-                  background: 'transparent',
-                  color: CREAM_SOFT,
-                  cursor: 'pointer',
-                  borderRadius: 4,
+                  fontSize: '0.72rem',
+                  fontWeight: 600,
+                  letterSpacing: '0.2em',
+                  textTransform: 'uppercase',
+                  color: neu.textBody,
+                  marginBottom: '0.85rem',
                 }}
               >
-                Compartir
-              </button>
+                Fin del álbum · {imagenes.length} fotografías
+              </p>
+              <h2
+                style={{
+                  fontStyle: 'italic',
+                  fontWeight: 600,
+                  fontSize: 'clamp(1.35rem, 3.8vw, 1.85rem)',
+                  color: neu.textMain,
+                  marginBottom: '1.25rem',
+                  lineHeight: 1.2,
+                }}
+              >
+                {historia.titulo}
+              </h2>
+              <div style={{ width: 48, height: 2, background: `${SEPIA}45`, margin: '0 auto 1.35rem', borderRadius: 999 }} />
+              <img
+                src={historia.autor.avatar}
+                alt={`Retrato de ${historia.autor.nombre}`}
+                style={{
+                  width: 72,
+                  height: 72,
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: `2px solid ${SEPIA}55`,
+                  marginBottom: '0.85rem',
+                  boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)',
+                }}
+              />
+              <p
+                style={{
+                  fontFamily: SITE_FONT_STACK,
+                  fontWeight: 600,
+                  fontSize: '1.05rem',
+                  color: neu.textMain,
+                  marginBottom: historia.autor.ubicacion ? '0.35rem' : '1.2rem',
+                }}
+              >
+                {historia.autor.nombre}
+              </p>
+              {historia.autor.ubicacion ? (
+                <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: neu.textBody, marginBottom: '1.25rem' }}>
+                  {historia.autor.ubicacion}
+                </p>
+              ) : null}
+              {(historia.tags ?? []).length > 0 ? (
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: '1.5rem' }}>
+                  {historia.tags!.map((tag) => (
+                    <span
+                      key={tag}
+                      style={{
+                        fontFamily: SITE_FONT_STACK,
+                        fontWeight: 600,
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.14em',
+                        textTransform: 'uppercase',
+                        padding: '6px 12px',
+                        border: `1px solid rgba(255,69,0,0.28)`,
+                        borderRadius: 999,
+                        color: SEPIA,
+                        backgroundColor: neu.bg,
+                        boxShadow: 'inset 2px 2px 4px rgba(163,177,198,0.3), inset -2px -2px 4px rgba(255,255,255,0.8)',
+                      }}
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <div style={{ marginBottom: '1.5rem' }} />
+              )}
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center' }}>
+                {onClose ? (
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    style={{
+                      ...neu.button,
+                      fontFamily: SITE_FONT_STACK,
+                      fontWeight: 600,
+                      fontSize: '0.74rem',
+                      letterSpacing: '0.14em',
+                      textTransform: 'uppercase',
+                      padding: '0.85rem 1.35rem',
+                      color: neu.textMain,
+                      cursor: 'pointer',
+                      borderRadius: 999,
+                      boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)`,
+                    }}
+                  >
+                    ← Ver más historias
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    const url =
+                      typeof window !== 'undefined' ? `${window.location.origin}/historias/${historia.id}/foto` : '';
+                    if (typeof navigator !== 'undefined' && navigator.share) {
+                      navigator.share({ title: historia.titulo, url }).catch(() => navigator.clipboard?.writeText(url));
+                    } else {
+                      navigator.clipboard?.writeText(url);
+                    }
+                  }}
+                  style={{
+                    fontFamily: SITE_FONT_STACK,
+                    fontWeight: 700,
+                    fontSize: '0.74rem',
+                    letterSpacing: '0.16em',
+                    textTransform: 'uppercase',
+                    padding: '0.85rem 1.35rem',
+                    borderRadius: 999,
+                    border: `1px solid rgba(255,69,0,0.32)`,
+                    color: '#fff',
+                    cursor: 'pointer',
+                    background: `linear-gradient(165deg, #ff7138 0%, ${neu.orange} 100%)`,
+                    boxShadow: '0 18px 40px rgba(255,69,0,0.2), inset 0 -1px 0 rgba(0,0,0,0.08)',
+                  }}
+                >
+                  Compartir
+                </button>
+              </div>
             </div>
           </section>
         </div>
