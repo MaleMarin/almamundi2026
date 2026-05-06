@@ -425,21 +425,9 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex scroll-mt-32 flex-col items-center overflow-hidden px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:scroll-mt-40 md:px-10 md:pb-6 md:pt-52 lg:scroll-mt-44 lg:pt-60 lg:pb-6"
+        className="home-intro-avenir relative z-[20] flex scroll-mt-32 flex-col items-center px-6 pb-4 pt-44 text-center sm:pt-48 sm:pb-5 md:scroll-mt-40 md:px-10 md:pb-6 md:pt-52 lg:scroll-mt-44 lg:pt-60 lg:pb-6"
       >
-        <div
-          className="pointer-events-none absolute inset-0 z-0 select-none"
-          aria-hidden
-        >
-          <img
-            src="/tati.png"
-            alt=""
-            className="h-full w-full scale-110 object-cover object-[center_44%] opacity-[0.46] sm:opacity-[0.5] md:opacity-[0.54]"
-            loading="eager"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#E0E5EC]/46 via-[#E0E5EC]/42 to-[#E0E5EC]/62" />
-        </div>
-        <div className="relative z-[1] mx-auto w-full max-w-[min(100%,42rem)]">
+        <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
               className="mx-auto mb-4 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-5 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
