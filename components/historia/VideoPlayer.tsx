@@ -116,6 +116,18 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
     return () => window.removeEventListener('keydown', fn)
   }, [onClose])
 
+  /** Igual que antes (fondo oscuro + sin scroll), sin `<style>` global en `*`/`body` que ensucia el masthead del sitio. */
+  useEffect(() => {
+    const prevOverflow = document.body.style.overflow
+    const prevBg = document.body.style.backgroundColor
+    document.body.style.overflow = 'hidden'
+    document.body.style.backgroundColor = 'var(--film, #111009)'
+    return () => {
+      document.body.style.overflow = prevOverflow
+      document.body.style.backgroundColor = prevBg
+    }
+  }, [])
+
   // ── Intertitle sequence ────────────────────────────────────────────────────
   useEffect(() => {
     if (stage !== 'intertitle') return
@@ -230,14 +242,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
           --ink:      #0d0b09;
           --ink-soft: #1a1612;
           --film:     #111009;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-          background: var(--film);
-          font-family: var(--font-sans);
-          overflow: hidden;
         }
 
         /* ── Iris Wipe ── */

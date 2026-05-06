@@ -6,7 +6,7 @@
  *
  * Solo difiere lo imprescindible:
  * - `scope: 'historias-interior'` → Propósito / Cómo funciona = `HomeHardLink` (`/#…`, recarga fuerte).
- * - `overImmersiveMedia` → “Historias” es `<Link href="/historias">` sin submenú; `z-index` alto sobre el vídeo.
+ * - `overImmersiveMedia` → barra opaca como la home + `z-[11000]` sobre reproductores; “Historias” → `/historias`.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
@@ -20,8 +20,21 @@ import {
 } from '@/components/layout/siteNavLinkStyles';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
+/** Misma franja que la home sobre fondo claro `#E0E5EC`. */
 const HOME_HEADER_SHELL =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20 font-sans';
+
+/**
+ * Reproductores en portal (audio z-9999, texto z-1000…): masthead debe quedar por encima
+ * pero por debajo de `DemoStoryDisclosure` (z-12000 en video).
+ */
+const HEADER_Z_LAYER_IMMERSIVE = 'z-[11000]';
+
+/**
+ * Sin transparencia sobre vídeo/imagen: mismo color percibido que en la home, sin «manchar» el fondo.
+ */
+const HOME_HEADER_SHELL_OVER_MEDIA =
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 border-b border-white/35 bg-[#E0E5EC] font-sans shadow-[0_10px_32px_rgba(0,0,0,0.16)]';
 
 const softHeaderButton = {
   backgroundColor: '#E9ECF3',
@@ -55,7 +68,12 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
   const { t } = useHomeLocale();
   const scope = props.scope;
   const overImmersiveMedia = scope === 'historias-interior' ? Boolean(props.overImmersiveMedia) : false;
-  const zLayer = scope === 'historias-interior' && overImmersiveMedia ? 'z-[140]' : 'z-[100]';
+  const zLayer =
+    scope === 'historias-interior' && overImmersiveMedia
+      ? HEADER_Z_LAYER_IMMERSIVE
+      : 'z-[100]';
+  const headerLayoutClass =
+    scope === 'historias-interior' && overImmersiveMedia ? HOME_HEADER_SHELL_OVER_MEDIA : HOME_HEADER_SHELL;
   /** Prefijo de id: mismo patrón que en la home (`home-*`) para `scope === 'home'`. */
   const idPrefix = scope === 'home' ? 'home' : 'historias-site';
   const mobileNavId = `${idPrefix}-header-mobile-nav`;
@@ -228,8 +246,13 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
       </>
     );
 
+  const mobileNavSheetClass =
+    scope === 'historias-interior' && overImmersiveMedia
+      ? 'absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/30 bg-[#E0E5EC] px-4 py-3 shadow-md md:hidden'
+      : 'absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-3 shadow-sm backdrop-blur-lg md:hidden';
+
   return (
-    <header className={`${HOME_HEADER_SHELL} ${zLayer}`}>
+    <header className={`${headerLayoutClass} ${zLayer}`}>
       <div className="flex items-center shrink-0 min-w-0">
         <img
           src="/logo.png"
@@ -270,7 +293,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           />
           <div
             id={mobileNavId}
-            className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-3 shadow-sm backdrop-blur-lg md:hidden"
+            className={mobileNavSheetClass}
             role="navigation"
             aria-label={t.ariaMainNav}
           >
