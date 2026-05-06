@@ -253,12 +253,18 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
 
   return (
     <header className={`${headerLayoutClass} ${zLayer}`}>
-      <div className="flex items-center shrink-0 min-w-0">
-        <img
-          src="/logo.png"
-          alt="AlmaMundi"
-          className="h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md"
-        />
+      <div className="flex shrink-0 min-w-0 items-center">
+        <HomeHardLink
+          href="/"
+          className="inline-flex min-w-0 shrink-0 !text-transparent outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
+          aria-label="AlmaMundi — inicio"
+        >
+          <img
+            src="/logo.png"
+            alt="AlmaMundi"
+            className="h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md"
+          />
+        </HomeHardLink>
       </div>
       <div className="flex items-center justify-end gap-2 shrink-0 md:gap-3">
         <button
