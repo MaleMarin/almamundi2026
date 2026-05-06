@@ -9,16 +9,21 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
-import { SITE_NAV_LINK_ACTIVE, SITE_NAV_LINK_CLASS, SITE_NAV_STORIES_ITEM_CLASS } from '@/components/layout/siteNavLinkStyles';
+import {
+  SITE_NAV_LINK_ACTIVE,
+  SITE_NAV_INTERIOR_LINK_CLASS,
+  SITE_NAV_STORIES_ITEM_CLASS,
+} from '@/components/layout/siteNavLinkStyles';
 import { MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
 
 const HEADER_SHELL =
-  'fixed top-0 left-0 z-[100] flex min-h-[4.75rem] w-full items-center justify-between gap-3 border-b border-white/20 bg-[#E0E5EC]/70 px-3 py-2 backdrop-blur-lg md:min-h-[5.25rem] md:gap-3 md:px-8 md:py-2 lg:min-h-[5.5rem] lg:px-10';
+  'fixed top-0 left-0 z-[100] flex min-h-[4.625rem] w-full items-center justify-between gap-2 border-b border-white/20 bg-[#E0E5EC]/70 px-3 py-1.5 backdrop-blur-lg sm:gap-3 md:min-h-[5rem] md:gap-3 md:px-7 md:py-2 lg:min-h-[5.125rem] lg:px-9 lg:py-2';
 
 const LOGO_IMG_CLASS =
   'h-16 w-auto max-h-[4.5rem] max-w-[min(320px,82vw)] object-contain object-left select-none filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.12)] sm:h-[4.25rem] sm:max-h-[4.75rem] sm:max-w-[min(360px,72vw)] md:h-[4.5rem] md:max-w-[min(400px,46vw)] lg:h-20 lg:max-h-[5.25rem] lg:max-w-[min(440px,36vw)]';
 
-const NAV_WRAP = 'hidden min-w-0 flex-nowrap items-center justify-end gap-x-1.5 md:flex md:gap-x-2';
+const NAV_WRAP =
+  'hidden min-w-0 flex-nowrap items-center justify-end gap-x-1 md:flex md:gap-x-1.5 lg:gap-x-2';
 
 export function HistoriasInteriorSiteHeader() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -51,7 +56,7 @@ export function HistoriasInteriorSiteHeader() {
     <>
       <ActiveInternalNavLink
         href="/#proposito"
-        className={SITE_NAV_LINK_CLASS}
+        className={SITE_NAV_INTERIOR_LINK_CLASS}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
@@ -59,7 +64,7 @@ export function HistoriasInteriorSiteHeader() {
       </ActiveInternalNavLink>
       <ActiveInternalNavLink
         href="/#como-funciona"
-        className={SITE_NAV_LINK_CLASS}
+        className={SITE_NAV_INTERIOR_LINK_CLASS}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
@@ -68,7 +73,7 @@ export function HistoriasInteriorSiteHeader() {
       <div className="relative" ref={storiesDesktopRef}>
         <button
           type="button"
-          className={SITE_NAV_LINK_CLASS}
+          className={SITE_NAV_INTERIOR_LINK_CLASS}
           aria-expanded={desktopStoriesOpen}
           aria-controls="historias-header-desktop-list"
           onClick={() => setDesktopStoriesOpen((o) => !o)}
@@ -76,7 +81,11 @@ export function HistoriasInteriorSiteHeader() {
           Historias
         </button>
         {desktopStoriesOpen ? (
-          <div id="historias-header-desktop-list" className="absolute left-0 top-[calc(100%+0.35rem)] z-[110] min-w-[8rem]">
+          <div
+            id="historias-header-desktop-list"
+            role="menu"
+            className="absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md"
+          >
             <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
               Mi colección
             </Link>
@@ -95,11 +104,7 @@ export function HistoriasInteriorSiteHeader() {
           </div>
         ) : null}
       </div>
-      <Link
-        href="/mapa"
-        className={SITE_NAV_LINK_CLASS}
-        onClick={closeMobileNav}
-      >
+      <Link href="/mapa" className={SITE_NAV_INTERIOR_LINK_CLASS} onClick={closeMobileNav}>
         Mapa
       </Link>
     </>
@@ -117,7 +122,7 @@ export function HistoriasInteriorSiteHeader() {
         </HomeHardLink>
       </div>
 
-      <div className="flex min-w-0 shrink-0 items-center justify-end gap-2 md:gap-2.5">
+      <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5 md:gap-2">
         <button
           type="button"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98] md:hidden"
@@ -153,7 +158,7 @@ export function HistoriasInteriorSiteHeader() {
             <div className="mx-auto flex max-w-md flex-col gap-y-1">
               <ActiveInternalNavLink
                 href="/#proposito"
-                className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
                 activeClassName={SITE_NAV_LINK_ACTIVE}
                 onClick={closeMobileNav}
               >
@@ -161,7 +166,7 @@ export function HistoriasInteriorSiteHeader() {
               </ActiveInternalNavLink>
               <ActiveInternalNavLink
                 href="/#como-funciona"
-                className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
                 activeClassName={SITE_NAV_LINK_ACTIVE}
                 onClick={closeMobileNav}
               >
@@ -169,7 +174,7 @@ export function HistoriasInteriorSiteHeader() {
               </ActiveInternalNavLink>
               <button
                 type="button"
-                className={`${SITE_NAV_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
+                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
                 aria-expanded={mobileStoriesOpen}
                 aria-controls="historias-header-mobile-list"
                 onClick={() => setMobileStoriesOpen((o) => !o)}
@@ -195,7 +200,11 @@ export function HistoriasInteriorSiteHeader() {
                   </Link>
                 </div>
               ) : null}
-              <Link href="/mapa" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
+              <Link
+                href="/mapa"
+                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
+                onClick={closeMobileNav}
+              >
                 Mapa
               </Link>
             </div>

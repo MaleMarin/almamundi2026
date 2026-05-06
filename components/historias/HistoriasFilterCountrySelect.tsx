@@ -78,7 +78,7 @@ export function HistoriasFilterCountrySelect({
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-1.5 rounded-xl border border-gray-300/40 bg-[#E0E5EC] px-2.5 py-1.5 text-left text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.45),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/40"
+        className="flex min-h-[2.75rem] w-full items-center gap-1.5 rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-left text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
         style={{ fontFamily: neu.APP_FONT }}
       >
         <span className="min-w-0 flex-1 truncate">{labelShown}</span>

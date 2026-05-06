@@ -291,7 +291,7 @@ export function HistoricalExhibitionCarousel({
           overflow: visible;
         }
         .historical-expo-swiper .swiper-slide {
-          transition: opacity 0.38s ease, filter 0.38s ease;
+          transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1), filter 0.45s ease;
           overflow: visible;
           transform-style: preserve-3d;
         }
@@ -311,14 +311,16 @@ export function HistoricalExhibitionCarousel({
           transform: scale(0.92);
           background-color: rgba(0, 0, 0, 0.28);
         }
-        /* Sala clara: el coverflow aporta rotateY / translateZ; no reescalar la tarjeta interior. */
+        /* Sala clara: menos contraste lateral; centro protagonista */
         .historical-expo-swiper--light-gallery .swiper-slide:not(.swiper-slide-active) {
-          opacity: 0.88;
-          filter: none;
+          opacity: 0.72;
+          filter: saturate(0.92);
         }
         .historical-expo-swiper--light-gallery .swiper-slide:not(.swiper-slide-active) .hec-card-inner {
           transform: none;
-          background-color: rgba(255, 255, 255, 0.14) !important;
+          background-color: rgba(255, 255, 255, 0.18) !important;
+          border-color: rgba(255, 255, 255, 0.38) !important;
+          box-shadow: 0 18px 48px rgba(15, 23, 42, 0.08) !important;
         }
         .historical-expo-swiper--light-gallery .swiper-slide-active .hec-card-inner {
           transform: none;
@@ -362,13 +364,13 @@ export function HistoricalExhibitionCarousel({
                   onClick={() => swiperRef.current?.slidePrev()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute left-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:left-3 md:left-4'
+                      ? 'pointer-events-auto absolute left-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:left-2.5 md:left-4'
                       : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/45 sm:left-1 md:left-2'
                   }
                   aria-label="Historia anterior"
                 >
                   <ChevronLeft
-                    className={isLightHall ? 'h-7 w-7 shrink-0' : 'h-8 w-8 shrink-0'}
+                    className={isLightHall ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700' : 'h-8 w-8 shrink-0'}
                     strokeWidth={2.75}
                   />
                 </button>
@@ -378,13 +380,13 @@ export function HistoricalExhibitionCarousel({
                   onClick={() => swiperRef.current?.slideNext()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute right-2 top-1/2 z-[60] flex min-h-[48px] min-w-[48px] -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/45 bg-white/90 p-2.5 text-gray-800 shadow-[0_10px_36px_rgba(0,0,0,0.12)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/90 disabled:active:scale-100 sm:right-3 md:right-4'
+                      ? 'pointer-events-auto absolute right-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:right-2.5 md:right-4'
                       : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/50 sm:right-1 md:right-2'
                   }
                   aria-label="Próxima historia"
                 >
                   <ChevronRight
-                    className={isLightHall ? 'h-7 w-7 shrink-0' : 'h-9 w-9 shrink-0'}
+                    className={isLightHall ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700' : 'h-9 w-9 shrink-0'}
                     strokeWidth={2.75}
                   />
                 </button>
@@ -402,7 +404,7 @@ export function HistoricalExhibitionCarousel({
           keyboard={{ enabled: !disableKeyboardNav }}
           coverflowEffect={
             historiasListEmbedded
-              ? { rotate: 28, stretch: 0, depth: 200, modifier: 1, slideShadows: true }
+              ? { rotate: 15, stretch: 6, depth: 120, modifier: 1.05, slideShadows: false }
               : { rotate: 45, stretch: 0, depth: 300, modifier: 1, slideShadows: true }
           }
           onSwiper={(s) => {
@@ -421,8 +423,8 @@ export function HistoricalExhibitionCarousel({
               style={
                 historiasListEmbedded
                   ? {
-                      width: 'min(100%, min(520px, 68dvh, calc(100vh - 260px)))',
-                      height: 'min(100%, min(520px, 68dvh, calc(100vh - 260px)))',
+                      width: 'min(100%, min(500px, 58dvh, calc(100dvh - 220px)))',
+                      height: 'min(100%, min(500px, 56dvh, calc(100dvh - 240px)))',
                     }
                   : {
                       width: `min(92vw, ${SLIDE_PX}px)`,
@@ -440,11 +442,12 @@ export function HistoricalExhibitionCarousel({
                 style={
                   isLightHall
                     ? {
-                        backdropFilter: 'blur(20px) saturate(180%)',
-                        WebkitBackdropFilter: 'blur(20px) saturate(180%)',
-                        border: '1px solid rgba(255, 255, 255, 0.4)',
-                        boxShadow: '0 40px 100px rgba(0,0,0,0.15)',
-                        background: 'rgba(255, 255, 255, 0.22)',
+                        backdropFilter: 'blur(18px) saturate(165%)',
+                        WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+                        border: '1px solid rgba(255, 255, 255, 0.52)',
+                        boxShadow:
+                          '0 28px 64px rgba(15,23,42,0.09), inset 1px 1px 0 rgba(255,255,255,0.85)',
+                        background: 'linear-gradient(165deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.24) 100%)',
                       }
                     : {
                         boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
@@ -464,7 +467,7 @@ export function HistoricalExhibitionCarousel({
                     alt=""
                     className="h-full w-full object-cover"
                   />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/14 to-transparent" />
                   {slideIdx === activeIndex &&
                   openHandler &&
                   canOpenPrimary(h, contentMode) ? (
@@ -516,7 +519,7 @@ export function HistoricalExhibitionCarousel({
                   <h3
                     className={
                       isLightHall
-                        ? 'text-lg font-semibold leading-tight tracking-tight text-gray-900 sm:text-xl'
+                        ? 'text-[1.05rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-xl'
                         : 'text-lg font-semibold leading-tight tracking-tight sm:text-xl'
                     }
                   >
@@ -525,7 +528,7 @@ export function HistoricalExhibitionCarousel({
                   <p
                     className={
                       isLightHall
-                        ? 'line-clamp-3 text-sm leading-relaxed text-gray-700'
+                        ? 'line-clamp-3 text-[0.9rem] leading-relaxed text-gray-700 sm:text-sm'
                         : 'line-clamp-3 text-sm leading-relaxed text-white/90'
                     }
                   >
