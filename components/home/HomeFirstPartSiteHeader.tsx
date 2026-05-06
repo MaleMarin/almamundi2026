@@ -5,17 +5,16 @@
  * `/historias/*`. Mismas clases, logo sin envoltorio de enlace, mismo menú neumático y mismo panel móvil.
  *
  * Solo difiere lo imprescindible:
- * - `scope: 'historias-interior'` → Propósito / Cómo funciona son `ActiveInternalNavLink` hacia `/` + hash.
+ * - `scope: 'historias-interior'` → Propósito / Cómo funciona = `HomeHardLink` (`/#…`, recarga fuerte).
  * - `overImmersiveMedia` → “Historias” es `<Link href="/historias">` sin submenú; `z-index` alto sobre el vídeo.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import {
-  SITE_NAV_LINK_ACTIVE,
   SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
@@ -106,22 +105,12 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
     </>
   ) : (
     <>
-      <ActiveInternalNavLink
-        href="/#proposito"
-        className={SITE_NAV_LINK_CLASS}
-        activeClassName={SITE_NAV_LINK_ACTIVE}
-        onClick={closeMobileNav}
-      >
+      <HomeHardLink href="/#proposito" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
         {t.navPurpose}
-      </ActiveInternalNavLink>
-      <ActiveInternalNavLink
-        href="/#como-funciona"
-        className={SITE_NAV_LINK_CLASS}
-        activeClassName={SITE_NAV_LINK_ACTIVE}
-        onClick={closeMobileNav}
-      >
+      </HomeHardLink>
+      <HomeHardLink href="/#como-funciona" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
         {t.navHow}
-      </ActiveInternalNavLink>
+      </HomeHardLink>
     </>
   );
 
@@ -188,22 +177,12 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
     </>
   ) : (
     <>
-      <ActiveInternalNavLink
-        href="/#proposito"
-        className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
-        activeClassName={SITE_NAV_LINK_ACTIVE}
-        onClick={closeMobileNav}
-      >
+      <HomeHardLink href="/#proposito" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
         {t.navPurpose}
-      </ActiveInternalNavLink>
-      <ActiveInternalNavLink
-        href="/#como-funciona"
-        className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
-        activeClassName={SITE_NAV_LINK_ACTIVE}
-        onClick={closeMobileNav}
-      >
+      </HomeHardLink>
+      <HomeHardLink href="/#como-funciona" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
         {t.navHow}
-      </ActiveInternalNavLink>
+      </HomeHardLink>
     </>
   );
 
