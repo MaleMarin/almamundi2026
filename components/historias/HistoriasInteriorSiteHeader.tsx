@@ -12,6 +12,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import {
   SITE_NAV_LINK_ACTIVE,
   SITE_NAV_INTERIOR_LINK_CLASS,
+  SITE_NAV_OVER_MEDIA_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
 import { MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
@@ -19,13 +20,25 @@ import { MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
 const HEADER_SHELL =
   'fixed top-0 left-0 z-[100] flex min-h-[4.625rem] w-full items-center justify-between gap-2 border-b border-white/20 bg-[#E0E5EC]/70 px-3 py-1.5 backdrop-blur-lg sm:gap-3 md:min-h-[5rem] md:gap-3 md:px-7 md:py-2 lg:min-h-[5.125rem] lg:px-9 lg:py-2';
 
+/** Franja tipo glass/neu más cerrada cuando el header flota sobre reproductores en portal (video/audio/texto/foto). */
+const HEADER_SHELL_OVER_IMMERSIVE =
+  'fixed top-0 left-0 z-[140] flex min-h-[4.75rem] w-full items-center justify-between gap-2 border-b border-white/50 bg-gradient-to-b from-[#eef1f6]/97 via-[#e6eaf2]/94 to-[#dfe4ee]/92 px-3 py-1.5 shadow-[0_14px_40px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl sm:gap-3 md:min-h-[5.125rem] md:gap-3 md:px-7 md:py-2 lg:min-h-[5.375rem] lg:px-9 lg:py-2.5';
+
 const LOGO_IMG_CLASS =
   'h-16 w-auto max-h-[4.5rem] max-w-[min(320px,82vw)] object-contain object-left select-none filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.12)] sm:h-[4.25rem] sm:max-h-[4.75rem] sm:max-w-[min(360px,72vw)] md:h-[4.5rem] md:max-w-[min(400px,46vw)] lg:h-20 lg:max-h-[5.25rem] lg:max-w-[min(440px,36vw)]';
+
+const LOGO_IMG_CLASS_OVER_IMMERSIVE =
+  'h-[4.5rem] w-auto max-h-[5.25rem] max-w-[min(340px,84vw)] object-contain object-left select-none filter drop-shadow-[0_4px_18px_rgba(0,0,0,0.22)] brightness-[1.02] sm:h-[4.875rem] sm:max-h-[5.4rem] sm:max-w-[min(384px,78vw)] md:h-[5.125rem] md:max-w-[min(428px,50vw)] lg:h-[5.5rem] lg:max-h-[5.75rem] lg:max-w-[min(472px,40vw)]';
 
 const NAV_WRAP =
   'hidden min-w-0 flex-nowrap items-center justify-end gap-x-1 md:flex md:gap-x-1.5 lg:gap-x-2';
 
-export function HistoriasInteriorSiteHeader() {
+export type HistoriasInteriorSiteHeaderProps = {
+  /** True cuando un reproductor/modal en portal cubre la pantalla: barra más legible sobre imagen oscura. */
+  overImmersiveMedia?: boolean;
+};
+
+export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: HistoriasInteriorSiteHeaderProps) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [desktopStoriesOpen, setDesktopStoriesOpen] = useState(false);
   const [mobileStoriesOpen, setMobileStoriesOpen] = useState(false);
@@ -52,11 +65,16 @@ export function HistoriasInteriorSiteHeader() {
     return () => window.removeEventListener('mousedown', onPointerDown);
   }, [desktopStoriesOpen]);
 
+  const navPillClass = overImmersiveMedia ? SITE_NAV_OVER_MEDIA_LINK_CLASS : SITE_NAV_INTERIOR_LINK_CLASS;
+  const desktopStoriesPanelClass = overImmersiveMedia
+    ? 'absolute left-0 top-[calc(100%+0.3rem)] z-[150] min-w-[11rem] rounded-xl border border-white/70 bg-[#f6f8fc]/98 py-1.5 pl-2 pr-2 shadow-[0_18px_44px_rgba(0,0,0,0.2),8px_12px_28px_rgba(100,110,130,0.14)] backdrop-blur-xl'
+    : 'absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md';
+
   const navLinks = (
     <>
       <ActiveInternalNavLink
         href="/#proposito"
-        className={SITE_NAV_INTERIOR_LINK_CLASS}
+        className={navPillClass}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
@@ -64,7 +82,7 @@ export function HistoriasInteriorSiteHeader() {
       </ActiveInternalNavLink>
       <ActiveInternalNavLink
         href="/#como-funciona"
-        className={SITE_NAV_INTERIOR_LINK_CLASS}
+        className={navPillClass}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
@@ -73,7 +91,7 @@ export function HistoriasInteriorSiteHeader() {
       <div className="relative" ref={storiesDesktopRef}>
         <button
           type="button"
-          className={SITE_NAV_INTERIOR_LINK_CLASS}
+          className={navPillClass}
           aria-expanded={desktopStoriesOpen}
           aria-controls="historias-header-desktop-list"
           onClick={() => setDesktopStoriesOpen((o) => !o)}
@@ -84,7 +102,7 @@ export function HistoriasInteriorSiteHeader() {
           <div
             id="historias-header-desktop-list"
             role="menu"
-            className="absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md"
+            className={desktopStoriesPanelClass}
           >
             <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
               Mi colección
@@ -104,21 +122,27 @@ export function HistoriasInteriorSiteHeader() {
           </div>
         ) : null}
       </div>
-      <Link href="/mapa" className={SITE_NAV_INTERIOR_LINK_CLASS} onClick={closeMobileNav}>
+      <Link href="/mapa" className={navPillClass} onClick={closeMobileNav}>
         Mapa
       </Link>
     </>
   );
 
+  const headerShellClass = overImmersiveMedia ? HEADER_SHELL_OVER_IMMERSIVE : HEADER_SHELL;
+  const logoImgClass = overImmersiveMedia ? LOGO_IMG_CLASS_OVER_IMMERSIVE : LOGO_IMG_CLASS;
+  const mobileSheetClass = overImmersiveMedia
+    ? 'absolute left-0 right-0 top-full z-[150] border-b border-white/45 bg-[#eef1f7]/98 px-4 py-2.5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] backdrop-blur-2xl md:hidden'
+    : 'absolute left-0 right-0 top-full z-[102] border-b border-white/30 bg-[#E0E5EC]/96 px-4 py-2.5 shadow-sm backdrop-blur-md md:hidden';
+
   return (
-    <header className={HEADER_SHELL} role="banner">
+    <header className={headerShellClass} role="banner">
       <div className="flex min-w-0 shrink-0 items-center self-stretch py-0.5">
         <HomeHardLink
           href="/"
           className="flex min-w-0 items-center justify-start"
           aria-label="AlmaMundi — inicio"
         >
-          <img src="/logo.png" alt="AlmaMundi" className={LOGO_IMG_CLASS} />
+          <img src="/logo.png" alt="AlmaMundi" className={logoImgClass} />
         </HomeHardLink>
       </div>
 
@@ -151,14 +175,14 @@ export function HistoriasInteriorSiteHeader() {
           />
           <div
             id="historias-interior-mobile-nav"
-            className="absolute left-0 right-0 top-full z-[102] border-b border-white/30 bg-[#E0E5EC]/96 px-4 py-2.5 shadow-sm backdrop-blur-md md:hidden"
+            className={mobileSheetClass}
             role="navigation"
             aria-label="Navegación principal"
           >
             <div className="mx-auto flex max-w-md flex-col gap-y-1">
               <ActiveInternalNavLink
                 href="/#proposito"
-                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
+                className={`${navPillClass} w-full justify-start text-left`}
                 activeClassName={SITE_NAV_LINK_ACTIVE}
                 onClick={closeMobileNav}
               >
@@ -166,7 +190,7 @@ export function HistoriasInteriorSiteHeader() {
               </ActiveInternalNavLink>
               <ActiveInternalNavLink
                 href="/#como-funciona"
-                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
+                className={`${navPillClass} w-full justify-start text-left`}
                 activeClassName={SITE_NAV_LINK_ACTIVE}
                 onClick={closeMobileNav}
               >
@@ -174,7 +198,7 @@ export function HistoriasInteriorSiteHeader() {
               </ActiveInternalNavLink>
               <button
                 type="button"
-                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
+                className={`${navPillClass} w-full justify-start border-t border-white/25 pt-2 text-left`}
                 aria-expanded={mobileStoriesOpen}
                 aria-controls="historias-header-mobile-list"
                 onClick={() => setMobileStoriesOpen((o) => !o)}
@@ -202,7 +226,7 @@ export function HistoriasInteriorSiteHeader() {
               ) : null}
               <Link
                 href="/mapa"
-                className={`${SITE_NAV_INTERIOR_LINK_CLASS} w-full justify-start text-left`}
+                className={`${navPillClass} w-full justify-start text-left`}
                 onClick={closeMobileNav}
               >
                 Mapa

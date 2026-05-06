@@ -166,6 +166,7 @@ export default function HistoriasEscritoPage() {
         onOpenContent={openTexto}
         onSlideChange={setShareSlideIndex}
         disableKeyboardNav={Boolean(textoOpen)}
+        immersiveMediaOpen={Boolean(textoOpen)}
       />
       {mounted && textoOpen
         ? ReactDOM.createPortal(

@@ -211,6 +211,7 @@ export default function HistoriasVideosPage() {
         onOpenContent={openVideo}
         onSlideChange={setShareSlideIndex}
         disableKeyboardNav={Boolean(activeVideo)}
+        immersiveMediaOpen={Boolean(activeVideo)}
       />
       {mounted && activeVideo
         ? ReactDOM.createPortal(

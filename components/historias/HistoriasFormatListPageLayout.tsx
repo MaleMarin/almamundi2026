@@ -51,6 +51,8 @@ export type HistoriasFormatListPageLayoutProps = {
   onOpenContent: (index: number) => void;
   onSlideChange: (index: number) => void;
   disableKeyboardNav: boolean;
+  /** True mientras un reproductor o lector en portal cubre la pantalla — refuerza el nav superior sobre el vídeo. */
+  immersiveMediaOpen?: boolean;
 };
 
 export function HistoriasFormatListPageLayout({
@@ -78,10 +80,11 @@ export function HistoriasFormatListPageLayout({
   onOpenContent,
   onSlideChange,
   disableKeyboardNav,
+  immersiveMediaOpen = false,
 }: HistoriasFormatListPageLayoutProps) {
   return (
     <>
-      <HistoriasInteriorSiteHeader />
+      <HistoriasInteriorSiteHeader overImmersiveMedia={immersiveMediaOpen} />
       <main
         className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}

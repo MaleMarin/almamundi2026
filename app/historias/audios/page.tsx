@@ -200,6 +200,7 @@ export default function HistoriasAudiosPage() {
         onOpenContent={openAudio}
         onSlideChange={setShareSlideIndex}
         disableKeyboardNav={Boolean(selectedForAudio)}
+        immersiveMediaOpen={Boolean(selectedForAudio)}
       />
       {mounted && historiaParaPlayer
         ? ReactDOM.createPortal(
