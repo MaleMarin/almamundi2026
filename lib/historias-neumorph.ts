@@ -82,9 +82,9 @@ export const neu = {
  */
 export const historiasInterior = {
   /**
-   * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader`, alineado a barra + logo más presente).
+   * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader` = misma altura que `HomeFirstPart`).
    */
-  fixedHeaderContentPadClassName: 'pt-[5rem] sm:pt-[5.125rem] md:pt-[5.375rem] lg:pt-[5.5rem]',
+  fixedHeaderContentPadClassName: 'pt-32 md:pt-40 lg:pt-44',
   /** main: fuerza scroll antes del footer */
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',

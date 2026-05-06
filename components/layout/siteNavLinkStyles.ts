@@ -6,20 +6,6 @@ export const SITE_NAV_LINK_CLASS =
 
 export const SITE_NAV_LINK_ACTIVE = '!text-orange-500 font-semibold';
 
-/**
- * Variante más compacta para `HistoriasInteriorSiteHeader`: mismo relieve que `SITE_NAV_LINK_CLASS`,
- * menor padding lateral y gaps en desktop/móvil sin tocar la home.
- */
-export const SITE_NAV_INTERIOR_LINK_CLASS =
-  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/55 bg-[#E9ECF3] px-2.5 py-1 text-left text-xs font-semibold text-gray-600 shadow-[6px_6px_16px_rgba(136,150,170,0.32),-6px_-6px_16px_rgba(255,255,255,0.92),inset_1px_1px_2px_rgba(255,255,255,0.55),inset_-2px_-2px_4px_rgba(163,177,198,0.14)] transition-colors hover:text-[var(--almamundi-orange)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 md:px-3 md:py-1.5 md:text-[0.8125rem]';
-
-/**
- * Pastillas más legibles cuando el nav queda sobre video/audio/modal oscuro en /historias/*:
- * relieve similar a `SITE_NAV_LINK_CLASS`, más contraste en texto y sombra proyectada ligera sobre la imagen.
- */
-export const SITE_NAV_OVER_MEDIA_LINK_CLASS =
-  'inline-flex shrink-0 items-center justify-center whitespace-nowrap rounded-full border border-white/70 bg-[#F1F4FA] px-3 py-1.5 text-left text-[0.7rem] font-semibold leading-tight text-gray-900 shadow-[0_14px_32px_rgba(0,0,0,0.22),6px_6px_14px_rgba(130,142,158,0.28),-4px_-4px_14px_rgba(255,255,255,0.88),inset_1px_1px_2px_rgba(255,255,255,0.78),inset_-2px_-2px_5px_rgba(110,118,138,0.12)] transition-[color,box-shadow] hover:text-[var(--almamundi-orange)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/55 md:px-3.5 md:py-2 md:text-sm';
-
 /** Enlaces internos del dropdown de Historias: livianos, sin pastillas. */
 export const SITE_NAV_STORIES_ITEM_CLASS =
   'block whitespace-nowrap rounded-md px-1.5 py-1 text-left text-[0.78rem] font-medium text-gray-600 transition-colors hover:bg-white/50 hover:text-[var(--almamundi-orange)] md:text-[0.82rem]';

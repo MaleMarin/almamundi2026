@@ -1,44 +1,53 @@
 'use client';
 
 /**
- * Barra fija en /historias/*: logo + enlaces de palabra (sin desplegable).
- * Navegación mínima: propósito, cómo funciona, Historias → /historias, Mapa → /mapa.
+ * Barra fija en /historias/* — misma pieza visual que el `<header>` de `HomeFirstPart` (altura, fondo,
+ * logo y pastillas `SITE_NAV_LINK_CLASS`). En vista inmersiva (reproductor en portal), “Historias” es
+ * enlace a `/historias` sin submenú y el `z-index` sube para quedar sobre el vídeo.
  */
+import type { CSSProperties } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import {
   SITE_NAV_LINK_ACTIVE,
-  SITE_NAV_INTERIOR_LINK_CLASS,
-  SITE_NAV_OVER_MEDIA_LINK_CLASS,
+  SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
-import { MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
+import { SITE_FONT_STACK } from '@/lib/typography';
 
-const HEADER_SHELL =
-  'fixed top-0 left-0 z-[100] flex min-h-[4.625rem] w-full items-center justify-between gap-2 border-b border-white/20 bg-[#E0E5EC]/70 px-3 py-1.5 backdrop-blur-lg sm:gap-3 md:min-h-[5rem] md:gap-3 md:px-7 md:py-2 lg:min-h-[5.125rem] lg:px-9 lg:py-2';
+/** Misma sombra/redondeo que el botón menú hamburguesa en `HomeFirstPart` (`soft.button`). */
+const HOME_HEADER_MENU_BUTTON_STYLE: CSSProperties = {
+  backgroundColor: '#E9ECF3',
+  borderRadius: '9999px',
+  border: '1px solid rgba(255,255,255,0.5)',
+  cursor: 'pointer',
+  fontFamily: SITE_FONT_STACK,
+  transition: 'transform 0.2s ease, box-shadow 0.25s ease, color 0.2s ease',
+  boxShadow: [
+    '11px 11px 26px rgba(136, 150, 170, 0.45)',
+    '-11px -11px 26px rgba(255, 255, 255, 0.96)',
+    'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
+    'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
+  ].join(', '),
+};
 
-/** Franja tipo glass/neu más cerrada cuando el header flota sobre reproductores en portal (video/audio/texto/foto). */
-const HEADER_SHELL_OVER_IMMERSIVE =
-  'fixed top-0 left-0 z-[140] flex min-h-[4.75rem] w-full items-center justify-between gap-2 border-b border-white/50 bg-gradient-to-b from-[#eef1f6]/97 via-[#e6eaf2]/94 to-[#dfe4ee]/92 px-3 py-1.5 shadow-[0_14px_40px_rgba(0,0,0,0.26),inset_0_1px_0_rgba(255,255,255,0.72)] backdrop-blur-2xl sm:gap-3 md:min-h-[5.125rem] md:gap-3 md:px-7 md:py-2 lg:min-h-[5.375rem] lg:px-9 lg:py-2.5';
+const HOME_HEADER_SHELL_BASE =
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20';
 
-const LOGO_IMG_CLASS =
-  'h-16 w-auto max-h-[4.5rem] max-w-[min(320px,82vw)] object-contain object-left select-none filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.12)] sm:h-[4.25rem] sm:max-h-[4.75rem] sm:max-w-[min(360px,72vw)] md:h-[4.5rem] md:max-w-[min(400px,46vw)] lg:h-20 lg:max-h-[5.25rem] lg:max-w-[min(440px,36vw)]';
-
-const LOGO_IMG_CLASS_OVER_IMMERSIVE =
-  'h-[4.5rem] w-auto max-h-[5.25rem] max-w-[min(340px,84vw)] object-contain object-left select-none filter drop-shadow-[0_4px_18px_rgba(0,0,0,0.22)] brightness-[1.02] sm:h-[4.875rem] sm:max-h-[5.4rem] sm:max-w-[min(384px,78vw)] md:h-[5.125rem] md:max-w-[min(428px,50vw)] lg:h-[5.5rem] lg:max-h-[5.75rem] lg:max-w-[min(472px,40vw)]';
-
-const NAV_WRAP =
-  'hidden min-w-0 flex-nowrap items-center justify-end gap-x-1 md:flex md:gap-x-1.5 lg:gap-x-2';
+const LOGO_HOME_CLASS =
+  'h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md';
 
 export type HistoriasInteriorSiteHeaderProps = {
-  /** True cuando un reproductor/modal en portal cubre la pantalla: barra más legible sobre imagen oscura. */
+  /** Reproductor/modal en portal: sin submenú Historias / z-index alto. */
   overImmersiveMedia?: boolean;
 };
 
 export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: HistoriasInteriorSiteHeaderProps) {
+  const { t } = useHomeLocale();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [desktopStoriesOpen, setDesktopStoriesOpen] = useState(false);
   const [mobileStoriesOpen, setMobileStoriesOpen] = useState(false);
@@ -71,46 +80,47 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
     setMobileStoriesOpen(false);
   }, [overImmersiveMedia]);
 
-  const navPillClass = overImmersiveMedia ? SITE_NAV_OVER_MEDIA_LINK_CLASS : SITE_NAV_INTERIOR_LINK_CLASS;
   const desktopStoriesPanelClass =
-    'absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md';
+    'absolute left-0 top-[calc(100%+0.35rem)] z-[110] min-w-[8rem]';
 
-  const navLinks = (
+  const headerShellClass = `${HOME_HEADER_SHELL_BASE} ${overImmersiveMedia ? 'z-[140]' : 'z-[100]'}`;
+
+  const navLinksDesktop = (
     <>
       <ActiveInternalNavLink
         href="/#proposito"
-        className={navPillClass}
+        className={SITE_NAV_LINK_CLASS}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
-        Nuestro propósito
+        {t.navPurpose}
       </ActiveInternalNavLink>
       <ActiveInternalNavLink
         href="/#como-funciona"
-        className={navPillClass}
+        className={SITE_NAV_LINK_CLASS}
         activeClassName={SITE_NAV_LINK_ACTIVE}
         onClick={closeMobileNav}
       >
-        ¿Cómo funciona?
+        {t.navHow}
       </ActiveInternalNavLink>
       {overImmersiveMedia ? (
-        <Link href="/historias" className={navPillClass} onClick={closeMobileNav}>
-          Historias
+        <Link href="/historias" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+          {t.navStories}
         </Link>
       ) : (
         <div className="relative" ref={storiesDesktopRef}>
           <button
             type="button"
-            className={navPillClass}
+            className={SITE_NAV_LINK_CLASS}
             aria-expanded={desktopStoriesOpen}
-            aria-controls="historias-header-desktop-list"
+            aria-controls="historias-interior-desktop-historias-list"
             onClick={() => setDesktopStoriesOpen((o) => !o)}
           >
-            Historias
+            {t.navStories}
           </button>
           {desktopStoriesOpen ? (
             <div
-              id="historias-header-desktop-list"
+              id="historias-interior-desktop-historias-list"
               role="menu"
               className={desktopStoriesPanelClass}
             >
@@ -133,46 +143,41 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
           ) : null}
         </div>
       )}
-      <Link href="/mapa" className={navPillClass} onClick={closeMobileNav}>
-        Mapa
+      <Link href="/mapa" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+        {t.navMap}
       </Link>
     </>
   );
 
-  const headerShellClass = overImmersiveMedia ? HEADER_SHELL_OVER_IMMERSIVE : HEADER_SHELL;
-  const logoImgClass = overImmersiveMedia ? LOGO_IMG_CLASS_OVER_IMMERSIVE : LOGO_IMG_CLASS;
-  const mobileSheetClass = overImmersiveMedia
-    ? 'absolute left-0 right-0 top-full z-[150] border-b border-white/45 bg-[#eef1f7]/98 px-4 py-2.5 shadow-[0_20px_48px_rgba(0,0,0,0.18)] backdrop-blur-2xl md:hidden'
-    : 'absolute left-0 right-0 top-full z-[102] border-b border-white/30 bg-[#E0E5EC]/96 px-4 py-2.5 shadow-sm backdrop-blur-md md:hidden';
-
   return (
     <header className={headerShellClass} role="banner">
-      <div className="flex min-w-0 shrink-0 items-center self-stretch py-0.5">
-        <HomeHardLink
-          href="/"
-          className="flex min-w-0 items-center justify-start"
-          aria-label="AlmaMundi — inicio"
-        >
-          <img src="/logo.png" alt="AlmaMundi" className={logoImgClass} />
-        </HomeHardLink>
+      <div className="flex shrink-0 min-w-0 items-center">
+        <Link href="/" className="flex min-w-0 items-center" aria-label="AlmaMundi — inicio">
+          <img src="/logo.png" alt="AlmaMundi" className={LOGO_HOME_CLASS} />
+        </Link>
       </div>
 
-      <div className="flex min-w-0 shrink-0 items-center justify-end gap-1.5 md:gap-2">
+      <div className="flex shrink-0 items-center justify-end gap-2 md:gap-3">
         <button
           type="button"
           className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98] md:hidden"
-          style={MAP_HOME_NEU_BUTTON_STYLE}
+          style={HOME_HEADER_MENU_BUTTON_STYLE}
           aria-expanded={mobileNavOpen}
           aria-controls="historias-interior-mobile-nav"
-          aria-label={mobileNavOpen ? 'Cerrar menú' : 'Abrir menú'}
+          aria-label={mobileNavOpen ? t.ariaCloseMenu : t.ariaOpenMenu}
           onClick={() => setMobileNavOpen((o) => !o)}
         >
           {mobileNavOpen ? <X size={20} strokeWidth={2} aria-hidden /> : <Menu size={20} strokeWidth={2} aria-hidden />}
         </button>
 
-        <nav className={NAV_WRAP} aria-label="Navegación principal">
-          {navLinks}
+        <nav
+          className="hidden min-w-0 flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:gap-x-2"
+          aria-label={t.ariaMainNav}
+        >
+          {navLinksDesktop}
         </nav>
+
+        <HomeLanguageSwitcher className="hidden md:flex" />
       </div>
 
       {mobileNavOpen ? (
@@ -180,80 +185,81 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
           <button
             type="button"
             className="fixed bottom-0 left-0 right-0 z-[98] bg-black/25 md:hidden"
-            style={{ top: 'clamp(4.5rem, 14vw, 6rem)' }}
-            aria-label="Cerrar menú"
+            style={{ top: '8rem' }}
+            aria-label={t.ariaCloseMenuBackdrop}
             onClick={closeMobileNav}
           />
           <div
             id="historias-interior-mobile-nav"
-            className={mobileSheetClass}
+            className="absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[#E0E5EC]/96 px-4 py-3 shadow-sm backdrop-blur-lg md:hidden"
             role="navigation"
-            aria-label="Navegación principal"
+            aria-label={t.ariaMainNav}
           >
-            <div className="mx-auto flex max-w-md flex-col gap-y-1">
-              <ActiveInternalNavLink
-                href="/#proposito"
-                className={`${navPillClass} w-full justify-start text-left`}
-                activeClassName={SITE_NAV_LINK_ACTIVE}
-                onClick={closeMobileNav}
-              >
-                Nuestro propósito
-              </ActiveInternalNavLink>
-              <ActiveInternalNavLink
-                href="/#como-funciona"
-                className={`${navPillClass} w-full justify-start text-left`}
-                activeClassName={SITE_NAV_LINK_ACTIVE}
-                onClick={closeMobileNav}
-              >
-                ¿Cómo funciona?
-              </ActiveInternalNavLink>
-              {overImmersiveMedia ? (
-                <Link
-                  href="/historias"
-                  className={`${navPillClass} w-full justify-start border-t border-white/25 pt-2 text-left`}
-                  onClick={closeMobileNav}
-                >
-                  Historias
-                </Link>
-              ) : (
-                <>
-                  <button
-                    type="button"
-                    className={`${navPillClass} w-full justify-start border-t border-white/20 pt-2 text-left`}
-                    aria-expanded={mobileStoriesOpen}
-                    aria-controls="historias-header-mobile-list"
-                    onClick={() => setMobileStoriesOpen((o) => !o)}
-                  >
-                    Historias
-                  </button>
-                  {mobileStoriesOpen ? (
-                    <div id="historias-header-mobile-list" className="pl-2">
-                      <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                        Mi colección
-                      </Link>
-                      <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                        Videos
-                      </Link>
-                      <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                        Audios
-                      </Link>
-                      <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                        Escritos
-                      </Link>
-                      <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                        Fotografías
-                      </Link>
-                    </div>
-                  ) : null}
-                </>
-              )}
+            <ActiveInternalNavLink
+              href="/#proposito"
+              className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+              activeClassName={SITE_NAV_LINK_ACTIVE}
+              onClick={closeMobileNav}
+            >
+              {t.navPurpose}
+            </ActiveInternalNavLink>
+            <ActiveInternalNavLink
+              href="/#como-funciona"
+              className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+              activeClassName={SITE_NAV_LINK_ACTIVE}
+              onClick={closeMobileNav}
+            >
+              {t.navHow}
+            </ActiveInternalNavLink>
+            {overImmersiveMedia ? (
               <Link
-                href="/mapa"
-                className={`${navPillClass} w-full justify-start text-left`}
+                href="/historias"
+                className={`${SITE_NAV_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
                 onClick={closeMobileNav}
               >
-                Mapa
+                {t.navStories}
               </Link>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  className={`${SITE_NAV_LINK_CLASS} w-full justify-start border-t border-white/20 pt-2 text-left`}
+                  aria-expanded={mobileStoriesOpen}
+                  aria-controls="historias-interior-mobile-historias-list"
+                  onClick={() => setMobileStoriesOpen((o) => !o)}
+                >
+                  {t.navStories}
+                </button>
+                {mobileStoriesOpen ? (
+                  <div id="historias-interior-mobile-historias-list" className="pl-2">
+                    <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                      Mi colección
+                    </Link>
+                    <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                      Videos
+                    </Link>
+                    <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                      Audios
+                    </Link>
+                    <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                      Escritos
+                    </Link>
+                    <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                      Fotografías
+                    </Link>
+                  </div>
+                ) : null}
+              </>
+            )}
+            <Link
+              href="/mapa"
+              className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
+              onClick={closeMobileNav}
+            >
+              {t.navMap}
+            </Link>
+            <div className="flex justify-center border-t border-white/20 pt-2 md:hidden">
+              <HomeLanguageSwitcher />
             </div>
           </div>
         </>
