@@ -65,10 +65,15 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
     return () => window.removeEventListener('mousedown', onPointerDown);
   }, [desktopStoriesOpen]);
 
+  useEffect(() => {
+    if (!overImmersiveMedia) return;
+    setDesktopStoriesOpen(false);
+    setMobileStoriesOpen(false);
+  }, [overImmersiveMedia]);
+
   const navPillClass = overImmersiveMedia ? SITE_NAV_OVER_MEDIA_LINK_CLASS : SITE_NAV_INTERIOR_LINK_CLASS;
-  const desktopStoriesPanelClass = overImmersiveMedia
-    ? 'absolute left-0 top-[calc(100%+0.3rem)] z-[150] min-w-[11rem] rounded-xl border border-white/70 bg-[#f6f8fc]/98 py-1.5 pl-2 pr-2 shadow-[0_18px_44px_rgba(0,0,0,0.2),8px_12px_28px_rgba(100,110,130,0.14)] backdrop-blur-xl'
-    : 'absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md';
+  const desktopStoriesPanelClass =
+    'absolute left-0 top-[calc(100%+0.3rem)] z-[110] min-w-[11rem] rounded-xl border border-white/60 bg-[#eef1f6]/96 py-1.5 pl-2 pr-2 shadow-[8px_12px_32px_rgba(100,110,130,0.16)] backdrop-blur-md';
 
   const navLinks = (
     <>
@@ -88,40 +93,46 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
       >
         ¿Cómo funciona?
       </ActiveInternalNavLink>
-      <div className="relative" ref={storiesDesktopRef}>
-        <button
-          type="button"
-          className={navPillClass}
-          aria-expanded={desktopStoriesOpen}
-          aria-controls="historias-header-desktop-list"
-          onClick={() => setDesktopStoriesOpen((o) => !o)}
-        >
+      {overImmersiveMedia ? (
+        <Link href="/historias" className={navPillClass} onClick={closeMobileNav}>
           Historias
-        </button>
-        {desktopStoriesOpen ? (
-          <div
-            id="historias-header-desktop-list"
-            role="menu"
-            className={desktopStoriesPanelClass}
+        </Link>
+      ) : (
+        <div className="relative" ref={storiesDesktopRef}>
+          <button
+            type="button"
+            className={navPillClass}
+            aria-expanded={desktopStoriesOpen}
+            aria-controls="historias-header-desktop-list"
+            onClick={() => setDesktopStoriesOpen((o) => !o)}
           >
-            <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Mi colección
-            </Link>
-            <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Videos
-            </Link>
-            <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Audios
-            </Link>
-            <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Escritos
-            </Link>
-            <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Fotografías
-            </Link>
-          </div>
-        ) : null}
-      </div>
+            Historias
+          </button>
+          {desktopStoriesOpen ? (
+            <div
+              id="historias-header-desktop-list"
+              role="menu"
+              className={desktopStoriesPanelClass}
+            >
+              <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                Mi colección
+              </Link>
+              <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                Videos
+              </Link>
+              <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                Audios
+              </Link>
+              <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                Escritos
+              </Link>
+              <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
+                Fotografías
+              </Link>
+            </div>
+          ) : null}
+        </div>
+      )}
       <Link href="/mapa" className={navPillClass} onClick={closeMobileNav}>
         Mapa
       </Link>
@@ -196,34 +207,46 @@ export function HistoriasInteriorSiteHeader({ overImmersiveMedia = false }: Hist
               >
                 ¿Cómo funciona?
               </ActiveInternalNavLink>
-              <button
-                type="button"
-                className={`${navPillClass} w-full justify-start border-t border-white/25 pt-2 text-left`}
-                aria-expanded={mobileStoriesOpen}
-                aria-controls="historias-header-mobile-list"
-                onClick={() => setMobileStoriesOpen((o) => !o)}
-              >
-                Historias
-              </button>
-              {mobileStoriesOpen ? (
-                <div id="historias-header-mobile-list" className="pl-2">
-                  <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                    Mi colección
-                  </Link>
-                  <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                    Videos
-                  </Link>
-                  <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                    Audios
-                  </Link>
-                  <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                    Escritos
-                  </Link>
-                  <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                    Fotografías
-                  </Link>
-                </div>
-              ) : null}
+              {overImmersiveMedia ? (
+                <Link
+                  href="/historias"
+                  className={`${navPillClass} w-full justify-start border-t border-white/25 pt-2 text-left`}
+                  onClick={closeMobileNav}
+                >
+                  Historias
+                </Link>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    className={`${navPillClass} w-full justify-start border-t border-white/20 pt-2 text-left`}
+                    aria-expanded={mobileStoriesOpen}
+                    aria-controls="historias-header-mobile-list"
+                    onClick={() => setMobileStoriesOpen((o) => !o)}
+                  >
+                    Historias
+                  </button>
+                  {mobileStoriesOpen ? (
+                    <div id="historias-header-mobile-list" className="pl-2">
+                      <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                        Mi colección
+                      </Link>
+                      <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                        Videos
+                      </Link>
+                      <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                        Audios
+                      </Link>
+                      <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                        Escritos
+                      </Link>
+                      <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                        Fotografías
+                      </Link>
+                    </div>
+                  ) : null}
+                </>
+              )}
               <Link
                 href="/mapa"
                 className={`${navPillClass} w-full justify-start text-left`}
