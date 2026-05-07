@@ -22,7 +22,6 @@ import {
   HISTORIAS_SHARE_ICONS_LEGEND,
 } from '@/lib/historias/historias-format-list-ui';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 export type HistoriasFormatListActiveTab = 'videos' | 'audios' | 'escrito' | 'fotos';
@@ -93,9 +92,6 @@ export function HistoriasFormatListPageLayout({
       <div className="flex min-h-0 w-full flex-1 flex-col">
         <div className="w-full shrink-0 px-4 pt-3 sm:px-6 md:px-10 lg:px-14">
           <div className="mx-auto w-full max-w-[52rem]">
-            <div className="mb-3 w-full shrink-0">
-              <SiteBreadcrumbs />
-            </div>
             <header className="flex flex-shrink-0 flex-col gap-2 border-b border-gray-400/18 pb-5 text-center sm:gap-2.5 sm:text-left md:pb-6">
               <p
                 className="mb-0 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] sm:text-xs"
