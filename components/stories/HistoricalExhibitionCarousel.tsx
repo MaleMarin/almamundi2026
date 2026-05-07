@@ -95,6 +95,13 @@ function canOpenPrimary(
   return true;
 }
 
+function primaryOpenLabel(mode: ExhibitionContentMode): string {
+  if (mode === 'video') return 'Ver historia';
+  if (mode === 'audio') return 'Escuchar historia';
+  if (mode === 'texto') return 'Leer historia';
+  return 'Ver fotografías';
+}
+
 /** Máx. inclinación por tarjeta (solo rotación local; sin mover el carrusel entero). */
 const CARD_TILT_MAX_DEG = 12;
 
@@ -325,18 +332,39 @@ export function HistoricalExhibitionCarousel({
         .historical-expo-swiper--light-gallery .swiper-slide-active .hec-card-inner {
           transform: none;
         }
+        /** Listados /historias/* — escenario: centro completo; laterales como eco suave */
+        .historical-expo-swiper--stage-gallery.historical-expo-swiper .swiper-slide {
+          height: auto;
+        }
+        .historical-expo-swiper--stage-gallery .swiper-slide:not(.swiper-slide-active) {
+          opacity: 0.5;
+          filter: blur(5px) saturate(0.9);
+          pointer-events: auto;
+        }
+        .historical-expo-swiper--stage-gallery .swiper-slide:not(.swiper-slide-active) .hec-stage-card-shell {
+          transform: scale(0.88);
+        }
+        .historical-expo-swiper--stage-gallery .swiper-slide-active {
+          opacity: 1 !important;
+          filter: none !important;
+          z-index: 4;
+        }
+        .historical-expo-swiper--stage-gallery .swiper-slide-active .hec-stage-card-shell {
+          transform: scale(1);
+          box-shadow: 0 32px 64px rgba(15,23,42,0.12), inset 2px 2px 0 rgba(255,255,255,0.94) !important;
+        }
       `}</style>
 
       {/*
-        Capa 2 — The Expo (z-10): carrusel, flechas y ficha de autor; paralaje más marcado.
+        Capa 2 — The Expo (z-10): carrusel y flechas; ficha narrador en listados dentro de la tarjeta central.
       */}
       <div
-        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}${historiasListEmbedded ? ' min-h-0 flex-1 justify-center pb-2 sm:px-2' : ''}`}
+        className={`relative z-10 mx-auto flex w-full ${expoMaxWidthClassName ?? 'max-w-[1400px]'} flex-col items-center px-2 pb-4 sm:px-6 ${expoPaddingTopClassName ?? 'pt-20 sm:pt-24'}${historiasListEmbedded ? ' flex-1 justify-center pb-3 sm:px-2' : ''}`}
       >
         <div
           className={`relative w-full ${
             historiasListEmbedded
-              ? 'flex min-h-0 flex-1 flex-col items-center justify-center gap-1.5'
+              ? 'flex flex-col items-center justify-center gap-0 py-3 sm:py-4'
               : ''
           }`}
           style={{
@@ -347,13 +375,15 @@ export function HistoricalExhibitionCarousel({
           <div
             className={`relative w-full ${
               historiasListEmbedded
-                ? 'flex min-h-0 shrink-0 items-center justify-center'
+                ? 'flex shrink-0 items-center justify-center'
                 : 'flex min-h-0 max-h-full flex-1 items-center justify-center'
             }`}
             style={
               embedded && isLightHall && !historiasListEmbedded
                 ? { minHeight: 'min(92vw, 620px)' }
-                : undefined
+                : historiasListEmbedded
+                  ? { minHeight: 'min(640px, max(470px, calc(100dvh - 17.5rem)))' }
+                  : undefined
             }
           >
             {showExpoNavArrows ? (
@@ -364,14 +394,22 @@ export function HistoricalExhibitionCarousel({
                   onClick={() => swiperRef.current?.slidePrev()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute left-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:left-2.5 md:left-4'
+                      ? historiasListEmbedded
+                        ? 'pointer-events-auto absolute left-0.5 top-1/2 z-[60] flex min-h-9 min-w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/38 bg-white/76 p-1.5 text-gray-700/90 shadow-[0_8px_24px_rgba(15,23,42,0.07)] backdrop-blur-lg transition hover:bg-white/92 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 sm:left-1 md:left-3'
+                        : 'pointer-events-auto absolute left-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:left-2.5 md:left-4'
                       : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/45 sm:left-1 md:left-2'
                   }
                   aria-label="Historia anterior"
                 >
                   <ChevronLeft
-                    className={isLightHall ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700' : 'h-8 w-8 shrink-0'}
-                    strokeWidth={2.75}
+                    className={
+                      isLightHall && historiasListEmbedded
+                        ? 'h-[1.1rem] w-[1.1rem] shrink-0 text-gray-600'
+                        : isLightHall
+                          ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700'
+                          : 'h-8 w-8 shrink-0'
+                    }
+                    strokeWidth={historiasListEmbedded ? 2.5 : 2.75}
                   />
                 </button>
                 <button
@@ -380,20 +418,28 @@ export function HistoricalExhibitionCarousel({
                   onClick={() => swiperRef.current?.slideNext()}
                   className={
                     isLightHall
-                      ? 'pointer-events-auto absolute right-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:right-2.5 md:right-4'
+                      ? historiasListEmbedded
+                        ? 'pointer-events-auto absolute right-0.5 top-1/2 z-[60] flex min-h-9 min-w-9 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/38 bg-white/76 p-1.5 text-gray-700/90 shadow-[0_8px_24px_rgba(15,23,42,0.07)] backdrop-blur-lg transition hover:bg-white/92 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 sm:right-1 md:right-3'
+                        : 'pointer-events-auto absolute right-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:right-2.5 md:right-4'
                       : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/50 sm:right-1 md:right-2'
                   }
                   aria-label="Próxima historia"
                 >
                   <ChevronRight
-                    className={isLightHall ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700' : 'h-9 w-9 shrink-0'}
-                    strokeWidth={2.75}
+                    className={
+                      isLightHall && historiasListEmbedded
+                        ? 'h-[1.1rem] w-[1.1rem] shrink-0 text-gray-600'
+                        : isLightHall
+                          ? 'h-[1.35rem] w-[1.35rem] shrink-0 text-gray-700'
+                          : 'h-9 w-9 shrink-0'
+                    }
+                    strokeWidth={historiasListEmbedded ? 2.5 : 2.75}
                   />
                 </button>
               </>
             ) : null}
             <Swiper
-          className={`historical-expo-swiper w-full${isLightHall ? ' historical-expo-swiper--light-gallery' : ''}`}
+          className={`historical-expo-swiper w-full${isLightHall ? ' historical-expo-swiper--light-gallery' : ''}${historiasListEmbedded ? ' historical-expo-swiper--stage-gallery' : ''}`}
           modules={[EffectCoverflow, Keyboard]}
           effect="coverflow"
           grabCursor
@@ -401,10 +447,13 @@ export function HistoricalExhibitionCarousel({
           slidesPerView="auto"
           initialSlide={initialSlide}
           slideToClickedSlide
+          observer={historiasListEmbedded}
+          observeParents={historiasListEmbedded}
+          watchSlidesProgress
           keyboard={{ enabled: !disableKeyboardNav }}
           coverflowEffect={
             historiasListEmbedded
-              ? { rotate: 15, stretch: 6, depth: 120, modifier: 1.05, slideShadows: false }
+              ? { rotate: 8, stretch: -36, depth: 72, modifier: 1.12, slideShadows: false }
               : { rotate: 45, stretch: 0, depth: 300, modifier: 1, slideShadows: true }
           }
           onSwiper={(s) => {
@@ -417,213 +466,273 @@ export function HistoricalExhibitionCarousel({
           }}
           onSlideChange={(s) => setActiveIndex(s.activeIndex)}
         >
-          {historias.map((h, slideIdx) => (
-            <SwiperSlide
-              key={h.id}
-              style={
-                historiasListEmbedded
-                  ? {
-                      width: 'min(100%, min(500px, 58dvh, calc(100dvh - 220px)))',
-                      height: 'min(100%, min(500px, 56dvh, calc(100dvh - 240px)))',
-                    }
-                  : {
-                      width: `min(92vw, ${SLIDE_PX}px)`,
-                      height: `min(92vw, ${SLIDE_PX}px)`,
-                    }
-              }
-            >
-              <ExpoCardTiltShell disableTilt={historiasListEmbedded}>
-                <div
-                className={
-                  isLightHall
-                    ? 'hec-card-inner flex h-full w-full flex-col overflow-hidden rounded-2xl p-6 text-left sm:p-8'
-                    : 'hec-card-inner flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-6 text-left text-white backdrop-blur-md sm:p-8'
-                }
-                style={
-                  isLightHall
-                    ? {
-                        backdropFilter: 'blur(18px) saturate(165%)',
-                        WebkitBackdropFilter: 'blur(18px) saturate(165%)',
-                        border: '1px solid rgba(255, 255, 255, 0.52)',
-                        boxShadow:
-                          '0 28px 64px rgba(15,23,42,0.09), inset 1px 1px 0 rgba(255,255,255,0.85)',
-                        background: 'linear-gradient(165deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.24) 100%)',
-                      }
-                    : {
-                        boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-                      }
-                }
-              >
-                <div
-                  className={
-                    isLightHall
-                      ? 'relative min-h-0 flex-1 overflow-hidden rounded-xl bg-gray-900/10'
-                      : 'relative min-h-0 flex-1 overflow-hidden rounded-xl bg-black/20'
-                  }
+          {historias.map((h, slideIdx) => {
+            const isActiveSlide = slideIdx === activeIndex;
+            const canOpenThis = Boolean(openHandler && canOpenPrimary(h, contentMode));
+            const embeddedStageChrome = Boolean(historiasListEmbedded && isLightHall);
+
+            if (embeddedStageChrome) {
+              return (
+                <SwiperSlide
+                  key={h.id}
+                  className="!h-auto pb-8 pt-1"
+                  style={{
+                    width: 'clamp(288px, 79vw, 428px)',
+                    height: 'auto',
+                  }}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element -- URLs externas (picsum, etc.) */}
-                  <img
-                    src={h.imagen_principal}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/14 to-transparent" />
-                  {slideIdx === activeIndex &&
-                  openHandler &&
-                  canOpenPrimary(h, contentMode) ? (
-                    <div className="pointer-events-auto absolute left-1/2 top-[42%] z-10 -translate-x-1/2 -translate-y-1/2">
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openHandler(slideIdx);
-                        }}
-                        className="flex h-14 w-14 items-center justify-center rounded-full border border-white/45 bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/60"
-                        aria-label={
-                          contentMode === 'video'
-                            ? 'Ver video'
-                            : contentMode === 'audio'
-                              ? 'Escuchar audio'
-                              : contentMode === 'texto'
-                                ? 'Leer historia'
-                                : 'Ver álbum de fotos'
-                        }
-                      >
-                        {contentMode === 'video' ? (
-                          <Play className="ml-0.5 h-7 w-7" fill="currentColor" strokeWidth={0} />
-                        ) : contentMode === 'audio' ? (
-                          <Headphones className="h-7 w-7" strokeWidth={2} />
-                        ) : contentMode === 'texto' ? (
-                          <BookOpen className="h-7 w-7" strokeWidth={2} />
-                        ) : (
-                          <Images className="h-7 w-7" strokeWidth={2} />
-                        )}
-                      </button>
-                    </div>
-                  ) : null}
-                </div>
-                {h.isDemoStory ? (
-                  <div className="mt-3 shrink-0">
-                    <DemoStoryDisclosure
-                      variant="card"
-                      story={{
-                        id: h.id,
-                        isDemo: true,
-                        isRealStory: false,
-                        demoNotice: h.demoNotice,
+                  <ExpoCardTiltShell disableTilt>
+                    <div
+                      className="hec-stage-card-shell relative flex w-full flex-col overflow-hidden rounded-[22px] p-4 text-left sm:p-[1.15rem]"
+                      style={{
+                        backdropFilter: 'blur(20px) saturate(170%)',
+                        WebkitBackdropFilter: 'blur(20px) saturate(170%)',
+                        border: '1px solid rgba(255, 255, 255, 0.58)',
+                        background: 'linear-gradient(168deg, rgba(255,255,255,0.58) 0%, rgba(235,239,246,0.42) 100%)',
+                        boxShadow: '0 28px 58px rgba(15,23,42,0.1), inset 1px 1px 0 rgba(255,255,255,0.92)',
                       }}
-                    />
-                  </div>
-                ) : null}
-                <div className="mt-4 flex-shrink-0 space-y-2">
-                  <h3
+                    >
+                      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.35)]">
+                        {/* eslint-disable-next-line @next/next/no-img-element -- URLs externas (picsum, etc.) */}
+                        <img
+                          src={h.imagen_principal}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                        {isActiveSlide && openHandler && canOpenThis ? (
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openHandler(slideIdx);
+                            }}
+                            className="pointer-events-auto absolute bottom-2.5 right-2.5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/52 bg-black/43 text-white shadow-lg backdrop-blur-md transition hover:bg-black/54"
+                            aria-label={primaryOpenLabel(contentMode)}
+                          >
+                            {contentMode === 'video' ? (
+                              <Play className="ml-0.5 h-5 w-5" fill="currentColor" strokeWidth={0} />
+                            ) : contentMode === 'audio' ? (
+                              <Headphones className="h-5 w-5" strokeWidth={2} />
+                            ) : contentMode === 'texto' ? (
+                              <BookOpen className="h-5 w-5" strokeWidth={2} />
+                            ) : (
+                              <Images className="h-5 w-5" strokeWidth={2} />
+                            )}
+                          </button>
+                        ) : null}
+                      </div>
+
+                      {h.isDemoStory ? (
+                        <div className="mt-2.5 shrink-0 rounded-xl border border-orange-400/35 bg-orange-400/8 px-1 py-0.5 sm:px-2">
+                          <DemoStoryDisclosure
+                            variant="card"
+                            story={{
+                              id: h.id,
+                              isDemo: true,
+                              isRealStory: false,
+                              demoNotice: h.demoNotice,
+                            }}
+                          />
+                        </div>
+                      ) : null}
+
+                      <div className="relative z-10 mt-3 shrink-0 space-y-2 sm:mt-4">
+                        <h3 className="text-[1.0625rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-[1.175rem]">
+                          {h.titulo}
+                        </h3>
+                        <p className="line-clamp-4 text-[0.895rem] leading-relaxed text-gray-700 sm:line-clamp-5">
+                          “{h.cita}”
+                        </p>
+                        <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-gray-600">
+                          {[h.fecha, h.lugar].filter(Boolean).join(' · ')}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {h.tags.slice(0, 6).map((t) => (
+                            <span
+                              key={`${h.id}-${t}`}
+                              className="rounded-full border border-orange-400/28 bg-[#ebeff6]/92 px-2 py-[0.1875rem] text-[10px] font-semibold uppercase tracking-[0.1em] text-orange-900/92"
+                            >
+                              {t}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div
+                        className="relative z-10 mt-3 flex min-w-0 shrink-0 items-center gap-2.5 rounded-[14px] border border-gray-400/38 px-3 py-2.5"
+                        style={{
+                          backgroundColor: '#ebeef4',
+                          boxShadow:
+                            'inset 6px 6px 12px rgba(163,177,198,0.38), inset -5px -5px 12px rgba(255,255,255,0.88)',
+                        }}
+                      >
+                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/76 bg-gray-200/92 shadow-[2px_2px_6px_rgba(163,177,198,0.45)]">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={h.foto_perfil} alt="" className="h-full w-full object-cover" />
+                        </div>
+                        <div className="min-w-0 text-left leading-tight">
+                          <p className="truncate text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                            Narrador
+                          </p>
+                          <p className="truncate text-sm font-semibold text-gray-900">{h.nombre}</p>
+                        </div>
+                      </div>
+
+                      {openHandler && isActiveSlide ? (
+                        <button
+                          type="button"
+                          disabled={!canOpenThis}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (!canOpenThis) return;
+                            openHandler(slideIdx);
+                          }}
+                          className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-xs font-bold uppercase tracking-[0.17em] transition sm:text-[0.8rem] ${
+                            canOpenThis
+                              ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#ff7138_0%,#ff4500_52%,#ea4000_100%)] text-white shadow-[0_18px_40px_rgba(255,69,0,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
+                              : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-gray-500 opacity-95'
+                          }`}
+                        >
+                          {canOpenThis ? primaryOpenLabel(contentMode) : 'Contenido no disponible en este formato'}
+                        </button>
+                      ) : null}
+                    </div>
+                  </ExpoCardTiltShell>
+                </SwiperSlide>
+              );
+            }
+
+            return (
+              <SwiperSlide
+                key={h.id}
+                style={{
+                  width: `min(92vw, ${SLIDE_PX}px)`,
+                  height: `min(92vw, ${SLIDE_PX}px)`,
+                }}
+              >
+                <ExpoCardTiltShell disableTilt={historiasListEmbedded}>
+                  <div
                     className={
                       isLightHall
-                        ? 'text-[1.05rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-xl'
-                        : 'text-lg font-semibold leading-tight tracking-tight sm:text-xl'
+                        ? 'hec-card-inner flex h-full w-full flex-col overflow-hidden rounded-2xl p-6 text-left sm:p-8'
+                        : 'hec-card-inner flex h-full w-full flex-col overflow-hidden rounded-2xl border border-white/20 bg-white/10 p-6 text-left text-white backdrop-blur-md sm:p-8'
                     }
-                  >
-                    {h.titulo}
-                  </h3>
-                  <p
-                    className={
+                    style={
                       isLightHall
-                        ? 'line-clamp-3 text-[0.9rem] leading-relaxed text-gray-700 sm:text-sm'
-                        : 'line-clamp-3 text-sm leading-relaxed text-white/90'
+                        ? {
+                            backdropFilter: 'blur(18px) saturate(165%)',
+                            WebkitBackdropFilter: 'blur(18px) saturate(165%)',
+                            border: '1px solid rgba(255, 255, 255, 0.52)',
+                            boxShadow:
+                              '0 28px 64px rgba(15,23,42,0.09), inset 1px 1px 0 rgba(255,255,255,0.85)',
+                            background: 'linear-gradient(165deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.24) 100%)',
+                          }
+                        : {
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
+                          }
                     }
                   >
-                    “{h.cita}”
-                  </p>
-                  <p
-                    className={
-                      isLightHall ? 'text-xs text-gray-600' : 'text-xs text-white/60'
-                    }
-                  >
-                    {h.fecha} · {h.lugar}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {h.tags.slice(0, 4).map((t) => (
-                      <span
-                        key={t}
+                    <div
+                      className={
+                        isLightHall
+                          ? 'relative min-h-0 flex-1 overflow-hidden rounded-xl bg-gray-900/10'
+                          : 'relative min-h-0 flex-1 overflow-hidden rounded-xl bg-black/20'
+                      }
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element -- URLs externas (picsum, etc.) */}
+                      <img src={h.imagen_principal} alt="" className="h-full w-full object-cover" />
+                      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/14 to-transparent" />
+                      {slideIdx === activeIndex && openHandler && canOpenPrimary(h, contentMode) ? (
+                        <div className="pointer-events-auto absolute left-1/2 top-[42%] z-10 -translate-x-1/2 -translate-y-1/2">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              openHandler(slideIdx);
+                            }}
+                            className="flex h-14 w-14 items-center justify-center rounded-full border border-white/45 bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/60"
+                            aria-label={
+                              contentMode === 'video'
+                                ? 'Ver video'
+                                : contentMode === 'audio'
+                                  ? 'Escuchar audio'
+                                  : contentMode === 'texto'
+                                    ? 'Leer historia'
+                                    : 'Ver álbum de fotos'
+                            }
+                          >
+                            {contentMode === 'video' ? (
+                              <Play className="ml-0.5 h-7 w-7" fill="currentColor" strokeWidth={0} />
+                            ) : contentMode === 'audio' ? (
+                              <Headphones className="h-7 w-7" strokeWidth={2} />
+                            ) : contentMode === 'texto' ? (
+                              <BookOpen className="h-7 w-7" strokeWidth={2} />
+                            ) : (
+                              <Images className="h-7 w-7" strokeWidth={2} />
+                            )}
+                          </button>
+                        </div>
+                      ) : null}
+                    </div>
+                    {h.isDemoStory ? (
+                      <div className="mt-3 shrink-0">
+                        <DemoStoryDisclosure
+                          variant="card"
+                          story={{
+                            id: h.id,
+                            isDemo: true,
+                            isRealStory: false,
+                            demoNotice: h.demoNotice,
+                          }}
+                        />
+                      </div>
+                    ) : null}
+                    <div className="mt-4 shrink-0 space-y-2">
+                      <h3
                         className={
                           isLightHall
-                            ? 'rounded-full border border-gray-400/35 bg-white/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-700'
-                            : 'rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/75'
+                            ? 'text-[1.05rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-xl'
+                            : 'text-lg font-semibold leading-tight tracking-tight sm:text-xl'
                         }
                       >
-                        {t}
-                      </span>
-                    ))}
+                        {h.titulo}
+                      </h3>
+                      <p
+                        className={
+                          isLightHall
+                            ? 'line-clamp-3 text-[0.9rem] leading-relaxed text-gray-700 sm:text-sm'
+                            : 'line-clamp-3 text-sm leading-relaxed text-white/90'
+                        }
+                      >
+                        “{h.cita}”
+                      </p>
+                      <p className={isLightHall ? 'text-xs text-gray-600' : 'text-xs text-white/60'}>
+                        {h.fecha} · {h.lugar}
+                      </p>
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {h.tags.slice(0, 4).map((t) => (
+                          <span
+                            key={t}
+                            className={
+                              isLightHall
+                                ? 'rounded-full border border-gray-400/35 bg-white/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-700'
+                                : 'rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/75'
+                            }
+                          >
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
-              </ExpoCardTiltShell>
-            </SwiperSlide>
-          ))}
+                </ExpoCardTiltShell>
+              </SwiperSlide>
+            );
+          })}
         </Swiper>
           </div>
 
-          {historiasListEmbedded && active ? (
-            <div
-              className={`pointer-events-none z-20 flex w-full shrink-0 justify-center px-2 ${isLightHall ? 'max-w-[min(92vw,720px)]' : 'max-w-[min(92vw,620px)]'}`}
-            >
-              <div
-                className={
-                  isLightHall
-                    ? 'pointer-events-auto flex max-w-md items-center gap-3 rounded-full border border-gray-300/50 bg-white/70 py-2 pl-2 pr-5 shadow-[0_12px_40px_rgba(0,0,0,0.1)] backdrop-blur-md'
-                    : 'pointer-events-auto flex max-w-md items-center gap-3 rounded-full border border-white/20 bg-white/10 py-2 pl-2 pr-5 shadow-lg backdrop-blur-md'
-                }
-              >
-                <div
-                  className={
-                    isLightHall
-                      ? 'relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-gray-300/60 bg-gray-200/80'
-                      : 'relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-white/25 bg-black/30'
-                  }
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={active.foto_perfil}
-                    alt=""
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="min-w-0 text-left">
-                  <p
-                    className={
-                      isLightHall
-                        ? 'truncate font-medium text-gray-900'
-                        : 'truncate font-medium text-white'
-                    }
-                  >
-                    {active.nombre}
-                  </p>
-                  <p
-                    className={
-                      isLightHall
-                        ? 'truncate text-xs text-gray-600'
-                        : 'truncate text-xs text-white/70'
-                    }
-                  >
-                    {metaLine}
-                  </p>
-                  {active.isDemoStory ? (
-                    <div className="pointer-events-auto mt-2 max-w-sm">
-                      <DemoStoryDisclosure
-                        variant="panel"
-                        story={{
-                          id: active.id,
-                          isDemo: true,
-                          isRealStory: false,
-                          demoNotice: active.demoNotice,
-                        }}
-                      />
-                    </div>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          ) : null}
         </div>
 
         {!historiasListEmbedded && active ? (

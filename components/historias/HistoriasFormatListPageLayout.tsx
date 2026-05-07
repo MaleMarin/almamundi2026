@@ -22,6 +22,7 @@ import {
   HISTORIAS_SHARE_ICONS_LEGEND,
 } from '@/lib/historias/historias-format-list-ui';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 export type HistoriasFormatListActiveTab = 'videos' | 'audios' | 'escrito' | 'fotos';
@@ -92,6 +93,9 @@ export function HistoriasFormatListPageLayout({
       <div className="flex min-h-0 w-full flex-1 flex-col">
         <div className="w-full shrink-0 px-4 pt-3 sm:px-6 md:px-10 lg:px-14">
           <div className="mx-auto w-full max-w-[52rem]">
+            <div className="mb-3 w-full shrink-0">
+              <SiteBreadcrumbs />
+            </div>
             <header className="flex flex-shrink-0 flex-col gap-2 border-b border-gray-400/18 pb-5 text-center sm:gap-2.5 sm:text-left md:pb-6">
               <p
                 className="mb-0 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] sm:text-xs"
@@ -215,8 +219,7 @@ export function HistoriasFormatListPageLayout({
         <section
           id="historias-carrusel"
           aria-label={HISTORIAS_CAROUSEL_ARIA_LABEL}
-          className="mt-4 flex min-h-[min(320px,calc(100dvh-14.5rem))] flex-1 flex-col overflow-hidden border-t border-gray-400/25 bg-[linear-gradient(180deg,rgba(224,229,236,0.42)_0%,#E0E5EC_16%,#e2e7ee_100%)] scroll-mt-24 px-2 pb-1 pt-4 sm:mt-5 sm:px-3 sm:pb-2 md:px-6 lg:min-h-[min(360px,calc(100dvh-13rem))] lg:px-10 lg:pb-3"
-          style={{ maxHeight: 'min(74dvh, calc(100dvh - 7.85rem))' }}
+          className="mt-4 flex min-h-[min(480px,calc(100dvh-11rem))] flex-1 flex-col overflow-visible border-t border-gray-400/25 bg-[linear-gradient(180deg,rgba(224,229,236,0.42)_0%,#E0E5EC_16%,#e2e7ee_100%)] scroll-mt-24 px-2 pb-4 pt-5 sm:mt-5 sm:px-3 sm:pb-6 md:px-6 lg:min-h-[min(520px,calc(100dvh-10.5rem))] lg:px-10 lg:pb-8"
         >
           <div className="flex min-h-0 w-full flex-1 flex-col items-stretch justify-center">
             <HistoricalExhibitionCarousel
