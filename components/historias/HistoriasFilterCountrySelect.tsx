@@ -90,7 +90,7 @@ export function HistoriasFilterCountrySelect({
 
       {open ? (
         <div
-          className="absolute left-0 right-0 top-[calc(100%+4px)] z-[120] flex max-h-[min(20rem,45vh)] flex-col overflow-hidden rounded-2xl border border-gray-300/50 bg-[#E8ECF2] shadow-[0_12px_40px_rgba(15,23,42,0.18)]"
+          className="absolute left-0 right-0 top-[calc(100%+4px)] z-[120] flex max-h-[min(22rem,min(50dvh,55vh))] min-h-0 flex-col overflow-hidden rounded-2xl border border-gray-300/50 bg-[#E8ECF2] shadow-[0_12px_40px_rgba(15,23,42,0.18)]"
           role="presentation"
         >
           <div className="shrink-0 border-b border-gray-300/40 p-2">
@@ -110,7 +110,7 @@ export function HistoriasFilterCountrySelect({
             id={listboxId}
             role="listbox"
             aria-labelledby={buttonId}
-            className="min-h-0 flex-1 overflow-y-auto overscroll-contain py-1"
+            className="min-h-0 max-h-[min(18rem,calc(50dvh-5.25rem))] shrink overflow-y-auto overscroll-contain py-1 [scrollbar-gutter:stable]"
           >
             <li role="presentation">
               <button
