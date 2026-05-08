@@ -8,11 +8,10 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
 import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
-import { neu } from '@/lib/historias-neumorph';
+import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 export default function HistoriasIdAudioPageClient() {
   const params = useParams();
@@ -50,70 +49,58 @@ export default function HistoriasIdAudioPageClient() {
     };
   }, [id, router]);
 
-  const crumbAudios = (
-    <div className="w-full max-w-[480px] shrink-0 px-1 pt-1 md:px-0">
-      <Breadcrumbs
-        items={
-          loading || !historia
-            ? [
-                { label: 'Inicio', href: '/' },
-                { label: 'Historias', href: '/historias' },
-                { label: 'Audios', href: '/historias/audios' },
-                { label: loading ? '…' : 'Audio' },
-              ]
-            : [
-                { label: 'Inicio', href: '/' },
-                { label: 'Historias', href: '/historias' },
-                { label: 'Audios', href: '/historias/audios' },
-                { label: historia.titulo },
-              ]
-        }
-      />
-    </div>
-  );
-
   if (loading) {
     return (
-      <div
-        className="flex w-full flex-1 flex-col items-center gap-3 min-h-[50vh]"
-        style={{ backgroundColor: neu.bg }}
+      <main
+        className={historiasInterior.mainClassName}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
       >
-        {crumbAudios}
-        <p className="font-sans text-sm tracking-wide text-[color:var(--almamundi-orange)]" style={{ color: neu.orange }}>
-          Cargando…
-        </p>
-      </div>
+        <div className={`${historiasInterior.contentWrapClassName} flex w-full flex-1 flex-col`}>
+          <section
+            className="flex w-full flex-1 flex-col items-center justify-center px-4 py-10 md:px-10"
+            aria-busy="true"
+          >
+            <p className="font-sans text-sm tracking-wide" style={{ color: neu.orange }}>
+              Cargando…
+            </p>
+          </section>
+        </div>
+      </main>
     );
   }
 
   if (!historia) {
     return (
-      <div
-        className="flex w-full flex-1 min-h-[50vh] flex-col items-center justify-center gap-6 px-6"
-        style={{ backgroundColor: neu.bg }}
+      <main
+        className={historiasInterior.mainClassName}
+        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
       >
-        {crumbAudios}
-        <p className="font-sans text-center" style={{ color: neu.textBody }}>
-          No encontramos esta historia o no tiene audio.
-        </p>
-        <Link
-          href="/historias"
-          className="rounded-full border border-[color:var(--almamundi-orange)]/40 px-6 py-3 text-sm font-medium transition-colors hover:bg-[#ff4500]/10"
-          style={{ color: neu.orange }}
-        >
-          Ver historias
-        </Link>
-      </div>
+        <div className={`${historiasInterior.contentWrapClassName} flex w-full flex-1 flex-col`}>
+          <section className="flex w-full flex-1 flex-col items-center justify-center gap-6 px-6 py-16 md:py-24">
+            <p className="font-sans text-center" style={{ color: neu.textBody }}>
+              No encontramos esta historia o no tiene audio.
+            </p>
+            <Link
+              href="/historias"
+              className="rounded-full border border-[color:var(--almamundi-orange)]/40 px-6 py-3 text-sm font-medium transition-colors hover:bg-[#ff4500]/10"
+              style={{ color: neu.orange }}
+            >
+              Ver historias
+            </Link>
+          </section>
+        </div>
+      </main>
     );
   }
 
-  /** Incrustado en layout global: masthead y footer como el resto del sitio. */
+  /** Masthead + migas (`GlobalSiteChrome`) + esta columna + footer global (`RootLayout`). */
   return (
-    <div className="flex w-full min-h-0 flex-1 flex-col items-center gap-1">
-      {crumbAudios}
-      <div className="flex min-h-0 w-full flex-1 flex-col">
-        <AudioPlayer historia={historia} presentation="embed" />
+    <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <div className={`${historiasInterior.contentWrapClassName} flex w-full flex-1 flex-col min-h-0`}>
+        <section className="flex w-full flex-1 flex-col items-center justify-center px-4 pb-12 pt-6 md:px-10 md:pb-16 md:pt-10 min-h-0">
+          <AudioPlayer historia={historia} presentation="embed" />
+        </section>
       </div>
-    </div>
+    </main>
   );
 }

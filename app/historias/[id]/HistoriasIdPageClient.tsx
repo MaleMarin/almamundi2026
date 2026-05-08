@@ -1,6 +1,5 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
@@ -90,17 +89,6 @@ export default function HistoriasIdPageClient() {
         className={`${historiasInterior.mainClassName} flex flex-col`}
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
       >
-          <div className="w-full shrink-0 px-6 pt-2 md:px-12 md:pt-4">
-            <div className="mx-auto max-w-6xl">
-              <Breadcrumbs
-                items={[
-                  { label: 'Inicio', href: '/' },
-                  { label: 'Historias', href: '/historias' },
-                  { label: 'Historia' },
-                ]}
-              />
-            </div>
-          </div>
           <div className="flex flex-1 flex-col items-center justify-center">
             <p style={{ color: neu.textBody }}>Cargando…</p>
           </div>
@@ -113,15 +101,6 @@ export default function HistoriasIdPageClient() {
         className={`${historiasInterior.mainClassName} flex flex-col items-center justify-center gap-4 px-6`}
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
       >
-          <div className="w-full max-w-6xl shrink-0 self-start px-6 md:px-12">
-            <Breadcrumbs
-              items={[
-                { label: 'Inicio', href: '/' },
-                { label: 'Historias', href: '/historias' },
-                { label: 'Historia' },
-              ]}
-            />
-          </div>
           <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
           <Link href="/historias" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>
             ← Historias
@@ -140,15 +119,6 @@ export default function HistoriasIdPageClient() {
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
         <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">
-          <div className="mb-4">
-            <Breadcrumbs
-              items={[
-                { label: 'Inicio', href: '/' },
-                { label: 'Historias', href: '/historias' },
-                { label: story.title || 'Historia' },
-              ]}
-            />
-          </div>
           <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>
             ← Historias
           </Link>

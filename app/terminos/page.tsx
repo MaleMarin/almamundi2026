@@ -1,5 +1,4 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 /**
  * /terminos — Términos de uso de AlmaMundi.
  * Mismo layout y estilo neumórfico que /privacidad.
@@ -78,9 +77,6 @@ export default function TerminosPage() {
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ marginBottom: '1rem' }}>
-          <SiteBreadcrumbs />
-        </div>
         <HomeHardLink
           href="/"
           style={{

@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import type { Metadata } from 'next';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
@@ -139,9 +138,6 @@ export default function VisionPage() {
       }}
     >
       <article style={{ maxWidth: 720, margin: '0 auto' }}>
-        <div style={{ marginBottom: '1rem' }}>
-          <SiteBreadcrumbs />
-        </div>
         <HomeHardLink
           href="/"
           style={{

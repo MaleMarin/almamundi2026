@@ -13,7 +13,6 @@ import {
 } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 
 type Submission = {
   id: string;
@@ -173,7 +172,6 @@ export default function CuraduriaPage() {
   if (!auth) {
     return (
       <main className="min-h-screen bg-[#0a0f24] text-white p-8 font-sans flex flex-col gap-6">
-        <SiteBreadcrumbs tone="dark" />
         <p>Firebase no está configurado en este entorno.</p>
       </main>
     );
@@ -182,7 +180,6 @@ export default function CuraduriaPage() {
   if (authLoading) {
     return (
       <main className="flex min-h-screen flex-col bg-[#0a0f24] p-8 font-sans text-white">
-        <SiteBreadcrumbs tone="dark" />
         <div className="flex flex-1 flex-col items-center justify-center">
           <p className="text-white/70">Cargando…</p>
         </div>
@@ -193,7 +190,6 @@ export default function CuraduriaPage() {
   if (!user || !idToken) {
     return (
       <main className="min-h-screen bg-[#0a0f24] text-white p-8 font-sans flex flex-col gap-6">
-        <SiteBreadcrumbs tone="dark" />
         <div className="max-w-md mx-auto mt-16 p-8 rounded-2xl bg-white/5 border border-white/10">
           <h1 className="text-xl font-bold mb-2">Curaduría Alma Mundi</h1>
           <p className="text-white/60 text-sm mb-6">Acceso con la misma cuenta que el panel admin.</p>
@@ -238,7 +234,6 @@ export default function CuraduriaPage() {
   return (
     <main className="min-h-screen bg-[#0a0f24] text-white p-8 font-sans">
       <div className="max-w-4xl mx-auto flex flex-col gap-6">
-        <SiteBreadcrumbs tone="dark" />
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-2xl font-bold">Curaduría Alma Mundi</h1>

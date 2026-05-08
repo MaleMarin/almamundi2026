@@ -66,7 +66,7 @@ export function StoryEndScreen({
   const shellStyle: CSSProperties = embedInSite
     ? {
         position: 'relative',
-        minHeight: 'min(92dvh, 56rem)',
+        minHeight: 'min(72dvh, 42rem)',
         width: '100%',
         display: 'flex',
         alignItems: 'center',

@@ -6,15 +6,19 @@ import { Breadcrumbs, type BreadcrumbNavItem } from '@/components/layout/Breadcr
 import {
   buildSiteBreadcrumbs,
   shouldShowSiteBreadcrumbs,
+  siteBreadcrumbTone,
 } from '@/lib/layout/site-breadcrumbs';
 
 export type SiteBreadcrumbsProps = {
-  /** Fondo claro neumórfico (interiores) u oscuro (archivo / observatorio / admin). */
+  /**
+   * Fondo claro u oscuro. Si se omite, se elige según la ruta
+   * (p. ej. `/archivo`, `/admin`, `/curaduria` → oscuro).
+   */
   tone?: 'light' | 'dark';
   className?: string;
 };
 
-function SiteBreadcrumbsInner({ tone = 'light', className = '' }: SiteBreadcrumbsProps) {
+function SiteBreadcrumbsInner({ tone: toneProp, className = '' }: SiteBreadcrumbsProps) {
   const pathname = usePathname() ?? '/';
   const searchParams = useSearchParams();
   const muestrasList =
@@ -40,13 +44,15 @@ function SiteBreadcrumbsInner({ tone = 'light', className = '' }: SiteBreadcrumb
     return { label: item.label, href: item.href };
   });
 
+  const tone = toneProp ?? siteBreadcrumbTone(pathname);
   return <Breadcrumbs items={navItems} tone={tone} className={className} />;
 }
 
 /**
- * Migas de pan según la ruta actual. No se muestra en home, `/mapa` a pantalla completa, lectores inmersivos ni recorrido cinematográfico por defecto de `/muestras`.
+ * Migas de pan según la ruta actual. No se muestra en home, raíz `/mapa`,
+ * recorrido cinematográfico por defecto de `/muestras` ni rutas `/cinematic`.
  */
-export function SiteBreadcrumbs({ tone = 'light', className = '' }: SiteBreadcrumbsProps) {
+export function SiteBreadcrumbs({ tone, className = '' }: SiteBreadcrumbsProps) {
   return (
     <Suspense fallback={null}>
       <SiteBreadcrumbsInner tone={tone} className={className} />

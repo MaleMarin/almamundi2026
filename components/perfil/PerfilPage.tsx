@@ -11,7 +11,6 @@ import { NuevaMuestraModal } from './NuevaMuestraModal';
 import { EliminarCuentaModal } from './EliminarCuentaModal';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { isAudiencePublicStoryStatus } from '@/lib/editorial/status';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -93,9 +92,6 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
         paddingBottom: 48,
       }}
     >
-      <div style={{ paddingLeft: isMobile ? '0.75rem' : '1.25rem', paddingRight: isMobile ? '0.75rem' : '1.25rem', paddingTop: '0.75rem' }}>
-        <SiteBreadcrumbs />
-      </div>
       {/* Hero */}
       <div
         style={{

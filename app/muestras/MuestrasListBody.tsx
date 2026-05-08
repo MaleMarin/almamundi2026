@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import type { MuestrasByTopic } from '@/lib/muestras-api';
 import { getMuestras } from '@/lib/muestras';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { MuestrasInteriorNav } from '@/components/muestras/MuestrasInteriorNav';
 import { MuestrasSalaEntranceLink } from '@/components/muestras/MuestrasSalaEntranceLink';
 import { neu } from '@/lib/historias-neumorph';
@@ -62,10 +61,6 @@ export function MuestrasListBody() {
       }}
     >
       <MuestrasInteriorNav />
-
-      <div className="mx-auto max-w-5xl px-6 pt-6 md:px-12">
-        <SiteBreadcrumbs />
-      </div>
 
       <div className="mx-auto max-w-5xl px-6 pb-16 pt-4 md:px-12 md:pt-6">
         <header

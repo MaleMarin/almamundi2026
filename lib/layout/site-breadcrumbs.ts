@@ -61,6 +61,22 @@ export function normalizePathnameForBreadcrumbs(pathname: string): string {
   return base.replace(/\/+$/, '') || '/';
 }
 
+/** Fondo de la barra de migas: oscuro en vistas tipo «archivo / admin». */
+export function siteBreadcrumbTone(pathname: string): 'light' | 'dark' {
+  const p = normalizePathnameForBreadcrumbs(pathname);
+  if (p === '/archivo' || p.startsWith('/archivo/')) return 'dark';
+  if (p === '/curaduria' || p.startsWith('/curaduria/')) return 'dark';
+  if (p === '/admin' || p.startsWith('/admin/')) return 'dark';
+  return 'light';
+}
+
+const HISTORIA_MEDIA_FORMAT_CRUMB: Record<string, [string, string]> = {
+  audio: ['/historias/audios', 'Audios'],
+  video: ['/historias/videos', 'Videos'],
+  foto: ['/historias/fotos', 'Fotografías'],
+  texto: ['/historias/escrito', 'Escritos'],
+};
+
 /**
  * Construye la lista de migas a partir del pathname.
  */
@@ -76,6 +92,21 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
     const prev = i > 0 ? segments[i - 1] : '';
     const pathUpTo = `/${segments.slice(0, i + 1).join('/')}`;
     const isLast = i === segments.length - 1;
+
+    // /historias/:id/audio|video|foto|texto — enlace al índice por formato + página actual
+    if (
+      segments[0] === 'historias' &&
+      segments.length === 3 &&
+      i === 2 &&
+      isLikelyStoryId(segments[1])
+    ) {
+      const pair = HISTORIA_MEDIA_FORMAT_CRUMB[seg];
+      if (pair) {
+        items.push({ href: pair[0], label: pair[1] });
+        items.push({ href: null, label: STATIC_LABELS[seg] ?? humanizeSegment(seg) });
+        break;
+      }
+    }
 
     // /mapa/historias/:id — el índice /mapa/historias redirige; migas: Inicio · Mapa · Historia (Mapa ya añadida en la vuelta anterior)
     if (prev === 'mapa' && seg === 'historias' && segments[i + 1] !== undefined && i + 2 === segments.length) {
@@ -122,7 +153,6 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   const p = normalizePathnameForBreadcrumbs(pathname);
   if (p === '/') return false;
   if (p === '/mapa') return false;
-  if (/^\/historias\/[^/]+\/(video|audio|texto|foto)$/.test(p)) return false;
   if (p === '/muestras' && !muestrasListMode) return false;
   if (p === '/cinematic' || p.startsWith('/cinematic/')) return false;
   return true;

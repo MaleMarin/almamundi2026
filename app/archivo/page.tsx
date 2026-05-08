@@ -1,6 +1,5 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 
 /**
  * Página pública Archivo AlmaMundi.
@@ -259,10 +258,6 @@ export default function ArchivoPage() {
             </HomeHardLink>
           </nav>
         </header>
-
-        <div className="mb-4 max-w-3xl">
-          <SiteBreadcrumbs tone="dark" />
-        </div>
 
         <h1 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 300, marginBottom: 8, letterSpacing: '-0.02em' }}>
           Archivo

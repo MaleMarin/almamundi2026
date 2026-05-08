@@ -255,19 +255,22 @@ export default function AudioPlayer({
               ? {
                   position: 'relative',
                   width: '100%',
-                  flex: 1,
-                  minHeight: 'min(88dvh, 52rem)',
+                  maxWidth: '30rem',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  flex: 'none',
+                  minHeight: 0,
                   background: PAGE_BG,
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
-                  paddingTop: '1rem',
-                  paddingLeft: '1rem',
-                  paddingRight: '1rem',
-                  paddingBottom: '1.5rem',
+                  alignItems: 'stretch',
+                  justifyContent: 'center',
+                  paddingTop: '0.5rem',
+                  paddingLeft: '0.25rem',
+                  paddingRight: '0.25rem',
+                  paddingBottom: '1rem',
                   zIndex: 1,
-                  overflowY: 'auto',
+                  overflowY: 'visible',
                 }
               : {
                   position: 'fixed',
@@ -335,7 +338,6 @@ export default function AudioPlayer({
               flexDirection: 'column',
               alignItems: 'center',
               minHeight: 0,
-              flex: presentation === 'embed' ? 1 : undefined,
             }}
           >
             <h1
@@ -632,7 +634,7 @@ export default function AudioPlayer({
   );
 
   if (presentation === 'embed') {
-    return <div className="flex w-full min-h-0 flex-1 flex-col">{content}</div>;
+    return <div className="flex w-full max-w-xl shrink-0 flex-col">{content}</div>;
   }
   if (typeof document === 'undefined') return null;
   return ReactDOM.createPortal(content, document.body);
