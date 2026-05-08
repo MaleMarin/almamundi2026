@@ -3,6 +3,8 @@
  * stories (master publicadas), story_submissions (borradores/pendientes), mail_queue (cola envío).
  */
 
+import type { HuellaV2VisualParams } from "@/lib/huella/types";
+
 /** Compatible con Firestore Timestamp (seconds, nanoseconds). */
 export interface TimestampLike {
   seconds: number;
@@ -70,8 +72,10 @@ export interface StorySubmission {
   curatorNotes?: string;
   /** Transcripción (Whisper) cuando format es audio/video. */
   transcription?: string;
-  /** Parámetros visuales de la huella (análisis IA → geometría). */
+  /** Parámetros visuales de la huella (análisis IA → geometría Bauhaus /subir). */
   huellaVisualParams?: unknown;
+  /** Huella v2 «cintas de memoria»: paleta y densidad deterministas por historia (opcional). */
+  huellaV2VisualParams?: HuellaV2VisualParams;
 }
 
 /** stories: solo existen cuando están publicadas (master). */

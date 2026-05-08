@@ -2,7 +2,7 @@ import type { HuellaVisualParams, VisualBlock } from "@/lib/huella/types";
 
 export const IMPRONTA_EXPORT_W = 900;
 export const IMPRONTA_EXPORT_H = 1200;
-const FOOTER_H = 100;
+const FOOTER_H = 112;
 
 function drawBlock(
   ctx: CanvasRenderingContext2D,
@@ -24,14 +24,21 @@ function drawBlock(
   ctx.restore();
 }
 
+export type BauhausExportOpts = {
+  footerLine: string;
+  dateLabel: string;
+  /** Etiqueta de formato en el pie descargable (recuerdo AlmaMundi). */
+  formatLabel?: string;
+};
+
 /**
- * Composición tipo Bauhaus: rectángulos duros a partir de `HuellaVisualParams`,
- * marco negro, franja inferior con sitio y fecha.
+ * Composición tipo Bauhaus: rectángulos a partir de `HuellaVisualParams`,
+ * marco sobrio y franja inferior clara (sin bloque negro).
  */
 export function drawImprontaBauhaus(
   ctx: CanvasRenderingContext2D,
   params: HuellaVisualParams,
-  opts: { footerLine: string; dateLabel: string }
+  opts: BauhausExportOpts
 ): void {
   const W = IMPRONTA_EXPORT_W;
   const H = IMPRONTA_EXPORT_H;
@@ -39,7 +46,8 @@ export function drawImprontaBauhaus(
   const cw = W;
   const ch = H - fh;
 
-  ctx.fillStyle = "#EDE9E0";
+  const pageBg = "#E0E5EC";
+  ctx.fillStyle = pageBg;
   ctx.fillRect(0, 0, W, H);
 
   const pad = 20;
@@ -48,9 +56,9 @@ export function drawImprontaBauhaus(
   const ox = pad;
   const oy = pad;
 
-  ctx.strokeStyle = "#0a0a0a";
-  ctx.lineWidth = 5;
-  ctx.strokeRect(ox - 4, oy - 4, innerW + 8, innerH + 8);
+  ctx.strokeStyle = "rgba(51, 65, 85, 0.35)";
+  ctx.lineWidth = 3;
+  ctx.strokeRect(ox - 2, oy - 2, innerW + 4, innerH + 4);
 
   for (const b of params.base) drawBlock(ctx, b, ox, oy, innerW, innerH);
   for (const b of params.core) drawBlock(ctx, b, ox, oy, innerW, innerH);
@@ -61,22 +69,38 @@ export function drawImprontaBauhaus(
     ctx.fillRect(ox, oy, innerW, innerH);
   }
 
-  ctx.strokeStyle = "#111";
-  ctx.lineWidth = 8;
+  ctx.strokeStyle = "rgba(255, 69, 0, 0.45)";
+  ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(ox, oy + innerH * 0.55);
-  ctx.lineTo(ox + innerW * 0.5, oy + 8);
+  ctx.lineTo(ox + innerW * 0.45, oy + 10);
   ctx.stroke();
 
-  ctx.fillStyle = "#0d0d0d";
+  ctx.fillStyle = pageBg;
   ctx.fillRect(0, H - fh, W, fh);
+  ctx.beginPath();
+  ctx.moveTo(0, H - fh);
+  ctx.lineTo(W, H - fh);
+  ctx.strokeStyle = "rgba(255,255,255,0.7)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
 
-  ctx.fillStyle = "#ffffff";
-  ctx.font = "700 24px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillStyle = "#ff4500";
+  ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
   ctx.textBaseline = "middle";
-  ctx.fillText(opts.footerLine, 28, H - fh / 2 - 14);
+  ctx.fillText("AlmaMundi", 28, H - fh / 2 - 26);
 
-  ctx.fillStyle = "rgba(255,255,255,0.78)";
-  ctx.font = "500 17px ui-sans-serif, system-ui, sans-serif";
-  ctx.fillText(opts.dateLabel, 28, H - fh / 2 + 18);
+  ctx.fillStyle = "#334155";
+  ctx.font = "600 22px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText(opts.footerLine, 28, H - fh / 2 + 2);
+
+  const fmt = opts.formatLabel?.trim();
+  const sub = fmt ? `${opts.dateLabel} · ${fmt}` : opts.dateLabel;
+  ctx.fillStyle = "#64748b";
+  ctx.font = "500 16px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText(sub, 28, H - fh / 2 + 30);
+
+  ctx.fillStyle = "#94a3b8";
+  ctx.font = "400 13px ui-sans-serif, system-ui, sans-serif";
+  ctx.fillText("Interpretación visual", 28, H - fh / 2 + 52);
 }

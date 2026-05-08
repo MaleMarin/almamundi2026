@@ -1,9 +1,17 @@
 /**
- * Sistema de Huellas v2 — AlmaMundi
- * Colores y trazos derivados del texto (o del nombre de archivo en fotos), no del formato.
+ * Huella v2 — «Cintas de memoria» AlmaMundi
+ *
+ * Capas del sistema (v1 controlada):
+ * 1. `buildPaletteFromMeta` / `buildHuellaV2VisualParams` — parámetros + paleta determinística (seed).
+ * 2. `drawHuellaV2OnCanvas` — render 2D.
+ * 3. `canvas.toDataURL` / `toBlob` — export PNG (en componentes).
+ *
+ * Lenguaje de producto: interpretación visual / recuerdo visual (sin lectura «clínica»).
  */
 
-export type HuellaV2Format = 'video' | 'audio' | 'texto' | 'foto';
+import type { HuellaV2VisualParams, HuellaV2Format } from '@/lib/huella/types';
+
+export type { HuellaV2Format };
 
 export type HuellaV2Meta = {
   storyId: string;
@@ -13,20 +21,57 @@ export type HuellaV2Meta = {
   submitHour?: number;
   width?: number;
   height?: number;
-  /** Franja inferior con URL y fecha (modal de confirmación / descarga). */
+  /** Pie tipo «recuerdo» con identidad del sitio. */
   embedSiteFooter?: boolean;
-  /** Fecha en la franja; por defecto “ahora” si `embedSiteFooter` es true. */
   footerAt?: Date;
-  /** Título de la historia en la franja del PNG (sustituye texto genérico de “recuerdo” / ID). */
   embedStoryTitle?: string;
+  /** Etiqueta legible del formato (p. ej. «Video») para el pie descargable. */
+  embedFormatLabel?: string;
+  /** URL pública de la historia (si existe) — se trunca en canvas si hace falta. */
+  embedPublicUrl?: string;
 };
 
-export const HUELLA_V2_BG = '#F0EFE9';
+/** Fondo alineado a interiores neumórficos claros. */
+export const HUELLA_V2_BG = '#E0E5EC';
 
 export const HUELLA_V2_SITE_DISPLAY = 'www.almamundi.org';
 
-/** Palabras significativas que forman la paleta (spec modal confirmación). */
-export const HUELLA_V2_MAX_PALABRAS = 14;
+/** Hasta 5 palabras guía; el resto no influye en la paleta reducida. */
+export const HUELLA_V2_MAX_PALABRAS = 5;
+
+const MAIN_RIBBON_COLORS = 5;
+
+/** Anclas HSL [h, s%, l%] por formato: gamas cercanas, baja saturación (evitar arcoíris). */
+const FORMAT_ANCHORS: Record<HuellaV2Format, [number, number, number][]> = {
+  video: [
+    [16, 38, 52],
+    [24, 34, 48],
+    [12, 36, 54],
+    [32, 40, 50],
+    [20, 42, 46],
+  ],
+  audio: [
+    [196, 36, 50],
+    [204, 40, 48],
+    [188, 34, 52],
+    [172, 38, 46],
+    [210, 32, 54],
+  ],
+  texto: [
+    [220, 32, 48],
+    [212, 36, 52],
+    [228, 30, 46],
+    [205, 34, 50],
+    [235, 28, 54],
+  ],
+  foto: [
+    [36, 38, 50],
+    [28, 40, 48],
+    [44, 36, 52],
+    [32, 34, 54],
+    [48, 42, 46],
+  ],
+};
 
 const STOP_WORDS = new Set([
   'de',
@@ -89,15 +134,13 @@ export function extraerPalabras(texto: string): string[] {
     .slice(0, HUELLA_V2_MAX_PALABRAS);
 }
 
+/** @deprecated Preferir paleta anclada por formato (`buildPaletteFromMeta`). Solo referencia / demos. */
 export function palabraAColor(palabra: string): string {
   const vocales = (palabra.match(/[aeiouáéíóú]/gi) || []).length;
   const charSum = [...palabra].reduce((s, c) => s + c.charCodeAt(0), 0);
   const hue = charSum % 360;
-  const sat = Math.min(100, 65 + (vocales / palabra.length) * 35);
-  const lit = Math.max(
-    22,
-    Math.min(58, 28 + ((palabra.length - vocales) / palabra.length) * 32),
-  );
+  const sat = Math.min(55, 38 + (vocales / Math.max(palabra.length, 1)) * 14);
+  const lit = Math.max(40, Math.min(56, 46 + ((palabra.length - vocales) / Math.max(palabra.length, 1)) * 10));
   return `hsl(${hue}, ${sat.toFixed(0)}%, ${lit.toFixed(0)}%)`;
 }
 
@@ -122,13 +165,22 @@ export function seededRnd(seed: number, i: number): number {
   return x - Math.floor(x);
 }
 
-function hslVibrate(hslStr: string, seed: number, i: number): string {
-  const m = hslStr.match(/hsl\((\d+),\s*(\d+)%,\s*(\d+)%\)/);
-  if (!m) return hslStr;
-  const h = (+m[1] + Math.floor(seededRnd(seed, i * 7 + 1) * 18) - 9 + 360) % 360;
-  const s = Math.min(100, +m[2] + 22 + Math.floor(seededRnd(seed, i * 7 + 2) * 15));
-  const l = Math.max(18, Math.min(60, +m[3] + Math.floor(seededRnd(seed, i * 7 + 3) * 10) - 5));
-  return `hsl(${h}, ${s}%, ${l}%)`;
+function hslCss(h: number, s: number, l: number): string {
+  const hh = ((h % 360) + 360) % 360;
+  const ss = Math.max(22, Math.min(46, s));
+  const ll = Math.max(42, Math.min(58, l));
+  return `hsl(${hh.toFixed(0)}, ${ss.toFixed(0)}%, ${ll.toFixed(0)}%)`;
+}
+
+/** Variación suave por palabra + seed (determinística). */
+function matizDesdePalabra(palabra: string, seed: number, slot: number): { dh: number; ds: number; dl: number } {
+  let a = seedFn(palabra + String(seed) + String(slot));
+  const dh = (a % 19) - 9;
+  a = Math.imul(a, 1103515245) + 12345;
+  const ds = ((a >>> 0) % 9) - 4;
+  a = Math.imul(a, 1103515245) + 12345;
+  const dl = ((a >>> 0) % 7) - 3;
+  return { dh, ds, dl };
 }
 
 function textoBaseParaHuella(meta: HuellaV2Meta): string {
@@ -139,58 +191,65 @@ function textoBaseParaHuella(meta: HuellaV2Meta): string {
   return content || storyId;
 }
 
+/**
+ * Paleta principal: 5 tonos anclados al formato + matiz por palabras (interpretación visual).
+ */
 export function buildPaletteFromMeta(meta: HuellaV2Meta): { palabras: string[]; paleta: string[] } {
+  const formato: HuellaV2Format = meta.format ?? 'texto';
   const texto = textoBaseParaHuella(meta);
   let palabras = extraerPalabras(texto);
-  if (palabras.length < 3) {
+  if (palabras.length < 2) {
     palabras = [...palabras, ...extraerPalabras(meta.storyId.replace(/[-_]/g, ' '))];
   }
   if (palabras.length === 0) {
-    palabras = ['historia', 'mundo', 'alma'];
+    palabras = ['memoria', 'relato', 'lugar', 'tiempo', 'voz'];
   }
-  const paleta = palabras.map(palabraAColor);
+  const seed = seedFn(meta.storyId);
+  const anchors = FORMAT_ANCHORS[formato];
+  const paleta: string[] = [];
+  for (let i = 0; i < MAIN_RIBBON_COLORS; i++) {
+    const [h0, s0, l0] = anchors[i] ?? anchors[0]!;
+    const w = palabras[i % palabras.length] ?? 'memoria';
+    const { dh, ds, dl } = matizDesdePalabra(w, seed, i);
+    paleta.push(hslCss(h0 + dh, s0 + ds, l0 + dl));
+  }
   return { palabras, paleta };
 }
 
-export type HuellaV2Stats = {
-  storyId: string;
-  palabrasPreview: string;
-  numColores: number;
-  /** Líneas dibujadas en canvas (Bézier, alta densidad). */
-  numLineas: number;
-  anguloBase: number;
-  /** Líneas en `generateHuella` / `generateHuellaSvg` (rectas, 80–200). */
-  numLineasSvg: number;
-  /** Ángulo base del SVG (×28), distinto del canvas (×22). */
-  anguloBaseSvg: number;
-  seed: number;
-};
-
-export function getHuellaV2DrawStats(meta: HuellaV2Meta): HuellaV2Stats {
-  const charCount = meta.charCount ?? (meta.content?.length ?? 0);
+/** Parámetros listos para guardar en Firestore u otro backend (misma semilla ⇒ mismo dibujo). */
+export function buildHuellaV2VisualParams(meta: HuellaV2Meta): HuellaV2VisualParams {
+  const charCount = meta.charCount ?? meta.content?.length ?? 0;
   const submitHour = meta.submitHour ?? 12;
-  const { palabras } = buildPaletteFromMeta(meta);
-  const numLineas = Math.floor(150 + (charCount / 4500) * 150);
-  const anguloBase = (submitHour / 23 - 0.5) * 22;
-  const numLineasSvg = Math.floor(80 + (charCount / 4500) * 120);
-  const anguloBaseSvg = (submitHour / 23 - 0.5) * 28;
+  const formato = meta.format ?? 'texto';
+  const { paleta, palabras } = buildPaletteFromMeta(meta);
+  const seed = seedFn(meta.storyId);
+  const anguloBase = (submitHour / 23 - 0.5) * 20;
+  const ribbonCount = Math.min(56, Math.floor(26 + (charCount / 11000) * 30));
   return {
-    storyId: meta.storyId,
-    palabrasPreview:
-      palabras.slice(0, 5).join(', ') + (palabras.length > 5 ? ' …' : ''),
-    numColores: palabras.length,
-    numLineas,
+    version: 1,
+    seed,
+    format: formato,
+    palette: paleta,
+    wordHints: palabras.slice(0, MAIN_RIBBON_COLORS),
+    ribbonCount,
     anguloBase,
-    numLineasSvg,
-    anguloBaseSvg,
-    seed: seedFn(meta.storyId),
+    charCount,
+    submitHour,
   };
 }
 
-/**
- * Dibuja la huella v2 en un canvas (usa canvas.width / canvas.height).
- * @returns paleta HSL usada (strings).
- */
+function hslSubtleShift(hslStr: string, seed: number, i: number): string {
+  const m = hslStr.match(/hsl\((-?\d+),\s*(\d+)%,\s*(\d+)%\)/);
+  if (!m) return hslStr;
+  let h = +m[1];
+  let s = +m[2];
+  let l = +m[3];
+  h = (h + Math.floor((seededRnd(seed, i * 5 + 1) - 0.5) * 10) + 360) % 360;
+  s = Math.max(24, Math.min(48, s + Math.floor((seededRnd(seed, i * 5 + 2) - 0.5) * 6)));
+  l = Math.max(44, Math.min(58, l + Math.floor((seededRnd(seed, i * 5 + 3) - 0.5) * 5)));
+  return `hsl(${h}, ${s}%, ${l}%)`;
+}
+
 const MESES_CORTO = [
   'ene',
   'feb',
@@ -206,12 +265,7 @@ const MESES_CORTO = [
   'dic',
 ] as const;
 
-/** Una línea; recorta con … si no cabe. */
-function truncateCanvasLine(
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  maxW: number
-): string {
+function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
   if (ctx.measureText(text).width <= maxW) return text;
   const ell = '…';
   let t = text.trim();
@@ -224,54 +278,96 @@ function truncateCanvasLine(
 function drawHuellaSiteFooter(
   ctx: CanvasRenderingContext2D,
   at: Date,
-  storyTitle?: string
+  storyTitle: string | undefined,
+  formatLabel: string | undefined,
+  publicUrl: string | undefined
 ): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
   const title = storyTitle?.trim();
   const hasTitle = Boolean(title);
-  /** Franja baja: menos altura para no tapar el dibujo (“menos vidrio” visual). */
-  const fH = H * (hasTitle ? 0.125 : 0.085);
+  const fmt = formatLabel?.trim();
+  const urlLine = publicUrl?.trim() || `https://${HUELLA_V2_SITE_DISPLAY}`;
+  const hasFooterDetail = Boolean(hasTitle || fmt);
+  const fH = H * (hasFooterDetail ? 0.14 : 0.1);
   const fechaCorta = `${at.getDate()} ${MESES_CORTO[at.getMonth()]} ${at.getFullYear()}`;
-  const metaLine = `${HUELLA_V2_SITE_DISPLAY} · ${fechaCorta}`;
+  const metaParts = [fechaCorta, fmt, urlLine].filter(Boolean);
+  const metaLine = metaParts.join(' · ');
 
   ctx.save();
-  /* Sólido: sin capa semitransparente tipo “glass” sobre los trazos */
   ctx.globalAlpha = 1;
   ctx.fillStyle = HUELLA_V2_BG;
   ctx.fillRect(0, H - fH, W, fH);
+  ctx.shadowColor = 'rgba(163, 177, 198, 0.35)';
+  ctx.shadowBlur = 0;
+  ctx.shadowOffsetY = -2;
   ctx.beginPath();
   ctx.moveTo(0, H - fH);
   ctx.lineTo(W, H - fH);
-  ctx.strokeStyle = 'rgba(20,29,38,0.08)';
+  ctx.strokeStyle = 'rgba(255,255,255,0.65)';
   ctx.lineWidth = 1;
   ctx.stroke();
+  ctx.shadowOffsetY = 0;
 
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   const bandTop = H - fH;
-  const maxW = W * 0.9;
+  const maxW = W * 0.92;
+
+  const brandPx = Math.max(10, Math.round(W * 0.022));
+  ctx.fillStyle = '#ff4500';
+  ctx.font = `600 ${brandPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+  ctx.fillText('AlmaMundi', W / 2, bandTop + fH * 0.22);
 
   if (hasTitle && title) {
-    const titlePx = Math.max(11, Math.round(W * 0.026));
-    ctx.fillStyle = '#111418';
+    const titlePx = Math.max(11, Math.round(W * 0.028));
+    ctx.fillStyle = '#334155';
     ctx.font = `500 ${titlePx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
     const lineTitle = truncateCanvasLine(ctx, title, maxW);
-    ctx.fillText(lineTitle, W / 2, bandTop + fH * 0.36);
-
-    const metaPx = Math.max(9, Math.round(W * 0.018));
-    ctx.fillStyle = '#64748B';
-    ctx.font = `400 ${metaPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    const lineMeta = truncateCanvasLine(ctx, metaLine, maxW);
-    ctx.fillText(lineMeta, W / 2, bandTop + fH * 0.74);
-  } else {
-    const metaPx = Math.max(10, Math.round(W * 0.022));
-    ctx.fillStyle = '#64748B';
-    ctx.font = `400 ${metaPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    const lineMeta = truncateCanvasLine(ctx, metaLine, maxW);
-    ctx.fillText(lineMeta, W / 2, bandTop + fH * 0.52);
+    ctx.fillText(lineTitle, W / 2, bandTop + fH * 0.48);
   }
+
+  const captionPx = Math.max(8, Math.round(W * 0.018));
+  ctx.fillStyle = '#94a3b8';
+  ctx.font = `400 ${captionPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+  ctx.fillText('Interpretación visual', W / 2, bandTop + fH * (hasTitle ? 0.68 : 0.48));
+
+  const metaPx = Math.max(9, Math.round(W * 0.019));
+  ctx.fillStyle = '#64748b';
+  ctx.font = `400 ${metaPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+  const lineMeta = truncateCanvasLine(ctx, metaLine, maxW);
+  ctx.fillText(lineMeta, W / 2, bandTop + fH * (hasTitle ? 0.88 : 0.76));
   ctx.restore();
+}
+
+export type HuellaV2Stats = {
+  storyId: string;
+  palabrasPreview: string;
+  numColores: number;
+  numLineas: number;
+  anguloBase: number;
+  numLineasSvg: number;
+  anguloBaseSvg: number;
+  seed: number;
+};
+
+export function getHuellaV2DrawStats(meta: HuellaV2Meta): HuellaV2Stats {
+  const charCount = meta.charCount ?? meta.content?.length ?? 0;
+  const submitHour = meta.submitHour ?? 12;
+  const { palabras } = buildPaletteFromMeta(meta);
+  const params = buildHuellaV2VisualParams(meta);
+  const numLineasSvg = Math.floor(52 + (charCount / 9000) * 48);
+  const anguloBaseSvg = (submitHour / 23 - 0.5) * 24;
+  return {
+    storyId: meta.storyId,
+    palabrasPreview: palabras.slice(0, 5).join(', ') + (palabras.length > 5 ? ' …' : ''),
+    numColores: params.palette.length,
+    numLineas: params.ribbonCount,
+    anguloBase: params.anguloBase,
+    numLineasSvg,
+    anguloBaseSvg,
+    seed: params.seed,
+  };
 }
 
 export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: HuellaV2Meta): string[] {
@@ -282,32 +378,32 @@ export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: Huella
     embedSiteFooter,
     footerAt,
     embedStoryTitle,
+    embedFormatLabel,
+    embedPublicUrl,
   } = meta;
-  const texto = textoBaseParaHuella(meta);
-  let palabras = extraerPalabras(texto);
-  if (palabras.length < 3) {
-    palabras = [...palabras, ...extraerPalabras(storyId.replace(/[-_]/g, ' '))];
-  }
-  if (palabras.length === 0) {
-    palabras = ['historia', 'mundo', 'alma'];
-  }
-  const paleta = palabras.map(palabraAColor);
-  const S = seedFn(storyId);
+
+  const { paleta } = buildPaletteFromMeta(meta);
+  const params = buildHuellaV2VisualParams(meta);
+  const S = params.seed;
   const rnd = (i: number) => seededRnd(S, i);
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
-  const numLineas = Math.floor(150 + (charCount / 4500) * 150);
-  const anguloBase = (submitHour / 23 - 0.5) * 22;
+  const contentFrac =
+    embedSiteFooter && (embedStoryTitle?.trim() || embedFormatLabel?.trim()) ? 0.14 : embedSiteFooter ? 0.1 : 0;
+  const contentH = H * (1 - contentFrac);
+  const numLineas = params.ribbonCount;
+  const anguloBase = params.anguloBase;
 
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = HUELLA_V2_BG;
   ctx.fillRect(0, 0, W, H);
 
   const pasadas = [
-    { frac: 0.3, anchoMin: 12, anchoMax: 55, opMin: 0.45, opMax: 0.75, wobble: 35 },
-    { frac: 0.42, anchoMin: 3, anchoMax: 18, opMin: 0.55, opMax: 0.92, wobble: 18 },
-    { frac: 0.28, anchoMin: 1, anchoMax: 7, opMin: 0.7, opMax: 1.0, wobble: 8 },
+    { frac: 0.52, anchoMin: 14, anchoMax: 42, opMin: 0.35, opMax: 0.58, wobble: 28 },
+    { frac: 0.38, anchoMin: 2, anchoMax: 10, opMin: 0.45, opMax: 0.78, wobble: 14 },
   ] as const;
+
+  const ACCENT_HSL = 'hsl(16, 72%, 52%)';
 
   let lineIdx = 0;
   pasadas.forEach((p, pi) => {
@@ -316,65 +412,61 @@ export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: Huella
     for (let i = 0; i < n; i++) {
       const ii = lineIdx++;
       const ci = Math.floor(rnd(ii + 10) * paleta.length);
-      const color = hslVibrate(paleta[ci]!, S, ii + pi * 1000);
+      const color = hslSubtleShift(paleta[ci]!, S, ii + pi * 900);
       const ancho = p.anchoMin + rnd(ii + 200) * (p.anchoMax - p.anchoMin);
-      const angulo = anguloBase + (rnd(ii + 300) - 0.5) * 34 + (rnd(ii + 301) - 0.5) * 10;
+      const angulo = anguloBase + (rnd(ii + 300) - 0.5) * 22 + (rnd(ii + 301) - 0.5) * 8;
       const opacidad = p.opMin + rnd(ii + 400) * (p.opMax - p.opMin);
-      const x = i * step + rnd(ii + 500) * step * 1.15 - W * 0.05;
-      const offset = Math.tan((angulo * Math.PI) / 180) * H;
-      const over = H * 0.18;
+      const x = i * step + rnd(ii + 500) * step * 0.85 - W * 0.04;
+      const offset = Math.tan((angulo * Math.PI) / 180) * contentH;
+      const over = contentH * 0.12;
       const x1 = x - offset / 2;
       const x2 = x + offset / 2;
-      const cx1 = x1 + (rnd(ii + 700) - 0.5) * p.wobble * 2;
-      const cy1 = H * 0.28 + rnd(ii + 701) * H * 0.12;
-      const cx2 = x2 + (rnd(ii + 702) - 0.5) * p.wobble * 2;
-      const cy2 = H * 0.62 + rnd(ii + 703) * H * 0.12;
+      const cx1 = x1 + (rnd(ii + 700) - 0.5) * p.wobble * 2.2;
+      const cy1 = contentH * 0.26 + rnd(ii + 701) * contentH * 0.14;
+      const cx2 = x2 + (rnd(ii + 702) - 0.5) * p.wobble * 2.2;
+      const cy2 = contentH * 0.64 + rnd(ii + 703) * contentH * 0.14;
 
       ctx.beginPath();
       ctx.moveTo(x1, -over);
-      ctx.bezierCurveTo(cx1, cy1, cx2, cy2, x2, H + over);
+      ctx.bezierCurveTo(cx1, cy1, cx2, cy2, x2, contentH + over);
       ctx.strokeStyle = color;
       ctx.lineWidth = ancho;
       ctx.globalAlpha = opacidad;
       ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
       ctx.stroke();
       ctx.globalAlpha = 1;
     }
   });
 
-  const nAcento = Math.floor(5 + rnd(9999) * 5);
+  const nAcento = 2 + Math.floor(rnd(9998) * 2);
   for (let i = 0; i < nAcento; i++) {
     const ii = lineIdx++;
-    const ci = Math.floor(rnd(ii + 50) * paleta.length);
-    const color = hslVibrate(paleta[ci]!, S, ii + 5000);
-    const ancho = 30 + rnd(ii + 800) * 50;
-    const angulo = anguloBase + (rnd(ii + 900) - 0.5) * 18;
-    const opacidad = 0.18 + rnd(ii + 901) * 0.28;
-    const x = -W * 0.1 + rnd(ii + 902) * W * 1.2;
-    const offset = Math.tan((angulo * Math.PI) / 180) * H;
-    const cx1 = x - offset / 3 + (rnd(ii + 903) - 0.5) * 40;
-    const cx2 = x + offset / 3 + (rnd(ii + 904) - 0.5) * 40;
+    const ancho = 22 + rnd(ii + 800) * 28;
+    const angulo = anguloBase + (rnd(ii + 900) - 0.5) * 14;
+    const opacidad = 0.1 + rnd(ii + 901) * 0.14;
+    const x = -W * 0.08 + rnd(ii + 902) * W * 1.2;
+    const offset = Math.tan((angulo * Math.PI) / 180) * contentH;
+    const cx1 = x - offset / 3 + (rnd(ii + 903) - 0.5) * 32;
+    const cx2 = x + offset / 3 + (rnd(ii + 904) - 0.5) * 32;
     ctx.beginPath();
-    ctx.moveTo(x - offset / 2, -H * 0.1);
-    ctx.bezierCurveTo(cx1, H * 0.32, cx2, H * 0.68, x + offset / 2, H * 1.1);
-    ctx.strokeStyle = color;
+    ctx.moveTo(x - offset / 2, -contentH * 0.08);
+    ctx.bezierCurveTo(cx1, contentH * 0.34, cx2, contentH * 0.66, x + offset / 2, contentH * 1.06);
+    ctx.strokeStyle = ACCENT_HSL;
     ctx.lineWidth = ancho;
     ctx.globalAlpha = opacidad;
-    ctx.lineCap = 'butt';
+    ctx.lineCap = 'round';
     ctx.stroke();
     ctx.globalAlpha = 1;
   }
 
   if (embedSiteFooter) {
-    drawHuellaSiteFooter(ctx, footerAt ?? new Date(), embedStoryTitle);
+    drawHuellaSiteFooter(ctx, footerAt ?? new Date(), embedStoryTitle, embedFormatLabel, embedPublicUrl);
   }
 
   return paleta;
 }
 
-/**
- * Versión SVG con líneas rectas (útil para export estático / imprimir).
- */
 export function generateHuellaSvg(meta: HuellaV2Meta): string {
   const {
     storyId,
@@ -387,36 +479,27 @@ export function generateHuellaSvg(meta: HuellaV2Meta): string {
   } = meta;
 
   const texto = format === 'foto' ? limpiarNombreFoto(content) || storyId : content || storyId;
-  let palabras = extraerPalabras(texto);
-  if (palabras.length < 3) {
-    palabras = [...palabras, ...extraerPalabras(storyId.replace(/[-_]/g, ' '))];
-  }
-  if (palabras.length === 0) {
-    palabras = ['historia', 'mundo', 'alma'];
-  }
-  const paleta = palabras.map(palabraAColor);
+  const metaForPal: HuellaV2Meta = { storyId, content: texto, format };
+  const { paleta } = buildPaletteFromMeta(metaForPal);
   const S = seedFn(storyId);
   const rnd = (i: number) => seededRnd(S, i);
-  const numLineas = Math.floor(80 + (charCount / 4500) * 120);
-  const anguloBase = (submitHour / 23 - 0.5) * 28;
+  const numLineas = Math.min(72, Math.floor(40 + (charCount / 9000) * 32));
+  const anguloBase = (submitHour / 23 - 0.5) * 22;
   const step = width / numLineas;
 
   let lines = '';
   for (let i = 0; i < numLineas; i++) {
     const colorIdx = Math.floor(rnd(i + 10) * paleta.length) % paleta.length;
-    const stroke = paleta[colorIdx] ?? '#888888';
-    const ancho = 1.5 + rnd(i + 200) * 16;
-    const angulo = anguloBase + (rnd(i + 300) - 0.5) * 26;
-    const opacidad = 0.35 + rnd(i + 400) * 0.65;
-    const x = i * step + rnd(i + 500) * step * 0.8;
+    const stroke = hslSubtleShift(paleta[colorIdx] ?? '#888888', S, i);
+    const ancho = 1.2 + rnd(i + 200) * 9;
+    const angulo = anguloBase + (rnd(i + 300) - 0.5) * 18;
+    const opacidad = 0.38 + rnd(i + 400) * 0.45;
+    const x = i * step + rnd(i + 500) * step * 0.65;
     const offset = Math.tan((angulo * Math.PI) / 180) * height;
-    lines += `<line x1="${(x - offset / 2).toFixed(1)}" y1="0" x2="${(x + offset / 2).toFixed(1)}" y2="${height}" stroke="${stroke}" stroke-width="${ancho.toFixed(1)}" opacity="${opacidad.toFixed(2)}"/>`;
+    lines += `<line x1="${(x - offset / 2).toFixed(1)}" y1="0" x2="${(x + offset / 2).toFixed(1)}" y2="${height}" stroke="${stroke}" stroke-width="${ancho.toFixed(1)}" opacity="${opacidad.toFixed(2)}" stroke-linecap="round"/>`;
   }
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="${HUELLA_V2_BG}"/>${lines}</svg>`;
 }
 
-/**
- * Alias del nombre usado en la spec (`generateHuella` → string SVG). Mismo cuerpo que `generateHuellaSvg`.
- */
 export const generateHuella = generateHuellaSvg;

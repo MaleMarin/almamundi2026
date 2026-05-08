@@ -74,7 +74,11 @@ export function ImprontaStep({
       dateStyle: 'long',
       timeStyle: 'short',
     }).format(new Date());
-    drawImprontaBauhaus(ctx, params, { footerLine: FOOTER_SITE, dateLabel });
+    drawImprontaBauhaus(ctx, params, {
+      footerLine: FOOTER_SITE,
+      dateLabel,
+      formatLabel: FORMAT_LABEL[format],
+    });
   }, []);
 
   useEffect(() => {

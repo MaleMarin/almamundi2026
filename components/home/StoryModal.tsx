@@ -255,6 +255,14 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     mediaBlob,
   });
 
+  const base =
+    (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '') ||
+    (typeof window !== 'undefined' ? window.location.origin : '');
+  const embedPublicUrl =
+    base && storyId
+      ? `${base}/historias/${encodeURIComponent(storyId)}`
+      : `https://www.almamundi.org`;
+
   drawHuellaV2OnCanvas(ctx, {
     storyId,
     content,
@@ -264,6 +272,15 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     embedSiteFooter: true,
     footerAt: receivedAt,
     embedStoryTitle: storyTitle.trim() || undefined,
+    embedFormatLabel:
+      mode === 'video'
+        ? 'Video'
+        : mode === 'audio'
+          ? 'Audio'
+          : mode === 'texto'
+            ? 'Texto'
+            : 'Fotografías',
+    embedPublicUrl,
   });
 }
 
