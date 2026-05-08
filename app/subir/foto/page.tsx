@@ -5,6 +5,7 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import { useCallback, useState } from 'react';
 import Link from 'next/link';
 import { UserCircle } from 'lucide-react';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
@@ -145,6 +146,10 @@ export default function SubirFotoPage() {
           <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
+
+      <div className="mx-auto w-full max-w-xl px-4 pt-4 sm:px-6 md:px-12 md:pt-6">
+        <SiteBreadcrumbs />
+      </div>
 
       <div className="pt-8 pb-12 px-4 sm:px-6 md:px-12 max-w-xl mx-auto">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-light mb-1" style={{ color: neu.textMain }}>

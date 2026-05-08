@@ -33,6 +33,8 @@ interface VideoPlayerProps {
   onClose?: () => void
   /** Si true, va directo al video (sin secuencia de intertítulo). Carruseles / listados. */
   skipIntertitle?: boolean
+  /** Ruta dedicada: stages `absolute` dentro del layout; masthead y footer accesibles. */
+  siteLayout?: boolean
 }
 
 // ─── Utils ────────────────────────────────────────────────────────────────────
@@ -91,7 +93,7 @@ const MinimizeIcon = () => (
 )
 
 // ─── Component ────────────────────────────────────────────────────────────────
-export default function VideoPlayer({ historia, onClose, skipIntertitle = false }: VideoPlayerProps) {
+export default function VideoPlayer({ historia, onClose, skipIntertitle = false, siteLayout = false }: VideoPlayerProps) {
   // Stages: 'intertitle' → 'playing' → 'ended' (skipIntertitle: entra en 'playing' al instante)
   const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>(() =>
     skipIntertitle ? 'playing' : 'intertitle'
@@ -119,6 +121,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
 
   /** Fondo coherentes con cada fase: cine durante reproducción / intertítulo; neumorfismo en pantalla final. */
   useEffect(() => {
+    if (siteLayout) return
     const prevOverflow = document.body.style.overflow
     const prevBg = document.body.style.backgroundColor
     document.body.style.overflow = 'hidden'
@@ -128,7 +131,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
       document.body.style.overflow = prevOverflow
       document.body.style.backgroundColor = prevBg
     }
-  }, [stage])
+  }, [stage, siteLayout])
 
   // ── Intertitle sequence ────────────────────────────────────────────────────
   useEffect(() => {
@@ -212,8 +215,9 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
   }
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0
+  const stagePosition: 'fixed' | 'absolute' = siteLayout ? 'absolute' : 'fixed'
 
-  return (
+  const playerUi = (
     <>
       {historia.demoStory && stage !== 'ended' ? (
         <div
@@ -331,7 +335,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
       {stage === 'intertitle' && (
         <div
           style={{
-            position: 'fixed', inset: 0,
+            position: stagePosition, inset: 0,
             background: 'var(--film)',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
@@ -473,7 +477,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
           onMouseMove={resetControlsTimer}
           onClick={togglePlay}
           style={{
-            position: 'fixed', inset: 0,
+            position: stagePosition, inset: 0,
             background: 'var(--film)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: showControls ? 'default' : 'none',
@@ -512,7 +516,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
               position: 'relative', zIndex: 2,
               width: '100%', height: '100%',
               objectFit: 'contain',
-              maxHeight: '100vh',
+              maxHeight: siteLayout ? 'min(85dvh, 100%)' : '100vh',
             }}
             playsInline
           >
@@ -728,6 +732,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
+          embedInSite={siteLayout}
           replayLabel="Ver de nuevo"
           onReplay={() => {
             setIntertitlePhase('in')
@@ -747,4 +752,13 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false 
       ) : null}
     </>
   )
+
+  if (siteLayout) {
+    return (
+      <div className="relative flex w-full min-h-[min(85dvh,720px)] flex-1 flex-col">
+        {playerUi}
+      </div>
+    )
+  }
+  return playerUi
 }

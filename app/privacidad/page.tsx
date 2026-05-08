@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 /**
  * /privacidad — Aviso de Privacidad de AlmaMundi.
  * Enlazada desde AgeGate (#s5), footer y modales. Estilo neumórfico.
@@ -88,6 +89,9 @@ export default function PrivacidadPage() {
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <div style={{ marginBottom: '1rem' }}>
+          <SiteBreadcrumbs />
+        </div>
         <HomeHardLink
           href="/"
           style={{

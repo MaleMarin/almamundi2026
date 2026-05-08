@@ -33,6 +33,8 @@ export interface HistoriaTexto {
 interface TextoReaderProps {
   historia: HistoriaTexto;
   onClose?: () => void;
+  /** Ruta dedicada: barra de progreso bajo el masthead global. */
+  siteLayout?: boolean;
 }
 
 function formatFecha(fecha: string): string {
@@ -57,7 +59,7 @@ function splitParrafos(contenido: string): string[] {
   return trimmed.split(/\n\n+/).map((p) => p.trim()).filter((p) => p.length > 0);
 }
 
-export default function TextoReader({ historia, onClose }: TextoReaderProps) {
+export default function TextoReader({ historia, onClose, siteLayout = false }: TextoReaderProps) {
   const [readProgress, setReadProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const paragraphRefs = useRef<(HTMLParagraphElement | null)[]>([]);
@@ -126,7 +128,7 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
       <div
         style={{
           position: 'fixed',
-          top: 0,
+          top: siteLayout ? 'clamp(6.75rem, 11vw, 11rem)' : 0,
           left: 0,
           right: 0,
           height: 3,
@@ -172,8 +174,8 @@ export default function TextoReader({ historia, onClose }: TextoReaderProps) {
         aria-label={`Historia: ${historia.titulo}`}
         style={{
           background: PAPEL,
-          minHeight: '100vh',
-          paddingTop: '5rem',
+          minHeight: siteLayout ? 'min(88dvh, 48rem)' : '100vh',
+          paddingTop: siteLayout ? '1.25rem' : '5rem',
           paddingBottom: '6rem',
           paddingLeft: paddingX,
           paddingRight: paddingX,

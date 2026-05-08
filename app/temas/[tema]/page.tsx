@@ -12,6 +12,7 @@ import { useStories } from '@/hooks/useStories';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { isPublicGlobeFallbackDemoId, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { getTemaBySlug } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -70,9 +71,14 @@ export default function TemaPage() {
 
   if (!tema) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center gap-4 px-6" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-        <p style={{ color: neu.textBody }}>Tema no encontrado.</p>
-        <Link href="/temas" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>← Temas</Link>
+      <main className="min-h-screen flex flex-col gap-6 px-6 py-10" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+        <div className="mx-auto w-full max-w-lg">
+          <SiteBreadcrumbs />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center gap-4">
+          <p style={{ color: neu.textBody }}>Tema no encontrado.</p>
+          <Link href="/temas" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>← Temas</Link>
+        </div>
       </main>
     );
   }
@@ -93,6 +99,10 @@ export default function TemaPage() {
           <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
+
+      <div className="mx-auto w-full max-w-5xl px-6 pt-4 md:px-12 md:pt-6">
+        <SiteBreadcrumbs />
+      </div>
 
       <section className="px-6 md:px-12 py-10 md:py-12 max-w-5xl mx-auto">
         <Link href="/temas" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>← Temas</Link>

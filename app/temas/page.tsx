@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useStories } from '@/hooks/useStories';
 import { isPublicGlobeFallbackDemoId } from '@/lib/demo-stories-public';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { TEMAS } from '@/lib/temas-list';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -54,6 +55,10 @@ export default function TemasPage() {
           <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
+
+      <div className="mx-auto w-full max-w-5xl px-6 pt-4 md:px-12 md:pt-6">
+        <SiteBreadcrumbs />
+      </div>
 
       <section className="px-6 md:px-12 pt-10 md:pt-14 pb-20 md:pb-28 max-w-5xl mx-auto">
         <p className="text-xs font-semibold tracking-[0.18em] text-amber-700 uppercase mb-3">Explorar por tema</p>

@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import type { Metadata } from 'next';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
@@ -15,6 +16,9 @@ export default function EducacionMediaticaPage() {
       style={{ fontFamily: SITE_FONT_STACK, color: '#1a1f2a' }}
     >
       <div className="mx-auto max-w-3xl">
+        <div className="mb-4">
+          <SiteBreadcrumbs />
+        </div>
         <Link
           href="/"
           className="inline-block text-sm font-semibold tracking-wide text-[#FF4A1C] underline decoration-2 underline-offset-[6px] transition-opacity hover:opacity-85"

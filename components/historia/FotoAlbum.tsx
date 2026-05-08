@@ -30,6 +30,8 @@ export interface HistoriaFoto {
 interface FotoAlbumProps {
   historia: HistoriaFoto;
   onClose?: () => void;
+  /** Ruta dedicada: sin barra superior propia; usa `GlobalSiteChrome`. */
+  siteLayout?: boolean;
 }
 
 function extractColor(imgUrl: string): Promise<string> {
@@ -52,7 +54,7 @@ function extractColor(imgUrl: string): Promise<string> {
   });
 }
 
-export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
+export default function FotoAlbum({ historia, onClose, siteLayout = false }: FotoAlbumProps) {
   const { imagenes } = historia;
   const [bgColor, setBgColor] = useState(DEFAULT_BG);
   const [fotoActivaIdx, setFotoActivaIdx] = useState(0);
@@ -134,11 +136,13 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
       <div
         style={{
           background: bgColor,
-          minHeight: '100vh',
+          minHeight: siteLayout ? undefined : '100vh',
+          width: '100%',
           transition: 'background 0.8s ease',
         }}
       >
-        {/* Header fijo */}
+        {/* Header fijo (solo en modal / vista sin masthead global) */}
+        {!siteLayout ? (
         <header
           style={{
             position: 'fixed',
@@ -189,9 +193,17 @@ export default function FotoAlbum({ historia, onClose }: FotoAlbumProps) {
             {fotoActivaIdx + 1} / {imagenes.length}
           </div>
         </header>
+        ) : null}
 
         {/* Scroll container */}
-        <div style={{ overflowY: 'auto', height: '100vh', paddingTop: 56 }}>
+        <div
+          style={{
+            overflowY: 'auto',
+            height: siteLayout ? undefined : '100vh',
+            minHeight: siteLayout ? 'min(88dvh, 48rem)' : undefined,
+            paddingTop: siteLayout ? 0 : 56,
+          }}
+        >
           {historia.demoStory ? (
             <div
               style={{

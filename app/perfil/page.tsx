@@ -12,6 +12,7 @@ import { getDoc, doc } from 'firebase/firestore';
 import { auth } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 
 export default function PerfilRedirectPage() {
@@ -56,14 +57,15 @@ export default function PerfilRedirectPage() {
         style={{
           minHeight: '100vh',
           display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: 'column',
           background: '#e8ecf0',
           fontFamily: SITE_FONT_STACK,
           color: '#4a5568',
+          padding: '1.5rem',
         }}
       >
-        Cargando...
+        <SiteBreadcrumbs />
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Cargando...</div>
       </div>
     );
   }

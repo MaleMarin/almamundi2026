@@ -32,6 +32,7 @@ import {
   FolderOpen,
 } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 
 const BG = '#0a0f24';
 
@@ -328,15 +329,32 @@ export default function AdminPage() {
 
   if (authLoading) {
     return (
-      <div style={{ minHeight: '100dvh', background: BG, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: APP_FONT, color: 'rgba(255,255,255,0.7)' }}>
-        Cargando…
+      <div
+        style={{
+          minHeight: '100dvh',
+          background: BG,
+          fontFamily: APP_FONT,
+          color: 'rgba(255,255,255,0.7)',
+          padding: '24px 16px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <div style={{ marginBottom: 16 }}>
+          <SiteBreadcrumbs tone="dark" />
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>Cargando…</div>
       </div>
     );
   }
 
   if (!user || !isAdmin) {
     return (
-      <div style={{ minHeight: '100dvh', background: BG, fontFamily: APP_FONT, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ minHeight: '100dvh', background: BG, fontFamily: APP_FONT, display: 'flex', flexDirection: 'column', padding: 24 }}>
+        <div style={{ marginBottom: 16 }}>
+          <SiteBreadcrumbs tone="dark" />
+        </div>
+        <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ ...glassCard, maxWidth: 400, width: '100%' }}>
           <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.95)', marginBottom: 8 }}>Panel Admin AlmaMundi</h1>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', marginBottom: 24 }}>Inicia sesión con tu cuenta del equipo.</p>
@@ -398,6 +416,7 @@ export default function AdminPage() {
             </button>
           </form>
         </div>
+        </div>
       </div>
     );
   }
@@ -445,6 +464,10 @@ export default function AdminPage() {
           {toast}
         </div>
       )}
+
+      <div style={{ marginBottom: 16 }}>
+        <SiteBreadcrumbs tone="dark" />
+      </div>
 
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
         <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Panel Admin AlmaMundi</h1>

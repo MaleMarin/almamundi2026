@@ -3,6 +3,7 @@
 import dynamic from 'next/dynamic';
 import '@/app/mapa/mapa-ui.css';
 import '@/app/mapa/liquid-metal.css';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import { MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
 
 const MapFullPage = dynamic(
@@ -21,6 +22,11 @@ export default function MapaPage() {
       style={{ background: MAP_STAGE_GRADIENT }}
       data-map-route="mapa-full"
     >
+      <div className="pointer-events-none absolute left-2 top-2 z-[60] max-w-[min(100%-1rem,28rem)] sm:left-3 sm:top-3">
+        <div className="pointer-events-auto">
+          <Breadcrumbs tone="dark" items={[{ label: 'Inicio', href: '/' }, { label: 'Mapa' }]} />
+        </div>
+      </div>
       <MapFullPage embedded={false} universeVisible />
     </div>
   );

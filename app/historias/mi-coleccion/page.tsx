@@ -8,7 +8,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useState } from 'react';
 import Link from 'next/link';
 import { useMiColeccion, type SavedStory } from '@/hooks/useMiColeccion';
-import { HistoriasInteriorSiteHeader } from '@/components/historias/HistoriasInteriorSiteHeader';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 function formatLabel(format?: string): string {
@@ -28,13 +28,16 @@ export default function MiColeccionPage() {
   };
 
   return (
-    <>
-      <HistoriasInteriorSiteHeader />
-      <main
-        className={`${historiasInterior.mainClassName} ${historiasInterior.fixedHeaderContentPadClassName}`}
-        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-      >
+    <main
+      className={historiasInterior.mainClassName}
+      style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
+    >
       <div className={historiasInterior.contentWrapClassName}>
+      <div className="w-full shrink-0 px-6 pt-4 md:px-12 md:pt-6">
+        <div className="mx-auto max-w-5xl">
+          <SiteBreadcrumbs />
+        </div>
+      </div>
       <header className={historiasInterior.headerClassName}>
         <p className="text-xs font-semibold tracking-[0.18em] uppercase mb-2" style={{ color: 'var(--almamundi-orange)' }}>
           Tu colección
@@ -106,6 +109,5 @@ export default function MiColeccionPage() {
       </div>
 
       </main>
-    </>
   );
 }

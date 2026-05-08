@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import { ChevronLeft, ChevronRight, MapPin, Image as ImageIcon } from 'lucide-react';
 import { getExposicionBySlug } from '@/lib/exposiciones';
 import { generatePostalPNG } from '@/lib/postal';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
@@ -61,11 +62,16 @@ export default function ExposicionDetailPage() {
 
   if (!exposicion) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center px-6" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-        <p className="text-gray-600 mb-4">No se encontró esta exposición.</p>
-        <Link href="/exposiciones" className="text-orange-500 font-semibold hover:underline">
-          Volver al listado
-        </Link>
+      <main className="min-h-screen flex flex-col gap-6 px-6 py-10" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+        <div className="mx-auto w-full max-w-lg">
+          <SiteBreadcrumbs />
+        </div>
+        <div className="flex flex-1 flex-col items-center justify-center">
+          <p className="text-gray-600 mb-4">No se encontró esta exposición.</p>
+          <Link href="/exposiciones" className="text-orange-500 font-semibold hover:underline">
+            Volver al listado
+          </Link>
+        </div>
       </main>
     );
   }
@@ -86,6 +92,10 @@ export default function ExposicionDetailPage() {
           <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
+
+      <div className="mx-auto w-full max-w-4xl px-6 pt-4 md:px-12 md:pt-6">
+        <SiteBreadcrumbs />
+      </div>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
         <Link href="/exposiciones" className="inline-block text-sm font-medium mb-6" style={{ color: neu.textBody }}>

@@ -1,5 +1,6 @@
 'use client';
 
+import type { CSSProperties } from 'react';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
@@ -25,6 +26,8 @@ export type StoryEndScreenProps = {
   onMoreStories: () => void;
   thumbnailUrl?: string;
   demoStory?: DemoStoryFields;
+  /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
+  embedInSite?: boolean;
 };
 
 const TEXT_TITLE = neu.textMain;
@@ -54,14 +57,33 @@ export function StoryEndScreen({
   onMoreStories,
   thumbnailUrl,
   demoStory,
+  embedInSite = false,
 }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
 
   const hasTitleExtras = Boolean(subtitulo?.trim()) || Boolean(fechaStr);
 
-  return (
-    <div
-      style={{
+  const shellStyle: CSSProperties = embedInSite
+    ? {
+        position: 'relative',
+        minHeight: 'min(92dvh, 56rem)',
+        width: '100%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'auto',
+        zIndex: 1,
+        fontFamily: SITE_FONT_STACK,
+        WebkitOverflowScrolling: 'touch',
+        padding: '1.25rem',
+        backgroundColor: neu.bg,
+        backgroundImage: `
+          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,74,28,0.085) 0%, transparent 55%),
+          radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
+          linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
+        `,
+      }
+    : {
         position: 'fixed',
         inset: 0,
         display: 'flex',
@@ -78,7 +100,11 @@ export function StoryEndScreen({
           radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
           linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
         `,
-      }}
+      };
+
+  return (
+    <div
+      style={shellStyle}
       data-story-end-screen
     >
       {thumbnailUrl ? (

@@ -3,13 +3,16 @@
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
+import { neu } from '@/lib/historias-neumorph';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
-const FILM = '#0d0b09';
-const CREAM = '#f5f0e8';
-/** Acento naranja AlmaMundi (antes sepia). */
+/** Fondo y tipografía coherentes con interiores AlmaMundi (neumorfismo claro). */
+const PAGE_BG = neu.bg;
+const TEXT_MAIN = neu.textMain;
+const TEXT_BODY = neu.textBody;
+/** Acento naranja AlmaMundi. */
 const SEPIA = '#ff4500';
 const SEPIA_DK = '#c23600';
 const BAR_COUNT = 16;
@@ -40,6 +43,11 @@ export interface HistoriaAudio {
 interface AudioPlayerProps {
   historia: HistoriaAudio;
   onClose?: () => void;
+  /**
+   * `portal` — overlay a pantalla completa (listados, prototipo).
+   * `embed` — bajo el layout global: masthead y footer del sitio visibles (`/historias/[id]/audio`).
+   */
+  presentation?: 'portal' | 'embed';
 }
 
 function formatTime(secs: number): string {
@@ -86,7 +94,11 @@ const MutedIcon = () => (
   </svg>
 );
 
-export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
+export default function AudioPlayer({
+  historia,
+  onClose,
+  presentation = 'portal',
+}: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(historia.duracion || 0);
@@ -113,17 +125,18 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
     setTitleVisible(true);
   }, []);
 
-  /** Fondo oscuro durante la escucha; al final, misma base neumórfica que el cierre compartido. */
+  /** Portal: fondo claro del sitio; al final se mantiene la misma base que `StoryEndScreen`. */
   useEffect(() => {
+    if (presentation === 'embed') return;
     const prevO = document.body.style.overflow;
     const prevB = document.body.style.backgroundColor;
     document.body.style.overflow = 'hidden';
-    document.body.style.backgroundColor = ended ? '#E0E5EC' : FILM;
+    document.body.style.backgroundColor = PAGE_BG;
     return () => {
       document.body.style.overflow = prevO;
       document.body.style.backgroundColor = prevB;
     };
-  }, [ended]);
+  }, [presentation]);
 
   useLayoutEffect(() => {
     const audio = audioRef.current;
@@ -231,25 +244,46 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           background: ${SEPIA}; margin-top: -4px;
         }
         input[type="range"].ap-range::-webkit-slider-runnable-track {
-          height: 3px; border-radius: 2px; background: rgba(255,255,255,0.12);
+          height: 3px; border-radius: 2px; background: rgba(74,85,104,0.22);
         }
       `}</style>
 
       {!ended ? (
         <div
           style={{
-            position: 'fixed',
-            inset: 0,
-            background: FILM,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingTop: '3rem',
-            paddingLeft: '1.5rem',
-            paddingRight: '1.5rem',
-            paddingBottom: '1rem',
-            zIndex: 9999,
+            ...(presentation === 'embed'
+              ? {
+                  position: 'relative',
+                  width: '100%',
+                  flex: 1,
+                  minHeight: 'min(88dvh, 52rem)',
+                  background: PAGE_BG,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  paddingTop: '1rem',
+                  paddingLeft: '1rem',
+                  paddingRight: '1rem',
+                  paddingBottom: '1.5rem',
+                  zIndex: 1,
+                  overflowY: 'auto',
+                }
+              : {
+                  position: 'fixed',
+                  inset: 0,
+                  background: `linear-gradient(165deg, ${PAGE_BG} 0%, #dce1e9 48%, ${PAGE_BG} 100%)`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'flex-start',
+                  paddingTop: '2rem',
+                  paddingLeft: '1rem',
+                  paddingRight: '1rem',
+                  paddingBottom: '1.5rem',
+                  zIndex: 9999,
+                  overflowY: 'auto',
+                }),
           }}
         >
           {historia.demoStory ? (
@@ -264,8 +298,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
               <DemoStoryDisclosure story={historia.demoStory} variant="page" />
             </div>
           ) : null}
-          {/* ZONA 1 — TOP: X + título */}
-          {onClose && (
+          {onClose ? (
             <button
               type="button"
               onClick={onClose}
@@ -274,13 +307,12 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 position: 'absolute',
                 top: '1.5rem',
                 right: '1.5rem',
+                ...neu.button,
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,69,0,0.25)',
-                color: 'rgba(245,240,232,0.6)',
-                cursor: 'pointer',
+                border: '1px solid rgba(255,69,0,0.35)',
+                color: TEXT_BODY,
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
@@ -291,285 +323,291 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
               </svg>
             </button>
-          )}
-          <h1
-            style={{
-              fontFamily: SITE_FONT_STACK,
-              fontStyle: 'italic',
-              fontWeight: 300,
-              fontSize: 'clamp(1.5rem, 4vw, 2.5rem)',
-              color: CREAM,
-              textAlign: 'center',
-              maxWidth: '90%',
-              marginBottom: '2rem',
-              lineHeight: 1.3,
-              opacity: titleVisible ? 1 : 0,
-              transition: 'opacity 0.6s ease',
-            }}
-          >
-            {historia.titulo}
-          </h1>
-
-          {/* ZONA 2 — CENTER: avatar + waveform + frases */}
-          <div
-            className={isPlaying ? 'ap-halo-pulse' : ''}
-            style={{
-              width: avatarSize,
-              height: avatarSize,
-              borderRadius: '50%',
-              overflow: 'hidden',
-              border: '2px solid rgba(255,69,0,0.4)',
-              marginBottom: '1.5rem',
-              flexShrink: 0,
-            }}
-          >
-            <img
-              src={historia.autor.avatar}
-              alt={historia.autor.nombre}
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-          <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.95rem', color: CREAM, marginBottom: '0.25rem' }}>
-            {historia.autor.nombre}
-          </p>
-          {historia.autor.ubicacion && (
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.8rem', color: SEPIA, letterSpacing: '0.12em', marginBottom: '2rem' }}>
-              {historia.autor.ubicacion}
-            </p>
-          )}
+          ) : null}
 
           <div
             style={{
-              display: 'flex',
-              alignItems: 'flex-end',
-              justifyContent: 'center',
-              gap: '4px',
-              height: '36px',
-              width: waveformWidth,
-              maxWidth: '100%',
-              marginBottom: '1.5rem',
-            }}
-          >
-            {barHeights.map((h, i) => (
-              <div
-                key={i}
-                className="ap-wave-bar"
-                style={{
-                  width: '3px',
-                  height: `${h}px`,
-                  background: SEPIA,
-                  borderRadius: '2px',
-                  // Longhand only: mezclar `animation` (shorthand) con `animationDelay` provoca el warning de React.
-                  ...(isPlaying
-                    ? {
-                        animationName: 'waveAnim',
-                        animationDuration: `${barDurations[i]}s`,
-                        animationTimingFunction: 'ease-in-out',
-                        animationIterationCount: 'infinite',
-                        animationDirection: 'alternate',
-                        animationDelay: `${i * 0.06}s`,
-                      }
-                    : {
-                        animationName: 'none',
-                        animationDuration: '0s',
-                        animationTimingFunction: 'ease',
-                        animationIterationCount: 1,
-                        animationDirection: 'normal',
-                        animationDelay: '0s',
-                      }),
-                }}
-              />
-            ))}
-          </div>
-
-          {frases.length > 0 && currentPhrase && (
-            <div style={{ minHeight: '4rem', maxWidth: '480px', textAlign: 'center', marginBottom: '1.5rem' }}>
-              <p
-                className="ap-phrase-in"
-                style={{
-                  fontFamily: SITE_FONT_STACK,
-                  fontStyle: 'italic',
-                  fontSize: '1.1rem',
-                  color: 'rgba(245,240,232,0.7)',
-                  lineHeight: 1.6,
-                  margin: 0,
-                }}
-              >
-                {currentPhrase}
-              </p>
-            </div>
-          )}
-
-          {/* ZONA 3 — BOTTOM: controles */}
-          <div
-            style={{
-              position: 'absolute',
-              bottom: 0,
-              left: 0,
-              right: 0,
-              padding: '2rem 2.5rem',
-              background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)',
+              ...neu.cardProminent,
+              width: '100%',
+              maxWidth: 480,
+              padding: '1.5rem 1.25rem 1.75rem',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '1rem',
+              minHeight: 0,
+              flex: presentation === 'embed' ? 1 : undefined,
             }}
           >
-            <div style={{ position: 'relative', width: '100%', maxWidth: '480px', marginBottom: '0.5rem' }}>
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: 0,
-                  width: `${progress}%`,
-                  height: '3px',
-                  background: SEPIA,
-                  borderRadius: '2px',
-                  transform: 'translateY(-50%)',
-                  pointerEvents: 'none',
-                }}
-              />
-              <input
-                type="range"
-                className="ap-range"
-                min={0}
-                max={duration || 100}
-                value={currentTime}
-                onChange={seek}
-              />
-            </div>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.8rem', color: 'rgba(245,240,232,0.6)', letterSpacing: '0.08em' }}>
-              {formatTime(currentTime)} · · · {formatTime(duration)}
-            </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-              <button
-                type="button"
-                onClick={() => skip(-10)}
-                aria-label="Atrás 10 s"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  border: '1px solid rgba(255,69,0,0.35)',
-                  background: 'rgba(255,255,255,0.06)',
-                  color: CREAM,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <SkipBackIcon />
-              </button>
-              <button
-                type="button"
-                onClick={togglePlay}
-                aria-pressed={isPlaying}
-                aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
-                style={{
-                  width: '64px',
-                  height: '64px',
-                  borderRadius: '50%',
-                  border: `2px solid ${SEPIA}`,
-                  background: 'rgba(255,69,0,0.1)',
-                  color: SEPIA,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {isPlaying ? <PauseIcon /> : <PlayIcon />}
-              </button>
-              <button
-                type="button"
-                onClick={() => skip(10)}
-                aria-label="Adelante 10 s"
-                style={{
-                  width: '40px',
-                  height: '40px',
-                  borderRadius: '50%',
-                  border: '1px solid rgba(255,69,0,0.35)',
-                  background: 'rgba(255,255,255,0.06)',
-                  color: CREAM,
-                  cursor: 'pointer',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                <SkipFwdIcon />
-              </button>
-            </div>
-            <button
-              type="button"
-              onClick={toggleMute}
-              aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+            <h1
               style={{
-                position: 'absolute',
-                bottom: '2rem',
-                right: '2.5rem',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                border: '1px solid rgba(255,69,0,0.3)',
-                background: 'transparent',
-                color: CREAM,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
+                fontFamily: SITE_FONT_STACK,
+                fontStyle: 'italic',
+                fontWeight: 300,
+                fontSize: 'clamp(1.35rem, 3.6vw, 2.15rem)',
+                color: TEXT_MAIN,
+                textAlign: 'center',
+                maxWidth: '100%',
+                marginBottom: '1.25rem',
+                lineHeight: 1.3,
+                opacity: titleVisible ? 1 : 0,
+                transition: 'opacity 0.6s ease',
               }}
             >
-              {isMuted ? <MutedIcon /> : <VolumeIcon />}
-            </button>
-            <audio
-              ref={audioRef}
-              src={historia.audioUrl}
-              controls
-              preload="metadata"
-              aria-label={`Reproducir audio: ${historia.titulo}`}
+              {historia.titulo}
+            </h1>
+
+            <div
+              className={isPlaying ? 'ap-halo-pulse' : ''}
               style={{
-                width: '100%',
-                maxWidth: '480px',
-                marginTop: '8px',
+                width: avatarSize,
+                height: avatarSize,
+                borderRadius: '50%',
+                overflow: 'hidden',
+                border: '2px solid rgba(255,69,0,0.45)',
+                marginBottom: '1.25rem',
+                flexShrink: 0,
+                boxShadow: '8px 8px 20px rgba(163,177,198,0.35), -6px -6px 16px rgba(255,255,255,0.85)',
               }}
-            />
-            {transcripcionText ? (
-              <details style={{ marginTop: '24px', width: '100%', maxWidth: '480px' }}>
-                <summary
+            >
+              <img
+                src={historia.autor.avatar}
+                alt={historia.autor.nombre}
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+              />
+            </div>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.95rem', color: TEXT_MAIN, marginBottom: '0.25rem' }}>
+              {historia.autor.nombre}
+            </p>
+            {historia.autor.ubicacion ? (
+              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: SEPIA_DK, letterSpacing: '0.12em', marginBottom: '1.25rem' }}>
+                {historia.autor.ubicacion}
+              </p>
+            ) : null}
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'flex-end',
+                justifyContent: 'center',
+                gap: '4px',
+                height: '36px',
+                width: waveformWidth,
+                maxWidth: '100%',
+                marginBottom: '1.25rem',
+              }}
+            >
+              {barHeights.map((h, i) => (
+                <div
+                  key={i}
+                  className="ap-wave-bar"
                   style={{
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontWeight: 600,
-                    letterSpacing: '0.08em',
-                    textTransform: 'uppercase',
-                    color: '#FF4A1C',
-                    listStyle: 'none',
+                    width: '3px',
+                    height: `${h}px`,
+                    background: SEPIA,
+                    borderRadius: '2px',
+                    ...(isPlaying
+                      ? {
+                          animationName: 'waveAnim',
+                          animationDuration: `${barDurations[i]}s`,
+                          animationTimingFunction: 'ease-in-out',
+                          animationIterationCount: 'infinite',
+                          animationDirection: 'alternate',
+                          animationDelay: `${i * 0.06}s`,
+                        }
+                      : {
+                          animationName: 'none',
+                          animationDuration: '0s',
+                          animationTimingFunction: 'ease',
+                          animationIterationCount: 1,
+                          animationDirection: 'normal',
+                          animationDelay: '0s',
+                        }),
+                  }}
+                />
+              ))}
+            </div>
+
+            {frases.length > 0 && currentPhrase ? (
+              <div style={{ minHeight: '3.5rem', maxWidth: '100%', textAlign: 'center', marginBottom: '1rem' }}>
+                <p
+                  className="ap-phrase-in"
+                  style={{
+                    fontFamily: SITE_FONT_STACK,
+                    fontStyle: 'italic',
+                    fontSize: '1.05rem',
+                    color: TEXT_BODY,
+                    lineHeight: 1.6,
+                    margin: 0,
+                  }}
+                >
+                  {currentPhrase}
+                </p>
+              </div>
+            ) : null}
+
+            <div
+              style={{
+                marginTop: 'auto',
+                width: '100%',
+                paddingTop: '1.15rem',
+                borderTop: '1px solid rgba(255,255,255,0.55)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.85rem',
+              }}
+            >
+              <div style={{ position: 'relative', width: '100%', maxWidth: '480px' }}>
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: 0,
+                    width: `${progress}%`,
+                    height: '3px',
+                    background: SEPIA,
+                    borderRadius: '2px',
+                    transform: 'translateY(-50%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+                <input
+                  type="range"
+                  className="ap-range"
+                  min={0}
+                  max={duration || 100}
+                  value={currentTime}
+                  onChange={seek}
+                />
+              </div>
+              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: TEXT_BODY, letterSpacing: '0.06em' }}>
+                {formatTime(currentTime)} · · · {formatTime(duration)}
+              </p>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  onClick={() => skip(-10)}
+                  aria-label="Atrás 10 s"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    ...neu.button,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255,69,0,0.35)',
+                    color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
+                    justifyContent: 'center',
                   }}
                 >
-                  <span aria-hidden="true">▶</span>
-                  Leer transcripción
-                </summary>
-                <div
-                  role="region"
-                  aria-label="Transcripción del audio"
+                  <SkipBackIcon />
+                </button>
+                <button
+                  type="button"
+                  onClick={togglePlay}
+                  aria-pressed={isPlaying}
+                  aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
                   style={{
-                    marginTop: '16px',
-                    fontSize: '15px',
-                    lineHeight: '1.8',
-                    color: 'inherit',
-                    borderLeft: '3px solid #FF4A1C',
-                    paddingLeft: '16px',
+                    width: '64px',
+                    height: '64px',
+                    borderRadius: '50%',
+                    border: `2px solid ${SEPIA}`,
+                    background: 'rgba(255,69,0,0.12)',
+                    color: SEPIA,
+                    boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.9)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                   }}
                 >
-                  {transcripcionText}
-                </div>
-              </details>
-            ) : null}
+                  {isPlaying ? <PauseIcon /> : <PlayIcon />}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => skip(10)}
+                  aria-label="Adelante 10 s"
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    ...neu.button,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255,69,0,0.35)',
+                    color: TEXT_MAIN,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <SkipFwdIcon />
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleMute}
+                  aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+                  style={{
+                    width: '40px',
+                    height: '40px',
+                    ...neu.button,
+                    borderRadius: '50%',
+                    border: '1px solid rgba(255,69,0,0.3)',
+                    color: TEXT_MAIN,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {isMuted ? <MutedIcon /> : <VolumeIcon />}
+                </button>
+              </div>
+              <audio
+                ref={audioRef}
+                src={historia.audioUrl}
+                controls
+                preload="metadata"
+                aria-label={`Reproducir audio: ${historia.titulo}`}
+                style={{
+                  width: '100%',
+                  maxWidth: '480px',
+                  marginTop: '4px',
+                }}
+              />
+              {transcripcionText ? (
+                <details style={{ marginTop: '12px', width: '100%', maxWidth: '480px' }}>
+                  <summary
+                    style={{
+                      cursor: 'pointer',
+                      fontSize: '13px',
+                      fontWeight: 600,
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: '#FF4A1C',
+                      listStyle: 'none',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px',
+                    }}
+                  >
+                    <span aria-hidden="true">▶</span>
+                    Leer transcripción
+                  </summary>
+                  <div
+                    role="region"
+                    aria-label="Transcripción del audio"
+                    style={{
+                      marginTop: '16px',
+                      fontSize: '15px',
+                      lineHeight: '1.8',
+                      color: TEXT_MAIN,
+                      borderLeft: '3px solid #FF4A1C',
+                      paddingLeft: '16px',
+                    }}
+                  >
+                    {transcripcionText}
+                  </div>
+                </details>
+              ) : null}
+            </div>
           </div>
         </div>
       ) : (
@@ -582,6 +620,7 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
+          embedInSite={presentation === 'embed'}
           replayLabel="Escuchar de nuevo"
           onReplay={restart}
           onMoreStories={() => {
@@ -592,6 +631,9 @@ export default function AudioPlayer({ historia, onClose }: AudioPlayerProps) {
     </>
   );
 
+  if (presentation === 'embed') {
+    return <div className="flex w-full min-h-0 flex-1 flex-col">{content}</div>;
+  }
   if (typeof document === 'undefined') return null;
   return ReactDOM.createPortal(content, document.body);
 }

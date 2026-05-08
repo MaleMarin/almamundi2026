@@ -1,4 +1,5 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { notFound } from 'next/navigation';
 import { getCameraBySlug } from '@/lib/map-data/cameras';
 import { ObservatoryShell } from '@/components/observatory/ObservatoryShell';
@@ -22,6 +23,11 @@ export default async function ObservatorioPage({ params }: PageProps) {
 
   return (
     <main className="min-h-screen bg-[#0F172A] flex flex-col">
+      <div className="w-full shrink-0 px-4 pt-6 md:px-10 md:pt-8">
+        <div className="mx-auto max-w-3xl">
+          <SiteBreadcrumbs tone="dark" />
+        </div>
+      </div>
       <ObservatoryShell
         title={camera.title}
         subtitleLeft={location || undefined}

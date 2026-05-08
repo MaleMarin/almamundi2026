@@ -8,9 +8,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer';
+import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
 import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
+import { neu } from '@/lib/historias-neumorph';
 
 export default function HistoriasIdAudioPageClient() {
   const params = useParams();
@@ -48,21 +50,56 @@ export default function HistoriasIdAudioPageClient() {
     };
   }, [id, router]);
 
+  const crumbAudios = (
+    <div className="w-full max-w-[480px] shrink-0 px-1 pt-1 md:px-0">
+      <Breadcrumbs
+        items={
+          loading || !historia
+            ? [
+                { label: 'Inicio', href: '/' },
+                { label: 'Historias', href: '/historias' },
+                { label: 'Audios', href: '/historias/audios' },
+                { label: loading ? '…' : 'Audio' },
+              ]
+            : [
+                { label: 'Inicio', href: '/' },
+                { label: 'Historias', href: '/historias' },
+                { label: 'Audios', href: '/historias/audios' },
+                { label: historia.titulo },
+              ]
+        }
+      />
+    </div>
+  );
+
   if (loading) {
     return (
-      <div className="fixed inset-0 bg-[#111009] flex items-center justify-center">
-        <p className="font-sans text-sm tracking-widest uppercase text-[#ff4500]/80">Cargando…</p>
+      <div
+        className="flex w-full flex-1 flex-col items-center gap-3 min-h-[50vh]"
+        style={{ backgroundColor: neu.bg }}
+      >
+        {crumbAudios}
+        <p className="font-sans text-sm tracking-wide text-[color:var(--almamundi-orange)]" style={{ color: neu.orange }}>
+          Cargando…
+        </p>
       </div>
     );
   }
 
   if (!historia) {
     return (
-      <div className="fixed inset-0 bg-[#111009] flex flex-col items-center justify-center gap-6 px-6">
-        <p className="font-sans text-[#f5f0e8]/70">No encontramos esta historia o no tiene audio.</p>
+      <div
+        className="flex w-full flex-1 min-h-[50vh] flex-col items-center justify-center gap-6 px-6"
+        style={{ backgroundColor: neu.bg }}
+      >
+        {crumbAudios}
+        <p className="font-sans text-center" style={{ color: neu.textBody }}>
+          No encontramos esta historia o no tiene audio.
+        </p>
         <Link
           href="/historias"
-          className="px-6 py-3 rounded-full text-sm font-medium text-[#ff4500] border border-[#ff4500]/40 hover:bg-[#ff4500]/10 transition-colors"
+          className="rounded-full border border-[color:var(--almamundi-orange)]/40 px-6 py-3 text-sm font-medium transition-colors hover:bg-[#ff4500]/10"
+          style={{ color: neu.orange }}
         >
           Ver historias
         </Link>
@@ -70,6 +107,13 @@ export default function HistoriasIdAudioPageClient() {
     );
   }
 
-  /** Misma presentación que `/historias/[id]/video`: experiencia a pantalla completa, sin volver al detalle neumórfico. */
-  return <AudioPlayer historia={historia} />;
+  /** Incrustado en layout global: masthead y footer como el resto del sitio. */
+  return (
+    <div className="flex w-full min-h-0 flex-1 flex-col items-center gap-1">
+      {crumbAudios}
+      <div className="flex min-h-0 w-full flex-1 flex-col">
+        <AudioPlayer historia={historia} presentation="embed" />
+      </div>
+    </div>
+  );
 }

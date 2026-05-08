@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import {
@@ -478,6 +479,10 @@ function SubirPageInner() {
           <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
+
+      <div className="mx-auto w-full max-w-5xl px-6 pt-4 md:px-12 md:pt-6">
+        <SiteBreadcrumbs />
+      </div>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
         {step === 'cards' && (

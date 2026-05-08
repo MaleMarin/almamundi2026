@@ -3,11 +3,11 @@
 /**
  * Layout compartido de /historias/videos, /audios, /escrito, /fotos.
  * Nav, hero y filtros en columna centrada (primera vista); carrusel a ancho completo.
- * Footer global en `app/layout.tsx`.
+ * Masthead: `GlobalSiteChrome` en layout raíz. Footer global en `app/layout.tsx`.
  */
-import { HistoriasInteriorSiteHeader } from '@/components/historias/HistoriasInteriorSiteHeader';
 import { EthicalShareFlow, EthicalShareTriggerButton } from '@/components/stories/EthicalShareFlow';
 import { ResonanceMailbox } from '@/components/stories/ResonanceMailbox';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import {
   HistoricalExhibitionCarousel,
   type ExhibitionContentMode,
@@ -51,8 +51,6 @@ export type HistoriasFormatListPageLayoutProps = {
   onOpenContent: (index: number) => void;
   onSlideChange: (index: number) => void;
   disableKeyboardNav: boolean;
-  /** True mientras un reproductor o lector en portal cubre la pantalla — refuerza el nav superior sobre el vídeo. */
-  immersiveMediaOpen?: boolean;
 };
 
 export function HistoriasFormatListPageLayout({
@@ -80,18 +78,19 @@ export function HistoriasFormatListPageLayout({
   onOpenContent,
   onSlideChange,
   disableKeyboardNav,
-  immersiveMediaOpen = false,
 }: HistoriasFormatListPageLayoutProps) {
   return (
     <>
-      <HistoriasInteriorSiteHeader overImmersiveMedia={immersiveMediaOpen} />
       <main
-        className={`flex min-h-svh flex-col overflow-x-hidden ${historiasInterior.fixedHeaderContentPadClassName}`}
+        className="flex min-h-svh flex-col overflow-x-hidden"
         style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
       >
       <div className="flex min-h-0 w-full flex-1 flex-col">
         <div className="w-full shrink-0 px-4 pt-3 sm:px-6 md:px-10 lg:px-14">
           <div className="mx-auto w-full max-w-[52rem]">
+            <div className="mb-3 min-w-0">
+              <SiteBreadcrumbs />
+            </div>
             <header className="flex flex-shrink-0 flex-col gap-2 border-b border-gray-400/18 pb-5 text-center sm:gap-2.5 sm:text-left md:pb-6">
               <p
                 className="mb-0 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] sm:text-xs"

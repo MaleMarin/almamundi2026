@@ -5,6 +5,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
 import { CookieBanner } from '@/components/ui/CookieBanner';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
+import { GlobalSiteChrome } from '@/components/layout/GlobalSiteChrome';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
@@ -92,7 +93,9 @@ export default async function RootLayout({
               Lenis + ScrollTrigger (cinematic / GSAP) viven en SmoothScrollProvider.
             */}
             <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)] bg-[var(--home-bg)]">
-              <LocaleProvider initialLocale={locale}>{children}</LocaleProvider>
+              <LocaleProvider initialLocale={locale}>
+                <GlobalSiteChrome>{children}</GlobalSiteChrome>
+              </LocaleProvider>
             </div>
             <Footer />
           </SmoothScrollProvider>

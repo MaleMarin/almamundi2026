@@ -167,7 +167,6 @@ export default function HistoriasFotosPage() {
         onOpenContent={openFoto}
         onSlideChange={setShareSlideIndex}
         disableKeyboardNav={Boolean(fotoOpen)}
-        immersiveMediaOpen={Boolean(fotoOpen)}
       />
       {mounted && fotoOpen
         ? ReactDOM.createPortal(

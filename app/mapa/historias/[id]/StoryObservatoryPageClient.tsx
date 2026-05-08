@@ -13,6 +13,7 @@ import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { ObservatoryShell } from '@/components/observatory/ObservatoryShell';
 import { StoryObservatory } from '@/components/observatory/StoryObservatory';
 import { SaveToCollectionButton } from '@/components/collection/SaveToCollectionButton';
+import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 
 export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
   const searchParams = useSearchParams();
@@ -64,6 +65,11 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
           transform: entranceDone ? 'translateY(0)' : 'translateY(28px)',
         }}
       >
+        <div className="w-full shrink-0 px-4 pt-6 md:px-10 md:pt-8">
+          <div className="mx-auto max-w-3xl">
+            <SiteBreadcrumbs tone="dark" />
+          </div>
+        </div>
         <ObservatoryShell
         title={story.label}
         subtitleLeft={subtitleLeft}
