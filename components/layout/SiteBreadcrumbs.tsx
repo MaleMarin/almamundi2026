@@ -49,8 +49,9 @@ function SiteBreadcrumbsInner({ tone: toneProp, className = '' }: SiteBreadcrumb
 }
 
 /**
- * Migas de pan según la ruta actual. No se muestra en home, raíz `/mapa`,
- * recorrido cinematográfico por defecto de `/muestras` ni rutas `/cinematic`.
+ * Migas según la ruta: casi todo el sitio vía `GlobalSiteChrome`, subrutas `/mapa/...`
+ * vía `MapaSubrouteBreadcrumbs`, `/mapa` raíz con barra propia.
+ * Excepciones: home `/`, recorrido por defecto de `/muestras`, `/cinematic`, modal cine embebido.
  */
 export function SiteBreadcrumbs({ tone, className = '' }: SiteBreadcrumbsProps) {
   return (

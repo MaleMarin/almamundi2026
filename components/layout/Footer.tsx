@@ -1,5 +1,6 @@
 'use client';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import { SITE_NAV_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
@@ -12,6 +13,14 @@ const FOOTER_LINK =
 
 /** PDF estático en `public/` (nombre con espacios; URL codificada para compatibilidad). */
 const GUIA_CONDUCTA_PDF_HREF = '/Guia%20de%20conducta%20AlmaMundi.pdf';
+
+/** Mismas entradas que las cards de la home y el flujo `/subir`. */
+const FOOTER_STORY_FORMAT_LINKS = [
+  { label: 'Video', href: '/subir?format=video&step=capture' },
+  { label: 'Audio', href: '/subir?format=audio&step=capture' },
+  { label: 'Escrito', href: '/subir?format=texto&step=capture' },
+  { label: 'Fotografía', href: '/subir/foto' },
+] as const;
 
 export type FooterProps = {
   /**
@@ -33,6 +42,28 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           ALMAMUNDI
         </h1>
       </div>
+
+      <nav
+        className="mb-16 md:mb-20 w-full max-w-3xl px-2"
+        aria-label="Contar tu historia por formato"
+      >
+        <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.18em] text-gray-600">
+          Contá tu historia
+        </p>
+        <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-3 sm:gap-4">
+          {FOOTER_STORY_FORMAT_LINKS.map(({ label, href }) => (
+            <li key={href}>
+              <ActiveInternalNavLink
+                href={href}
+                className={`${SITE_NAV_LINK_CLASS} almamundi-footer-link min-w-[7.25rem] justify-center px-4 py-2.5 text-sm md:min-w-[8rem] md:px-5`}
+                activeClassName="!text-[var(--almamundi-orange)] font-semibold"
+              >
+                {label}
+              </ActiveInternalNavLink>
+            </li>
+          ))}
+        </ul>
+      </nav>
 
       <div className="w-full max-w-6xl flex flex-col md:flex-row justify-between items-center md:items-center gap-12 pt-4 md:pt-6 pb-8 text-gray-600">
         <div className="flex flex-col items-center md:items-start">

@@ -34,6 +34,16 @@ const STATIC_LABELS: Record<string, string> = {
   camaras: 'Cámaras',
   noticias: 'Noticias',
   u: 'Perfil público',
+  /** Rutas de laboratorio / preview */
+  prototipo: 'Prototipo',
+  'vista-previa': 'Vista previa',
+  'preview-home': 'Vista previa home',
+  'globo-validacion': 'Validación del globo',
+  'globo-v2': 'Globo',
+  'earth-globe-demo': 'Demo globo',
+  'demo-impronta': 'Demo impronta',
+  'demo-huellas-v2': 'Huellas demo',
+  cinematic: 'Cine',
 };
 
 function humanizeSegment(raw: string): string {
