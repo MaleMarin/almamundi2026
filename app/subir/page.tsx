@@ -1,13 +1,11 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
 import { Suspense, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Video, Mic, FileText, Image as ImageIcon, UserCircle } from 'lucide-react';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
-import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -18,6 +16,7 @@ import {
 } from '@/lib/media-duration-rules';
 import { StoryCaptureStep, type CaptureOutcome } from '@/components/subir/StoryCaptureStep';
 import { ImprontaStep } from '@/components/subir/ImprontaStep';
+import { SubmissionSuccessWithHuella } from '@/components/subir/SubmissionSuccessWithHuella';
 import {
   SUBIR_AV_MAX_MINUTES,
   SUBIR_PHOTO_MAX,
@@ -150,6 +149,7 @@ function SubirPageInner() {
 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [lastSubmissionId, setLastSubmissionId] = useState<string | null>(null);
   /** Audio: archivo o URL no supera 5 min (o URL no verificable por CORS). */
   const [audioFileWithinMax, setAudioFileWithinMax] = useState(true);
   const [audioUrlWithinMax, setAudioUrlWithinMax] = useState(true);
@@ -328,6 +328,8 @@ function SubirPageInner() {
         setError(data.error || `Error ${res.status}. Intenta de nuevo.`);
         return;
       }
+      const sid = typeof data.id === 'string' && data.id ? data.id : null;
+      setLastSubmissionId(sid);
       setStep('received');
       router.replace('/subir?sent=1', { scroll: false });
     } catch (e) {
@@ -384,6 +386,7 @@ function SubirPageInner() {
 
   const selectFormat = useCallback(
     (f: Format) => {
+      setLastSubmissionId(null);
       setCapture(null);
       setFormat(f);
       setStep('capture');
@@ -393,6 +396,7 @@ function SubirPageInner() {
   );
 
   const backToCards = useCallback(() => {
+    setLastSubmissionId(null);
     setExtraContext('');
     setPhotoFiles([]);
     setAudioFile(null);
@@ -463,23 +467,15 @@ function SubirPageInner() {
     };
   }, [format, videoUrl, capture]);
 
-  return (
-    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
-            Historias
-          </Link>
-          <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
-        </div>
-      </nav>
+  const fmtForSuccess = (format ?? 'texto') as Format;
+  const narrativeForHuellaSuccess =
+    capture?.narrativeText?.trim() ||
+    buildSubmissionContext(fmtForSuccess, textBody, storyTitle, ciudad, pais, extraContext);
+  const huellaSlug = (lastSubmissionId ?? 'x').replace(/[^a-zA-Z0-9_-]/g, '');
 
-      <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
+  return (
+    <main className={`min-h-screen overflow-x-hidden ${historiasInterior.mainClassName}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      <div className="w-full pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
         {step === 'cards' && (
           <>
             <header className="mb-10 md:mb-14 space-y-4">
@@ -1216,27 +1212,18 @@ function SubirPageInner() {
         )}
 
         {step === 'received' && (
-          <section className="mt-4 p-8 rounded-[40px] text-center" style={neu.card}>
-            <p className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
-              Listo
-            </p>
-            <p className="text-base font-light mb-6" style={{ color: neu.textBody }}>
-              Quedó en revisión. Te avisaremos por email.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/subir" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
-                Subir otro
-              </Link>
-              <HomeHardLink href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
-                Ir al inicio
-              </HomeHardLink>
-            </div>
-          </section>
+          <div className="mt-2 flex w-full flex-col items-center">
+            <SubmissionSuccessWithHuella
+              format={fmtForSuccess}
+              narrativeSeed={narrativeForHuellaSuccess}
+              submissionId={lastSubmissionId}
+              hrefSubirAnother="/subir"
+              canvasIdSuffix={`main-${fmtForSuccess}-${huellaSlug}`}
+            />
+          </div>
         )}
       </div>
 
-      <div className="border-t border-gray-400/50 pt-10 md:pt-14">
-      </div>
     </main>
   );
 }

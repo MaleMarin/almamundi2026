@@ -1,39 +1,15 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { Download, Share2, Loader2 } from 'lucide-react';
-import type { HuellaVisualParams, StoryAnalysis } from '@/lib/huella/types';
-import { analysisToVisualParams } from '@/lib/huella/translate';
-import {
-  drawImprontaBauhaus,
-  IMPRONTA_EXPORT_H,
-  IMPRONTA_EXPORT_W,
-} from '@/lib/impronta/bauhausExport';
-import { computeTextStats, temperatureLabel } from '@/lib/impronta/textStats';
-import { huellaFormatFromSubmission } from '@/lib/impronta/formatMap';
+import { Download, Loader2, Share2 } from 'lucide-react';
+import { IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
 import { neu } from '@/lib/historias-neumorph';
+import {
+  SUBIR_HUELLA_FOOTER_SITE,
+  useSubirHuella,
+  type SubirHuellaFormat,
+} from '@/hooks/useSubirHuella';
 
-export type SubirFormat = 'video' | 'audio' | 'texto' | 'foto';
-
-function clamp01(n: number) {
-  return Math.max(0, Math.min(1, n));
-}
-
-function fallbackParams(text: string, format: SubirFormat): { analysis: StoryAnalysis; visualParams: HuellaVisualParams } {
-  const stats = computeTextStats(text);
-  const analysis: StoryAnalysis = {
-    themes: ['historia', 'voz'],
-    emotions: stats.temperature > 0.55 ? ['intensidad'] : ['calma'],
-    intensity: clamp01(stats.temperature * 0.9 + 0.05),
-    rhythm: clamp01(stats.punctDensity * 4 + stats.uniqueRatio * 0.35),
-    depth: clamp01(stats.uniqueRatio * 0.85 + (stats.wordCount > 80 ? 0.15 : 0)),
-    tone: stats.temperature,
-  };
-  const visualParams = analysisToVisualParams(analysis, huellaFormatFromSubmission(format));
-  return { analysis, visualParams };
-}
-
-const FOOTER_SITE = 'www.almamundi.org';
+export type SubirFormat = SubirHuellaFormat;
 
 const FORMAT_LABEL: Record<SubirFormat, string> = {
   video: 'Video',
@@ -57,129 +33,16 @@ export function ImprontaStep({
   onBack,
   onContinue,
 }: Props) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [loading, setLoading] = useState(true);
-  const [err, setErr] = useState('');
-  const [analysis, setAnalysis] = useState<StoryAnalysis | null>(null);
-  const [statsLine, setStatsLine] = useState('');
-
-  const redraw = useCallback((params: HuellaVisualParams) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.width = IMPRONTA_EXPORT_W;
-    canvas.height = IMPRONTA_EXPORT_H;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const dateLabel = new Intl.DateTimeFormat('es', {
-      dateStyle: 'long',
-      timeStyle: 'short',
-    }).format(new Date());
-    drawImprontaBauhaus(ctx, params, {
-      footerLine: FOOTER_SITE,
-      dateLabel,
-      formatLabel: FORMAT_LABEL[format],
-    });
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    const text = narrativeText.trim() || 'historia almamundi';
-
-    async function run() {
-      setLoading(true);
-      setErr('');
-      try {
-        const res = await fetch('/api/impronta/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ text, format }),
-        });
-        const data = (await res.json()) as {
-          analysis?: StoryAnalysis | null;
-          visualParams?: HuellaVisualParams;
-          error?: string;
-        };
-        if (cancelled) return;
-        if (!res.ok || !data.visualParams) {
-          const fb = fallbackParams(text, format);
-          setAnalysis(fb.analysis);
-          const st = computeTextStats(text);
-          setStatsLine(
-            `${temperatureLabel(st.temperature)} · ${st.wordCount} palabras · heurística local (sin IA o API no disponible)`
-          );
-          redraw(fb.visualParams);
-          if (!res.ok && data.error) setErr(data.error);
-          return;
-        }
-        setAnalysis(data.analysis ?? null);
-        const st = computeTextStats(text);
-        if (data.analysis) {
-          setStatsLine(
-            `${temperatureLabel(st.temperature)} · Tono modelo ${(data.analysis.tone * 100).toFixed(0)}% · ${st.wordCount} palabras`
-          );
-        } else {
-          setStatsLine(`${temperatureLabel(st.temperature)} · ${st.wordCount} palabras`);
-        }
-        redraw(data.visualParams);
-      } catch {
-        if (cancelled) return;
-        const fb = fallbackParams(text, format);
-        setAnalysis(fb.analysis);
-        setStatsLine('Vista generada en tu dispositivo (sin conexión al análisis en servidor).');
-        redraw(fb.visualParams);
-        setErr('No hubo respuesta del servidor; usamos un diseño local.');
-      } finally {
-        if (!cancelled) setLoading(false);
-      }
-    }
-
-    void run();
-    return () => {
-      cancelled = true;
-    };
-  }, [format, narrativeText, redraw]);
-
-  const downloadPng = useCallback(() => {
-    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    try {
-      const a = document.createElement('a');
-      a.href = canvas.toDataURL('image/png');
-      a.download = 'AlmaMundi-impronta.png';
-      a.click();
-    } catch {
-      setErr('No se pudo descargar en este navegador.');
-    }
-  }, [canvasId]);
-
-  const shareImage = useCallback(async () => {
-    const canvas = document.getElementById(canvasId) as HTMLCanvasElement | null;
-    if (!canvas) return;
-    try {
-      const blob = await new Promise<Blob | null>((resolve) =>
-        canvas.toBlob((b) => resolve(b), 'image/png')
-      );
-      if (!blob) {
-        setErr('No se pudo generar la imagen para compartir.');
-        return;
-      }
-      const file = new File([blob], 'AlmaMundi-impronta.png', { type: 'image/png' });
-      if (navigator.share && navigator.canShare?.({ files: [file] })) {
-        await navigator.share({
-          files: [file],
-          title: 'Mi impronta — AlmaMundi',
-          text: `Mi impronta en ${FOOTER_SITE}`,
-        });
-        return;
-      }
-      await navigator.clipboard.writeText(`https://${FOOTER_SITE}`);
-      setErr('');
-      window.alert('Tu navegador no permite compartir el archivo aquí. Enlace copiado al portapapeles.');
-    } catch (e) {
-      if ((e as Error).name === 'AbortError') return;
-      setErr('No se pudo abrir el menú de compartir.');
-    }
-  }, [canvasId]);
+  const {
+    canvasRef,
+    loading,
+    err,
+    setErr,
+    analysis,
+    statsLine,
+    downloadPng,
+    shareImage,
+  } = useSubirHuella({ format, narrativeText, canvasId });
 
   const neoCard = {
     ...neu.cardInset,
@@ -210,7 +73,7 @@ export function ImprontaStep({
       <div style={neoCard} className="p-6 md:p-8 space-y-4">
         <p className="text-lg md:text-xl lg:text-2xl font-light leading-relaxed" style={{ color: neu.textBody }}>
           Para cada persona generamos una composición con <strong style={{ color: neu.textMain }}>cuadrados y rectángulos</strong>, capas de color y trazos nítidos. No hay dos iguales: sale de tus palabras y del tono del texto. Abajo van{' '}
-          <strong style={{ color: neu.textMain }}>www.almamundi.org</strong> y la fecha.
+          <strong style={{ color: neu.textMain }}>{SUBIR_HUELLA_FOOTER_SITE}</strong> y la fecha.
         </p>
         {loading && (
           <p className="flex items-center gap-2 text-base md:text-lg" style={{ color: neu.textBody }}>
@@ -259,7 +122,10 @@ export function ImprontaStep({
       <div className="flex flex-wrap gap-4">
         <button
           type="button"
-          onClick={downloadPng}
+          onClick={() => {
+            setErr('');
+            downloadPng('AlmaMundi-impronta.png');
+          }}
           disabled={loading}
           aria-busy={loading}
           aria-disabled={loading}
@@ -274,7 +140,10 @@ export function ImprontaStep({
         </button>
         <button
           type="button"
-          onClick={() => void shareImage()}
+          onClick={() => {
+            setErr('');
+            void shareImage();
+          }}
           disabled={loading}
           aria-busy={loading}
           aria-disabled={loading}

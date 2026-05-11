@@ -1,11 +1,9 @@
 'use client';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { UserCircle } from 'lucide-react';
-import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
+import { SubmissionSuccessWithHuella } from '@/components/subir/SubmissionSuccessWithHuella';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 
@@ -33,6 +31,7 @@ export default function SubirFotoPage() {
   const [extraAttachmentFile, setExtraAttachmentFile] = useState<File | null>(null);
   const [status, setStatus] = useState<'idle' | 'subiendo' | 'error'>('idle');
   const [error, setError] = useState('');
+  const [submissionIdSuccess, setSubmissionIdSuccess] = useState<string | null>(null);
 
   const canContinuePhoto = file != null && file.size <= MAX_MB * 1024 * 1024 && file.type.startsWith('image/');
   const canSubmit =
@@ -91,6 +90,8 @@ export default function SubirFotoPage() {
           setStatus('error');
           return;
         }
+        const sid = typeof data.submissionId === 'string' && data.submissionId ? data.submissionId : null;
+        setSubmissionIdSuccess(sid);
         setStep('enviado');
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error de conexión');
@@ -120,7 +121,17 @@ export default function SubirFotoPage() {
     setPreviewUrl(null);
     setFile(f);
     if (f && f.type.startsWith('image/')) setPreviewUrl(URL.createObjectURL(f));
-  }, [previewUrl]);
+  },     [previewUrl]);
+
+  const narrativeForHuellaPhoto = useMemo(() => {
+    const parts = [
+      storyTitle.trim(),
+      context.trim(),
+      [ciudad.trim(), pais.trim()].filter(Boolean).join(', '),
+      file?.name ? `Archivo: ${file.name}` : null,
+    ].filter(Boolean);
+    return parts.length ? parts.join('. ') : '';
+  }, [storyTitle, context, ciudad, pais, file?.name]);
 
   const goToForm = useCallback(() => {
     if (!canContinuePhoto) return;
@@ -129,24 +140,9 @@ export default function SubirFotoPage() {
   }, [canContinuePhoto]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
-      <nav className={historiasInterior.navClassName} style={historiasInterior.navBarStyle}>
-        <HomeHardLink href="/" className="flex items-center flex-shrink-0 min-w-0 pr-2" aria-label="AlmaMundi — inicio">
-          <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
-        </HomeHardLink>
-        <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#historias" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Elegir formato en inicio</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
-          <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
-            Historias
-          </Link>
-          <ActiveInternalNavLink href="/subir/foto" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Foto</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
-        </div>
-      </nav>
-
-      <div className="pt-8 pb-12 px-4 sm:px-6 md:px-12 max-w-xl mx-auto">
+    <main className={`min-h-screen overflow-x-hidden ${historiasInterior.mainClassName}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
+      {step !== 'enviado' ? (
+      <div className="pt-8 pb-12 px-4 sm:px-6 md:px-12 max-w-xl mx-auto w-full">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-light mb-1" style={{ color: neu.textMain }}>
           Subir una foto
         </h1>
@@ -196,24 +192,7 @@ export default function SubirFotoPage() {
           </section>
         )}
 
-        {step === 'enviado' ? (
-          <section className="p-8 rounded-[40px] text-center" style={neu.card}>
-            <p className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
-              Enviado
-            </p>
-            <p className="text-base font-light mb-6" style={{ color: neu.textBody }}>
-              Quedó en curaduría. Te avisaremos por email.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/subir/foto" className="btn-almamundi px-6 py-3 rounded-full font-semibold text-orange-600" style={neu.button}>
-                Subir otra
-              </Link>
-              <HomeHardLink href="/" className="btn-almamundi px-6 py-3 rounded-full font-semibold" style={{ ...neu.button, color: neu.textMain }}>
-                Ir al inicio
-              </HomeHardLink>
-            </div>
-          </section>
-        ) : step === 'form' ? (
+        {step === 'form' ? (
           <form onSubmit={onSubmit} className="flex flex-col gap-4 min-h-0">
             {file && (
               <div style={neu.cardInset} className="p-3 rounded-2xl flex items-center gap-3 shrink-0">
@@ -538,9 +517,17 @@ export default function SubirFotoPage() {
           </form>
         ) : null}
       </div>
-
-      <div className="border-t border-gray-400/50 pt-10 md:pt-14">
-      </div>
+      ) : (
+        <div className="flex w-full flex-1 flex-col items-center px-4 py-8 md:py-14 md:px-8">
+          <SubmissionSuccessWithHuella
+            format="foto"
+            narrativeSeed={narrativeForHuellaPhoto}
+            submissionId={submissionIdSuccess}
+            hrefSubirAnother="/subir/foto"
+            canvasIdSuffix={`photo-${(submissionIdSuccess ?? 'sin-id').replace(/[^a-zA-Z0-9_-]/g, '')}`}
+          />
+        </div>
+      )}
     </main>
   );
 }
