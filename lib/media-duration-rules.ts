@@ -31,6 +31,28 @@ export function probeAudioFileDurationSeconds(file: File): Promise<number | null
   });
 }
 
+/** Duración de un archivo de video local (segundos), o null si no se puede leer. */
+export function probeVideoFileDurationSeconds(file: File): Promise<number | null> {
+  if (typeof window === 'undefined') return Promise.resolve(null);
+  return new Promise((resolve) => {
+    const el = document.createElement('video');
+    const objectUrl = URL.createObjectURL(file);
+    const finish = (sec: number | null) => {
+      URL.revokeObjectURL(objectUrl);
+      el.removeAttribute('src');
+      resolve(sec);
+    };
+    el.preload = 'metadata';
+    el.muted = true;
+    el.onloadedmetadata = () => {
+      const d = el.duration;
+      finish(Number.isFinite(d) ? d : null);
+    };
+    el.onerror = () => finish(null);
+    el.src = objectUrl;
+  });
+}
+
 /** Duración de un audio remoto (segundos). Puede fallar por CORS; entonces null. */
 export function probeAudioUrlDurationSeconds(url: string): Promise<number | null> {
   if (typeof window === 'undefined') return Promise.resolve(null);

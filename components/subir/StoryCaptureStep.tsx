@@ -1,11 +1,12 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Video, Mic, Square, RotateCcw, Link2, Camera } from 'lucide-react';
+import { Video, Mic, Square, RotateCcw, Link2, Camera, Upload } from 'lucide-react';
 import { neu } from '@/lib/historias-neumorph';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
   probeAudioFileDurationSeconds,
+  probeVideoFileDurationSeconds,
   isDurationWithinMax,
 } from '@/lib/media-duration-rules';
 import {
@@ -20,7 +21,7 @@ import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 
 export type SubmissionSexApi = 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';
 
-export type AudioCapturePrefill = {
+export type SubmissionPrefill = {
   storyTitle: string;
   ciudad: string;
   pais: string;
@@ -31,8 +32,11 @@ export type AudioCapturePrefill = {
   email: string;
 };
 
+/** @deprecated Usar SubmissionPrefill */
+export type AudioCapturePrefill = SubmissionPrefill;
+
 export type CaptureOutcome = {
-  /** Texto que alimenta la impronta (historia completa o resumen). */
+  /** Texto para curación y composición posterior (no se adelanta “huella” en la captura). */
   narrativeText: string;
   recordedBlob: Blob | null;
   recordedMime: string;
@@ -41,16 +45,22 @@ export type CaptureOutcome = {
   videoUrl: string;
   audioUrl: string;
   audioFile: File | null;
-  /** Solo audio: datos ya recogidos para el paso final del envío. */
-  audioPrefill?: AudioCapturePrefill;
+  /** Video subido desde el equipo (alternativa a grabación o enlace). */
+  videoFile?: File | null;
+  /** Texto de contexto de la foto (restaurar al volver atrás). */
+  fotoContext?: string;
+  /** Datos de historia y persona ya recogidos antes del paso de envío. */
+  submissionPrefill?: SubmissionPrefill;
+  /** @deprecated Usar submissionPrefill */
+  audioPrefill?: SubmissionPrefill;
 };
 
-function buildAudioNarrativeText(p: {
-  storyTitle: string;
-  ciudad: string;
-  pais: string;
-  extraStory: string;
-}): string {
+type FlowStage = 'welcome' | 'media' | 'storyDetails' | 'personDetails';
+
+function buildSubmissionNarrativeText(
+  format: SubirFormat,
+  p: { storyTitle: string; ciudad: string; pais: string; extraStory: string }
+): string {
   const title = p.storyTitle.trim();
   const place = [p.ciudad.trim(), p.pais.trim()].filter(Boolean).join(', ');
   const extra = p.extraStory.trim();
@@ -58,17 +68,29 @@ function buildAudioNarrativeText(p: {
   if (extra) blocks.push(extra);
   blocks.push(`Historia: «${title || 'Sin título'}».`);
   if (place) blocks.push(`Lugar: ${place}.`);
-  blocks.push('Relato en voz para AlmaMundi.');
+  const suffix =
+    format === 'video'
+      ? 'Relato en video para AlmaMundi.'
+      : format === 'audio'
+        ? 'Relato en voz para AlmaMundi.'
+        : format === 'texto'
+          ? 'Relato escrito para AlmaMundi.'
+          : 'Relato con imágenes para AlmaMundi.';
+  blocks.push(suffix);
   let text = blocks.join('\n\n');
   if (text.length < 30) {
-    text = `${text}\n\nGracias por compartir tu historia con tu voz.`;
+    text = `${text}\n\nGracias por compartir tu historia.`;
   }
   return text.slice(0, 2000);
 }
 
 const PHOTO_MAX_MB = 5;
 const AUDIO_MAX_MB = 10;
+/** Subida de video desde equipo (cliente). */
+const VIDEO_UPLOAD_MAX_MB = 100;
 const NARRATIVE_MIN = 30;
+const FOTO_CAPTION_MIN = 15;
+const TEXT_DRAFT_KEY = 'almamundi-subir-texto-draft';
 
 const neoSurface = {
   ...neu.cardInset,
@@ -111,9 +133,18 @@ function pickRecorderMime(forVideo: boolean): string | undefined {
 type Props = {
   format: SubirFormat;
   onContinue: (out: CaptureOutcome) => void;
+  /** Si el usuario vuelve desde el envío, repuebla campos y etapa. */
+  restoredCapture?: CaptureOutcome | null;
+  /** Incrementar al volver para forzar la hidratación. */
+  hydrateKey?: number;
 };
 
-export function StoryCaptureStep({ format, onContinue }: Props) {
+export function StoryCaptureStep({
+  format,
+  onContinue,
+  restoredCapture = null,
+  hydrateKey = 0,
+}: Props) {
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const videoReviewRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -143,15 +174,16 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
 
   const [videoUrl, setVideoUrl] = useState('');
-  const [narrativeExtra, setNarrativeExtra] = useState('');
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoFilePreviewUrl, setVideoFilePreviewUrl] = useState<string | null>(null);
 
   const [audioUrl, setAudioUrl] = useState('');
   const [audioFile, setAudioFile] = useState<File | null>(null);
 
   const [localErr, setLocalErr] = useState('');
 
-  /** Flujo audio: bienvenida → captura → datos (sin hablar de huella en las dos primeras). */
-  const [audioFlow, setAudioFlow] = useState<'welcome' | 'media' | 'details'>('welcome');
+  /** Flujo por formato: bienvenida → medio → datos de historia → datos de persona. */
+  const [flowStage, setFlowStage] = useState<FlowStage>('welcome');
   const [liveMicStream, setLiveMicStream] = useState<MediaStream | null>(null);
 
   const [adStoryTitle, setAdStoryTitle] = useState('');
@@ -162,6 +194,8 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
   const [adAgeRange, setAdAgeRange] = useState<AgeRangeId | ''>('');
   const [adSex, setAdSex] = useState<'' | SubmissionSexApi>('');
   const [adEmail, setAdEmail] = useState('');
+
+  const textDraftLoadedRef = useRef(false);
 
   const stopStream = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -186,18 +220,126 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
   }, [stopStream, clearReviewUrl]);
 
   useEffect(() => {
-    if (format !== 'audio') {
-      setAudioFlow('welcome');
-      setAdStoryTitle('');
-      setAdCiudad('');
-      setAdPais('');
-      setAdExtra('');
-      setAdAlias('');
-      setAdAgeRange('');
-      setAdSex('');
-      setAdEmail('');
+    setFlowStage('welcome');
+    setAdStoryTitle('');
+    setAdCiudad('');
+    setAdPais('');
+    setAdExtra('');
+    setAdAlias('');
+    setAdAgeRange('');
+    setAdSex('');
+    setAdEmail('');
+    setVideoFile(null);
+    setVideoUrl('');
+    setTextStory('');
+    setFotoCaption('');
+    setPhotoFiles([]);
+    setAudioUrl('');
+    setAudioFile(null);
+    setRecordedBlob(null);
+    setRecordedMime('');
+    setPhase('idle');
+    setRecording(false);
+    setLocalErr('');
+    textDraftLoadedRef.current = false;
+  }, [format]);
+
+  useEffect(() => {
+    if (format !== 'texto' || textDraftLoadedRef.current || typeof window === 'undefined') return;
+    try {
+      const raw = localStorage.getItem(TEXT_DRAFT_KEY);
+      if (raw) {
+        textDraftLoadedRef.current = true;
+        setTextStory(raw.slice(0, SUBIR_TEXT_MAX_CHARS));
+      }
+    } catch {
+      /* ignore */
     }
   }, [format]);
+
+  useEffect(() => {
+    if (format !== 'texto' || typeof window === 'undefined') return;
+    try {
+      if (textStory.trim()) localStorage.setItem(TEXT_DRAFT_KEY, textStory);
+      else localStorage.removeItem(TEXT_DRAFT_KEY);
+    } catch {
+      /* ignore */
+    }
+  }, [format, textStory]);
+
+  useEffect(() => {
+    if (!restoredCapture?.submissionPrefill && !restoredCapture?.audioPrefill) return;
+    const p = restoredCapture.submissionPrefill ?? restoredCapture.audioPrefill;
+    if (!p) return;
+    setAdStoryTitle(p.storyTitle);
+    setAdCiudad(p.ciudad);
+    setAdPais(p.pais);
+    setAdExtra(p.extraStory);
+    setAdAlias(p.alias);
+    setAdAgeRange(p.ageRange);
+    setAdSex(p.sex);
+    setAdEmail(p.email);
+    if (format === 'texto') setTextStory(restoredCapture.narrativeText.slice(0, SUBIR_TEXT_MAX_CHARS));
+    if (format === 'foto') {
+      if (restoredCapture.photoFiles?.length) setPhotoFiles(restoredCapture.photoFiles);
+      if (restoredCapture.fotoContext != null) setFotoCaption(restoredCapture.fotoContext);
+    }
+    if (format === 'video') {
+      setVideoUrl(restoredCapture.videoUrl);
+      if (restoredCapture.videoFile) setVideoFile(restoredCapture.videoFile);
+      if (restoredCapture.recordedBlob) {
+        setRecordedBlob(restoredCapture.recordedBlob);
+        setRecordedMime(restoredCapture.recordedMime);
+        const url = URL.createObjectURL(restoredCapture.recordedBlob);
+        setPreviewUrl(url);
+        setPhase('review');
+      } else {
+        setPhase('idle');
+      }
+    }
+    if (format === 'audio') {
+      setAudioUrl(restoredCapture.audioUrl);
+      setAudioFile(restoredCapture.audioFile);
+      if (restoredCapture.recordedBlob) {
+        setRecordedBlob(restoredCapture.recordedBlob);
+        setRecordedMime(restoredCapture.recordedMime);
+        const url = URL.createObjectURL(restoredCapture.recordedBlob);
+        setPreviewUrl(url);
+        setPhase('review');
+      } else {
+        setPhase('idle');
+      }
+    }
+    setFlowStage('personDetails');
+    setLocalErr('');
+  }, [hydrateKey, restoredCapture, format, setPreviewUrl]);
+
+  useEffect(() => {
+    if (!videoFile) {
+      setVideoFilePreviewUrl(null);
+      return;
+    }
+    const u = URL.createObjectURL(videoFile);
+    setVideoFilePreviewUrl(u);
+    return () => {
+      URL.revokeObjectURL(u);
+    };
+  }, [videoFile]);
+
+  const [photoMainPreviewUrl, setPhotoMainPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    const f = photoFiles[0];
+    if (!f) {
+      setPhotoMainPreviewUrl(null);
+      return;
+    }
+    const u = URL.createObjectURL(f);
+    setPhotoMainPreviewUrl(u);
+    return () => {
+      URL.revokeObjectURL(u);
+    };
+  }, [photoFiles]);
 
   const startLive = useCallback(async () => {
     setLocalErr('');
@@ -273,9 +415,10 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
     clearReviewUrl();
     setPhase('idle');
     setRecording(false);
+    setVideoFile(null);
   }, [clearReviewUrl]);
 
-  const backAudioToWelcome = useCallback(() => {
+  const backToWelcomeFromPicker = useCallback(() => {
     stopStream();
     setRecordedBlob(null);
     setRecordedMime('');
@@ -284,58 +427,73 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
     setRecording(false);
     setAudioFile(null);
     setAudioUrl('');
-    setAudioFlow('welcome');
+    setVideoFile(null);
+    setVideoUrl('');
+    setFlowStage('welcome');
     setLocalErr('');
   }, [stopStream, clearReviewUrl]);
 
-  const narrativeTextForFormat = useCallback((): string => {
-    if (format === 'texto') return textStory.trim();
-    if (format === 'foto') {
-      const c = fotoCaption.trim();
-      return c.length >= 15 ? c : 'Historia compartida en imagen — AlmaMundi';
-    }
-    return narrativeExtra.trim();
-  }, [format, textStory, fotoCaption, narrativeExtra]);
-
   const canContinue = useCallback((): boolean => {
-    if (format === 'audio') {
-      if (audioFlow === 'welcome') return false;
-      if (audioFlow === 'media') {
+    if (flowStage === 'welcome') return false;
+
+    if (flowStage === 'media') {
+      if (format === 'audio') {
         return (
           recordedBlob != null ||
           audioFile != null ||
           (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl))
         );
       }
-      if (audioFlow === 'details') {
+      if (format === 'video') {
         return (
-          adStoryTitle.trim().length >= 2 &&
-          adCiudad.trim().length >= 1 &&
-          adPais.trim().length >= 2 &&
-          adAlias.trim().length >= 2 &&
-          adAgeRange !== '' &&
-          adSex !== '' &&
-          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adEmail.trim())
+          recordedBlob != null ||
+          videoFile != null ||
+          (videoUrl.trim().length > 0 && isVideoUrl(videoUrl))
+        );
+      }
+      if (format === 'texto') {
+        const len = textStory.trim().length;
+        return len >= NARRATIVE_MIN && len <= SUBIR_TEXT_MAX_CHARS;
+      }
+      if (format === 'foto') {
+        return (
+          photoFiles.length >= SUBIR_PHOTO_MIN &&
+          photoFiles.length <= SUBIR_PHOTO_MAX &&
+          fotoCaption.trim().length >= FOTO_CAPTION_MIN
         );
       }
       return false;
     }
-    const nar = narrativeTextForFormat();
-    if (format === 'texto')
-      return nar.length >= NARRATIVE_MIN && nar.length <= SUBIR_TEXT_MAX_CHARS;
-    if (format === 'foto')
-      return photoFiles.length >= SUBIR_PHOTO_MIN && photoFiles.length <= SUBIR_PHOTO_MAX;
-    if (format === 'video') {
-      const hasMedia = recordedBlob != null || (videoUrl.trim().length > 0 && isVideoUrl(videoUrl));
-      return hasMedia && nar.length >= NARRATIVE_MIN;
+
+    if (flowStage === 'storyDetails') {
+      return (
+        adStoryTitle.trim().length >= 2 &&
+        adCiudad.trim().length >= 1 &&
+        adPais.trim().length >= 2
+      );
     }
+
+    if (flowStage === 'personDetails') {
+      return (
+        adAlias.trim().length >= 2 &&
+        adAgeRange !== '' &&
+        adSex !== '' &&
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(adEmail.trim())
+      );
+    }
+
     return false;
   }, [
+    flowStage,
     format,
-    audioFlow,
     recordedBlob,
     audioFile,
     audioUrl,
+    videoFile,
+    videoUrl,
+    textStory,
+    photoFiles,
+    fotoCaption,
     adStoryTitle,
     adCiudad,
     adPais,
@@ -343,100 +501,109 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
     adAgeRange,
     adSex,
     adEmail,
-    narrativeTextForFormat,
-    photoFiles,
-    videoUrl,
   ]);
 
   const handleContinue = useCallback(() => {
-    if (format === 'audio') {
-      if (audioFlow === 'welcome') return;
-      if (audioFlow === 'media') {
-        const hasMedia =
-          recordedBlob != null ||
-          audioFile != null ||
-          (audioUrl.trim().length > 0 && /^https?:\/\//i.test(audioUrl));
-        if (!hasMedia) {
-          setLocalErr('Graba un momento en voz o elige un audio para seguir.');
-          return;
-        }
-        setLocalErr('');
-        setAudioFlow('details');
-        return;
-      }
-      if (audioFlow === 'details') {
-        if (!canContinue()) {
+    if (flowStage === 'welcome') return;
+
+    if (flowStage === 'media') {
+      if (!canContinue()) {
+        if (format === 'texto') {
           setLocalErr(
-            'Revisa título, ciudad, país, cómo te presentas, etapa de vida, género y un correo válido.'
+            textStory.trim().length > SUBIR_TEXT_MAX_CHARS
+              ? `Máximo ${SUBIR_TEXT_MAX_CHARS} caracteres (~2 carillas).`
+              : `Escribe al menos ${NARRATIVE_MIN} caracteres para poder seguir.`
           );
-          return;
+        } else if (format === 'foto') {
+          setLocalErr(
+            photoFiles.length < SUBIR_PHOTO_MIN || photoFiles.length > SUBIR_PHOTO_MAX
+              ? `Elige entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes.`
+              : `Cuéntanos un poco más sobre la imagen (al menos ${FOTO_CAPTION_MIN} caracteres).`
+          );
+        } else if (format === 'video') {
+          setLocalErr('Graba un momento, sube un video desde tu equipo o pega un enlace de YouTube o Vimeo.');
+        } else {
+          setLocalErr('Graba un momento en voz o elige un audio para seguir.');
         }
-        setLocalErr('');
-        const narrativeText = buildAudioNarrativeText({
-          storyTitle: adStoryTitle,
-          ciudad: adCiudad,
-          pais: adPais,
-          extraStory: adExtra,
-        });
-        onContinue({
-          narrativeText,
-          recordedBlob,
-          recordedMime,
-          photoFiles,
-          videoUrl: videoUrl.trim(),
-          audioUrl: audioUrl.trim(),
-          audioFile,
-          audioPrefill: {
-            storyTitle: adStoryTitle.trim(),
-            ciudad: adCiudad.trim(),
-            pais: adPais.trim(),
-            extraStory: adExtra.trim(),
-            alias: adAlias.trim(),
-            ageRange: adAgeRange as AgeRangeId,
-            sex: adSex as SubmissionSexApi,
-            email: adEmail.trim(),
-          },
-        });
         return;
       }
+      setLocalErr('');
+      setFlowStage('storyDetails');
       return;
     }
 
-    if (!canContinue()) {
-      setLocalErr(
-        format === 'texto'
-          ? textStory.trim().length > SUBIR_TEXT_MAX_CHARS
-            ? `Máximo ${SUBIR_TEXT_MAX_CHARS} caracteres (~2 carillas).`
-            : `Escribe al menos ${NARRATIVE_MIN} caracteres.`
-          : format === 'foto'
-            ? `Elige entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} fotos.`
-            : `Necesitas medio (grabación, archivo o enlace válido) y un texto de al menos ${NARRATIVE_MIN} caracteres para la huella.`
-      );
+    if (flowStage === 'storyDetails') {
+      if (!canContinue()) {
+        setLocalErr('Revisa el nombre de la historia, la ciudad y el país.');
+        return;
+      }
+      setLocalErr('');
+      setFlowStage('personDetails');
       return;
     }
-    setLocalErr('');
-    onContinue({
-      narrativeText: narrativeTextForFormat(),
-      recordedBlob,
-      recordedMime,
-      photoFiles,
-      videoUrl: videoUrl.trim(),
-      audioUrl: audioUrl.trim(),
-      audioFile,
-    });
+
+    if (flowStage === 'personDetails') {
+      if (!canContinue()) {
+        setLocalErr('Revisa nombre o alias, etapa etaria, género y un correo válido.');
+        return;
+      }
+      setLocalErr('');
+      const meta = {
+        storyTitle: adStoryTitle.trim(),
+        ciudad: adCiudad.trim(),
+        pais: adPais.trim(),
+        extraStory: adExtra.trim(),
+      };
+      let narrativeText: string;
+      if (format === 'texto') {
+        narrativeText = textStory.trim().slice(0, SUBIR_TEXT_MAX_CHARS);
+      } else if (format === 'foto') {
+        narrativeText =
+          fotoCaption.trim().length >= FOTO_CAPTION_MIN
+            ? fotoCaption.trim()
+            : buildSubmissionNarrativeText('foto', meta);
+      } else {
+        narrativeText = buildSubmissionNarrativeText(format, meta);
+      }
+      const prefill: SubmissionPrefill = {
+        storyTitle: meta.storyTitle,
+        ciudad: meta.ciudad,
+        pais: meta.pais,
+        extraStory: meta.extraStory,
+        alias: adAlias.trim(),
+        ageRange: adAgeRange as AgeRangeId,
+        sex: adSex as SubmissionSexApi,
+        email: adEmail.trim(),
+      };
+      const out: CaptureOutcome = {
+        narrativeText:
+          format === 'texto' ? narrativeText : narrativeText.slice(0, 2000),
+        recordedBlob,
+        recordedMime,
+        photoFiles,
+        videoUrl: videoUrl.trim(),
+        audioUrl: audioUrl.trim(),
+        audioFile,
+        videoFile: format === 'video' ? videoFile : undefined,
+        fotoContext: format === 'foto' ? fotoCaption : undefined,
+        submissionPrefill: prefill,
+        audioPrefill: prefill,
+      };
+      onContinue(out);
+    }
   }, [
+    flowStage,
     canContinue,
     format,
-    audioFlow,
-    narrativeTextForFormat,
     textStory,
-    onContinue,
-    recordedBlob,
-    recordedMime,
+    fotoCaption,
     photoFiles,
     videoUrl,
+    videoFile,
     audioUrl,
     audioFile,
+    recordedBlob,
+    recordedMime,
     adStoryTitle,
     adCiudad,
     adPais,
@@ -445,62 +612,11 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
     adAgeRange,
     adSex,
     adEmail,
+    onContinue,
   ]);
 
-  const narrativeTooShort =
-    narrativeExtra.trim().length > 0 && narrativeExtra.trim().length < NARRATIVE_MIN;
-
-  const renderNarrativeBox = (label: string, hint: string, fieldId: string) => (
-    <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-      <label htmlFor={fieldId} className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
-        {label}
-      </label>
-      <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
-        {hint}
-      </p>
-      <textarea
-        id={fieldId}
-        value={narrativeExtra}
-        onChange={(e) => setNarrativeExtra(e.target.value)}
-        rows={5}
-        aria-required="true"
-        aria-invalid={narrativeTooShort}
-        aria-describedby={narrativeTooShort ? `${fieldId}-error` : undefined}
-        className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[140px]"
-        style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-      />
-      {narrativeTooShort && (
-        <p id={`${fieldId}-error`} className="text-sm text-amber-700" role="alert">
-          Mínimo {NARRATIVE_MIN} caracteres.
-        </p>
-      )}
-    </div>
-  );
-
-  /** Intro por formato (audio usa cabecera propia más abajo). */
-  const pageCopy =
-    format === 'video'
-      ? {
-          a11yTitle: 'Captura de video',
-          line: `Graba con la cámara o pega un enlace (YouTube/Vimeo). Máximo ${SUBIR_AV_MAX_MINUTES} minutos. En segundos verás una huella única hecha de cuadrados y color; después completas tus datos.`,
-        }
-      : format === 'texto'
-        ? {
-            a11yTitle: 'Relato por texto',
-            line: `Escribe hasta ~2 carillas (${SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres como máximo). Cada relato genera una huella distinta en cuadrados y capas de color.`,
-          }
-        : format === 'foto'
-          ? {
-              a11yTitle: 'Imágenes para la huella',
-              line: `Sube entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} fotos (JPG, PNG o WebP). La huella mezcla geometría y paleta según tus palabras clave.`,
-            }
-          : {
-              a11yTitle: 'Tu historia en audio',
-              line: '',
-            };
-
   const voiceWaveMode: VoiceWaveformMode =
-    format !== 'audio' || audioFlow !== 'media'
+    format !== 'audio' || flowStage !== 'media'
       ? 'idle'
       : localErr && phase === 'idle'
         ? 'error'
@@ -513,70 +629,104 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
               : 'idle';
 
   const continueButtonLabel =
-    format === 'audio'
-      ? audioFlow === 'welcome'
-        ? ''
-        : audioFlow === 'media'
-          ? 'Continuar — cuéntanos sobre tu historia'
-          : 'Seguir'
-      : 'Seguir — ver tu huella';
+    flowStage === 'welcome'
+      ? ''
+      : flowStage === 'media'
+        ? 'Continuar — datos de tu historia'
+        : flowStage === 'storyDetails'
+          ? 'Continuar — un poco sobre ti'
+          : 'Seguir al envío';
 
-  const showContinueButton = !(format === 'audio' && audioFlow === 'welcome');
+  const showContinueButton = flowStage !== 'welcome';
 
   const footerNote =
-    format === 'audio' && audioFlow === 'welcome'
-      ? 'Tu historia será revisada con cuidado antes de publicarse.'
-      : format === 'audio' && audioFlow !== 'details'
-        ? 'Tu historia pasará por revisión antes de publicarse. Si quieres, más adelante verás una composición visual inspirada en lo que compartiste.'
-        : 'Tu historia pasará por revisión editorial antes de publicarse.';
+    flowStage === 'welcome'
+      ? 'Tu historia quedará en revisión antes de formar parte de AlmaMundi.'
+      : flowStage === 'media'
+        ? 'Puedes tomarte el tiempo que necesites. Nada se publica automáticamente.'
+        : flowStage === 'storyDetails'
+          ? 'Estos datos ayudan a ubicar tu relato si llega al mapa.'
+          : 'Con tu correo te avisaremos del estado de tu historia; no será visible públicamente.';
+
+  const stepBadge =
+    flowStage === 'welcome' || flowStage === 'media'
+      ? 'Paso 1 · Tu historia'
+      : flowStage === 'storyDetails'
+        ? 'Paso 2 · Datos de la historia'
+        : 'Paso 3 · Datos de la persona';
+
+  const formatWelcomeTitle =
+    format === 'video'
+      ? 'Cuenta tu historia en video'
+      : format === 'audio'
+        ? 'Cuenta tu historia con tu voz'
+        : format === 'texto'
+          ? 'Escribe tu historia'
+          : 'Cuenta una historia con una foto';
+
+  const formatWelcomeBody =
+    format === 'video'
+      ? `Puedes grabarla ahora o subir un video desde tu equipo. No tiene que ser perfecto: basta con que muestre algo de tu historia. Hasta ${SUBIR_AV_MAX_MINUTES} minutos.`
+      : format === 'audio'
+        ? `Puedes grabarla ahora o subir un audio desde tu equipo. No tiene que quedar perfecta: basta con que suene a ti. Hasta ${SUBIR_AV_MAX_MINUTES} minutos.`
+        : format === 'texto'
+          ? 'Puedes empezar con unas líneas. No tiene que estar perfecta: puedes contar una escena, una carta, una despedida o algo que todavía vuelve.'
+          : 'Sube una imagen y cuéntanos qué guarda: quién aparece, dónde fue, qué momento recuerda o por qué importa.';
 
   return (
-    <section className="space-y-8 md:space-y-10" aria-label="Paso 2 de 4: captura de tu historia" aria-current="step">
+    <section className="space-y-8 md:space-y-10" aria-label="Captura de tu historia" aria-current="step">
       <header className="space-y-4 md:space-y-5">
         <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
-        {format === 'audio' ? (
-          <>
-            <h1 className="sr-only">Contar tu historia con tu voz</h1>
-            {audioFlow === 'welcome' && (
-              <div className="space-y-3 max-w-2xl">
-                <h2 className="text-2xl md:text-3xl font-light leading-snug tracking-tight" style={{ color: neu.textMain }}>
-                  Cuenta tu historia con tu voz
-                </h2>
-                <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
-                  Puedes grabarla ahora o subir un audio desde tu equipo. No tiene que quedar perfecta: basta con que
-                  suene a ti. Hasta {SUBIR_AV_MAX_MINUTES} minutos.
-                </p>
-              </div>
+        <h1 className="sr-only">{formatWelcomeTitle}</h1>
+        {flowStage === 'welcome' && (
+          <div className="space-y-3 max-w-2xl">
+            <h2 className="text-2xl md:text-3xl font-light leading-snug tracking-tight" style={{ color: neu.textMain }}>
+              {formatWelcomeTitle}
+            </h2>
+            <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
+              {formatWelcomeBody}
+            </p>
+          </div>
+        )}
+        {flowStage !== 'welcome' && (
+          <div className="space-y-2 max-w-2xl">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600/90">{stepBadge}</p>
+            {flowStage === 'media' && (
+              <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
+                {format === 'video' && videoMode === 'grabar'
+                  ? 'Te pediremos permiso para usar la cámara y el micrófono. Puedes detener la grabación cuando quieras.'
+                  : format === 'video'
+                    ? 'Puedes traer un video desde tu equipo o pegar un enlace de YouTube o Vimeo.'
+                    : format === 'audio' && audioMode === 'grabar'
+                      ? 'Activa el micrófono cuando estés listo. Puedes detener cuando quieras y escuchar antes de seguir.'
+                      : format === 'audio'
+                        ? 'Elige un audio de tu equipo o pega un enlace que empiece por https://'
+                        : format === 'texto'
+                          ? 'Este es tu espacio para contar. Puedes editar hasta que pulses continuar.'
+                          : 'Elige una o varias fotos y escribe el contexto con calma.'}
+              </p>
             )}
-            {audioFlow === 'media' && (
-              <div className="space-y-2 max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600/90">Paso 2 · Tu voz</p>
-                <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
-                  {audioMode === 'grabar'
-                    ? 'Activa el micrófono cuando estés listo. Puedes detener cuando quieras y escuchar antes de seguir.'
-                    : 'Elige un audio de tu equipo o pega un enlace que empiece por https://'}
-                </p>
-              </div>
-            )}
-            {audioFlow === 'details' && (
-              <div className="space-y-2 max-w-2xl">
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600/90">Paso 3 · Tú y tu relato</p>
+            {flowStage === 'storyDetails' && (
+              <>
                 <h2 className="text-xl md:text-2xl font-light leading-snug" style={{ color: neu.textMain }}>
-                  Unos datos para acompañar tu historia
+                  Datos de tu historia
                 </h2>
                 <p className="text-sm md:text-base leading-relaxed" style={{ color: neu.textBody }}>
-                  Así podremos ubicar tu relato en el mapa si se publica, y saber cómo dirigirnos a ti con respeto.
+                  Así podremos reconocer tu relato con claridad si llega a publicarse.
                 </p>
-              </div>
+              </>
             )}
-          </>
-        ) : (
-          <>
-            <h1 className="sr-only">{pageCopy.a11yTitle}</h1>
-            <p className="text-xl md:text-3xl lg:text-4xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
-              {pageCopy.line}
-            </p>
-          </>
+            {flowStage === 'personDetails' && (
+              <>
+                <h2 className="text-xl md:text-2xl font-light leading-snug" style={{ color: neu.textMain }}>
+                  Un poco sobre ti
+                </h2>
+                <p className="text-sm md:text-base leading-relaxed" style={{ color: neu.textBody }}>
+                  Nos ayuda a dirigirnos a ti con respeto y a mantenerte al tanto por correo.
+                </p>
+              </>
+            )}
+          </div>
         )}
       </header>
 
@@ -586,149 +736,507 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
         </p>
       )}
 
-      {format === 'texto' && (
-        <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-          <label htmlFor="capture-texto-relato" className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
-            Relato (obligatorio)
-          </label>
-          <textarea
-            id="capture-texto-relato"
-            value={textStory}
-            onChange={(e) => setTextStory(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
-            rows={14}
-            placeholder="Escribe aquí…"
-            className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[280px]"
-            style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-            aria-required="true"
-            aria-invalid={textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN}
-            aria-describedby={
-              textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN
-                ? 'capture-texto-relato-error'
-                : 'capture-texto-relato-count'
-            }
-          />
-          <p id="capture-texto-relato-count" className="text-base md:text-lg" style={{ color: neu.textBody }}>
-            {textStory.length.toLocaleString('es')} / {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres
-          </p>
-          {textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN && (
-            <p id="capture-texto-relato-error" className="text-sm text-amber-700" role="alert">
-              Mínimo {NARRATIVE_MIN} caracteres.
+      {flowStage === 'storyDetails' && (
+        <div className="mx-auto max-w-xl space-y-5">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('media');
+              setLocalErr('');
+            }}
+            className="text-sm font-medium px-4 py-2 rounded-full"
+            style={{ ...neu.button, color: neu.textBody }}
+          >
+            ← Volver a tu historia
+          </button>
+          <div style={neoSurface} className="p-5 md:p-6 space-y-5">
+            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+              Tu historia
             </p>
-          )}
+            <div>
+              <label htmlFor="ad-story-title" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                Nombre de la historia
+              </label>
+              <input
+                id="ad-story-title"
+                type="text"
+                value={adStoryTitle}
+                onChange={(e) => setAdStoryTitle(e.target.value)}
+                placeholder="Cómo quieres llamar a este relato"
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              />
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label htmlFor="ad-ciudad" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  Ciudad o localidad
+                </label>
+                <input
+                  id="ad-ciudad"
+                  type="text"
+                  value={adCiudad}
+                  onChange={(e) => setAdCiudad(e.target.value)}
+                  placeholder="Ej: Oaxaca"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+              </div>
+              <div>
+                <label htmlFor="ad-pais" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                  País
+                </label>
+                <input
+                  id="ad-pais"
+                  type="text"
+                  value={adPais}
+                  onChange={(e) => setAdPais(e.target.value)}
+                  placeholder="Ej: México"
+                  className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+              </div>
+            </div>
+            <div>
+              <label htmlFor="ad-extra" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                ¿Quieres agregar algo más sobre esta historia?
+              </label>
+              <p className="text-xs mb-1.5" style={{ color: neu.textBody }}>
+                Es opcional. Si quieres, aquí puedes ampliar contexto o un detalle que te importe.
+              </p>
+              <textarea
+                id="ad-extra"
+                value={adExtra}
+                onChange={(e) => setAdExtra(e.target.value)}
+                rows={4}
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60 resize-y min-h-[100px]"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              />
+            </div>
+          </div>
         </div>
       )}
 
-      {format === 'foto' && (
-        <>
-          <div style={neoSurface} className="p-6 md:p-8 space-y-4">
-            <label htmlFor="capture-foto-files" className="flex items-center gap-3 text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
-              <Camera className="h-8 w-8 text-orange-500 shrink-0" aria-hidden />
-              Imágenes ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX}) *
-            </label>
-            <input
-              id="capture-foto-files"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              multiple
-              capture="environment"
-              aria-label={`Seleccionar archivos de imagen para la historia (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX} fotos)`}
-              aria-required="true"
-              onChange={(e) => {
-                const list = e.target.files;
-                if (!list?.length) return;
-                setPhotoFiles((prev) => {
-                  const next = [...prev];
-                  for (const f of Array.from(list)) {
-                    if (next.length >= SUBIR_PHOTO_MAX) break;
-                    if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
-                      setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
-                      return prev;
-                    }
-                    if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
-                      setLocalErr('Formato: JPG, PNG o WebP.');
-                      return prev;
-                    }
-                    next.push(f);
-                  }
-                  setLocalErr('');
-                  return next;
-                });
-                e.target.value = '';
-              }}
-              className="w-full text-base md:text-lg"
-              style={{ color: neu.textBody }}
-            />
-            {photoFiles.length > 0 && (
-              <ul className="space-y-2">
-                {photoFiles.map((f, i) => (
-                  <li
-                    key={`${f.name}-${i}`}
-                    className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-base"
-                    style={{ ...neu.card, borderRadius: '16px' }}
-                  >
-                    <span className="truncate font-medium" style={{ color: neu.textMain }}>
-                      {f.name}
-                    </span>
-                    <button
-                      type="button"
-                      className="shrink-0 rounded-full px-4 py-2 text-sm font-bold text-white"
-                      style={{ background: orangeCta }}
-                      onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
-                    >
-                      Quitar
-                    </button>
-                  </li>
+      {flowStage === 'personDetails' && (
+        <div className="mx-auto max-w-xl space-y-5">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('storyDetails');
+              setLocalErr('');
+            }}
+            className="text-sm font-medium px-4 py-2 rounded-full"
+            style={{ ...neu.button, color: neu.textBody }}
+          >
+            ← Volver a los datos de la historia
+          </button>
+          <div style={neoSurface} className="p-5 md:p-6 space-y-5">
+            <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
+              Sobre ti
+            </p>
+            <div>
+              <label htmlFor="ad-alias" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                Nombre o alias
+              </label>
+              <input
+                id="ad-alias"
+                type="text"
+                value={adAlias}
+                onChange={(e) => setAdAlias(e.target.value)}
+                placeholder="Cómo te gustaría que te llamemos"
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              />
+            </div>
+            <div>
+              <label htmlFor="ad-age" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                Etapa etaria
+              </label>
+              <select
+                id="ad-age"
+                value={adAgeRange}
+                onChange={(e) => setAdAgeRange(e.target.value as AgeRangeId | '')}
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              >
+                <option value="">Elige una opción</option>
+                {AGE_RANGE_OPTIONS.map((o) => (
+                  <option key={o.id} value={o.id}>
+                    {o.label}
+                  </option>
                 ))}
-              </ul>
-            )}
-            <p className="text-base md:text-lg" style={{ color: neu.textBody }}>
-              Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos.
-            </p>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="ad-sex" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                Género
+              </label>
+              <select
+                id="ad-sex"
+                value={adSex}
+                onChange={(e) => setAdSex(e.target.value as '' | SubmissionSexApi)}
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              >
+                <option value="">Elige una opción</option>
+                <option value="femenino">Mujer</option>
+                <option value="masculino">Hombre</option>
+                <option value="no-binario">No binario</option>
+                <option value="prefiero-no-decir">Prefiero no decirlo</option>
+                <option value="otro">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label htmlFor="ad-email" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
+                Correo electrónico
+              </label>
+              <input
+                id="ad-email"
+                type="email"
+                value={adEmail}
+                onChange={(e) => setAdEmail(e.target.value)}
+                placeholder="tu@correo.com"
+                className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
+                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              />
+              <p className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
+                Usaremos tu correo para avisarte sobre el estado de tu historia y si llega a publicarse en el mapa. No
+                será visible públicamente.
+              </p>
+            </div>
           </div>
-          <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-            <label htmlFor="capture-foto-caption" className="block text-xl md:text-2xl font-semibold" style={{ color: neu.textMain }}>
-              Palabras clave o pie (opcional)
-            </label>
-            <p className="text-base md:text-lg" style={{ color: neu.textBody }}>
-              15+ caracteres ayudan a personalizar la huella.
-            </p>
-            <textarea
-              id="capture-foto-caption"
-              value={fotoCaption}
-              onChange={(e) => setFotoCaption(e.target.value)}
-              rows={4}
-              className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y"
-              style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-            />
-          </div>
-        </>
+        </div>
       )}
 
-      {format === 'video' && (
-        <>
-          <div className="flex flex-wrap gap-3">
+      {format === 'texto' && flowStage === 'welcome' && (
+        <div className="mx-auto max-w-md">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('media');
+              setLocalErr('');
+            }}
+            className="w-full py-4 md:py-5 rounded-full font-bold text-base text-white"
+            style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+          >
+            Comenzar a escribir
+          </button>
+        </div>
+      )}
+
+      {format === 'texto' && flowStage === 'media' && (
+        <div className="space-y-4 max-w-3xl mx-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('welcome');
+              setLocalErr('');
+            }}
+            className="text-sm font-medium px-4 py-2 rounded-full"
+            style={{ ...neu.button, color: neu.textBody }}
+          >
+            ← Volver
+          </button>
+          <div style={neoSurface} className="p-6 md:p-8 space-y-4">
+            <label htmlFor="capture-texto-relato" className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
+              Tu relato
+            </label>
+            <textarea
+              id="capture-texto-relato"
+              value={textStory}
+              onChange={(e) => setTextStory(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
+              rows={14}
+              placeholder="Empieza aquí… puede ser una escena, un recuerdo, una voz, un lugar o una frase que no quieres perder."
+              className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[280px]"
+              style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+              aria-required="true"
+              aria-invalid={textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN}
+              aria-describedby={
+                textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN
+                  ? 'capture-texto-relato-error'
+                  : 'capture-texto-relato-count'
+              }
+            />
+            <div className="flex flex-wrap gap-2">
+              {(
+                [
+                  'Una escena que recuerdas',
+                  'Un lugar que cambió',
+                  'Una persona que marcó tu vida',
+                  'Algo que nunca dijiste',
+                ] as const
+              ).map((hint) => (
+                <button
+                  key={hint}
+                  type="button"
+                  onClick={() =>
+                    setTextStory((prev) => {
+                      const prefix = prev.trim().length ? `${prev.trim()}\n\n` : '';
+                      return `${prefix}${hint}…`.slice(0, SUBIR_TEXT_MAX_CHARS);
+                    })
+                  }
+                  className="rounded-full px-3 py-1.5 text-xs font-medium"
+                  style={{ ...neu.button, color: neu.textBody }}
+                >
+                  {hint}
+                </button>
+              ))}
+            </div>
+            <p id="capture-texto-relato-count" className="text-sm md:text-base" style={{ color: neu.textBody }}>
+              {textStory.length.toLocaleString('es')} caracteres ·{' '}
+              {textStory.trim().split(/\s+/).filter(Boolean).length.toLocaleString('es')} palabras (máx.{' '}
+              {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres)
+            </p>
+            {textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN && (
+              <p id="capture-texto-relato-error" className="text-sm text-amber-700" role="alert">
+                Escribe al menos {NARRATIVE_MIN} caracteres para poder seguir.
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {format === 'foto' && flowStage === 'welcome' && (
+        <div className="mx-auto max-w-md">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('media');
+              setLocalErr('');
+            }}
+            className="w-full py-4 md:py-5 rounded-full font-bold text-base text-white"
+            style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+          >
+            Comenzar
+          </button>
+        </div>
+      )}
+
+      {format === 'foto' && flowStage === 'media' && (
+        <div className="space-y-5 max-w-3xl mx-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setFlowStage('welcome');
+              setLocalErr('');
+            }}
+            className="text-sm font-medium px-4 py-2 rounded-full"
+            style={{ ...neu.button, color: neu.textBody }}
+          >
+            ← Volver
+          </button>
+          <div className="grid gap-6 lg:grid-cols-2">
+            <div style={neoSurface} className="p-6 md:p-8 space-y-4">
+              <label htmlFor="capture-foto-files" className="flex items-center gap-3 text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
+                <Camera className="h-8 w-8 text-orange-500 shrink-0" aria-hidden />
+                Tu imagen ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX})
+              </label>
+              <p className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
+                Puedes subir una o varias fotos (JPG, PNG o WebP, hasta {PHOTO_MAX_MB} MB cada una).
+              </p>
+              <input
+                id="capture-foto-files"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                capture="environment"
+                aria-label={`Elegir imágenes (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX})`}
+                onChange={(e) => {
+                  const list = e.target.files;
+                  if (!list?.length) return;
+                  setPhotoFiles((prev) => {
+                    const next = [...prev];
+                    for (const f of Array.from(list)) {
+                      if (next.length >= SUBIR_PHOTO_MAX) break;
+                      if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
+                        setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
+                        return prev;
+                      }
+                      if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
+                        setLocalErr('Formato: JPG, PNG o WebP.');
+                        return prev;
+                      }
+                      next.push(f);
+                    }
+                    setLocalErr('');
+                    return next;
+                  });
+                  e.target.value = '';
+                }}
+                className="w-full text-sm md:text-base"
+                style={{ color: neu.textBody }}
+              />
+              {photoFiles.length > 0 && (
+                <ul className="space-y-2">
+                  {photoFiles.map((f, i) => (
+                    <li
+                      key={`${f.name}-${i}`}
+                      className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm"
+                      style={{ ...neu.card, borderRadius: '16px' }}
+                    >
+                      <span className="truncate font-medium" style={{ color: neu.textMain }}>
+                        {f.name}
+                      </span>
+                      <button
+                        type="button"
+                        className="shrink-0 rounded-full px-4 py-2 text-xs font-bold text-white"
+                        style={{ background: orangeCta }}
+                        onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
+                      >
+                        Quitar
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <p className="text-sm" style={{ color: neu.textBody }}>
+                Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos.
+              </p>
+            </div>
+            <div className="space-y-4">
+              {photoMainPreviewUrl && (
+                <div
+                  className="rounded-[1.75rem] overflow-hidden border border-white/50"
+                  style={{ ...neu.cardInset, minHeight: '200px' }}
+                >
+                  <img
+                    src={photoMainPreviewUrl}
+                    alt="Vista previa de tu foto"
+                    className="w-full h-full max-h-[360px] object-contain bg-[#e8ecf4]"
+                  />
+                </div>
+              )}
+              <div style={neoSurface} className="p-6 md:p-8 space-y-3">
+                <label htmlFor="capture-foto-caption" className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
+                  Contexto de la foto
+                </label>
+                <p className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
+                  Al menos {FOTO_CAPTION_MIN} caracteres nos ayudan a entender qué cuenta esta imagen.
+                </p>
+                <textarea
+                  id="capture-foto-caption"
+                  value={fotoCaption}
+                  onChange={(e) => setFotoCaption(e.target.value)}
+                  rows={6}
+                  placeholder="¿Qué guarda esta imagen? Puedes contar quién aparece, dónde fue tomada, qué estaba pasando o por qué la conservas."
+                  className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                />
+                <p className="text-xs" style={{ color: neu.textBody }}>
+                  {fotoCaption.trim().length.toLocaleString('es')} caracteres
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {format === 'video' && flowStage === 'welcome' && (
+        <div className="grid gap-4 sm:grid-cols-2 max-w-3xl mx-auto">
+          <button
+            type="button"
+            onClick={() => {
+              setVideoMode('grabar');
+              setFlowStage('media');
+              setPhase('idle');
+              setLocalErr('');
+              setVideoFile(null);
+              setVideoUrl('');
+              clearReviewUrl();
+              setRecordedBlob(null);
+              setRecordedMime('');
+            }}
+            className="rounded-[1.75rem] p-6 md:p-7 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99]"
+            style={{ ...neu.card, boxShadow: `${neu.card.boxShadow}, 0 14px 32px rgba(163,177,198,0.22)` }}
+          >
+            <Video className="h-9 w-9 text-orange-500 mb-3" aria-hidden />
+            <span className="block text-lg font-semibold mb-2" style={{ color: neu.textMain }}>
+              Grabar video
+            </span>
+            <span className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
+              Usa la cámara y el micrófono cuando estés listo. Puedes detener y repetir si quieres.
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setVideoMode('enlace');
+              setFlowStage('media');
+              setLocalErr('');
+              stopStream();
+              setRecordedBlob(null);
+              setRecordedMime('');
+              clearReviewUrl();
+              setPhase('idle');
+              setRecording(false);
+            }}
+            className="rounded-[1.75rem] p-6 md:p-7 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99]"
+            style={{ ...neu.card, boxShadow: `${neu.card.boxShadow}, 0 14px 32px rgba(163,177,198,0.22)` }}
+          >
+            <Upload className="h-9 w-9 text-orange-500 mb-3" aria-hidden />
+            <span className="block text-lg font-semibold mb-2" style={{ color: neu.textMain }}>
+              Subir video o pegar enlace
+            </span>
+            <span className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
+              Si ya tienes un archivo o un enlace de YouTube o Vimeo, puedes traerlo aquí.
+            </span>
+          </button>
+        </div>
+      )}
+
+      {format === 'video' && flowStage === 'media' && (
+        <div className="space-y-5 max-w-3xl mx-auto">
+          <div className="flex flex-wrap items-center gap-3">
             <button
               type="button"
-              onClick={() => setVideoMode('grabar')}
-              className="px-6 py-3.5 rounded-full text-base md:text-lg font-semibold"
+              onClick={backToWelcomeFromPicker}
+              className="text-sm font-medium px-4 py-2 rounded-full"
+              style={{ ...neu.button, color: neu.textBody }}
+            >
+              ← Cambiar forma de contar
+            </button>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => {
+                setVideoMode('grabar');
+                setVideoFile(null);
+                setVideoUrl('');
+                setLocalErr('');
+              }}
+              className="px-4 py-2 rounded-full text-sm font-semibold"
               style={videoMode === 'grabar' ? { ...neu.button, color: neu.orange } : neu.button}
             >
-              <Video className="inline h-5 w-5 mr-2 align-text-bottom" aria-hidden />
-              Grabar
+              <Video className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />
+              Grabar video
             </button>
             <button
               type="button"
-              onClick={() => setVideoMode('enlace')}
-              className="px-6 py-3.5 rounded-full text-base md:text-lg font-semibold"
+              onClick={() => {
+                setVideoMode('enlace');
+                stopStream();
+                setRecordedBlob(null);
+                setRecordedMime('');
+                clearReviewUrl();
+                setPhase('idle');
+                setRecording(false);
+                setLocalErr('');
+              }}
+              className="px-4 py-2 rounded-full text-sm font-semibold"
               style={videoMode === 'enlace' ? { ...neu.button, color: neu.orange } : neu.button}
             >
-              <Link2 className="inline h-5 w-5 mr-2 align-text-bottom" aria-hidden />
-              Enlace YouTube/Vimeo
+              <Link2 className="inline h-4 w-4 mr-1.5 align-text-bottom" aria-hidden />
+              Subir o enlace
             </button>
           </div>
 
           {videoMode === 'grabar' && (
             <div style={neoSurface} className="p-6 md:p-8 space-y-5">
+              <p className="text-xs md:text-sm leading-relaxed text-center max-w-lg mx-auto" style={{ color: neu.textBody }}>
+                Te pediremos permiso para usar la cámara y el micrófono. Puedes detener la grabación cuando quieras.
+              </p>
               {phase === 'idle' && (
                 <button
                   type="button"
@@ -736,12 +1244,12 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                   className="w-full py-4 md:py-5 rounded-full font-bold text-base md:text-lg text-white"
                   style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
                 >
-                  Activar cámara y micrófono
+                  Activar cámara
                 </button>
               )}
               {phase === 'live' && (
                 <>
-                  <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#e8ecf4] border border-white/60">
                     <video
                       ref={videoLiveRef}
                       className="h-full w-full scale-x-[-1] object-cover"
@@ -755,19 +1263,19 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                       <button
                         type="button"
                         onClick={startRecording}
-                        className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-base md:text-lg font-bold text-white"
+                        className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm md:text-base font-bold text-white"
                         style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
                       >
-                        <Video size={22} aria-hidden />
-                        Grabar
+                        <Video size={20} aria-hidden />
+                        Empezar grabación
                       </button>
                     ) : (
                       <button
                         type="button"
                         onClick={stopRecording}
-                        className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-base md:text-lg font-bold text-white bg-red-600 shadow-lg"
+                        className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm md:text-base font-bold text-white bg-red-600 shadow-lg"
                       >
-                        <Square size={22} aria-hidden />
+                        <Square size={20} aria-hidden />
                         Detener
                       </button>
                     )}
@@ -775,11 +1283,11 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                 </>
               )}
               {phase === 'review' && recordedBlob && (
-                <>
-                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
-                    Revisa tu grabación
+                <div className="space-y-4">
+                  <p className="text-sm font-medium text-center" style={{ color: neu.textMain }}>
+                    Escucha y mira con calma
                   </p>
-                  <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
+                  <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#e8ecf4] border border-white/60">
                     <video
                       ref={videoReviewRef}
                       key={previewUrl ?? 'no-preview'}
@@ -789,64 +1297,123 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                       controls
                     />
                   </div>
-                  <button
-                    type="button"
-                    onClick={discardRecording}
-                    className="inline-flex items-center gap-2 text-sm font-medium"
-                    style={{ color: neu.textBody }}
-                  >
-                    <RotateCcw size={16} aria-hidden />
-                    Descartar y volver a grabar
-                  </button>
-                </>
+                  <div className="flex flex-wrap justify-center gap-3">
+                    <button
+                      type="button"
+                      onClick={discardRecording}
+                      className="inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-medium"
+                      style={{ ...neu.button, color: neu.textBody }}
+                    >
+                      <RotateCcw size={16} aria-hidden />
+                      Volver a grabar
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
           )}
 
           {videoMode === 'enlace' && (
-            <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-              <label htmlFor="capture-video-url" className="block text-xl font-semibold" style={{ color: neu.textMain }}>
-                URL del video *
+            <div style={neoSurface} className="p-6 md:p-8 space-y-5">
+              <label htmlFor="capture-video-file" className="flex items-center gap-2 text-base font-semibold" style={{ color: neu.textMain }}>
+                <Upload className="h-5 w-5 text-orange-500" aria-hidden />
+                Video desde tu equipo (máx. {VIDEO_UPLOAD_MAX_MB} MB)
               </label>
+              <p className="text-xs leading-relaxed" style={{ color: neu.textBody }}>
+                MP4, WebM u otros formatos habituales. Comprobamos la duración cuando el navegador lo permite (máx.{' '}
+                {SUBIR_AV_MAX_MINUTES} minutos).
+              </p>
               <input
-                id="capture-video-url"
-                type="url"
-                value={videoUrl}
-                onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://www.youtube.com/..."
-                className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60"
-                style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                aria-required="true"
-                aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
-                aria-describedby={
-                  videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'capture-video-url-error' : undefined
-                }
+                id="capture-video-file"
+                type="file"
+                accept="video/mp4,video/webm,video/quicktime,video/*"
+                aria-label="Elegir video desde tu equipo"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  e.target.value = '';
+                  if (!f) {
+                    setVideoFile(null);
+                    return;
+                  }
+                  if (f.size > VIDEO_UPLOAD_MAX_MB * 1024 * 1024) {
+                    setLocalErr(`Ese video supera los ${VIDEO_UPLOAD_MAX_MB} MB. Prueba con uno más liviano.`);
+                    setVideoFile(null);
+                    return;
+                  }
+                  void probeVideoFileDurationSeconds(f).then((sec) => {
+                    if (sec != null && !isDurationWithinMax(sec)) {
+                      setLocalErr(`El video supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+                      setVideoFile(null);
+                      return;
+                    }
+                    setLocalErr('');
+                    setVideoFile(f);
+                    setVideoUrl('');
+                    setRecordedBlob(null);
+                    setRecordedMime('');
+                    clearReviewUrl();
+                    setPhase('idle');
+                  });
+                }}
+                className="w-full text-sm"
+                style={{ color: neu.textBody }}
               />
-              {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
-                <p id="capture-video-url-error" className="text-xs text-amber-700" role="alert">
-                  Usa un enlace de YouTube o Vimeo
+              {videoFile && (
+                <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                  Listo: {videoFile.name}
                 </p>
               )}
+              {videoFilePreviewUrl && (
+                <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-[#e8ecf4] border border-white/60">
+                  <video
+                    src={videoFilePreviewUrl}
+                    className="h-full w-full object-contain"
+                    playsInline
+                    controls
+                    muted
+                  />
+                </div>
+              )}
+              <div className="border-t border-white/40 pt-4 space-y-2">
+                <label htmlFor="capture-video-url" className="block text-sm font-semibold" style={{ color: neu.textMain }}>
+                  O pega un enlace (YouTube o Vimeo)
+                </label>
+                <input
+                  id="capture-video-url"
+                  type="url"
+                  value={videoUrl}
+                  onChange={(e) => {
+                    setVideoUrl(e.target.value);
+                    if (e.target.value.trim()) setVideoFile(null);
+                  }}
+                  placeholder="https://www.youtube.com/…"
+                  className="w-full px-5 py-4 rounded-2xl text-base outline-none bg-white/55 border border-white/60"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                  aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
+                  aria-describedby={
+                    videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) ? 'capture-video-url-error' : undefined
+                  }
+                />
+                {videoUrl.trim().length > 0 && !isVideoUrl(videoUrl) && (
+                  <p id="capture-video-url-error" className="text-xs text-amber-700" role="alert">
+                    Usa un enlace de YouTube o Vimeo
+                  </p>
+                )}
+              </div>
             </div>
           )}
-
-          {renderNarrativeBox(
-            'Texto para tu impronta *',
-            'Resume o describe lo que cuentas en el video (temas, emociones). Lo usamos para dibujar la composición y las etiquetas.',
-            'capture-narrative-video'
-          )}
-        </>
+        </div>
       )}
 
       {format === 'audio' && (
         <>
-          {audioFlow === 'welcome' && (
+          {flowStage === 'welcome' && (
             <div className="grid gap-4 sm:grid-cols-2 max-w-3xl mx-auto">
               <button
                 type="button"
                 onClick={() => {
                   setAudioMode('grabar');
-                  setAudioFlow('media');
+                  setFlowStage('media');
                   setPhase('idle');
                   setLocalErr('');
                 }}
@@ -865,7 +1432,7 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
                 type="button"
                 onClick={() => {
                   setAudioMode('archivo');
-                  setAudioFlow('media');
+                  setFlowStage('media');
                   setLocalErr('');
                 }}
                 className="rounded-[1.75rem] p-6 md:p-7 text-left transition-all hover:-translate-y-0.5 active:scale-[0.99]"
@@ -882,12 +1449,12 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
             </div>
           )}
 
-          {audioFlow === 'media' && (
+          {flowStage === 'media' && (
             <>
               <div className="flex flex-wrap items-center gap-3">
                 <button
                   type="button"
-                  onClick={backAudioToWelcome}
+                  onClick={backToWelcomeFromPicker}
                   className="text-sm font-medium px-4 py-2 rounded-full"
                   style={{ ...neu.button, color: neu.textBody }}
                 >
@@ -1044,162 +1611,6 @@ export function StoryCaptureStep({ format, onContinue }: Props) {
             </>
           )}
 
-          {audioFlow === 'details' && (
-            <div className="space-y-5 max-w-xl mx-auto">
-              <button
-                type="button"
-                onClick={() => {
-                  setAudioFlow('media');
-                  setLocalErr('');
-                }}
-                className="text-sm font-medium px-4 py-2 rounded-full"
-                style={{ ...neu.button, color: neu.textBody }}
-              >
-                ← Volver al audio
-              </button>
-              <div style={neoSurface} className="p-5 md:p-6 space-y-5">
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
-                  Tu historia
-                </p>
-                <div>
-                  <label htmlFor="ad-story-title" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Nombre de la historia
-                  </label>
-                  <input
-                    id="ad-story-title"
-                    type="text"
-                    value={adStoryTitle}
-                    onChange={(e) => setAdStoryTitle(e.target.value)}
-                    placeholder="Cómo quieres llamar a este relato"
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label htmlFor="ad-ciudad" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                      Ciudad o localidad
-                    </label>
-                    <input
-                      id="ad-ciudad"
-                      type="text"
-                      value={adCiudad}
-                      onChange={(e) => setAdCiudad(e.target.value)}
-                      placeholder="Ej: Oaxaca"
-                      className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                      style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                    />
-                  </div>
-                  <div>
-                    <label htmlFor="ad-pais" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                      País
-                    </label>
-                    <input
-                      id="ad-pais"
-                      type="text"
-                      value={adPais}
-                      onChange={(e) => setAdPais(e.target.value)}
-                      placeholder="Ej: México"
-                      className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                      style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label htmlFor="ad-extra" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    ¿Quieres agregar algo más sobre esta historia?
-                  </label>
-                  <p className="text-xs mb-1.5" style={{ color: neu.textBody }}>
-                    Es opcional. Puedes contar contexto, un detalle que te importe o cómo te sentiste.
-                  </p>
-                  <textarea
-                    id="ad-extra"
-                    value={adExtra}
-                    onChange={(e) => setAdExtra(e.target.value)}
-                    rows={4}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60 resize-y min-h-[100px]"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                </div>
-              </div>
-
-              <div style={neoSurface} className="p-5 md:p-6 space-y-5">
-                <p className="text-xs font-semibold uppercase tracking-wider" style={{ color: neu.textBody }}>
-                  Sobre ti
-                </p>
-                <div>
-                  <label htmlFor="ad-alias" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Nombre o alias
-                  </label>
-                  <input
-                    id="ad-alias"
-                    type="text"
-                    value={adAlias}
-                    onChange={(e) => setAdAlias(e.target.value)}
-                    placeholder="Cómo te gustaría que te llamemos"
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="ad-age" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Etapa de vida
-                  </label>
-                  <select
-                    id="ad-age"
-                    value={adAgeRange}
-                    onChange={(e) => setAdAgeRange(e.target.value as AgeRangeId | '')}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  >
-                    <option value="">Elige una opción</option>
-                    {AGE_RANGE_OPTIONS.map((o) => (
-                      <option key={o.id} value={o.id}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="ad-sex" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Género
-                  </label>
-                  <select
-                    id="ad-sex"
-                    value={adSex}
-                    onChange={(e) => setAdSex(e.target.value as '' | SubmissionSexApi)}
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  >
-                    <option value="">Elige una opción</option>
-                    <option value="femenino">Mujer</option>
-                    <option value="masculino">Hombre</option>
-                    <option value="no-binario">No binario</option>
-                    <option value="prefiero-no-decir">Prefiero no decirlo</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="ad-email" className="block text-sm font-medium mb-1" style={{ color: neu.textMain }}>
-                    Correo electrónico
-                  </label>
-                  <input
-                    id="ad-email"
-                    type="email"
-                    value={adEmail}
-                    onChange={(e) => setAdEmail(e.target.value)}
-                    placeholder="tu@correo.com"
-                    className="w-full px-3 py-2.5 rounded-xl text-sm outline-none bg-white/55 border border-white/60"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                  <p className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
-                    Usaremos tu correo para avisarte sobre el estado de tu historia y si llega a publicarse en el mapa. No
-                    será visible públicamente.
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
         </>
       )}
 

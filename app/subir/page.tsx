@@ -11,11 +11,11 @@ import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
   probeAudioFileDurationSeconds,
   probeAudioUrlDurationSeconds,
+  probeVideoFileDurationSeconds,
   fetchVimeoVideoDurationSeconds,
   isDurationWithinMax,
 } from '@/lib/media-duration-rules';
 import { StoryCaptureStep, type CaptureOutcome } from '@/components/subir/StoryCaptureStep';
-import { ImprontaStep } from '@/components/subir/ImprontaStep';
 import { SubmissionSuccessWithHuella } from '@/components/subir/SubmissionSuccessWithHuella';
 import {
   SUBIR_AV_MAX_MINUTES,
@@ -37,10 +37,10 @@ const FORMAT_LABELS: Record<Format, string> = {
 };
 
 const FORMAT_PHRASES: Record<Format, string> = {
-  video: `Video: hasta ${SUBIR_AV_MAX_MINUTES} minutos (grabación o enlace). Luego tu huella en formas y colores.`,
+  video: `Video: hasta ${SUBIR_AV_MAX_MINUTES} minutos. Puedes grabar, subir desde tu equipo o pegar un enlace; después te pedimos unos datos para acompañar tu relato.`,
   audio: `Audio: hasta ${SUBIR_AV_MAX_MINUTES} minutos. Graba con tu voz o sube un audio; después te pedimos unos datos para acompañar tu relato.`,
-  texto: `Texto: máximo ~2 carillas (${SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres). Cada relato, otra huella.`,
-  foto: `Fotos: entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes. Palabras clave refinan la huella.`,
+  texto: `Texto: máximo ~2 carillas (${SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres). Un espacio para contar con calma.`,
+  foto: `Fotos: entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes, con un poco de contexto para entender qué cuentan.`,
 };
 
 /** Texto para curación cuando ya no hay campos separados “Contexto” / “Texto” en el paso datos. */
@@ -88,10 +88,11 @@ function isVideoUrl(url: string): boolean {
 function SubirPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  /** Flujo: tarjetas → captura (cámara/texto/foto) → impronta → datos → recibido. */
-  const [step, setStep] = useState<'cards' | 'capture' | 'impronta' | 'form' | 'received'>('cards');
+  /** Flujo: tarjetas → captura → revisión y envío → recibido. */
+  const [step, setStep] = useState<'cards' | 'capture' | 'form' | 'received'>('cards');
   const [format, setFormat] = useState<Format | null>(null);
   const [capture, setCapture] = useState<CaptureOutcome | null>(null);
+  const [captureHydrateKey, setCaptureHydrateKey] = useState(0);
   const captureRef = useRef<CaptureOutcome | null>(null);
   captureRef.current = capture;
 
@@ -110,13 +111,23 @@ function SubirPageInner() {
       return;
     }
     setFormat(raw as Format);
-    if (st === 'impronta' || st === 'datos') {
+    if (st === 'impronta') {
       if (!captureRef.current) {
         setStep('capture');
         router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
         return;
       }
-      setStep(st === 'impronta' ? 'impronta' : 'form');
+      setStep('form');
+      router.replace(`/subir?format=${raw}&step=datos`, { scroll: false });
+      return;
+    }
+    if (st === 'datos') {
+      if (!captureRef.current) {
+        setStep('capture');
+        router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
+        return;
+      }
+      setStep('form');
       return;
     }
     setStep('capture');
@@ -157,6 +168,7 @@ function SubirPageInner() {
 
   const hasVideoSource =
     capture?.recordedBlob != null ||
+    capture?.videoFile != null ||
     (Boolean(capture?.videoUrl) && isVideoUrl(capture!.videoUrl)) ||
     (videoUrl.trim().length > 0 && isVideoUrl(videoUrl));
 
@@ -189,7 +201,7 @@ function SubirPageInner() {
     (format === 'audio' ? hasAudioSource : true) &&
     (format !== 'audio' || (audioFileWithinMax && audioUrlWithinMax)) &&
     (format !== 'video' || capture?.recordedBlob != null || !videoVimeoTooLong) &&
-    (format !== 'audio' || sex !== '');
+    sex !== '';
 
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
@@ -246,6 +258,18 @@ function SubirPageInner() {
             'submissions',
             `video-grabado.${ext}`
           );
+          payload = { videoUrl: url };
+        } else if (capture?.videoFile) {
+          const vf = capture.videoFile;
+          const sec = await probeVideoFileDurationSeconds(vf);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setError(`El video supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            setSaving(false);
+            return;
+          }
+          const extRaw = vf.name.split('.').pop()?.toLowerCase() || '';
+          const safeExt = extRaw && /^[a-z0-9]+$/.test(extRaw) ? extRaw : 'mp4';
+          const url = await trackUpload(vf, 'submissions', `video-subido.${safeExt}`);
           payload = { videoUrl: url };
         } else {
           const vu = (videoUrl.trim() || capture?.videoUrl?.trim() || '').trim();
@@ -389,6 +413,7 @@ function SubirPageInner() {
     (f: Format) => {
       setLastSubmissionId(null);
       setCapture(null);
+      setCaptureHydrateKey(0);
       setFormat(f);
       setStep('capture');
       router.replace(`/subir?format=${f}&step=capture`, { scroll: false });
@@ -406,6 +431,7 @@ function SubirPageInner() {
     setVideoVimeoTooLong(false);
     clearProfilePhoto();
     setCapture(null);
+    setCaptureHydrateKey(0);
     setExtraFiles([]);
     setFormat(null);
     setStep('cards');
@@ -483,9 +509,10 @@ function SubirPageInner() {
               <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
               <h1 className="sr-only">Elegir formato de participación</h1>
               <p className="text-xl md:text-3xl lg:text-4xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
-                Elige cómo participar; en segundos verás una <strong style={{ color: neu.textMain }}>huella única</strong> hecha de
-                cuadrados y color. Después completas tus datos. Video y audio: hasta {SUBIR_AV_MAX_MINUTES} minutos. Texto: hasta ~2
-                carillas. Fotos: {SUBIR_PHOTO_MIN} a {SUBIR_PHOTO_MAX} imágenes.
+                Elige cómo quieres contar tu historia: con video, voz, texto o imagen. Primero dejas tu relato; después
+                revisamos unos datos contigo y, al enviar, tu historia queda en revisión. Video y audio: hasta{' '}
+                {SUBIR_AV_MAX_MINUTES} minutos. Texto: hasta ~2 carillas. Fotos: {SUBIR_PHOTO_MIN} a {SUBIR_PHOTO_MAX}{' '}
+                imágenes.
               </p>
             </header>
             <section
@@ -537,33 +564,23 @@ function SubirPageInner() {
         {step === 'capture' && format && (
           <StoryCaptureStep
             format={format}
+            hydrateKey={captureHydrateKey}
+            restoredCapture={
+              capture?.submissionPrefill || capture?.audioPrefill ? capture : null
+            }
             onContinue={(out) => {
               setCapture(out);
-              if (out.audioPrefill) {
-                setStoryTitle(out.audioPrefill.storyTitle);
-                setCiudad(out.audioPrefill.ciudad);
-                setPais(out.audioPrefill.pais);
-                setExtraContext(out.audioPrefill.extraStory);
-                setAlias(out.audioPrefill.alias);
-                setAgeRange(out.audioPrefill.ageRange);
-                setSex(out.audioPrefill.sex);
-                setEmail(out.audioPrefill.email);
+              const pre = out.submissionPrefill ?? out.audioPrefill;
+              if (pre) {
+                setStoryTitle(pre.storyTitle);
+                setCiudad(pre.ciudad);
+                setPais(pre.pais);
+                setExtraContext(pre.extraStory);
+                setAlias(pre.alias);
+                setAgeRange(pre.ageRange);
+                setSex(pre.sex);
+                setEmail(pre.email);
               }
-              setStep('impronta');
-              router.replace(`/subir?format=${format}&step=impronta`, { scroll: false });
-            }}
-          />
-        )}
-
-        {step === 'impronta' && format && capture && (
-          <ImprontaStep
-            format={format}
-            narrativeText={capture.narrativeText}
-            onBack={() => {
-              setStep('capture');
-              router.replace(`/subir?format=${format}&step=capture`, { scroll: false });
-            }}
-            onContinue={() => {
               setStep('form');
               router.replace(`/subir?format=${format}&step=datos`, { scroll: false });
             }}
@@ -574,28 +591,35 @@ function SubirPageInner() {
           <>
             <header className="mb-10 space-y-4">
               <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">Paso 3 · Tus datos · {FORMAT_LABELS[format]}</p>
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-light leading-[1.1]" style={{ color: neu.textMain }}>
-                Completa y envía · {FORMAT_LABELS[format]}
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">
+                Revisión y envío · {FORMAT_LABELS[format]}
+              </p>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-light leading-[1.15]" style={{ color: neu.textMain }}>
+                Revisa tus datos y envía tu historia
               </h1>
-              <p className="text-lg md:text-xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
+              <p className="text-base md:text-lg font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
                 {format === 'video' && (
-                  <>Video: hasta {SUBIR_AV_MAX_MINUTES} min si ajustas el archivo o el enlace. Ya tienes tu huella; estos datos son para curación y el mapa.</>
+                  <>
+                    Video: hasta {SUBIR_AV_MAX_MINUTES} minutos. Comprueba que el archivo o el enlace sea el que quieres
+                    enviar; aquí puedes ajustar texto o datos si hace falta.
+                  </>
                 )}
                 {format === 'audio' && (
                   <>
-                    Audio: hasta {SUBIR_AV_MAX_MINUTES} min. Revisa que el audio se escuche bien. Los datos de tu relato
-                    ya los anotaste; aquí puedes revisarlos o completar lo que falte antes de enviar.
+                    Audio: hasta {SUBIR_AV_MAX_MINUTES} min. Revisa que se escuche bien. Los datos de tu relato ya los
+                    anotaste; aquí puedes revisarlos antes de enviar.
                   </>
                 )}
                 {format === 'texto' && (
                   <>
-                    Texto: máximo {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres (~2 carillas). Confirma o edita el cuerpo si hace falta.
+                    Texto: máximo {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres (~2 carillas). Confirma o edita
+                    el cuerpo si hace falta.
                   </>
                 )}
                 {format === 'foto' && (
                   <>
-                    Fotos: entre {SUBIR_PHOTO_MIN} y {SUBIR_PHOTO_MAX} imágenes. Ajusta la galería o la URL de respaldo antes de enviar.
+                    Fotos: entre {SUBIR_PHOTO_MIN} y {SUBIR_PHOTO_MAX} imágenes. Ajusta la galería o la URL de respaldo
+                    antes de enviar.
                   </>
                 )}
               </p>
@@ -605,13 +629,14 @@ function SubirPageInner() {
               <button
                 type="button"
                 onClick={() => {
-                  setStep('impronta');
-                  router.replace(`/subir?format=${format}&step=impronta`, { scroll: false });
+                  setCaptureHydrateKey((k) => k + 1);
+                  setStep('capture');
+                  router.replace(`/subir?format=${format}&step=capture`, { scroll: false });
                 }}
                 className="text-sm font-medium"
                 style={{ color: neu.textBody }}
               >
-                ← Volver a la huella
+                ← Volver a tu historia
               </button>
               <button type="button" onClick={backToCards} className="text-sm font-medium underline" style={{ color: neu.textBody }}>
                 Empezar de cero
@@ -671,7 +696,7 @@ function SubirPageInner() {
               </div>
               <div>
                 <label htmlFor="subir-datos-extras-contexto" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                  Extras / contexto (opcional)
+                  ¿Quieres agregar algo más sobre esta historia? (opcional)
                 </label>
                 <textarea
                   id="subir-datos-extras-contexto"
@@ -764,7 +789,7 @@ function SubirPageInner() {
                 </div>
                 <div>
                   <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Género {format === 'audio' ? '*' : '(opcional)'}
+                    Género *
                   </label>
                   <select
                     id="subir-datos-sexo"
@@ -777,7 +802,7 @@ function SubirPageInner() {
                     className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
                     style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                   >
-                    <option value="">{format === 'audio' ? 'Elige una opción' : 'Prefiero no indicar'}</option>
+                    <option value="">Elige una opción</option>
                     <option value="femenino">Mujer</option>
                     <option value="masculino">Hombre</option>
                     <option value="no-binario">No binario</option>
@@ -826,14 +851,23 @@ function SubirPageInner() {
               <div style={neu.cardInset} className="p-4 rounded-3xl space-y-3">
                 {capture?.recordedBlob ? (
                   <p className="text-sm font-medium" style={{ color: neu.textMain }}>
-                    Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo abajo.
+                    Incluiremos el video que grabaste en el paso anterior. Si quieres usar solo un enlace público, pégalo
+                    abajo.
+                  </p>
+                ) : null}
+                {capture?.videoFile ? (
+                  <p className="text-sm font-medium" style={{ color: neu.textMain }}>
+                    Incluiremos el video que subiste desde tu equipo ({capture.videoFile.name}). Si quieres cambiarlo,
+                    vuelve al paso anterior.
                   </p>
                 ) : null}
                 <label htmlFor="subir-datos-video-url" className="block text-sm font-medium mb-2" style={{ color: neu.textMain }}>
-                  URL del video (YouTube o Vimeo){capture?.recordedBlob ? '' : ' *'}
+                  URL del video (YouTube o Vimeo)
+                  {!capture?.recordedBlob && !capture?.videoFile ? ' *' : ''}
                 </label>
                 <p className="text-[11px] leading-relaxed" style={{ color: neu.textBody }}>
-                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos la duración automáticamente si el enlace lo permite.
+                  Duración máxima <strong>{MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos</strong>. En Vimeo comprobamos
+                  la duración automáticamente si el enlace lo permite.
                 </p>
                 <input
                   id="subir-datos-video-url"
@@ -843,7 +877,7 @@ function SubirPageInner() {
                   placeholder="https://www.youtube.com/..."
                   className="w-full px-4 py-3 rounded-xl outline-none bg-white/50 border border-white/50"
                   style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  aria-required={!capture?.recordedBlob}
+                  aria-required={!capture?.recordedBlob && !capture?.videoFile}
                   aria-invalid={videoUrl.trim().length > 0 && !isVideoUrl(videoUrl)}
                   aria-describedby={
                     [
@@ -1209,6 +1243,10 @@ function SubirPageInner() {
               </p>
             )}
 
+            <p className="text-sm leading-relaxed text-center max-w-xl mx-auto px-2" style={{ color: neu.textBody }}>
+              Tu historia quedará en revisión antes de formar parte de AlmaMundi.
+            </p>
+
             <button
               type="button"
               disabled={!canSubmit || saving}
@@ -1221,7 +1259,7 @@ function SubirPageInner() {
                 boxShadow: canSubmit && !saving ? '0 4px 14px rgba(249,115,22,0.4)' : 'none',
               }}
             >
-              {saving ? 'Enviando…' : 'Enviar'}
+              {saving ? 'Enviando…' : 'Enviar historia'}
             </button>
           </section>
           </>
