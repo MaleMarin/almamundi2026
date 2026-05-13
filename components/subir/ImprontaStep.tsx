@@ -1,5 +1,10 @@
 'use client';
 
+/**
+ * @deprecated No montar en el flujo de /subir. La resonancia visual solo debe mostrarse tras el envío exitoso
+ * (`SubmissionSuccessWithHuella`). Este archivo se conserva por si quedan enlaces antiguos o demos.
+ */
+
 import { Download, Loader2, Share2 } from 'lucide-react';
 import { IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
 import { neu } from '@/lib/historias-neumorph';
@@ -53,7 +58,7 @@ export function ImprontaStep({
     'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)' as const;
 
   return (
-    <section className="space-y-8 md:space-y-10" aria-label="Paso 3 de 4: impronta visual" aria-current="step">
+    <section className="space-y-8 md:space-y-10" aria-label="Vista previa (obsoleto): resonancia visual" aria-current="step">
       <button
         type="button"
         onClick={onBack}
@@ -66,19 +71,19 @@ export function ImprontaStep({
       <header className="space-y-4">
         <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
         <h1 className="text-sm font-semibold uppercase tracking-[0.2em] text-orange-600">
-          Paso 2 · Huella · {FORMAT_LABEL[format]}
+          Paso obsoleto · Resonancia visual · {FORMAT_LABEL[format]}
         </h1>
       </header>
 
       <div style={neoCard} className="p-6 md:p-8 space-y-4">
         <p className="text-lg md:text-xl lg:text-2xl font-light leading-relaxed" style={{ color: neu.textBody }}>
-          Para cada persona generamos una composición con <strong style={{ color: neu.textMain }}>cuadrados y rectángulos</strong>, capas de color y trazos nítidos. No hay dos iguales: sale de tus palabras y del tono del texto. Abajo van{' '}
+          Para cada relato generamos una resonancia visual con <strong style={{ color: neu.textMain }}>cintas de memoria</strong>, paleta contenida y fondo claro. Abajo van{' '}
           <strong style={{ color: neu.textMain }}>{SUBIR_HUELLA_FOOTER_SITE}</strong> y la fecha.
         </p>
         {loading && (
           <p className="flex items-center gap-2 text-base md:text-lg" style={{ color: neu.textBody }}>
             <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-            Generando tu huella…
+            Generando tu resonancia visual…
           </p>
         )}
         {statsLine && !loading && (
@@ -124,7 +129,7 @@ export function ImprontaStep({
           type="button"
           onClick={() => {
             setErr('');
-            downloadPng('AlmaMundi-impronta.png');
+            downloadPng('almamundi-resonancia-visual.png');
           }}
           disabled={loading}
           aria-busy={loading}
@@ -136,7 +141,7 @@ export function ImprontaStep({
           }}
         >
           <Download size={20} aria-hidden />
-          Descargar imagen
+          Descargar resonancia
         </button>
         <button
           type="button"
@@ -165,7 +170,7 @@ export function ImprontaStep({
           boxShadow: loading ? 'none' : '0 10px 32px rgba(255,69,0,0.4)',
         }}
       >
-        Seguir — completar datos
+        Continuar
       </button>
     </section>
   );

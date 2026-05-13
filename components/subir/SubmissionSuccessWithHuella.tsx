@@ -6,6 +6,7 @@ import { Download, Loader2, Share2 } from 'lucide-react';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { neu } from '@/lib/historias-neumorph';
 import { IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
+import { HUELLA_V2_BG } from '@/lib/huella/huellaV2';
 import { useSubirHuella, type SubirHuellaFormat } from '@/hooks/useSubirHuella';
 
 export type SubmissionSuccessWithHuellaProps = {
@@ -14,18 +15,21 @@ export type SubmissionSuccessWithHuellaProps = {
   narrativeSeed: string;
   /** Refuerza unicidad opcional si el backend devolvió id. */
   submissionId?: string | null;
+  /** Título de la historia para el pie del lienzo descargable. */
+  storyTitle?: string | null;
   hrefSubirAnother: string;
   canvasIdSuffix?: string;
 };
 
 /**
- * Pantalla de cierre tras envío: confirmación editorial + huella Bauhaus como recuerdo.
+ * Pantalla de cierre tras envío: confirmación + resonancia visual (cintas de memoria).
  * No monta segundo header/logo: va bajo `GlobalSiteChrome` + breadcrumbs del layout raíz.
  */
 export function SubmissionSuccessWithHuella({
   format,
   narrativeSeed,
   submissionId,
+  storyTitle,
   hrefSubirAnother,
   canvasIdSuffix = 'success',
 }: SubmissionSuccessWithHuellaProps) {
@@ -37,12 +41,14 @@ export function SubmissionSuccessWithHuella({
     return 'historia almamundi';
   }, [narrativeSeed, submissionId]);
 
-  const canvasId = `subir-success-huella-${canvasIdSuffix}`;
+  const canvasId = `subir-success-resonancia-${canvasIdSuffix}`;
 
   const { canvasRef, loading, err, setErr, analysis, statsLine, downloadPng, shareImage } = useSubirHuella({
     format,
     narrativeText: narrativeForHuella,
     canvasId,
+    submissionId,
+    storyTitle,
   });
 
   const neoInset = {
@@ -69,21 +75,17 @@ export function SubmissionSuccessWithHuella({
             Tu historia fue recibida
           </h1>
           <p className="text-base md:text-lg font-light leading-relaxed" style={{ color: neu.textBody }}>
-            Gracias por compartirla. Quedará en <strong style={{ color: neu.textMain }}>revisión</strong> antes de formar
-            parte de AlmaMundi — <strong style={{ color: neu.textMain }}>no se publica sola.</strong>
+            Gracias por compartirla. Quedará en revisión antes de formar parte de AlmaMundi.
           </p>
         </header>
 
         <div style={neoInset} className="p-5 md:p-6 space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-orange-600">
-            Esta es tu huella visual
-          </h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-orange-600">Tu resonancia visual está lista</h2>
           <p className="text-sm md:text-[0.9375rem] leading-relaxed" style={{ color: neu.textBody }}>
-            Una pieza única creada a partir de tu relato, el formato elegido y el momento en que lo compartiste.
+            Es una pieza creada a partir de tu relato, el formato elegido y el momento en que lo compartiste.
           </p>
           <p className="text-xs md:text-sm leading-relaxed opacity-95" style={{ color: neu.textBody }}>
-            No resume tu vida ni interpreta quién eres. Es un{' '}
-            <strong style={{ color: neu.textMain }}>recuerdo visual de tu participación.</strong>
+            No resume tu vida ni interpreta quién eres: acompaña la forma en que tu historia resonó en AlmaMundi.
           </p>
         </div>
 
@@ -91,7 +93,7 @@ export function SubmissionSuccessWithHuella({
           {loading ? (
             <p className="flex items-center justify-center gap-2 text-base py-10" style={{ color: neu.textBody }}>
               <Loader2 className="h-5 w-5 animate-spin shrink-0" aria-hidden />
-              Preparando tu huella…
+              Preparando tu resonancia visual…
             </p>
           ) : null}
           {!loading && statsLine ? (
@@ -101,12 +103,12 @@ export function SubmissionSuccessWithHuella({
           ) : null}
           {!loading && analysis ? (
             <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 text-[11px] md:text-xs" style={{ color: neu.textBody }}>
-              {analysis.themes.slice(0, 6).map((t) => (
+              {analysis.themes.slice(0, 4).map((t) => (
                 <span key={t} className="px-2 py-0.5 rounded-full bg-black/[0.06]">
                   {t}
                 </span>
               ))}
-              {analysis.emotions.slice(0, 4).map((t) => (
+              {analysis.emotions.slice(0, 3).map((t) => (
                 <span key={t} className="px-2 py-0.5 rounded-full bg-orange-500/12 text-orange-900">
                   {t}
                 </span>
@@ -115,8 +117,8 @@ export function SubmissionSuccessWithHuella({
           ) : null}
 
           <div
-            className="mx-auto overflow-hidden rounded-2xl border border-gray-300/80 bg-white shadow-inner"
-            style={{ maxWidth: IMPRONTA_EXPORT_W }}
+            className="mx-auto overflow-hidden rounded-2xl border border-white/60 shadow-inner"
+            style={{ maxWidth: IMPRONTA_EXPORT_W, backgroundColor: HUELLA_V2_BG }}
           >
             <canvas
               ref={canvasRef}
@@ -139,7 +141,7 @@ export function SubmissionSuccessWithHuella({
             type="button"
             onClick={() => {
               setErr('');
-              downloadPng('almamundi-mi-huella.png');
+              downloadPng('almamundi-resonancia-visual.png');
             }}
             disabled={loading}
             aria-busy={loading}
@@ -150,7 +152,7 @@ export function SubmissionSuccessWithHuella({
             }}
           >
             <Download size={18} aria-hidden />
-            Descargar mi huella
+            Descargar resonancia
           </button>
           <button
             type="button"

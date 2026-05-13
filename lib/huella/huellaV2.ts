@@ -330,7 +330,7 @@ function drawHuellaSiteFooter(
   const captionPx = Math.max(8, Math.round(W * 0.018));
   ctx.fillStyle = '#94a3b8';
   ctx.font = `400 ${captionPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-  ctx.fillText('Interpretación visual', W / 2, bandTop + fH * (hasTitle ? 0.68 : 0.48));
+  ctx.fillText('Resonancia visual', W / 2, bandTop + fH * (hasTitle ? 0.68 : 0.48));
 
   const metaPx = Math.max(9, Math.round(W * 0.019));
   ctx.fillStyle = '#64748b';

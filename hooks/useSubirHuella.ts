@@ -3,13 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { HuellaVisualParams, StoryAnalysis } from '@/lib/huella/types';
 import { analysisToVisualParams } from '@/lib/huella/translate';
-import {
-  drawImprontaBauhaus,
-  IMPRONTA_EXPORT_H,
-  IMPRONTA_EXPORT_W,
-} from '@/lib/impronta/bauhausExport';
+import { IMPRONTA_EXPORT_H, IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
 import { computeTextStats, temperatureLabel } from '@/lib/impronta/textStats';
 import { huellaFormatFromSubmission } from '@/lib/impronta/formatMap';
+import { drawHuellaV2OnCanvas, type HuellaV2Meta } from '@/lib/huella/huellaV2';
 
 export type SubirHuellaFormat = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -17,7 +14,10 @@ function clamp01(n: number) {
   return Math.max(0, Math.min(1, n));
 }
 
-export function fallbackHuellaParams(text: string, format: SubirHuellaFormat): { analysis: StoryAnalysis; visualParams: HuellaVisualParams } {
+export function fallbackHuellaParams(
+  text: string,
+  format: SubirHuellaFormat
+): { analysis: StoryAnalysis; visualParams: HuellaVisualParams } {
   const stats = computeTextStats(text);
   const analysis: StoryAnalysis = {
     themes: ['historia', 'voz'],
@@ -40,40 +40,66 @@ const FORMAT_LABEL: Record<SubirHuellaFormat, string> = {
 
 export const SUBIR_HUELLA_FOOTER_SITE = 'www.almamundi.org';
 
+function stableStoryId(submissionId: string | null | undefined, text: string, format: SubirHuellaFormat): string {
+  const sid = submissionId?.trim();
+  if (sid) return sid.slice(0, 120);
+  let h = 2166136261;
+  const s = `${format}|${text.slice(0, 2000)}`;
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return `sub-${format}-${(h >>> 0).toString(16)}`;
+}
+
 type UseSubirHuellaOptions = {
   format: SubirHuellaFormat;
   narrativeText: string;
   canvasId: string;
+  /** Si existe, ancla la semilla de la resonancia y el pie del lienzo. */
+  submissionId?: string | null;
+  /** Título breve opcional en el pie descargable. */
+  storyTitle?: string | null;
 };
 
-/** Genera Bauhaus/impronta en canvas (`drawImprontaBauhaus`) vía `/api/impronta/analyze` o fallback local. */
-export function useSubirHuella({ format, narrativeText, canvasId }: UseSubirHuellaOptions) {
+/**
+ * Resonancia visual (huella v2 / cintas de memoria) en canvas.
+ * El análisis vía `/api/impronta/analyze` alimenta chips de tono; el dibujo es determinista en cliente.
+ */
+export function useSubirHuella({
+  format,
+  narrativeText,
+  canvasId,
+  submissionId,
+  storyTitle,
+}: UseSubirHuellaOptions) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState('');
   const [analysis, setAnalysis] = useState<StoryAnalysis | null>(null);
   const [statsLine, setStatsLine] = useState('');
 
-  const redraw = useCallback(
-    (params: HuellaVisualParams) => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      canvas.width = IMPRONTA_EXPORT_W;
-      canvas.height = IMPRONTA_EXPORT_H;
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      const dateLabel = new Intl.DateTimeFormat('es', {
-        dateStyle: 'long',
-        timeStyle: 'short',
-      }).format(new Date());
-      drawImprontaBauhaus(ctx, params, {
-        footerLine: SUBIR_HUELLA_FOOTER_SITE,
-        dateLabel,
-        formatLabel: FORMAT_LABEL[format],
-      });
-    },
-    [format]
-  );
+  const paintResonanceVisual = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.width = IMPRONTA_EXPORT_W;
+    canvas.height = IMPRONTA_EXPORT_H;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const text = narrativeText.trim() || 'historia almamundi';
+    const meta: HuellaV2Meta = {
+      storyId: stableStoryId(submissionId, text, format),
+      content: text,
+      format,
+      charCount: Math.max(1, text.length),
+      submitHour: new Date().getHours(),
+      embedSiteFooter: true,
+      footerAt: new Date(),
+      embedStoryTitle: storyTitle?.trim() || undefined,
+      embedFormatLabel: FORMAT_LABEL[format],
+    };
+    drawHuellaV2OnCanvas(ctx, meta);
+  }, [format, narrativeText, submissionId, storyTitle]);
 
   useEffect(() => {
     let cancelled = false;
@@ -99,31 +125,31 @@ export function useSubirHuella({ format, narrativeText, canvasId }: UseSubirHuel
           setAnalysis(fb.analysis);
           const st = computeTextStats(text);
           setStatsLine(
-            `${temperatureLabel(st.temperature)} · ${st.wordCount} palabras · heurística local (sin IA o API no disponible)`
+            `${temperatureLabel(st.temperature)} · ${st.wordCount} palabras · referencia local (sin IA o API no disponible)`
           );
-          redraw(fb.visualParams);
           if (!res.ok && data.error) setErr(data.error);
-          return;
-        }
-        setAnalysis(data.analysis ?? null);
-        const st = computeTextStats(text);
-        if (data.analysis) {
-          setStatsLine(
-            `${temperatureLabel(st.temperature)} · Tono modelo ${(data.analysis.tone * 100).toFixed(0)}% · ${st.wordCount} palabras`
-          );
         } else {
-          setStatsLine(`${temperatureLabel(st.temperature)} · ${st.wordCount} palabras`);
+          setAnalysis(data.analysis ?? null);
+          const st = computeTextStats(text);
+          if (data.analysis) {
+            setStatsLine(
+              `${temperatureLabel(st.temperature)} · Tono modelo ${(data.analysis.tone * 100).toFixed(0)}% · ${st.wordCount} palabras`
+            );
+          } else {
+            setStatsLine(`${temperatureLabel(st.temperature)} · ${st.wordCount} palabras`);
+          }
         }
-        redraw(data.visualParams);
       } catch {
         if (cancelled) return;
         const fb = fallbackHuellaParams(text, format);
         setAnalysis(fb.analysis);
         setStatsLine('Vista generada en tu dispositivo (sin conexión al análisis en servidor).');
-        redraw(fb.visualParams);
-        setErr('No hubo respuesta del servidor; usamos un diseño local.');
+        setErr('No hubo respuesta del servidor; usamos tonos de referencia locales.');
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          paintResonanceVisual();
+          setLoading(false);
+        }
       }
     }
 
@@ -131,10 +157,10 @@ export function useSubirHuella({ format, narrativeText, canvasId }: UseSubirHuel
     return () => {
       cancelled = true;
     };
-  }, [format, narrativeText, redraw]);
+  }, [format, narrativeText, paintResonanceVisual, submissionId, storyTitle]);
 
   const downloadPng = useCallback(
-    (filename = 'almamundi-mi-huella.png') => {
+    (filename = 'almamundi-resonancia-visual.png') => {
       const canvas = (document.getElementById(canvasId) as HTMLCanvasElement | null) ?? canvasRef.current;
       if (!canvas) return false;
       try {
@@ -162,12 +188,12 @@ export function useSubirHuella({ format, narrativeText, canvasId }: UseSubirHuel
         setErr('No se pudo generar la imagen para compartir.');
         return;
       }
-      const file = new File([blob], 'almamundi-mi-huella.png', { type: 'image/png' });
+      const file = new File([blob], 'almamundi-resonancia-visual.png', { type: 'image/png' });
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'Tu huella — AlmaMundi',
-          text: `Mi huella en ${SUBIR_HUELLA_FOOTER_SITE}`,
+          title: 'Resonancia visual — AlmaMundi',
+          text: `Mi resonancia visual en ${SUBIR_HUELLA_FOOTER_SITE}`,
         });
         return;
       }

@@ -15,7 +15,7 @@ import {
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
 } from '@/lib/subir-limits';
-import type { SubirFormat } from './ImprontaStep';
+import type { SubirHuellaFormat as SubirFormat } from '@/hooks/useSubirHuella';
 import { VoiceWaveform, type VoiceWaveformMode } from './VoiceWaveform';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 
@@ -36,7 +36,7 @@ export type SubmissionPrefill = {
 export type AudioCapturePrefill = SubmissionPrefill;
 
 export type CaptureOutcome = {
-  /** Texto para curación y composición posterior (no se adelanta “huella” en la captura). */
+  /** Texto para curación y resonancia posterior (no se adelanta en la captura). */
   narrativeText: string;
   recordedBlob: Blob | null;
   recordedMime: string;

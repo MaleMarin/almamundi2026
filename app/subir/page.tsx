@@ -1271,6 +1271,7 @@ function SubirPageInner() {
               format={fmtForSuccess}
               narrativeSeed={narrativeForHuellaSuccess}
               submissionId={lastSubmissionId}
+              storyTitle={storyTitle}
               hrefSubirAnother="/subir"
               canvasIdSuffix={`main-${fmtForSuccess}-${huellaSlug}`}
             />
