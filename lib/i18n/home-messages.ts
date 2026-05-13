@@ -68,7 +68,7 @@ const es: HomeMessages = {
   heroSubBefore: 'Aquí, cada relato importa.',
   heroSubBold: 'Cada historia es extraordinaria.',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
-  historiasLead2: 'Elige tu forma y cuéntala.',
+  historiasLead2: 'Elige tu forma y comparte tu relato.',
   mapSectionTitle: 'El Alma del Mundo',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',

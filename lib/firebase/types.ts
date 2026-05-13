@@ -37,6 +37,8 @@ export interface SubmissionMedia {
   coverImageUrl?: string;
   /** URL de la imagen cuando format es "image". */
   imageUrl?: string;
+  /** Subtítulos WebVTT del vídeo. */
+  captionsUrl?: string;
 }
 
 export interface SubmissionTags {
@@ -100,6 +102,12 @@ export interface Story {
 
   excerpt?: string;
   durationSec?: number;
+  /** Transcripción accesible (audio/vídeo). */
+  transcription?: string;
+  /** Subtítulos WebVTT (vídeo). */
+  captionsUrl?: string;
+  /** Frases para subtítulos aproximados en audio. */
+  captionPhrases?: string[];
 }
 
 /** mail_queue: para Cloud Functions / Firestore extension (correo al publicar). */

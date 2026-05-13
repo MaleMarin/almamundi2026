@@ -8,40 +8,11 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
-import { demoStoryFieldsFromPoint, showPublicDemoStories } from '@/lib/demo-stories-public';
+import { showPublicDemoStories } from '@/lib/demo-stories-public';
 import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { storyToVideoHistoria } from '@/lib/historias/video-adapter';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
-
-function defaultAvatar(name: string): string {
-  const initial = (name || '?').trim().charAt(0).toUpperCase();
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#c23600" opacity="0.25"/><text x="50" y="62" font-family="sans-serif" font-size="44" font-weight="300" fill="#ff4500" text-anchor="middle">${initial}</text></svg>`;
-  return `data:image/svg+xml,${encodeURIComponent(svg)}`;
-}
-
-function storyToCineHistoria(s: StoryPoint): Historia {
-  const nombre = s.authorName || 'Anónimo';
-  const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
-  const demoStory = demoStoryFieldsFromPoint(s);
-  return {
-    id: s.id,
-    titulo: s.title || 'Sin título',
-    subtitulo: ubicacion,
-    autor: {
-      nombre,
-      avatar: s.imageUrl || defaultAvatar(nombre),
-      ubicacion,
-      bio: s.description,
-    },
-    videoUrl: s.videoUrl!,
-    thumbnailUrl: s.imageUrl || s.videoUrl!,
-    duracion: 0,
-    fecha: s.publishedAt || '',
-    tags: s.topic ? [s.topic] : undefined,
-    citaDestacada: undefined,
-    ...(demoStory ? { demoStory } : {}),
-  };
-}
 
 export default function HistoriasIdVideoPageClient() {
   const params = useParams();
@@ -62,11 +33,11 @@ export default function HistoriasIdVideoPageClient() {
             router.replace(`/historias/${id}`);
             return;
           }
-          setHistoria(storyToCineHistoria(data.story));
+          setHistoria(storyToVideoHistoria(data.story));
         } else if (showPublicDemoStories() && id.startsWith('demo-video-')) {
           const demo = DEMO_VIDEO_STORIES.find((s) => s.id === id);
           if (demo?.videoUrl) {
-            setHistoria(storyToCineHistoria(demo as StoryPoint));
+            setHistoria(storyToVideoHistoria(demo as StoryPoint));
           } else router.replace(`/historias/${id}`);
         } else {
           setHistoria(null);

@@ -19,6 +19,7 @@ import {
   DEMO_STORY_NOTICE,
   showPublicDemoStories,
 } from "@/lib/demo-stories-public";
+import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 
 function publishedAtIso(d: Record<string, unknown>): string | undefined {
   const p = d.publishedAt;
@@ -112,6 +113,8 @@ function firestoreDocToStoryPoint(
   const latOut = globeOnly ? (lat as number) : lat ?? 0;
   const lngOut = globeOnly ? (lng as number) : lng ?? 0;
 
+  const accessibility = storyAccessibilityFieldsFromRecord(d);
+
   const base: StoryPoint = {
     id,
     lat: latOut,
@@ -139,6 +142,7 @@ function firestoreDocToStoryPoint(
     weatherTags: (d.weatherTags as string[] | undefined) ?? undefined,
     isBetaDemo: isBetaDemo ? true : undefined,
     editorialStatus: typeof status === "string" ? status : undefined,
+    ...accessibility,
   };
 
   if (isBetaDemo) {

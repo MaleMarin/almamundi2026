@@ -550,7 +550,7 @@ Decía que me quería. Lo sabía. Pero es diferente saberlo a leerlo con tus pro
 
 Hay dos tipos de encierro: el que te imponen y el que te construís. El mío tenía paredes que solo yo podía ver.
 
-Lo que aprendí es que la recuperación no tiene forma de línea recta. Tiene forma de espiral: volvés al mismo punto pero un poco más arriba cada vez.
+Lo que aprendí es que la recuperación no tiene forma de línea recta. Tiene forma de espiral: vuelves al mismo punto pero un poco más arriba cada vez.
 
 Lo que me salvó fue ridículo y real: una planta. Una potus que casi mato tres veces. Cuidarla me obligó a levantarme todos los días.
 

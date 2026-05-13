@@ -48,7 +48,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
         aria-label="Contar tu historia por formato"
       >
         <p className="mb-5 text-center text-xs font-semibold uppercase tracking-[0.18em] text-gray-600">
-          Contá tu historia
+          Cuenta tu historia
         </p>
         <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-3 sm:gap-4">
           {FOOTER_STORY_FORMAT_LINKS.map(({ label, href }) => (

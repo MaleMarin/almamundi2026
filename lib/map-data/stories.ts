@@ -56,6 +56,12 @@ export type StoryPoint = {
   tags?: string[];
   /** Cita destacada */
   quote?: string;
+  /** URL WebVTT para subtítulos de vídeo. */
+  captionsUrl?: string;
+  /** Transcripción del audio o vídeo (texto accesible). */
+  transcription?: string;
+  /** Frases para subtítulos aproximados en audio. */
+  captionPhrases?: string[];
   /** Varias imágenes: presentación Ken Burns, una por vez (roadmap 1B) */
   images?: string[];
   /** Fotos con nombre y fecha para Ken Burns en StoryViewer */

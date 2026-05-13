@@ -156,7 +156,7 @@ export default function HistoriasIdPageClient() {
                   ¿Estuviste aquí o conocés algo de este lugar?
                 </p>
                 <p className="text-sm mb-4" style={{ color: neu.textBody }}>
-                  Contá tu historia o experiencia.
+                  Cuenta tu historia o experiencia.
                 </p>
                 <HomeHardLink
                   href="/#historias"

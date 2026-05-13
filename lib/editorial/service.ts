@@ -14,6 +14,7 @@ import {
   type PublishPayload,
   type StoryData,
 } from "@/lib/story-schema";
+import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 
 const MAX_PUBLISHED_ARCHIVE_CAP = 30;
 
@@ -170,6 +171,7 @@ export async function editorialPublishFromSubmission(
     const countryKnown = typeof sub.country === "string" ? sub.country : undefined;
     if (cityKnown) story.city = cityKnown;
     if (countryKnown) story.country = countryKnown;
+    Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
     const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
@@ -248,6 +250,7 @@ export async function editorialPublishFromSubmission(
     country: sd.countryLabel ?? undefined,
     city: sd.placeLabel ?? undefined,
   };
+  Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
 
   await storyRef.set(story);
   const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
@@ -323,6 +326,7 @@ export async function editorialPublishApprovedStorySubmission(
     media: data.media ?? {},
   };
   if (data.authorName) storyData.authorName = data.authorName;
+  Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
   const storyRef = db.collection("stories").doc();
   await storyRef.set(storyData);

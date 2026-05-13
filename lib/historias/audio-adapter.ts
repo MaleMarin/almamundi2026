@@ -5,6 +5,7 @@
 import type { HistoriaAudio } from '@/components/historia/AudioPlayer';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { captionPhrasesFromTranscription } from '@/lib/historias/story-accessibility';
 
 export function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -17,6 +18,10 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
   const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
   const thumb = s.imageUrl ?? s.thumbnailUrl ?? '';
   const demoStory = demoStoryFieldsFromPoint(s);
+  const transcription = s.transcription?.trim();
+  const frases =
+    s.captionPhrases ??
+    (transcription ? captionPhrasesFromTranscription(transcription) : undefined);
   return {
     id: s.id,
     titulo: s.title ?? 'Sin título',
@@ -26,7 +31,9 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
     duracion: 0,
     fecha: s.publishedAt ?? '',
     citaDestacada: s.quote,
-    frases: undefined,
+    frases,
+    transcripcion: transcription,
+    transcript: transcription,
     autor: {
       nombre,
       avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(nombre),
