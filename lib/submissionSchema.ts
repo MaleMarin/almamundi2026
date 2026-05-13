@@ -17,7 +17,7 @@ export type SubmissionType = z.infer<typeof SubmissionType>;
 const themeIdsTuple = THEME_IDS as unknown as [string, ...string[]];
 export const ThemeIdSchema = z.enum(themeIdsTuple);
 
-const sexSchema = z.enum(["femenino", "masculino", "no-binario", "prefiero-no-decir"]);
+const sexSchema = z.enum(["femenino", "masculino", "no-binario", "prefiero-no-decir", "otro"]);
 
 const ageRangeEnum = z.enum(
   AGE_RANGE_OPTIONS.map((o) => o.id) as [AgeRangeId, ...AgeRangeId[]]
@@ -85,7 +85,7 @@ export interface SubmissionDoc {
   profilePhotoUrl?: string;
   countryLabel?: string;
   birthDate?: string;
-  sex?: "femenino" | "masculino" | "no-binario" | "prefiero-no-decir";
+  sex?: "femenino" | "masculino" | "no-binario" | "prefiero-no-decir" | "otro";
   ageRange?: AgeRangeId;
   consentPrivacyPolicy?: true;
   extraAttachmentUrls?: string[];

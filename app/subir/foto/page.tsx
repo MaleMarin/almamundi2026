@@ -11,7 +11,7 @@ const MAX_MB = 8;
 const PROFILE_MAX_MB = 8;
 const EXTRA_MAX_MB = 15;
 
-type SexOpt = 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | '';
+type SexOpt = 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro' | '';
 
 export default function SubirFotoPage() {
   const [step, setStep] = useState<'photo' | 'form' | 'enviado'>('photo');
@@ -362,7 +362,8 @@ export default function SubirFotoPage() {
                     <option value="femenino">Femenino</option>
                     <option value="masculino">Masculino</option>
                     <option value="no-binario">No binario</option>
-                    <option value="prefiero-no-decir">Otro / no decir</option>
+                    <option value="prefiero-no-decir">Prefiero no decirlo</option>
+                    <option value="otro">Otro</option>
                   </select>
                 </div>
               </div>

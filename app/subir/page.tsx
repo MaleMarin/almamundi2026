@@ -38,7 +38,7 @@ const FORMAT_LABELS: Record<Format, string> = {
 
 const FORMAT_PHRASES: Record<Format, string> = {
   video: `Video: hasta ${SUBIR_AV_MAX_MINUTES} minutos (grabación o enlace). Luego tu huella en formas y colores.`,
-  audio: `Audio: hasta ${SUBIR_AV_MAX_MINUTES} minutos. Tu voz se traduce en una huella geométrica única.`,
+  audio: `Audio: hasta ${SUBIR_AV_MAX_MINUTES} minutos. Graba con tu voz o sube un audio; después te pedimos unos datos para acompañar tu relato.`,
   texto: `Texto: máximo ~2 carillas (${SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres). Cada relato, otra huella.`,
   foto: `Fotos: entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes. Palabras clave refinan la huella.`,
 };
@@ -131,7 +131,7 @@ function SubirPageInner() {
   const [ciudad, setCiudad] = useState('');
   const [pais, setPais] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [sex, setSex] = useState<'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | ''>('');
+  const [sex, setSex] = useState<'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro' | ''>('');
   const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
   const [ageRange, setAgeRange] = useState<AgeRangeId | ''>('');
@@ -188,7 +188,8 @@ function SubirPageInner() {
       : true) &&
     (format === 'audio' ? hasAudioSource : true) &&
     (format !== 'audio' || (audioFileWithinMax && audioUrlWithinMax)) &&
-    (format !== 'video' || capture?.recordedBlob != null || !videoVimeoTooLong);
+    (format !== 'video' || capture?.recordedBlob != null || !videoVimeoTooLong) &&
+    (format !== 'audio' || sex !== '');
 
   const submit = useCallback(async () => {
     if (!canSubmit || !format) return;
@@ -538,6 +539,16 @@ function SubirPageInner() {
             format={format}
             onContinue={(out) => {
               setCapture(out);
+              if (out.audioPrefill) {
+                setStoryTitle(out.audioPrefill.storyTitle);
+                setCiudad(out.audioPrefill.ciudad);
+                setPais(out.audioPrefill.pais);
+                setExtraContext(out.audioPrefill.extraStory);
+                setAlias(out.audioPrefill.alias);
+                setAgeRange(out.audioPrefill.ageRange);
+                setSex(out.audioPrefill.sex);
+                setEmail(out.audioPrefill.email);
+              }
               setStep('impronta');
               router.replace(`/subir?format=${format}&step=impronta`, { scroll: false });
             }}
@@ -572,7 +583,10 @@ function SubirPageInner() {
                   <>Video: hasta {SUBIR_AV_MAX_MINUTES} min si ajustas el archivo o el enlace. Ya tienes tu huella; estos datos son para curación y el mapa.</>
                 )}
                 {format === 'audio' && (
-                  <>Audio: hasta {SUBIR_AV_MAX_MINUTES} min. Revisa archivo o URL. Tu huella ya está lista; aquí va lo que verá curación.</>
+                  <>
+                    Audio: hasta {SUBIR_AV_MAX_MINUTES} min. Revisa que el audio se escuche bien. Los datos de tu relato
+                    ya los anotaste; aquí puedes revisarlos o completar lo que falte antes de enviar.
+                  </>
                 )}
                 {format === 'texto' && (
                   <>
@@ -750,24 +764,25 @@ function SubirPageInner() {
                 </div>
                 <div>
                   <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Género (opcional)
+                    Género {format === 'audio' ? '*' : '(opcional)'}
                   </label>
                   <select
                     id="subir-datos-sexo"
                     value={sex}
                     onChange={(e) =>
                       setSex(
-                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir'
+                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro'
                       )
                     }
                     className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
                     style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
                   >
-                    <option value="">Prefiero no indicar</option>
-                    <option value="femenino">Femenino</option>
-                    <option value="masculino">Masculino</option>
+                    <option value="">{format === 'audio' ? 'Elige una opción' : 'Prefiero no indicar'}</option>
+                    <option value="femenino">Mujer</option>
+                    <option value="masculino">Hombre</option>
                     <option value="no-binario">No binario</option>
-                    <option value="prefiero-no-decir">Otro / no decir</option>
+                    <option value="prefiero-no-decir">Prefiero no decirlo</option>
+                    <option value="otro">Otro</option>
                   </select>
                 </div>
               </div>
@@ -797,7 +812,8 @@ function SubirPageInner() {
                   aria-describedby="subir-datos-email-hint"
                 />
                 <p id="subir-datos-email-hint" className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
-                  Te avisaremos por correo cuando tu historia esté en el globo. No se muestra en público.
+                  Usaremos tu correo para avisarte sobre el estado de tu historia y si llega a publicarse en el mapa. No
+                  será visible públicamente.
                 </p>
               </div>
             </div>

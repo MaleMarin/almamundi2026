@@ -43,6 +43,7 @@ const SEX_OK = new Set([
   "masculino",
   "no-binario",
   "prefiero-no-decir",
+  "otro",
 ]);
 
 const THEME_SET = new Set<string>(THEME_IDS);

@@ -133,7 +133,7 @@ const PRIVACY_URL = 'https://almamundi.org';
 const MAX_PROFILE_PHOTO_MB = 8;
 const MAX_EXTRA_FILE_MB = 15;
 
-type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir';
+type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';
 
 type AgeRange = '' | AgeRangeId;
 
@@ -1553,6 +1553,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         <option value="masculino">Masculino</option>
                         <option value="no-binario">No binario</option>
                         <option value="prefiero-no-decir">Prefiero no decir</option>
+                        <option value="otro">Otro</option>
                       </select>
                     </div>
                     <div className="sm:col-span-2">
