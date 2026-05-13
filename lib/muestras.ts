@@ -230,7 +230,7 @@ const MUESTRAS_MOCK: Muestra[] = [
   },
   {
     slug: "huellas-compartidas",
-    title: "Huellas compartidas",
+    title: "Resonancias compartidas",
     theme: "naturaleza",
     description: "Relatos que se encuentran en el mismo territorio.",
     intro: "Una curaduría de voces que nombran el lugar desde distintas miradas.",

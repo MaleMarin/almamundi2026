@@ -3681,7 +3681,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         setHovered({
           kind: 'huella',
           id: (p as { id?: string }).id ?? '',
-          title: (p as { titulo?: string }).titulo ?? 'Huella',
+          title: (p as { titulo?: string }).titulo ?? 'Relato breve',
           subtitle: [(p as { lugar?: string }).lugar, (p as { pais?: string }).pais].filter(Boolean).join(', ') || '—',
           lat,
           lng,
@@ -4843,7 +4843,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   lineHeight: 1.55,
                   fontFamily: SITE_FONT_STACK,
                 }}>
-                  Cada punto es una huella: curiosidades, paradojas y formas de vivir. Toca un punto para leer.
+                  Cada punto es una curiosidad del mundo: datos insólitos, paradojas y formas de vivir. Toca un punto para leer.
                 </p>
               </>
             )}

@@ -495,10 +495,10 @@ function SubirPageInner() {
   }, [format, videoUrl, capture]);
 
   const fmtForSuccess = (format ?? 'texto') as Format;
-  const narrativeForHuellaSuccess =
+  const narrativeForResonanceSuccess =
     capture?.narrativeText?.trim() ||
     buildSubmissionContext(fmtForSuccess, textBody, storyTitle, ciudad, pais, extraContext);
-  const huellaSlug = (lastSubmissionId ?? 'x').replace(/[^a-zA-Z0-9_-]/g, '');
+  const resonanceSlug = (lastSubmissionId ?? 'x').replace(/[^a-zA-Z0-9_-]/g, '');
 
   return (
     <main className={`min-h-screen overflow-x-hidden ${historiasInterior.mainClassName}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -1269,11 +1269,11 @@ function SubirPageInner() {
           <div className="mt-2 flex w-full flex-col items-center">
             <SubmissionSuccessWithHuella
               format={fmtForSuccess}
-              narrativeSeed={narrativeForHuellaSuccess}
+              narrativeSeed={narrativeForResonanceSuccess}
               submissionId={lastSubmissionId}
               storyTitle={storyTitle}
               hrefSubirAnother="/subir"
-              canvasIdSuffix={`main-${fmtForSuccess}-${huellaSlug}`}
+              canvasIdSuffix={`main-${fmtForSuccess}-${resonanceSlug}`}
             />
           </div>
         )}

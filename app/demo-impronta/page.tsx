@@ -189,7 +189,7 @@ export default function DemoImprontaPage() {
   }, []);
 
   const downloadPng = useCallback(() => {
-    const canvas = document.getElementById('impronta-canvas-demo') as HTMLCanvasElement | null;
+    const canvas = document.getElementById('resonancia-canvas-demo') as HTMLCanvasElement | null;
     if (!canvas) {
       setErr('No se encontró el lienzo.');
       window.setTimeout(() => setErr(''), 2000);
@@ -199,7 +199,7 @@ export default function DemoImprontaPage() {
       const png = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = png;
-      a.download = 'AlmaMundi-Impronta-demo.png';
+      a.download = 'AlmaMundi-resonancia-visual-demo.png';
       a.click();
     } catch {
       setErr('No se pudo descargar en este navegador.');
@@ -215,9 +215,9 @@ export default function DemoImprontaPage() {
             Volver al inicio
           </HomeHardLink>
         </p>
-        <h1 className="mt-2 text-2xl font-bold text-gray-800">Vista previa de la Impronta (histórica)</h1>
+        <h1 className="mt-2 text-2xl font-bold text-gray-800">Demo resonancia visual (histórica)</h1>
         <p className="mt-2 text-gray-600">
-          Misma animación de canvas que había en la home antigua tras enviar una historia. Solo para mirar o probar; no está enlazada al flujo real de subida.
+          Animación de canvas de referencia, heredada de versiones anteriores. Solo para mirar o probar; no está enlazada al flujo real de subida.
         </p>
       </div>
 
@@ -238,7 +238,7 @@ export default function DemoImprontaPage() {
       {err ? <p className="text-sm text-red-600">{err}</p> : null}
 
       <div className="overflow-hidden rounded-[28px] border border-gray-200 bg-white shadow-sm" style={{ height: 220 }}>
-        <ImprontaVisualizer isActive seedText={seed} audioBlob={audioBlob} canvasId="impronta-canvas-demo" />
+        <ImprontaVisualizer isActive seedText={seed} audioBlob={audioBlob} canvasId="resonancia-canvas-demo" />
       </div>
 
       <button

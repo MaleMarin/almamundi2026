@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Demo Impronta (histórica) · AlmaMundi',
+  title: 'Demo resonancia visual (histórica) · AlmaMundi',
   robots: { index: false, follow: false },
 };
 

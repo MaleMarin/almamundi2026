@@ -63,8 +63,8 @@ type UseSubirHuellaOptions = {
 };
 
 /**
- * Resonancia visual (huella v2 / cintas de memoria) en canvas.
- * El análisis vía `/api/impronta/analyze` alimenta chips de tono; el dibujo es determinista en cliente.
+ * Resonancia visual (cintas de memoria / render v2) en canvas.
+ * El análisis en servidor alimenta chips de tono; el dibujo es determinista en cliente.
  */
 export function useSubirHuella({
   format,

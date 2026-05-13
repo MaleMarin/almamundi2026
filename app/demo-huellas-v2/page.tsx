@@ -144,14 +144,13 @@ export default function DemoHuellasV2Page() {
     <div className={`min-h-screen bg-[#F0EFE9] px-6 py-8 pb-16 text-[#141D26] ${jakarta.className}`}>
       <div className="mx-auto max-w-[960px]">
         <h1 className={`mb-1 text-[2rem] font-semibold leading-tight ${fraunces.className}`}>
-          Sistema de Huellas v2 · AlmaMundi
+          Resonancia visual (cintas de memoria) · AlmaMundi
         </h1>
         <p className="mb-10 max-w-3xl text-sm leading-relaxed text-[#8A8A7A]">
           Los colores nacen de las palabras de la historia — no del formato.
           <br />
-          Más líneas, más densidad, más color. Cada huella es irrepetible. Implementación en{' '}
-          <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">lib/huella/huellaV2.ts</code>
-          .
+          Más líneas, más densidad, más color. Cada resonancia visual es irrepetible. Implementación en el módulo TypeScript de
+          resonancia visual v2 del repositorio.
         </p>
 
         <section className="mb-10">
@@ -163,8 +162,7 @@ export default function DemoHuellasV2Page() {
             Se extraen hasta 14 palabras significativas del contenido (o del nombre del archivo en el caso de fotos). Cada palabra
             genera un color HSL a partir de su valor numérico: suma de caracteres → matiz; vocales → saturación; consonantes →
             luminosidad. El resultado es una paleta de hasta 14 colores irrepetible para esa historia. La tabla describe el export
-            SVG (<code className="font-mono text-[11px]">generateHuella</code> / <code className="font-mono text-[11px]">generateHuellaSvg</code>
-            ); la vista previa de abajo usa canvas con más líneas y trazos Bézier.
+            SVG; la vista previa de abajo usa canvas con más líneas y trazos Bézier.
           </p>
           <div className="mb-4 overflow-x-auto rounded-xl border border-[#D4D4C4] bg-white">
             <table className="w-full min-w-[520px] border-collapse text-[0.82rem]">
@@ -296,7 +294,7 @@ export default function DemoHuellasV2Page() {
                 onClick={generar}
                 className="rounded-lg bg-[#E8400A] px-5 py-2 text-sm font-semibold text-white hover:bg-[#c73308]"
               >
-                Generar huella →
+                Generar resonancia visual →
               </button>
               <button
                 type="button"
@@ -354,7 +352,7 @@ export default function DemoHuellasV2Page() {
                   <InfoRow k="Semilla" v={String(stats.seed)} />
                 </>
               ) : (
-                <p className="text-[#8A8A7A]">Generá una huella para ver los datos.</p>
+                <p className="text-[#8A8A7A]">Generá una resonancia visual para ver los datos.</p>
               )}
             </div>
           </div>
@@ -362,7 +360,7 @@ export default function DemoHuellasV2Page() {
 
         <section>
           <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
-            04 · Ejemplos — historias reales generan huellas diferentes
+            04 · Ejemplos — historias reales generan resonancias distintas
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3.5">
             {EXAMPLES.map((m) => (
@@ -373,17 +371,11 @@ export default function DemoHuellasV2Page() {
 
         <section className="mt-12 border-t border-[#D4D4C4] pt-10">
           <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
-            05 · Código para Cursor —{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px] text-[#141D26]">lib/huella/huellaV2.ts</code>
+            05 · Código para Cursor — módulo de resonancia visual v2
           </div>
           <p className="max-w-3xl text-[0.83rem] leading-relaxed text-[#8A8A7A]">
-            Equivalente TypeScript al snippet <code className="font-mono text-[11px]">utils/huella.js</code> de la spec:{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">drawHuellaV2OnCanvas</code>,{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">generateHuellaSvg</code>, alias{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">generateHuella</code>,{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">buildPaletteFromMeta</code>,{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">extraerPalabras</code>,{' '}
-            <code className="rounded bg-[#E8E8D8] px-1.5 py-0.5 font-mono text-[11px]">limpiarNombreFoto</code>, etc.
+            Pipeline TypeScript alineado con la spec de referencia: render en canvas, export SVG y utilidades de paleta viven en el
+            mismo módulo del repositorio (véase el archivo indicado arriba y sus exportaciones públicas).
           </p>
         </section>
       </div>

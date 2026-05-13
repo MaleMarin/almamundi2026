@@ -11,7 +11,7 @@ import { useSubirHuella, type SubirHuellaFormat } from '@/hooks/useSubirHuella';
 
 export type SubmissionSuccessWithHuellaProps = {
   format: SubirHuellaFormat;
-  /** Semilla textual para `/api/impronta/analyze` (título, contexto, lugar, archivo…). */
+  /** Semilla textual para el análisis en servidor (título, contexto, lugar, archivo…). */
   narrativeSeed: string;
   /** Refuerza unicidad opcional si el backend devolvió id. */
   submissionId?: string | null;
@@ -33,7 +33,7 @@ export function SubmissionSuccessWithHuella({
   hrefSubirAnother,
   canvasIdSuffix = 'success',
 }: SubmissionSuccessWithHuellaProps) {
-  const narrativeForHuella = useMemo(() => {
+  const narrativeForResonance = useMemo(() => {
     const seed = narrativeSeed.trim();
     if (seed && submissionId) return `${seed}\n—\nreferencia técnica: ${submissionId}`;
     if (seed) return seed;
@@ -45,7 +45,7 @@ export function SubmissionSuccessWithHuella({
 
   const { canvasRef, loading, err, setErr, analysis, statsLine, downloadPng, shareImage } = useSubirHuella({
     format,
-    narrativeText: narrativeForHuella,
+    narrativeText: narrativeForResonance,
     canvasId,
     submissionId,
     storyTitle,

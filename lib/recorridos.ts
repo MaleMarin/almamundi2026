@@ -36,7 +36,7 @@ const RECORRIDOS_MOCK: Recorrido[] = [
   },
   {
     slug: 'huellas-en-el-territorio',
-    title: 'Huellas en el territorio',
+    title: 'Relatos en el territorio',
     description: 'Relatos de quienes caminan y nombran el paisaje.',
     intro: 'Un recorrido por voces que dibujan mapas íntimos del lugar.',
     cover: '/recorrido2.jpg',

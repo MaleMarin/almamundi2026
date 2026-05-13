@@ -191,7 +191,7 @@ function modalModeToHuellaFormat(mode: StoryModalMode): HuellaV2Format {
   return mode;
 }
 
-/** Texto y longitud que alimentan la huella v2 (palabras → colores; charCount → densidad). */
+/** Texto y longitud que alimentan la resonancia visual v2 (palabras → colores; charCount → densidad). */
 function imprintHuellaSource(args: {
   mode: StoryModalMode;
   textBody: string;
@@ -294,7 +294,7 @@ function huellaPngFilename(storyTitle: string, imprintId: string): string {
     const part = t.replace(/\s/g, '-').slice(0, 88);
     return `AlmaMundi-${part}.png`;
   }
-  return `AlmaMundi-huella-${imprintId}.png`;
+  return `AlmaMundi-resonancia-visual-${imprintId}.png`;
 }
 
 export type StoryModalProps = {
@@ -344,7 +344,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [saving, setSaving] = useState(false);
 
   const [imprintId, setImprintId] = useState('');
-  /** Fecha del envío mostrada en la huella (canvas y descarga). */
+  /** Fecha del envío mostrada en la resonancia visual (canvas y descarga). */
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
   const [linkCopied, setLinkCopied] = useState(false);
@@ -1659,7 +1659,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 {alias.trim() ? (
                   <>
                     {alias.trim()},<br />
-                    esta es <em className="italic font-light text-[#E8400A]">tu huella.</em>
+                    esta es <em className="italic font-light text-[#E8400A]">tu resonancia visual.</em>
                   </>
                 ) : (
                   <>
@@ -1683,7 +1683,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <canvas
                   ref={imprintCanvasRef}
                   className="h-full w-full object-cover"
-                  aria-label="Huella generada"
+                  aria-label="Resonancia visual generada"
                 />
               </div>
               <p className="text-[10px] leading-relaxed tracking-wide text-[#8A8A7A]">
@@ -1700,10 +1700,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   type="button"
                   onClick={downloadImprint}
                   className="inline-flex min-w-[120px] flex-1 items-center justify-center gap-2 rounded-full bg-[#E8400A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#c73308]"
-                  aria-label="Descargar imagen de huella"
+                  aria-label="Descargar resonancia visual"
                 >
                   <Download size={15} strokeWidth={1.6} aria-hidden />
-                  Descargar
+                  Descargar resonancia
                 </button>
                 <button
                   type="button"
@@ -1732,11 +1732,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               </p>
               <div className="rounded-[10px] border border-[#D4D4C4] bg-[#F0EFE9] p-4 text-left">
                 <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A8A7A]">
-                  ¿Cómo se genera esta imagen?
+                  ¿Qué es esta resonancia visual?
                 </p>
                 <p className="text-[0.8rem] font-light leading-relaxed text-[#8A8A7A]">
-                  Cada color viene de una palabra de tu historia. AlmaMundi analiza las palabras que usaste y les asigna un color
-                  único según su sonido y su forma. Ninguna historia genera la misma combinación — la tuya es irrepetible.
+                  Es una pieza creada a partir de tu relato, el formato elegido y el momento en que la compartiste. Los colores
+                  surgen de las palabras de tu texto: AlmaMundi las traduce en una paleta determinista. No resume tu vida ni
+                  interpreta quién eres: acompaña la forma en que tu historia resonó aquí.
                 </p>
               </div>
             </div>

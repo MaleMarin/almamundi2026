@@ -26,7 +26,7 @@ export type Exposicion = {
 const MOCK_PIEZAS_MEMORIA: Pieza[] = [
   { id: 'p1', titulo: 'Primera luz', descripcion: 'Fragmentos de memoria que iluminan el relato.', orden: 1 },
   { id: 'p2', titulo: 'Voces del sur', descripcion: 'Historias en primera persona desde el territorio.', orden: 2 },
-  { id: 'p3', titulo: 'Lo que queda', descripcion: 'Objetos y lugares que guardan huella.', orden: 3 },
+  { id: 'p3', titulo: 'Lo que queda', descripcion: 'Objetos y lugares que guardan memoria.', orden: 3 },
   { id: 'p4', titulo: 'Cartas al futuro', descripcion: 'Mensajes escritos para quienes vendrán.', orden: 4 },
 ];
 

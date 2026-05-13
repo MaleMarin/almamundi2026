@@ -1,5 +1,5 @@
 /**
- * Huella v2 — «Cintas de memoria» AlmaMundi
+ * Huella v2 — resonancia visual «cintas de memoria» AlmaMundi
  *
  * Capas del sistema (v1 controlada):
  * 1. `buildPaletteFromMeta` / `buildHuellaV2VisualParams` — parámetros + paleta determinística (seed).

@@ -34,7 +34,7 @@ type Props = {
 export function ImprontaStep({
   format,
   narrativeText,
-  canvasId = 'impronta-export-canvas',
+  canvasId = 'subir-resonancia-export-canvas',
   onBack,
   onContinue,
 }: Props) {
@@ -106,7 +106,7 @@ export function ImprontaStep({
           </div>
         )}
         {err && (
-          <p id="impronta-step-error" className="text-sm text-amber-800" role="alert">
+          <p id="subir-resonancia-step-error" className="text-sm text-amber-800" role="alert">
             {err}
           </p>
         )}

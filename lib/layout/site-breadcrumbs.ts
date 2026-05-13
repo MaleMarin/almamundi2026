@@ -41,8 +41,8 @@ const STATIC_LABELS: Record<string, string> = {
   'globo-validacion': 'Validación del globo',
   'globo-v2': 'Globo',
   'earth-globe-demo': 'Demo globo',
-  'demo-impronta': 'Demo impronta',
-  'demo-huellas-v2': 'Huellas demo',
+  'demo-impronta': 'Demo resonancia visual (histórica)',
+  'demo-huellas-v2': 'Demo resonancia visual',
   cinematic: 'Cine',
 };
 

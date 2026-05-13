@@ -21,7 +21,7 @@ function clientIp(req: NextRequest): string {
   return req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? req.headers.get("x-real-ip") ?? "unknown";
 }
 
-/** POST { text?: string, format?: string } → { analysis, visualParams } para dibujar impronta. */
+/** POST { text?: string, format?: string } → { analysis, visualParams } para resonancia visual (legacy). */
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
   if (!rateOk(ip)) {

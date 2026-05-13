@@ -1,5 +1,5 @@
 /**
- * Huellas: datos inesperados del mundo para AlmaMundi.
+ * Curiosidades del mapa: datos inesperados del mundo para AlmaMundi.
  * Carga desde /huellas2.json (puntos con lat, lon, titulo, historia, categoria, color).
  */
 
