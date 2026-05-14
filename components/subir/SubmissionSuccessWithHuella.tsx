@@ -2,7 +2,7 @@
 
 import { useMemo } from 'react';
 import Link from 'next/link';
-import { Download, Loader2, Share2 } from 'lucide-react';
+import { Download, Share2 } from 'lucide-react';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { neu } from '@/lib/historias-neumorph';
 import { IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
@@ -11,7 +11,7 @@ import { useSubirHuella, type SubirHuellaFormat } from '@/hooks/useSubirHuella';
 
 export type SubmissionSuccessWithHuellaProps = {
   format: SubirHuellaFormat;
-  /** Semilla textual para el análisis en servidor (título, contexto, lugar, archivo…). */
+  /** Texto del relato / contexto para la semilla visual (sin metadatos técnicos). */
   narrativeSeed: string;
   /** Refuerza unicidad opcional si el backend devolvió id. */
   submissionId?: string | null;
@@ -33,17 +33,12 @@ export function SubmissionSuccessWithHuella({
   hrefSubirAnother,
   canvasIdSuffix = 'success',
 }: SubmissionSuccessWithHuellaProps) {
-  const narrativeForResonance = useMemo(() => {
-    const seed = narrativeSeed.trim();
-    if (seed && submissionId) return `${seed}\n—\nreferencia técnica: ${submissionId}`;
-    if (seed) return seed;
-    if (submissionId) return `Tu participación AlmaMundi. referencia técnica: ${submissionId}`;
-    return 'historia almamundi';
-  }, [narrativeSeed, submissionId]);
+  /** Solo texto del relato / contexto editorial: nada de IDs ni metadatos técnicos en la semilla visual. */
+  const narrativeForResonance = useMemo(() => narrativeSeed.trim(), [narrativeSeed]);
 
   const canvasId = `subir-success-resonancia-${canvasIdSuffix}`;
 
-  const { canvasRef, loading, err, setErr, analysis, statsLine, downloadPng, shareImage } = useSubirHuella({
+  const { canvasRef, err, setErr, downloadPng, shareImage } = useSubirHuella({
     format,
     narrativeText: narrativeForResonance,
     canvasId,
@@ -90,32 +85,6 @@ export function SubmissionSuccessWithHuella({
         </div>
 
         <div style={neoInset} className="p-4 md:p-5 space-y-3">
-          {loading ? (
-            <p className="flex items-center justify-center gap-2 text-base py-10" style={{ color: neu.textBody }}>
-              <Loader2 className="h-5 w-5 animate-spin shrink-0" aria-hidden />
-              Preparando tu resonancia visual…
-            </p>
-          ) : null}
-          {!loading && statsLine ? (
-            <p className="text-xs md:text-sm text-center uppercase tracking-wide font-medium" style={{ color: neu.textMain }}>
-              {statsLine}
-            </p>
-          ) : null}
-          {!loading && analysis ? (
-            <div className="flex flex-wrap justify-center gap-1.5 md:gap-2 text-[11px] md:text-xs" style={{ color: neu.textBody }}>
-              {analysis.themes.slice(0, 4).map((t) => (
-                <span key={t} className="px-2 py-0.5 rounded-full bg-black/[0.06]">
-                  {t}
-                </span>
-              ))}
-              {analysis.emotions.slice(0, 3).map((t) => (
-                <span key={t} className="px-2 py-0.5 rounded-full bg-orange-500/12 text-orange-900">
-                  {t}
-                </span>
-              ))}
-            </div>
-          ) : null}
-
           <div
             className="mx-auto overflow-hidden rounded-2xl border border-white/60 shadow-inner"
             style={{ maxWidth: IMPRONTA_EXPORT_W, backgroundColor: HUELLA_V2_BG }}
@@ -125,7 +94,6 @@ export function SubmissionSuccessWithHuella({
               id={canvasId}
               className="block h-auto w-full"
               style={{ maxHeight: 'min(70vh, 520px)' }}
-              aria-hidden={loading}
             />
           </div>
 
@@ -143,12 +111,10 @@ export function SubmissionSuccessWithHuella({
               setErr('');
               downloadPng('almamundi-resonancia-visual.png');
             }}
-            disabled={loading}
-            aria-busy={loading}
-            className="inline-flex justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white disabled:opacity-45"
+            className="inline-flex justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white"
             style={{
-              background: loading ? '#9ca3af' : orangeCta,
-              boxShadow: loading ? 'none' : '0 8px 24px rgba(255,69,0,0.32)',
+              background: orangeCta,
+              boxShadow: '0 8px 24px rgba(255,69,0,0.32)',
             }}
           >
             <Download size={18} aria-hidden />
@@ -160,8 +126,7 @@ export function SubmissionSuccessWithHuella({
               setErr('');
               void shareImage();
             }}
-            disabled={loading}
-            className="inline-flex justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide disabled:opacity-45"
+            className="inline-flex justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide"
             style={{ ...neu.button, color: neu.orange }}
           >
             <Share2 size={18} aria-hidden />

@@ -5,7 +5,7 @@
  * (`SubmissionSuccessWithHuella`). Este archivo se conserva por si quedan enlaces antiguos o demos.
  */
 
-import { Download, Loader2, Share2 } from 'lucide-react';
+import { Download, Share2 } from 'lucide-react';
 import { IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
 import { neu } from '@/lib/historias-neumorph';
 import {
@@ -38,16 +38,11 @@ export function ImprontaStep({
   onBack,
   onContinue,
 }: Props) {
-  const {
-    canvasRef,
-    loading,
-    err,
-    setErr,
-    analysis,
-    statsLine,
-    downloadPng,
-    shareImage,
-  } = useSubirHuella({ format, narrativeText, canvasId });
+  const { canvasRef, err, setErr, downloadPng, shareImage } = useSubirHuella({
+    format,
+    narrativeText,
+    canvasId,
+  });
 
   const neoCard = {
     ...neu.cardInset,
@@ -80,31 +75,6 @@ export function ImprontaStep({
           Para cada relato generamos una resonancia visual con <strong style={{ color: neu.textMain }}>cintas de memoria</strong>, paleta contenida y fondo claro. Abajo van{' '}
           <strong style={{ color: neu.textMain }}>{SUBIR_HUELLA_FOOTER_SITE}</strong> y la fecha.
         </p>
-        {loading && (
-          <p className="flex items-center gap-2 text-base md:text-lg" style={{ color: neu.textBody }}>
-            <Loader2 className="h-5 w-5 animate-spin" aria-hidden />
-            Generando tu resonancia visual…
-          </p>
-        )}
-        {statsLine && !loading && (
-          <p className="text-sm md:text-base font-semibold uppercase tracking-wide" style={{ color: neu.textMain }}>
-            {statsLine}
-          </p>
-        )}
-        {analysis && !loading && (
-          <div className="flex flex-wrap gap-2 text-sm md:text-base" style={{ color: neu.textBody }}>
-            {analysis.themes.slice(0, 5).map((t) => (
-              <span key={t} className="px-2 py-0.5 rounded-full bg-black/5">
-                {t}
-              </span>
-            ))}
-            {analysis.emotions.slice(0, 4).map((t) => (
-              <span key={t} className="px-2 py-0.5 rounded-full bg-orange-500/15 text-orange-800">
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
         {err && (
           <p id="subir-resonancia-step-error" className="text-sm text-amber-800" role="alert">
             {err}
@@ -131,13 +101,10 @@ export function ImprontaStep({
             setErr('');
             downloadPng('almamundi-resonancia-visual.png');
           }}
-          disabled={loading}
-          aria-busy={loading}
-          aria-disabled={loading}
-          className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide text-white disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide text-white"
           style={{
-            background: loading ? '#9ca3af' : orangeCta,
-            boxShadow: loading ? 'none' : '0 8px 24px rgba(255,69,0,0.35)',
+            background: orangeCta,
+            boxShadow: '0 8px 24px rgba(255,69,0,0.35)',
           }}
         >
           <Download size={20} aria-hidden />
@@ -149,10 +116,7 @@ export function ImprontaStep({
             setErr('');
             void shareImage();
           }}
-          disabled={loading}
-          aria-busy={loading}
-          aria-disabled={loading}
-          className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide disabled:opacity-50"
+          className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide"
           style={{ ...neu.button, color: neu.orange }}
         >
           <Share2 size={20} aria-hidden />
@@ -163,11 +127,10 @@ export function ImprontaStep({
       <button
         type="button"
         onClick={onContinue}
-        disabled={loading}
-        className="w-full py-5 md:py-6 rounded-full font-bold text-white text-lg md:text-xl uppercase tracking-wide disabled:opacity-50"
+        className="w-full py-5 md:py-6 rounded-full font-bold text-white text-lg md:text-xl uppercase tracking-wide"
         style={{
-          background: loading ? '#9ca3af' : orangeCta,
-          boxShadow: loading ? 'none' : '0 10px 32px rgba(255,69,0,0.4)',
+          background: orangeCta,
+          boxShadow: '0 10px 32px rgba(255,69,0,0.4)',
         }}
       >
         Continuar
