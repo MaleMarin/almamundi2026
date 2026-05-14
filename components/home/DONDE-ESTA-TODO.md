@@ -25,7 +25,7 @@ Dentro de `StoryModal` está:
 - Grabación de video/audio (MediaRecorder, stream, preview)
 - Formulario: título, nombre, email, edad, sexo, ciudad, país, privacidad
 - Texto largo (hasta 6000 caracteres) y tema de inspiración
-- Lógica de envío, “impronta”, descarga de imagen, etc.
+- Lógica de envío, resonancia visual, descarga de imagen, etc.
 
 ## 4. Resumen por archivo
 

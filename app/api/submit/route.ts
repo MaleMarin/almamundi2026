@@ -210,7 +210,7 @@ export async function POST(request: NextRequest) {
         await ref.update(update);
       }
     } catch (e) {
-      console.warn("[submit] Análisis huella (Whisper/GPT) falló:", e);
+      console.warn("[submit] Análisis resonancia visual (Whisper/GPT) falló:", e);
     }
   }
 

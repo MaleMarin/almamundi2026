@@ -98,4 +98,4 @@ Si no usas la página, puedes publicar con curl (ver `docs/CURACION_FLUJO.md`).
 | `RESEND_API_KEY` + `MAIL_FROM` | Enviar email al autor cuando publicas su historia. |
 | `PUBLIC_SITE_URL` | Enlace que se manda en el email (ej. `https://www.almamundi.org`). |
 
-Sin Firebase Admin configurado, el formulario sigue mostrando “Gracias, tu historia dejó una Impronta” pero **no se guarda nada** (el ID que ves será `dev-...`). En cuanto configuras las variables y reinicias, los nuevos envíos sí se guardan y, después de publicarlos desde curaduría, se ven en el mapa.
+Sin Firebase Admin configurado, el flujo de envío puede mostrar la confirmación de recepción (incluida la resonancia visual) pero **no se guarda nada** en Firestore (el ID que ves será `dev-...`). En cuanto configuras las variables y reinicias, los nuevos envíos sí se guardan y, después de publicarlos desde curaduría, se ven en el mapa.

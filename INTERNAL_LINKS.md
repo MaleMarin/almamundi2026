@@ -12,11 +12,11 @@ En Cursor, los enlaces Markdown suelen verse **azules** al renderizarlos; **Cmd+
 
 - [Subir historia](http://127.0.0.1:3005/subir) · [Subir foto](http://127.0.0.1:3005/subir/foto)
 
-- [Muestras](http://127.0.0.1:3005/muestras) · [Ej. sala «el hilo» (Voces del desplazamiento)](http://127.0.0.1:3005/muestras/voces-del-desplazamiento) · [Huellas compartidas](http://127.0.0.1:3005/muestras/huellas-compartidas) · [Memoria ciudad](http://127.0.0.1:3005/muestras/memoria-ciudad)
+- [Muestras](http://127.0.0.1:3005/muestras) · [Ej. sala «el hilo» (Voces del desplazamiento)](http://127.0.0.1:3005/muestras/voces-del-desplazamiento) · [Resonancias compartidas](http://127.0.0.1:3005/muestras/huellas-compartidas) · [Memoria ciudad](http://127.0.0.1:3005/muestras/memoria-ciudad)
 
 - [Exposiciones](http://127.0.0.1:3005/exposiciones) · [Memoria colectiva](http://127.0.0.1:3005/exposiciones/memoria-colectiva) · [Sonidos del mundo](http://127.0.0.1:3005/exposiciones/sonidos-del-mundo) · [El mapa vivo](http://127.0.0.1:3005/exposiciones/el-mapa-vivo)
 
-- [Recorridos](http://127.0.0.1:3005/recorridos) · [Voces del desplazamiento](http://127.0.0.1:3005/recorridos/voces-del-desplazamiento) · [Huellas en el territorio](http://127.0.0.1:3005/recorridos/huellas-en-el-territorio)
+- [Recorridos](http://127.0.0.1:3005/recorridos) · [Voces del desplazamiento](http://127.0.0.1:3005/recorridos/voces-del-desplazamiento) · [Relatos en el territorio](http://127.0.0.1:3005/recorridos/huellas-en-el-territorio)
 
 - [Temas](http://127.0.0.1:3005/temas) · *(cada tema:* `http://127.0.0.1:3005/temas/<slug>` *— listado en* `lib/temas.ts` *)*
 
@@ -46,7 +46,7 @@ En Cursor, los enlaces Markdown suelen verse **azules** al renderizarlos; **Cmd+
 
 ### Demos / prototipos *(desarrollo)*
 
-- [Preview home](http://127.0.0.1:3005/preview-home) · [Vista previa](http://127.0.0.1:3005/vista-previa) · [Prototipo](http://127.0.0.1:3005/prototipo) · [Globo v2](http://127.0.0.1:3005/globo-v2) · [Globo validación](http://127.0.0.1:3005/globo-validacion) · [Earth globe demo](http://127.0.0.1:3005/earth-globe-demo) · [Demo huellas v2](http://127.0.0.1:3005/demo-huellas-v2) · [Demo impronta](http://127.0.0.1:3005/demo-impronta)
+- [Preview home](http://127.0.0.1:3005/preview-home) · [Vista previa](http://127.0.0.1:3005/vista-previa) · [Prototipo](http://127.0.0.1:3005/prototipo) · [Globo v2](http://127.0.0.1:3005/globo-v2) · [Globo validación](http://127.0.0.1:3005/globo-validacion) · [Earth globe demo](http://127.0.0.1:3005/earth-globe-demo) · [Demo resonancia visual](http://127.0.0.1:3005/demo-huellas-v2) · [Demo resonancia visual (histórica)](http://127.0.0.1:3005/demo-impronta)
 
 ---
 

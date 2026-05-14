@@ -1,6 +1,6 @@
 # AlmaMundi 🌍
 
-**AlmaMundi** es una plataforma digital que visualiza historias, noticias y sonidos globales sobre un mapa interactivo y un globo 3D. Es un espacio para explorar la huella humana y el pulso del mundo en tiempo real, combinando tecnología moderna y derechos digitales.
+**AlmaMundi** es una plataforma digital que visualiza historias, noticias y sonidos globales sobre un mapa interactivo y un globo 3D. Es un espacio para explorar las historias humanas y el pulso del mundo en tiempo real, combinando tecnología moderna y derechos digitales.
 
 Este repositorio contiene la aplicación full-stack construida con Next.js (App Router), React 19, y Tailwind CSS v4.
 
