@@ -1,15 +1,15 @@
 /**
- * Resonancia visual AlmaMundi — cintas fluidas (referencias: flowing_ribbons_of_soft_color,
- * flowing_ribbons_of_color_and_texture). Dos familias: soft-ribbons y kinetic-ribbons.
+ * Resonancia visual AlmaMundi — cintas fluidas y pulsos (referencias: flowing_ribbons_of_soft_color,
+ * flowing_ribbons_of_color_and_texture, pulse-lines). Tres familias: soft-ribbons, kinetic-ribbons, pulse-lines.
  *
- * Capas: paleta determinista → campo de cintas (Bézier, gradientes, transparencia, textura fina) → pie editorial.
+ * Capas: paleta determinista → campo (Bézier, líneas finas, gradientes, transparencia) → pie editorial.
  */
 
 import type { HuellaV2VisualParams, HuellaV2Format } from '@/lib/huella/types';
 
 export type { HuellaV2Format };
 
-export type ResonanceFamily = 'soft-ribbons' | 'kinetic-ribbons';
+export type ResonanceFamily = 'soft-ribbons' | 'kinetic-ribbons' | 'pulse-lines';
 export type ResonanceOrientation = 'vertical' | 'horizontal' | 'square';
 
 export type HuellaV2Meta = {
@@ -112,24 +112,33 @@ function textoBaseParaHuella(meta: HuellaV2Meta): string {
 
 /**
  * Familia visual determinista: misma historia + formato + longitud ⇒ misma familia.
- * — kinetic: video; textos largos; audio con mucho contexto.
- * — soft: foto; textos breves; audio breve.
+ * — kinetic: video, movimiento y cruces.
+ * — soft: foto, intimidad y aire.
+ * — pulse-lines: ritmo, señal, vibración (audio con frecuencia mayor; texto medio).
  */
 export function chooseResonanceFamily(meta: HuellaV2Meta): ResonanceFamily {
   if (meta.resonanceFamily) return meta.resonanceFamily;
   const fmt = meta.format ?? 'texto';
   const cc = Math.max(0, meta.charCount ?? meta.content?.length ?? 0);
-  const tie = seededRnd(seedFn(meta.storyId), 404);
+  const S = seedFn(meta.storyId);
+  const tie = seededRnd(S, 404);
+
   if (fmt === 'video') return 'kinetic-ribbons';
   if (fmt === 'foto') return 'soft-ribbons';
+
   if (fmt === 'audio') {
-    if (cc < 420) return 'soft-ribbons';
-    if (cc > 900) return 'kinetic-ribbons';
-    return tie < 0.45 ? 'soft-ribbons' : 'kinetic-ribbons';
+    if (cc < 380) return 'soft-ribbons';
+    if (cc > 1150) return 'kinetic-ribbons';
+    if (tie < 0.58) return 'pulse-lines';
+    if (tie < 0.86) return 'kinetic-ribbons';
+    return 'soft-ribbons';
   }
+
   if (cc < 720) return 'soft-ribbons';
   if (cc > 2800) return 'kinetic-ribbons';
-  return tie < 0.38 ? 'soft-ribbons' : 'kinetic-ribbons';
+  if (tie < 0.3) return 'soft-ribbons';
+  if (tie < 0.62) return 'pulse-lines';
+  return 'kinetic-ribbons';
 }
 
 /** Inferencia por proporción del lienzo (vertical móvil, horizontal web, cuadrado redes). */
@@ -160,15 +169,24 @@ export function buildResonancePalette(meta: HuellaV2Meta, family: ResonanceFamil
     const [h0, s0, l0] = TONE_PRESETS[(idx + off) % TONE_PRESETS.length]!;
     const j = seededRnd(S, off * 17 + 3);
     const dh = (j - 0.5) * 14;
-    const ds = (seededRnd(S, off * 19 + 5) - 0.5) * 10;
-    const dl = family === 'soft-ribbons' ? 6 + seededRnd(S, off * 23 + 7) * 8 : (seededRnd(S, off * 23 + 7) - 0.5) * 6;
-    return hsl(h0 + dh, s0 + ds, l0 + dl);
+    const ds = (seededRnd(S, off * 19 + 5) - 0.5) * (family === 'pulse-lines' ? 14 : 10);
+    const dsBoost = family === 'pulse-lines' ? 6 : 0;
+    let dl: number;
+    if (family === 'soft-ribbons') dl = 6 + seededRnd(S, off * 23 + 7) * 8;
+    else if (family === 'pulse-lines') dl = -4 + seededRnd(S, off * 23 + 7) * 5;
+    else dl = (seededRnd(S, off * 23 + 7) - 0.5) * 6;
+    return hsl(h0 + dh, s0 + ds + dsBoost, l0 + dl);
   };
   const dominant = pick(0);
   const secondaryA = pick(2);
   const secondaryB = pick(4);
   const accent = hsl(16 + (seededRnd(S, 91) - 0.5) * 8, 90, 52 + seededRnd(S, 92) * 6);
-  const air = family === 'soft-ribbons' ? 'rgba(255,255,255,0.72)' : 'rgba(255,255,255,0.52)';
+  const air =
+    family === 'soft-ribbons'
+      ? 'rgba(255,255,255,0.72)'
+      : family === 'pulse-lines'
+        ? 'rgba(255,255,255,0.62)'
+        : 'rgba(255,255,255,0.52)';
   const cream = hsl(210, 22, 96, 0.9);
   return { dominant, secondaryA, secondaryB, accent, air, cream };
 }
@@ -202,6 +220,20 @@ function ribbonBudget(meta: HuellaV2Meta, family: ResonanceFamily): RibbonBudget
     return { thick: Math.max(6, thick), thin: Math.max(18, thin), accent, texture };
   }
 
+  if (family === 'pulse-lines') {
+    const baseCols = fmt === 'audio' ? 102 : fmt === 'texto' ? 88 : fmt === 'video' ? 76 : 84;
+    const nCols = Math.min(
+      152,
+      Math.max(56, Math.floor(baseCols * (long ? 1.14 : short ? 0.86 : 1) + seededRnd(S, 728) * 26))
+    );
+    return {
+      thick: 2,
+      thin: nCols,
+      accent: 4 + Math.floor(seededRnd(S, 730) * 2),
+      texture: 160 + Math.floor(seededRnd(S, 732) * 140),
+    };
+  }
+
   const baseThick = fmt === 'video' ? 18 : 14;
   const thick = Math.floor((baseThick + seededRnd(S, 12) * 10) * (long ? 1.12 : short ? 0.88 : 1));
   const thin = Math.floor((52 + seededRnd(S, 14) * 48) * (long ? 1.25 : 1) * (short ? 0.75 : 1));
@@ -224,6 +256,12 @@ function drawBackgroundWash(
     g.addColorStop(0, 'rgba(255,255,255,0.92)');
     g.addColorStop(0.4, 'rgba(236,240,247,0.85)');
     g.addColorStop(1, 'rgba(214,222,235,0.55)');
+  } else if (family === 'pulse-lines') {
+    g.addColorStop(0, 'rgba(255,255,255,0.95)');
+    g.addColorStop(0.18, 'rgba(248,250,252,0.92)');
+    g.addColorStop(0.48, 'rgba(236,241,248,0.78)');
+    g.addColorStop(0.72, 'rgba(228,234,244,0.65)');
+    g.addColorStop(1, 'rgba(216,224,236,0.52)');
   } else {
     g.addColorStop(0, 'rgba(255,255,255,0.88)');
     g.addColorStop(0.35, 'rgba(230,236,246,0.7)');
@@ -232,14 +270,19 @@ function drawBackgroundWash(
   ctx.fillStyle = g;
   ctx.fillRect(left, top, cw, ch);
   const rg = ctx.createRadialGradient(left + cw * 0.35, top + ch * 0.25, 0, left + cw * 0.35, top + ch * 0.25, Math.max(cw, ch) * 0.65);
-  rg.addColorStop(0, family === 'soft-ribbons' ? 'rgba(255,255,255,0.35)' : hslaFromCss(pal.dominant, 0.12));
+  const washAlpha = family === 'soft-ribbons' ? 0.35 : family === 'pulse-lines' ? 0.1 : 0.12;
+  rg.addColorStop(0, family === 'soft-ribbons' ? 'rgba(255,255,255,0.35)' : hslaFromCss(pal.dominant, washAlpha));
   rg.addColorStop(1, 'rgba(255,255,255,0)');
   ctx.fillStyle = rg;
   ctx.fillRect(left, top, cw, ch);
 }
 
 function hslaFromCss(hslStr: string, alpha: number): string {
-  const m = hslStr.match(/hsl\((-?\d+(?:\.\d+)?),\s*(\d+(?:\.\d+)?)%,\s*(\d+(?:\.\d+)?)%\)/);
+  const ma = hslStr.match(
+    /hsla\(\s*(-?\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)%\s*,\s*(\d+(?:\.\d+)?)%\s*,\s*([\d.]+)\s*\)/
+  );
+  if (ma) return `hsla(${ma[1]}, ${ma[2]}%, ${ma[3]}%, ${alpha})`;
+  const m = hslStr.match(/hsl\(\s*(-?\d+(?:\.\d+)?)\s*,\s*(\d+(?:\.\d+)?)%\s*,\s*(\d+(?:\.\d+)?)%\s*\)/);
   if (!m) return `rgba(255,255,255,${alpha})`;
   return `hsla(${m[1]}, ${m[2]}%, ${m[3]}%, ${alpha})`;
 }
@@ -291,7 +334,12 @@ function drawTexture(
     const y = top + seededRnd(S, i * 3 + 901) * ch;
     const col = colors[i % colors.length]!;
     ctx.fillStyle = col;
-    ctx.globalAlpha = family === 'soft-ribbons' ? 0.04 + seededRnd(S, i + 902) * 0.07 : 0.06 + seededRnd(S, i + 902) * 0.1;
+    ctx.globalAlpha =
+      family === 'soft-ribbons'
+        ? 0.04 + seededRnd(S, i + 902) * 0.07
+        : family === 'pulse-lines'
+          ? 0.045 + seededRnd(S, i + 902) * 0.065
+          : 0.06 + seededRnd(S, i + 902) * 0.1;
     if (seededRnd(S, i + 903) < 0.55) {
       const r = 0.6 + seededRnd(S, i + 904) * 1.4;
       ctx.beginPath();
@@ -408,6 +456,103 @@ function renderKineticRibbons(
   generateRibbonField(ctx, left, top, cw, ch, 'kinetic-ribbons', pal, S, budget);
 }
 
+/** Ritmo / señal: líneas finas con microvariación, interrupciones y dos cintas suaves de anclaje AlmaMundi. */
+function renderPulseLines(
+  ctx: CanvasRenderingContext2D,
+  left: number,
+  top: number,
+  cw: number,
+  ch: number,
+  meta: HuellaV2Meta,
+  pal: ResonancePalette,
+  S: number
+): void {
+  const rnd = (k: number) => seededRnd(S, k);
+  drawBackgroundWash(ctx, left, top, cw, ch, pal, 'pulse-lines');
+  const colors = [pal.dominant, pal.secondaryA, pal.secondaryB, pal.accent, pal.cream];
+  const cc = Math.max(1, meta.charCount ?? meta.content?.length ?? 400);
+  const long = cc > 2000;
+
+  for (let b = 0; b < 2; b++) {
+    const t = 0.18 + b * 0.45 + (rnd(940 + b) - 0.5) * 0.08;
+    const xBase = left + cw * t + (rnd(942 + b) - 0.5) * cw * 0.06;
+    const wob = cw * (0.07 + rnd(944 + b) * 0.12);
+    const y0 = top - ch * 0.06;
+    const y1 = top + ch * 1.06;
+    const cx1 = xBase - wob * 1.1 + (rnd(946 + b) - 0.5) * cw * 0.04;
+    const cy1 = top + ch * (0.26 + rnd(948 + b) * 0.16);
+    const cx2 = xBase + wob * 1.05 + (rnd(950 + b) - 0.5) * cw * 0.04;
+    const cy2 = top + ch * (0.58 + rnd(952 + b) * 0.14);
+    const col = b === 0 ? pal.secondaryB : pal.cream;
+    strokeRibbon(
+      ctx,
+      xBase - wob,
+      y0,
+      cx1,
+      cy1,
+      cx2,
+      cy2,
+      xBase + wob * 0.85,
+      y1,
+      col,
+      22 + rnd(954 + b) * 36,
+      0.07 + rnd(956 + b) * 0.07
+    );
+  }
+
+  const budget = ribbonBudget(meta, 'pulse-lines');
+  const nCols = budget.thin;
+  const marginX = cw * 0.035;
+  const innerW = cw - marginX * 2;
+  const golden = 0.6180339887498949;
+
+  const breathLeft = left + marginX + rnd(960) * innerW * 0.5;
+  const breathW = innerW * (0.12 + rnd(962) * 0.1);
+  const breathRight = breathLeft + breathW;
+
+  for (let i = 0; i < nCols; i++) {
+    const rawT = (i * golden + rnd(964) * 0.19 + Math.sin(i * 0.23) * 0.06) % 1;
+    const xCenter = left + marginX + rawT * innerW;
+
+    if (xCenter >= breathLeft && xCenter <= breathRight && rnd(966 + i) < 0.58) continue;
+    if (rnd(968 + i * 3) < 0.048) continue;
+
+    const jitterCol = [0, 1, 2, 1, 4, 0, 3, 2, 1];
+    const col = colors[jitterCol[i % jitterCol.length]!]!;
+    const lineW = 0.5 + rnd(970 + i * 2) * 1.25;
+    const baseAlpha = long ? 0.1 + rnd(972 + i * 2) * 0.12 : 0.14 + rnd(972 + i * 2) * 0.15;
+
+    const yTop = top + ch * (0.07 + rnd(974 + i) * 0.13);
+    const yBot = top + ch * (0.84 + rnd(976 + i) * 0.09);
+    const nSeg = 2 + Math.floor(rnd(978 + i) * 3);
+    const totalSpan = yBot - yTop;
+    const segH = totalSpan / Math.max(2.2, nSeg * 2.05 + 0.4);
+
+    for (let s = 0; s < nSeg; s++) {
+      if (rnd(980 + i * 5 + s) < 0.085) continue;
+      const ys = yTop + s * segH * 2.05 + rnd(982 + i + s) * segH * 0.32;
+      const ye = ys + segH * (0.62 + rnd(984 + i + s) * 0.48);
+      if (ye > yBot + ch * 0.015) break;
+
+      const x0 = xCenter + (rnd(986 + i * 4 + s) - 0.5) * 1.1;
+      const xMid = xCenter + (rnd(988 + i * 4 + s) - 0.5) * 2.5;
+      const x1 = xCenter + (rnd(990 + i * 4 + s) - 0.5) * 1.35;
+
+      ctx.save();
+      ctx.strokeStyle = hslaFromCss(col, baseAlpha * (0.8 + rnd(992 + i + s) * 0.3));
+      ctx.lineWidth = lineW;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x0, ys);
+      ctx.quadraticCurveTo(xMid, (ys + ye) / 2, x1, ye);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  drawTexture(ctx, left, top, cw, ch, Math.min(280, budget.texture), S, colors, 'pulse-lines');
+}
+
 /** Dibuja el campo de cintas según familia, dentro del rectángulo (ya clipado si aplica). */
 function drawOrientedRibbonField(
   ctx: CanvasRenderingContext2D,
@@ -431,6 +576,7 @@ function drawOrientedRibbonField(
     ctx.rect(0, 0, contentH, W);
     ctx.clip();
     if (family === 'soft-ribbons') renderSoftRibbons(ctx, 0, 0, contentH, W, meta, pal, S);
+    else if (family === 'pulse-lines') renderPulseLines(ctx, 0, 0, contentH, W, meta, pal, S);
     else renderKineticRibbons(ctx, 0, 0, contentH, W, meta, pal, S);
   } else {
     ctx.beginPath();
@@ -444,6 +590,7 @@ function drawOrientedRibbonField(
       ctx.translate(-cx, -cy);
     }
     if (family === 'soft-ribbons') renderSoftRibbons(ctx, 0, 0, W, contentH, meta, pal, S);
+    else if (family === 'pulse-lines') renderPulseLines(ctx, 0, 0, W, contentH, meta, pal, S);
     else renderKineticRibbons(ctx, 0, 0, W, contentH, meta, pal, S);
   }
 
@@ -642,6 +789,60 @@ export function generateHuellaSvg(meta: HuellaV2Meta): string {
   const rnd = (i: number) => seededRnd(S, i);
   const budget = ribbonBudget(metaFor, family);
   const colors = [pal.dominant, pal.secondaryA, pal.secondaryB, pal.cream, pal.accent];
+
+  if (family === 'pulse-lines') {
+    let paths = '';
+    for (let r = 0; r < 2; r++) {
+      const t = 0.2 + r * 0.42 + (rnd(200 + r) - 0.5) * 0.08;
+      const x0 = width * t;
+      const wob = width * (0.06 + rnd(204 + r) * 0.1);
+      const y0 = -height * 0.06;
+      const y1 = height * 1.06;
+      const cx1 = x0 - wob * 1.05 + (rnd(208 + r) - 0.5) * width * 0.04;
+      const cy1 = height * (0.26 + rnd(212 + r) * 0.14);
+      const cx2 = x0 + wob + (rnd(216 + r) - 0.5) * width * 0.04;
+      const cy2 = height * (0.58 + rnd(220 + r) * 0.12);
+      const col = r === 0 ? pal.secondaryB : pal.cream;
+      const op = 0.08 + rnd(224 + r) * 0.06;
+      const sw = 20 + rnd(228 + r) * 28;
+      paths += `<path d="M ${(x0 - wob).toFixed(1)} ${y0.toFixed(1)} C ${cx1.toFixed(1)} ${cy1.toFixed(1)} ${cx2.toFixed(1)} ${cy2.toFixed(1)} ${(x0 + wob * 0.85).toFixed(1)} ${y1.toFixed(1)}" stroke="${col}" stroke-width="${sw.toFixed(1)}" fill="none" opacity="${op.toFixed(2)}" stroke-linecap="round"/>`;
+    }
+    const golden = 0.6180339887498949;
+    const nPulse = Math.min(96, budget.thin);
+    const marginX = width * 0.035;
+    const innerW = width - marginX * 2;
+    const breathLeft = marginX + rnd(240) * innerW * 0.5;
+    const breathW = innerW * (0.12 + rnd(242) * 0.1);
+    const breathRight = breathLeft + breathW;
+    const jitterCol = [0, 1, 2, 1, 4, 0, 3, 2, 1];
+    const longText = charCount > 2000;
+    for (let i = 0; i < nPulse; i++) {
+      const rawT = (i * golden + rnd(250) * 0.19 + Math.sin(i * 0.23) * 0.06) % 1;
+      const xCenter = marginX + rawT * innerW;
+      if (xCenter >= breathLeft && xCenter <= breathRight && rnd(252 + i) < 0.55) continue;
+      if (rnd(254 + i * 3) < 0.05) continue;
+      const col = colors[jitterCol[i % jitterCol.length]!]!;
+      const op = longText ? 0.11 + rnd(256 + i) * 0.12 : 0.15 + rnd(256 + i) * 0.14;
+      const sw = 0.6 + rnd(258 + i) * 1.1;
+      const yTop = height * (0.08 + rnd(260 + i) * 0.12);
+      const yBot = height * (0.85 + rnd(262 + i) * 0.08);
+      const nSeg = 2 + Math.floor(rnd(264 + i) * 2);
+      const totalSpan = yBot - yTop;
+      const segH = totalSpan / Math.max(2.2, nSeg * 2.05 + 0.35);
+      for (let s = 0; s < nSeg; s++) {
+        if (rnd(266 + i * 4 + s) < 0.09) continue;
+        const ys = yTop + s * segH * 2.05 + rnd(268 + i + s) * segH * 0.3;
+        const ye = ys + segH * (0.6 + rnd(270 + i + s) * 0.45);
+        if (ye > yBot) break;
+        const xa = xCenter + (rnd(272 + i * 4 + s) - 0.5) * 1.2;
+        const xM = xCenter + (rnd(274 + i * 4 + s) - 0.5) * 2.2;
+        const xb = xCenter + (rnd(276 + i * 4 + s) - 0.5) * 1.2;
+        paths += `<path d="M ${xa.toFixed(2)} ${ys.toFixed(2)} Q ${xM.toFixed(2)} ${((ys + ye) / 2).toFixed(2)} ${xb.toFixed(2)} ${ye.toFixed(2)}" stroke="${col}" stroke-width="${sw.toFixed(2)}" fill="none" opacity="${op.toFixed(3)}" stroke-linecap="round"/>`;
+      }
+    }
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="${width}" height="${height}" fill="${HUELLA_V2_BG}"/>${paths}</svg>`;
+  }
+
   let paths = '';
   const n = Math.min(64, budget.thick + Math.min(48, Math.floor(budget.thin / 2)));
   for (let i = 0; i < n; i++) {

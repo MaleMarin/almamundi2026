@@ -55,8 +55,8 @@ export interface HuellaV2VisualParams {
   anguloBase: number;
   charCount: number;
   submitHour: number;
-  /** Familia visual de resonancia (cintas suaves vs cinéticas). */
-  resonanceFamily?: 'soft-ribbons' | 'kinetic-ribbons';
+  /** Familia visual de resonancia (cintas suaves, cinéticas o pulsos finos). */
+  resonanceFamily?: 'soft-ribbons' | 'kinetic-ribbons' | 'pulse-lines';
   /** Orientación compositiva (vertical / horizontal / cuadrada). */
   resonanceOrientation?: 'vertical' | 'horizontal' | 'square';
 }
