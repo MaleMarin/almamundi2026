@@ -133,6 +133,14 @@ const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.22;
 
 const GLOBE_V2_REALTIME_SUN_TICK_MS = 60_000;
 
+/** Giro visual en home realtime: ~1 vuelta sidérea cada ~90 s en reposo (sol sigue en hora real). */
+const GLOBE_V2_REALTIME_VISUAL_SPIN_SCALE = 960;
+
+const SIDEREAL_DAY_MS = 86164000;
+const SIDEREAL_RAD_PER_MS = (Math.PI * 2) / SIDEREAL_DAY_MS;
+
+const _axisY = new THREE.Vector3(0, 1, 0);
+
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
 export type { GlobeV2LayerBuildStage, GlobeV2OceanSunDebug } from '@/lib/globe/globe-v2-assets';
@@ -279,6 +287,7 @@ function SyncSunToGlobe({
   obliquityXRad,
   getEarthSceneDate,
   realTimeSun,
+  visualSpinOffsetRadRef,
 }: {
   oceanMat: THREE.ShaderMaterial;
   landMat: THREE.ShaderMaterial | null;
@@ -291,6 +300,8 @@ function SyncSunToGlobe({
   getEarthSceneDate: () => Date;
   /** Reloj de pared para el terminador; actualiza ~cada 60 s (no cada frame). */
   realTimeSun?: boolean;
+  /** Compensa el giro visual extra para que día/noche no se deslice sobre la textura. */
+  visualSpinOffsetRadRef?: RefObject<number>;
 }) {
   const { camera } = useThree();
   const camWorld = useMemo(() => new THREE.Vector3(), []);
@@ -308,6 +319,8 @@ function SyncSunToGlobe({
     }
     const sceneDate = realTimeSun ? sunDateRef.current : getEarthSceneDate();
     const s = computeSunDirection(sceneDate, obliquityXRad, sunScratch);
+    const spinOff = visualSpinOffsetRadRef?.current ?? 0;
+    if (spinOff !== 0) s.applyAxisAngle(_axisY, -spinOff);
     const uSunO = oceanMat.uniforms.uSunDir as { value: THREE.Vector3 };
     uSunO.value.copy(s);
     const uUseOv = oceanMat.uniforms.uUseSunOverride as { value: number } | undefined;
@@ -426,6 +439,7 @@ function EarthGroup({
   embedded,
   editorialFillLight,
   realTimeLighting,
+  visualSpinOffsetRadRef,
 }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
@@ -441,6 +455,7 @@ function EarthGroup({
   embedded?: boolean;
   editorialFillLight?: boolean;
   realTimeLighting?: boolean;
+  visualSpinOffsetRadRef?: RefObject<number>;
 }) {
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
@@ -837,6 +852,7 @@ function EarthGroup({
         obliquityXRad={obliquityXRad}
         getEarthSceneDate={getEarthSceneDate}
         realTimeSun={Boolean(realTimeLighting) && !fullDaySurface}
+        visualSpinOffsetRadRef={visualSpinOffsetRadRef}
       />
     </group>
   );
@@ -895,6 +911,7 @@ function GlobeScene({
   const sceneTimeMsRef = useRef<number | null>(null);
   const lastRealMsRef = useRef<number | null>(null);
   const smoothedSpinRateRef = useRef(1);
+  const visualSpinOffsetRadRef = useRef(0);
   const bitInteractionStoreRef = useRef<GlobeBitInteractionStore>({
     pointerOnCanvas: false,
     magneticHoverId: null,
@@ -913,22 +930,44 @@ function GlobeScene({
   useFrame((_, dt) => {
     const now = Date.now();
 
-    if (realTimeLighting) {
-      if (!pauseEarthSpinForUi) {
-        const g = planetSpinRef.current;
-        if (g && !lockView) {
-          g.rotation.y = earthGreenwichSpinYRadFromUtc(
-            new Date(),
-            GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
-          );
-        }
-      }
-      return;
-    }
-
     if (sceneTimeMsRef.current == null) {
       sceneTimeMsRef.current = now;
       lastRealMsRef.current = now;
+    }
+
+    if (realTimeLighting) {
+      const last = lastRealMsRef.current!;
+      const deltaMs = now - last;
+      lastRealMsRef.current = now;
+
+      if (!pauseEarthSpinForUi && !lockView) {
+        const st = bitInteractionStoreRef.current;
+        let target = AUTO_ROTATE_IDLE_SPEED;
+        if (st.magneticHoverId != null) target = AUTO_ROTATE_HOVER_SPEED;
+        else if (st.pointerOnCanvas) {
+          const u = Math.min(1, st.pointerGlobeCenterDist / AUTO_ROTATE_PROXIMITY_BLEND_DIST);
+          target =
+            AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED +
+            (AUTO_ROTATE_POINTER_SPEED - AUTO_ROTATE_NEAR_GLOBE_CENTER_SPEED) * u;
+        }
+
+        const k = Math.min(1, MAGNETIC_SPIN_RATE_SMOOTH * dt);
+        smoothedSpinRateRef.current += (target - smoothedSpinRateRef.current) * k;
+
+        visualSpinOffsetRadRef.current +=
+          deltaMs *
+          SIDEREAL_RAD_PER_MS *
+          GLOBE_V2_REALTIME_VISUAL_SPIN_SCALE *
+          smoothedSpinRateRef.current;
+
+        const g = planetSpinRef.current;
+        if (g) {
+          g.rotation.y =
+            earthGreenwichSpinYRadFromUtc(new Date(), GLOBE_V2_GMST_TEXTURE_OFFSET_RAD) +
+            visualSpinOffsetRadRef.current;
+        }
+      }
+      return;
     }
     const last = lastRealMsRef.current!;
     const deltaMs = now - last;
@@ -1093,6 +1132,7 @@ function GlobeScene({
               embedded={embedded}
               editorialFillLight={editorialFillLight}
               realTimeLighting={realTimeLighting}
+              visualSpinOffsetRadRef={visualSpinOffsetRadRef}
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (
@@ -1139,7 +1179,7 @@ function GlobeScene({
         enableZoom={!embedded}
         minDistance={embedded ? 2.08 : 2.65}
         maxDistance={embedded ? 6.2 : 8}
-        /* El giro lo marca `planetSpinRef` (corteza + nubes + bits a la vez); evita doble rotación con la cámara. */
+        /* Giro de corteza en `planetSpinRef`; la cámara no auto-rota (evita doble giro). */
         autoRotate={false}
         enableDamping
         dampingFactor={0.09}
