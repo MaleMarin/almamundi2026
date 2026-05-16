@@ -82,6 +82,11 @@ import {
 } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
+import { useUserPosition } from '@/hooks/useUserPosition';
+
+/** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
+const HOME_GLOBE_FALLBACK_LAT = -18;
+const HOME_GLOBE_FALLBACK_LNG = -60;
 
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
@@ -102,6 +107,9 @@ export type HomeMapProps = {
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const router = useRouter();
+  const userPosition = useUserPosition();
+  const globeInitialLat = userPosition?.lat ?? HOME_GLOBE_FALLBACK_LAT;
+  const globeInitialLng = userPosition?.lng ?? HOME_GLOBE_FALLBACK_LNG;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -530,7 +538,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded
-              forceDaylight={true}
+              lightingMode="realtime"
+              editorialFillLight
+              earthVisualTimeScale={1}
+              initialViewLat={globeInitialLat}
+              initialViewLng={globeInitialLng}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}

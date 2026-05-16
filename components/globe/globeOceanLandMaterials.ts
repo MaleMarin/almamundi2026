@@ -48,6 +48,8 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     uOceanMaskLand: { value: 1 },
     /** 1 = sin terminador: todo el disco como hemisferio iluminado (p. ej. `forceDaylight` en GlobeV2). */
     uFullDay: { value: 0 },
+    /** Relleno editorial en hemisferio nocturno (0–1; ~0.22 = 18–30 % base legible). */
+    uNightFill: { value: 0 },
   };
 
   /* Esfera rígida como la tierra: sin micro-olas en vértice (evita que el mar “se deslice” frente a continentes). */
@@ -75,6 +77,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     uniform vec3 uCamPos;
     uniform float uOceanMaskLand;
     uniform float uFullDay;
+    uniform float uNightFill;
 
     varying vec2 vUv;
     varying vec3 vWorldNormal;
@@ -137,10 +140,12 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.08, 0.1, 0.16) + vec3(0.008, 0.014, 0.032);
-      colNight += fresTint * rim * 0.032 * (0.22 + 0.48 * openWater);
+      vec3 colNight = base * vec3(0.1, 0.13, 0.2) + vec3(0.012, 0.018, 0.04);
+      colNight += fresTint * rim * 0.04 * (0.24 + 0.5 * openWater);
+      vec3 colNightFill = base * vec3(0.14, 0.2, 0.34) + vec3(0.02, 0.028, 0.05);
+      colNight = mix(colNight, colNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.42, 0.36, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.52, 0.42, mu);
       vec3 col = mix(colNight, colDay, dayW);
       col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
@@ -186,6 +191,7 @@ export function createLandSphereMaterial(
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
     uCamPos: { value: new THREE.Vector3(0, 0, 5) },
     uFullDay: { value: 0 },
+    uNightFill: { value: 0 },
     ...(allowVertexTextureFetch
       ? {
           uHeightTex: { value: heightTex },
@@ -260,6 +266,7 @@ export function createLandSphereMaterial(
     uniform float uNormalScale;
     uniform vec3 uSunDir;
     uniform float uFullDay;
+    uniform float uNightFill;
 
     varying vec2 vUv;
     varying vec3 vTw;
@@ -315,13 +322,17 @@ export function createLandSphereMaterial(
       float hot = smoothstep(0.5, 0.86, luma);
       litDay *= mix(1.0, 0.78, hot);
 
-      vec3 litNight = d0 * vec3(0.1, 0.12, 0.17) * (0.38 + 0.5 * mountainPop);
-      litNight += vec3(0.02, 0.024, 0.038) * landMask;
+      vec3 litNight = d0 * vec3(0.12, 0.14, 0.19) * (0.42 + 0.52 * mountainPop);
+      litNight += vec3(0.024, 0.03, 0.045) * landMask;
+      vec3 litNightFill = d0 * vec3(0.16, 0.18, 0.24) * (0.5 + 0.38 * mountainPop);
+      litNightFill += vec3(0.03, 0.036, 0.05) * landMask;
+      litNight = mix(litNight, litNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.38, 0.34, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.48, 0.4, mu);
       vec3 lit = mix(litNight, litDay, dayW);
       if (uFullDay < 0.5) {
-        lit = max(lit, d0 * 0.11);
+        float floorLift = 0.11 + uNightFill * 0.14;
+        lit = max(lit, d0 * floorLift);
       }
       lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));
 

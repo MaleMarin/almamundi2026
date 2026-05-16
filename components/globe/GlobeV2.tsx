@@ -8,7 +8,8 @@
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
  *
- * `embedded`: home `#mapa` — `forceDaylight` por defecto salvo `forceDaylight={false}` (terminador UTC + halo tipo referencia órbita). Página completa: /globo-v2 sin `embedded`.
+ * `embedded` + `lightingMode="realtime"`: terminador UTC real (`earthVisualTimeScale={1}`) y relleno editorial nocturno.
+ * `lightingMode="forced-day"` o `forceDaylight={true}`: disco siempre legible (sin terminador). Página completa: /globo-v2 sin `embedded`.
  */
 
 import type { RefObject } from 'react';
@@ -53,6 +54,7 @@ import {
   type GlobeV2OceanSunDebug,
   type GlobeV2TextureUrls,
 } from '@/lib/globe/globe-v2-assets';
+import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
 import {
   approximateCoordinatesForIANATimeZone,
   earthGreenwichSpinYRadFromUtc,
@@ -125,6 +127,11 @@ const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];
 const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.06, -0.07, 0];
+
+/** Relleno mínimo en hemisferio nocturno (shaders `uNightFill`; ~18–30 % legible). */
+const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.22;
+
+const GLOBE_V2_REALTIME_SUN_TICK_MS = 60_000;
 
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
@@ -205,6 +212,31 @@ function CameraPresetRig({
   return null;
 }
 
+/** Encuadre inicial hacia lat/lng (home: usuario o fallback América Latina). */
+function InitialViewRig({
+  lat,
+  lng,
+  distance,
+  orbitTarget,
+}: {
+  lat: number;
+  lng: number;
+  distance: number;
+  orbitTarget: [number, number, number];
+}) {
+  const { camera, controls } = useThree();
+  useEffect(() => {
+    if (!controls) return;
+    const p = latLngToCartesianThetaLon(lat, lng, 1);
+    const pos = new THREE.Vector3(p.x, p.y, p.z).normalize().multiplyScalar(distance);
+    camera.position.copy(pos);
+    const c = controls as unknown as OrbitControlsImpl;
+    c.target.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
+    c.update();
+  }, [camera, controls, lat, lng, distance, orbitTarget]);
+  return null;
+}
+
 /** Más segmentos = relieve del mapa normal más suave (sigue razonable en home). */
 /** Más segmentos = displacement + normales más suaves (coste GPU mayor). */
 const EARTH_SEGMENTS = 240;
@@ -246,6 +278,7 @@ function SyncSunToGlobe({
   oceanSunDebug,
   obliquityXRad,
   getEarthSceneDate,
+  realTimeSun,
 }: {
   oceanMat: THREE.ShaderMaterial;
   landMat: THREE.ShaderMaterial | null;
@@ -256,13 +289,25 @@ function SyncSunToGlobe({
   oceanSunDebug: GlobeV2OceanSunDebug;
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
+  /** Reloj de pared para el terminador; actualiza ~cada 60 s (no cada frame). */
+  realTimeSun?: boolean;
 }) {
   const { camera } = useThree();
   const camWorld = useMemo(() => new THREE.Vector3(), []);
   const sunScratch = useMemo(() => new THREE.Vector3(), []);
+  const sunDateRef = useRef(new Date());
+  const lastSunTickMsRef = useRef(0);
 
   useFrame(() => {
-    const s = computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
+    const nowMs = Date.now();
+    if (realTimeSun) {
+      if (lastSunTickMsRef.current === 0 || nowMs - lastSunTickMsRef.current >= GLOBE_V2_REALTIME_SUN_TICK_MS) {
+        sunDateRef.current = new Date();
+        lastSunTickMsRef.current = nowMs;
+      }
+    }
+    const sceneDate = realTimeSun ? sunDateRef.current : getEarthSceneDate();
+    const s = computeSunDirection(sceneDate, obliquityXRad, sunScratch);
     const uSunO = oceanMat.uniforms.uSunDir as { value: THREE.Vector3 };
     uSunO.value.copy(s);
     const uUseOv = oceanMat.uniforms.uUseSunOverride as { value: number } | undefined;
@@ -379,6 +424,8 @@ function EarthGroup({
   obliquityXRad,
   getEarthSceneDate,
   embedded,
+  editorialFillLight,
+  realTimeLighting,
 }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
@@ -392,6 +439,8 @@ function EarthGroup({
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
   embedded?: boolean;
+  editorialFillLight?: boolean;
+  realTimeLighting?: boolean;
 }) {
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
@@ -613,6 +662,11 @@ function EarthGroup({
     if (u) u.value = fullDaySurface ? 1 : 0;
   }, [oceanMat, fullDaySurface]);
 
+  useLayoutEffect(() => {
+    const u = oceanMat.uniforms.uNightFill as { value: number } | undefined;
+    if (u) u.value = editorialFillLight && !fullDaySurface ? GLOBE_V2_EDITORIAL_NIGHT_FILL : 0;
+  }, [oceanMat, editorialFillLight, fullDaySurface]);
+
   const landMat = useMemo(() => {
     if (!showLand) return null;
     return createLandSphereMaterial(
@@ -672,6 +726,12 @@ function EarthGroup({
     const u = landMat.uniforms.uFullDay as { value: number } | undefined;
     if (u) u.value = fullDaySurface ? 1 : 0;
   }, [landMat, fullDaySurface]);
+
+  useLayoutEffect(() => {
+    if (!landMat) return;
+    const u = landMat.uniforms.uNightFill as { value: number } | undefined;
+    if (u) u.value = editorialFillLight && !fullDaySurface ? GLOBE_V2_EDITORIAL_NIGHT_FILL : 0;
+  }, [landMat, editorialFillLight, fullDaySurface]);
 
   useLayoutEffect(() => {
     if (!cityLightsMat) return;
@@ -776,6 +836,7 @@ function EarthGroup({
         oceanSunDebug={oceanSunDebug}
         obliquityXRad={obliquityXRad}
         getEarthSceneDate={getEarthSceneDate}
+        realTimeSun={Boolean(realTimeLighting) && !fullDaySurface}
       />
     </group>
   );
@@ -798,6 +859,10 @@ function GlobeScene({
   showMoon,
   earthVisualTimeScale,
   pauseEarthSpinForUi,
+  realTimeLighting,
+  editorialFillLight,
+  initialViewLat,
+  initialViewLng,
 }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
@@ -816,6 +881,10 @@ function GlobeScene({
   earthVisualTimeScale: number;
   /** Drawer / panel que debe congelar el reloj terrestre (p. ej. bits abiertos en home). */
   pauseEarthSpinForUi: boolean;
+  realTimeLighting: boolean;
+  editorialFillLight: boolean;
+  initialViewLat?: number;
+  initialViewLng?: number;
 }) {
   const geoScale = embedded ? GLOBE_V2_EMBEDDED_GEO_SCALE : 1;
   const camDist = embedded ? 3.62 : 3.14;
@@ -843,6 +912,20 @@ function GlobeScene({
    */
   useFrame((_, dt) => {
     const now = Date.now();
+
+    if (realTimeLighting) {
+      if (!pauseEarthSpinForUi) {
+        const g = planetSpinRef.current;
+        if (g && !lockView) {
+          g.rotation.y = earthGreenwichSpinYRadFromUtc(
+            new Date(),
+            GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
+          );
+        }
+      }
+      return;
+    }
+
     if (sceneTimeMsRef.current == null) {
       sceneTimeMsRef.current = now;
       lastRealMsRef.current = now;
@@ -889,13 +972,19 @@ function GlobeScene({
     ? viewerNight
       ? forceDaylight
         ? 1.72
-        : 1.9
+        : editorialFillLight
+          ? 2.02
+          : 1.9
       : forceDaylight
         ? 3.42
-        : 2.16
+        : editorialFillLight
+          ? 2.24
+          : 2.16
     : viewerNight
       ? 1.65
       : 1.95;
+
+  const embeddedFill = embedded && editorialFillLight && !forceDaylight;
 
   return (
     <>
@@ -925,10 +1014,14 @@ function GlobeScene({
           '#1a1f28',
           embedded
             ? viewerNight
-              ? 0.44
+              ? embeddedFill
+                ? 0.5
+                : 0.44
               : forceDaylight
                 ? 1.18
-                : 0.48
+                : embeddedFill
+                  ? 0.56
+                  : 0.48
             : viewerNight
               ? 0.38
               : 0.44,
@@ -936,7 +1029,19 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.56 : 0.18) : viewerNight ? 0.09 : 0.16
+          embedded
+            ? viewerNight
+              ? embeddedFill
+                ? 0.14
+                : 0.11
+              : forceDaylight
+                ? 0.56
+                : embeddedFill
+                  ? 0.24
+                  : 0.18
+            : viewerNight
+              ? 0.09
+              : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
@@ -947,10 +1052,14 @@ function GlobeScene({
             ? viewerNight
               ? forceDaylight
                 ? 3.65
-                : 3.95
+                : embeddedFill
+                  ? 4.15
+                  : 3.95
               : forceDaylight
                 ? 8.35
-                : 4.95
+                : embeddedFill
+                  ? 5.35
+                  : 4.95
             : viewerNight
               ? 3.35
               : 4.2
@@ -982,6 +1091,8 @@ function GlobeScene({
               obliquityXRad={GLOBE_V2_EARTH_OBLIQUITY_RAD}
               getEarthSceneDate={getEarthSceneDate}
               embedded={embedded}
+              editorialFillLight={editorialFillLight}
+              realTimeLighting={realTimeLighting}
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (
@@ -1039,6 +1150,17 @@ function GlobeScene({
       {lockView && fixedCameraPreset ? (
         <CameraPresetRig preset={fixedCameraPreset} distance={camDist} />
       ) : null}
+      {!lockView &&
+      embedded &&
+      typeof initialViewLat === 'number' &&
+      typeof initialViewLng === 'number' ? (
+        <InitialViewRig
+          lat={initialViewLat}
+          lng={initialViewLng}
+          distance={camDist}
+          orbitTarget={GLOBE_V2_EMBEDDED_ORBIT_TARGET}
+        />
+      ) : null}
     </>
   );
 }
@@ -1067,11 +1189,20 @@ export type GlobeV2Props = {
    */
   displacementScale?: number;
   /**
+   * `realtime` = terminador UTC con reloj de pared (`earthVisualTimeScale` 1).
+   * `forced-day` = disco siempre iluminado (sin terminador).
+   */
+  lightingMode?: 'realtime' | 'forced-day';
+  /** Relleno suave en hemisferio nocturno (legible tipo NASA editorial). */
+  editorialFillLight?: boolean;
+  /**
    * true = disco siempre como de día (sin terminador ni luces urbanas nocturnas).
-   * false = siempre terminador UTC (útil en `embedded` para volver al ciclo día/noche real).
-   * Omitido + `embedded`: se asume día (home `#mapa` legible y luminoso).
+   * Ignorado si `lightingMode="realtime"`. Preferir `lightingMode` en home.
    */
   forceDaylight?: boolean;
+  /** Encuadre inicial de la cámara (grados). Home: ubicación del visitante o fallback LATAM. */
+  initialViewLat?: number;
+  initialViewLng?: number;
   /**
    * Construcción por capas (QA): `ocean` → … → `full`. Marcadores y luces nocturnas solo con `full`.
    */
@@ -1104,18 +1235,23 @@ export default function GlobeV2({
   onBitClick,
   fixedCameraPreset = null,
   displacementScale = GLOBE_V2_DISPLACEMENT_SCALE_DEFAULT,
+  lightingMode,
+  editorialFillLight = false,
   forceDaylight,
   layerBuildStage = 'full',
   oceanSunDebug = 'utc',
   showMoon = true,
-  earthVisualTimeScale = GLOBE_V2_EARTH_VISUAL_TIME_SCALE,
+  earthVisualTimeScale,
   pauseEarthSpinForUi = false,
+  initialViewLat,
+  initialViewLng,
 }: GlobeV2Props) {
-  /**
-   * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
-   * En `embedded` (home `#mapa`), por defecto activo salvo `forceDaylight={false}` explícito.
-   */
-  const forceDaylightOn = forceDaylight === true || (embedded && forceDaylight !== false);
+  const realTimeLighting = lightingMode === 'realtime';
+  const forceDaylightOn = forceDaylight === true || lightingMode === 'forced-day';
+
+  const resolvedEarthVisualTimeScale = realTimeLighting
+    ? 1
+    : (earthVisualTimeScale ?? GLOBE_V2_EARTH_VISUAL_TIME_SCALE);
 
   const urls: GlobeV2TextureUrls = {
     day: textureUrls?.day ?? GLOBE_V2_DEFAULT_TEXTURES.day,
@@ -1181,14 +1317,16 @@ export default function GlobeV2({
         className="relative z-0 h-full w-full"
         dpr={[1, dprMax]}
         onCreated={({ gl }) => {
-          gl.setClearColor('#000000', 1);
+          gl.setClearColor(embeddedCinematicChrome ? 0x050a14 : 0x000000, 1);
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedDayChrome
             ? 3.05
             : embeddedCinematicChrome
-              ? 2.14
+              ? editorialFillLight
+                ? 2.22
+                : 2.14
               : embedded
                 ? 2.02
                 : 1.92;
@@ -1210,8 +1348,12 @@ export default function GlobeV2({
             oceanSunDebug={oceanSunDebug}
             forceDaylight={forceDaylightOn}
             showMoon={showMoon}
-            earthVisualTimeScale={earthVisualTimeScale}
+            earthVisualTimeScale={resolvedEarthVisualTimeScale}
             pauseEarthSpinForUi={pauseEarthSpinForUi}
+            realTimeLighting={realTimeLighting}
+            editorialFillLight={editorialFillLight}
+            initialViewLat={initialViewLat}
+            initialViewLng={initialViewLng}
           />
         </Suspense>
       </Canvas>
