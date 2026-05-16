@@ -110,27 +110,29 @@ function PullQuote({ text }: { text: string }) {
 
 function StoryGrid({ items }: { items: string[] }) {
   return (
-    <ul className="my-5 grid gap-3 sm:grid-cols-2" role="list">
-      {items.map((story, i) => (
-        <li
-          key={i}
-          className="rounded-2xl px-4 py-3.5 text-sm leading-snug md:text-[0.9375rem] md:leading-relaxed"
-          style={{
-            ...soft.card,
-            color: soft.textBody,
-            fontFamily: SITE_FONT_STACK,
-          }}
-        >
-          <span
-            className="mb-2 block text-[10px] font-semibold uppercase tracking-[0.14em]"
-            style={{ color: soft.orange }}
+    <div className="my-5">
+      <p
+        className="mb-3 text-xs font-semibold uppercase tracking-[0.12em]"
+        style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
+      >
+        Ejemplos de historias que importan
+      </p>
+      <ul className="grid gap-3 sm:grid-cols-2" role="list">
+        {items.map((story, i) => (
+          <li
+            key={i}
+            className="rounded-2xl px-4 py-3.5 text-sm leading-snug md:text-[0.9375rem] md:leading-relaxed"
+            style={{
+              ...soft.card,
+              color: soft.textBody,
+              fontFamily: SITE_FONT_STACK,
+            }}
           >
-            Historia real
-          </span>
-          {story}
-        </li>
-      ))}
-    </ul>
+            {story}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -368,7 +370,7 @@ export function PropositoModal({
 
         {/* Cuerpo con scroll */}
         <div
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 md:px-10 md:py-10"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 pb-10 md:px-10 md:py-10 md:pb-12"
           style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,74,28,0.35) transparent' }}
         >
           {MANIFIESTO_SECTIONS.map((section, index) => (
@@ -376,25 +378,6 @@ export function PropositoModal({
           ))}
         </div>
 
-        <div
-          className="shrink-0 border-t border-white/35 px-6 py-4 md:px-10"
-          style={{ background: '#E0E5EC' }}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-almamundi w-full rounded-full py-3.5 text-sm font-semibold transition active:scale-[0.99] sm:w-auto sm:px-10"
-            style={{
-              background: `linear-gradient(180deg, rgba(255, 88, 28, 0.9) 0%, ${soft.orange} 100%)`,
-              color: '#fff',
-              border: '1px solid rgba(255, 160, 100, 0.6)',
-              boxShadow: '0 6px 20px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
-              fontFamily: SITE_FONT_STACK,
-            }}
-          >
-            Cerrar
-          </button>
-        </div>
       </div>
     </div>,
     document.body
