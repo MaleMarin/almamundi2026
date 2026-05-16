@@ -1,5 +1,7 @@
 'use client';
 
+import '@/lib/dev-performance-measure-guard';
+
 /**
  * Mapa en home (dock + drawer + historias/noticias/sonidos).
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
