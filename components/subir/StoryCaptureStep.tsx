@@ -11,10 +11,19 @@ import {
 } from '@/lib/media-duration-rules';
 import {
   SUBIR_AV_MAX_MINUTES,
+  SUBIR_AUDIO_UPLOAD_MAX_MB,
+  SUBIR_PHOTO_FILE_MAX_MB,
   SUBIR_PHOTO_MAX,
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
+  SUBIR_VIDEO_UPLOAD_MAX_MB,
 } from '@/lib/subir-limits';
+import {
+  UPLOAD_DURATION_ERROR,
+  UPLOAD_MODAL_COPY,
+  SUBIR_TEXT_COUNTER_WARN_CHARS,
+} from '@/lib/subir-upload-modal-copy';
+import amStyles from '@/components/subir/am-upload-modal.module.css';
 import type { SubirHuellaFormat as SubirFormat } from '@/hooks/useSubirHuella';
 import { VoiceWaveform, type VoiceWaveformMode } from './VoiceWaveform';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
@@ -84,10 +93,9 @@ function buildSubmissionNarrativeText(
   return text.slice(0, 2000);
 }
 
-const PHOTO_MAX_MB = 5;
-const AUDIO_MAX_MB = 10;
-/** Subida de video desde equipo (cliente). */
-const VIDEO_UPLOAD_MAX_MB = 100;
+const PHOTO_MAX_MB = SUBIR_PHOTO_FILE_MAX_MB;
+const AUDIO_MAX_MB = SUBIR_AUDIO_UPLOAD_MAX_MB;
+const VIDEO_UPLOAD_MAX_MB = SUBIR_VIDEO_UPLOAD_MAX_MB;
 const NARRATIVE_MIN = 30;
 const FOTO_CAPTION_MIN = 15;
 const TEXT_DRAFT_KEY = 'almamundi-subir-texto-draft';
@@ -655,23 +663,9 @@ export function StoryCaptureStep({
         ? 'Paso 2 · Datos de la historia'
         : 'Paso 3 · Datos de la persona';
 
-  const formatWelcomeTitle =
-    format === 'video'
-      ? 'Cuenta tu historia en video'
-      : format === 'audio'
-        ? 'Cuenta tu historia con tu voz'
-        : format === 'texto'
-          ? 'Escribe tu historia'
-          : 'Cuenta una historia con una foto';
-
-  const formatWelcomeBody =
-    format === 'video'
-      ? `Puedes grabarla ahora o subir un video desde tu equipo. No tiene que ser perfecto: basta con que muestre algo de tu historia. Hasta ${SUBIR_AV_MAX_MINUTES} minutos.`
-      : format === 'audio'
-        ? `Puedes grabarla ahora o subir un audio desde tu equipo. No tiene que quedar perfecta: basta con que suene a ti. Hasta ${SUBIR_AV_MAX_MINUTES} minutos.`
-        : format === 'texto'
-          ? 'Puedes empezar con unas líneas. No tiene que estar perfecta: puedes contar una escena, una carta, una despedida o algo que todavía vuelve.'
-          : 'Sube una imagen y cuéntanos qué guarda: quién aparece, dónde fue, qué momento recuerda o por qué importa.';
+  const modalCopy = UPLOAD_MODAL_COPY[format];
+  const formatWelcomeTitle = modalCopy.title.replace(/\n/g, ' ');
+  const formatWelcomeBody = [modalCopy.subtitle, modalCopy.limit].filter(Boolean).join(' ');
 
   return (
     <section className="space-y-8 md:space-y-10" aria-label="Captura de tu historia" aria-current="step">
@@ -1342,7 +1336,7 @@ export function StoryCaptureStep({
                   }
                   void probeVideoFileDurationSeconds(f).then((sec) => {
                     if (sec != null && !isDurationWithinMax(sec)) {
-                      setLocalErr(`El video supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+                      setLocalErr(UPLOAD_DURATION_ERROR.video);
                       setVideoFile(null);
                       return;
                     }
@@ -1583,7 +1577,7 @@ export function StoryCaptureStep({
                       }
                       void probeAudioFileDurationSeconds(f).then((sec) => {
                         if (sec != null && !isDurationWithinMax(sec)) {
-                          setLocalErr(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+                          setLocalErr(UPLOAD_DURATION_ERROR.audio);
                           setAudioFile(null);
                           return;
                         }
