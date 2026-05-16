@@ -48,6 +48,8 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     uOceanMaskLand: { value: 1 },
     /** 1 = sin terminador: todo el disco como hemisferio iluminado (p. ej. `forceDaylight` en GlobeV2). */
     uFullDay: { value: 0 },
+    /** Relleno editorial en hemisferio nocturno (0–1; ~0.22 = 18–30 % base legible). */
+    uNightFill: { value: 0 },
   };
 
   /* Esfera rígida como la tierra: sin micro-olas en vértice (evita que el mar “se deslice” frente a continentes). */
@@ -75,6 +77,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     uniform vec3 uCamPos;
     uniform float uOceanMaskLand;
     uniform float uFullDay;
+    uniform float uNightFill;
 
     varying vec2 vUv;
     varying vec3 vWorldNormal;
@@ -107,13 +110,13 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       float mu = dot(N, L);
       float ndlRaw = max(mu, 0.0);
       /* Con uFullDay: disco legible sin empujar el centro a blanco puro (menos “continentes quemados”). */
-      float ndl = uFullDay > 0.5 ? clamp(0.5 + 0.5 * ndlRaw, 0.58, 0.9) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.68 + 0.32 * ndlRaw, 0.78, 1.0) : ndlRaw;
       float ndv = clamp(dot(N, V), 0.0, 1.0);
       float openWater = smoothstep(0.36, 0.92, specSample);
 
-      /* Océano #0a2a6e dominante (referencia ISS) */
-      vec3 deep = vec3(0.039, 0.165, 0.431);
-      vec3 mid = vec3(0.06, 0.22, 0.48);
+      /* Océano azul profundo pero legible (NASA Earth Observatory / día) */
+      vec3 deep = mix(vec3(0.039, 0.165, 0.431), vec3(0.05, 0.22, 0.52), uFullDay);
+      vec3 mid = mix(vec3(0.06, 0.22, 0.48), vec3(0.1, 0.32, 0.58), uFullDay);
       float bathy = 0.5 + 0.5 * sin(vUv.x * 18.0 + vUv.y * 11.0);
       bathy = bathy * 0.06 + 0.94;
       vec3 base = mix(deep, mid, bathy * 0.12 + 0.1);
@@ -123,9 +126,9 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 fresTint = vec3(0.28, 0.42, 0.55);
       float fresAmt = rim * 0.055;
 
-      /* Difuso contenido: océano profundo y limpio (estilo imágenes NASA procesadas con suavidad). */
-      float diff = 0.36 + 0.44 * pow(ndl, 1.12);
-      vec3 colDay = base * diff * 0.98;
+      /* Difuso: más lift en modo día completo para evitar océanos casi negros. */
+      float diff = mix(0.36 + 0.44 * pow(ndl, 1.12), 0.48 + 0.52 * pow(ndl, 1.05), uFullDay);
+      vec3 colDay = base * diff * mix(0.98, 1.08, uFullDay);
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
       vec3 H = normalize(L + V);
@@ -137,10 +140,12 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.08, 0.1, 0.16) + vec3(0.008, 0.014, 0.032);
-      colNight += fresTint * rim * 0.032 * (0.22 + 0.48 * openWater);
+      vec3 colNight = base * vec3(0.1, 0.13, 0.2) + vec3(0.012, 0.018, 0.04);
+      colNight += fresTint * rim * 0.04 * (0.24 + 0.5 * openWater);
+      vec3 colNightFill = base * vec3(0.14, 0.2, 0.34) + vec3(0.02, 0.028, 0.05);
+      colNight = mix(colNight, colNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.42, 0.36, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.52, 0.42, mu);
       vec3 col = mix(colNight, colDay, dayW);
       col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
@@ -186,6 +191,7 @@ export function createLandSphereMaterial(
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
     uCamPos: { value: new THREE.Vector3(0, 0, 5) },
     uFullDay: { value: 0 },
+    uNightFill: { value: 0 },
     ...(allowVertexTextureFetch
       ? {
           uHeightTex: { value: heightTex },
@@ -260,6 +266,7 @@ export function createLandSphereMaterial(
     uniform float uNormalScale;
     uniform vec3 uSunDir;
     uniform float uFullDay;
+    uniform float uNightFill;
 
     varying vec2 vUv;
     varying vec3 vTw;
@@ -299,7 +306,7 @@ export function createLandSphereMaterial(
       vec3 n = normalize(mTbn * normalize(tmap));
       vec3 s = normalize(uSunDir);
       float ndlRaw = max(dot(n, s), 0.0);
-      float ndl = uFullDay > 0.5 ? clamp(0.42 + 0.58 * ndlRaw, 0.52, 0.82) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.64 + 0.36 * ndlRaw, 0.74, 0.98) : ndlRaw;
 
       vec3 geomN = normalize(vNw);
       float mu = dot(geomN, s);
@@ -307,21 +314,25 @@ export function createLandSphereMaterial(
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = 0.2;
-      float dif = 0.68 * pow(ndl, 0.94);
-      vec3 litDay = d0 * (amb + dif) * mountainPop;
+      float amb = mix(0.2, 0.28, uFullDay);
+      float dif = mix(0.68, 0.78, uFullDay) * pow(ndl, 0.94);
+      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.06, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);
       litDay *= mix(1.0, 0.78, hot);
 
-      vec3 litNight = d0 * vec3(0.1, 0.12, 0.17) * (0.38 + 0.5 * mountainPop);
-      litNight += vec3(0.02, 0.024, 0.038) * landMask;
+      vec3 litNight = d0 * vec3(0.12, 0.14, 0.19) * (0.42 + 0.52 * mountainPop);
+      litNight += vec3(0.024, 0.03, 0.045) * landMask;
+      vec3 litNightFill = d0 * vec3(0.16, 0.18, 0.24) * (0.5 + 0.38 * mountainPop);
+      litNightFill += vec3(0.03, 0.036, 0.05) * landMask;
+      litNight = mix(litNight, litNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.38, 0.34, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.48, 0.4, mu);
       vec3 lit = mix(litNight, litDay, dayW);
       if (uFullDay < 0.5) {
-        lit = max(lit, d0 * 0.11);
+        float floorLift = 0.11 + uNightFill * 0.14;
+        lit = max(lit, d0 * floorLift);
       }
       lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));
 

@@ -1,5 +1,7 @@
 'use client';
 
+import '@/lib/dev-performance-measure-guard';
+
 /**
  * Mapa en home (dock + drawer + historias/noticias/sonidos).
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
@@ -20,8 +22,11 @@ import { useRouter } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
-import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
-import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
+import {
+  getNewsTopicApiQuery,
+  NEWS_TOPIC_GROUPS,
+} from '@/lib/news-topics';
+import { filterRealNewsItems } from '@/components/NewsLayer';
 import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
@@ -79,6 +84,11 @@ import {
 } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
+import { useUserPosition } from '@/hooks/useUserPosition';
+
+/** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
+const HOME_GLOBE_FALLBACK_LAT = -18;
+const HOME_GLOBE_FALLBACK_LNG = -60;
 
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
@@ -99,6 +109,9 @@ export type HomeMapProps = {
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const router = useRouter();
+  const userPosition = useUserPosition();
+  const globeInitialLat = userPosition?.lat ?? HOME_GLOBE_FALLBACK_LAT;
+  const globeInitialLng = userPosition?.lng ?? HOME_GLOBE_FALLBACK_LNG;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -312,35 +325,26 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const isMobile = useViewportBelow(MAP_LAYOUT_MOBILE_MAX_WIDTH_PX);
 
-  const topicQuery =
-    selectedTopicId == null
-      ? DEFAULT_NEWS_TOPIC_QUERY
-      : (NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.query ?? DEFAULT_NEWS_TOPIC_QUERY);
+  const topicQuery = getNewsTopicApiQuery(selectedTopicId);
 
   const fetchNews = useCallback(
-    async (topic: string, signal: AbortSignal): Promise<{ items: NewsItem[]; isFallback?: boolean }> => {
-      const { tz, day } = getUserCalendarDayForNewsApi();
-      const q = new URLSearchParams({
-        kind: 'news',
-        topic,
-        limit: '20',
-        lang: 'es',
-        tz,
-        day,
-      });
-      const url = `/api/world?${q.toString()}`;
-      try {
-        const res = await fetch(url, { signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { items?: unknown[]; isFallback?: boolean };
-        const rawItems = Array.isArray(data.items) ? data.items : [];
-        const topicLabel = selectedTopicId != null ? NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.label ?? null : null;
-        const items: NewsItem[] = rawItems.map((it: unknown) => {
+    async (topic: string, signal: AbortSignal) => {
+      const topicLabel =
+        selectedTopicId != null
+          ? (NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.label ?? null)
+          : null;
+
+      const mapApiItems = (rawItems: unknown[]): NewsItem[] =>
+        rawItems.map((it: unknown) => {
           const i = it as Record<string, unknown>;
           const geo = (() => {
             const g = i.geo as { lat?: number; lng?: number; label?: string } | null | undefined;
-            if (g && typeof g.lat === 'number' && typeof g.lng === 'number') return { lat: g.lat, lng: g.lng, label: g.label };
-            if (typeof i.lat === 'number' && typeof i.lng === 'number') return { lat: i.lat, lng: i.lng };
+            if (g && typeof g.lat === 'number' && typeof g.lng === 'number') {
+              return { lat: g.lat, lng: g.lng, label: g.label };
+            }
+            if (typeof i.lat === 'number' && typeof i.lng === 'number') {
+              return { lat: i.lat, lng: i.lng };
+            }
             return null;
           })();
           return {
@@ -360,20 +364,77 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             topic: typeof i.topic === 'string' ? i.topic : topicLabel ?? 'Actualidad',
           } as NewsItem;
         });
-        return { items, isFallback: Boolean(data.isFallback) };
-      } catch (err) {
-        /* No resolver con []: useNewsLayer ignoraría el abort y podía dejar lista vacía por carrera. */
-        if (err instanceof Error && err.name === 'AbortError') throw err;
-        throw err;
+
+      const apiTopic = topic.length > 80 ? topic.slice(0, 80) : topic;
+      const q = new URLSearchParams({
+        kind: 'news',
+        topic: apiTopic,
+        limit: '20',
+        lang: 'es',
+      });
+      if (selectedTopicId != null) {
+        q.set('topicId', selectedTopicId);
       }
+
+      const res = await fetch(`/api/world?${q.toString()}`, { signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = (await res.json()) as {
+        items?: unknown[];
+        generalItems?: unknown[];
+        isFallback?: boolean;
+        relaxedTopic?: boolean;
+        topicMatched?: boolean;
+      };
+
+      const topicItems = filterRealNewsItems(
+        mapApiItems(Array.isArray(data.items) ? data.items : [])
+      );
+      const generalItems = filterRealNewsItems(
+        mapApiItems(Array.isArray(data.generalItems) ? data.generalItems : [])
+      );
+
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[news] topic', selectedTopicId, apiTopic, {
+          topic: topicItems.length,
+          general: generalItems.length,
+          relaxedTopic: data.relaxedTopic,
+        });
+      }
+
+      return {
+        topicItems,
+        generalItems,
+        topicMatched: Boolean(data.topicMatched) && topicItems.length > 0,
+        relaxedTopic: Boolean(data.relaxedTopic) && generalItems.length > 0,
+        isFallback: Boolean(data.isFallback) && topicItems.length === 0 && generalItems.length === 0,
+      };
     },
     [selectedTopicId]
   );
 
-  const { effectiveNewsItems } = useNewsLayer(selectedTopicId, topicQuery, 'actualidad', fetchNews, {
-    refreshIntervalMs: 120_000,
-  });
-  const filteredNewsItems = effectiveNewsItems;
+  const {
+    topicItems: topicNewsItems,
+    generalItems: generalNewsItems,
+    loading: newsLoading,
+    error: newsError,
+    topicMatched,
+    relaxedTopic,
+    loadingTimedOut,
+    isRefreshing,
+  } = useNewsLayer(
+    selectedTopicId,
+    topicQuery,
+    'actualidad',
+    fetchNews,
+    {
+      refreshIntervalMs: 120_000,
+    }
+  );
+  const filteredNewsItems = useMemo(
+    () => [...topicNewsItems, ...generalNewsItems],
+    [topicNewsItems, generalNewsItems]
+  );
 
   const handleStoryFocus = useCallback((story: StoryPoint) => {
     setHighlightedStoryId(story.id ?? null);
@@ -435,7 +496,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   };
 
   const noticiasProps = {
+    topicNews: topicNewsItems,
+    generalNews: generalNewsItems,
     news: filteredNewsItems,
+    loading: newsLoading,
+    isRefreshing,
+    loadingTimedOut,
+    topicMatched,
+    relaxedTopic,
+    error: newsError,
     selectedTopicId,
     onTopicIdChange: setSelectedTopicId,
     onNewsFocus: (n: NewsItem) => setSelectedNews(n),
@@ -467,11 +536,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-black pt-8 pb-2 md:pt-10 lg:pt-12">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-[#050a14] pt-8 pb-2 md:pt-10 lg:pt-12">
           <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded
-              forceDaylight={false}
+              lightingMode="realtime"
+              editorialFillLight
+              earthVisualTimeScale={1}
+              initialViewLat={globeInitialLat}
+              initialViewLng={globeInitialLng}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}
