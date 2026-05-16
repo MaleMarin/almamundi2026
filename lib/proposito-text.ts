@@ -103,7 +103,6 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
         lines: [
           'Cuéntalo como puedas.',
           'Cuéntalo como quieras.',
-          'En video desde tu celular. En audio caminando. En texto escrito de noche. En una foto con dos líneas al pie.',
           'El formato es tuyo. La historia también.',
           'AlmaMundi solo es el lugar donde va a existir.',
         ],
