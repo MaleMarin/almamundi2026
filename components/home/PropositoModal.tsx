@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import {
   MANIFIESTO_SECTIONS,
@@ -48,6 +48,39 @@ const soft = {
     ].join(', '),
   },
 } as const;
+
+const DEFAULT_SECTION_ID = MANIFIESTO_SECTIONS[0]?.id ?? 'por-que';
+
+function sectionChipStyle(active: boolean) {
+  if (active) {
+    return {
+      padding: '7px 12px',
+      borderRadius: 999,
+      cursor: 'pointer' as const,
+      fontSize: '0.65rem',
+      fontWeight: 600,
+      textTransform: 'uppercase' as const,
+      letterSpacing: '0.06em',
+      fontFamily: SITE_FONT_STACK,
+      color: '#fff8f2',
+      background: `linear-gradient(180deg, rgba(255, 88, 28, 0.85) 0%, ${soft.orange} 100%)`,
+      border: '1px solid rgba(255, 150, 90, 0.75)',
+      boxShadow: '0 2px 10px rgba(255, 74, 28, 0.22)',
+    };
+  }
+  return {
+    ...soft.card,
+    padding: '7px 12px',
+    borderRadius: 999,
+    cursor: 'pointer' as const,
+    fontSize: '0.65rem',
+    fontWeight: 500,
+    textTransform: 'uppercase' as const,
+    letterSpacing: '0.06em',
+    fontFamily: SITE_FONT_STACK,
+    color: soft.textBody,
+  };
+}
 
 function SectionHeader({ title, index }: { title: string; index: number }) {
   return (
@@ -105,34 +138,6 @@ function PullQuote({ text }: { text: string }) {
         {text}
       </p>
     </blockquote>
-  );
-}
-
-function StoryGrid({ items }: { items: string[] }) {
-  return (
-    <div className="my-5">
-      <p
-        className="mb-3 text-xs font-semibold uppercase tracking-[0.12em]"
-        style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
-      >
-        Ejemplos de historias que importan
-      </p>
-      <ul className="grid gap-3 sm:grid-cols-2" role="list">
-        {items.map((story, i) => (
-          <li
-            key={i}
-            className="rounded-2xl px-4 py-3.5 text-sm leading-snug md:text-[0.9375rem] md:leading-relaxed"
-            style={{
-              ...soft.card,
-              color: soft.textBody,
-              fontFamily: SITE_FONT_STACK,
-            }}
-          >
-            {story}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
 
@@ -222,8 +227,6 @@ function renderBlock(block: ManifiestoBlock, key: string) {
       );
     case 'quote':
       return <PullQuote key={key} text={block.text} />;
-    case 'stories':
-      return <StoryGrid key={key} items={block.items} />;
     case 'beliefs':
       return <BeliefsList key={key} items={block.items} />;
     case 'emphasis':
@@ -247,13 +250,16 @@ function ManifiestoSectionView({ section, index }: { section: ManifiestoSection;
   const isClosing = section.id === 'cierre';
   return (
     <section
-      id={`manifiesto-${section.id}`}
-      className={isClosing ? 'pt-2' : 'border-t border-white/40 pt-10 first:border-t-0 first:pt-0'}
+      key={section.id}
       aria-labelledby={`manifiesto-heading-${section.id}`}
+      className="min-h-0"
     >
       {!isClosing ? <SectionHeader title={section.title} index={index} /> : null}
       {isClosing ? (
-        <h3 id={`manifiesto-heading-${section.id}`} className="sr-only">
+        <h3
+          id={`manifiesto-heading-${section.id}`}
+          className="sr-only"
+        >
           {section.title}
         </h3>
       ) : (
@@ -273,6 +279,13 @@ export function PropositoModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const [activeSectionId, setActiveSectionId] = useState(DEFAULT_SECTION_ID);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setActiveSectionId(DEFAULT_SECTION_ID);
+  }, [isOpen]);
+
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -293,6 +306,10 @@ export function PropositoModal({
 
   if (!isOpen || typeof document === 'undefined') return null;
 
+  const activeIndex = MANIFIESTO_SECTIONS.findIndex((s) => s.id === activeSectionId);
+  const activeSection =
+    MANIFIESTO_SECTIONS[activeIndex >= 0 ? activeIndex : 0] ?? MANIFIESTO_SECTIONS[0];
+
   return createPortal(
     <div
       className="fixed inset-0 z-[99990] flex items-end justify-center p-0 sm:items-center sm:p-4 md:p-6"
@@ -311,7 +328,6 @@ export function PropositoModal({
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Cabecera fija */}
         <div
           className="shrink-0 border-b border-white/35 px-6 pb-4 pt-6 md:px-10 md:pt-8"
           style={{ background: 'linear-gradient(180deg, #E8EBF2 0%, #E0E5EC 100%)' }}
@@ -342,42 +358,44 @@ export function PropositoModal({
               Cerrar
             </button>
           </div>
-          {/* Índice de secciones */}
+
           <nav
             className="mt-4 flex flex-wrap gap-2"
             aria-label="Secciones del manifiesto"
+            role="tablist"
           >
-            {MANIFIESTO_SECTIONS.filter((s) => s.id !== 'cierre').map((s) => (
-              <a
-                key={s.id}
-                href={`#manifiesto-${s.id}`}
-                className="rounded-full px-3 py-1.5 text-[11px] font-medium uppercase tracking-wide transition hover:opacity-90"
-                style={{
-                  ...soft.card,
-                  color: soft.textBody,
-                  fontSize: '0.65rem',
-                }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  document.getElementById(`manifiesto-${s.id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                }}
-              >
-                {s.title}
-              </a>
-            ))}
+            {MANIFIESTO_SECTIONS.map((s) => {
+              const active = s.id === activeSectionId;
+              return (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  aria-controls={`manifiesto-panel-${s.id}`}
+                  id={`manifiesto-tab-${s.id}`}
+                  style={sectionChipStyle(active)}
+                  onClick={() => setActiveSectionId(s.id)}
+                >
+                  {s.title}
+                </button>
+              );
+            })}
           </nav>
         </div>
 
-        {/* Cuerpo con scroll */}
         <div
+          id={`manifiesto-panel-${activeSection.id}`}
+          role="tabpanel"
+          aria-labelledby={`manifiesto-tab-${activeSection.id}`}
           className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 pb-10 md:px-10 md:py-10 md:pb-12"
           style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,74,28,0.35) transparent' }}
         >
-          {MANIFIESTO_SECTIONS.map((section, index) => (
-            <ManifiestoSectionView key={section.id} section={section} index={index} />
-          ))}
+          <ManifiestoSectionView
+            section={activeSection}
+            index={activeIndex >= 0 ? activeIndex : 0}
+          />
         </div>
-
       </div>
     </div>,
     document.body

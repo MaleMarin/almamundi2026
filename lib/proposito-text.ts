@@ -8,7 +8,6 @@ export type ManifiestoBlock =
   | { type: 'lead'; lines: string[] }
   | { type: 'p'; text: string }
   | { type: 'quote'; text: string }
-  | { type: 'stories'; items: string[] }
   | { type: 'beliefs'; items: string[] }
   | { type: 'emphasis'; text: string }
   | { type: 'closing'; lines: string[] };
@@ -48,17 +47,8 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
         text: 'Porque nadie archiva lo que importa. Solo lo que performa. Millones de fotos de atardeceres idénticos. Miles de videos de lo mismo editado de maneras distintas. Y muy pocas personas contando lo que de verdad pasó.',
       },
       {
-        type: 'stories',
-        items: [
-          'La historia de la mujer que crió sola a tres hijos mientras estudiaba.',
-          'El hombre que reconstruyó su casa con sus propias manos después del terremoto.',
-          'La abuela que aprendió a usar el celular solo para poder ver la cara de su nieta.',
-          'El joven que llegó a una ciudad sin conocer a nadie y encontró su lugar en el mundo.',
-        ],
-      },
-      {
         type: 'p',
-        text: 'Esas historias no tienen filtro. No tienen música de fondo. No tienen la luz perfecta.',
+        text: 'La mujer que crió sola a tres hijos mientras estudiaba. El hombre que reconstruyó su casa con sus propias manos después del terremoto. La abuela que aprendió a usar el celular solo para ver la cara de su nieta. El joven que llegó a una ciudad sin conocer a nadie y encontró su lugar. Esas historias no tienen filtro. No tienen música de fondo. No tienen la luz perfecta.',
       },
       {
         type: 'p',
