@@ -153,12 +153,91 @@ function NewsRow({
   );
 }
 
+function hasLocation(n: NewsItem): boolean {
+  return (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
+}
+
+function NewsListSection({
+  items,
+  selectedNews,
+  onNewsFocus,
+  sectionLabel,
+  dimAll = false,
+}: {
+  items: NewsItem[];
+  selectedNews: NewsItem | null;
+  onNewsFocus: (n: NewsItem) => void;
+  sectionLabel?: string;
+  dimAll?: boolean;
+}) {
+  if (items.length === 0) return null;
+
+  const withLocation = items.filter(hasLocation);
+  const withoutLocation = items.filter((n) => !hasLocation(n));
+
+  return (
+    <>
+      {sectionLabel ? (
+        <p
+          style={{
+            fontSize: 11,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: sectionLabel === '◎ En el mapa' ? '#ff6b2e' : 'rgba(200, 214, 235, 0.72)',
+            margin: '8px 0 2px 2px',
+            fontFamily: SITE_FONT_STACK,
+            lineHeight: 1.35,
+          }}
+        >
+          {sectionLabel}
+        </p>
+      ) : null}
+      {withLocation.length > 0 && sectionLabel !== '◎ En el mapa' ? (
+        <p
+          style={{
+            fontSize: 11,
+            letterSpacing: '0.08em',
+            textTransform: 'uppercase',
+            color: '#ff6b2e',
+            margin: '4px 0 2px 2px',
+            fontFamily: SITE_FONT_STACK,
+            lineHeight: 1.35,
+          }}
+        >
+          ◎ En el mapa
+        </p>
+      ) : null}
+      {withLocation.map((n, i) => (
+        <NewsRow
+          key={`${n.id ?? 'news'}-map-${i}`}
+          news={n}
+          isActive={selectedNews?.id === n.id}
+          onClick={() => onNewsFocus(n)}
+          dimmed={dimAll}
+        />
+      ))}
+      {withoutLocation.map((n, i) => (
+        <NewsRow
+          key={`${n.id ?? 'news'}-nl-${i}`}
+          news={n}
+          isActive={selectedNews?.id === n.id}
+          onClick={() => onNewsFocus(n)}
+          dimmed
+        />
+      ))}
+    </>
+  );
+}
+
 export type NewsPanelProps = {
+  topicNews?: NewsItem[];
+  generalNews?: NewsItem[];
   news: NewsItem[];
   loading?: boolean;
   isRefreshing?: boolean;
   loadingTimedOut?: boolean;
-  showStaleNotice?: boolean;
+  topicMatched?: boolean;
+  relaxedTopic?: boolean;
   error?: string | null;
   selectedTopicId: string | null;
   onTopicIdChange: (id: string | null) => void;
@@ -167,32 +246,35 @@ export type NewsPanelProps = {
 };
 
 export function NewsPanel({
+  topicNews = [],
+  generalNews = [],
   news,
   loading = false,
   isRefreshing = false,
   loadingTimedOut = false,
-  showStaleNotice = false,
+  topicMatched = true,
+  relaxedTopic = false,
   error = null,
   selectedTopicId,
   onTopicIdChange,
   onNewsFocus,
   selectedNews,
 }: NewsPanelProps) {
-  const hasLocation = (n: NewsItem) =>
-    (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
-  const withLocation = news.filter(hasLocation);
-  const withoutLocation = news.filter((n) => !hasLocation(n));
+  const isAllTopics = selectedTopicId == null;
+  const displayTopic = topicNews.length > 0 ? topicNews : isAllTopics ? news : [];
+  const displayGeneral = !isAllTopics && relaxedTopic ? generalNews : [];
+  const totalVisible = displayTopic.length + displayGeneral.length;
 
   const statusMessage = (() => {
-    if (loading && news.length === 0) {
+    if (loading && totalVisible === 0) {
       return 'Cargando titulares de medios curados…';
     }
-    if (loadingTimedOut && news.length === 0) {
+    if (loadingTimedOut && totalVisible === 0) {
       return 'No pudimos cargar titulares en este momento. Intenta otra categoría.';
     }
-    if (error && news.length === 0) return error;
-    if (!loading && !error && news.length === 0) {
-      return 'No hay titulares para este tema en este momento.';
+    if (error && totalVisible === 0) return error;
+    if (!loading && !error && !isAllTopics && displayTopic.length === 0 && displayGeneral.length === 0) {
+      return 'No encontramos titulares recientes para esta categoría.';
     }
     return null;
   })();
@@ -253,21 +335,7 @@ export function NewsPanel({
           gap: 8,
         }}
       >
-        {showStaleNotice ? (
-          <p
-            style={{
-              fontSize: 12,
-              color: 'rgba(200, 214, 235, 0.78)',
-              fontFamily: SITE_FONT_STACK,
-              lineHeight: 1.4,
-              padding: '4px 4px 0',
-              fontStyle: 'italic',
-            }}
-          >
-            Mostrando últimos titulares disponibles.
-          </p>
-        ) : null}
-        {isRefreshing && news.length > 0 ? (
+        {isRefreshing && totalVisible > 0 ? (
           <p
             style={{
               fontSize: 11,
@@ -280,6 +348,7 @@ export function NewsPanel({
             Actualizando…
           </p>
         ) : null}
+
         {statusMessage ? (
           <p
             style={{
@@ -293,40 +362,52 @@ export function NewsPanel({
             {statusMessage}
           </p>
         ) : null}
-        {withLocation.length > 0 && (
+
+        {!isAllTopics && displayTopic.length === 0 && displayGeneral.length > 0 && !loading ? (
+          <p
+            style={{
+              fontSize: 13,
+              color: 'rgba(212, 220, 232, 0.88)',
+              fontFamily: SITE_FONT_STACK,
+              lineHeight: 1.5,
+              padding: '4px 4px 0',
+            }}
+          >
+            No encontramos titulares recientes para esta categoría.
+          </p>
+        ) : null}
+
+        <NewsListSection
+          items={displayTopic}
+          selectedNews={selectedNews}
+          onNewsFocus={onNewsFocus}
+        />
+
+        {displayGeneral.length > 0 ? (
           <>
             <p
               style={{
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#ff6b2e',
-                margin: '4px 0 2px 2px',
+                color: 'rgba(200, 214, 235, 0.72)',
+                margin: '12px 0 4px 2px',
                 fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.35,
+                borderTop: '1px solid rgba(255,255,255,0.1)',
+                paddingTop: 12,
               }}
             >
-              ◎ En el mapa
+              Titulares generales
             </p>
-            {withLocation.map((n, i) => (
-              <NewsRow
-                key={`${n.id ?? 'news'}-${i}`}
-                news={n}
-                isActive={selectedNews?.id === n.id}
-                onClick={() => onNewsFocus(n)}
-              />
-            ))}
+            <NewsListSection
+              items={displayGeneral}
+              selectedNews={selectedNews}
+              onNewsFocus={onNewsFocus}
+              dimAll
+            />
           </>
-        )}
-        {withoutLocation.map((n, i) => (
-          <NewsRow
-            key={`${n.id ?? 'news'}-nl-${i}`}
-            news={n}
-            isActive={selectedNews?.id === n.id}
-            onClick={() => onNewsFocus(n)}
-            dimmed
-          />
-        ))}
+        ) : null}
       </div>
     </div>
   );

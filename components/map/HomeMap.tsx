@@ -21,8 +21,7 @@ import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import {
-  DEFAULT_NEWS_TOPIC_API,
-  DEFAULT_NEWS_TOPIC_QUERY,
+  getNewsTopicApiQuery,
   NEWS_TOPIC_GROUPS,
 } from '@/lib/news-topics';
 import { filterRealNewsItems } from '@/components/NewsLayer';
@@ -316,10 +315,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const isMobile = useViewportBelow(MAP_LAYOUT_MOBILE_MAX_WIDTH_PX);
 
-  const topicQuery =
-    selectedTopicId == null
-      ? DEFAULT_NEWS_TOPIC_QUERY
-      : (NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.query ?? DEFAULT_NEWS_TOPIC_QUERY);
+  const topicQuery = getNewsTopicApiQuery(selectedTopicId);
 
   const fetchNews = useCallback(
     async (topic: string, signal: AbortSignal) => {
@@ -359,90 +355,61 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           } as NewsItem;
         });
 
-      const requestNews = async (topicParam: string, fetchSignal: AbortSignal) => {
-        const q = new URLSearchParams({
-          kind: 'news',
-          topic: topicParam.length > 80 ? topicParam.slice(0, 80) : topicParam,
-          limit: '20',
-          lang: 'es',
-        });
-        const res = await fetch(`/api/world?${q.toString()}`, { signal: fetchSignal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as {
-          items?: unknown[];
-          isFallback?: boolean;
-          relaxedTopic?: boolean;
-        };
-        const items = filterRealNewsItems(
-          mapApiItems(Array.isArray(data.items) ? data.items : [])
-        );
-        return {
-          items,
-          isFallback: Boolean(data.isFallback) && items.length === 0,
-          relaxedTopic: Boolean(data.relaxedTopic),
-        };
-      };
-
-      const mergeUnique = (base: NewsItem[], extra: NewsItem[]) => {
-        const seen = new Set(base.map((n) => n.url).filter(Boolean));
-        const out = [...base];
-        for (const item of extra) {
-          if (item.url && seen.has(item.url)) continue;
-          if (item.url) seen.add(item.url);
-          out.push(item);
-        }
-        return out.slice(0, 20);
-      };
-
-      try {
-        const topicTrim = topic.trim();
-        const isBroadTopic =
-          topicTrim === DEFAULT_NEWS_TOPIC_QUERY || topicTrim === DEFAULT_NEWS_TOPIC_API;
-
-        if (isBroadTopic || selectedTopicId == null) {
-          const general = await requestNews(DEFAULT_NEWS_TOPIC_API, signal);
-          return general;
-        }
-
-        const [primary, general] = await Promise.all([
-          requestNews(topic, signal),
-          requestNews(DEFAULT_NEWS_TOPIC_API, signal).catch(() => ({
-            items: [] as NewsItem[],
-            isFallback: false,
-            relaxedTopic: false,
-          })),
-        ]);
-
-        let merged = primary.items;
-        let relaxedTopic = primary.relaxedTopic;
-        let isFallback = primary.isFallback;
-
-        if (merged.length < 8 && general.items.length > 0) {
-          merged = mergeUnique(merged, general.items);
-          relaxedTopic = true;
-          isFallback = false;
-        }
-
-        if (merged.length === 0 && general.items.length > 0) {
-          merged = general.items;
-          relaxedTopic = true;
-          isFallback = false;
-        }
-
-        return { items: merged, isFallback, relaxedTopic };
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') throw err;
-        throw err;
+      const apiTopic = topic.length > 80 ? topic.slice(0, 80) : topic;
+      const q = new URLSearchParams({
+        kind: 'news',
+        topic: apiTopic,
+        limit: '20',
+        lang: 'es',
+      });
+      if (selectedTopicId != null) {
+        q.set('topicId', selectedTopicId);
       }
+
+      const res = await fetch(`/api/world?${q.toString()}`, { signal });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+      const data = (await res.json()) as {
+        items?: unknown[];
+        generalItems?: unknown[];
+        isFallback?: boolean;
+        relaxedTopic?: boolean;
+        topicMatched?: boolean;
+      };
+
+      const topicItems = filterRealNewsItems(
+        mapApiItems(Array.isArray(data.items) ? data.items : [])
+      );
+      const generalItems = filterRealNewsItems(
+        mapApiItems(Array.isArray(data.generalItems) ? data.generalItems : [])
+      );
+
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[news] topic', selectedTopicId, apiTopic, {
+          topic: topicItems.length,
+          general: generalItems.length,
+          relaxedTopic: data.relaxedTopic,
+        });
+      }
+
+      return {
+        topicItems,
+        generalItems,
+        topicMatched: Boolean(data.topicMatched) && topicItems.length > 0,
+        relaxedTopic: Boolean(data.relaxedTopic) && generalItems.length > 0,
+        isFallback: Boolean(data.isFallback) && topicItems.length === 0 && generalItems.length === 0,
+      };
     },
     [selectedTopicId]
   );
 
   const {
-    effectiveNewsItems,
+    topicItems: topicNewsItems,
+    generalItems: generalNewsItems,
     loading: newsLoading,
     error: newsError,
-    showStaleNotice,
+    topicMatched,
+    relaxedTopic,
     loadingTimedOut,
     isRefreshing,
   } = useNewsLayer(
@@ -454,7 +421,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       refreshIntervalMs: 120_000,
     }
   );
-  const filteredNewsItems = effectiveNewsItems;
+  const filteredNewsItems = useMemo(
+    () => [...topicNewsItems, ...generalNewsItems],
+    [topicNewsItems, generalNewsItems]
+  );
 
   const handleStoryFocus = useCallback((story: StoryPoint) => {
     setHighlightedStoryId(story.id ?? null);
@@ -516,11 +486,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   };
 
   const noticiasProps = {
+    topicNews: topicNewsItems,
+    generalNews: generalNewsItems,
     news: filteredNewsItems,
     loading: newsLoading,
     isRefreshing,
     loadingTimedOut,
-    showStaleNotice,
+    topicMatched,
+    relaxedTopic,
     error: newsError,
     selectedTopicId,
     onTopicIdChange: setSelectedTopicId,

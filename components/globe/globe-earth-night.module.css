@@ -11,7 +11,7 @@
 
 /** Home `#mapa` con `forceDaylight`: menos viñeta para que el disco se lea como día. */
 .earthDayEmbeddedContainer {
-  background: radial-gradient(ellipse 85% 75% at 50% 42%, #1a3a6e 0%, #0a1428 55%, #050a14 100%);
+  background: radial-gradient(ellipse 90% 80% at 50% 40%, #2a5a9e 0%, #143a6e 42%, #0a1e3a 78%, #060e1c 100%);
   box-shadow: none;
   position: relative;
 }

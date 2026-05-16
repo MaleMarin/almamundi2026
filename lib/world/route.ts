@@ -2,7 +2,11 @@ import { NextRequest } from "next/server";
 import Parser from "rss-parser";
 import { mockWorldNow, worldMockItemsPublicFilter } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
-import { DEFAULT_NEWS_TOPIC_API, DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
+import {
+  DEFAULT_NEWS_TOPIC_API,
+  DEFAULT_NEWS_TOPIC_QUERY,
+  getNewsTopicMatchKeywords,
+} from "@/lib/news-topics";
 
 function isDefaultNewsTopic(topicTrim: string): boolean {
   const t = topicTrim.trim();
@@ -361,11 +365,15 @@ function applyGeoFallback(items: NormalizedNewsItem[]): NormalizedNewsItem[] {
 
 export type NormalizedNewsResponse = {
   generatedAt: string;
+  /** Titulares del tema solicitado (vacío si solo hay generales). */
   items: NormalizedNewsItem[];
-  /** true cuando la respuesta es la lista de medios (fallback), no titulares reales */
-  isFallback?: boolean;
-  /** true cuando se amplió a titulares generales por pocos resultados del tema */
+  /** Titulares generales cuando el tema no tuvo suficientes coincidencias. */
+  generalItems?: NormalizedNewsItem[];
+  /** true cuando `items` corresponden al tema pedido */
+  topicMatched?: boolean;
+  /** true cuando solo hay (o también) titulares generales */
   relaxedTopic?: boolean;
+  isFallback?: boolean;
 };
 
 // GDELT artlist response (subset we use)
@@ -499,12 +507,28 @@ function normalizeForMatch(text: string): string {
     .trim();
 }
 
-/** True si el título contiene al menos una palabra del tema (query). */
-function titleMatchesTopic(title: string, topicQuery: string): boolean {
-  if (!topicQuery || !topicQuery.trim()) return true;
+function titleMatchesKeywords(title: string, keywords: string[]): boolean {
+  const titleNorm = normalizeForMatch(title);
+  return keywords.some((k) => {
+    const kn = normalizeForMatch(k);
+    return kn.length >= 3 && titleNorm.includes(kn);
+  });
+}
+
+/** True si el título encaja con el tema (keywords del chip o palabras de la query). */
+function titleMatchesTopic(
+  title: string,
+  topicQuery: string,
+  topicId: string | null
+): boolean {
+  const keywords = topicId ? getNewsTopicMatchKeywords(topicId) : null;
+  if (keywords && keywords.length > 0) {
+    return titleMatchesKeywords(title, keywords);
+  }
+  if (!topicQuery || !topicQuery.trim() || isDefaultNewsTopic(topicQuery)) return true;
   const titleNorm = normalizeForMatch(title);
   const words = topicQuery.trim().split(/\s+/).filter(Boolean).map(normalizeForMatch);
-  return words.some((w) => w.length >= 2 && titleNorm.includes(w));
+  return words.some((w) => w.length >= 3 && titleNorm.includes(w));
 }
 
 /**
@@ -560,7 +584,11 @@ async function fetchRssFeedCurated(domain: string, feedUrl: string): Promise<Nor
  * Pulso global: titulares desde RSS de los medios curados.
  * Si topic tiene valor, se filtran los ítems cuyo título coincida con alguna palabra del tema.
  */
-async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<NormalizedNewsResponse | null> {
+async function fetchNewsFromRss(
+  limit: number,
+  topic: string = "",
+  topicId: string | null = null
+): Promise<NormalizedNewsResponse | null> {
   const results = await Promise.allSettled(
     RSS_FEEDS.map(({ domain, url }) => fetchRssFeedCurated(domain, url))
   );
@@ -576,12 +604,44 @@ async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<Norm
   });
   let items = allItems;
   const topicTrimmed = topic.trim();
-  if (topicTrimmed.length > 0 && topicTrimmed.length <= 80 && !isDefaultNewsTopic(topicTrimmed)) {
-    items = items.filter((it) => titleMatchesTopic(it.title, topicTrimmed));
+  if (topicTrimmed.length > 0 && !isDefaultNewsTopic(topicTrimmed)) {
+    items = items.filter((it) => titleMatchesTopic(it.title, topicTrimmed, topicId));
   }
   items = items.slice(0, limit);
   if (items.length === 0) return null;
   return { generatedAt: new Date().toISOString(), items, isFallback: false };
+}
+
+async function collectNewsFromSources(
+  topicTrim: string,
+  topicId: string | null,
+  limit: number,
+  lang: string,
+  strictTopic: boolean
+): Promise<NormalizedNewsItem[]> {
+  const rssLimit = Math.min(250, Math.max(limit * 4, 40));
+  const rss = await fetchNewsFromRss(rssLimit, topicTrim, strictTopic ? topicId : null).catch(
+    () => null
+  );
+  let merged: NormalizedNewsItem[] = rss?.items?.length ? [...rss.items] : [];
+
+  if (merged.length < limit) {
+    const domainQuery = buildDomainQuery();
+    const fullQuery =
+      topicTrim.length > 0 && strictTopic ? `${topicTrim} ${domainQuery}` : domainQuery;
+    const g = await fetchNewsFromGdelt(fullQuery, Math.max(limit * 2, 30), lang, 150, "6h").catch(
+      () => null
+    );
+    if (g?.items.length) {
+      let gdeltItems = g.items;
+      if (strictTopic && topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
+        gdeltItems = gdeltItems.filter((it) => titleMatchesTopic(it.title, topicTrim, topicId));
+      }
+      merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...gdeltItems]));
+    }
+  }
+
+  return applyGeoFallback(merged.slice(0, limit));
 }
 
 function dedupeNewsItems(items: NormalizedNewsItem[]): NormalizedNewsItem[] {
@@ -614,11 +674,13 @@ export async function getNews(
   topic: string,
   limit: number,
   lang: string = "es",
-  calendar: NewsCalendarFilter | null = null
+  calendar: NewsCalendarFilter | null = null,
+  topicId: string | null = null
 ): Promise<NormalizedNewsResponse> {
   const topicTrim = topic.trim();
   const dayKey = calendar ? `${calendar.dayYmd}|${calendar.timeZone}` : "all";
-  const key = cacheKey(topic, limit, lang, dayKey);
+  const cacheTopicKey = topicId ? `${topicTrim}|${topicId}` : topicTrim;
+  const key = cacheKey(cacheTopicKey, limit, lang, dayKey);
   const cached = getCached(key);
   if (cached) return cached;
 
@@ -627,7 +689,7 @@ export async function getNews(
       items.filter((it) => isPublishedOnCalendarDay(it.publishedAt, calendar.dayYmd, calendar.timeZone));
 
     const rssLimit = Math.min(250, Math.max(limit * 8, 60));
-    const rss = await fetchNewsFromRss(rssLimit, topicTrim).catch(() => null);
+    const rss = await fetchNewsFromRss(rssLimit, topicTrim, topicId).catch(() => null);
     let merged: NormalizedNewsItem[] = rss && rss.items.length ? applyDay(rss.items) : [];
     merged = sortByPublishedDesc(merged);
 
@@ -647,88 +709,62 @@ export async function getNews(
     merged = applyGeoFallback(merged);
 
     if (merged.length > 0) {
-      let relaxedTopic = false;
-      if (merged.length < limit && topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
-        const broader = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
-        if (broader.items.length > merged.length) {
-          merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...broader.items])).slice(0, limit);
-          relaxedTopic = true;
-        }
-      }
       const data: NormalizedNewsResponse = {
         generatedAt: new Date().toISOString(),
         items: merged,
+        generalItems: [],
+        topicMatched: true,
+        relaxedTopic: false,
         isFallback: false,
-        relaxedTopic,
       };
       setCached(key, data);
       return data;
     }
-    // Nada encaja en el día calendario (feeds retrasados o sin pubDate): mismas fuentes sin filtro de día
-    return getNews(topic, limit, lang, null);
+    return getNews(topic, limit, lang, null, topicId);
   }
 
-  const MIN_TOPIC_ITEMS = Math.min(limit, 8);
+  const isBroad = isDefaultNewsTopic(topicTrim);
 
-  // RSS primero (rápido, medios curados); GDELT ventana corta (6h) para titulares más frescos
-  const rss = await fetchNewsFromRss(Math.max(limit, MIN_TOPIC_ITEMS * 2), topicTrim).catch(() => null);
-  if (rss && rss.items.length > 0) {
-    let items = rss.items.slice(0, limit);
-    let relaxedTopic = false;
-    if (
-      items.length < MIN_TOPIC_ITEMS &&
-      topicTrim.length > 0 &&
-      !isDefaultNewsTopic(topicTrim)
-    ) {
-      const general = await fetchNewsFromRss(limit, "").catch(() => null);
-      if (general && general.items.length > 0) {
-        items = dedupeNewsItems(sortByPublishedDesc([...items, ...general.items])).slice(0, limit);
-        relaxedTopic = true;
-      }
-    }
-    const withGeo: NormalizedNewsResponse = {
-      ...rss,
-      items: applyGeoFallback(items),
-      isFallback: false,
-      relaxedTopic,
+  if (isBroad) {
+    const general = await collectNewsFromSources(DEFAULT_NEWS_TOPIC_API, null, limit, lang, false);
+    const data: NormalizedNewsResponse = {
+      generatedAt: new Date().toISOString(),
+      items: general,
+      generalItems: [],
+      topicMatched: true,
+      relaxedTopic: false,
+      isFallback: general.length === 0,
     };
-    setCached(key, withGeo);
-    return withGeo;
+    if (general.length > 0) setCached(key, data);
+    return data;
   }
 
-  const domainQuery = buildDomainQuery();
-  const fullQuery = topicTrim.length > 0 ? `${topicTrim} ${domainQuery}` : domainQuery;
+  const specific = await collectNewsFromSources(topicTrim, topicId, limit, lang, true);
 
-  let gdelt = await fetchNewsFromGdelt(fullQuery, limit, lang, 150, "6h").catch(() => null);
-  if (gdelt && gdelt.items.length > 0) {
-    const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
-    setCached(key, withGeo);
-    return withGeo;
-  }
-  gdelt = await fetchNewsFromGdelt(domainQuery, limit, lang, 150, "6h").catch(() => null);
-  if (gdelt && gdelt.items.length > 0) {
-    const withGeo = { ...gdelt, items: applyGeoFallback(gdelt.items) };
-    setCached(key, withGeo);
-    return withGeo;
-  }
-  if (topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
-    const broad = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
-    if (broad.items.length > 0) {
-      const withGeo: NormalizedNewsResponse = {
-        ...broad,
-        items: applyGeoFallback(broad.items),
-        isFallback: false,
-        relaxedTopic: true,
-      };
-      setCached(key, withGeo);
-      return withGeo;
-    }
+  if (specific.length > 0) {
+    const data: NormalizedNewsResponse = {
+      generatedAt: new Date().toISOString(),
+      items: specific,
+      generalItems: [],
+      topicMatched: true,
+      relaxedTopic: false,
+      isFallback: false,
+    };
+    setCached(key, data);
+    return data;
   }
 
-  const cachedNews = getAnyCachedNews();
-  if (cachedNews) return { ...cachedNews, items: applyGeoFallback(cachedNews.items) };
-  const fallback = fallbackMediaLinks();
-  return { ...fallback, items: applyGeoFallback(fallback.items) };
+  const general = await collectNewsFromSources(DEFAULT_NEWS_TOPIC_API, null, limit, lang, false);
+  const data: NormalizedNewsResponse = {
+    generatedAt: new Date().toISOString(),
+    items: [],
+    generalItems: general,
+    topicMatched: false,
+    relaxedTopic: general.length > 0,
+    isFallback: general.length === 0,
+  };
+  if (general.length > 0) setCached(key, data);
+  return data;
 }
 
 function fallbackMediaLinks(): NormalizedNewsResponse {
@@ -756,58 +792,48 @@ export async function GET(request: NextRequest) {
     if (kind === "news") {
       let topic = request.nextUrl.searchParams.get("topic")?.trim() || DEFAULT_NEWS_TOPIC_QUERY;
       if (topic.length > 80) topic = topic.slice(0, 80);
+      const topicIdParam = request.nextUrl.searchParams.get("topicId")?.trim() || null;
       const limitParam = request.nextUrl.searchParams.get("limit");
       const limit = limitParam ? Math.min(250, Math.max(1, parseInt(limitParam, 10) || 10)) : 20;
       const lang = request.nextUrl.searchParams.get("lang")?.trim() ?? "es";
       const dayParam = sanitizeDayYmd(request.nextUrl.searchParams.get("day"));
       const tzParam = sanitizeTimeZone(request.nextUrl.searchParams.get("tz"));
       const calendar = dayParam && tzParam ? { dayYmd: dayParam, timeZone: tzParam } : null;
-      let data = await getNews(topic, limit, lang, calendar);
-      const topicTrim = topic.trim();
-      if (
-        calendar &&
-        data.items.length > 0 &&
-        data.items.length < Math.min(limit, 8) &&
-        !isDefaultNewsTopic(topicTrim)
-      ) {
-        const broader = await getNews(topic, limit, lang, null);
-        if (broader.items.length > data.items.length) {
-          data = {
-            ...broader,
-            items: dedupeNewsItems(sortByPublishedDesc([...data.items, ...broader.items])).slice(0, limit),
-            relaxedTopic: true,
-          };
-        }
-      }
-      if ((!data.items || data.items.length === 0) && !isDefaultNewsTopic(topicTrim)) {
-        const broader = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
-        if (broader.items.length > 0) {
-          data = { ...broader, relaxedTopic: true };
-        }
-      }
-      if (data.items?.length) {
-        data = {
-          ...data,
-          items: data.items.filter((it) => !String(it.id ?? '').startsWith('media-')),
-          isFallback: false,
-        };
-      }
-      if (!data.items || data.items.length === 0) {
+      let data = await getNews(topic, limit, lang, calendar, topicIdParam);
+
+      const stripDemo = (items: NormalizedNewsItem[]) =>
+        items.filter((it) => !String(it.id ?? "").startsWith("media-"));
+
+      data = {
+        ...data,
+        items: stripDemo(data.items ?? []),
+        generalItems: stripDemo(data.generalItems ?? []),
+      };
+
+      if (data.items.length === 0 && (data.generalItems ?? []).length === 0) {
         const cachedNews = getAnyCachedNews();
-        if (cachedNews && cachedNews.items.length > 0) {
+        if (cachedNews) {
+          const cachedItems = stripDemo(cachedNews.items ?? []);
           data = {
-            ...cachedNews,
-            items: cachedNews.items.filter((it) => !String(it.id ?? '').startsWith('media-')),
+            generatedAt: new Date().toISOString(),
+            items: [],
+            generalItems: cachedItems,
+            topicMatched: false,
+            relaxedTopic: cachedItems.length > 0,
             isFallback: false,
-            relaxedTopic: true,
           };
         } else {
           data = {
             generatedAt: new Date().toISOString(),
             items: [],
+            generalItems: [],
+            topicMatched: false,
+            relaxedTopic: false,
             isFallback: true,
           };
         }
+      } else {
+        data = { ...data, isFallback: false };
       }
       return Response.json(data, {
         headers: {

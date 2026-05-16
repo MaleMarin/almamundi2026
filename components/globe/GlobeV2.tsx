@@ -891,7 +891,7 @@ function GlobeScene({
         ? 1.72
         : 1.9
       : forceDaylight
-        ? 3.15
+        ? 3.42
         : 2.16
     : viewerNight
       ? 1.65
@@ -927,7 +927,7 @@ function GlobeScene({
             ? viewerNight
               ? 0.44
               : forceDaylight
-                ? 1.05
+                ? 1.18
                 : 0.48
             : viewerNight
               ? 0.38
@@ -936,7 +936,7 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.48 : 0.18) : viewerNight ? 0.09 : 0.16
+          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.56 : 0.18) : viewerNight ? 0.09 : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
@@ -949,7 +949,7 @@ function GlobeScene({
                 ? 3.65
                 : 3.95
               : forceDaylight
-                ? 7.8
+                ? 8.35
                 : 4.95
             : viewerNight
               ? 3.35
@@ -958,7 +958,7 @@ function GlobeScene({
         color={forceDaylight && embedded ? '#fffaf0' : '#fff8ec'}
       />
       {embedded && forceDaylight && !viewerNight ? (
-        <directionalLight position={[-5, 3, 4]} intensity={2.4} color="#b8d4ff" />
+        <directionalLight position={[-5, 3, 4]} intensity={2.85} color="#c8e0ff" />
       ) : null}
 
       <group scale={geoScale}>
