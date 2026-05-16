@@ -2,7 +2,7 @@
  * Manifiesto AlmaMundi — contenido del modal «Propósito» (/#proposito).
  */
 
-export const MANIFIESTO_TITLE = 'Manifiesto';
+export const MANIFIESTO_TITLE = 'Propósito';
 
 export type ManifiestoBlock =
   | { type: 'lead'; lines: string[] }
