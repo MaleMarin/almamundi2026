@@ -27,7 +27,7 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'lead',
         lines: [
-          'El mundo tiene demasiadas historias que se olvidan.',
+          'El mundo tiene demasiadas historias perfectas.',
           'Necesita la tuya.',
         ],
       },
