@@ -471,7 +471,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded
-              forceDaylight={false}
+              forceDaylight={true}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}

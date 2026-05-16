@@ -281,7 +281,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
           {desktopFirstTwoLinks}
           {desktopHistoriasSegment}
-          <Link href="/mapa" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+          <Link href="/#mapa" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
             {t.navMap}
           </Link>
         </nav>
@@ -306,7 +306,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             {mobilePurposeHow}
             {mobileHistoriasSegment}
             <Link
-              href="/mapa"
+              href="/#mapa"
               className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
               onClick={closeMobileNav}
             >
