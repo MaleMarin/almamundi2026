@@ -63,3 +63,6 @@ export const NEWS_TOPIC_GROUPS: NewsTopicGroup[] = [
 /** Query por defecto: combina todos los temas para mostrar lo más actual en estas áreas */
 export const DEFAULT_NEWS_TOPIC_QUERY =
   "transparencia gobernanza política digital derechos humanos inteligencia artificial tecnología alfabetización mediática arte cultura finanzas salud educación medio ambiente deportes ciencia migración";
+
+/** Misma query recortada a 80 caracteres (límite de /api/world). */
+export const DEFAULT_NEWS_TOPIC_API = DEFAULT_NEWS_TOPIC_QUERY.slice(0, 80);

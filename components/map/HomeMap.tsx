@@ -20,7 +20,12 @@ import { useRouter } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
-import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
+import {
+  DEFAULT_NEWS_TOPIC_API,
+  DEFAULT_NEWS_TOPIC_QUERY,
+  NEWS_TOPIC_GROUPS,
+} from '@/lib/news-topics';
+import { filterRealNewsItems } from '@/components/NewsLayer';
 import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
@@ -354,59 +359,77 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           } as NewsItem;
         });
 
-      const requestNews = async (topicParam: string) => {
+      const requestNews = async (topicParam: string, fetchSignal: AbortSignal) => {
         const q = new URLSearchParams({
           kind: 'news',
-          topic: topicParam,
+          topic: topicParam.length > 80 ? topicParam.slice(0, 80) : topicParam,
           limit: '20',
           lang: 'es',
         });
-        const res = await fetch(`/api/world?${q.toString()}`, { signal });
+        const res = await fetch(`/api/world?${q.toString()}`, { signal: fetchSignal });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as {
           items?: unknown[];
           isFallback?: boolean;
           relaxedTopic?: boolean;
         };
+        const items = filterRealNewsItems(
+          mapApiItems(Array.isArray(data.items) ? data.items : [])
+        );
         return {
-          items: mapApiItems(Array.isArray(data.items) ? data.items : []),
-          isFallback: Boolean(data.isFallback),
+          items,
+          isFallback: Boolean(data.isFallback) && items.length === 0,
           relaxedTopic: Boolean(data.relaxedTopic),
         };
       };
 
+      const mergeUnique = (base: NewsItem[], extra: NewsItem[]) => {
+        const seen = new Set(base.map((n) => n.url).filter(Boolean));
+        const out = [...base];
+        for (const item of extra) {
+          if (item.url && seen.has(item.url)) continue;
+          if (item.url) seen.add(item.url);
+          out.push(item);
+        }
+        return out.slice(0, 20);
+      };
+
       try {
-        const primary = await requestNews(topic);
+        const topicTrim = topic.trim();
+        const isBroadTopic =
+          topicTrim === DEFAULT_NEWS_TOPIC_QUERY || topicTrim === DEFAULT_NEWS_TOPIC_API;
+
+        if (isBroadTopic || selectedTopicId == null) {
+          const general = await requestNews(DEFAULT_NEWS_TOPIC_API, signal);
+          return general;
+        }
+
+        const [primary, general] = await Promise.all([
+          requestNews(topic, signal),
+          requestNews(DEFAULT_NEWS_TOPIC_API, signal).catch(() => ({
+            items: [] as NewsItem[],
+            isFallback: false,
+            relaxedTopic: false,
+          })),
+        ]);
+
         let merged = primary.items;
         let relaxedTopic = primary.relaxedTopic;
         let isFallback = primary.isFallback;
 
-        const topicTrim = topic.trim();
-        const isBroadTopic =
-          topicTrim === DEFAULT_NEWS_TOPIC_QUERY ||
-          topicTrim === DEFAULT_NEWS_TOPIC_QUERY.slice(0, 80);
-        const needsMore = selectedTopicId != null && !isBroadTopic && merged.length < 8;
-        if (needsMore) {
-          try {
-            const general = await requestNews(DEFAULT_NEWS_TOPIC_QUERY);
-            const seen = new Set(merged.map((n) => n.url).filter(Boolean));
-            for (const item of general.items) {
-              if (item.url && seen.has(item.url)) continue;
-              if (item.url) seen.add(item.url);
-              merged.push(item);
-            }
-            if (general.items.length > 0) relaxedTopic = true;
-            isFallback = isFallback && merged.length === 0;
-          } catch {
-            /* complemento opcional */
-          }
+        if (merged.length < 8 && general.items.length > 0) {
+          merged = mergeUnique(merged, general.items);
+          relaxedTopic = true;
+          isFallback = false;
         }
 
-        return {
-          items: merged.slice(0, 20),
-          isFallback,
-          relaxedTopic,
-        };
+        if (merged.length === 0 && general.items.length > 0) {
+          merged = general.items;
+          relaxedTopic = true;
+          isFallback = false;
+        }
+
+        return { items: merged, isFallback, relaxedTopic };
       } catch (err) {
         if (err instanceof Error && err.name === 'AbortError') throw err;
         throw err;
@@ -530,7 +553,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-black pt-8 pb-2 md:pt-10 lg:pt-12">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-[#050a14] pt-8 pb-2 md:pt-10 lg:pt-12">
           <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded

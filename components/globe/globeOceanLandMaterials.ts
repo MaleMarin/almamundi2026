@@ -107,7 +107,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       float mu = dot(N, L);
       float ndlRaw = max(mu, 0.0);
       /* Con uFullDay: disco legible sin empujar el centro a blanco puro (menos “continentes quemados”). */
-      float ndl = uFullDay > 0.5 ? clamp(0.5 + 0.5 * ndlRaw, 0.58, 0.9) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.62 + 0.38 * ndlRaw, 0.72, 1.0) : ndlRaw;
       float ndv = clamp(dot(N, V), 0.0, 1.0);
       float openWater = smoothstep(0.36, 0.92, specSample);
 
@@ -299,7 +299,7 @@ export function createLandSphereMaterial(
       vec3 n = normalize(mTbn * normalize(tmap));
       vec3 s = normalize(uSunDir);
       float ndlRaw = max(dot(n, s), 0.0);
-      float ndl = uFullDay > 0.5 ? clamp(0.42 + 0.58 * ndlRaw, 0.52, 0.82) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.58 + 0.42 * ndlRaw, 0.68, 0.96) : ndlRaw;
 
       vec3 geomN = normalize(vNw);
       float mu = dot(geomN, s);

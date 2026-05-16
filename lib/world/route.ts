@@ -2,10 +2,7 @@ import { NextRequest } from "next/server";
 import Parser from "rss-parser";
 import { mockWorldNow, worldMockItemsPublicFilter } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
-import { DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
-
-/** Misma cadena que envía GET tras recortar a 80 caracteres. */
-const DEFAULT_NEWS_TOPIC_API = DEFAULT_NEWS_TOPIC_QUERY.slice(0, 80);
+import { DEFAULT_NEWS_TOPIC_API, DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
 
 function isDefaultNewsTopic(topicTrim: string): boolean {
   const t = topicTrim.trim();
@@ -788,8 +785,29 @@ export async function GET(request: NextRequest) {
           data = { ...broader, relaxedTopic: true };
         }
       }
+      if (data.items?.length) {
+        data = {
+          ...data,
+          items: data.items.filter((it) => !String(it.id ?? '').startsWith('media-')),
+          isFallback: false,
+        };
+      }
       if (!data.items || data.items.length === 0) {
-        data = fallbackMediaLinks();
+        const cachedNews = getAnyCachedNews();
+        if (cachedNews && cachedNews.items.length > 0) {
+          data = {
+            ...cachedNews,
+            items: cachedNews.items.filter((it) => !String(it.id ?? '').startsWith('media-')),
+            isFallback: false,
+            relaxedTopic: true,
+          };
+        } else {
+          data = {
+            generatedAt: new Date().toISOString(),
+            items: [],
+            isFallback: true,
+          };
+        }
       }
       return Response.json(data, {
         headers: {
