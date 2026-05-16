@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 /** Geo = siempre lugar del hecho (event location). No se usa país del medio para ubicar. */
 export type NewsGeo = { lat: number; lng: number; label?: string };
@@ -28,6 +28,7 @@ export type NewsItem = {
 };
 
 const NEWS_FETCH_TIMEOUT_MS = 18_000;
+const NEWS_PANEL_LOADING_HINT_MS = 20_000;
 
 /** Identificadores de placeholder (no mostrar como titulares reales). */
 export function isDemoNewsItem(item: NewsItem): boolean {
@@ -56,7 +57,13 @@ export const NEWS_FALLBACK_ITEMS: NewsItem[] = [
   { id: 'fb-5', title: 'En desarrollo', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: 35.67, lng: 139.65 }, lat: 35.67, lng: 139.65 },
 ];
 
-export type FetchNewsFn = (topic: string, signal: AbortSignal) => Promise<{ items: NewsItem[]; isFallback?: boolean }>;
+export type FetchNewsResult = {
+  items: NewsItem[];
+  isFallback?: boolean;
+  relaxedTopic?: boolean;
+};
+
+export type FetchNewsFn = (topic: string, signal: AbortSignal) => Promise<FetchNewsResult>;
 
 export type UseNewsLayerOptions = {
   /** Vista actualidad: volver a pedir noticias cada N ms (día calendario + lista al día). 0 = solo al cambiar tema. */
@@ -86,8 +93,7 @@ function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; 
 
 /**
  * Hook estable para la capa de noticias.
- * selectedTopicId = fuente única: fetch y lista solo ese tema.
- * geo = solo lugar del hecho; items sin geo no van al mapa (panel con "Sin ubicación").
+ * La API ya filtra por tema; no se vuelve a filtrar por topicId en cliente (evita vaciar la lista).
  */
 export function useNewsLayer(
   selectedTopicId: string | null,
@@ -98,13 +104,18 @@ export function useNewsLayer(
 ) {
   const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [relaxedTopic, setRelaxedTopic] = useState(false);
+  const [showStaleNotice, setShowStaleNotice] = useState(false);
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
   const mountedRef = useRef(true);
   const lastSuccessfulItemsRef = useRef<NewsItem[]>([]);
-  const hadRealLoadRef = useRef(false);
+  const requestSeqRef = useRef(0);
   const topicQueryRef = useRef(topicQuery);
-  useLayoutEffect(() => {
+
+  useEffect(() => {
     topicQueryRef.current = topicQuery;
   }, [topicQuery]);
 
@@ -115,19 +126,6 @@ export function useNewsLayer(
     };
   }, []);
 
-  /**
-   * Al cambiar tema, la lista anterior suele tener topicId distinto (p. ej. null en "Todas").
-   * Un frame con loading=false + filtro estricto dejaba el panel vacío hasta que llegaba el fetch.
-   */
-  useLayoutEffect(() => {
-    if (activeView !== 'actualidad') return;
-    queueMicrotask(() => {
-      setNewsItems([]);
-      setLoading(true);
-      setError(null);
-    });
-  }, [topicQuery, activeView]);
-
   useEffect(() => {
     if (activeView !== 'actualidad') return;
     const ms = options?.refreshIntervalMs ?? 0;
@@ -137,76 +135,116 @@ export function useNewsLayer(
   }, [activeView, options?.refreshIntervalMs]);
 
   useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    const t = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
+    if (activeView !== 'actualidad') return;
 
+    const requestSeq = ++requestSeqRef.current;
     const requestTopic = topicQuery;
-    queueMicrotask(() => {
-      if (!cancelled) setLoading(true);
-      if (!cancelled) setError(null);
-    });
+    const hasVisibleItems =
+      filterRealNewsItems(newsItems).length > 0 || lastSuccessfulItemsRef.current.length > 0;
+
+    setLoadingTimedOut(false);
+    setError(null);
+    setRelaxedTopic(false);
+    if (hasVisibleItems) {
+      setIsRefreshing(true);
+    } else {
+      setLoading(true);
+      setIsRefreshing(false);
+    }
+
+    const controller = new AbortController();
+    const abortTimer = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
+    const hintTimer = window.setTimeout(() => {
+      if (requestSeqRef.current !== requestSeq) return;
+      setLoadingTimedOut(true);
+    }, NEWS_PANEL_LOADING_HINT_MS);
+
+    const finish = () => {
+      if (requestSeqRef.current !== requestSeq || !mountedRef.current) return;
+      setLoading(false);
+      setIsRefreshing(false);
+    };
+
     fetchNews(requestTopic, controller.signal)
       .then((result) => {
-        if (cancelled || !mountedRef.current) return;
+        if (requestSeqRef.current !== requestSeq || !mountedRef.current) return;
         if (topicQueryRef.current !== requestTopic) return;
+
         const realItems = filterRealNewsItems(result.items);
+        const isRelaxed = Boolean(result.relaxedTopic);
+        setRelaxedTopic(isRelaxed);
+
         if (realItems.length > 0) {
-          hadRealLoadRef.current = true;
           lastSuccessfulItemsRef.current = realItems;
+          setNewsItems(realItems);
+          setShowStaleNotice(isRelaxed);
+          setError(null);
+          setLoadingTimedOut(false);
+        } else if (lastSuccessfulItemsRef.current.length > 0) {
+          setNewsItems(lastSuccessfulItemsRef.current);
+          setShowStaleNotice(true);
+          setError(null);
+        } else {
+          setShowStaleNotice(false);
+          setNewsItems([]);
+          setError(
+            result.isFallback
+              ? 'No pudimos cargar titulares en este momento. Intenta otra categoría.'
+              : 'No hay titulares para este tema en este momento.'
+          );
         }
-        setNewsItems(realItems);
-        setLoading(false);
-        setError(
-          realItems.length === 0 && result.isFallback
-            ? 'No pudimos cargar noticias en este momento'
-            : null
-        );
       })
       .catch((err) => {
-        if (cancelled || !mountedRef.current) return;
-        setLoading(false);
-        if (err?.name === 'AbortError') setError(null);
-        else setError(err instanceof Error ? err.message : 'Error al cargar noticias');
+        if (requestSeqRef.current !== requestSeq || !mountedRef.current) return;
+        if (topicQueryRef.current !== requestTopic) return;
+
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        if (lastSuccessfulItemsRef.current.length > 0) {
+          setNewsItems(lastSuccessfulItemsRef.current);
+          setShowStaleNotice(true);
+          setError(isAbort ? null : err instanceof Error ? err.message : 'Error al cargar noticias');
+        } else if (!isAbort) {
+          setNewsItems([]);
+          setShowStaleNotice(false);
+          setError(err instanceof Error ? err.message : 'Error al cargar noticias');
+        } else {
+          setShowStaleNotice(false);
+          setError('No pudimos cargar titulares en este momento. Intenta otra categoría.');
+        }
       })
-      .finally(() => window.clearTimeout(t));
+      .finally(() => {
+        window.clearTimeout(abortTimer);
+        window.clearTimeout(hintTimer);
+        finish();
+      });
 
     return () => {
-      cancelled = true;
-      window.clearTimeout(t);
+      window.clearTimeout(abortTimer);
+      window.clearTimeout(hintTimer);
       controller.abort();
+      finish();
     };
-  }, [topicQuery, fetchNews, refreshTick]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- newsItems solo define modo inicial/recarga
+  }, [topicQuery, fetchNews, refreshTick, activeView]);
 
-  /** Filtro estricto por tema: item.topicId === selectedTopicId (o todos si null). */
   const effectiveNewsItems = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-
-    const filterByTopic = (raw: NewsItem[]) =>
-      selectedTopicId == null ? raw : raw.filter((n) => n.topicId === selectedTopicId);
-
-    const stickySource =
-      newsItems.length > 0
-        ? newsItems
-        : lastSuccessfulItemsRef.current.length > 0
-          ? lastSuccessfulItemsRef.current
-          : null;
-    const sticky = stickySource ? filterRealNewsItems(filterByTopic(stickySource)) : [];
-
-    if (sticky.length > 0) {
-      return sticky;
+    const current = filterRealNewsItems(newsItems);
+    if (current.length > 0) return current;
+    if (loading || isRefreshing) {
+      return filterRealNewsItems(lastSuccessfulItemsRef.current);
     }
+    return current;
+  }, [activeView, loading, isRefreshing, newsItems]);
 
-    if (loading) {
-      return [];
-    }
-
-    return filterByTopic(filterRealNewsItems(newsItems));
-  }, [activeView, loading, error, newsItems, selectedTopicId]);
+  const panelLoading =
+    activeView === 'actualidad' &&
+    loading &&
+    effectiveNewsItems.length === 0 &&
+    !loadingTimedOut;
 
   const isFallback = false;
 
-  /** Solo items con geo (lugar del hecho) van al globo. */
   const newsPoints = useMemo(() => {
     if (activeView !== 'actualidad') return [];
     return effectiveNewsItems.map(newsToGlobePoint).filter(Boolean) as Array<ReturnType<typeof newsToGlobePoint> & { id: string; lat: number; lng: number }>;
@@ -219,8 +257,12 @@ export function useNewsLayer(
 
   return {
     newsItems,
-    loading,
+    loading: panelLoading,
+    isRefreshing,
+    loadingTimedOut,
     error,
+    relaxedTopic,
+    showStaleNotice,
     effectiveNewsItems,
     isFallback,
     newsPoints,

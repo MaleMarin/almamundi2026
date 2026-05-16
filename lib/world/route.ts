@@ -3,6 +3,14 @@ import Parser from "rss-parser";
 import { mockWorldNow, worldMockItemsPublicFilter } from "@/lib/world/mockWorldNow";
 import { getMediaByDomain, MEDIA_SOURCES } from "@/lib/media-sources";
 import { DEFAULT_NEWS_TOPIC_QUERY } from "@/lib/news-topics";
+
+/** Misma cadena que envía GET tras recortar a 80 caracteres. */
+const DEFAULT_NEWS_TOPIC_API = DEFAULT_NEWS_TOPIC_QUERY.slice(0, 80);
+
+function isDefaultNewsTopic(topicTrim: string): boolean {
+  const t = topicTrim.trim();
+  return t === DEFAULT_NEWS_TOPIC_QUERY || t === DEFAULT_NEWS_TOPIC_API;
+}
 import { isPublishedOnCalendarDay, sanitizeDayYmd, sanitizeTimeZone } from "@/lib/news-calendar-day";
 
 export const runtime = "nodejs";
@@ -10,7 +18,7 @@ export const runtime = "nodejs";
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 /** Caché corta para que el polling del cliente vea títulos nuevos sin esperar demasiado. */
 const CACHE_TTL_MS = 120_000; // 2 min
-const GDELT_REQUEST_TIMEOUT_MS = 8_000;
+const GDELT_REQUEST_TIMEOUT_MS = 12_000;
 
 const rssParser = new Parser({
   timeout: 8_000,
@@ -359,6 +367,8 @@ export type NormalizedNewsResponse = {
   items: NormalizedNewsItem[];
   /** true cuando la respuesta es la lista de medios (fallback), no titulares reales */
   isFallback?: boolean;
+  /** true cuando se amplió a titulares generales por pocos resultados del tema */
+  relaxedTopic?: boolean;
 };
 
 // GDELT artlist response (subset we use)
@@ -569,7 +579,7 @@ async function fetchNewsFromRss(limit: number, topic: string = ""): Promise<Norm
   });
   let items = allItems;
   const topicTrimmed = topic.trim();
-  if (topicTrimmed.length > 0 && topicTrimmed.length <= 80 && topicTrimmed !== DEFAULT_NEWS_TOPIC_QUERY) {
+  if (topicTrimmed.length > 0 && topicTrimmed.length <= 80 && !isDefaultNewsTopic(topicTrimmed)) {
     items = items.filter((it) => titleMatchesTopic(it.title, topicTrimmed));
   }
   items = items.slice(0, limit);
@@ -640,7 +650,20 @@ export async function getNews(
     merged = applyGeoFallback(merged);
 
     if (merged.length > 0) {
-      const data: NormalizedNewsResponse = { generatedAt: new Date().toISOString(), items: merged, isFallback: false };
+      let relaxedTopic = false;
+      if (merged.length < limit && topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
+        const broader = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
+        if (broader.items.length > merged.length) {
+          merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...broader.items])).slice(0, limit);
+          relaxedTopic = true;
+        }
+      }
+      const data: NormalizedNewsResponse = {
+        generatedAt: new Date().toISOString(),
+        items: merged,
+        isFallback: false,
+        relaxedTopic,
+      };
       setCached(key, data);
       return data;
     }
@@ -648,10 +671,30 @@ export async function getNews(
     return getNews(topic, limit, lang, null);
   }
 
+  const MIN_TOPIC_ITEMS = Math.min(limit, 8);
+
   // RSS primero (rápido, medios curados); GDELT ventana corta (6h) para titulares más frescos
-  const rss = await fetchNewsFromRss(limit, topicTrim).catch(() => null);
+  const rss = await fetchNewsFromRss(Math.max(limit, MIN_TOPIC_ITEMS * 2), topicTrim).catch(() => null);
   if (rss && rss.items.length > 0) {
-    const withGeo = { ...rss, items: applyGeoFallback(rss.items) };
+    let items = rss.items.slice(0, limit);
+    let relaxedTopic = false;
+    if (
+      items.length < MIN_TOPIC_ITEMS &&
+      topicTrim.length > 0 &&
+      !isDefaultNewsTopic(topicTrim)
+    ) {
+      const general = await fetchNewsFromRss(limit, "").catch(() => null);
+      if (general && general.items.length > 0) {
+        items = dedupeNewsItems(sortByPublishedDesc([...items, ...general.items])).slice(0, limit);
+        relaxedTopic = true;
+      }
+    }
+    const withGeo: NormalizedNewsResponse = {
+      ...rss,
+      items: applyGeoFallback(items),
+      isFallback: false,
+      relaxedTopic,
+    };
     setCached(key, withGeo);
     return withGeo;
   }
@@ -671,16 +714,15 @@ export async function getNews(
     setCached(key, withGeo);
     return withGeo;
   }
-  if (topicTrim.length > 0 && topicTrim !== DEFAULT_NEWS_TOPIC_QUERY) {
-    const rssGeneral = await fetchNewsFromRss(limit, "").catch(() => null);
-    if (rssGeneral && rssGeneral.items.length > 0) {
-      const withGeo = { ...rssGeneral, items: applyGeoFallback(rssGeneral.items) };
-      setCached(key, withGeo);
-      return withGeo;
-    }
-    const gdeltGeneral = await fetchNewsFromGdelt(domainQuery, limit, lang, 150, "6h").catch(() => null);
-    if (gdeltGeneral && gdeltGeneral.items.length > 0) {
-      const withGeo = { ...gdeltGeneral, items: applyGeoFallback(gdeltGeneral.items) };
+  if (topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
+    const broad = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
+    if (broad.items.length > 0) {
+      const withGeo: NormalizedNewsResponse = {
+        ...broad,
+        items: applyGeoFallback(broad.items),
+        isFallback: false,
+        relaxedTopic: true,
+      };
       setCached(key, withGeo);
       return withGeo;
     }
@@ -725,10 +767,28 @@ export async function GET(request: NextRequest) {
       const calendar = dayParam && tzParam ? { dayYmd: dayParam, timeZone: tzParam } : null;
       let data = await getNews(topic, limit, lang, calendar);
       const topicTrim = topic.trim();
-      if ((!data.items || data.items.length === 0) && !calendar && topicTrim !== DEFAULT_NEWS_TOPIC_QUERY) {
-        data = await getNews(DEFAULT_NEWS_TOPIC_QUERY, limit, lang, null);
+      if (
+        calendar &&
+        data.items.length > 0 &&
+        data.items.length < Math.min(limit, 8) &&
+        !isDefaultNewsTopic(topicTrim)
+      ) {
+        const broader = await getNews(topic, limit, lang, null);
+        if (broader.items.length > data.items.length) {
+          data = {
+            ...broader,
+            items: dedupeNewsItems(sortByPublishedDesc([...data.items, ...broader.items])).slice(0, limit),
+            relaxedTopic: true,
+          };
+        }
       }
-      if ((!data.items || data.items.length === 0) && !calendar) {
+      if ((!data.items || data.items.length === 0) && !isDefaultNewsTopic(topicTrim)) {
+        const broader = await getNews(DEFAULT_NEWS_TOPIC_API, limit, lang, null);
+        if (broader.items.length > 0) {
+          data = { ...broader, relaxedTopic: true };
+        }
+      }
+      if (!data.items || data.items.length === 0) {
         data = fallbackMediaLinks();
       }
       return Response.json(data, {

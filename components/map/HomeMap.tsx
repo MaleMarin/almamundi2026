@@ -21,7 +21,6 @@ import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import { DEFAULT_NEWS_TOPIC_QUERY, NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
-import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
@@ -318,29 +317,23 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       : (NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.query ?? DEFAULT_NEWS_TOPIC_QUERY);
 
   const fetchNews = useCallback(
-    async (topic: string, signal: AbortSignal): Promise<{ items: NewsItem[]; isFallback?: boolean }> => {
-      const { tz, day } = getUserCalendarDayForNewsApi();
-      const q = new URLSearchParams({
-        kind: 'news',
-        topic,
-        limit: '20',
-        lang: 'es',
-        tz,
-        day,
-      });
-      const url = `/api/world?${q.toString()}`;
-      try {
-        const res = await fetch(url, { signal });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = (await res.json()) as { items?: unknown[]; isFallback?: boolean };
-        const rawItems = Array.isArray(data.items) ? data.items : [];
-        const topicLabel = selectedTopicId != null ? NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.label ?? null : null;
-        const items: NewsItem[] = rawItems.map((it: unknown) => {
+    async (topic: string, signal: AbortSignal) => {
+      const topicLabel =
+        selectedTopicId != null
+          ? (NEWS_TOPIC_GROUPS.find((g) => g.id === selectedTopicId)?.label ?? null)
+          : null;
+
+      const mapApiItems = (rawItems: unknown[]): NewsItem[] =>
+        rawItems.map((it: unknown) => {
           const i = it as Record<string, unknown>;
           const geo = (() => {
             const g = i.geo as { lat?: number; lng?: number; label?: string } | null | undefined;
-            if (g && typeof g.lat === 'number' && typeof g.lng === 'number') return { lat: g.lat, lng: g.lng, label: g.label };
-            if (typeof i.lat === 'number' && typeof i.lng === 'number') return { lat: i.lat, lng: i.lng };
+            if (g && typeof g.lat === 'number' && typeof g.lng === 'number') {
+              return { lat: g.lat, lng: g.lng, label: g.label };
+            }
+            if (typeof i.lat === 'number' && typeof i.lng === 'number') {
+              return { lat: i.lat, lng: i.lng };
+            }
             return null;
           })();
           return {
@@ -350,10 +343,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             source: i.source != null ? String(i.source) : null,
             publishedAt: i.publishedAt != null ? String(i.publishedAt) : null,
             sourceCountry: i.sourceCountry != null ? String(i.sourceCountry) : null,
-            topicId:
-              typeof i.topicId === 'string'
-                ? i.topicId
-                : selectedTopicId,
+            topicId: selectedTopicId,
             topicLabel,
             outletName: i.source != null ? String(i.source) : null,
             outletId: null,
@@ -363,9 +353,61 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             topic: typeof i.topic === 'string' ? i.topic : topicLabel ?? 'Actualidad',
           } as NewsItem;
         });
-        return { items, isFallback: Boolean(data.isFallback) };
+
+      const requestNews = async (topicParam: string) => {
+        const q = new URLSearchParams({
+          kind: 'news',
+          topic: topicParam,
+          limit: '20',
+          lang: 'es',
+        });
+        const res = await fetch(`/api/world?${q.toString()}`, { signal });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = (await res.json()) as {
+          items?: unknown[];
+          isFallback?: boolean;
+          relaxedTopic?: boolean;
+        };
+        return {
+          items: mapApiItems(Array.isArray(data.items) ? data.items : []),
+          isFallback: Boolean(data.isFallback),
+          relaxedTopic: Boolean(data.relaxedTopic),
+        };
+      };
+
+      try {
+        const primary = await requestNews(topic);
+        let merged = primary.items;
+        let relaxedTopic = primary.relaxedTopic;
+        let isFallback = primary.isFallback;
+
+        const topicTrim = topic.trim();
+        const isBroadTopic =
+          topicTrim === DEFAULT_NEWS_TOPIC_QUERY ||
+          topicTrim === DEFAULT_NEWS_TOPIC_QUERY.slice(0, 80);
+        const needsMore = selectedTopicId != null && !isBroadTopic && merged.length < 8;
+        if (needsMore) {
+          try {
+            const general = await requestNews(DEFAULT_NEWS_TOPIC_QUERY);
+            const seen = new Set(merged.map((n) => n.url).filter(Boolean));
+            for (const item of general.items) {
+              if (item.url && seen.has(item.url)) continue;
+              if (item.url) seen.add(item.url);
+              merged.push(item);
+            }
+            if (general.items.length > 0) relaxedTopic = true;
+            isFallback = isFallback && merged.length === 0;
+          } catch {
+            /* complemento opcional */
+          }
+        }
+
+        return {
+          items: merged.slice(0, 20),
+          isFallback,
+          relaxedTopic,
+        };
       } catch (err) {
-        /* No resolver con []: useNewsLayer ignoraría el abort y podía dejar lista vacía por carrera. */
         if (err instanceof Error && err.name === 'AbortError') throw err;
         throw err;
       }
@@ -373,7 +415,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [selectedTopicId]
   );
 
-  const { effectiveNewsItems, loading: newsLoading, error: newsError } = useNewsLayer(
+  const {
+    effectiveNewsItems,
+    loading: newsLoading,
+    error: newsError,
+    showStaleNotice,
+    loadingTimedOut,
+    isRefreshing,
+  } = useNewsLayer(
     selectedTopicId,
     topicQuery,
     'actualidad',
@@ -446,6 +495,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const noticiasProps = {
     news: filteredNewsItems,
     loading: newsLoading,
+    isRefreshing,
+    loadingTimedOut,
+    showStaleNotice,
     error: newsError,
     selectedTopicId,
     onTopicIdChange: setSelectedTopicId,

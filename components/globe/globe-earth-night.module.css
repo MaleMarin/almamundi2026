@@ -11,9 +11,9 @@
 
 /** Home `#mapa` con `forceDaylight`: menos viñeta para que el disco se lea como día. */
 .earthDayEmbeddedContainer {
-  background: #050a14;
-  /* Viñeta mínima: disco día legible tipo NASA Earth Observatory. */
-  box-shadow: inset 0 0 64px rgba(0, 0, 0, 0.03);
+  background: #070d18;
+  /* Viñeta casi nula: el disco debe leerse como día (NASA Earth Observatory). */
+  box-shadow: inset 0 0 48px rgba(0, 0, 0, 0.015);
   position: relative;
 }
 

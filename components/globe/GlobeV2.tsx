@@ -324,10 +324,10 @@ function AtmosphereGlow({
       createAtmosphereGlowMaterial(
         homeCinematic
           ? {
-              intensity: 0.152,
-              power: 2.82,
-              innerColor: 0x7ed4ff,
-              outerColor: 0x082458,
+              intensity: 0.128,
+              power: 3.05,
+              innerColor: 0x8ed8ff,
+              outerColor: 0x0a2a5c,
             }
           : undefined
       ),
@@ -561,9 +561,9 @@ function EarthGroup({
     cloudMaterial.roughness = 1;
     cloudMaterial.metalness = 0;
     cloudMaterial.emissive.set('#d8e2ee');
-    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : 0.09;
+    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : fullDaySurface && embedded ? 0.12 : 0.09;
     cloudMaterial.needsUpdate = true;
-  }, [cloudMaterial, cloudOpacity, viewerNight]);
+  }, [cloudMaterial, cloudOpacity, viewerNight, fullDaySurface, embedded]);
 
   useLayoutEffect(() => {
     const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
@@ -891,7 +891,7 @@ function GlobeScene({
         ? 1.72
         : 1.9
       : forceDaylight
-        ? 2.52
+        ? 2.68
         : 2.16
     : viewerNight
       ? 1.65
@@ -927,7 +927,7 @@ function GlobeScene({
             ? viewerNight
               ? 0.44
               : forceDaylight
-                ? 0.66
+                ? 0.74
                 : 0.48
             : viewerNight
               ? 0.38
@@ -936,7 +936,7 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.24 : 0.18) : viewerNight ? 0.09 : 0.16
+          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.3 : 0.18) : viewerNight ? 0.09 : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
@@ -949,7 +949,7 @@ function GlobeScene({
                 ? 3.65
                 : 3.95
               : forceDaylight
-                ? 5.65
+                ? 6.05
                 : 4.95
             : viewerNight
               ? 3.35
@@ -1183,7 +1183,7 @@ export default function GlobeV2({
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedDayChrome
-            ? 2.5
+            ? 2.62
             : embeddedCinematicChrome
               ? 2.14
               : embedded

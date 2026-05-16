@@ -6,40 +6,41 @@ import { NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 function chipStyle(active: boolean) {
-  if (active) return {
-    padding: '8px 16px',
-    borderRadius: 999,
-    cursor: 'pointer' as const,
-    fontSize: 14,
-    whiteSpace: 'nowrap' as const,
-    fontFamily: SITE_FONT_STACK,
-    outline: 'none',
-    WebkitTapHighlightColor: 'transparent',
-    transition: 'all 180ms ease',
-    color: '#ffffff',
-    background: 'linear-gradient(180deg, rgba(255, 69, 0, 0.62) 0%, rgba(255, 85, 20, 0.38) 100%)',
-    backdropFilter: 'blur(12px) saturate(1.35)',
-    WebkitBackdropFilter: 'blur(12px) saturate(1.35)',
-    border: '1px solid rgba(255, 140, 70, 0.95)',
-    boxShadow:
-      'inset 0 2px 0 rgba(255, 210, 160, 0.55), inset 0 -1px 0 rgba(180, 40, 0, 0.35), 0 0 20px rgba(255, 69, 0, 0.45), 0 4px 14px rgba(0,0,0,0.25)',
-  };
+  if (active) {
+    return {
+      padding: '7px 14px',
+      borderRadius: 999,
+      cursor: 'pointer' as const,
+      fontSize: 13,
+      whiteSpace: 'nowrap' as const,
+      fontFamily: SITE_FONT_STACK,
+      outline: 'none',
+      WebkitTapHighlightColor: 'transparent',
+      transition: 'all 180ms ease',
+      color: '#fff8f2',
+      background: 'linear-gradient(180deg, rgba(255, 88, 28, 0.72) 0%, rgba(255, 105, 40, 0.42) 100%)',
+      backdropFilter: 'blur(10px) saturate(1.25)',
+      WebkitBackdropFilter: 'blur(10px) saturate(1.25)',
+      border: '1px solid rgba(255, 150, 90, 0.75)',
+      boxShadow: 'inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 10px rgba(255, 69, 0, 0.22)',
+    };
+  }
   return {
-    padding: '8px 16px',
+    padding: '7px 14px',
     borderRadius: 999,
     cursor: 'pointer' as const,
-    fontSize: 14,
+    fontSize: 13,
     whiteSpace: 'nowrap' as const,
     fontFamily: SITE_FONT_STACK,
     outline: 'none',
     WebkitTapHighlightColor: 'transparent',
     transition: 'all 180ms ease',
-    color: 'rgba(255,255,255,0.62)',
-    background: 'linear-gradient(180deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.08) 100%)',
-    backdropFilter: 'blur(14px) saturate(1.2)',
-    WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
-    border: '1px solid rgba(255,255,255,0.28)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28)',
+    color: 'rgba(248,250,255,0.78)',
+    background: 'rgba(255,255,255,0.07)',
+    backdropFilter: 'blur(12px) saturate(1.15)',
+    WebkitBackdropFilter: 'blur(12px) saturate(1.15)',
+    border: '1px solid rgba(255,255,255,0.16)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
   };
 }
 
@@ -48,10 +49,10 @@ const topicShortLabel: Record<string, string> = {
   'tecnologia-innovacion': 'Tecnología',
   'arte-cultura': 'Arte y cultura',
   'finanzas-salud': 'Finanzas y salud',
-  'educacion': 'Educación',
+  educacion: 'Educación',
   'medio-ambiente': 'Medio ambiente',
-  'deportes': 'Deportes',
-  'ciencia': 'Ciencia',
+  deportes: 'Deportes',
+  ciencia: 'Ciencia',
   'migracion-derechos': 'Migración',
 };
 
@@ -93,38 +94,40 @@ function NewsRow({
     if (news.url) window.open(news.url, '_blank', 'noopener,noreferrer');
   };
 
+  const timeLabel = timeAgo(news.publishedAt ?? null, now);
+
   return (
     <button
       type="button"
       onClick={handleClick}
       style={{
         textAlign: 'left',
-        padding: '12px 14px',
-        borderRadius: 16,
+        padding: '13px 15px',
+        borderRadius: 14,
         background: isActive
-          ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.35) 0%, rgba(255, 95, 35, 0.16) 100%)'
-          : 'linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)',
-        backdropFilter: 'blur(14px) saturate(1.2)',
-        WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
-        border: `1px solid ${isActive ? 'rgba(255, 110, 55, 0.65)' : 'rgba(255,255,255,0.22)'}`,
-        borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
+          ? 'linear-gradient(135deg, rgba(255, 82, 24, 0.28) 0%, rgba(255, 120, 50, 0.12) 100%)'
+          : 'rgba(255, 255, 255, 0.09)',
+        backdropFilter: 'blur(12px) saturate(1.15)',
+        WebkitBackdropFilter: 'blur(12px) saturate(1.15)',
+        border: `1px solid ${isActive ? 'rgba(255, 130, 70, 0.55)' : 'rgba(255,255,255,0.14)'}`,
+        borderLeft: isActive ? '3px solid #ff5a1f' : '3px solid rgba(255,255,255,0.08)',
         boxShadow: isActive
-          ? 'inset 0 1px 0 rgba(255, 200, 150, 0.35), 0 0 12px rgba(255, 69, 0, 0.2)'
-          : 'inset 0 1px 0 rgba(255,255,255,0.2)',
+          ? 'inset 0 1px 0 rgba(255, 210, 160, 0.25)'
+          : 'inset 0 1px 0 rgba(255,255,255,0.1)',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
         width: '100%',
-        opacity: dimmed ? 0.5 : 1,
+        opacity: dimmed ? 0.72 : 1,
       }}
     >
       <p
         style={{
-          fontSize: 17,
+          fontSize: 16,
           fontWeight: 600,
-          color: 'rgba(240,245,255,0.96)',
+          color: 'rgba(248, 250, 255, 0.98)',
           margin: '0 0 8px',
-          lineHeight: 1.42,
+          lineHeight: 1.45,
           display: '-webkit-box',
           WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical',
@@ -134,15 +137,17 @@ function NewsRow({
         {news.title}
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.48)', lineHeight: 1.35 }}>
+        <span style={{ fontSize: 12, color: 'rgba(230, 236, 248, 0.72)', lineHeight: 1.35 }}>
           {news.source ?? news.outletName ?? '—'}
         </span>
-        <span
-          style={{ fontSize: 12, color: 'rgba(212,220,232,0.82)', lineHeight: 1.35 }}
-          title={news.publishedAt ?? undefined}
-        >
-          {timeAgo(news.publishedAt ?? null, now)}
-        </span>
+        {timeLabel ? (
+          <span
+            style={{ fontSize: 12, color: 'rgba(200, 210, 228, 0.88)', lineHeight: 1.35 }}
+            title={news.publishedAt ?? undefined}
+          >
+            {timeLabel}
+          </span>
+        ) : null}
       </div>
     </button>
   );
@@ -151,6 +156,9 @@ function NewsRow({
 export type NewsPanelProps = {
   news: NewsItem[];
   loading?: boolean;
+  isRefreshing?: boolean;
+  loadingTimedOut?: boolean;
+  showStaleNotice?: boolean;
   error?: string | null;
   selectedTopicId: string | null;
   onTopicIdChange: (id: string | null) => void;
@@ -161,25 +169,45 @@ export type NewsPanelProps = {
 export function NewsPanel({
   news,
   loading = false,
+  isRefreshing = false,
+  loadingTimedOut = false,
+  showStaleNotice = false,
   error = null,
   selectedTopicId,
   onTopicIdChange,
   onNewsFocus,
   selectedNews,
 }: NewsPanelProps) {
-  const hasLocation = (n: NewsItem) => (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
+  const hasLocation = (n: NewsItem) =>
+    (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
   const withLocation = news.filter(hasLocation);
   const withoutLocation = news.filter((n) => !hasLocation(n));
 
+  const statusMessage = (() => {
+    if (loading && news.length === 0) {
+      return 'Cargando titulares de medios curados…';
+    }
+    if (loadingTimedOut && news.length === 0) {
+      return 'No pudimos cargar titulares en este momento. Intenta otra categoría.';
+    }
+    if (error && news.length === 0) return error;
+    if (!loading && !error && news.length === 0) {
+      return 'No hay titulares para este tema en este momento.';
+    }
+    return null;
+  })();
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
       <div style={{ flexShrink: 0 }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))',
-          gap: 8,
-          alignContent: 'start',
-        }}>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))',
+            gap: 7,
+            alignContent: 'start',
+          }}
+        >
           <button
             type="button"
             onClick={() => onTopicIdChange(null)}
@@ -214,44 +242,55 @@ export function NewsPanel({
           ))}
         </div>
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {loading && news.length === 0 ? (
+
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          scrollbarWidth: 'none',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 8,
+        }}
+      >
+        {showStaleNotice ? (
           <p
             style={{
-              fontSize: 14,
-              color: 'rgba(212,220,232,0.82)',
+              fontSize: 12,
+              color: 'rgba(200, 214, 235, 0.78)',
               fontFamily: SITE_FONT_STACK,
-              lineHeight: 1.5,
-              padding: '12px 4px',
+              lineHeight: 1.4,
+              padding: '4px 4px 0',
+              fontStyle: 'italic',
             }}
           >
-            Cargando titulares de medios curados…
+            Mostrando últimos titulares disponibles.
           </p>
         ) : null}
-        {error && news.length === 0 ? (
+        {isRefreshing && news.length > 0 ? (
           <p
             style={{
-              fontSize: 14,
-              color: 'rgba(255,200,170,0.92)',
+              fontSize: 11,
+              color: 'rgba(180, 198, 220, 0.65)',
               fontFamily: SITE_FONT_STACK,
-              lineHeight: 1.5,
-              padding: '12px 4px',
+              lineHeight: 1.35,
+              padding: '0 4px',
             }}
           >
-            {error}
+            Actualizando…
           </p>
         ) : null}
-        {!loading && !error && news.length === 0 ? (
+        {statusMessage ? (
           <p
             style={{
               fontSize: 14,
-              color: 'rgba(212,220,232,0.72)',
+              color: loading || loadingTimedOut ? 'rgba(212,220,232,0.82)' : 'rgba(255,200,170,0.92)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.5,
-              padding: '12px 4px',
+              padding: '10px 4px',
             }}
           >
-            No hay titulares para este tema en este momento.
+            {statusMessage}
           </p>
         ) : null}
         {withLocation.length > 0 && (
@@ -261,8 +300,8 @@ export function NewsPanel({
                 fontSize: 11,
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase',
-                color: '#ff5f1a',
-                margin: '6px 0 4px 2px',
+                color: '#ff6b2e',
+                margin: '4px 0 2px 2px',
                 fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.35,
               }}
@@ -270,12 +309,23 @@ export function NewsPanel({
               ◎ En el mapa
             </p>
             {withLocation.map((n, i) => (
-              <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} />
+              <NewsRow
+                key={`${n.id ?? 'news'}-${i}`}
+                news={n}
+                isActive={selectedNews?.id === n.id}
+                onClick={() => onNewsFocus(n)}
+              />
             ))}
           </>
         )}
         {withoutLocation.map((n, i) => (
-          <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} dimmed />
+          <NewsRow
+            key={`${n.id ?? 'news'}-nl-${i}`}
+            news={n}
+            isActive={selectedNews?.id === n.id}
+            onClick={() => onNewsFocus(n)}
+            dimmed
+          />
         ))}
       </div>
     </div>
