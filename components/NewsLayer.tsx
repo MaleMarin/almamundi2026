@@ -27,7 +27,7 @@ export type NewsItem = {
   topic?: string | null;
 };
 
-const NEWS_FETCH_TIMEOUT_MS = 10_000;
+const NEWS_FETCH_TIMEOUT_MS = 18_000;
 
 /** Fallback cuando la API falla o devuelve 0. Geo = lugar del hecho (demo). */
 export const NEWS_FALLBACK_ITEMS: NewsItem[] = [
@@ -83,6 +83,8 @@ export function useNewsLayer(
   const [error, setError] = useState<string | null>(null);
   const [refreshTick, setRefreshTick] = useState(0);
   const mountedRef = useRef(true);
+  const lastSuccessfulItemsRef = useRef<NewsItem[]>([]);
+  const hadRealLoadRef = useRef(false);
   const topicQueryRef = useRef(topicQuery);
   useLayoutEffect(() => {
     topicQueryRef.current = topicQuery;
@@ -130,6 +132,10 @@ export function useNewsLayer(
       .then((result) => {
         if (cancelled || !mountedRef.current) return;
         if (topicQueryRef.current !== requestTopic) return;
+        if (result.items.length > 0) {
+          hadRealLoadRef.current = true;
+          lastSuccessfulItemsRef.current = result.items;
+        }
         setNewsItems(result.items);
         setLoading(false);
         setError(null);
@@ -152,17 +158,34 @@ export function useNewsLayer(
   /** Filtro estricto por tema: item.topicId === selectedTopicId (o todos si null). */
   const effectiveNewsItems = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-    if (loading) return NEWS_FALLBACK_ITEMS;
-    if (error) return NEWS_FALLBACK_ITEMS;
-    const raw = newsItems;
-    const byTopic =
-      selectedTopicId == null
-        ? raw
-        : raw.filter((n) => n.topicId === selectedTopicId);
-    return byTopic;
+
+    const filterByTopic = (raw: NewsItem[]) =>
+      selectedTopicId == null ? raw : raw.filter((n) => n.topicId === selectedTopicId);
+
+    const sticky =
+      newsItems.length > 0
+        ? newsItems
+        : lastSuccessfulItemsRef.current.length > 0
+          ? lastSuccessfulItemsRef.current
+          : null;
+
+    if (sticky) {
+      return filterByTopic(sticky);
+    }
+
+    if (loading || error != null) {
+      return NEWS_FALLBACK_ITEMS;
+    }
+
+    return filterByTopic(newsItems);
   }, [activeView, loading, error, newsItems, selectedTopicId]);
 
-  const isFallback = activeView === 'actualidad' && (loading || error != null);
+  const isFallback =
+    activeView === 'actualidad' &&
+    !hadRealLoadRef.current &&
+    (loading || error != null) &&
+    newsItems.length === 0 &&
+    lastSuccessfulItemsRef.current.length === 0;
 
   /** Solo items con geo (lugar del hecho) van al globo. */
   const newsPoints = useMemo(() => {

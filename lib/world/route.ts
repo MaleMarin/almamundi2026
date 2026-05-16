@@ -542,7 +542,9 @@ async function fetchRssFeedCurated(domain: string, feedUrl: string): Promise<Nor
     }
     return items;
   } catch (err) {
-    console.error(`[world] RSS error ${domain}:`, err);
+    if (process.env.DEBUG_WORLD_RSS === "1") {
+      console.warn(`[world] RSS skipped ${domain}:`, err);
+    }
     return [];
   }
 }
