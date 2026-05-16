@@ -7,6 +7,7 @@ import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -70,6 +71,21 @@ export function HomePageClient() {
       );
     }
   }, []);
+
+  const goToHistoriasFromProposito = useCallback(() => {
+    closeProposito();
+    if (typeof window === 'undefined') return;
+    const onHome =
+      window.location.pathname === '/' || window.location.pathname === '';
+    if (onHome) {
+      window.history.replaceState(null, '', '/#historias');
+      window.requestAnimationFrame(() => {
+        document.getElementById('historias')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
+    hardNavigateTo('/#historias');
+  }, [closeProposito]);
 
   const openProposito = useCallback(() => {
     setComoFuncionaOpen(false);
@@ -190,7 +206,11 @@ export function HomePageClient() {
       />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
-      <PropositoModal isOpen={propositoOpen} onClose={closeProposito} />
+      <PropositoModal
+        isOpen={propositoOpen}
+        onClose={closeProposito}
+        onGoToHistorias={goToHistoriasFromProposito}
+      />
     </main>
   );
 }

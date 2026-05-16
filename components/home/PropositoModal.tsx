@@ -272,12 +272,33 @@ function ManifiestoSectionView({ section, index }: { section: ManifiestoSection;
   );
 }
 
+function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="btn-almamundi mt-6 w-full rounded-full py-3.5 text-sm font-semibold transition active:scale-[0.99] sm:w-auto sm:min-w-[min(100%,320px)] sm:px-10"
+      style={{
+        background: `linear-gradient(180deg, rgba(255, 88, 28, 0.9) 0%, ${soft.orange} 100%)`,
+        color: '#fff',
+        border: '1px solid rgba(255, 160, 100, 0.6)',
+        boxShadow: '0 6px 20px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
+        fontFamily: SITE_FONT_STACK,
+      }}
+    >
+      Contar mi historia — ver los 4 formatos
+    </button>
+  );
+}
+
 export function PropositoModal({
   isOpen,
   onClose,
+  onGoToHistorias,
 }: {
   isOpen: boolean;
   onClose: () => void;
+  onGoToHistorias?: () => void;
 }) {
   const [activeSectionId, setActiveSectionId] = useState(DEFAULT_SECTION_ID);
 
@@ -395,6 +416,11 @@ export function PropositoModal({
             section={activeSection}
             index={activeIndex >= 0 ? activeIndex : 0}
           />
+          {onGoToHistorias ? (
+            <div className="mt-2 flex justify-center border-t border-white/35 pt-6">
+              <HistoriasCtaButton onClick={onGoToHistorias} />
+            </div>
+          ) : null}
         </div>
       </div>
     </div>,
