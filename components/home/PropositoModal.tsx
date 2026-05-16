@@ -353,7 +353,7 @@ export function PropositoModal({
               onClick={onClose}
               className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition active:scale-[0.97]"
               style={{ ...soft.button, color: soft.textMain }}
-              aria-label="Cerrar manifiesto"
+              aria-label="Cerrar propósito"
             >
               Cerrar
             </button>
@@ -361,7 +361,7 @@ export function PropositoModal({
 
           <nav
             className="mt-4 flex flex-wrap gap-2"
-            aria-label="Secciones del manifiesto"
+            aria-label="Secciones del propósito"
             role="tablist"
           >
             {MANIFIESTO_SECTIONS.map((s) => {
