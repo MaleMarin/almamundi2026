@@ -350,7 +350,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             source: i.source != null ? String(i.source) : null,
             publishedAt: i.publishedAt != null ? String(i.publishedAt) : null,
             sourceCountry: i.sourceCountry != null ? String(i.sourceCountry) : null,
-            topicId: selectedTopicId,
+            topicId:
+              typeof i.topicId === 'string'
+                ? i.topicId
+                : selectedTopicId,
             topicLabel,
             outletName: i.source != null ? String(i.source) : null,
             outletId: null,
@@ -370,9 +373,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [selectedTopicId]
   );
 
-  const { effectiveNewsItems } = useNewsLayer(selectedTopicId, topicQuery, 'actualidad', fetchNews, {
-    refreshIntervalMs: 120_000,
-  });
+  const { effectiveNewsItems, loading: newsLoading, error: newsError } = useNewsLayer(
+    selectedTopicId,
+    topicQuery,
+    'actualidad',
+    fetchNews,
+    {
+      refreshIntervalMs: 120_000,
+    }
+  );
   const filteredNewsItems = effectiveNewsItems;
 
   const handleStoryFocus = useCallback((story: StoryPoint) => {
@@ -436,6 +445,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const noticiasProps = {
     news: filteredNewsItems,
+    loading: newsLoading,
+    error: newsError,
     selectedTopicId,
     onTopicIdChange: setSelectedTopicId,
     onNewsFocus: (n: NewsItem) => setSelectedNews(n),

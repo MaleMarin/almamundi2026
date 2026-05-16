@@ -671,6 +671,21 @@ export async function getNews(
     setCached(key, withGeo);
     return withGeo;
   }
+  if (topicTrim.length > 0 && topicTrim !== DEFAULT_NEWS_TOPIC_QUERY) {
+    const rssGeneral = await fetchNewsFromRss(limit, "").catch(() => null);
+    if (rssGeneral && rssGeneral.items.length > 0) {
+      const withGeo = { ...rssGeneral, items: applyGeoFallback(rssGeneral.items) };
+      setCached(key, withGeo);
+      return withGeo;
+    }
+    const gdeltGeneral = await fetchNewsFromGdelt(domainQuery, limit, lang, 150, "6h").catch(() => null);
+    if (gdeltGeneral && gdeltGeneral.items.length > 0) {
+      const withGeo = { ...gdeltGeneral, items: applyGeoFallback(gdeltGeneral.items) };
+      setCached(key, withGeo);
+      return withGeo;
+    }
+  }
+
   const cachedNews = getAnyCachedNews();
   if (cachedNews) return { ...cachedNews, items: applyGeoFallback(cachedNews.items) };
   const fallback = fallbackMediaLinks();
@@ -709,6 +724,10 @@ export async function GET(request: NextRequest) {
       const tzParam = sanitizeTimeZone(request.nextUrl.searchParams.get("tz"));
       const calendar = dayParam && tzParam ? { dayYmd: dayParam, timeZone: tzParam } : null;
       let data = await getNews(topic, limit, lang, calendar);
+      const topicTrim = topic.trim();
+      if ((!data.items || data.items.length === 0) && !calendar && topicTrim !== DEFAULT_NEWS_TOPIC_QUERY) {
+        data = await getNews(DEFAULT_NEWS_TOPIC_QUERY, limit, lang, null);
+      }
       if ((!data.items || data.items.length === 0) && !calendar) {
         data = fallbackMediaLinks();
       }

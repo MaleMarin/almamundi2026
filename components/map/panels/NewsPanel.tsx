@@ -79,7 +79,9 @@ function NewsRow({
   const timeAgo = (date: string | null, currentTime: number) => {
     if (!date) return '';
     const diff = currentTime - new Date(date).getTime();
+    if (!Number.isFinite(diff) || diff < 0) return '';
     const mins = Math.floor(diff / 60000);
+    if (mins < 1) return 'ahora';
     if (mins < 60) return `hace ${mins}m`;
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `hace ${hrs}h`;
@@ -148,6 +150,8 @@ function NewsRow({
 
 export type NewsPanelProps = {
   news: NewsItem[];
+  loading?: boolean;
+  error?: string | null;
   selectedTopicId: string | null;
   onTopicIdChange: (id: string | null) => void;
   onNewsFocus: (n: NewsItem) => void;
@@ -156,6 +160,8 @@ export type NewsPanelProps = {
 
 export function NewsPanel({
   news,
+  loading = false,
+  error = null,
   selectedTopicId,
   onTopicIdChange,
   onNewsFocus,
@@ -209,6 +215,45 @@ export function NewsPanel({
         </div>
       </div>
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+        {loading && news.length === 0 ? (
+          <p
+            style={{
+              fontSize: 14,
+              color: 'rgba(212,220,232,0.82)',
+              fontFamily: SITE_FONT_STACK,
+              lineHeight: 1.5,
+              padding: '12px 4px',
+            }}
+          >
+            Cargando titulares de medios curados…
+          </p>
+        ) : null}
+        {error && news.length === 0 ? (
+          <p
+            style={{
+              fontSize: 14,
+              color: 'rgba(255,200,170,0.92)',
+              fontFamily: SITE_FONT_STACK,
+              lineHeight: 1.5,
+              padding: '12px 4px',
+            }}
+          >
+            {error}
+          </p>
+        ) : null}
+        {!loading && !error && news.length === 0 ? (
+          <p
+            style={{
+              fontSize: 14,
+              color: 'rgba(212,220,232,0.72)',
+              fontFamily: SITE_FONT_STACK,
+              lineHeight: 1.5,
+              padding: '12px 4px',
+            }}
+          >
+            No hay titulares para este tema en este momento.
+          </p>
+        ) : null}
         {withLocation.length > 0 && (
           <>
             <p

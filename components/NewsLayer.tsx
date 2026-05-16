@@ -29,7 +29,25 @@ export type NewsItem = {
 
 const NEWS_FETCH_TIMEOUT_MS = 18_000;
 
-/** Fallback cuando la API falla o devuelve 0. Geo = lugar del hecho (demo). */
+/** Identificadores de placeholder (no mostrar como titulares reales). */
+export function isDemoNewsItem(item: NewsItem): boolean {
+  if (item.id.startsWith('fb-') || item.id.startsWith('media-')) return true;
+  if (!item.url?.trim() || item.url === '#') return true;
+  const t = item.title.trim();
+  return (
+    t === 'Noticias en vivo' ||
+    t === 'Actualidad global' ||
+    t === 'Cobertura mundial' ||
+    t === 'Última hora' ||
+    t === 'En desarrollo'
+  );
+}
+
+export function filterRealNewsItems(items: NewsItem[]): NewsItem[] {
+  return items.filter((n) => !isDemoNewsItem(n) && n.title.trim().length > 0);
+}
+
+/** @deprecated Solo para pruebas; no usar en UI de producto. */
 export const NEWS_FALLBACK_ITEMS: NewsItem[] = [
   { id: 'fb-1', title: 'Noticias en vivo', url: '#', source: 'AlmaMundi', publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: 'AlmaMundi', outletId: null, geo: { lat: 19.43, lng: -99.13 }, lat: 19.43, lng: -99.13 },
   { id: 'fb-2', title: 'Actualidad global', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: 40.71, lng: -74.0 }, lat: 40.71, lng: -74.0 },
@@ -132,13 +150,18 @@ export function useNewsLayer(
       .then((result) => {
         if (cancelled || !mountedRef.current) return;
         if (topicQueryRef.current !== requestTopic) return;
-        if (result.items.length > 0) {
+        const realItems = filterRealNewsItems(result.items);
+        if (realItems.length > 0) {
           hadRealLoadRef.current = true;
-          lastSuccessfulItemsRef.current = result.items;
+          lastSuccessfulItemsRef.current = realItems;
         }
-        setNewsItems(result.items);
+        setNewsItems(realItems);
         setLoading(false);
-        setError(null);
+        setError(
+          realItems.length === 0 && result.isFallback
+            ? 'No pudimos cargar noticias en este momento'
+            : null
+        );
       })
       .catch((err) => {
         if (cancelled || !mountedRef.current) return;
@@ -162,30 +185,26 @@ export function useNewsLayer(
     const filterByTopic = (raw: NewsItem[]) =>
       selectedTopicId == null ? raw : raw.filter((n) => n.topicId === selectedTopicId);
 
-    const sticky =
+    const stickySource =
       newsItems.length > 0
         ? newsItems
         : lastSuccessfulItemsRef.current.length > 0
           ? lastSuccessfulItemsRef.current
           : null;
+    const sticky = stickySource ? filterRealNewsItems(filterByTopic(stickySource)) : [];
 
-    if (sticky) {
-      return filterByTopic(sticky);
+    if (sticky.length > 0) {
+      return sticky;
     }
 
-    if (loading || error != null) {
-      return NEWS_FALLBACK_ITEMS;
+    if (loading) {
+      return [];
     }
 
-    return filterByTopic(newsItems);
+    return filterByTopic(filterRealNewsItems(newsItems));
   }, [activeView, loading, error, newsItems, selectedTopicId]);
 
-  const isFallback =
-    activeView === 'actualidad' &&
-    !hadRealLoadRef.current &&
-    (loading || error != null) &&
-    newsItems.length === 0 &&
-    lastSuccessfulItemsRef.current.length === 0;
+  const isFallback = false;
 
   /** Solo items con geo (lugar del hecho) van al globo. */
   const newsPoints = useMemo(() => {

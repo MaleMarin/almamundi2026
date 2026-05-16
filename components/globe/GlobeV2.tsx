@@ -891,7 +891,7 @@ function GlobeScene({
         ? 1.72
         : 1.9
       : forceDaylight
-        ? 2.38
+        ? 2.52
         : 2.16
     : viewerNight
       ? 1.65
@@ -927,7 +927,7 @@ function GlobeScene({
             ? viewerNight
               ? 0.44
               : forceDaylight
-                ? 0.58
+                ? 0.66
                 : 0.48
             : viewerNight
               ? 0.38
@@ -936,7 +936,7 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.18 : 0.18) : viewerNight ? 0.09 : 0.16
+          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.24 : 0.18) : viewerNight ? 0.09 : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
@@ -949,7 +949,7 @@ function GlobeScene({
                 ? 3.65
                 : 3.95
               : forceDaylight
-                ? 5.25
+                ? 5.65
                 : 4.95
             : viewerNight
               ? 3.35
@@ -1183,7 +1183,7 @@ export default function GlobeV2({
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedDayChrome
-            ? 2.38
+            ? 2.5
             : embeddedCinematicChrome
               ? 2.14
               : embedded
