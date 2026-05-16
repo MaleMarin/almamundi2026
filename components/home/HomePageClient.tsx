@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
@@ -83,21 +83,31 @@ export function HomePageClient() {
     }
   }, []);
 
+  const syncModalsFromHash = useCallback(() => {
+    if (typeof window === 'undefined') return;
+    const h = window.location.hash;
+    if (h === '#como-funciona') {
+      setComoFuncionaOpen(true);
+      setPropositoOpen(false);
+      return;
+    }
+    if (h === '#proposito') {
+      setPropositoOpen(true);
+      setComoFuncionaOpen(false);
+      return;
+    }
+    setPropositoOpen(false);
+    setComoFuncionaOpen(false);
+  }, []);
+
+  useLayoutEffect(() => {
+    syncModalsFromHash();
+  }, [syncModalsFromHash]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const syncFromHash = () => {
-      const h = window.location.hash;
-      if (h === '#como-funciona') {
-        setComoFuncionaOpen(true);
-        setPropositoOpen(false);
-      }
-      if (h === '#proposito') {
-        setPropositoOpen(true);
-        setComoFuncionaOpen(false);
-      }
-    };
-    syncFromHash();
-    window.addEventListener('hashchange', syncFromHash);
+    window.addEventListener('hashchange', syncModalsFromHash);
+    window.addEventListener('popstate', syncModalsFromHash);
 
     const voiceOpenPurpose = () => {
       setComoFuncionaOpen(false);
@@ -111,10 +121,11 @@ export function HomePageClient() {
     window.addEventListener('almamundi:voice:showPurpose', voiceOpenPurpose);
 
     return () => {
-      window.removeEventListener('hashchange', syncFromHash);
+      window.removeEventListener('hashchange', syncModalsFromHash);
+      window.removeEventListener('popstate', syncModalsFromHash);
       window.removeEventListener('almamundi:voice:showPurpose', voiceOpenPurpose);
     };
-  }, []);
+  }, [syncModalsFromHash]);
 
   return (
     <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
