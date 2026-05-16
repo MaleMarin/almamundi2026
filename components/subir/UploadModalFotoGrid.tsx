@@ -9,6 +9,7 @@ type Props = {
   onAddFiles: (files: FileList | null) => void;
   onRemove: (index: number) => void;
   maxPhotos?: number;
+  showCounter?: boolean;
 };
 
 export function UploadModalFotoGrid({
@@ -17,6 +18,7 @@ export function UploadModalFotoGrid({
   onAddFiles,
   onRemove,
   maxPhotos = SUBIR_PHOTO_MAX,
+  showCounter = true,
 }: Props) {
   const slots = Array.from({ length: maxPhotos }, (_, i) => i);
 
@@ -73,9 +75,11 @@ export function UploadModalFotoGrid({
           );
         })}
       </div>
-      <p className={styles.amFotoCounter}>
-        {photoPreviews.length} de {maxPhotos} fotos
-      </p>
+      {showCounter ? (
+        <p className={styles.amFotoCounter}>
+          {photoPreviews.length} de {maxPhotos} fotos
+        </p>
+      ) : null}
     </div>
   );
 }

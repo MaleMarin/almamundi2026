@@ -18,8 +18,6 @@ import {
   MapPin,
   Globe2,
   Mail,
-  Camera,
-  Images,
 } from 'lucide-react';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -29,6 +27,7 @@ import {
 } from '@/lib/media-duration-rules';
 import {
   SUBIR_AUDIO_UPLOAD_MAX_MB,
+  SUBIR_PHOTO_FILE_MAX_MB,
   SUBIR_PHOTO_MAX,
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
@@ -42,7 +41,7 @@ import {
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
-import { UploadModalFotoGrid } from '@/components/subir/UploadModalFotoGrid';
+import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { THEME_LIST, type ThemeId } from '@/lib/themes';
 import {
@@ -122,9 +121,9 @@ type CaptureIntroBlock = {
 function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   const c = UPLOAD_MODAL_COPY[mode];
   return {
-    title: c.title.replace(/\n/g, ' '),
+    title: mode === 'foto' ? c.title : c.title.replace(/\n/g, ' '),
     lead: c.subtitle,
-    meta: c.limit,
+    meta: mode === 'foto' ? undefined : c.limit,
   };
 }
 
@@ -650,15 +649,15 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         const next = [...prev];
         for (const f of Array.from(list)) {
           if (next.length >= SUBIR_PHOTO_MAX) {
-            setErr(`Máximo ${SUBIR_PHOTO_MAX} fotos.`);
+            setErr(UPLOAD_PHOTO_MAX_MESSAGE);
             break;
           }
-          if (!/^image\/(jpeg|png|webp|jpg)$/i.test(f.type)) {
-            setErr('Solo imágenes (JPG, PNG, WebP).');
+          if (!/^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type)) {
+            setErr('Solo imágenes (JPG, PNG, WEBP, HEIC).');
             continue;
           }
-          if (f.size > 8 * 1024 * 1024) {
-            setErr('Cada foto: máximo 8 MB.');
+          if (f.size > SUBIR_PHOTO_FILE_MAX_MB * 1024 * 1024) {
+            setErr(`Cada foto: máximo ${SUBIR_PHOTO_FILE_MAX_MB} MB.`);
             continue;
           }
           next.push(f);
@@ -933,7 +932,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         >
           {step === 'capture' && (
             <div className="mb-6 space-y-3 px-1">
-              <h3 className="text-2xl font-light leading-snug text-gray-800 md:text-3xl md:leading-snug">
+              <h3 className={amStyles.amModalTitle}>
                 {captureIntroFor(mode).title}
               </h3>
               <p className={amStyles.amModalSubtitle}>
@@ -1216,87 +1215,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
 
           {step === 'capture' && mode === 'foto' && (
-            <div className="space-y-4">
-              <p className="text-base leading-relaxed text-gray-600 md:text-lg">
-                Elige fotos de tu galería o toma fotos nuevas con la cámara. Necesitas al menos {SUBIR_PHOTO_MIN} y como máximo{' '}
-                {SUBIR_PHOTO_MAX} (JPG, PNG o WebP).
-              </p>
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                <label
-                  className={`flex cursor-pointer items-center justify-center gap-3 rounded-[18px] px-5 py-4 text-base font-bold text-gray-700 transition active:scale-[0.99] md:text-lg ${
-                    photoFiles.length >= SUBIR_PHOTO_MAX ? 'pointer-events-none opacity-45' : ''
-                  }`}
-                  style={{ ...soft.flat, borderRadius: '18px' }}
-                >
-                  <Images className="h-5 w-5 shrink-0 text-orange-500" aria-hidden />
-                  <span>Desde la galería</span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/jpg"
-                    multiple
-                    disabled={photoFiles.length >= SUBIR_PHOTO_MAX}
-                    className="sr-only"
-                    aria-label={`Elegir imágenes de la galería, hasta ${SUBIR_PHOTO_MAX} en total`}
-                    onChange={(e) => {
-                      addPhotos(e.target.files);
-                      e.target.value = '';
-                    }}
-                  />
-                </label>
-                <label
-                  className={`flex cursor-pointer items-center justify-center gap-3 rounded-[18px] px-5 py-4 text-base font-bold text-gray-700 transition active:scale-[0.99] md:text-lg ${
-                    photoFiles.length >= SUBIR_PHOTO_MAX ? 'pointer-events-none opacity-45' : ''
-                  }`}
-                  style={{ ...soft.flat, borderRadius: '18px' }}
-                >
-                  <Camera className="h-5 w-5 shrink-0 text-orange-500" aria-hidden />
-                  <span>Tomar foto</span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/jpg"
-                    capture="environment"
-                    disabled={photoFiles.length >= SUBIR_PHOTO_MAX}
-                    className="sr-only"
-                    aria-label="Abrir cámara para tomar una foto"
-                    onChange={(e) => {
-                      addPhotos(e.target.files);
-                      e.target.value = '';
-                    }}
-                  />
-                </label>
-              </div>
-              {photoFiles.length >= SUBIR_PHOTO_MAX && (
-                <p className="text-base font-medium text-orange-700 md:text-lg">Llegaste al máximo de {SUBIR_PHOTO_MAX} fotos.</p>
-              )}
-              {photoPreviews.length > 0 && (
-                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">
-                  Revisa tus fotos antes de continuar
-                </p>
-              )}
-              <p className="text-lg font-semibold text-gray-700 md:text-xl" aria-live="polite">
-                {photoFiles.length} / {SUBIR_PHOTO_MAX} fotos
-                {photoFiles.length > 0 && photoFiles.length < SUBIR_PHOTO_MIN && (
-                  <span className="ml-2 text-base font-normal text-amber-700 md:text-lg">
-                    (faltan {SUBIR_PHOTO_MIN - photoFiles.length} para el mínimo)
-                  </span>
-                )}
-              </p>
-              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                {photoPreviews.map((src, i) => (
-                  <div key={src} className="relative overflow-hidden rounded-2xl" style={soft.inset}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={src} alt="" className="aspect-square w-full object-cover" />
-                    <button
-                      type="button"
-                      onClick={() => removePhotoAt(i)}
-                      className="absolute bottom-2 right-2 rounded-full bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow"
-                      aria-label={`Quitar foto ${i + 1}`}
-                    >
-                      Quitar
-                    </button>
-                  </div>
-                ))}
-              </div>
+            <div className={amStyles.amCaptureEditorialPanel}>
+              <UploadModalFotoCapture
+                photoFiles={photoFiles}
+                photoPreviews={photoPreviews}
+                onAddFiles={addPhotos}
+                onRemove={removePhotoAt}
+                inlineError={err || undefined}
+              />
             </div>
           )}
 

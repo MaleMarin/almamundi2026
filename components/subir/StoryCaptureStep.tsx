@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Video, Mic, Square, RotateCcw, Link2, Camera, Upload } from 'lucide-react';
+import { Video, Mic, Square, RotateCcw, Link2, Upload } from 'lucide-react';
 import { neu } from '@/lib/historias-neumorph';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -21,9 +21,11 @@ import {
 import {
   UPLOAD_DURATION_ERROR,
   UPLOAD_MODAL_COPY,
+  UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
+import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import type { SubirHuellaFormat as SubirFormat } from '@/hooks/useSubirHuella';
 import { VoiceWaveform, type VoiceWaveformMode } from './VoiceWaveform';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
@@ -97,7 +99,6 @@ const PHOTO_MAX_MB = SUBIR_PHOTO_FILE_MAX_MB;
 const AUDIO_MAX_MB = SUBIR_AUDIO_UPLOAD_MAX_MB;
 const VIDEO_UPLOAD_MAX_MB = SUBIR_VIDEO_UPLOAD_MAX_MB;
 const NARRATIVE_MIN = 30;
-const FOTO_CAPTION_MIN = 15;
 const TEXT_DRAFT_KEY = 'almamundi-subir-texto-draft';
 
 const neoSurface = {
@@ -180,6 +181,7 @@ export function StoryCaptureStep({
   const [textStory, setTextStory] = useState('');
   const [fotoCaption, setFotoCaption] = useState('');
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   const [videoUrl, setVideoUrl] = useState('');
   const [videoFile, setVideoFile] = useState<File | null>(null);
@@ -334,21 +336,6 @@ export function StoryCaptureStep({
     };
   }, [videoFile]);
 
-  const [photoMainPreviewUrl, setPhotoMainPreviewUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const f = photoFiles[0];
-    if (!f) {
-      setPhotoMainPreviewUrl(null);
-      return;
-    }
-    const u = URL.createObjectURL(f);
-    setPhotoMainPreviewUrl(u);
-    return () => {
-      URL.revokeObjectURL(u);
-    };
-  }, [photoFiles]);
-
   const startLive = useCallback(async () => {
     setLocalErr('');
     const wantVideo = format === 'video';
@@ -464,11 +451,7 @@ export function StoryCaptureStep({
         return len >= NARRATIVE_MIN && len <= SUBIR_TEXT_MAX_CHARS;
       }
       if (format === 'foto') {
-        return (
-          photoFiles.length >= SUBIR_PHOTO_MIN &&
-          photoFiles.length <= SUBIR_PHOTO_MAX &&
-          fotoCaption.trim().length >= FOTO_CAPTION_MIN
-        );
+        return photoFiles.length >= SUBIR_PHOTO_MIN && photoFiles.length <= SUBIR_PHOTO_MAX;
       }
       return false;
     }
@@ -524,9 +507,9 @@ export function StoryCaptureStep({
           );
         } else if (format === 'foto') {
           setLocalErr(
-            photoFiles.length < SUBIR_PHOTO_MIN || photoFiles.length > SUBIR_PHOTO_MAX
-              ? `Elige entre ${SUBIR_PHOTO_MIN} y ${SUBIR_PHOTO_MAX} imágenes.`
-              : `Cuéntanos un poco más sobre la imagen (al menos ${FOTO_CAPTION_MIN} caracteres).`
+            photoFiles.length > SUBIR_PHOTO_MAX
+              ? UPLOAD_PHOTO_MAX_MESSAGE
+              : `Sube al menos ${SUBIR_PHOTO_MIN} foto para continuar.`
           );
         } else if (format === 'video') {
           setLocalErr('Graba un momento, sube un video desde tu equipo o pega un enlace de YouTube o Vimeo.');
@@ -567,7 +550,7 @@ export function StoryCaptureStep({
         narrativeText = textStory.trim().slice(0, SUBIR_TEXT_MAX_CHARS);
       } else if (format === 'foto') {
         narrativeText =
-          fotoCaption.trim().length >= FOTO_CAPTION_MIN
+          fotoCaption.trim().length > 0
             ? fotoCaption.trim()
             : buildSubmissionNarrativeText('foto', meta);
       } else {
@@ -664,8 +647,45 @@ export function StoryCaptureStep({
         : 'Paso 3 · Datos de la persona';
 
   const modalCopy = UPLOAD_MODAL_COPY[format];
-  const formatWelcomeTitle = modalCopy.title.replace(/\n/g, ' ');
+  const formatWelcomeTitle = format === 'foto' ? modalCopy.title : modalCopy.title.replace(/\n/g, ' ');
   const formatWelcomeBody = [modalCopy.subtitle, modalCopy.limit].filter(Boolean).join(' ');
+
+  const addPhotoFiles = useCallback((list: FileList | null) => {
+    if (!list?.length) return;
+    setPhotoFiles((prev) => {
+      const next = [...prev];
+      for (const f of Array.from(list)) {
+        if (next.length >= SUBIR_PHOTO_MAX) {
+          setLocalErr(UPLOAD_PHOTO_MAX_MESSAGE);
+          break;
+        }
+        if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
+          setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB.`);
+          return prev;
+        }
+        if (!/^image\/(jpeg|png|webp|heic|heif|jpg)$/i.test(f.type)) {
+          setLocalErr('Formato: JPG, PNG, WEBP o HEIC.');
+          return prev;
+        }
+        next.push(f);
+      }
+      setLocalErr('');
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
+    const urls = photoFiles.map((f) => URL.createObjectURL(f));
+    setPhotoPreviews(urls);
+    return () => {
+      urls.forEach((u) => URL.revokeObjectURL(u));
+    };
+  }, [photoFiles]);
+
+  const removePhotoAt = useCallback((index: number) => {
+    setPhotoFiles((p) => p.filter((_, i) => i !== index));
+    setLocalErr('');
+  }, []);
 
   return (
     <section className="space-y-8 md:space-y-10" aria-label="Captura de tu historia" aria-current="step">
@@ -674,12 +694,16 @@ export function StoryCaptureStep({
         <h1 className="sr-only">{formatWelcomeTitle}</h1>
         {flowStage === 'welcome' && (
           <div className="space-y-3 max-w-2xl">
-            <h2 className="text-2xl md:text-3xl font-light leading-snug tracking-tight" style={{ color: neu.textMain }}>
+            <h2
+              className={amStyles.amModalTitle}
+              style={{ whiteSpace: format === 'foto' ? 'pre-line' : 'normal' }}
+            >
               {formatWelcomeTitle}
             </h2>
-            <p className="text-base md:text-lg leading-relaxed" style={{ color: neu.textBody }}>
-              {formatWelcomeBody}
-            </p>
+            <p className={amStyles.amModalSubtitle}>{modalCopy.subtitle}</p>
+            {modalCopy.limit && format !== 'texto' ? (
+              <p className={amStyles.amModalLimit}>{modalCopy.limit}</p>
+            ) : null}
           </div>
         )}
         {flowStage !== 'welcome' && (
@@ -998,8 +1022,7 @@ export function StoryCaptureStep({
               setFlowStage('media');
               setLocalErr('');
             }}
-            className="w-full py-4 md:py-5 rounded-full font-bold text-base text-white"
-            style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+            className={amStyles.amModalBtnPrimary}
           >
             Comenzar
           </button>
@@ -1007,119 +1030,39 @@ export function StoryCaptureStep({
       )}
 
       {format === 'foto' && flowStage === 'media' && (
-        <div className="space-y-5 max-w-3xl mx-auto">
-          <button
-            type="button"
-            onClick={() => {
-              setFlowStage('welcome');
-              setLocalErr('');
-            }}
-            className="text-sm font-medium px-4 py-2 rounded-full"
-            style={{ ...neu.button, color: neu.textBody }}
-          >
-            ← Volver
-          </button>
-          <div className="grid gap-6 lg:grid-cols-2">
-            <div style={neoSurface} className="p-6 md:p-8 space-y-4">
-              <label htmlFor="capture-foto-files" className="flex items-center gap-3 text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
-                <Camera className="h-8 w-8 text-orange-500 shrink-0" aria-hidden />
-                Tu imagen ({SUBIR_PHOTO_MIN}–{SUBIR_PHOTO_MAX})
+        <div className="mx-auto w-full max-w-[620px]">
+          <div className={amStyles.amCaptureEditorialPanel}>
+            <button
+              type="button"
+              onClick={() => {
+                setFlowStage('welcome');
+                setLocalErr('');
+              }}
+              className="mb-6 text-sm font-medium px-4 py-2 rounded-full"
+              style={{ ...neu.button, color: neu.textBody }}
+            >
+              ← Volver
+            </button>
+            <UploadModalFotoCapture
+              photoFiles={photoFiles}
+              photoPreviews={photoPreviews}
+              onAddFiles={addPhotoFiles}
+              onRemove={removePhotoAt}
+              inlineError={localErr || undefined}
+            />
+            <div className="mt-6 space-y-2">
+              <label htmlFor="capture-foto-caption" className="block text-sm font-medium text-[#1c1c2e]">
+                Contexto de tus fotos (opcional)
               </label>
-              <p className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
-                Puedes subir una o varias fotos (JPG, PNG o WebP, hasta {PHOTO_MAX_MB} MB cada una).
-              </p>
-              <input
-                id="capture-foto-files"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                capture="environment"
-                aria-label={`Elegir imágenes (${SUBIR_PHOTO_MIN} a ${SUBIR_PHOTO_MAX})`}
-                onChange={(e) => {
-                  const list = e.target.files;
-                  if (!list?.length) return;
-                  setPhotoFiles((prev) => {
-                    const next = [...prev];
-                    for (const f of Array.from(list)) {
-                      if (next.length >= SUBIR_PHOTO_MAX) break;
-                      if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
-                        setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB`);
-                        return prev;
-                      }
-                      if (!/^image\/(jpeg|png|webp)$/i.test(f.type)) {
-                        setLocalErr('Formato: JPG, PNG o WebP.');
-                        return prev;
-                      }
-                      next.push(f);
-                    }
-                    setLocalErr('');
-                    return next;
-                  });
-                  e.target.value = '';
-                }}
-                className="w-full text-sm md:text-base"
-                style={{ color: neu.textBody }}
+              <textarea
+                id="capture-foto-caption"
+                value={fotoCaption}
+                onChange={(e) => setFotoCaption(e.target.value)}
+                rows={5}
+                placeholder="¿Qué guardan estas imágenes? Quién aparece, dónde fueron, por qué importan…"
+                className={amStyles.amTextarea}
+                aria-label="Contexto de las fotos"
               />
-              {photoFiles.length > 0 && (
-                <ul className="space-y-2">
-                  {photoFiles.map((f, i) => (
-                    <li
-                      key={`${f.name}-${i}`}
-                      className="flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm"
-                      style={{ ...neu.card, borderRadius: '16px' }}
-                    >
-                      <span className="truncate font-medium" style={{ color: neu.textMain }}>
-                        {f.name}
-                      </span>
-                      <button
-                        type="button"
-                        className="shrink-0 rounded-full px-4 py-2 text-xs font-bold text-white"
-                        style={{ background: orangeCta }}
-                        onClick={() => setPhotoFiles((p) => p.filter((_, j) => j !== i))}
-                      >
-                        Quitar
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <p className="text-sm" style={{ color: neu.textBody }}>
-                Llevas {photoFiles.length} de {SUBIR_PHOTO_MAX} fotos.
-              </p>
-            </div>
-            <div className="space-y-4">
-              {photoMainPreviewUrl && (
-                <div
-                  className="rounded-[1.75rem] overflow-hidden border border-white/50"
-                  style={{ ...neu.cardInset, minHeight: '200px' }}
-                >
-                  <img
-                    src={photoMainPreviewUrl}
-                    alt="Vista previa de tu foto"
-                    className="w-full h-full max-h-[360px] object-contain bg-[#e8ecf4]"
-                  />
-                </div>
-              )}
-              <div style={neoSurface} className="p-6 md:p-8 space-y-3">
-                <label htmlFor="capture-foto-caption" className="block text-lg md:text-xl font-semibold" style={{ color: neu.textMain }}>
-                  Contexto de la foto
-                </label>
-                <p className="text-sm leading-relaxed" style={{ color: neu.textBody }}>
-                  Al menos {FOTO_CAPTION_MIN} caracteres nos ayudan a entender qué cuenta esta imagen.
-                </p>
-                <textarea
-                  id="capture-foto-caption"
-                  value={fotoCaption}
-                  onChange={(e) => setFotoCaption(e.target.value)}
-                  rows={6}
-                  placeholder="¿Qué guarda esta imagen? Puedes contar quién aparece, dónde fue tomada, qué estaba pasando o por qué la conservas."
-                  className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y"
-                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                />
-                <p className="text-xs" style={{ color: neu.textBody }}>
-                  {fotoCaption.trim().length.toLocaleString('es')} caracteres
-                </p>
-              </div>
             </div>
           </div>
         </div>
