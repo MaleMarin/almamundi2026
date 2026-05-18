@@ -41,6 +41,7 @@ import {
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
+import { CaptureEditorialIntro } from '@/components/subir/CaptureEditorialIntro';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { THEME_LIST, type ThemeId } from '@/lib/themes';
@@ -930,7 +931,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
-          {step === 'capture' && (
+          {step === 'capture' && mode !== 'foto' && (
             <div className="mb-6 space-y-3 px-1">
               <h3 className={amStyles.amModalTitle}>
                 {captureIntroFor(mode).title}
@@ -1216,6 +1217,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
           {step === 'capture' && mode === 'foto' && (
             <div className={amStyles.amCaptureEditorialPanel}>
+              <CaptureEditorialIntro
+                title={UPLOAD_MODAL_COPY.foto.title}
+                subtitle={UPLOAD_MODAL_COPY.foto.subtitle}
+                titlePreLine
+              />
               <UploadModalFotoCapture
                 photoFiles={photoFiles}
                 photoPreviews={photoPreviews}

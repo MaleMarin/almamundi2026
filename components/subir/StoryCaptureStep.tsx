@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Video, Mic, Square, RotateCcw, Link2, Upload } from 'lucide-react';
 import { neu } from '@/lib/historias-neumorph';
 import {
@@ -21,10 +22,12 @@ import {
 import {
   UPLOAD_DURATION_ERROR,
   UPLOAD_MODAL_COPY,
+  UPLOAD_MODAL_LEGAL_NOTE,
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
+import { CaptureEditorialIntro } from '@/components/subir/CaptureEditorialIntro';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import type { SubirHuellaFormat as SubirFormat } from '@/hooks/useSubirHuella';
 import { VoiceWaveform, type VoiceWaveformMode } from './VoiceWaveform';
@@ -110,6 +113,10 @@ const neoSurface = {
 const orangeCta =
   'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)' as const;
 
+function initialFlowStage(format: SubirFormat): FlowStage {
+  return format === 'foto' ? 'media' : 'welcome';
+}
+
 function isVideoUrl(url: string): boolean {
   try {
     const u = new URL(url);
@@ -154,6 +161,7 @@ export function StoryCaptureStep({
   restoredCapture = null,
   hydrateKey = 0,
 }: Props) {
+  const router = useRouter();
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const videoReviewRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -193,7 +201,7 @@ export function StoryCaptureStep({
   const [localErr, setLocalErr] = useState('');
 
   /** Flujo por formato: bienvenida → medio → datos de historia → datos de persona. */
-  const [flowStage, setFlowStage] = useState<FlowStage>('welcome');
+  const [flowStage, setFlowStage] = useState<FlowStage>(() => initialFlowStage(format));
   const [liveMicStream, setLiveMicStream] = useState<MediaStream | null>(null);
 
   const [adStoryTitle, setAdStoryTitle] = useState('');
@@ -230,7 +238,7 @@ export function StoryCaptureStep({
   }, [stopStream, clearReviewUrl]);
 
   useEffect(() => {
-    setFlowStage('welcome');
+    setFlowStage(initialFlowStage(format));
     setAdStoryTitle('');
     setAdCiudad('');
     setAdPais('');
@@ -687,16 +695,20 @@ export function StoryCaptureStep({
     setLocalErr('');
   }, []);
 
+  const isFotoCapturePanel = format === 'foto' && flowStage === 'media';
+
   return (
     <section className="space-y-8 md:space-y-10" aria-label="Captura de tu historia" aria-current="step">
       <header className="space-y-4 md:space-y-5">
-        <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
+        {!isFotoCapturePanel && (
+          <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
+        )}
         <h1 className="sr-only">{formatWelcomeTitle}</h1>
-        {flowStage === 'welcome' && (
+        {flowStage === 'welcome' && format !== 'foto' && (
           <div className="space-y-3 max-w-2xl">
             <h2
               className={amStyles.amModalTitle}
-              style={{ whiteSpace: format === 'foto' ? 'pre-line' : 'normal' }}
+              style={{ whiteSpace: format === 'texto' ? 'pre-line' : 'normal' }}
             >
               {formatWelcomeTitle}
             </h2>
@@ -706,7 +718,7 @@ export function StoryCaptureStep({
             ) : null}
           </div>
         )}
-        {flowStage !== 'welcome' && (
+        {flowStage !== 'welcome' && !isFotoCapturePanel && (
           <div className="space-y-2 max-w-2xl">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-orange-600/90">{stepBadge}</p>
             {flowStage === 'media' && (
@@ -1014,35 +1026,25 @@ export function StoryCaptureStep({
         </div>
       )}
 
-      {format === 'foto' && flowStage === 'welcome' && (
-        <div className="mx-auto max-w-md">
-          <button
-            type="button"
-            onClick={() => {
-              setFlowStage('media');
-              setLocalErr('');
-            }}
-            className={amStyles.amModalBtnPrimary}
-          >
-            Comenzar
-          </button>
-        </div>
-      )}
-
       {format === 'foto' && flowStage === 'media' && (
         <div className="mx-auto w-full max-w-[620px]">
           <div className={amStyles.amCaptureEditorialPanel}>
             <button
               type="button"
               onClick={() => {
-                setFlowStage('welcome');
+                router.replace('/subir');
                 setLocalErr('');
               }}
-              className="mb-6 text-sm font-medium px-4 py-2 rounded-full"
+              className="mb-2 text-sm font-medium px-4 py-2 rounded-full"
               style={{ ...neu.button, color: neu.textBody }}
             >
-              ← Volver
+              ← Cambiar formato
             </button>
+            <CaptureEditorialIntro
+              title={modalCopy.title}
+              subtitle={modalCopy.subtitle}
+              titlePreLine
+            />
             <UploadModalFotoCapture
               photoFiles={photoFiles}
               photoPreviews={photoPreviews}
@@ -1064,6 +1066,7 @@ export function StoryCaptureStep({
                 aria-label="Contexto de las fotos"
               />
             </div>
+            <p className={`${amStyles.amModalLegal} mt-8`}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
           </div>
         </div>
       )}
@@ -1551,31 +1554,50 @@ export function StoryCaptureStep({
         </>
       )}
 
-      <p
-        style={{
-          fontSize: 12,
-          color: '#9299a8',
-          textAlign: 'center',
-          marginTop: 12,
-          marginBottom: 0,
-          fontFamily: neu.APP_FONT,
-        }}
-      >
-        {footerNote}
-      </p>
-      {showContinueButton && (
-        <button
-          type="button"
-          onClick={handleContinue}
-          className="w-full py-4 md:py-5 rounded-full font-bold text-white text-base md:text-lg uppercase tracking-wide mt-4"
+      {!isFotoCapturePanel && (
+        <p
           style={{
-            background: canContinue() ? orangeCta : '#9ca3af',
-            boxShadow: canContinue() ? '0 10px 32px rgba(255,69,0,0.4)' : 'none',
+            fontSize: 12,
+            color: '#9299a8',
+            textAlign: 'center',
+            marginTop: 12,
+            marginBottom: 0,
+            fontFamily: neu.APP_FONT,
           }}
         >
-          {continueButtonLabel}
-        </button>
+          {footerNote}
+        </p>
       )}
+      {showContinueButton &&
+        (isFotoCapturePanel ? (
+          <footer className={`${amStyles.amModalFooter} mx-auto mt-4 w-full max-w-[620px]`}>
+            <p className={amStyles.amModalLegal} style={{ marginBottom: 4 }}>
+              Puedes tomarte el tiempo que necesites. Nada se publica automáticamente.
+            </p>
+            <button
+              type="button"
+              onClick={handleContinue}
+              disabled={!canContinue()}
+              className={`${amStyles.amModalBtnContinue} ${
+                canContinue() ? amStyles.amModalBtnContinueActive : ''
+              }`}
+            >
+              {continueButtonLabel}
+            </button>
+          </footer>
+        ) : (
+          <button
+            type="button"
+            onClick={handleContinue}
+            className="w-full py-4 md:py-5 rounded-full font-bold text-white text-base md:text-lg uppercase tracking-wide mt-4"
+            style={{
+              background: canContinue() ? orangeCta : '#9ca3af',
+              boxShadow: canContinue() ? '0 10px 32px rgba(255,69,0,0.4)' : 'none',
+            }}
+          >
+            {continueButtonLabel}
+          </button>
+        ))}
     </section>
   );
 }
