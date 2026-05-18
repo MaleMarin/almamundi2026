@@ -132,6 +132,18 @@ export function sunElevationCosineAt(lat: number, lng: number, date: Date): numb
   return sun.x * n.x + sun.y * n.y + sun.z * n.z;
 }
 
+/** Bordes del terminador en shaders (océano/tierra/luces); más estrecho = menos penumbra editorial. */
+export const GLOBE_SHADER_TERMINATOR_NIGHT_EDGE = -0.28;
+export const GLOBE_SHADER_TERMINATOR_DAY_EDGE = 0.22;
+
+/** 0 = noche plena, 1 = día pleno; misma curva que `smoothstep` en GLSL del globo. */
+export function sunDayFactorAtLocation(lat: number, lng: number, date: Date): number {
+  const mu = sunElevationCosineAt(lat, lng, date);
+  const span = GLOBE_SHADER_TERMINATOR_DAY_EDGE - GLOBE_SHADER_TERMINATOR_NIGHT_EDGE;
+  const t = Math.max(0, Math.min(1, (mu - GLOBE_SHADER_TERMINATOR_NIGHT_EDGE) / span));
+  return t * t * (3 - 2 * t);
+}
+
 export type MapSyncCaption = {
   headline: string;
   detail: string;

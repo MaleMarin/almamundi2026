@@ -48,7 +48,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     uOceanMaskLand: { value: 1 },
     /** 1 = sin terminador: todo el disco como hemisferio iluminado (p. ej. `forceDaylight` en GlobeV2). */
     uFullDay: { value: 0 },
-    /** Relleno editorial en hemisferio nocturno (0–1; ~0.22 = 18–30 % base legible). */
+    /** Relleno editorial en hemisferio nocturno (0–1; ~0.35 en home realtime). */
     uNightFill: { value: 0 },
   };
 
@@ -140,12 +140,12 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.1, 0.13, 0.2) + vec3(0.012, 0.018, 0.04);
-      colNight += fresTint * rim * 0.04 * (0.24 + 0.5 * openWater);
-      vec3 colNightFill = base * vec3(0.14, 0.2, 0.34) + vec3(0.02, 0.028, 0.05);
+      vec3 colNight = base * vec3(0.12, 0.17, 0.28) + vec3(0.018, 0.026, 0.05);
+      colNight += fresTint * rim * 0.045 * (0.26 + 0.5 * openWater);
+      vec3 colNightFill = base * vec3(0.18, 0.26, 0.42) + vec3(0.028, 0.038, 0.065);
       colNight = mix(colNight, colNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.52, 0.42, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.22, mu);
       vec3 col = mix(colNight, colDay, dayW);
       col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
@@ -296,7 +296,7 @@ export function createLandSphereMaterial(
       float y = dot(d0, vec3(0.299, 0.587, 0.114));
       vec3 gray = vec3(y);
       d0 = clamp(mix(gray, d0, 1.02), 0.0, 1.0);
-      d0 = clamp((d0 - 0.5) * 0.88 + 0.5, 0.0, 1.0);
+      d0 = clamp((d0 - 0.5) * 0.96 + 0.5, 0.0, 1.0);
 
       vec3 tmap = texture2D(uNormalTex, vUv).xyz * 2.0 - 1.0;
       float landScale = mix(0.82, 1.22, landMask);
@@ -314,24 +314,24 @@ export function createLandSphereMaterial(
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = mix(0.2, 0.28, uFullDay);
-      float dif = mix(0.68, 0.78, uFullDay) * pow(ndl, 0.94);
+      float amb = mix(0.24, 0.3, uFullDay);
+      float dif = mix(0.72, 0.8, uFullDay) * pow(ndl, 0.94);
       vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.06, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);
       litDay *= mix(1.0, 0.78, hot);
 
-      vec3 litNight = d0 * vec3(0.12, 0.14, 0.19) * (0.42 + 0.52 * mountainPop);
-      litNight += vec3(0.024, 0.03, 0.045) * landMask;
-      vec3 litNightFill = d0 * vec3(0.16, 0.18, 0.24) * (0.5 + 0.38 * mountainPop);
-      litNightFill += vec3(0.03, 0.036, 0.05) * landMask;
+      vec3 litNight = d0 * vec3(0.14, 0.16, 0.22) * (0.48 + 0.5 * mountainPop);
+      litNight += vec3(0.03, 0.036, 0.05) * landMask;
+      vec3 litNightFill = d0 * vec3(0.2, 0.22, 0.3) * (0.54 + 0.36 * mountainPop);
+      litNightFill += vec3(0.038, 0.044, 0.062) * landMask;
       litNight = mix(litNight, litNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.48, 0.4, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.26, 0.2, mu);
       vec3 lit = mix(litNight, litDay, dayW);
       if (uFullDay < 0.5) {
-        float floorLift = 0.11 + uNightFill * 0.14;
+        float floorLift = 0.13 + uNightFill * 0.18;
         lit = max(lit, d0 * floorLift);
       }
       lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));

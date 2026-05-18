@@ -59,6 +59,8 @@ import {
   approximateCoordinatesForIANATimeZone,
   earthGreenwichSpinYRadFromUtc,
   isNightAtLocation,
+  sunDayFactorAtLocation,
+  sunElevationCosineAt,
 } from '@/lib/sunPosition';
 import {
   AUTO_ROTATE_HOVER_SPEED,
@@ -128,8 +130,8 @@ const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];
 const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.06, -0.07, 0];
 
-/** Relleno mínimo en hemisferio nocturno (shaders `uNightFill`; ~18–30 % legible). */
-const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.22;
+/** Relleno mínimo en hemisferio nocturno (shaders `uNightFill`; hemisferio nocturno legible, no día falso). */
+const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.35;
 
 const GLOBE_V2_REALTIME_SUN_TICK_MS = 60_000;
 
@@ -414,6 +416,34 @@ function AtmosphereGlow({
   );
 }
 
+/** Solo desarrollo: coherencia terminador ↔ punto de vista inicial (home LATAM). */
+function GlobeSolarViewDevProbe({
+  lat,
+  lng,
+  getEarthSceneDate,
+}: {
+  lat: number;
+  lng: number;
+  getEarthSceneDate: () => Date;
+}) {
+  useEffect(() => {
+    if (process.env.NODE_ENV !== 'development') return;
+    const date = getEarthSceneDate();
+    const mu = sunElevationCosineAt(lat, lng, date);
+    const dayFactor = sunDayFactorAtLocation(lat, lng, date);
+    const night = isNightAtLocation(lat, lng, date);
+    console.debug('[GlobeV2] initial view solar', {
+      lat,
+      lng,
+      sunMu: Number(mu.toFixed(3)),
+      dayFactor: Number(dayFactor.toFixed(3)),
+      isNight: night,
+      utc: date.toISOString(),
+    });
+  }, [lat, lng, getEarthSceneDate]);
+  return null;
+}
+
 function setHeightTextureParams(t: THREE.Texture, maxAniso: number) {
   t.colorSpace = THREE.NoColorSpace;
   t.anisotropy = maxAniso;
@@ -619,36 +649,63 @@ function EarthGroup({
     [cloudMap, cloudOpacity, cloudOuterOpacityFactor, viewerNight]
   );
 
+  const embeddedCinematicRealtime =
+    Boolean(embedded && editorialFillLight && realTimeLighting && !fullDaySurface);
+
   useLayoutEffect(() => {
-    cloudMaterial.opacity = cloudOpacity;
-    cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    const opacityBoost = embeddedCinematicRealtime ? 1.05 : 1;
+    cloudMaterial.opacity = cloudOpacity * opacityBoost;
+    cloudMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudMaterial.roughness = 1;
     cloudMaterial.metalness = 0;
-    cloudMaterial.emissive.set('#d8e2ee');
-    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : fullDaySurface && embedded ? 0.18 : 0.09;
+    cloudMaterial.emissive.set('#e8f0fa');
+    const emissiveNight = embeddedCinematicRealtime ? 0.05 : 0.02;
+    const emissiveDay = fullDaySurface && embedded ? 0.18 : embeddedCinematicRealtime ? 0.13 : 0.09;
+    cloudMaterial.emissiveIntensity = viewerNight ? emissiveNight : emissiveDay;
     cloudMaterial.needsUpdate = true;
-  }, [cloudMaterial, cloudOpacity, viewerNight, fullDaySurface, embedded]);
+  }, [
+    cloudMaterial,
+    cloudOpacity,
+    viewerNight,
+    fullDaySurface,
+    embedded,
+    embeddedCinematicRealtime,
+  ]);
 
   useLayoutEffect(() => {
-    const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
+    const opacityBoost = embeddedCinematicRealtime ? 1.05 : 1;
+    const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR * opacityBoost;
     cloudUnderlayMaterial.opacity = uo;
-    cloudUnderlayMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudUnderlayMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudUnderlayMaterial.roughness = 1;
     cloudUnderlayMaterial.metalness = 0;
-    cloudUnderlayMaterial.emissive.set('#d8e2ee');
-    cloudUnderlayMaterial.emissiveIntensity = viewerNight ? 0.015 : 0.065;
+    cloudUnderlayMaterial.emissive.set('#e8f0fa');
+    cloudUnderlayMaterial.emissiveIntensity = viewerNight
+      ? embeddedCinematicRealtime
+        ? 0.038
+        : 0.015
+      : embeddedCinematicRealtime
+        ? 0.085
+        : 0.065;
     cloudUnderlayMaterial.needsUpdate = true;
-  }, [cloudUnderlayMaterial, cloudOpacity, viewerNight]);
+  }, [cloudUnderlayMaterial, cloudOpacity, viewerNight, embeddedCinematicRealtime]);
 
   useLayoutEffect(() => {
-    cloudOuterMaterial.opacity = cloudOpacity * cloudOuterOpacityFactor;
-    cloudOuterMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    const opacityBoost = embeddedCinematicRealtime ? 1.05 : 1;
+    cloudOuterMaterial.opacity = cloudOpacity * cloudOuterOpacityFactor * opacityBoost;
+    cloudOuterMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudOuterMaterial.roughness = 1;
     cloudOuterMaterial.metalness = 0;
-    cloudOuterMaterial.emissive.set('#d8e2ee');
-    cloudOuterMaterial.emissiveIntensity = viewerNight ? 0.018 : 0.075;
+    cloudOuterMaterial.emissive.set('#e8f0fa');
+    cloudOuterMaterial.emissiveIntensity = viewerNight
+      ? embeddedCinematicRealtime
+        ? 0.042
+        : 0.018
+      : embeddedCinematicRealtime
+        ? 0.095
+        : 0.075;
     cloudOuterMaterial.needsUpdate = true;
-  }, [cloudOuterMaterial, cloudOpacity, cloudOuterOpacityFactor, viewerNight]);
+  }, [cloudOuterMaterial, cloudOpacity, cloudOuterOpacityFactor, viewerNight, embeddedCinematicRealtime]);
 
   useLayoutEffect(() => {
     return () => {
@@ -1194,12 +1251,21 @@ function GlobeScene({
       embedded &&
       typeof initialViewLat === 'number' &&
       typeof initialViewLng === 'number' ? (
-        <InitialViewRig
-          lat={initialViewLat}
-          lng={initialViewLng}
-          distance={camDist}
-          orbitTarget={GLOBE_V2_EMBEDDED_ORBIT_TARGET}
-        />
+        <>
+          {process.env.NODE_ENV === 'development' && realTimeLighting ? (
+            <GlobeSolarViewDevProbe
+              lat={initialViewLat}
+              lng={initialViewLng}
+              getEarthSceneDate={getEarthSceneDate}
+            />
+          ) : null}
+          <InitialViewRig
+            lat={initialViewLat}
+            lng={initialViewLng}
+            distance={camDist}
+            orbitTarget={GLOBE_V2_EMBEDDED_ORBIT_TARGET}
+          />
+        </>
       ) : null}
     </>
   );

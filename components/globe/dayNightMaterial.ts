@@ -122,10 +122,10 @@ export function createCityLightsOverlayMaterial(
       mat3 mGlobeTbn = mat3(vTw, vBw, vNw);
       vec3 n = normalize(mGlobeTbn * normalize(tmap));
       float ndl = dot(n, normalize(uSunDir));
-      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.44, 0.34, ndl));
-      night = pow(clamp(night, 0.0, 1.0), 0.92);
-      float dayLeak = smoothstep(-0.02, 0.18, ndl);
-      night *= 1.0 - dayLeak * 0.82;
+      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.28, 0.22, ndl));
+      night = pow(clamp(night, 0.0, 1.0), 0.94);
+      float dayLeak = smoothstep(-0.06, 0.12, ndl);
+      night *= 1.0 - dayLeak * 0.9;
       float poleFade = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
 
       float e = 0.00042;
