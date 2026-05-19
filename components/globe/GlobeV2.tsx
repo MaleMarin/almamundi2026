@@ -3,7 +3,7 @@
 /**
  * GlobeV2 — R3F + drei: Tierra + Luna, tiempo real UTC.
  *
- * Tierra: oblicuidad ~23,44° (eje X); `planetSpinRef.rotation.y` = GMST + offset (textura alineada al meridiano).
+ * Tierra: inclinación axial ~23,44° (eje Z, marco inercial); `planetSpinRef.rotation.y` = GMST (giro diario sobre el eje inclinado).
  * Reloj Tierra+Sol: `getEarthSceneDate()` (UTC acelerado con `GLOBE_V2_EARTH_VISUAL_TIME_SCALE` / prop). Luna en tiempo real.
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
@@ -87,8 +87,11 @@ function stripGlobeMeshRaycast(mesh: THREE.Mesh | null) {
  */
 const GLOBE_V2_EMBEDDED_GEO_SCALE = 1.06;
 
-/** Oblicuidad de la eclíptica (~23,44°): eje de rotación terrestre fijo respecto al plano orbital de la Luna. */
-const GLOBE_V2_EARTH_OBLIQUITY_RAD = THREE.MathUtils.degToRad(23.439421);
+/** Inclinación axial terrestre (oblicuidad eclíptica). Eje Z = convención NASA / MapFullPage (~0,41 rad). */
+const EARTH_AXIAL_TILT_DEG = 23.44;
+const EARTH_AXIAL_TILT_RAD = THREE.MathUtils.degToRad(EARTH_AXIAL_TILT_DEG);
+/** @deprecated alias interno */
+const GLOBE_V2_EARTH_OBLIQUITY_RAD = EARTH_AXIAL_TILT_RAD;
 
 /**
  * Desfase opcional si el meridiano 0 de la textura no coincide con el astronómico (casi siempre 0).
@@ -994,13 +997,13 @@ function GlobeScene({
 
       <group scale={geoScale}>
         {/*
-          Jerarquía Tierra:
-          - Inclinación fija del eje (oblicuidad) en X.
-          - Rotación diaria en Y bajo la inclinación (corteza + nubes + bits).
-          La Luna es hermana (órbita geocéntrica en marco “inercial” de la escena, no hereda la oblicuidad).
+          Jerarquía Tierra (marco inercial estable):
+          - earthAxialTiltGroup: inclinación axial fija en Z (no sigue a la cámara).
+          - earthSpinGroup: giro sidéreo en Y local (GMST + textura).
+          La Luna es hermana (órbita geocéntrica; no hereda el tilt).
         */}
-        <group rotation={[GLOBE_V2_EARTH_OBLIQUITY_RAD, 0, 0]}>
-          <group ref={planetSpinRef}>
+        <group name="earthAxialTilt" rotation={[0, 0, EARTH_AXIAL_TILT_RAD]}>
+          <group ref={planetSpinRef} name="earthSpin">
             <EarthGroup
               urls={urls}
               viewerNight={viewerNight}

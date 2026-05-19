@@ -244,22 +244,24 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
   return mat;
 }
 
-const _axisSunX = new THREE.Vector3(1, 0, 0);
+const _axisAxialTiltZ = new THREE.Vector3(0, 0, 1);
 
 /**
- * Dirección Tierra → Sol en **espacio mundial** (antes del giro GMST del mesh).
- * El vector está en el marco del hijo de la oblicuidad (eje Y = rotación diaria); solo se aplica `R_x(obliquity)`.
- * La rotación `planetSpinRef` (GMST) va **solo** en la corteza: si rotáramos también la luz con Y, el terminador quedaría fijo en la textura.
+ * Dirección Tierra → Sol en espacio mundial (antes del giro GMST de la corteza).
+ * Misma inclinación axial que `earthAxialTiltGroup` en GlobeV2: `R_z(axialTilt)`.
+ * El GMST solo rota la textura (`planetSpinRef`); no se aplica aquí para que el terminador se mueva.
  */
 export function computeSunDirection(
   date: Date,
-  obliquityXRad: number,
+  axialTiltRad: number,
   target?: THREE.Vector3
 ): THREE.Vector3 {
   const ecef = sunUnitVectorTowardSunEcef(date);
   const v = target ?? new THREE.Vector3();
   v.set(ecef.x, ecef.y, ecef.z);
-  v.applyAxisAngle(_axisSunX, obliquityXRad);
+  if (axialTiltRad !== 0) {
+    v.applyAxisAngle(_axisAxialTiltZ, axialTiltRad);
+  }
   return v.normalize();
 }
 
