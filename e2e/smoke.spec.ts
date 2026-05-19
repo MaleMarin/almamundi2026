@@ -8,16 +8,12 @@ test.describe('smoke', () => {
     await expect(page.locator('#intro')).toBeVisible({ timeout: 30_000 });
   });
 
-  test('mapa monta el shell sin error de página', async ({ page }) => {
+  test('/mapa redirige al mapa de la home (#mapa)', async ({ page }) => {
     const res = await page.goto('/mapa', { waitUntil: 'load' });
     expect(res?.ok()).toBeTruthy();
-    await expect(page.locator('[data-map-route="mapa-full"]')).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByText('Algo salió mal en el mapa')).toHaveCount(0);
-    // MapFullPage es dinámico (SSR off): shell interno o canvas del globo.
-    const inner = page.locator('[data-build="mapa-v1"]');
-    const globeCanvas = page.locator('[data-map-route="mapa-full"] canvas').first();
-    // .or() puede resolver a varios nodos; .first() evita violación de strict mode.
-    await expect(inner.or(globeCanvas).first()).toBeVisible({ timeout: 120_000 });
+    await expect(page).toHaveURL(/\/(#mapa)?$/, { timeout: 30_000 });
+    await expect(page.locator('#mapa')).toBeVisible({ timeout: 60_000 });
+    await expect(page.locator('[data-map-route="mapa-full"]')).toHaveCount(0);
   });
 
   test('/historias/videos muestra el carrusel de historias', async ({ page }) => {

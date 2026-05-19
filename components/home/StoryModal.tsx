@@ -41,7 +41,7 @@ import {
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
-import { CaptureEditorialIntro } from '@/components/subir/CaptureEditorialIntro';
+import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { THEME_LIST, type ThemeId } from '@/lib/themes';
@@ -124,7 +124,7 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   return {
     title: mode === 'foto' ? c.title : c.title.replace(/\n/g, ' '),
     lead: c.subtitle,
-    meta: mode === 'foto' ? undefined : c.limit,
+    meta: c.limit,
   };
 }
 
@@ -886,6 +886,288 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   if (!isOpen) return null;
 
+  if (step === 'capture') {
+    const copy = UPLOAD_MODAL_COPY[mode];
+    return (
+      <FormatCaptureEditorialShell
+        copy={copy}
+        titlePreLine={mode === 'foto' || mode === 'texto'}
+        onClose={onClose}
+        continueEnabled={canContinueCapture()}
+        onContinue={goDetails}
+      >
+        {err ? <p className={amStyles.amModalInlineError}>{err}</p> : null}
+        {chosenTopic && mode !== 'texto' && (
+          <div
+            className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-base"
+            style={soft.inset}
+          >
+            <div className="min-w-0">
+              <p className="font-semibold text-gray-700">Tema guía activo</p>
+              <p className="truncate text-gray-600 md:text-lg">{chosenTopic.title}</p>
+            </div>
+            <button
+              type="button"
+              onClick={onClearTopic}
+              className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide text-orange-700"
+              style={soft.button}
+              aria-label="Quitar inspiración"
+            >
+              Quitar
+            </button>
+          </div>
+        )}
+
+        {mode === 'video' && (
+          <div className="space-y-4">
+            {!mediaBlob && (
+              <>
+                {!streamReady && !recording && (
+                  <button
+                    type="button"
+                    onClick={() => void startVideoCapture()}
+                    className={amStyles.amModalBtnPrimary}
+                    aria-label="Activar cámara para grabar"
+                  >
+                    {copy.primaryCta}
+                  </button>
+                )}
+                {streamReady && (
+                  <div className="space-y-3 text-center">
+                    <div
+                      className="relative mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-gray-300/40"
+                      style={soft.inset}
+                    >
+                      <video
+                        ref={videoLiveRef}
+                        className="h-full w-full scale-x-[-1] object-cover"
+                        playsInline
+                        muted
+                        autoPlay
+                        aria-label={recording ? 'Grabando: vista de cámara en vivo' : 'Vista previa de cámara en vivo'}
+                      />
+                    </div>
+                    {!recording ? (
+                      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+                        <span className="text-xl font-mono font-semibold text-gray-700 md:text-2xl" aria-live="polite">
+                          {formatMmSs(recordSec)}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={startRecordingVideo}
+                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
+                          style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)', boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+                          aria-label="Comenzar a grabar video"
+                        >
+                          <Video size={22} aria-hidden />
+                          Grabar
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
+                          Grabando… {formatMmSs(recordSec)}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={stopRecording}
+                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white shadow-lg md:text-xl"
+                          aria-label="Detener grabación de video"
+                        >
+                          <Square size={22} aria-hidden />
+                          Detener
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
+            {mediaBlob && previewUrl && (
+              <div className="space-y-3">
+                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu video</p>
+                <p className="text-center text-sm text-gray-600 md:text-base">
+                  Comprueba el sonido y la imagen. Si no se ve bien, vuelve a grabar.
+                </p>
+                <div
+                  className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-black/80"
+                  style={soft.inset}
+                >
+                  <video
+                    key={previewUrl}
+                    src={previewUrl}
+                    className="h-full max-h-[280px] w-full object-contain"
+                    playsInline
+                    controls
+                    preload="auto"
+                    aria-label="Reproducción del video grabado"
+                    onLoadedData={() => setErr('')}
+                    onError={() => {
+                      console.error('[StoryModal] video blob preview error');
+                      setErr(
+                        'Tu navegador no pudo reproducir esta vista previa. Prueba «Volver a grabar» o usa Chrome/Firefox actualizado.'
+                      );
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={discardRecording}
+                  className="w-full rounded-full py-3 text-base font-semibold text-gray-600 md:text-lg"
+                  style={soft.button}
+                  aria-label="Volver a grabar"
+                >
+                  Volver a grabar
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {mode === 'audio' && (
+          <div className="space-y-4">
+            {!mediaBlob && (
+              <>
+                {!streamReady && !recording && (
+                  <button
+                    type="button"
+                    onClick={() => void startAudioCapture()}
+                    className={amStyles.amModalBtnPrimary}
+                    aria-label="Activar micrófono"
+                  >
+                    {copy.primaryCta}
+                  </button>
+                )}
+                {streamReady && !recording && (
+                  <div className="flex flex-col items-center gap-6 py-6">
+                    <div className="flex h-32 w-32 items-center justify-center rounded-full" style={soft.inset} aria-hidden>
+                      <Mic className="h-14 w-14 text-orange-500" />
+                    </div>
+                    <p className="font-mono text-2xl text-gray-700 md:text-3xl" aria-live="polite">
+                      {formatMmSs(recordSec)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={startRecordingAudio}
+                      className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
+                      style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)', boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+                      aria-label="Grabar audio"
+                    >
+                      Grabar
+                    </button>
+                  </div>
+                )}
+                {recording && (
+                  <div className="flex flex-col items-center gap-6 py-6">
+                    <div className="relative flex h-36 w-36 items-center justify-center rounded-full" style={soft.inset}>
+                      <span className="absolute inset-3 animate-pulse rounded-full bg-orange-400/25" aria-hidden />
+                      <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
+                    </div>
+                    <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
+                      Grabando… {formatMmSs(recordSec)}
+                    </p>
+                    <button
+                      type="button"
+                      onClick={stopRecording}
+                      className="rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white md:text-xl"
+                      aria-label="Detener grabación de audio"
+                    >
+                      Detener
+                    </button>
+                  </div>
+                )}
+              </>
+            )}
+            {mediaBlob && previewUrl && (
+              <div className="space-y-3">
+                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu audio</p>
+                <p className="text-center text-sm text-gray-600 md:text-base">Escucha el clip completo antes de continuar.</p>
+                <div className="rounded-2xl px-3 py-2" style={soft.inset}>
+                  <audio
+                    key={previewUrl}
+                    src={previewUrl}
+                    controls
+                    preload="metadata"
+                    className="w-full"
+                    aria-label="Audio grabado"
+                    onLoadedData={() => setErr('')}
+                    onError={() => {
+                      console.error('[StoryModal] audio blob preview error');
+                      setErr('No se pudo reproducir el audio aquí. Prueba «Volver a grabar» o abre en otro navegador.');
+                    }}
+                  />
+                </div>
+                <button
+                  type="button"
+                  onClick={discardRecording}
+                  className="w-full rounded-full py-3 text-base font-semibold md:text-lg"
+                  style={soft.button}
+                  aria-label="Volver a grabar audio"
+                >
+                  Volver a grabar
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {mode === 'texto' && (
+          <div className="space-y-4">
+            {chosenTopic && (
+              <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
+                <div className="flex flex-wrap items-start justify-between gap-2">
+                  <p className="text-lg font-semibold text-gray-800 md:text-xl">Inspiración · {chosenTopic.title}</p>
+                  <button
+                    type="button"
+                    onClick={onClearTopic}
+                    className="rounded-full px-3 py-1.5 text-xs font-bold text-orange-700"
+                    style={soft.button}
+                    aria-label="Quitar inspiración"
+                  >
+                    Quitar inspiración
+                  </button>
+                </div>
+                <ul className="list-inside list-disc space-y-2 text-base text-gray-600 md:text-lg">
+                  {chosenTopic.questions.slice(0, 3).map((q) => (
+                    <li key={q}>{q}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <textarea
+              id="story-textarea"
+              value={textBody}
+              onChange={(e) => setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
+              rows={10}
+              className={amStyles.amTextarea}
+              placeholder="Escribe aquí…"
+              aria-label="Tu historia"
+              maxLength={SUBIR_TEXT_MAX_CHARS}
+            />
+            <p
+              className={`${amStyles.amTextareaCounter} ${
+                textBody.length >= SUBIR_TEXT_COUNTER_WARN_CHARS ? amStyles.amTextareaCounterWarn : ''
+              }`}
+              aria-live="polite"
+            >
+              {textBody.length.toLocaleString('es')} / 5.000 caracteres
+            </p>
+          </div>
+        )}
+
+        {mode === 'foto' && (
+          <UploadModalFotoCapture
+            photoFiles={photoFiles}
+            photoPreviews={photoPreviews}
+            onAddFiles={addPhotos}
+            onRemove={removePhotoAt}
+            inlineError={err || undefined}
+          />
+        )}
+      </FormatCaptureEditorialShell>
+    );
+  }
+
   return (
     <div
       className="fixed inset-0 z-[220] flex items-center justify-center p-3 sm:p-4"
@@ -931,307 +1213,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
-          {step === 'capture' && mode !== 'foto' && (
-            <div className="mb-6 space-y-3 px-1">
-              <h3 className={amStyles.amModalTitle}>
-                {captureIntroFor(mode).title}
-              </h3>
-              <p className={amStyles.amModalSubtitle}>
-                {captureIntroFor(mode).lead}
-              </p>
-              {captureIntroFor(mode).meta != null && (
-                <p className={amStyles.amModalLimit}>{captureIntroFor(mode).meta}</p>
-              )}
-            </div>
-          )}
-          {chosenTopic && mode !== 'texto' && step === 'capture' && (
-            <div
-              className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-base"
-              style={soft.inset}
-            >
-              <div className="min-w-0">
-                <p className="font-semibold text-gray-700">Tema guía activo</p>
-                <p className="truncate text-gray-600 md:text-lg">{chosenTopic.title}</p>
-              </div>
-              <button
-                type="button"
-                onClick={onClearTopic}
-                className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide text-orange-700"
-                style={soft.button}
-                aria-label="Quitar inspiración"
-              >
-                Quitar
-              </button>
-            </div>
-          )}
-
-          {step === 'capture' && mode === 'video' && (
-            <div className="space-y-4">
-              {!mediaBlob && (
-                <>
-                  {!streamReady && !recording && (
-                    <button
-                      type="button"
-                      onClick={() => void startVideoCapture()}
-                      className="w-full rounded-full py-4 text-lg font-bold text-gray-700 md:py-5 md:text-xl"
-                      style={soft.button}
-                      aria-label="Activar cámara para grabar"
-                    >
-                      Activar cámara
-                    </button>
-                  )}
-                  {streamReady && (
-                    <div className="space-y-3 text-center">
-                      <div
-                        className="relative mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-gray-300/40"
-                        style={soft.inset}
-                      >
-                        <video
-                          ref={videoLiveRef}
-                          className="h-full w-full scale-x-[-1] object-cover"
-                          playsInline
-                          muted
-                          autoPlay
-                          aria-label={recording ? 'Grabando: vista de cámara en vivo' : 'Vista previa de cámara en vivo'}
-                        />
-                      </div>
-                      {!recording ? (
-                        <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                          <span className="text-xl font-mono font-semibold text-gray-700 md:text-2xl" aria-live="polite">
-                            {formatMmSs(recordSec)}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={startRecordingVideo}
-                            className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
-                            style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)', boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
-                            aria-label="Comenzar a grabar video"
-                          >
-                            <Video size={22} aria-hidden />
-                            Grabar
-                          </button>
-                        </div>
-                      ) : (
-                        <>
-                          <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                            Grabando… {formatMmSs(recordSec)}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={stopRecording}
-                            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white shadow-lg md:text-xl"
-                            aria-label="Detener grabación"
-                          >
-                            <Square size={20} fill="currentColor" aria-hidden />
-                            Detener
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-              {mediaBlob && previewUrl && (
-                <div className="space-y-3">
-                  <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu video</p>
-                  <p className="text-center text-sm text-gray-600 md:text-base">
-                    Comprueba el sonido y la imagen. Si no se ve bien, vuelve a grabar.
-                  </p>
-                  <div
-                    className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-black/80"
-                    style={soft.inset}
-                  >
-                    <video
-                      key={previewUrl}
-                      src={previewUrl}
-                      className="h-full max-h-[280px] w-full object-contain"
-                      playsInline
-                      controls
-                      preload="auto"
-                      aria-label="Reproducción del video grabado"
-                      onLoadedData={() => setErr('')}
-                      onError={() => {
-                        console.error('[StoryModal] video blob preview error');
-                        setErr(
-                          'Tu navegador no pudo reproducir esta vista previa. Prueba «Volver a grabar» o usa Chrome/Firefox actualizado.'
-                        );
-                      }}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={discardRecording}
-                    className="w-full rounded-full py-3 text-base font-semibold text-gray-600 md:text-lg"
-                    style={soft.button}
-                    aria-label="Volver a grabar"
-                  >
-                    Volver a grabar
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {step === 'capture' && mode === 'audio' && (
-            <div className="space-y-4">
-              {!mediaBlob && (
-                <>
-                  {!streamReady && !recording && (
-                    <button
-                      type="button"
-                      onClick={() => void startAudioCapture()}
-                      className="w-full rounded-full py-4 text-lg font-bold text-gray-700 md:py-5 md:text-xl"
-                      style={soft.button}
-                      aria-label="Activar micrófono"
-                    >
-                      Activar micrófono
-                    </button>
-                  )}
-                  {streamReady && !recording && (
-                    <div className="flex flex-col items-center gap-6 py-6">
-                      <div
-                        className="flex h-32 w-32 items-center justify-center rounded-full"
-                        style={soft.inset}
-                        aria-hidden
-                      >
-                        <Mic className="h-14 w-14 text-orange-500" />
-                      </div>
-                      <p className="font-mono text-2xl text-gray-700 md:text-3xl" aria-live="polite">
-                        {formatMmSs(recordSec)}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={startRecordingAudio}
-                        className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
-                        style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)', boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
-                        aria-label="Grabar audio"
-                      >
-                        Grabar
-                      </button>
-                    </div>
-                  )}
-                  {recording && (
-                    <div className="flex flex-col items-center gap-6 py-6">
-                      <div
-                        className="relative flex h-36 w-36 items-center justify-center rounded-full"
-                        style={soft.inset}
-                      >
-                        <span className="absolute inset-3 animate-pulse rounded-full bg-orange-400/25" aria-hidden />
-                        <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
-                      </div>
-                      <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                        Grabando… {formatMmSs(recordSec)}
-                      </p>
-                      <button
-                        type="button"
-                        onClick={stopRecording}
-                        className="rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white md:text-xl"
-                        aria-label="Detener grabación de audio"
-                      >
-                        Detener
-                      </button>
-                    </div>
-                  )}
-                </>
-              )}
-              {mediaBlob && previewUrl && (
-                <div className="space-y-3">
-                  <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu audio</p>
-                  <p className="text-center text-sm text-gray-600 md:text-base">
-                    Escucha el clip completo antes de continuar.
-                  </p>
-                  <div className="rounded-2xl px-3 py-2" style={soft.inset}>
-                    <audio
-                      key={previewUrl}
-                      src={previewUrl}
-                      controls
-                      preload="metadata"
-                      className="w-full"
-                      aria-label="Audio grabado"
-                      onLoadedData={() => setErr('')}
-                      onError={() => {
-                        console.error('[StoryModal] audio blob preview error');
-                        setErr(
-                          'No se pudo reproducir el audio aquí. Prueba «Volver a grabar» o abre en otro navegador.'
-                        );
-                      }}
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={discardRecording}
-                    className="w-full rounded-full py-3 text-base font-semibold md:text-lg"
-                    style={soft.button}
-                    aria-label="Volver a grabar audio"
-                  >
-                    Volver a grabar
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-
-          {step === 'capture' && mode === 'texto' && (
-            <div className="space-y-4">
-              {chosenTopic && (
-                <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
-                  <div className="flex flex-wrap items-start justify-between gap-2">
-                    <p className="text-lg font-semibold text-gray-800 md:text-xl">Inspiración · {chosenTopic.title}</p>
-                    <button
-                      type="button"
-                      onClick={onClearTopic}
-                      className="rounded-full px-3 py-1.5 text-xs font-bold text-orange-700"
-                      style={soft.button}
-                      aria-label="Quitar inspiración"
-                    >
-                      Quitar inspiración
-                    </button>
-                  </div>
-                  <ul className="list-inside list-disc space-y-2 text-base text-gray-600 md:text-lg">
-                    {chosenTopic.questions.slice(0, 3).map((q) => (
-                      <li key={q}>{q}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <textarea
-                id="story-textarea"
-                value={textBody}
-                onChange={(e) => setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
-                rows={10}
-                className={amStyles.amTextarea}
-                placeholder="Escribe aquí…"
-                aria-label="Tu historia"
-                maxLength={SUBIR_TEXT_MAX_CHARS}
-              />
-              <p
-                className={`${amStyles.amTextareaCounter} ${
-                  textBody.length >= SUBIR_TEXT_COUNTER_WARN_CHARS ? amStyles.amTextareaCounterWarn : ''
-                }`}
-                aria-live="polite"
-              >
-                {textBody.length.toLocaleString('es')} / 5.000 caracteres
-              </p>
-            </div>
-          )}
-
-          {step === 'capture' && mode === 'foto' && (
-            <div className={amStyles.amCaptureEditorialPanel}>
-              <CaptureEditorialIntro
-                title={UPLOAD_MODAL_COPY.foto.title}
-                subtitle={UPLOAD_MODAL_COPY.foto.subtitle}
-                titlePreLine
-              />
-              <UploadModalFotoCapture
-                photoFiles={photoFiles}
-                photoPreviews={photoPreviews}
-                onAddFiles={addPhotos}
-                onRemove={removePhotoAt}
-                inlineError={err || undefined}
-              />
-            </div>
-          )}
-
           {step === 'details' && (
             <div className="flex min-h-0 flex-1 flex-col gap-2 md:gap-3">
               <div className="shrink-0 space-y-0.5 px-0.5">
@@ -1636,38 +1617,20 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
         </div>
 
-        {(step === 'capture' || step === 'received') && (
+        {step === 'received' && (
           <footer
             className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-white/30 px-5 py-4 md:px-8"
             style={{ backgroundColor: soft.bg }}
           >
-            {step === 'capture' && (
-              <>
-                <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
-                <button
-                  type="button"
-                  onClick={goDetails}
-                  disabled={!canContinueCapture()}
-                  className={`${amStyles.amModalBtnContinue} ml-auto ${
-                    canContinueCapture() ? amStyles.amModalBtnContinueActive : ''
-                  }`}
-                  aria-label="Continuar al formulario de datos"
-                >
-                  Continuar
-                </button>
-              </>
-            )}
-            {step === 'received' && (
-              <button
-                type="button"
-                onClick={onClose}
-                className="w-full rounded-full py-4 text-lg font-bold text-gray-700 sm:w-auto sm:px-10 md:text-xl"
-                style={soft.button}
-                aria-label="Volver al mapa"
-              >
-                Volver al mapa
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full rounded-full py-4 text-lg font-bold text-gray-700 sm:w-auto sm:px-10 md:text-xl"
+              style={soft.button}
+              aria-label="Volver al mapa"
+            >
+              Volver al mapa
+            </button>
           </footer>
         )}
       </div>

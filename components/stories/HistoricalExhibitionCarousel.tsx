@@ -547,16 +547,6 @@ export function HistoricalExhibitionCarousel({
                         <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-gray-600">
                           {[h.fecha, h.lugar].filter(Boolean).join(' · ')}
                         </p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {h.tags.slice(0, 6).map((t) => (
-                            <span
-                              key={`${h.id}-${t}`}
-                              className="rounded-full border border-orange-400/28 bg-[#ebeff6]/92 px-2 py-[0.1875rem] text-[10px] font-semibold uppercase tracking-[0.1em] text-orange-900/92"
-                            >
-                              {t}
-                            </span>
-                          ))}
-                        </div>
                       </div>
 
                       <div
@@ -710,20 +700,6 @@ export function HistoricalExhibitionCarousel({
                       <p className={isLightHall ? 'text-xs text-gray-600' : 'text-xs text-white/60'}>
                         {h.fecha} · {h.lugar}
                       </p>
-                      <div className="flex flex-wrap gap-1.5 pt-1">
-                        {h.tags.slice(0, 4).map((t) => (
-                          <span
-                            key={t}
-                            className={
-                              isLightHall
-                                ? 'rounded-full border border-gray-400/35 bg-white/40 px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-700'
-                                : 'rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[10px] uppercase tracking-wide text-white/75'
-                            }
-                          >
-                            {t}
-                          </span>
-                        ))}
-                      </div>
                     </div>
                   </div>
                 </ExpoCardTiltShell>

@@ -125,12 +125,12 @@ export function HistoriasFormatListPageLayout({
                       onChange={setFilterCountry}
                     />
                   </label>
-                  <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-gray-600 lg:w-[7.75rem] lg:max-w-none">
+                  <label className="flex min-w-0 flex-col gap-1.5 text-xs font-medium text-gray-600 sm:min-w-[10.5rem] lg:min-w-[11rem] lg:w-[11rem] lg:flex-none lg:max-w-none">
                     Año
                     <select
                       value={filterYear}
                       onChange={(e) => setFilterYear(e.target.value)}
-                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] py-2 pl-3 pr-9 text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     >
                       <option value="">Todos los años</option>

@@ -1,3 +1,5 @@
+'use client';
+
 import type { AnchorHTMLAttributes, MouseEvent, ReactNode } from 'react';
 import { hardNavigateTo, isHomeHardNavHref } from '@/lib/home-hard-nav';
 

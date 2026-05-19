@@ -479,9 +479,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const handleSubirMiHistoria = useCallback(() => {
     close();
     requestAnimationFrame(() => {
-      const hero = document.getElementById('historias');
-      if (hero) hero.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      else hardNavigateTo('/#historias');
+      const onHome =
+        typeof window !== 'undefined' &&
+        (window.location.pathname === '/' || window.location.pathname === '');
+      if (onHome) {
+        window.history.replaceState(null, '', '/#historias');
+        document.getElementById('historias')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+      hardNavigateTo('/#historias');
     });
   }, []);
 

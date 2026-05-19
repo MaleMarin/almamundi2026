@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -213,7 +212,7 @@ export type HomeFirstPartProps = {
   onRecordVideo: () => void;
   onRecordAudio: () => void;
   onWriteStory: () => void;
-  /** Reservado por la API de la home; la cuarta card usa /subir/foto. */
+  onRecordPhoto: () => void;
   onMediaEducation: () => void;
   /** Historias: ancla #historias. Mapa: sección del mapa en la home `/#mapa`. */
   basePath?: string;
@@ -225,10 +224,10 @@ export function HomeFirstPart({
   onRecordVideo,
   onRecordAudio,
   onWriteStory,
+  onRecordPhoto,
   onMediaEducation: _onMediaEducation,
   basePath: _basePath = ''
 }: HomeFirstPartProps) {
-  const router = useRouter();
   const { t } = useHomeLocale();
 
   return (
@@ -330,7 +329,7 @@ export function HomeFirstPart({
           title={t.cardPhotoTitle}
           subtitle={t.cardPhotoSubtitle}
           buttonLabel={t.cardPhotoCta}
-          onClick={() => router.push('/subir/foto')}
+          onClick={onRecordPhoto}
           delay="1.35s"
           hoverKind="photo"
         >

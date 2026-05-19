@@ -327,7 +327,7 @@ function BitDetailCompact({
             boxShadow: '0 8px 28px rgba(255, 69, 0, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
           }}
         >
-          Contar tu historia
+          Cuenta tu historia
         </button>
       </div>
     </div>
