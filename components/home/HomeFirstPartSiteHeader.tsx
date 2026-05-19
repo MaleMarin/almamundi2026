@@ -19,6 +19,7 @@ import {
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { MAPA_HOME_HREF } from '@/lib/mapa-home-nav';
 
 /** Misma franja que la home sobre fondo claro `#E0E5EC`. */
 const HOME_HEADER_SHELL =
@@ -281,7 +282,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
           {desktopFirstTwoLinks}
           {desktopHistoriasSegment}
-          <HomeHardLink href="/#mapa" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+          <HomeHardLink href={MAPA_HOME_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
             {t.navMap}
           </HomeHardLink>
         </nav>
@@ -306,7 +307,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             {mobilePurposeHow}
             {mobileHistoriasSegment}
             <HomeHardLink
-              href="/#mapa"
+              href={MAPA_HOME_HREF}
               className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
               onClick={closeMobileNav}
             >

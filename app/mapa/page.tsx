@@ -1,12 +1,11 @@
-import { redirect } from 'next/navigation';
-import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
+import { MapaToHomeRedirect } from '@/components/map/MapaToHomeRedirect';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * `/mapa` ya no monta MapFullPage: el mapa vive en home `/#mapa` (MapSectionLocked + HomeMap).
- * Redirect en servidor (el fragmento `#mapa` no sobrevive a redirects HTTP).
+ * Ruta exacta `/mapa`: no monta la experiencia antigua; redirige a `/#mapa` en cliente.
+ * Redirect en `next.config.ts` (`/?section=mapa`) cubre la primera petición en edge.
  */
 export default function MapaPage() {
-  redirect(MAPA_HOME_REDIRECT_PATH);
+  return <MapaToHomeRedirect />;
 }

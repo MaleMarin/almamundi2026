@@ -1,3 +1,5 @@
+import { isMapaHomeHref, navigateToHomeMapa } from '@/lib/mapa-home-nav';
+
 /**
  * Navegación forzada a la home (o anclas / query en `/`).
  * Evita que el App Router reutilice una instantánea antigua de `/` al usar `Link` o `router.push`.
@@ -12,6 +14,10 @@ export function isHomeHardNavHref(href: string): boolean {
 /** `window.location.assign` — recarga completa del documento. En home, anclas `/#…` hacen scroll sin recargar. */
 export function hardNavigateTo(href: string): void {
   if (typeof window === 'undefined') return;
+  if (isMapaHomeHref(href)) {
+    navigateToHomeMapa();
+    return;
+  }
   if (!isHomeHardNavHref(href)) {
     console.warn('[home-hard-nav] href no es ruta de inicio, se navega igual:', href);
     window.location.assign(href);
@@ -34,5 +40,7 @@ export function hardNavigateTo(href: string): void {
     /* assign below */
   }
 
-  window.location.assign(href);
+  window.location.replace(
+    href.startsWith('http') ? href : `${window.location.origin}${href.startsWith('/') ? href : `/${href}`}`
+  );
 }
