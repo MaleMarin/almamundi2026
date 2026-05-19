@@ -9,13 +9,12 @@ export const MAPA_HOME_REDIRECT_PATH = `/?${MAPA_HOME_QUERY}` as const;
 /** `href` de menús: query fiable en App Router; el scroll deja `/#mapa`. */
 export const MAPA_HOME_LINK_HREF = MAPA_HOME_REDIRECT_PATH;
 
-type LenisLike = {
-  scrollTo: (target: number | Element | string, options?: { immediate?: boolean }) => void;
-};
-
 declare global {
   interface Window {
-    __almamundiLenis?: LenisLike;
+    /** Instancia Lenis (SmoothScrollProvider) para scroll programático a `#mapa`. */
+    __almamundiLenis?: {
+      scrollTo: (target: number | string | HTMLElement, options?: { immediate?: boolean }) => void;
+    };
   }
 }
 

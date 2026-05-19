@@ -1,15 +1,25 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { isPlaceholderHistoriasId } from '@/lib/historias/historias-demo-stories';
+import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
 
 /**
- * Si alguien abre /historias/ID/... copiando un ejemplo, redirige a una demo real
- * para que video / audio / texto / foto se vean igual que con un id válido.
- *
  * Next.js 16+: convención `proxy` (antes `middleware`).
+ * - `/mapa` exacto → home `/?section=mapa` (mapa embebido en `#mapa`).
+ * - `/historias/ID/...` placeholder → demo real.
  */
 export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  const path = pathname.replace(/\/$/, '') || '/';
+
+  if (path === '/mapa') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/';
+    url.search = MAPA_HOME_REDIRECT_PATH.split('?')[1] ?? '';
+    url.hash = '';
+    return NextResponse.redirect(url, 307);
+  }
+
   const parts = pathname.split('/').filter(Boolean);
   if (parts[0] !== 'historias' || parts.length < 2) return NextResponse.next();
 
@@ -38,5 +48,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/historias/:path*'],
+  matcher: ['/mapa', '/mapa/', '/historias/:path*'],
 };

@@ -33,7 +33,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         smoothWheel: true,
         autoRaf: false,
       });
-      window.__almamundiLenis = lenisInstance;
+      window.__almamundiLenis = lenisInstance as Window['__almamundiLenis'];
       ScrollTrigger.scrollerProxy(scroller, {
         scrollTop(value) {
           if (!lenisInstance) return 0;
