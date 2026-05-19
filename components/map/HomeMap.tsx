@@ -93,7 +93,7 @@ const HOME_GLOBE_FALLBACK_LNG = -60;
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-black text-sm text-white/40">
+    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-[#0a1428] text-sm text-white/40">
       Cargando mapa…
     </div>
   ),

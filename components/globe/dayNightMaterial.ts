@@ -122,10 +122,10 @@ export function createCityLightsOverlayMaterial(
       mat3 mGlobeTbn = mat3(vTw, vBw, vNw);
       vec3 n = normalize(mGlobeTbn * normalize(tmap));
       float ndl = dot(n, normalize(uSunDir));
-      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.28, 0.22, ndl));
+      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.35, 0.28, ndl));
       night = pow(clamp(night, 0.0, 1.0), 0.94);
       float dayLeak = smoothstep(-0.06, 0.12, ndl);
-      night *= 1.0 - dayLeak * 0.9;
+      night *= 1.0 - dayLeak * 0.95;
       float poleFade = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
 
       float e = 0.00042;
@@ -143,9 +143,9 @@ export function createCityLightsOverlayMaterial(
       boosted = boosted / (vec3(1.0) + boosted * 0.55);
       boosted = min(boosted, vec3(0.72));
 
-      /* Tono #ffcc44 (cálido cinematográfico) */
-      vec3 warmLow = vec3(1.0, 0.76, 0.22);
-      vec3 warmMid = vec3(1.0, 0.85, 0.35);
+      /* Luces urbanas: cálido suave (sin franja naranja en el terminador). */
+      vec3 warmLow = vec3(1.0, 0.82, 0.48);
+      vec3 warmMid = vec3(1.0, 0.88, 0.55);
 
       vec3 cityTint = mix(warmLow, warmMid, smoothstep(0.25, 0.88, pkLift));
 

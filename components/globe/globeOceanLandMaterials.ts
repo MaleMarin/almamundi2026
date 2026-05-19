@@ -126,8 +126,8 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 fresTint = vec3(0.28, 0.42, 0.55);
       float fresAmt = rim * 0.055;
 
-      /* Difuso: más lift en modo día completo para evitar océanos casi negros. */
-      float diff = mix(0.36 + 0.44 * pow(ndl, 1.12), 0.48 + 0.52 * pow(ndl, 1.05), uFullDay);
+      /* Difuso: azul profundo legible de día; piso nocturno azul, no negro. */
+      float diff = mix(0.42 + 0.48 * pow(ndl, 1.08), 0.48 + 0.52 * pow(ndl, 1.05), uFullDay);
       vec3 colDay = base * diff * mix(0.98, 1.08, uFullDay);
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
@@ -140,12 +140,12 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.12, 0.17, 0.28) + vec3(0.018, 0.026, 0.05);
+      vec3 colNight = base * vec3(0.16, 0.24, 0.38) + vec3(0.024, 0.034, 0.058);
       colNight += fresTint * rim * 0.045 * (0.26 + 0.5 * openWater);
-      vec3 colNightFill = base * vec3(0.18, 0.26, 0.42) + vec3(0.028, 0.038, 0.065);
+      vec3 colNightFill = base * vec3(0.22, 0.32, 0.48) + vec3(0.032, 0.044, 0.072);
       colNight = mix(colNight, colNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.22, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.15, 0.38, mu);
       vec3 col = mix(colNight, colDay, dayW);
       col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
@@ -296,7 +296,7 @@ export function createLandSphereMaterial(
       float y = dot(d0, vec3(0.299, 0.587, 0.114));
       vec3 gray = vec3(y);
       d0 = clamp(mix(gray, d0, 1.02), 0.0, 1.0);
-      d0 = clamp((d0 - 0.5) * 0.96 + 0.5, 0.0, 1.0);
+      d0 = clamp((d0 - 0.5) * 1.0 + 0.5, 0.0, 1.0);
 
       vec3 tmap = texture2D(uNormalTex, vUv).xyz * 2.0 - 1.0;
       float landScale = mix(0.82, 1.22, landMask);
@@ -328,7 +328,7 @@ export function createLandSphereMaterial(
       litNightFill += vec3(0.038, 0.044, 0.062) * landMask;
       litNight = mix(litNight, litNightFill, clamp(uNightFill, 0.0, 1.0));
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.26, 0.2, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.15, 0.36, mu);
       vec3 lit = mix(litNight, litDay, dayW);
       if (uFullDay < 0.5) {
         float floorLift = 0.13 + uNightFill * 0.18;

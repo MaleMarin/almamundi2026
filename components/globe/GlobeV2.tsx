@@ -128,10 +128,10 @@ const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
 
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];
-const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.06, -0.07, 0];
+const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [0, -0.02, 0];
 
 /** Relleno mínimo en hemisferio nocturno (shaders `uNightFill`; hemisferio nocturno legible, no día falso). */
-const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.35;
+const GLOBE_V2_EDITORIAL_NIGHT_FILL = 0.28;
 
 const GLOBE_V2_REALTIME_SUN_TICK_MS = 60_000;
 
