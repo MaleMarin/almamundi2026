@@ -128,6 +128,16 @@ export function HomePageClient() {
     const wantsMapa = u.hash === '#mapa' || u.searchParams.get('section') === 'mapa';
     if (!wantsMapa) return;
     navigateToHomeMapa();
+    const retry = window.setInterval(() => {
+      if (!document.getElementById('mapa')) return;
+      scrollToHomeMapaSection();
+      window.clearInterval(retry);
+    }, 120);
+    const stop = window.setTimeout(() => window.clearInterval(retry), 4000);
+    return () => {
+      window.clearInterval(retry);
+      window.clearTimeout(stop);
+    };
   }, []);
 
   useEffect(() => {

@@ -33,6 +33,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         smoothWheel: true,
         autoRaf: false,
       });
+      window.__almamundiLenis = lenisInstance;
       ScrollTrigger.scrollerProxy(scroller, {
         scrollTop(value) {
           if (!lenisInstance) return 0;
@@ -73,6 +74,9 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         lenisInstance?.destroy();
       } catch {
         /* ignore */
+      }
+      if (window.__almamundiLenis === lenisInstance) {
+        delete window.__almamundiLenis;
       }
       queueMicrotask(() => setLenis(null));
       try {

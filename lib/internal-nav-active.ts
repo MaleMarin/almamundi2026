@@ -16,7 +16,21 @@ export function isInternalNavActive(href: string, pathname: string, hash: string
 
   if (pathOnly.startsWith('/#')) {
     const expectedHash = pathOnly.slice(1);
-    return pathname === '/' && h === expectedHash;
+    if (pathname !== '/') return false;
+    if (h === expectedHash) return true;
+    if (expectedHash === 'mapa' && typeof window !== 'undefined') {
+      return new URL(window.location.href).searchParams.get('section') === 'mapa';
+    }
+    return false;
+  }
+
+  if (pathOnly === '/' && href.includes('section=mapa')) {
+    if (pathname !== '/') return false;
+    if (h === '#mapa') return true;
+    if (typeof window !== 'undefined') {
+      return new URL(window.location.href).searchParams.get('section') === 'mapa';
+    }
+    return false;
   }
 
   if (pathOnly === '/') {

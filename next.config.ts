@@ -63,6 +63,11 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: '/mapa/',
+        destination: '/?section=mapa',
+        permanent: false,
+      },
+      {
         source: '/cultura-digital',
         destination: '/educacion-mediatica',
         permanent: false,

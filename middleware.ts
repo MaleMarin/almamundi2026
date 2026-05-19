@@ -4,7 +4,8 @@ import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
 
 /** Solo la raíz `/mapa`; subrutas `/mapa/historias/*` etc. siguen para deep links. */
 export function middleware(request: NextRequest) {
-  if (request.nextUrl.pathname !== '/mapa') {
+  const path = request.nextUrl.pathname.replace(/\/$/, '') || '/';
+  if (path !== '/mapa') {
     return NextResponse.next();
   }
   const url = request.nextUrl.clone();
@@ -15,5 +16,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/mapa'],
+  matcher: ['/mapa', '/mapa/'],
 };

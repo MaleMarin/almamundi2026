@@ -1,4 +1,4 @@
-/** Destino canónico del menú «Mapa»: sección embebida en la home (no `/mapa`). */
+/** URL canónica tras llegar (ancla en la home). */
 export const MAPA_HOME_HREF = '/#mapa' as const;
 
 /** Query de llegada vía redirect HTTP (el hash no viaja en redirects). */
@@ -6,23 +6,55 @@ export const MAPA_HOME_QUERY = 'section=mapa' as const;
 
 export const MAPA_HOME_REDIRECT_PATH = `/?${MAPA_HOME_QUERY}` as const;
 
+/** `href` de menús: query fiable en App Router; el scroll deja `/#mapa`. */
+export const MAPA_HOME_LINK_HREF = MAPA_HOME_REDIRECT_PATH;
+
+type LenisLike = {
+  scrollTo: (target: number | Element | string, options?: { immediate?: boolean }) => void;
+};
+
+declare global {
+  interface Window {
+    __almamundiLenis?: LenisLike;
+  }
+}
+
 export function isMapaHomeHref(href: string): boolean {
   try {
     const u = new URL(href, 'https://almamundi.local');
-    return u.pathname === '/' && u.hash === '#mapa';
+    return (
+      u.pathname === '/' &&
+      (u.hash === '#mapa' || u.searchParams.get('section') === 'mapa')
+    );
   } catch {
-    return href === MAPA_HOME_HREF || href.endsWith('#mapa');
+    return (
+      href === MAPA_HOME_HREF ||
+      href === MAPA_HOME_LINK_HREF ||
+      href.endsWith('#mapa') ||
+      href.includes('section=mapa')
+    );
   }
+}
+
+function scrollMapaElement(el: HTMLElement, behavior: ScrollBehavior): void {
+  const headerOffset = 176;
+  const top = Math.max(0, el.getBoundingClientRect().top + window.scrollY - headerOffset);
+  const lenis = window.__almamundiLenis;
+  if (lenis) {
+    lenis.scrollTo(top, { immediate: behavior === 'auto' });
+    return;
+  }
+  window.scrollTo({ top, behavior });
 }
 
 export function scrollToHomeMapaSection(behavior: ScrollBehavior = 'smooth', attempt = 0): void {
   if (typeof document === 'undefined') return;
   const el = document.getElementById('mapa');
   if (el) {
-    el.scrollIntoView({ behavior, block: 'start' });
+    scrollMapaElement(el, behavior);
     return;
   }
-  if (attempt < 32) {
+  if (attempt < 48) {
     requestAnimationFrame(() => scrollToHomeMapaSection(behavior, attempt + 1));
   }
 }
@@ -46,5 +78,5 @@ export function navigateToHomeMapa(): void {
     scrollToHomeMapaSection();
     return;
   }
-  window.location.replace(`${window.location.origin}${MAPA_HOME_HREF}`);
+  window.location.replace(`${window.location.origin}${MAPA_HOME_REDIRECT_PATH}`);
 }
