@@ -119,7 +119,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
   const maxWidth = isMobile ? '100%' : '640px';
   const maxWidthDesktop = '720px';
   const paddingX = isMobile ? 20 : 24;
-  const displayTags = (historia.tags ?? []).slice(0, isMobile ? 3 : undefined);
   const avatarSize = isMobile ? 48 : 64;
 
   return (
@@ -410,26 +409,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               >
                 {historia.autor.bio}
               </p>
-            )}
-            {displayTags.length > 0 && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center' }}>
-                {displayTags.map((tag) => (
-                  <span
-                    key={tag}
-                    style={{
-                      fontFamily: SITE_FONT_STACK,
-                      fontWeight: 200,
-                      fontSize: '0.65rem',
-                      padding: '4px 10px',
-                      border: `1px solid rgba(255,69,0,0.5)`,
-                      borderRadius: 999,
-                      color: SEPIA_DK,
-                    }}
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
             )}
           </div>
         </div>

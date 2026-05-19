@@ -365,18 +365,20 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(163,177,198,0.22)`,
               }}
             >
-              <p
-                style={{
-                  fontSize: '0.72rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: neu.textBody,
-                  marginBottom: '0.85rem',
-                }}
-              >
-                Fin del álbum · {imagenes.length} fotografías
-              </p>
+              {imagenes.length > 0 ? (
+                <p
+                  style={{
+                    fontSize: '0.72rem',
+                    fontWeight: 600,
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: neu.textBody,
+                    marginBottom: '0.85rem',
+                  }}
+                >
+                  {imagenes.length} fotografías
+                </p>
+              ) : null}
               <h2
                 style={{
                   fontStyle: 'italic',
@@ -419,33 +421,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   {historia.autor.ubicacion}
                 </p>
               ) : null}
-              {(historia.tags ?? []).length > 0 ? (
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, justifyContent: 'center', marginBottom: '1.5rem' }}>
-                  {historia.tags!.map((tag) => (
-                    <span
-                      key={tag}
-                      style={{
-                        fontFamily: SITE_FONT_STACK,
-                        fontWeight: 600,
-                        fontSize: '0.62rem',
-                        letterSpacing: '0.14em',
-                        textTransform: 'uppercase',
-                        padding: '6px 12px',
-                        border: `1px solid rgba(255,69,0,0.28)`,
-                        borderRadius: 999,
-                        color: SEPIA,
-                        backgroundColor: neu.bg,
-                        boxShadow: 'inset 2px 2px 4px rgba(163,177,198,0.3), inset -2px -2px 4px rgba(255,255,255,0.8)',
-                      }}
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              ) : (
-                <div style={{ marginBottom: '1.5rem' }} />
-              )}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center', marginTop: historia.autor.ubicacion ? 0 : '0.25rem' }}>
                 {onClose ? (
                   <button
                     type="button"
