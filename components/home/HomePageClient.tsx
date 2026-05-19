@@ -120,6 +120,16 @@ export function HomePageClient() {
     syncModalsFromHash();
   }, [syncModalsFromHash]);
 
+  /** Llegada con `/#mapa` (menú Mapa, redirect desde `/mapa`): scroll a la sección bajo las tarjetas. */
+  useEffect(() => {
+    if (typeof window === 'undefined' || window.location.hash !== '#mapa') return;
+    const scrollToMapa = () => {
+      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    const id = requestAnimationFrame(() => requestAnimationFrame(scrollToMapa));
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.addEventListener('hashchange', syncModalsFromHash);
