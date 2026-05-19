@@ -1,9 +1,12 @@
-import { MapaToHomeRedirect } from '@/components/map/MapaToHomeRedirect';
+import { redirect } from 'next/navigation';
+import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
+
+export const dynamic = 'force-dynamic';
 
 /**
- * Ruta índice `/mapa`: redirige en cliente a home `/#mapa` (HomeMap + GlobeV2 bajo las tarjetas).
- * Subrutas `/mapa/noticias/*`, `/mapa/historias/*`, etc. siguen en sus pages.
+ * `/mapa` ya no monta MapFullPage: el mapa vive en home `/#mapa` (MapSectionLocked + HomeMap).
+ * Redirect en servidor (el fragmento `#mapa` no sobrevive a redirects HTTP).
  */
 export default function MapaPage() {
-  return <MapaToHomeRedirect />;
+  redirect(MAPA_HOME_REDIRECT_PATH);
 }

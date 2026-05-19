@@ -1,17 +1,16 @@
 'use client';
 
 import { useEffect } from 'react';
+import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
 
 /**
- * `/mapa` ya no es una experiencia propia: el mapa vive en home `/#mapa` (MapSectionLocked + HomeMap).
- * `redirect('/#mapa')` en servidor pierde el fragmento; aquí forzamos la URL con hash en cliente.
+ * Respaldo cliente si `/mapa` llegara a hidratar HTML en caché: el mapa vive en home `/#mapa`.
+ * La ruta usa `redirect(MAPA_HOME_REDIRECT_PATH)` en servidor; este componente no debería montarse.
  */
 export function MapaToHomeRedirect() {
   useEffect(() => {
-    const target = `${window.location.origin}/#mapa`;
-    if (`${window.location.pathname}${window.location.hash}` !== `/#mapa`) {
-      window.location.replace(target);
-    }
+    if (window.location.pathname !== '/mapa') return;
+    window.location.replace(`${window.location.origin}${MAPA_HOME_REDIRECT_PATH}`);
   }, []);
 
   return (

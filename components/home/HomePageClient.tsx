@@ -8,6 +8,10 @@ import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
+import {
+  replaceUrlWithMapaHash,
+  scrollToHomeMapaSection,
+} from '@/lib/mapa-home-nav';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -120,13 +124,18 @@ export function HomePageClient() {
     syncModalsFromHash();
   }, [syncModalsFromHash]);
 
-  /** Llegada con `/#mapa` (menú Mapa, redirect desde `/mapa`): scroll a la sección bajo las tarjetas. */
+  /** Llegada con `/#mapa` o `/?section=mapa` (menú Mapa, redirect desde `/mapa`). */
   useEffect(() => {
-    if (typeof window === 'undefined' || window.location.hash !== '#mapa') return;
-    const scrollToMapa = () => {
-      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    };
-    const id = requestAnimationFrame(() => requestAnimationFrame(scrollToMapa));
+    if (typeof window === 'undefined') return;
+    const u = new URL(window.location.href);
+    const wantsMapa = u.hash === '#mapa' || u.searchParams.get('section') === 'mapa';
+    if (!wantsMapa) return;
+    const id = requestAnimationFrame(() =>
+      requestAnimationFrame(() => {
+        scrollToHomeMapaSection();
+        replaceUrlWithMapaHash();
+      })
+    );
     return () => cancelAnimationFrame(id);
   }, []);
 
