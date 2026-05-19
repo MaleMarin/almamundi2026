@@ -143,7 +143,7 @@ export function createCityLightsOverlayMaterial(
       boosted = boosted / (vec3(1.0) + boosted * 0.55);
       boosted = min(boosted, vec3(0.72));
 
-      /* Luces urbanas: cálido suave (sin franja naranja en el terminador). */
+      /* Luces urbanas: cálido suave (puntos, sin franja naranja en terminador). */
       vec3 warmLow = vec3(1.0, 0.82, 0.48);
       vec3 warmMid = vec3(1.0, 0.88, 0.55);
 

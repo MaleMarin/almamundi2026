@@ -1,7 +1,5 @@
 'use client';
 
-import '@/lib/dev-performance-measure-guard';
-
 /**
  * Mapa en home (dock + drawer + historias/noticias/sonidos).
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
@@ -540,8 +538,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
             <GlobeV2Home
               embedded
-              lightingMode="realtime"
-              editorialFillLight
+              forceDaylight={false}
               earthVisualTimeScale={1}
               initialViewLat={globeInitialLat}
               initialViewLng={globeInitialLng}

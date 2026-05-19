@@ -1,10 +1,10 @@
 /**
- * Fondo detrás del canvas: negro puro. Los azules del océano solo en el shader del planeta.
+ * Fondo detrás del canvas: azul espacial profundo (no negro puro).
  */
 
 .earthNightContainer {
   background: radial-gradient(ellipse 95% 85% at 50% 42%, #102a4a 0%, #0a1830 55%, #071420 100%);
-  box-shadow: inset 0 0 48px rgba(4, 18, 42, 0.12);
+  box-shadow: inset 0 0 48px rgba(4, 18, 42, 0.1);
   position: relative;
 }
 
@@ -18,7 +18,7 @@
 /** Home `#mapa` con terminador UTC: espacio profundo azul (NASA Earth Observatory). */
 .earthCinematicEmbeddedContainer {
   background: radial-gradient(ellipse 92% 82% at 50% 38%, #1e4278 0%, #123060 46%, #0c1e38 88%, #0a1628 100%);
-  box-shadow: inset 0 0 32px rgba(12, 42, 88, 0.1);
+  box-shadow: inset 0 0 32px rgba(12, 42, 88, 0.08);
   position: relative;
 }
 
