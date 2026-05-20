@@ -8,6 +8,7 @@ import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
+import { navigateToHomeMapa, scrollToHomeMapaSection } from '@/lib/mapa-home-nav';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -120,6 +121,34 @@ export function HomePageClient() {
     syncModalsFromHash();
   }, [syncModalsFromHash]);
 
+  /** Llegada con `/#mapa` o `/?section=mapa` (menú Mapa, redirect desde `/mapa`). */
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const u = new URL(window.location.href);
+    const wantsMapa = u.hash === '#mapa' || u.searchParams.get('section') === 'mapa';
+    if (!wantsMapa) return;
+    navigateToHomeMapa();
+    const retry = window.setInterval(() => {
+      if (!document.getElementById('mapa')) return;
+      scrollToHomeMapaSection();
+      window.clearInterval(retry);
+    }, 120);
+    const stop = window.setTimeout(() => window.clearInterval(retry), 4000);
+    return () => {
+      window.clearInterval(retry);
+      window.clearTimeout(stop);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const onHash = () => {
+      if (window.location.hash === '#mapa') scrollToHomeMapaSection();
+    };
+    window.addEventListener('hashchange', onHash);
+    return () => window.removeEventListener('hashchange', onHash);
+  }, []);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
     window.addEventListener('hashchange', syncModalsFromHash);
@@ -192,6 +221,7 @@ export function HomePageClient() {
         onRecordVideo={() => openStory('video', true)}
         onRecordAudio={() => openStory('audio', true)}
         onWriteStory={() => openStory('texto', true)}
+        onRecordPhoto={() => openStory('foto', true)}
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />

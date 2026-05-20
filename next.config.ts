@@ -58,6 +58,16 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: '/mapa',
+        destination: '/?section=mapa',
+        permanent: true,
+      },
+      {
+        source: '/mapa/',
+        destination: '/?section=mapa',
+        permanent: true,
+      },
+      {
         source: '/cultura-digital',
         destination: '/educacion-mediatica',
         permanent: false,

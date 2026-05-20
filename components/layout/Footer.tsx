@@ -100,7 +100,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             Historias
           </ActiveInternalNavLink>
           <ActiveInternalNavLink
-            href="/mapa"
+            href="/#mapa"
             className={FOOTER_LINK}
             activeClassName="!text-gray-900 font-semibold"
           >

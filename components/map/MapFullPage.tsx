@@ -731,7 +731,7 @@ function getCuratedSourceName(url: string | null | undefined, fallbackSource: st
   return fallbackSource;
 }
 
-const NEWS_FETCH_TIMEOUT_MS = 10_000;
+const NEWS_FETCH_TIMEOUT_MS = 18_000;
 const NEWS_RING_MAX_R = 14;
 const NEWS_RING_SPEED = 10;
 const NEWS_RING_PERIOD = 1600;

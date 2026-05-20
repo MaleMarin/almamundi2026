@@ -21,7 +21,7 @@ const HUD_CLASS =
 
 /** Nota bajo fecha/hora: sonido en el vacío y sonificación (científica). */
 const SPACE_SOUND_NOTE =
-  'En el espacio no hay sonido porque es una onda mecánica que necesita un medio físico como el aire para propagarse, y el vacío espacial carece de las partículas necesarias para transmitir esas vibraciones. Para poder «escuchar» eventos como explosiones, los científicos utilizan la sonificación, un proceso que traduce datos digitales de telescopios y radiación electromagnética en frecuencias audibles para detectar patrones y facilitar el estudio de fenómenos invisibles.';
+  'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles — un proceso llamado sonificación.';
 
 type Props = {
   selectedLocation?: WorldClockLocation | null;

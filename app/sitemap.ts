@@ -18,7 +18,6 @@ function siteOrigin(): string {
 /** Rutas estáticas principales (sin dinámicas [id]). Ampliar si hace falta indexación fina. */
 const STATIC_PATHS: string[] = [
   '/',
-  '/mapa',
   '/historias',
   '/historias/audios',
   '/historias/videos',

@@ -1,14 +1,11 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { getNewsTopicCacheKey } from '@/lib/news-topics';
 
 /** Geo = siempre lugar del hecho (event location). No se usa país del medio para ubicar. */
 export type NewsGeo = { lat: number; lng: number; label?: string };
 
-/**
- * Item normalizado: geo = lugar del hecho; source/outlet = attribution (quién publicó), no para mapa.
- * Si no hay geo, el item se muestra en panel con "Sin ubicación" y no va al globo.
- */
 export type NewsItem = {
   id: string;
   title: string;
@@ -20,32 +17,74 @@ export type NewsItem = {
   topicLabel: string | null;
   outletName: string | null;
   outletId: string | null;
-  /** Solo lugar del hecho. null = sin ubicación (no se dibuja en el mapa). */
   geo: NewsGeo | null;
   lat: number | null;
   lng: number | null;
   topic?: string | null;
+  topicMatched?: boolean;
 };
 
-const NEWS_FETCH_TIMEOUT_MS = 10_000;
+const NEWS_FETCH_TIMEOUT_MS = 14_000;
+const NEWS_PANEL_HARD_STOP_MS = 12_000;
 
-/** Fallback cuando la API falla o devuelve 0. Geo = lugar del hecho (demo). */
-export const NEWS_FALLBACK_ITEMS: NewsItem[] = [
-  { id: 'fb-1', title: 'Noticias en vivo', url: '#', source: 'AlmaMundi', publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: 'AlmaMundi', outletId: null, geo: { lat: 19.43, lng: -99.13 }, lat: 19.43, lng: -99.13 },
-  { id: 'fb-2', title: 'Actualidad global', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: 40.71, lng: -74.0 }, lat: 40.71, lng: -74.0 },
-  { id: 'fb-3', title: 'Cobertura mundial', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: 51.5, lng: -0.12 }, lat: 51.5, lng: -0.12 },
-  { id: 'fb-4', title: 'Última hora', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: -33.86, lng: 151.2 }, lat: -33.86, lng: 151.2 },
-  { id: 'fb-5', title: 'En desarrollo', url: '#', source: null, publishedAt: new Date().toISOString(), sourceCountry: null, topicId: null, topicLabel: null, outletName: null, outletId: null, geo: { lat: 35.67, lng: 139.65 }, lat: 35.67, lng: 139.65 },
-];
+export function isDemoNewsItem(item: NewsItem): boolean {
+  if (item.id.startsWith('fb-') || item.id.startsWith('media-')) return true;
+  if (!item.url?.trim() || item.url === '#') return true;
+  const t = item.title.trim();
+  return (
+    t === 'Noticias en vivo' ||
+    t === 'Actualidad global' ||
+    t === 'Cobertura mundial' ||
+    t === 'Última hora' ||
+    t === 'En desarrollo'
+  );
+}
 
-export type FetchNewsFn = (topic: string, signal: AbortSignal) => Promise<{ items: NewsItem[]; isFallback?: boolean }>;
+export function filterRealNewsItems(items: NewsItem[]): NewsItem[] {
+  return items.filter((n) => !isDemoNewsItem(n) && n.title.trim().length > 0);
+}
+
+export const NEWS_FALLBACK_ITEMS: NewsItem[] = [];
+
+export type FetchNewsResult = {
+  topicItems: NewsItem[];
+  generalItems: NewsItem[];
+  topicMatched: boolean;
+  relaxedTopic: boolean;
+  isFallback?: boolean;
+};
+
+/** Respuesta legacy (MapFullPage) o nueva forma con topic/general separados. */
+export type FetchNewsFn = (
+  topic: string,
+  signal: AbortSignal
+) => Promise<FetchNewsResult | { items: NewsItem[]; isFallback?: boolean; relaxedTopic?: boolean }>;
+
+function normalizeFetchResult(
+  result: FetchNewsResult | { items: NewsItem[]; isFallback?: boolean; relaxedTopic?: boolean }
+): FetchNewsResult {
+  if ('topicItems' in result) return result;
+  const topicItems = filterRealNewsItems(result.items ?? []);
+  return {
+    topicItems,
+    generalItems: [],
+    topicMatched: topicItems.length > 0,
+    relaxedTopic: Boolean(result.relaxedTopic),
+    isFallback: result.isFallback,
+  };
+}
 
 export type UseNewsLayerOptions = {
-  /** Vista actualidad: volver a pedir noticias cada N ms (día calendario + lista al día). 0 = solo al cambiar tema. */
   refreshIntervalMs?: number;
 };
 
-/** Solo items con geo (lugar del hecho) van al globo. */
+type TopicCacheEntry = {
+  topicItems: NewsItem[];
+  generalItems: NewsItem[];
+  topicMatched: boolean;
+  relaxedTopic: boolean;
+};
+
 function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; kind: 'news'; title: string; source: string | null; publishedAt: string | null; url: string; topic?: string | null; geoLabel?: string; weight: number; altitude: number; radius?: number } | null {
   const geo = n.geo ?? null;
   if (!geo || !Number.isFinite(geo.lat) || !Number.isFinite(geo.lng)) return null;
@@ -66,11 +105,6 @@ function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; 
   };
 }
 
-/**
- * Hook estable para la capa de noticias.
- * selectedTopicId = fuente única: fetch y lista solo ese tema.
- * geo = solo lugar del hecho; items sin geo no van al mapa (panel con "Sin ubicación").
- */
 export function useNewsLayer(
   selectedTopicId: string | null,
   topicQuery: string,
@@ -78,15 +112,28 @@ export function useNewsLayer(
   fetchNews: FetchNewsFn,
   options?: UseNewsLayerOptions
 ) {
-  const [newsItems, setNewsItems] = useState<NewsItem[]>([]);
+  const topicKey = getNewsTopicCacheKey(selectedTopicId);
+
+  const [topicItems, setTopicItems] = useState<NewsItem[]>([]);
+  const [generalItems, setGeneralItems] = useState<NewsItem[]>([]);
+  const [topicMatched, setTopicMatched] = useState(true);
+  const [relaxedTopic, setRelaxedTopic] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [loadingTimedOut, setLoadingTimedOut] = useState(false);
   const [refreshTick, setRefreshTick] = useState(0);
+
   const mountedRef = useRef(true);
+  const cacheByTopicRef = useRef<Record<string, TopicCacheEntry>>({});
+  const requestSeqRef = useRef(0);
   const topicQueryRef = useRef(topicQuery);
-  useLayoutEffect(() => {
+  const topicKeyRef = useRef(topicKey);
+
+  useEffect(() => {
     topicQueryRef.current = topicQuery;
-  }, [topicQuery]);
+    topicKeyRef.current = topicKey;
+  }, [topicQuery, topicKey]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -94,19 +141,6 @@ export function useNewsLayer(
       mountedRef.current = false;
     };
   }, []);
-
-  /**
-   * Al cambiar tema, la lista anterior suele tener topicId distinto (p. ej. null en "Todas").
-   * Un frame con loading=false + filtro estricto dejaba el panel vacío hasta que llegaba el fetch.
-   */
-  useLayoutEffect(() => {
-    if (activeView !== 'actualidad') return;
-    queueMicrotask(() => {
-      setNewsItems([]);
-      setLoading(true);
-      setError(null);
-    });
-  }, [topicQuery, activeView]);
 
   useEffect(() => {
     if (activeView !== 'actualidad') return;
@@ -117,70 +151,187 @@ export function useNewsLayer(
   }, [activeView, options?.refreshIntervalMs]);
 
   useEffect(() => {
-    let cancelled = false;
-    const controller = new AbortController();
-    const t = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
+    if (activeView !== 'actualidad') return;
 
+    const requestSeq = ++requestSeqRef.current;
     const requestTopic = topicQuery;
-    queueMicrotask(() => {
-      if (!cancelled) setLoading(true);
-      if (!cancelled) setError(null);
-    });
-    fetchNews(requestTopic, controller.signal)
-      .then((result) => {
-        if (cancelled || !mountedRef.current) return;
-        if (topicQueryRef.current !== requestTopic) return;
-        setNewsItems(result.items);
-        setLoading(false);
+    const requestKey = topicKey;
+    const cached = cacheByTopicRef.current[requestKey];
+    const hasCache = Boolean(
+      cached && (cached.topicItems.length > 0 || cached.generalItems.length > 0)
+    );
+
+    if (hasCache && cached) {
+      setTopicItems(cached.topicItems);
+      setGeneralItems(cached.generalItems);
+      setTopicMatched(cached.topicMatched);
+      setRelaxedTopic(cached.relaxedTopic);
+      setLoading(false);
+      setIsRefreshing(true);
+    } else {
+      setTopicItems([]);
+      setGeneralItems([]);
+      setLoading(true);
+      setIsRefreshing(false);
+    }
+
+    setLoadingTimedOut(false);
+    setError(null);
+
+    const controller = new AbortController();
+    const abortTimer = window.setTimeout(() => controller.abort(), NEWS_FETCH_TIMEOUT_MS);
+
+    const endLoading = () => {
+      if (!mountedRef.current || requestSeqRef.current !== requestSeq) return;
+      setLoading(false);
+      setIsRefreshing(false);
+    };
+
+    const hardStopTimer = window.setTimeout(() => {
+      if (requestSeqRef.current !== requestSeq || !mountedRef.current) return;
+      setLoadingTimedOut(true);
+      endLoading();
+      const entry = cacheByTopicRef.current[requestKey];
+      if (entry) {
+        setTopicItems(entry.topicItems);
+        setGeneralItems(entry.generalItems);
+        setTopicMatched(entry.topicMatched);
+        setRelaxedTopic(entry.relaxedTopic);
         setError(null);
+      } else {
+        setError('No pudimos cargar titulares en este momento. Intenta otra categoría.');
+      }
+    }, NEWS_PANEL_HARD_STOP_MS);
+
+    const applyResult = (result: FetchNewsResult) => {
+      const tItems = filterRealNewsItems(result.topicItems);
+      const gItems = filterRealNewsItems(result.generalItems);
+      const entry: TopicCacheEntry = {
+        topicItems: tItems,
+        generalItems: gItems,
+        topicMatched: result.topicMatched,
+        relaxedTopic: result.relaxedTopic,
+      };
+      cacheByTopicRef.current[requestKey] = entry;
+      setTopicItems(tItems);
+      setGeneralItems(gItems);
+      setTopicMatched(result.topicMatched);
+      setRelaxedTopic(result.relaxedTopic);
+      setError(null);
+      setLoadingTimedOut(false);
+    };
+
+    fetchNews(requestTopic, controller.signal)
+      .then((raw) => {
+        const result = normalizeFetchResult(raw);
+        if (!mountedRef.current || requestSeqRef.current !== requestSeq) return;
+        if (topicQueryRef.current !== requestTopic || topicKeyRef.current !== requestKey) return;
+
+        const tItems = filterRealNewsItems(result.topicItems);
+        const gItems = filterRealNewsItems(result.generalItems);
+
+        if (tItems.length > 0 || gItems.length > 0) {
+          applyResult(result);
+          return;
+        }
+
+        if (result.isFallback) {
+          setTopicItems([]);
+          setGeneralItems([]);
+          setTopicMatched(false);
+          setRelaxedTopic(false);
+          setError('No pudimos cargar titulares en este momento. Intenta otra categoría.');
+          return;
+        }
+
+        setTopicItems([]);
+        setGeneralItems([]);
+        setTopicMatched(false);
+        setRelaxedTopic(false);
+        setError('No encontramos titulares recientes para esta categoría.');
       })
       .catch((err) => {
-        if (cancelled || !mountedRef.current) return;
-        setLoading(false);
-        if (err?.name === 'AbortError') setError(null);
-        else setError(err instanceof Error ? err.message : 'Error al cargar noticias');
+        if (!mountedRef.current || requestSeqRef.current !== requestSeq) return;
+        if (topicQueryRef.current !== requestTopic || topicKeyRef.current !== requestKey) return;
+
+        const entry = cacheByTopicRef.current[requestKey];
+        if (entry && (entry.topicItems.length > 0 || entry.generalItems.length > 0)) {
+          setTopicItems(entry.topicItems);
+          setGeneralItems(entry.generalItems);
+          setTopicMatched(entry.topicMatched);
+          setRelaxedTopic(entry.relaxedTopic);
+          const isAbort = err instanceof Error && err.name === 'AbortError';
+          setError(isAbort ? null : err instanceof Error ? err.message : 'Error al cargar noticias');
+          return;
+        }
+
+        setTopicItems([]);
+        setGeneralItems([]);
+        const isAbort = err instanceof Error && err.name === 'AbortError';
+        setError(
+          isAbort
+            ? 'No pudimos cargar titulares en este momento. Intenta otra categoría.'
+            : err instanceof Error
+              ? err.message
+              : 'Error al cargar noticias'
+        );
       })
-      .finally(() => window.clearTimeout(t));
+      .finally(() => {
+        window.clearTimeout(abortTimer);
+        window.clearTimeout(hardStopTimer);
+        endLoading();
+      });
 
     return () => {
-      cancelled = true;
-      window.clearTimeout(t);
+      window.clearTimeout(abortTimer);
+      window.clearTimeout(hardStopTimer);
       controller.abort();
     };
-  }, [topicQuery, fetchNews, refreshTick]);
+  }, [topicQuery, topicKey, fetchNews, refreshTick, activeView]);
 
-  /** Filtro estricto por tema: item.topicId === selectedTopicId (o todos si null). */
-  const effectiveNewsItems = useMemo(() => {
+  const effectiveTopicItems = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-    if (loading) return NEWS_FALLBACK_ITEMS;
-    if (error) return NEWS_FALLBACK_ITEMS;
-    const raw = newsItems;
-    const byTopic =
-      selectedTopicId == null
-        ? raw
-        : raw.filter((n) => n.topicId === selectedTopicId);
-    return byTopic;
-  }, [activeView, loading, error, newsItems, selectedTopicId]);
+    return filterRealNewsItems(topicItems);
+  }, [activeView, topicItems]);
 
-  const isFallback = activeView === 'actualidad' && (loading || error != null);
+  const effectiveGeneralItems = useMemo(() => {
+    if (activeView !== 'actualidad') return [];
+    return filterRealNewsItems(generalItems);
+  }, [activeView, generalItems]);
 
-  /** Solo items con geo (lugar del hecho) van al globo. */
+  const panelLoading =
+    activeView === 'actualidad' &&
+    loading &&
+    effectiveTopicItems.length === 0 &&
+    effectiveGeneralItems.length === 0;
+
   const newsPoints = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-    return effectiveNewsItems.map(newsToGlobePoint).filter(Boolean) as Array<ReturnType<typeof newsToGlobePoint> & { id: string; lat: number; lng: number }>;
-  }, [activeView, effectiveNewsItems]);
+    return effectiveTopicItems.map(newsToGlobePoint).filter(Boolean) as Array<
+      ReturnType<typeof newsToGlobePoint> & { id: string; lat: number; lng: number }
+    >;
+  }, [activeView, effectiveTopicItems]);
 
   const newsObjectsForGlobe = useMemo(() => {
     if (activeView !== 'actualidad') return [];
-    return effectiveNewsItems.filter((n) => n.geo != null && Number.isFinite(n.geo.lat) && Number.isFinite(n.geo.lng));
-  }, [activeView, effectiveNewsItems]);
+    return effectiveTopicItems.filter(
+      (n) => n.geo != null && Number.isFinite(n.geo.lat) && Number.isFinite(n.geo.lng)
+    );
+  }, [activeView, effectiveTopicItems]);
 
   return {
-    newsItems,
-    loading,
+    newsItems: effectiveTopicItems,
+    topicItems: effectiveTopicItems,
+    generalItems: effectiveGeneralItems,
+    loading: panelLoading,
+    isRefreshing,
+    loadingTimedOut,
     error,
-    effectiveNewsItems,
-    isFallback,
+    topicMatched,
+    relaxedTopic,
+    showStaleNotice: false,
+    effectiveNewsItems: [...effectiveTopicItems, ...effectiveGeneralItems],
+    isFallback: false,
     newsPoints,
     newsObjectsForGlobe,
   };

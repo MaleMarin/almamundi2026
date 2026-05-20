@@ -1,0 +1,14 @@
+{
+  "redirects": [
+    {
+      "source": "/mapa",
+      "destination": "/?section=mapa",
+      "permanent": true
+    },
+    {
+      "source": "/mapa/",
+      "destination": "/?section=mapa",
+      "permanent": true
+    }
+  ]
+}

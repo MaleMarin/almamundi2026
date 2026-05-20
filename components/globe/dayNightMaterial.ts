@@ -122,10 +122,10 @@ export function createCityLightsOverlayMaterial(
       mat3 mGlobeTbn = mat3(vTw, vBw, vNw);
       vec3 n = normalize(mGlobeTbn * normalize(tmap));
       float ndl = dot(n, normalize(uSunDir));
-      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.36, 0.26, ndl));
-      night = pow(clamp(night, 0.0, 1.0), 0.92);
-      float dayLeak = smoothstep(-0.02, 0.18, ndl);
-      night *= 1.0 - dayLeak * 0.82;
+      float night = uFullDay > 0.5 ? 0.0 : (1.0 - smoothstep(-0.35, 0.28, ndl));
+      night = pow(clamp(night, 0.0, 1.0), 0.94);
+      float dayLeak = smoothstep(-0.06, 0.12, ndl);
+      night *= 1.0 - dayLeak * 0.95;
       float poleFade = smoothstep(0.0, 0.2, vUv.y) * (1.0 - smoothstep(0.72, 1.0, vUv.y));
 
       float e = 0.00042;
@@ -143,9 +143,9 @@ export function createCityLightsOverlayMaterial(
       boosted = boosted / (vec3(1.0) + boosted * 0.55);
       boosted = min(boosted, vec3(0.72));
 
-      /* Tono #ffcc44 (cálido cinematográfico) */
-      vec3 warmLow = vec3(1.0, 0.76, 0.22);
-      vec3 warmMid = vec3(1.0, 0.85, 0.35);
+      /* Luces urbanas: cálido suave (puntos, sin franja naranja en terminador). */
+      vec3 warmLow = vec3(1.0, 0.82, 0.48);
+      vec3 warmMid = vec3(1.0, 0.88, 0.55);
 
       vec3 cityTint = mix(warmLow, warmMid, smoothstep(0.25, 0.88, pkLift));
 
@@ -244,22 +244,24 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
   return mat;
 }
 
-const _axisSunX = new THREE.Vector3(1, 0, 0);
+const _axisAxialTiltZ = new THREE.Vector3(0, 0, 1);
 
 /**
- * Dirección Tierra → Sol en **espacio mundial** (antes del giro GMST del mesh).
- * El vector está en el marco del hijo de la oblicuidad (eje Y = rotación diaria); solo se aplica `R_x(obliquity)`.
- * La rotación `planetSpinRef` (GMST) va **solo** en la corteza: si rotáramos también la luz con Y, el terminador quedaría fijo en la textura.
+ * Dirección Tierra → Sol en espacio mundial (antes del giro GMST de la corteza).
+ * Misma inclinación axial que `earthAxialTiltGroup` en GlobeV2: `R_z(axialTilt)`.
+ * El GMST solo rota la textura (`planetSpinRef`); no se aplica aquí para que el terminador se mueva.
  */
 export function computeSunDirection(
   date: Date,
-  obliquityXRad: number,
+  axialTiltRad: number,
   target?: THREE.Vector3
 ): THREE.Vector3 {
   const ecef = sunUnitVectorTowardSunEcef(date);
   const v = target ?? new THREE.Vector3();
   v.set(ecef.x, ecef.y, ecef.z);
-  v.applyAxisAngle(_axisSunX, obliquityXRad);
+  if (axialTiltRad !== 0) {
+    v.applyAxisAngle(_axisAxialTiltZ, axialTiltRad);
+  }
   return v.normalize();
 }
 

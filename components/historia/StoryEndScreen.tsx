@@ -51,7 +51,6 @@ export function StoryEndScreen({
   fecha,
   citaDestacada,
   autor,
-  tags,
   replayLabel,
   onReplay,
   onMoreStories,
@@ -142,14 +141,6 @@ export function StoryEndScreen({
           </div>
         ) : null}
 
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', marginBottom: '1.85rem' }}>
-          <div style={{ flex: '0 1 52px', height: 1, background: `${ORANGE}55` }} />
-          <span style={{ fontSize: '0.8rem', fontStyle: 'italic', fontWeight: 500, letterSpacing: '0.28em', color: TEXT_BODY }}>
-            Fin
-          </span>
-          <div style={{ flex: '0 1 52px', height: 1, background: `${ORANGE}55` }} />
-        </div>
-
         <h2
           style={{
             fontWeight: 600,
@@ -226,7 +217,7 @@ export function StoryEndScreen({
             alignItems: 'flex-start',
             gap: '1.15rem',
             padding: '1.15rem 1.35rem',
-            marginBottom: tags && tags.length > 0 ? '1.5rem' : '1.95rem',
+            marginBottom: '1.95rem',
             width: '100%',
             textAlign: 'left',
           }}
@@ -262,30 +253,6 @@ export function StoryEndScreen({
             ) : null}
           </div>
         </div>
-
-        {tags && tags.length > 0 ? (
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.45rem', justifyContent: 'center', marginBottom: '1.95rem' }}>
-            {tags.map((tag) => (
-              <span
-                key={tag}
-                style={{
-                  fontSize: '0.65rem',
-                  fontWeight: 600,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: ORANGE,
-                  border: `1px solid rgba(255,69,0,0.26)`,
-                  padding: '0.32rem 0.75rem',
-                  borderRadius: 999,
-                  backgroundColor: neu.bg,
-                  boxShadow: 'inset 2px 2px 4px rgba(163,177,198,0.35), inset -2px -2px 4px rgba(255,255,255,0.75)',
-                }}
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        ) : null}
 
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.95rem', width: '100%', justifyContent: 'stretch' }}>
           <button

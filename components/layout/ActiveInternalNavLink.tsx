@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { isHomeHardNavHref } from '@/lib/home-hard-nav';
 import { ACTIVE_NAV_CLASS, isInternalNavActive } from '@/lib/internal-nav-active';
+import { isMapaHomeHref, MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
 export type ActiveInternalNavLinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
   href: string;
@@ -36,12 +37,13 @@ export function ActiveInternalNavLink({
     return () => window.removeEventListener('hashchange', sync);
   }, []);
 
-  const active = isInternalNavActive(href, pathname, hash);
+  const resolvedHref = isMapaHomeHref(href) ? MAPA_HOME_LINK_HREF : href;
+  const active = isInternalNavActive(resolvedHref, pathname, hash);
   const merged = [className, active ? activeClassName : ''].filter(Boolean).join(' ').trim();
 
-  if (isHomeHardNavHref(href)) {
+  if (isHomeHardNavHref(resolvedHref)) {
     return (
-      <HomeHardLink href={href} className={merged} style={style} {...rest}>
+      <HomeHardLink href={resolvedHref} className={merged} style={style} {...rest}>
         {children}
       </HomeHardLink>
     );

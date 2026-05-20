@@ -1,26 +1,24 @@
 /**
- * Fondo detrás del canvas: negro puro. Los azules del océano solo en el shader del planeta.
+ * Fondo detrás del canvas: azul espacial profundo (no negro puro).
  */
 
 .earthNightContainer {
-  background: #000000;
-  /* Vignette suave: el inset oscuro anterior apagaba todo el encuadre del globo. */
-  box-shadow: inset 0 0 90px rgba(0, 0, 0, 0.22);
+  background: radial-gradient(ellipse 95% 85% at 50% 42%, #102a4a 0%, #0a1830 55%, #071420 100%);
+  box-shadow: inset 0 0 48px rgba(4, 18, 42, 0.1);
   position: relative;
 }
 
 /** Home `#mapa` con `forceDaylight`: menos viñeta para que el disco se lea como día. */
 .earthDayEmbeddedContainer {
-  background: #03060c;
-  /* Viñeta suave: menos oscurecimiento arriba (evita sensación de “globo tapado”). */
-  box-shadow: inset 0 0 72px rgba(0, 0, 0, 0.05);
+  background: radial-gradient(ellipse 90% 80% at 50% 40%, #2a5a9e 0%, #143a6e 42%, #0a1e3a 78%, #060e1c 100%);
+  box-shadow: none;
   position: relative;
 }
 
-/** Home `#mapa` con terminador UTC: negro espacial + viñeta suave (referencia órbita / NASA). */
+/** Home `#mapa` con terminador UTC: espacio profundo azul (NASA Earth Observatory). */
 .earthCinematicEmbeddedContainer {
-  background: #000000;
-  box-shadow: inset 0 0 88px rgba(0, 14, 32, 0.28);
+  background: radial-gradient(ellipse 92% 82% at 50% 38%, #1e4278 0%, #123060 46%, #0c1e38 88%, #0a1628 100%);
+  box-shadow: inset 0 0 32px rgba(12, 42, 88, 0.08);
   position: relative;
 }
 

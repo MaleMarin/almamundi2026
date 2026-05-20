@@ -1,33 +1,19 @@
-'use client';
+import Script from 'next/script';
+import { MapaToHomeRedirect } from '@/components/map/MapaToHomeRedirect';
 
-import dynamic from 'next/dynamic';
-import '@/app/mapa/mapa-ui.css';
-import '@/app/mapa/liquid-metal.css';
-import { Breadcrumbs } from '@/components/layout/Breadcrumbs';
-import { MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
-
-const MapFullPage = dynamic(
-  () => import('@/components/map/MapFullPage').then((m) => m.default),
-  { ssr: false }
-);
+export const dynamic = 'force-dynamic';
 
 /**
- * Ruta `/mapa`: `MapFullPage` a pantalla completa (mismo globo que `#mapa` en la home).
- * La Luna orbita vía `MapCanvas` + `lib/map-gl-moon.ts`.
+ * `/mapa` no es una página: solo redirige al mapa de la home (`/#mapa` vía `?section=mapa`).
+ * Subrutas `/mapa/historias/*` etc. siguen activas para deep links.
  */
 export default function MapaPage() {
   return (
-    <div
-      className="relative flex min-h-[100dvh] w-full flex-col overflow-hidden"
-      style={{ background: MAP_STAGE_GRADIENT }}
-      data-map-route="mapa-full"
-    >
-      <div className="pointer-events-none absolute left-2 top-2 z-[60] max-w-[min(100%-1rem,28rem)] sm:left-3 sm:top-3">
-        <div className="pointer-events-auto">
-          <Breadcrumbs tone="dark" items={[{ label: 'Inicio', href: '/' }, { label: 'Mapa' }]} />
-        </div>
-      </div>
-      <MapFullPage embedded={false} universeVisible />
-    </div>
+    <>
+      <Script id="mapa-root-redirect" strategy="beforeInteractive">
+        {`if(location.pathname==='/mapa'||location.pathname==='/mapa/'){location.replace('/?section=mapa');}`}
+      </Script>
+      <MapaToHomeRedirect />
+    </>
   );
 }

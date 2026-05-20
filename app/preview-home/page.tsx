@@ -20,6 +20,7 @@ export default function PreviewHomePage() {
         onRecordVideo={() => add('Graba video')}
         onRecordAudio={() => add('Graba audio')}
         onWriteStory={() => add('Escribe historia')}
+        onRecordPhoto={() => add('Fotografía')}
         onMediaEducation={() => add('Educación mediática')}
         basePath="/"
       />

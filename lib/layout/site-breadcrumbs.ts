@@ -125,8 +125,8 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
     }
 
     let href: string | null = isLast ? null : pathUpTo;
-    if (pathUpTo === '/mapa/historias' || pathUpTo === '/mapa/camaras') {
-      href = '/mapa';
+    if (pathUpTo === '/mapa' || pathUpTo === '/mapa/historias' || pathUpTo === '/mapa/camaras') {
+      href = isLast ? null : '/#mapa';
     }
 
     let label: string | undefined = STATIC_LABELS[seg];

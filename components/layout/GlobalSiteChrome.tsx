@@ -2,7 +2,7 @@
 
 /**
  * Masthead y relleno superior compartidos: misma pieza que la home (`HomeFirstPartSiteHeader`)
- * en todas las rutas salvo `/` (header dentro de `HomeFirstPart`) y `/mapa` (experiencia a pantalla completa).
+ * en todas las rutas salvo `/` (header dentro de `HomeFirstPart`) y `/mapa/*` (subrutas legacy; `/mapa` redirige a `/#mapa`).
  */
 import type { ReactNode } from 'react';
 import { usePathname } from 'next/navigation';

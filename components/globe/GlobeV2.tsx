@@ -3,7 +3,7 @@
 /**
  * GlobeV2 — R3F + drei: Tierra + Luna, tiempo real UTC.
  *
- * Tierra: oblicuidad ~23,44° (eje X); `planetSpinRef.rotation.y` = GMST + offset (textura alineada al meridiano).
+ * Tierra: inclinación axial ~23,44° (eje Z, marco inercial); `planetSpinRef.rotation.y` = GMST (giro diario sobre el eje inclinado).
  * Reloj Tierra+Sol: `getEarthSceneDate()` (UTC acelerado con `GLOBE_V2_EARTH_VISUAL_TIME_SCALE` / prop). Luna en tiempo real.
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
@@ -53,6 +53,7 @@ import {
   type GlobeV2OceanSunDebug,
   type GlobeV2TextureUrls,
 } from '@/lib/globe/globe-v2-assets';
+import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
 import {
   approximateCoordinatesForIANATimeZone,
   earthGreenwichSpinYRadFromUtc,
@@ -84,10 +85,13 @@ function stripGlobeMeshRaycast(mesh: THREE.Mesh | null) {
  * Home embebida: escala Tierra + Luna + bits a la vez (1 = tamaño de referencia).
  * &gt;1 acerca el disco al encuadre del mapa en `#mapa`.
  */
-const GLOBE_V2_EMBEDDED_GEO_SCALE = 1.1;
+const GLOBE_V2_EMBEDDED_GEO_SCALE = 1.06;
 
-/** Oblicuidad de la eclíptica (~23,44°): eje de rotación terrestre fijo respecto al plano orbital de la Luna. */
-const GLOBE_V2_EARTH_OBLIQUITY_RAD = THREE.MathUtils.degToRad(23.439421);
+/** Inclinación axial terrestre (oblicuidad eclíptica). Eje Z = convención NASA / MapFullPage (~0,41 rad). */
+const EARTH_AXIAL_TILT_DEG = 23.44;
+const EARTH_AXIAL_TILT_RAD = THREE.MathUtils.degToRad(EARTH_AXIAL_TILT_DEG);
+/** @deprecated alias interno */
+const GLOBE_V2_EARTH_OBLIQUITY_RAD = EARTH_AXIAL_TILT_RAD;
 
 /**
  * Desfase opcional si el meridiano 0 de la textura no coincide con el astronómico (casi siempre 0).
@@ -108,10 +112,11 @@ const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
 const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 218, full: 162 } as const;
 
 /** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: más cerca del disco para que no se salga del encuadre. */
-const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.58, full: 3.58 } as const;
+/** Home: semieje mayor alto para que la Luna no cruce el disco terrestre. */
+const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 2.08, full: 3.58 } as const;
 
 /** Escala solo del disco lunar (no del radio orbital). */
-const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.48, full: 0.6 } as const;
+const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.42, full: 0.6 } as const;
 
 /** Inclinación del plano orbital respecto a la eclíptica (~5,145°). */
 const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
@@ -123,8 +128,8 @@ const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as con
 const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
 
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
-const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.22, 0.3, 0];
-const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [-0.06, -0.07, 0];
+const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.14, 0.18, 0];
+const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [0, -0.02, 0];
 
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
@@ -202,6 +207,31 @@ function CameraPresetRig({
       distance
     );
   }, [camera, controls, preset, distance]);
+  return null;
+}
+
+/** Encuadre inicial hacia lat/lng (home: geolocalización o fallback América Latina). */
+function InitialViewRig({
+  lat,
+  lng,
+  distance,
+  orbitTarget,
+}: {
+  lat: number;
+  lng: number;
+  distance: number;
+  orbitTarget: [number, number, number];
+}) {
+  const { camera, controls } = useThree();
+  useEffect(() => {
+    if (!controls) return;
+    const p = latLngToCartesianThetaLon(lat, lng, 1);
+    const pos = new THREE.Vector3(p.x, p.y, p.z).normalize().multiplyScalar(distance);
+    camera.position.copy(pos);
+    const c = controls as unknown as OrbitControlsImpl;
+    c.target.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
+    c.update();
+  }, [camera, controls, lat, lng, distance, orbitTarget]);
   return null;
 }
 
@@ -324,10 +354,10 @@ function AtmosphereGlow({
       createAtmosphereGlowMaterial(
         homeCinematic
           ? {
-              intensity: 0.152,
-              power: 2.82,
-              innerColor: 0x7ed4ff,
-              outerColor: 0x082458,
+              intensity: 0.128,
+              power: 3.05,
+              innerColor: 0x8ed8ff,
+              outerColor: 0x0a2a5c,
             }
           : undefined
       ),
@@ -557,18 +587,18 @@ function EarthGroup({
 
   useLayoutEffect(() => {
     cloudMaterial.opacity = cloudOpacity;
-    cloudMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudMaterial.roughness = 1;
     cloudMaterial.metalness = 0;
     cloudMaterial.emissive.set('#d8e2ee');
-    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : 0.09;
+    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : fullDaySurface && embedded ? 0.18 : 0.09;
     cloudMaterial.needsUpdate = true;
-  }, [cloudMaterial, cloudOpacity, viewerNight]);
+  }, [cloudMaterial, cloudOpacity, viewerNight, fullDaySurface, embedded]);
 
   useLayoutEffect(() => {
     const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
     cloudUnderlayMaterial.opacity = uo;
-    cloudUnderlayMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudUnderlayMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudUnderlayMaterial.roughness = 1;
     cloudUnderlayMaterial.metalness = 0;
     cloudUnderlayMaterial.emissive.set('#d8e2ee');
@@ -578,7 +608,7 @@ function EarthGroup({
 
   useLayoutEffect(() => {
     cloudOuterMaterial.opacity = cloudOpacity * cloudOuterOpacityFactor;
-    cloudOuterMaterial.color.set(viewerNight ? '#a8b0bc' : '#ffffff');
+    cloudOuterMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
     cloudOuterMaterial.roughness = 1;
     cloudOuterMaterial.metalness = 0;
     cloudOuterMaterial.emissive.set('#d8e2ee');
@@ -798,6 +828,8 @@ function GlobeScene({
   showMoon,
   earthVisualTimeScale,
   pauseEarthSpinForUi,
+  initialViewLat,
+  initialViewLng,
 }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
@@ -816,6 +848,8 @@ function GlobeScene({
   earthVisualTimeScale: number;
   /** Drawer / panel que debe congelar el reloj terrestre (p. ej. bits abiertos en home). */
   pauseEarthSpinForUi: boolean;
+  initialViewLat?: number;
+  initialViewLng?: number;
 }) {
   const geoScale = embedded ? GLOBE_V2_EMBEDDED_GEO_SCALE : 1;
   const camDist = embedded ? 3.62 : 3.14;
@@ -891,7 +925,7 @@ function GlobeScene({
         ? 1.72
         : 1.9
       : forceDaylight
-        ? 2.38
+        ? 3.42
         : 2.16
     : viewerNight
       ? 1.65
@@ -925,10 +959,10 @@ function GlobeScene({
           '#1a1f28',
           embedded
             ? viewerNight
-              ? 0.44
+              ? 0.48
               : forceDaylight
-                ? 0.58
-                : 0.48
+                ? 1.18
+                : 0.58
             : viewerNight
               ? 0.38
               : 0.44,
@@ -936,7 +970,7 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.11 : forceDaylight ? 0.18 : 0.18) : viewerNight ? 0.09 : 0.16
+          embedded ? (viewerNight ? 0.14 : forceDaylight ? 0.56 : 0.24) : viewerNight ? 0.09 : 0.16
         }
         color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
       />
@@ -949,24 +983,27 @@ function GlobeScene({
                 ? 3.65
                 : 3.95
               : forceDaylight
-                ? 5.25
+                ? 8.35
                 : 4.95
             : viewerNight
               ? 3.35
               : 4.2
         }
-        color={forceDaylight && embedded ? '#fff5e0' : '#fff8ec'}
+        color={forceDaylight && embedded ? '#fffaf0' : '#fff8ec'}
       />
+      {embedded && forceDaylight && !viewerNight ? (
+        <directionalLight position={[-5, 3, 4]} intensity={2.85} color="#c8e0ff" />
+      ) : null}
 
       <group scale={geoScale}>
         {/*
-          Jerarquía Tierra:
-          - Inclinación fija del eje (oblicuidad) en X.
-          - Rotación diaria en Y bajo la inclinación (corteza + nubes + bits).
-          La Luna es hermana (órbita geocéntrica en marco “inercial” de la escena, no hereda la oblicuidad).
+          Jerarquía Tierra (marco inercial estable):
+          - earthAxialTiltGroup: inclinación axial fija en Z (no sigue a la cámara).
+          - earthSpinGroup: giro sidéreo en Y local (GMST + textura).
+          La Luna es hermana (órbita geocéntrica; no hereda el tilt).
         */}
-        <group rotation={[GLOBE_V2_EARTH_OBLIQUITY_RAD, 0, 0]}>
-          <group ref={planetSpinRef}>
+        <group name="earthAxialTilt" rotation={[0, 0, EARTH_AXIAL_TILT_RAD]}>
+          <group ref={planetSpinRef} name="earthSpin">
             <EarthGroup
               urls={urls}
               viewerNight={viewerNight}
@@ -1036,6 +1073,17 @@ function GlobeScene({
       {lockView && fixedCameraPreset ? (
         <CameraPresetRig preset={fixedCameraPreset} distance={camDist} />
       ) : null}
+      {embedded &&
+      !lockView &&
+      typeof initialViewLat === 'number' &&
+      typeof initialViewLng === 'number' ? (
+        <InitialViewRig
+          lat={initialViewLat}
+          lng={initialViewLng}
+          distance={camDist}
+          orbitTarget={GLOBE_V2_EMBEDDED_ORBIT_TARGET}
+        />
+      ) : null}
     </>
   );
 }
@@ -1089,6 +1137,9 @@ export type GlobeV2Props = {
    * En home: típ. `drawerOpen && drawerMode === 'bits'`.
    */
   pauseEarthSpinForUi?: boolean;
+  /** Encuadre inicial (grados). Home: geolocalización o fallback editorial LATAM. */
+  initialViewLat?: number;
+  initialViewLng?: number;
 };
 
 export default function GlobeV2({
@@ -1107,6 +1158,8 @@ export default function GlobeV2({
   showMoon = true,
   earthVisualTimeScale = GLOBE_V2_EARTH_VISUAL_TIME_SCALE,
   pauseEarthSpinForUi = false,
+  initialViewLat,
+  initialViewLng,
 }: GlobeV2Props) {
   /**
    * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
@@ -1183,7 +1236,7 @@ export default function GlobeV2({
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedDayChrome
-            ? 2.38
+            ? 3.05
             : embeddedCinematicChrome
               ? 2.14
               : embedded
@@ -1209,6 +1262,8 @@ export default function GlobeV2({
             showMoon={showMoon}
             earthVisualTimeScale={earthVisualTimeScale}
             pauseEarthSpinForUi={pauseEarthSpinForUi}
+            initialViewLat={initialViewLat}
+            initialViewLng={initialViewLng}
           />
         </Suspense>
       </Canvas>

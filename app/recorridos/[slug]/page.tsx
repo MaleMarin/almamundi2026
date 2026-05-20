@@ -40,7 +40,7 @@ export default function RecorridoDetailPage() {
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 

@@ -54,7 +54,7 @@ export function MuestrasInteriorNav() {
           Muestras
         </ActiveInternalNavLink>
         <ActiveInternalNavLink
-          href="/mapa"
+          href="/#mapa"
           className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[0.9375rem]"
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >
