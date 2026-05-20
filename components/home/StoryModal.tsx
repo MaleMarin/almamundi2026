@@ -1193,10 +1193,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 >
                   Un par de datos más
                 </h3>
-                <p className="text-xs leading-snug text-gray-600 md:text-sm">
-                  Mismos datos que en el envío web: historia, ubicación, aviso al mapa y privacidad. Sin desplazamiento en
-                  pantallas medianas o grandes.
-                </p>
               </div>
 
               <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start">
