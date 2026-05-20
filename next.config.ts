@@ -60,12 +60,12 @@ const nextConfig: NextConfig = {
       {
         source: '/mapa',
         destination: '/?section=mapa',
-        permanent: false,
+        permanent: true,
       },
       {
         source: '/mapa/',
         destination: '/?section=mapa',
-        permanent: false,
+        permanent: true,
       },
       {
         source: '/cultura-digital',

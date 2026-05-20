@@ -1,4 +1,5 @@
 import React from 'react';
+import { MapaLayoutGate } from '@/components/map/MapaLayoutGate';
 import { MapaSubrouteBreadcrumbs } from '@/components/layout/MapaSubrouteBreadcrumbs';
 
 /** Evita prerender estático de `/mapa` y HTML cacheado en CDN como “sitio viejo”. */
@@ -16,10 +17,10 @@ export default function MapaLayout({
   modal: React.ReactNode;
 }) {
   return (
-    <>
+    <MapaLayoutGate>
       <MapaSubrouteBreadcrumbs />
       {children}
       {modal}
-    </>
+    </MapaLayoutGate>
   );
 }

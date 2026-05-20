@@ -1,20 +1,21 @@
 'use client';
 
+import { useLayoutEffect } from 'react';
 import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
 
+function redirectToHomeMap() {
+  const p = window.location.pathname.replace(/\/$/, '') || '/';
+  if (p !== '/mapa') return;
+  window.location.replace(`${window.location.origin}${MAPA_HOME_REDIRECT_PATH}`);
+}
+
 /**
- * Respaldo si `/mapa` hidrata HTML en caché: redirect antes de React (inline) + en mount.
+ * Respaldo cliente: `/mapa` → globo en la home (`/#mapa`).
  */
 export function MapaToHomeRedirect() {
-  if (typeof window !== 'undefined' && window.location.pathname === '/mapa') {
-    window.location.replace(`${window.location.origin}${MAPA_HOME_REDIRECT_PATH}`);
-  }
+  useLayoutEffect(() => {
+    redirectToHomeMap();
+  }, []);
 
-  return (
-    <script
-      dangerouslySetInnerHTML={{
-        __html: `if(location.pathname==='/mapa'){location.replace(${JSON.stringify(MAPA_HOME_REDIRECT_PATH)});}`,
-      }}
-    />
-  );
+  return null;
 }

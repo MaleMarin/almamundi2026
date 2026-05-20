@@ -1,40 +1,22 @@
 'use client';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { useEffect } from 'react';
+import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
 
+/**
+ * Si `/mapa` falla, no mostrar pantalla de error: ir al globo de la home.
+ */
 export default function MapaError({
   error,
-  reset,
+  reset: _reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   useEffect(() => {
-    console.error('[mapa]', error);
+    console.error('[mapa] redirecting to home map after error', error);
+    window.location.replace(`${window.location.origin}${MAPA_HOME_REDIRECT_PATH}`);
   }, [error]);
 
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center gap-6 bg-[#0F172A] text-white p-6">
-      <h1 className="text-xl font-semibold text-white/95">Algo salió mal en el mapa</h1>
-      <p className="text-white/60 text-sm text-center max-w-md">
-        No se pudo cargar esta vista. Puedes intentar de nuevo o volver al inicio.
-      </p>
-      <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={reset}
-          className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors"
-        >
-          Intentar de nuevo
-        </button>
-        <HomeHardLink
-          href="/"
-          className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors"
-        >
-          Ir al inicio
-        </HomeHardLink>
-      </div>
-    </div>
-  );
+  return null;
 }

@@ -1,12 +1,19 @@
-import { redirect } from 'next/navigation';
-import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
+import Script from 'next/script';
+import { MapaToHomeRedirect } from '@/components/map/MapaToHomeRedirect';
 
 export const dynamic = 'force-dynamic';
 
 /**
- * `/mapa` exacto: redirect inmediato en servidor (sin MapFullPage).
- * Respaldo edge: `middleware.ts` + `next.config.ts` → misma query `section=mapa`.
+ * `/mapa` no es una página: solo redirige al mapa de la home (`/#mapa` vía `?section=mapa`).
+ * Subrutas `/mapa/historias/*` etc. siguen activas para deep links.
  */
 export default function MapaPage() {
-  redirect(MAPA_HOME_REDIRECT_PATH);
+  return (
+    <>
+      <Script id="mapa-root-redirect" strategy="beforeInteractive">
+        {`if(location.pathname==='/mapa'||location.pathname==='/mapa/'){location.replace('/?section=mapa');}`}
+      </Script>
+      <MapaToHomeRedirect />
+    </>
+  );
 }
