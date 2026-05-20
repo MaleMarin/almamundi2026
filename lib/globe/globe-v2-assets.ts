@@ -143,7 +143,7 @@ export const GLOBE_V2_CLOUD_UNDERLAY_RADIUS_DELTA = 0.009;
 export const GLOBE_V2_CLOUD_SPHERE_SEGMENTS = 112;
 
 /** Luces urbanas: muy discretas (documental, no mapa nocturno recargado). */
-export const GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY = 0.2;
+export const GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY = 0.04;
 export const GLOBE_V2_CITY_LIGHTS_STRENGTH_NIGHT = 0.3;
 
 /** Normal / displacement: relieve perceptible pero no “inflado”. */

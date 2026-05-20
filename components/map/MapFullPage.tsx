@@ -18,7 +18,6 @@ import {
 import { TopicsModal, type TopicsModalStory } from '@/components/mapa/TopicsModal';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 import { TimeBar } from '@/components/map/TimeBar';
-import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 import { UniverseBackground } from '@/components/UniverseBackground';
 import { AtmosphereOverlay } from '@/components/AtmosphereOverlay';
 import { useAtmosphere } from '@/hooks/useAtmosphere';
@@ -5266,7 +5265,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
-        <MapRealtimeSyncLine userLat={userLocation?.lat} userLng={userLocation?.lng} />
       </div>
       </div>
     </div>

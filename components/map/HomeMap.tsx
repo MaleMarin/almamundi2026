@@ -620,8 +620,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-[#0a1428] pt-8 pb-2 md:pt-10 lg:pt-12">
-          <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-[#0a1428] pt-8 pb-0 md:pt-10 lg:pt-12">
+          <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-hidden">
             <GlobeV2Home
               embedded
               forceDaylight={false}
@@ -639,14 +639,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="flex-shrink-0 w-full flex items-end justify-center z-10 bg-black pb-4 pt-1.5"
+        className="relative z-10 -mt-px flex w-full flex-shrink-0 items-end justify-center border-0 bg-black pb-4 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
-        <TimeBar
-          viewerLat={viewerLat}
-          viewerLng={viewerLng}
-          className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]"
-        />
+        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
       </div>
 
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}

@@ -55,7 +55,7 @@ import {
 } from '@/lib/globe/globe-v2-assets';
 import { useViewerSolarNight } from '@/hooks/useViewerSolarNight';
 import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
-import { earthGreenwichSpinYRadFromUtc } from '@/lib/sunPosition';
+import { earthGreenwichSpinYRadFromUtc, sunDayFactorAtLocation } from '@/lib/sunPosition';
 import {
   AUTO_ROTATE_HOVER_SPEED,
   AUTO_ROTATE_IDLE_SPEED,
@@ -191,15 +191,25 @@ function InitialViewRig({
   orbitTarget: [number, number, number];
 }) {
   const { camera, controls } = useThree();
+  const sunScratch = useMemo(() => new THREE.Vector3(), []);
   useEffect(() => {
     if (!controls) return;
+    const now = new Date();
+    computeSunDirection(now, EARTH_AXIAL_TILT_RAD, sunScratch);
     const p = latLngToCartesianThetaLon(lat, lng, 1);
-    const pos = new THREE.Vector3(p.x, p.y, p.z).normalize().multiplyScalar(distance);
-    camera.position.copy(pos);
+    const surfaceN = new THREE.Vector3(p.x, p.y, p.z).normalize();
+    const dayFactor = sunDayFactorAtLocation(lat, lng, now);
+    const camDir = surfaceN.clone();
+    if (dayFactor > 0.2) {
+      camDir.addScaledVector(sunScratch, 0.72).normalize();
+    } else {
+      camDir.addScaledVector(sunScratch, -0.38).normalize();
+    }
+    camera.position.copy(camDir.multiplyScalar(distance));
     const c = controls as unknown as OrbitControlsImpl;
     c.target.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
     c.update();
-  }, [camera, controls, lat, lng, distance, orbitTarget]);
+  }, [camera, controls, lat, lng, distance, orbitTarget, sunScratch]);
   return null;
 }
 
@@ -1168,7 +1178,7 @@ export default function GlobeV2({
   const embeddedCinematicChrome = embedded && !forceDaylightOn && className == null;
   const rootClassName =
     className == null
-      ? `${wrapperClass} ${
+      ? `${wrapperClass} outline-none focus:outline-none ${
           embeddedDayChrome
             ? earthNightStyles.earthDayEmbeddedContainer
             : embeddedCinematicChrome
@@ -1185,7 +1195,7 @@ export default function GlobeV2({
     <div
       className={rootClassName}
       role="img"
-      tabIndex={0}
+      tabIndex={embedded ? -1 : 0}
       aria-label="Globo terráqueo interactivo. Explorar con el ratón."
     >
       {className == null && !embeddedDayChrome && !embeddedCinematicChrome ? (
