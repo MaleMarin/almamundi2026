@@ -55,16 +55,12 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'beliefs',
         items: [
-          '01 — Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única.',
-          '02 — Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego.',
-          '03 — El único requisito es haber vivido algo. Todo lo demás — el formato, la extensión, la forma — es completamente tuyo.',
-          '04 — El formato no importa. Un video grabado en el baño de tu casa puede contener más verdad que una producción de millones. Un audio de dos minutos grabado caminando puede ser la historia más importante de tu día.',
-          '05 — Las historias que despiertan otras historias son siempre las más honestas. No las más elaboradas. Las más honestas.',
+          'Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única.',
+          'Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego.',
+          'El único requisito es querer compartirlo.',
+          'Video, audio, texto, foto. Cuatro maneras de contar. Cuatro maneras de conocer.',
+          'Las historias que despiertan otras historias vienen de la experiencia vivida.',
         ],
-      },
-      {
-        type: 'quote',
-        text: 'Tu historia no necesita likes para existir. Solo necesita ser contada.',
       },
     ],
   },
@@ -97,8 +93,6 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'closing',
         lines: [
-          'Cuéntalo como puedas. Cuéntalo como quieras.',
-          'En video desde tu celular. En audio caminando. En texto escrito de noche. En una foto con dos líneas al pie.',
           'El formato es tuyo. La historia también. AlmaMundi es el lugar donde lo que viviste no desaparece.',
         ],
       },
