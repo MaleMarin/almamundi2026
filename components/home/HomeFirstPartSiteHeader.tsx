@@ -15,6 +15,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import {
+  SITE_HEADER_STORIES_LINKS,
   SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
@@ -151,21 +152,16 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         </button>
         {desktopStoriesOpen ? (
           <div id={desktopStoriesListId} className="absolute left-0 top-[calc(100%+0.35rem)] z-[110] min-w-[8rem]">
-            <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Mi colección
-            </Link>
-            <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Videos
-            </Link>
-            <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Audios
-            </Link>
-            <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Escritos
-            </Link>
-            <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={() => setDesktopStoriesOpen(false)}>
-              Fotografías
-            </Link>
+            {SITE_HEADER_STORIES_LINKS.map(({ href, label }) => (
+              <Link
+                key={href}
+                href={href}
+                className={SITE_NAV_STORIES_ITEM_CLASS}
+                onClick={() => setDesktopStoriesOpen(false)}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
         ) : null}
       </div>
@@ -227,21 +223,11 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         </button>
         {mobileStoriesOpen ? (
           <div id={mobileStoriesListId} className="pl-2">
-            <Link href="/historias/mi-coleccion" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-              Mi colección
-            </Link>
-            <Link href="/historias/videos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-              Videos
-            </Link>
-            <Link href="/historias/audios" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-              Audios
-            </Link>
-            <Link href="/historias/escrito" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-              Escritos
-            </Link>
-            <Link href="/historias/fotos" className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-              Fotografías
-            </Link>
+            {SITE_HEADER_STORIES_LINKS.map(({ href, label }) => (
+              <Link key={href} href={href} className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
+                {label}
+              </Link>
+            ))}
           </div>
         ) : null}
       </>

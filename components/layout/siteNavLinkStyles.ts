@@ -13,6 +13,15 @@ export const SITE_NAV_STORIES_ITEM_CLASS =
 export const SITE_NAV_PILL_LINK_CLASS =
   'rounded-full px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-[var(--almamundi-orange)] md:px-4 md:text-[0.9375rem]';
 
+/** Submenú Historias del header (mismo orden en footer). */
+export const SITE_HEADER_STORIES_LINKS = [
+  { href: '/historias/mi-coleccion', label: 'Mi colección' },
+  { href: '/historias/videos', label: 'Videos' },
+  { href: '/historias/audios', label: 'Audios' },
+  { href: '/historias/escrito', label: 'Escritos' },
+  { href: '/historias/fotos', label: 'Fotografías' },
+] as const;
+
 /** `/historias` o `${base}/historias` si la home está bajo un prefijo (p. ej. preview). */
 export function historiasListHrefFromBasePath(basePath: string): string {
   const raw = basePath.replace(/\/$/, '');
