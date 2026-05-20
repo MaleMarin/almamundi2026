@@ -23,7 +23,7 @@ export function MapSectionLocked() {
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
       <section
         id="mapa"
-        className="relative z-[15] w-full scroll-mt-32 bg-[var(--home-bg)] -mt-32 pt-32 md:scroll-mt-40 md:-mt-40 md:pt-40 lg:scroll-mt-44 lg:-mt-44 lg:pt-44"
+        className="relative z-[15] w-full scroll-mt-32 bg-transparent -mt-32 pt-32 md:scroll-mt-40 md:-mt-40 md:pt-40 lg:scroll-mt-44 lg:-mt-44 lg:pt-44"
       >
         {/* Un solo degradado continuo (claro → noche → espacio); sin franja intermedia. */}
         <div className="map-section-atmosphere w-full">
@@ -45,7 +45,7 @@ export function MapSectionLocked() {
           </div>
           <div
             ref={globeUniverseRef}
-            className="map-universe-stage relative flex w-full min-h-[88vh] flex-col overflow-hidden pt-0"
+            className="map-universe-stage relative z-[1] flex w-full min-h-[88vh] flex-col overflow-hidden pt-0"
           >
             <HomeMap universeSectionRef={globeUniverseRef} />
           </div>

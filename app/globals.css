@@ -301,37 +301,40 @@ a.home-map-neu-pill.btn-almamundi:visited {
 .map-section-atmosphere {
   position: relative;
   width: 100%;
-  background: linear-gradient(
+  isolation: isolate;
+  /* Paradas en vh: transición larga y estable (no banda al crecer la sección con el globo). */
+  background-color: var(--map-space-deep);
+  background-image: linear-gradient(
     180deg,
-    var(--home-bg) 0%,
-    var(--home-bg) 8%,
-    #e8edf3 14%,
-    #dfe6ee 22%,
-    #d0dae6 30%,
-    #bcc9d8 38%,
-    #a3b2c4 46%,
-    #8a9cb0 53%,
-    #7289a0 59%,
-    #5d748c 65%,
-    #4a6278 70%,
-    #3b5268 75%,
-    #2f4560 79%,
-    #253a56 83%,
-    #1d314c 86%,
-    #172a44 89%,
-    #12243c 91%,
-    #0e1f36 93%,
-    #0b1a30 95%,
-    #091628 96.5%,
-    #071220 97.5%,
-    var(--map-space-mid) 98.5%,
-    var(--map-space-deep) 100%
+    var(--home-bg) 0,
+    var(--home-bg) 10vh,
+    #e8edf3 14vh,
+    #dfe6ee 20vh,
+    #d4dde8 26vh,
+    #c2cfdd 32vh,
+    #adbdd0 38vh,
+    #96a9bf 44vh,
+    #7f95ad 50vh,
+    #6a829c 56vh,
+    #566f88 62vh,
+    #455f78 68vh,
+    #37516a 74vh,
+    #2c4560 80vh,
+    #243b56 86vh,
+    #1d334c 92vh,
+    #172c44 98vh,
+    #13253c 104vh,
+    #0f2034 110vh,
+    #0c1b2e 116vh,
+    var(--map-space-mid) 122vh,
+    var(--map-space-deep) 128vh
   );
 }
 
 .map-section-editorial {
   position: relative;
   z-index: 1;
+  padding-bottom: 0.5rem;
 }
 
 /* Globo: fondo transparente — el degradado del padre continúa detrás del canvas. */
@@ -370,8 +373,9 @@ a.home-map-neu-pill.btn-almamundi:visited {
   content: "";
   position: absolute;
   inset: 0;
+  z-index: 0;
   pointer-events: none;
-  opacity: 0.028;
+  opacity: 0.022;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -410,9 +414,13 @@ a.home-map-neu-pill.btn-almamundi:visited {
 
 /* Footer home: relevo neumórfico; en globals para evitar destello de "footer antiguo" (texto negro) al cargar */
 .almamundi-footer-title {
-  display: inline-block;
+  display: block;
+  width: max-content;
+  max-width: 100%;
   text-align: center;
   margin-inline: auto;
+  /* Compensa letter-spacing negativo para centrado óptico real */
+  padding-inline-end: 0.06em;
   color: #E0E5EC;
   font-family: var(--font-sans);
   font-weight: 900;
