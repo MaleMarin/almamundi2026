@@ -1,3 +1,5 @@
+import { initFromUserGesture, unlockAmbientAudio } from '@/lib/sound/ambient';
+
 /** URL canónica tras llegar (ancla en la home). */
 export const MAPA_HOME_HREF = '/#mapa' as const;
 
@@ -8,6 +10,24 @@ export const MAPA_HOME_REDIRECT_PATH = `/?${MAPA_HOME_QUERY}` as const;
 
 /** `href` de menús: query fiable en App Router; el scroll deja `/#mapa`. */
 export const MAPA_HOME_LINK_HREF = MAPA_HOME_REDIRECT_PATH;
+
+/** Clic en «Mapa»: desbloquear audio en el mismo gesto y avisar a HomeMap. */
+export const MAP_NAV_GESTURE_EVENT = 'almamundi:mapNavGesture' as const;
+
+const MAP_AMBIENT_PENDING_KEY = 'almamundi:mapAmbientPending';
+
+/** Llamar en el handler de clic que navega al mapa (antes de scroll o recarga). */
+export function primeMapAmbientFromNavGesture(): void {
+  if (typeof window === 'undefined') return;
+  initFromUserGesture();
+  void unlockAmbientAudio();
+  try {
+    sessionStorage.setItem(MAP_AMBIENT_PENDING_KEY, '1');
+  } catch {
+    /* modo privado */
+  }
+  window.dispatchEvent(new CustomEvent(MAP_NAV_GESTURE_EVENT));
+}
 
 declare global {
   interface Window {

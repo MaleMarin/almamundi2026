@@ -95,9 +95,9 @@ export default async function RootLayout({
             <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)] bg-[var(--home-bg)]">
               <LocaleProvider initialLocale={locale}>
                 <GlobalSiteChrome>{children}</GlobalSiteChrome>
+                <Footer initialLocale={locale} />
               </LocaleProvider>
             </div>
-            <Footer />
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />

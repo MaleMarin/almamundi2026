@@ -13,6 +13,29 @@ export const SITE_NAV_STORIES_ITEM_CLASS =
 export const SITE_NAV_PILL_LINK_CLASS =
   'rounded-full px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:text-[var(--almamundi-orange)] md:px-4 md:text-[0.9375rem]';
 
+/** Submenú Historias del header (mismo orden en footer). */
+export const SITE_HEADER_STORIES_LINKS = [
+  { href: '/historias/mi-coleccion', label: 'Mi colección' },
+  { href: '/historias/videos', label: 'Videos' },
+  { href: '/historias/audios', label: 'Audios' },
+  { href: '/historias/escrito', label: 'Escritos' },
+  { href: '/historias/fotos', label: 'Fotografías' },
+] as const;
+
+/** Anclas en la home (Propósito, Cómo funciona) — `HomeHardLink` + modales. */
+export const SITE_FOOTER_HOME_HASH_LINKS = [
+  { href: '/#proposito', labelKey: 'navPurpose' as const },
+  { href: '/#como-funciona', labelKey: 'navHow' as const },
+] as const;
+
+/** Enlaces legales del pie (segunda fila). */
+export const SITE_FOOTER_LEGAL_LINKS = [
+  { href: '/privacidad', label: 'Aviso de privacidad' },
+  { href: '/mis-datos-personales', label: 'Mis datos personales' },
+] as const;
+
+export const SITE_FOOTER_GUIA_CONDUCTA_HREF = '/Guia%20de%20conducta%20AlmaMundi.pdf';
+
 /** `/historias` o `${base}/historias` si la home está bajo un prefijo (p. ej. preview). */
 export function historiasListHrefFromBasePath(basePath: string): string {
   const raw = basePath.replace(/\/$/, '');
