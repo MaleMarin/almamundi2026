@@ -46,6 +46,7 @@ import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCaptur
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import {
   drawHuellaV2OnCanvas,
+  formatHuellaImprintFooterLine,
   limpiarNombreFoto,
   type HuellaV2Format,
 } from '@/lib/huella/huellaV2';
@@ -253,14 +254,6 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     mediaBlob,
   });
 
-  const base =
-    (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '') ||
-    (typeof window !== 'undefined' ? window.location.origin : '');
-  const embedPublicUrl =
-    base && storyId
-      ? `${base}/historias/${encodeURIComponent(storyId)}`
-      : `https://www.almamundi.org`;
-
   drawHuellaV2OnCanvas(ctx, {
     storyId,
     content,
@@ -269,16 +262,6 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     submitHour: receivedAt.getHours(),
     embedSiteFooter: true,
     footerAt: receivedAt,
-    embedStoryTitle: storyTitle.trim() || undefined,
-    embedFormatLabel:
-      mode === 'video'
-        ? 'Video'
-        : mode === 'audio'
-          ? 'Audio'
-          : mode === 'texto'
-            ? 'Texto'
-            : 'Fotografías',
-    embedPublicUrl,
   });
 }
 
@@ -1483,26 +1466,16 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 {alias.trim() ? (
                   <>
                     {alias.trim()},<br />
-                    esta es <em className="italic font-light text-[#E8400A]">tu resonancia visual.</em>
+                    tu historia dejó esta{' '}
+                    <em className="italic font-light text-[#E8400A]">resonancia visual.</em>
                   </>
                 ) : (
                   <>
-                    Una historia nueva
-                    <br />
-                    ya está <em className="italic font-light text-[#E8400A]">en el mapa.</em>
+                    Tu historia dejó esta{' '}
+                    <em className="italic font-light text-[#E8400A]">resonancia visual.</em>
                   </>
                 )}
               </h3>
-              <p
-                className="max-w-full truncate px-1 text-[0.9375rem] font-medium leading-tight tracking-tight text-[#111418]"
-                style={{
-                  fontFamily:
-                    'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-                }}
-                title={storyTitle.trim() || 'Tu historia'}
-              >
-                {storyTitle.trim() || 'Tu historia'}
-              </p>
               <div className="aspect-square w-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F0EFE9]">
                 <canvas
                   ref={imprintCanvasRef}
@@ -1510,15 +1483,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   aria-label="Resonancia visual generada"
                 />
               </div>
-              <p className="text-[10px] leading-relaxed tracking-wide text-[#8A8A7A]">
-                {imprintReceivedAt
-                  ? imprintReceivedAt.toLocaleDateString('es', {
-                      day: 'numeric',
-                      month: 'long',
-                      year: 'numeric',
-                    })
-                  : ''}
-              </p>
+              {imprintReceivedAt ? (
+                <p className="text-[10px] leading-relaxed tracking-wide text-[#8A8A7A]">
+                  {formatHuellaImprintFooterLine(imprintReceivedAt)}
+                </p>
+              ) : null}
               <div className="flex flex-wrap gap-2">
                 <button
                   type="button"

@@ -26,33 +26,29 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'lead',
         lines: [
-          'El mundo tiene demasiadas historias perfectas.',
-          'Necesita la tuya.',
+          'El mundo está lleno de historias que merecen ser contadas.',
+          'AlmaMundi es el lugar donde eso ocurre.',
         ],
       },
       {
         type: 'p',
-        text: 'No estamos construyendo una red social. Estamos construyendo el lugar donde la humanidad se cuenta a sí misma. Una historia real a la vez.',
+        text: 'Estamos construyendo el lugar donde la humanidad se cuenta a sí misma. Una historia real a la vez.',
       },
       {
         type: 'p',
-        text: 'Durante los últimos veinte años, internet nos enseñó a editar antes de mostrar. A filtrar. A cortar lo feo. A publicar solo cuando la luz era buena, cuando el ángulo era el correcto, cuando la vida se veía como debía verse. Las plataformas nos entrenaron para producir una versión de nosotros mismos que performa bien en un feed.',
+        text: 'Cada persona que vive algo lo vive de una manera que nadie más va a vivir exactamente igual. Ese momento, esa experiencia, ese fragmento de vida — tiene un valor que solo existe si alguien lo cuenta.',
       },
       {
         type: 'quote',
-        text: 'Vivimos en la era más documentada de la historia. Y estamos perdiendo más historias reales que ninguna generación anterior.',
+        text: 'Vivimos en la era más documentada de la historia. Y hay millones de historias reales esperando el lugar correcto para existir.',
       },
       {
         type: 'p',
-        text: 'Porque nadie archiva lo que importa. Solo lo que performa. Millones de fotos de atardeceres idénticos. Miles de videos de lo mismo editado de maneras distintas. Y muy pocas personas contando lo que de verdad pasó.',
+        text: 'La mujer que crió sola a tres hijos mientras estudiaba. El hombre que reconstruyó su casa con sus propias manos después del terremoto. La abuela que aprendió a usar el celular solo para ver la cara de su nieta. El joven que llegó a una ciudad sin conocer a nadie y encontró su lugar.',
       },
       {
-        type: 'p',
-        text: 'La mujer que crió sola a tres hijos mientras estudiaba. El hombre que reconstruyó su casa con sus propias manos después del terremoto. La abuela que aprendió a usar el celular solo para ver la cara de su nieta. El joven que llegó a una ciudad sin conocer a nadie y encontró su lugar. Esas historias no tienen filtro. No tienen música de fondo. No tienen la luz perfecta.',
-      },
-      {
-        type: 'p',
-        text: 'Y son las más importantes del mundo.',
+        type: 'emphasis',
+        text: 'Esas son las historias que AlmaMundi existe para guardar.',
       },
     ],
   },
@@ -63,11 +59,11 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'beliefs',
         items: [
-          'Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única.',
-          'Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego.',
-          'No hace falta saber escribir. No hace falta tener cámara profesional. No hace falta ser famoso ni interesante ni tener seguidores. Solo hace falta haber vivido algo.',
-          'El formato no importa. Un video grabado en el baño de tu casa puede contener más verdad que una producción de millones. Un audio de dos minutos grabado caminando puede ser la historia más importante de tu día.',
-          'Las historias que despiertan otras historias son siempre las más honestas. No las más perfectas. Las más honestas.',
+          '01 — Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única.',
+          '02 — Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego.',
+          '03 — El único requisito es haber vivido algo. Todo lo demás — el formato, la extensión, la forma — es completamente tuyo.',
+          '04 — El formato no importa. Un video grabado en el baño de tu casa puede contener más verdad que una producción de millones. Un audio de dos minutos grabado caminando puede ser la historia más importante de tu día.',
+          '05 — Las historias que despiertan otras historias son siempre las más honestas. No las más elaboradas. Las más honestas.',
         ],
       },
       {
@@ -82,15 +78,19 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
     blocks: [
       {
         type: 'p',
-        text: 'AlmaMundi no tiene algoritmo que decida cuánto vale lo que viviste. No hay feed que empuje una historia hacia arriba y entierre otra. No hay métricas de vanidad que conviertan tu experiencia en un número. Aquí, una historia publicada hace tres años puede despertar a alguien hoy. Y una historia publicada hoy puede llegar a alguien en tres años.',
-      },
-      {
-        type: 'emphasis',
-        text: 'Eso no lo hace ninguna red social del mundo.',
+        text: 'AlmaMundi fue diseñado para la resonancia larga.',
       },
       {
         type: 'p',
-        text: 'Porque las redes sociales fueron diseñadas para la atención inmediata. AlmaMundi fue diseñado para la resonancia larga. Para el momento en que alguien encuentra una historia que le dice exactamente lo que necesitaba escuchar, exactamente cuando lo necesitaba.',
+        text: 'En AlmaMundi, cada historia tiene su propio tiempo. Una historia publicada hoy puede encontrar a quien la necesita mañana. O en tres años. El encuentro entre una historia y la persona que la necesita no tiene prisa.',
+      },
+      {
+        type: 'p',
+        text: 'Aquí las historias existen porque existen. No hay sistema que decida cuánto valen ni cuándo aparecen. Una historia publicada hace tres años puede despertar a alguien hoy con la misma fuerza que el día en que se publicó.',
+      },
+      {
+        type: 'p',
+        text: 'Construimos AlmaMundi para que cada historia que se lee despierte una que aún no se ha contado.',
       },
     ],
   },
@@ -101,7 +101,9 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'closing',
         lines: [
-          'AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que despiertan otras historias.',
+          'Cuéntalo como puedas. Cuéntalo como quieras.',
+          'En video desde tu celular. En audio caminando. En texto escrito de noche. En una foto con dos líneas al pie.',
+          'El formato es tuyo. La historia también. AlmaMundi es el lugar donde lo que viviste no desaparece.',
         ],
       },
     ],

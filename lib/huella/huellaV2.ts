@@ -33,6 +33,8 @@ export type HuellaV2Meta = {
 
 export const HUELLA_V2_BG = '#E8ECF2';
 export const HUELLA_V2_SITE_DISPLAY = 'www.almamundi.org';
+/** Pie discreto en pantalla y PNG descargable. */
+export const HUELLA_IMPRINT_SITE_LABEL = 'almamundi.org';
 export const HUELLA_V2_MAX_PALABRAS = 5;
 
 const STOP_WORDS = new Set([
@@ -609,24 +611,16 @@ function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: n
   return t ? t + ell : ell;
 }
 
-function drawHuellaSiteFooter(
-  ctx: CanvasRenderingContext2D,
-  at: Date,
-  storyTitle: string | undefined,
-  formatLabel: string | undefined,
-  publicUrl: string | undefined
-): void {
+export function formatHuellaImprintFooterLine(at: Date): string {
+  const fechaCorta = `${at.getDate()} ${MESES_CORTO[at.getMonth()]} ${at.getFullYear()}`;
+  return `AlmaMundi · ${HUELLA_IMPRINT_SITE_LABEL} · ${fechaCorta}`;
+}
+
+function drawHuellaSiteFooter(ctx: CanvasRenderingContext2D, at: Date): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
-  const title = storyTitle?.trim();
-  const hasTitle = Boolean(title);
-  const fmt = formatLabel?.trim();
-  const urlLine = publicUrl?.trim() || `https://${HUELLA_V2_SITE_DISPLAY}`;
-  const hasFooterDetail = Boolean(hasTitle || fmt);
-  const fH = H * (hasFooterDetail ? 0.14 : 0.1);
-  const fechaCorta = `${at.getDate()} ${MESES_CORTO[at.getMonth()]} ${at.getFullYear()}`;
-  const metaParts = [fechaCorta, fmt, urlLine].filter(Boolean);
-  const metaLine = metaParts.join(' · ');
+  const fH = H * 0.09;
+  const metaLine = formatHuellaImprintFooterLine(at);
 
   ctx.save();
   ctx.globalAlpha = 1;
@@ -643,30 +637,11 @@ function drawHuellaSiteFooter(
   ctx.textBaseline = 'middle';
   const bandTop = H - fH;
   const maxW = W * 0.92;
-
-  const brandPx = Math.max(10, Math.round(W * 0.022));
-  ctx.fillStyle = '#ff4500';
-  ctx.font = `600 ${brandPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-  ctx.fillText('AlmaMundi', W / 2, bandTop + fH * 0.22);
-
-  if (hasTitle && title) {
-    const titlePx = Math.max(11, Math.round(W * 0.028));
-    ctx.fillStyle = '#334155';
-    ctx.font = `500 ${titlePx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-    const lineTitle = truncateCanvasLine(ctx, title, maxW);
-    ctx.fillText(lineTitle, W / 2, bandTop + fH * 0.48);
-  }
-
-  const captionPx = Math.max(8, Math.round(W * 0.018));
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = `400 ${captionPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
-  ctx.fillText('Resonancia visual', W / 2, bandTop + fH * (hasTitle ? 0.68 : 0.48));
-
   const metaPx = Math.max(9, Math.round(W * 0.019));
   ctx.fillStyle = '#64748b';
   ctx.font = `400 ${metaPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
   const lineMeta = truncateCanvasLine(ctx, metaLine, maxW);
-  ctx.fillText(lineMeta, W / 2, bandTop + fH * (hasTitle ? 0.88 : 0.76));
+  ctx.fillText(lineMeta, W / 2, bandTop + fH * 0.55);
   ctx.restore();
 }
 
@@ -738,13 +713,7 @@ export function getHuellaV2DrawStats(meta: HuellaV2Meta): HuellaV2Stats {
 }
 
 export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: HuellaV2Meta): string[] {
-  const {
-    embedSiteFooter,
-    footerAt,
-    embedStoryTitle,
-    embedFormatLabel,
-    embedPublicUrl,
-  } = meta;
+  const { embedSiteFooter, footerAt } = meta;
 
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
@@ -754,8 +723,7 @@ export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: Huella
   const paletteArr = [pal.dominant, pal.secondaryA, pal.secondaryB, pal.accent, pal.cream];
   const S = seedFn(meta.storyId);
 
-  const contentFrac =
-    embedSiteFooter && (embedStoryTitle?.trim() || embedFormatLabel?.trim()) ? 0.14 : embedSiteFooter ? 0.1 : 0;
+  const contentFrac = embedSiteFooter ? 0.09 : 0;
 
   ctx.clearRect(0, 0, W, H);
   ctx.fillStyle = HUELLA_V2_BG;
@@ -764,7 +732,7 @@ export function drawHuellaV2OnCanvas(ctx: CanvasRenderingContext2D, meta: Huella
   drawOrientedRibbonField(ctx, W, H, orientation, family, meta, pal, S, contentFrac);
 
   if (embedSiteFooter) {
-    drawHuellaSiteFooter(ctx, footerAt ?? new Date(), embedStoryTitle, embedFormatLabel, embedPublicUrl);
+    drawHuellaSiteFooter(ctx, footerAt ?? new Date());
   }
 
   return paletteArr;
