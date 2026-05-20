@@ -644,7 +644,7 @@ export function StoryCaptureStep({
         ? 'Puedes tomarte el tiempo que necesites. Nada se publica automáticamente.'
         : flowStage === 'storyDetails'
           ? 'Estos datos ayudan a ubicar tu relato si llega al mapa.'
-          : 'Con tu correo te avisaremos del estado de tu historia; no será visible públicamente.';
+          : 'Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No será visible públicamente.';
 
   const stepBadge =
     flowStage === 'welcome' || flowStage === 'media'

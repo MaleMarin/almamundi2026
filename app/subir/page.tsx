@@ -206,7 +206,7 @@ function SubirPageInner() {
     if (!canSubmit || !format) return;
     setError('');
     if (!email.trim()) {
-      setError('El correo es necesario para avisarte cuando tu historia esté en el globo.');
+      setError('El correo es necesario para avisarte cuando tu historia esté en el mapa.');
       return;
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
@@ -808,7 +808,7 @@ function SubirPageInner() {
                   value={email}
                   onChange={(e) => {
                     setEmail(e.target.value);
-                    if (error === 'El correo es necesario para avisarte cuando tu historia esté en el globo.') setError('');
+                    if (error === 'El correo es necesario para avisarte cuando tu historia esté en el mapa.') setError('');
                   }}
                   placeholder="tu@email.com"
                   className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
@@ -818,8 +818,8 @@ function SubirPageInner() {
                   aria-describedby="subir-datos-email-hint"
                 />
                 <p id="subir-datos-email-hint" className="mt-1.5 text-[11px] leading-snug" style={{ color: neu.textBody }}>
-                  Usaremos tu correo para avisarte sobre el estado de tu historia y si llega a publicarse en el mapa. No
-                  será visible públicamente.
+                  Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No será visible
+                  públicamente.
                 </p>
               </div>
             </div>

@@ -766,7 +766,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
 
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setErr('Escribe un correo válido para recibir avisos cuando tu contenido se suba al globo.');
+      setErr('Escribe un correo válido para avisarte cuando tu historia esté en el mapa.');
       return false;
     }
 
@@ -1211,7 +1211,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   Un par de datos más
                 </h3>
                 <p className="text-xs leading-snug text-gray-600 md:text-sm">
-                  Mismos datos que en el envío web: historia, ubicación, aviso al globo y privacidad. Sin desplazamiento en
+                  Mismos datos que en el envío web: historia, ubicación, aviso al mapa y privacidad. Sin desplazamiento en
                   pantallas medianas o grandes.
                 </p>
               </div>
@@ -1413,7 +1413,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] leading-tight text-gray-500 md:text-[11px]">
-                        Aviso cuando tu historia, imagen, audio o video se suba al globo (tras la revisión). No se muestra en
+                        Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No se muestra en
                         público.
                       </p>
                     </div>
