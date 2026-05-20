@@ -112,8 +112,8 @@ const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
 const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 218, full: 162 } as const;
 
 /** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: más cerca del disco para que no se salga del encuadre. */
-/** Home: semieje mayor alto para que la Luna no cruce el disco terrestre. */
-const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 2.08, full: 3.58 } as const;
+/** Home: semieje acotado al encuadre negro del canvas (la Luna no sale del universo). */
+const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.52, full: 3.58 } as const;
 
 /** Escala solo del disco lunar (no del radio orbital). */
 const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.42, full: 0.6 } as const;
@@ -124,8 +124,8 @@ const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
 /** Fase inicial del plano en Y (solo encuadre: home ≈ Luna arriba-izquierda respecto al disco). */
 const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as const;
 
-/** Inclinación orbital lunar en home: moderada para no perder la Luna arriba/abajo del canvas. */
-const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 5.25;
+/** Inclinación orbital lunar en home: baja para que la Luna no salga del recorte vertical. */
+const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 2.85;
 
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.14, 0.18, 0];
@@ -1048,6 +1048,7 @@ function GlobeScene({
               }
               roughness={embedded ? 0.81 : 0.94}
               emissiveIntensity={embedded ? 0.07 : 0.04}
+              clipToViewport={embedded}
             />
           </Suspense>
         ) : null}
@@ -1061,7 +1062,7 @@ function GlobeScene({
         enablePan={false}
         enableZoom={!embedded}
         minDistance={embedded ? 2.08 : 2.65}
-        maxDistance={embedded ? 6.2 : 8}
+        maxDistance={embedded ? 4.85 : 8}
         /* El giro lo marca `planetSpinRef` (corteza + nubes + bits a la vez); evita doble rotación con la cámara. */
         autoRotate={false}
         enableDamping
@@ -1188,19 +1189,16 @@ export default function GlobeV2({
   const wrapperClass =
     className ??
     (embedded
-      ? 'relative z-0 h-full w-full min-h-[50vh] flex-1 overflow-visible max-w-full [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none'
+      ? 'relative z-0 h-full w-full min-h-[50vh] flex-1 overflow-hidden max-w-full [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none'
       : 'fixed inset-0 z-0 h-[100dvh] w-full min-h-0 [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none');
 
-  const embeddedDayChrome = embedded && forceDaylightOn && className == null;
-  const embeddedCinematicChrome = embedded && !forceDaylightOn && className == null;
+  const embeddedUniverseChrome = embedded && className == null;
   const rootClassName =
     className == null
-      ? `${wrapperClass} ${
-          embeddedDayChrome
-            ? earthNightStyles.earthDayEmbeddedContainer
-            : embeddedCinematicChrome
-              ? earthNightStyles.earthCinematicEmbeddedContainer
-              : earthNightStyles.earthNightContainer
+      ? `${wrapperClass} outline-none focus:outline-none ${
+          embeddedUniverseChrome
+            ? earthNightStyles.earthUniverseEmbeddedContainer
+            : earthNightStyles.earthNightContainer
         }`
       : wrapperClass;
 
@@ -1212,10 +1210,10 @@ export default function GlobeV2({
     <div
       className={rootClassName}
       role="img"
-      tabIndex={0}
+      tabIndex={embedded ? -1 : 0}
       aria-label="Globo terráqueo interactivo. Explorar con el ratón."
     >
-      {className == null && !embeddedDayChrome && !embeddedCinematicChrome ? (
+      {className == null && !embeddedUniverseChrome ? (
         <div className={earthNightStyles.atmosphereOverlay} aria-hidden />
       ) : null}
       <Canvas
@@ -1235,13 +1233,13 @@ export default function GlobeV2({
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
-          gl.toneMappingExposure = embeddedDayChrome
-            ? 3.05
-            : embeddedCinematicChrome
-              ? 2.14
-              : embedded
-                ? 2.02
-                : 1.92;
+          gl.toneMappingExposure = embeddedUniverseChrome
+            ? forceDaylightOn
+              ? 3.05
+              : 2.14
+            : embedded
+              ? 2.02
+              : 1.92;
         }}
       >
         <Suspense fallback={null}>

@@ -91,7 +91,7 @@ const HOME_GLOBE_FALLBACK_LNG = -60;
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-[#0a1428] text-sm text-white/40">
+    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-transparent text-sm text-white/40">
       Cargando mapa…
     </div>
   ),
@@ -525,11 +525,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
   const TIME_STRIP_HEIGHT = 128;
   return (
-    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-visible">
+    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-hidden">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
       <div
         ref={globeContainerRef}
-        className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-visible"
+        className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-hidden"
         onPointerDownCapture={() => {
           if (!globeInViewRef.current) return;
           if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
@@ -540,8 +540,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-visible bg-[#0a1428] pt-8 pb-2 md:pt-10 lg:pt-12">
-          <div className="relative min-h-[min(380px,48vh)] w-full flex-1 overflow-visible">
+        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
+          <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
             <GlobeV2Home
               embedded
               forceDaylight={false}
@@ -557,7 +557,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="flex-shrink-0 w-full flex items-end justify-center z-10 bg-black pb-4 pt-1.5"
+        className="map-timebar-stage relative z-10 -mt-px flex w-full flex-shrink-0 items-end justify-center border-0 pb-4 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />

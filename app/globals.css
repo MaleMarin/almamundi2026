@@ -7,6 +7,16 @@
   --home-bg: #E0E5EC;
   /* Espacio detrás del globo: negro neutro (sin tinte azul) */
   --universe-bg: #000000;
+  /* Transición editorial home → mapa (niebla → noche → espacio) */
+  --map-fade-haze: #dce4ee;
+  --map-fade-mist: #b8c6d6;
+  --map-fade-slate: #8fa0b6;
+  --map-fade-twilight: #5a7088;
+  --map-fade-dusk: #3d5270;
+  --map-fade-night: #243550;
+  --map-fade-deep: #152238;
+  --map-fade-space: #0c1a2e;
+  --map-fade-void: #071018;
   /* Naranja AlmaMundi en todo el sitio (#ff4500) */
   --almamundi-orange: #ff4500;
   --almamundi-orange-rgb: 255, 69, 0;
@@ -291,36 +301,108 @@ a.home-map-neu-pill.btn-almamundi:visited {
   font: inherit;
 }
 
-/* Mapa home: degradado entre frase "Mapa AlmaMundi" y universo (negro al fondo) */
+/*
+ * Mapa home: antesala editorial → universo (sin corte negro brusco).
+ * La franja clara baja en niebla azul grisácea hasta espacio profundo.
+ */
 .map-section-gradient-block {
   position: relative;
+  isolation: isolate;
   background: linear-gradient(
-    to bottom,
+    180deg,
     var(--home-bg) 0%,
-    var(--home-bg) 40%,
-    #e8ecf2 52%,
-    #dce2ea 62%,
-    #c8d0da 72%,
-    #a8b4c4 82%,
-    #7c8a9e 90%,
-    #4a5568 95%,
-    var(--universe-bg) 100%
+    var(--home-bg) 18%,
+    #e8edf4 28%,
+    var(--map-fade-haze) 38%,
+    var(--map-fade-mist) 48%,
+    var(--map-fade-slate) 58%,
+    var(--map-fade-twilight) 68%,
+    var(--map-fade-dusk) 76%,
+    var(--map-fade-night) 84%,
+    var(--map-fade-deep) 91%,
+    var(--map-fade-space) 97%,
+    var(--map-fade-space) 100%
   );
-  min-height: 220px;
+  min-height: 200px;
 }
+
 @media (min-width: 768px) {
   .map-section-gradient-block {
-    min-height: 240px;
+    min-height: 220px;
   }
 }
-/* Anti-banding: ruido sutil para transición muy suave */
-.map-section-gradient-block::after {
+
+/* Puente visual entre pills y globo: continúa el degradado (no negro puro). */
+.map-section-to-universe-bleed {
+  width: 100%;
+  min-height: 3.5rem;
+  background: linear-gradient(
+    180deg,
+    var(--map-fade-space) 0%,
+    var(--map-fade-deep) 38%,
+    var(--map-fade-void) 78%,
+    #050c14 100%
+  );
+}
+
+@media (min-width: 768px) {
+  .map-section-to-universe-bleed {
+    min-height: 4.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .map-section-to-universe-bleed {
+    min-height: 5rem;
+  }
+}
+
+/* Contenedor del globo: espacio oscuro gradual (continúa el degradado). */
+.map-universe-stage {
+  position: relative;
+  background: linear-gradient(
+    180deg,
+    #050c14 0%,
+    var(--map-fade-void) 22%,
+    #040a12 55%,
+    #030810 100%
+  );
+}
+
+/* Franja TimeBar: mismo tono espacial, sin banda negra dura. */
+.map-timebar-stage {
+  background: linear-gradient(180deg, #030810 0%, #020609 100%);
+}
+
+/* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
+.map-section-hero-title {
+  font-size: clamp(2.5rem, 6.2vw + 0.5rem, 6.875rem);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+}
+
+/* Pills del mapa: centradas y ligadas al bloque editorial. */
+#map-dock-slot {
+  width: 100%;
+  max-width: 48rem;
+  margin-inline: auto;
+  padding-top: 0.75rem;
+  padding-bottom: 0.25rem;
+}
+
+/* Anti-banding: ruido sutil en la transición editorial (no sobre el canvas del globo). */
+.map-section-gradient-block::after,
+.map-section-to-universe-bleed::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.04;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.map-section-to-universe-bleed {
+  position: relative;
 }
 
 /* Globo NASA: video con fondo transparente para que no tape la imagen de la Tierra */
