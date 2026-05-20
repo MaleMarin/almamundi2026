@@ -141,7 +141,6 @@ function SubirPageInner() {
   const [email, setEmail] = useState('');
   const [ciudad, setCiudad] = useState('');
   const [pais, setPais] = useState('');
-  const [birthDate, setBirthDate] = useState('');
   const [sex, setSex] = useState<'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro' | ''>('');
   const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [consentPrivacyPolicy, setConsentPrivacyPolicy] = useState(false);
@@ -340,7 +339,6 @@ function SubirPageInner() {
           consentPostales: true,
           consentPrivacyPolicy: true,
           ...(profilePhotoUrl ? { profilePhotoUrl } : {}),
-          ...(birthDate.trim() ? { birthDate: birthDate.trim() } : {}),
           ...(sex ? { sex } : {}),
           ...(ageRange ? { ageRange } : {}),
           ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
@@ -376,7 +374,6 @@ function SubirPageInner() {
     email,
     ciudad,
     pais,
-    birthDate,
     sex,
     ageRange,
     extraContext,
@@ -772,44 +769,28 @@ function SubirPageInner() {
                   ))}
                 </select>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label htmlFor="subir-datos-nacimiento" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Fecha de nacimiento (opcional)
-                  </label>
-                  <input
-                    id="subir-datos-nacimiento"
-                    type="text"
-                    value={birthDate}
-                    onChange={(e) => setBirthDate(e.target.value)}
-                    placeholder="Ej: 1990-04-12 o aproximada"
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
-                    Género *
-                  </label>
-                  <select
-                    id="subir-datos-sexo"
-                    value={sex}
-                    onChange={(e) =>
-                      setSex(
-                        e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro'
-                      )
-                    }
-                    className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
-                    style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
-                  >
-                    <option value="">Elige una opción</option>
-                    <option value="femenino">Mujer</option>
-                    <option value="masculino">Hombre</option>
-                    <option value="no-binario">No binario</option>
-                    <option value="prefiero-no-decir">Prefiero no decirlo</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
+              <div>
+                <label htmlFor="subir-datos-sexo" className="block text-sm font-medium mb-1.5" style={{ color: neu.textMain }}>
+                  Género *
+                </label>
+                <select
+                  id="subir-datos-sexo"
+                  value={sex}
+                  onChange={(e) =>
+                    setSex(
+                      e.target.value as '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro'
+                    )
+                  }
+                  className="w-full px-3 py-2.5 rounded-xl outline-none bg-white/50 border border-white/50"
+                  style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+                >
+                  <option value="">Elige una opción</option>
+                  <option value="femenino">Mujer</option>
+                  <option value="masculino">Hombre</option>
+                  <option value="no-binario">No binario</option>
+                  <option value="prefiero-no-decir">Prefiero no decirlo</option>
+                  <option value="otro">Otro</option>
+                </select>
               </div>
             </div>
 

@@ -44,7 +44,6 @@ import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
-import { THEME_LIST, type ThemeId } from '@/lib/themes';
 import {
   drawHuellaV2OnCanvas,
   limpiarNombreFoto,
@@ -339,10 +338,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [ageRange, setAgeRange] = useState<AgeRange>('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('');
-  const [birthDate, setBirthDate] = useState('');
   const [email, setEmail] = useState('');
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-  const [themeId, setThemeId] = useState<ThemeId | ''>('');
   const [saving, setSaving] = useState(false);
 
   const [imprintId, setImprintId] = useState('');
@@ -414,10 +411,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setAgeRange('');
       setCity('');
       setCountry('');
-      setBirthDate('');
       setEmail('');
       setAcceptedPrivacy(false);
-      setThemeId('');
       setSaving(false);
       setImprintId('');
       setImprintReceivedAt(null);
@@ -765,11 +760,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       return false;
     }
 
-    if (!THEME_LIST.some((t) => t.id === themeId)) {
-      setErr('Elige un tema para tu historia.');
-      return false;
-    }
-
     if (!ageRange || !city.trim() || !country.trim()) {
       setErr('Faltan datos obligatorios: tramo de edad, ciudad y país.');
       return false;
@@ -787,7 +777,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
     setErr('');
     return true;
-  }, [acceptedPrivacy, ageRange, alias, city, country, email, storyTitle, themeId]);
+  }, [acceptedPrivacy, ageRange, alias, city, country, email, storyTitle]);
 
   const submitDetails = useCallback(() => {
     if (saving) return;
@@ -877,10 +867,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     setAgeRange('');
     setCity('');
     setCountry('');
-    setBirthDate('');
     setEmail('');
     setAcceptedPrivacy(false);
-    setThemeId('');
     setErr('');
   }, [resetCaptureMedia, mode, chosenTopic]);
 
@@ -1262,27 +1250,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       />
                     </div>
                     <div>
-                      <div className="mb-1 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Tema (obligatorio) *
-                      </div>
-                      <div className="flex flex-wrap gap-1.5">
-                        {THEME_LIST.map((t) => (
-                          <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => setThemeId(t.id)}
-                            className="px-2 py-0.5 text-[10px] font-medium md:text-xs"
-                            style={{
-                              ...soft.button,
-                              color: themeId === t.id ? '#ff4500' : soft.textBody,
-                            }}
-                          >
-                            {t.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
                       <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         Extras (opcional)
                       </div>
@@ -1394,17 +1361,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
-                    <div>
+                    <div className="sm:col-span-2">
                       <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Fecha de nac. (opc.)
+                        Tramo de edad *
                       </div>
-                      <input
-                        value={birthDate}
-                        onChange={(e) => setBirthDate(e.target.value)}
-                        placeholder="Ej: 1990-04-12"
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                      <select
+                        value={ageRange}
+                        onChange={(e) => setAgeRange(e.target.value as AgeRange)}
+                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
-                      />
+                      >
+                        <option value="">Elige una opción</option>
+                        {AGE_RANGE_OPTIONS.map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.label}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
@@ -1423,24 +1396,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         <option value="no-binario">No binario</option>
                         <option value="prefiero-no-decir">Prefiero no decir</option>
                         <option value="otro">Otro</option>
-                      </select>
-                    </div>
-                    <div className="sm:col-span-2">
-                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Tramo de edad *
-                      </div>
-                      <select
-                        value={ageRange}
-                        onChange={(e) => setAgeRange(e.target.value as AgeRange)}
-                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
-                        style={{ ...soft.flat, borderRadius: '12px' }}
-                      >
-                        <option value="">Elige una opción</option>
-                        {AGE_RANGE_OPTIONS.map((o) => (
-                          <option key={o.id} value={o.id}>
-                            {o.label}
-                          </option>
-                        ))}
                       </select>
                     </div>
                     <div className="sm:col-span-2">

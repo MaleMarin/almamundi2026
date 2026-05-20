@@ -1,4 +1,8 @@
-import { isMapaHomeHref, navigateToHomeMapa } from '@/lib/mapa-home-nav';
+import {
+  isMapaHomeHref,
+  navigateToHomeMapa,
+  primeMapAmbientFromNavGesture,
+} from '@/lib/mapa-home-nav';
 
 /**
  * Navegación forzada a la home (o anclas / query en `/`).
@@ -15,6 +19,7 @@ export function isHomeHardNavHref(href: string): boolean {
 export function hardNavigateTo(href: string): void {
   if (typeof window === 'undefined') return;
   if (isMapaHomeHref(href)) {
+    primeMapAmbientFromNavGesture();
     navigateToHomeMapa();
     return;
   }

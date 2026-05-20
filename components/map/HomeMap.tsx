@@ -31,6 +31,11 @@ import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
 import { BITS_DATA } from '@/lib/bits-data';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
+import {
+  consumeMapAmbientPending,
+  MAP_NAV_GESTURE_EVENT,
+  peekMapAmbientPending,
+} from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { MAP_HOME_DOCK_NAV_CLASS } from '@/lib/map-home-neu-button';
@@ -285,35 +290,82 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     void startMapAmbientFromRefs();
   }, [globeInView, soundEnabled, selectedMood, startMapAmbientFromRefs]);
 
+  const primeUniverseAmbientForMap = useCallback(() => {
+    if (userSilencedMapAmbientRef.current) return;
+    if (!hasPrimedUniverseForMapRef.current) {
+      hasPrimedUniverseForMapRef.current = true;
+      setSelectedMood('universo');
+    }
+    soundEnabledRef.current = true;
+    setSoundEnabled(true);
+  }, []);
+
+  const tryPlayUniverseWhenMapVisible = useCallback(() => {
+    if (!globeInViewRef.current) return;
+    if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
+    primeUniverseAmbientForMap();
+    if (hasActiveAmbientPlayback()) return;
+    void startMapAmbientFromRefs();
+  }, [primeUniverseAmbientForMap, startMapAmbientFromRefs]);
+
+  /** Clic en menú «Mapa»: audio desbloqueado en el mismo gesto; reproducir al entrar el globo en vista. */
+  useEffect(() => {
+    const onMapNavGesture = () => {
+      initFromUserGesture();
+      void unlockAmbientAudio();
+      primeUniverseAmbientForMap();
+      tryPlayUniverseWhenMapVisible();
+    };
+    window.addEventListener(MAP_NAV_GESTURE_EVENT, onMapNavGesture);
+    return () => window.removeEventListener(MAP_NAV_GESTURE_EVENT, onMapNavGesture);
+  }, [primeUniverseAmbientForMap, tryPlayUniverseWhenMapVisible]);
+
+  /** Tras recarga desde otra ruta (`/?section=mapa`), el primer toque en la página reintenta el ambiente. */
+  useEffect(() => {
+    if (!peekMapAmbientPending()) return;
+    const onFirstGesture = () => {
+      if (!peekMapAmbientPending()) return;
+      initFromUserGesture();
+      void unlockAmbientAudio().then(() => {
+        if (!globeInViewRef.current) return;
+        consumeMapAmbientPending();
+        tryPlayUniverseWhenMapVisible();
+      });
+    };
+    document.addEventListener('pointerdown', onFirstGesture, { capture: true, passive: true, once: true });
+    document.addEventListener('keydown', onFirstGesture, { capture: true, once: true });
+    return () => {
+      document.removeEventListener('pointerdown', onFirstGesture, { capture: true });
+      document.removeEventListener('keydown', onFirstGesture, { capture: true });
+    };
+  }, [tryPlayUniverseWhenMapVisible]);
+
   /**
-   * Gesto en #mapa: activar sonido aunque el IntersectionObserver no hubiera puesto soundEnabled (p. ej. layout del globo).
+   * Gesto en la página o en #mapa: activar sonido si el universo ya es visible.
    * Respeta silencio explícito del usuario (`userSilencedMapAmbientRef`).
    */
   useEffect(() => {
-    const tryPlayInMap = () => {
-      if (!globeInViewRef.current) return;
-      if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
-      soundEnabledRef.current = true;
-      setSoundEnabled(true);
-      if (hasActiveAmbientPlayback()) return;
-      void startMapAmbientFromRefs();
-    };
-
     const onPointerDown = (e: PointerEvent) => {
       initFromUserGesture();
+      const pending = peekMapAmbientPending();
       const node = e.target;
       if (!(node instanceof Node)) return;
       const root =
         node instanceof Element ? node : node.parentElement != null ? node.parentElement : null;
-      if (root == null || !root.closest('#mapa')) return;
-      tryPlayInMap();
+      const inMapa = root != null && root.closest('#mapa') != null;
+      if (!pending && !inMapa) return;
+      if (pending) consumeMapAmbientPending();
+      tryPlayUniverseWhenMapVisible();
     };
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key !== 'Enter' && e.key !== ' ') return;
       initFromUserGesture();
+      const pending = peekMapAmbientPending();
       const ae = document.activeElement;
-      if (!(ae instanceof Element) || !ae.closest('#mapa')) return;
-      tryPlayInMap();
+      const inMapa = ae instanceof Element && ae.closest('#mapa') != null;
+      if (!pending && !inMapa) return;
+      if (pending) consumeMapAmbientPending();
+      tryPlayUniverseWhenMapVisible();
     };
     document.addEventListener('pointerdown', onPointerDown, { capture: true, passive: true });
     document.addEventListener('keydown', onKeyDown, { capture: true });
@@ -321,7 +373,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       document.removeEventListener('pointerdown', onPointerDown, { capture: true });
       document.removeEventListener('keydown', onKeyDown, { capture: true });
     };
-  }, [startMapAmbientFromRefs]);
+  }, [tryPlayUniverseWhenMapVisible]);
+
+  /** Scroll al mapa sin menú: el primer toque en la página desbloquea y arranca «universo» si aún no suena. */
+  useEffect(() => {
+    if (!globeInView || userSilencedMapAmbientRef.current) return;
+    if (hasActiveAmbientPlayback()) return;
+
+    const onGesture = () => {
+      initFromUserGesture();
+      void unlockAmbientAudio().then(() => tryPlayUniverseWhenMapVisible());
+    };
+    document.addEventListener('pointerdown', onGesture, { capture: true, passive: true, once: true });
+    return () => document.removeEventListener('pointerdown', onGesture, { capture: true });
+  }, [globeInView, tryPlayUniverseWhenMapVisible]);
 
   const handleToggleSound = useCallback(() => {
     setSoundEnabled((v) => {
