@@ -279,7 +279,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
     <button
       type="button"
       onClick={onClick}
-      className="btn-almamundi mt-6 w-full rounded-full py-3.5 text-sm font-semibold transition active:scale-[0.99] sm:w-auto sm:min-w-[min(100%,320px)] sm:px-10"
+      className="btn-almamundi w-full rounded-full py-3.5 text-sm font-semibold transition active:scale-[0.99] sm:w-auto sm:min-w-[min(100%,320px)] sm:px-10"
       style={{
         background: `linear-gradient(180deg, rgba(255, 88, 28, 0.9) 0%, ${soft.orange} 100%)`,
         color: '#fff',
@@ -344,7 +344,7 @@ export function PropositoModal({
         role="dialog"
         aria-modal="true"
         aria-labelledby="proposito-titulo"
-        className="flex max-h-[min(94dvh,900px)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] sm:rounded-[32px]"
+        className="flex max-h-[min(92dvh,880px)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] sm:max-h-[min(90dvh,900px)] sm:rounded-[32px]"
         style={{
           ...soft.shell,
           fontFamily: SITE_FONT_STACK,
@@ -383,7 +383,7 @@ export function PropositoModal({
           </div>
 
           <nav
-            className="mt-4 flex flex-wrap gap-2"
+            className="mt-4 -mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
             aria-label="Secciones del propósito"
             role="tablist"
           >
@@ -398,6 +398,7 @@ export function PropositoModal({
                   aria-controls={`manifiesto-panel-${s.id}`}
                   id={`manifiesto-tab-${s.id}`}
                   style={sectionChipStyle(active)}
+                  className="shrink-0 whitespace-nowrap"
                   onClick={() => setActiveSectionId(s.id)}
                 >
                   {s.title}
@@ -411,19 +412,25 @@ export function PropositoModal({
           id={`manifiesto-panel-${activeSection.id}`}
           role="tabpanel"
           aria-labelledby={`manifiesto-tab-${activeSection.id}`}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-8 pb-10 md:px-10 md:py-10 md:pb-12"
+          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6 md:px-10 md:py-8"
           style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,74,28,0.35) transparent' }}
         >
           <ManifiestoSectionView
             section={activeSection}
             index={activeIndex >= 0 ? activeIndex : 0}
           />
-          {onGoToHistorias ? (
-            <div className="mt-2 flex justify-center border-t border-white/35 pt-6">
-              <HistoriasCtaButton onClick={onGoToHistorias} />
-            </div>
-          ) : null}
         </div>
+
+        {onGoToHistorias ? (
+          <div
+            className="flex shrink-0 justify-center border-t border-white/35 bg-[#E0E5EC] px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:px-10 md:py-5"
+            style={{
+              boxShadow: '0 -8px 24px rgba(136, 150, 170, 0.12)',
+            }}
+          >
+            <HistoriasCtaButton onClick={onGoToHistorias} />
+          </div>
+        ) : null}
       </div>
     </div>,
     document.body
