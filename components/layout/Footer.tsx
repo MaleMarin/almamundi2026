@@ -2,23 +2,26 @@
 
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import {
+  SITE_FOOTER_GUIA_CONDUCTA_HREF,
+  SITE_FOOTER_HOME_HASH_LINKS,
+  SITE_FOOTER_LEGAL_LINKS,
   SITE_HEADER_STORIES_LINKS,
   SITE_NAV_LINK_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
-import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
+import { MAPA_HOME_LINK_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
  * Footer unificado AlmaMundi (E0E5EC, sans moderna).
  * Se monta una sola vez en `app/layout.tsx` para todas las rutas.
  */
-/** Paridad con nav del header: `SITE_NAV_LINK_CLASS` en enlaces principales. */
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-none tracking-normal transition-colors';
 
-/** PDF estático en `public/` (nombre con espacios; URL codificada para compatibilidad). */
-const GUIA_CONDUCTA_PDF_HREF = '/Guia%20de%20conducta%20AlmaMundi.pdf';
+const FOOTER_PILL =
+  `${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} min-w-0 justify-center px-4 py-2.5`;
 
 export type FooterProps = {
   /**
@@ -38,9 +41,18 @@ export function Footer({ embedded = false }: FooterProps = {}) {
       style={{ fontFamily: SITE_FONT_STACK }}
     >
       <div className="mb-24 md:mb-32 mt-10 md:mt-12 w-full flex justify-center select-none">
-        <h1 className="text-8xl sm:text-9xl md:text-[170px] lg:text-[240px] text-center leading-none almamundi-footer-title">
-          ALMAMUNDI
-        </h1>
+        <HomeHardLink
+          href="/"
+          className="block text-center leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
+          aria-label="AlmaMundi — inicio"
+        >
+          <span
+            className="almamundi-footer-title text-8xl sm:text-9xl md:text-[170px] lg:text-[240px] block"
+            aria-hidden
+          >
+            ALMAMUNDI
+          </span>
+        </HomeHardLink>
       </div>
 
       <nav
@@ -48,29 +60,18 @@ export function Footer({ embedded = false }: FooterProps = {}) {
         aria-label={t.ariaMainNav}
       >
         <ul className="m-0 flex list-none flex-wrap items-center justify-center gap-3 sm:gap-4 md:gap-5">
-          <li>
-            <ActiveInternalNavLink
-              href="/#proposito"
-              className={`${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} min-w-0 justify-center px-4 py-2.5`}
-              activeClassName="!text-[var(--almamundi-orange)] font-semibold"
-            >
-              {t.navPurpose}
-            </ActiveInternalNavLink>
-          </li>
-          <li>
-            <ActiveInternalNavLink
-              href="/#como-funciona"
-              className={`${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} min-w-0 justify-center px-4 py-2.5`}
-              activeClassName="!text-[var(--almamundi-orange)] font-semibold"
-            >
-              {t.navHow}
-            </ActiveInternalNavLink>
-          </li>
+          {SITE_FOOTER_HOME_HASH_LINKS.map(({ href, labelKey }) => (
+            <li key={href}>
+              <HomeHardLink href={href} className={FOOTER_PILL}>
+                {t[labelKey]}
+              </HomeHardLink>
+            </li>
+          ))}
           {SITE_HEADER_STORIES_LINKS.map(({ href, label }) => (
             <li key={href}>
               <ActiveInternalNavLink
                 href={href}
-                className={`${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} min-w-0 justify-center px-4 py-2.5`}
+                className={FOOTER_PILL}
                 activeClassName="!text-[var(--almamundi-orange)] font-semibold"
               >
                 {label}
@@ -78,13 +79,13 @@ export function Footer({ embedded = false }: FooterProps = {}) {
             </li>
           ))}
           <li>
-            <ActiveInternalNavLink
+            <HomeHardLink
               href={MAPA_HOME_LINK_HREF}
-              className={`${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} min-w-0 justify-center px-4 py-2.5`}
-              activeClassName="!text-[var(--almamundi-orange)] font-semibold"
+              className={FOOTER_PILL}
+              onClick={() => primeMapAmbientFromNavGesture()}
             >
               {t.navMap}
-            </ActiveInternalNavLink>
+            </HomeHardLink>
           </li>
         </ul>
       </nav>
@@ -101,23 +102,22 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8 lg:gap-10">
-          <ActiveInternalNavLink
-            href="/privacidad"
-            className={FOOTER_LINK}
-            activeClassName="!text-gray-900 font-semibold"
-          >
-            Aviso de privacidad
-          </ActiveInternalNavLink>
-          <ActiveInternalNavLink
-            href="/mis-datos-personales"
-            className={FOOTER_LINK}
-            activeClassName="!text-gray-900 font-semibold"
-          >
-            Mis datos personales
-          </ActiveInternalNavLink>
+        <nav
+          className="flex flex-wrap items-center justify-center gap-6 md:gap-8 lg:gap-10"
+          aria-label="Información legal y datos personales"
+        >
+          {SITE_FOOTER_LEGAL_LINKS.map(({ href, label }) => (
+            <ActiveInternalNavLink
+              key={href}
+              href={href}
+              className={FOOTER_LINK}
+              activeClassName="!text-gray-900 font-semibold"
+            >
+              {label}
+            </ActiveInternalNavLink>
+          ))}
           <a
-            href={GUIA_CONDUCTA_PDF_HREF}
+            href={SITE_FOOTER_GUIA_CONDUCTA_HREF}
             className={FOOTER_LINK}
             target="_blank"
             rel="noopener noreferrer"
@@ -126,7 +126,7 @@ export function Footer({ embedded = false }: FooterProps = {}) {
           >
             Guía de conducta
           </a>
-        </div>
+        </nav>
       </div>
     </footer>
   );

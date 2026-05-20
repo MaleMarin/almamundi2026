@@ -50,7 +50,7 @@ export function ActiveInternalNavLink({
   }
 
   return (
-    <Link href={href} className={merged} style={style} {...rest}>
+    <Link href={resolvedHref} className={merged} style={style} {...rest}>
       {children}
     </Link>
   );

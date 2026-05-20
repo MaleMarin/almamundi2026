@@ -34,12 +34,20 @@ export function hardNavigateTo(href: string): void {
     const onHome = window.location.pathname === '/' || window.location.pathname === '';
     if (onHome && target.pathname === '/' && target.hash) {
       const fullHref = `${target.pathname}${target.search}${target.hash}`;
+      const hashId = target.hash.slice(1);
       window.history.replaceState(null, '', fullHref);
-      const el = document.getElementById(target.hash.slice(1));
+      /** Modales Propósito / Cómo funciona: el ancla es solo sr-only; abrir vía `hashchange` en HomePageClient. */
+      if (hashId === 'proposito' || hashId === 'como-funciona') {
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+        return;
+      }
+      const el = document.getElementById(hashId);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth', block: 'start' });
         return;
       }
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+      return;
     }
   } catch {
     /* assign below */
