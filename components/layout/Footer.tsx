@@ -20,10 +20,6 @@ const FOOTER_CLOSING_LINE =
 
 const FOOTER_CONTACT_HREF = 'mailto:hola@almamundi.org';
 
-/**
- * Footer unificado AlmaMundi (E0E5EC, sans moderna).
- * Se monta una sola vez en `app/layout.tsx` para todas las rutas.
- */
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-snug tracking-normal transition-colors';
 
@@ -31,12 +27,7 @@ const FOOTER_PILL =
   `${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} w-full min-w-0 justify-center px-3 py-2.5 sm:px-4`;
 
 export type FooterProps = {
-  /**
-   * true = mismo diseño pero sin `data-site-footer` (p. ej. portal cinematográfico;
-   * el layout sigue ocultando solo el footer global vía CSS).
-   */
   embedded?: boolean;
-  /** Idioma desde el layout (respaldo si el pie queda fuera de LocaleProvider). */
   initialLocale?: AlmaLocale;
 };
 
@@ -69,34 +60,34 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
   return (
     <footer
       {...(!embedded ? { 'data-site-footer': 'global' as const } : {})}
-      className="relative z-20 flex w-full flex-col items-center bg-[#E0E5EC] px-6 pb-24 pt-28 sm:px-8 md:px-12 md:pb-28 md:pt-40"
+      className="almamundi-footer relative z-20 flex w-full flex-col items-center bg-[#E0E5EC] px-6 pb-24 pt-28 sm:px-8 md:px-12 md:pb-32 md:pt-44"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
-      {/* 1. Marca + frase de cierre */}
-      <div className="flex w-full max-w-5xl flex-col items-center text-center">
+      {/* 1. Marca gigante + frase de cierre */}
+      <div className="flex w-full max-w-6xl flex-col items-center text-center">
         <HomeHardLink
           href="/"
-          className="mb-5 block w-full select-none text-center leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55 md:mb-7"
+          className="mb-6 block w-full select-none text-center leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55 md:mb-8"
           aria-label="AlmaMundi — inicio"
         >
           <span
-            className="almamundi-footer-title block text-7xl sm:text-8xl md:text-[150px] lg:text-[220px]"
+            className="almamundi-footer-title block text-7xl sm:text-8xl md:text-[170px] lg:text-[240px]"
             aria-hidden
           >
             ALMAMUNDI
           </span>
         </HomeHardLink>
-        <p className="almamundi-footer-tagline mx-auto max-w-md px-2 text-[13px] font-medium leading-relaxed tracking-[0.02em] md:text-sm">
+        <p className="almamundi-footer-tagline mx-auto max-w-lg px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
           {FOOTER_CLOSING_LINE}
         </p>
       </div>
 
-      {/* 2. Navegación en pills — grilla 2×4 intencional */}
+      {/* 2. Pills: grilla 2×4 centrada (Mapa en la última celda, no suelto) */}
       <nav
-        className="mt-14 w-full max-w-3xl px-1 md:mt-20"
+        className="mt-14 w-full max-w-4xl px-2 md:mt-20"
         aria-label={t.ariaMainNav}
       >
-        <ul className="m-0 grid list-none grid-cols-2 gap-2.5 p-0 sm:grid-cols-4 sm:gap-3">
+        <ul className="almamundi-footer-pill-grid m-0 list-none p-0">
           {footerPills.map((pill) => (
             <li key={pill.id} className="min-w-0">
               {pill.kind === 'hard' ? (
@@ -105,7 +96,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                   className={FOOTER_PILL}
                   onClick={pill.onNavigate}
                 >
-                  {pill.label}
+                  <span className="block text-center">{pill.label}</span>
                 </HomeHardLink>
               ) : (
                 <ActiveInternalNavLink
@@ -113,7 +104,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                   className={FOOTER_PILL}
                   activeClassName="!text-[var(--almamundi-orange)] font-semibold"
                 >
-                  {pill.label}
+                  <span className="block text-center">{pill.label}</span>
                 </ActiveInternalNavLink>
               )}
             </li>
@@ -122,24 +113,22 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       </nav>
 
       {/* 3. Bloque institucional */}
-      <div className="mt-16 w-full max-w-6xl border-t border-black/[0.06] pt-10 md:mt-20 md:pt-12">
+      <div className="mt-16 w-full max-w-6xl border-t border-black/[0.06] pt-10 md:mt-24 md:pt-14">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex flex-col items-center gap-3 lg:items-start">
-            <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-center sm:gap-4">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-gray-500">
-                Una iniciativa de
-              </span>
-              <img
-                src="/logo-precisar.png"
-                alt="Precisar"
-                className="h-11 w-auto object-contain sm:h-12"
-              />
-            </div>
+          <div className="flex flex-col items-center lg:items-start">
+            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+              Una iniciativa de
+            </p>
+            <img
+              src="/logo-precisar.png"
+              alt="Precisar"
+              className="h-12 w-auto object-contain md:h-[3.25rem]"
+            />
           </div>
 
           <div className="flex flex-col items-center gap-5 lg:items-end">
             <nav
-              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 sm:gap-x-6 md:gap-x-8"
+              className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 sm:gap-x-7 md:justify-end"
               aria-label="Información legal y datos personales"
             >
               {SITE_FOOTER_LEGAL_LINKS.map(({ href, label }) => (
