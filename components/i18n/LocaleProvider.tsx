@@ -71,3 +71,8 @@ export function useHomeLocale(): LocaleContextValue {
   }
   return ctx;
 }
+
+/** Para pie global u otros nodos que pueden montarse fuera del árbol de página. */
+export function useHomeLocaleOptional(): LocaleContextValue | null {
+  return useContext(LocaleContext);
+}

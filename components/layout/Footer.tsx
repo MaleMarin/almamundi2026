@@ -1,6 +1,8 @@
 'use client';
 
-import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
+import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import {
@@ -29,10 +31,13 @@ export type FooterProps = {
    * el layout sigue ocultando solo el footer global vía CSS).
    */
   embedded?: boolean;
+  /** Idioma desde el layout (respaldo si el pie queda fuera de LocaleProvider). */
+  initialLocale?: AlmaLocale;
 };
 
-export function Footer({ embedded = false }: FooterProps = {}) {
-  const { t } = useHomeLocale();
+export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps = {}) {
+  const localeCtx = useHomeLocaleOptional();
+  const t = localeCtx?.t ?? HOME_MESSAGES[initialLocale];
 
   return (
     <footer
