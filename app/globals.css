@@ -348,6 +348,10 @@ a.home-map-neu-pill.btn-almamundi:visited {
     0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
 }
 
+.almamundi-footer-tagline {
+  color: #6b7280;
+}
+
 /* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */
 button:focus,
 a:focus,
