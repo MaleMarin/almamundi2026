@@ -53,12 +53,9 @@ import {
   type GlobeV2OceanSunDebug,
   type GlobeV2TextureUrls,
 } from '@/lib/globe/globe-v2-assets';
+import { useViewerSolarNight } from '@/hooks/useViewerSolarNight';
 import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
-import {
-  approximateCoordinatesForIANATimeZone,
-  earthGreenwichSpinYRadFromUtc,
-  isNightAtLocation,
-} from '@/lib/sunPosition';
+import { earthGreenwichSpinYRadFromUtc } from '@/lib/sunPosition';
 import {
   AUTO_ROTATE_HOVER_SPEED,
   AUTO_ROTATE_IDLE_SPEED,
@@ -147,35 +144,6 @@ export type { GlobeV2TextureUrls };
  * - `full` (C): B + GlobeAtmosphereGlow + GlobeBitsLayer (GlobeBitStarBurst / Selected).
  */
 export type GlobeV2VisualStage = 'surface' | 'nightLights' | 'full';
-
-/**
- * Noche en la UI (estrellas, exposición, nubes) según el sol en un punto representativo de la
- * zona IANA del navegador — evita modo “noche” a las 20:00 con sol alto (p. ej. verano en Chile).
- * El terminador del globo sigue usando `sunDirectionUtc` en el shader.
- */
-function useViewerLocalNight(): boolean {
-  const compute = (): boolean => {
-    if (typeof window === 'undefined') return false;
-    const now = new Date();
-    let tz: string;
-    try {
-      tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    } catch {
-      tz = 'UTC';
-    }
-    const anchor = approximateCoordinatesForIANATimeZone(tz);
-    if (anchor) return isNightAtLocation(anchor.lat, anchor.lng, now);
-    const h = now.getHours();
-    return h >= 20 || h < 6;
-  };
-  const [night, setNight] = useState(compute);
-  useEffect(() => {
-    const tick = () => setNight(compute());
-    const id = window.setInterval(tick, 60_000);
-    return () => window.clearInterval(id);
-  }, []);
-  return night;
-}
 
 function ExposureSync({ exposure }: { exposure: number }) {
   const { gl } = useThree();
@@ -1140,6 +1108,9 @@ export type GlobeV2Props = {
   /** Encuadre inicial (grados). Home: geolocalización o fallback editorial LATAM. */
   initialViewLat?: number;
   initialViewLng?: number;
+  /** Ubicación del usuario para día/noche local (GPS); si no hay, zona IANA del navegador. */
+  viewerLat?: number;
+  viewerLng?: number;
 };
 
 export default function GlobeV2({
@@ -1160,6 +1131,8 @@ export default function GlobeV2({
   pauseEarthSpinForUi = false,
   initialViewLat,
   initialViewLng,
+  viewerLat,
+  viewerLng,
 }: GlobeV2Props) {
   /**
    * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
@@ -1175,7 +1148,7 @@ export default function GlobeV2({
     heightMap: textureUrls?.heightMap ?? GLOBE_V2_DEFAULT_TEXTURES.heightMap,
   };
 
-  const localNight = useViewerLocalNight();
+  const localNight = useViewerSolarNight(viewerLat, viewerLng);
   const viewerNight = forceDaylightOn ? false : localNight;
   const sunLightRef = useRef<THREE.DirectionalLight | null>(null);
 

@@ -83,6 +83,7 @@ import {
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
 import { useUserPosition } from '@/hooks/useUserPosition';
+import { getApproxLocation } from '@/lib/userLocation';
 
 /** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
 const HOME_GLOBE_FALLBACK_LAT = -18;
@@ -108,8 +109,22 @@ export type HomeMapProps = {
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const router = useRouter();
   const userPosition = useUserPosition();
-  const globeInitialLat = userPosition?.lat ?? HOME_GLOBE_FALLBACK_LAT;
-  const globeInitialLng = userPosition?.lng ?? HOME_GLOBE_FALLBACK_LNG;
+  const [approxPosition, setApproxPosition] = useState<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getApproxLocation().then((loc) => {
+      if (!cancelled && loc) setApproxPosition(loc);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const viewerLat = userPosition?.lat ?? approxPosition?.lat ?? null;
+  const viewerLng = userPosition?.lng ?? approxPosition?.lng ?? null;
+  const globeInitialLat = viewerLat ?? HOME_GLOBE_FALLBACK_LAT;
+  const globeInitialLng = viewerLng ?? HOME_GLOBE_FALLBACK_LNG;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -548,6 +563,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               earthVisualTimeScale={1}
               initialViewLat={globeInitialLat}
               initialViewLng={globeInitialLng}
+              viewerLat={viewerLat ?? undefined}
+              viewerLng={viewerLng ?? undefined}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}
@@ -560,7 +577,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         className="flex-shrink-0 w-full flex items-end justify-center z-10 bg-black pb-4 pt-1.5"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
-        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
+        <TimeBar
+          viewerLat={viewerLat}
+          viewerLng={viewerLng}
+          className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]"
+        />
       </div>
 
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}
