@@ -272,14 +272,23 @@ a.home-map-neu-pill.btn-almamundi:visited {
   border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
 }
 
-/* Dentro de PillNavButton (misma altura/padding que el resto): una sola línea, font-size fluido */
+/* Píldoras del dock bajo «Mapa de AlmaMundi»: una línea, tipografía editorial compacta */
 .pill-nav-long-line {
+  display: block;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   line-height: 1;
   letter-spacing: -0.045em;
   font-size: clamp(0.625rem, 0.3rem + 1.35vw, 0.875rem);
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-synthesis: none;
+}
+
+/* `<button>` del dock: sin fuente del user-agent; el span lleva la tipografía */
+#map-dock-slot .home-map-neu-pill.btn-almamundi {
+  font: inherit;
 }
 
 /* Mapa home: degradado entre frase "Mapa AlmaMundi" y universo (negro al fondo) */
@@ -346,6 +355,27 @@ a.home-map-neu-pill.btn-almamundi:visited {
     0.03em 0.03em 0.06em rgba(163, 177, 198, 0.7),
     -0.06em -0.06em 0.12em rgba(255, 255, 255, 0.6),
     0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
+}
+
+.almamundi-footer-tagline {
+  color: #6b7280;
+}
+
+/* Footer: grilla 2×4 de pills centrada (desktop); 2 columnas en móvil */
+.almamundi-footer-pill-grid {
+  display: grid;
+  width: 100%;
+  gap: 0.625rem;
+  justify-items: stretch;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 640px) {
+  .almamundi-footer-pill-grid {
+    gap: 0.75rem;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 42rem;
+    margin-inline: auto;
+  }
 }
 
 /* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */
