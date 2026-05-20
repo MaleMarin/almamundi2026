@@ -177,14 +177,16 @@ function ClosingBlock({ lines }: { lines: string[] }) {
         <p
           key={i}
           className={
-            i === 0 || i === 1
-              ? 'text-xl font-semibold leading-tight md:text-2xl'
-              : i >= lines.length - 2
-                ? 'mt-4 text-sm font-medium md:text-base'
-                : 'mt-3 text-sm leading-relaxed md:text-[0.9375rem]'
+            lines.length === 1
+              ? 'text-base font-medium leading-relaxed md:text-lg md:leading-[1.65]'
+              : i === 0 || i === 1
+                ? 'text-xl font-semibold leading-tight md:text-2xl'
+                : i >= lines.length - 2
+                  ? 'mt-4 text-sm font-medium md:text-base'
+                  : 'mt-3 text-sm leading-relaxed md:text-[0.9375rem]'
           }
           style={{
-            color: i < 2 ? soft.textMain : soft.textBody,
+            color: lines.length === 1 ? soft.textMain : i < 2 ? soft.textMain : soft.textBody,
             fontFamily: SITE_FONT_STACK,
           }}
         >

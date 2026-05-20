@@ -101,10 +101,7 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'closing',
         lines: [
-          'Cuéntalo como puedas.',
-          'Cuéntalo como quieras.',
-          'El formato es tuyo. La historia también.',
-          'AlmaMundi solo es el lugar donde va a existir.',
+          'AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que despiertan otras historias.',
         ],
       },
     ],
