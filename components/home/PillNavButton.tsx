@@ -19,7 +19,7 @@ export type PillNavButtonProps = {
   compactInline?: boolean;
   /** Estado activo (dock): solo color/borde vía `.btn-almamundi[data-active]` */
   active?: boolean;
-  /** Etiqueta larga en una sola línea: tipografía más compacta (misma caja que el resto). */
+  /** Etiqueta larga en una sola línea: misma tipografía; solo ellipsis si no cabe. */
   longSingleLine?: boolean;
   /** Tooltip / accesibilidad cuando el texto puede quedar recortado visualmente */
   title?: string;
@@ -54,10 +54,19 @@ export function PillNavButton({
         : MAP_HOME_NEU_BUTTON_CLASS_COMPACT
       : MAP_HOME_NEU_BUTTON_CLASS;
   const inner =
-    longSingleLine === true ? (
-      <span className="pill-nav-long-line block min-w-0 max-w-full">{children}</span>
-    ) : (
+    compact === true ? (
       children
+    ) : (
+      <span
+        className={[
+          'pill-nav-dock-label',
+          longSingleLine === true ? 'pill-nav-dock-label--clip min-w-0 max-w-full' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+      >
+        {children}
+      </span>
     );
 
   const tip = title ?? (typeof children === 'string' ? children : undefined);

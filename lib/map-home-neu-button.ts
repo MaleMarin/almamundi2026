@@ -19,7 +19,7 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
 
 /**
  * Misma caja siempre: ~60px alto, ancho = celda del grid (1fr), sin crecer por contenido.
- * Una línea de texto por defecto; «Buscar…» usa `.pill-nav-long-line` (misma caja, tipografía más compacta).
+ * Texto del dock en `.pill-nav-dock-label` (misma tipografía en todos; «Buscar…» solo recorta con ellipsis).
  */
 export const MAP_HOME_NEU_BUTTON_CLASS =
   'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';

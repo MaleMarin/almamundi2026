@@ -275,23 +275,38 @@ a.home-map-neu-pill.btn-almamundi:visited {
   border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
 }
 
-/* Píldoras del dock bajo «Mapa de AlmaMundi»: una línea, tipografía editorial compacta */
-.pill-nav-long-line {
+/*
+ * Dock «El Alma del Mundo»: tipografía única (referencia: «Bits»).
+ * Misma pila que MAP_HOME_NEU_BUTTON_CLASS: text-base / semibold / leading-none.
+ */
+.pill-nav-dock-label {
   display: block;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1;
-  letter-spacing: -0.045em;
-  font-size: clamp(0.625rem, 0.3rem + 1.35vw, 0.875rem);
   font-family: var(--font-sans);
+  font-size: 1rem;
   font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  color: inherit;
+  white-space: nowrap;
   font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* `<button>` del dock: sin fuente del user-agent; el span lleva la tipografía */
+.pill-nav-dock-label--clip {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* `<button>` del dock: tipografía en el span; el botón solo alinea la caja */
 #map-dock-slot .home-map-neu-pill.btn-almamundi {
-  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+  font-synthesis: none;
 }
 
 /*
