@@ -165,5 +165,6 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/mapa') return false;
   if (p === '/muestras' && !muestrasListMode) return false;
   if (p === '/cinematic' || p.startsWith('/cinematic/')) return false;
+  if (p === '/privacidad') return false;
   return true;
 }
