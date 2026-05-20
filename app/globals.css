@@ -7,16 +7,9 @@
   --home-bg: #E0E5EC;
   /* Espacio detrás del globo: negro neutro (sin tinte azul) */
   --universe-bg: #000000;
-  /* Transición editorial home → mapa (niebla → noche → espacio) */
-  --map-fade-haze: #dce4ee;
-  --map-fade-mist: #b8c6d6;
-  --map-fade-slate: #8fa0b6;
-  --map-fade-twilight: #5a7088;
-  --map-fade-dusk: #3d5270;
-  --map-fade-night: #243550;
-  --map-fade-deep: #152238;
-  --map-fade-space: #0c1a2e;
-  --map-fade-void: #071018;
+  /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
+  --map-space-deep: #050811;
+  --map-space-mid: #0a1520;
   /* Naranja AlmaMundi en todo el sitio (#ff4500) */
   --almamundi-orange: #ff4500;
   --almamundi-orange-rgb: 255, 69, 0;
@@ -302,76 +295,58 @@ a.home-map-neu-pill.btn-almamundi:visited {
 }
 
 /*
- * Mapa home: antesala editorial → universo (sin corte negro brusco).
- * La franja clara baja en niebla azul grisácea hasta espacio profundo.
+ * Mapa home: un solo degradado en todo el flujo (editorial + globo).
+ * Evita la franja azul que creaba `.map-section-to-universe-bleed` como banda aparte.
  */
-.map-section-gradient-block {
+.map-section-atmosphere {
   position: relative;
-  isolation: isolate;
+  width: 100%;
   background: linear-gradient(
     180deg,
     var(--home-bg) 0%,
-    var(--home-bg) 18%,
-    #e8edf4 28%,
-    var(--map-fade-haze) 38%,
-    var(--map-fade-mist) 48%,
-    var(--map-fade-slate) 58%,
-    var(--map-fade-twilight) 68%,
-    var(--map-fade-dusk) 76%,
-    var(--map-fade-night) 84%,
-    var(--map-fade-deep) 91%,
-    var(--map-fade-space) 97%,
-    var(--map-fade-space) 100%
-  );
-  min-height: 200px;
-}
-
-@media (min-width: 768px) {
-  .map-section-gradient-block {
-    min-height: 220px;
-  }
-}
-
-/* Puente visual entre pills y globo: continúa el degradado (no negro puro). */
-.map-section-to-universe-bleed {
-  width: 100%;
-  min-height: 3.5rem;
-  background: linear-gradient(
-    180deg,
-    var(--map-fade-space) 0%,
-    var(--map-fade-deep) 38%,
-    var(--map-fade-void) 78%,
-    #050c14 100%
+    var(--home-bg) 8%,
+    #e8edf3 14%,
+    #dfe6ee 22%,
+    #d0dae6 30%,
+    #bcc9d8 38%,
+    #a3b2c4 46%,
+    #8a9cb0 53%,
+    #7289a0 59%,
+    #5d748c 65%,
+    #4a6278 70%,
+    #3b5268 75%,
+    #2f4560 79%,
+    #253a56 83%,
+    #1d314c 86%,
+    #172a44 89%,
+    #12243c 91%,
+    #0e1f36 93%,
+    #0b1a30 95%,
+    #091628 96.5%,
+    #071220 97.5%,
+    var(--map-space-mid) 98.5%,
+    var(--map-space-deep) 100%
   );
 }
 
-@media (min-width: 768px) {
-  .map-section-to-universe-bleed {
-    min-height: 4.5rem;
-  }
+.map-section-editorial {
+  position: relative;
+  z-index: 1;
 }
 
-@media (min-width: 1024px) {
-  .map-section-to-universe-bleed {
-    min-height: 5rem;
-  }
-}
-
-/* Contenedor del globo: espacio oscuro gradual (continúa el degradado). */
+/* Globo: fondo transparente — el degradado del padre continúa detrás del canvas. */
 .map-universe-stage {
   position: relative;
-  background: linear-gradient(
-    180deg,
-    #050c14 0%,
-    var(--map-fade-void) 22%,
-    #040a12 55%,
-    #030810 100%
-  );
+  background: transparent;
 }
 
-/* Franja TimeBar: mismo tono espacial, sin banda negra dura. */
+/* Franja TimeBar: continúa el tono del espacio profundo. */
 .map-timebar-stage {
-  background: linear-gradient(180deg, #030810 0%, #020609 100%);
+  background: linear-gradient(
+    180deg,
+    var(--map-space-deep) 0%,
+    #03060c 100%
+  );
 }
 
 /* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
@@ -390,19 +365,14 @@ a.home-map-neu-pill.btn-almamundi:visited {
   padding-bottom: 0.25rem;
 }
 
-/* Anti-banding: ruido sutil en la transición editorial (no sobre el canvas del globo). */
-.map-section-gradient-block::after,
-.map-section-to-universe-bleed::after {
+/* Anti-banding: ruido muy sutil en toda la atmósfera del mapa. */
+.map-section-atmosphere::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  opacity: 0.035;
+  opacity: 0.028;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
-.map-section-to-universe-bleed {
-  position: relative;
 }
 
 /* Globo NASA: video con fondo transparente para que no tape la imagen de la Tierra */
