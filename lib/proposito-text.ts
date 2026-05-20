@@ -43,10 +43,6 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
         text: 'Vivimos en la era más documentada de la historia. Y hay millones de historias reales esperando el lugar correcto para existir.',
       },
       {
-        type: 'p',
-        text: 'La mujer que crió sola a tres hijos mientras estudiaba. El hombre que reconstruyó su casa con sus propias manos después del terremoto. La abuela que aprendió a usar el celular solo para ver la cara de su nieta. El joven que llegó a una ciudad sin conocer a nadie y encontró su lugar.',
-      },
-      {
         type: 'emphasis',
         text: 'Esas son las historias que AlmaMundi existe para guardar.',
       },
