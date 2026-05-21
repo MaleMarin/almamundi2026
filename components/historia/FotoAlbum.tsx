@@ -4,6 +4,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 import { neu } from '@/lib/historias-neumorph';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -61,6 +62,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
   const [caption, setCaption] = useState(imagenes[0]?.caption ?? '');
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const sectionRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
@@ -445,15 +447,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 ) : null}
                 <button
                   type="button"
-                  onClick={() => {
-                    const url =
-                      typeof window !== 'undefined' ? `${window.location.origin}/historias/${historia.id}/foto` : '';
-                    if (typeof navigator !== 'undefined' && navigator.share) {
-                      navigator.share({ title: historia.titulo, url }).catch(() => navigator.clipboard?.writeText(url));
-                    } else {
-                      navigator.clipboard?.writeText(url);
-                    }
-                  }}
+                  onClick={() => setShareOpen(true)}
                   style={{
                     fontFamily: SITE_FONT_STACK,
                     fontWeight: 700,
@@ -558,6 +552,20 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
           </div>
         )}
       </div>
+      <EthicalShareFlow
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        authorName={historia.autor.nombre}
+        storyTitle={historia.titulo}
+        quote={historia.subtitulo ?? ''}
+        imageUrl={historia.imagenes[0]?.url ?? historia.autor.avatar}
+        shareUrl={
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/historias/${historia.id}/foto`
+            : ''
+        }
+        exhibitionLabel="Fotografías"
+      />
     </>
   );
 }

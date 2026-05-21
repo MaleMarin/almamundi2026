@@ -628,6 +628,7 @@ export default function AudioPlayer({
           onMoreStories={() => {
             void onClose?.();
           }}
+          share={{ storyId: historia.id, formato: 'audio', imageUrl: historia.thumbnailUrl }}
         />
       )}
     </>

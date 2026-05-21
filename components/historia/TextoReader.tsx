@@ -5,6 +5,7 @@ import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-s
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
+import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
@@ -64,6 +65,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
   const [isMobile, setIsMobile] = useState(false);
   const paragraphRefs = useRef<(HTMLParagraphElement | null)[]>([]);
   const [visibleParrafos, setVisibleParrafos] = useState<boolean[]>([]);
+  const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
     const check = () => setIsMobile(typeof window !== 'undefined' && window.innerWidth < 640);
@@ -446,16 +448,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           )}
           <button
             type="button"
-            onClick={() => {
-              const url = typeof window !== 'undefined' ? `${window.location.origin}/historias/${historia.id}/texto` : '';
-              if (typeof navigator !== 'undefined' && navigator.share) {
-                navigator.share({ title: historia.titulo, url, text: historia.subtitulo }).catch(() => {
-                  navigator.clipboard?.writeText(url);
-                });
-              } else {
-                navigator.clipboard?.writeText(url);
-              }
-            }}
+            onClick={() => setShareOpen(true)}
             style={{
               fontFamily: SITE_FONT_STACK,
               fontWeight: 700,
@@ -475,6 +468,20 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           </button>
         </div>
       </div>
+      <EthicalShareFlow
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        authorName={historia.autor.nombre}
+        storyTitle={historia.titulo}
+        quote={historia.subtitulo ?? ''}
+        imageUrl={historia.autor.avatar}
+        shareUrl={
+          typeof window !== 'undefined'
+            ? `${window.location.origin}/historias/${historia.id}/texto`
+            : ''
+        }
+        exhibitionLabel="Escrito"
+      />
     </>
   );
 }

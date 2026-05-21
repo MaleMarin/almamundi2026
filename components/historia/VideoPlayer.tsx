@@ -748,6 +748,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           onMoreStories={() => {
             void onClose?.()
           }}
+          share={{ storyId: historia.id, formato: 'video', imageUrl: historia.thumbnailUrl }}
         />
       ) : null}
     </>

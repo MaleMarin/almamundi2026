@@ -9,7 +9,7 @@ import { getUserWeather } from '@/lib/weather';
 import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
-import { ShareStoryModal } from '@/components/mapa/ShareStoryModal';
+import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
@@ -203,7 +203,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
   const [lastSecondText, setLastSecondText] = useState('');
   const [lastSecondSent, setLastSecondSent] = useState(false);
   const [resonanceSent, setResonanceSent] = useState(false);
-  const [shareMode, setShareMode] = useState<'share' | 'postal' | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
   const [showMomentoJusto, setShowMomentoJusto] = useState(false);
   const [liveReaders, setLiveReaders] = useState(0);
   const [weather, setWeather] = useState<string>('unknown');
@@ -625,8 +625,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     {listening ? 'Detener lectura' : 'Cerrar los ojos'}
                   </button>
                 )}
-                <ActionButton label="Enviar a alguien" onClick={() => setShareMode('share')} />
-                <ActionButton label="Enviar postal" onClick={() => setShareMode('postal')} />
+                <ActionButton label="Compartir" onClick={() => setShareOpen(true)} />
                 {!alreadySent && !resonanceSent && (
                   <button
                     type="button"
@@ -912,13 +911,36 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
             </div>
           )}
 
-          {shareMode && (
-            <ShareStoryModal
-              story={story}
-              mode={shareMode}
-              onClose={() => setShareMode(null)}
-            />
-          )}
+          <EthicalShareFlow
+            open={shareOpen}
+            onClose={() => setShareOpen(false)}
+            authorName={story.label}
+            storyTitle={story.title ?? story.label}
+            quote={story.quote ?? story.excerpt ?? ''}
+            imageUrl={story.imageUrl ?? photos[0]?.url ?? ''}
+            shareUrl={
+              typeof window !== 'undefined' && story.id
+                ? `${window.location.origin}/historias/${story.id}/${
+                    format === 'video'
+                      ? 'video'
+                      : format === 'audio'
+                        ? 'audio'
+                        : format === 'photos'
+                          ? 'foto'
+                          : 'texto'
+                  }`
+                : ''
+            }
+            exhibitionLabel={
+              format === 'video'
+                ? 'Video'
+                : format === 'audio'
+                  ? 'Audio'
+                  : format === 'photos'
+                    ? 'Fotografías'
+                    : 'Escrito'
+            }
+          />
         </div>
       </div>
     </>

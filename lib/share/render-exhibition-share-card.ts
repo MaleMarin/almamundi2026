@@ -187,7 +187,7 @@ export async function renderExhibitionShareCardPng(
   ctx.textAlign = 'left';
   ctx.font = '13px ui-sans-serif, system-ui, sans-serif';
   ctx.fillStyle = 'rgba(55, 60, 72, 0.75)';
-  ctx.fillText('Escanea para volver a la historia en su contexto original.', pad, W - pad - 18);
+  ctx.fillText('almamundi.org · Escanea para volver a la historia.', pad, W - pad - 18);
 
   return new Promise((resolve, reject) => {
     canvas.toBlob(

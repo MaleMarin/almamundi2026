@@ -1,8 +1,9 @@
 'use client';
 
-import type { CSSProperties } from 'react';
+import { useState, type CSSProperties } from 'react';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
+import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -12,6 +13,15 @@ export type StoryEndAutor = {
   avatar: string;
   ubicacion?: string;
   bio?: string;
+};
+
+export type StoryEndShareFormat = 'video' | 'audio' | 'escrito' | 'foto';
+
+export type StoryEndShare = {
+  storyId: string;
+  formato: StoryEndShareFormat;
+  /** Imagen para la tarjeta descargable. Si se omite, se usa thumbnailUrl o avatar. */
+  imageUrl?: string;
 };
 
 export type StoryEndScreenProps = {
@@ -28,6 +38,22 @@ export type StoryEndScreenProps = {
   demoStory?: DemoStoryFields;
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
   embedInSite?: boolean;
+  /** Datos para abrir el flujo de compartir; si está ausente, no se muestra botón. */
+  share?: StoryEndShare;
+};
+
+const FORMATO_TO_ROUTE: Record<StoryEndShareFormat, string> = {
+  video: 'video',
+  audio: 'audio',
+  escrito: 'texto',
+  foto: 'foto',
+};
+
+const FORMATO_TO_LABEL: Record<StoryEndShareFormat, string> = {
+  video: 'Video',
+  audio: 'Audio',
+  escrito: 'Escrito',
+  foto: 'Fotografías',
 };
 
 const TEXT_TITLE = neu.textMain;
@@ -57,8 +83,10 @@ export function StoryEndScreen({
   thumbnailUrl,
   demoStory,
   embedInSite = false,
+  share,
 }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
+  const [shareOpen, setShareOpen] = useState(false);
 
   const hasTitleExtras = Boolean(subtitulo?.trim()) || Boolean(fechaStr);
 
@@ -274,6 +302,27 @@ export function StoryEndScreen({
           >
             {replayLabel}
           </button>
+          {share ? (
+            <button
+              type="button"
+              onClick={() => setShareOpen(true)}
+              style={{
+                ...neu.button,
+                flex: '1 1 160px',
+                padding: '0.92rem 1rem',
+                borderRadius: 999,
+                fontFamily: SITE_FONT_STACK,
+                fontWeight: 600,
+                fontSize: '0.74rem',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: neu.textMain,
+                boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)`,
+              }}
+            >
+              Compartir
+            </button>
+          ) : null}
           <button
             type="button"
             onClick={onMoreStories}
@@ -297,6 +346,23 @@ export function StoryEndScreen({
           </button>
         </div>
       </div>
+
+      {share ? (
+        <EthicalShareFlow
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          authorName={autor.nombre}
+          storyTitle={titulo}
+          quote={citaDestacada ?? subtitulo ?? ''}
+          imageUrl={share.imageUrl ?? thumbnailUrl ?? autor.avatar}
+          shareUrl={
+            typeof window !== 'undefined'
+              ? `${window.location.origin}/historias/${share.storyId}/${FORMATO_TO_ROUTE[share.formato]}`
+              : ''
+          }
+          exhibitionLabel={FORMATO_TO_LABEL[share.formato]}
+        />
+      ) : null}
 
       <style>{`
         @keyframes storyEndReveal {
