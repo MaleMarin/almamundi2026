@@ -420,6 +420,9 @@ a.home-map-neu-pill.btn-almamundi:visited {
   align-items: center;
   overflow-x: clip;
   text-align: center;
+  /* Container query: el título escala con el ancho real del contenedor (no del viewport)
+     para que "ALMAMUNDI" entre siempre completo, incluso en monitores anchos. */
+  container-type: inline-size;
 }
 
 .almamundi-footer-brand a {
@@ -439,6 +442,11 @@ a.home-map-neu-pill.btn-almamundi:visited {
   color: #E0E5EC;
   font-family: var(--font-sans);
   font-weight: 900;
+  /* Tamaño responsive atado al ancho del contenedor (cqi) para que "ALMAMUNDI"
+     entre completo en cualquier viewport, incluido 4K.
+     Cálculo: con letter-spacing -0.06em la palabra ocupa ~5.6em de ancho;
+     16.5cqi × 5.6 ≈ 92.4% del contenedor, con margen seguro de ~7%. */
+  font-size: clamp(3rem, 16.5cqi, 12rem);
   letter-spacing: -0.06em;
   line-height: 0.9;
   white-space: nowrap;

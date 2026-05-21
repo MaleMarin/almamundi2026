@@ -71,10 +71,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             className="inline-block max-w-full select-none leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
             aria-label="AlmaMundi — inicio"
           >
-            <span
-              className="almamundi-footer-title text-7xl sm:text-8xl md:text-[170px] lg:text-[240px]"
-              aria-hidden
-            >
+            <span className="almamundi-footer-title" aria-hidden>
               ALMAMUNDI
             </span>
           </HomeHardLink>
