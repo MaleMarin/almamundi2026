@@ -120,7 +120,7 @@ export function MoonSatellite({
   orbitYawRad = 0,
   orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
   roughness = 0.94,
-  emissiveIntensity = 0.04,
+  emissiveIntensity = 0.035,
   clipToViewport = false,
 }: MoonSatelliteProps) {
   const { camera } = useThree();
@@ -268,7 +268,7 @@ export function MoonSatellite({
             map={moonMap}
             roughness={roughness}
             metalness={0}
-            emissive="#0a0a12"
+            emissive="#080812"
             emissiveIntensity={emissiveIntensity}
             depthTest
             depthWrite

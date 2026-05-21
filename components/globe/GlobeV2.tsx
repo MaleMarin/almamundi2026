@@ -811,6 +811,83 @@ function EarthGroup({
   );
 }
 
+/**
+ * Starfield 3D embebido (solo home `#mapa`). 380 puntos blanco-azulados muy tenues,
+ * distribuidos en una esfera lejana (radio 60), `Points` con additive y `depthWrite=false`
+ * para no recortar el globo ni la luna. Sin nebulosas ni colores fuertes. Deriva apenas
+ * perceptible: ~0.003 rad/s en Y. Si performance baja, basta con omitir su montaje.
+ */
+function EmbeddedStarfield() {
+  const groupRef = useRef<THREE.Group>(null);
+  const geometry = useMemo(() => {
+    const count = 380;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+    const colors = new Float32Array(count * 3);
+    const radius = 60;
+    for (let i = 0; i < count; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = 2 * Math.PI * u;
+      const phi = Math.acos(2 * v - 1);
+      const r = radius * (0.96 + Math.random() * 0.06);
+      positions[i * 3 + 0] = r * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      positions[i * 3 + 2] = r * Math.cos(phi);
+      const bright = 0.35 + Math.random() * 0.55;
+      sizes[i] = 0.06 + Math.random() * 0.08;
+      /* Paleta sobria: blanco roto con ligerísima desviación azul/cálida. */
+      const warm = Math.random() < 0.18;
+      const r0 = warm ? 0.96 : 0.86;
+      const g0 = warm ? 0.92 : 0.90;
+      const b0 = warm ? 0.84 : 0.98;
+      colors[i * 3 + 0] = r0 * bright;
+      colors[i * 3 + 1] = g0 * bright;
+      colors[i * 3 + 2] = b0 * bright;
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geo.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+    geo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    return geo;
+  }, []);
+
+  const material = useMemo(
+    () =>
+      new THREE.PointsMaterial({
+        size: 0.07,
+        sizeAttenuation: true,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        toneMapped: false,
+      }),
+    []
+  );
+
+  useEffect(() => {
+    return () => {
+      geometry.dispose();
+      material.dispose();
+    };
+  }, [geometry, material]);
+
+  useFrame((_, dt) => {
+    const g = groupRef.current;
+    if (!g) return;
+    /* Deriva muy lenta para evitar sensación estática sin parecer videojuego. */
+    g.rotation.y += dt * 0.003;
+  });
+
+  return (
+    <group ref={groupRef} renderOrder={-10}>
+      <points geometry={geometry} material={material} frustumCulled={false} />
+    </group>
+  );
+}
+
 function GlobeScene({
   urls,
   embedded,
@@ -886,7 +963,9 @@ function GlobeScene({
     lastRealMsRef.current = now;
 
     const st = bitInteractionStoreRef.current;
-    let target = AUTO_ROTATE_IDLE_SPEED;
+    /* Calma editorial: en modo contemplativo (sin interacción) reducimos el ritmo del reloj
+       de escena ~18 % respecto a `AUTO_ROTATE_IDLE_SPEED`. No afecta hover/panel/puntero. */
+    let target = AUTO_ROTATE_IDLE_SPEED * 0.82;
     if (pauseEarthSpinForUi) target = AUTO_ROTATE_PANEL_SPEED;
     else if (st.magneticHoverId != null) target = AUTO_ROTATE_HOVER_SPEED;
     else if (st.pointerOnCanvas) {
@@ -934,6 +1013,13 @@ function GlobeScene({
   return (
     <>
       <ExposureSync exposure={exp} />
+
+      {/*
+        Embedded `#mapa`: capa 3D propia de estrellas finas (380 puntos additive con deriva
+        lentísima) para aportar profundidad sin parecer videojuego. Convive con `<Stars/>` de
+        drei (que sigue como base) y se descarta automáticamente en `/globo-v2`.
+      */}
+      {embedded ? <EmbeddedStarfield /> : null}
 
       <Stars
         radius={starsRadius}

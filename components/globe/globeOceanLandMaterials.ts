@@ -130,19 +130,19 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
       vec3 H = normalize(L + V);
       float nh = max(dot(N, H), 0.0);
-      float sunSpec = pow(nh, 384.0) * openWater * 0.055 * smoothstep(0.04, 0.98, ndl);
+      float sunSpec = pow(nh, 384.0) * openWater * 0.065 * smoothstep(0.04, 0.98, ndl);
       /* Highlight especular cálido (sol sobre el mar) */
       colDay += vec3(0.95, 0.88, 0.72) * sunSpec;
 
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
-      colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
+      colDay += fresTint * fresAmt * ndl * (0.30 + 0.70 * openWater);
 
       vec3 colNight = base * vec3(0.14, 0.20, 0.34) + vec3(0.022, 0.032, 0.055);
       colNight += fresTint * rim * 0.04 * (0.24 + 0.5 * openWater);
 
       float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.18, 0.36, mu);
       vec3 col = mix(colNight, colDay, dayW);
-      col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
+      col = pow(clamp(col, 0.0, 1.0), vec3(0.97));
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -308,12 +308,12 @@ export function createLandSphereMaterial(
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
       float amb = mix(0.2, 0.28, uFullDay);
-      float dif = mix(0.68, 0.78, uFullDay) * pow(ndl, 0.94);
+      float dif = mix(0.70, 0.82, uFullDay) * pow(ndl, 0.92);
       vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.06, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);
-      litDay *= mix(1.0, 0.78, hot);
+      litDay *= mix(1.0, 0.84, hot);
 
       vec3 litNight = d0 * vec3(0.14, 0.16, 0.22) * (0.48 + 0.5 * mountainPop);
       litNight += vec3(0.028, 0.034, 0.048) * landMask;

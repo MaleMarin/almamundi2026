@@ -38,7 +38,7 @@ export function createCityLightsOverlayMaterial(
     uMap: { value: lightsTex },
     uNormalTex: { value: normalTex },
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
-    uStrength: { value: 0.504 },
+    uStrength: { value: 0.46 },
     uNormalScale: { value: GLOBE_V2_NORMAL_SCALE_CITY_LIGHTS },
     uFullDay: { value: 0 },
     ...(allowVertexTextureFetch
@@ -141,7 +141,7 @@ export function createCityLightsOverlayMaterial(
       float dense = smoothstep(0.35, 0.92, pkLift);
       vec3 boosted = L * mix(vec3(1.0), vec3(1.06, 1.04, 1.02), dense);
       boosted = boosted / (vec3(1.0) + boosted * 0.55);
-      boosted = min(boosted, vec3(0.72));
+      boosted = min(boosted, vec3(0.66));
 
       /* Luces urbanas: cálido suave (puntos, sin franja naranja en terminador). */
       vec3 warmLow = vec3(1.0, 0.82, 0.48);
@@ -186,10 +186,10 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
   const uniforms = {
     uCamPos: { value: new THREE.Vector3(0, 0, 5) },
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
-    uInner: { value: new THREE.Color(opts?.innerColor ?? 0x1a5fff) },
+    uInner: { value: new THREE.Color(opts?.innerColor ?? 0x2a78ff) },
     uOuter: { value: new THREE.Color(opts?.outerColor ?? 0x0a2060) },
-    uIntensity: { value: opts?.intensity ?? 0.101 },
-    uPower: { value: opts?.power ?? 3.15 },
+    uIntensity: { value: opts?.intensity ?? 0.115 },
+    uPower: { value: opts?.power ?? 3.4 },
     uFullDay: { value: 0 },
   };
 
