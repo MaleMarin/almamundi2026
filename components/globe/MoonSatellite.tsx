@@ -108,6 +108,8 @@ export type MoonSatelliteProps = {
   /** Lectura de cráteres / terminador (home cinematográfica). */
   roughness?: number;
   emissiveIntensity?: number;
+  /** Home embebida: ocultar la Luna si proyectada fuera del canvas negro. */
+  clipToViewport?: boolean;
 };
 
 export function MoonSatellite({
@@ -119,6 +121,7 @@ export function MoonSatellite({
   orbitInclinationDeg = MOON_ORBIT_INCLINATION_DEG,
   roughness = 0.94,
   emissiveIntensity = 0.04,
+  clipToViewport = false,
 }: MoonSatelliteProps) {
   const { camera } = useThree();
   const moonOrbitRootRef = useRef<THREE.Group>(null);
@@ -140,6 +143,7 @@ export function MoonSatellite({
       scratchDir: new THREE.Vector3(),
       scratchOc: new THREE.Vector3(),
       worldScale: new THREE.Vector3(),
+      ndc: new THREE.Vector3(),
     }),
     []
   );
@@ -227,7 +231,19 @@ export function MoonSatellite({
         aux.scratchDir,
         aux.scratchOc
       );
-      mesh.visible = !occluded;
+      let inViewport = true;
+      if (clipToViewport) {
+        aux.ndc.copy(aux.moonWorld).project(camera);
+        const margin = 0.08;
+        inViewport =
+          aux.ndc.z > 0 &&
+          aux.ndc.z < 1 &&
+          aux.ndc.x >= -1 + margin &&
+          aux.ndc.x <= 1 - margin &&
+          aux.ndc.y >= -1 + margin &&
+          aux.ndc.y <= 1 - margin;
+      }
+      mesh.visible = !occluded && inViewport;
     }
   });
 

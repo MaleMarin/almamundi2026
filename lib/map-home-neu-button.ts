@@ -1,4 +1,22 @@
 import type { CSSProperties } from 'react';
+import { SITE_FONT_STACK } from '@/lib/typography';
+
+/**
+ * Tipografía del texto en pills del dock (referencia visual: «Bits»).
+ * Una sola definición en inline style + CSS para evitar user-agent de `<button>`.
+ */
+export const MAP_HOME_DOCK_LABEL_STYLE: CSSProperties = {
+  fontFamily: SITE_FONT_STACK,
+  fontSize: '1rem',
+  fontWeight: 600,
+  lineHeight: 1,
+  letterSpacing: '0',
+  color: 'inherit',
+  fontSynthesis: 'none',
+  WebkitFontSmoothing: 'antialiased',
+  MozOsxFontSmoothing: 'grayscale',
+  textRendering: 'optimizeLegibility',
+};
 
 /**
  * Única fuente de verdad: header + dock (PillNavButton).
@@ -19,10 +37,14 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
 
 /**
  * Misma caja siempre: ~60px alto, ancho = celda del grid (1fr), sin crecer por contenido.
- * Una línea de texto por defecto; «Buscar…» usa `.pill-nav-long-line` (misma caja, tipografía más compacta).
+ * Texto del dock en `.pill-nav-dock-label` (misma tipografía en todos; «Buscar…» solo recorta con ellipsis).
  */
 export const MAP_HOME_NEU_BUTTON_CLASS =
   'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+
+/** Dock «El Alma del Mundo»: misma caja; tipografía solo en `.pill-nav-dock-label` (sin utilidades font-* en el botón). */
+export const MAP_HOME_NEU_BUTTON_CLASS_DOCK =
+  'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-gray-600 whitespace-nowrap overflow-hidden';
 
 /** Home header: píldoras más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =

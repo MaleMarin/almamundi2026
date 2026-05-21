@@ -65,18 +65,20 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
     >
       {/* 1. Marca gigante + frase de cierre */}
       <div className="flex w-full max-w-6xl flex-col items-center text-center">
-        <HomeHardLink
-          href="/"
-          className="mb-6 block w-full select-none text-center leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55 md:mb-8"
-          aria-label="AlmaMundi — inicio"
-        >
-          <span
-            className="almamundi-footer-title block text-7xl sm:text-8xl md:text-[170px] lg:text-[240px]"
-            aria-hidden
+        <div className="almamundi-footer-brand mb-6 w-full md:mb-8">
+          <HomeHardLink
+            href="/"
+            className="inline-block max-w-full select-none leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
+            aria-label="AlmaMundi — inicio"
           >
-            ALMAMUNDI
-          </span>
-        </HomeHardLink>
+            <span
+              className="almamundi-footer-title text-7xl sm:text-8xl md:text-[170px] lg:text-[240px]"
+              aria-hidden
+            >
+              ALMAMUNDI
+            </span>
+          </HomeHardLink>
+        </div>
         <p className="almamundi-footer-tagline mx-auto max-w-lg px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
           {FOOTER_CLOSING_LINE}
         </p>

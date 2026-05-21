@@ -1,5 +1,6 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
 import Link from 'next/link';
 import { Home, MapPin, Video, CornerDownLeft } from 'lucide-react';
@@ -22,7 +23,7 @@ export default function NotFound() {
         </header>
         <nav className="grid grid-cols-1 sm:grid-cols-2 gap-8 mt-12">
           <HomeHardLink
-            href="/#mapa"
+            href={MAPA_HOME_LINK_HREF}
             className="group flex items-center gap-5 p-6 rounded-3xl transition-all duration-300 shadow-[8px_8px_16px_#bfc6cc,-8px_-8px_16px_#ffffff] hover:shadow-[4px_4px_8px_#bfc6cc,-4px_-4px_8px_#ffffff] bg-[#E0E5EC] text-slate-800 hover:text-[#ff4500]"
           >
             <div className="p-4 rounded-full bg-[#E0E5EC] group-hover:bg-[#ff4500]/5 shadow-[inner_4px_4px_8px_#bfc6cc,inner_-4px_-4px_8px_#ffffff]">

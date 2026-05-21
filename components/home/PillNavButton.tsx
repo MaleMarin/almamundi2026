@@ -2,9 +2,11 @@
 
 import type { ReactNode } from 'react';
 import {
+  MAP_HOME_DOCK_LABEL_STYLE,
   MAP_HOME_NEU_BUTTON_CLASS,
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE,
+  MAP_HOME_NEU_BUTTON_CLASS_DOCK,
   MAP_HOME_NEU_BUTTON_STYLE,
 } from '@/lib/map-home-neu-button';
 
@@ -17,9 +19,11 @@ export type PillNavButtonProps = {
    * La home usa grid con celdas 1fr; allí no activar esto.
    */
   compactInline?: boolean;
+  /** Fila bajo «Mapa de AlmaMundi» (`#map-dock-slot`): tipografía unificada vía `MAP_HOME_DOCK_LABEL_STYLE`. */
+  dock?: boolean;
   /** Estado activo (dock): solo color/borde vía `.btn-almamundi[data-active]` */
   active?: boolean;
-  /** Etiqueta larga en una sola línea: tipografía más compacta (misma caja que el resto). */
+  /** Etiqueta larga en una sola línea: misma tipografía; solo ellipsis si no cabe. */
   longSingleLine?: boolean;
   /** Tooltip / accesibilidad cuando el texto puede quedar recortado visualmente */
   title?: string;
@@ -39,6 +43,7 @@ export function PillNavButton({
   children,
   compact,
   compactInline,
+  dock,
   active,
   longSingleLine,
   title,
@@ -48,14 +53,26 @@ export function PillNavButton({
   type = 'button',
 }: PillNavButtonProps) {
   const pillClass =
-    compact === true
-      ? compactInline === true
-        ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE
-        : MAP_HOME_NEU_BUTTON_CLASS_COMPACT
-      : MAP_HOME_NEU_BUTTON_CLASS;
+    dock === true
+      ? MAP_HOME_NEU_BUTTON_CLASS_DOCK
+      : compact === true
+        ? compactInline === true
+          ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE
+          : MAP_HOME_NEU_BUTTON_CLASS_COMPACT
+        : MAP_HOME_NEU_BUTTON_CLASS;
   const inner =
-    longSingleLine === true ? (
-      <span className="pill-nav-long-line block min-w-0 max-w-full">{children}</span>
+    dock === true ? (
+      <span
+        className={[
+          'pill-nav-dock-label',
+          longSingleLine === true ? 'pill-nav-dock-label--clip min-w-0 max-w-full' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')}
+        style={MAP_HOME_DOCK_LABEL_STYLE}
+      >
+        {children}
+      </span>
     ) : (
       children
     );
