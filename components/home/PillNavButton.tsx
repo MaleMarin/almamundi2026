@@ -2,9 +2,11 @@
 
 import type { ReactNode } from 'react';
 import {
+  MAP_HOME_DOCK_LABEL_STYLE,
   MAP_HOME_NEU_BUTTON_CLASS,
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE,
+  MAP_HOME_NEU_BUTTON_CLASS_DOCK,
   MAP_HOME_NEU_BUTTON_STYLE,
 } from '@/lib/map-home-neu-button';
 
@@ -17,6 +19,8 @@ export type PillNavButtonProps = {
    * La home usa grid con celdas 1fr; allí no activar esto.
    */
   compactInline?: boolean;
+  /** Fila bajo «Mapa de AlmaMundi» (`#map-dock-slot`): tipografía unificada vía `MAP_HOME_DOCK_LABEL_STYLE`. */
+  dock?: boolean;
   /** Estado activo (dock): solo color/borde vía `.btn-almamundi[data-active]` */
   active?: boolean;
   /** Etiqueta larga en una sola línea: misma tipografía; solo ellipsis si no cabe. */
@@ -39,6 +43,7 @@ export function PillNavButton({
   children,
   compact,
   compactInline,
+  dock,
   active,
   longSingleLine,
   title,
@@ -48,15 +53,15 @@ export function PillNavButton({
   type = 'button',
 }: PillNavButtonProps) {
   const pillClass =
-    compact === true
-      ? compactInline === true
-        ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE
-        : MAP_HOME_NEU_BUTTON_CLASS_COMPACT
-      : MAP_HOME_NEU_BUTTON_CLASS;
+    dock === true
+      ? MAP_HOME_NEU_BUTTON_CLASS_DOCK
+      : compact === true
+        ? compactInline === true
+          ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE
+          : MAP_HOME_NEU_BUTTON_CLASS_COMPACT
+        : MAP_HOME_NEU_BUTTON_CLASS;
   const inner =
-    compact === true ? (
-      children
-    ) : (
+    dock === true ? (
       <span
         className={[
           'pill-nav-dock-label',
@@ -64,9 +69,12 @@ export function PillNavButton({
         ]
           .filter(Boolean)
           .join(' ')}
+        style={MAP_HOME_DOCK_LABEL_STYLE}
       >
         {children}
       </span>
+    ) : (
+      children
     );
 
   const tip = title ?? (typeof children === 'string' ? children : undefined);

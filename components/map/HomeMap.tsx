@@ -567,16 +567,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {dockSlot &&
         createPortal(
           <div className={MAP_HOME_DOCK_NAV_CLASS}>
-            <PillNavButton active={drawerMode === 'stories'} onClick={() => open('stories')}>
+            <PillNavButton dock active={drawerMode === 'stories'} onClick={() => open('stories')}>
               Historias
             </PillNavButton>
-            <PillNavButton active={drawerMode === 'sounds'} onClick={() => open('sounds')}>
+            <PillNavButton dock active={drawerMode === 'sounds'} onClick={() => open('sounds')}>
               Sonidos
             </PillNavButton>
-            <PillNavButton active={drawerMode === 'news'} onClick={() => open('news')}>
+            <PillNavButton dock active={drawerMode === 'news'} onClick={() => open('news')}>
               Noticias en vivo
             </PillNavButton>
             <PillNavButton
+              dock
               active={drawerMode === 'bits'}
               onClick={() => {
                 setSelectedBit(null);
@@ -586,6 +587,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               Bits
             </PillNavButton>
             <PillNavButton
+              dock
               active={drawerMode === 'search'}
               onClick={() => open('search')}
               longSingleLine

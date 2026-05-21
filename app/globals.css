@@ -281,17 +281,11 @@ a.home-map-neu-pill.btn-almamundi:visited {
  */
 .pill-nav-dock-label {
   display: block;
-  font-family: var(--font-sans);
-  font-size: 1rem;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0;
-  color: inherit;
   white-space: nowrap;
+  font: inherit;
   font-synthesis: none;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  text-transform: none;
+  font-variant: normal;
 }
 
 .pill-nav-dock-label--clip {
@@ -299,14 +293,20 @@ a.home-map-neu-pill.btn-almamundi:visited {
   text-overflow: ellipsis;
 }
 
-/* `<button>` del dock: tipografía en el span; el botón solo alinea la caja */
+/* Dock: anula user-agent de `<button>`; el span lleva MAP_HOME_DOCK_LABEL_STYLE */
 #map-dock-slot .home-map-neu-pill.btn-almamundi {
+  appearance: none;
+  -webkit-appearance: none;
   font-family: var(--font-sans);
   font-size: 1rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
+  color: #4b5563;
   font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 /*
