@@ -15,20 +15,20 @@ import {
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 
-import { renderExhibitionShareCardPng } from '@/lib/share/render-exhibition-share-card';
-
 export type EthicalShareFlowProps = {
   open: boolean;
   onClose: () => void;
   authorName: string;
   storyTitle: string;
-  quote: string;
-  imageUrl: string;
+  /** Solo para compatibilidad con call sites antiguos. No se usa en el flujo nuevo. */
+  quote?: string;
+  /** Solo para compatibilidad con call sites antiguos. No se usa en el flujo nuevo. */
+  imageUrl?: string;
   /** URL canónica de la historia (mismo origen). */
   shareUrl: string;
-  /** Texto de formato para la tarjeta y cuerpo del share. Default: "AlmaMundi". */
+  /** Texto de formato para el cuerpo del share. Default: "AlmaMundi". */
   exhibitionLabel?: string;
-  /** Compatibilidad con call sites antiguos: ya no se usa en el flujo nuevo. */
+  /** Solo para compatibilidad con call sites antiguos. No se usa en el flujo nuevo. */
   themeTag?: string;
 };
 
@@ -49,15 +49,12 @@ export function EthicalShareFlow({
   onClose,
   authorName,
   storyTitle,
-  quote,
-  imageUrl,
   shareUrl,
   exhibitionLabel = 'AlmaMundi',
 }: EthicalShareFlowProps) {
   const dialogId = useId();
   const [step, setStep] = useState<Step>('notice');
   const [toast, setToast] = useState<string | null>(null);
-  const [downloading, setDownloading] = useState(false);
 
   // Reinicia el flujo a 'notice' cada vez que se abre: el aviso aparece SIEMPRE.
   useEffect(() => {
@@ -99,65 +96,6 @@ export function EthicalShareFlow({
     const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
     window.location.href = `mailto:?subject=${subject}&body=${body}`;
   }, [shareText, shareUrl, storyTitle]);
-
-  const nativeShare = useCallback(async () => {
-    try {
-      if (typeof navigator !== 'undefined' && navigator.share) {
-        await navigator.share({
-          title: `${storyTitle} · ${authorName}`,
-          text: shareText,
-          url: shareUrl,
-        });
-      } else {
-        await copyLink();
-      }
-    } catch {
-      /* cancelado por el usuario */
-    }
-  }, [storyTitle, authorName, shareText, shareUrl, copyLink]);
-
-  const downloadCard = useCallback(async () => {
-    if (downloading) return;
-    setDownloading(true);
-    try {
-      const qrRes = await fetch(`/api/qr?url=${encodeURIComponent(shareUrl)}`);
-      if (!qrRes.ok) throw new Error('qr');
-      const qrBlob = await qrRes.blob();
-      const qrDataUrl = await new Promise<string>((resolve, reject) => {
-        const r = new FileReader();
-        r.onloadend = () =>
-          typeof r.result === 'string' ? resolve(r.result) : reject();
-        r.onerror = () => reject();
-        r.readAsDataURL(qrBlob);
-      });
-      const blob = await renderExhibitionShareCardPng({
-        imageUrl,
-        quote: quote || storyTitle,
-        authorName,
-        storyTitle,
-        exhibitionLabel,
-        qrDataUrl,
-      });
-      const a = document.createElement('a');
-      a.href = URL.createObjectURL(blob);
-      a.download = `almamundi-${authorName.replace(/\s+/g, '-').slice(0, 32) || 'historia'}.png`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch {
-      flashToast('No se pudo generar la tarjeta');
-    } finally {
-      setDownloading(false);
-    }
-  }, [
-    downloading,
-    shareUrl,
-    imageUrl,
-    quote,
-    authorName,
-    storyTitle,
-    exhibitionLabel,
-    flashToast,
-  ]);
 
   if (!open) return null;
 
@@ -242,30 +180,6 @@ export function EthicalShareFlow({
                   className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
                 >
                   Email
-                </button>
-                <button
-                  type="button"
-                  onClick={() => void nativeShare()}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
-                >
-                  Compartir con el sistema
-                </button>
-                <button
-                  type="button"
-                  disabled={downloading}
-                  onClick={() => void downloadCard()}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
-                >
-                  {downloading ? 'Generando tarjeta…' : 'Descargar tarjeta'}
-                </button>
-              </div>
-              <div className="mt-6 flex justify-end">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/85 hover:bg-white/10"
-                >
-                  Cerrar
                 </button>
               </div>
             </div>
