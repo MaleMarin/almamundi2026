@@ -1,31 +1,22 @@
 ---
-description: BLOQUEO — Estética completa de la home (/). No cambiar salvo petición explícita del usuario.
-globs: app/page.tsx, components/home/HomeFirstPart.tsx, components/politica-v2/MapSectionLocked.tsx, components/layout/Footer.tsx
-alwaysApply: true
+description: BLOQUEO estético de la home AlmaMundi. No modificar layout, tipografía, espaciados, colores, textos ni animaciones sin petición explícita del usuario.
+globs: app/page.tsx, components/home/HomeFirstPart.tsx, components/home/HomeFirstPartSiteHeader.tsx, components/home/HomePageClient.tsx, components/politica-v2/MapSectionLocked.tsx, components/layout/Footer.tsx
+alwaysApply: false
 ---
 
-# Home AlmaMundi — estética cerrada (NO TOCAR por iniciativa propia)
+# Home AlmaMundi — estética cerrada
 
-La **home** (`/`) es el layout acordado: fondo neumórfico `#E0E5EC`, `HomeFirstPart` (header fijo + `#intro` + `#historias`), sección de mapa `MapSectionLocked` (`#mapa`) y `Footer`. **No modifiques estructura, tipografía, espaciados, tamaños de logo, colores, textos, animaciones ni orden de bloques** salvo que el usuario lo pida **explícitamente** (p. ej. "cambia el logo", "sube el hero"). No "mejorar", "unificar" ni "refactorizar" la home por cuenta propia.
+La home (`/`) es el layout acordado: fondo neumórfico `#E0E5EC`, `HomeFirstPart` (header + `#intro` + `#historias`), `MapSectionLocked` (`#mapa`) y `Footer`.
 
-## Archivos donde aplica el candado visual de la home
+**No modificar estructura, tipografía, espaciados, tamaños de logo, colores, textos, animaciones ni orden de bloques sin petición explícita.** No "mejorar", "unificar" ni "refactorizar" por iniciativa propia.
 
-- `app/page.tsx` — composición del `main` de la home.
-- `components/home/HomeFirstPart.tsx` — hero, barra superior, cards, DM Sans en intro, neumorfismo de cards/botones.
-- `components/politica-v2/MapSectionLocked.tsx` — mapa embebido en la home (respeta también `mapa-seccion-lock.mdc`).
-- `components/layout/Footer.tsx` — si el cambio solo persigue alterar el aspecto de la home sin petición, no hacerlo.
+## Bloqueado
 
-## Qué queda bloqueado (resumen)
+- **Header**: logo AlmaMundi, altura de barra, nav, enlaces.
+- **#intro**: titular, línea naranja var(--almamundi-orange), frase "Aquí, cada relato importa…", espaciados, tipografía hero.
+- **#historias**: las 4 cards (orden, textos, neumorfismo, CTAs).
+- **Mapa en home**: no sustituir por otras secciones ni romper la estructura del mapa.
 
-- **Header:** logo AlmaMundi, altura de barra, nav, enlaces.
-- **`#intro`:** titular, línea naranja `var(--almamundi-orange)`, frase "Aquí, cada relato importa…", espaciados y tipografía del hero.
-- **`#historias`:** las cuatro cards (orden, textos, neumorfismo, CTAs).
-- **Mapa en home:** no sustituir por otras secciones ni romper la regla estructural del mapa.
+## Cambios permitidos
 
-## Cuándo sí se puede cambiar
-
-Solo con **instrucción explícita** del usuario sobre un elemento concreto. Si el usuario dice que el trabajo está aceptado o "no lo cambies más", tratar esa zona como **cerrada** hasta nueva orden.
-
-## Frase de referencia
-
-> La estética de la home no se cambia salvo que yo lo pida.
+Solo con instrucción explícita del usuario sobre un elemento concreto. Si el usuario dice que algo está aceptado o "no lo cambies más", esa zona queda cerrada hasta nueva orden.

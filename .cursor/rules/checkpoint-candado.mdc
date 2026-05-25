@@ -1,11 +1,12 @@
 ---
-description: Crear candado (checkpoint) cuando algo queda listo. Evitar pérdida de trabajo.
-alwaysApply: true
+description: Recordar al usuario hacer checkpoint en git cuando algo queda listo. Activar cuando el usuario diga "listo", "terminado", "así lo quiero", "no toques más" o pida cerrar una sección.
+alwaysApply: false
 ---
 
-# Candado cuando algo está listo
+# Candado por checkpoint
 
-- Si el usuario dice que algo está **listo**, **terminado**, **así lo quiero** o **no toques más esto**: recordar que debe hacer un **checkpoint en git** para no perder cambios.
-- Frase sugerida para el asistente: *"Para dejar este estado asegurado, haz un commit: `git add [archivos]` y `git commit -m 'chore: checkpoint — [descripción breve]'."*
-- No reordenar ni refactorizar bloques que el usuario haya marcado como "listo" o "LOCKED" sin que lo pida.
-- Si en el código hay comentarios `// LOCKED` o `// DO NOT MOVE`, no mover ni reordenar ese bloque.
+Cuando el usuario indique que algo está **listo**, **terminado**, **así lo quiero** o **no toques más esto**:
+
+- Recordar al usuario hacer commit: `git add [archivos]` + `git commit -m "chore: checkpoint — [descripción breve]"`.
+- No reordenar ni refactorizar bloques marcados como listos.
+- Respetar comentarios `// LOCKED` o `// DO NOT MOVE`: no mover ni reescribir esos bloques.

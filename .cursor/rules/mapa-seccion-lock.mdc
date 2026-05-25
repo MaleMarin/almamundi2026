@@ -1,15 +1,18 @@
 ---
-description: Sección mapa en home — con todas las funciones acordadas. No quitar sin petición explícita.
-alwaysApply: true
+description: BLOQUEO estructural de la sección Mapa en home. UniverseStage, Dock dentro del stage, TimeBar en franja propia. No quitar funciones acordadas sin petición explícita.
+globs: app/page.tsx, app/mapa/**, components/map/**, components/mapa/**, components/politica-v2/MapSectionLocked.tsx
+alwaysApply: false
 ---
 
-# Mapa (home) — REGLA ESTRUCTURAL (NO NEGOCIABLE)
+# Mapa (home) — REGLA ESTRUCTURAL
+
+## Degradado y stage
 
 - **Degradado**: solo la transición (gris → oscuro) bajo el título "Mapa de AlmaMundi". El Dock NO va en la franja de transición ni "arriba del mapa" como franja.
-- **UniverseStage**: contenedor único (fondo oscuro). El Dock se renderiza **dentro** de UniverseStage, nunca fuera.
+- **UniverseStage**: contenedor único (fondo oscuro). El Dock se renderiza DENTRO de UniverseStage, nunca fuera.
 - **Dock**: overlay flotante dentro de UniverseStage, centrado arriba del globo (position absolute), glass/neumorfismo. Globo limpio; Dock "vive" dentro del universo.
 
 ## HUD Fecha/Hora/Ciudad (TimeBar)
 
-- El HUD de fecha/lugar/hora es **`<TimeBar />`**. No montar en layout ni en Footer global. No usar `position: fixed`. Siempre dentro del contenedor del mapa (UniverseStage).
-- **No solapamiento:** La fecha/hora debe ir en una **franja propia debajo del globo** (div independiente con altura fija, ej. 64px), no superpuesta al canvas. El globo debe tener altura explícita `calc(100% - 64px)` para no invadir esa franja. Así el mapa mundi nunca tapa ni corta los datos de fecha/hora.
+- El HUD de fecha/lugar/hora es <TimeBar />. No montar en layout global ni en Footer. No usar position: fixed. Siempre dentro del contenedor del mapa (UniverseStage).
+- **No solapamiento**: la fecha/hora va en una franja propia debajo del globo (div independiente con altura fija, ej. 64px), no superpuesta al canvas. El globo debe tener altura explícita calc(100% - 64px) para no invadir esa franja.
