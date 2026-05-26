@@ -303,6 +303,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const chunksRef = useRef<BlobPart[]>([]);
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const mediaRequestTokenRef = useRef(0);
 
   const [textBody, setTextBody] = useState('');
   /** Tras escribir, la persona confirma que leyó/revisó antes de Continuar (modo texto). */
@@ -354,6 +355,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   }, [previewUrl]);
 
   const resetCaptureMedia = useCallback(() => {
+    mediaRequestTokenRef.current += 1;
     stopTimer();
     const mr = recorderRef.current;
     if (mr && mr.state !== 'inactive') {
@@ -444,8 +446,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   const startVideoCapture = useCallback(async () => {
     setErr('');
+    const requestToken = ++mediaRequestTokenRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: true });
+      if (requestToken !== mediaRequestTokenRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
       setStreamReady(true);
       if (videoLiveRef.current) {
@@ -453,6 +460,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         await videoLiveRef.current.play().catch(() => {});
       }
     } catch {
+      if (requestToken !== mediaRequestTokenRef.current) return;
       setErr('No pudimos acceder a la cámara. Revisa permisos.');
       setStreamReady(false);
     }
@@ -460,11 +468,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   const startAudioCapture = useCallback(async () => {
     setErr('');
+    const requestToken = ++mediaRequestTokenRef.current;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (requestToken !== mediaRequestTokenRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
       setStreamReady(true);
     } catch {
+      if (requestToken !== mediaRequestTokenRef.current) return;
       setErr('No pudimos acceder al micrófono.');
       setStreamReady(false);
     }
