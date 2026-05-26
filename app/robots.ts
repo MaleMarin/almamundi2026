@@ -15,12 +15,39 @@ function siteOrigin(): string {
   return 'https://www.almamundi.org';
 }
 
+/**
+ * Rutas privadas, administrativas, de preview y de desarrollo que no deben
+ * indexarse. El resto del sitio queda accesible vía `allow: '/'`.
+ */
+const DISALLOWED_PATHS: string[] = [
+  '/admin',
+  '/admin/*',
+  '/api/*',
+  '/preview-home',
+  '/vista-previa',
+  '/prototipo',
+  '/demo-huellas-v2',
+  '/demo-impronta',
+  '/earth-globe-demo',
+  '/globo-v2',
+  '/globo-validacion',
+  '/mis-datos-personales',
+  '/privacidad/data-request',
+  '/curaduria',
+  '/perfil/*',
+  '/historias/mi-coleccion',
+  '/u/*',
+  '/alma-almamundi',
+  '/vision',
+];
+
 export default function robots(): MetadataRoute.Robots {
   const base = siteOrigin();
   return {
     rules: {
       userAgent: '*',
       allow: '/',
+      disallow: DISALLOWED_PATHS,
     },
     sitemap: `${base}/sitemap.xml`,
   };
