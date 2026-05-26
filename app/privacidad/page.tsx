@@ -113,7 +113,7 @@ export default function PrivacidadPage() {
           Aviso de Privacidad
         </h1>
         <p style={{ margin: 0, fontSize: '0.9rem', color: TEXT_3 }}>
-          AlmaMundi · Documento actualizado según los procesos del sitio
+          AlmaMundi · Última actualización: 25 de mayo de 2026
         </p>
 
         <Section id="intro" title="Introducción">
@@ -140,6 +140,38 @@ export default function PrivacidadPage() {
           </p>
         </Section>
 
+        <Section id="marco-legal" title="Marco legal">
+          <p style={{ marginBottom: '0.5rem' }}>Esta política de privacidad cumple con:</p>
+          <ul style={{ ...ul, marginBottom: '1rem' }}>
+            <li style={{ marginBottom: '0.5rem' }}>
+              el <strong>Reglamento General de Protección de Datos</strong> (Reglamento UE 2016/679, RGPD) de la Unión
+              Europea;
+            </li>
+            <li style={{ marginBottom: '0.5rem' }}>
+              la <strong>Ley N° 19.628 sobre Protección de la Vida Privada</strong> de Chile;
+            </li>
+            <li style={{ marginBottom: '0.5rem' }}>
+              la <strong>Ley Federal de Protección de Datos Personales en Posesión de los Particulares</strong>{' '}
+              (LFPDPPP) de México;
+            </li>
+            <li style={{ marginBottom: 0 }}>
+              los marcos internacionales de derechos humanos digitales (ONU, OEA).
+            </li>
+          </ul>
+          <p style={pLast}>
+            Como persona usuaria, cuentas con los siguientes derechos: acceso, rectificación, cancelación, oposición,
+            portabilidad y retiro del consentimiento. Para ejercerlos puedes escribir a{' '}
+            <a href="mailto:hola@almamundi.org" style={{ color: LINK }}>
+              hola@almamundi.org
+            </a>{' '}
+            o usar el formulario en{' '}
+            <Link href="/mis-datos-personales" style={{ color: LINK, fontWeight: 600 }}>
+              /mis-datos-personales
+            </Link>
+            .
+          </p>
+        </Section>
+
         <Section id="s1" title="1. ¿Quién es responsable del tratamiento de tus datos personales?">
           <p style={p}>
             AlmaMundi es responsable de definir cómo y para qué se tratan los datos personales entregados a través de la
@@ -151,12 +183,11 @@ export default function PrivacidadPage() {
             editoriales, revisa los contenidos enviados y responde las solicitudes relacionadas con privacidad.
           </p>
           <p style={pLast}>
-            Para consultas sobre privacidad o tratamiento de datos, puedes escribir al correo oficial indicado en el
-            sitio (por ejemplo{' '}
+            Para consultas sobre privacidad o tratamiento de datos, puedes escribir a{' '}
             <a href="mailto:hola@almamundi.org" style={{ color: LINK }}>
               hola@almamundi.org
             </a>
-            ).
+            .
           </p>
         </Section>
 
@@ -454,12 +485,12 @@ export default function PrivacidadPage() {
 
         <Section id="s18" title="18. ¿Cómo puedes hacer consultas o solicitudes?">
           <p style={p}>
-            Puedes escribir al canal de contacto indicado por AlmaMundi para consultas de privacidad, solicitudes sobre
-            datos personales o preguntas relacionadas con una historia publicada (por ejemplo{' '}
+            Puedes escribir a{' '}
             <a href="mailto:hola@almamundi.org" style={{ color: LINK }}>
               hola@almamundi.org
-            </a>
-            ).
+            </a>{' '}
+            para consultas de privacidad, solicitudes sobre datos personales o preguntas relacionadas con una historia
+            publicada.
           </p>
           <p style={p}>
             También puedes usar el formulario{' '}
