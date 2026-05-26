@@ -34,11 +34,10 @@ const DISALLOWED_PATHS: string[] = [
   '/mis-datos-personales',
   '/privacidad/data-request',
   '/curaduria',
+  '/perfil',
   '/perfil/*',
   '/historias/mi-coleccion',
   '/u/*',
-  '/alma-almamundi',
-  '/vision',
 ];
 
 export default function robots(): MetadataRoute.Robots {
