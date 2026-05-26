@@ -1,4 +1,10 @@
 import type { MetadataRoute } from 'next';
+import { getAdminDb } from '@/lib/firebase/admin';
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from '@/lib/editorial/status';
+
+// Regenerar la sitemap a lo sumo cada hora: balance entre frescura para
+// historias recién publicadas y costo de lecturas a Firestore.
+export const revalidate = 3600;
 
 function siteOrigin(): string {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.NEXT_PUBLIC_APP_URL?.trim();
@@ -15,34 +21,91 @@ function siteOrigin(): string {
   return 'https://www.almamundi.org';
 }
 
-/** Rutas estáticas principales (sin dinámicas [id]). Ampliar si hace falta indexación fina. */
+/**
+ * Rutas estáticas públicas. NO incluir privadas/admin/preview/demos:
+ * esas viven en `app/robots.ts` (disallow) y deben quedar fuera del sitemap.
+ */
 const STATIC_PATHS: string[] = [
   '/',
   '/historias',
-  '/historias/audios',
   '/historias/videos',
-  '/historias/escrito',
+  '/historias/audios',
   '/historias/fotos',
-  '/historias/mi-coleccion',
+  '/historias/escrito',
+  '/mapa',
+  '/temas',
   '/subir',
-  '/privacidad',
-  '/mis-datos-personales',
-  '/vision',
   '/muestras',
   '/exposiciones',
-  '/temas',
-  '/curaduria',
-  '/archivo',
   '/educacion-mediatica',
   '/recorridos',
-  '/perfil',
+  '/archivo',
+  '/privacidad',
+  '/terminos',
+  '/vision',
+  '/alma-almamundi',
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
+/** Acepta Firestore Timestamp, ISO string o nada. Devuelve Date válida o null. */
+function toDateOrNull(value: unknown): Date | null {
+  if (!value) return null;
+  if (typeof (value as { toDate?: () => Date }).toDate === 'function') {
+    try {
+      const d = (value as { toDate: () => Date }).toDate();
+      return Number.isFinite(d.getTime()) ? d : null;
+    } catch {
+      return null;
+    }
+  }
+  if (typeof value === 'string' && value.trim()) {
+    const d = new Date(value);
+    return Number.isFinite(d.getTime()) ? d : null;
+  }
+  if (value instanceof Date && Number.isFinite(value.getTime())) {
+    return value;
+  }
+  return null;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteOrigin();
-  const lastModified = new Date();
-  return STATIC_PATHS.map((path) => ({
+  const now = new Date();
+
+  const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
     url: path === '/' ? `${base}/` : `${base}${path}`,
-    lastModified,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: path === '/' ? 1.0 : 0.7,
   }));
+
+  let storyEntries: MetadataRoute.Sitemap = [];
+  try {
+    const db = getAdminDb();
+    const snap = await db
+      .collection('stories')
+      .where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
+      .select('updatedAt', 'publishedAt', 'createdAt')
+      .get();
+
+    storyEntries = snap.docs.map((doc) => {
+      const data = doc.data() as Record<string, unknown>;
+      const lastModified =
+        toDateOrNull(data.updatedAt) ??
+        toDateOrNull(data.publishedAt) ??
+        toDateOrNull(data.createdAt) ??
+        now;
+      return {
+        url: `${base}/historias/${doc.id}`,
+        lastModified,
+        changeFrequency: 'monthly' as const,
+        priority: 0.6,
+      };
+    });
+  } catch (error) {
+    // Si Firestore falla (credenciales, red, índice), el sitemap igual responde
+    // con las rutas estáticas. No tiramos el endpoint por una lectura caída.
+    console.error('[sitemap] Error fetching published stories:', error);
+  }
+
+  return [...staticEntries, ...storyEntries];
 }
