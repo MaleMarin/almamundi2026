@@ -119,13 +119,25 @@ function SubirPageInner() {
   };
 
   useLayoutEffect(() => {
-    if (searchParams.get('sent') === '1') {
+    const sentParam = searchParams.get('sent');
+    const stepParam = searchParams.get('step')?.toLowerCase();
+    const urlWantsAdvancedStep =
+      sentParam === '1' ||
+      stepParam === 'capture' ||
+      stepParam === 'datos' ||
+      stepParam === 'impronta';
+    if (!ageDeclaration && urlWantsAdvancedStep) {
+      setStep('cards');
+      router.replace('/subir', { scroll: false });
+      return;
+    }
+    if (sentParam === '1') {
       setStep('received');
       return;
     }
     const raw = searchParams.get('format')?.toLowerCase();
     const ok = raw === 'video' || raw === 'audio' || raw === 'texto' || raw === 'foto';
-    const st = searchParams.get('step')?.toLowerCase();
+    const st = stepParam;
     if (!ok) {
       setFormat(null);
       setCapture(null);
@@ -156,7 +168,7 @@ function SubirPageInner() {
     if (st && st !== 'capture') {
       router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
     }
-  }, [searchParams, router]);
+  }, [searchParams, router, ageDeclaration]);
 
   const [storyTitle, setStoryTitle] = useState('');
   const [alias, setAlias] = useState('');
