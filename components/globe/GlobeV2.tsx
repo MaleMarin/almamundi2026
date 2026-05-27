@@ -829,7 +829,9 @@ function GlobeScene({
   initialViewLat?: number;
   initialViewLng?: number;
 }) {
-  const geoScale = embedded ? GLOBE_V2_EMBEDDED_GEO_SCALE : 1;
+  const { size } = useThree();
+  const embeddedGeoFit = embedded ? Math.min(1, size.width / 400, size.height / 620) : 1;
+  const geoScale = embedded ? Math.max(1, GLOBE_V2_EMBEDDED_GEO_SCALE * embeddedGeoFit) : 1;
   const camDist = embedded ? 3.62 : 3.14;
   const lockView = fixedCameraPreset != null;
   const planetSpinRef = useRef<THREE.Group>(null);

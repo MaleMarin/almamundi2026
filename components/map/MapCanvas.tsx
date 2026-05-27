@@ -495,7 +495,14 @@ export function MapCanvas({
   const globeBlock = (injectedOnGlobeReady: () => void) => (
     <div
       className="relative z-[2] w-full h-full flex items-center justify-center min-w-0 min-h-0 pointer-events-none"
-      style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', minWidth: 400, minHeight: 620 }}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+        minWidth: embedded ? 'min(400px, 100%)' : 400,
+        minHeight: embedded ? 'min(620px, 100%)' : 620,
+      }}
     >
       <div
         className="pointer-events-auto globe-halo-wrap"
