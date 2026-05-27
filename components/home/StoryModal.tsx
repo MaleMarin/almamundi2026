@@ -332,6 +332,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
   const [linkCopied, setLinkCopied] = useState(false);
   const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const shareRequestTokenRef = useRef(0);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -402,6 +403,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setImprintId('');
       setImprintReceivedAt(null);
       setLinkCopied(false);
+      shareRequestTokenRef.current += 1;
       if (linkCopiedTimerRef.current) {
         clearTimeout(linkCopiedTimerRef.current);
         linkCopiedTimerRef.current = null;
@@ -511,7 +513,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     };
     mr.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mr.mimeType });
+      const probeToken = mediaRequestTokenRef.current;
       void probeVideoBlobDurationSeconds(blob).then((sec) => {
+        if (probeToken !== mediaRequestTokenRef.current) return;
         if (sec != null && !isDurationWithinMax(sec)) {
           setErr(`El video supera ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
           setMediaBlob(null);
@@ -582,7 +586,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     };
     mr.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mr.mimeType });
+      const probeToken = mediaRequestTokenRef.current;
       void probeAudioFileDurationSeconds(new File([blob], 'rec.webm', { type: blob.type })).then((sec) => {
+        if (probeToken !== mediaRequestTokenRef.current) return;
         if (sec != null && !isDurationWithinMax(sec)) {
           setErr(`El audio supera ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
           setMediaBlob(null);
@@ -833,7 +839,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '') || window.location.origin;
     const url = `${base}/historias/${encodeURIComponent(imprintId)}`;
     if (linkCopiedTimerRef.current) clearTimeout(linkCopiedTimerRef.current);
+    const requestToken = ++shareRequestTokenRef.current;
     void navigator.clipboard.writeText(url).then(() => {
+      if (requestToken !== shareRequestTokenRef.current) return;
       setLinkCopied(true);
       linkCopiedTimerRef.current = setTimeout(() => {
         setLinkCopied(false);
