@@ -75,9 +75,14 @@ service cloud.firestore {
 
       allow read: if storyPublicAudienceStatus() || ownsStoryDoc();
 
-      /** Dueño puede anonimizar / editar sin cambiar `status` (p. ej. eliminar cuenta). */
-      allow update: if ownsStoryDoc()
-        && request.resource.data.status == resource.data.status;
+      /** Dueño solo puede anonimizar su historia publicada al eliminar la cuenta.
+       *  Permite exclusivamente modificar `autor` + `updatedAt`, y exige `autor.nombre` == 'Autor anónimo'.
+       *  Cualquier otra edición (texto, media, status, lugar, fecha, etc.) se hace vía Admin SDK. */
+      allow update: if request.auth != null
+        && resource.data.autor != null
+        && resource.data.autor.id == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['autor', 'updatedAt'])
+        && request.resource.data.autor.nombre == 'Autor anónimo';
 
       allow delete: if ownsStoryDoc();
 
