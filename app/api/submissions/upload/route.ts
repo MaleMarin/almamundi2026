@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import {
   MAX_DESCRIPCION,
   MAX_TITULO,
@@ -98,7 +99,11 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ ok: true, submissionId, readUrl: signedReadUrl, storagePath });
-  } catch {
+  } catch (err) {
+    Sentry.captureException(err, {
+      tags: { source: 'api.submissions.upload' },
+      extra: { operation: 'submissions.upload.photo' },
+    });
     return NextResponse.json({ error: "server_error" }, { status: 500 });
   }
 }

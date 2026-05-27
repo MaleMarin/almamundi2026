@@ -1,6 +1,8 @@
 'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
+import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
@@ -9,6 +11,13 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error, {
+      tags: { source: 'boundary.global' },
+      extra: { digest: error.digest },
+    });
+  }, [error]);
+
   return (
     <html lang="es">
       <body style={{ margin: 0, background: '#0F172A', color: '#fff', fontFamily: 'system-ui, sans-serif', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>

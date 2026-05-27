@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import {
   isValidMediaUrl,
@@ -173,6 +174,10 @@ export async function POST(request: NextRequest) {
     const db = getAdminDb();
     ref = await db.collection("story_submissions").add(doc);
   } catch (dbError) {
+    Sentry.captureException(dbError, {
+      tags: { source: 'api.submit.firestore_add' },
+      extra: { operation: 'story_submissions.add', format, hasMedia: Object.keys(media).length > 0 },
+    });
     console.error("[submit] Firestore error", dbError);
     return NextResponse.json(
       { error: "No pudimos guardar tu historia. Intenta más tarde." },
@@ -188,6 +193,10 @@ export async function POST(request: NextRequest) {
       toStatus: "pending",
     });
   } catch (auditErr) {
+    Sentry.captureException(auditErr, {
+      tags: { source: 'api.submit.audit_log' },
+      extra: { operation: 'appendEditorialAuditLog', submissionId: ref.id, submissionCollection: 'story_submissions' },
+    });
     console.warn("[submit POST] audit log omitido:", auditErr);
   }
 
@@ -210,6 +219,17 @@ export async function POST(request: NextRequest) {
         await ref.update(update);
       }
     } catch (e) {
+      Sentry.captureException(e, {
+        tags: { source: 'api.submit.analyze' },
+        extra: {
+          operation: 'analyzeStory',
+          submissionId: ref.id,
+          format,
+          hasText: Boolean(text),
+          hasAudioUrl: Boolean(media.audioUrl),
+          hasVideoUrl: Boolean(media.videoUrl),
+        },
+      });
       console.warn("[submit] Análisis resonancia visual (Whisper/GPT) falló:", e);
     }
   }

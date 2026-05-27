@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { getAdminDb } from "@/lib/firebase/admin";
 import {
   isValidMediaUrl,
@@ -203,10 +204,18 @@ export async function POST(req: NextRequest) {
         toStatus: "pending",
       });
     } catch (auditErr) {
+      Sentry.captureException(auditErr, {
+        tags: { source: 'api.submissions.audit_log' },
+        extra: { operation: 'appendEditorialAuditLog', submissionId: ref.id, submissionCollection: 'submissions' },
+      });
       console.warn("[submissions POST] audit log omitido:", auditErr);
     }
     return NextResponse.json({ ok: true, id: ref.id });
   } catch (e) {
+    Sentry.captureException(e, {
+      tags: { source: 'api.submissions.firestore_add' },
+      extra: { operation: 'submissions.add', type: data.type, hasPayload: Object.keys(doc.payload).length > 0 },
+    });
     console.error("submissions POST", e);
     return NextResponse.json(
       { error: "Error al guardar" },

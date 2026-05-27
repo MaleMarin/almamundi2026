@@ -2,6 +2,7 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 import { useEffect } from 'react';
+import * as Sentry from '@sentry/nextjs';
 
 export default function RootError({
   error,
@@ -11,6 +12,10 @@ export default function RootError({
   reset: () => void;
 }) {
   useEffect(() => {
+    Sentry.captureException(error, {
+      tags: { source: 'boundary.error' },
+      extra: { digest: error.digest },
+    });
     console.error('[app]', error);
   }, [error]);
 

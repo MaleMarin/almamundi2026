@@ -1,5 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { Resend } from "resend";
@@ -94,6 +95,10 @@ export async function POST(req: NextRequest) {
         });
         mailSent = true;
       } catch (err) {
+        Sentry.captureException(err, {
+          tags: { source: 'api.admin.publish.email' },
+          extra: { operation: 'resend.emails.send', storyId: result.storyId, submissionId },
+        });
         console.error("Resend send failed", err);
       }
     }
