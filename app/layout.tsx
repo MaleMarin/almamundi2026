@@ -10,8 +10,29 @@ import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import { Bebas_Neue, Instrument_Serif, Syne } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
+
+const bebasNeue = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-bebas',
+  display: 'swap',
+});
+
+const instrumentSerif = Instrument_Serif({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-instrument',
+  display: 'swap',
+});
+
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-syne',
+  display: 'swap',
+});
 
 function defaultMetadataBase(): URL {
   const candidates = [
@@ -61,7 +82,10 @@ export default async function RootLayout({
   const ns = NOSCRIPT_BY_LOCALE[locale];
 
   return (
-    <html lang={locale}>
+    <html
+      lang={locale}
+      className={`${bebasNeue.variable} ${instrumentSerif.variable} ${syne.variable}`}
+    >
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
         <CursorGlobal />
         <a
