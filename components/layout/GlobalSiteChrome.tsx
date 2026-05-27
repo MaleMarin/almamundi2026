@@ -16,6 +16,8 @@ function showGlobalSiteChrome(pathname: string): boolean {
   return true;
 }
 
+const ROUTES_WITHOUT_BREADCRUMBS = new Set(['/terminos', '/privacidad', '/vision']);
+
 /**
  * Audio / vídeo / texto / foto en rutas dedicadas se renderizan en modo `embed` bajo este chrome
  * (sin portal `fixed` a pantalla completa). El header usa el mismo patrón que el resto de interiores:
@@ -26,17 +28,21 @@ export function GlobalSiteChrome({ children }: { children: ReactNode }) {
   if (!showGlobalSiteChrome(pathname)) {
     return <>{children}</>;
   }
+  const showBreadcrumbsSlot = !ROUTES_WITHOUT_BREADCRUMBS.has(pathname);
+
   return (
     <>
       <HistoriasInteriorSiteHeader overImmersiveMedia={false} />
       <div
         className={`flex w-full min-h-0 flex-1 flex-col ${historiasInterior.fixedHeaderContentPadClassName}`}
       >
-        <div className="w-full shrink-0 px-4 pb-2 md:px-6 lg:px-10">
-          <div className="mx-auto w-full max-w-7xl">
-            <SiteBreadcrumbs />
+        {showBreadcrumbsSlot ? (
+          <div className="w-full shrink-0 px-4 pb-2 md:px-6 lg:px-10">
+            <div className="mx-auto w-full max-w-7xl">
+              <SiteBreadcrumbs />
+            </div>
           </div>
-        </div>
+        ) : null}
         {children}
       </div>
     </>
