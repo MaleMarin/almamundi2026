@@ -13,7 +13,6 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { SITE_FONT_STACK } from '@/lib/typography';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 export type AgeGroup = 'adult' | 'minor';
@@ -35,6 +34,16 @@ export type FormatoPermitido = {
 type Props = {
   onChange: (declaration: AgeDeclaration) => void;
 };
+
+// ─── Identidad visual AlmaMundi ─────────────────────────────────────────────
+const FONT_DISPLAY = 'var(--font-bebas), Impact, "Arial Narrow", sans-serif';
+const FONT_EDITORIAL = 'var(--font-instrument), Georgia, "Times New Roman", serif';
+const FONT_UI = 'var(--font-syne), system-ui, -apple-system, sans-serif';
+
+const BRAND_BLACK = '#0A0C12';
+const BRAND_BLUE = '#023661';
+const BRAND_ORANGE = '#DB5227';
+const BRAND_CREAM = '#F5F2EC';
 
 // ─── Reglas por grupo de edad ─────────────────────────────────────────────────
 const FORMATS_ADULT: FormatoPermitido[] = [
@@ -117,421 +126,488 @@ export function AgeGate({ onChange }: Props) {
   return (
     <div
       style={{
-        background: '#fff',
-        border: '1.5px solid #e5e7eb',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        fontFamily: SITE_FONT_STACK,
+        background: BRAND_CREAM,
+        color: BRAND_BLACK,
+        padding: '2.75rem 2.5rem 2.25rem',
+        borderTop: `1px solid ${BRAND_BLACK}14`,
+        borderBottom: `1px solid ${BRAND_BLACK}14`,
+        borderRadius: 0,
       }}
     >
-      {/* ── Header ── */}
-      <div
-        style={{
-          background: '#0d0b09',
-          padding: '1.4rem 1.8rem',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.8rem',
-        }}
-      >
-        <span style={{ fontSize: '1.2rem' }}>🔒</span>
-        <div>
-          <p
-            style={{
-              fontFamily: SITE_FONT_STACK,
-              fontWeight: 500,
-              fontSize: '0.88rem',
-              color: '#f5f0e8',
-              margin: 0,
-              letterSpacing: '0.03em',
-            }}
-          >
-            Declaración de edad
-          </p>
-          <p
-            style={{
-              fontFamily: SITE_FONT_STACK,
-              fontWeight: 300,
-              fontSize: '0.75rem',
-              color: 'rgba(245,240,232,0.5)',
-              margin: '0.15rem 0 0',
-            }}
-          >
-            Requerida antes de continuar · Determina qué formatos puedes compartir
-          </p>
-        </div>
-      </div>
+      {/* ── Header editorial ── */}
+      <header style={{ marginBottom: '2rem' }}>
+        <p
+          style={{
+            fontFamily: FONT_UI,
+            fontSize: '0.68rem',
+            letterSpacing: '0.24em',
+            textTransform: 'uppercase',
+            color: `${BRAND_BLUE}AA`,
+            margin: 0,
+            fontWeight: 500,
+          }}
+        >
+          — Declaración previa
+        </p>
+        <h2
+          style={{
+            fontFamily: FONT_DISPLAY,
+            fontSize: 'clamp(2.5rem, 5vw, 3.5rem)',
+            lineHeight: 0.95,
+            letterSpacing: '0.005em',
+            color: BRAND_BLACK,
+            margin: '0.7rem 0 0.9rem',
+            fontWeight: 400,
+          }}
+        >
+          Antes de empezar
+        </h2>
+        <p
+          style={{
+            fontFamily: FONT_EDITORIAL,
+            fontStyle: 'italic',
+            fontSize: '1.0625rem',
+            lineHeight: 1.55,
+            color: `${BRAND_BLACK}A6`,
+            margin: 0,
+            maxWidth: '44ch',
+          }}
+        >
+          Necesitamos saber tu edad para mostrarte los formatos que puedes
+          compartir en AlmaMundi.
+        </p>
+      </header>
 
-      <div style={{ padding: '1.8rem' }}>
-        {/* ── Pregunta ── */}
-        {!confirmed && (
-          <>
-            <p
-              role="alert"
-              style={{
-                fontWeight: 400,
-                fontSize: '0.9rem',
-                color: '#374151',
-                marginBottom: '1rem',
-              }}
-            >
-              ¿Cuántos años tienes?
-            </p>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: '1fr 1fr',
-                gap: '0.75rem',
-                marginBottom: '1.5rem',
-              }}
-            >
-              {[
-                {
-                  group: 'adult' as AgeGroup,
-                  label: '18 años o más',
-                  emoji: '🧑',
-                  color: '#ff4500',
-                },
-                {
-                  group: 'minor' as AgeGroup,
-                  label: 'Menos de 18 años',
-                  emoji: '🌱',
-                  color: '#059669',
-                },
-              ].map((opt) => (
+      <hr
+        style={{
+          border: 0,
+          borderTop: `1px solid ${BRAND_BLACK}1F`,
+          margin: '0 0 1.75rem',
+        }}
+      />
+
+      {!confirmed && (
+        <>
+          {/* ── Pregunta ── */}
+          <p
+            role="alert"
+            style={{
+              fontFamily: FONT_UI,
+              fontSize: '0.68rem',
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: `${BRAND_BLACK}80`,
+              margin: '0 0 1.1rem',
+              fontWeight: 500,
+            }}
+          >
+            ¿Cuántos años tienes?
+          </p>
+
+          {/* ── Selector edad ── */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              gap: 0,
+              marginBottom: '2.5rem',
+              borderTop: `1px solid ${BRAND_BLACK}1F`,
+            }}
+          >
+            {[
+              {
+                group: 'adult' as AgeGroup,
+                numeral: '01',
+                label: '18 años o más',
+              },
+              {
+                group: 'minor' as AgeGroup,
+                numeral: '02',
+                label: 'Menos de 18 años',
+              },
+            ].map((opt, idx) => {
+              const isSelected = selected === opt.group;
+              return (
                 <button
                   key={opt.group}
                   type="button"
                   onClick={() => handleSelect(opt.group)}
+                  aria-pressed={isSelected}
                   style={{
-                    padding: '1.1rem',
-                    borderRadius: '8px',
-                    border:
-                      selected === opt.group
-                        ? `2px solid ${opt.color}`
-                        : '1.5px solid #e5e7eb',
-                    background: selected === opt.group ? `${opt.color}0d` : '#fafafa',
+                    background: 'transparent',
+                    border: 0,
+                    borderBottom: isSelected
+                      ? `2px solid ${BRAND_ORANGE}`
+                      : `1px solid ${BRAND_BLACK}1F`,
+                    borderLeft: idx === 1 ? `1px solid ${BRAND_BLACK}14` : 0,
+                    padding: '1.5rem 1.25rem 1.4rem',
                     cursor: 'pointer',
                     textAlign: 'left',
-                    transition: 'all 0.15s',
+                    color: BRAND_BLACK,
+                    transition:
+                      'border-color 0.2s ease, color 0.2s ease, background 0.2s ease',
+                    borderRadius: 0,
                   }}
                 >
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.4rem' }}>
-                    {opt.emoji}
-                  </div>
-                  <p
+                  <span
                     style={{
-                      fontWeight: selected === opt.group ? 500 : 400,
-                      fontSize: '0.85rem',
-                      color: selected === opt.group ? opt.color : '#374151',
-                      margin: 0,
+                      display: 'block',
+                      fontFamily: FONT_DISPLAY,
+                      fontSize: '2.5rem',
+                      lineHeight: 1,
+                      letterSpacing: '0.02em',
+                      color: isSelected ? BRAND_ORANGE : `${BRAND_BLACK}26`,
+                      transition: 'color 0.2s ease',
+                      fontWeight: 400,
+                    }}
+                  >
+                    {opt.numeral}
+                  </span>
+                  <span
+                    style={{
+                      display: 'block',
+                      fontFamily: FONT_EDITORIAL,
+                      fontStyle: 'italic',
+                      fontSize: '1.0625rem',
+                      marginTop: '0.6rem',
+                      color: isSelected ? BRAND_BLACK : `${BRAND_BLACK}99`,
+                      transition: 'color 0.2s ease',
                     }}
                   >
                     {opt.label}
-                  </p>
+                  </span>
                 </button>
-              ))}
-            </div>
+              );
+            })}
+          </div>
 
-            {/* ── Formatos disponibles preview ── */}
-            {selected && (
-              <>
-                <p
-                  style={{
-                    fontWeight: 400,
-                    fontSize: '0.78rem',
-                    color: '#6b7280',
-                    marginBottom: '0.8rem',
-                    letterSpacing: '0.05em',
-                    textTransform: 'uppercase',
-                  }}
-                >
-                  Formatos disponibles para ti:
-                </p>
-                <div
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '0.5rem',
-                    marginBottom: '1.5rem',
-                  }}
-                >
-                  {formats.map((fmt) => (
-                    <div
-                      key={fmt.id}
-                      style={{
-                        display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '0.75rem',
-                        padding: '0.7rem 0.9rem',
-                        borderRadius: '6px',
-                        background: fmt.allowed ? '#f0fdf4' : '#fef2f2',
-                        border: `1px solid ${fmt.allowed ? '#bbf7d0' : '#fecaca'}`,
-                      }}
-                    >
-                      <span
-                        style={{
-                          fontSize: '1rem',
-                          flexShrink: 0,
-                          lineHeight: 1.4,
-                        }}
-                      >
-                        {fmt.emoji}
-                      </span>
-                      <div style={{ flex: 1 }}>
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.5rem',
-                          }}
-                        >
-                          <span
-                            style={{
-                              fontWeight: 500,
-                              fontSize: '0.83rem',
-                              color: fmt.allowed ? '#166534' : '#991b1b',
-                            }}
-                          >
-                            {fmt.label}
-                          </span>
-                          <span
-                            style={{
-                              fontSize: '0.65rem',
-                              fontWeight: 600,
-                              padding: '0.1rem 0.5rem',
-                              borderRadius: '10px',
-                              background: fmt.allowed ? '#dcfce7' : '#fee2e2',
-                              color: fmt.allowed ? '#166534' : '#991b1b',
-                              letterSpacing: '0.05em',
-                              textTransform: 'uppercase',
-                            }}
-                          >
-                            {fmt.allowed ? 'Disponible' : 'No disponible'}
-                          </span>
-                        </div>
-                        {fmt.condition && (
-                          <p
-                            style={{
-                              fontSize: '0.75rem',
-                              color: '#6b7280',
-                              margin: '0.15rem 0 0',
-                              fontWeight: 300,
-                            }}
-                          >
-                            {fmt.condition}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+          {/* ── Formatos disponibles ── */}
+          {selected && (
+            <>
+              <p
+                style={{
+                  fontFamily: FONT_UI,
+                  fontSize: '0.68rem',
+                  letterSpacing: '0.24em',
+                  textTransform: 'uppercase',
+                  color: `${BRAND_BLUE}AA`,
+                  margin: '0 0 1rem',
+                  fontWeight: 500,
+                }}
+              >
+                — Formatos disponibles para ti
+              </p>
 
-                {/* ── Aviso menor ── */}
-                {selected === 'minor' && (
-                  <div
-                    role="alert"
+              <ul
+                style={{
+                  listStyle: 'none',
+                  margin: '0 0 2rem',
+                  padding: 0,
+                  borderTop: `1px solid ${BRAND_BLACK}14`,
+                }}
+              >
+                {formats.map((fmt) => (
+                  <li
+                    key={fmt.id}
                     style={{
-                      background: '#fffbeb',
-                      border: '1px solid #fde68a',
-                      borderRadius: '6px',
-                      padding: '0.9rem 1rem',
-                      marginBottom: '1.2rem',
-                      fontSize: '0.78rem',
-                      color: '#92400e',
-                      lineHeight: 1.6,
-                    }}
-                  >
-                    <strong style={{ display: 'block', marginBottom: '0.3rem' }}>
-                      ⚠️ Reglas importantes para personas menores de 18 años
-                    </strong>
-                    No incluyas tu nombre completo, número de teléfono, dirección, nombre
-                    de tu colegio ni ningún dato que permita identificarte o localizarte. Tu
-                    historia pasará por revisión especial antes de publicarse. Puedes usar
-                    un seudónimo.{' '}
-                    <a
-                      href="/privacidad#s5"
-                      style={{ color: '#b45309', fontWeight: 500 }}
-                    >
-                      Leer política completa →
-                    </a>
-                  </div>
-                )}
-
-                {/* ── Confirmar edad; debajo, consentimiento obligatorio antes de avanzar ── */}
-                <button
-                  type="button"
-                  onClick={handleConfirm}
-                  disabled={!consentido}
-                  autoFocus={Boolean(selected)}
-                  aria-describedby="age-gate-consent-explicito-bloque"
-                  style={{
-                    width: '100%',
-                    padding: '0.85rem',
-                    marginTop: 16,
-                    borderRadius: '8px',
-                    border: 'none',
-                    background: consentido ? '#0d0b09' : '#9ca3af',
-                    color: '#f5f0e8',
-                    fontFamily: SITE_FONT_STACK,
-                    fontWeight: 500,
-                    fontSize: '0.85rem',
-                    letterSpacing: '0.08em',
-                    cursor: consentido ? 'pointer' : 'not-allowed',
-                    transition: 'background 0.15s',
-                    opacity: consentido ? 1 : 0.85,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!consentido) return;
-                    e.currentTarget.style.background = '#1a1612';
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!consentido) return;
-                    e.currentTarget.style.background = '#0d0b09';
-                  }}
-                >
-                  Confirmar y continuar →
-                </button>
-
-                <div
-                  id="age-gate-consent-explicito-bloque"
-                  style={{
-                    background: 'rgba(255,74,28,0.04)',
-                    border: '1px solid rgba(255,74,28,0.15)',
-                    borderRadius: 12,
-                    padding: '14px 16px',
-                    marginTop: 16,
-                    fontSize: 13,
-                    color: '#5a6070',
-                    lineHeight: 1.7,
-                  }}
-                >
-                  <label
-                    htmlFor="age-gate-consent-explicito"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: 14,
-                      cursor: 'pointer',
-                      margin: 0,
+                      display: 'grid',
+                      gridTemplateColumns: '1.5rem 1fr',
+                      gap: '0.9rem',
+                      alignItems: 'baseline',
+                      padding: '1rem 0',
+                      borderBottom: `1px solid ${BRAND_BLACK}14`,
                     }}
                   >
                     <span
+                      aria-hidden
                       style={{
-                        flexShrink: 0,
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        width: 28,
-                        height: 28,
-                        marginTop: 2,
-                        borderRadius: 10,
-                        background: '#eef0f4',
-                        boxShadow:
-                          'inset 3px 3px 6px rgba(163,177,198,0.45), inset -3px -3px 6px rgba(255,255,255,0.95)',
-                        border: '1px solid rgba(255,255,255,0.55)',
+                        fontFamily: FONT_DISPLAY,
+                        fontSize: '1.4rem',
+                        lineHeight: 1,
+                        color: fmt.allowed ? BRAND_ORANGE : `${BRAND_BLACK}33`,
+                        textAlign: 'center',
                       }}
                     >
-                      <input
-                        id="age-gate-consent-explicito"
-                        type="checkbox"
-                        checked={consentido}
-                        onChange={(e) => setConsentido(e.target.checked)}
+                      {fmt.allowed ? '·' : '—'}
+                    </span>
+                    <div>
+                      <span
                         style={{
-                          width: 16,
-                          height: 16,
-                          margin: 0,
-                          accentColor: '#FF4A1C',
-                          cursor: 'pointer',
+                          fontFamily: FONT_EDITORIAL,
+                          fontStyle: 'italic',
+                          fontSize: '1.15rem',
+                          color: fmt.allowed ? BRAND_BLACK : `${BRAND_BLACK}59`,
+                          textDecoration: fmt.allowed ? 'none' : 'line-through',
+                          textDecorationColor: `${BRAND_BLACK}33`,
+                          textDecorationThickness: '1px',
                         }}
-                      />
-                    </span>
-                    <span style={{ flex: 1, minWidth: 0 }}>
-                      Al continuar, acepto que:
-                      <br />
-                      <span style={{ display: 'block', marginTop: 6 }}>
-                        — El contenido que subo es de mi autoría o tengo los derechos para compartirlo.
+                      >
+                        {fmt.label}
                       </span>
-                      <span style={{ display: 'block', marginTop: 4 }}>
-                        — AlmaMundi puede publicar mi historia en la plataforma.
-                      </span>
-                      <span style={{ display: 'block', marginTop: 4 }}>
-                        — Mis datos serán tratados según la{' '}
-                        <Link
-                          href="/privacidad"
-                          style={{ color: '#FF4A1C', fontWeight: 500, textDecoration: 'underline', textUnderlineOffset: 2 }}
+                      {fmt.condition && (
+                        <p
+                          style={{
+                            fontFamily: FONT_UI,
+                            fontSize: '0.7rem',
+                            letterSpacing: '0.16em',
+                            textTransform: 'uppercase',
+                            color: `${BRAND_BLUE}A6`,
+                            margin: '0.45rem 0 0',
+                            fontWeight: 500,
+                            lineHeight: 1.55,
+                          }}
                         >
-                          política de privacidad
-                        </Link>
-                        .
-                      </span>
-                    </span>
-                  </label>
-                </div>
-              </>
-            )}
-          </>
-        )}
+                          {fmt.condition}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
 
-        {/* ── Confirmed state ── */}
-        {confirmed && selected && (
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.8rem',
-              padding: '0.9rem 1rem',
-              background: '#f0fdf4',
-              border: '1px solid #bbf7d0',
-              borderRadius: '8px',
-            }}
-          >
-            <span style={{ fontSize: '1.2rem' }}>✅</span>
-            <div>
-              <p
-                style={{
-                  fontWeight: 500,
-                  fontSize: '0.85rem',
-                  color: '#166534',
-                  margin: 0,
-                }}
-              >
-                Declaración registrada
-              </p>
-              <p
-                style={{
-                  fontWeight: 300,
-                  fontSize: '0.75rem',
-                  color: '#6b7280',
-                  margin: '0.1rem 0 0',
-                }}
-              >
-                {selected === 'adult' ? '18 años o más' : 'Menor de 18 años'} ·{' '}
-                {formats.filter((f) => f.allowed).length} formatos disponibles ·{' '}
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelected(null);
-                    setConfirmed(false);
-                    setConsentido(false);
-                  }}
+              {/* ── Aviso menor ── */}
+              {selected === 'minor' && (
+                <aside
+                  role="alert"
                   style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#c9a96e',
-                    cursor: 'pointer',
-                    fontSize: '0.75rem',
-                    padding: 0,
-                    fontFamily: 'inherit',
+                    borderLeft: `2px solid ${BRAND_BLUE}`,
+                    padding: '0.35rem 0 0.35rem 1.25rem',
+                    marginBottom: '2rem',
                   }}
                 >
-                  Cambiar
-                </button>
-              </p>
-            </div>
-          </div>
-        )}
-      </div>
+                  <p
+                    style={{
+                      fontFamily: FONT_UI,
+                      fontSize: '0.68rem',
+                      letterSpacing: '0.24em',
+                      textTransform: 'uppercase',
+                      color: BRAND_BLUE,
+                      margin: '0 0 0.65rem',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Reglas para personas menores de 18
+                  </p>
+                  <p
+                    style={{
+                      fontFamily: FONT_EDITORIAL,
+                      fontStyle: 'italic',
+                      fontSize: '1rem',
+                      lineHeight: 1.65,
+                      color: `${BRAND_BLACK}CC`,
+                      margin: 0,
+                    }}
+                  >
+                    No incluyas tu nombre completo, número de teléfono,
+                    dirección, nombre de tu colegio ni ningún dato que permita
+                    identificarte o localizarte. Tu historia pasará por
+                    revisión especial antes de publicarse. Puedes usar un
+                    seudónimo.{' '}
+                    <a
+                      href="/privacidad#s5"
+                      style={{
+                        color: BRAND_ORANGE,
+                        textDecoration: 'underline',
+                        textUnderlineOffset: 3,
+                        fontWeight: 500,
+                      }}
+                    >
+                      Leer política completa →
+                    </a>
+                  </p>
+                </aside>
+              )}
+
+              {/* ── Consentimiento explícito ── */}
+              <div
+                id="age-gate-consent-explicito-bloque"
+                style={{
+                  borderTop: `1px solid ${BRAND_BLACK}14`,
+                  padding: '1.5rem 0 0',
+                  marginBottom: '1.5rem',
+                }}
+              >
+                <label
+                  htmlFor="age-gate-consent-explicito"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                    gap: '0.9rem',
+                    cursor: 'pointer',
+                    margin: 0,
+                  }}
+                >
+                  <input
+                    id="age-gate-consent-explicito"
+                    type="checkbox"
+                    checked={consentido}
+                    onChange={(e) => setConsentido(e.target.checked)}
+                    style={{
+                      flexShrink: 0,
+                      width: '1.05rem',
+                      height: '1.05rem',
+                      margin: '0.35rem 0 0',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      border: `1px solid ${
+                        consentido ? BRAND_ORANGE : `${BRAND_BLACK}66`
+                      }`,
+                      borderRadius: 0,
+                      background: consentido ? BRAND_ORANGE : 'transparent',
+                      cursor: 'pointer',
+                      transition:
+                        'background 0.15s ease, border-color 0.15s ease',
+                      backgroundImage: consentido
+                        ? "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 10' fill='none' stroke='%23F5F2EC' stroke-width='2' stroke-linecap='square' stroke-linejoin='miter'%3E%3Cpath d='M1.5 5 L4.5 8 L10.5 1.5'/%3E%3C/svg%3E\")"
+                        : 'none',
+                      backgroundSize: '72% 72%',
+                      backgroundPosition: 'center',
+                      backgroundRepeat: 'no-repeat',
+                    }}
+                  />
+                  <span
+                    style={{
+                      flex: 1,
+                      fontFamily: FONT_EDITORIAL,
+                      fontStyle: 'italic',
+                      fontSize: '0.95rem',
+                      lineHeight: 1.7,
+                      color: `${BRAND_BLACK}B3`,
+                    }}
+                  >
+                    Al continuar, acepto que:
+                    <span style={{ display: 'block', marginTop: '0.55rem' }}>
+                      — El contenido que subo es de mi autoría o tengo los
+                      derechos para compartirlo.
+                    </span>
+                    <span style={{ display: 'block', marginTop: '0.3rem' }}>
+                      — AlmaMundi puede publicar mi historia en la plataforma.
+                    </span>
+                    <span style={{ display: 'block', marginTop: '0.3rem' }}>
+                      — Mis datos serán tratados según la{' '}
+                      <Link
+                        href="/privacidad"
+                        style={{
+                          color: BRAND_ORANGE,
+                          textDecoration: 'underline',
+                          textUnderlineOffset: 3,
+                          fontWeight: 500,
+                        }}
+                      >
+                        política de privacidad
+                      </Link>
+                      .
+                    </span>
+                  </span>
+                </label>
+              </div>
+
+              {/* ── Botón confirmar ── */}
+              <button
+                type="button"
+                onClick={handleConfirm}
+                disabled={!consentido}
+                autoFocus={Boolean(selected)}
+                aria-describedby="age-gate-consent-explicito-bloque"
+                style={{
+                  width: '100%',
+                  padding: '1.15rem 1.5rem',
+                  border: consentido ? 'none' : `1px solid ${BRAND_BLACK}33`,
+                  background: consentido ? BRAND_ORANGE : 'transparent',
+                  color: consentido ? BRAND_CREAM : `${BRAND_BLACK}66`,
+                  fontFamily: FONT_UI,
+                  fontWeight: 600,
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.28em',
+                  textTransform: 'uppercase',
+                  cursor: consentido ? 'pointer' : 'not-allowed',
+                  transition:
+                    'background 0.2s ease, color 0.2s ease, border-color 0.2s ease',
+                  borderRadius: 0,
+                }}
+                onMouseEnter={(e) => {
+                  if (!consentido) return;
+                  e.currentTarget.style.background = BRAND_BLACK;
+                }}
+                onMouseLeave={(e) => {
+                  if (!consentido) return;
+                  e.currentTarget.style.background = BRAND_ORANGE;
+                }}
+              >
+                Confirmar y continuar →
+              </button>
+            </>
+          )}
+        </>
+      )}
+
+      {/* ── Estado confirmado ── */}
+      {confirmed && selected && (
+        <div
+          style={{
+            borderTop: `1px solid ${BRAND_BLACK}14`,
+            borderBottom: `1px solid ${BRAND_BLACK}14`,
+            padding: '1.4rem 0',
+          }}
+        >
+          <p
+            style={{
+              fontFamily: FONT_UI,
+              fontSize: '0.68rem',
+              letterSpacing: '0.24em',
+              textTransform: 'uppercase',
+              color: BRAND_ORANGE,
+              margin: '0 0 0.55rem',
+              fontWeight: 600,
+            }}
+          >
+            — Edad declarada
+          </p>
+          <p
+            style={{
+              fontFamily: FONT_EDITORIAL,
+              fontStyle: 'italic',
+              fontSize: '1.0625rem',
+              color: BRAND_BLACK,
+              margin: 0,
+              lineHeight: 1.6,
+            }}
+          >
+            {selected === 'adult' ? '18 años o más' : 'Menor de 18 años'}
+            <span style={{ color: `${BRAND_BLACK}40`, margin: '0 0.55rem' }}>
+              ·
+            </span>
+            {formats.filter((f) => f.allowed).length} formatos disponibles
+            <span style={{ color: `${BRAND_BLACK}40`, margin: '0 0.55rem' }}>
+              ·
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setSelected(null);
+                setConfirmed(false);
+                setConsentido(false);
+              }}
+              style={{
+                background: 'none',
+                border: 0,
+                color: BRAND_ORANGE,
+                cursor: 'pointer',
+                fontFamily: FONT_UI,
+                fontSize: '0.7rem',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                fontWeight: 600,
+                padding: 0,
+                textDecoration: 'underline',
+                textUnderlineOffset: 3,
+              }}
+            >
+              Cambiar
+            </button>
+          </p>
+        </div>
+      )}
     </div>
   );
 }
