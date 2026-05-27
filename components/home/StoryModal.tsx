@@ -1162,7 +1162,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}
     >
       <div
-        className="flex min-h-0 w-full max-w-4xl max-h-[min(90vh,92dvh)] flex-col overflow-hidden"
+        className="flex min-h-0 w-full max-w-4xl max-h-[min(90vh,92dvh)] flex-col overflow-hidden transition-all duration-200 ease-out"
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
         <header
@@ -1211,7 +1211,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
               <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start">
                 {/* Historia + extras — columna izquierda */}
-                <div className="min-h-0 rounded-2xl p-3 md:p-4" style={soft.inset}>
+                <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
                     Historia
                   </div>
@@ -1322,7 +1322,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </div>
 
                 {/* Datos persona — columna derecha (alineado con /subir) */}
-                <div className="min-h-0 rounded-2xl p-3 md:p-4" style={soft.inset}>
+                <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
                     Datos y avisos
                   </div>
