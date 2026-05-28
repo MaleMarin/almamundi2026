@@ -121,16 +121,6 @@ function SubirPageInner() {
   useLayoutEffect(() => {
     const sentParam = searchParams.get('sent');
     const stepParam = searchParams.get('step')?.toLowerCase();
-    const urlWantsAdvancedStep =
-      sentParam === '1' ||
-      stepParam === 'capture' ||
-      stepParam === 'datos' ||
-      stepParam === 'impronta';
-    if (!ageDeclaration && urlWantsAdvancedStep) {
-      setStep('cards');
-      router.replace('/subir', { scroll: false });
-      return;
-    }
     if (sentParam === '1') {
       setStep('received');
       return;
@@ -168,7 +158,7 @@ function SubirPageInner() {
     if (st && st !== 'capture') {
       router.replace(`/subir?format=${raw}&step=capture`, { scroll: false });
     }
-  }, [searchParams, router, ageDeclaration]);
+  }, [searchParams, router]);
 
   const [storyTitle, setStoryTitle] = useState('');
   const [alias, setAlias] = useState('');
@@ -534,32 +524,7 @@ function SubirPageInner() {
   return (
     <main className={`min-h-screen overflow-x-hidden ${historiasInterior.mainClassName}`} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <div className="w-full pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
-        {step === 'cards' && !ageDeclaration && (
-          <>
-            <header className="mb-8 md:mb-10 space-y-4">
-              <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
-              <h1 className="sr-only">Declaración de edad para participar</h1>
-              <p className="text-xl md:text-3xl lg:text-4xl font-light leading-relaxed max-w-3xl" style={{ color: neu.textBody }}>
-                Antes de elegir cómo quieres contar tu historia, necesitamos que declares tu edad. Esto determina qué
-                formatos puedes compartir.
-              </p>
-            </header>
-            <section
-              className="mb-12"
-              aria-label="Paso previo: declaración de edad"
-              aria-current="step"
-            >
-              <AgeGate onChange={setAgeDeclaration} />
-            </section>
-            <p className="text-center">
-              <HomeHardLink href="/#historias" className="text-sm font-medium underline-offset-4 hover:underline" style={{ color: neu.textBody }}>
-                ← Volver a las tarjetas del inicio
-              </HomeHardLink>
-            </p>
-          </>
-        )}
-
-        {step === 'cards' && ageDeclaration && (
+        {step === 'cards' && (
           <>
             <header className="mb-10 md:mb-14 space-y-4">
               <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
@@ -576,59 +541,38 @@ function SubirPageInner() {
               aria-label="Paso 1 de 4: elegir formato de historia"
               aria-current="step"
             >
-              {(['video', 'audio', 'texto', 'foto'] as const).map((f) => {
-                const allowed = isFormatAllowedForAge(f);
-                const condition = getFormatAgeCondition(f);
-                return (
-                  <button
-                    key={f}
-                    type="button"
-                    disabled={!allowed}
-                    aria-disabled={!allowed}
-                    onClick={() => {
-                      if (!allowed) return;
-                      selectFormat(f);
-                    }}
-                    className={`p-8 md:p-10 rounded-[2.5rem] flex flex-col items-start gap-4 transition-all text-left ${
-                      allowed
-                        ? 'hover:-translate-y-1 active:scale-[0.99] cursor-pointer'
-                        : 'cursor-not-allowed'
-                    }`}
+              {(['video', 'audio', 'texto', 'foto'] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => selectFormat(f)}
+                  className="p-8 md:p-10 rounded-[2.5rem] flex flex-col items-start gap-4 transition-all text-left hover:-translate-y-1 active:scale-[0.99] cursor-pointer"
+                  style={{
+                    ...neu.card,
+                    boxShadow: `${neu.card.boxShadow}, 0 24px 48px rgba(163,177,198,0.28)`,
+                  }}
+                >
+                  {f === 'video' && <Video size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'audio' && <Mic size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'texto' && <FileText size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  {f === 'foto' && <ImageIcon size={40} className="text-orange-500 shrink-0" aria-hidden />}
+                  <span className="font-semibold text-2xl md:text-3xl" style={{ color: neu.textMain }}>
+                    {FORMAT_LABELS[f]}
+                  </span>
+                  <p className="text-base md:text-xl font-light leading-relaxed" style={{ color: neu.textBody }}>
+                    {FORMAT_PHRASES[f]}
+                  </p>
+                  <span
+                    className="mt-3 px-8 py-3.5 rounded-full text-base md:text-lg font-bold text-white"
                     style={{
-                      ...neu.card,
-                      boxShadow: `${neu.card.boxShadow}, 0 24px 48px rgba(163,177,198,0.28)`,
-                      opacity: allowed ? 1 : 0.5,
+                      background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
+                      boxShadow: '0 10px 28px rgba(255,69,0,0.38)',
                     }}
                   >
-                    {f === 'video' && <Video size={40} className="text-orange-500 shrink-0" aria-hidden />}
-                    {f === 'audio' && <Mic size={40} className="text-orange-500 shrink-0" aria-hidden />}
-                    {f === 'texto' && <FileText size={40} className="text-orange-500 shrink-0" aria-hidden />}
-                    {f === 'foto' && <ImageIcon size={40} className="text-orange-500 shrink-0" aria-hidden />}
-                    <span className="font-semibold text-2xl md:text-3xl" style={{ color: neu.textMain }}>
-                      {FORMAT_LABELS[f]}
-                    </span>
-                    <p className="text-base md:text-xl font-light leading-relaxed" style={{ color: neu.textBody }}>
-                      {FORMAT_PHRASES[f]}
-                    </p>
-                    <span
-                      className="mt-3 px-8 py-3.5 rounded-full text-base md:text-lg font-bold text-white"
-                      style={{
-                        background: allowed
-                          ? 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)'
-                          : '#9ca3af',
-                        boxShadow: allowed ? '0 10px 28px rgba(255,69,0,0.38)' : 'none',
-                      }}
-                    >
-                      {allowed ? 'Empezar' : 'No disponible'}
-                    </span>
-                    {!allowed && condition && (
-                      <p className="text-sm font-medium text-red-700" role="note">
-                        {condition}
-                      </p>
-                    )}
-                  </button>
-                );
-              })}
+                    Empezar
+                  </span>
+                </button>
+              ))}
             </section>
             <p className="text-center">
               <HomeHardLink href="/#historias" className="text-sm font-medium underline-offset-4 hover:underline" style={{ color: neu.textBody }}>
@@ -639,29 +583,72 @@ function SubirPageInner() {
         )}
 
         {step === 'capture' && format && (
-          <StoryCaptureStep
-            format={format}
-            hydrateKey={captureHydrateKey}
-            restoredCapture={
-              capture?.submissionPrefill || capture?.audioPrefill ? capture : null
-            }
-            onContinue={(out) => {
-              setCapture(out);
-              const pre = out.submissionPrefill ?? out.audioPrefill;
-              if (pre) {
-                setStoryTitle(pre.storyTitle);
-                setCiudad(pre.ciudad);
-                setPais(pre.pais);
-                setExtraContext(pre.extraStory);
-                setAlias(pre.alias);
-                setAgeRange(pre.ageRange);
-                setSex(pre.sex);
-                setEmail(pre.email);
-              }
-              setStep('form');
-              router.replace(`/subir?format=${format}&step=datos`, { scroll: false });
-            }}
-          />
+          <>
+            {!ageDeclaration && (
+              <section aria-label="Declaración de edad" className="mb-8">
+                <AgeGate onChange={setAgeDeclaration} />
+              </section>
+            )}
+
+            {ageDeclaration && !isFormatAllowedForAge(format) && (
+              <section aria-label="Formato no disponible" className="space-y-5">
+                <header className="space-y-3">
+                  <p className="text-sm md:text-base font-semibold uppercase tracking-[0.2em] text-orange-600">AlmaMundi</p>
+                  <h1 className="text-2xl md:text-3xl font-light leading-tight" style={{ color: neu.textMain }}>
+                    Este formato no está disponible
+                  </h1>
+                </header>
+                <div style={neu.cardInset} className="p-5 md:p-6 rounded-3xl space-y-4">
+                  <p className="text-base leading-relaxed" style={{ color: neu.textBody }}>
+                    Este formato no está disponible para personas menores de 18 años. Vuelve a elegir otro formato para
+                    contar tu historia.
+                  </p>
+                  {getFormatAgeCondition(format) && (
+                    <p className="text-sm font-medium text-red-700" role="note">
+                      {getFormatAgeCondition(format)}
+                    </p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={backToCards}
+                    className="px-6 py-3 rounded-full font-bold text-white text-sm uppercase tracking-wider"
+                    style={{
+                      background: 'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)',
+                      boxShadow: '0 4px 14px rgba(249,115,22,0.4)',
+                    }}
+                  >
+                    Volver a elegir formato
+                  </button>
+                </div>
+              </section>
+            )}
+
+            {ageDeclaration && isFormatAllowedForAge(format) && (
+              <StoryCaptureStep
+                format={format}
+                hydrateKey={captureHydrateKey}
+                restoredCapture={
+                  capture?.submissionPrefill || capture?.audioPrefill ? capture : null
+                }
+                onContinue={(out) => {
+                  setCapture(out);
+                  const pre = out.submissionPrefill ?? out.audioPrefill;
+                  if (pre) {
+                    setStoryTitle(pre.storyTitle);
+                    setCiudad(pre.ciudad);
+                    setPais(pre.pais);
+                    setExtraContext(pre.extraStory);
+                    setAlias(pre.alias);
+                    setAgeRange(pre.ageRange);
+                    setSex(pre.sex);
+                    setEmail(pre.email);
+                  }
+                  setStep('form');
+                  router.replace(`/subir?format=${format}&step=datos`, { scroll: false });
+                }}
+              />
+            )}
+          </>
         )}
 
         {step === 'form' && format && (
