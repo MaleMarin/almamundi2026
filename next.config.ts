@@ -9,7 +9,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net",
+  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org",
   "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://*.firebaseapp.com https://challenges.cloudflare.com",
   "media-src 'self' blob: https:",
   "object-src 'none'",
