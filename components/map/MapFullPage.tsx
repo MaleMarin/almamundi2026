@@ -2425,10 +2425,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           globe.rotation.z = 0.41;
           const isDragging = isDraggingRef.current;
           const velocityY = velocityYRef.current;
-          // Rotación oeste→este (izquierda a derecha), norte arriba.
-          if (!isDragging && Math.abs(velocityY) < 0.0001) {
-            globe.rotation.y += 0.0008;
-          } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
+          // Momentum tras drag. La rotación base la maneja controls.autoRotate.
+          if (!isDragging && Math.abs(velocityY) > 0.0001) {
             globe.rotation.y += velocityY;
             velocityYRef.current = velocityY * 0.95;
           }
@@ -2686,7 +2684,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           controls.autoRotate = false;
         } else {
           controls.autoRotate = true;
-          controls.autoRotateSpeed = 0.45;
+          controls.autoRotateSpeed = 0.22;
         }
       }
       const now = performance.now();
@@ -2779,8 +2777,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           color: new THREE.Color(0.74, 0.88, 1.14),
           emissive: new THREE.Color(0x032d50),
           emissiveIntensity: 0.07,
-          shininess: 60,
-          specular: new THREE.Color(0x4f8fd9),
+          shininess: 25,
+          specular: new THREE.Color(0x1a2530),
         });
 
         if (mat && 'opacity' in mat) {
@@ -2837,8 +2835,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       phong.color.setRGB(0.74, 0.88, 1.14);
       phong.emissive.setHex(0x033a5c);
       phong.emissiveIntensity = 0.06;
-      phong.shininess = 60;
-      phong.specular.setHex(0x4f8fd9);
+      phong.shininess = 25;
+      phong.specular.setHex(0x1a2530);
     } else {
       phong.color.setRGB(0.94, 0.97, 1.02);
       phong.emissive.setHex(0x051a28);
@@ -3880,7 +3878,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       const controls = globeEl.current.controls();
       controls.enableZoom = false;
       controls.autoRotate = false;
-      controls.autoRotateSpeed = 0.45;
+      controls.autoRotateSpeed = 0.22;
       if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = false;
       }
@@ -5086,7 +5084,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         atmosphereColor={
           showDayGlobe ? 'rgba(120, 200, 255, 0.52)' : 'rgba(140, 210, 255, 0.48)'
         }
-        atmosphereAltitude={0.3}
+        atmosphereAltitude={0.35 + atmosphereBreathingOffset}
         backgroundColor={GLOBE_CANVAS_BG}
         pointsData={pointsForGlobe}
         pointLat="lat"
