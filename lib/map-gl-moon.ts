@@ -1,9 +1,8 @@
 /**
  * Luna decorativa en la escena de react-globe.gl (radio terrestre del motor = 100).
- * Misma textura que GlobeV2 / MoonSatellite.
+ * Textura local 8K para evitar dependencias externas.
  */
 import * as THREE from 'three';
-import { GLOBE_V2_TEXTURE_BASE } from '@/lib/globe/globe-v2-assets';
 
 /** Debe coincidir con `GLOBE_RADIUS` interno de globe.gl (v2). */
 export const GLOBE_GL_EARTH_RADIUS = 100;
@@ -15,9 +14,9 @@ const MOON_RADIUS_RATIO = 0.2725;
  * Escala del disco lunar (solo visual): en globe.gl la cámara suele estar a ~(1+2,35)R⊕;
  * un poco más grande que el físico ayuda a leerla en pantalla.
  */
-const MOON_DISC_SCALE = 1.35;
+const MOON_DISC_SCALE = 1.1;
 
-const MOON_MAP_URL = `${GLOBE_V2_TEXTURE_BASE}/moon_1024.jpg`;
+const MOON_MAP_URL = '/8k_moon.jpg';
 
 const ROOT_NAME = 'AM_GLOBEGL_MOON_ROOT';
 const MESH_NAME = 'AM_GLOBEGL_MOON_MESH';
@@ -32,7 +31,7 @@ const MESH_NAME = 'AM_GLOBEGL_MOON_MESH';
 const ORBIT_SEMI_MAJOR = 1.58 * GLOBE_GL_EARTH_RADIUS;
 
 /** Inclinación del plano orbital (rad): suave para no empujar la Luna fuera del encuadre. */
-const ORBIT_INCLINATION_RAD = 0.14;
+const ORBIT_INCLINATION_RAD = 0.03;
 
 /** Segundos por órbita (solo lectura visual, como en EarthGlobeDemoScene). */
 const ORBIT_PERIOD_SEC = 150;

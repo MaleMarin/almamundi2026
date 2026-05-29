@@ -363,9 +363,9 @@ const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
 /** Texturas estáticas (mismo origen, más rápido que /api/globe-texture en primera carga). */
-const GLOBE_IMAGE_LOCAL = '/textures/earth-night.jpg';
-const GLOBE_IMAGE_DAY_LOCAL = '/textures/earth-day.jpg';
-const GLOBE_IMAGE_DAY_OR_FALLBACK = '/textures/earth-day.jpg';
+const GLOBE_IMAGE_LOCAL = '/8k_earth_nightmap.jpg';
+const GLOBE_IMAGE_DAY_LOCAL = '/8k_earth_daymap.jpg';
+const GLOBE_IMAGE_DAY_OR_FALLBACK = '/8k_earth_daymap.jpg';
 /** Bump map deshabilitado (unpkg puede dar CORS y deja el globo en círculo oscuro). */
 const GLOBE_BUMP_IMAGE: string | null = null;
 
@@ -2778,9 +2778,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           ...(bumpTex ? { bumpMap: bumpTex, bumpScale: GLOBE_BUMP_SCALE } : {}),
           color: new THREE.Color(0.74, 0.88, 1.14),
           emissive: new THREE.Color(0x032d50),
-          emissiveIntensity: 0.095,
-          shininess: 42,
-          specular: new THREE.Color(0x4cb0ff),
+          emissiveIntensity: 0.07,
+          shininess: 60,
+          specular: new THREE.Color(0x4f8fd9),
         });
 
         if (mat && 'opacity' in mat) {
@@ -2836,15 +2836,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (showDayGlobe) {
       phong.color.setRGB(0.74, 0.88, 1.14);
       phong.emissive.setHex(0x033a5c);
-      phong.emissiveIntensity = 0.072;
-      phong.shininess = 38;
-      phong.specular.setHex(0x4cb0ff);
+      phong.emissiveIntensity = 0.06;
+      phong.shininess = 60;
+      phong.specular.setHex(0x4f8fd9);
     } else {
       phong.color.setRGB(0.94, 0.97, 1.02);
       phong.emissive.setHex(0x051a28);
-      phong.emissiveIntensity = 0.11;
-      phong.shininess = 22;
-      phong.specular.setHex(0x6ec0ff);
+      phong.emissiveIntensity = 0.14;
+      phong.shininess = 26;
+      phong.specular.setHex(0x6aa0d0);
     }
   }, [globeMaterial, showDayGlobe, flipGlobeTexture, globeNightLoadTick]);
 
@@ -4061,15 +4061,17 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           const cloudGeo = new THREE.SphereGeometry(100.4, 64, 64);
           const cloudLoader = new THREE.TextureLoader();
           cloudLoader.load(
-            '/textures/earth-clouds.png',
+            '/8k_earth_clouds.jpg',
             (cloudTex) => {
               if (cloudTex && cloudMeshRef.current === null) {
                 cloudTex.colorSpace = THREE.SRGBColorSpace;
+                cloudTex.needsUpdate = true;
                 const cloudMat = new THREE.MeshPhongMaterial({
                   map: cloudTex,
+                  alphaMap: cloudTex,
                   color: new THREE.Color(0xeaf6ff),
                   transparent: true,
-                  opacity: 0.78,
+                  opacity: 0.62,
                   depthWrite: false,
                 });
                 const cloudMesh = new THREE.Mesh(cloudGeo, cloudMat);
