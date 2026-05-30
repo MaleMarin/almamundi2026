@@ -2426,9 +2426,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           const isDragging = isDraggingRef.current;
           const velocityY = velocityYRef.current;
           // Rotación oeste→este (izquierda a derecha), norte arriba.
-          // Nota: la rotación automática la maneja OrbitControls.autoRotate (cámara orbitando).
-          // Acá solo se aplica el momentum del drag para que el flick del usuario siga moviendo el mesh.
-          if (!isDragging && Math.abs(velocityY) > 0.0001) {
+          if (!isDragging && Math.abs(velocityY) < 0.0001) {
+            globe.rotation.y += 0.0008;
+          } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
             globe.rotation.y += velocityY;
             velocityYRef.current = velocityY * 0.95;
           }
@@ -2689,14 +2689,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         if ('enableRotate' in controls) {
           (controls as { enableRotate: boolean }).enableRotate = true;
         }
-        // Rotación visible: orbitamos la cámara (mecanismo nativo de OrbitControls).
-        // Se pausa cuando el usuario está interactuando para que no compita con el drag.
-        if (isUserInteractingRef.current) {
-          controls.autoRotate = false;
-        } else {
-          controls.autoRotate = true;
-          controls.autoRotateSpeed = 2.0;
-        }
+        controls.autoRotate = false;
         (controls as { update?: () => void }).update?.();
       }
       const now = performance.now();
