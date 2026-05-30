@@ -2426,7 +2426,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
           // Rotación base oeste→este cuando no hay drag.
           if (!isDraggingRef.current) {
-            globe.rotation.y += 0.0005;
+            globe.rotation.y += 0.02;
           }
 
           const isDragging = isDraggingRef.current;
