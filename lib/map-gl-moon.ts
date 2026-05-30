@@ -14,7 +14,7 @@ const MOON_RADIUS_RATIO = 0.2725;
  * Escala del disco lunar (solo visual): en globe.gl la cámara suele estar a ~(1+2,35)R⊕;
  * un poco más grande que el físico ayuda a leerla en pantalla.
  */
-const MOON_DISC_SCALE = 1.1;
+const MOON_DISC_SCALE = 0.9;
 
 const MOON_MAP_URL = '/8k_moon.jpg';
 
@@ -28,7 +28,7 @@ const MESH_NAME = 'AM_GLOBEGL_MOON_MESH';
  * Órbita ~1,55–1,65 R⊕ mantiene la Luna cerca del disco y reduce que se corte por los bordes
  * del viewport frente a órbitas más amplias.
  */
-const ORBIT_SEMI_MAJOR = 1.58 * GLOBE_GL_EARTH_RADIUS;
+const ORBIT_SEMI_MAJOR = 2.4 * GLOBE_GL_EARTH_RADIUS;
 
 /** Inclinación del plano orbital (rad): suave para no empujar la Luna fuera del encuadre. */
 const ORBIT_INCLINATION_RAD = 0.03;

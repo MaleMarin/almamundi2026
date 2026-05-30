@@ -2686,6 +2686,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           controls.autoRotate = true;
           controls.autoRotateSpeed = 0.22;
         }
+        (controls as { update?: () => void }).update?.();
       }
       const now = performance.now();
       const breathing = 0.01 * Math.sin(now * 0.002);
