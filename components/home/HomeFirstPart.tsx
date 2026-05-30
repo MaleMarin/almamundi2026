@@ -291,7 +291,6 @@ export function HomeFirstPart({
           className="home-intro-avenir mx-auto mb-8 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-10 md:mb-12 md:text-lg md:leading-relaxed lg:mb-14 lg:text-xl"
           style={{ color: soft.textBody }}
         >
-          {t.historiasLead1}{' '}
           <span className="font-normal text-gray-700">{t.historiasLead2}</span>
         </p>
         <div className="mx-auto mt-12 grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:mt-14 sm:px-0 md:mt-16 lg:grid-cols-4 lg:mt-20 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11">
