@@ -2432,6 +2432,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             globe.rotation.y += velocityY;
             velocityYRef.current = velocityY * 0.95;
           }
+          // Sincronizar capa de nubes con la rotación del globo
+          const cloudMesh = cloudMeshRef.current;
+          if (cloudMesh) {
+            cloudMesh.rotation.x = globe.rotation.x;
+            cloudMesh.rotation.y = globe.rotation.y;
+            cloudMesh.rotation.z = globe.rotation.z;
+          }
           const cam = globeEl.current?.camera?.();
           if (cam && earthMarkersRef.current.length > 0) {
             const camPos = new THREE.Vector3();
