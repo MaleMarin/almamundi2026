@@ -2193,6 +2193,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const velocityYRef = useRef(0);
   const prevMouseXRef = useRef(0);
   const didDragThisPointerRef = useRef(false);
+  const debugTickRef = useRef(0);
   /** POV base para “return to base” al cerrar historia (shot 1). */
   const basePOVRef = useRef<{ lat: number; lng: number; altitude: number } | null>(null);
   const isUserInteractingRef = useRef(false);
@@ -2425,12 +2426,21 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           globe.rotation.z = 0.41;
           const isDragging = isDraggingRef.current;
           const velocityY = velocityYRef.current;
+          const shouldLogIncrement = debugTickRef.current % 60 === 0;
+          let beforeY = 0;
+          if (shouldLogIncrement) {
+            beforeY = globe.rotation.y;
+            console.log('[GLOBE_DEBUG] before increment:', beforeY.toFixed(6));
+          }
           // Rotación oeste→este (izquierda a derecha), norte arriba.
           if (!isDragging && Math.abs(velocityY) < 0.0001) {
             globe.rotation.y += 0.0008;
           } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
             globe.rotation.y += velocityY;
             velocityYRef.current = velocityY * 0.95;
+          }
+          if (shouldLogIncrement) {
+            console.log('[GLOBE_DEBUG] after increment:', globe.rotation.y.toFixed(6), 'diff:', (globe.rotation.y - beforeY).toFixed(6));
           }
           // Sincronizar capa de nubes con la rotación del globo
           const cloudMesh = cloudMeshRef.current;
@@ -2454,6 +2464,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               const scale = dot.userData.bitId === sid ? 1.14 : 1;
               dot.scale.setScalar(scale);
             });
+          }
+          debugTickRef.current++;
+          if (debugTickRef.current % 60 === 0) {
+            console.log('[GLOBE_DEBUG] tick #', debugTickRef.current, 'globe.uuid:', globe.uuid, 'rotation.y:', globe.rotation.y.toFixed(4), 'isDragging:', isDraggingRef.current);
           }
         }
       }
@@ -3960,6 +3974,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               }
             });
           }
+          console.log('[GLOBE_DEBUG] handleGlobeReady — earthMeshRef.current:', earthMeshRef.current ? {uuid: earthMeshRef.current.uuid, type: earthMeshRef.current.type, hasGeometry: !!earthMeshRef.current.geometry, geoType: earthMeshRef.current.geometry?.type} : 'NULL');
           if (earthMeshRef.current) {
             const globeMesh = earthMeshRef.current;
             // Voltear la TEXTURA verticalmente (norte arriba): así no depende de qué mesh rotemos.
