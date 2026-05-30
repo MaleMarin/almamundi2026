@@ -2423,16 +2423,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           // Forzar orientación cada frame: 180° en X para norte arriba (North America top).
           globe.rotation.x = Math.PI;
           globe.rotation.z = 0.41;
-
-          // Rotación base oeste→este cuando no hay drag.
-          if (!isDraggingRef.current) {
-            globe.rotation.y += 0.02;
-          }
-
           const isDragging = isDraggingRef.current;
           const velocityY = velocityYRef.current;
-          // Momentum tras drag.
-          if (!isDragging && Math.abs(velocityY) > 0.0001) {
+          // Rotación oeste→este (izquierda a derecha), norte arriba.
+          if (!isDragging && Math.abs(velocityY) < 0.0001) {
+            globe.rotation.y += 0.0008;
+          } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
             globe.rotation.y += velocityY;
             velocityYRef.current = velocityY * 0.95;
           }
