@@ -22,6 +22,7 @@ import {
 import {
   UPLOAD_DURATION_ERROR,
   UPLOAD_MODAL_COPY,
+  UPLOAD_MODAL_LEGAL_NOTE,
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
@@ -639,7 +640,7 @@ export function StoryCaptureStep({
 
   const footerNote =
     flowStage === 'welcome'
-      ? 'Tu historia quedará en revisión antes de formar parte de AlmaMundi.'
+      ? ''
       : flowStage === 'media'
         ? 'Puedes tomarte el tiempo que necesites. Nada se publica automáticamente.'
         : flowStage === 'storyDetails'
@@ -1521,6 +1522,9 @@ export function StoryCaptureStep({
       >
           {footerNote}
       </p>
+      )}
+      {flowStage === 'personDetails' && (
+        <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
       )}
       {(flowStage === 'storyDetails' || flowStage === 'personDetails') && (
       <button

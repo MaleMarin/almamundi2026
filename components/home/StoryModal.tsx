@@ -1444,6 +1444,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </p>
               )}
 
+              <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
+
               <div className="mt-auto flex shrink-0 flex-wrap justify-end gap-2 border-t border-white/25 pt-2">
                 <button
                   type="button"

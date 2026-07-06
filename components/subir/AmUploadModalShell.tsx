@@ -2,7 +2,6 @@
 
 import type { ReactNode } from 'react';
 import styles from '@/components/subir/am-upload-modal.module.css';
-import { UPLOAD_MODAL_LEGAL_NOTE } from '@/lib/subir-upload-modal-copy';
 
 export type AmUploadModalShellProps = {
   title: string;
@@ -14,7 +13,6 @@ export type AmUploadModalShellProps = {
   onContinue?: () => void;
   continueLabel?: string;
   showContinue?: boolean;
-  showLegalNote?: boolean;
   className?: string;
   /** Si true, solo renderiza la tarjeta (sin overlay). */
   cardOnly?: boolean;
@@ -30,7 +28,6 @@ export function AmUploadModalShell({
   onContinue,
   continueLabel = 'Continuar',
   showContinue = true,
-  showLegalNote = true,
   className,
   cardOnly = false,
 }: AmUploadModalShellProps) {
@@ -50,21 +47,18 @@ export function AmUploadModalShell({
         {children}
       </div>
 
-      {(showContinue || showLegalNote) && (
+      {showContinue ? (
         <footer className={styles.amModalFooter}>
-          {showLegalNote ? <p className={styles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p> : null}
-          {showContinue ? (
-            <button
-              type="button"
-              className={`${styles.amModalBtnContinue} ${continueEnabled ? styles.amModalBtnContinueActive : ''}`}
-              disabled={!continueEnabled}
-              onClick={continueEnabled ? onContinue : undefined}
-            >
-              {continueLabel}
-            </button>
-          ) : null}
+          <button
+            type="button"
+            className={`${styles.amModalBtnContinue} ${continueEnabled ? styles.amModalBtnContinueActive : ''}`}
+            disabled={!continueEnabled}
+            onClick={continueEnabled ? onContinue : undefined}
+          >
+            {continueLabel}
+          </button>
         </footer>
-      )}
+      ) : null}
     </div>
   );
 

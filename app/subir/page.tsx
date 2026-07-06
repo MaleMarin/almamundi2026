@@ -23,6 +23,8 @@ import {
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
 } from '@/lib/subir-limits';
+import { UPLOAD_MODAL_LEGAL_NOTE } from '@/lib/subir-upload-modal-copy';
+import amStyles from '@/components/subir/am-upload-modal.module.css';
 import {
   AGE_RANGE_OPTIONS,
   type AgeRangeId,
@@ -1291,9 +1293,7 @@ function SubirPageInner() {
               </p>
             )}
 
-            <p className="text-sm leading-relaxed text-center max-w-xl mx-auto px-2" style={{ color: neu.textBody }}>
-              Tu historia quedará en revisión antes de formar parte de AlmaMundi.
-            </p>
+            <p className={`${amStyles.amModalLegal} text-center max-w-xl mx-auto px-2`}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
 
             <button
               type="button"
