@@ -2164,6 +2164,26 @@ function NoticiasPanel({
   );
 }
 
+type GlobePov = { lat: number; lng: number; altitude: number };
+
+/** react-globe.gl expone pointOfView() sin args como getter; el tipo del ref solo documenta el setter. */
+function readGlobePointOfView(globe: NonNullable<MapCanvasGlobeRef>): GlobePov | null {
+  try {
+    const pov = (globe.pointOfView as unknown as () => GlobePov)();
+    if (
+      pov &&
+      Number.isFinite(pov.lat) &&
+      Number.isFinite(pov.lng) &&
+      Number.isFinite(pov.altitude)
+    ) {
+      return pov;
+    }
+  } catch {
+    /* getter no disponible */
+  }
+  return null;
+}
+
 type MapaPageContentProps = {
   embedded?: boolean;
   /** Donde empieza el universo (sección oscura) para recortar el drawer */
@@ -2193,10 +2213,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const velocityYRef = useRef(0);
   const prevMouseXRef = useRef(0);
   const didDragThisPointerRef = useRef(false);
-  const debugTickRef = useRef(0);
   /** POV base para “return to base” al cerrar historia (shot 1). */
   const basePOVRef = useRef<{ lat: number; lng: number; altitude: number } | null>(null);
   const isUserInteractingRef = useRef(false);
+  const globeSpinLastTsRef = useRef(0);
+  /** ~12°/s ≈ una vuelta completa en 30 s (oeste → este). */
+  const GLOBE_SPIN_DEG_PER_SEC = 12;
   const panelCanvasRef = useRef<HTMLCanvasElement>(null);
   const [globeReady, setGlobeReady] = useState(false);
   const [topicsOpen, setTopicsOpen] = useState(false);
@@ -2426,21 +2448,14 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           globe.rotation.z = 0.41;
           const isDragging = isDraggingRef.current;
           const velocityY = velocityYRef.current;
-          const shouldLogIncrement = debugTickRef.current % 60 === 0;
-          let beforeY = 0;
-          if (shouldLogIncrement) {
-            beforeY = globe.rotation.y;
-            console.log('[GLOBE_DEBUG] before increment:', beforeY.toFixed(6));
-          }
-          // Rotación oeste→este (izquierda a derecha), norte arriba.
-          if (!isDragging && Math.abs(velocityY) < 0.0001) {
-            globe.rotation.y += 0.0008;
-          } else if (!isDragging && Math.abs(velocityY) > 0.0001) {
-            globe.rotation.y += velocityY;
+          // Momentum del flick: aplica vía pointOfView (visible), no vía mesh.
+          if (!isDragging && Math.abs(velocityY) > 0.01) {
+            const g = globeEl.current;
+            const pov = g ? readGlobePointOfView(g) : null;
+            if (g && pov) {
+              g.pointOfView({ lat: pov.lat, lng: pov.lng + velocityY, altitude: pov.altitude }, 0);
+            }
             velocityYRef.current = velocityY * 0.95;
-          }
-          if (shouldLogIncrement) {
-            console.log('[GLOBE_DEBUG] after increment:', globe.rotation.y.toFixed(6), 'diff:', (globe.rotation.y - beforeY).toFixed(6));
           }
           // Sincronizar capa de nubes con la rotación del globo
           const cloudMesh = cloudMeshRef.current;
@@ -2464,10 +2479,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               const scale = dot.userData.bitId === sid ? 1.14 : 1;
               dot.scale.setScalar(scale);
             });
-          }
-          debugTickRef.current++;
-          if (debugTickRef.current % 60 === 0) {
-            console.log('[GLOBE_DEBUG] tick #', debugTickRef.current, 'globe.uuid:', globe.uuid, 'rotation.y:', globe.rotation.y.toFixed(4), 'isDragging:', isDraggingRef.current);
           }
         }
       }
@@ -2693,10 +2704,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     return () => clearInterval(id);
   }, [userLocation, hourOverride]);
 
-  // Movimiento suave: autoRotate cuando el usuario no arrastra; en /mapa el usuario puede girar el globo con el ratón (enableRotate = true)
+  // Rotación visible vía pointOfView(lng): globe.gl posiciona la cámara en geo-coords, no rota el mesh.
   useEffect(() => {
-    let rafId: number;
-    const loop = () => {
+    if (!globeReady) return;
+    let rafId = 0;
+    const loop = (ts: number) => {
       const globe = globeEl.current;
       const controls = globe?.controls?.();
       if (controls) {
@@ -2705,6 +2717,24 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         }
         controls.autoRotate = false;
         (controls as { update?: () => void }).update?.();
+      }
+      const interacting =
+        isUserInteractingRef.current ||
+        isDraggingRef.current ||
+        Math.abs(velocityYRef.current) > 0.01;
+      if (globe && !interacting) {
+        const pov = readGlobePointOfView(globe);
+        if (pov) {
+          const prev = globeSpinLastTsRef.current || ts;
+          const dt = Math.min(0.05, (ts - prev) / 1000);
+          globeSpinLastTsRef.current = ts;
+          globe.pointOfView(
+            { lat: pov.lat, lng: pov.lng + GLOBE_SPIN_DEG_PER_SEC * dt, altitude: pov.altitude },
+            0
+          );
+        }
+      } else {
+        globeSpinLastTsRef.current = ts;
       }
       const now = performance.now();
       const breathing = 0.01 * Math.sin(now * 0.002);
@@ -2716,7 +2746,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     };
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, [embedded]);
+  }, [embedded, globeReady]);
 
   useEffect(() => {
     const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'stories' : 'music';
@@ -3974,7 +4004,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               }
             });
           }
-          console.log('[GLOBE_DEBUG] handleGlobeReady — earthMeshRef.current:', earthMeshRef.current ? {uuid: earthMeshRef.current.uuid, type: earthMeshRef.current.type, hasGeometry: !!earthMeshRef.current.geometry, geoType: earthMeshRef.current.geometry?.type} : 'NULL');
           if (earthMeshRef.current) {
             const globeMesh = earthMeshRef.current;
             // Voltear la TEXTURA verticalmente (norte arriba): así no depende de qué mesh rotemos.
@@ -4009,13 +4038,18 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 prevMouseXRef.current = getClientX(e);
               };
               const onPointerMove = (e: PointerEvent | TouchEvent) => {
-                if (!isDraggingRef.current || !earthMeshRef.current) return;
+                if (!isDraggingRef.current) return;
+                const g = globeEl.current;
+                if (!g) return;
                 const clientX = getClientX(e);
                 const delta = clientX - prevMouseXRef.current;
                 if (Math.abs(delta) > 2) didDragThisPointerRef.current = true;
-                // Arrastrar a la derecha = globo gira como si lo agarras (el mapa sigue el dedo). Sentido coherente con la Tierra.
-                earthMeshRef.current.rotation.y -= delta * 0.005;
-                velocityYRef.current = -delta * 0.005;
+                const pov = readGlobePointOfView(g);
+                if (pov) {
+                  // Arrastrar a la derecha = el mapa sigue el dedo (oeste → este).
+                  g.pointOfView({ lat: pov.lat, lng: pov.lng - delta * 0.12, altitude: pov.altitude }, 0);
+                  velocityYRef.current = -delta * 0.12;
+                }
                 prevMouseXRef.current = clientX;
               };
               const onPointerUp = () => {
