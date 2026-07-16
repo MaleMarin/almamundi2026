@@ -2164,24 +2164,20 @@ function NoticiasPanel({
   );
 }
 
-type GlobePov = { lat: number; lng: number; altitude: number };
-
-/** react-globe.gl expone pointOfView() sin args como getter; el tipo del ref solo documenta el setter. */
-function readGlobePointOfView(globe: NonNullable<MapCanvasGlobeRef>): GlobePov | null {
+function rotateGlobeCamera(globe: NonNullable<MapCanvasGlobeRef>, deltaLngDeg: number) {
   try {
-    const pov = (globe.pointOfView as unknown as () => GlobePov)();
-    if (
-      pov &&
-      Number.isFinite(pov.lat) &&
-      Number.isFinite(pov.lng) &&
-      Number.isFinite(pov.altitude)
-    ) {
-      return pov;
-    }
+    const camera = globe.camera?.();
+    if (!camera || !Number.isFinite(deltaLngDeg) || deltaLngDeg === 0) return;
+    const controls = globe.controls?.() as { target?: THREE.Vector3; update?: () => void } | undefined;
+    const center = controls?.target ?? new THREE.Vector3(0, 0, 0);
+    const offset = camera.position.clone().sub(center);
+    offset.applyAxisAngle(new THREE.Vector3(0, 1, 0), THREE.MathUtils.degToRad(deltaLngDeg));
+    camera.position.copy(center).add(offset);
+    camera.lookAt(center);
+    controls?.update?.();
   } catch {
-    /* getter no disponible */
+    /* cámara aún no disponible */
   }
-  return null;
 }
 
 type MapaPageContentProps = {
@@ -2217,6 +2213,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const basePOVRef = useRef<{ lat: number; lng: number; altitude: number } | null>(null);
   const isUserInteractingRef = useRef(false);
   const globeSpinLastTsRef = useRef(0);
+  /**
+   * Opción C: pausa el giro automático mientras tour/panel usan la cámara.
+   * Se sincroniza desde state (tour, noticias, historia abierta, modal).
+   */
+  const globeSpinBlockedRef = useRef(false);
   /** ~12°/s ≈ una vuelta completa en 30 s (oeste → este). */
   const GLOBE_SPIN_DEG_PER_SEC = 12;
   const panelCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -2451,10 +2452,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           // Momentum del flick: aplica vía pointOfView (visible), no vía mesh.
           if (!isDragging && Math.abs(velocityY) > 0.01) {
             const g = globeEl.current;
-            const pov = g ? readGlobePointOfView(g) : null;
-            if (g && pov) {
-              g.pointOfView({ lat: pov.lat, lng: pov.lng + velocityY, altitude: pov.altitude }, 0);
-            }
+            if (g) rotateGlobeCamera(g, velocityY);
             velocityYRef.current = velocityY * 0.95;
           }
           // Sincronizar capa de nubes con la rotación del globo
@@ -2704,35 +2702,40 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     return () => clearInterval(id);
   }, [userLocation, hourOverride]);
 
-  // Rotación visible vía pointOfView(lng): globe.gl posiciona la cámara en geo-coords, no rota el mesh.
+  // Opción C: gira solo en modo contemplar (sin tour/panel/arrastre). Un solo motor: cámara.
   useEffect(() => {
-    if (!globeReady) return;
+    globeSpinBlockedRef.current =
+      (isTourRunning && !isTourPaused) ||
+      newsTour.running ||
+      !!openStory ||
+      storyModalOpen ||
+      isOpening ||
+      isClosing;
+  }, [isTourRunning, isTourPaused, newsTour.running, openStory, storyModalOpen, isOpening, isClosing]);
+
+  useEffect(() => {
     let rafId = 0;
     const loop = (ts: number) => {
       const globe = globeEl.current;
       const controls = globe?.controls?.();
       if (controls) {
+        // Solo arrastre custom vía pointOfView: evita pelear con OrbitControls.
         if ('enableRotate' in controls) {
-          (controls as { enableRotate: boolean }).enableRotate = true;
+          (controls as { enableRotate: boolean }).enableRotate = false;
         }
         controls.autoRotate = false;
         (controls as { update?: () => void }).update?.();
       }
-      const interacting =
-        isUserInteractingRef.current ||
+      const userBusy =
         isDraggingRef.current ||
+        isUserInteractingRef.current ||
         Math.abs(velocityYRef.current) > 0.01;
-      if (globe && !interacting) {
-        const pov = readGlobePointOfView(globe);
-        if (pov) {
-          const prev = globeSpinLastTsRef.current || ts;
-          const dt = Math.min(0.05, (ts - prev) / 1000);
-          globeSpinLastTsRef.current = ts;
-          globe.pointOfView(
-            { lat: pov.lat, lng: pov.lng + GLOBE_SPIN_DEG_PER_SEC * dt, altitude: pov.altitude },
-            0
-          );
-        }
+      const canAutoSpin = !userBusy && !globeSpinBlockedRef.current;
+      if (globe && canAutoSpin) {
+        const prev = globeSpinLastTsRef.current || ts;
+        const dt = Math.min(0.05, (ts - prev) / 1000);
+        globeSpinLastTsRef.current = ts;
+        rotateGlobeCamera(globe, GLOBE_SPIN_DEG_PER_SEC * dt);
       } else {
         globeSpinLastTsRef.current = ts;
       }
@@ -2746,7 +2749,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     };
     rafId = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafId);
-  }, [embedded, globeReady]);
+  }, [embedded]);
 
   useEffect(() => {
     const nextView = activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'stories' : 'music';
@@ -4044,12 +4047,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 const clientX = getClientX(e);
                 const delta = clientX - prevMouseXRef.current;
                 if (Math.abs(delta) > 2) didDragThisPointerRef.current = true;
-                const pov = readGlobePointOfView(g);
-                if (pov) {
-                  // Arrastrar a la derecha = el mapa sigue el dedo (oeste → este).
-                  g.pointOfView({ lat: pov.lat, lng: pov.lng - delta * 0.12, altitude: pov.altitude }, 0);
-                  velocityYRef.current = -delta * 0.12;
-                }
+                // Arrastrar a la derecha = el mapa sigue el dedo (oeste → este).
+                rotateGlobeCamera(g, -delta * 0.12);
+                velocityYRef.current = -delta * 0.12;
                 prevMouseXRef.current = clientX;
               };
               const onPointerUp = () => {
