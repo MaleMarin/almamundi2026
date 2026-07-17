@@ -114,33 +114,25 @@ function textoBaseParaHuella(meta: HuellaV2Meta): string {
 
 /**
  * Familia visual determinista: misma historia + formato + longitud ⇒ misma familia.
- * — kinetic: video, movimiento y cruces.
- * — soft: foto, intimidad y aire.
- * — pulse-lines: ritmo, señal, vibración (audio con frecuencia mayor; texto medio).
+ * — kinetic: video; textos largos; audio con mucho contexto.
+ * — soft: foto; textos breves; audio breve.
  */
 export function chooseResonanceFamily(meta: HuellaV2Meta): ResonanceFamily {
   if (meta.resonanceFamily) return meta.resonanceFamily;
   const fmt = meta.format ?? 'texto';
   const cc = Math.max(0, meta.charCount ?? meta.content?.length ?? 0);
-  const S = seedFn(meta.storyId);
-  const tie = seededRnd(S, 404);
-
+  const tie = seededRnd(seedFn(meta.storyId), 404);
+  // pulse-lines desactivada por decisión de diseño
   if (fmt === 'video') return 'kinetic-ribbons';
   if (fmt === 'foto') return 'soft-ribbons';
-
   if (fmt === 'audio') {
-    if (cc < 380) return 'soft-ribbons';
-    if (cc > 1150) return 'kinetic-ribbons';
-    if (tie < 0.58) return 'pulse-lines';
-    if (tie < 0.86) return 'kinetic-ribbons';
-    return 'soft-ribbons';
+    if (cc < 420) return 'soft-ribbons';
+    if (cc > 900) return 'kinetic-ribbons';
+    return tie < 0.45 ? 'soft-ribbons' : 'kinetic-ribbons';
   }
-
   if (cc < 720) return 'soft-ribbons';
   if (cc > 2800) return 'kinetic-ribbons';
-  if (tie < 0.3) return 'soft-ribbons';
-  if (tie < 0.62) return 'pulse-lines';
-  return 'kinetic-ribbons';
+  return tie < 0.38 ? 'soft-ribbons' : 'kinetic-ribbons';
 }
 
 /** Inferencia por proporción del lienzo (vertical móvil, horizontal web, cuadrado redes). */

@@ -99,10 +99,10 @@
   .home-neu-card.home-historias-card-surface:hover {
     transform: translateY(-0.65rem);
     box-shadow:
-      18px 18px 46px rgba(120, 135, 155, 0.48),
-      -18px -18px 50px rgba(255, 255, 255, 1),
-      inset 2px 2px 6px rgba(255, 255, 255, 0.88),
-      inset -4px -4px 12px rgba(163, 177, 198, 0.22) !important;
+      26px 26px 60px rgba(120, 135, 155, 0.62),
+      -24px -24px 62px rgba(255, 255, 255, 1),
+      inset 3px 3px 7px rgba(255, 255, 255, 0.94),
+      inset -6px -6px 16px rgba(140, 155, 175, 0.36) !important;
   }
 }
 

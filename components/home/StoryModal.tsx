@@ -50,6 +50,7 @@ import {
   limpiarNombreFoto,
   type HuellaV2Format,
 } from '@/lib/huella/huellaV2';
+import { uploadFileToStorage } from '@/lib/firebase/upload';
 
 const jakartaHuella = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -131,6 +132,39 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
 const PRIVACY_URL = 'https://almamundi.org';
 const MAX_PROFILE_PHOTO_MB = 8;
 const MAX_EXTRA_FILE_MB = 15;
+
+const MODE_CONTEXT_LABEL: Record<StoryModalMode, string> = {
+  video: 'Video',
+  audio: 'Audio',
+  texto: 'Escrito',
+  foto: 'Fotografía',
+};
+
+/** Contexto ≥30 chars exigido por /api/submissions. */
+function buildModalSubmissionContext(
+  mode: StoryModalMode,
+  textBody: string,
+  storyTitle: string,
+  city: string,
+  country: string,
+  extraText: string
+): string {
+  const ex = extraText.trim();
+  const tbRaw = textBody.trim();
+  const tb =
+    ex && tbRaw
+      ? `${tbRaw}\n\n— Extras / contexto —\n${ex}`
+      : ex && !tbRaw
+        ? ex
+        : tbRaw;
+  if (tb.length >= 30) return tb.slice(0, 2000);
+  const geo = [city.trim(), country.trim()].filter(Boolean).join(', ');
+  const pieces = [storyTitle.trim(), geo, `Formato: ${MODE_CONTEXT_LABEL[mode]}`].filter(Boolean);
+  let out = pieces.join(' · ');
+  if (tb.length > 0) out = `${tb}\n\n${out}`;
+  if (out.trim().length >= 30) return out.slice(0, 2000);
+  return `${out}\n(Envío AlmaMundi — sin descripción ampliada.)`.slice(0, 2000);
+}
 
 type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';
 
@@ -325,6 +359,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [email, setEmail] = useState('');
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [saving, setSaving] = useState(false);
+  /** Evita validar un título stale si el closure del submit no se actualizó. */
+  const storyTitleRef = useRef(storyTitle);
+  storyTitleRef.current = storyTitle;
 
   const [imprintId, setImprintId] = useState('');
   /** Fecha del envío mostrada en la resonancia visual (canvas y descarga). */
@@ -754,8 +791,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   }, [canContinueCapture]);
 
   const validateDetails = useCallback(() => {
-    if (!storyTitle.trim()) {
+    // Leer siempre el ref: evita falsos "Falta el nombre…" por closure stale.
+    const title = storyTitleRef.current.trim();
+    if (!title) {
       setErr('Falta el nombre de la historia.');
+      return false;
+    }
+    if (title.length < 2) {
+      setErr('El nombre de la historia debe tener al menos 2 caracteres.');
       return false;
     }
     if (alias.trim().length < 2) {
@@ -780,21 +823,180 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
     setErr('');
     return true;
-  }, [acceptedPrivacy, ageRange, alias, city, country, email, storyTitle]);
+  }, [acceptedPrivacy, ageRange, alias, city, country, email]);
 
-  const submitDetails = useCallback(() => {
+  const submitDetails = useCallback(async () => {
     if (saving) return;
     if (!validateDetails()) return;
     setSaving(true);
+    setErr('');
     try {
-      const id = `AM-${Date.now().toString(36).toUpperCase()}`;
+      const privateMediaPaths: string[] = [];
+      const trackUpload = async (file: File | Blob, prefix: string, name: string) => {
+        const r = await uploadFileToStorage(file, prefix, name);
+        privateMediaPaths.push(r.storagePath);
+        return r.readUrl;
+      };
+
+      let profilePhotoUploaded: string | undefined;
+      if (profilePhoto) {
+        profilePhotoUploaded = await trackUpload(
+          profilePhoto,
+          'submissions/avatars',
+          `avatar-${profilePhoto.name}`
+        );
+      }
+
+      const extraAttachmentUrls: string[] = [];
+      for (let i = 0; i < extraFiles.length; i++) {
+        const f = extraFiles[i]!;
+        const url = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`);
+        extraAttachmentUrls.push(url);
+      }
+
+      const title = storyTitleRef.current.trim();
+      const placeCombined = `${city.trim()}, ${country.trim()}`;
+
+      let payload: {
+        textBody?: string;
+        photoUrl?: string;
+        photoUrls?: string[];
+        audioUrl?: string;
+        videoUrl?: string;
+      } = {};
+
+      if (mode === 'texto') {
+        payload = { textBody: textBody.trim() };
+      } else if (mode === 'video') {
+        if (mediaBlob) {
+          const ext = mediaBlob.type.includes('mp4') ? 'mp4' : 'webm';
+          const url = await trackUpload(mediaBlob, 'submissions', `video-grabado.${ext}`);
+          payload = { videoUrl: url };
+        } else if (uploadVideoFile) {
+          const sec = await probeVideoFileDurationSeconds(uploadVideoFile);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setErr(`El video supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            return;
+          }
+          const extRaw = uploadVideoFile.name.split('.').pop()?.toLowerCase() || '';
+          const safeExt = extRaw && /^[a-z0-9]+$/.test(extRaw) ? extRaw : 'mp4';
+          const url = await trackUpload(uploadVideoFile, 'submissions', `video-subido.${safeExt}`);
+          payload = { videoUrl: url };
+        } else {
+          setErr('Falta el video de la historia.');
+          return;
+        }
+      } else if (mode === 'audio') {
+        if (mediaBlob) {
+          const af = new File([mediaBlob], 'grabacion.webm', {
+            type: mediaBlob.type || 'audio/webm',
+          });
+          const sec = await probeAudioFileDurationSeconds(af);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setErr(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            return;
+          }
+          const ext = mediaBlob.type.includes('mp4') ? 'm4a' : 'webm';
+          const url = await trackUpload(mediaBlob, 'submissions', `audio-grabado.${ext}`);
+          payload = { audioUrl: url };
+        } else if (uploadAudioFile) {
+          const sec = await probeAudioFileDurationSeconds(uploadAudioFile);
+          if (sec != null && !isDurationWithinMax(sec)) {
+            setErr(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
+            return;
+          }
+          const url = await trackUpload(
+            uploadAudioFile,
+            'submissions',
+            `audio.${uploadAudioFile.name.split('.').pop() || 'mp3'}`
+          );
+          payload = { audioUrl: url };
+        } else {
+          setErr('Falta el audio de la historia.');
+          return;
+        }
+      } else if (mode === 'foto') {
+        if (photoFiles.length > 0) {
+          const urls = await Promise.all(
+            photoFiles.map((f, i) => trackUpload(f, 'submissions', `photo-${i}-${f.name}`))
+          );
+          const first = urls[0];
+          if (first) payload = { photoUrl: first, photoUrls: urls };
+        } else {
+          setErr('Faltan las fotos de la historia.');
+          return;
+        }
+      }
+
+      const res = await fetch('/api/submissions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: mode,
+          storyTitle: title,
+          alias: alias.trim(),
+          email: email.trim(),
+          themeId: '',
+          date: '',
+          dateApprox: false,
+          placeLabel: placeCombined,
+          countryLabel: country.trim(),
+          context: buildModalSubmissionContext(mode, textBody, title, city, country, extraText),
+          payload,
+          consentRights: true,
+          consentCurate: true,
+          consentPostales: true,
+          consentPrivacyPolicy: true,
+          ...(profilePhotoUploaded ? { profilePhotoUrl: profilePhotoUploaded } : {}),
+          ...(sex ? { sex } : {}),
+          ...(ageRange ? { ageRange } : {}),
+          ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
+          ...(privateMediaPaths.length ? { privateMediaPaths } : {}),
+        }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
+      if (!res.ok) {
+        setErr(data.error || `Error ${res.status}. Intenta de nuevo.`);
+        return;
+      }
+
+      const id =
+        typeof data.id === 'string' && data.id
+          ? data.id
+          : `AM-${Date.now().toString(36).toUpperCase()}`;
       setImprintId(id);
       setImprintReceivedAt(new Date());
       setStep('received');
+    } catch (e) {
+      console.error('[StoryModal] submit', e);
+      setErr(
+        e instanceof Error && e.message.includes('Firebase')
+          ? 'Subida no configurada. Configura Firebase en .env.local.'
+          : 'No pudimos enviar. Revisa tu conexión e intenta de nuevo.'
+      );
     } finally {
       setSaving(false);
     }
-  }, [saving, validateDetails]);
+  }, [
+    saving,
+    validateDetails,
+    profilePhoto,
+    extraFiles,
+    mode,
+    textBody,
+    mediaBlob,
+    uploadVideoFile,
+    uploadAudioFile,
+    photoFiles,
+    alias,
+    email,
+    city,
+    country,
+    extraText,
+    sex,
+    ageRange,
+  ]);
 
   useEffect(() => {
     if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
@@ -1231,7 +1433,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       </div>
                       <input
                         value={storyTitle}
-                        onChange={(e) => setStoryTitle(e.target.value)}
+                        onChange={(e) => {
+                          setStoryTitle(e.target.value);
+                          if (err) setErr('');
+                        }}
                         placeholder="Ej: El día que entendí algo"
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
@@ -1244,7 +1449,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       </div>
                       <input
                         value={alias}
-                        onChange={(e) => setAlias(e.target.value)}
+                        onChange={(e) => {
+                          setAlias(e.target.value);
+                          if (err) setErr('');
+                        }}
                         placeholder="Cómo quieres aparecer"
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}

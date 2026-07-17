@@ -23,10 +23,10 @@ const soft = {
     borderRadius: '40px',
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [
-      '14px 14px 34px rgba(136, 150, 170, 0.48)',
-      '-14px -14px 38px rgba(255, 255, 255, 0.98)',
-      'inset 2px 2px 4px rgba(255, 255, 255, 0.75)',
-      'inset -3px -3px 8px rgba(163, 177, 198, 0.22)',
+      '22px 22px 52px rgba(120, 135, 155, 0.58)',
+      '-20px -20px 52px rgba(255, 255, 255, 1)',
+      'inset 3px 3px 6px rgba(255, 255, 255, 0.92)',
+      'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
     ].join(', '),
   },
 } as const;
