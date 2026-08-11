@@ -137,10 +137,10 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Fresnel acoplado al sol en el día (no “luz de estudio” desde la cámara en el centro). */
       colDay += fresTint * fresAmt * ndl * (0.35 + 0.65 * openWater);
 
-      vec3 colNight = base * vec3(0.14, 0.20, 0.34) + vec3(0.022, 0.032, 0.055);
-      colNight += fresTint * rim * 0.04 * (0.24 + 0.5 * openWater);
+      vec3 colNight = base * vec3(0.2, 0.28, 0.42) + vec3(0.035, 0.05, 0.08);
+      colNight += fresTint * rim * 0.05 * (0.3 + 0.5 * openWater);
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.18, 0.36, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.42, mu);
       vec3 col = mix(colNight, colDay, dayW);
       col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
 
@@ -315,13 +315,14 @@ export function createLandSphereMaterial(
       float hot = smoothstep(0.5, 0.86, luma);
       litDay *= mix(1.0, 0.78, hot);
 
-      vec3 litNight = d0 * vec3(0.14, 0.16, 0.22) * (0.48 + 0.5 * mountainPop);
-      litNight += vec3(0.028, 0.034, 0.048) * landMask;
+      vec3 litNight = d0 * vec3(0.22, 0.26, 0.34) * (0.62 + 0.42 * mountainPop);
+      litNight += vec3(0.045, 0.055, 0.075) * landMask;
+      litNight = max(litNight, d0 * 0.24);
 
-      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.18, 0.36, mu);
+      float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.42, mu);
       vec3 lit = mix(litNight, litDay, dayW);
       if (uFullDay < 0.5) {
-        lit = max(lit, d0 * 0.14);
+        lit = max(lit, d0 * 0.22);
       }
       lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));
 

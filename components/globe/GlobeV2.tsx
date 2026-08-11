@@ -127,6 +127,7 @@ const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 2.85;
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.14, 0.18, 0];
 const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [0, -0.02, 0];
+const GLOBE_V2_FULL_ORBIT_TARGET: [number, number, number] = [0, 0, 0];
 
 export type { GlobeBitMarker };
 export type { GlobeV2CameraPreset };
@@ -178,39 +179,68 @@ function CameraPresetRig({
   return null;
 }
 
-/** Encuadre inicial hacia lat/lng (home: geolocalización o fallback América Latina). */
+/**
+ * Encuadre inicial hacia lat/lng.
+ * `alignToSun`: si true, sesga la cámara hacia/contra el sol (modo astronómico).
+ * En home embedded va en false: LatAm de frente, sin sesgo.
+ */
 function InitialViewRig({
   lat,
   lng,
   distance,
   orbitTarget,
+  alignToSun = true,
 }: {
   lat: number;
   lng: number;
   distance: number;
   orbitTarget: [number, number, number];
+  alignToSun?: boolean;
 }) {
   const { camera, controls } = useThree();
   const sunScratch = useMemo(() => new THREE.Vector3(), []);
   useEffect(() => {
     if (!controls) return;
-    const now = new Date();
-    computeSunDirection(now, EARTH_AXIAL_TILT_RAD, sunScratch);
     const p = latLngToCartesianThetaLon(lat, lng, 1);
     const surfaceN = new THREE.Vector3(p.x, p.y, p.z).normalize();
-    const dayFactor = sunDayFactorAtLocation(lat, lng, now);
     const camDir = surfaceN.clone();
-    if (dayFactor > 0.2) {
-      camDir.addScaledVector(sunScratch, 0.72).normalize();
-    } else {
-      camDir.addScaledVector(sunScratch, -0.38).normalize();
+    if (alignToSun) {
+      const now = new Date();
+      computeSunDirection(now, EARTH_AXIAL_TILT_RAD, sunScratch);
+      const dayFactor = sunDayFactorAtLocation(lat, lng, now);
+      if (dayFactor > 0.2) {
+        camDir.addScaledVector(sunScratch, 0.72).normalize();
+      } else {
+        camDir.addScaledVector(sunScratch, -0.38).normalize();
+      }
     }
     camera.position.copy(camDir.multiplyScalar(distance));
     const c = controls as unknown as OrbitControlsImpl;
     c.target.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
     c.update();
-  }, [camera, controls, lat, lng, distance, orbitTarget, sunScratch]);
+  }, [camera, controls, lat, lng, distance, orbitTarget, sunScratch, alignToSun]);
   return null;
+}
+
+/**
+ * Sol editorial: arriba-izquierda respecto a la cámara (~30–40° del eje cámara→globo).
+ * Desacoplado del reloj acelerado; la cara visible permanece lit al orbitar.
+ */
+function aestheticSunDirFromCamera(
+  camera: THREE.Camera,
+  orbitTarget: THREE.Vector3,
+  out: THREE.Vector3,
+  rightScratch: THREE.Vector3,
+  upScratch: THREE.Vector3
+): THREE.Vector3 {
+  camera.updateMatrixWorld();
+  camera.getWorldPosition(out);
+  out.sub(orbitTarget).normalize(); // desde el globo hacia la cámara
+  rightScratch.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
+  upScratch.setFromMatrixColumn(camera.matrixWorld, 1).normalize();
+  // Mezcla: cara a cámara + arriba − derecha ≈ 35° hacia arriba-izquierda
+  out.addScaledVector(upScratch, 0.52).addScaledVector(rightScratch, -0.42).normalize();
+  return out;
 }
 
 /** Más segmentos = relieve del mapa normal más suave (sigue razonable en home). */
@@ -243,7 +273,7 @@ function cloneLightsMapLinear(src: THREE.Texture): THREE.Texture {
   return c;
 }
 
-/** Sincroniza sol, cámara y tiempo con OceanSphere / LandSphere / luces (`earthSceneDate` = reloj Tierra). */
+/** Sincroniza sol, cámara y tiempo con OceanSphere / LandSphere / luces. */
 function SyncSunToGlobe({
   oceanMat,
   landMat,
@@ -254,6 +284,8 @@ function SyncSunToGlobe({
   oceanSunDebug,
   obliquityXRad,
   getEarthSceneDate,
+  cameraRelativeSun = false,
+  orbitTarget,
 }: {
   oceanMat: THREE.ShaderMaterial;
   landMat: THREE.ShaderMaterial | null;
@@ -264,13 +296,25 @@ function SyncSunToGlobe({
   oceanSunDebug: GlobeV2OceanSunDebug;
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
+  /** Home: sol editorial fijo respecto a la cámara (no usa reloj acelerado). */
+  cameraRelativeSun?: boolean;
+  orbitTarget: [number, number, number];
 }) {
   const { camera } = useThree();
   const camWorld = useMemo(() => new THREE.Vector3(), []);
   const sunScratch = useMemo(() => new THREE.Vector3(), []);
+  const rightScratch = useMemo(() => new THREE.Vector3(), []);
+  const upScratch = useMemo(() => new THREE.Vector3(), []);
+  const targetScratch = useMemo(
+    () => new THREE.Vector3(orbitTarget[0], orbitTarget[1], orbitTarget[2]),
+    [orbitTarget]
+  );
 
   useFrame(() => {
-    const s = computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
+    camera.getWorldPosition(camWorld);
+    const s = cameraRelativeSun
+      ? aestheticSunDirFromCamera(camera, targetScratch, sunScratch, rightScratch, upScratch)
+      : computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
     const uSunO = oceanMat.uniforms.uSunDir as { value: THREE.Vector3 };
     uSunO.value.copy(s);
     const uUseOv = oceanMat.uniforms.uUseSunOverride as { value: number } | undefined;
@@ -286,7 +330,6 @@ function SyncSunToGlobe({
         uUseOv.value = 0;
       }
     }
-    camera.getWorldPosition(camWorld);
     const uCamO = oceanMat.uniforms.uCamPos as { value: THREE.Vector3 };
     uCamO.value.copy(camWorld);
 
@@ -318,6 +361,8 @@ function AtmosphereGlow({
   obliquityXRad,
   getEarthSceneDate,
   homeCinematic,
+  cameraRelativeSun = false,
+  orbitTarget,
 }: {
   scale: number;
   fullDay: boolean;
@@ -325,6 +370,8 @@ function AtmosphereGlow({
   getEarthSceneDate: () => Date;
   /** Home `#mapa`: halo azul más legible (foto órbita / NASA). */
   homeCinematic?: boolean;
+  cameraRelativeSun?: boolean;
+  orbitTarget: [number, number, number];
 }) {
   const { camera } = useThree();
   const mat = useMemo(
@@ -343,11 +390,21 @@ function AtmosphereGlow({
   );
   const camWorld = useMemo(() => new THREE.Vector3(), []);
   const sunScratch = useMemo(() => new THREE.Vector3(), []);
+  const rightScratch = useMemo(() => new THREE.Vector3(), []);
+  const upScratch = useMemo(() => new THREE.Vector3(), []);
+  const targetScratch = useMemo(
+    () => new THREE.Vector3(orbitTarget[0], orbitTarget[1], orbitTarget[2]),
+    [orbitTarget]
+  );
 
   useFrame(() => {
     camera.getWorldPosition(camWorld);
     (mat.uniforms.uCamPos as { value: THREE.Vector3 }).value.copy(camWorld);
-    computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
+    if (cameraRelativeSun) {
+      aestheticSunDirFromCamera(camera, targetScratch, sunScratch, rightScratch, upScratch);
+    } else {
+      computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
+    }
     (mat.uniforms.uSunDir as { value: THREE.Vector3 }).value.copy(sunScratch);
     (mat.uniforms.uFullDay as { value: number }).value = fullDay ? 1 : 0;
   });
@@ -387,6 +444,8 @@ function EarthGroup({
   obliquityXRad,
   getEarthSceneDate,
   embedded,
+  cameraRelativeSun = false,
+  orbitTarget,
 }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
@@ -400,6 +459,8 @@ function EarthGroup({
   obliquityXRad: number;
   getEarthSceneDate: () => Date;
   embedded?: boolean;
+  cameraRelativeSun?: boolean;
+  orbitTarget: [number, number, number];
 }) {
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
@@ -743,6 +804,8 @@ function EarthGroup({
           obliquityXRad={obliquityXRad}
           getEarthSceneDate={getEarthSceneDate}
           homeCinematic={Boolean(embedded)}
+          cameraRelativeSun={cameraRelativeSun}
+          orbitTarget={orbitTarget}
         />
       ) : null}
       {showClouds ? (
@@ -784,6 +847,8 @@ function EarthGroup({
         oceanSunDebug={oceanSunDebug}
         obliquityXRad={obliquityXRad}
         getEarthSceneDate={getEarthSceneDate}
+        cameraRelativeSun={cameraRelativeSun}
+        orbitTarget={orbitTarget}
       />
     </group>
   );
@@ -935,14 +1000,14 @@ function GlobeScene({
 
       <hemisphereLight
         args={[
-          '#f0f3f8',
-          '#1a1f28',
+          embedded && !forceDaylight ? '#d8e4f2' : '#f0f3f8',
+          embedded && !forceDaylight ? '#1a2838' : '#1a1f28',
           embedded
             ? viewerNight
-              ? 0.48
+              ? 0.52
               : forceDaylight
                 ? 1.18
-                : 0.58
+                : 0.5
             : viewerNight
               ? 0.38
               : 0.44,
@@ -950,9 +1015,25 @@ function GlobeScene({
       />
       <ambientLight
         intensity={
-          embedded ? (viewerNight ? 0.14 : forceDaylight ? 0.56 : 0.24) : viewerNight ? 0.09 : 0.16
+          embedded
+            ? viewerNight
+              ? 0.42
+              : forceDaylight
+                ? 0.56
+                : 0.46
+            : viewerNight
+              ? 0.09
+              : 0.16
         }
-        color={viewerNight ? '#4a5568' : forceDaylight && embedded ? '#eef1f6' : '#dfe3ea'}
+        color={
+          viewerNight
+            ? '#6a7d96'
+            : forceDaylight && embedded
+              ? '#eef1f6'
+              : embedded
+                ? '#a8b8cc'
+                : '#dfe3ea'
+        }
       />
       <directionalLight
         ref={sunLightRef}
@@ -971,18 +1052,22 @@ function GlobeScene({
         }
         color={forceDaylight && embedded ? '#fffaf0' : '#fff8ec'}
       />
-      {embedded && forceDaylight && !viewerNight ? (
-        <directionalLight position={[-5, 3, 4]} intensity={2.85} color="#c8e0ff" />
+      {/* Fill débil permanente en home: evita cara frontal negra con sol editorial. */}
+      {embedded ? (
+        <directionalLight position={[-5, 3, 4]} intensity={viewerNight ? 0.85 : 1.35} color="#c8e0ff" />
       ) : null}
 
       <group scale={geoScale}>
         {/*
-          Jerarquía Tierra (marco inercial estable):
-          - earthAxialTiltGroup: inclinación axial fija en Z (no sigue a la cámara).
-          - earthSpinGroup: giro sidéreo en Y local (GMST + textura).
-          La Luna es hermana (órbita geocéntrica; no hereda el tilt).
+          Jerarquía Tierra:
+          - earthAxialTilt: en full = oblicuidad 23,44°; en embedded home = 0 (eje vertical en pantalla).
+          - earthSpin: giro sidéreo en Y local (GMST) — no modificar aquí.
+          Luna hermana (no hereda tilt).
         */}
-        <group name="earthAxialTilt" rotation={[0, 0, EARTH_AXIAL_TILT_RAD]}>
+        <group
+          name="earthAxialTilt"
+          rotation={embedded ? [0, 0, 0] : [0, 0, EARTH_AXIAL_TILT_RAD]}
+        >
           <group ref={planetSpinRef} name="earthSpin">
             <EarthGroup
               urls={urls}
@@ -996,6 +1081,8 @@ function GlobeScene({
               obliquityXRad={GLOBE_V2_EARTH_OBLIQUITY_RAD}
               getEarthSceneDate={getEarthSceneDate}
               embedded={embedded}
+              cameraRelativeSun={embedded}
+              orbitTarget={embedded ? GLOBE_V2_EMBEDDED_ORBIT_TARGET : GLOBE_V2_FULL_ORBIT_TARGET}
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (
@@ -1063,6 +1150,7 @@ function GlobeScene({
           lng={initialViewLng}
           distance={camDist}
           orbitTarget={GLOBE_V2_EMBEDDED_ORBIT_TARGET}
+          alignToSun={false}
         />
       ) : null}
     </>

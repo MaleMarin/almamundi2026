@@ -99,7 +99,8 @@ export const GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER = 0.88;
  *   (tierra oscura / mar claro → volumen aproximado; sustituir por DEM si hace falta).
  */
 export const GLOBE_V2_TEXTURE_URLS = {
-  day: `${GLOBE_V2_TEXTURE_BASE}/earth_day_4096.jpg`,
+  /** PASO 1: day 8K local (Blue Marble). Resto sigue en CDN Three hasta pasos siguientes. */
+  day: '/8k_earth_daymap.jpg',
   normal: `${GLOBE_V2_TEXTURE_BASE}/earth_normal_2048.jpg`,
   clouds: `${GLOBE_V2_TEXTURE_BASE}/earth_clouds_1024.png`,
   nightLights: `${GLOBE_V2_TEXTURE_BASE}/earth_lights_2048.png`,
@@ -182,11 +183,11 @@ export const GLOBE_V2_ASSET_AUDIT: GlobeV2AssetAuditEntry[] = [
   {
     id: 'day',
     urlOrNote: GLOBE_V2_TEXTURE_URLS.day,
-    nominalSize: '4096 × 2048 (2:1 equirectangular)',
+    nominalSize: '8192 × 4096 (2:1 equirectangular)',
     format: 'JPEG',
-    compression: 'Lossy (calidad depende del export en el repo Three)',
+    compression: 'Lossy (~4.6 MB local /8k_earth_daymap.jpg)',
     premiumVerdict: 'strong',
-    note: 'Base visual sólida para Blue Marble a distancia de órbita típica.',
+    note: 'PASO 1: day 8K local; mipmaps + anisotropy vía setTextureQuality en GlobeV2.',
   },
   {
     id: 'normal',

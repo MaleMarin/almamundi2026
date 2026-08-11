@@ -91,8 +91,9 @@ import { useUserPosition } from '@/hooks/useUserPosition';
 import { getApproxLocation } from '@/lib/userLocation';
 
 /** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
-const HOME_GLOBE_FALLBACK_LAT = -18;
-const HOME_GLOBE_FALLBACK_LNG = -60;
+/** Encuadre editorial fijo del globo en home (Sudamérica de frente). Geoloc solo para UI noche. */
+const HOME_GLOBE_FRAME_LAT = -15;
+const HOME_GLOBE_FRAME_LNG = -60;
 
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
@@ -128,8 +129,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const viewerLat = userPosition?.lat ?? approxPosition?.lat ?? null;
   const viewerLng = userPosition?.lng ?? approxPosition?.lng ?? null;
-  const globeInitialLat = viewerLat ?? HOME_GLOBE_FALLBACK_LAT;
-  const globeInitialLng = viewerLng ?? HOME_GLOBE_FALLBACK_LNG;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -625,9 +624,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <GlobeV2Home
               embedded
               forceDaylight={false}
-              earthVisualTimeScale={1}
-              initialViewLat={globeInitialLat}
-              initialViewLng={globeInitialLng}
+              earthVisualTimeScale={1050}
+              initialViewLat={HOME_GLOBE_FRAME_LAT}
+              initialViewLng={HOME_GLOBE_FRAME_LNG}
               viewerLat={viewerLat ?? undefined}
               viewerLng={viewerLng ?? undefined}
               bits={globeMarkers}
