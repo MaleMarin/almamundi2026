@@ -39,56 +39,56 @@ export type GlobeV2LayerBuildStage =
 export const GLOBE_V2_OCEAN_RADIUS = 1;
 
 /**
- * Tierra claramente por delante del océano en profundidad (evita z-fighting y “mar bajo el continente”).
- * El shader del océano también descarta UV de tierra (`uOceanMaskLand`); el offset físico refuerza el test de profundidad.
+ * Tierra ligeramente por delante del océano (evita z-fighting).
+ * Outset alto deja un “peldaño” negro en costas; 0.01 basta con máscara 4K suave.
  */
-export const GLOBE_V2_LAND_OUTSET = 0.02;
+export const GLOBE_V2_LAND_OUTSET = 0.01;
 
 export const GLOBE_V2_LAND_RADIUS = GLOBE_V2_OCEAN_RADIUS + GLOBE_V2_LAND_OUTSET;
 
 /** Luces urbanas: misma esfera que la tierra + epsilon. */
 export const GLOBE_V2_CITY_LIGHTS_SCALE = GLOBE_V2_LAND_RADIUS * 1.0008;
 
-/** Nubes: por encima de `GLOBE_V2_LAND_RADIUS` (1.02); capa exterior fina. */
-export const GLOBE_V2_CLOUD_ROOT_SCALE = 1.021;
+/** Nubes: por encima de `GLOBE_V2_LAND_RADIUS`; capa exterior fina. */
+export const GLOBE_V2_CLOUD_ROOT_SCALE = 1.011;
 
-/** Halo atmosférico: anillo fino fuera de la corteza (intensidad baja en shader). */
-export const GLOBE_V2_ATMOSPHERE_SCALE = 1.023;
+/** Halo atmosférico: anillo fino fuera de la corteza. */
+export const GLOBE_V2_ATMOSPHERE_SCALE = 1.014;
 
 /**
- * Bits: por encima de la capa exterior de nubes (no entre tierra ~1.02 y nubes ~1.021).
- * Evita que los marcadores queden “encajados” en el sandwich del globo.
+ * Bits: por encima de la capa exterior de nubes.
  */
 export const GLOBE_V2_BIT_SURFACE_RADIUS = GLOBE_V2_CLOUD_ROOT_SCALE + 0.007;
 
 /**
- * Máscara tierra desde `earth_specular` (canal R): mar ≈ alto, tierra ≈ bajo.
- * Banda estrecha en vértice (relieve); descarte duro en fragmento tras dilatar tierra (min vecinos).
+ * Máscara agua (canal R): mar ≈ 1, tierra ≈ 0. Fuente: water mask 4K limpia (no specular Three 2K).
+ * Banda smoothstep en fragmento; dilatación min-vecinos conserva islas.
  */
-export const GLOBE_V2_LAND_MASK_SPEC_LOW = 0.42;
+export const GLOBE_V2_LAND_MASK_SPEC_LOW = 0.38;
 export const GLOBE_V2_LAND_MASK_SPEC_HIGH = 0.58;
 /**
- * Tras dilatación (min vecinos): spec por encima = mar → descartar tierra/océano complementario.
- * Valores demasiado bajos hacen que zonas continentales con spec alto (arena, nieve, ruido del PNG)
- * se clasifiquen como mar: la tierra hace discard y el océano pinta → “continentes transparentes”.
- * ~0.62–0.68 suele ser seguro con earth_specular de Three; bajar solo para costas muy duras.
- * 0.68 reduce “agujeros” negros en desiertos/nieve (spec alto) mal clasificados como mar.
+ * Centro de la banda soft (tierra→agua). Con mask limpia ~0.5–0.6.
+ * Land alpha cae con smoothstep(EDGE0, EDGE1); ocean usa banda un poco más ancha hacia agua.
  */
-export const GLOBE_V2_LAND_MASK_SPEC_DISCARD = 0.68;
-/** Dilatación tierra (min): ~1–2 px en 2k; un poco más de radio ayuda islas sin abrir mar interior. */
-export const GLOBE_V2_LAND_MASK_DILATE_UV = 0.00115;
+export const GLOBE_V2_LAND_MASK_SPEC_DISCARD = 0.52;
+/** Dilatación (min vecinos) en UV: ~2 px a 4K (1/4096≈0.00024). */
+export const GLOBE_V2_LAND_MASK_DILATE_UV = 0.00055;
+/** Banda soft tierra/agua (land alpha). */
+export const GLOBE_V2_LAND_MASK_SOFT_LO = 0.4;
+export const GLOBE_V2_LAND_MASK_SOFT_HI = 0.68;
+/** Ocean: empieza a pintar agua un poco antes (solapa costa, evita hueco negro). */
+export const GLOBE_V2_OCEAN_MASK_SOFT_LO = 0.32;
+export const GLOBE_V2_OCEAN_MASK_SOFT_HI = 0.62;
 
 /**
- * Heurística en earth_day (RGB): océano suele dominar B frente a max(R,G); la tierra suele tener más R/G.
- * Complementa al specular para no clasificar desiertos/nieve como “mar” (continentes transparentes).
+ * Heurística RGB del day (refuerzo; mask 4K limpia es la fuente principal).
  */
 export const GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0 = 0.08;
 export const GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1 = 0.46;
 export const GLOBE_V2_LAND_MASK_DAY_OCEAN_RG = 0.72;
-/** Si dayOcean supera este valor y el spec dice agua → descartar tierra (agua real). */
-export const GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE = 0.4;
-/** Spec muy alto = mar abierto aunque el day sea oscuro o ambiguo. */
-export const GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER = 0.88;
+export const GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE = 0.28;
+/** Spec muy alto = mar abierto. */
+export const GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER = 0.82;
 
 /**
  * Rutas activas. Para el salto visual:
@@ -99,12 +99,14 @@ export const GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER = 0.88;
  *   (tierra oscura / mar claro → volumen aproximado; sustituir por DEM si hace falta).
  */
 export const GLOBE_V2_TEXTURE_URLS = {
-  /** PASO 1: day 8K local (Blue Marble). Resto sigue en CDN Three hasta pasos siguientes. */
+  /** Day 8K local (Blue Marble). */
   day: '/8k_earth_daymap.jpg',
   normal: `${GLOBE_V2_TEXTURE_BASE}/earth_normal_2048.jpg`,
-  clouds: `${GLOBE_V2_TEXTURE_BASE}/earth_clouds_1024.png`,
+  /** PASO B: nubes 4K WebP con alpha real; carga diferida (idle) para no romper presupuesto ~8 MB. */
+  clouds: '/textures/earth-clouds-4k.webp',
   nightLights: `${GLOBE_V2_TEXTURE_BASE}/earth_lights_2048.png`,
-  heightMap: `${GLOBE_V2_TEXTURE_BASE}/earth_specular_2048.jpg`,
+  /** PASO A: water mask 4K limpia (mar claro / tierra oscura), no specular Three 2K. */
+  heightMap: '/textures/earth-water-mask-4k.jpg',
 } as const satisfies GlobeV2TextureUrls;
 
 /** Orden recomendado de reemplazo (mayor impacto / menor riesgo primero). */
@@ -120,21 +122,21 @@ export const GLOBE_V2_NIGHT_LIGHTS_PIPELINE_NOTE =
 
 // ——— Valores congelados (no compensar falta de resolucion subiendo opacidad al azar) ———
 
-/** Opacidad capa exterior de nubes (fina; evitar “torta” blanca). */
-export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.93;
-export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.62;
+/** Opacidad capa de nubes (alpha del WebP hace el corte; evitar “torta” blanca). */
+export const GLOBE_V2_CLOUD_OPACITY_DAY = 0.58;
+export const GLOBE_V2_CLOUD_OPACITY_NIGHT = 0.4;
 
-/** Multiplicador opacidad esfera interior (velo ligero sobre océano, sin duplicar peso). */
-export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.52;
+/** Multiplicador opacidad esfera interior (velo ligero). */
+export const GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR = 0.28;
 
 /** Capa de nubes adicional: radio = `GLOBE_V2_CLOUD_ROOT_SCALE` + delta (volumen leve). */
 export const GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA = 0.0048;
 
 /** Opacidad de la capa exterior (× opacidad base día/noche). */
-export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY = 0.34;
-export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT = 0.24;
+export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY = 0.22;
+export const GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT = 0.15;
 
-/** Desfase Y (rad) de la textura de nubes en la capa exterior (más lectura de nubosidad). */
+/** Desfase Y (rad) de la textura de nubes en la capa exterior. */
 export const GLOBE_V2_CLOUD_OUTER_Y_ROT_RAD = 0.38;
 
 /** Radio interior = `GLOBE_V2_CLOUD_ROOT_SCALE` − este delta (unidades de escena). */
@@ -142,6 +144,12 @@ export const GLOBE_V2_CLOUD_UNDERLAY_RADIUS_DELTA = 0.009;
 
 /** Segmentos esfera nubes. */
 export const GLOBE_V2_CLOUD_SPHERE_SEGMENTS = 112;
+
+/**
+ * Drift local de nubes (rad/s) respecto a la corteza: se mueven un poco más lento / deslizan.
+ * Va en el group de nubes dentro de earthSpin (no toca GMST).
+ */
+export const GLOBE_V2_CLOUD_DRIFT_RAD_PER_SEC = 0.011;
 
 /** Luces urbanas: muy discretas (documental, no mapa nocturno recargado). */
 export const GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY = 0.04;
@@ -201,11 +209,11 @@ export const GLOBE_V2_ASSET_AUDIT: GlobeV2AssetAuditEntry[] = [
   {
     id: 'clouds',
     urlOrNote: GLOBE_V2_TEXTURE_URLS.clouds,
-    nominalSize: '1024 × 512 → preparado para 2k/4k',
-    format: 'PNG',
-    compression: '8-bit + alpha; mismo layout UV que el day map',
-    premiumVerdict: 'limiting',
-    note: 'Pipeline listo: anisotropia max, alpha en map, opacidad fija en GLOBE_V2_CLOUD_OPACITY_*.',
+    nominalSize: '4096 × 2048 WebP + alpha',
+    format: 'WebP',
+    compression: '~1.23 MB local; carga al idle (progressive)',
+    premiumVerdict: 'strong',
+    note: 'PASO B: alpha real; no bloquea primer paint del globo.',
   },
   {
     id: 'nightLights',
@@ -219,11 +227,11 @@ export const GLOBE_V2_ASSET_AUDIT: GlobeV2AssetAuditEntry[] = [
   {
     id: 'heightMap',
     urlOrNote: GLOBE_V2_TEXTURE_URLS.heightMap ?? 'null (neutral 0.5 → sin desplazamiento)',
-    nominalSize: '—',
-    format: 'PNG/TIFF/JPEG linear R',
-    compression: 'según archivo',
-    premiumVerdict: 'limiting',
-    note: 'Pipeline: uHeightTex + uDispScale en vértice (tierra + luces). Centro 0.5 = plano.',
+    nominalSize: '4096 × 2048 water mask (mar claro / tierra oscura)',
+    format: 'JPEG',
+    compression: '~1.15 MB local /textures/earth-water-mask-4k.jpg',
+    premiumVerdict: 'strong',
+    note: 'PASO A: máscara limpia 4K; softstep costa + dilatación UV fina. También proxy de displacement.',
   },
   {
     id: 'elevation',

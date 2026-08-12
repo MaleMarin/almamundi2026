@@ -34,6 +34,7 @@ import {
   GLOBE_V2_CITY_LIGHTS_SCALE,
   GLOBE_V2_CITY_LIGHTS_STRENGTH_DAY,
   GLOBE_V2_CITY_LIGHTS_STRENGTH_NIGHT,
+  GLOBE_V2_CLOUD_DRIFT_RAD_PER_SEC,
   GLOBE_V2_CLOUD_OPACITY_DAY,
   GLOBE_V2_CLOUD_OPACITY_NIGHT,
   GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY,
@@ -446,6 +447,7 @@ function EarthGroup({
   embedded,
   cameraRelativeSun = false,
   orbitTarget,
+  spinRateRef,
 }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
@@ -461,6 +463,8 @@ function EarthGroup({
   embedded?: boolean;
   cameraRelativeSun?: boolean;
   orbitTarget: [number, number, number];
+  /** Mismo factor que modula GMST en GlobeScene (hover/proximidad). */
+  spinRateRef: RefObject<number>;
 }) {
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
@@ -494,12 +498,69 @@ function EarthGroup({
   const showNightLightsLayer =
     layerBuildStage === 'full' && visualStage !== 'surface' && !fullDaySurface;
 
-  const [dayMap, cloudMap, lightsMap, normalMap] = useTexture([
-    urls.day,
-    urls.clouds,
-    urls.nightLights,
-    urls.normal,
-  ]);
+  /** Path crítico: day + luces + normal (sin nubes 4K, ~1.2 MB diferidas). */
+  const [dayMap, lightsMap, normalMap] = useTexture([urls.day, urls.nightLights, urls.normal]);
+
+  const [cloudMap, setCloudMap] = useState<THREE.Texture | null>(null);
+  const cloudDriftRef = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    if (!showClouds) {
+      setCloudMap((prev) => {
+        if (prev) prev.dispose();
+        return null;
+      });
+      return;
+    }
+    let cancelled = false;
+    let idleId = 0;
+    let timeoutId = 0;
+    const maxA = Math.min(16, gl.capabilities.getMaxAnisotropy?.() ?? 16);
+
+    const startLoad = () => {
+      new THREE.TextureLoader().load(
+        urls.clouds,
+        (tex) => {
+          if (cancelled) {
+            tex.dispose();
+            return;
+          }
+          setTextureQuality(tex, THREE.SRGBColorSpace, maxA);
+          setCloudMap((prev) => {
+            if (prev) prev.dispose();
+            return tex;
+          });
+        },
+        undefined,
+        () => {
+          /* fallido: globo sigue sin nubes */
+        }
+      );
+    };
+
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (id: number) => void;
+    };
+    if (typeof w.requestIdleCallback === 'function') {
+      idleId = w.requestIdleCallback(startLoad, { timeout: 2200 });
+    } else {
+      timeoutId = window.setTimeout(startLoad, 450);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId && typeof w.cancelIdleCallback === 'function') w.cancelIdleCallback(idleId);
+      if (timeoutId) window.clearTimeout(timeoutId);
+    };
+  }, [showClouds, urls.clouds, gl]);
+
+  useFrame((_, dt) => {
+    if (!cloudDriftRef.current) return;
+    /* Mismo frenado que planetSpin (hover/proximidad); si no, las nubes siguen a velocidad idle sobre el mar. */
+    const rate = spinRateRef.current ?? 1;
+    cloudDriftRef.current.rotation.y += GLOBE_V2_CLOUD_DRIFT_RAD_PER_SEC * dt * rate;
+  });
 
   const neutralHeightTex = useMemo(() => createGlobeV2NeutralHeightTexture(), []);
   const remoteHeightRef = useRef<THREE.Texture | null>(null);
@@ -552,7 +613,6 @@ function EarthGroup({
   useLayoutEffect(() => {
     const maxA = Math.min(16, gl.capabilities.getMaxAnisotropy?.() ?? 16);
     setTextureQuality(dayMap, THREE.SRGBColorSpace, maxA);
-    setTextureQuality(cloudMap, THREE.SRGBColorSpace, maxA);
     setTextureQuality(lightsMap, THREE.SRGBColorSpace, maxA);
     normalMap.colorSpace = THREE.NoColorSpace;
     normalMap.anisotropy = maxA;
@@ -562,104 +622,103 @@ function EarthGroup({
     normalMap.wrapS = THREE.ClampToEdgeWrapping;
     normalMap.wrapT = THREE.ClampToEdgeWrapping;
     normalMap.needsUpdate = true;
-  }, [gl, dayMap, cloudMap, lightsMap, normalMap]);
+  }, [gl, dayMap, lightsMap, normalMap]);
 
   const cloudOpacity = viewerNight ? GLOBE_V2_CLOUD_OPACITY_NIGHT : GLOBE_V2_CLOUD_OPACITY_DAY;
   const cloudOuterOpacityFactor = viewerNight
     ? GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT
     : GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY;
 
-  const cloudMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        map: cloudMap,
-        transparent: true,
-        opacity: cloudOpacity,
-        depthWrite: false,
-        blending: THREE.NormalBlending,
-        premultipliedAlpha: false,
-        /* Sin Environment en embebido: metalness/IBL apagan el mapa; mate + emissive suave = nubes visibles */
-        roughness: 1,
-        metalness: 0,
-        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0xd8e2ee),
-        emissiveIntensity: viewerNight ? 0.02 : 0.09,
-      }),
-    [cloudMap, cloudOpacity, viewerNight]
-  );
+  const cloudMaterial = useMemo(() => {
+    if (!cloudMap) return null;
+    return new THREE.MeshStandardMaterial({
+      map: cloudMap,
+      transparent: true,
+      opacity: cloudOpacity,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+      premultipliedAlpha: false,
+      roughness: 1,
+      metalness: 0,
+      color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
+      emissive: new THREE.Color(0xb8c8dc),
+      emissiveIntensity: viewerNight ? 0.01 : 0.035,
+    });
+  }, [cloudMap, cloudOpacity, viewerNight]);
 
-  const cloudUnderlayMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        map: cloudMap,
-        transparent: true,
-        opacity: cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR,
-        depthWrite: false,
-        blending: THREE.NormalBlending,
-        premultipliedAlpha: false,
-        roughness: 1,
-        metalness: 0,
-        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0xd8e2ee),
-        emissiveIntensity: viewerNight ? 0.015 : 0.065,
-      }),
-    [cloudMap, cloudOpacity, viewerNight]
-  );
+  const cloudUnderlayMaterial = useMemo(() => {
+    if (!cloudMap) return null;
+    return new THREE.MeshStandardMaterial({
+      map: cloudMap,
+      transparent: true,
+      opacity: cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+      premultipliedAlpha: false,
+      roughness: 1,
+      metalness: 0,
+      color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
+      emissive: new THREE.Color(0xb8c8dc),
+      emissiveIntensity: viewerNight ? 0.008 : 0.02,
+    });
+  }, [cloudMap, cloudOpacity, viewerNight]);
 
-  const cloudOuterMaterial = useMemo(
-    () =>
-      new THREE.MeshStandardMaterial({
-        map: cloudMap,
-        transparent: true,
-        opacity: cloudOpacity * cloudOuterOpacityFactor,
-        depthWrite: false,
-        blending: THREE.NormalBlending,
-        premultipliedAlpha: false,
-        roughness: 1,
-        metalness: 0,
-        color: viewerNight ? new THREE.Color(0.84, 0.88, 0.92) : new THREE.Color(0xffffff),
-        emissive: new THREE.Color(0xd8e2ee),
-        emissiveIntensity: viewerNight ? 0.018 : 0.075,
-      }),
-    [cloudMap, cloudOpacity, cloudOuterOpacityFactor, viewerNight]
-  );
+  const cloudOuterMaterial = useMemo(() => {
+    if (!cloudMap) return null;
+    return new THREE.MeshStandardMaterial({
+      map: cloudMap,
+      transparent: true,
+      opacity: cloudOpacity * cloudOuterOpacityFactor,
+      depthWrite: false,
+      blending: THREE.NormalBlending,
+      premultipliedAlpha: false,
+      roughness: 1,
+      metalness: 0,
+      color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
+      emissive: new THREE.Color(0xb8c8dc),
+      emissiveIntensity: viewerNight ? 0.01 : 0.025,
+    });
+  }, [cloudMap, cloudOpacity, cloudOuterOpacityFactor, viewerNight]);
 
   useLayoutEffect(() => {
+    if (!cloudMaterial) return;
     cloudMaterial.opacity = cloudOpacity;
-    cloudMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
+    cloudMaterial.color.set(viewerNight ? '#e0e6ee' : '#ffffff');
     cloudMaterial.roughness = 1;
     cloudMaterial.metalness = 0;
-    cloudMaterial.emissive.set('#d8e2ee');
-    cloudMaterial.emissiveIntensity = viewerNight ? 0.02 : fullDaySurface && embedded ? 0.18 : 0.09;
+    cloudMaterial.emissive.set('#b8c8dc');
+    cloudMaterial.emissiveIntensity = viewerNight ? 0.01 : fullDaySurface && embedded ? 0.05 : 0.035;
     cloudMaterial.needsUpdate = true;
   }, [cloudMaterial, cloudOpacity, viewerNight, fullDaySurface, embedded]);
 
   useLayoutEffect(() => {
+    if (!cloudUnderlayMaterial) return;
     const uo = cloudOpacity * GLOBE_V2_CLOUD_UNDERLAY_OPACITY_FACTOR;
     cloudUnderlayMaterial.opacity = uo;
-    cloudUnderlayMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
+    cloudUnderlayMaterial.color.set(viewerNight ? '#e0e6ee' : '#ffffff');
     cloudUnderlayMaterial.roughness = 1;
     cloudUnderlayMaterial.metalness = 0;
-    cloudUnderlayMaterial.emissive.set('#d8e2ee');
-    cloudUnderlayMaterial.emissiveIntensity = viewerNight ? 0.015 : 0.065;
+    cloudUnderlayMaterial.emissive.set('#b8c8dc');
+    cloudUnderlayMaterial.emissiveIntensity = viewerNight ? 0.008 : 0.02;
     cloudUnderlayMaterial.needsUpdate = true;
   }, [cloudUnderlayMaterial, cloudOpacity, viewerNight]);
 
   useLayoutEffect(() => {
+    if (!cloudOuterMaterial) return;
     cloudOuterMaterial.opacity = cloudOpacity * cloudOuterOpacityFactor;
-    cloudOuterMaterial.color.set(viewerNight ? '#b8c4d4' : '#ffffff');
+    cloudOuterMaterial.color.set(viewerNight ? '#e0e6ee' : '#ffffff');
     cloudOuterMaterial.roughness = 1;
     cloudOuterMaterial.metalness = 0;
-    cloudOuterMaterial.emissive.set('#d8e2ee');
-    cloudOuterMaterial.emissiveIntensity = viewerNight ? 0.018 : 0.075;
+    cloudOuterMaterial.emissive.set('#b8c8dc');
+    cloudOuterMaterial.emissiveIntensity = viewerNight ? 0.01 : 0.025;
     cloudOuterMaterial.needsUpdate = true;
   }, [cloudOuterMaterial, cloudOpacity, cloudOuterOpacityFactor, viewerNight]);
 
   useLayoutEffect(() => {
     return () => {
-      cloudMaterial.dispose();
-      cloudUnderlayMaterial.dispose();
-      cloudOuterMaterial.dispose();
+      cloudMaterial?.dispose();
+      cloudUnderlayMaterial?.dispose();
+      cloudOuterMaterial?.dispose();
     };
   }, [cloudMaterial, cloudUnderlayMaterial, cloudOuterMaterial]);
 
@@ -808,8 +867,8 @@ function EarthGroup({
           orbitTarget={orbitTarget}
         />
       ) : null}
-      {showClouds ? (
-        <group>
+      {showClouds && cloudMap && cloudMaterial && cloudUnderlayMaterial && cloudOuterMaterial ? (
+        <group ref={cloudDriftRef}>
           <mesh ref={stripGlobeMeshRaycast} material={cloudUnderlayMaterial} renderOrder={3}>
             <sphereGeometry
               args={[
@@ -918,7 +977,8 @@ function GlobeScene({
 
   /**
    * Prioridad negativa: actualiza el reloj de escena antes que los materiales lean `getEarthSceneDate`.
-   * `smoothedSpinRateRef` modula cuánto avanza el tiempo (giro terrestre + terminador) según puntero/hover/panel.
+   * `smoothedSpinRateRef` es el ÚNICO freno de giro: avanza GMST → `planetSpinRef` (océano+tierra+nubes+luces).
+   * El drift local de nubes debe multiplicar el mismo factor (ver EarthGroup) para no desfasarse.
    */
   useFrame((_, dt) => {
     const now = Date.now();
@@ -1083,6 +1143,7 @@ function GlobeScene({
               embedded={embedded}
               cameraRelativeSun={embedded}
               orbitTarget={embedded ? GLOBE_V2_EMBEDDED_ORBIT_TARGET : GLOBE_V2_FULL_ORBIT_TARGET}
+              spinRateRef={smoothedSpinRateRef}
             />
 
             {layerBuildStage === 'full' && visualStage === 'full' ? (

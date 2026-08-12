@@ -12,11 +12,14 @@ import {
   GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE,
   GLOBE_V2_LAND_MASK_DAY_OCEAN_RG,
   GLOBE_V2_LAND_MASK_DILATE_UV,
-  GLOBE_V2_LAND_MASK_SPEC_DISCARD,
+  GLOBE_V2_LAND_MASK_SOFT_HI,
+  GLOBE_V2_LAND_MASK_SOFT_LO,
   GLOBE_V2_LAND_MASK_SPEC_HIGH,
   GLOBE_V2_LAND_MASK_SPEC_LOW,
   GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER,
   GLOBE_V2_NORMAL_SCALE_SURFACE,
+  GLOBE_V2_OCEAN_MASK_SOFT_HI,
+  GLOBE_V2_OCEAN_MASK_SOFT_LO,
 } from '@/lib/globe/globe-v2-assets';
 
 /** Peso relieve en vértice (misma convención que luces urbanas). */
@@ -83,7 +86,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
     void main() {
       float specSample = texture2D(uSpecTex, vUv).r;
 
-      /* Misma partición que LandSphere: spec dilatado + mapa diurno (evita mar bajo continentes por spec falso). */
+      /* Soft water weight (mask 4K): solapa costa con land; evita hueco negro entre esferas. */
       if (uOceanMaskLand > 0.5) {
         float e = ${GLOBE_V2_LAND_MASK_DILATE_UV};
         float sp0 = specSample;
@@ -95,10 +98,10 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
         vec3 d = texture2D(uDayTex, vUv).rgb;
         float dayOcean = smoothstep(${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0}, ${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1},
           d.b - max(d.r, d.g) * ${GLOBE_V2_LAND_MASK_DAY_OCEAN_RG});
-        bool isOpenWater =
-          (spM > ${GLOBE_V2_LAND_MASK_SPEC_DISCARD} && dayOcean > ${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE})
-          || (spM > ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER});
-        if (!isOpenWater) discard;
+        float waterW = smoothstep(${GLOBE_V2_OCEAN_MASK_SOFT_LO}, ${GLOBE_V2_OCEAN_MASK_SOFT_HI}, spM);
+        waterW = max(waterW, smoothstep(0.7, ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER}, sp0));
+        waterW = max(waterW, waterW * 0.85 + dayOcean * 0.15 * step(${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE}, dayOcean));
+        if (waterW < 0.04) discard;
       }
 
       vec3 N = normalize(vWorldNormal);
@@ -278,12 +281,14 @@ export function createLandSphereMaterial(
       vec3 d0 = texture2D(uDayTex, vUv).rgb;
       float dayOcean = smoothstep(${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0}, ${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1},
         d0.b - max(d0.r, d0.g) * ${GLOBE_V2_LAND_MASK_DAY_OCEAN_RG});
-      bool isOpenWater =
-        (spM > ${GLOBE_V2_LAND_MASK_SPEC_DISCARD} && dayOcean > ${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE})
-        || (spM > ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER});
-      if (isOpenWater) discard;
+      /* Soft coast: waterW 0→1; landAmt con alpha (sin corte duro). */
+      float waterW = smoothstep(${GLOBE_V2_LAND_MASK_SOFT_LO}, ${GLOBE_V2_LAND_MASK_SOFT_HI}, spM);
+      waterW = max(waterW, smoothstep(0.72, ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER}, sp0));
+      waterW = max(waterW, waterW * 0.9 + dayOcean * 0.1 * step(${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE}, dayOcean));
+      float landAmt = 1.0 - waterW;
+      if (landAmt < 0.03) discard;
 
-      float landMask = 1.0 - smoothstep(0.32, 0.68, sp0);
+      float landMask = 1.0 - smoothstep(${GLOBE_V2_LAND_MASK_SPEC_LOW}, ${GLOBE_V2_LAND_MASK_SPEC_HIGH}, sp0);
 
       /* Albedo casi directo del mapa: poco “grade” en shader (menos aspecto videojuego). */
       float y = dot(d0, vec3(0.299, 0.587, 0.114));
@@ -326,7 +331,7 @@ export function createLandSphereMaterial(
       }
       lit = pow(clamp(lit, 0.0, 1.0), vec3(0.99));
 
-      gl_FragColor = vec4(lit, 1.0);
+      gl_FragColor = vec4(lit, landAmt);
     }
   `;
 
@@ -335,7 +340,7 @@ export function createLandSphereMaterial(
     uniforms,
     vertexShader,
     fragmentShader,
-    transparent: false,
+    transparent: true,
     depthWrite: true,
     depthTest: true,
     toneMapped: false,
