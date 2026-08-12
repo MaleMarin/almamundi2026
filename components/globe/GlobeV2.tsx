@@ -106,15 +106,18 @@ const GLOBE_V2_EARTH_VISUAL_TIME_SCALE = 1050;
 
 /**
  * Segundos de escena para 1 órbita sidereal lunar (solo `MoonSatellite`).
+ * Home: ~7 min — contemplativo, aún legible. Antes: 218 s (~3,6 min).
  */
-const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 218, full: 162 } as const;
+const GLOBE_V2_MOON_ORBIT_BASE_S = { embedded: 420, full: 300 } as const;
 
-/** Semieje mayor orbital (Tierra R⊕ ≈ 1). Home: más cerca del disco para que no se salga del encuadre. */
-/** Home: semieje acotado al encuadre negro del canvas (la Luna no sale del universo). */
-const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 1.52, full: 3.58 } as const;
+/** Semieje mayor orbital (Tierra R⊕ ≈ 1). Más lejos = menos “juguete” y cabe detrás del disco. */
+const GLOBE_V2_MOON_ORBIT_SEMI_MAJOR = { embedded: 2.55, full: 3.58 } as const;
 
-/** Escala solo del disco lunar (no del radio orbital). */
-const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.42, full: 0.6 } as const;
+/**
+ * Escala del disco: 1 = ~0,27 R⊕ real. Home 0,92 ≈ proporción creíble sin puntito.
+ * (Antes 0,42 con órbita 1,52 → disco cercano y “de juguete”.)
+ */
+const GLOBE_V2_MOON_DISC_SCALE = { embedded: 0.92, full: 0.85 } as const;
 
 /** Inclinación del plano orbital respecto a la eclíptica (~5,145°). */
 const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
@@ -122,8 +125,8 @@ const GLOBE_V2_MOON_ORBIT_INCLINATION_DEG = MOON_ORBIT_INCLINATION_DEG;
 /** Fase inicial del plano en Y (solo encuadre: home ≈ Luna arriba-izquierda respecto al disco). */
 const GLOBE_V2_MOON_ORBIT_YAW_RAD = { embedded: Math.PI * 0.82, full: 0 } as const;
 
-/** Inclinación orbital lunar en home: baja para que la Luna no salga del recorte vertical. */
-const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = 2.85;
+/** Home: misma inclinación realista ~5° (antes 2,85° para no salir del recorte). */
+const GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG = MOON_ORBIT_INCLINATION_DEG;
 
 /** Cámara / target en home: Tierra más abajo-derecha (offset pantalla). Target menos bajo para no recortar el disco por arriba en el canvas. */
 const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.14, 0.18, 0];
@@ -380,10 +383,12 @@ function AtmosphereGlow({
       createAtmosphereGlowMaterial(
         homeCinematic
           ? {
-              intensity: 0.128,
-              power: 3.05,
-              innerColor: 0x8ed8ff,
-              outerColor: 0x0a2a5c,
+              // Halo tipo foto orbital: limbo intenso + soft outer; cálido leve al sol.
+              intensity: 0.48,
+              power: 2.05,
+              innerColor: 0x7ec8ff,
+              outerColor: 0x0a2558,
+              warmColor: 0xffd2b0,
             }
           : undefined
       ),
@@ -414,8 +419,9 @@ function AtmosphereGlow({
     return () => mat.dispose();
   }, [mat]);
 
+  /* Tras nubes (3–6). depthTest false: ver createAtmosphereGlowMaterial. */
   return (
-    <mesh ref={stripGlobeMeshRaycast} scale={scale} renderOrder={-1}>
+    <mesh ref={stripGlobeMeshRaycast} scale={scale} renderOrder={8}>
       <sphereGeometry args={[1, 72, 72]} />
       <primitive object={mat} attach="material" />
     </mesh>
@@ -1030,7 +1036,7 @@ function GlobeScene({
         ? 1.72
         : 1.9
       : forceDaylight
-        ? 3.42
+        ? 3.55
         : 2.16
     : viewerNight
       ? 1.65
@@ -1066,7 +1072,7 @@ function GlobeScene({
             ? viewerNight
               ? 0.52
               : forceDaylight
-                ? 1.18
+                ? 1.32
                 : 0.5
             : viewerNight
               ? 0.38
@@ -1079,7 +1085,7 @@ function GlobeScene({
             ? viewerNight
               ? 0.42
               : forceDaylight
-                ? 0.56
+                ? 0.68
                 : 0.46
             : viewerNight
               ? 0.09
@@ -1114,7 +1120,7 @@ function GlobeScene({
       />
       {/* Fill débil permanente en home: evita cara frontal negra con sol editorial. */}
       {embedded ? (
-        <directionalLight position={[-5, 3, 4]} intensity={viewerNight ? 0.85 : 1.35} color="#c8e0ff" />
+        <directionalLight position={[-5, 3, 4]} intensity={viewerNight ? 0.85 : 1.55} color="#c8e0ff" />
       ) : null}
 
       <group scale={geoScale}>
@@ -1177,6 +1183,7 @@ function GlobeScene({
               roughness={embedded ? 0.81 : 0.94}
               emissiveIntensity={embedded ? 0.07 : 0.04}
               clipToViewport={embedded}
+              keepBehindEarth
             />
           </Suspense>
         ) : null}

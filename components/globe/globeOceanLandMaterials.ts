@@ -9,17 +9,13 @@ import * as THREE from 'three';
 import {
   GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0,
   GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1,
-  GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE,
   GLOBE_V2_LAND_MASK_DAY_OCEAN_RG,
   GLOBE_V2_LAND_MASK_DILATE_UV,
   GLOBE_V2_LAND_MASK_SOFT_HI,
   GLOBE_V2_LAND_MASK_SOFT_LO,
   GLOBE_V2_LAND_MASK_SPEC_HIGH,
   GLOBE_V2_LAND_MASK_SPEC_LOW,
-  GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER,
   GLOBE_V2_NORMAL_SCALE_SURFACE,
-  GLOBE_V2_OCEAN_MASK_SOFT_HI,
-  GLOBE_V2_OCEAN_MASK_SOFT_LO,
 } from '@/lib/globe/globe-v2-assets';
 
 /** Peso relieve en vértice (misma convención que luces urbanas). */
@@ -85,8 +81,15 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
 
     void main() {
       float specSample = texture2D(uSpecTex, vUv).r;
+      /*
+       * La water mask 4K (specular fuente) NO es binaria: en Pacífico/Atlántico hay
+       * parches oscuros (~18–26% bajo umbral). Usarla para discard/openWater mottled
+       * producía agujeros negros. Solo descartar tierra clara; day map rescata mar sucio.
+       */
+      vec3 dDay = texture2D(uDayTex, vUv).rgb;
+      float dayOcean = smoothstep(${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0}, ${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1},
+        dDay.b - max(dDay.r, dDay.g) * ${GLOBE_V2_LAND_MASK_DAY_OCEAN_RG});
 
-      /* Soft water weight (mask 4K): solapa costa con land; evita hueco negro entre esferas. */
       if (uOceanMaskLand > 0.5) {
         float e = ${GLOBE_V2_LAND_MASK_DILATE_UV};
         float sp0 = specSample;
@@ -95,13 +98,11 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
           min(texture2D(uSpecTex, vUv + vec2(-e, 0.0)).r,
           min(texture2D(uSpecTex, vUv + vec2(0.0, e)).r,
               texture2D(uSpecTex, vUv + vec2(0.0, -e)).r))));
-        vec3 d = texture2D(uDayTex, vUv).rgb;
-        float dayOcean = smoothstep(${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0}, ${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1},
-          d.b - max(d.r, d.g) * ${GLOBE_V2_LAND_MASK_DAY_OCEAN_RG});
-        float waterW = smoothstep(${GLOBE_V2_OCEAN_MASK_SOFT_LO}, ${GLOBE_V2_OCEAN_MASK_SOFT_HI}, spM);
-        waterW = max(waterW, smoothstep(0.7, ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER}, sp0));
-        waterW = max(waterW, waterW * 0.85 + dayOcean * 0.15 * step(${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE}, dayOcean));
-        if (waterW < 0.04) discard;
+        /* Gris medio = agua (mask sucia); dayOcean anula falsos “continentes” en mar abierto. */
+        float waterW = smoothstep(0.1, 0.36, spM);
+        waterW = max(waterW, dayOcean);
+        waterW = max(waterW, smoothstep(0.08, 0.28, sp0));
+        if (waterW < 0.06) discard;
       }
 
       vec3 N = normalize(vWorldNormal);
@@ -112,14 +113,13 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Con uFullDay: disco legible sin empujar el centro a blanco puro (menos “continentes quemados”). */
       float ndl = uFullDay > 0.5 ? clamp(0.68 + 0.32 * ndlRaw, 0.78, 1.0) : ndlRaw;
       float ndv = clamp(dot(N, V), 0.0, 1.0);
-      float openWater = smoothstep(0.36, 0.92, specSample);
+      /* Specular uniforme en mar (no seguir ruido de la mask). */
+      float openWater = 1.0;
 
-      /* Océano azul profundo pero legible (NASA Earth Observatory / día) */
+      /* Océano azul profundo pero legible (NASA Earth Observatory / día) — sin mottling de mask. */
       vec3 deep = mix(vec3(0.039, 0.165, 0.431), vec3(0.05, 0.22, 0.52), uFullDay);
       vec3 mid = mix(vec3(0.06, 0.22, 0.48), vec3(0.1, 0.32, 0.58), uFullDay);
-      float bathy = 0.5 + 0.5 * sin(vUv.x * 18.0 + vUv.y * 11.0);
-      bathy = bathy * 0.06 + 0.94;
-      vec3 base = mix(deep, mid, bathy * 0.12 + 0.1);
+      vec3 base = mix(deep, mid, 0.16);
 
       /* Fresnel solo en limbo (ndv bajo). Sin término extra que suba el centro del disco. */
       float rim = pow(1.0 - ndv, 6.2);
@@ -281,10 +281,13 @@ export function createLandSphereMaterial(
       vec3 d0 = texture2D(uDayTex, vUv).rgb;
       float dayOcean = smoothstep(${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE0}, ${GLOBE_V2_LAND_MASK_DAY_OCEAN_EDGE1},
         d0.b - max(d0.r, d0.g) * ${GLOBE_V2_LAND_MASK_DAY_OCEAN_RG});
-      /* Soft coast: waterW 0→1; landAmt con alpha (sin corte duro). */
+      /*
+       * Soft coast. dayOcean a peso pleno: la mask 4K tiene parches oscuros en mar abierto
+       * que, sin rescate, pintaban “tierra” (albedo day) → manchas sucias sobre el océano.
+       */
       float waterW = smoothstep(${GLOBE_V2_LAND_MASK_SOFT_LO}, ${GLOBE_V2_LAND_MASK_SOFT_HI}, spM);
-      waterW = max(waterW, smoothstep(0.72, ${GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER}, sp0));
-      waterW = max(waterW, waterW * 0.9 + dayOcean * 0.1 * step(${GLOBE_V2_LAND_MASK_DAY_OCEAN_GATE}, dayOcean));
+      waterW = max(waterW, smoothstep(0.55, 0.82, sp0));
+      waterW = max(waterW, dayOcean);
       float landAmt = 1.0 - waterW;
       if (landAmt < 0.03) discard;
 
@@ -312,13 +315,13 @@ export function createLandSphereMaterial(
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = mix(0.2, 0.28, uFullDay);
-      float dif = mix(0.68, 0.78, uFullDay) * pow(ndl, 0.94);
-      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.06, uFullDay);
+      float amb = mix(0.26, 0.36, uFullDay);
+      float dif = mix(0.74, 0.88, uFullDay) * pow(ndl, 0.94);
+      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.1, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);
-      litDay *= mix(1.0, 0.78, hot);
+      litDay *= mix(1.0, 0.82, hot);
 
       vec3 litNight = d0 * vec3(0.22, 0.26, 0.34) * (0.62 + 0.42 * mountainPop);
       litNight += vec3(0.045, 0.055, 0.075) * landMask;

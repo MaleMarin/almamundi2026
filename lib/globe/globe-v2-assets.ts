@@ -52,8 +52,11 @@ export const GLOBE_V2_CITY_LIGHTS_SCALE = GLOBE_V2_LAND_RADIUS * 1.0008;
 /** Nubes: por encima de `GLOBE_V2_LAND_RADIUS`; capa exterior fina. */
 export const GLOBE_V2_CLOUD_ROOT_SCALE = 1.011;
 
-/** Halo atmosférico: anillo fino fuera de la corteza. */
-export const GLOBE_V2_ATMOSPHERE_SCALE = 1.014;
+/**
+ * Halo atmosférico: por encima de la capa exterior de nubes (~1.016).
+ * 1.08 ≈ anillo claramente fuera del limbo a cámara home (~3.6 R⊕).
+ */
+export const GLOBE_V2_ATMOSPHERE_SCALE = 1.08;
 
 /**
  * Bits: por encima de la capa exterior de nubes.

@@ -176,10 +176,13 @@ export type GlobeAtmosphereGlowOptions = {
   power?: number;
   innerColor?: THREE.ColorRepresentation;
   outerColor?: THREE.ColorRepresentation;
+  /** Tinte del limbo en el lado iluminado (fotos órbita: azul → leve cálido). */
+  warmColor?: THREE.ColorRepresentation;
 };
 
 /**
- * Halo orbital: más lectura a contraluz, casi apagado en sombra.
+ * Halo orbital (cáscara BackSide): limbo intenso que se desvanece hacia afuera.
+ * GLSL3 + `fragColor` (mismo patrón que `Atmosphere.tsx`; evita fallos del shim `gl_FragColor`).
  * `opts` permite preset «home cinematográfica» sin mutar uniforms tras crear el material.
  */
 export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions): THREE.ShaderMaterial {
@@ -188,11 +191,13 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     uSunDir: { value: new THREE.Vector3(1, 0, 0) },
     uInner: { value: new THREE.Color(opts?.innerColor ?? 0x1a5fff) },
     uOuter: { value: new THREE.Color(opts?.outerColor ?? 0x0a2060) },
-    uIntensity: { value: opts?.intensity ?? 0.101 },
-    uPower: { value: opts?.power ?? 3.15 },
+    uWarm: { value: new THREE.Color(opts?.warmColor ?? 0xffd4b8) },
+    uIntensity: { value: opts?.intensity ?? 0.16 },
+    uPower: { value: opts?.power ?? 2.85 },
     uFullDay: { value: 0 },
   };
 
+  /* Mismo estilo que `Atmosphere.tsx`: varying + fragColor + GLSL3 (Three reescribe varyings). */
   const vertexShader = /* glsl */ `
     varying vec3 vWorldNormal;
     varying vec3 vWorldPos;
@@ -209,6 +214,7 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     uniform vec3 uSunDir;
     uniform vec3 uInner;
     uniform vec3 uOuter;
+    uniform vec3 uWarm;
     uniform float uIntensity;
     uniform float uPower;
     uniform float uFullDay;
@@ -216,15 +222,30 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     varying vec3 vWorldNormal;
     varying vec3 vWorldPos;
 
+    layout(location = 0) out highp vec4 fragColor;
+
     void main() {
+      /*
+       * FrontSide shell > planeta: limbo intenso + haze ancha (el anillo entre tierra y
+       * silueta del shell tiene ndv medio; un power alto lo apagaba a negro).
+       */
       vec3 N = normalize(vWorldNormal);
-      vec3 viewDir = normalize(uCamPos - vWorldPos);
-      float ndv = clamp(dot(N, viewDir), -1.0, 1.0);
-      float rim = pow(1.0 - abs(ndv), uPower);
+      vec3 toCam = uCamPos - vWorldPos;
+      float lenV = length(toCam);
+      vec3 viewDir = lenV > 1e-4 ? toCam / lenV : N;
+      float ndv = clamp(dot(N, viewDir), 0.0, 1.0);
+      float oneMinus = max(1.0 - ndv, 0.0);
+      float limbCore = pow(oneMinus, uPower);
+      float limbHaze = pow(oneMinus, max(uPower * 0.38, 0.85));
       float sunF = clamp(dot(N, normalize(uSunDir)) * 0.5 + 0.5, 0.0, 1.0);
-      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.18, 0.88, pow(sunF, 0.78));
-      vec3 glow = mix(uInner, uOuter, rim) * rim * uIntensity * sunLit;
-      gl_FragColor = vec4(glow, clamp(rim * 0.24 * sunLit, 0.0, 0.55));
+      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.4, 1.0, pow(sunF, 0.6));
+      vec3 cool = mix(uOuter, uInner, pow(limbCore, 0.55));
+      vec3 dayLimb = mix(uInner, uWarm, 0.4);
+      vec3 col = mix(cool, dayLimb, sunF * 0.8);
+      float glowAmt = (limbCore * 2.1 + limbHaze * 1.35) * uIntensity * sunLit;
+      vec3 glow = col * glowAmt;
+      float alpha = clamp((limbCore * 0.95 + limbHaze * 0.55) * sunLit, 0.0, 0.96);
+      fragColor = vec4(glow, alpha);
     }
   `;
 
@@ -233,11 +254,19 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     uniforms: uniforms as Record<string, THREE.IUniform>,
     vertexShader,
     fragmentShader,
+    glslVersion: THREE.GLSL3,
     transparent: true,
+    /**
+     * QA home (cámara ~3.6 R⊕, scale 1.08):
+     * - depthTest true: el z-buffer mata el anillo exterior (~33 px medidos con shell sólido).
+     * - BackSide + fresnel: glow solo sobre el disco, sin anillo fuera del limbo.
+     * - FrontSide + depthTest false + fresnel: anillo visible; centro del disco ~0.
+     * GLSL3 + fragColor: mismo patrón que `Atmosphere.tsx`.
+     */
     side: THREE.FrontSide,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    depthTest: true,
+    depthTest: false,
     toneMapped: false,
   });
   mat.name = 'GlobeAtmosphereGlow';
@@ -267,5 +296,6 @@ export function computeSunDirection(
 
 /*
  * Superficie día/noche: ver `globeOceanLandMaterials.ts` (OceanSphere + LandSphere).
- * GlobeCityLightsOverlay + GlobeAtmosphereGlow: GLSL ES 1.0 (gl_FragColor, texture2D).
+ * GlobeCityLightsOverlay: GLSL ES 1.0 (gl_FragColor, texture2D).
+ * GlobeAtmosphereGlow: GLSL3 (fragColor) + BackSide, como `Atmosphere.tsx`.
  */

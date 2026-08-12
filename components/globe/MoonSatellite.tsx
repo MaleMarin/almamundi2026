@@ -1,12 +1,14 @@
 'use client';
 
 /**
- * Luna en órbita geocéntrica: elipse (e ≈ 0,055), plano con inclinación ~5,145° (eclíptica) y yaw opcional.
- * Posición: anomalía media M con n = 2π/T y ecuación de Kepler → E → coords perifocales (mismo `dt` que la Tierra).
- * Traslación en sentido progrado respecto a la Tierra (coherente con el giro del globo en escena).
- * Orientación: el grupo raíz traslada + `lookAt(0,0,0)` (eje +Z hacia la Tierra). Hijo con giro en Y a velocidad n = 2π/T:
- * bloqueo mareal (misma cara a la Tierra) y a la vez se percibe rotación sobre el eje local como en la Tierra.
- * Si el radio casi alinea con `up`, se usa un eje auxiliar estable (misma idea que el antiguo `makeBasis`).
+ * Luna en órbita geocéntrica: elipse (e ≈ 0,055), plano con inclinación ~5,145°.
+ * Posición: anomalía media M con n = 2π/T y Kepler → coords perifocales.
+ *
+ * Realismo perceptivo (GlobeV2 home):
+ * - Siempre detrás del planeta respecto a la cámara (sin tránsitos frontales).
+ * - Acoplamiento de marea: `lookAt(Tierra)` fija la misma cara; sin spin hijo extra.
+ * - Fase = misma luz direccional de escena que ilumina la Tierra.
+ * - Radio ≈ 0,27 R⊕ (ajustable con `moonRadiusScale`).
  */
 
 import { useLayoutEffect, useMemo, useRef } from 'react';
@@ -89,8 +91,7 @@ export type MoonSatelliteProps = {
   /** Semieje mayor de la órbita en las mismas unidades (visual; no escala real ~60 R⊕). */
   orbitSemiMajor?: number;
   /**
-   * Escala solo del disco (no de la órbita): valores &lt;1 hacen la Luna más pequeña en pantalla
-   * sin acercar la Tierra; útil porque una órbita “corta” agranda mucho el ángulo aparente.
+   * Escala solo del disco (no de la órbita): 1 = proporción real ~0,27 R⊕.
    */
   moonRadiusScale?: number;
   /**
@@ -103,13 +104,23 @@ export type MoonSatelliteProps = {
    * la Luna al lado izquierdo del encuadre respecto a la fase inicial de la elipse.
    */
   orbitYawRad?: number;
-  /** Inclinación del plano orbital (grados); más grados = más barrido en Y y lectura 3D frente a cámara en +Z. */
+  /** Inclinación del plano orbital (grados); ~5,145° real. */
   orbitInclinationDeg?: number;
   /** Lectura de cráteres / terminador (home cinematográfica). */
   roughness?: number;
   emissiveIntensity?: number;
   /** Home embebida: ocultar la Luna si proyectada fuera del canvas negro. */
   clipToViewport?: boolean;
+  /**
+   * Si true, la Luna nunca queda entre la cámara y la Tierra: se refleja al hemisferio lejano.
+   * Evita tránsitos frontales (lectura de error a ~3,6 R⊕ de cámara).
+   */
+  keepBehindEarth?: boolean;
+  /**
+   * Yaw fijo del mapa lunar en el frame que mira a la Tierra (mares / cara conocida).
+   * El acoplamiento de marea lo da solo `lookAt`; este offset no gira con la órbita.
+   */
+  nearSideYawRad?: number;
 };
 
 export function MoonSatellite({
@@ -122,13 +133,13 @@ export function MoonSatellite({
   roughness = 0.94,
   emissiveIntensity = 0.04,
   clipToViewport = false,
+  keepBehindEarth = true,
+  nearSideYawRad = Math.PI,
 }: MoonSatelliteProps) {
   const { camera } = useThree();
   const moonOrbitRootRef = useRef<THREE.Group>(null);
-  /** Giro propio sobre Y local (polos), hijo del grupo que ya mira a la Tierra. */
-  const moonSpinAboutAxisRef = useRef<THREE.Group>(null);
   const moonMeshRef = useRef<THREE.Mesh>(null);
-  /** Anomalía media M (rad): dM/dt = n = 2π/T; ν y r vía Kepler (elipse coherente con el período sidereal). */
+  /** Anomalía media M (rad): dM/dt = n = 2π/T; ν y r vía Kepler. */
   const meanAnomalyRef = useRef(0);
   const moonMap = useTexture(MOON_MAP_URL);
 
@@ -140,10 +151,13 @@ export function MoonSatellite({
       moonWorld: new THREE.Vector3(),
       camWorld: new THREE.Vector3(),
       earthWorld: new THREE.Vector3(),
+      camLocal: new THREE.Vector3(),
+      toCam: new THREE.Vector3(),
       scratchDir: new THREE.Vector3(),
       scratchOc: new THREE.Vector3(),
       worldScale: new THREE.Vector3(),
       ndc: new THREE.Vector3(),
+      invParent: new THREE.Matrix4(),
     }),
     []
   );
@@ -181,7 +195,7 @@ export function MoonSatellite({
     const xOrbit = a * (Math.cos(E) - e);
     const zOrbit = a * sqrt1me2 * Math.sin(E);
     let x = xOrbit;
-    const y = zOrbit * Math.sin(inc);
+    let y = zOrbit * Math.sin(inc);
     let z = zOrbit * Math.cos(inc);
 
     if (orbitYawRad !== 0) {
@@ -191,6 +205,25 @@ export function MoonSatellite({
       const zr = -x * s + z * c;
       x = xr;
       z = zr;
+    }
+
+    const parent = root.parent;
+    if (keepBehindEarth && parent) {
+      /*
+       * Hemisferio lejano respecto a la cámara: si la Luna quedaría entre cámara y Tierra,
+       * se refleja al otro lado del plano que pasa por la Tierra ⊥ (cámara→Tierra).
+       */
+      parent.getWorldPosition(aux.earthWorld);
+      camera.getWorldPosition(aux.camWorld);
+      aux.invParent.copy(parent.matrixWorld).invert();
+      aux.camLocal.copy(aux.camWorld).applyMatrix4(aux.invParent);
+      aux.toCam.copy(aux.camLocal).normalize();
+      const along = x * aux.toCam.x + y * aux.toCam.y + z * aux.toCam.z;
+      if (along > 0) {
+        x -= 2 * along * aux.toCam.x;
+        y -= 2 * along * aux.toCam.y;
+        z -= 2 * along * aux.toCam.z;
+      }
     }
 
     const lenSq = x * x + y * y + z * z;
@@ -204,15 +237,10 @@ export function MoonSatellite({
     } else {
       root.up.copy(aux.worldY);
     }
+    /* Acoplamiento de marea: una sola cara a la Tierra (sin spin inercial extra). */
     root.lookAt(0, 0, 0);
 
-    const spin = moonSpinAboutAxisRef.current;
-    if (spin) {
-      spin.rotation.y -= meanMotion * dt;
-    }
-
     const mesh = moonMeshRef.current;
-    const parent = root.parent;
     if (mesh && parent) {
       parent.getWorldPosition(aux.earthWorld);
       parent.getWorldScale(aux.worldScale);
@@ -253,28 +281,28 @@ export function MoonSatellite({
         La Luna debe dibujarse después de la capa opaca (tierra + océano, renderOrder 0 y 1 en EarthGroup).
         Si va antes (p. ej. -20), escribe profundidad y las nubes (transparentes, sin depthWrite) no la
         actualizan: el z-buffer puede seguir “en la Luna” y se ven fragmentos al pasar detrás del disco.
+        Fase: MeshStandardMaterial recibe el mismo directionalLight (sol) que la Tierra.
       */}
-      <group ref={moonSpinAboutAxisRef} name="AM_moonAxisSpin">
-        <mesh
-          ref={(m) => {
-            moonMeshRef.current = m;
-            if (m) m.raycast = () => {};
-          }}
-          name="AM_moonMesh"
-          renderOrder={2}
-        >
-          <sphereGeometry args={[moonRadius, 52, 52]} />
-          <meshStandardMaterial
-            map={moonMap}
-            roughness={roughness}
-            metalness={0}
-            emissive="#0a0a12"
-            emissiveIntensity={emissiveIntensity}
-            depthTest
-            depthWrite
-          />
-        </mesh>
-      </group>
+      <mesh
+        ref={(m) => {
+          moonMeshRef.current = m;
+          if (m) m.raycast = () => {};
+        }}
+        name="AM_moonMesh"
+        renderOrder={2}
+        rotation={[0, nearSideYawRad, 0]}
+      >
+        <sphereGeometry args={[moonRadius, 52, 52]} />
+        <meshStandardMaterial
+          map={moonMap}
+          roughness={roughness}
+          metalness={0}
+          emissive="#0a0a12"
+          emissiveIntensity={emissiveIntensity}
+          depthTest
+          depthWrite
+        />
+      </mesh>
     </group>
   );
 }
