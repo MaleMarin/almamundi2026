@@ -1022,9 +1022,9 @@ function GlobeScene({
       GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
     );
   }, -100);
-  /* Estrellas procedurales: densidad baja; no compiten con bits (dorados en la Tierra). */
-  const starsCount = embedded ? (viewerNight ? 380 : 290) : viewerNight ? 900 : 720;
-  const starsRadius = embedded ? 470 : 520;
+  /* Estrellas: radio < camera.far (1000). Home ≥2000; sutiles, no compiten con bits. */
+  const starsCount = embedded ? (viewerNight ? 2800 : 2400) : viewerNight ? 8000 : 6500;
+  const starsRadius = embedded ? 420 : 480;
 
   /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css). */
   const exp = embedded
@@ -1046,7 +1046,7 @@ function GlobeScene({
       <ProceduralStarfield
         count={starsCount}
         radius={starsRadius}
-        twinkle={embedded ? 0.035 : 0.05}
+        twinkle={embedded ? 0.025 : 0.035}
       />
 
       {!embedded && (
@@ -1174,7 +1174,7 @@ function GlobeScene({
                 embedded ? GLOBE_V2_MOON_INCLINATION_EMBEDDED_DEG : GLOBE_V2_MOON_ORBIT_INCLINATION_DEG
               }
               roughness={embedded ? 0.81 : 0.94}
-              emissiveIntensity={embedded ? 0.07 : 0.04}
+              emissiveIntensity={embedded ? 0.12 : 0.07}
               clipToViewport={embedded}
               keepBehindEarth
             />
@@ -1352,7 +1352,8 @@ export default function GlobeV2({
       ) : null}
       <Canvas
         shadows={false}
-        camera={{ position: camPos, fov: embedded ? 40 : 42, near: 0.1, far: 280 }}
+        /* far 1000: el starfield vive a radio ~420–480; far 280 lo recortaba entero. */
+        camera={{ position: camPos, fov: embedded ? 40 : 42, near: 0.1, far: 1000 }}
         gl={{
           antialias: true,
           alpha: false,

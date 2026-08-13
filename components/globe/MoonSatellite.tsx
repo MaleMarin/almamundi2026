@@ -230,6 +230,8 @@ export function MoonSatellite({
     if (lenSq < 1e-24) return;
 
     root.position.set(x, y, z);
+    /* lookAt + padre con scale puede introducir shear; la esfera debe permanecer uniforme. */
+    root.scale.set(1, 1, 1);
     aux.radial.set(-x, -y, -z).normalize();
     /* Evita singularidad de lookAt cuando el radio ≈ paralelo a worldY. */
     if (Math.abs(aux.radial.dot(aux.worldY)) > 0.995) {
@@ -239,14 +241,22 @@ export function MoonSatellite({
     }
     /* Acoplamiento de marea: una sola cara a la Tierra (sin spin inercial extra). */
     root.lookAt(0, 0, 0);
+    root.scale.set(1, 1, 1);
 
     const mesh = moonMeshRef.current;
     if (mesh && parent) {
+      mesh.scale.set(1, 1, 1);
       parent.getWorldPosition(aux.earthWorld);
       parent.getWorldScale(aux.worldScale);
       const worldUniform = Math.max(aux.worldScale.x, aux.worldScale.y, aux.worldScale.z);
+      /*
+       * Ocultar antes de que el disco lunar se recorte contra la Tierra.
+       * Si solo se oculta el centro, el limbo recorta la esfera → óvalo aplastado.
+       * El halo ancho anterior (scale 1.08) tapaba ese recorte; el rim ISS ya no.
+       */
       const earthOcclusionRadius =
-        (GLOBE_V2_CLOUD_ROOT_SCALE + GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA) * worldUniform * 1.015;
+        (GLOBE_V2_CLOUD_ROOT_SCALE + GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA) * worldUniform * 1.015 +
+        moonRadius * worldUniform;
 
       root.getWorldPosition(aux.moonWorld);
       camera.getWorldPosition(aux.camWorld);
@@ -297,7 +307,7 @@ export function MoonSatellite({
           map={moonMap}
           roughness={roughness}
           metalness={0}
-          emissive="#0a0a12"
+          emissive="#1c1c28"
           emissiveIntensity={emissiveIntensity}
           depthTest
           depthWrite
