@@ -192,8 +192,8 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     uInner: { value: new THREE.Color(opts?.innerColor ?? 0x1a5fff) },
     uOuter: { value: new THREE.Color(opts?.outerColor ?? 0x0a2060) },
     uWarm: { value: new THREE.Color(opts?.warmColor ?? 0xffd4b8) },
-    uIntensity: { value: opts?.intensity ?? 0.16 },
-    uPower: { value: opts?.power ?? 2.85 },
+    uIntensity: { value: opts?.intensity ?? 0.07 },
+    uPower: { value: opts?.power ?? 5.8 },
     uFullDay: { value: 0 },
   };
 
@@ -225,26 +225,23 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     layout(location = 0) out highp vec4 fragColor;
 
     void main() {
-      /*
-       * FrontSide shell > planeta: limbo intenso + haze ancha (el anillo entre tierra y
-       * silueta del shell tiene ndv medio; un power alto lo apagaba a negro).
-       */
+      /* Franja ISS: solo limbo (power alto); sin haze ancha ni alpha que marque el borde del shell. */
       vec3 N = normalize(vWorldNormal);
       vec3 toCam = uCamPos - vWorldPos;
       float lenV = length(toCam);
       vec3 viewDir = lenV > 1e-4 ? toCam / lenV : N;
       float ndv = clamp(dot(N, viewDir), 0.0, 1.0);
-      float oneMinus = max(1.0 - ndv, 0.0);
-      float limbCore = pow(oneMinus, uPower);
-      float limbHaze = pow(oneMinus, max(uPower * 0.38, 0.85));
+      float rim = pow(max(1.0 - ndv, 0.0), uPower);
+      /* Colas <4%: sin contorno del shell; solo el pico del limbo. */
+      if (rim < 0.04) discard;
       float sunF = clamp(dot(N, normalize(uSunDir)) * 0.5 + 0.5, 0.0, 1.0);
-      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.4, 1.0, pow(sunF, 0.6));
-      vec3 cool = mix(uOuter, uInner, pow(limbCore, 0.55));
-      vec3 dayLimb = mix(uInner, uWarm, 0.4);
-      vec3 col = mix(cool, dayLimb, sunF * 0.8);
-      float glowAmt = (limbCore * 2.1 + limbHaze * 1.35) * uIntensity * sunLit;
+      float sunLit = uFullDay > 0.5 ? 1.0 : mix(0.28, 1.0, pow(sunF, 0.75));
+      vec3 col = mix(uOuter, uInner, clamp(rim * 1.4, 0.0, 1.0));
+      col = mix(col, mix(uInner, uWarm, 0.15), sunF * 0.25);
+      /* Como Atmosphere.tsx: contribución baja (suma luz, no tapa superficie). */
+      float glowAmt = rim * uIntensity * sunLit;
       vec3 glow = col * glowAmt;
-      float alpha = clamp((limbCore * 0.95 + limbHaze * 0.55) * sunLit, 0.0, 0.96);
+      float alpha = clamp(rim * 0.11 * sunLit, 0.0, 0.16);
       fragColor = vec4(glow, alpha);
     }
   `;
@@ -257,11 +254,8 @@ export function createAtmosphereGlowMaterial(opts?: GlobeAtmosphereGlowOptions):
     glslVersion: THREE.GLSL3,
     transparent: true,
     /**
-     * QA home (cámara ~3.6 R⊕, scale 1.08):
-     * - depthTest true: el z-buffer mata el anillo exterior (~33 px medidos con shell sólido).
-     * - BackSide + fresnel: glow solo sobre el disco, sin anillo fuera del limbo.
-     * - FrontSide + depthTest false + fresnel: anillo visible; centro del disco ~0.
-     * GLSL3 + fragColor: mismo patrón que `Atmosphere.tsx`.
+     * Shell fino (scale ~1.025) + additive sutil.
+     * depthTest false: el anillo de pocos px sigue siendo visible; el power alto evita teñir continentes.
      */
     side: THREE.FrontSide,
     blending: THREE.AdditiveBlending,

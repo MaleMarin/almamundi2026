@@ -14,10 +14,11 @@
 import type { RefObject } from 'react';
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { Environment, OrbitControls, Stars, useTexture } from '@react-three/drei';
+import { Environment, OrbitControls, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { GlobeBitsLayer, type GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
 import { MoonSatellite, MOON_ORBIT_INCLINATION_DEG } from '@/components/globe/MoonSatellite';
+import { ProceduralStarfield } from '@/components/globe/ProceduralStarfield';
 import {
   computeSunDirection,
   createAtmosphereGlowMaterial,
@@ -384,11 +385,12 @@ function AtmosphereGlow({
         homeCinematic
           ? {
               // Halo tipo foto orbital: limbo intenso + soft outer; cálido leve al sol.
-              intensity: 0.48,
-              power: 2.05,
-              innerColor: 0x7ec8ff,
-              outerColor: 0x0a2558,
-              warmColor: 0xffd2b0,
+              // Intento 2 ISS: scale 1.022, power 5.8, alpha máx ~0.16.
+              intensity: 0.075,
+              power: 5.8,
+              innerColor: 0x5aa8ff,
+              outerColor: 0x081828,
+              warmColor: 0xffd0b0,
             }
           : undefined
       ),
@@ -1020,14 +1022,9 @@ function GlobeScene({
       GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
     );
   }, -100);
-  const starsCount = embedded
-    ? viewerNight
-      ? 1600
-      : 1050
-    : viewerNight
-      ? 11000
-      : 9000;
-  const starsRadius = embedded ? 465 : 520;
+  /* Estrellas procedurales: densidad baja; no compiten con bits (dorados en la Tierra). */
+  const starsCount = embedded ? (viewerNight ? 380 : 290) : viewerNight ? 900 : 720;
+  const starsRadius = embedded ? 470 : 520;
 
   /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css). */
   const exp = embedded
@@ -1046,14 +1043,10 @@ function GlobeScene({
     <>
       <ExposureSync exposure={exp} />
 
-      <Stars
-        radius={starsRadius}
-        depth={100}
+      <ProceduralStarfield
         count={starsCount}
-        factor={embedded ? 2.05 : 3}
-        saturation={0}
-        fade
-        speed={embedded ? 0.18 : 0.32}
+        radius={starsRadius}
+        twinkle={embedded ? 0.035 : 0.05}
       />
 
       {!embedded && (
