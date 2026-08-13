@@ -40,6 +40,7 @@ import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import { MAP_HOME_DOCK_NAV_CLASS } from '@/lib/map-home-neu-button';
 import type { GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
+import { StoryViewer } from '@/components/mapa/StoryViewer';
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
@@ -136,6 +137,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [selectedMood, setSelectedMood] = useState<string>('universo');
   const [exploreQuery, setExploreQuery] = useState('');
   const [highlightedStoryId, setHighlightedStoryId] = useState<string | null>(null);
+  const [openStory, setOpenStory] = useState<StoryPoint | null>(null);
+  const [storyViewerClosing, setStoryViewerClosing] = useState(false);
+  const storyCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   /** Portal del dock neumórfico bajo el título (`#map-dock-slot` en MapSectionLocked). */
@@ -188,6 +192,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       lat: s.lat,
       lon: s.lng,
       markerKind: 'story' as const,
+      title: s.title ?? s.label,
+      place: [s.city, s.country].filter(Boolean).join(', ') || undefined,
     }));
     return [...globeBitsMarkers, ...storyLayer];
   }, [globeBitsMarkers, storiesOnGlobe]);
@@ -513,8 +519,32 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [topicNewsItems, generalNewsItems]
   );
 
-  const handleStoryFocus = useCallback((story: StoryPoint) => {
+  const openStoryViewer = useCallback((story: StoryPoint) => {
+    if (storyCloseTimerRef.current) {
+      clearTimeout(storyCloseTimerRef.current);
+      storyCloseTimerRef.current = null;
+    }
+    setStoryViewerClosing(false);
     setHighlightedStoryId(story.id ?? null);
+    setDrawerOpen(false);
+    setOpenStory(story);
+  }, []);
+
+  const closeStoryViewer = useCallback(() => {
+    setStoryViewerClosing(true);
+    if (storyCloseTimerRef.current) clearTimeout(storyCloseTimerRef.current);
+    storyCloseTimerRef.current = setTimeout(() => {
+      setOpenStory(null);
+      setHighlightedStoryId(null);
+      setStoryViewerClosing(false);
+      storyCloseTimerRef.current = null;
+    }, 400);
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      if (storyCloseTimerRef.current) clearTimeout(storyCloseTimerRef.current);
+    };
   }, []);
 
   const selectedGlobeMarkerId = useMemo(() => {
@@ -532,21 +562,28 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         const idx = id - STORY_GLOBE_ID_BASE;
         const story = storiesOnGlobe[idx];
         if (!story) return;
-        setHighlightedStoryId(story.id ?? null);
-        setDrawerMode('stories');
-        setDrawerOpen(true);
+        openStoryViewer(story);
         return;
       }
       const bit = huellasPuntos.find((h) => h.id === id);
       if (!bit) return;
+      setOpenStory(null);
+      setHighlightedStoryId(null);
       setSelectedBit(bit);
       setDrawerMode('bits');
       setDrawerOpen(true);
     },
-    [storiesOnGlobe, huellasPuntos]
+    [storiesOnGlobe, huellasPuntos, openStoryViewer]
   );
 
   function open(mode: MapDockMode) {
+    if (storyCloseTimerRef.current) {
+      clearTimeout(storyCloseTimerRef.current);
+      storyCloseTimerRef.current = null;
+    }
+    setOpenStory(null);
+    setStoryViewerClosing(false);
+    setHighlightedStoryId(null);
     setDrawerMode(mode);
     setDrawerOpen(true);
   }
@@ -574,7 +611,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     stories,
     exploreQuery,
     onExploreQueryChange: setExploreQuery,
-    onStoryFocus: handleStoryFocus,
+    onStoryFocus: openStoryViewer,
     highlightedStoryId,
   };
 
@@ -631,7 +668,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               viewerLng={viewerLng ?? undefined}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
-              pauseEarthSpinForUi={drawerOpen && drawerMode === 'bits'}
+              pauseEarthSpinForUi={Boolean(openStory) || (drawerOpen && drawerMode === 'bits')}
               onBitClick={handleGlobeMarkerClick}
             />
           </div>
@@ -713,6 +750,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <SoundsPanel {...sonidosProps} />
           )}
       </MapDrawer>
+      {openStory
+        ? createPortal(
+            <StoryViewer
+              story={openStory}
+              onClose={closeStoryViewer}
+              isClosing={storyViewerClosing}
+              variant="compact"
+            />,
+            document.body
+          )
+        : null}
       </div>
     </div>
   );

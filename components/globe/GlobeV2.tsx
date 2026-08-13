@@ -1022,9 +1022,9 @@ function GlobeScene({
       GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
     );
   }, -100);
-  /* Estrellas: radio < camera.far (1000). Home ≥2000; sutiles, no compiten con bits. */
-  const starsCount = embedded ? (viewerNight ? 2800 : 2400) : viewerNight ? 8000 : 6500;
-  const starsRadius = embedded ? 420 : 480;
+  /* Estrellas: radio 420 < camera.far 1000. Tamaño en px (sin attenuation). */
+  const starsCount = embedded ? 2500 : 4200;
+  const starsRadius = 420;
 
   /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css). */
   const exp = embedded
@@ -1352,7 +1352,7 @@ export default function GlobeV2({
       ) : null}
       <Canvas
         shadows={false}
-        /* far 1000: el starfield vive a radio ~420–480; far 280 lo recortaba entero. */
+        /* far 1000: el starfield vive a radio ~420; far 280 lo recortaba entero. */
         camera={{ position: camPos, fov: embedded ? 40 : 42, near: 0.1, far: 1000 }}
         gl={{
           antialias: true,

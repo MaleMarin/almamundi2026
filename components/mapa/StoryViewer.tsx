@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import Link from 'next/link';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
 import { registerPulse, getApproxLocation } from '@/lib/userLocation';
@@ -17,6 +18,8 @@ type Props = {
   onClose: () => void;
   isClosing: boolean;
   onSelectRelated?: (story: StoryPoint) => void;
+  /** Home mapa: un solo panel, máximo media pantalla. */
+  variant?: 'full' | 'compact';
 };
 
 function KenBurnsViewer({
@@ -195,11 +198,11 @@ function KenBurnsViewer({
   );
 }
 
-export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Props) {
+export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full' }: Props) {
+  const compact = variant === 'compact';
   const [mounted, setMounted] = useState(false);
-  const [showEco, setShowEco] = useState(false);
+  const [ecoPanel, setEcoPanel] = useState<null | 'voice' | 'text'>(null);
   const [listening, setListening] = useState(false);
-  const [showLastSecond, setShowLastSecond] = useState(false);
   const [lastSecondText, setLastSecondText] = useState('');
   const [lastSecondSent, setLastSecondSent] = useState(false);
   const [resonanceSent, setResonanceSent] = useState(false);
@@ -219,6 +222,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
     requestAnimationFrame(() => setMounted(true));
     duckAmbient(true);
     incrementStoriesRead(story.id);
+    setEcoPanel(null);
+    setLastSecondText('');
+    setLastSecondSent(false);
     return () => {
       duckAmbient(false);
     };
@@ -232,9 +238,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
         if (entry?.isIntersecting && !fired) {
           fired = true;
           void registerPulse(story.id ?? '');
-          setTimeout(() => setShowEco(true), 3000);
-          setTimeout(() => setShowLastSecond(true), 30_000);
-          if (shouldShowMomentoJusto()) {
+          if (!compact && shouldShowMomentoJusto()) {
             markMomentoJustoShown();
             setTimeout(() => setShowMomentoJusto(true), 2000);
           }
@@ -244,7 +248,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
     );
     obs.observe(endRef.current);
     return () => obs.disconnect();
-  }, [story.id]);
+  }, [story.id, compact]);
 
   const photos = story.photos ?? [];
   const format = story.videoUrl
@@ -342,24 +346,35 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
       <div
         style={{
           position: 'fixed',
-          left: 'clamp(0px, 30vw, 420px)',
-          right: 0,
-          bottom: 0,
-          top: 0,
-          zIndex: 30,
+          ...(compact
+            ? {
+                right: 20,
+                bottom: 20,
+                left: 'auto',
+                top: 'auto',
+                width: 'min(460px, 48vw)',
+                maxHeight: '50vh',
+              }
+            : {
+                left: 'clamp(0px, 30vw, 420px)',
+                right: 0,
+                bottom: 0,
+                top: 0,
+              }),
+          zIndex: 40,
           display: 'flex',
-          alignItems: 'flex-end',
-          justifyContent: 'center',
+          alignItems: compact ? 'stretch' : 'flex-end',
+          justifyContent: compact ? 'flex-end' : 'center',
           pointerEvents: 'none',
         }}
       >
         <div
           style={{
             width: '100%',
-            maxWidth: 720,
-            maxHeight: '92vh',
-            margin: '0 auto',
-            padding: '0 24px 24px',
+            maxWidth: compact ? '100%' : 720,
+            maxHeight: compact ? '50vh' : '50vh',
+            margin: compact ? 0 : '0 auto',
+            padding: compact ? 0 : '0 24px 24px',
             pointerEvents: 'auto',
             animation: isClosing
               ? 'storySlideDown 400ms ease forwards'
@@ -383,7 +398,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                 0 8px 32px rgba(0, 0, 0, 0.40)
               `,
               overflow:       'hidden',
-              maxHeight:      '88vh',
+              maxHeight:      '50vh',
               display:        'flex',
               flexDirection:  'column',
               position:       'relative',
@@ -447,7 +462,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     fontFamily: SITE_FONT_STACK,
                   }}
                 >
-                  — {story.label}
+                  — {story.authorName || story.label}
                 </p>
                 {liveReaders > 1 && (
                   <p
@@ -534,9 +549,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     src={story.videoUrl}
                     onEnded={() => {
                       void registerPulse(story.id ?? '');
-                      setTimeout(() => setShowEco(true), 2000);
                     }}
-                    style={{ width: '100%', display: 'block', maxHeight: '55vh', objectFit: 'cover' }}
+                    style={{ width: '100%', display: 'block', maxHeight: compact ? '22vh' : '40vh', objectFit: 'cover' }}
                   />
                 </div>
               )}
@@ -557,7 +571,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
                     src={story.audioUrl}
                     onEnded={() => {
                       void registerPulse(story.id ?? '');
-                      setTimeout(() => setShowEco(true), 2000);
                     }}
                     style={{ width: '100%' }}
                   />
@@ -590,326 +603,298 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated }: Prop
 
               <div ref={endRef} style={{ height: 1 }} />
 
-              <div
-                style={{
-                  height: 1,
-                  background: 'rgba(255,255,255,0.07)',
-                  margin: '24px 0',
-                }}
-              />
-
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-                {format === 'text' && story.body && (
-                  <button
-                    type="button"
-                    onClick={listening ? stopListening : startListening}
-                    style={{
-                      padding: '9px 18px',
-                      borderRadius: 999,
-                      background: listening
-                        ? 'rgba(96,165,250,0.15)'
-                        : 'rgba(255,255,255,0.06)',
-                      border: `1px solid ${
-                        listening
-                          ? 'rgba(96,165,250,0.35)'
-                          : 'rgba(255,255,255,0.10)'
-                      }`,
-                      color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
-                      cursor: 'pointer',
-                      fontSize: 13,
-                      fontFamily: SITE_FONT_STACK,
-                      outline: 'none',
-                      transition: 'all 180ms ease',
-                    }}
-                  >
-                    {listening ? 'Detener lectura' : 'Cerrar los ojos'}
-                  </button>
-                )}
-                <ActionButton label="Compartir" onClick={() => setShareOpen(true)} />
-                {!alreadySent && !resonanceSent && (
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      try {
-                        const loc = await getApproxLocation();
-                        await fetch(`/api/stories/${story.id}/resonance`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }),
-                        });
-                      } catch {}
-                      if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
-                      setResonanceSent(true);
-                    }}
-                    style={{
-                      padding: '9px 18px',
-                      borderRadius: 999,
-                      background: 'rgba(255,255,255,0.06)',
-                      border: '1px solid rgba(255,255,255,0.10)',
-                      color: 'rgba(255,255,255,0.55)',
-                      cursor: 'pointer',
-                      fontSize: 13,
-                      outline: 'none',
-                      fontFamily: SITE_FONT_STACK,
-                      transition: 'all 180ms ease',
-                    }}
-                  >
-                    Esto me llegó
-                  </button>
-                )}
-                {resonanceSent && (
+              {ecoPanel === 'voice' ? (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: '14px 16px',
+                    background: 'rgba(8,12,25,0.55)',
+                    border: '1px solid rgba(249,115,22,0.18)',
+                    borderRadius: 16,
+                  }}
+                >
                   <p
                     style={{
-                      fontSize: 12,
-                      color: 'rgba(249,115,22,0.60)',
-                      margin: 0,
+                      fontSize: 13,
+                      color: 'rgba(255,255,255,0.70)',
+                      margin: '0 0 10px',
                       fontFamily: SITE_FONT_STACK,
-                      fontStyle: 'italic',
                     }}
                   >
-                    El autor sabrá que llegó a alguien.
+                    ¿Quieres dejar tu reacción?
+                    <span style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
+                      10 segundos. Sin edición. Solo tu voz.
+                    </span>
                   </p>
-                )}
-                <ActionButton label="¿Dejar un eco?" onClick={() => setShowEco(true)} accent />
-              </div>
+                  <EcoRecorder storyId={story.id ?? ''} onDone={() => setEcoPanel(null)} />
+                  <button
+                    type="button"
+                    onClick={() => setEcoPanel('text')}
+                    style={{
+                      marginTop: 10,
+                      background: 'none',
+                      border: 'none',
+                      color: 'rgba(255,180,80,0.9)',
+                      cursor: 'pointer',
+                      fontSize: 12,
+                      fontFamily: SITE_FONT_STACK,
+                      padding: 0,
+                    }}
+                  >
+                    Prefiero escribir
+                  </button>
+                </div>
+              ) : null}
 
-              <ReadingChain storyId={story.id ?? ''} />
+              {ecoPanel === 'text' && !lastSecondSent ? (
+                <div
+                  style={{
+                    marginTop: 16,
+                    padding: '14px 16px',
+                    background: 'rgba(8,12,25,0.55)',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 16,
+                  }}
+                >
+                  <p
+                    style={{
+                      fontSize: 13,
+                      color: 'rgba(255,255,255,0.70)',
+                      margin: '0 0 4px',
+                      fontFamily: SITE_FONT_STACK,
+                    }}
+                  >
+                    ¿Hay algo que no dijiste en esta historia?
+                  </p>
+                  <p
+                    style={{
+                      fontSize: 11,
+                      color: 'rgba(255,255,255,0.28)',
+                      margin: '0 0 10px',
+                      fontFamily: SITE_FONT_STACK,
+                    }}
+                  >
+                    El autor lo recibirá. Máximo dos líneas.
+                  </p>
+                  <textarea
+                    value={lastSecondText}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 180) setLastSecondText(e.target.value);
+                    }}
+                    placeholder="Lo que quedó sin decir..."
+                    rows={2}
+                    style={{
+                      width: '100%',
+                      padding: '10px 14px',
+                      borderRadius: 10,
+                      background: 'rgba(255,255,255,0.06)',
+                      border: '1px solid rgba(255,255,255,0.10)',
+                      color: 'rgba(255,255,255,0.82)',
+                      fontSize: 13,
+                      fontFamily: SITE_FONT_STACK,
+                      resize: 'none',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+                    <button
+                      type="button"
+                      onClick={() => setEcoPanel('voice')}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        color: 'rgba(255,180,80,0.9)',
+                        cursor: 'pointer',
+                        fontSize: 12,
+                        fontFamily: SITE_FONT_STACK,
+                        padding: 0,
+                      }}
+                    >
+                      Prefiero grabar voz
+                    </button>
+                    <div style={{ display: 'flex', gap: 8 }}>
+                      <button
+                        type="button"
+                        onClick={() => setEcoPanel(null)}
+                        style={{
+                          padding: '7px 14px',
+                          borderRadius: 999,
+                          background: 'transparent',
+                          border: '1px solid rgba(255,255,255,0.10)',
+                          color: 'rgba(255,255,255,0.35)',
+                          cursor: 'pointer',
+                          fontSize: 12,
+                          fontFamily: SITE_FONT_STACK,
+                        }}
+                      >
+                        Cerrar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={!lastSecondText.trim()}
+                        onClick={async () => {
+                          try {
+                            await fetch(`/api/stories/${story.id}/addendum`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ text: lastSecondText }),
+                            });
+                          } catch {}
+                          setLastSecondSent(true);
+                          setEcoPanel(null);
+                        }}
+                        style={{
+                          padding: '7px 16px',
+                          borderRadius: 999,
+                          background: lastSecondText.trim() ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.04)',
+                          border: `1px solid ${lastSecondText.trim() ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.06)'}`,
+                          color: lastSecondText.trim() ? '#fdba74' : 'rgba(255,255,255,0.25)',
+                          cursor: lastSecondText.trim() ? 'pointer' : 'not-allowed',
+                          fontSize: 12,
+                          fontFamily: SITE_FONT_STACK,
+                        }}
+                      >
+                        Enviar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
 
-              {onSelectRelated && (
+              {!compact ? <ReadingChain storyId={story.id ?? ''} /> : null}
+
+              {!compact && onSelectRelated ? (
                 <RelatedCarousel
                   currentStoryId={story.id ?? ''}
                   onSelect={onSelectRelated}
                 />
-              )}
-            </div>
-          </div>
+              ) : null}
 
-          {showEco && (
-            <div
-              style={{
-                marginTop: 12,
-                padding: '16px 20px',
-                background: 'rgba(8,12,25,0.85)',
-                backdropFilter: 'blur(30px)',
-                border: '1px solid rgba(249,115,22,0.18)',
-                borderRadius: 18,
-                animation: 'ecoFadeIn 500ms ease forwards',
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 14,
-                  color: 'rgba(255,255,255,0.70)',
-                  margin: '0 0 12px',
-                  fontFamily: SITE_FONT_STACK,
-                  lineHeight: 1.4,
-                }}
-              >
-                ¿Quieres dejar tu reacción?
-                <span
+              {!compact && showMomentoJusto ? (
+                <div
                   style={{
-                    color: 'rgba(255,255,255,0.38)',
-                    fontSize: 12,
-                    display: 'block',
-                    marginTop: 2,
+                    marginTop: 16,
+                    padding: '16px 18px',
+                    background: 'rgba(8,12,25,0.55)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    borderRadius: 16,
+                    textAlign: 'center',
                   }}
                 >
-                  10 segundos. Sin edición. Solo tu voz.
-                </span>
-              </p>
-              <EcoRecorder storyId={story.id ?? ''} onDone={() => setShowEco(false)} />
-            </div>
-          )}
-
-          {showLastSecond && !lastSecondSent && (
-            <div
-              style={{
-                marginTop: 12,
-                padding: '18px 20px',
-                background: 'rgba(8,12,25,0.90)',
-                backdropFilter: 'blur(30px)',
-                border: '1px solid rgba(255,255,255,0.08)',
-                borderRadius: 18,
-                animation: 'ecoFadeIn 600ms ease forwards',
-              }}
-            >
-              <p
-                style={{
-                  fontSize: 14,
-                  color: 'rgba(255,255,255,0.65)',
-                  margin: '0 0 4px',
-                  fontFamily: SITE_FONT_STACK,
-                }}
-              >
-                ¿Hay algo que no dijiste en esta historia?
-              </p>
-              <p
-                style={{
-                  fontSize: 11,
-                  color: 'rgba(255,255,255,0.28)',
-                  margin: '0 0 14px',
-                  fontFamily: SITE_FONT_STACK,
-                }}
-              >
-                El autor lo recibirá. Máximo dos líneas.
-              </p>
-              <textarea
-                value={lastSecondText}
-                onChange={(e) => {
-                  if (e.target.value.length <= 180) setLastSecondText(e.target.value);
-                }}
-                placeholder="Lo que quedó sin decir..."
-                rows={2}
-                style={{
-                  width: '100%',
-                  padding: '10px 14px',
-                  borderRadius: 10,
-                  background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,255,255,0.10)',
-                  color: 'rgba(255,255,255,0.82)',
-                  fontSize: 13,
-                  fontFamily: SITE_FONT_STACK,
-                  resize: 'none',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  lineHeight: 1.5,
-                }}
-              />
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
-                <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.22)', fontFamily: SITE_FONT_STACK }}>
-                  {180 - lastSecondText.length} caracteres restantes
-                </span>
-                <div style={{ display: 'flex', gap: 8 }}>
+                  <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.82)', margin: '0 0 6px', fontFamily: SITE_FONT_STACK }}>
+                    Llevas un rato aquí.
+                  </p>
+                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', margin: '0 0 14px', fontFamily: SITE_FONT_STACK }}>
+                    ¿Hay algo tuyo que podría vivir en este mapa?
+                  </p>
                   <button
                     type="button"
-                    onClick={() => setShowLastSecond(false)}
+                    onClick={() => {
+                      setShowMomentoJusto(false);
+                      onClose();
+                      setTimeout(() => {
+                        window.dispatchEvent(new CustomEvent('almamundi:openModal'));
+                      }, 600);
+                    }}
                     style={{
-                      padding: '7px 14px',
+                      padding: '8px 18px',
                       borderRadius: 999,
-                      background: 'transparent',
-                      border: '1px solid rgba(255,255,255,0.10)',
-                      color: 'rgba(255,255,255,0.35)',
+                      background: 'rgba(249,115,22,0.18)',
+                      border: '1px solid rgba(249,115,22,0.35)',
+                      color: '#fdba74',
                       cursor: 'pointer',
-                      fontSize: 12,
-                      outline: 'none',
+                      fontSize: 13,
                       fontFamily: SITE_FONT_STACK,
                     }}
                   >
-                    No, gracias
-                  </button>
-                  <button
-                    type="button"
-                    disabled={!lastSecondText.trim()}
-                    onClick={async () => {
-                      try {
-                        await fetch(`/api/stories/${story.id}/addendum`, {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({ text: lastSecondText }),
-                        });
-                      } catch {}
-                      setLastSecondSent(true);
-                      setShowLastSecond(false);
-                    }}
-                    style={{
-                      padding: '7px 16px',
-                      borderRadius: 999,
-                      background: lastSecondText.trim() ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.04)',
-                      border: `1px solid ${lastSecondText.trim() ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.06)'}`,
-                      color: lastSecondText.trim() ? '#fdba74' : 'rgba(255,255,255,0.25)',
-                      cursor: lastSecondText.trim() ? 'pointer' : 'not-allowed',
-                      fontSize: 12,
-                      outline: 'none',
-                      fontFamily: SITE_FONT_STACK,
-                      transition: 'all 180ms ease',
-                    }}
-                  >
-                    Enviar
+                    Sí, quiero contarlo
                   </button>
                 </div>
-              </div>
+              ) : null}
             </div>
-          )}
 
-          {showMomentoJusto && (
             <div
               style={{
-                marginTop: 16,
-                padding: '20px 22px',
-                background: 'rgba(8,12,25,0.88)',
-                backdropFilter: 'blur(30px)',
-                border: '1px solid rgba(255,255,255,0.07)',
-                borderRadius: 18,
-                animation: 'ecoFadeIn 800ms ease forwards',
-                textAlign: 'center',
+                flexShrink: 0,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                flexWrap: 'wrap',
+                padding: '12px 16px 14px',
+                borderTop: '1px solid rgba(255,255,255,0.07)',
+                zIndex: 2,
               }}
             >
-              <p
-                style={{
-                  fontSize: 18,
-                  fontWeight: 300,
-                  color: 'rgba(255,255,255,0.82)',
-                  margin: '0 0 6px',
-                  fontFamily: SITE_FONT_STACK,
-                  lineHeight: 1.35,
-                }}
-              >
-                Llevas un rato aquí.
-              </p>
-              <p
-                style={{
-                  fontSize: 13,
-                  color: 'rgba(255,255,255,0.40)',
-                  margin: '0 0 18px',
-                  fontFamily: SITE_FONT_STACK,
-                }}
-              >
-                ¿Hay algo tuyo que podría vivir en este mapa?
-              </p>
-              <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              {format === 'text' && story.body ? (
                 <button
                   type="button"
-                  onClick={() => {
-                    setShowMomentoJusto(false);
-                    onClose();
-                    setTimeout(() => {
-                      window.dispatchEvent(new CustomEvent('almamundi:openModal'));
-                    }, 600);
-                  }}
+                  onClick={listening ? stopListening : startListening}
                   style={{
-                    padding: '10px 22px',
+                    padding: '8px 14px',
                     borderRadius: 999,
-                    background: 'rgba(249,115,22,0.18)',
-                    border: '1px solid rgba(249,115,22,0.35)',
-                    color: '#fdba74',
+                    background: listening ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.06)',
+                    border: `1px solid ${listening ? 'rgba(96,165,250,0.35)' : 'rgba(255,255,255,0.10)'}`,
+                    color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
-                    fontSize: 13,
-                    outline: 'none',
+                    fontSize: 12,
                     fontFamily: SITE_FONT_STACK,
                   }}
                 >
-                  Sí, quiero contarlo
+                  {listening ? 'Detener lectura' : 'Cerrar los ojos'}
                 </button>
+              ) : null}
+              <ActionButton label="Compartir" onClick={() => setShareOpen(true)} />
+              {!alreadySent && !resonanceSent ? (
                 <button
                   type="button"
-                  onClick={() => setShowMomentoJusto(false)}
+                  onClick={async () => {
+                    try {
+                      const loc = await getApproxLocation();
+                      await fetch(`/api/stories/${story.id}/resonance`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }),
+                      });
+                    } catch {}
+                    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
+                    setResonanceSent(true);
+                  }}
                   style={{
-                    padding: '10px 16px',
+                    padding: '8px 14px',
                     borderRadius: 999,
-                    background: 'transparent',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    color: 'rgba(255,255,255,0.30)',
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.10)',
+                    color: 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
-                    fontSize: 13,
-                    outline: 'none',
+                    fontSize: 12,
                     fontFamily: SITE_FONT_STACK,
                   }}
                 >
-                  Ahora no
+                  Esto me llegó
                 </button>
-              </div>
+              ) : null}
+              <ActionButton
+                label="¿Dejar un eco?"
+                onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
+                accent
+              />
+              <Link
+                href="/subir"
+                style={{
+                  marginLeft: 4,
+                  padding: '8px 2px',
+                  color: 'rgba(255,255,255,0.38)',
+                  fontSize: 12,
+                  fontFamily: SITE_FONT_STACK,
+                  textDecoration: 'none',
+                  letterSpacing: '0.01em',
+                }}
+              >
+                Cuenta la tuya
+              </Link>
             </div>
-          )}
+          </div>
 
           <EthicalShareFlow
             open={shareOpen}

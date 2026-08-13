@@ -1,9 +1,8 @@
 'use client';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
- * Texto a la izquierda, vídeo/audio/imagen a la derecha, CTA "Subir mi historia", Más historias de [país].
+ * Texto a la izquierda, vídeo/audio/imagen a la derecha, invitación a /subir, Más historias de [país].
  */
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -151,21 +150,14 @@ export default function HistoriasIdPageClient() {
                   </Link>
                 </>
               )}
-              <div className="rounded-2xl p-6 mb-8" style={neu.cardInset}>
-                <p className="text-xl font-semibold tracking-tight mb-2" style={{ color: neu.textMain }}>
-                  ¿Estuviste aquí o conocés algo de este lugar?
-                </p>
-                <p className="text-sm mb-4" style={{ color: neu.textBody }}>
-                  Cuenta tu historia o experiencia.
-                </p>
-                <HomeHardLink
-                  href="/#historias"
-                  className="inline-flex items-center gap-2 px-5 py-3 rounded-full font-medium text-white transition-colors hover:opacity-90"
-                  style={{ backgroundColor: 'var(--almamundi-orange)' }}
+              <p className="mb-8">
+                <Link
+                  href="/subir"
+                  className="text-sm font-medium tracking-wide !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)]"
                 >
-                  + Subir mi historia
-                </HomeHardLink>
-              </div>
+                  Cuenta la tuya
+                </Link>
+              </p>
             </div>
             <div>
               <div className="relative rounded-2xl overflow-hidden aspect-video flex items-center justify-center" style={neu.card}>

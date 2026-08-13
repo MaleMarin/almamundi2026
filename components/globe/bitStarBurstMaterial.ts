@@ -1,16 +1,21 @@
 import * as THREE from 'three';
 
 /**
- * Material aditivo tipo lucerna nocturna: punto muy brillante, halo cálido (sodio / ciudad).
+ * Punto circular suave (bits / historias). Sin rayos ni cruces: el alfa cae
+ * con la distancia al centro y se descarta fuera del radio.
  */
-export function createBitStarBurstMaterial(
+function createCircularMarkerMaterial(
   intensity: number,
-  materialName = 'GlobeBitStarBurst'
+  coreRgb: [number, number, number],
+  rimRgb: [number, number, number],
+  materialName: string
 ): THREE.ShaderMaterial {
   const mat = new THREE.ShaderMaterial({
     name: materialName,
     uniforms: {
       uIntensity: { value: intensity },
+      uCore: { value: new THREE.Vector3(coreRgb[0], coreRgb[1], coreRgb[2]) },
+      uRim: { value: new THREE.Vector3(rimRgb[0], rimRgb[1], rimRgb[2]) },
     },
     glslVersion: THREE.GLSL3,
     vertexShader: /* glsl */ `
@@ -23,6 +28,8 @@ export function createBitStarBurstMaterial(
     fragmentShader: /* glsl */ `
       precision highp float;
       uniform float uIntensity;
+      uniform vec3 uCore;
+      uniform vec3 uRim;
       varying vec2 vUv;
 
       layout(location = 0) out highp vec4 fragColor;
@@ -30,38 +37,21 @@ export function createBitStarBurstMaterial(
       void main() {
         vec2 c = vUv - 0.5;
         float d = length(c) * 2.0;
-        float edge = 1.0 - smoothstep(0.9, 1.02, d);
+        if (d > 1.0) discard;
 
-        float angle = atan(c.y, c.x);
-        float r8a = pow(abs(cos(angle * 4.0)), 20.0);
-        float r8b = pow(abs(cos(angle * 4.0 + 0.785398)), 20.0);
-        float spokes = max(r8a, r8b) * smoothstep(0.94, 0.06, d);
+        float core = exp(-d * d * 7.5);
+        float halo = (1.0 - smoothstep(0.0, 1.0, d)) * 0.55;
+        float edge = 1.0 - smoothstep(0.72, 1.0, d);
+        float alpha = clamp((core * 1.15 + halo) * edge * uIntensity, 0.0, 1.0);
 
-        vec2 nd = length(c) > 1e-4 ? normalize(c) : vec2(0.0);
-        float d1 = abs(dot(nd, vec2(0.70710678, 0.70710678)));
-        float d2 = abs(dot(nd, vec2(-0.70710678, 0.70710678)));
-        float streak = pow(max(d1, d2), 26.0) * smoothstep(0.96, 0.08, d) * 0.88;
-
-        float core = exp(-d * d * 38.0);
-        float halo = smoothstep(1.0, 0.0, d) * 0.62;
-
-        float alpha = (core * 1.05 + halo * 0.72 + spokes * 0.55 + streak * 0.42) * uIntensity;
-        alpha = clamp(alpha * edge, 0.0, 1.0);
-
-        vec3 sodium = vec3(1.0, 0.88, 0.38);
-        vec3 warm = vec3(1.0, 0.76, 0.22);
-        vec3 white = vec3(1.0);
-        vec3 col = mix(sodium, white, clamp(core * 1.65, 0.0, 1.0));
-        col = mix(col, warm, spokes * 0.42);
-        col *= 1.1;
-
+        vec3 col = mix(uRim, uCore, clamp(core * 1.35, 0.0, 1.0));
         fragColor = vec4(col, alpha);
       }
     `,
     transparent: true,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
-    depthTest: true,
+    depthTest: false,
     toneMapped: false,
     side: THREE.DoubleSide,
   });
@@ -70,16 +60,41 @@ export function createBitStarBurstMaterial(
 }
 
 /**
- * Mismo brillo que los bits, tono naranja AlmaMundi para historias en el globo.
+ * Material aditivo tipo lucerna nocturna: núcleo brillante, halo cálido (sodio / ciudad).
+ */
+export function createBitStarBurstMaterial(
+  intensity: number,
+  materialName = 'GlobeBitStarBurst'
+): THREE.ShaderMaterial {
+  return createCircularMarkerMaterial(
+    intensity,
+    [1.0, 1.0, 1.0],
+    [1.0, 0.88, 0.38],
+    materialName
+  );
+}
+
+/** Naranja fuerte de historias (`#ff7a00`), en lineal para ShaderMaterial. */
+function almaMundiCoralLinear(): THREE.Vector3 {
+  const c = new THREE.Color('#ff7a00').convertSRGBToLinear();
+  return new THREE.Vector3(c.r, c.g, c.b);
+}
+
+/**
+ * Disco coral opaco (historias). NormalBlending: el aditivo + ACES las pintaba de oro.
  */
 export function createStoryStarBurstMaterial(
   intensity: number,
   materialName = 'GlobeStoryStarBurst'
 ): THREE.ShaderMaterial {
+  const coral = almaMundiCoralLinear();
+  const core = new THREE.Color('#ffb020').convertSRGBToLinear();
   const mat = new THREE.ShaderMaterial({
     name: materialName,
     uniforms: {
       uIntensity: { value: intensity },
+      uCore: { value: new THREE.Vector3(core.r, core.g, core.b) },
+      uRim: { value: coral },
     },
     glslVersion: THREE.GLSL3,
     vertexShader: /* glsl */ `
@@ -92,6 +107,8 @@ export function createStoryStarBurstMaterial(
     fragmentShader: /* glsl */ `
       precision highp float;
       uniform float uIntensity;
+      uniform vec3 uCore;
+      uniform vec3 uRim;
       varying vec2 vUv;
 
       layout(location = 0) out highp vec4 fragColor;
@@ -99,41 +116,103 @@ export function createStoryStarBurstMaterial(
       void main() {
         vec2 c = vUv - 0.5;
         float d = length(c) * 2.0;
-        float edge = 1.0 - smoothstep(0.9, 1.02, d);
+        if (d > 1.0) discard;
 
-        float angle = atan(c.y, c.x);
-        float r8a = pow(abs(cos(angle * 4.0)), 20.0);
-        float r8b = pow(abs(cos(angle * 4.0 + 0.785398)), 20.0);
-        float spokes = max(r8a, r8b) * smoothstep(0.94, 0.06, d);
-
-        vec2 nd = length(c) > 1e-4 ? normalize(c) : vec2(0.0);
-        float d1 = abs(dot(nd, vec2(0.70710678, 0.70710678)));
-        float d2 = abs(dot(nd, vec2(-0.70710678, 0.70710678)));
-        float streak = pow(max(d1, d2), 26.0) * smoothstep(0.96, 0.08, d) * 0.88;
-
-        float core = exp(-d * d * 38.0);
-        float halo = smoothstep(1.0, 0.0, d) * 0.62;
-
-        float alpha = (core * 1.05 + halo * 0.72 + spokes * 0.55 + streak * 0.42) * uIntensity;
-        alpha = clamp(alpha * edge, 0.0, 1.0);
-
-        vec3 coral = vec3(1.0, 0.42, 0.18);
-        vec3 deep = vec3(1.0, 0.28, 0.08);
-        vec3 white = vec3(1.0);
-        vec3 col = mix(coral, white, clamp(core * 1.55, 0.0, 1.0));
-        col = mix(col, deep, spokes * 0.38);
-        col *= 1.08;
-
+        float fill = 1.0 - smoothstep(0.56, 0.66, d);
+        float ring = smoothstep(0.74, 0.80, d) * (1.0 - smoothstep(0.90, 0.98, d));
+        float alpha = max(fill, ring) * clamp(uIntensity, 0.0, 1.0);
+        if (alpha < 0.03) discard;
+        vec3 col = mix(uRim, uCore, fill);
         fragColor = vec4(col, alpha);
       }
     `,
     transparent: true,
-    blending: THREE.AdditiveBlending,
+    blending: THREE.NormalBlending,
     depthWrite: false,
-    depthTest: true,
+    depthTest: false,
     toneMapped: false,
     side: THREE.DoubleSide,
   });
   mat.name = materialName;
   return mat;
+}
+
+/**
+ * Anillo concéntrico tipo onda expansiva (historias). Fase y período por vértice
+ * para desfasar cada marcador con un material compartido.
+ */
+export function createStoryRippleMaterial(
+  intensity = 1,
+  materialName = 'GlobeStoryRipple'
+): THREE.ShaderMaterial {
+  const coral = almaMundiCoralLinear();
+  const mat = new THREE.ShaderMaterial({
+    name: materialName,
+    uniforms: {
+      uTime: { value: 0 },
+      uIntensity: { value: intensity },
+      uCoral: { value: coral },
+    },
+    glslVersion: THREE.GLSL3,
+    vertexShader: /* glsl */ `
+      in float aPhase;
+      in float aPeriod;
+      out vec2 vUv;
+      out float vPhase;
+      out float vPeriod;
+      void main() {
+        vUv = uv;
+        vPhase = aPhase;
+        vPeriod = aPeriod;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      precision highp float;
+      uniform float uTime;
+      uniform float uIntensity;
+      uniform vec3 uCoral;
+      in vec2 vUv;
+      in float vPhase;
+      in float vPeriod;
+
+      layout(location = 0) out highp vec4 fragColor;
+
+      void main() {
+        vec2 c = vUv - 0.5;
+        float r = length(c) * 2.0;
+        if (r > 1.0) discard;
+
+        float period = clamp(vPeriod, 2.0, 4.0);
+        float t = fract(uTime / period + vPhase);
+        float ringR = mix(0.58, 0.96, t);
+        float halfW = 0.046;
+        float dist = abs(r - ringR);
+        float ring = 1.0 - smoothstep(0.0, halfW, dist);
+        float fade = pow(1.0 - t, 0.65);
+        float alpha = ring * fade * 0.98 * uIntensity;
+        if (alpha < 0.05) discard;
+
+        fragColor = vec4(uCoral, alpha);
+      }
+    `,
+    transparent: true,
+    blending: THREE.NormalBlending,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  mat.name = materialName;
+  return mat;
+}
+
+export function makeStoryRippleGeometry(bitId: number): THREE.PlaneGeometry {
+  const g = new THREE.PlaneGeometry(1, 1);
+  const n = g.getAttribute('position').count;
+  const phase = ((Math.sin(bitId * 127.1 + 19.7) * 43758.5453) % 1 + 1) % 1;
+  const period = 2.15 + ((((bitId * 17) % 100) + 100) % 100) / 100 * 1.7;
+  g.setAttribute('aPhase', new THREE.BufferAttribute(new Float32Array(n).fill(phase), 1));
+  g.setAttribute('aPeriod', new THREE.BufferAttribute(new Float32Array(n).fill(period), 1));
+  return g;
 }
