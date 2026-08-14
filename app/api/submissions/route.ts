@@ -4,11 +4,11 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import {
   isValidMediaUrl,
   MAX_DESCRIPCION,
-  MAX_TEXTO,
   MAX_TITULO,
   stripHtml,
 } from "@/lib/api/input-validation";
 import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema";
+import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import {
   clientIpFromRequest,
   enforceRateLimit,
@@ -81,7 +81,7 @@ export async function POST(req: NextRequest) {
   const textBodyRaw = data.payload.textBody?.trim();
   const textBody =
     textBodyRaw !== undefined && textBodyRaw !== ""
-      ? stripHtml(textBodyRaw).slice(0, MAX_TEXTO)
+      ? stripHtml(textBodyRaw).slice(0, SUBIR_TEXT_MAX_CHARS)
       : undefined;
 
   const videoUrl = data.payload.videoUrl?.trim() ?? "";

@@ -5,10 +5,21 @@ import { getAuth } from "firebase-admin/auth";
 import { getFirestore } from "firebase-admin/firestore";
 import { getStorage } from "firebase-admin/storage";
 
+/** FIREBASE_STORAGE_BUCKET o, si falta, el público (mismo bucket del cliente). */
+function resolveStorageBucketName(): string | undefined {
+  const raw = (
+    process.env.FIREBASE_STORAGE_BUCKET ||
+    process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ||
+    ""
+  ).trim();
+  if (!raw) return undefined;
+  return raw.replace(/^gs:\/\//, "");
+}
+
 function initAdmin(): App {
   if (getApps().length) return getApp() as App;
 
-  const storageBucketEnv = process.env.FIREBASE_STORAGE_BUCKET || undefined;
+  const storageBucketEnv = resolveStorageBucketName();
 
   // Opción A: JSON completo del service account en Base64 (recomendado en Vercel), o JSON en claro si empieza por "{".
   const secretRaw = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64?.trim();
@@ -86,9 +97,16 @@ export function getAdminStorage() {
   return getStorage(initAdmin());
 }
 
-/** Bucket por defecto. Usa FIREBASE_STORAGE_BUCKET o el del app si se inicializó con storageBucket (ej. desde base64). */
+/** Bucket por defecto. Usa FIREBASE_STORAGE_BUCKET, NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET o el del app. */
 export function getAdminBucket() {
-  const bucketName = process.env.FIREBASE_STORAGE_BUCKET;
+  const bucketName = resolveStorageBucketName();
   const storage = getAdminStorage();
-  return bucketName ? storage.bucket(bucketName) : storage.bucket();
+  if (bucketName) return storage.bucket(bucketName);
+  const fallback = storage.bucket();
+  if (!fallback.name) {
+    throw new Error(
+      "Firebase Storage: falta FIREBASE_STORAGE_BUCKET o NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET"
+    );
+  }
+  return fallback;
 }

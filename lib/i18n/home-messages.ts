@@ -10,6 +10,8 @@ export type HomeMessages = {
   navHistoriasEscrito: string;
   navHistoriasFotos: string;
   navMap: string;
+  /** Acción principal: enviar una historia. */
+  navTellStory: string;
   ariaOpenMenu: string;
   ariaCloseMenu: string;
   ariaCloseMenuBackdrop: string;
@@ -54,6 +56,7 @@ const es: HomeMessages = {
   navHistoriasEscrito: 'Escritos',
   navHistoriasFotos: 'Fotografías',
   navMap: 'Mapa',
+  navTellStory: 'Cuenta tu historia',
   ariaOpenMenu: 'Abrir menú',
   ariaCloseMenu: 'Cerrar menú',
   ariaCloseMenuBackdrop: 'Cerrar menú',
@@ -100,6 +103,7 @@ const pt: HomeMessages = {
   navHistoriasEscrito: 'Escritos',
   navHistoriasFotos: 'Fotografias',
   navMap: 'Mapa',
+  navTellStory: 'Conta a sua história',
   ariaOpenMenu: 'Abrir menu',
   ariaCloseMenu: 'Fechar menu',
   ariaCloseMenuBackdrop: 'Fechar menu',
@@ -146,6 +150,7 @@ const en: HomeMessages = {
   navHistoriasEscrito: 'Written',
   navHistoriasFotos: 'Photos',
   navMap: 'Map',
+  navTellStory: 'Tell your story',
   ariaOpenMenu: 'Open menu',
   ariaCloseMenu: 'Close menu',
   ariaCloseMenuBackdrop: 'Close menu',

@@ -18,6 +18,7 @@ import {
   MapPin,
   Globe2,
   Mail,
+  Link2,
 } from 'lucide-react';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -129,9 +130,22 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   };
 }
 
-const PRIVACY_URL = 'https://almamundi.org';
+const PRIVACY_PATH = '/privacidad';
 const MAX_PROFILE_PHOTO_MB = 8;
 const MAX_EXTRA_FILE_MB = 15;
+
+function isVideoShareUrl(url: string): boolean {
+  try {
+    const u = new URL(url);
+    return /youtube\.com|youtu\.be|vimeo\.com/i.test(u.hostname);
+  } catch {
+    return false;
+  }
+}
+
+function isHttpUrl(url: string): boolean {
+  return /^https?:\/\//i.test(url.trim());
+}
 
 const MODE_CONTEXT_LABEL: Record<StoryModalMode, string> = {
   video: 'Video',
@@ -327,6 +341,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [uploadVideoFile, setUploadVideoFile] = useState<File | null>(null);
   const [uploadAudioFile, setUploadAudioFile] = useState<File | null>(null);
+  const [videoShareUrl, setVideoShareUrl] = useState('');
+  const [audioShareUrl, setAudioShareUrl] = useState('');
+  const [avSource, setAvSource] = useState<'grabar' | 'archivo'>('grabar');
   const [durationInlineErr, setDurationInlineErr] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
@@ -414,10 +431,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   }, [revokePreview, stopStream, stopTimer]);
 
   const wasOpenRef = useRef(false);
+  const modeAtOpenRef = useRef<StoryModalMode | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
       wasOpenRef.current = false;
+      modeAtOpenRef.current = null;
       resetCaptureMedia();
       setStep('capture');
       setErr('');
@@ -436,6 +455,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setCountry('');
       setEmail('');
       setAcceptedPrivacy(false);
+      setUploadVideoFile(null);
+      setUploadAudioFile(null);
+      setVideoShareUrl('');
+      setAudioShareUrl('');
+      setAvSource('grabar');
+      setDurationInlineErr('');
       setSaving(false);
       setImprintId('');
       setImprintReceivedAt(null);
@@ -447,10 +472,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
       return;
     }
-    if (!wasOpenRef.current) {
+    const modeChanged = modeAtOpenRef.current !== null && modeAtOpenRef.current !== mode;
+    if (!wasOpenRef.current || modeChanged) {
       wasOpenRef.current = true;
+      modeAtOpenRef.current = mode;
       setStep('capture');
       setErr('');
+      resetCaptureMedia();
+      setUploadVideoFile(null);
+      setUploadAudioFile(null);
+      setVideoShareUrl('');
+      setAudioShareUrl('');
+      setAvSource('grabar');
       if (mode === 'texto' && chosenTopic) {
         setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
       } else if (mode === 'texto') {
@@ -677,6 +710,22 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     setErr('');
   }, [resetCaptureMedia]);
 
+  const switchAvSource = useCallback(
+    (next: 'grabar' | 'archivo') => {
+      setAvSource(next);
+      setErr('');
+      if (next === 'grabar') {
+        setUploadVideoFile(null);
+        setUploadAudioFile(null);
+        setVideoShareUrl('');
+        setAudioShareUrl('');
+      } else {
+        resetCaptureMedia();
+      }
+    },
+    [resetCaptureMedia]
+  );
+
   const addPhotos = useCallback(
     (list: FileList | null) => {
       if (!list?.length) return;
@@ -769,26 +818,44 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   const canContinueCapture = useCallback((): boolean => {
     if (mode === 'video') {
-      return (mediaBlob != null && mediaBlob.size > 0) || uploadVideoFile != null;
+      return (
+        (mediaBlob != null && mediaBlob.size > 0) ||
+        uploadVideoFile != null ||
+        isVideoShareUrl(videoShareUrl)
+      );
     }
     if (mode === 'audio') {
-      return (mediaBlob != null && mediaBlob.size > 0) || uploadAudioFile != null;
+      return (
+        (mediaBlob != null && mediaBlob.size > 0) ||
+        uploadAudioFile != null ||
+        isHttpUrl(audioShareUrl)
+      );
     }
     if (mode === 'texto') {
       const t = textBody.trim();
       return t.length > 0 && t.length <= SUBIR_TEXT_MAX_CHARS;
     }
     return photoFiles.length >= SUBIR_PHOTO_MIN && photoFiles.length <= SUBIR_PHOTO_MAX;
-  }, [mode, mediaBlob, uploadVideoFile, uploadAudioFile, textBody, photoFiles.length]);
+  }, [
+    mode,
+    mediaBlob,
+    uploadVideoFile,
+    uploadAudioFile,
+    videoShareUrl,
+    audioShareUrl,
+    textBody,
+    photoFiles.length,
+  ]);
 
   const goDetails = useCallback(() => {
     if (!canContinueCapture()) {
       setErr('Completa este paso antes de continuar.');
       return;
     }
+    stopStream();
     setErr('');
     setStep('details');
-  }, [canContinueCapture]);
+  }, [canContinueCapture, stopStream]);
 
   const validateDetails = useCallback(() => {
     // Leer siempre el ref: evita falsos "Falta el nombre…" por closure stale.
@@ -817,7 +884,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
 
     if (!acceptedPrivacy) {
-      setErr('Para enviar, debes aceptar la política de privacidad.');
+      setErr('Para enviar, confirma que eres mayor de 18 años y aceptas la política de privacidad.');
       return false;
     }
 
@@ -882,6 +949,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           const safeExt = extRaw && /^[a-z0-9]+$/.test(extRaw) ? extRaw : 'mp4';
           const url = await trackUpload(uploadVideoFile, 'submissions', `video-subido.${safeExt}`);
           payload = { videoUrl: url };
+        } else if (isVideoShareUrl(videoShareUrl)) {
+          payload = { videoUrl: videoShareUrl.trim() };
         } else {
           setErr('Falta el video de la historia.');
           return;
@@ -911,6 +980,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             `audio.${uploadAudioFile.name.split('.').pop() || 'mp3'}`
           );
           payload = { audioUrl: url };
+        } else if (isHttpUrl(audioShareUrl)) {
+          payload = { audioUrl: audioShareUrl.trim() };
         } else {
           setErr('Falta el audio de la historia.');
           return;
@@ -988,6 +1059,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     mediaBlob,
     uploadVideoFile,
     uploadAudioFile,
+    videoShareUrl,
+    audioShareUrl,
     photoFiles,
     alias,
     email,
@@ -1076,6 +1149,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     setCountry('');
     setEmail('');
     setAcceptedPrivacy(false);
+    setUploadVideoFile(null);
+    setUploadAudioFile(null);
+    setVideoShareUrl('');
+    setAudioShareUrl('');
+    setAvSource('grabar');
     setErr('');
   }, [resetCaptureMedia, mode, chosenTopic]);
 
@@ -1115,7 +1193,27 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
         {mode === 'video' && (
           <div className="space-y-4">
-            {!mediaBlob && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => switchAvSource('grabar')}
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={avSource === 'grabar' ? { ...soft.button, color: '#ff4500' } : soft.button}
+              >
+                <Video className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                Grabar video
+              </button>
+              <button
+                type="button"
+                onClick={() => switchAvSource('archivo')}
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={avSource === 'archivo' ? { ...soft.button, color: '#ff4500' } : soft.button}
+              >
+                <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                Subir o enlace
+              </button>
+            </div>
+            {avSource === 'grabar' && !mediaBlob && (
               <>
                 {!streamReady && !recording && (
                   <button
@@ -1216,12 +1314,94 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </button>
               </div>
             )}
+            {avSource === 'archivo' && (
+              <div className="space-y-4">
+                <label htmlFor="story-video-file" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                  <Upload className="h-4 w-4 text-orange-500" aria-hidden />
+                  Video desde tu equipo (máx. {SUBIR_VIDEO_UPLOAD_MAX_MB} MB)
+                </label>
+                <input
+                  id="story-video-file"
+                  type="file"
+                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  aria-label="Elegir video desde tu equipo"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = '';
+                    if (!f) {
+                      setUploadVideoFile(null);
+                      return;
+                    }
+                    if (f.size > SUBIR_VIDEO_UPLOAD_MAX_MB * 1024 * 1024) {
+                      setErr(`Ese video supera los ${SUBIR_VIDEO_UPLOAD_MAX_MB} MB. Prueba con uno más liviano.`);
+                      setUploadVideoFile(null);
+                      return;
+                    }
+                    void probeVideoFileDurationSeconds(f).then((sec) => {
+                      if (sec != null && !isDurationWithinMax(sec)) {
+                        setErr(UPLOAD_DURATION_ERROR.video);
+                        setUploadVideoFile(null);
+                        return;
+                      }
+                      setErr('');
+                      setUploadVideoFile(f);
+                      setVideoShareUrl('');
+                    });
+                  }}
+                  className="w-full text-sm text-gray-600"
+                />
+                {uploadVideoFile ? (
+                  <p className="text-sm font-medium text-gray-800">Listo: {uploadVideoFile.name}</p>
+                ) : null}
+                <label htmlFor="story-video-url" className="block text-sm font-semibold text-gray-800">
+                  O pega un enlace (YouTube o Vimeo)
+                </label>
+                <input
+                  id="story-video-url"
+                  type="url"
+                  value={videoShareUrl}
+                  onChange={(e) => {
+                    setVideoShareUrl(e.target.value);
+                    if (e.target.value.trim()) setUploadVideoFile(null);
+                  }}
+                  placeholder="https://www.youtube.com/…"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
+                  style={{ ...soft.flat, borderRadius: '12px' }}
+                  aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
+                />
+                {videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl) ? (
+                  <p className="text-xs text-amber-700" role="alert">
+                    Usa un enlace de YouTube o Vimeo
+                  </p>
+                ) : null}
+              </div>
+            )}
           </div>
         )}
 
         {mode === 'audio' && (
           <div className="space-y-4">
-            {!mediaBlob && (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => switchAvSource('grabar')}
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={avSource === 'grabar' ? { ...soft.button, color: '#ff4500' } : soft.button}
+              >
+                <Mic className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                Grabar voz
+              </button>
+              <button
+                type="button"
+                onClick={() => switchAvSource('archivo')}
+                className="rounded-full px-4 py-2 text-sm font-semibold"
+                style={avSource === 'archivo' ? { ...soft.button, color: '#ff4500' } : soft.button}
+              >
+                <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                Subir audio o pegar enlace
+              </button>
+            </div>
+            {avSource === 'grabar' && !mediaBlob && (
               <>
                 {!streamReady && !recording && (
                   <button
@@ -1303,6 +1483,61 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </button>
               </div>
             )}
+            {avSource === 'archivo' && (
+              <div className="space-y-4">
+                <label htmlFor="story-audio-file" className="block text-sm font-semibold text-gray-800">
+                  Audio desde tu equipo (hasta {SUBIR_AUDIO_UPLOAD_MAX_MB} MB)
+                </label>
+                <input
+                  id="story-audio-file"
+                  type="file"
+                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a,audio/*"
+                  aria-label="Elegir audio desde tu equipo"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    e.target.value = '';
+                    if (!f) {
+                      setUploadAudioFile(null);
+                      return;
+                    }
+                    if (f.size > SUBIR_AUDIO_UPLOAD_MAX_MB * 1024 * 1024) {
+                      setErr(`Ese audio supera los ${SUBIR_AUDIO_UPLOAD_MAX_MB} MB. Prueba con uno más liviano.`);
+                      setUploadAudioFile(null);
+                      return;
+                    }
+                    void probeAudioFileDurationSeconds(f).then((sec) => {
+                      if (sec != null && !isDurationWithinMax(sec)) {
+                        setErr(UPLOAD_DURATION_ERROR.audio);
+                        setUploadAudioFile(null);
+                        return;
+                      }
+                      setErr('');
+                      setUploadAudioFile(f);
+                      setAudioShareUrl('');
+                    });
+                  }}
+                  className="w-full text-sm text-gray-600"
+                />
+                {uploadAudioFile ? (
+                  <p className="text-sm font-medium text-gray-800">Listo: {uploadAudioFile.name}</p>
+                ) : null}
+                <label htmlFor="story-audio-url" className="block text-sm font-semibold text-gray-800">
+                  O pega un enlace
+                </label>
+                <input
+                  id="story-audio-url"
+                  type="url"
+                  value={audioShareUrl}
+                  onChange={(e) => {
+                    setAudioShareUrl(e.target.value);
+                    if (e.target.value.trim()) setUploadAudioFile(null);
+                  }}
+                  placeholder="https://…"
+                  className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
+                  style={{ ...soft.flat, borderRadius: '12px' }}
+                />
+              </div>
+            )}
           </div>
         )}
 
@@ -1345,7 +1580,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               }`}
               aria-live="polite"
             >
-              {textBody.length.toLocaleString('es')} / 5.000 caracteres
+              {textBody.length.toLocaleString('es')} / {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres
             </p>
           </div>
         )}
@@ -1403,7 +1638,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         <div
           className={`min-h-0 flex-1 overflow-x-hidden overscroll-contain ${
             step === 'details'
-              ? 'flex flex-col overflow-y-auto px-3 py-2 sm:px-4 sm:py-3 md:overflow-hidden md:px-5 md:py-4'
+              ? 'flex flex-col overflow-hidden px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4'
               : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
           }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
@@ -1419,7 +1654,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </h3>
               </div>
 
-              <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start">
+              <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto overscroll-contain md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start md:overflow-hidden">
                 {/* Historia + extras — columna izquierda */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
@@ -1626,22 +1861,6 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         público.
                       </p>
                     </div>
-                    <div className="sm:col-span-2 flex items-start gap-2 pt-0.5">
-                      <input
-                        id="privacy"
-                        type="checkbox"
-                        checked={acceptedPrivacy}
-                        onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                        className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
-                      />
-                      <label htmlFor="privacy" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
-                        Leí y acepto la{' '}
-                        <a className="text-orange-600 underline" href={PRIVACY_URL} target="_blank" rel="noreferrer">
-                          política de privacidad
-                        </a>
-                        .
-                      </label>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1652,29 +1871,46 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 </p>
               )}
 
-              <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
-
-              <div className="mt-auto flex shrink-0 flex-wrap justify-end gap-2 border-t border-white/25 pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setErr('');
-                    setStep('capture');
-                  }}
-                  className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-gray-600 active:scale-95 md:px-6 md:text-xs"
-                  style={soft.button}
-                >
-                  Volver
-                </button>
-                <button
-                  type="button"
-                  onClick={submitDetails}
-                  disabled={saving}
-                  className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
-                  style={{ ...soft.button, backgroundColor: '#F97316' }}
-                >
-                  {saving ? 'Enviando…' : 'Enviar'}
-                </button>
+              <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-white/25 pt-2">
+                <div className="flex items-start gap-2">
+                  <input
+                    id="privacy"
+                    type="checkbox"
+                    checked={acceptedPrivacy}
+                    onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
+                  />
+                  <label htmlFor="privacy" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
+                    Confirmo que soy mayor de 18 años y que leí y acepto la{' '}
+                    <a className="text-orange-600 underline" href={PRIVACY_PATH} target="_blank" rel="noreferrer">
+                      política de privacidad
+                    </a>
+                    .
+                  </label>
+                </div>
+                <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
+                <div className="flex flex-wrap justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setErr('');
+                      setStep('capture');
+                    }}
+                    className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-gray-600 active:scale-95 md:px-6 md:text-xs"
+                    style={soft.button}
+                  >
+                    Volver
+                  </button>
+                  <button
+                    type="button"
+                    onClick={submitDetails}
+                    disabled={saving}
+                    className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
+                    style={{ ...soft.button, backgroundColor: '#F97316' }}
+                  >
+                    {saving ? 'Enviando…' : 'Enviar'}
+                  </button>
+                </div>
               </div>
             </div>
           )}

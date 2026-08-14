@@ -92,7 +92,28 @@ const SIGS: { mime: string; check: (b: Buffer) => boolean }[] = [
       return false;
     },
   },
+  {
+    mime: "image/heic",
+    check: isHeicLike,
+  },
+  {
+    mime: "image/heif",
+    check: isHeicLike,
+  },
 ];
+
+function isHeicLike(b: Buffer): boolean {
+  if (b.length < 12) return false;
+  const ftypAt = b.indexOf("ftyp", 0, "ascii");
+  if (ftypAt < 0 || ftypAt > 16) return false;
+  const brand = b.subarray(ftypAt + 4, ftypAt + 8).toString("ascii").toLowerCase();
+  return (
+    brand.startsWith("hei") ||
+    brand === "mif1" ||
+    brand === "msf1" ||
+    brand === "hevc"
+  );
+}
 
 export function bufferMatchesDeclaredMime(buffer: Buffer, declaredMime: string): boolean {
   const normalized = declaredMime.split(";")[0]?.trim().toLowerCase() ?? "";
@@ -106,6 +127,8 @@ export const ALLOWED_STORY_MEDIA_MIMES = [
   "image/png",
   "image/webp",
   "image/gif",
+  "image/heic",
+  "image/heif",
   "video/mp4",
   "video/webm",
   "audio/mpeg",

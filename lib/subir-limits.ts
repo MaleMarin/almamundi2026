@@ -3,8 +3,8 @@ import { MAX_AUDIO_VIDEO_DURATION_SECONDS } from "@/lib/media-duration-rules";
 /** Audio y video: máximo en minutos (regla de producto). */
 export const SUBIR_AV_MAX_MINUTES = MAX_AUDIO_VIDEO_DURATION_SECONDS / 60;
 
-/** Escrito: ~2 carillas (aprox. folio mecanografiado). */
-export const SUBIR_TEXT_MAX_CHARS = 5000;
+/** Escrito: ~1800 caracteres. */
+export const SUBIR_TEXT_MAX_CHARS = 1800;
 
 /** Video subido desde dispositivo (recomendado). */
 export const SUBIR_VIDEO_UPLOAD_MAX_MB = 500;

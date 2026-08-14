@@ -66,7 +66,7 @@ export async function savePrivateSubmissionObject(opts: {
 
 function pickExtension(contentType: string, filename: string): string {
   const lower = filename.toLowerCase();
-  const fromName = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".mp4", ".webm", ".mp3", ".m4a", ".wav", ".ogg"]
+  const fromName = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".heif", ".mp4", ".webm", ".mp3", ".m4a", ".wav", ".ogg"]
     .find((e) => lower.endsWith(e));
   if (fromName) return "";
 
@@ -74,6 +74,8 @@ function pickExtension(contentType: string, filename: string): string {
   if (contentType === "image/jpeg" || contentType === "image/jpg") return ".jpg";
   if (contentType === "image/webp") return ".webp";
   if (contentType === "image/gif") return ".gif";
+  if (contentType === "image/heic") return ".heic";
+  if (contentType === "image/heif") return ".heif";
   if (contentType === "video/mp4") return ".mp4";
   if (contentType === "video/webm") return ".webm";
   if (contentType === "audio/mpeg") return ".mp3";

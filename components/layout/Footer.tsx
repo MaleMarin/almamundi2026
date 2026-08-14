@@ -9,6 +9,7 @@ import {
   SITE_FOOTER_GUIA_CONDUCTA_HREF,
   SITE_FOOTER_LEGAL_LINKS,
   SITE_HEADER_STORIES_LINKS,
+  SITE_NAV_CTA_CLASS,
   SITE_NAV_LINK_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
@@ -81,9 +82,19 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         </p>
       </div>
 
+      <div className="mt-14 flex w-full max-w-4xl justify-center px-2 md:mt-20">
+        <ActiveInternalNavLink
+          href="/subir"
+          className={`${SITE_NAV_CTA_CLASS} px-6 py-2.5 text-sm md:px-8 md:py-3 md:text-base`}
+          activeClassName="font-semibold"
+        >
+          {t.navTellStory}
+        </ActiveInternalNavLink>
+      </div>
+
       {/* 2. Pills: grilla 2×4 centrada (Mapa en la última celda, no suelto) */}
       <nav
-        className="mt-14 w-full max-w-4xl px-2 md:mt-20"
+        className="mt-8 w-full max-w-4xl px-2 md:mt-10"
         aria-label={t.ariaMainNav}
       >
         <ul className="almamundi-footer-pill-grid m-0 list-none p-0">

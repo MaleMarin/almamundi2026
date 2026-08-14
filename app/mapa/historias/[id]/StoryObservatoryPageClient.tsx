@@ -79,7 +79,7 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
       >
         <StoryObservatory story={story} onEmotionChange={setCurrentEmotion} />
         <SimilarStories storyId={story.id} />
-        <StoryInvitation onInvite={() => hardNavigateTo('/?openModal=true')} />
+        <StoryInvitation onInvite={() => hardNavigateTo('/subir')} />
         <div className="mt-8">
           <HomeHardLink
             href={backHref}

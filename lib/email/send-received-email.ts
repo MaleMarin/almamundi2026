@@ -1,13 +1,21 @@
 /**
  * Correo inmediato al autor cuando AlmaMundi recibe su historia (antes de curación).
- * El encabezado va en texto ("AlmaMundi"): los PNG de /public cargan en el
- * navegador, pero en clientes de correo el logo sale roto.
+ *
+ * El wordmark va embebido (CID): Gmail bloquea /logo.png remoto hasta “mostrar
+ * imágenes”, y el PNG público es negro sobre transparente (parece texto negro).
+ * Si no hay archivo, el nombre va en naranja de marca y Avenir.
  */
 
+import { readFile } from 'node:fs/promises';
+import path from 'node:path';
 import { escapeHtml } from '@/lib/email-html';
 import { getResend } from '@/lib/emailSubmission';
 
 const EMAIL_PUBLIC_ORIGIN = 'https://www.almamundi.org';
+const BRAND_ORANGE = '#FF4A1C';
+const LOGO_CID = 'almamundi-logo';
+const WORDMARK_FONT =
+  "Avenir, 'Avenir Light', 'Avenir Next', system-ui, -apple-system, 'Segoe UI', Arial, sans-serif";
 
 export type SendReceivedEmailParams = {
   /** Vacío si la persona no dejó nombre ni alias. */
@@ -20,7 +28,20 @@ function greetingLine(authorName: string): string {
   return n ? `Hola ${escapeHtml(n)},` : 'Hola,';
 }
 
-export function buildReceivedEmailHtml(params: SendReceivedEmailParams): string {
+function brandHeaderHtml(hasInlineLogo: boolean): string {
+  if (hasInlineLogo) {
+    return `<img src="cid:${LOGO_CID}" alt="AlmaMundi" width="200" height="200"
+        style="display:block;margin:0 auto;width:200px;height:200px;border:0;outline:none;text-decoration:none">`;
+  }
+  return `<p style="margin:0;font-size:22px;font-weight:300;letter-spacing:0.04em;color:${BRAND_ORANGE};font-family:${WORDMARK_FONT}">
+        AlmaMundi
+      </p>`;
+}
+
+export function buildReceivedEmailHtml(
+  params: SendReceivedEmailParams,
+  hasInlineLogo = false
+): string {
   const greeting = greetingLine(params.authorName);
 
   return `<!DOCTYPE html>
@@ -33,13 +54,10 @@ export function buildReceivedEmailHtml(params: SendReceivedEmailParams): string 
   box-shadow:14px 14px 34px rgba(136,150,170,0.48),
   -14px -14px 38px rgba(255,255,255,0.98)">
 
-  <!-- Header: nombre en texto (sin imagen: en el correo el PNG sale roto) -->
   <tr>
     <td style="padding:32px 40px 24px;text-align:center;
       border-bottom:1px solid rgba(255,255,255,0.6)">
-      <p style="margin:0;font-size:22px;font-weight:700;letter-spacing:0.04em;color:#2D3748;font-family:Arial,sans-serif">
-        AlmaMundi
-      </p>
+      ${brandHeaderHtml(hasInlineLogo)}
     </td>
   </tr>
 
@@ -84,6 +102,21 @@ export function buildReceivedEmailHtml(params: SendReceivedEmailParams): string 
 </html>`;
 }
 
+async function loadInlineWordmark(): Promise<Buffer | null> {
+  const candidates = [
+    path.join(process.cwd(), 'lib/email/almamundi-wordmark-orange.png'),
+    path.join(process.cwd(), 'public/logo.png'),
+  ];
+  for (const filePath of candidates) {
+    try {
+      return await readFile(filePath);
+    } catch {
+      /* siguiente */
+    }
+  }
+  return null;
+}
+
 export type SendReceivedEmailResult =
   | { ok: true; emailId?: string }
   | { ok: false; error: string };
@@ -104,13 +137,26 @@ export async function sendReceivedEmail(
 
   const from = mailFromAddress();
   const subject = 'Recibimos tu historia';
+  const logo = await loadInlineWordmark();
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
-      html: buildReceivedEmailHtml(params),
+      html: buildReceivedEmailHtml(params, Boolean(logo)),
+      ...(logo
+        ? {
+            attachments: [
+              {
+                filename: 'almamundi-logo.png',
+                content: logo,
+                contentType: 'image/png',
+                contentId: LOGO_CID,
+              },
+            ],
+          }
+        : {}),
     });
     if (sent.error) {
       const msg = sent.error.message || 'Error de Resend';

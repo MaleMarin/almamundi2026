@@ -510,7 +510,7 @@ export function StoryCaptureStep({
         if (format === 'texto') {
       setLocalErr(
             textStory.trim().length > SUBIR_TEXT_MAX_CHARS
-            ? `Máximo ${SUBIR_TEXT_MAX_CHARS} caracteres (~2 carillas).`
+            ? `Máximo ${SUBIR_TEXT_MAX_CHARS} caracteres.`
               : `Escribe al menos ${NARRATIVE_MIN} caracteres para poder seguir.`
           );
         } else if (format === 'foto') {

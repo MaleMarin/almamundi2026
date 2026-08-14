@@ -29,12 +29,15 @@ export function GlobalSiteChrome({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
   const showBreadcrumbsSlot = !ROUTES_WITHOUT_BREADCRUMBS.has(pathname);
+  const fillFirstScreen = pathname === '/subir';
 
   return (
     <>
       <HistoriasInteriorSiteHeader overImmersiveMedia={false} />
       <div
-        className={`flex w-full min-h-0 flex-1 flex-col ${historiasInterior.fixedHeaderContentPadClassName}`}
+        className={`flex w-full min-h-0 flex-1 flex-col ${historiasInterior.fixedHeaderContentPadClassName}${
+          fillFirstScreen ? ' min-h-svh' : ''
+        }`}
       >
         {showBreadcrumbsSlot ? (
           <div className="w-full shrink-0 px-4 pb-2 md:px-6 lg:px-10">

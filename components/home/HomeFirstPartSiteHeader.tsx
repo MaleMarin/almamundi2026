@@ -16,6 +16,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HomeLanguageSwitcher } from '@/components/home/HomeLanguageSwitcher';
 import {
   SITE_HEADER_STORIES_LINKS,
+  SITE_NAV_CTA_CLASS,
   SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
@@ -254,6 +255,16 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         </HomeHardLink>
       </div>
       <div className="flex items-center justify-end gap-2 shrink-0 md:gap-3">
+        <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
+          {desktopFirstTwoLinks}
+          {desktopHistoriasSegment}
+          <HomeHardLink href={MAPA_HOME_LINK_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+            {t.navMap}
+          </HomeHardLink>
+        </nav>
+        <Link href="/subir" className={`${SITE_NAV_CTA_CLASS} shrink-0`}>
+          {t.navTellStory}
+        </Link>
         <button
           type="button"
           className="md:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"
@@ -265,13 +276,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         >
           {mobileNavOpen ? <X size={20} strokeWidth={2} aria-hidden /> : <Menu size={20} strokeWidth={2} aria-hidden />}
         </button>
-        <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
-          {desktopFirstTwoLinks}
-          {desktopHistoriasSegment}
-          <HomeHardLink href={MAPA_HOME_LINK_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
-            {t.navMap}
-          </HomeHardLink>
-        </nav>
         <HomeLanguageSwitcher className="hidden md:flex" />
       </div>
 

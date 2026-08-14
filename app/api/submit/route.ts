@@ -4,10 +4,10 @@ import { FieldValue, type DocumentReference } from "firebase-admin/firestore";
 import {
   isValidMediaUrl,
   MAX_DESCRIPCION,
-  MAX_TEXTO,
   MAX_TITULO,
   stripHtml,
 } from "@/lib/api/input-validation";
+import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import { getAdminDb } from "@/lib/firebase/admin";
 import type { StorySubmission, StoryFormat, StoryMood, Consent } from "@/lib/firebase/types";
 import { analyzeStory } from "@/lib/huella/analyze";
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
   const format = FORMATS.includes(body.format as StoryFormat) ? (body.format as StoryFormat) : "text";
   const textRaw = typeof body.text === "string" ? body.text : "";
   const text = textRaw.trim()
-    ? stripHtml(textRaw).slice(0, MAX_TEXTO)
+    ? stripHtml(textRaw).slice(0, SUBIR_TEXT_MAX_CHARS)
     : undefined;
   const tags = body.tags as Record<string, unknown> | undefined;
   const consent = body.consent;

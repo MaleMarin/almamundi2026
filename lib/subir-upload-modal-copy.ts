@@ -49,4 +49,4 @@ export const UPLOAD_DURATION_ERROR = {
 export const UPLOAD_PHOTO_MAX_MESSAGE = 'Solo puedes subir hasta 6 fotos.';
 
 /** Contador en naranja editorial a partir de este umbral (texto). */
-export const SUBIR_TEXT_COUNTER_WARN_CHARS = 4500;
+export const SUBIR_TEXT_COUNTER_WARN_CHARS = 1400;
