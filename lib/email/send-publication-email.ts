@@ -104,28 +104,43 @@ function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
 </html>`;
 }
 
+export type SendPublicationEmailResult =
+  | { ok: true; emailId?: string }
+  | { ok: false; error: string };
+
+function mailFromAddress(): string {
+  const raw = (process.env.RESEND_FROM_EMAIL ?? process.env.MAIL_FROM ?? 'AlmaMundi <hola@almamundi.org>').trim();
+  if (!raw) return 'AlmaMundi <hola@almamundi.org>';
+  return raw.includes('<') ? raw : `AlmaMundi <${raw}>`;
+}
+
 export async function sendPublicationEmail(
   params: SendPublicationEmailParams
-): Promise<boolean> {
+): Promise<SendPublicationEmailResult> {
   const resend = getResend();
   if (!resend) {
-    return false;
+    return { ok: false, error: 'Resend no configurado (falta RESEND_API_KEY)' };
   }
 
-  const from =
-    process.env.RESEND_FROM_EMAIL ?? 'AlmaMundi <hola@almamundi.org>';
+  const from = mailFromAddress();
   const subject = 'Tu historia ya está en AlmaMundi';
 
   try {
-    await resend.emails.send({
+    const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
       html: buildPublicationEmailHtml(params),
     });
-    return true;
+    if (sent.error) {
+      const msg = sent.error.message || 'Error de Resend';
+      console.error('sendPublicationEmail', sent.error);
+      return { ok: false, error: msg };
+    }
+    return { ok: true, emailId: sent.data?.id };
   } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Error al enviar el correo';
     console.error('sendPublicationEmail', err);
-    return false;
+    return { ok: false, error: msg };
   }
 }

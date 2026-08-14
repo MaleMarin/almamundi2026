@@ -167,6 +167,13 @@ export async function editorialPublishFromSubmission(
       excerpt: typeof sub.title === "string" ? sub.title.slice(0, 160) : undefined,
     };
     if (typeof sub.authorName === "string" && sub.authorName.trim()) story.authorName = sub.authorName;
+    const authorEmailOnSub =
+      typeof sub.authorEmail === "string"
+        ? sub.authorEmail.trim()
+        : typeof sub.email === "string"
+          ? sub.email.trim()
+          : "";
+    if (authorEmailOnSub) story.authorEmail = authorEmailOnSub;
     const cityKnown = typeof sub.city === "string" ? sub.city : undefined;
     const countryKnown = typeof sub.country === "string" ? sub.country : undefined;
     if (cityKnown) story.city = cityKnown;
@@ -246,6 +253,7 @@ export async function editorialPublishFromSubmission(
     media,
     tags: { themes: themes.length ? themes : [], moods: [], keywords: [] },
     authorName: sd.alias,
+    authorEmail: typeof sd.email === "string" && sd.email.trim() ? sd.email.trim() : undefined,
     placeLabel: sd.placeLabel,
     country: sd.countryLabel ?? undefined,
     city: sd.placeLabel ?? undefined,
@@ -326,6 +334,13 @@ export async function editorialPublishApprovedStorySubmission(
     media: data.media ?? {},
   };
   if (data.authorName) storyData.authorName = data.authorName;
+  const authorEmailLegacy =
+    typeof data.authorEmail === "string"
+      ? data.authorEmail.trim()
+      : typeof data.email === "string"
+        ? data.email.trim()
+        : "";
+  if (authorEmailLegacy) storyData.authorEmail = authorEmailLegacy;
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
   const storyRef = db.collection("stories").doc();

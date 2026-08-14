@@ -64,6 +64,7 @@ export async function GET(request: NextRequest) {
         createdAt,
         authorEmail: d.authorEmail ?? null,
         rightsAccepted: Boolean(d.rightsAccepted),
+        publicationMail: d.publicationMail ?? null,
       };
     });
 

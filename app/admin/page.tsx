@@ -67,6 +67,12 @@ type Story = {
   createdAt: number | null;
   authorEmail: string | null;
   rightsAccepted: boolean;
+  publicationMail: {
+    status: 'sent' | 'skipped_no_email' | 'failed';
+    to: string | null;
+    error: string | null;
+    at?: string;
+  } | null;
 };
 
 type Collection = {
@@ -140,7 +146,7 @@ export default function AdminPage() {
 
   const showToast = (msg: string) => {
     setToast(msg);
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 8000);
   };
 
   const getAuthHeaders = useCallback((): HeadersInit => {
@@ -274,9 +280,30 @@ export default function AdminPage() {
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
         body: JSON.stringify({ action }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
+      const data = (await res.json()) as {
+        ok?: boolean;
+        error?: string;
+        publicationMail?: {
+          status: 'sent' | 'skipped_no_email' | 'failed';
+          to: string | null;
+          error: string | null;
+        };
+      };
       if (data.ok) {
-        showToast(action === 'approve' ? '✅ Aprobada al mapa' : action === 'reject' ? '❌ Rechazada' : action === 'feature' ? '⭐ Destacada' : '📦 Archivada');
+        if (action === 'approve') {
+          const mail = data.publicationMail;
+          if (mail?.status === 'sent') {
+            showToast(`Aprobada. Correo enviado a ${mail.to ?? 'el autor'}`);
+          } else if (mail?.status === 'skipped_no_email') {
+            showToast('Aprobada. No se avisó: la historia no tiene correo del autor');
+          } else if (mail?.status === 'failed') {
+            showToast(`Aprobada, pero el correo NO salió: ${mail.error ?? 'error de envío'}`);
+          } else {
+            showToast('Aprobada al mapa');
+          }
+        } else {
+          showToast(action === 'reject' ? 'Rechazada' : action === 'feature' ? 'Destacada' : 'Archivada');
+        }
         await Promise.all([fetchPending(), fetchActive(), fetchArchived(), fetchStats()]);
       } else {
         showToast(data.error ?? 'Error');
@@ -534,6 +561,9 @@ export default function AdminPage() {
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
+                  <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
+                    {s.authorEmail ? `Se avisará a ${s.authorEmail}` : 'Sin correo del autor: no se podrá avisar al publicar'}
+                  </p>
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
@@ -610,6 +640,19 @@ export default function AdminPage() {
                     </div>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
+                    {s.publicationMail?.status === 'sent' ? (
+                      <p style={{ fontSize: 12, margin: '6px 0 0', color: '#86efac' }}>
+                        Correo enviado a {s.publicationMail.to}
+                      </p>
+                    ) : s.publicationMail?.status === 'failed' ? (
+                      <p style={{ fontSize: 12, margin: '6px 0 0', color: '#fca5a5' }}>
+                        Correo NO enviado: {s.publicationMail.error || 'error de envío'}
+                      </p>
+                    ) : s.publicationMail?.status === 'skipped_no_email' ? (
+                      <p style={{ fontSize: 12, margin: '6px 0 0', color: '#fbbf24' }}>
+                        No se avisó: no hay correo del autor
+                      </p>
+                    ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {!s.isFeatured && (

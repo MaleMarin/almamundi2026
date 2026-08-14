@@ -5,6 +5,7 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
+import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 
 export const runtime = "nodejs";
 
@@ -81,7 +82,12 @@ export async function PATCH(
       toStatus: nextStatus,
     });
 
-    return NextResponse.json({ ok: true, status: nextStatus });
+    let publicationMail = null;
+    if (action === "approve") {
+      publicationMail = await notifyAuthorStoryPublished({ db, storyId: id });
+    }
+
+    return NextResponse.json({ ok: true, status: nextStatus, publicationMail });
   } catch (e) {
     console.error("[admin/stories PATCH]", e);
     return NextResponse.json({ error: "update failed" }, { status: 500 });

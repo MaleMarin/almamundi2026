@@ -12,19 +12,9 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import type { StoryData } from "@/lib/story-schema";
 import { editorialPublishSpanishDraftInPlace } from "@/lib/editorial/service";
 import { TEMAS_MAP } from "@/lib/temas";
-import { sendPublicationEmail } from "@/lib/email/send-publication-email";
+import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 
 export const runtime = "nodejs";
-
-/** Campos opcionales que pueden existir en Firestore aunque no estén en StoryData tipado. */
-type StoryPublishExtras = StoryData & {
-  autorName?: string;
-  title?: string;
-  email?: string;
-  autorEmail?: string;
-  placeLabel?: string;
-  city?: string;
-};
 
 export async function POST(req: NextRequest) {
   const auth = await requireAdmin(req);
@@ -69,43 +59,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: editorial.error }, { status: code });
     }
 
-    try {
-      const ref = db.collection("stories").doc(storyId);
-      const refreshed = await ref.get();
-      const story = (refreshed.exists ? refreshed.data() : {}) as StoryData;
-
-      const submissionSnap = await db.collection("story_submissions").doc(storyId).get();
-      const submissionData = submissionSnap.exists ? submissionSnap.data() : null;
-
-      const storyX = story as StoryPublishExtras;
-      const autorWithEmail = story.autor as StoryData["autor"] & { email?: string };
-      const authorEmail =
-        (submissionData?.email as string | undefined) ||
-        (submissionData?.autorEmail as string | undefined) ||
-        autorWithEmail?.email ||
-        storyX.autorEmail ||
-        storyX.email ||
-        null;
-
-      if (authorEmail) {
-        const ubic = story.ubicacion as (NonNullable<StoryData["ubicacion"]> & { nombre?: string }) | undefined;
-        await sendPublicationEmail({
-          authorName: story.autor?.nombre || storyX.autorName || "Autor",
-          authorEmail,
-          storyTitle: story.titulo || storyX.title || "Tu historia",
-          storyId,
-          placeName:
-            ubic?.nombre || ubic?.label || ubic?.ciudad || storyX.placeLabel || storyX.city || "el mundo",
-        });
-      }
-    } catch (emailErr) {
-      console.error("[curate/publish] Error enviando correo:", emailErr);
-    }
+    const publicationMail = await notifyAuthorStoryPublished({ db, storyId });
 
     return NextResponse.json({
       ok: true,
       storyId,
       temas,
+      publicationMail,
       message: `Historia visible (approved) para audiencia público en flujo español`,
     });
   } catch (err) {

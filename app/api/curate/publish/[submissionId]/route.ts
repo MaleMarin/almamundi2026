@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { editorialPublishApprovedStorySubmission } from "@/lib/editorial/service";
+import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 
 export const runtime = "nodejs";
 
@@ -21,11 +22,14 @@ export async function POST(
       return NextResponse.json({ error: r.error }, { status: r.httpStatus });
     }
 
+    const publicationMail = await notifyAuthorStoryPublished({ db, storyId: r.storyId });
+
     return NextResponse.json({
       ok: true,
       storyId: r.storyId,
       submissionId,
-      mailQueued: true,
+      publicationMail,
+      mailQueued: publicationMail.status === "sent",
     });
   } catch (e) {
     console.error("curate publish", e);

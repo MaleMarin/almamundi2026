@@ -42,6 +42,7 @@ export default function CuraduriaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [lastMailNotice, setLastMailNotice] = useState<string | null>(null);
 
   useEffect(() => {
     if (!auth) {
@@ -126,6 +127,18 @@ export default function CuraduriaPage() {
         if (!res.ok) {
           setError(data.error || 'Error al publicar.');
           return;
+        }
+        const mail = data.publicationMail as
+          | { status?: string; to?: string | null; error?: string | null }
+          | undefined;
+        if (mail?.status === 'sent') {
+          setLastMailNotice(`Publicada. Correo enviado a ${mail.to ?? 'el autor'}.`);
+        } else if (mail?.status === 'skipped_no_email') {
+          setLastMailNotice('Publicada. No se avisó: el envío no tiene correo del autor.');
+        } else if (mail?.status === 'failed') {
+          setLastMailNotice(`Publicada, pero el correo NO salió: ${mail.error ?? 'error de envío'}`);
+        } else {
+          setLastMailNotice(null);
         }
         setList((prev) => prev.filter((s) => s.id !== submissionId));
       } catch {
@@ -257,6 +270,11 @@ export default function CuraduriaPage() {
         {error && (
           <div className="mb-4 p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-200 text-sm">
             {error}
+          </div>
+        )}
+        {lastMailNotice && (
+          <div className="mb-4 p-4 rounded-xl bg-white/10 border border-white/20 text-white/90 text-sm">
+            {lastMailNotice}
           </div>
         )}
 
