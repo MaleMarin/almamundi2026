@@ -17,6 +17,7 @@ import {
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
+import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 
 export const runtime = "nodejs";
 
@@ -225,6 +226,16 @@ export async function POST(req: Request) {
       });
     } catch (auditErr) {
       console.warn("[submissions/photo POST] audit log omitido:", auditErr);
+    }
+
+    try {
+      await notifyAuthorStoryReceived({
+        db,
+        collection: "submissions",
+        submissionId,
+      });
+    } catch (mailErr) {
+      console.warn("[submissions/photo POST] received mail omitido:", mailErr);
     }
 
     return NextResponse.json({ ok: true, submissionId, readUrl: signedReadUrl, storagePath });

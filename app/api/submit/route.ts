@@ -18,6 +18,7 @@ import {
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
+import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -198,6 +199,17 @@ export async function POST(request: NextRequest) {
       extra: { operation: 'appendEditorialAuditLog', submissionId: ref.id, submissionCollection: 'story_submissions' },
     });
     console.warn("[submit POST] audit log omitido:", auditErr);
+  }
+
+  try {
+    const dbMail = getAdminDb();
+    await notifyAuthorStoryReceived({
+      db: dbMail,
+      collection: "story_submissions",
+      submissionId: ref.id,
+    });
+  } catch (mailErr) {
+    console.warn("[submit POST] received mail omitido:", mailErr);
   }
 
   let visualParams: unknown = undefined;
