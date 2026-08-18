@@ -35,6 +35,7 @@ export const SITE_FOOTER_HOME_HASH_LINKS = [
 /** Enlaces legales del pie (segunda fila). */
 export const SITE_FOOTER_LEGAL_LINKS = [
   { href: '/privacidad', label: 'Aviso de privacidad' },
+  { href: '/terminos', label: 'Términos de uso' },
   { href: '/mis-datos-personales', label: 'Mis datos personales' },
 ] as const;
 

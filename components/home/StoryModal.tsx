@@ -52,6 +52,7 @@ import {
   type HuellaV2Format,
 } from '@/lib/huella/huellaV2';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 
 const jakartaHuella = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -130,7 +131,6 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   };
 }
 
-const PRIVACY_PATH = '/privacidad';
 const MAX_PROFILE_PHOTO_MB = 8;
 const MAX_EXTRA_FILE_MB = 15;
 
@@ -1872,22 +1872,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               )}
 
               <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-white/25 pt-2">
-                <div className="flex items-start gap-2">
-                  <input
-                    id="privacy"
-                    type="checkbox"
-                    checked={acceptedPrivacy}
-                    onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
-                  />
-                  <label htmlFor="privacy" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
-                    Confirmo que soy mayor de 18 años y que leí y acepto la{' '}
-                    <a className="text-orange-600 underline" href={PRIVACY_PATH} target="_blank" rel="noreferrer">
-                      política de privacidad
-                    </a>
-                    .
-                  </label>
-                </div>
+                <AdultConsentCheckbox
+                  checked={acceptedPrivacy}
+                  onChange={setAcceptedPrivacy}
+                />
                 <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
                 <div className="flex flex-wrap justify-end gap-2">
                   <button

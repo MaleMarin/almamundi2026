@@ -27,55 +27,45 @@ export function CookieBanner() {
     return () => mq.removeEventListener('change', update);
   }, []);
 
+  useEffect(() => {
+    const body = document.body;
+    const prev = body.style.paddingBottom;
+    if (visible) {
+      body.style.paddingBottom = narrow ? '92px' : '72px';
+    } else {
+      body.style.paddingBottom = prev || '';
+    }
+    return () => {
+      body.style.paddingBottom = prev || '';
+    };
+  }, [visible, narrow]);
+
   if (!visible) return null;
 
-  const panel: CSSProperties = narrow
-    ? {
-        position: 'fixed',
-        bottom: 16,
-        left: 16,
-        right: 16,
-        transform: 'none',
-        zIndex: 9990,
-        maxWidth: 600,
-        margin: '0 auto',
-        boxSizing: 'border-box',
-        background: '#e6e9ee',
-        borderRadius: 16,
-        boxShadow: '8px 8px 16px #c4c7cd, -8px -8px 16px #ffffff',
-        padding: '14px 24px',
-        display: 'flex',
-        alignItems: 'flex-start',
-        flexDirection: 'column',
-        gap: 20,
-        whiteSpace: 'normal',
-      }
-    : {
-        position: 'fixed',
-        bottom: 80,
-        left: '50%',
-        transform: 'translateX(-50%)',
-        zIndex: 9990,
-        maxWidth: 600,
-        width: 'min(600px, calc(100% - 32px))',
-        boxSizing: 'border-box',
-        background: '#e6e9ee',
-        borderRadius: 16,
-        boxShadow: '8px 8px 16px #c4c7cd, -8px -8px 16px #ffffff',
-        padding: '14px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'row',
-        gap: 20,
-        whiteSpace: 'nowrap',
-      };
+  const panel: CSSProperties = {
+    position: 'fixed',
+    bottom: 8,
+    left: 12,
+    right: 12,
+    zIndex: 40,
+    maxWidth: 560,
+    margin: '0 auto',
+    boxSizing: 'border-box',
+    background: '#e6e9ee',
+    borderRadius: 12,
+    padding: narrow ? '10px 14px' : '10px 18px',
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: narrow ? 'column' : 'row',
+    gap: narrow ? 10 : 16,
+    border: '1px solid rgba(163,177,198,0.35)',
+  };
 
   const textStyle: CSSProperties = {
-    fontSize: 13,
+    fontSize: 12,
     color: '#5a6070',
-    lineHeight: 1.5,
+    lineHeight: 1.45,
     margin: 0,
-    whiteSpace: narrow ? 'normal' : 'nowrap',
   };
 
   const linkStyle: CSSProperties = {
@@ -87,7 +77,7 @@ export function CookieBanner() {
     background: '#FF4A1C',
     color: 'white',
     border: 'none',
-    padding: '8px 20px',
+    padding: '7px 16px',
     borderRadius: 100,
     fontSize: 12,
     fontWeight: 800,
@@ -95,6 +85,7 @@ export function CookieBanner() {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,
+    alignSelf: narrow ? 'stretch' : 'auto',
   };
 
   const onAccept = () => {
@@ -109,11 +100,9 @@ export function CookieBanner() {
   return (
     <div style={panel} role="region" aria-label="Aviso de cookies">
       <p style={textStyle}>
-        AlmaMundi usa cookies esenciales y analítica básica.
-        <br />
-        Ver nuestra{' '}
+        AlmaMundi usa cookies esenciales y analítica básica.{' '}
         <a href="/privacidad" style={linkStyle}>
-          política de privacidad
+          Política de privacidad
         </a>
         .
       </p>
