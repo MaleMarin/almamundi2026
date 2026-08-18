@@ -17,6 +17,10 @@ pnpm-debug.log*
 # OS
 .DS_Store
 
+# Léxicos VAD de terceros (prototipo local; no commitear ni redistribuir)
+/tmp-lexicons/
+/tmp-vad-compare/
+
 # env local (claves y secretos; no commitear)
 .env
 .env.local

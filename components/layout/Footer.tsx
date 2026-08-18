@@ -19,8 +19,6 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 const FOOTER_CLOSING_LINE =
   'Historias que no se pierden, sino que despiertan otras historias.';
 
-const FOOTER_CONTACT_HREF = 'mailto:hola@almamundi.org';
-
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-snug tracking-normal transition-colors';
 
@@ -161,9 +159,13 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               >
                 Guía de conducta
               </a>
-              <a href={FOOTER_CONTACT_HREF} className={FOOTER_LINK}>
+              <ActiveInternalNavLink
+                href="/contacto"
+                className={FOOTER_LINK}
+                activeClassName="!text-gray-900 font-semibold"
+              >
                 Contacto
-              </a>
+              </ActiveInternalNavLink>
             </nav>
             <p className="text-[11px] font-medium tracking-wide text-gray-500">
               © 2026 AlmaMundi

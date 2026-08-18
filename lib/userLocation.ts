@@ -36,26 +36,8 @@ export async function getApproxLocation(): Promise<ApproxLocation | null> {
       };
       return cachedLocation;
     } catch {
-      // Sin permiso o timeout
+      // Sin permiso o timeout: no hay fallback por IP (privacidad + CSP).
     }
-  }
-
-  try {
-    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
-    const data = (await res.json()) as { latitude?: number; longitude?: number; country_code?: string; country?: string };
-    if (data.latitude != null && data.longitude != null) {
-      let lat = Math.round(data.latitude * 10) / 10;
-      let lng = Math.round(data.longitude * 10) / 10;
-      const isChile = data.country_code === 'CL' || data.country === 'CL';
-      if (isChile) {
-        lat = -33.37;
-        lng = -71.65;
-      }
-      cachedLocation = { lat, lng };
-      return cachedLocation;
-    }
-  } catch {
-    // Silencioso
   }
 
   return null;

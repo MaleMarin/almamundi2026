@@ -15,10 +15,11 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { SUBIR_FILE_MAX_BYTES } from "@/lib/subir-limits";
 
 export const runtime = "nodejs";
 
-const MAX_BYTES = 8 * 1024 * 1024;
+const MAX_BYTES = SUBIR_FILE_MAX_BYTES;
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export async function POST(req: Request) {

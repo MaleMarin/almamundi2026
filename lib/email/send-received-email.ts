@@ -29,13 +29,18 @@ function greetingLine(authorName: string): string {
 }
 
 function brandHeaderHtml(hasInlineLogo: boolean): string {
+  const href = EMAIL_PUBLIC_ORIGIN;
   if (hasInlineLogo) {
-    return `<img src="cid:${LOGO_CID}" alt="AlmaMundi" width="200" height="200"
-        style="display:block;margin:0 auto;width:200px;height:200px;border:0;outline:none;text-decoration:none">`;
+    return `<a href="${href}" style="text-decoration:none;border:0;color:${BRAND_ORANGE}">
+        <img src="cid:${LOGO_CID}" alt="AlmaMundi" width="200" height="200"
+        style="display:block;margin:0 auto;width:200px;height:200px;border:0;outline:none;text-decoration:none">
+      </a>`;
   }
-  return `<p style="margin:0;font-size:22px;font-weight:300;letter-spacing:0.04em;color:${BRAND_ORANGE};font-family:${WORDMARK_FONT}">
+  return `<a href="${href}" style="text-decoration:none;border:0;color:${BRAND_ORANGE}">
+        <p style="margin:0;font-size:22px;font-weight:300;letter-spacing:0.04em;color:${BRAND_ORANGE};font-family:${WORDMARK_FONT}">
         AlmaMundi
-      </p>`;
+      </p>
+      </a>`;
 }
 
 export function buildReceivedEmailHtml(
@@ -73,6 +78,11 @@ export function buildReceivedEmailHtml(
       </p>
       <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
         Gracias por contarla.
+      </p>
+      <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
+        Si tienes otra que quieras contar, puedes
+        <a href="${EMAIL_PUBLIC_ORIGIN}/subir"
+          style="color:${BRAND_ORANGE};font-weight:700;text-decoration:underline">dejarla aquí</a>.
       </p>
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
         Un abrazo,<br>

@@ -15,8 +15,11 @@ import {
   type StoryData,
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
-
-const MAX_PUBLISHED_ARCHIVE_CAP = 30;
+import {
+  isStoryExpiredOnMap,
+  MAP_MIN_PUBLIC_STORIES,
+  storyMapStartMs,
+} from "@/lib/editorial/map-lifecycle";
 
 export type PublishFromSubmissionResult =
   | {
@@ -67,27 +70,49 @@ function coerceFiniteNumber(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-async function maybeArchiveOldestPublicIfOverCap(db: Firestore): Promise<string | undefined> {
+/**
+ * Archiva historias con más de 15 días en el mapa, solo si quedarían
+ * al menos 40 visibles. No usa el cap viejo de 30.
+ */
+export async function archiveExpiredMapStories(db: Firestore): Promise<string[]> {
   try {
     const snap = await db
       .collection("stories")
       .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
-      .orderBy("publishedAt", "asc")
-      .limit(MAX_PUBLISHED_ARCHIVE_CAP + 1)
       .get();
-    if (snap.docs.length <= MAX_PUBLISHED_ARCHIVE_CAP) return undefined;
-    const oldest = snap.docs[0];
-    await oldest.ref.update({ status: "archived", updatedAt: FieldValue.serverTimestamp() });
-    await appendEditorialAuditLog(db, "system", "archive", {
-      storyId: oldest.id,
-      fromStatus: String(oldest.data()?.status ?? ""),
-      toStatus: "archived",
-      extras: { reason: "max_public_visible_cap" },
-    });
-    return oldest.id;
+    if (snap.size < MAP_MIN_PUBLIC_STORIES) return [];
+
+    const expired = snap.docs
+      .filter((doc) => {
+        const data = doc.data() as Record<string, unknown>;
+        if (data.isFeatured === true || data.status === "featured") return false;
+        return isStoryExpiredOnMap(data);
+      })
+      .sort((a, b) => {
+        const aStart = storyMapStartMs(a.data() as Record<string, unknown>) ?? 0;
+        const bStart = storyMapStartMs(b.data() as Record<string, unknown>) ?? 0;
+        return aStart - bStart;
+      });
+
+    const archivedIds: string[] = [];
+    let remaining = snap.size;
+    for (const doc of expired) {
+      if (remaining - 1 < MAP_MIN_PUBLIC_STORIES) break;
+      const prev = String(doc.data()?.status ?? "");
+      await doc.ref.update({ status: "archived", updatedAt: FieldValue.serverTimestamp() });
+      await appendEditorialAuditLog(db, "system", "archive", {
+        storyId: doc.id,
+        fromStatus: prev,
+        toStatus: "archived",
+        extras: { reason: "map_ttl_15d_min_40" },
+      });
+      archivedIds.push(doc.id);
+      remaining -= 1;
+    }
+    return archivedIds;
   } catch (e) {
-    console.warn("[editorial] maybeArchiveOldestPublicIfOverCap skipped:", e);
-    return undefined;
+    console.warn("[editorial] archiveExpiredMapStories skipped:", e);
+    return [];
   }
 }
 
@@ -156,6 +181,7 @@ export async function editorialPublishFromSubmission(
       createdAt: sub.createdAt ?? now,
       updatedAt: now,
       publishedAt: now,
+      activeSince: now,
       title: sub.title,
       placeLabel: sub.placeLabel,
       lat,
@@ -181,7 +207,8 @@ export async function editorialPublishFromSubmission(
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
-    const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
+    const archivedIds = await archiveExpiredMapStories(db);
+    const archivedOldestStoryId = archivedIds[0];
     await resolved.ref.update({
       status: "approved",
       updatedAt: now,
@@ -243,6 +270,7 @@ export async function editorialPublishFromSubmission(
     createdAt: now,
     updatedAt: now,
     publishedAt: now,
+    activeSince: now,
     title: sd.storyTitle,
     excerpt: sd.storyTitle ? String(sd.storyTitle).slice(0, 160) : undefined,
     /** Sin geocoding en servidor: público sí, globo sólo cuando existan coords en revisión posterior. */
@@ -261,7 +289,8 @@ export async function editorialPublishFromSubmission(
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
 
   await storyRef.set(story);
-  const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
+  const archivedIds = await archiveExpiredMapStories(db);
+  const archivedOldestStoryId = archivedIds[0];
   await resolved.ref.update({
     status: "approved" as SubmissionsPipelineDoc["status"],
     reviewedAt: Date.now(),
@@ -318,6 +347,7 @@ export async function editorialPublishApprovedStorySubmission(
     status: "approved",
     editorialSource: "story_submissions_preapproved",
     publishedAt: now,
+    activeSince: now,
     createdAt: now,
     updatedAt: now,
     sourceSubmissionId: submissionId,
@@ -350,7 +380,7 @@ export async function editorialPublishApprovedStorySubmission(
     updatedAt: FieldValue.serverTimestamp(),
     publishedStoryId: storyRef.id,
   });
-  await maybeArchiveOldestPublicIfOverCap(db);
+  await archiveExpiredMapStories(db);
   await appendEditorialAuditLog(db, actorEmail, "approve_from_submission", {
     submissionId,
     submissionCollection: "story_submissions",

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const list = snap.docs.map((doc) => {
       const d = doc.data();
       const createdAt = toMillis(d.createdAt);
-      const activeSince = toMillis(d.activeSince);
+      const activeSince = toMillis(d.activeSince) ?? toMillis(d.publishedAt) ?? createdAt;
       return {
         id: doc.id,
         title: (d.title as string | undefined) ?? (d.titulo as string | undefined) ?? "",

@@ -10,17 +10,14 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { SUBIR_FILE_MAX_BYTES } from "@/lib/subir-limits";
 
 export const runtime = "nodejs";
 
-const MAX_IMAGE = 8 * 1024 * 1024;
-const MAX_AUDIO = 12 * 1024 * 1024;
-const MAX_VIDEO = 60 * 1024 * 1024;
-
 function maxBytesForMime(mime: string): number {
-  if (mime.startsWith("image/")) return MAX_IMAGE;
-  if (mime.startsWith("audio/")) return MAX_AUDIO;
-  if (mime.startsWith("video/")) return MAX_VIDEO;
+  if (mime.startsWith("image/") || mime.startsWith("audio/") || mime.startsWith("video/")) {
+    return SUBIR_FILE_MAX_BYTES;
+  }
   return 0;
 }
 

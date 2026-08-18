@@ -15,6 +15,7 @@ import {
   signOut,
 } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
+import { MAP_STORY_TTL_MS } from '@/lib/editorial/map-lifecycle';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   Check,
@@ -112,8 +113,7 @@ function formatDate(ts: number | null): string {
 
 function daysRemaining(activeSince: number | null): number | null {
   if (activeSince == null) return null;
-  const days = 15;
-  const end = activeSince + days * 24 * 60 * 60 * 1000;
+  const end = activeSince + MAP_STORY_TTL_MS;
   const now = Date.now();
   const left = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
   return Math.max(0, left);

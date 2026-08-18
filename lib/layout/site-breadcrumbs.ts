@@ -31,6 +31,7 @@ const STATIC_LABELS: Record<string, string> = {
   vision: 'Visión',
   'educacion-mediatica': 'Educación mediática',
   'mis-datos-personales': 'Mis datos personales',
+  contacto: 'Contacto',
   camaras: 'Cámaras',
   noticias: 'Noticias',
   u: 'Perfil público',
@@ -167,6 +168,7 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/cinematic' || p.startsWith('/cinematic/')) return false;
   if (p === '/privacidad') return false;
   if (p === '/terminos') return false;
+  if (p === '/contacto') return false;
   if (p === '/vision') return false;
   return true;
 }

@@ -45,13 +45,17 @@ import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
+import { formatHuellaImprintFooterLine } from '@/lib/huella/huellaV2';
+import { RESONANCE_CANVAS_W } from '@/lib/huella/resonance-concepts';
 import {
-  drawHuellaV2OnCanvas,
-  formatHuellaImprintFooterLine,
-  limpiarNombreFoto,
-  type HuellaV2Format,
-} from '@/lib/huella/huellaV2';
+  drawResonanceStripes,
+  extractPhotoDominantHexes,
+  extractResonanceHits,
+  hitsFromPhotoHexes,
+  type ResonanceHit,
+} from '@/lib/huella/resonance-stripes';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 
 const jakartaHuella = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -130,9 +134,8 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   };
 }
 
-const PRIVACY_PATH = '/privacidad';
-const MAX_PROFILE_PHOTO_MB = 8;
-const MAX_EXTRA_FILE_MB = 15;
+const MAX_PROFILE_PHOTO_MB = SUBIR_PHOTO_FILE_MAX_MB;
+const MAX_EXTRA_FILE_MB = SUBIR_PHOTO_FILE_MAX_MB;
 
 function isVideoShareUrl(url: string): boolean {
   try {
@@ -234,45 +237,6 @@ function probeVideoBlobDurationSeconds(blob: Blob): Promise<number | null> {
   });
 }
 
-function modalModeToHuellaFormat(mode: StoryModalMode): HuellaV2Format {
-  return mode;
-}
-
-/** Texto y longitud que alimentan la resonancia visual v2 (palabras → colores; charCount → densidad). */
-function imprintHuellaSource(args: {
-  mode: StoryModalMode;
-  textBody: string;
-  storyTitle: string;
-  extraText: string;
-  photoFiles: File[];
-  mediaBlob: Blob | null;
-}): { content: string; charCount: number } {
-  const { mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
-  const titleBlock = [storyTitle, extraText].filter((s) => s.trim()).join('\n').trim();
-
-  if (mode === 'texto') {
-    const content = textBody.trim() || titleBlock || storyTitle;
-    return { content, charCount: Math.max(content.length, 1) };
-  }
-
-  if (mode === 'foto') {
-    const fromNames = photoFiles.map((f) => limpiarNombreFoto(f.name)).filter(Boolean).join(' ');
-    const content = fromNames || titleBlock || textBody.trim() || storyTitle;
-    const rawLen = photoFiles.map((f) => f.name).join(' ').length;
-    return {
-      content,
-      charCount: Math.max(rawLen + titleBlock.length, content.length, 400),
-    };
-  }
-
-  const content = titleBlock || storyTitle.trim() || 'historia';
-  const avBonus = Math.min(Math.floor((mediaBlob?.size ?? 0) / 120), 14000);
-  return {
-    content,
-    charCount: Math.max(content.length + avBonus, 900),
-  };
-}
-
 type ImprintDrawArgs = {
   storyId: string;
   receivedAt: Date;
@@ -281,35 +245,40 @@ type ImprintDrawArgs = {
   storyTitle: string;
   extraText: string;
   photoFiles: File[];
-  mediaBlob: Blob | null;
 };
 
-const HUELLA_EXPORT_SIZE = 600;
+function imprintSourceText(args: Pick<ImprintDrawArgs, 'mode' | 'textBody' | 'storyTitle' | 'extraText'>): string {
+  const titleBlock = [args.storyTitle, args.extraText].filter((s) => s.trim()).join('\n').trim();
+  if (args.mode === 'texto') return args.textBody.trim() || titleBlock;
+  return titleBlock;
+}
 
-function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
-  const { storyId, receivedAt, mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
-  canvas.width = HUELLA_EXPORT_SIZE;
-  canvas.height = HUELLA_EXPORT_SIZE;
+async function collectImprintHits(args: ImprintDrawArgs): Promise<ResonanceHit[]> {
+  const textHits = extractResonanceHits(imprintSourceText(args));
+  if (args.mode !== 'foto') return textHits;
+
+  const hexes: string[] = [];
+  for (const file of args.photoFiles.slice(0, 6)) {
+    try {
+      hexes.push(...(await extractPhotoDominantHexes(file, 6)));
+    } catch {
+      /* sin esa foto */
+    }
+  }
+  const photoHits = hitsFromPhotoHexes(hexes);
+  return photoHits.length > 0 ? photoHits : textHits;
+}
+
+async function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): Promise<void> {
+  canvas.width = RESONANCE_CANVAS_W;
+  canvas.height = RESONANCE_CANVAS_W;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
-
-  const { content, charCount } = imprintHuellaSource({
-    mode,
-    textBody,
-    storyTitle,
-    extraText,
-    photoFiles,
-    mediaBlob,
-  });
-
-  drawHuellaV2OnCanvas(ctx, {
-    storyId,
-    content,
-    format: modalModeToHuellaFormat(mode),
-    charCount,
-    submitHour: receivedAt.getHours(),
-    embedSiteFooter: true,
-    footerAt: receivedAt,
+  const hits = await collectImprintHits(args);
+  drawResonanceStripes(ctx, {
+    storyId: args.storyId,
+    hits,
+    footerLine: formatHuellaImprintFooterLine(args.receivedAt),
   });
 }
 
@@ -1073,31 +1042,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   useEffect(() => {
     if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
-    try {
-      drawImprintPreview(imprintCanvasRef.current, {
-        storyId: imprintId,
-        receivedAt: imprintReceivedAt,
-        mode,
-        textBody,
-        storyTitle,
-        extraText,
-        photoFiles,
-        mediaBlob,
-      });
-    } catch (e) {
-      console.error('[StoryModal] drawImprintPreview', e);
-    }
-  }, [
-    step,
-    imprintId,
-    imprintReceivedAt,
-    mode,
-    textBody,
-    storyTitle,
-    extraText,
-    photoFiles,
-    mediaBlob,
-  ]);
+    const canvas = imprintCanvasRef.current;
+    let cancelled = false;
+    void drawImprintPreview(canvas, {
+      storyId: imprintId,
+      receivedAt: imprintReceivedAt,
+      mode,
+      textBody,
+      storyTitle,
+      extraText,
+      photoFiles,
+    }).catch((e) => {
+      if (!cancelled) console.error('[StoryModal] drawImprintPreview', e);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [step, imprintId, imprintReceivedAt, mode, textBody, storyTitle, extraText, photoFiles]);
 
   const downloadImprint = useCallback(() => {
     const c = imprintCanvasRef.current;
@@ -1872,22 +1833,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               )}
 
               <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-white/25 pt-2">
-                <div className="flex items-start gap-2">
-                  <input
-                    id="privacy"
-                    type="checkbox"
-                    checked={acceptedPrivacy}
-                    onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
-                  />
-                  <label htmlFor="privacy" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
-                    Confirmo que soy mayor de 18 años y que leí y acepto la{' '}
-                    <a className="text-orange-600 underline" href={PRIVACY_PATH} target="_blank" rel="noreferrer">
-                      política de privacidad
-                    </a>
-                    .
-                  </label>
-                </div>
+                <AdultConsentCheckbox
+                  checked={acceptedPrivacy}
+                  onChange={setAcceptedPrivacy}
+                />
                 <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
                 <div className="flex flex-wrap justify-end gap-2">
                   <button
@@ -1992,9 +1941,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   ¿Qué es esta resonancia visual?
                 </p>
                 <p className="text-[0.8rem] font-light leading-relaxed text-[#8A8A7A]">
-                  Es una pieza creada a partir de tu relato, el formato elegido y el momento en que la compartiste. Los colores
-                  surgen de las palabras de tu texto: AlmaMundi las traduce en una paleta determinista. No resume tu vida ni
-                  interpreta quién eres: acompaña la forma en que tu historia resonó aquí.
+                  Es una pieza hecha con las palabras de tu relato. Cada color corresponde a una emoción, un vínculo o un
+                  lugar que aparece en tu historia. El ancho de cada franja sigue cuántas veces se nombra. No resume tu vida:
+                  acompaña cómo resonó aquí.
                 </p>
               </div>
             </div>

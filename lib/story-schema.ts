@@ -80,6 +80,7 @@ export type StoryData = {
   curadorId?: string // uid del admin que aprobó
   curadorNota?: string // nota interna del curador
   publishedAt?: string // ISO cuando se publicó
+  activeSince?: string // ISO / timestamp: inicio de los 15 días en el mapa
   createdAt: string // ISO cuando se subió
   updatedAt: string // ISO última modificación
 
@@ -144,6 +145,7 @@ export function buildPublishUpdate(payload: PublishPayload): Partial<StoryData> 
     ubicacion: payload.ubicacion,
     quote: payload.quote,
     publishedAt: new Date().toISOString(),
+    activeSince: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
 }

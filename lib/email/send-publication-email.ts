@@ -41,9 +41,11 @@ function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
   <tr>
     <td style="padding:32px 40px 24px;text-align:center;
       border-bottom:1px solid rgba(255,255,255,0.6)">
-      <img src="https://www.almamundi.org/logo.png"
+      <a href="https://www.almamundi.org" style="text-decoration:none;border:0;color:#FF4A1C">
+        <img src="https://www.almamundi.org/logo.png"
         alt="AlmaMundi" height="40"
-        style="margin-right:16px;vertical-align:middle">
+        style="margin-right:16px;vertical-align:middle;border:0;outline:none">
+      </a>
       <img src="https://www.almamundi.org/logo-precisar.png"
         alt="Precisar" height="32"
         style="vertical-align:middle">
@@ -80,6 +82,15 @@ function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
           </td>
         </tr>
       </table>
+      <p style="margin:32px 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
+        Si tienes otra que quieras contar, puedes
+        <a href="https://www.almamundi.org/subir"
+          style="color:#FF4A1C;font-weight:700;text-decoration:underline">dejarla aquí</a>.
+      </p>
+      <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
+        Un abrazo,<br>
+        Equipo AlmaMundi
+      </p>
     </td>
   </tr>
 

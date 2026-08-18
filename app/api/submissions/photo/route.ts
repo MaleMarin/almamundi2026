@@ -18,12 +18,13 @@ import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
+import { SUBIR_FILE_MAX_BYTES } from "@/lib/subir-limits";
 
 export const runtime = "nodejs";
 
-const MAX_BYTES = 8 * 1024 * 1024;
-const PROFILE_MAX_BYTES = 8 * 1024 * 1024;
-const EXTRA_MAX_BYTES = 15 * 1024 * 1024;
+const MAX_BYTES = SUBIR_FILE_MAX_BYTES;
+const PROFILE_MAX_BYTES = SUBIR_FILE_MAX_BYTES;
+const EXTRA_MAX_BYTES = SUBIR_FILE_MAX_BYTES;
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 const PROFILE_ALLOWED = ALLOWED;
