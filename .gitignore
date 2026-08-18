@@ -17,6 +17,12 @@ pnpm-debug.log*
 # OS
 .DS_Store
 
+# Artefactos locales de prototipo (léxicos VAD, capturas). No van a Vercel.
+/tmp-lexicons/
+/tmp-vad-compare/
+/tmp-resonance-preview/
+/tmp-launch-audit/
+
 # env local (claves y secretos; no commitear)
 .env
 .env.local

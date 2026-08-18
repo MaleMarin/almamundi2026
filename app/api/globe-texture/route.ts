@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
-import { join } from "path";
+import { fileURLToPath } from "node:url";
 
-const ALLOWED = ["earth-day.jpg", "earth-night.jpg", "earth-clouds.png"] as const;
+const TEXTURE_FILES = {
+  "earth-day.jpg": fileURLToPath(new URL("../../../public/textures/earth-day.jpg", import.meta.url)),
+  "earth-night.jpg": fileURLToPath(new URL("../../../public/textures/earth-night.jpg", import.meta.url)),
+  "earth-clouds.png": fileURLToPath(new URL("../../../public/textures/earth-clouds.png", import.meta.url)),
+} as const;
 
 /**
  * GET /api/globe-texture?name=earth-day.jpg
@@ -10,12 +14,11 @@ const ALLOWED = ["earth-day.jpg", "earth-night.jpg", "earth-clouds.png"] as cons
  */
 export async function GET(request: NextRequest) {
   const name = request.nextUrl.searchParams.get("name");
-  if (!name || !ALLOWED.includes(name as (typeof ALLOWED)[number])) {
+  if (!name || !(name in TEXTURE_FILES)) {
     return NextResponse.json({ error: "name required (earth-day.jpg | earth-night.jpg | earth-clouds.png)" }, { status: 400 });
   }
   try {
-    const path = join(process.cwd(), "public", "textures", name);
-    const buf = await readFile(path);
+    const buf = await readFile(TEXTURE_FILES[name as keyof typeof TEXTURE_FILES]);
     const contentType =
       name.endsWith(".png") ? "image/png" : name.endsWith(".jpg") || name.endsWith(".jpeg") ? "image/jpeg" : "application/octet-stream";
     return new NextResponse(buf, {

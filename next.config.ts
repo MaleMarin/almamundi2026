@@ -21,10 +21,21 @@ const csp = [
 
 const nextConfig: NextConfig = {
   /**
-   * `/api/public-audio` solo importa un JSON pequeño; por si el trazado volviera a arrastrar `public/`.
+   * `public/` pesa ~380 MB (videos, texturas, audio). El file tracing de Next
+   * lo metía entero en funciones como /api/submissions/photo (~414 MB) si algún
+   * import usaba process.cwd() + "public". Esos archivos los sirve el CDN, no la función.
    */
   outputFileTracingExcludes: {
-    "/app/api/public-audio": ["public/**/*"],
+    "/*": [
+      "./public/**/*",
+      "./tmp-*/**/*",
+      "./node_modules/playwright/**/*",
+      "./node_modules/playwright-core/**/*",
+      "./node_modules/@playwright/**/*",
+    ],
+  },
+  outputFileTracingIncludes: {
+    "/api/globe-texture": ["./public/textures/**/*"],
   },
   devIndicators: false,
   /** Menos reutilización de la caché del cliente en rutas dinámicas (p. ej. vuelta a `/`). */

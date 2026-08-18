@@ -7,9 +7,13 @@
  */
 
 import { readFile } from 'node:fs/promises';
-import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { escapeHtml } from '@/lib/email-html';
 import { getResend } from '@/lib/emailSubmission';
+
+const WORDMARK_PATH = fileURLToPath(
+  new URL('./almamundi-wordmark-orange.png', import.meta.url)
+);
 
 const EMAIL_PUBLIC_ORIGIN = 'https://www.almamundi.org';
 const BRAND_ORANGE = '#FF4A1C';
@@ -103,18 +107,13 @@ export function buildReceivedEmailHtml(
 }
 
 async function loadInlineWordmark(): Promise<Buffer | null> {
-  const candidates = [
-    path.join(process.cwd(), 'lib/email/almamundi-wordmark-orange.png'),
-    path.join(process.cwd(), 'public/logo.png'),
-  ];
-  for (const filePath of candidates) {
-    try {
-      return await readFile(filePath);
-    } catch {
-      /* siguiente */
-    }
+  // Solo este PNG junto al módulo. No usar process.cwd()+public/: el file
+  // tracing de Next metería todo public/ (~380 MB) en cada función que importa esto.
+  try {
+    return await readFile(WORDMARK_PATH);
+  } catch {
+    return null;
   }
-  return null;
 }
 
 export type SendReceivedEmailResult =
