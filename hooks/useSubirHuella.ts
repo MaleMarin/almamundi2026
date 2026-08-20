@@ -1,9 +1,8 @@
 'use client';
 
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import { IMPRONTA_EXPORT_H, IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { drawVadResonanceOnCanvas } from '@/lib/huella/resonance-stripes';
+import { drawVadResonanceOnCanvas, RESONANCE_EXPORT_PX } from '@/lib/huella/resonance-stripes';
 
 export type SubirHuellaFormat = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -28,6 +27,8 @@ type UseSubirHuellaOptions = {
   canvasId: string;
   submissionId?: string | null;
   storyTitle?: string | null;
+  city?: string | null;
+  country?: string | null;
 };
 
 /**
@@ -39,6 +40,9 @@ export function useSubirHuella({
   narrativeText,
   canvasId,
   submissionId,
+  storyTitle,
+  city,
+  country,
 }: UseSubirHuellaOptions) {
   const { locale } = useHomeLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -47,8 +51,8 @@ export function useSubirHuella({
   const paintResonanceVisual = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    canvas.width = IMPRONTA_EXPORT_W;
-    canvas.height = IMPRONTA_EXPORT_H;
+    canvas.width = RESONANCE_EXPORT_PX;
+    canvas.height = RESONANCE_EXPORT_PX;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
     const raw = narrativeText.trim();
@@ -57,9 +61,15 @@ export function useSubirHuella({
       storyId: stableStoryId(submissionId, raw || `subir-${format}`, format),
       text: textForPalette,
       locale,
-      footerAt: new Date(),
+      footer: {
+        at: new Date(),
+        title: storyTitle?.trim() || undefined,
+        city: city?.trim() || undefined,
+        country: country?.trim() || undefined,
+        locale,
+      },
     });
-  }, [format, narrativeText, submissionId, locale]);
+  }, [format, narrativeText, submissionId, locale, storyTitle, city, country]);
 
   useLayoutEffect(() => {
     paintResonanceVisual();

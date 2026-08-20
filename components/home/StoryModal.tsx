@@ -10,7 +10,6 @@ import {
   Check,
   Download,
   Share2,
-  RefreshCw,
   FileText,
   User,
   Upload,
@@ -45,11 +44,16 @@ import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCaptur
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
+import { limpiarNombreFoto } from '@/lib/huella/huellaV2';
 import {
-  formatHuellaImprintFooterLine,
-  limpiarNombreFoto,
-} from '@/lib/huella/huellaV2';
-import { drawVadResonanceOnCanvas } from '@/lib/huella/resonance-stripes';
+  drawVadResonanceOnCanvas,
+  RESONANCE_EXPORT_PX,
+} from '@/lib/huella/resonance-stripes';
+import {
+  canvasToPngBlob,
+  downloadPngBlob,
+  shareOrCopyResonancePng,
+} from '@/lib/huella/share-resonance-png';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 
@@ -261,14 +265,26 @@ type ImprintDrawArgs = {
   photoFiles: File[];
   mediaBlob: Blob | null;
   locale: 'es' | 'pt' | 'en';
+  city: string;
+  country: string;
 };
 
-const HUELLA_EXPORT_SIZE = 600;
-
 function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
-  const { storyId, receivedAt, mode, textBody, storyTitle, extraText, photoFiles, mediaBlob, locale } = args;
-  canvas.width = HUELLA_EXPORT_SIZE;
-  canvas.height = HUELLA_EXPORT_SIZE;
+  const {
+    storyId,
+    receivedAt,
+    mode,
+    textBody,
+    storyTitle,
+    extraText,
+    photoFiles,
+    mediaBlob,
+    locale,
+    city,
+    country,
+  } = args;
+  canvas.width = RESONANCE_EXPORT_PX;
+  canvas.height = RESONANCE_EXPORT_PX;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
@@ -285,7 +301,13 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     storyId,
     text: content,
     locale,
-    footerAt: receivedAt,
+    footer: {
+      at: receivedAt,
+      title: storyTitle,
+      city,
+      country,
+      locale,
+    },
   });
 }
 
@@ -361,8 +383,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   /** Fecha del envío mostrada en la resonancia visual (canvas y descarga). */
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
-  const [linkCopied, setLinkCopied] = useState(false);
-  const linkCopiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [shareNotice, setShareNotice] = useState('');
+  const shareNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareRequestTokenRef = useRef(0);
 
   const stopTimer = useCallback(() => {
@@ -441,11 +463,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setSaving(false);
       setImprintId('');
       setImprintReceivedAt(null);
-      setLinkCopied(false);
+      setShareNotice('');
       shareRequestTokenRef.current += 1;
-      if (linkCopiedTimerRef.current) {
-        clearTimeout(linkCopiedTimerRef.current);
-        linkCopiedTimerRef.current = null;
+      if (shareNoticeTimerRef.current) {
+        clearTimeout(shareNoticeTimerRef.current);
+        shareNoticeTimerRef.current = null;
       }
       return;
     }
@@ -1061,6 +1083,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         photoFiles,
         mediaBlob,
         locale,
+        city,
+        country,
       });
     } catch (e) {
       console.error('[StoryModal] drawImprintPreview', e);
@@ -1076,65 +1100,56 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     photoFiles,
     mediaBlob,
     locale,
+    city,
+    country,
   ]);
 
-  const downloadImprint = useCallback(() => {
+  const flashShareNotice = useCallback((msg: string) => {
+    if (shareNoticeTimerRef.current) clearTimeout(shareNoticeTimerRef.current);
+    setShareNotice(msg);
+    shareNoticeTimerRef.current = setTimeout(() => {
+      setShareNotice('');
+      shareNoticeTimerRef.current = null;
+    }, 2800);
+  }, []);
+
+  const downloadImprint = useCallback(async () => {
     const c = imprintCanvasRef.current;
     if (!c) return;
-    const a = document.createElement('a');
-    a.href = c.toDataURL('image/png');
-    a.download = huellaPngFilename(storyTitle, imprintId);
-    a.click();
-  }, [imprintId, storyTitle]);
-
-  const copyLink = useCallback(() => {
-    if (typeof window === 'undefined' || !imprintId) return;
-    const base =
-      (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '') || window.location.origin;
-    const url = `${base}/historias/${encodeURIComponent(imprintId)}`;
-    if (linkCopiedTimerRef.current) clearTimeout(linkCopiedTimerRef.current);
-    const requestToken = ++shareRequestTokenRef.current;
-    void navigator.clipboard.writeText(url).then(() => {
-      if (requestToken !== shareRequestTokenRef.current) return;
-      setLinkCopied(true);
-      linkCopiedTimerRef.current = setTimeout(() => {
-        setLinkCopied(false);
-        linkCopiedTimerRef.current = null;
-      }, 2200);
-    });
-  }, [imprintId]);
-
-  const anotherStory = useCallback(() => {
-    setLinkCopied(false);
-    if (linkCopiedTimerRef.current) {
-      clearTimeout(linkCopiedTimerRef.current);
-      linkCopiedTimerRef.current = null;
+    try {
+      const blob = await canvasToPngBlob(c);
+      downloadPngBlob(blob, huellaPngFilename(storyTitle, imprintId));
+    } catch {
+      flashShareNotice(t.modalShareFailed);
     }
-    resetCaptureMedia();
-    setStep('capture');
-    setTextBody(mode === 'texto' && chosenTopic ? chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n') : '');
-    setTextoReviewAck(false);
-    setPhotoFiles([]);
-    setImprintId('');
-    setImprintReceivedAt(null);
-    setStoryTitle('');
-    setAlias('');
-    setExtraText('');
-    setExtraFiles([]);
-    setProfilePhoto(null);
-    setSex('');
-    setAgeRange('');
-    setCity('');
-    setCountry('');
-    setEmail('');
-    setAcceptedPrivacy(false);
-    setUploadVideoFile(null);
-    setUploadAudioFile(null);
-    setVideoShareUrl('');
-    setAudioShareUrl('');
-    setAvSource('grabar');
-    setErr('');
-  }, [resetCaptureMedia, mode, chosenTopic]);
+  }, [imprintId, storyTitle, t.modalShareFailed, flashShareNotice]);
+
+  const shareImprint = useCallback(async () => {
+    const c = imprintCanvasRef.current;
+    if (!c) return;
+    const requestToken = ++shareRequestTokenRef.current;
+    try {
+      const blob = await canvasToPngBlob(c);
+      const result = await shareOrCopyResonancePng(
+        blob,
+        huellaPngFilename(storyTitle, imprintId),
+        storyTitle.trim() || 'AlmaMundi'
+      );
+      if (requestToken !== shareRequestTokenRef.current) return;
+      if (result === 'copied') flashShareNotice(t.modalShareCopied);
+      else if (result === 'downloaded') flashShareNotice(t.modalShareDownloaded);
+    } catch {
+      if (requestToken !== shareRequestTokenRef.current) return;
+      flashShareNotice(t.modalShareFailed);
+    }
+  }, [
+    imprintId,
+    storyTitle,
+    t.modalShareCopied,
+    t.modalShareDownloaded,
+    t.modalShareFailed,
+    flashShareNotice,
+  ]);
 
   if (!isOpen) return null;
 
@@ -1584,18 +1599,26 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   return (
     <div
-      className="fixed inset-0 z-[220] flex items-center justify-center p-3 sm:p-4"
+      className={`fixed inset-0 z-[220] flex items-center justify-center ${
+        step === 'received' ? 'p-4' : 'p-3 sm:p-4'
+      }`}
       style={{ backgroundColor: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(6px)' }}
       role="dialog"
       aria-modal="true"
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}
     >
       <div
-        className="flex min-h-0 w-full max-w-4xl max-h-[min(90vh,92dvh)] flex-col overflow-hidden transition-all duration-200 ease-out"
+        className={`flex min-h-0 w-full flex-col overflow-hidden transition-all duration-200 ease-out ${
+          step === 'received'
+            ? 'h-[min(90vh,92dvh)] max-h-[min(90vh,92dvh)] max-w-[720px]'
+            : 'max-h-[min(90vh,92dvh)] max-w-4xl'
+        }`}
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
         <header
-          className="flex shrink-0 items-start justify-between gap-4 border-b border-white/30 px-5 py-4 md:px-8 md:py-5"
+          className={`flex shrink-0 items-start justify-between gap-4 border-b border-white/30 ${
+            step === 'received' ? 'px-4 py-3 md:px-5' : 'px-5 py-4 md:px-8 md:py-5'
+          }`}
           style={{ backgroundColor: soft.bg }}
         >
           <div className="min-w-0 space-y-1">
@@ -1623,7 +1646,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           className={`min-h-0 flex-1 overflow-x-hidden overscroll-contain ${
             step === 'details'
               ? 'flex flex-col overflow-hidden px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4'
-              : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
+              : step === 'received'
+                ? 'flex flex-col overflow-hidden px-4 py-3 md:px-5 md:py-4'
+                : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
           }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
@@ -1893,100 +1918,83 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
 
           {step === 'received' && (
-            <div
-              className={`mx-auto max-w-[480px] space-y-5 text-center ${jakartaHuella.className}`}
-            >
-              <div className="flex justify-center">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[14px] border border-[#D4D4C4] bg-white text-[#E8400A]">
-                  <Check size={22} strokeWidth={2.2} aria-hidden />
+            <div className={`flex min-h-0 flex-1 flex-col ${jakartaHuella.className}`}>
+              <div className="shrink-0 space-y-2 text-center">
+                <div className="flex justify-center">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#E8400A]">
+                    <Check size={20} strokeWidth={2.2} aria-hidden />
+                  </div>
+                </div>
+                <h3
+                  className={`text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26] ${frauncesHuella.className}`}
+                >
+                  {alias.trim() ? (
+                    <>
+                      {alias.trim()}, {t.modalReceivedAfterName}
+                    </>
+                  ) : (
+                    t.modalReceivedAnonBefore
+                  )}
+                </h3>
+                <p className="text-[13px] font-light leading-snug text-[#5C5C52] md:text-sm">
+                  {t.modalImprintExplain}
+                </p>
+              </div>
+
+              <div className="mt-3 flex min-h-0 flex-1 items-center justify-center [container-type:size]">
+                <div className="aspect-square max-h-full w-[min(100%,100cqh)] overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:min-w-[min(480px,100cqh,100%)]">
+                  <canvas
+                    ref={imprintCanvasRef}
+                    className="block h-full w-full object-contain"
+                    aria-label={t.modalImprintAria}
+                  />
                 </div>
               </div>
-              <h3
-                className={`text-[clamp(1.6rem,5vw,2rem)] font-semibold leading-[1.15] text-[#141D26] ${frauncesHuella.className}`}
-              >
-                {alias.trim() ? (
-                  <>
-                    {alias.trim()},<br />
-                    {t.modalReceivedAfterName}
-                  </>
-                ) : (
-                  t.modalReceivedAnonBefore
-                )}
-              </h3>
-              <p className="text-sm font-light leading-relaxed text-[#5C5C52] md:text-[0.9375rem]">
-                {t.modalImprintExplain}
-              </p>
-              <div className="aspect-square w-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F0EFE9]">
-                <canvas
-                  ref={imprintCanvasRef}
-                  className="h-full w-full object-cover"
-                  aria-label={t.modalImprintAria}
-                />
-              </div>
-              {imprintReceivedAt ? (
-                <p className="text-[10px] leading-relaxed tracking-wide text-[#8A8A7A]">
-                  {formatHuellaImprintFooterLine(imprintReceivedAt)}
+
+              <div className="mt-3 shrink-0 space-y-2">
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void downloadImprint()}
+                    className="inline-flex min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#E8400A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#c73308]"
+                  >
+                    <Download size={16} strokeWidth={1.6} aria-hidden />
+                    {t.modalDownloadImprint}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void shareImprint()}
+                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
+                  >
+                    <Share2 size={15} aria-hidden />
+                    {t.modalShareImprint}
+                  </button>
+                </div>
+                <p className="text-center">
+                  <button
+                    type="button"
+                    onClick={onClose}
+                    className="text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#E8400A] hover:underline"
+                  >
+                    {t.modalBackToMap}
+                  </button>
                 </p>
-              ) : null}
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={downloadImprint}
-                  className="inline-flex min-w-[120px] flex-1 items-center justify-center gap-2 rounded-full bg-[#E8400A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#c73308]"
-                  aria-label={t.modalDownloadImprint}
+                <p
+                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#E8400A] ${
+                    shareNotice ? 'opacity-100' : 'opacity-0'
+                  }`}
+                  aria-live="polite"
                 >
-                  <Download size={15} strokeWidth={1.6} aria-hidden />
-                  {t.modalDownloadImprint}
-                </button>
-                <button
-                  type="button"
-                  onClick={copyLink}
-                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
-                  aria-label={t.modalCopyLink}
-                >
-                  <Share2 size={14} aria-hidden />
-                  {t.modalCopyLink}
-                </button>
-                <button
-                  type="button"
-                  onClick={anotherStory}
-                  className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
-                  aria-label={t.modalAnotherStory}
-                >
-                  <RefreshCw size={14} aria-hidden />
-                  {t.modalAnotherStory}
-                </button>
+                  {shareNotice || '\u00a0'}
+                </p>
               </div>
-              <p
-                className={`h-[18px] text-center text-[0.78rem] font-medium text-[#E8400A] transition-opacity ${linkCopied ? 'opacity-100' : 'opacity-0'}`}
-                aria-live="polite"
-              >
-                {t.modalLinkCopied}
-              </p>
             </div>
           )}
 
-          {err && step !== 'details' && (
+          {err && step !== 'details' && step !== 'received' && (
             <p className="mt-4 text-base font-medium text-red-600 md:text-lg">{err}</p>
           )}
         </div>
-
-        {step === 'received' && (
-          <footer
-            className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-t border-white/30 px-5 py-4 md:px-8"
-            style={{ backgroundColor: soft.bg }}
-          >
-            <button
-              type="button"
-              onClick={onClose}
-              className="w-full rounded-full py-4 text-lg font-bold text-gray-700 sm:w-auto sm:px-10 md:text-xl"
-              style={soft.button}
-              aria-label={t.modalBackToMap}
-            >
-              {t.modalBackToMap}
-            </button>
-          </footer>
-        )}
       </div>
     </div>
   );

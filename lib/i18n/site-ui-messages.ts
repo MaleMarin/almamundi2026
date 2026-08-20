@@ -129,6 +129,10 @@ export type SiteUiMessages = {
   modalReceivedEmph: string;
   modalImprintAria: string;
   modalDownloadImprint: string;
+  modalShareImprint: string;
+  modalShareCopied: string;
+  modalShareDownloaded: string;
+  modalShareFailed: string;
   modalCopyLink: string;
   modalAnotherStory: string;
   modalLinkCopied: string;
@@ -273,7 +277,11 @@ const es: SiteUiMessages = {
   modalReceivedAnonBefore: 'Tu relato en colores.',
   modalReceivedEmph: 'colores.',
   modalImprintAria: 'Resonancia visual generada',
-  modalDownloadImprint: 'Descargar resonancia',
+  modalDownloadImprint: 'Descargar',
+  modalShareImprint: 'Compartir',
+  modalShareCopied: 'Imagen copiada. Puedes pegarla donde quieras.',
+  modalShareDownloaded: 'Tu navegador no pudo copiar la imagen; se descargó el PNG.',
+  modalShareFailed: 'No se pudo compartir la imagen.',
   modalCopyLink: 'Copiar enlace',
   modalAnotherStory: 'Otra historia',
   modalLinkCopied: '¡Enlace copiado!',
@@ -448,7 +456,11 @@ const pt: SiteUiMessages = {
   modalReceivedAnonBefore: 'O seu relato em cores.',
   modalReceivedEmph: 'cores.',
   modalImprintAria: 'Ressonância visual gerada',
-  modalDownloadImprint: 'Descarregar ressonância',
+  modalDownloadImprint: 'Descarregar',
+  modalShareImprint: 'Partilhar',
+  modalShareCopied: 'Imagem copiada. Pode colá-la onde quiser.',
+  modalShareDownloaded: 'O seu navegador não pôde copiar a imagem; o PNG foi descarregado.',
+  modalShareFailed: 'Não foi possível partilhar a imagem.',
   modalCopyLink: 'Copiar ligação',
   modalAnotherStory: 'Outra história',
   modalLinkCopied: 'Ligação copiada!',
@@ -622,7 +634,11 @@ const en: SiteUiMessages = {
   modalReceivedAnonBefore: 'Your story in colors.',
   modalReceivedEmph: 'colors.',
   modalImprintAria: 'Generated visual resonance',
-  modalDownloadImprint: 'Download resonance',
+  modalDownloadImprint: 'Download',
+  modalShareImprint: 'Share',
+  modalShareCopied: 'Image copied. You can paste it wherever you like.',
+  modalShareDownloaded: 'Your browser could not copy the image; the PNG was downloaded instead.',
+  modalShareFailed: 'Could not share the image.',
   modalCopyLink: 'Copy link',
   modalAnotherStory: 'Another story',
   modalLinkCopied: 'Link copied!',

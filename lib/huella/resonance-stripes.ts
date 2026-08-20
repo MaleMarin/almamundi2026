@@ -4,7 +4,8 @@
  */
 
 import type { AlmaLocale } from '@/lib/i18n/locale';
-import { seedFn, seededRnd, formatHuellaImprintFooterLine } from '@/lib/huella/huellaV2';
+import { formatLongDate } from '@/lib/i18n/locale';
+import { seedFn, seededRnd } from '@/lib/huella/huellaV2';
 import { hitsFromText, type LexiconHit } from '@/lib/huella/almamundi-lexicon';
 import {
   colorizeVadHits,
@@ -17,6 +18,9 @@ import {
 export const RESONANCE_BG = '#F7F4EE';
 export const RESONANCE_STRIPE_MIN_PX = 8;
 export const RESONANCE_STRIPE_MAX_PX = 60;
+export const RESONANCE_EXPORT_PX = 1080;
+export const RESONANCE_FOOTER_SITE = 'almamundi.org';
+const FOOTER_INK = '#8A8A7A';
 
 function hueDist(a: number, b: number): number {
   const d = Math.abs(a - b) % 360;
@@ -64,12 +68,90 @@ function fallbackHits(storyId: string): LexiconHit[] {
   return hits;
 }
 
+export type ResonancePieceFooter = {
+  at: Date;
+  title?: string;
+  city?: string;
+  country?: string;
+  locale: AlmaLocale;
+};
+
 export type DrawVadResonanceArgs = {
   storyId: string;
   text: string;
   locale: AlmaLocale;
+  footer?: ResonancePieceFooter;
+  /** Si no hay `footer`, pinta solo fecha + sitio (compatibilidad). */
   footerAt?: Date;
 };
+
+function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
+  if (ctx.measureText(text).width <= maxW) return text;
+  const ell = '…';
+  let t = text.trim();
+  while (t.length > 0 && ctx.measureText(t + ell).width > maxW) {
+    t = t.slice(0, -1);
+  }
+  return t ? t + ell : ell;
+}
+
+function footerMetrics(W: number, H: number, hasTitle: boolean) {
+  const padX = Math.round(W * 0.056);
+  const padBottom = Math.round(H * 0.042);
+  const padTop = Math.round(H * 0.028);
+  const titlePx = Math.max(15, Math.round(W * 0.022));
+  const metaPx = Math.max(12, Math.round(W * 0.015));
+  const sitePx = Math.max(11, Math.round(W * 0.013));
+  const gap = Math.max(4, Math.round(H * 0.008));
+  const titleBlock = hasTitle ? titlePx + gap : 0;
+  const height = padTop + titleBlock + metaPx + gap + sitePx + padBottom;
+  return { padX, padBottom, padTop, titlePx, metaPx, sitePx, gap, height };
+}
+
+function drawResonancePieceFooter(
+  ctx: CanvasRenderingContext2D,
+  fieldH: number,
+  footer: ResonancePieceFooter
+): void {
+  const W = ctx.canvas.width;
+  const H = ctx.canvas.height;
+  const title = footer.title?.trim() ?? '';
+  const m = footerMetrics(W, H, Boolean(title));
+  const maxW = W - m.padX * 2;
+  const place = [footer.city?.trim(), footer.country?.trim()].filter(Boolean).join(', ');
+  const date = formatLongDate(footer.at, footer.locale);
+  const meta = place ? `${place} · ${date}` : date;
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = true;
+  ctx.fillStyle = RESONANCE_BG;
+  ctx.fillRect(0, fieldH, W, H - fieldH);
+  ctx.strokeStyle = 'rgba(0,0,0,0.06)';
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(0, fieldH);
+  ctx.lineTo(W, fieldH);
+  ctx.stroke();
+
+  ctx.fillStyle = FOOTER_INK;
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'alphabetic';
+  const fontStack = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
+  let y = fieldH + m.padTop;
+  if (title) {
+    y += m.titlePx;
+    ctx.font = `400 ${m.titlePx}px ${fontStack}`;
+    ctx.fillText(truncateCanvasLine(ctx, title, maxW), m.padX, y);
+    y += m.gap;
+  }
+  y += m.metaPx;
+  ctx.font = `400 ${m.metaPx}px ${fontStack}`;
+  ctx.fillText(truncateCanvasLine(ctx, meta, maxW), m.padX, y);
+  y += m.gap + m.sitePx;
+  ctx.font = `400 ${m.sitePx}px ${fontStack}`;
+  ctx.fillText(RESONANCE_FOOTER_SITE, m.padX, y);
+  ctx.restore();
+}
 
 export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: DrawVadResonanceArgs): void {
   const W = ctx.canvas.width;
@@ -92,7 +174,12 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
   ctx.fillStyle = RESONANCE_BG;
   ctx.fillRect(0, 0, W, H);
 
-  const footerH = args.footerAt ? Math.round(H * 0.09) : 0;
+  const footer: ResonancePieceFooter | null = args.footer
+    ? args.footer
+    : args.footerAt
+      ? { at: args.footerAt, locale: args.locale }
+      : null;
+  const footerH = footer ? footerMetrics(W, H, Boolean(footer.title?.trim())).height : 0;
   const fieldH = H - footerH;
 
   let x = 0;
@@ -113,21 +200,5 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
     repeat += 1;
   }
 
-  if (args.footerAt && footerH > 0) {
-    const line = formatHuellaImprintFooterLine(args.footerAt);
-    ctx.fillStyle = RESONANCE_BG;
-    ctx.fillRect(0, fieldH, W, footerH);
-    ctx.strokeStyle = 'rgba(0,0,0,0.06)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(0, fieldH);
-    ctx.lineTo(W, fieldH);
-    ctx.stroke();
-    ctx.fillStyle = '#8A8A7A';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    const px = Math.max(11, Math.round(W * 0.014));
-    ctx.font = `400 ${px}px ui-sans-serif, system-ui, sans-serif`;
-    ctx.fillText(line, W / 2, fieldH + footerH * 0.55);
-  }
+  if (footer) drawResonancePieceFooter(ctx, fieldH, footer);
 }
