@@ -2,16 +2,10 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import { IMPRONTA_EXPORT_H, IMPRONTA_EXPORT_W } from '@/lib/impronta/bauhausExport';
-import { drawHuellaV2OnCanvas, type HuellaV2Meta } from '@/lib/huella/huellaV2';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { drawVadResonanceOnCanvas } from '@/lib/huella/resonance-stripes';
 
 export type SubirHuellaFormat = 'video' | 'audio' | 'texto' | 'foto';
-
-const FORMAT_LABEL: Record<SubirHuellaFormat, string> = {
-  video: 'Video',
-  audio: 'Audio',
-  texto: 'Texto',
-  foto: 'Fotos',
-};
 
 export const SUBIR_HUELLA_FOOTER_SITE = 'www.almamundi.org';
 
@@ -45,8 +39,8 @@ export function useSubirHuella({
   narrativeText,
   canvasId,
   submissionId,
-  storyTitle,
 }: UseSubirHuellaOptions) {
+  const { locale } = useHomeLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [err, setErr] = useState('');
 
@@ -59,19 +53,13 @@ export function useSubirHuella({
     if (!ctx) return;
     const raw = narrativeText.trim();
     const textForPalette = raw.length > 0 ? raw : ' ';
-    const meta: HuellaV2Meta = {
+    drawVadResonanceOnCanvas(ctx, {
       storyId: stableStoryId(submissionId, raw || `subir-${format}`, format),
-      content: textForPalette,
-      format,
-      charCount: Math.max(1, raw.length > 0 ? raw.length : 120),
-      submitHour: new Date().getHours(),
-      embedSiteFooter: true,
+      text: textForPalette,
+      locale,
       footerAt: new Date(),
-      embedStoryTitle: storyTitle?.trim() || undefined,
-      embedFormatLabel: FORMAT_LABEL[format],
-    };
-    drawHuellaV2OnCanvas(ctx, meta);
-  }, [format, narrativeText, submissionId, storyTitle]);
+    });
+  }, [format, narrativeText, submissionId, locale]);
 
   useLayoutEffect(() => {
     paintResonanceVisual();

@@ -75,12 +75,9 @@ export function SubmissionSuccessWithHuella({
         </header>
 
         <div style={neoInset} className="p-5 md:p-6 space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-orange-600">Tu resonancia visual está lista</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-orange-600">Tu relato en colores</h2>
           <p className="text-sm md:text-[0.9375rem] leading-relaxed" style={{ color: neu.textBody }}>
-            Es una pieza creada a partir de tu relato, el formato elegido y el momento en que lo compartiste.
-          </p>
-          <p className="text-xs md:text-sm leading-relaxed opacity-95" style={{ color: neu.textBody }}>
-            No resume tu vida ni interpreta quién eres: acompaña la forma en que tu historia resonó en AlmaMundi.
+            Cada palabra que contaste eligió un color. Nadie tiene esta combinación.
           </p>
         </div>
 

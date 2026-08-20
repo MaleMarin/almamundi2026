@@ -36,8 +36,6 @@ import {
 } from '@/lib/subir-limits';
 import {
   UPLOAD_DURATION_ERROR,
-  UPLOAD_MODAL_COPY,
-  UPLOAD_MODAL_LEGAL_NOTE,
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
 } from '@/lib/subir-upload-modal-copy';
@@ -45,12 +43,13 @@ import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { interpolate } from '@/lib/i18n/locale';
 import {
-  drawHuellaV2OnCanvas,
   formatHuellaImprintFooterLine,
   limpiarNombreFoto,
-  type HuellaV2Format,
 } from '@/lib/huella/huellaV2';
+import { drawVadResonanceOnCanvas } from '@/lib/huella/resonance-stripes';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 
@@ -113,23 +112,6 @@ const soft = {
     ].join(', '),
   },
 } as const;
-
-type CaptureIntroBlock = {
-  title: string;
-  lead: string;
-  /** Línea aparte (p. ej. duración en video/audio). */
-  meta?: string;
-};
-
-/** Encabezado del paso en que la persona graba, escribe o sube su historia. */
-function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
-  const c = UPLOAD_MODAL_COPY[mode];
-  return {
-    title: mode === 'foto' ? c.title : c.title.replace(/\n/g, ' '),
-    lead: c.subtitle,
-    meta: c.limit,
-  };
-}
 
 const MAX_PROFILE_PHOTO_MB = SUBIR_PHOTO_FILE_MAX_MB;
 const MAX_EXTRA_FILE_MB = SUBIR_PHOTO_FILE_MAX_MB;
@@ -234,11 +216,7 @@ function probeVideoBlobDurationSeconds(blob: Blob): Promise<number | null> {
   });
 }
 
-function modalModeToHuellaFormat(mode: StoryModalMode): HuellaV2Format {
-  return mode;
-}
-
-/** Texto y longitud que alimentan la resonancia visual v2 (palabras → colores; charCount → densidad). */
+/** Texto del relato / título / fotos que alimentan la resonancia VAD. */
 function imprintHuellaSource(args: {
   mode: StoryModalMode;
   textBody: string;
@@ -282,18 +260,19 @@ type ImprintDrawArgs = {
   extraText: string;
   photoFiles: File[];
   mediaBlob: Blob | null;
+  locale: 'es' | 'pt' | 'en';
 };
 
 const HUELLA_EXPORT_SIZE = 600;
 
 function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
-  const { storyId, receivedAt, mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
+  const { storyId, receivedAt, mode, textBody, storyTitle, extraText, photoFiles, mediaBlob, locale } = args;
   canvas.width = HUELLA_EXPORT_SIZE;
   canvas.height = HUELLA_EXPORT_SIZE;
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
 
-  const { content, charCount } = imprintHuellaSource({
+  const { content } = imprintHuellaSource({
     mode,
     textBody,
     storyTitle,
@@ -302,13 +281,10 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     mediaBlob,
   });
 
-  drawHuellaV2OnCanvas(ctx, {
+  drawVadResonanceOnCanvas(ctx, {
     storyId,
-    content,
-    format: modalModeToHuellaFormat(mode),
-    charCount,
-    submitHour: receivedAt.getHours(),
-    embedSiteFooter: true,
+    text: content,
+    locale,
     footerAt: receivedAt,
   });
 }
@@ -335,6 +311,7 @@ export type StoryModalProps = {
 };
 
 export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }: StoryModalProps) {
+  const { t, locale } = useHomeLocale();
   const [step, setStep] = useState<StoryModalStep>('capture');
   const [err, setErr] = useState('');
 
@@ -1083,6 +1060,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         extraText,
         photoFiles,
         mediaBlob,
+        locale,
       });
     } catch (e) {
       console.error('[StoryModal] drawImprintPreview', e);
@@ -1097,6 +1075,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     extraText,
     photoFiles,
     mediaBlob,
+    locale,
   ]);
 
   const downloadImprint = useCallback(() => {
@@ -1160,7 +1139,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   if (!isOpen) return null;
 
   if (step === 'capture') {
-    const copy = UPLOAD_MODAL_COPY[mode];
+    const copy = t.upload[mode];
     return (
       <FormatCaptureEditorialShell
         copy={copy}
@@ -1168,6 +1147,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         onClose={onClose}
         continueEnabled={canContinueCapture()}
         onContinue={goDetails}
+        continueLabel={t.modalContinue}
+        closeAriaLabel={t.modalClose}
       >
         {err ? <p className={amStyles.amModalInlineError}>{err}</p> : null}
         {chosenTopic && mode !== 'texto' && (
@@ -1176,7 +1157,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             style={soft.inset}
           >
             <div className="min-w-0">
-              <p className="font-semibold text-gray-700">Tema guía activo</p>
+              <p className="font-semibold text-gray-700">{t.modalTopicActive}</p>
               <p className="truncate text-gray-600 md:text-lg">{chosenTopic.title}</p>
             </div>
             <button
@@ -1184,9 +1165,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               onClick={onClearTopic}
               className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide text-orange-700"
               style={soft.button}
-              aria-label="Quitar inspiración"
+              aria-label={t.modalRemove}
             >
-              Quitar
+              {t.modalRemove}
             </button>
           </div>
         )}
@@ -1201,7 +1182,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 style={avSource === 'grabar' ? { ...soft.button, color: '#ff4500' } : soft.button}
               >
                 <Video className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
-                Grabar video
+                {t.modalRecordVideo}
               </button>
               <button
                 type="button"
@@ -1210,7 +1191,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 style={avSource === 'archivo' ? { ...soft.button, color: '#ff4500' } : soft.button}
               >
                 <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
-                Subir o enlace
+                {t.modalUploadOrLink}
               </button>
             </div>
             {avSource === 'grabar' && !mediaBlob && (
@@ -1253,13 +1234,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           aria-label="Comenzar a grabar video"
                         >
                           <Video size={22} aria-hidden />
-                          Grabar
+                          {t.modalRecord}
                         </button>
                       </div>
                     ) : (
                       <>
                         <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                          Grabando… {formatMmSs(recordSec)}
+                          {t.modalRecording} {formatMmSs(recordSec)}
                         </p>
                         <button
                           type="button"
@@ -1278,7 +1259,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             )}
             {mediaBlob && previewUrl && (
               <div className="space-y-3">
-                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu video</p>
+                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">{t.modalReviewVideo}</p>
                 <p className="text-center text-sm text-gray-600 md:text-base">
                   Comprueba el sonido y la imagen. Si no se ve bien, vuelve a grabar.
                 </p>
@@ -1308,9 +1289,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   onClick={discardRecording}
                   className="w-full rounded-full py-3 text-base font-semibold text-gray-600 md:text-lg"
                   style={soft.button}
-                  aria-label="Volver a grabar"
+                  aria-label={t.modalRerecord}
                 >
-                  Volver a grabar
+                  {t.modalRerecord}
                 </button>
               </div>
             )}
@@ -1389,7 +1370,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 style={avSource === 'grabar' ? { ...soft.button, color: '#ff4500' } : soft.button}
               >
                 <Mic className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
-                Grabar voz
+                {t.modalRecordVoice}
               </button>
               <button
                 type="button"
@@ -1426,9 +1407,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       onClick={startRecordingAudio}
                       className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
                       style={{ background: 'linear-gradient(180deg,#ff4500,#e63e00)', boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
-                      aria-label="Grabar audio"
+                      aria-label={t.modalRecordVoice}
                     >
-                      Grabar
+                      {t.modalRecord}
                     </button>
                   </div>
                 )}
@@ -1439,15 +1420,15 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
                     </div>
                     <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                      Grabando… {formatMmSs(recordSec)}
+                      {t.modalRecording} {formatMmSs(recordSec)}
                     </p>
                     <button
                       type="button"
                       onClick={stopRecording}
                       className="rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white md:text-xl"
-                      aria-label="Detener grabación de audio"
+                      aria-label={t.modalStop}
                     >
-                      Detener
+                      {t.modalStop}
                     </button>
                   </div>
                 )}
@@ -1455,8 +1436,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             )}
             {mediaBlob && previewUrl && (
               <div className="space-y-3">
-                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">Revisa tu audio</p>
-                <p className="text-center text-sm text-gray-600 md:text-base">Escucha el clip completo antes de continuar.</p>
+                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">{t.modalReviewAudio}</p>
+                <p className="text-center text-sm text-gray-600 md:text-base">{t.modalListenClip}</p>
                 <div className="rounded-2xl px-3 py-2" style={soft.inset}>
                   <audio
                     key={previewUrl}
@@ -1477,9 +1458,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   onClick={discardRecording}
                   className="w-full rounded-full py-3 text-base font-semibold md:text-lg"
                   style={soft.button}
-                  aria-label="Volver a grabar audio"
+                  aria-label={t.modalRerecord}
                 >
-                  Volver a grabar
+                  {t.modalRerecord}
                 </button>
               </div>
             )}
@@ -1570,8 +1551,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               onChange={(e) => setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
               rows={10}
               className={amStyles.amTextarea}
-              placeholder="Escribe aquí…"
-              aria-label="Tu historia"
+              placeholder={t.modalWritePlaceholder}
+              aria-label={t.modalSectionStory}
               maxLength={SUBIR_TEXT_MAX_CHARS}
             />
             <p
@@ -1580,7 +1561,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               }`}
               aria-live="polite"
             >
-              {textBody.length.toLocaleString('es')} / {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres
+              {interpolate(t.modalChars, {
+                n: String(textBody.length),
+                max: String(SUBIR_TEXT_MAX_CHARS),
+              })}
             </p>
           </div>
         )}
@@ -1620,7 +1604,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             </p>
             {step !== 'details' && (
               <span id="story-modal-title" className="sr-only">
-                {step === 'received' ? 'Confirmación de envío' : 'Captura'}
+                {step === 'received' ? t.modalConfirmSend : t.modalCapture}
               </span>
             )}
           </div>
@@ -1629,7 +1613,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             onClick={onClose}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-gray-600 transition hover:text-red-600 active:scale-95 md:h-14 md:w-14"
             style={soft.button}
-            aria-label="Cerrar modal"
+            aria-label={t.modalClose}
           >
             <X size={22} strokeWidth={2} />
           </button>
@@ -1650,7 +1634,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   id="story-modal-details-title"
                   className="text-lg font-light leading-tight text-gray-800 md:text-xl"
                 >
-                  Un par de datos más
+                  {t.modalDetailsTitle}
                 </h3>
               </div>
 
@@ -1658,13 +1642,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 {/* Historia + extras — columna izquierda */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
-                    Historia
+                    {t.modalSectionStory}
                   </div>
                   <div className="space-y-2">
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <FileText size={12} className="text-orange-500" aria-hidden />
-                        Nombre de la historia *
+                        {t.modalStoryName}
                       </div>
                       <input
                         value={storyTitle}
@@ -1672,7 +1656,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           setStoryTitle(e.target.value);
                           if (err) setErr('');
                         }}
-                        placeholder="Ej: El día que entendí algo"
+                        placeholder={t.modalStoryNamePlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -1680,7 +1664,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <User size={12} className="text-orange-500" aria-hidden />
-                        Nombre o alias *
+                        {t.modalAlias}
                       </div>
                       <input
                         value={alias}
@@ -1688,19 +1672,19 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           setAlias(e.target.value);
                           if (err) setErr('');
                         }}
-                        placeholder="Cómo quieres aparecer"
+                        placeholder={t.modalAliasPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
                     <div>
                       <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Extras (opcional)
+                        {t.modalExtras}
                       </div>
                       <textarea
                         value={extraText}
                         onChange={(e) => setExtraText(e.target.value)}
-                        placeholder="Contexto breve si hace falta…"
+                        placeholder={t.modalExtrasPlaceholder}
                         rows={2}
                         className="w-full resize-none rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
@@ -1709,13 +1693,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <Upload size={12} className="text-orange-500" aria-hidden />
-                        Archivos · máx. {MAX_EXTRA_FILE_MB}MB c/u
+                        {interpolate(t.modalFiles, { mb: MAX_EXTRA_FILE_MB })}
                       </div>
                       <label
                         className="flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-xs text-gray-600 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
-                        <span>Adjuntar</span>
+                        <span>{t.modalAttach}</span>
                         <input type="file" multiple className="hidden" onChange={(e) => addExtraFiles(e.target.files)} />
                       </label>
                       {extraFiles.length > 0 && (
@@ -1737,14 +1721,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     </div>
                     <div>
                       <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Foto perfil (opc.) · máx. {MAX_PROFILE_PHOTO_MB}MB
+                        {interpolate(t.modalProfilePhoto, { mb: MAX_PROFILE_PHOTO_MB })}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
                           className="cursor-pointer rounded-xl px-2.5 py-1 text-[10px] text-gray-600 md:text-xs"
                           style={{ ...soft.flat, borderRadius: '12px' }}
                         >
-                          {profilePhoto ? 'Cambiar' : 'Subir'}
+                          {profilePhoto ? t.modalChange : t.modalUpload}
                           <input
                             type="file"
                             accept="image/*"
@@ -1763,7 +1747,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                               onClick={() => setProfilePhoto(null)}
                               className="text-[10px] font-bold uppercase text-gray-500 hover:text-red-500"
                             >
-                              Quitar
+                              {t.modalRemove}
                             </button>
                           </>
                         )}
@@ -1775,18 +1759,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 {/* Datos persona — columna derecha (alineado con /subir) */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
-                    Datos y avisos
+                    {t.modalSectionPerson}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
-                        País *
+                        {t.modalCountry}
                       </div>
                       <input
                         value={country}
                         onChange={(e) => setCountry(e.target.value)}
-                        placeholder="Ej: Chile"
+                        placeholder={t.modalCountryPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="country-name"
@@ -1795,19 +1779,19 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div className="sm:col-span-2">
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <MapPin size={12} className="text-orange-500" aria-hidden />
-                        Ciudad o localidad *
+                        {t.modalCity}
                       </div>
                       <input
                         value={city}
                         onChange={(e) => setCity(e.target.value)}
-                        placeholder="Ej: Santiago"
+                        placeholder={t.modalCityPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
                     <div className="sm:col-span-2">
                       <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        Tramo de edad *
+                        {t.modalAge}
                       </div>
                       <select
                         value={ageRange}
@@ -1815,10 +1799,16 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
-                        <option value="">Elige una opción</option>
+                        <option value="">{t.modalAgeChoose}</option>
                         {AGE_RANGE_OPTIONS.map((o) => (
                           <option key={o.id} value={o.id}>
-                            {o.label}
+                            {o.id === 'menos-18'
+                              ? t.modalAgeMenos18
+                              : o.id === '60-mas'
+                                ? t.modalAge60
+                                : o.id === 'prefiero-no-decir'
+                                  ? t.modalAgePreferNot
+                                  : o.label}
                           </option>
                         ))}
                       </select>
@@ -1826,7 +1816,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <Users size={12} className="text-orange-500" aria-hidden />
-                        Género (opcional)
+                        {t.modalGender}
                       </div>
                       <select
                         value={sex}
@@ -1834,18 +1824,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
-                        <option value="">Prefiero no indicar</option>
-                        <option value="femenino">Femenino</option>
-                        <option value="masculino">Masculino</option>
-                        <option value="no-binario">No binario</option>
-                        <option value="prefiero-no-decir">Prefiero no decir</option>
-                        <option value="otro">Otro</option>
+                        <option value="">{t.modalGenderBlank}</option>
+                        <option value="femenino">{t.modalGenderFemale}</option>
+                        <option value="masculino">{t.modalGenderMale}</option>
+                        <option value="no-binario">{t.modalGenderNb}</option>
+                        <option value="prefiero-no-decir">{t.modalGenderPreferNot}</option>
+                        <option value="otro">{t.modalGenderOther}</option>
                       </select>
                     </div>
                     <div className="sm:col-span-2">
                       <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
                         <Mail size={12} className="text-orange-500" aria-hidden />
-                        Correo electrónico *
+                        {t.modalEmail}
                       </div>
                       <input
                         value={email}
@@ -1857,8 +1847,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] leading-tight text-gray-500 md:text-[11px]">
-                        Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No se muestra en
-                        público.
+                        {t.modalEmailHint}
                       </p>
                     </div>
                   </div>
@@ -1876,7 +1865,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   checked={acceptedPrivacy}
                   onChange={setAcceptedPrivacy}
                 />
-                <p className={amStyles.amModalLegal}>{UPLOAD_MODAL_LEGAL_NOTE}</p>
+                <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
                 <div className="flex flex-wrap justify-end gap-2">
                   <button
                     type="button"
@@ -1887,7 +1876,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-gray-600 active:scale-95 md:px-6 md:text-xs"
                     style={soft.button}
                   >
-                    Volver
+                    {t.modalBack}
                   </button>
                   <button
                     type="button"
@@ -1896,7 +1885,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
                     style={{ ...soft.button, backgroundColor: '#F97316' }}
                   >
-                    {saving ? 'Enviando…' : 'Enviar'}
+                    {saving ? t.modalSending : t.modalSend}
                   </button>
                 </div>
               </div>
@@ -1918,21 +1907,20 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 {alias.trim() ? (
                   <>
                     {alias.trim()},<br />
-                    tu historia dejó esta{' '}
-                    <em className="italic font-light text-[#E8400A]">resonancia visual.</em>
+                    {t.modalReceivedAfterName}
                   </>
                 ) : (
-                  <>
-                    Tu historia dejó esta{' '}
-                    <em className="italic font-light text-[#E8400A]">resonancia visual.</em>
-                  </>
+                  t.modalReceivedAnonBefore
                 )}
               </h3>
+              <p className="text-sm font-light leading-relaxed text-[#5C5C52] md:text-[0.9375rem]">
+                {t.modalImprintExplain}
+              </p>
               <div className="aspect-square w-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F0EFE9]">
                 <canvas
                   ref={imprintCanvasRef}
                   className="h-full w-full object-cover"
-                  aria-label="Resonancia visual generada"
+                  aria-label={t.modalImprintAria}
                 />
               </div>
               {imprintReceivedAt ? (
@@ -1945,46 +1933,36 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   type="button"
                   onClick={downloadImprint}
                   className="inline-flex min-w-[120px] flex-1 items-center justify-center gap-2 rounded-full bg-[#E8400A] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#c73308]"
-                  aria-label="Descargar resonancia visual"
+                  aria-label={t.modalDownloadImprint}
                 >
                   <Download size={15} strokeWidth={1.6} aria-hidden />
-                  Descargar resonancia
+                  {t.modalDownloadImprint}
                 </button>
                 <button
                   type="button"
                   onClick={copyLink}
                   className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
-                  aria-label="Copiar enlace a la historia"
+                  aria-label={t.modalCopyLink}
                 >
                   <Share2 size={14} aria-hidden />
-                  Copiar enlace
+                  {t.modalCopyLink}
                 </button>
                 <button
                   type="button"
                   onClick={anotherStory}
                   className="inline-flex min-w-[100px] flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
-                  aria-label="Contar otra historia"
+                  aria-label={t.modalAnotherStory}
                 >
                   <RefreshCw size={14} aria-hidden />
-                  Otra historia
+                  {t.modalAnotherStory}
                 </button>
               </div>
               <p
                 className={`h-[18px] text-center text-[0.78rem] font-medium text-[#E8400A] transition-opacity ${linkCopied ? 'opacity-100' : 'opacity-0'}`}
                 aria-live="polite"
               >
-                ¡Enlace copiado!
+                {t.modalLinkCopied}
               </p>
-              <div className="rounded-[10px] border border-[#D4D4C4] bg-[#F0EFE9] p-4 text-left">
-                <p className="mb-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#8A8A7A]">
-                  ¿Qué es esta resonancia visual?
-                </p>
-                <p className="text-[0.8rem] font-light leading-relaxed text-[#8A8A7A]">
-                  Es una pieza creada a partir de tu relato, el formato elegido y el momento en que la compartiste. Los colores
-                  surgen de las palabras de tu texto: AlmaMundi las traduce en una paleta determinista. No resume tu vida ni
-                  interpreta quién eres: acompaña la forma en que tu historia resonó aquí.
-                </p>
-              </div>
             </div>
           )}
 
@@ -2003,9 +1981,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               onClick={onClose}
               className="w-full rounded-full py-4 text-lg font-bold text-gray-700 sm:w-auto sm:px-10 md:text-xl"
               style={soft.button}
-              aria-label="Volver al mapa"
+              aria-label={t.modalBackToMap}
             >
-              Volver al mapa
+              {t.modalBackToMap}
             </button>
           </footer>
         )}

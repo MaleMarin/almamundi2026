@@ -15,11 +15,18 @@ import {
   type AlmaLocale,
 } from '@/lib/i18n/locale';
 import { HOME_MESSAGES, type HomeMessages } from '@/lib/i18n/home-messages';
+import { SITE_UI_MESSAGES, type SiteUiMessages } from '@/lib/i18n/site-ui-messages';
+
+export type UiMessages = HomeMessages & SiteUiMessages;
+
+export function uiMessages(locale: AlmaLocale): UiMessages {
+  return { ...HOME_MESSAGES[locale], ...SITE_UI_MESSAGES[locale] };
+}
 
 type LocaleContextValue = {
   locale: AlmaLocale;
   setLocale: (next: AlmaLocale) => void;
-  t: HomeMessages;
+  t: UiMessages;
 };
 
 const LocaleContext = createContext<LocaleContextValue | null>(null);
@@ -52,7 +59,7 @@ export function LocaleProvider({
     [router]
   );
 
-  const t = useMemo(() => HOME_MESSAGES[locale], [locale]);
+  const t = useMemo(() => uiMessages(locale), [locale]);
 
   const value = useMemo(
     () => ({ locale, setLocale, t }),

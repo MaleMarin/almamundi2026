@@ -9,3 +9,11 @@ export function parseAlmaLocale(raw: string | undefined | null): AlmaLocale {
   if (v === 'pt' || v === 'en' || v === 'es') return v;
   return 'es';
 }
+
+/** Sustituye `{nombre}` en plantillas del diccionario. */
+export function interpolate(
+  template: string,
+  vars: Record<string, string | number>
+): string {
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(vars[key] ?? ''));
+}
