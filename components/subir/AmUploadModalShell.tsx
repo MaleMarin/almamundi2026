@@ -12,6 +12,7 @@ export type AmUploadModalShellProps = {
   continueEnabled?: boolean;
   onContinue?: () => void;
   continueLabel?: string;
+  closeAriaLabel?: string;
   showContinue?: boolean;
   className?: string;
   /** Si true, solo renderiza la tarjeta (sin overlay). */
@@ -27,6 +28,7 @@ export function AmUploadModalShell({
   continueEnabled = false,
   onContinue,
   continueLabel = 'Continuar',
+  closeAriaLabel = 'Cerrar',
   showContinue = true,
   className,
   cardOnly = false,
@@ -35,7 +37,7 @@ export function AmUploadModalShell({
     <div className={`${styles.amModalCard} ${className ?? ''}`}>
       <header className={styles.amModalHeader}>
         <span className={styles.amModalBrand}>ALMAMUNDI</span>
-        <button type="button" className={styles.amModalClose} onClick={onClose} aria-label="Cerrar">
+        <button type="button" className={styles.amModalClose} onClick={onClose} aria-label={closeAriaLabel}>
           ×
         </button>
       </header>
