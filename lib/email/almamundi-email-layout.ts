@@ -46,7 +46,7 @@ export function brandHeaderHtml(hasInlineLogo: boolean): string {
 export function invitationHtml(): string {
   return `<p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
     Si tienes otra que quieras contar, puedes
-    <a href="${EMAIL_PUBLIC_ORIGIN}/subir"
+    <a href="${EMAIL_PUBLIC_ORIGIN}/#historias"
       style="color:${BRAND_ORANGE};text-decoration:underline">dejarla aquí</a>.
   </p>`;
 }

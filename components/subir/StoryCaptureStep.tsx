@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { Video, Mic, Square, RotateCcw, Link2, Upload } from 'lucide-react';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { neu } from '@/lib/historias-neumorph';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -161,7 +161,6 @@ export function StoryCaptureStep({
   restoredCapture = null,
   hydrateKey = 0,
 }: Props) {
-  const router = useRouter();
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const videoReviewRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -703,7 +702,7 @@ export function StoryCaptureStep({
         copy={modalCopy}
         titlePreLine={format === 'foto' || format === 'texto'}
         onClose={() => {
-          router.replace('/subir');
+          hardNavigateTo('/#historias');
           setLocalErr('');
         }}
         continueEnabled={canContinue()}
@@ -778,6 +777,7 @@ export function StoryCaptureStep({
               placeholder="Empieza aquí… puede ser una escena, un recuerdo, una voz, un lugar o una frase que no quieres perder."
             className="w-full px-5 py-4 rounded-2xl text-base md:text-lg outline-none bg-white/55 border border-white/60 resize-y min-h-[280px]"
             style={{ color: neu.textMain, fontFamily: neu.APP_FONT }}
+            maxLength={SUBIR_TEXT_MAX_CHARS}
             aria-required="true"
             aria-invalid={textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN}
             aria-describedby={
@@ -812,9 +812,9 @@ export function StoryCaptureStep({
               ))}
             </div>
             <p id="capture-texto-relato-count" className="text-sm md:text-base" style={{ color: neu.textBody }}>
-              {textStory.length.toLocaleString('es')} caracteres ·{' '}
-              {textStory.trim().split(/\s+/).filter(Boolean).length.toLocaleString('es')} palabras (máx.{' '}
-              {SUBIR_TEXT_MAX_CHARS.toLocaleString('es')} caracteres)
+              {textStory.length} caracteres ·{' '}
+              {textStory.trim().split(/\s+/).filter(Boolean).length} palabras (máx.{' '}
+              {SUBIR_TEXT_MAX_CHARS} caracteres)
           </p>
           {textStory.trim().length > 0 && textStory.trim().length < NARRATIVE_MIN && (
             <p id="capture-texto-relato-error" className="text-sm text-amber-700" role="alert">

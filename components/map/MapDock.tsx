@@ -83,12 +83,12 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
     ? { position: 'absolute', top: 0, left: '50%', transform: 'translateX(-50%)', zIndex: 25 }
     : { position: 'fixed', top: topPx, left: '50%', transform: 'translateX(-50%)', zIndex: dockZ };
 
-  /** Orden: Historias, Sonidos, Noticias, Bits, Buscar por palabras clave. */
+  /** Orden: capas del globo juntas, luego Sonidos, luego búsqueda. */
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
-    { mode: 'sounds', label: 'Sonidos' },
-    { mode: 'news', label: 'Noticias en vivo' },
     { mode: 'bits', label: 'Bits' },
+    { mode: 'news', label: 'Noticias en vivo' },
+    { mode: 'sounds', label: 'Sonidos' },
     { mode: 'search', label: 'Buscar por palabras clave' },
   ];
 

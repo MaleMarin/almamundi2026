@@ -2,10 +2,11 @@
 
 /**
  * /historias/[id] — Historia individual. Neumorfismo fuerte.
- * Texto a la izquierda, vídeo/audio/imagen a la derecha, invitación a /subir, Más historias de [país].
+ * Texto a la izquierda, vídeo/audio/imagen a la derecha, invitación a /#historias, Más historias de [país].
  */
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useParams } from 'next/navigation';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
@@ -151,12 +152,12 @@ export default function HistoriasIdPageClient() {
                 </>
               )}
               <p className="mb-8">
-                <Link
-                  href="/subir"
+                <HomeHardLink
+                  href="/#historias"
                   className="text-sm font-medium tracking-wide !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)]"
                 >
                   Cuenta la tuya
-                </Link>
+                </HomeHardLink>
               </p>
             </div>
             <div>

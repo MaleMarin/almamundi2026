@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import Link from 'next/link';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
 import { registerPulse, getApproxLocation } from '@/lib/userLocation';
@@ -11,6 +10,7 @@ import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
@@ -879,8 +879,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
                 accent
               />
-              <Link
-                href="/subir"
+              <HomeHardLink
+                href="/#historias"
                 style={{
                   marginLeft: 4,
                   padding: '8px 2px',
@@ -892,7 +892,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 }}
               >
                 Cuenta la tuya
-              </Link>
+              </HomeHardLink>
             </div>
           </div>
 

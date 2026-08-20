@@ -20,6 +20,7 @@ import {
   SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
+import { storiesLinkLabel } from '@/lib/i18n/home-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
@@ -153,14 +154,14 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         </button>
         {desktopStoriesOpen ? (
           <div id={desktopStoriesListId} className="absolute left-0 top-[calc(100%+0.35rem)] z-[110] min-w-[8rem]">
-            {SITE_HEADER_STORIES_LINKS.map(({ href, label }) => (
+            {SITE_HEADER_STORIES_LINKS.map(({ href }) => (
               <Link
                 key={href}
                 href={href}
                 className={SITE_NAV_STORIES_ITEM_CLASS}
                 onClick={() => setDesktopStoriesOpen(false)}
               >
-                {label}
+                {storiesLinkLabel(t, href)}
               </Link>
             ))}
           </div>
@@ -224,9 +225,9 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         </button>
         {mobileStoriesOpen ? (
           <div id={mobileStoriesListId} className="pl-2">
-            {SITE_HEADER_STORIES_LINKS.map(({ href, label }) => (
+            {SITE_HEADER_STORIES_LINKS.map(({ href }) => (
               <Link key={href} href={href} className={SITE_NAV_STORIES_ITEM_CLASS} onClick={closeMobileNav}>
-                {label}
+                {storiesLinkLabel(t, href)}
               </Link>
             ))}
           </div>
@@ -262,9 +263,9 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             {t.navMap}
           </HomeHardLink>
         </nav>
-        <Link href="/subir" className={`${SITE_NAV_CTA_CLASS} shrink-0`}>
+        <HomeHardLink href="/#historias" className={`${SITE_NAV_CTA_CLASS} shrink-0`} onClick={closeMobileNav}>
           {t.navTellStory}
-        </Link>
+        </HomeHardLink>
         <button
           type="button"
           className="md:hidden flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-gray-600 transition-shadow active:scale-[0.98]"

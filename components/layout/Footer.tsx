@@ -1,7 +1,7 @@
 'use client';
 
-import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
-import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
+import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvider';
+import { storiesLinkLabel } from '@/lib/i18n/home-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
@@ -14,10 +14,6 @@ import {
 } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { SITE_FONT_STACK } from '@/lib/typography';
-
-/** Frase de cierre editorial bajo la marca. */
-const FOOTER_CLOSING_LINE =
-  'Historias que no se pierden, sino que despiertan otras historias.';
 
 const FOOTER_LINK =
   'almamundi-footer-link text-xs font-semibold leading-snug tracking-normal transition-colors';
@@ -36,16 +32,16 @@ type FooterPillItem =
 
 export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps = {}) {
   const localeCtx = useHomeLocaleOptional();
-  const t = localeCtx?.t ?? HOME_MESSAGES[initialLocale];
+  const t = localeCtx?.t ?? uiMessages(initialLocale);
 
   const footerPills: FooterPillItem[] = [
     { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
     { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
-    ...SITE_HEADER_STORIES_LINKS.map(({ href, label }) => ({
+    ...SITE_HEADER_STORIES_LINKS.map(({ href }) => ({
       id: href,
       kind: 'internal' as const,
       href,
-      label,
+      label: storiesLinkLabel(t, href),
     })),
     {
       id: 'mapa',
@@ -76,18 +72,17 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           </HomeHardLink>
         </div>
         <p className="almamundi-footer-tagline mx-auto max-w-lg px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
-          {FOOTER_CLOSING_LINE}
+          {t.footerClosingLine}
         </p>
       </div>
 
       <div className="mt-14 flex w-full max-w-4xl justify-center px-2 md:mt-20">
-        <ActiveInternalNavLink
-          href="/subir"
+        <HomeHardLink
+          href="/#historias"
           className={`${SITE_NAV_CTA_CLASS} px-6 py-2.5 text-sm md:px-8 md:py-3 md:text-base`}
-          activeClassName="font-semibold"
         >
           {t.navTellStory}
-        </ActiveInternalNavLink>
+        </HomeHardLink>
       </div>
 
       {/* 2. Pills: grilla 2×4 centrada (Mapa en la última celda, no suelto) */}
@@ -125,7 +120,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex flex-col items-center lg:items-start">
             <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
-              Una iniciativa de
+              {t.footerInitiativeOf}
             </p>
             <img
               src="/logo-precisar.png"
@@ -137,16 +132,20 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           <div className="flex flex-col items-center gap-5 lg:items-end">
             <nav
               className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 sm:gap-x-7 md:justify-end"
-              aria-label="Información legal y datos personales"
+              aria-label={t.footerLegalAria}
             >
-              {SITE_FOOTER_LEGAL_LINKS.map(({ href, label }) => (
+              {SITE_FOOTER_LEGAL_LINKS.map(({ href }) => (
                 <ActiveInternalNavLink
                   key={href}
                   href={href}
                   className={FOOTER_LINK}
                   activeClassName="!text-gray-900 font-semibold"
                 >
-                  {label}
+                  {href === '/privacidad'
+                    ? t.footerPrivacy
+                    : href === '/terminos'
+                      ? t.footerTerms
+                      : t.footerMyData}
                 </ActiveInternalNavLink>
               ))}
               <a
@@ -155,16 +154,16 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 target="_blank"
                 rel="noopener noreferrer"
                 type="application/pdf"
-                title="Guía de conducta AlmaMundi (PDF): respeto, cuidado y uso responsable del sitio"
+                title={t.footerConductGuideTitle}
               >
-                Guía de conducta
+                {t.footerConductGuide}
               </a>
               <ActiveInternalNavLink
                 href="/contacto"
                 className={FOOTER_LINK}
                 activeClassName="!text-gray-900 font-semibold"
               >
-                Contacto
+                {t.footerContact}
               </ActiveInternalNavLink>
             </nav>
             <p className="text-[11px] font-medium tracking-wide text-gray-500">

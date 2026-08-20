@@ -16,7 +16,6 @@ import {
 } from 'react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
-import { useRouter } from 'next/navigation';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -123,7 +122,6 @@ export type HomeMapProps = {
 };
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
-  const router = useRouter();
   const userPosition = useUserPosition();
   const [approxPosition, setApproxPosition] = useState<{ lat: number; lng: number } | null>(null);
 
@@ -753,7 +751,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
       </div>
 
-      {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}
+      {/* Dock: Historias, Bits, Noticias en vivo (capas), luego Sonidos (audio), luego buscar. */}
       {dockSlot &&
         createPortal(
           <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-3 px-2 sm:flex-row sm:flex-wrap md:px-3">
@@ -833,10 +831,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <StoriesPanel
               {...historiasProps}
               panelMode={drawerMode === 'search' ? 'search' : 'stories'}
-              onContarMiHistoria={() => {
-                close();
-                router.push('/subir');
-              }}
+              onContarMiHistoria={handleSubirMiHistoria}
             />
           ) : drawerMode === 'news' ? (
             <NewsPanel {...noticiasProps} />

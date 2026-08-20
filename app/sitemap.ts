@@ -34,7 +34,6 @@ const STATIC_PATHS: string[] = [
   '/historias/escrito',
   '/mapa',
   '/temas',
-  '/subir',
   '/muestras',
   '/exposiciones',
   '/educacion-mediatica',
