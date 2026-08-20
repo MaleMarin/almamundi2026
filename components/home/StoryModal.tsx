@@ -131,8 +131,8 @@ function captureIntroFor(mode: StoryModalMode): CaptureIntroBlock {
   };
 }
 
-const MAX_PROFILE_PHOTO_MB = 8;
-const MAX_EXTRA_FILE_MB = 15;
+const MAX_PROFILE_PHOTO_MB = SUBIR_PHOTO_FILE_MAX_MB;
+const MAX_EXTRA_FILE_MB = SUBIR_PHOTO_FILE_MAX_MB;
 
 function isVideoShareUrl(url: string): boolean {
   try {
