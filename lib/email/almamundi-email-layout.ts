@@ -31,11 +31,10 @@ export function emailLogoAttachment(logo: Buffer) {
 
 /** Logo (o wordmark de texto) enlazado a la home. Una sola imagen, CID, sin PNG remotos. */
 export function brandHeaderHtml(hasInlineLogo: boolean): string {
-  // El PNG es 500×500. En Gmail, width + max-height aplasta el dibujo.
+  // El PNG es 500x500. En Gmail, width + max-height aplasta el dibujo.
   const inner = hasInlineLogo
     ? `<img src="cid:${LOGO_CID}" alt="AlmaMundi" width="180" height="180"
         style="display:block;margin:0 auto;width:180px;height:180px;border:0;outline:none;text-decoration:none">`
-    : `<span style="font-size:22px;font-weight:300;letter-spacing:0.04em;color:${BRAND_ORANGE};font-family:${WORDMARK_FONT}">AlmaMundi</span>`;
     : `<span style="font-size:22px;font-weight:300;letter-spacing:0.04em;color:${BRAND_ORANGE};font-family:${WORDMARK_FONT}">AlmaMundi</span>`;
 
   return `<a href="${EMAIL_PUBLIC_ORIGIN}" target="_blank" rel="noopener noreferrer"
