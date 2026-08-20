@@ -22,7 +22,7 @@ const HUD_CLASS =
 
 /** Nota bajo fecha/hora: sonido en el vacío y sonificación (científica). */
 const SPACE_SOUND_NOTE =
-  'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles — un proceso llamado sonificación.';
+  'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles, un proceso llamado sonificación.';
 
 type Props = {
   selectedLocation?: WorldClockLocation | null;
