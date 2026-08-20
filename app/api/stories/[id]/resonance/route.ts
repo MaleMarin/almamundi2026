@@ -8,6 +8,7 @@ import {
   getRateLimiter,
 } from '@/lib/rate-limit';
 import { isValidRecipientEmail, safeEmailText, safeHrefForEmail } from '@/lib/email-html';
+import { noteEmailSent } from '@/lib/ops/usage-state';
 
 export const runtime = 'nodejs';
 
@@ -93,6 +94,7 @@ export async function POST(
           </div>
         `,
         });
+        await noteEmailSent();
       } catch (e) {
         console.error('[resonance] email', e);
       }

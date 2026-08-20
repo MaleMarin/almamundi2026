@@ -1,4 +1,10 @@
 {
+  "crons": [
+    {
+      "path": "/api/cron/usage-alerts",
+      "schedule": "0 13 * * *"
+    }
+  ],
   "redirects": [
     {
       "source": "/mapa",

@@ -7,6 +7,7 @@
  */
 
 import { Resend } from "resend";
+import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export function getResend(): Resend | null {
   const key = process.env.RESEND_API_KEY;
@@ -44,6 +45,7 @@ export async function sendSubmissionStatusEmail(
       subject,
       html: `<div style="font-family:system-ui,sans-serif;line-height:1.5">${body}</div>`,
     });
+    await noteEmailSent();
     return true;
   } catch (err) {
     console.error("sendSubmissionStatusEmail", err);

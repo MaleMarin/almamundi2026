@@ -28,6 +28,7 @@ const DISALLOWED_PATHS: string[] = [
   '/prototipo',
   '/demo-huellas-v2',
   '/demo-impronta',
+  '/demo-lexico',
   '/earth-globe-demo',
   '/globo-v2',
   '/globo-validacion',

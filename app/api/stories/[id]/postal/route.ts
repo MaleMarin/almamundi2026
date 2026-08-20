@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { Resend } from 'resend';
+import { noteEmailSent } from '@/lib/ops/usage-state';
 import { isPublicStoryDocumentStatus } from '@/lib/story-public';
 import {
   clientIpFromRequest,
@@ -116,6 +117,7 @@ export async function POST(
       `,
     });
 
+    await noteEmailSent();
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[postal]', err);

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from "@/lib/rate-limit";
 import { escapeHtml, isValidRecipientEmail } from "@/lib/email-html";
+import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export const runtime = "nodejs";
 
@@ -133,6 +134,7 @@ export async function POST(req: NextRequest) {
       )}</pre>`,
     });
 
+    await noteEmailSent();
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[privacy-data-request]", e);
