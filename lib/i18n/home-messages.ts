@@ -5,6 +5,7 @@ export type HomeMessages = {
   navHow: string;
   navStories: string;
   /** Enlaces planos a formatos de historias (cabecera home). */
+  navHistoriasColeccion: string;
   navHistoriasVideos: string;
   navHistoriasAudios: string;
   navHistoriasEscrito: string;
@@ -51,6 +52,7 @@ const es: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: '¿Cómo funciona?',
   navStories: 'Historias',
+  navHistoriasColeccion: 'Mi colección',
   navHistoriasVideos: 'Videos',
   navHistoriasAudios: 'Audios',
   navHistoriasEscrito: 'Escritos',
@@ -76,21 +78,21 @@ const es: HomeMessages = {
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBody:
-    'Una cámara puede guardar un gesto, una pausa, una voz, una mirada.',
+    'Una cámara puede guardar un gesto, una pausa, una voz, una mirada. Hasta 5 minutos.',
   cardVideoCta: 'Graba un video',
   cardAudioTitle: 'Dale voz',
   cardAudioSubtitle: 'a lo que recuerdas',
   cardAudioBody:
-    'Hay historias que no necesitan verse. Solo necesitan ser escuchadas.',
+    'Hay historias que no necesitan verse. Solo necesitan ser escuchadas. Hasta 5 minutos.',
   cardAudioCta: 'Graba un audio',
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
-    'Escribe una escena, una carta, una despedida o algo que todavía vuelve.',
+    'Escribe una escena, una carta, una despedida o algo que todavía vuelve. Hasta 5000 caracteres.',
   cardWriteCta: 'Escribe una historia',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
-  cardPhotoBody: 'Sube una foto y cuenta la historia que guarda.',
+  cardPhotoBody: 'Sube una foto y cuenta la historia que guarda. Hasta 8 fotos.',
   cardPhotoCta: 'Sube una foto',
 };
 
@@ -98,6 +100,7 @@ const pt: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: 'Como funciona?',
   navStories: 'Histórias',
+  navHistoriasColeccion: 'A minha coleção',
   navHistoriasVideos: 'Vídeos',
   navHistoriasAudios: 'Áudios',
   navHistoriasEscrito: 'Escritos',
@@ -123,21 +126,21 @@ const pt: HomeMessages = {
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBody:
-    'Uma câmara pode guardar um gesto, uma pausa, uma voz, um olhar.',
+    'Uma câmara pode guardar um gesto, uma pausa, uma voz, um olhar. Até 5 minutos.',
   cardVideoCta: 'Grava um vídeo',
   cardAudioTitle: 'Dê voz',
   cardAudioSubtitle: 'ao que recorda',
   cardAudioBody:
-    'Há histórias que não precisam de ser vistas. Só precisam de ser ouvidas.',
+    'Há histórias que não precisam de ser vistas. Só precisam de ser ouvidas. Até 5 minutos.',
   cardAudioCta: 'Grava um áudio',
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
-    'Escreva uma cena, uma carta, um adeus ou algo que ainda volta.',
+    'Escreva uma cena, uma carta, um adeus ou algo que ainda volta. Até 5000 caracteres.',
   cardWriteCta: 'Escreve uma história',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
-  cardPhotoBody: 'Carregue uma foto e conte a história que ela guarda.',
+  cardPhotoBody: 'Carregue uma foto e conte a história que ela guarda. Até 8 fotos.',
   cardPhotoCta: 'Envia uma foto',
 };
 
@@ -145,6 +148,7 @@ const en: HomeMessages = {
   navPurpose: 'Purpose',
   navHow: 'How it works',
   navStories: 'Stories',
+  navHistoriasColeccion: 'My collection',
   navHistoriasVideos: 'Videos',
   navHistoriasAudios: 'Audio',
   navHistoriasEscrito: 'Written',
@@ -170,21 +174,21 @@ const en: HomeMessages = {
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBody:
-    'A camera can hold a gesture, a pause, a voice, a look.',
+    'A camera can hold a gesture, a pause, a voice, a look. Up to 5 minutes.',
   cardVideoCta: 'Record a video',
   cardAudioTitle: 'Give voice',
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
-    'Some stories don’t need to be seen. They only need to be heard.',
+    'Some stories don’t need to be seen. They only need to be heard. Up to 5 minutes.',
   cardAudioCta: 'Record audio',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
-    'Write a scene, a letter, a farewell—or something that still comes back.',
+    'Write a scene, a letter, a farewell—or something that still comes back. Up to 5000 characters.',
   cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
-  cardPhotoBody: 'Upload a photo and tell the story it holds.',
+  cardPhotoBody: 'Upload a photo and tell the story it holds. Up to 8 photos.',
   cardPhotoCta: 'Upload a photo',
 };
 
@@ -209,3 +213,20 @@ export const NOSCRIPT_BY_LOCALE: Record<AlmaLocale, NoscriptCopy> = {
     link: 'Go to home',
   },
 };
+
+export function storiesLinkLabel(t: HomeMessages, href: string): string {
+  switch (href) {
+    case '/historias/mi-coleccion':
+      return t.navHistoriasColeccion;
+    case '/historias/videos':
+      return t.navHistoriasVideos;
+    case '/historias/audios':
+      return t.navHistoriasAudios;
+    case '/historias/escrito':
+      return t.navHistoriasEscrito;
+    case '/historias/fotos':
+      return t.navHistoriasFotos;
+    default:
+      return href;
+  }
+}
