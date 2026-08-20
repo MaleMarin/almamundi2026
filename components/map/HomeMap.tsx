@@ -38,12 +38,21 @@ import {
 } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { PillNavButton } from '@/components/home/PillNavButton';
-import { MAP_HOME_DOCK_NAV_CLASS } from '@/lib/map-home-neu-button';
-import type { GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
+import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
+const NEWS_GLOBE_ID_BASE = 8_000_000;
+const GLOBE_NEWS_MAX = 20;
+
+function jitterNewsOffset(id: string): { dLat: number; dLng: number } {
+  let h = 2166136261;
+  for (let i = 0; i < id.length; i++) h = Math.imul(h ^ id.charCodeAt(i), 16777619);
+  const a = ((h >>> 0) % 360) * (Math.PI / 180);
+  const r = 0.2 + ((h >>> 8) % 16) * 0.015;
+  return { dLat: Math.sin(a) * r, dLng: Math.cos(a) * r };
+}
 
 function storyHasValidGeo(s: { lat?: number; lng?: number }): boolean {
   const { lat, lng } = s;
@@ -147,6 +156,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   /** Textos curiosos y categorías: `public/huellas2.json`. Fallback = BITS_DATA (solo lugar/país) si falla la carga. */
   const [huellasPuntos, setHuellasPuntos] = useState<HuellaPunto[]>(huellasFallbackDesdeBitsData);
   const [selectedBit, setSelectedBit] = useState<HuellaPunto | BitLike | null>(null);
+  const [globeLayers, setGlobeLayers] = useState<GlobeLayerVisibility>({
+    stories: true,
+    bits: true,
+    news: false,
+  });
+  const [newsMarkersMounted, setNewsMarkersMounted] = useState(false);
 
   useEffect(() => {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
@@ -165,6 +180,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (globeLayers.news) {
+      setNewsMarkersMounted(true);
+      return;
+    }
+    const t = window.setTimeout(() => setNewsMarkersMounted(false), 480);
+    return () => window.clearTimeout(t);
+  }, [globeLayers.news]);
 
   const stories = useStories();
 
@@ -185,18 +209,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     () => stories.filter((s) => storyHasValidGeo(s)),
     [stories]
   );
-
-  const globeMarkers = useMemo((): GlobeBitMarker[] => {
-    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
-      id: STORY_GLOBE_ID_BASE + i,
-      lat: s.lat,
-      lon: s.lng,
-      markerKind: 'story' as const,
-      title: s.title ?? s.label,
-      place: [s.city, s.country].filter(Boolean).join(', ') || undefined,
-    }));
-    return [...globeBitsMarkers, ...storyLayer];
-  }, [globeBitsMarkers, storiesOnGlobe]);
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -519,6 +531,43 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [topicNewsItems, generalNewsItems]
   );
 
+  const globeNewsMarkers = useMemo((): GlobeBitMarker[] => {
+    if (!newsMarkersMounted) return [];
+    const withGeo = filteredNewsItems.filter(
+      (n): n is typeof n & { lat: number; lng: number } =>
+        typeof n.lat === 'number' &&
+        typeof n.lng === 'number' &&
+        Number.isFinite(n.lat) &&
+        Number.isFinite(n.lng) &&
+        Math.abs(n.lat) <= 90 &&
+        Math.abs(n.lng) <= 180
+    );
+    return withGeo.slice(0, GLOBE_NEWS_MAX).map((n, i) => {
+      const j = jitterNewsOffset(n.id || String(i));
+      return {
+        id: NEWS_GLOBE_ID_BASE + i,
+        lat: n.lat + j.dLat,
+        lon: n.lng + j.dLng,
+        markerKind: 'news' as const,
+        title: n.title,
+        place: n.geo?.label || n.source || n.outletName || undefined,
+        url: n.url,
+      };
+    });
+  }, [filteredNewsItems, newsMarkersMounted]);
+
+  const globeMarkers = useMemo((): GlobeBitMarker[] => {
+    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
+      id: STORY_GLOBE_ID_BASE + i,
+      lat: s.lat,
+      lon: s.lng,
+      markerKind: 'story' as const,
+      title: s.title ?? s.label,
+      place: [s.city, s.country].filter(Boolean).join(', ') || undefined,
+    }));
+    return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers];
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers]);
+
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {
       clearTimeout(storyCloseTimerRef.current);
@@ -565,6 +614,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         openStoryViewer(story);
         return;
       }
+      if (id >= NEWS_GLOBE_ID_BASE) {
+        const idx = id - NEWS_GLOBE_ID_BASE;
+        const marker = globeNewsMarkers[idx];
+        if (marker?.url) {
+          window.open(marker.url, '_blank', 'noopener,noreferrer');
+        }
+        return;
+      }
       const bit = huellasPuntos.find((h) => h.id === id);
       if (!bit) return;
       setOpenStory(null);
@@ -573,8 +630,22 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setDrawerMode('bits');
       setDrawerOpen(true);
     },
-    [storiesOnGlobe, huellasPuntos, openStoryViewer]
+    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers]
   );
+
+  function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits', key: keyof GlobeLayerVisibility) {
+    const layerOn = globeLayers[key];
+    if (drawerOpen && drawerMode === mode) {
+      setGlobeLayers((prev) => ({ ...prev, [key]: !layerOn }));
+      if (layerOn) close();
+      return;
+    }
+    if (!layerOn) {
+      setGlobeLayers((prev) => ({ ...prev, [key]: true }));
+    }
+    if (mode === 'bits') setSelectedBit(null);
+    open(mode);
+  }
 
   function open(mode: MapDockMode) {
     if (storyCloseTimerRef.current) {
@@ -668,6 +739,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               viewerLng={viewerLng ?? undefined}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
+              layerVisibility={globeLayers}
               pauseEarthSpinForUi={Boolean(openStory) || (drawerOpen && drawerMode === 'bits')}
               onBitClick={handleGlobeMarkerClick}
             />
@@ -684,35 +756,65 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {/* Botones sueltos (sin franja) debajo de "Mapa de AlmaMundi" vía portal */}
       {dockSlot &&
         createPortal(
-          <div className={MAP_HOME_DOCK_NAV_CLASS}>
-            <PillNavButton dock active={drawerMode === 'stories'} onClick={() => open('stories')}>
-              Historias
-            </PillNavButton>
-            <PillNavButton dock active={drawerMode === 'sounds'} onClick={() => open('sounds')}>
-              Sonidos
-            </PillNavButton>
-            <PillNavButton dock active={drawerMode === 'news'} onClick={() => open('news')}>
-              Noticias en vivo
-            </PillNavButton>
-            <PillNavButton
-              dock
-              active={drawerMode === 'bits'}
-              onClick={() => {
-                setSelectedBit(null);
-                open('bits');
-              }}
+          <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-3 px-2 sm:flex-row sm:flex-wrap md:px-3">
+            <div
+              className="grid w-full justify-center justify-items-stretch gap-3 sm:w-auto sm:[grid-template-columns:repeat(3,max-content)] [grid-template-columns:repeat(1,minmax(0,1fr))]"
+              role="group"
+              aria-label="Capas del globo"
             >
-              Bits
-            </PillNavButton>
-            <PillNavButton
-              dock
-              active={drawerMode === 'search'}
-              onClick={() => open('search')}
-              longSingleLine
-              title="Buscar por palabras clave"
+              <PillNavButton
+                dock
+                layerOn={globeLayers.stories}
+                title={globeLayers.stories ? 'Historias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar historias en el globo'}
+                onClick={() => onGlobeLayerPill('stories', 'stories')}
+              >
+                Historias
+              </PillNavButton>
+              <PillNavButton
+                dock
+                layerOn={globeLayers.bits}
+                title={globeLayers.bits ? 'Bits visibles. Clic para ver la ficha o apagar la capa.' : 'Mostrar bits en el globo'}
+                onClick={() => onGlobeLayerPill('bits', 'bits')}
+              >
+                Bits
+              </PillNavButton>
+              <PillNavButton
+                dock
+                layerOn={globeLayers.news}
+                title={globeLayers.news ? 'Noticias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar noticias en el globo'}
+                onClick={() => onGlobeLayerPill('news', 'news')}
+              >
+                Noticias en vivo
+              </PillNavButton>
+            </div>
+            <div
+              className="hidden h-8 w-px shrink-0 bg-[#8896aa]/35 sm:block"
+              aria-hidden
+            />
+            <div
+              className="grid w-full justify-center justify-items-stretch gap-3 sm:w-auto sm:[grid-template-columns:repeat(2,max-content)] [grid-template-columns:repeat(1,minmax(0,1fr))]"
+              role="group"
+              aria-label="Audio y búsqueda"
             >
-              Buscar por palabras clave
-            </PillNavButton>
+              <PillNavButton
+                dock
+                audio
+                active={drawerOpen && drawerMode === 'sounds'}
+                title="Abrir sonidos del mapa"
+                onClick={() => open('sounds')}
+              >
+                Sonidos
+              </PillNavButton>
+              <PillNavButton
+                dock
+                active={drawerOpen && drawerMode === 'search'}
+                onClick={() => open('search')}
+                longSingleLine
+                title="Buscar por palabras clave"
+              >
+                Buscar por palabras clave
+              </PillNavButton>
+            </div>
           </div>,
           dockSlot
         )}

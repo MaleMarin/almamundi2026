@@ -6,7 +6,7 @@ import "server-only";
 import type { DocumentReference, Firestore } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
-import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
+import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
 import {
   buildPublishUpdate,
@@ -16,7 +16,31 @@ import {
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 
-const MAX_PUBLISHED_ARCHIVE_CAP = 30;
+async function maybeArchiveOldestPublicIfOverCap(db: Firestore): Promise<string | undefined> {
+  try {
+    const snap = await db
+      .collection("stories")
+      .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
+      .orderBy("publishedAt", "desc")
+      .limit(GLOBE_PUBLIC_STORY_CAP + 16)
+      .get();
+    if (snap.docs.length <= GLOBE_PUBLIC_STORY_CAP) return undefined;
+    const overflow = snap.docs.slice(GLOBE_PUBLIC_STORY_CAP);
+    const victim = overflow.find((doc) => !isFeaturedStoryStatus(doc.data()?.status));
+    if (!victim) return undefined;
+    await victim.ref.update({ status: "archived", updatedAt: FieldValue.serverTimestamp() });
+    await appendEditorialAuditLog(db, "system", "archive", {
+      storyId: victim.id,
+      fromStatus: String(victim.data()?.status ?? ""),
+      toStatus: "archived",
+      extras: { reason: "max_public_visible_cap", cap: GLOBE_PUBLIC_STORY_CAP },
+    });
+    return victim.id;
+  } catch (e) {
+    console.warn("[editorial] maybeArchiveOldestPublicIfOverCap skipped:", e);
+    return undefined;
+  }
+}
 
 export type PublishFromSubmissionResult =
   | {
@@ -65,30 +89,6 @@ function coerceFiniteNumber(v: unknown): number | null {
   if (v == null || v === "") return null;
   const n = typeof v === "number" ? v : Number(v);
   return Number.isFinite(n) ? n : null;
-}
-
-async function maybeArchiveOldestPublicIfOverCap(db: Firestore): Promise<string | undefined> {
-  try {
-    const snap = await db
-      .collection("stories")
-      .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
-      .orderBy("publishedAt", "asc")
-      .limit(MAX_PUBLISHED_ARCHIVE_CAP + 1)
-      .get();
-    if (snap.docs.length <= MAX_PUBLISHED_ARCHIVE_CAP) return undefined;
-    const oldest = snap.docs[0];
-    await oldest.ref.update({ status: "archived", updatedAt: FieldValue.serverTimestamp() });
-    await appendEditorialAuditLog(db, "system", "archive", {
-      storyId: oldest.id,
-      fromStatus: String(oldest.data()?.status ?? ""),
-      toStatus: "archived",
-      extras: { reason: "max_public_visible_cap" },
-    });
-    return oldest.id;
-  } catch (e) {
-    console.warn("[editorial] maybeArchiveOldestPublicIfOverCap skipped:", e);
-    return undefined;
-  }
 }
 
 async function resolveSubmission(

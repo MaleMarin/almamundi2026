@@ -21,6 +21,10 @@ export type PillNavButtonProps = {
   compactInline?: boolean;
   /** Fila bajo «Mapa de AlmaMundi» (`#map-dock-slot`): tipografía unificada vía `MAP_HOME_DOCK_LABEL_STYLE`. */
   dock?: boolean;
+  /** Capa del globo encendida (historias / bits / noticias). */
+  layerOn?: boolean;
+  /** Sonidos: no es capa de puntos; estilo distinto. */
+  audio?: boolean;
   /** Estado activo (dock): solo color/borde vía `.btn-almamundi[data-active]` */
   active?: boolean;
   /** Etiqueta larga en una sola línea: misma tipografía; solo ellipsis si no cabe. */
@@ -45,6 +49,8 @@ export function PillNavButton({
   compactInline,
   dock,
   active,
+  layerOn,
+  audio,
   longSingleLine,
   title,
   href,
@@ -54,7 +60,12 @@ export function PillNavButton({
 }: PillNavButtonProps) {
   const pillClass =
     dock === true
-      ? MAP_HOME_NEU_BUTTON_CLASS_DOCK
+      ? [
+          MAP_HOME_NEU_BUTTON_CLASS_DOCK,
+          audio === true ? 'home-map-neu-pill--audio' : '',
+        ]
+          .filter(Boolean)
+          .join(' ')
       : compact === true
         ? compactInline === true
           ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE
@@ -86,6 +97,8 @@ export function PillNavButton({
         className={pillClass}
         style={MAP_HOME_NEU_BUTTON_STYLE}
         data-active={active ? 'true' : undefined}
+        data-layer-on={layerOn === undefined ? undefined : layerOn ? 'true' : 'false'}
+        aria-pressed={layerOn === undefined ? undefined : layerOn}
         title={tip}
         onClick={() => onAfterClick?.()}
       >
@@ -104,6 +117,8 @@ export function PillNavButton({
       className={pillClass}
       style={MAP_HOME_NEU_BUTTON_STYLE}
       data-active={active ? 'true' : undefined}
+      data-layer-on={layerOn === undefined ? undefined : layerOn ? 'true' : 'false'}
+      aria-pressed={layerOn === undefined ? undefined : layerOn}
       title={tip}
     >
       {inner}

@@ -4,7 +4,7 @@
  * El cliente usa getStoryById / getStories desde stories.ts (sin Firebase).
  *
  * Índice compuesto requerido: stories (status IN audience_public + publishedAt DESC).
- * Despliega índices: firebase deploy --only firestore:indexes
+ * El globo pide las `GLOBE_PUBLIC_STORY_CAP` más recientes (40); no hay TTL.
  */
 import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
@@ -12,6 +12,7 @@ import { getDemoStoryPointById } from "@/lib/historias/historias-demo-stories";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
+  GLOBE_PUBLIC_STORY_CAP,
   isAudiencePublicStoryStatus,
 } from "@/lib/editorial/status";
 import {
@@ -164,7 +165,7 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       .collection("stories")
       .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
       .orderBy("publishedAt", "desc")
-      .limit(64)
+      .limit(GLOBE_PUBLIC_STORY_CAP)
       .get();
 
     return snap.docs

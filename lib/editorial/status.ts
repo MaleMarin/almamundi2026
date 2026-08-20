@@ -39,6 +39,16 @@ export const FIRESTORE_AUDIENCE_PUBLIC_STATUSES: readonly AudiencePublicStorySta
   "active",
 ];
 
+/**
+ * Máximo de relatos públicos en el globo. Al entrar el siguiente, el más antiguo
+ * (que no sea destacado) pasa a `archived`. No hay caducidad por tiempo.
+ */
+export const GLOBE_PUBLIC_STORY_CAP = 40;
+
+export function isFeaturedStoryStatus(status: unknown): boolean {
+  return status === "featured";
+}
+
 export function isAudiencePublicStoryStatus(status: unknown): status is AudiencePublicStoryStatus {
   return (
     typeof status === "string" &&

@@ -16,7 +16,7 @@ import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, use
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, OrbitControls, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
-import { GlobeBitsLayer, type GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
+import { GlobeBitsLayer, type GlobeBitMarker, type GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { MoonSatellite, MOON_ORBIT_INCLINATION_DEG } from '@/components/globe/MoonSatellite';
 import { ProceduralStarfield } from '@/components/globe/ProceduralStarfield';
 import {
@@ -134,7 +134,7 @@ const GLOBE_V2_EMBEDDED_CAM_POSITION: [number, number, number] = [0.14, 0.18, 0]
 const GLOBE_V2_EMBEDDED_ORBIT_TARGET: [number, number, number] = [0, -0.02, 0];
 const GLOBE_V2_FULL_ORBIT_TARGET: [number, number, number] = [0, 0, 0];
 
-export type { GlobeBitMarker };
+export type { GlobeBitMarker, GlobeLayerVisibility };
 export type { GlobeV2CameraPreset };
 export type { GlobeV2LayerBuildStage, GlobeV2OceanSunDebug } from '@/lib/globe/globe-v2-assets';
 
@@ -940,6 +940,7 @@ function GlobeScene({
   pauseEarthSpinForUi,
   initialViewLat,
   initialViewLng,
+  layerVisibility,
 }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
@@ -956,10 +957,10 @@ function GlobeScene({
   forceDaylight: boolean;
   showMoon: boolean;
   earthVisualTimeScale: number;
-  /** Drawer / panel que debe congelar el reloj terrestre (p. ej. bits abiertos en home). */
   pauseEarthSpinForUi: boolean;
   initialViewLat?: number;
   initialViewLng?: number;
+  layerVisibility?: GlobeLayerVisibility;
 }) {
   const { size } = useThree();
   const embeddedGeoFit = embedded ? Math.min(1, size.width / 400, size.height / 620) : 1;
@@ -1153,6 +1154,7 @@ function GlobeScene({
                 orbitControlsRef={orbitControlsRef}
                 interactionStoreRef={bitInteractionStoreRef}
                 earthSpinGroupRef={planetSpinRef}
+                layerVisibility={layerVisibility}
               />
             ) : null}
           </group>
@@ -1232,6 +1234,8 @@ export type GlobeV2Props = {
   bits?: GlobeBitMarker[];
   selectedBitId?: number | null;
   onBitClick?: (id: number) => void;
+  /** Home: interruptores de historias / bits / noticias. */
+  layerVisibility?: GlobeLayerVisibility;
   /**
    * Encuadre fijo para QA (p. ej. /globo-validacion): sin giro de corteza y controls alineados al preset.
    */
@@ -1283,6 +1287,7 @@ export default function GlobeV2({
   bits = [],
   selectedBitId = null,
   onBitClick,
+  layerVisibility,
   fixedCameraPreset = null,
   displacementScale = GLOBE_V2_DISPLACEMENT_SCALE_DEFAULT,
   forceDaylight,
@@ -1397,6 +1402,7 @@ export default function GlobeV2({
             pauseEarthSpinForUi={pauseEarthSpinForUi}
             initialViewLat={initialViewLat}
             initialViewLng={initialViewLng}
+            layerVisibility={layerVisibility}
           />
         </Suspense>
       </Canvas>

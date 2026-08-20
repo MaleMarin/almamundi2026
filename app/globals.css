@@ -242,7 +242,8 @@ a:hover {
     transform 0.2s ease,
     box-shadow 0.28s ease,
     color 0.2s ease,
-    border-color 0.2s ease;
+    border-color 0.2s ease,
+    opacity 0.28s ease;
 }
 .home-map-neu-pill:hover {
   box-shadow:
@@ -264,10 +265,29 @@ a.home-map-neu-pill.btn-almamundi:visited {
   color: #4b5563 !important;
 }
 
-/* Dock bajo «Mapa de AlmaMundi»: misma píldora neumórfica que el header (sin naranja fijo al activo). */
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
-  color: #4b5563 !important;
-  border-color: rgba(255, 255, 255, 0.48) !important;
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'] {
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.45) !important;
+  box-shadow:
+    inset 7px 7px 16px rgba(163, 177, 198, 0.42),
+    inset -5px -5px 14px rgba(255, 255, 255, 0.92) !important;
+  opacity: 1;
+}
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
+  color: #6b7280 !important;
+  opacity: 0.48;
+  box-shadow:
+    8px 8px 18px rgba(136, 150, 170, 0.28),
+    -8px -8px 18px rgba(255, 255, 255, 0.7) !important;
+}
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false']:hover,
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false']:focus-visible {
+  opacity: 0.72;
+  color: var(--almamundi-orange) !important;
+}
+#map-dock-slot .home-map-neu-pill--audio {
+  outline: 1px dashed rgba(136, 150, 170, 0.55);
+  outline-offset: 3px;
 }
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:hover,
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:focus-visible {

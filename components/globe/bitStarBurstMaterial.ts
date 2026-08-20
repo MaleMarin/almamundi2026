@@ -16,6 +16,7 @@ function createCircularMarkerMaterial(
       uIntensity: { value: intensity },
       uCore: { value: new THREE.Vector3(coreRgb[0], coreRgb[1], coreRgb[2]) },
       uRim: { value: new THREE.Vector3(rimRgb[0], rimRgb[1], rimRgb[2]) },
+      uLayerOpacity: { value: 1 },
     },
     glslVersion: THREE.GLSL3,
     vertexShader: /* glsl */ `
@@ -30,6 +31,7 @@ function createCircularMarkerMaterial(
       uniform float uIntensity;
       uniform vec3 uCore;
       uniform vec3 uRim;
+      uniform float uLayerOpacity;
       varying vec2 vUv;
 
       layout(location = 0) out highp vec4 fragColor;
@@ -42,7 +44,7 @@ function createCircularMarkerMaterial(
         float core = exp(-d * d * 7.5);
         float halo = (1.0 - smoothstep(0.0, 1.0, d)) * 0.55;
         float edge = 1.0 - smoothstep(0.72, 1.0, d);
-        float alpha = clamp((core * 1.15 + halo) * edge * uIntensity, 0.0, 1.0);
+        float alpha = clamp((core * 1.15 + halo) * edge * uIntensity * uLayerOpacity, 0.0, 1.0);
 
         vec3 col = mix(uRim, uCore, clamp(core * 1.35, 0.0, 1.0));
         fragColor = vec4(col, alpha);
@@ -95,6 +97,7 @@ export function createStoryStarBurstMaterial(
       uIntensity: { value: intensity },
       uCore: { value: new THREE.Vector3(core.r, core.g, core.b) },
       uRim: { value: coral },
+      uLayerOpacity: { value: 1 },
     },
     glslVersion: THREE.GLSL3,
     vertexShader: /* glsl */ `
@@ -109,6 +112,7 @@ export function createStoryStarBurstMaterial(
       uniform float uIntensity;
       uniform vec3 uCore;
       uniform vec3 uRim;
+      uniform float uLayerOpacity;
       varying vec2 vUv;
 
       layout(location = 0) out highp vec4 fragColor;
@@ -120,7 +124,7 @@ export function createStoryStarBurstMaterial(
 
         float fill = 1.0 - smoothstep(0.56, 0.66, d);
         float ring = smoothstep(0.74, 0.80, d) * (1.0 - smoothstep(0.90, 0.98, d));
-        float alpha = max(fill, ring) * clamp(uIntensity, 0.0, 1.0);
+        float alpha = max(fill, ring) * clamp(uIntensity, 0.0, 1.0) * uLayerOpacity;
         if (alpha < 0.03) discard;
         vec3 col = mix(uRim, uCore, fill);
         fragColor = vec4(col, alpha);
@@ -152,6 +156,7 @@ export function createStoryRippleMaterial(
       uTime: { value: 0 },
       uIntensity: { value: intensity },
       uCoral: { value: coral },
+      uLayerOpacity: { value: 1 },
     },
     glslVersion: THREE.GLSL3,
     vertexShader: /* glsl */ `
@@ -172,6 +177,7 @@ export function createStoryRippleMaterial(
       uniform float uTime;
       uniform float uIntensity;
       uniform vec3 uCoral;
+      uniform float uLayerOpacity;
       in vec2 vUv;
       in float vPhase;
       in float vPeriod;
@@ -190,7 +196,7 @@ export function createStoryRippleMaterial(
         float dist = abs(r - ringR);
         float ring = 1.0 - smoothstep(0.0, halfW, dist);
         float fade = pow(1.0 - t, 0.65);
-        float alpha = ring * fade * 0.98 * uIntensity;
+        float alpha = ring * fade * 0.98 * uIntensity * uLayerOpacity;
         if (alpha < 0.05) discard;
 
         fragColor = vec4(uCoral, alpha);
@@ -215,4 +221,65 @@ export function makeStoryRippleGeometry(bitId: number): THREE.PlaneGeometry {
   g.setAttribute('aPhase', new THREE.BufferAttribute(new Float32Array(n).fill(phase), 1));
   g.setAttribute('aPeriod', new THREE.BufferAttribute(new Float32Array(n).fill(period), 1));
   return g;
+}
+
+/**
+ * Anillo fino, frío y hueco: noticias (efímeras). No compite con el disco coral.
+ */
+export function createNewsRingMaterial(
+  intensity = 0.88,
+  materialName = 'GlobeNewsRing'
+): THREE.ShaderMaterial {
+  const rim = new THREE.Color('#7ec8ff').convertSRGBToLinear();
+  const core = new THREE.Color('#e8f6ff').convertSRGBToLinear();
+  const mat = new THREE.ShaderMaterial({
+    name: materialName,
+    uniforms: {
+      uTime: { value: 0 },
+      uIntensity: { value: intensity },
+      uCore: { value: new THREE.Vector3(core.r, core.g, core.b) },
+      uRim: { value: new THREE.Vector3(rim.r, rim.g, rim.b) },
+      uLayerOpacity: { value: 1 },
+    },
+    glslVersion: THREE.GLSL3,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      precision highp float;
+      uniform float uTime;
+      uniform float uIntensity;
+      uniform vec3 uCore;
+      uniform vec3 uRim;
+      uniform float uLayerOpacity;
+      varying vec2 vUv;
+
+      layout(location = 0) out highp vec4 fragColor;
+
+      void main() {
+        vec2 c = vUv - 0.5;
+        float d = length(c) * 2.0;
+        if (d > 1.0) discard;
+
+        float pulse = 0.62 + 0.38 * sin(uTime * 2.35);
+        float ring = smoothstep(0.52, 0.62, d) * (1.0 - smoothstep(0.86, 0.98, d));
+        float alpha = ring * pulse * uIntensity * uLayerOpacity;
+        if (alpha < 0.04) discard;
+        vec3 col = mix(uRim, uCore, 1.0 - smoothstep(0.55, 0.82, d));
+        fragColor = vec4(col, alpha);
+      }
+    `,
+    transparent: true,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  mat.name = materialName;
+  return mat;
 }

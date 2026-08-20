@@ -30,6 +30,7 @@ import {
 } from '@/lib/globe/globe-bits-magnetic-config';
 import {
   createBitStarBurstMaterial,
+  createNewsRingMaterial,
   createStoryRippleMaterial,
   createStoryStarBurstMaterial,
   makeStoryRippleGeometry,
@@ -41,11 +42,30 @@ export type GlobeBitMarker = {
   lat: number;
   lon: number;
   color?: string;
-  /** Historias en el mapa vs bits curados (color distinto en el globo). */
-  markerKind?: 'bit' | 'story';
+  /** Historias, bits curados o titulares (capa noticias). */
+  markerKind?: 'bit' | 'story' | 'news';
   title?: string;
   place?: string;
+  url?: string;
 };
+
+export type GlobeLayerVisibility = {
+  stories: boolean;
+  bits: boolean;
+  news: boolean;
+};
+
+const DEFAULT_LAYER_VISIBILITY: GlobeLayerVisibility = {
+  stories: true,
+  bits: true,
+  news: false,
+};
+
+function markerLayerKind(bit: GlobeBitMarker): keyof GlobeLayerVisibility {
+  if (bit.markerKind === 'story') return 'stories';
+  if (bit.markerKind === 'news') return 'news';
+  return 'bits';
+}
 
 const BIT_SURFACE_RADIUS = GLOBE_V2_BIT_SURFACE_RADIUS;
 
@@ -57,6 +77,8 @@ const BIT_PLANE_MUL = 1.9;
 const STORY_PLANE_MUL = 3.05;
 const STORY_RIPPLE_MUL = 5.6;
 const STORY_HOVER_SCALE = 1.32;
+/** Noticias: anillo más chico y frío que las historias. */
+const NEWS_PLANE_MUL = 2.22;
 
 function disableMeshRaycast(obj: THREE.Object3D | null) {
   if (obj instanceof THREE.Mesh) obj.raycast = () => {};
@@ -107,6 +129,8 @@ function BitDot({
   storyMatSelected,
   storyRippleMat,
   storyRippleMatHover,
+  newsMat,
+  layerOpRef,
 }: {
   bit: GlobeBitMarker;
   selected: boolean;
@@ -117,11 +141,13 @@ function BitDot({
   storyMatSelected: THREE.ShaderMaterial;
   storyRippleMat: THREE.ShaderMaterial;
   storyRippleMatHover: THREE.ShaderMaterial;
+  newsMat: THREE.ShaderMaterial;
+  layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number }>;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
     const p = latLngToCartesianThreeJS(bit.lat, bit.lon, BIT_SURFACE_RADIUS);
     const s = new THREE.Vector3(p.x, p.y, p.z);
-    const lift = bit.markerKind === 'story' ? 0.0064 : 0.0042;
+    const lift = bit.markerKind === 'story' ? 0.0064 : bit.markerKind === 'news' ? 0.0052 : 0.0042;
     const b = s.clone().normalize().multiplyScalar(lift);
     return { surfacePos: s, flareBump: b };
   }, [bit.lat, bit.lon, bit.markerKind]);
@@ -136,7 +162,10 @@ function BitDot({
 
   useFrame(() => {
     const root = rootRef.current;
-    if (root) root.userData.bitId = bit.id;
+    if (root) {
+      root.userData.bitId = bit.id;
+      root.userData.layerKind = markerLayerKind(bit);
+    }
     if (!root) return;
     const bitsRoot = root.parent;
     const spin = bitsRoot?.parent ?? null;
@@ -161,10 +190,12 @@ function BitDot({
       return;
     }
     outRadial.normalize();
-    root.visible = outRadial.dot(toCam) > FRONT_HEMISPHERE_MIN_DOT;
+    const layerOp = layerOpRef.current[markerLayerKind(bit)];
+    root.visible = layerOp > 0.04 && outRadial.dot(toCam) > FRONT_HEMISPHERE_MIN_DOT;
   });
 
   const isStory = bit.markerKind === 'story';
+  const isNews = bit.markerKind === 'news';
   const rippleGeom = useMemo(
     () => (isStory ? makeStoryRippleGeometry(bit.id) : null),
     [bit.id, isStory]
@@ -175,7 +206,9 @@ function BitDot({
     };
   }, [rippleGeom]);
 
-  const starMat = selected || (isStory && magneticActive)
+  const starMat = isNews
+    ? newsMat
+    : selected || (isStory && magneticActive)
     ? isStory
       ? storyMatSelected
       : starMatSelected
@@ -184,7 +217,8 @@ function BitDot({
       : starMatNormal;
   const sel = selected ? 1.08 : 1.0;
   const mag = magneticActive && !selected ? (isStory ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
-  const planeScale = STAR_PLANE_SCALE * (isStory ? STORY_PLANE_MUL : BIT_PLANE_MUL);
+  const planeScale =
+    STAR_PLANE_SCALE * (isStory ? STORY_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
   const rippleScale = STAR_PLANE_SCALE * STORY_RIPPLE_MUL;
   const coreScale = CORE_SCALE * (isStory ? 1 : 2.4);
   const rippleMat = selected || magneticActive ? storyRippleMatHover : storyRippleMat;
@@ -215,11 +249,11 @@ function BitDot({
             ref={(m) => disableMeshRaycast(m)}
             material={starMat}
             scale={[planeScale * sel * mag, planeScale * sel * mag, 1]}
-            renderOrder={isStory ? 15 : 10}
+            renderOrder={isStory ? 15 : isNews ? 13 : 10}
           >
             <planeGeometry args={[1, 1]} />
           </mesh>
-          {isStory && magneticActive && (bit.title || bit.place) ? (
+          {(isStory || isNews) && magneticActive && (bit.title || bit.place) ? (
             <Html
               center
               sprite
@@ -235,7 +269,7 @@ function BitDot({
                   padding: '8px 12px',
                   borderRadius: 12,
                   background: 'rgba(8, 10, 18, 0.82)',
-                  border: '1px solid rgba(255, 122, 0, 0.55)',
+                  border: `1px solid ${isNews ? 'rgba(126, 200, 255, 0.55)' : 'rgba(255, 122, 0, 0.55)'}`,
                   boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
                   color: '#fff',
                   fontFamily: 'system-ui, sans-serif',
@@ -258,7 +292,7 @@ function BitDot({
           ) : null}
         </Billboard>
 
-        {isStory ? null : (
+        {isStory || isNews ? null : (
         <mesh
           ref={(m) => disableMeshRaycast(m)}
           scale={coreScale * sel * mag}
@@ -288,14 +322,15 @@ export function GlobeBitsLayer({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
+  layerVisibility = DEFAULT_LAYER_VISIBILITY,
 }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
   onBitClick?: (id: number) => void;
   orbitControlsRef?: RefObject<OrbitControlsImpl | null>;
   interactionStoreRef: MutableRefObject<GlobeBitInteractionStore>;
-  /** Mismo ref que `planetSpinRef` en GlobeV2 (origen Tierra en el subárbol que rota). */
   earthSpinGroupRef: RefObject<THREE.Group | null>;
+  layerVisibility?: GlobeLayerVisibility;
 }) {
   if (!bits.length) return null;
   return (
@@ -306,8 +341,14 @@ export function GlobeBitsLayer({
       orbitControlsRef={orbitControlsRef}
       interactionStoreRef={interactionStoreRef}
       earthSpinGroupRef={earthSpinGroupRef}
+      layerVisibility={layerVisibility}
     />
   );
+}
+
+function setMatLayerOpacity(mat: THREE.ShaderMaterial, value: number) {
+  const u = mat.uniforms.uLayerOpacity;
+  if (u) u.value = value;
 }
 
 function GlobeBitsLayerMounted({
@@ -317,6 +358,7 @@ function GlobeBitsLayerMounted({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
+  layerVisibility,
 }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
@@ -324,9 +366,11 @@ function GlobeBitsLayerMounted({
   orbitControlsRef?: RefObject<OrbitControlsImpl | null>;
   interactionStoreRef: MutableRefObject<GlobeBitInteractionStore>;
   earthSpinGroupRef: RefObject<THREE.Group | null>;
+  layerVisibility: GlobeLayerVisibility;
 }) {
   const bitsRootRef = useRef<THREE.Group>(null);
   const { camera, gl } = useThree();
+  const layerOpRef = useRef({ stories: 1, bits: 1, news: 0 });
 
   const [hoverCandidateId, setHoverCandidateId] = useState<number | null>(null);
   useCursor(!!hoverCandidateId && Boolean(onBitClick));
@@ -355,6 +399,7 @@ function GlobeBitsLayerMounted({
   const storyMatSelected = useMemo(() => createStoryStarBurstMaterial(1.0, 'GlobeStoryStarBurstSelected'), []);
   const storyRippleMat = useMemo(() => createStoryRippleMaterial(1.0, 'GlobeStoryRipple'), []);
   const storyRippleMatHover = useMemo(() => createStoryRippleMaterial(1.55, 'GlobeStoryRippleHover'), []);
+  const newsMat = useMemo(() => createNewsRingMaterial(0.9, 'GlobeNewsRing'), []);
 
   useEffect(() => {
     return () => {
@@ -364,6 +409,7 @@ function GlobeBitsLayerMounted({
       storyMatSelected.dispose();
       storyRippleMat.dispose();
       storyRippleMatHover.dispose();
+      newsMat.dispose();
     };
   }, [
     starMatNormal,
@@ -372,12 +418,25 @@ function GlobeBitsLayerMounted({
     storyMatSelected,
     storyRippleMat,
     storyRippleMatHover,
+    newsMat,
   ]);
 
-  useFrame(({ clock }) => {
+  useFrame(({ clock }, dt) => {
     const t = clock.elapsedTime;
     storyRippleMat.uniforms.uTime.value = t;
     storyRippleMatHover.uniforms.uTime.value = t;
+    newsMat.uniforms.uTime.value = t;
+    const op = layerOpRef.current;
+    op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? 1 : 0, 7, dt);
+    op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? 1 : 0, 7, dt);
+    op.news = THREE.MathUtils.damp(op.news, layerVisibility.news ? 1 : 0, 7, dt);
+    setMatLayerOpacity(starMatNormal, op.bits);
+    setMatLayerOpacity(starMatSelected, op.bits);
+    setMatLayerOpacity(storyMatNormal, op.stories);
+    setMatLayerOpacity(storyMatSelected, op.stories);
+    setMatLayerOpacity(storyRippleMat, op.stories);
+    setMatLayerOpacity(storyRippleMatHover, op.stories);
+    setMatLayerOpacity(newsMat, op.news);
   });
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {
@@ -407,6 +466,8 @@ function GlobeBitsLayerMounted({
       const ch = bitsRoot.children[i];
       const id = ch.userData.bitId as number | undefined;
       if (id === undefined) continue;
+      const kind = ch.userData.layerKind as keyof GlobeLayerVisibility | undefined;
+      if (kind && layerOpRef.current[kind] < 0.08) continue;
       ch.getWorldPosition(aux.bitWorld);
       const n = aux.bitWorld.clone().sub(aux.earthCenter).normalize();
       const vCam = aux.camWorld.clone().sub(aux.bitWorld).normalize();
@@ -529,22 +590,39 @@ function GlobeBitsLayerMounted({
     };
   }, [gl, camera, bits, onBitClick, orbitControlsRef, interactionStoreRef, earthSpinGroupRef, aux]);
 
+  const bitDotProps = {
+    starMatNormal,
+    starMatSelected,
+    storyMatNormal,
+    storyMatSelected,
+    storyRippleMat,
+    storyRippleMatHover,
+    newsMat,
+    layerOpRef,
+  };
+
   return (
     <group ref={bitsRootRef} name="globe-bits">
       {bits
-        .filter((b) => b.markerKind !== 'story')
+        .filter((b) => b.markerKind !== 'story' && b.markerKind !== 'news')
         .map((bit) => (
           <BitDot
             key={`bit-${bit.id}`}
             bit={bit}
             selected={selectedBitId === bit.id}
             magneticActive={hoverCandidateId === bit.id}
-            starMatNormal={starMatNormal}
-            starMatSelected={starMatSelected}
-            storyMatNormal={storyMatNormal}
-            storyMatSelected={storyMatSelected}
-            storyRippleMat={storyRippleMat}
-            storyRippleMatHover={storyRippleMatHover}
+            {...bitDotProps}
+          />
+        ))}
+      {bits
+        .filter((b) => b.markerKind === 'news')
+        .map((bit) => (
+          <BitDot
+            key={`news-${bit.id}`}
+            bit={bit}
+            selected={selectedBitId === bit.id}
+            magneticActive={hoverCandidateId === bit.id}
+            {...bitDotProps}
           />
         ))}
       {bits
@@ -555,12 +633,7 @@ function GlobeBitsLayerMounted({
             bit={bit}
             selected={selectedBitId === bit.id}
             magneticActive={hoverCandidateId === bit.id}
-            starMatNormal={starMatNormal}
-            starMatSelected={starMatSelected}
-            storyMatNormal={storyMatNormal}
-            storyMatSelected={storyMatSelected}
-            storyRippleMat={storyRippleMat}
-            storyRippleMatHover={storyRippleMatHover}
+            {...bitDotProps}
           />
         ))}
     </group>
