@@ -317,8 +317,13 @@ a.home-map-neu-pill.btn-almamundi:visited {
 #map-dock-slot .home-map-neu-pill.btn-almamundi {
   appearance: none;
   -webkit-appearance: none;
+  width: auto;
+  min-width: max-content;
+  flex: 0 0 auto;
+  padding-left: 0.7rem;
+  padding-right: 0.7rem;
   font-family: var(--font-sans);
-  font-size: 1rem;
+  font-size: 0.8125rem;
   font-weight: 600;
   line-height: 1;
   letter-spacing: 0;
@@ -327,6 +332,22 @@ a.home-map-neu-pill.btn-almamundi:visited {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+@media (min-width: 768px) {
+  #map-dock-slot .home-map-neu-pill.btn-almamundi {
+    padding-left: 0.9rem;
+    padding-right: 0.9rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  #map-dock-slot .home-map-neu-pill.btn-almamundi {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    font-size: 1rem;
+  }
 }
 
 /*
@@ -394,13 +415,66 @@ a.home-map-neu-pill.btn-almamundi:visited {
   letter-spacing: -0.03em;
 }
 
-/* Pills del mapa: centradas y ligadas al bloque editorial. */
+/* Pills del mapa: una sola fila; si no caben, scroll horizontal (nunca dos renglones). */
 #map-dock-slot {
   width: 100%;
-  max-width: 48rem;
+  max-width: none;
   margin-inline: auto;
   padding-top: 0.75rem;
   padding-bottom: 0.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+#map-dock-slot .map-dock-row {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: max-content;
+  min-width: 100%;
+}
+
+#map-dock-slot .map-dock-group {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+#map-dock-slot .map-dock-sep {
+  width: 1px;
+  height: 2rem;
+  flex: 0 0 auto;
+  background: rgba(136, 150, 170, 0.35);
+}
+
+#map-dock-slot .map-dock-search-long {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  #map-dock-slot .map-dock-row,
+  #map-dock-slot .map-dock-group {
+    gap: 0.625rem;
+  }
+}
+
+@media (min-width: 1280px) {
+  #map-dock-slot .map-dock-row,
+  #map-dock-slot .map-dock-group {
+    gap: 0.75rem;
+  }
+  #map-dock-slot .map-dock-search-short {
+    display: none;
+  }
+  #map-dock-slot .map-dock-search-long {
+    display: inline;
+  }
 }
 
 /* Anti-banding: ruido muy sutil en toda la atmósfera del mapa. */

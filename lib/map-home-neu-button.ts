@@ -7,7 +7,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
  */
 export const MAP_HOME_DOCK_LABEL_STYLE: CSSProperties = {
   fontFamily: SITE_FONT_STACK,
-  fontSize: '1rem',
+  fontSize: 'inherit',
   fontWeight: 600,
   lineHeight: 1,
   letterSpacing: '0',

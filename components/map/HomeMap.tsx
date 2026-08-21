@@ -754,12 +754,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {/* Dock: Historias, Bits, Noticias en vivo (capas), luego Sonidos (audio), luego buscar. */}
       {dockSlot &&
         createPortal(
-          <div className="mx-auto flex w-full max-w-5xl flex-col items-center justify-center gap-3 px-2 sm:flex-row sm:flex-wrap md:px-3">
-            <div
-              className="grid w-full justify-center justify-items-stretch gap-3 sm:w-auto sm:[grid-template-columns:repeat(3,max-content)] [grid-template-columns:repeat(1,minmax(0,1fr))]"
-              role="group"
-              aria-label="Capas del globo"
-            >
+          <div className="map-dock-row">
+            <div className="map-dock-group" role="group" aria-label="Capas del globo">
               <PillNavButton
                 dock
                 layerOn={globeLayers.stories}
@@ -785,15 +781,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 Noticias en vivo
               </PillNavButton>
             </div>
-            <div
-              className="hidden h-8 w-px shrink-0 bg-[#8896aa]/35 sm:block"
-              aria-hidden
-            />
-            <div
-              className="grid w-full justify-center justify-items-stretch gap-3 sm:w-auto sm:[grid-template-columns:repeat(2,max-content)] [grid-template-columns:repeat(1,minmax(0,1fr))]"
-              role="group"
-              aria-label="Audio y búsqueda"
-            >
+            <div className="map-dock-sep" aria-hidden />
+            <div className="map-dock-group" role="group" aria-label="Audio y búsqueda">
               <PillNavButton
                 dock
                 audio
@@ -807,10 +796,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 dock
                 active={drawerOpen && drawerMode === 'search'}
                 onClick={() => open('search')}
-                longSingleLine
                 title="Buscar por palabras clave"
               >
-                Buscar por palabras clave
+                <span className="map-dock-search-short">Buscar</span>
+                <span className="map-dock-search-long">Buscar por palabras clave</span>
               </PillNavButton>
             </div>
           </div>,
