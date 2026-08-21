@@ -265,24 +265,6 @@ a.home-map-neu-pill.btn-almamundi:visited {
   color: #4b5563 !important;
 }
 
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'] {
-  color: var(--almamundi-orange) !important;
-  border-color: rgba(var(--almamundi-orange-rgb), 0.45) !important;
-}
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
-  color: #6b7280 !important;
-  border-color: rgba(255, 255, 255, 0.48) !important;
-}
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false']:hover,
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false']:focus-visible {
-  color: var(--almamundi-orange) !important;
-}
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:hover,
-#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true']:focus-visible {
-  color: var(--almamundi-orange) !important;
-  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
-}
-
 /*
  * Dock «El Alma del Mundo»: tipografía única (referencia: «Bits»).
  * Misma pila que MAP_HOME_NEU_BUTTON_CLASS: text-base / semibold / leading-none.
@@ -312,21 +294,23 @@ a.home-map-neu-pill.btn-almamundi:visited {
   -webkit-appearance: none;
   box-sizing: border-box;
   width: auto;
-  min-width: max-content;
+  min-width: 0;
   flex: 0 0 auto;
-  height: 2.75rem;
-  min-height: 2.75rem;
-  max-height: 2.75rem;
-  padding: 0 1.1rem;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 9999px;
-  outline: none;
-  transform: none;
-  opacity: 1;
+  height: 44px !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  padding: 0 18px !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  border-radius: 9999px !important;
+  outline: none !important;
+  outline-offset: 0 !important;
+  transform: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  overflow: hidden;
   box-shadow:
-    8px 8px 16px rgba(136, 150, 170, 0.28),
-    -8px -8px 16px rgba(255, 255, 255, 0.78) !important;
+    inset 2px 2px 5px rgba(255, 255, 255, 0.9),
+    inset -2px -2px 6px rgba(163, 177, 198, 0.28) !important;
   font-family: var(--font-sans);
   font-size: 0.875rem;
   font-weight: 600;
@@ -336,6 +320,21 @@ a.home-map-neu-pill.btn-almamundi:visited {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'] {
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
+}
+
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
+  color: #6b7280 !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+}
+
+#map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
 }
 
 /*
@@ -417,19 +416,19 @@ a.home-map-neu-pill.btn-almamundi:visited {
 }
 
 #map-dock-slot .map-dock-row {
-  display: flex;
-  flex-wrap: nowrap;
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: max-content;
   align-items: center;
   justify-content: center;
-  gap: 0.75rem;
+  column-gap: 12px;
   width: max-content;
   min-width: 100%;
 }
 
 #map-dock-slot .map-dock-sep {
   width: 1px;
-  height: 1.35rem;
-  flex: 0 0 auto;
+  height: 18px;
   margin: 0;
   background: rgba(136, 150, 170, 0.4);
 }

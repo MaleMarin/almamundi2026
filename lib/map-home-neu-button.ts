@@ -42,9 +42,9 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
 export const MAP_HOME_NEU_BUTTON_CLASS =
   'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
 
-/** Dock «El Alma del Mundo»: misma caja; tipografía solo en `.pill-nav-dock-label` (sin utilidades font-* en el botón). */
+/** Dock: caja fija 44px. Alto/padding los fija `#map-dock-slot` en CSS para no pelear con Tailwind. */
 export const MAP_HOME_NEU_BUTTON_CLASS_DOCK =
-  'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-gray-600 whitespace-nowrap overflow-hidden';
+  'btn-almamundi home-map-neu-pill box-border flex h-[2.75rem] min-h-[2.75rem] max-h-[2.75rem] min-w-0 w-auto shrink-0 items-center justify-center px-[1.1rem] py-0 text-center text-gray-600 whitespace-nowrap overflow-hidden';
 
 /** Home header: píldoras más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =
