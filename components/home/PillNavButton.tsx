@@ -60,12 +60,7 @@ export function PillNavButton({
 }: PillNavButtonProps) {
   const pillClass =
     dock === true
-      ? [
-          MAP_HOME_NEU_BUTTON_CLASS_DOCK,
-          audio === true ? 'home-map-neu-pill--audio' : '',
-        ]
-          .filter(Boolean)
-          .join(' ')
+      ? MAP_HOME_NEU_BUTTON_CLASS_DOCK
       : compact === true
         ? compactInline === true
           ? MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE

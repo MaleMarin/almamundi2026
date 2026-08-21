@@ -754,8 +754,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {/* Dock: Historias, Bits, Noticias en vivo (capas), luego Sonidos (audio), luego buscar. */}
       {dockSlot &&
         createPortal(
-          <div className="map-dock-row">
-            <div className="map-dock-group" role="group" aria-label="Capas del globo">
+          <div className="map-dock-row" role="toolbar" aria-label="Capas y herramientas del mapa">
               <PillNavButton
                 dock
                 layerOn={globeLayers.stories}
@@ -780,12 +779,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 Noticias en vivo
               </PillNavButton>
-            </div>
             <div className="map-dock-sep" aria-hidden />
-            <div className="map-dock-group" role="group" aria-label="Audio y búsqueda">
               <PillNavButton
                 dock
-                audio
                 active={drawerOpen && drawerMode === 'sounds'}
                 title="Abrir sonidos del mapa"
                 onClick={() => open('sounds')}
@@ -798,10 +794,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 onClick={() => open('search')}
                 title="Buscar por palabras clave"
               >
-                <span className="map-dock-search-short">Buscar</span>
-                <span className="map-dock-search-long">Buscar por palabras clave</span>
+                Buscar
               </PillNavButton>
-            </div>
           </div>,
           dockSlot
         )}
