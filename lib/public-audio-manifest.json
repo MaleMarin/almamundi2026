@@ -1,7 +1,32 @@
 {
   "paths": [
-    "/audio/amanecer.mp3",
     "/audio/ambients/animals.mp3",
+    "/audio/ambients/animals.wav",
+    "/audio/ambients/city.mp3",
+    "/audio/ambients/city.wav",
+    "/audio/ambients/forest.mp3",
+    "/audio/ambients/forest.wav",
+    "/audio/ambients/ocean.mp3",
+    "/audio/ambients/ocean.wav",
+    "/audio/ambients/people.mp3",
+    "/audio/ambients/people.wav",
+    "/audio/ambients/universe.mp3",
+    "/audio/ambients/universe.wav",
+    "/audio/mar.m4a",
+    "/audio/sonido arroyo.mp4",
+    "/audio/sonido bajo el mar.mp4",
+    "/audio/sonido bosque.mp4",
+    "/audio/sonido ciudad.mp4",
+    "/audio/sonido de arroyo.mp4",
+    "/audio/sonido latido de corazon.mp4",
+    "/audio/sonido lava de volcan.mp4",
+    "/audio/sonido lluvia.mp4",
+    "/audio/sonido mercado.mp4",
+    "/audio/sonido radio.mp4",
+    "/audio/sonido volcán.mp4",
+    "/universo.mp3"
+  ]
+}
     "/audio/ambients/animals.wav",
     "/audio/ambients/city.mp3",
     "/audio/ambients/city.wav",

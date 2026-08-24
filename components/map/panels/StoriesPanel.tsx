@@ -298,7 +298,7 @@ export function StoriesPanel({
                   transition: 'all 200ms ease',
                 }}
               >
-                Contar mi historia
+                Cuenta tu historia
               </button>
             )}
           </div>

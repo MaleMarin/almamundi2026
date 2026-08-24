@@ -1322,7 +1322,7 @@ function RightPanel({
   // ===== Tabs / Views (premium segmented control) =====
   const VIEW_LABEL: Record<string, string> = {
     historias: "Historias de personas",
-    actualidad: "Noticias en vivo",
+    actualidad: "Noticias",
     musica: "Sonidos del mundo",
   };
   /** Etiquetas cortas solo para los tabs (1 línea). El título del panel sigue siendo largo. */
@@ -1475,12 +1475,12 @@ function RightPanel({
             </>
           )}
 
-          {/* — Noticias en vivo (Apple-level copy) */}
+          {/* — Noticias */}
           {activeView === 'actualidad' && (() => {
             const selectedNewsId = selectedNews?.id ?? null;
             return (
             <>
-              <h3 className="panelTitle mb-2">Noticias en vivo</h3>
+              <h3 className="panelTitle mb-2">Noticias</h3>
               <p className="panelLead mb-2 max-w-[36ch]">
                 Para ver el mundo mientras ocurre. El mapa marca dónde pasa cada titular. Tú decides qué abrir: siempre fuente y hora.
               </p>
@@ -4759,7 +4759,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               { id: 'historias',  label: 'Historias' },
               { id: 'musica',     label: 'Sonidos'   },
               { id: 'actualidad', label: 'Noticias'  },
-              { id: 'bits',       label: 'Bits'      },
+              { id: 'bits',       label: 'También cuenta'      },
             ].map(tab => {
               const isActive = activeView === tab.id;
               return (
@@ -4909,7 +4909,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'musica' && <SoundsPanel {...sonidosProps} />}
             {activeView === 'bits' && (
               <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
-                <p className="mb-4">Los puntos en el mapa son Bits: datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
+                <p className="mb-4">Los puntos de También cuenta son datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
                 <p className="text-white/50 text-xs">Categorías: Dato insólito, Vivir distinto, Paradoja moderna, Para pensar.</p>
               </div>
             )}

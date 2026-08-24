@@ -74,10 +74,9 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   if (!open) return null;
 
   const title =
-    mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias en vivo' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'Bits' : 'Buscar por palabras clave';
+    mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
   const bitsMode = mode === 'bits';
-  /** En Bits no se muestra el título visible; el diálogo sigue teniendo etiqueta para accesibilidad. */
-  const dialogAriaLabel = bitsMode ? 'Hecho curioso del lugar' : title;
+  const dialogAriaLabel = title;
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
   if (isMobile) {
@@ -100,16 +99,12 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           }}
         >
           <div
-            className={`flex flex-shrink-0 items-center px-5 py-4 ${bitsMode ? 'justify-end' : 'justify-between'}`}
+            className="flex flex-shrink-0 items-center justify-between px-5 py-4"
             style={glassHeaderBar}
           >
-            {!bitsMode ? (
-              <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
-                {title}
-              </span>
-            ) : (
-              <span className="sr-only">{dialogAriaLabel}</span>
-            )}
+            <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+              {title}
+            </span>
             <button
               type="button"
               onClick={onClose}
@@ -164,16 +159,12 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         }}
       >
         <div
-          className={`flex flex-shrink-0 items-center px-5 py-4 ${bitsMode ? 'justify-end' : 'justify-between'}`}
+          className="flex flex-shrink-0 items-center justify-between px-5 py-4"
           style={glassHeaderBar}
         >
-          {!bitsMode ? (
-            <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
-              {title}
-            </span>
-          ) : (
-            <span className="sr-only">{dialogAriaLabel}</span>
-          )}
+          <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+            {title}
+          </span>
           <button
             type="button"
             onClick={onClose}

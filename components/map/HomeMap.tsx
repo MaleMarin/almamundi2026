@@ -751,7 +751,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
       </div>
 
-      {/* Dock: Historias, Bits, Noticias en vivo (capas), luego Sonidos (audio), luego buscar. */}
+      {/* Dock: Historias, También cuenta, Noticias (capas), luego Sonidos (audio), luego buscar. */}
       {dockSlot &&
         createPortal(
           <div className="map-dock-row" role="toolbar" aria-label="Capas y herramientas del mapa">
@@ -766,10 +766,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               <PillNavButton
                 dock
                 layerOn={globeLayers.bits}
-                title={globeLayers.bits ? 'Bits visibles. Clic para ver la ficha o apagar la capa.' : 'Mostrar bits en el globo'}
+                title={globeLayers.bits ? 'También cuenta está visible. Clic para ver la ficha o apagar la capa.' : 'Mostrar También cuenta en el globo'}
                 onClick={() => onGlobeLayerPill('bits', 'bits')}
               >
-                Bits
+                También cuenta
               </PillNavButton>
               <PillNavButton
                 dock
@@ -777,7 +777,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 title={globeLayers.news ? 'Noticias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar noticias en el globo'}
                 onClick={() => onGlobeLayerPill('news', 'news')}
               >
-                Noticias en vivo
+                Noticias
               </PillNavButton>
             <div className="map-dock-sep" aria-hidden />
               <PillNavButton

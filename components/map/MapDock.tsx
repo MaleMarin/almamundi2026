@@ -40,17 +40,17 @@ const dockWrapperStyle: CSSProperties = {
 
 const baseBtnStyle: CSSProperties = {
   flex: '1 1 140px',
-  minWidth: 120,
+  minWidth: 108,
   minHeight: 56,
   maxWidth: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
   textAlign: 'center',
-  padding: '12px 14px',
+  padding: '10px 12px',
   borderRadius: 9999,
-  fontSize: 15,
-  lineHeight: 1.25,
+  fontSize: 13,
+  lineHeight: 1.2,
   color: 'rgba(255,255,255,0.85)',
   background: 'rgba(255,255,255,0.06)',
   backdropFilter: 'blur(12px)',
@@ -86,8 +86,8 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
   /** Orden: capas del globo juntas, luego Sonidos, luego búsqueda. */
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
-    { mode: 'bits', label: 'Bits' },
-    { mode: 'news', label: 'Noticias en vivo' },
+    { mode: 'bits', label: 'También cuenta' },
+    { mode: 'news', label: 'Noticias' },
     { mode: 'sounds', label: 'Sonidos' },
     { mode: 'search', label: 'Buscar por palabras clave' },
   ];

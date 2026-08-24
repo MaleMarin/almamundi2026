@@ -288,7 +288,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
         fontFamily: SITE_FONT_STACK,
       }}
     >
-      Contar mi historia — ver los 4 formatos
+      Cuenta tu historia — ver los 4 formatos
     </button>
   );
 }

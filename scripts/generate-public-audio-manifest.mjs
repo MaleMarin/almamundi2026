@@ -30,7 +30,14 @@ async function walkAudioFiles(dir, publicRoot, out) {
       await walkAudioFiles(full, publicRoot, out);
     } else {
       const ext = path.extname(e.name).toLowerCase();
-      if (AUDIO_EXT.has(ext)) out.add(toUrlPath(full, publicRoot));
+      if (!AUDIO_EXT.has(ext)) continue;
+      try {
+        const st = await stat(full);
+        if (st.size < 1) continue;
+      } catch {
+        continue;
+      }
+      out.add(toUrlPath(full, publicRoot));
     }
   }
 }

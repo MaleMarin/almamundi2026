@@ -2,7 +2,7 @@ import type { CSSProperties } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 /**
- * Tipografía del texto en pills del dock (referencia visual: «Bits»).
+ * Tipografía del texto en pills del dock (referencia visual: «También cuenta»).
  * Una sola definición en inline style + CSS para evitar user-agent de `<button>`.
  */
 export const MAP_HOME_DOCK_LABEL_STYLE: CSSProperties = {

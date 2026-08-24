@@ -17,8 +17,6 @@ import {
 const AMBIENT_OPTS = [
   { id: 'universo' as const, label: 'Universo', desc: 'Sonido del espacio', place: 'Espacio', country: '—' },
   { id: 'mar' as const, label: 'Mar', desc: 'Olas, calma', place: 'Océano', country: '—' },
-  { id: 'ciudad' as const, label: 'Ciudad', desc: 'Urbano, presente', place: 'Ciudad', country: 'Varios' },
-  { id: 'viento' as const, label: 'Viento', desc: 'Aire, naturaleza', place: 'Naturaleza', country: '—' },
   { id: 'radio' as const, label: 'Radios comunitarias', desc: 'Voces y transmisiones', place: 'Radio', country: '—' },
   { id: 'lluvia' as const, label: 'Lluvia en ciudades', desc: 'Lluvia en distintas ciudades', place: 'Lluvia', country: 'Varias ciudades' },
   { id: 'mercado' as const, label: 'Mercados', desc: 'Ambiente de mercado', place: 'Mercado', country: '—' },
@@ -223,7 +221,17 @@ export function SoundsPanel({
   }, []);
 
   const publicPathsDeduped = useMemo(
-    () => dedupePublicAudioPaths(publicPaths),
+    () =>
+      dedupePublicAudioPaths(publicPaths).filter((p) => {
+        const n = p.toLowerCase();
+        return !(
+          n.endsWith('/neblina.mp3') ||
+          n.endsWith('/amanecer.mp3') ||
+          n.endsWith('/anochecer.mp3') ||
+          n.endsWith('/dia.mp3') ||
+          n.endsWith('/auto.mp3')
+        );
+      }),
     [publicPaths]
   );
 

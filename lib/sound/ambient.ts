@@ -208,7 +208,7 @@ export function setAmbientOrPublicTrackVolume(id: string, vol: number): void {
 const AMBIENT_MASTER_VOL = 1.0;
 
 /** Volumen base actual (0–1) para la atmósfera temporal. */
-let ambientBaseVolume = 0.95;
+let ambientBaseVolume = 0.2;
 
 /** Crea el contexto solo tras un gesto del usuario (evita el aviso de AudioContext en consola). */
 export function initFromUserGesture(): void {

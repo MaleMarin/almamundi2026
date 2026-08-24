@@ -433,6 +433,39 @@ a.home-map-neu-pill.btn-almamundi:visited {
   background: rgba(136, 150, 170, 0.4);
 }
 
+/* «También cuenta» es más largo que «Bits»: en celular, menos padding y fuente más chica para que quepa sin cortar ni dos renglones. */
+@media (max-width: 639px) {
+  #map-dock-slot .home-map-neu-pill.btn-almamundi,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi:hover,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi:active,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'],
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'],
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
+    padding: 0 11px !important;
+    font-size: 0.75rem !important;
+  }
+
+  #map-dock-slot .map-dock-row {
+    column-gap: 8px;
+  }
+}
+
+@media (max-width: 380px) {
+  #map-dock-slot .home-map-neu-pill.btn-almamundi,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi:hover,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi:active,
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'],
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'],
+  #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
+    padding: 0 8px !important;
+    font-size: 0.6875rem !important;
+  }
+
+  #map-dock-slot .map-dock-row {
+    column-gap: 6px;
+  }
+}
+
 /* Anti-banding: ruido muy sutil en toda la atmósfera del mapa. */
 .map-section-atmosphere::after {
   content: "";
