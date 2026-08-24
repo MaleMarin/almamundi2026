@@ -11,9 +11,8 @@ export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais' | 'lat' | 'lon'>
   fuenteUrl?: string;
 };
 
-function openStreetMapUrl(lat: number, lon: number): string {
-  const z = lat === 0 && lon === 0 ? 2 : 7;
-  return `https://www.openstreetmap.org/#map=${z}/${lat}/${lon}`;
+function googleMapsUrl(lat: number, lon: number): string {
+  return `https://www.google.com/maps?q=${lat},${lon}`;
 }
 
 const linkButtonStyle = (density: 'compact' | 'readable'): React.CSSProperties => ({
@@ -59,7 +58,7 @@ function idLabel(id: number): string {
   return id < 100 ? String(id).padStart(2, '0') : String(id);
 }
 
-function BitsPanelIntro({ onSubirMiHistoria }: { onSubirMiHistoria: () => void }) {
+function BitsPanelIntro() {
   return (
     <div style={{ flexShrink: 0, margin: '0 0 14px' }}>
       <p
@@ -67,32 +66,11 @@ function BitsPanelIntro({ onSubirMiHistoria }: { onSubirMiHistoria: () => void }
           fontSize: 13,
           color: 'rgba(248, 250, 255, 0.82)',
           lineHeight: 1.5,
-          margin: '0 0 10px',
+          margin: 0,
         }}
       >
         El mundo está lleno de historias sorprendentes. La tuya también merece contarse.
       </p>
-      <button
-        type="button"
-        onClick={onSubirMiHistoria}
-        style={{
-          padding: '8px 16px',
-          borderRadius: 999,
-          cursor: 'pointer',
-          fontFamily: SITE_FONT_STACK,
-          outline: 'none',
-          WebkitTapHighlightColor: 'transparent',
-          color: '#ffffff',
-          fontSize: 12,
-          fontWeight: 600,
-          letterSpacing: '0.04em',
-          background: 'linear-gradient(180deg, #ff5f1a 0%, #e63e00 100%)',
-          border: '1px solid rgba(255, 170, 110, 0.9)',
-          boxShadow: '0 6px 20px rgba(255, 69, 0, 0.4), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
-        }}
-      >
-        Cuenta tu historia
-      </button>
     </div>
   );
 }
@@ -335,12 +313,12 @@ function BitDetailCompact({
         }}
       >
         <a
-          href={openStreetMapUrl(bit.lat, bit.lon)}
+          href={googleMapsUrl(bit.lat, bit.lon)}
           target="_blank"
           rel="noopener noreferrer"
           style={linkButtonStyle(density)}
         >
-          Ver ubicación en mapa (OpenStreetMap)
+          Ver ubicación en Google Maps
         </a>
       </div>
 
@@ -382,7 +360,7 @@ export function BitsPanel({
   if (!showIndexList) {
     return (
       <div className="flex flex-col" style={{ fontFamily: SITE_FONT_STACK }}>
-        <BitsPanelIntro onSubirMiHistoria={onSubirMiHistoria} />
+        <BitsPanelIntro />
         <div className="min-w-0 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
           {selectedBit ? (
             <BitDetailCompact
@@ -417,7 +395,7 @@ export function BitsPanel({
       className="flex min-h-[min(360px,52vh)] w-full flex-col gap-2"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
-      <BitsPanelIntro onSubirMiHistoria={onSubirMiHistoria} />
+      <BitsPanelIntro />
       <div className="flex min-h-0 flex-1 flex-col gap-2 md:flex-row md:gap-0">
       <div className="flex max-h-[min(40vh,300px)] min-h-0 shrink-0 flex-col border-white/10 md:max-h-none md:w-[112px] md:flex-none md:border-r md:pr-2">
         <p

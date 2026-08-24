@@ -300,7 +300,7 @@ function BitDot({
         >
           <sphereGeometry args={[1, 10, 10]} />
           <meshBasicMaterial
-            color="#f2f4f8"
+            color="#ff5f1a"
             transparent
             opacity={magneticActive && !selected ? 0.88 : 0.72}
             depthWrite={false}
