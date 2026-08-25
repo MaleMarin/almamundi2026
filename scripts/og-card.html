@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <title>AlmaMundi OG</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        overflow: hidden;
+      }
+      .card {
+        box-sizing: border-box;
+        width: 1200px;
+        height: 630px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 28px;
+        padding: 48px 64px 52px;
+        background: linear-gradient(165deg, #ab301c 0%, #8f2717 100%);
+        font-family: system-ui, -apple-system, 'Segoe UI', Avenir, sans-serif;
+      }
+      /* Copia de `.almamundi-footer-title` en app/globals.css (relieve neumórfico). */
+      .almamundi-footer-title {
+        display: block;
+        width: max-content;
+        max-width: 100%;
+        text-align: center;
+        margin-inline: auto;
+        padding-inline-end: 0.06em;
+        color: #e0e5ec;
+        font-family: system-ui, -apple-system, 'Segoe UI', Avenir, sans-serif;
+        font-weight: 900;
+        font-size: 7rem;
+        letter-spacing: -0.06em;
+        line-height: 0.9;
+        white-space: nowrap;
+        text-shadow:
+          -0.01em -0.01em 0.02em rgba(255, 255, 255, 0.95),
+          0.01em 0.01em 0.02em rgba(163, 177, 198, 0.85),
+          -0.03em -0.03em 0.06em rgba(255, 255, 255, 0.8),
+          0.03em 0.03em 0.06em rgba(163, 177, 198, 0.7),
+          -0.06em -0.06em 0.12em rgba(255, 255, 255, 0.6),
+          0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
+      }
+      .tagline {
+        margin: 0;
+        max-width: 52rem;
+        color: rgba(224, 229, 236, 0.94);
+        font-size: 1.35rem;
+        font-weight: 400;
+        line-height: 1.4;
+        letter-spacing: 0.01em;
+        text-align: center;
+      }
+      .pills {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 4px;
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 9999px;
+        border: 1px solid rgba(224, 229, 236, 0.42);
+        background: rgba(224, 229, 236, 0.1);
+        color: #e0e5ec;
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 0.55rem 1.15rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <span class="almamundi-footer-title">ALMAMUNDI</span>
+      <p class="tagline">
+        AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que
+        despiertan otras historias.
+      </p>
+      <div class="pills">
+        <span class="pill">Video</span>
+        <span class="pill">Audio</span>
+        <span class="pill">Escrito</span>
+        <span class="pill">Foto</span>
+      </div>
+    </div>
+  </body>
+</html>

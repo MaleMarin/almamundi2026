@@ -73,11 +73,20 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'es_CL',
     siteName: 'AlmaMundi',
+    images: [
+      {
+        url: '/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
+      },
+    ],
   },
   twitter: {
-    card: 'summary',
+    card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+    images: ['/og-image.png'],
   },
   /**
    * Favicon: `public/artemis.ico` → `/artemis.ico`.
