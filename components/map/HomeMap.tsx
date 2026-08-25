@@ -757,7 +757,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="map-dock-row" role="toolbar" aria-label="Capas y herramientas del mapa">
               <PillNavButton
                 dock
-                layerOn={globeLayers.stories}
+                active={drawerOpen && drawerMode === 'stories'}
                 title={globeLayers.stories ? 'Historias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar historias en el globo'}
                 onClick={() => onGlobeLayerPill('stories', 'stories')}
               >
@@ -765,7 +765,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               </PillNavButton>
               <PillNavButton
                 dock
-                layerOn={globeLayers.bits}
+                active={drawerOpen && drawerMode === 'bits'}
                 title={globeLayers.bits ? 'También cuenta está visible. Clic para ver la ficha o apagar la capa.' : 'Mostrar También cuenta en el globo'}
                 onClick={() => onGlobeLayerPill('bits', 'bits')}
               >
@@ -773,13 +773,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               </PillNavButton>
               <PillNavButton
                 dock
-                layerOn={globeLayers.news}
+                active={drawerOpen && drawerMode === 'news'}
                 title={globeLayers.news ? 'Noticias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar noticias en el globo'}
                 onClick={() => onGlobeLayerPill('news', 'news')}
               >
                 Noticias
               </PillNavButton>
-            <div className="map-dock-sep" aria-hidden />
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'sounds'}

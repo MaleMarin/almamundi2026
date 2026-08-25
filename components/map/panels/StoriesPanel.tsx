@@ -278,7 +278,7 @@ export function StoriesPanel({
               lineHeight: 1.5,
               fontFamily: SITE_FONT_STACK,
             }}>
-              Todavía no hay historias públicas aquí. Cuando aparezca la primera, se verá en el mapa.
+              Este mapa se construye con historias como la tuya.
             </p>
             {onContarMiHistoria && (
               <button

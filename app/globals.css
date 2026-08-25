@@ -426,13 +426,6 @@ a.home-map-neu-pill.btn-almamundi:visited {
   min-width: 100%;
 }
 
-#map-dock-slot .map-dock-sep {
-  width: 1px;
-  height: 18px;
-  margin: 0;
-  background: rgba(136, 150, 170, 0.4);
-}
-
 /* «También cuenta» es más largo que «Bits»: en celular, menos padding y fuente más chica para que quepa sin cortar ni dos renglones. */
 @media (max-width: 639px) {
   #map-dock-slot .home-map-neu-pill.btn-almamundi,
