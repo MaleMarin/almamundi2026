@@ -55,13 +55,30 @@ function defaultMetadataBase(): URL {
   return new URL('http://localhost:3000');
 }
 
+const SITE_TITLE =
+  'AlmaMundi — Historias de vida contadas por sus protagonistas';
+const SITE_DESCRIPTION =
+  'El lugar donde las historias no se pierden en el scroll: relatos de vida en video, audio, texto o foto.';
+
 export const metadata: Metadata = {
   metadataBase: defaultMetadataBase(),
   title: {
-    default: 'AlmaMundi',
+    default: SITE_TITLE,
     template: '%s · AlmaMundi',
   },
-  description: 'Explora el mapa',
+  description: SITE_DESCRIPTION,
+  openGraph: {
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    type: 'website',
+    locale: 'es_CL',
+    siteName: 'AlmaMundi',
+  },
+  twitter: {
+    card: 'summary',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
   /**
    * Favicon: `public/artemis.ico` → `/artemis.ico`.
    * Apple: convención `app/apple-icon.png` (icono al guardar en pantalla de inicio).
