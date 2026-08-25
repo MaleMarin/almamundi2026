@@ -51,7 +51,7 @@ export const UPLOAD_PHOTO_MAX_MESSAGE = 'Solo puedes subir hasta 8 fotos.';
 export const UPLOAD_EXTRA_TYPE_ERROR =
   'Los adjuntos solo pueden ser imágenes: JPG, PNG, WEBP o HEIC.';
 
-export type UploadFailureKind = 'video' | 'audio' | 'foto' | 'extra' | 'generic';
+export type UploadFailureKind = 'video' | 'audio' | 'texto' | 'foto' | 'extra' | 'generic';
 
 /** Traduce códigos del servidor / fallos de fetch a un mensaje usable. */
 export function messageForUploadError(
