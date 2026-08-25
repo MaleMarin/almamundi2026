@@ -26,17 +26,25 @@ import {
   isDurationWithinMax,
 } from '@/lib/media-duration-rules';
 import {
+  SUBIR_AUDIO_FILE_ACCEPT,
   SUBIR_AUDIO_UPLOAD_MAX_MB,
+  SUBIR_EXTRA_FILE_ACCEPT,
   SUBIR_PHOTO_FILE_MAX_MB,
   SUBIR_PHOTO_MAX,
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
+  SUBIR_VIDEO_FILE_ACCEPT,
   SUBIR_VIDEO_UPLOAD_MAX_MB,
+  isAllowedAudioUploadFile,
+  isAllowedExtraAttachmentFile,
+  isAllowedVideoUploadFile,
 } from '@/lib/subir-limits';
 import {
   UPLOAD_DURATION_ERROR,
+  UPLOAD_EXTRA_TYPE_ERROR,
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
+  messageForUploadError,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
@@ -789,6 +797,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     if (!files) return;
 
     const next = Array.from(files).filter((f) => {
+      if (!isAllowedExtraAttachmentFile(f)) {
+        setErr(UPLOAD_EXTRA_TYPE_ERROR);
+        return false;
+      }
       const okSize = f.size <= MAX_EXTRA_FILE_MB * 1024 * 1024;
       if (!okSize) {
         setErr(`Un archivo supera ${MAX_EXTRA_FILE_MB}MB. Prueba con uno más liviano.`);
@@ -1053,11 +1065,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setStep('received');
     } catch (e) {
       console.error('[StoryModal] submit', e);
-      setErr(
-        e instanceof Error && e.message.includes('Firebase')
-          ? 'Subida no configurada. Configura Firebase en .env.local.'
-          : 'No pudimos enviar. Revisa tu conexión e intenta de nuevo.'
-      );
+      setErr(messageForUploadError(e, mode));
     } finally {
       setSaving(false);
     }
@@ -1335,12 +1343,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <input
                   id="story-video-file"
                   type="file"
-                  accept="video/mp4,video/webm,video/quicktime,video/*"
+                  accept={SUBIR_VIDEO_FILE_ACCEPT}
                   aria-label="Elegir video desde tu equipo"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
                     if (!f) {
+                      setUploadVideoFile(null);
+                      return;
+                    }
+                    if (!isAllowedVideoUploadFile(f)) {
+                      setErr('Este formato de video no es compatible. Prueba con .mp4, .webm o .mov.');
                       setUploadVideoFile(null);
                       return;
                     }
@@ -1503,12 +1516,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <input
                   id="story-audio-file"
                   type="file"
-                  accept="audio/mpeg,audio/wav,audio/x-wav,audio/mp4,audio/m4a,audio/*"
+                  accept={SUBIR_AUDIO_FILE_ACCEPT}
                   aria-label="Elegir audio desde tu equipo"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
                     if (!f) {
+                      setUploadAudioFile(null);
+                      return;
+                    }
+                    if (!isAllowedAudioUploadFile(f)) {
+                      setErr('Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav.');
                       setUploadAudioFile(null);
                       return;
                     }
@@ -1741,8 +1759,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <span>{t.modalAttach}</span>
-                        <input type="file" multiple className="hidden" onChange={(e) => addExtraFiles(e.target.files)} />
+                        <input
+                          type="file"
+                          multiple
+                          accept={SUBIR_EXTRA_FILE_ACCEPT}
+                          className="hidden"
+                          onChange={(e) => addExtraFiles(e.target.files)}
+                        />
                       </label>
+                      <p className="mt-0.5 text-[10px] leading-tight text-gray-500">
+                        JPG, PNG, WEBP o HEIC.
+                      </p>
                       {extraFiles.length > 0 && (
                         <ul className="mt-1 max-h-14 space-y-0.5 overflow-y-auto text-[10px] text-gray-700">
                           {extraFiles.map((f, idx) => (

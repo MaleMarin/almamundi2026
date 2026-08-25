@@ -21,9 +21,11 @@ function inferContentType(blob: Blob, filename: string): string {
   if (n.endsWith('.webp')) return 'image/webp';
   if (n.endsWith('.gif')) return 'image/gif';
   if (n.endsWith('.mp4')) return 'video/mp4';
+  if (n.endsWith('.mov')) return 'video/quicktime';
   if (n.endsWith('.webm')) return 'video/webm';
   if (n.endsWith('.mp3')) return 'audio/mpeg';
   if (n.endsWith('.m4a')) return 'audio/mp4';
+  if (n.endsWith('.wav')) return 'audio/wav';
   return declared || 'application/octet-stream';
 }
 

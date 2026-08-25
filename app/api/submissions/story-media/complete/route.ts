@@ -57,6 +57,7 @@ export async function POST(req: NextRequest) {
       "empty_object",
       "file_too_large",
       "content_type_mismatch",
+      "duration_too_long",
       "invalid_storage_path",
       "upload_expired",
     ];

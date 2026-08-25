@@ -46,16 +46,11 @@ const SIGS: { mime: string; check: (b: Buffer) => boolean }[] = [
   },
   {
     mime: "video/mp4",
-    check: (b) => {
-      if (b.length < 12) return false;
-      for (let i = 0; i <= Math.min(b.length - 12, 32); i++) {
-        if (b[i] === 0 && b[i + 1] === 0 && b[i + 2] === 0 && b[i + 3] === 0x18 && b[i + 4] === 0x66 && b[i + 5] === 0x74 && b[i + 6] === 0x79 && b[i + 7] === 0x70)
-          return true;
-        if (b[i] === 0 && b[i + 1] === 0 && b[i + 2] === 0 && b[i + 3] === 0x20 && b[i + 4] === 0x66 && b[i + 5] === 0x74 && b[i + 6] === 0x79 && b[i + 7] === 0x70)
-          return true;
-      }
-      return false;
-    },
+    check: isIsoBmffNotHeic,
+  },
+  {
+    mime: "video/quicktime",
+    check: isIsoBmffNotHeic,
   },
   {
     mime: "video/webm",
@@ -83,14 +78,11 @@ const SIGS: { mime: string; check: (b: Buffer) => boolean }[] = [
   },
   {
     mime: "audio/mp4",
-    check: (b) => {
-      if (b.length < 12) return false;
-      for (let i = 0; i <= Math.min(b.length - 12, 24); i++) {
-        if (b[i] === 0 && b[i + 1] === 0 && b[i + 2] === 0 && b[i + 3] === 0x18 && b[i + 4] === 0x66 && b[i + 5] === 0x74 && b[i + 6] === 0x79 && b[i + 7] === 0x70)
-          return true;
-      }
-      return false;
-    },
+    check: isIsoBmffNotHeic,
+  },
+  {
+    mime: "audio/wav",
+    check: isRiffWave,
   },
   {
     mime: "image/heic",
@@ -115,8 +107,40 @@ function isHeicLike(b: Buffer): boolean {
   );
 }
 
+/** MP4 / MOV / M4A: caja `ftyp` (iPhone usa tamaño 0x14, no solo 0x18/0x20). */
+function isIsoBmffNotHeic(b: Buffer): boolean {
+  if (b.length < 12) return false;
+  const ftypAt = b.indexOf("ftyp", 0, "ascii");
+  if (ftypAt < 4 || ftypAt > 32) return false;
+  return !isHeicLike(b);
+}
+
+function isRiffWave(b: Buffer): boolean {
+  return (
+    b.length >= 12 &&
+    b[0] === 0x52 &&
+    b[1] === 0x49 &&
+    b[2] === 0x46 &&
+    b[3] === 0x46 &&
+    b[8] === 0x57 &&
+    b[9] === 0x41 &&
+    b[10] === 0x56 &&
+    b[11] === 0x45
+  );
+}
+
+/** Alias de navegador → MIME canónico de esta lista. */
+export function canonicalizeStoryMediaMime(declaredMime: string): string {
+  const m = declaredMime.split(";")[0]?.trim().toLowerCase() ?? "";
+  if (m === "audio/x-wav" || m === "audio/wave" || m === "audio/vnd.wave") return "audio/wav";
+  if (m === "audio/x-m4a" || m === "audio/m4a") return "audio/mp4";
+  if (m === "audio/mp3") return "audio/mpeg";
+  if (m === "video/x-quicktime") return "video/quicktime";
+  return m;
+}
+
 export function bufferMatchesDeclaredMime(buffer: Buffer, declaredMime: string): boolean {
-  const normalized = declaredMime.split(";")[0]?.trim().toLowerCase() ?? "";
+  const normalized = canonicalizeStoryMediaMime(declaredMime);
   const entry = SIGS.find((s) => s.mime === normalized);
   if (!entry) return false;
   return entry.check(buffer);
@@ -130,14 +154,17 @@ export const ALLOWED_STORY_MEDIA_MIMES = [
   "image/heic",
   "image/heif",
   "video/mp4",
+  "video/quicktime",
   "video/webm",
   "audio/mpeg",
   "audio/webm",
   "audio/mp4",
+  "audio/wav",
 ] as const;
 
 export type AllowedStoryMediaMime = (typeof ALLOWED_STORY_MEDIA_MIMES)[number];
 
 export function isAllowedStoryMediaMime(m: string): m is AllowedStoryMediaMime {
-  return (ALLOWED_STORY_MEDIA_MIMES as readonly string[]).includes(m.split(";")[0]?.trim().toLowerCase() ?? "");
+  const canonical = canonicalizeStoryMediaMime(m);
+  return (ALLOWED_STORY_MEDIA_MIMES as readonly string[]).includes(canonical);
 }

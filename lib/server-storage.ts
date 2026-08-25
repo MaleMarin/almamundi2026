@@ -1,5 +1,10 @@
 import "server-only";
 import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
+import { MAX_AUDIO_VIDEO_DURATION_SECONDS } from "@/lib/media-duration-rules";
+import {
+  durationSecondsFromMediaBytes,
+  isAudioOrVideoMime,
+} from "@/lib/media-duration-probe";
 import { getAdminBucket } from "@/lib/firebase/admin";
 import { areUploadsPaused } from "@/lib/ops/usage-state";
 
@@ -120,11 +125,38 @@ export async function finalizePrivateSubmissionObject(opts: {
     throw new Error("file_too_large");
   }
 
-  const end = Math.min(size, 512) - 1;
-  const [head] = await file.download({ start: 0, end: Math.max(0, end) });
-  if (!bufferMatchesDeclaredMime(Buffer.from(head), opts.declaredMime)) {
+  const av = isAudioOrVideoMime(opts.declaredMime);
+  const headLen = Math.min(size, av ? 1024 * 1024 : 512);
+  const [head] = await file.download({
+    start: 0,
+    end: Math.max(0, headLen - 1),
+  });
+  const headBuf = Buffer.from(head);
+  if (!bufferMatchesDeclaredMime(headBuf, opts.declaredMime)) {
     await file.delete({ ignoreNotFound: true }).catch(() => undefined);
     throw new Error("content_type_mismatch");
+  }
+
+  if (av) {
+    let tail: Buffer | undefined;
+    if (size > headLen) {
+      const tailLen = Math.min(size - headLen, 1024 * 1024);
+      const [t] = await file.download({
+        start: size - tailLen,
+        end: size - 1,
+      });
+      tail = Buffer.from(t);
+    }
+    const sec = durationSecondsFromMediaBytes({
+      mime: opts.declaredMime,
+      head: headBuf,
+      tail,
+      totalSize: size,
+    });
+    if (sec != null && sec > MAX_AUDIO_VIDEO_DURATION_SECONDS) {
+      await file.delete({ ignoreNotFound: true }).catch(() => undefined);
+      throw new Error("duration_too_long");
+    }
   }
 
   const readMs = Math.min(
@@ -180,7 +212,7 @@ export async function savePrivateSubmissionObject(opts: {
 
 function pickExtension(contentType: string, filename: string): string {
   const lower = filename.toLowerCase();
-  const fromName = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".heif", ".mp4", ".webm", ".mp3", ".m4a", ".wav", ".ogg"]
+  const fromName = [".png", ".jpg", ".jpeg", ".webp", ".gif", ".heic", ".heif", ".mp4", ".mov", ".webm", ".mp3", ".m4a", ".wav", ".ogg"]
     .find((e) => lower.endsWith(e));
   if (fromName) return "";
 
@@ -191,10 +223,14 @@ function pickExtension(contentType: string, filename: string): string {
   if (contentType === "image/heic") return ".heic";
   if (contentType === "image/heif") return ".heif";
   if (contentType === "video/mp4") return ".mp4";
+  if (contentType === "video/quicktime") return ".mov";
   if (contentType === "video/webm") return ".webm";
   if (contentType === "audio/mpeg") return ".mp3";
   if (contentType === "audio/webm") return ".webm";
   if (contentType === "audio/mp4" || contentType === "audio/x-m4a") return ".m4a";
+  if (contentType === "audio/wav" || contentType === "audio/x-wav" || contentType === "audio/wave") {
+    return ".wav";
+  }
   return "";
 }
 

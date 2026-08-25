@@ -5,7 +5,7 @@
 
 import { z } from "zod";
 import { THEME_IDS } from "@/lib/themes";
-import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
+import { SUBIR_PHOTO_MAX, SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from "@/lib/subir-author-fields";
 
 const privatePathRegex =
@@ -40,8 +40,8 @@ export const CreateSubmissionBody = z.object({
   payload: z.object({
     textBody: z.string().max(SUBIR_TEXT_MAX_CHARS).optional(),
     photoUrl: z.string().url().optional(),
-    /** Galería 1–6 imágenes; `photoUrl` suele repetir la primera para compatibilidad. */
-    photoUrls: z.array(z.string().url()).max(6).optional(),
+    /** Galería 1–8 imágenes; `photoUrl` suele repetir la primera para compatibilidad. */
+    photoUrls: z.array(z.string().url()).max(SUBIR_PHOTO_MAX).optional(),
     audioUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
   }),
