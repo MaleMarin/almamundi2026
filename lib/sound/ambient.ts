@@ -204,11 +204,15 @@ export function setAmbientOrPublicTrackVolume(id: string, vol: number): void {
   setAmbientTrackVolume(id as AmbientKey, vol);
 }
 
-/** Volumen base nominal del master. Más alto para que el sonido del universo se oiga bien. */
+/** Volumen base nominal del master. */
 const AMBIENT_MASTER_VOL = 1.0;
 
-/** Volumen base actual (0–1) para la atmósfera temporal. */
-let ambientBaseVolume = 0.2;
+/** Volumen base actual (0–1) para la atmósfera del mapa. */
+let ambientBaseVolume = 0.1;
+
+function ambientMasterTarget(): number {
+  return ambientBaseVolume * AMBIENT_MASTER_VOL;
+}
 
 /** Crea el contexto solo tras un gesto del usuario (evita el aviso de AudioContext en consola). */
 export function initFromUserGesture(): void {
@@ -218,7 +222,7 @@ export function initFromUserGesture(): void {
   }
   state.ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   state.master = state.ctx.createGain();
-  state.master.gain.value = AMBIENT_MASTER_VOL;
+  state.master.gain.value = ambientMasterTarget();
   state.master.connect(state.ctx.destination);
   state.ctx.resume();
 }
@@ -233,9 +237,9 @@ function restoreAmbientMasterGain() {
   const t = state.ctx.currentTime;
   try {
     state.master.gain.cancelScheduledValues(t);
-    state.master.gain.setValueAtTime(ambientBaseVolume * AMBIENT_MASTER_VOL, t);
+    state.master.gain.setValueAtTime(ambientMasterTarget(), t);
   } catch {
-    state.master.gain.value = ambientBaseVolume * AMBIENT_MASTER_VOL;
+    state.master.gain.value = ambientMasterTarget();
   }
 }
 
@@ -499,12 +503,12 @@ export function stopAmbient() {
 export function setAmbientEnabled(enabled: boolean) {
   if (!state.master || !state.ctx) return;
   const ramp = enabled ? 0.08 : 0.15;
-  state.master.gain.setTargetAtTime(enabled ? AMBIENT_MASTER_VOL : 0.0, state.ctx.currentTime, ramp);
+  state.master.gain.setTargetAtTime(enabled ? ambientMasterTarget() : 0.0, state.ctx.currentTime, ramp);
 }
 
 export function duckAmbient(duck: boolean) {
   if (!state.master || !state.ctx) return;
-  state.master.gain.setTargetAtTime(duck ? 0.15 : AMBIENT_MASTER_VOL, state.ctx.currentTime, 0.08);
+  state.master.gain.setTargetAtTime(duck ? 0.05 : ambientMasterTarget(), state.ctx.currentTime, 0.08);
 }
 
 export function getAmbientUnlocked() {
@@ -533,7 +537,7 @@ export function setAmbientBaseVolume(targetVol: number, durationMs = 3000) {
   state.master.gain.cancelScheduledValues(now);
   state.master.gain.setValueAtTime(state.master.gain.value, now);
   state.master.gain.linearRampToValueAtTime(
-    ambientBaseVolume * AMBIENT_MASTER_VOL,
+    ambientMasterTarget(),
     now + durationMs / 1000
   );
 }
