@@ -4,6 +4,10 @@
     <meta charset="utf-8" />
     <title>AlmaMundi OG</title>
     <style>
+      :root {
+        --font-sans: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
+        --home-bg: #e0e5ec;
+      }
       html,
       body {
         margin: 0;
@@ -19,12 +23,36 @@
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 28px;
-        padding: 48px 64px 52px;
+        gap: 0;
+        padding: 0;
         background: linear-gradient(165deg, #ab301c 0%, #8f2717 100%);
-        font-family: system-ui, -apple-system, 'Segoe UI', Avenir, sans-serif;
+        font-family: var(--font-sans);
       }
-      /* Copia de `.almamundi-footer-title` en app/globals.css (relieve neumórfico). */
+      /*
+        Superficie del footer (`bg-[#E0E5EC]` en Footer.tsx).
+        El relieve de `.almamundi-footer-title` usa fill #E0E5EC: solo se lee
+        igual al sitio si el fondo detrás de las letras es ese gris, no el naranja.
+      */
+      .almamundi-footer {
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #e0e5ec;
+        padding: 36px 48px 28px;
+      }
+      .almamundi-footer-brand {
+        display: flex;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        overflow-x: clip;
+        text-align: center;
+        container-type: inline-size;
+      }
+      /* Copia literal de `.almamundi-footer-title` en app/globals.css */
       .almamundi-footer-title {
         display: block;
         width: max-content;
@@ -33,9 +61,9 @@
         margin-inline: auto;
         padding-inline-end: 0.06em;
         color: #e0e5ec;
-        font-family: system-ui, -apple-system, 'Segoe UI', Avenir, sans-serif;
+        font-family: var(--font-sans);
         font-weight: 900;
-        font-size: 7rem;
+        font-size: clamp(3rem, 16.5cqi, 12rem);
         letter-spacing: -0.06em;
         line-height: 0.9;
         white-space: nowrap;
@@ -47,11 +75,20 @@
           -0.06em -0.06em 0.12em rgba(255, 255, 255, 0.6),
           0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
       }
+      .lower {
+        box-sizing: border-box;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+        padding: 28px 64px 36px;
+      }
       .tagline {
         margin: 0;
         max-width: 52rem;
         color: rgba(224, 229, 236, 0.94);
-        font-size: 1.35rem;
+        font-size: 1.28rem;
         font-weight: 400;
         line-height: 1.4;
         letter-spacing: 0.01em;
@@ -62,7 +99,6 @@
         flex-wrap: wrap;
         justify-content: center;
         gap: 12px;
-        margin-top: 4px;
       }
       .pill {
         display: inline-flex;
@@ -82,16 +118,22 @@
   </head>
   <body>
     <div class="card">
-      <span class="almamundi-footer-title">ALMAMUNDI</span>
-      <p class="tagline">
-        AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que
-        despiertan otras historias.
-      </p>
-      <div class="pills">
-        <span class="pill">Video</span>
-        <span class="pill">Audio</span>
-        <span class="pill">Escrito</span>
-        <span class="pill">Foto</span>
+      <div class="almamundi-footer">
+        <div class="almamundi-footer-brand">
+          <span class="almamundi-footer-title">AlmaMundi</span>
+        </div>
+      </div>
+      <div class="lower">
+        <p class="tagline">
+          AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que
+          despiertan otras historias.
+        </p>
+        <div class="pills">
+          <span class="pill">Video</span>
+          <span class="pill">Audio</span>
+          <span class="pill">Escrito</span>
+          <span class="pill">Foto</span>
+        </div>
       </div>
     </div>
   </body>
