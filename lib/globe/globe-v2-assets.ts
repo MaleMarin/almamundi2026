@@ -102,8 +102,8 @@ export const GLOBE_V2_LAND_MASK_SPEC_OPEN_WATER = 0.82;
  *   (tierra oscura / mar claro → volumen aproximado; sustituir por DEM si hace falta).
  */
 export const GLOBE_V2_TEXTURE_URLS = {
-  /** Day 8K local (Blue Marble). */
-  day: '/8k_earth_daymap.jpg',
+  /** NASA Blue Marble Next Generation (equirectangular 2:1, dominio público). */
+  day: '/earth-day-nasa.jpg',
   normal: `${GLOBE_V2_TEXTURE_BASE}/earth_normal_2048.jpg`,
   /** PASO B: nubes 4K WebP con alpha real; carga diferida (idle) para no romper presupuesto ~8 MB. */
   clouds: '/textures/earth-clouds-4k.webp',
@@ -194,11 +194,11 @@ export const GLOBE_V2_ASSET_AUDIT: GlobeV2AssetAuditEntry[] = [
   {
     id: 'day',
     urlOrNote: GLOBE_V2_TEXTURE_URLS.day,
-    nominalSize: '8192 × 4096 (2:1 equirectangular)',
+    nominalSize: '4096 × 2048 (2:1 equirectangular)',
     format: 'JPEG',
-    compression: 'Lossy (~4.6 MB local /8k_earth_daymap.jpg)',
+    compression: 'Lossy (~1.6 MB local /earth-day-nasa.jpg)',
     premiumVerdict: 'strong',
-    note: 'PASO 1: day 8K local; mipmaps + anisotropy vía setTextureQuality en GlobeV2.',
+    note: 'NASA Blue Marble Next Generation (dic. 2004); mipmaps + anisotropy vía setTextureQuality en GlobeV2.',
   },
   {
     id: 'normal',

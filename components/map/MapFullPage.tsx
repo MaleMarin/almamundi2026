@@ -364,8 +364,8 @@ const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
 /** Texturas estáticas (mismo origen, más rápido que /api/globe-texture en primera carga). */
 const GLOBE_IMAGE_LOCAL = '/8k_earth_nightmap.jpg';
-const GLOBE_IMAGE_DAY_LOCAL = '/8k_earth_daymap.jpg';
-const GLOBE_IMAGE_DAY_OR_FALLBACK = '/8k_earth_daymap.jpg';
+const GLOBE_IMAGE_DAY_LOCAL = '/earth-day-nasa.jpg';
+const GLOBE_IMAGE_DAY_OR_FALLBACK = '/earth-day-nasa.jpg';
 /** Bump map deshabilitado (unpkg puede dar CORS y deja el globo en círculo oscuro). */
 const GLOBE_BUMP_IMAGE: string | null = null;
 
