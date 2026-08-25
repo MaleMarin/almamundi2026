@@ -76,15 +76,18 @@ function BitsPanelIntro() {
 }
 
 const rowBase: React.CSSProperties = {
-  display: 'block',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  gap: 2,
   width: '100%',
   textAlign: 'left',
   cursor: 'pointer',
   fontFamily: SITE_FONT_STACK,
   border: 'none',
   borderRadius: 8,
-  padding: '5px 6px',
-  marginBottom: 2,
+  padding: '8px 10px',
+  marginBottom: 4,
   transition: 'background 160ms ease, border-color 160ms ease',
 };
 
@@ -104,29 +107,20 @@ function BitIndexRow({
       onClick={onClick}
       style={{
         ...rowBase,
-        background: isActive
-          ? 'linear-gradient(90deg, rgba(255, 69, 0, 0.38) 0%, rgba(255, 95, 30, 0.18) 100%)'
-          : 'linear-gradient(145deg, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0.05) 100%)',
-        backdropFilter: 'blur(12px) saturate(1.2)',
-        WebkitBackdropFilter: 'blur(12px) saturate(1.2)',
-        border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.2)'}`,
+        background: isActive ? 'rgba(255, 69, 0, 0.28)' : 'rgba(255,255,255,0.08)',
+        border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.16)'}`,
         borderLeft: isActive ? '2px solid #ff4500' : '2px solid transparent',
-        boxShadow: isActive ? 'inset 0 1px 0 rgba(255, 200, 150, 0.35), 0 0 12px rgba(255, 69, 0, 0.2)' : 'inset 0 1px 0 rgba(255,255,255,0.15)',
       }}
     >
-      <span style={{ fontSize: 9, color: '#ff5719', letterSpacing: '0.12em', display: 'block' }}>
+      <span style={{ fontSize: 11, color: '#ff5719', letterSpacing: '0.08em', fontWeight: 600, lineHeight: 1.2 }}>
         #{num}
       </span>
       <span
         style={{
-          fontSize: 10,
-          color: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.72)',
-          lineHeight: 1.25,
-          display: '-webkit-box',
-          WebkitLineClamp: 2,
-          WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-          marginTop: 2,
+          fontSize: 13,
+          color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
+          lineHeight: 1.35,
+          fontWeight: 500,
         }}
       >
         {bit.lugar}
@@ -389,6 +383,7 @@ export function BitsPanel({
 
   const bitsList = bits as unknown as HuellaPunto[];
   const count = bitsList.length;
+  const hasSelection = selectedBit != null;
 
   return (
     <div
@@ -396,44 +391,52 @@ export function BitsPanel({
       style={{ fontFamily: SITE_FONT_STACK }}
     >
       <BitsPanelIntro />
-      <div className="flex min-h-0 flex-1 flex-col gap-2 md:flex-row md:gap-0">
-      <div className="flex max-h-[min(40vh,300px)] min-h-0 shrink-0 flex-col border-white/10 md:max-h-none md:w-[112px] md:flex-none md:border-r md:pr-2">
-        <p
-          style={{
-            fontSize: 9,
-            letterSpacing: '0.14em',
-            textTransform: 'uppercase',
-            color: 'rgba(255,255,255,0.45)',
-            margin: '0 0 6px',
-            flexShrink: 0,
-          }}
+      <div
+        className={
+          hasSelection
+            ? 'flex min-h-0 flex-1 flex-col gap-2 md:flex-row md:gap-0'
+            : 'flex min-h-0 flex-1 flex-col'
+        }
+      >
+        <div
+          className={
+            hasSelection
+              ? 'flex max-h-[min(40vh,300px)] min-h-0 shrink-0 flex-col border-white/10 md:max-h-none md:w-[140px] md:flex-none md:border-r md:pr-2'
+              : 'flex min-h-0 w-full flex-1 flex-col'
+          }
         >
-          {count} lugares
-        </p>
-        <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden md:max-h-none" style={{ scrollbarWidth: 'thin' }}>
-          {bitsList.map((_bit, index) => {
-            const item = ensureHuellaPunto(getBitAt(bitsList, index));
-            return (
-              <BitIndexRow
-                key={item.id ?? index}
-                bit={item}
-                isActive={selectedBit?.id === item.id}
-                onClick={() => onSelectBit(item)}
-              />
-            );
-          })}
-        </div>
-      </div>
-
-      <div className="min-h-0 min-w-0 flex-1 overflow-y-auto md:pl-2" style={{ scrollbarWidth: 'thin' }}>
-        {selectedBit ? (
-          <BitDetailCompact bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
-        ) : (
-          <p style={{ fontSize: 10, color: 'rgba(255,255,255,0.45)', lineHeight: 1.5, margin: '6px 0 0' }}>
-            Elegí un lugar en la lista o un punto en el globo para leer el hecho curioso de ese sitio.
+          <p
+            style={{
+              fontSize: 9,
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: 'rgba(255,255,255,0.45)',
+              margin: '0 0 6px',
+              flexShrink: 0,
+            }}
+          >
+            {count} lugares
           </p>
-        )}
-      </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'thin' }}>
+            {bitsList.map((_bit, index) => {
+              const item = ensureHuellaPunto(getBitAt(bitsList, index));
+              return (
+                <BitIndexRow
+                  key={item.id ?? index}
+                  bit={item}
+                  isActive={selectedBit?.id === item.id}
+                  onClick={() => onSelectBit(item)}
+                />
+              );
+            })}
+          </div>
+        </div>
+
+        {selectedBit ? (
+          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto md:pl-2" style={{ scrollbarWidth: 'thin' }}>
+            <BitDetailCompact bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
+          </div>
+        ) : null}
       </div>
     </div>
   );
