@@ -374,6 +374,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [country, setCountry] = useState('');
   const [email, setEmail] = useState('');
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [acceptedPublicacion, setAcceptedPublicacion] = useState(false);
+  const [acceptedTerminos, setAcceptedTerminos] = useState(false);
   const [saving, setSaving] = useState(false);
   /** Evita validar un título stale si el closure del submit no se actualizó. */
   const storyTitleRef = useRef(storyTitle);
@@ -454,6 +456,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setCountry('');
       setEmail('');
       setAcceptedPrivacy(false);
+      setAcceptedPublicacion(false);
+      setAcceptedTerminos(false);
       setUploadVideoFile(null);
       setUploadAudioFile(null);
       setVideoShareUrl('');
@@ -887,9 +891,19 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       return false;
     }
 
+    if (!acceptedPublicacion) {
+      setErr('Para enviar, autoriza la publicación pública de tu imagen, voz y/o nombre (o alias).');
+      return false;
+    }
+
+    if (!acceptedTerminos) {
+      setErr('Para enviar, acepta los Términos de Uso.');
+      return false;
+    }
+
     setErr('');
     return true;
-  }, [acceptedPrivacy, ageRange, alias, city, country, email]);
+  }, [acceptedPrivacy, acceptedPublicacion, acceptedTerminos, ageRange, alias, city, country, email]);
 
   const submitDetails = useCallback(async () => {
     if (saving) return;
@@ -1013,10 +1027,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           countryLabel: country.trim(),
           context: buildModalSubmissionContext(mode, textBody, title, city, country, extraText),
           payload,
-          consentRights: true,
-          consentCurate: true,
-          consentPostales: true,
-          consentPrivacyPolicy: true,
+          consentPrivacyPolicy: acceptedPrivacy,
+          consentPublicacion: acceptedPublicacion,
+          consentTerminos: acceptedTerminos,
           ...(profilePhotoUploaded ? { profilePhotoUrl: profilePhotoUploaded } : {}),
           ...(sex ? { sex } : {}),
           ...(ageRange ? { ageRange } : {}),
@@ -1068,6 +1081,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     extraText,
     sex,
     ageRange,
+    acceptedPrivacy,
+    acceptedPublicacion,
+    acceptedTerminos,
   ]);
 
   useEffect(() => {
@@ -1890,6 +1906,34 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   checked={acceptedPrivacy}
                   onChange={setAcceptedPrivacy}
                 />
+                <div className="flex items-start gap-2">
+                  <input
+                    id="consent-publicacion"
+                    type="checkbox"
+                    checked={acceptedPublicacion}
+                    onChange={(e) => setAcceptedPublicacion(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
+                  />
+                  <label htmlFor="consent-publicacion" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
+                    Autorizo que mi imagen, voz y/o nombre (o alias) se publiquen públicamente en AlmaMundi.
+                  </label>
+                </div>
+                <div className="flex items-start gap-2">
+                  <input
+                    id="consent-terminos"
+                    type="checkbox"
+                    checked={acceptedTerminos}
+                    onChange={(e) => setAcceptedTerminos(e.target.checked)}
+                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
+                  />
+                  <label htmlFor="consent-terminos" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
+                    Acepto los{' '}
+                    <a className="text-orange-600 underline" href="/terminos" target="_blank" rel="noreferrer">
+                      Términos de Uso
+                    </a>
+                    .
+                  </label>
+                </div>
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
                 <div className="flex flex-wrap justify-end gap-2">
                   <button
@@ -1906,7 +1950,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   <button
                     type="button"
                     onClick={submitDetails}
-                    disabled={saving}
+                    disabled={
+                      saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
+                    }
                     className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
                     style={{ ...soft.button, backgroundColor: '#F97316' }}
                   >

@@ -45,11 +45,12 @@ export const CreateSubmissionBody = z.object({
     audioUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
   }),
-  consentRights: z.literal(true),
-  consentCurate: z.literal(true),
-  consentPostales: z.literal(true),
   /** Lectura y aceptación explícita de la política de privacidad. */
   consentPrivacyPolicy: z.literal(true),
+  /** Autorización de publicación pública de imagen, voz y/o nombre (o alias). */
+  consentPublicacion: z.literal(true),
+  /** Aceptación explícita de los Términos de Uso. */
+  consentTerminos: z.literal(true),
   /** Cloudflare Turnstile (opcional si TURNSTILE_SECRET_KEY está definida). */
   captchaToken: z.string().max(4000).optional(),
   /** Foto personal opcional (avatar) para mostrar junto al nombre público si se aprueba. */
@@ -88,6 +89,10 @@ export interface SubmissionDoc {
   sex?: "femenino" | "masculino" | "no-binario" | "prefiero-no-decir" | "otro";
   ageRange?: AgeRangeId;
   consentPrivacyPolicy?: true;
+  consentPublicacion?: true;
+  consentTerminos?: true;
+  /** Momento en que se registraron los consentimientos (ms epoch). */
+  consentedAt?: number;
   extraAttachmentUrls?: string[];
   privateMediaPaths?: string[];
   payload: {

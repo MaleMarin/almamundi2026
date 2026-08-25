@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 /**
  * /privacidad — Aviso de Privacidad de AlmaMundi.
- * Enlazada desde AgeGate (#s5), footer y modales. Estilo neumórfico.
+ * Enlazada desde footer y modales. Estilo neumórfico.
  */
 
 import type { Metadata } from 'next';
@@ -410,7 +410,7 @@ export default function PrivacidadPage() {
         </Section>
 
         <Section id="s14" title="14. Datos de niños, niñas y adolescentes">
-          {/* Ancla legada: AgeGate y otros enlaces usan /privacidad#s5 */}
+          {/* Ancla legada: enlaces existentes usan /privacidad#s5 */}
           <div id="s5" style={{ height: 0, overflow: 'hidden' }} aria-hidden />
           <p style={p}>
             AlmaMundi busca proteger especialmente a niños, niñas y adolescentes.

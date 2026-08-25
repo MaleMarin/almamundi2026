@@ -186,6 +186,13 @@ export async function POST(req: NextRequest) {
   if (data.consentPrivacyPolicy) {
     (doc as SubmissionDoc).consentPrivacyPolicy = true;
   }
+  if (data.consentPublicacion) {
+    (doc as SubmissionDoc).consentPublicacion = true;
+  }
+  if (data.consentTerminos) {
+    (doc as SubmissionDoc).consentTerminos = true;
+  }
+  (doc as SubmissionDoc).consentedAt = now;
   if (data.extraAttachmentUrls?.length) {
     (doc as SubmissionDoc).extraAttachmentUrls = data.extraAttachmentUrls
       .map((u) => u.trim())
