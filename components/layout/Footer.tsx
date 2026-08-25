@@ -71,8 +71,8 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             </span>
           </HomeHardLink>
         </div>
-        <p className="almamundi-footer-tagline mx-auto max-w-lg px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
-          {t.footerClosingLine}
+        <p className="almamundi-footer-tagline mx-auto max-w-2xl px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
+          AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que despiertan otras historias.
         </p>
       </div>
 
