@@ -305,7 +305,7 @@ export default function ArchivoPage() {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 40 }}>
             {byWeek.length === 0 && (
               <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 48 }}>
-                Aún no hay historias en el archivo.
+                El archivo se construye con las historias que ya recorrieron el mapa. La tuya también puede llegar.
               </p>
             )}
             {byWeek.map(({ key, list, start, weekNum }) => (
@@ -372,7 +372,7 @@ export default function ArchivoPage() {
             </div>
             {filteredByTema.length === 0 && (
               <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 48 }}>
-                No hay historias con ese tema.
+                Este tema, en el archivo, se escribe con historias como la tuya.
               </p>
             )}
           </div>

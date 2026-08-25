@@ -1822,7 +1822,7 @@ function PulseIndicator({
         }}>
           {storiesCount > 0
             ? `${storiesCount} historias en el mapa`
-            : 'Aún no hay historias'}
+            : 'Este mapa se construye con historias como la tuya.'}
         </p>
         {newbornCount > 0 && (
           <p style={{

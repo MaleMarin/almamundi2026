@@ -111,7 +111,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
   if (stories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
-        <p className="text-lg">Aún no hay historias en video.</p>
+        <p className="text-lg">Las historias también se ven. Cuenta la tuya en video.</p>
         <Link href="/historias" className="mt-4 text-amber-500 hover:underline">
           Ver todas las historias
         </Link>

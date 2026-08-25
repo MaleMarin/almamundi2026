@@ -109,7 +109,7 @@ export default function TemaPage() {
         </div>
 
         {list.length === 0 ? (
-          <p className="py-8" style={{ color: neu.textBody }}>Aún no hay historias con este tema.</p>
+          <p className="py-8" style={{ color: neu.textBody }}>Este tema se escribe con historias como la tuya.</p>
         ) : (
           <div className="space-y-4">
             {list.map((s) => (
