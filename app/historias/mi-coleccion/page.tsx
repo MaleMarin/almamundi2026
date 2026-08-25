@@ -74,7 +74,7 @@ export default function MiColeccionPage() {
                     <button
                       type="button"
                       onClick={() => shareStory(s)}
-                      style={{ color: 'var(--almamundi-orange)', borderColor: 'rgba(255, 69, 0, 0.5)' }}
+                      style={{ color: 'var(--almamundi-orange)', borderColor: 'rgba(171, 48, 28, 0.5)' }}
                       className="text-xs font-medium px-3 py-1.5 rounded-full border hover:bg-orange-50"
                     >
                       {copiedId === s.id ? 'Copiado' : 'Compartir'}

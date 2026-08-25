@@ -150,8 +150,8 @@ export function InspirationFormatPickers({
                               }}
                               className="w-full rounded-full py-3.5 text-sm font-bold uppercase tracking-wide text-white md:py-4 md:text-base"
                               style={{
-                                background: 'linear-gradient(180deg,#ff4500,#e63e00)',
-                                boxShadow: '0 8px 24px rgba(255,69,0,0.35)',
+                                background: 'linear-gradient(180deg,#AB301C,#8F2717)',
+                                boxShadow: '0 8px 24px rgba(171,48,28,0.35)',
                               }}
                               aria-label={`Usar tema ${topic.title}`}
                             >

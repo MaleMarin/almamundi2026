@@ -181,25 +181,25 @@ export function ResonanceMailbox({
           width: 40px;
           height: 40px;
           background: rgba(255, 255, 255, 0.92);
-          border: 2px solid var(--almamundi-orange, #ff4500);
-          color: var(--almamundi-orange, #ff4500);
-          box-shadow: 0 2px 14px rgba(255, 69, 0, 0.12);
+          border: 2px solid var(--almamundi-orange, #AB301C);
+          color: var(--almamundi-orange, #AB301C);
+          box-shadow: 0 2px 14px rgba(171, 48, 28, 0.12);
           animation: none;
         }
         .boton-resonancia--orange-inline:hover {
           background: rgba(255, 255, 255, 1);
-          border-color: var(--almamundi-orange, #ff4500);
-          box-shadow: 0 2px 18px rgba(255, 69, 0, 0.2);
+          border-color: var(--almamundi-orange, #AB301C);
+          box-shadow: 0 2px 18px rgba(171, 48, 28, 0.2);
         }
         .boton-resonancia--orange-floating {
           background: rgba(255, 255, 255, 0.12);
-          border: 2px solid var(--almamundi-orange, #ff4500);
-          color: var(--almamundi-orange, #ff4500);
+          border: 2px solid var(--almamundi-orange, #AB301C);
+          color: var(--almamundi-orange, #AB301C);
           animation: none;
-          box-shadow: 0 0 18px rgba(255, 69, 0, 0.25);
+          box-shadow: 0 0 18px rgba(171, 48, 28, 0.25);
         }
         .boton-resonancia--orange-floating:hover {
-          border-color: var(--almamundi-orange, #ff4500);
+          border-color: var(--almamundi-orange, #AB301C);
           background: rgba(255, 255, 255, 0.18);
         }
       `}</style>

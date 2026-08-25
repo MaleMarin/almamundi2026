@@ -68,8 +68,8 @@ export function createBitStarBurstMaterial(
   intensity: number,
   materialName = 'GlobeBitStarBurst'
 ): THREE.ShaderMaterial {
-  const core = new THREE.Color('#ff5f1a').convertSRGBToLinear();
-  const rim = new THREE.Color('#e63e00').convertSRGBToLinear();
+  const core = new THREE.Color('#AB301C').convertSRGBToLinear();
+  const rim = new THREE.Color('#8F2717').convertSRGBToLinear();
   return createCircularMarkerMaterial(
     intensity,
     [core.r, core.g, core.b],

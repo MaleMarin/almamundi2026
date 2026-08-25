@@ -13,8 +13,8 @@ const PAGE_BG = neu.bg;
 const TEXT_MAIN = neu.textMain;
 const TEXT_BODY = neu.textBody;
 /** Acento naranja AlmaMundi. */
-const SEPIA = '#ff4500';
-const SEPIA_DK = '#c23600';
+const SEPIA = '#AB301C';
+const SEPIA_DK = '#7A2114';
 const BAR_COUNT = 16;
 
 export interface HistoriaAudio {
@@ -222,8 +222,8 @@ export default function AudioPlayer({
       <style>{`
         * { box-sizing: border-box; margin: 0; padding: 0; }
         @keyframes haloPulse {
-          0%, 100% { box-shadow: 0 0 0 0 rgba(255,69,0,0.3); }
-          50% { box-shadow: 0 0 0 20px rgba(255,69,0,0); }
+          0%, 100% { box-shadow: 0 0 0 0 rgba(171,48,28,0.3); }
+          50% { box-shadow: 0 0 0 20px rgba(171,48,28,0); }
         }
         @keyframes waveAnim {
           from { transform: scaleY(0.2); }
@@ -314,7 +314,7 @@ export default function AudioPlayer({
                 width: '40px',
                 height: '40px',
                 borderRadius: '50%',
-                border: '1px solid rgba(255,69,0,0.35)',
+                border: '1px solid rgba(171,48,28,0.35)',
                 color: TEXT_BODY,
                 display: 'flex',
                 alignItems: 'center',
@@ -365,7 +365,7 @@ export default function AudioPlayer({
                 height: avatarSize,
                 borderRadius: '50%',
                 overflow: 'hidden',
-                border: '2px solid rgba(255,69,0,0.45)',
+                border: '2px solid rgba(171,48,28,0.45)',
                 marginBottom: '1.25rem',
                 flexShrink: 0,
                 boxShadow: '8px 8px 20px rgba(163,177,198,0.35), -6px -6px 16px rgba(255,255,255,0.85)',
@@ -495,7 +495,7 @@ export default function AudioPlayer({
                     height: '40px',
                     ...neu.button,
                     borderRadius: '50%',
-                    border: '1px solid rgba(255,69,0,0.35)',
+                    border: '1px solid rgba(171,48,28,0.35)',
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
@@ -514,7 +514,7 @@ export default function AudioPlayer({
                     height: '64px',
                     borderRadius: '50%',
                     border: `2px solid ${SEPIA}`,
-                    background: 'rgba(255,69,0,0.12)',
+                    background: 'rgba(171,48,28,0.12)',
                     color: SEPIA,
                     boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.9)',
                     cursor: 'pointer',
@@ -534,7 +534,7 @@ export default function AudioPlayer({
                     height: '40px',
                     ...neu.button,
                     borderRadius: '50%',
-                    border: '1px solid rgba(255,69,0,0.35)',
+                    border: '1px solid rgba(171,48,28,0.35)',
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
@@ -552,7 +552,7 @@ export default function AudioPlayer({
                     height: '40px',
                     ...neu.button,
                     borderRadius: '50%',
-                    border: '1px solid rgba(255,69,0,0.3)',
+                    border: '1px solid rgba(171,48,28,0.3)',
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',

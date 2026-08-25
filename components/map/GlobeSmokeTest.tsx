@@ -11,7 +11,7 @@ const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
  */
 export default function GlobeSmokeTest() {
   const points = useMemo(
-    () => [{ lat: -33.45, lng: -70.66, size: 0.6, color: '#F97316' }],
+    () => [{ lat: -33.45, lng: -70.66, size: 0.6, color: '#AB301C' }],
     []
   );
 

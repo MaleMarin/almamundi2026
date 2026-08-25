@@ -8,7 +8,7 @@ const MOTION_VIEW = { once: true, margin: '-80px 0px' };
 function HeroSection() {
   return (
     <section className="relative min-h-[100vh] flex flex-col justify-end pb-24 md:pb-32 px-6 md:px-12 overflow-hidden bg-[#0a0a0f]">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(255,69,0,0.12),transparent)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_20%,rgba(171,48,28,0.12),transparent)]" />
       <motion.div
         className="relative z-10 max-w-5xl"
         initial={{ opacity: 0, y: 40 }}

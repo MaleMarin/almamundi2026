@@ -263,7 +263,7 @@ export function MisDatosPersonalesForm() {
             <button
               type="submit"
               disabled={status === 'sending' || ownData === ''}
-              className="rounded-full bg-[#ff6b2b] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="rounded-full bg-[#AB301C] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === 'sending' ? 'Enviando…' : 'Enviar solicitud'}
             </button>

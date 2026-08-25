@@ -580,7 +580,7 @@ export function HistoricalExhibitionCarousel({
                           }}
                           className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-xs font-bold uppercase tracking-[0.17em] transition sm:text-[0.8rem] ${
                             canOpenThis
-                              ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#ff7138_0%,#ff4500_52%,#ea4000_100%)] text-white shadow-[0_18px_40px_rgba(255,69,0,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
+                              ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#C44532_0%,#AB301C_52%,#8F2717_100%)] text-white shadow-[0_18px_40px_rgba(171,48,28,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
                               : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-gray-500 opacity-95'
                           }`}
                         >

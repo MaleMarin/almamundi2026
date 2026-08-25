@@ -69,7 +69,7 @@ export function drawImprontaBauhaus(
     ctx.fillRect(ox, oy, innerW, innerH);
   }
 
-  ctx.strokeStyle = "rgba(255, 69, 0, 0.45)";
+  ctx.strokeStyle = "rgba(171, 48, 28, 0.45)";
   ctx.lineWidth = 4;
   ctx.beginPath();
   ctx.moveTo(ox, oy + innerH * 0.55);
@@ -85,7 +85,7 @@ export function drawImprontaBauhaus(
   ctx.lineWidth = 1;
   ctx.stroke();
 
-  ctx.fillStyle = "#ff4500";
+  ctx.fillStyle = "#AB301C";
   ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
   ctx.textBaseline = "middle";
   ctx.fillText("AlmaMundi", 28, H - fh / 2 - 26);

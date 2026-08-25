@@ -446,7 +446,7 @@ export function MapCanvas({
   const height =
     embedded ? embedSize.h : (heightProp ?? (measured ? Math.max(minGlobeSize, Math.min(sizeHook.width, sizeHook.height)) : fallback));
   const pointColorFn = useCallback(
-    (d: object) => (pointColor ? pointColor(d) : '#ff4500'),
+    (d: object) => (pointColor ? pointColor(d) : '#AB301C'),
     [pointColor]
   );
   const pointAltitudeFn = useCallback(

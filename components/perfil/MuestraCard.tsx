@@ -5,7 +5,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 
 const SH_DARK = 'rgba(163,177,198,0.6)';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
-const ORANGE = '#ff6b2b';
+const ORANGE = '#AB301C';
 const TEXT_1 = '#1a2332';
 const TEXT_3 = '#8896a5';
 

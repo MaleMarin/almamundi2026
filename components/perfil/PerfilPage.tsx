@@ -18,8 +18,8 @@ const SH_DARK = 'rgba(163,177,198,0.6)';
 const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';
 const TEXT_3 = '#8896a5';
-const ORANGE = '#ff6b2b';
-const ORANGE_2 = '#ff8c55';
+const ORANGE = '#AB301C';
+const ORANGE_2 = '#C44532';
 const GREEN = '#00d4aa';
 
 type TabId = 'muestras' | 'guardadas' | 'propias' | 'temas';

@@ -111,7 +111,7 @@ const neoSurface = {
 } as const;
 
 const orangeCta =
-  'linear-gradient(180deg, #ff4500 0%, #e63e00 100%)' as const;
+  'linear-gradient(180deg, #AB301C 0%, #8F2717 100%)' as const;
 
 function initialFlowStage(format: SubirFormat): FlowStage {
   return format === 'foto' ? 'media' : 'welcome';
@@ -924,7 +924,7 @@ export function StoryCaptureStep({
                   type="button"
                   onClick={() => void startLive()}
                   className="w-full py-4 md:py-5 rounded-full font-bold text-base md:text-lg text-white"
-                  style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+                  style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(171,48,28,0.35)' }}
                 >
                   Activar cámara
                 </button>
@@ -946,7 +946,7 @@ export function StoryCaptureStep({
                         type="button"
                         onClick={startRecording}
                         className="inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm md:text-base font-bold text-white"
-                        style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255,69,0,0.35)' }}
+                        style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(171,48,28,0.35)' }}
                       >
                         <Video size={20} aria-hidden />
                         Empezar grabación
@@ -1203,7 +1203,7 @@ export function StoryCaptureStep({
                       type="button"
                       onClick={startRecording}
                           className="rounded-full px-8 py-3 text-sm md:text-base font-semibold text-white"
-                          style={{ background: orangeCta, boxShadow: '0 6px 20px rgba(255,69,0,0.3)' }}
+                          style={{ background: orangeCta, boxShadow: '0 6px 20px rgba(171,48,28,0.3)' }}
                     >
                           Empezar grabación
                     </button>
@@ -1533,7 +1533,7 @@ export function StoryCaptureStep({
             className="w-full py-4 md:py-5 rounded-full font-bold text-white text-base md:text-lg uppercase tracking-wide mt-4"
         style={{
           background: canContinue() ? orangeCta : '#9ca3af',
-          boxShadow: canContinue() ? '0 10px 32px rgba(255,69,0,0.4)' : 'none',
+          boxShadow: canContinue() ? '0 10px 32px rgba(171,48,28,0.4)' : 'none',
         }}
       >
             {continueButtonLabel}

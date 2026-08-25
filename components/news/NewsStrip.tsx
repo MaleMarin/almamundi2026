@@ -111,7 +111,7 @@ export default function NewsStrip() {
             textTransform: 'uppercase',
             color: '#ff5a14',
             marginBottom: '10px',
-            textShadow: '0 0 18px rgba(255, 69, 0, 0.45)',
+            textShadow: '0 0 18px rgba(171, 48, 28, 0.45)',
           }}
         >
           Noticias en vivo
@@ -142,13 +142,13 @@ export default function NewsStrip() {
                     : '1px solid rgba(255,255,255,0.22)',
                 background:
                   activeTopic === t.id
-                    ? 'linear-gradient(180deg, rgba(255, 69, 0, 0.55) 0%, rgba(255, 85, 20, 0.32) 100%)'
+                    ? 'linear-gradient(180deg, rgba(171, 48, 28, 0.55) 0%, rgba(171, 48, 28, 0.32) 100%)'
                     : 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.05) 100%)',
                 backdropFilter: 'blur(12px)',
                 WebkitBackdropFilter: 'blur(12px)',
                 boxShadow:
                   activeTopic === t.id
-                    ? 'inset 0 1px 0 rgba(255, 200, 150, 0.45), 0 0 16px rgba(255, 69, 0, 0.35)'
+                    ? 'inset 0 1px 0 rgba(255, 200, 150, 0.45), 0 0 16px rgba(171, 48, 28, 0.35)'
                     : 'inset 0 1px 0 rgba(255,255,255,0.18)',
                 color: activeTopic === t.id ? '#ffffff' : 'rgba(255,255,255,0.52)',
                 fontSize: '11px',

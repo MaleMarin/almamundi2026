@@ -29,7 +29,7 @@ export default function GlobalError({
           <button
             type="button"
             onClick={() => reset()}
-            style={{ padding: '8px 16px', borderRadius: 12, background: '#f97316', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+            style={{ padding: '8px 16px', borderRadius: 12, background: '#AB301C', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}
           >
             Intentar de nuevo
           </button>

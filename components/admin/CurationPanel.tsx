@@ -367,7 +367,7 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
             padding: '0.6rem 1.8rem',
             border: 'none',
             borderRadius: '8px',
-            background: temasSeleccionados.length === 0 ? '#d1d5db' : '#ff4500',
+            background: temasSeleccionados.length === 0 ? '#d1d5db' : '#AB301C',
             color: '#fff',
             fontSize: '0.85rem',
             fontWeight: 600,
@@ -376,11 +376,11 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
           }}
           onMouseEnter={(e) => {
             if (temasSeleccionados.length > 0)
-              (e.currentTarget as HTMLButtonElement).style.background = '#cc3300';
+              (e.currentTarget as HTMLButtonElement).style.background = '#7A2114';
           }}
           onMouseLeave={(e) => {
             if (temasSeleccionados.length > 0)
-              (e.currentTarget as HTMLButtonElement).style.background = '#ff4500';
+              (e.currentTarget as HTMLButtonElement).style.background = '#AB301C';
           }}
         >
           {state === 'publishing' ? 'Publicando…' : '✓ Publicar historia'}

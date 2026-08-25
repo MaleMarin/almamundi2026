@@ -7,7 +7,7 @@ export const SITE_NAV_LINK_CLASS =
 
 /** Acción principal (Cuenta tu historia → /#historias): misma pastilla, texto y borde naranja. Visible en la barra, también en móvil. */
 export const SITE_NAV_CTA_CLASS =
-  'inline-flex items-center justify-center whitespace-nowrap rounded-full border border-[rgba(255,69,0,0.38)] bg-[#E9ECF3] px-2.5 py-1.5 text-[11px] font-semibold !text-[var(--almamundi-orange)] visited:!text-[var(--almamundi-orange)] shadow-[8px_8px_20px_rgba(136,150,170,0.34),-8px_-8px_20px_rgba(255,255,255,0.9),inset_1px_1px_2px_rgba(255,255,255,0.58),inset_-2px_-2px_5px_rgba(163,177,198,0.16)] transition-colors hover:!text-[#d63c00] hover:border-[rgba(255,69,0,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 sm:px-3 sm:text-xs md:px-3.5 md:py-2 md:text-sm';
+  'inline-flex items-center justify-center whitespace-nowrap rounded-full border border-[rgba(171,48,28,0.38)] bg-[#E9ECF3] px-2.5 py-1.5 text-[11px] font-semibold !text-[var(--almamundi-orange)] visited:!text-[var(--almamundi-orange)] shadow-[8px_8px_20px_rgba(136,150,170,0.34),-8px_-8px_20px_rgba(255,255,255,0.9),inset_1px_1px_2px_rgba(255,255,255,0.58),inset_-2px_-2px_5px_rgba(163,177,198,0.16)] transition-colors hover:!text-[#8F2717] hover:border-[rgba(171,48,28,0.55)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 sm:px-3 sm:text-xs md:px-3.5 md:py-2 md:text-sm';
 
 /** Enlaces internos del dropdown de Historias: livianos, sin pastillas. */
 export const SITE_NAV_STORIES_ITEM_CLASS =

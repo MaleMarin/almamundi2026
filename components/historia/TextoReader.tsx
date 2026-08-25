@@ -11,8 +11,8 @@ import { neu } from '@/lib/historias-neumorph';
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
 const TINTA_SOFT = '#4a3f32';
-const SEPIA = '#ff4500';
-const SEPIA_DK = '#c23600';
+const SEPIA = '#AB301C';
+const SEPIA_DK = '#7A2114';
 
 export interface HistoriaTexto {
   id: string;
@@ -457,11 +457,11 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               textTransform: 'uppercase',
               padding: '0.85rem 1.35rem',
               borderRadius: 999,
-              border: `1px solid rgba(255,69,0,0.32)`,
+              border: `1px solid rgba(171,48,28,0.32)`,
               color: '#fff',
               cursor: 'pointer',
-              background: `linear-gradient(165deg, #ff7138 0%, ${neu.orange} 100%)`,
-              boxShadow: '0 18px 40px rgba(255,69,0,0.18), inset 0 -1px 0 rgba(0,0,0,0.06)',
+              background: `linear-gradient(165deg, #C44532 0%, ${neu.orange} 100%)`,
+              boxShadow: '0 18px 40px rgba(171,48,28,0.18), inset 0 -1px 0 rgba(0,0,0,0.06)',
             }}
           >
             Compartir esta historia

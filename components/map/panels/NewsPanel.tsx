@@ -22,7 +22,7 @@ function chipStyle(active: boolean) {
       backdropFilter: 'blur(10px) saturate(1.25)',
       WebkitBackdropFilter: 'blur(10px) saturate(1.25)',
       border: '1px solid rgba(255, 150, 90, 0.75)',
-      boxShadow: 'inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 10px rgba(255, 69, 0, 0.22)',
+      boxShadow: 'inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 10px rgba(171, 48, 28, 0.22)',
     };
   }
   return {
@@ -183,7 +183,7 @@ function NewsListSection({
             fontSize: 11,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: sectionLabel === '◎ En el mapa' ? '#ff6b2e' : 'rgba(200, 214, 235, 0.72)',
+            color: sectionLabel === '◎ En el mapa' ? '#AB301C' : 'rgba(200, 214, 235, 0.72)',
             margin: '8px 0 2px 2px',
             fontFamily: SITE_FONT_STACK,
             lineHeight: 1.35,
@@ -198,7 +198,7 @@ function NewsListSection({
             fontSize: 11,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: '#ff6b2e',
+            color: '#AB301C',
             margin: '4px 0 2px 2px',
             fontFamily: SITE_FONT_STACK,
             lineHeight: 1.35,

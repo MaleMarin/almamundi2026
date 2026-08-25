@@ -90,7 +90,7 @@ function GalleryCard({ t, id, h }: { t: string; id: string; h: number }) {
     <div className="overflow-hidden rounded-[10px] border border-[#D4D4C4] bg-white">
       <canvas ref={ref} width={200} height={250} className="block w-full" />
       <div className="px-2.5 py-2">
-        <div className="mb-0.5 text-[9px] font-semibold tracking-wide text-[#E8400A]">{id}</div>
+        <div className="mb-0.5 text-[9px] font-semibold tracking-wide text-[#AB301C]">{id}</div>
         <div className="text-[10px] leading-snug text-[#8A8A7A]">
           {esFoto ? 'Foto' : 'Texto'} · hora {h}h
           <br />
@@ -154,7 +154,7 @@ export default function DemoHuellasV2Page() {
         </p>
 
         <section className="mb-10">
-          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#AB301C]">
             01 · Cómo las palabras generan colores
           </div>
           <p className="mb-2 text-[1.05rem] font-semibold">Cada palabra tiene un color propio. La historia compone la paleta.</p>
@@ -231,7 +231,7 @@ export default function DemoHuellasV2Page() {
         </section>
 
         <section className="mb-10">
-          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#AB301C]">
             02 · Fotos: el nombre del archivo como texto
           </div>
           <p className="mb-2 text-[1.05rem] font-semibold">Para imágenes, las palabras vienen del nombre del archivo</p>
@@ -247,7 +247,7 @@ export default function DemoHuellasV2Page() {
         </section>
 
         <section className="mb-10">
-          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#AB301C]">
             03 · Generador interactivo
           </div>
 
@@ -292,7 +292,7 @@ export default function DemoHuellasV2Page() {
               <button
                 type="button"
                 onClick={generar}
-                className="rounded-lg bg-[#E8400A] px-5 py-2 text-sm font-semibold text-white hover:bg-[#c73308]"
+                className="rounded-lg bg-[#AB301C] px-5 py-2 text-sm font-semibold text-white hover:bg-[#8F2717]"
               >
                 Generar resonancia visual →
               </button>
@@ -359,7 +359,7 @@ export default function DemoHuellasV2Page() {
         </section>
 
         <section>
-          <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+          <div className="mb-4 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#AB301C]">
             04 · Ejemplos — historias reales generan resonancias distintas
           </div>
           <div className="grid grid-cols-[repeat(auto-fill,minmax(160px,1fr))] gap-3.5">
@@ -370,7 +370,7 @@ export default function DemoHuellasV2Page() {
         </section>
 
         <section className="mt-12 border-t border-[#D4D4C4] pt-10">
-          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#E8400A]">
+          <div className="mb-3 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#AB301C]">
             05 · Código para Cursor — módulo de resonancia visual v2
           </div>
           <p className="max-w-3xl text-[0.83rem] leading-relaxed text-[#8A8A7A]">

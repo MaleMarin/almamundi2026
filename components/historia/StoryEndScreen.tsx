@@ -58,8 +58,8 @@ const FORMATO_TO_LABEL: Record<StoryEndShareFormat, string> = {
 
 const TEXT_TITLE = neu.textMain;
 const TEXT_BODY = neu.textBody;
-const ORANGE = 'var(--almamundi-orange, #ff4500)';
-const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(255,69,0,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
+const ORANGE = 'var(--almamundi-orange, #AB301C)';
+const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(171,48,28,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
 
 function formatEndFecha(raw: string | undefined): string | null {
   if (!raw || !String(raw).trim()) return null;
@@ -330,7 +330,7 @@ export function StoryEndScreen({
               flex: '1 1 160px',
               padding: '0.92rem 1rem',
               borderRadius: 999,
-              border: `1px solid rgba(255,69,0,0.32)`,
+              border: `1px solid rgba(171,48,28,0.32)`,
               fontFamily: SITE_FONT_STACK,
               fontWeight: 700,
               fontSize: '0.74rem',
@@ -338,7 +338,7 @@ export function StoryEndScreen({
               textTransform: 'uppercase',
               cursor: 'pointer',
               color: '#fff',
-              background: `linear-gradient(165deg, #ff7138 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
+              background: `linear-gradient(165deg, #C44532 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
               boxShadow: SOFT_ORANGE_SHADOW,
             }}
           >

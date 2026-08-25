@@ -11,7 +11,7 @@ import type { StoryPoint } from '@/lib/map-data/stories';
 
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#c23600" opacity="0.25"/><text x="50" y="62" font-family="sans-serif" font-size="44" font-weight="300" fill="#ff4500" text-anchor="middle">${initial}</text></svg>`;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#7A2114" opacity="0.25"/><text x="50" y="62" font-family="sans-serif" font-size="44" font-weight="300" fill="#AB301C" text-anchor="middle">${initial}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
@@ -232,7 +232,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                       citaDestacada: undefined,
                     })
                   }
-                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
+                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#AB301C)] hover:opacity-90 text-white transition-colors mb-6"
                   aria-label="Ver en cine"
                 >
                   <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />
@@ -240,7 +240,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               ) : (
                 <Link
                   href={`/historias/${selected.id}`}
-                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#f97316)] hover:opacity-90 text-white transition-colors mb-6"
+                  className="inline-flex items-center justify-center gap-2 w-14 h-14 rounded-full bg-[var(--almamundi-orange,#AB301C)] hover:opacity-90 text-white transition-colors mb-6"
                   aria-label="Reproducir"
                 >
                   <span className="w-0 h-0 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[16px] border-l-white ml-1" />

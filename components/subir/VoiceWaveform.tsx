@@ -4,9 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 
 const BAR_COUNT = 28;
 const THROTTLE_MS = 48;
-const ORANGE = '#ff6b35';
+const ORANGE = '#C44532';
 const ORANGE_SOFT = '#ffb399';
-const ORANGE_DEEP = '#e63e00';
+const ORANGE_DEEP = '#8F2717';
 const BG = 'linear-gradient(180deg, #f0f3f8 0%, #e8ecf4 55%, #e0e5ec 100%)';
 
 export type VoiceWaveformMode = 'idle' | 'listening' | 'recording' | 'stopped' | 'error';

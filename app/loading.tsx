@@ -7,7 +7,7 @@ export default function Loading() {
       aria-live="polite"
       aria-busy="true"
     >
-      <div className="w-8 h-8 border-2 border-[var(--almamundi-orange,#ff4500)] border-t-transparent rounded-full animate-spin opacity-70" />
+      <div className="w-8 h-8 border-2 border-[var(--almamundi-orange,#AB301C)] border-t-transparent rounded-full animate-spin opacity-70" />
       <p className="text-sm font-medium text-gray-600">Cargando…</p>
     </div>
   );

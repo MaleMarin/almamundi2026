@@ -63,14 +63,14 @@ function SoundRow({
       style={{
         borderRadius: 16,
         background: isActive
-          ? 'linear-gradient(135deg, rgba(255, 69, 0, 0.38) 0%, rgba(255, 95, 30, 0.18) 100%)'
+          ? 'linear-gradient(135deg, rgba(171, 48, 28, 0.38) 0%, rgba(196, 69, 50, 0.18) 100%)'
           : 'linear-gradient(145deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.06) 100%)',
         backdropFilter: 'blur(14px) saturate(1.2)',
         WebkitBackdropFilter: 'blur(14px) saturate(1.2)',
         border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.72)' : 'rgba(255,255,255,0.22)'}`,
-        borderLeft: isActive ? '3px solid #ff4500' : '3px solid transparent',
+        borderLeft: isActive ? '3px solid #AB301C' : '3px solid transparent',
         boxShadow: isActive
-          ? 'inset 0 1px 0 rgba(255, 200, 150, 0.4), 0 0 12px rgba(255, 69, 0, 0.22)'
+          ? 'inset 0 1px 0 rgba(255, 200, 150, 0.4), 0 0 12px rgba(171, 48, 28, 0.22)'
           : 'inset 0 1px 0 rgba(255,255,255,0.2)',
         overflow: 'hidden',
         fontFamily: SITE_FONT_STACK,
@@ -111,7 +111,7 @@ function SoundRow({
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: isPlaying ? 'rgba(255, 69, 0, 0.45)' : 'rgba(255,255,255,0.12)',
+            background: isPlaying ? 'rgba(171, 48, 28, 0.45)' : 'rgba(255,255,255,0.12)',
             border: isPlaying ? '1px solid rgba(255, 150, 80, 0.7)' : '1px solid rgba(255,255,255,0.18)',
             display: 'flex',
             alignItems: 'center',
@@ -248,12 +248,12 @@ export function SoundsPanel({
             borderRadius: 999,
             border: soundEnabled ? '1px solid rgba(255, 120, 60, 0.85)' : '1px solid rgba(255,255,255,0.22)',
             background: soundEnabled
-              ? 'linear-gradient(180deg, rgba(255, 69, 0, 0.5) 0%, rgba(255, 85, 25, 0.28) 100%)'
+              ? 'linear-gradient(180deg, rgba(171, 48, 28, 0.5) 0%, rgba(171, 48, 28, 0.28) 100%)'
               : 'linear-gradient(180deg, rgba(255,255,255,0.14) 0%, rgba(255,255,255,0.06) 100%)',
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             color: soundEnabled ? '#ffffff' : 'rgba(255,255,255,0.55)',
-            boxShadow: soundEnabled ? '0 0 16px rgba(255, 69, 0, 0.35), inset 0 1px 0 rgba(255, 200, 160, 0.35)' : 'inset 0 1px 0 rgba(255,255,255,0.2)',
+            boxShadow: soundEnabled ? '0 0 16px rgba(171, 48, 28, 0.35), inset 0 1px 0 rgba(255, 200, 160, 0.35)' : 'inset 0 1px 0 rgba(255,255,255,0.2)',
             cursor: 'pointer',
             fontSize: 13,
             fontFamily: SITE_FONT_STACK,
