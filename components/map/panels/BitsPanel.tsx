@@ -372,8 +372,8 @@ export function BitsPanel({
                 letterSpacing: '0.01em',
               }}
             >
-              Tocá un punto <span style={{ color: '#ff4500', fontWeight: 700 }}>brillante</span> en el
-              globo para leer la historia de ese lugar.
+              Toca un punto <span style={{ color: '#ff4500', fontWeight: 700 }}>brillante</span> en el
+              globo para leer el hecho curioso de ese lugar.
             </p>
           )}
         </div>

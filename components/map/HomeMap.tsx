@@ -819,6 +819,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <NewsPanel {...noticiasProps} />
           ) : drawerMode === 'bits' ? (
             <BitsPanel
+              showIndexList={false}
               bits={huellasPuntos}
               selectedBit={selectedBit}
               onSelectBit={setSelectedBit}
