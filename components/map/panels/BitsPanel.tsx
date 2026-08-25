@@ -300,7 +300,7 @@ function BitDetailCompact({
             margin: `0 0 ${s.historiaMb}px`,
           }}
         >
-          Aún no hay relato cargado para este lugar.
+          Este mapa se construye con historias como la tuya.
         </p>
       )}
 
