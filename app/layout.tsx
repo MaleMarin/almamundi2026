@@ -55,10 +55,9 @@ function defaultMetadataBase(): URL {
   return new URL('http://localhost:3000');
 }
 
-const SITE_TITLE =
-  'AlmaMundi — Historias de vida contadas por sus protagonistas';
+const SITE_TITLE = 'AlmaMundi — Entra y cuenta tu historia';
 const SITE_DESCRIPTION =
-  'El lugar donde las historias no se pierden en el scroll: relatos de vida en video, audio, texto o foto.';
+  'Descubre historias de vida reales en video, audio o texto, y entra a contar la tuya. Cada historia despierta otra.';
 
 export const metadata: Metadata = {
   metadataBase: defaultMetadataBase(),
