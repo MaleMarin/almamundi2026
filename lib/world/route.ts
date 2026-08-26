@@ -739,7 +739,12 @@ export async function getNews(
     return data;
   }
 
-  const specific = await collectNewsFromSources(topicTrim, topicId, limit, lang, true);
+  // Tema y respaldo general en paralelo: si el tema da 0 ítems, no esperar
+  // un segundo ciclo (~11s extra) para llenar generalItems.
+  const [specific, general] = await Promise.all([
+    collectNewsFromSources(topicTrim, topicId, limit, lang, true),
+    collectNewsFromSources(DEFAULT_NEWS_TOPIC_API, null, limit, lang, false),
+  ]);
 
   if (specific.length > 0) {
     const data: NormalizedNewsResponse = {
@@ -754,7 +759,6 @@ export async function getNews(
     return data;
   }
 
-  const general = await collectNewsFromSources(DEFAULT_NEWS_TOPIC_API, null, limit, lang, false);
   const data: NormalizedNewsResponse = {
     generatedAt: new Date().toISOString(),
     items: [],
