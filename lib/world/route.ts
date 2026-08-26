@@ -18,7 +18,7 @@ export const runtime = "nodejs";
 
 const GDELT_BASE = "https://api.gdeltproject.org/api/v2/doc/doc";
 /** Caché corta para que el polling del cliente vea títulos nuevos sin esperar demasiado. */
-const CACHE_TTL_MS = 120_000; // 2 min
+const CACHE_TTL_MS = 300_000; // 5 min: titulares del globo; evita el camino frío en la mayoría de visitas
 const GDELT_REQUEST_TIMEOUT_MS = 12_000;
 
 const rssParser = new Parser({
@@ -438,7 +438,8 @@ async function fetchNewsFromGdelt(
   limit: number,
   lang: string,
   maxRecords = 150,
-  timespan: string = "6h"
+  timespan: string = "6h",
+  retryLongerTimespan = true
 ): Promise<NormalizedNewsResponse | null> {
   const queryStr = topic.trim().length > 0 ? (lang === "es" ? `${topic.trim()} sourcelang:spanish` : topic.trim()) : "news";
   const params = new URLSearchParams({
@@ -463,15 +464,15 @@ async function fetchNewsFromGdelt(
       if (spanishOnly.length > 0) articles = spanishOnly;
     }
     const items = normalizeGdeltArticles(articles).slice(0, limit);
-    if (items.length === 0 && timespan === "6h") {
-      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day");
+    if (items.length === 0 && timespan === "6h" && retryLongerTimespan) {
+      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day", false);
     }
     if (items.length === 0) return null;
     return { generatedAt: new Date().toISOString(), items, isFallback: false };
   } catch {
     clearTimeout(timeoutId);
-    if (timespan === "6h") {
-      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day");
+    if (timespan === "6h" && retryLongerTimespan) {
+      return fetchNewsFromGdelt(topic, limit, lang, maxRecords, "1day", false);
     }
     return null;
   }
@@ -620,25 +621,24 @@ async function collectNewsFromSources(
   strictTopic: boolean
 ): Promise<NormalizedNewsItem[]> {
   const rssLimit = Math.min(250, Math.max(limit * 4, 40));
-  const rss = await fetchNewsFromRss(rssLimit, topicTrim, strictTopic ? topicId : null).catch(
-    () => null
-  );
-  let merged: NormalizedNewsItem[] = rss?.items?.length ? [...rss.items] : [];
+  const domainQuery = buildDomainQuery();
+  const fullQuery =
+    topicTrim.length > 0 && strictTopic ? `${topicTrim} ${domainQuery}` : domainQuery;
 
-  if (merged.length < limit) {
-    const domainQuery = buildDomainQuery();
-    const fullQuery =
-      topicTrim.length > 0 && strictTopic ? `${topicTrim} ${domainQuery}` : domainQuery;
-    const g = await fetchNewsFromGdelt(fullQuery, Math.max(limit * 2, 30), lang, 150, "6h").catch(
+  const [rss, g] = await Promise.all([
+    fetchNewsFromRss(rssLimit, topicTrim, strictTopic ? topicId : null).catch(() => null),
+    fetchNewsFromGdelt(fullQuery, Math.max(limit * 2, 30), lang, 150, "6h", false).catch(
       () => null
-    );
-    if (g?.items.length) {
-      let gdeltItems = g.items;
-      if (strictTopic && topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
-        gdeltItems = gdeltItems.filter((it) => titleMatchesTopic(it.title, topicTrim, topicId));
-      }
-      merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...gdeltItems]));
+    ),
+  ]);
+
+  let merged: NormalizedNewsItem[] = rss?.items?.length ? [...rss.items] : [];
+  if (g?.items.length) {
+    let gdeltItems = g.items;
+    if (strictTopic && topicTrim.length > 0 && !isDefaultNewsTopic(topicTrim)) {
+      gdeltItems = gdeltItems.filter((it) => titleMatchesTopic(it.title, topicTrim, topicId));
     }
+    merged = dedupeNewsItems(sortByPublishedDesc([...merged, ...gdeltItems]));
   }
 
   return applyGeoFallback(merged.slice(0, limit));
