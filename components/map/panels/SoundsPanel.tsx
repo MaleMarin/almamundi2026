@@ -111,12 +111,12 @@ function SoundRow({
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: isPlaying ? 'rgba(255, 74, 28, 0.45)' : 'rgba(255,255,255,0.12)',
-            border: isPlaying ? '1px solid rgba(255, 150, 80, 0.7)' : '1px solid rgba(255,255,255,0.18)',
+            background: isPlaying ? 'var(--almamundi-orange)' : 'rgba(255,255,255,0.12)',
+            border: isPlaying ? '1px solid var(--almamundi-orange)' : '1px solid rgba(255,255,255,0.18)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: isPlaying ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.6)',
+            color: isPlaying ? '#ffffff' : 'rgba(255,255,255,0.6)',
           }}
           aria-hidden
         >

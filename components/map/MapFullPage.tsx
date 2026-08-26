@@ -1363,7 +1363,11 @@ function RightPanel({
             type="button"
             onClick={onToggleAudio}
             className="lm-btn-ghost flex items-center gap-2"
-            style={soundEnabled ? { borderColor: 'rgba(255,74,28,.5)', background: 'rgba(255,74,28,.12)' } : undefined}
+            style={
+              soundEnabled
+                ? { borderColor: 'var(--almamundi-orange)', background: 'var(--almamundi-orange)', color: '#ffffff' }
+                : undefined
+            }
             title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
             aria-pressed={soundEnabled}
             aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
@@ -4698,9 +4702,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 width: 44,
                 height: 44,
                 borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.15)',
-                background: soundEnabled ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.06)',
-                color: soundEnabled ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.5)',
+                border: soundEnabled
+                  ? '1px solid var(--almamundi-orange)'
+                  : '1px solid rgba(255,255,255,0.15)',
+                background: soundEnabled ? 'var(--almamundi-orange)' : 'rgba(255,255,255,0.06)',
+                color: soundEnabled ? '#ffffff' : 'rgba(255,255,255,0.5)',
                 cursor: 'pointer',
                 outline: 'none',
                 WebkitTapHighlightColor: 'transparent',
