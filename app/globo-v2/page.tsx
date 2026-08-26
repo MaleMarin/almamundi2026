@@ -26,7 +26,7 @@ export default function GloboV2Page() {
         <span className="text-xs font-semibold uppercase tracking-[0.2em]">GlobeV2 · Beta</span>
         <HomeHardLink
           href="/"
-          className="pointer-events-auto text-sm underline decoration-white/30 underline-offset-4 hover:text-[#AB301C]"
+          className="pointer-events-auto text-sm underline decoration-white/30 underline-offset-4 hover:text-[#FF4A1C]"
         >
           Volver al inicio
         </HomeHardLink>

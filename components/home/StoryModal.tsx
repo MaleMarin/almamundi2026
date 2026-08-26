@@ -1218,7 +1218,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={avSource === 'grabar' ? { ...soft.button, color: '#AB301C' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
                 <Video className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
                 {t.modalRecordVideo}
@@ -1227,7 +1227,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={avSource === 'archivo' ? { ...soft.button, color: '#AB301C' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
                 <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
@@ -1269,7 +1269,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           type="button"
                           onClick={startRecordingVideo}
                           className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
-                          style={{ background: 'linear-gradient(180deg,#AB301C,#8F2717)', boxShadow: '0 8px 24px rgba(171,48,28,0.35)' }}
+                          style={{ background: 'linear-gradient(180deg,#FF4A1C,#D13D17)', boxShadow: '0 8px 24px rgba(255,74,28,0.35)' }}
                           aria-label="Comenzar a grabar video"
                         >
                           <Video size={22} aria-hidden />
@@ -1411,7 +1411,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={avSource === 'grabar' ? { ...soft.button, color: '#AB301C' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
                 <Mic className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
                 {t.modalRecordVoice}
@@ -1420,7 +1420,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={avSource === 'archivo' ? { ...soft.button, color: '#AB301C' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
                 <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
                 Subir audio o pegar enlace
@@ -1450,7 +1450,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       type="button"
                       onClick={startRecordingAudio}
                       className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
-                      style={{ background: 'linear-gradient(180deg,#AB301C,#8F2717)', boxShadow: '0 8px 24px rgba(171,48,28,0.35)' }}
+                      style={{ background: 'linear-gradient(180deg,#FF4A1C,#D13D17)', boxShadow: '0 8px 24px rgba(255,74,28,0.35)' }}
                       aria-label={t.modalRecordVoice}
                     >
                       {t.modalRecord}
@@ -1981,7 +1981,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
                     }
                     className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
-                    style={{ ...soft.button, backgroundColor: '#AB301C' }}
+                    style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
                   >
                     {saving ? t.modalSending : t.modalSend}
                   </button>
@@ -1994,7 +1994,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             <div className={`flex min-h-0 flex-1 flex-col ${jakartaHuella.className}`}>
               <div className="shrink-0 space-y-2 text-center">
                 <div className="flex justify-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#AB301C]">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#FF4A1C]">
                     <Check size={20} strokeWidth={2.2} aria-hidden />
                   </div>
                 </div>
@@ -2029,7 +2029,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   <button
                     type="button"
                     onClick={() => void downloadImprint()}
-                    className="inline-flex min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#AB301C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#8F2717]"
+                    className="inline-flex min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#D13D17]"
                   >
                     <Download size={16} strokeWidth={1.6} aria-hidden />
                     {t.modalDownloadImprint}
@@ -2047,13 +2047,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   <button
                     type="button"
                     onClick={onClose}
-                    className="text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#AB301C] hover:underline"
+                    className="text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
                   >
                     {t.modalBackToMap}
                   </button>
                 </p>
                 <p
-                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#AB301C] ${
+                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#FF4A1C] ${
                     shareNotice ? 'opacity-100' : 'opacity-0'
                   }`}
                   aria-live="polite"

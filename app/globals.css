@@ -10,9 +10,9 @@
   /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
   --map-space-deep: #050811;
   --map-space-mid: #0a1520;
-  /* Naranja AlmaMundi en todo el sitio (#AB301C) */
-  --almamundi-orange: #AB301C;
-  --almamundi-orange-rgb: 171, 48, 28;
+  /* Naranja AlmaMundi en todo el sitio (#FF4A1C) */
+  --almamundi-orange: #FF4A1C;
+  --almamundi-orange-rgb: 255, 74, 28;
 }
 
 @theme inline {
@@ -20,11 +20,11 @@
   --color-foreground: var(--foreground);
   --font-sans: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   --font-mono: ui-monospace, monospace;
-  /* Naranja AlmaMundi: tonalidad #AB301C en toda la web */
-  --color-orange-400: #C44532;
+  /* Naranja AlmaMundi: tonalidad #FF4A1C en toda la web */
+  --color-orange-400: #FF6E49;
   --color-orange-500: var(--almamundi-orange);
-  --color-orange-600: #8F2717;
-  --color-orange-700: #7A2114;
+  --color-orange-600: #D13D17;
+  --color-orange-700: #B53514;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -204,10 +204,10 @@ a {
   color: var(--almamundi-orange);
 }
 a:visited {
-  color: #7A2114;
+  color: #B53514;
 }
 a:hover {
-  color: #C44532;
+  color: #FF6E49;
 }
 
 /* Botones neumórficos: borde y color unificados al hover y al estar activo (naranja) */

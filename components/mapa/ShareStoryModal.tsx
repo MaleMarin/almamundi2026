@@ -175,7 +175,7 @@ export function ShareStoryModal({
                 type="checkbox"
                 checked={anon}
                 onChange={(e) => setAnon(e.target.checked)}
-                style={{ accentColor: '#AB301C' }}
+                style={{ accentColor: '#FF4A1C' }}
               />
               <span
                 style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}

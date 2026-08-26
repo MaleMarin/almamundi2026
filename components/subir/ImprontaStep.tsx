@@ -50,7 +50,7 @@ export function ImprontaStep({
     boxShadow: `${neu.cardInset.boxShadow}, 0 18px 40px rgba(163,177,198,0.25)`,
   } as const;
   const orangeCta =
-    'linear-gradient(180deg, #AB301C 0%, #8F2717 100%)' as const;
+    'linear-gradient(180deg, #FF4A1C 0%, #D13D17 100%)' as const;
 
   return (
     <section className="space-y-8 md:space-y-10" aria-label="Vista previa (obsoleto): resonancia visual" aria-current="step">
@@ -104,7 +104,7 @@ export function ImprontaStep({
           className="inline-flex items-center gap-2 rounded-full px-8 py-4 text-sm md:text-base font-bold uppercase tracking-wide text-white"
           style={{
             background: orangeCta,
-            boxShadow: '0 8px 24px rgba(171,48,28,0.35)',
+            boxShadow: '0 8px 24px rgba(255,74,28,0.35)',
           }}
         >
           <Download size={20} aria-hidden />
@@ -130,7 +130,7 @@ export function ImprontaStep({
         className="w-full py-5 md:py-6 rounded-full font-bold text-white text-lg md:text-xl uppercase tracking-wide"
         style={{
           background: orangeCta,
-          boxShadow: '0 10px 32px rgba(171,48,28,0.4)',
+          boxShadow: '0 10px 32px rgba(255,74,28,0.4)',
         }}
       >
         Continuar

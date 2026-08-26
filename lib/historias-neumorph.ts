@@ -16,8 +16,8 @@ export const neu = {
   /** Menú superior en interiores: inactivo negro; activo / hover píldora = naranja (`ACTIVE_NAV_CLASS` + `.btn-almamundi`). */
   navLinkIdle: '#0a0a0a',
   /** Naranja fuerte como la home (--almamundi-orange) */
-  orange: '#AB301C',
-  gold: '#AB301C',
+  orange: '#FF4A1C',
+  gold: '#FF4A1C',
   /** Card elevada (relieve hacia fuera) */
   card: {
     position: 'relative' as const,

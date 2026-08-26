@@ -127,7 +127,7 @@ export function EcoRecorder({
             width: state === 'recording' ? 14 : 18,
             height: state === 'recording' ? 14 : 18,
             borderRadius: state === 'recording' ? 3 : '50%',
-            background: state === 'recording' ? '#ef4444' : '#AB301C',
+            background: state === 'recording' ? '#ef4444' : '#FF4A1C',
             transition: 'all 200ms ease',
           }}
         />

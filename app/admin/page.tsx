@@ -423,7 +423,7 @@ export default function AdminPage() {
                 width: '100%',
                 padding: '12px 0',
                 borderRadius: 999,
-                background: '#AB301C',
+                background: '#FF4A1C',
                 color: '#fff',
                 fontWeight: 700,
                 fontSize: 14,
@@ -524,8 +524,8 @@ export default function AdminPage() {
               padding: '10px 18px',
               borderRadius: 999,
               border: '1px solid rgba(255,255,255,0.14)',
-              background: section === s.id ? 'rgba(171,48,28,0.2)' : 'rgba(255,255,255,0.06)',
-              color: section === s.id ? '#C44532' : 'rgba(255,255,255,0.85)',
+              background: section === s.id ? 'rgba(255,74,28,0.2)' : 'rgba(255,255,255,0.06)',
+              color: section === s.id ? '#FF6E49' : 'rgba(255,255,255,0.85)',
               fontSize: 14,
               fontWeight: 600,
               cursor: 'pointer',
@@ -553,7 +553,7 @@ export default function AdminPage() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(171,48,28,0.2)', border: '1px solid rgba(171,48,28,0.4)', color: '#fdba74' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(255,74,28,0.2)', border: '1px solid rgba(255,74,28,0.4)', color: '#fdba74' }}>
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{s.place}</span>
@@ -864,7 +864,7 @@ export default function AdminPage() {
                 padding: '10px 18px',
                 borderRadius: 999,
                 border: 'none',
-                background: '#AB301C',
+                background: '#FF4A1C',
                 color: '#fff',
                 fontWeight: 700,
                 fontSize: 14,

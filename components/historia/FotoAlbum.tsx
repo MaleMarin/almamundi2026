@@ -10,7 +10,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 const CREAM = 'rgba(245,240,232,0.85)';
 const CREAM_SOFT = 'rgba(245,240,232,0.7)';
 const CREAM_MUTED = 'rgba(245,240,232,0.5)';
-const SEPIA = '#AB301C';
+const SEPIA = '#FF4A1C';
 const DEFAULT_BG = '#1a1410';
 
 export interface HistoriaFoto {
@@ -456,11 +456,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     textTransform: 'uppercase',
                     padding: '0.85rem 1.35rem',
                     borderRadius: 999,
-                    border: `1px solid rgba(171,48,28,0.32)`,
+                    border: `1px solid rgba(255,74,28,0.32)`,
                     color: '#fff',
                     cursor: 'pointer',
-                    background: `linear-gradient(165deg, #C44532 0%, ${neu.orange} 100%)`,
-                    boxShadow: '0 18px 40px rgba(171,48,28,0.2), inset 0 -1px 0 rgba(0,0,0,0.08)',
+                    background: `linear-gradient(165deg, #FF6E49 0%, ${neu.orange} 100%)`,
+                    boxShadow: '0 18px 40px rgba(255,74,28,0.2), inset 0 -1px 0 rgba(0,0,0,0.08)',
                   }}
                 >
                   Compartir

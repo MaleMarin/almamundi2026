@@ -51,7 +51,7 @@ export function SubmissionSuccessWithHuella({
     borderRadius: '1.5rem',
   } as React.CSSProperties;
 
-  const orangeCta = 'linear-gradient(180deg, #AB301C 0%, #8F2717 100%)' as const;
+  const orangeCta = 'linear-gradient(180deg, #FF4A1C 0%, #D13D17 100%)' as const;
 
   return (
     <section className="w-full max-w-2xl mx-auto px-0 sm:px-1 pb-8" aria-labelledby="subir-success-title">
@@ -111,7 +111,7 @@ export function SubmissionSuccessWithHuella({
             className="inline-flex justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white"
             style={{
               background: orangeCta,
-              boxShadow: '0 8px 24px rgba(171,48,28,0.32)',
+              boxShadow: '0 8px 24px rgba(255,74,28,0.32)',
             }}
           >
             <Download size={18} aria-hidden />

@@ -556,7 +556,7 @@ const globalStyles = `
   border-radius: 14px;
   background: rgba(249,115,22,0.16);
   border: 1px solid rgba(249,115,22,0.25);
-  color: #AB301C;
+  color: #FF4A1C;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -1363,7 +1363,7 @@ function RightPanel({
             type="button"
             onClick={onToggleAudio}
             className="lm-btn-ghost flex items-center gap-2"
-            style={soundEnabled ? { borderColor: 'rgba(171,48,28,.5)', background: 'rgba(171,48,28,.12)' } : undefined}
+            style={soundEnabled ? { borderColor: 'rgba(255,74,28,.5)', background: 'rgba(255,74,28,.12)' } : undefined}
             title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
             aria-pressed={soundEnabled}
             aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
@@ -1827,7 +1827,7 @@ function PulseIndicator({
         {newbornCount > 0 && (
           <p style={{
             fontSize: 11,
-            color: '#AB301C',
+            color: '#FF4A1C',
             margin: '2px 0 0',
             fontFamily: SITE_FONT_STACK,
           }}>

@@ -9,7 +9,7 @@ import { auth } from '@/lib/firebase/client';
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
 const SH_DARK = 'rgba(163,177,198,0.6)';
-const ORANGE = '#AB301C';
+const ORANGE = '#FF4A1C';
 const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';
 const TEXT_3 = '#8896a5';
@@ -269,7 +269,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 cursor: 'pointer',
                 fontSize: '0.8rem',
                 fontFamily: SITE_FONT_STACK,
-                background: isPublic ? `linear-gradient(135deg, ${ORANGE}, #C44532)` : BG,
+                background: isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF6E49)` : BG,
                 color: isPublic ? '#fff' : TEXT_2,
                 boxShadow: isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
               }}
@@ -287,7 +287,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 cursor: 'pointer',
                 fontSize: '0.8rem',
                 fontFamily: SITE_FONT_STACK,
-                background: !isPublic ? `linear-gradient(135deg, ${ORANGE}, #C44532)` : BG,
+                background: !isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF6E49)` : BG,
                 color: !isPublic ? '#fff' : TEXT_2,
                 boxShadow: !isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
               }}
@@ -330,7 +330,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 cursor: loading ? 'not-allowed' : 'pointer',
                 fontSize: '0.9rem',
                 fontFamily: SITE_FONT_STACK,
-                background: `linear-gradient(135deg, ${ORANGE}, #C44532)`,
+                background: `linear-gradient(135deg, ${ORANGE}, #FF6E49)`,
                 color: '#fff',
                 boxShadow: `5px 5px 12px rgba(255,107,43,0.4), -2px -2px 6px ${SH_LIGHT}`,
               }}

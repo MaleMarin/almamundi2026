@@ -20,7 +20,7 @@ function formatPlace(s: StoryPoint): string {
 }
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase()
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#7A2114" opacity="0.3"/><text x="50" y="64" font-family="serif" font-size="46" font-weight="300" fill="#AB301C" text-anchor="middle">${initial}</text></svg>`
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#B53514" opacity="0.3"/><text x="50" y="64" font-family="serif" font-size="46" font-weight="300" fill="#FF4A1C" text-anchor="middle">${initial}</text></svg>`
   return `data:image/svg+xml,${encodeURIComponent(svg)}`
 }
 
@@ -164,7 +164,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   }
 
   if (!stories.length) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#7A2114', fontFamily: SITE_FONT_STACK, fontSize: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#B53514', fontFamily: SITE_FONT_STACK, fontSize: '1rem' }}>
       No hay historias por ahora.
     </div>
   )
@@ -211,17 +211,17 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
 
         .sfc-bottom { position:absolute; bottom:0; left:0; right:0; padding:14px 13px; }
         .sfc-title { font-family:'Cormorant Garamond',serif; font-style:italic; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
-        .sfc-divider { width:24px; height:1px; background:rgba(171,48,28,0.6); margin-bottom:7px; }
+        .sfc-divider { width:24px; height:1px; background:rgba(255,74,28,0.6); margin-bottom:7px; }
         .sfc-author { display:flex; align-items:center; gap:8px; }
         .sfc-avatar-wrap {
           position:relative; flex-shrink:0;
           width:22px; height:22px;
           border-radius:50%;
           box-shadow:
-            0 0 0 1px rgba(171,48,28,0.45),
-            0 0 0 3px rgba(171,48,28,0.12);
+            0 0 0 1px rgba(255,74,28,0.45),
+            0 0 0 3px rgba(255,74,28,0.12);
         }
-        .sfc-avatar { width:22px; height:22px; border-radius:50%; border:1px solid rgba(171,48,28,0.55); object-fit:cover; display:block; }
+        .sfc-avatar { width:22px; height:22px; border-radius:50%; border:1px solid rgba(255,74,28,0.55); object-fit:cover; display:block; }
         .sfc-huella {
           flex-shrink:0; opacity:0.85;
           filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
@@ -245,7 +245,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         @keyframes sfcWave { from{transform:scaleY(0.25)} to{transform:scaleY(1)} }
 
         .sfc-text-inner { position:absolute; inset:0; background:#faf7f2; padding:18px 14px 0; overflow:hidden; }
-        .sfc-text-drop { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:300; font-style:italic; color:#AB301C; line-height:1; float:left; margin-right:3px; margin-top:2px; }
+        .sfc-text-drop { font-family:'Cormorant Garamond',serif; font-size:56px; font-weight:300; font-style:italic; color:#FF4A1C; line-height:1; float:left; margin-right:3px; margin-top:2px; }
         .sfc-text-body { font-family:'Cormorant Garamond',serif; font-size:11px; line-height:1.75; color:#3a3028; }
         .sfc-text-fade { position:absolute; bottom:0; left:0; right:0; height:120px; background:linear-gradient(to top,#faf7f2 30%,transparent 100%); }
 
@@ -388,7 +388,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                         <img className="sfc-avatar" src={avatar} alt="" />
                       </div>
                       <svg className="sfc-huella" width="16" height="16" viewBox="0 0 32 32" aria-hidden>
-                        <g fill="none" stroke="rgba(171,48,28,0.72)" strokeWidth="0.85" strokeLinecap="round">
+                        <g fill="none" stroke="rgba(255,74,28,0.72)" strokeWidth="0.85" strokeLinecap="round">
                           <path d="M16 6c-4 1.5-6.5 5-6 9 .3 2.8 2 5 4 6" />
                           <path d="M18 7c3 2 4.5 5.5 4 9-.4 3-2.5 5.5-5 6.5" />
                           <path d="M12 14c2 1.2 4.5 1.5 7 .5" />
@@ -426,7 +426,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
             </p>
             <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
               {authorName}
-              <span style={{ display: 'inline-block', width: '1px', height: '10px', background: '#AB301C', margin: '0 8px', verticalAlign: 'middle', opacity: 0.5 }} />
+              <span style={{ display: 'inline-block', width: '1px', height: '10px', background: '#FF4A1C', margin: '0 8px', verticalAlign: 'middle', opacity: 0.5 }} />
               {formatPlace(current)}
             </p>
           </div>
@@ -439,7 +439,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
               key={i}
               className="sfc-dot"
               onClick={() => goTo(i)}
-              style={{ width: i === active ? '18px' : '5px', height: '5px', borderRadius: i === active ? '3px' : '50%', background: i === active ? '#7A2114' : 'rgba(26,20,14,0.15)', border: '1px solid rgba(26,20,14,0.2)' }}
+              style={{ width: i === active ? '18px' : '5px', height: '5px', borderRadius: i === active ? '3px' : '50%', background: i === active ? '#B53514' : 'rgba(26,20,14,0.15)', border: '1px solid rgba(26,20,14,0.2)' }}
             />
           ))}
         </div>

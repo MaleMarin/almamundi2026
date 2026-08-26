@@ -75,7 +75,7 @@ export default function HistoriasIdVideoPageClient() {
             </p>
             <Link
               href="/historias"
-              className="rounded-full border border-[color:var(--almamundi-orange)]/40 px-6 py-3 text-sm font-medium transition-colors hover:bg-[#AB301C]/10"
+              className="rounded-full border border-[color:var(--almamundi-orange)]/40 px-6 py-3 text-sm font-medium transition-colors hover:bg-[#FF4A1C]/10"
               style={{ color: neu.orange }}
             >
               Ver historias
