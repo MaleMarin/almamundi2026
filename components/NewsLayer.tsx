@@ -24,8 +24,8 @@ export type NewsItem = {
   topicMatched?: boolean;
 };
 
-const NEWS_FETCH_TIMEOUT_MS = 14_000;
-const NEWS_PANEL_HARD_STOP_MS = 12_000;
+const NEWS_FETCH_TIMEOUT_MS = 18_000;
+const NEWS_PANEL_HARD_STOP_MS = 16_000;
 
 export function isDemoNewsItem(item: NewsItem): boolean {
   if (item.id.startsWith('fb-') || item.id.startsWith('media-')) return true;
