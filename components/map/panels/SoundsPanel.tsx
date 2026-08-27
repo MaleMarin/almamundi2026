@@ -15,11 +15,11 @@ import {
 } from '@/lib/sound/ambient';
 
 const AMBIENT_OPTS = [
-  { id: 'universo' as const, label: 'Universo', desc: 'Sonido del espacio', place: 'Espacio', country: '—' },
-  { id: 'mar' as const, label: 'Mar', desc: 'Olas, calma', place: 'Océano', country: '—' },
-  { id: 'radio' as const, label: 'Radios comunitarias', desc: 'Voces y transmisiones', place: 'Radio', country: '—' },
-  { id: 'lluvia' as const, label: 'Lluvia en ciudades', desc: 'Lluvia en distintas ciudades', place: 'Lluvia', country: 'Varias ciudades' },
-  { id: 'mercado' as const, label: 'Mercados', desc: 'Ambiente de mercado', place: 'Mercado', country: '—' },
+  { id: 'universo' as const, label: 'Universo', desc: '', place: 'Universo', country: '' },
+  { id: 'mar' as const, label: 'Mar', desc: '', place: 'Mar', country: '' },
+  { id: 'radio' as const, label: 'Radio', desc: '', place: 'Radio', country: '' },
+  { id: 'lluvia' as const, label: 'Lluvia', desc: '', place: 'Lluvia', country: '' },
+  { id: 'mercado' as const, label: 'Mercado', desc: '', place: 'Mercado', country: '' },
 ];
 
 type SoundRowMood = (typeof AMBIENT_OPTS)[number] | {
@@ -98,11 +98,8 @@ function SoundRow({
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: '0 0 4px', lineHeight: 1.4 }}>
+          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.4 }}>
             {mood.place}
-          </p>
-          <p style={{ fontSize: 11, color: 'rgba(255,255,255,0.35)' }}>
-            {mood.country} {mood.desc ? ` · ${mood.desc}` : ''}
           </p>
         </div>
         <span
