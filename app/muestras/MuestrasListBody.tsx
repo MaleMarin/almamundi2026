@@ -125,7 +125,7 @@ export function MuestrasListBody() {
             </p>
           </div>
           <p className="mb-5 text-sm leading-relaxed" style={{ color: neu.textBody }}>
-            Tocá cada título (relieve neumórfico) para entrar a la sala, recorrer el hilo y abrir las
+            Toca cada título (relieve neumórfico) para entrar a la sala, recorrer el hilo y abrir las
             historias de ejemplo.{' '}
             <MuestrasSalaEntranceLink
               href="/muestras/el-hilo"

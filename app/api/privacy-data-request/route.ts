@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   if (!process.env.RESEND_API_KEY?.trim()) {
     return NextResponse.json(
-      { error: "El envío electrónico no está configurado. Escribinos a hola@almamundi.org con el mismo contenido." },
+      { error: "El envío electrónico no está configurado. Escríbenos a hola@almamundi.org con el mismo contenido." },
       { status: 503 },
     );
   }
@@ -138,6 +138,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[privacy-data-request]", e);
-    return NextResponse.json({ error: "No pudimos enviar la solicitud. Intentá de nuevo más tarde." }, { status: 500 });
+    return NextResponse.json({ error: "No pudimos enviar la solicitud. Intenta de nuevo más tarde." }, { status: 500 });
   }
 }
