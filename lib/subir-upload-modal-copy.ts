@@ -90,6 +90,15 @@ export function messageForUploadError(
     return kind === 'audio' ? UPLOAD_DURATION_ERROR.audio : UPLOAD_DURATION_ERROR.video;
   }
 
+  if (
+    code === 'captcha_required' ||
+    code === 'captcha_failed' ||
+    code === 'captcha_verify_error' ||
+    code.toLowerCase().includes('anti-bot')
+  ) {
+    return 'No pudimos confirmar que eres una persona. Completa la verificación e intenta de nuevo.';
+  }
+
   const lower = code.toLowerCase();
   if (
     lower.includes('failed to fetch') ||

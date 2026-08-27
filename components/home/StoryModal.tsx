@@ -63,6 +63,8 @@ import {
   shareOrCopyResonancePng,
 } from '@/lib/huella/share-resonance-png';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
+import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 
 const jakartaHuella = Plus_Jakarta_Sans({
@@ -385,6 +387,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [acceptedPublicacion, setAcceptedPublicacion] = useState(false);
   const [acceptedTerminos, setAcceptedTerminos] = useState(false);
   const [saving, setSaving] = useState(false);
+  const captchaTokenRef = useRef('');
+  const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(
+    getTurnstileSiteKey() ? 'wait' : 'skip'
+  );
   /** Evita validar un título stale si el closure del submit no se actualizó. */
   const storyTitleRef = useRef(storyTitle);
   storyTitleRef.current = storyTitle;
@@ -920,6 +926,16 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const submitDetails = useCallback(async () => {
     if (saving) return;
     if (!validateDetails()) return;
+    if (captchaGate === 'need') {
+      setErr('Completa la verificación de seguridad antes de enviar.');
+      return;
+    }
+    if (captchaGate === 'wait') {
+      setErr(
+        'La verificación de seguridad todavía está cargando. Espera un momento o usa Reintentar.'
+      );
+      return;
+    }
     setSaving(true);
     setErr('');
     try {
@@ -1042,6 +1058,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           consentPrivacyPolicy: acceptedPrivacy,
           consentPublicacion: acceptedPublicacion,
           consentTerminos: acceptedTerminos,
+          ...(captchaTokenRef.current ? { captchaToken: captchaTokenRef.current } : {}),
           ...(profilePhotoUploaded ? { profilePhotoUrl: profilePhotoUploaded } : {}),
           ...(sex ? { sex } : {}),
           ...(ageRange ? { ageRange } : {}),
@@ -1092,6 +1109,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     acceptedPrivacy,
     acceptedPublicacion,
     acceptedTerminos,
+    captchaGate,
   ]);
 
   useEffect(() => {
@@ -1962,6 +1980,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   </label>
                 </div>
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
+                <TurnstileWidget
+                  onTokenChange={(token) => {
+                    captchaTokenRef.current = token;
+                  }}
+                  onGateChange={setCaptchaGate}
+                />
                 <div className="flex flex-wrap justify-end gap-2">
                   <button
                     type="button"

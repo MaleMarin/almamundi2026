@@ -10,13 +10,14 @@ import {
   getRateLimiter,
 } from "@/lib/rate-limit";
 import { maxUploadBytesForMime } from "@/lib/subir-limits";
-import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 
 export const runtime = "nodejs";
 
 /**
- * POST JSON: { filename, contentType, size, cfTurnstileResponse? }
+ * POST JSON: { filename, contentType, size }
  * Devuelve URL resumable de GCS. El archivo NO pasa por Vercel.
+ * El captcha Turnstile se verifica en POST /api/submissions (token de un solo uso).
+ * Aquí el límite es rate-limit (40/hora por IP).
  */
 export async function POST(req: NextRequest) {
   const ip = clientIpFromRequest(req);
@@ -39,20 +40,11 @@ export async function POST(req: NextRequest) {
     filename?: unknown;
     contentType?: unknown;
     size?: unknown;
-    cfTurnstileResponse?: unknown;
   };
   try {
     body = (await req.json()) as typeof body;
   } catch {
     return NextResponse.json({ error: "invalid_json" }, { status: 400 });
-  }
-
-  const captcha = await verifyTurnstileIfConfigured(
-    typeof body.cfTurnstileResponse === "string" ? body.cfTurnstileResponse : null,
-    ip
-  );
-  if (!captcha.ok) {
-    return NextResponse.json({ error: captcha.reason }, { status: 400 });
   }
 
   const mime =

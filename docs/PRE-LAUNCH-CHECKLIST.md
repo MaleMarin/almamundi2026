@@ -63,7 +63,8 @@ Verificar que TODAS las variables de `.env.example` están seteadas en Vercel (P
 - [ ] `NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID`
 - [ ] `NEXT_PUBLIC_FIREBASE_APP_ID`
 - [ ] `RESEND_API_KEY`
-- [ ] `TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`
+- [ ] `NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY` y `TURNSTILE_ENFORCE`
+- [ ] `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN`
 - [ ] `SENTRY_DSN`
 - [ ] Cualquier otra variable propia del proyecto
 

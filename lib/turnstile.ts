@@ -3,8 +3,9 @@ import "server-only";
 /**
  * Cloudflare Turnstile (opcional).
  * - Sin TURNSTILE_SECRET_KEY: no verifica.
- * - Con secret pero sin TURNSTILE_ENFORCE=true: no exige token (compat hasta integrar widget en el cliente).
- * - Con secret y TURNSTILE_ENFORCE=true: exige token válido.
+ * - Con secret pero sin TURNSTILE_ENFORCE=true: no exige token.
+ * - Con secret y TURNSTILE_ENFORCE=true: exige token válido (widget en StoryModal).
+ * El token es de un solo uso: solo el POST de /api/submissions debe verificarlo.
  */
 export async function verifyTurnstileIfConfigured(
   token: string | null | undefined,
