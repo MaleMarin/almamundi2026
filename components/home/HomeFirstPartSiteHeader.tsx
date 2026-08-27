@@ -26,7 +26,7 @@ import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
 /** Misma franja que la home sobre fondo claro `#E0E5EC`. */
 const HOME_HEADER_SHELL =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20 font-sans';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[12.25rem] lg:h-[13.5rem] bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20 font-sans';
 
 /**
  * Reproductores en portal (audio z-9999, texto z-1000…): masthead debe quedar por encima
@@ -38,7 +38,7 @@ const HEADER_Z_LAYER_IMMERSIVE = 'z-[11000]';
  * Sin transparencia sobre vídeo/imagen: mismo color percibido que en la home, sin «manchar» el fondo.
  */
 const HOME_HEADER_SHELL_OVER_MEDIA =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-32 md:h-40 lg:h-44 border-b border-white/35 bg-[#E0E5EC] font-sans shadow-[0_10px_32px_rgba(0,0,0,0.16)]';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[12.25rem] lg:h-[13.5rem] border-b border-white/35 bg-[#E0E5EC] font-sans shadow-[0_10px_32px_rgba(0,0,0,0.16)]';
 
 const softHeaderButton = {
   backgroundColor: '#E9ECF3',
@@ -251,7 +251,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           <img
             src="/logo.png"
             alt="AlmaMundi"
-            className="h-28 md:h-36 lg:h-40 xl:h-44 w-auto object-contain object-left select-none filter drop-shadow-md"
+            className="h-[8.5rem] md:h-[11rem] lg:h-[12.25rem] xl:h-[13.5rem] w-auto object-contain object-left select-none filter drop-shadow-md"
           />
         </HomeHardLink>
       </div>
@@ -285,7 +285,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           <button
             type="button"
             className="fixed left-0 right-0 bottom-0 z-[98] bg-black/25 md:hidden"
-            style={{ top: '8rem' }}
+            style={{ top: '9.75rem' }}
             aria-label={t.ariaCloseMenuBackdrop}
             onClick={closeMobileNav}
           />

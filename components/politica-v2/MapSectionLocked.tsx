@@ -23,7 +23,7 @@ export function MapSectionLocked() {
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
       <section
         id="mapa"
-        className="relative z-[15] w-full scroll-mt-32 bg-transparent -mt-32 pt-32 md:scroll-mt-40 md:-mt-40 md:pt-40 lg:scroll-mt-44 lg:-mt-44 lg:pt-44"
+        className="relative z-[15] w-full scroll-mt-[9.75rem] bg-transparent -mt-[9.75rem] pt-[9.75rem] md:scroll-mt-[12.25rem] md:-mt-[12.25rem] md:pt-[12.25rem] lg:scroll-mt-[13.5rem] lg:-mt-[13.5rem] lg:pt-[13.5rem]"
       >
         {/* Un solo degradado continuo (claro → noche → espacio); sin franja intermedia. */}
         <div className="map-section-atmosphere w-full">
