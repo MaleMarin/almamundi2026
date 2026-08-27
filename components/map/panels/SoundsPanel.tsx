@@ -234,6 +234,19 @@ export function SoundsPanel({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ flexShrink: 0, margin: '0 0 2px' }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'rgba(248, 250, 255, 0.82)',
+            lineHeight: 1.5,
+            margin: 0,
+            fontFamily: SITE_FONT_STACK,
+          }}
+        >
+          Estos sonidos pueden traerte recuerdos de otros lugares. Elige el que quieras mientras exploras el mapa.
+        </p>
+      </div>
       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
         <button
           type="button"

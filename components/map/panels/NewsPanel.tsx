@@ -281,6 +281,19 @@ export function NewsPanel({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
+      <div style={{ flexShrink: 0, margin: '0 0 4px' }}>
+        <p
+          style={{
+            fontSize: 13,
+            color: 'rgba(248, 250, 255, 0.82)',
+            lineHeight: 1.5,
+            margin: 0,
+            fontFamily: SITE_FONT_STACK,
+          }}
+        >
+          El mundo sigue su curso mientras se cuentan estas historias. Aquí tienes noticias reales para entenderlo mejor.
+        </p>
+      </div>
       <div style={{ flexShrink: 0 }}>
         <div
           style={{
