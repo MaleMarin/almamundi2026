@@ -52,6 +52,7 @@ export function storyToVideoHistoria(s: StoryPoint): Historia {
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     citaDestacada: s.quote,
     subtitulos: s.captionsUrl,
+    ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }

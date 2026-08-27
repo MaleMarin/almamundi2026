@@ -41,6 +41,7 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
       bio: s.author?.bio,
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
+    ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }

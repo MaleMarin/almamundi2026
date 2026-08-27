@@ -7,6 +7,7 @@ import { z } from "zod";
 import { THEME_IDS } from "@/lib/themes";
 import { SUBIR_PHOTO_MAX, SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from "@/lib/subir-author-fields";
+import { CANCION_RELACIONADA_MAX } from "@/lib/cancion-relacionada";
 
 const privatePathRegex =
   /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
@@ -65,6 +66,8 @@ export const CreateSubmissionBody = z.object({
   extraAttachmentUrls: z.array(z.string().url()).max(8).optional(),
   /** Paths en Storage (privados) asociados a esta solicitud; para re-firmar URLs en curación. */
   privateMediaPaths: z.array(z.string().regex(privatePathRegex)).max(24).optional(),
+  /** Nombre de una canción o enlace (Spotify, YouTube, etc.). Opcional. */
+  cancionRelacionada: z.string().max(CANCION_RELACIONADA_MAX).optional(),
 });
 export type CreateSubmissionBodyType = z.infer<typeof CreateSubmissionBody>;
 
@@ -95,6 +98,8 @@ export interface SubmissionDoc {
   consentedAt?: number;
   extraAttachmentUrls?: string[];
   privateMediaPaths?: string[];
+  /** Nombre de canción o enlace; opcional. */
+  cancionRelacionada?: string;
   payload: {
     textBody?: string;
     photoUrl?: string;

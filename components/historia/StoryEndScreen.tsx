@@ -4,6 +4,7 @@ import { useState, type CSSProperties } from 'react';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -36,6 +37,7 @@ export type StoryEndScreenProps = {
   onMoreStories: () => void;
   thumbnailUrl?: string;
   demoStory?: DemoStoryFields;
+  cancionRelacionada?: string;
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
   embedInSite?: boolean;
   /** Datos para abrir el flujo de compartir; si está ausente, no se muestra botón. */
@@ -82,13 +84,14 @@ export function StoryEndScreen({
   onMoreStories,
   thumbnailUrl,
   demoStory,
+  cancionRelacionada,
   embedInSite = false,
   share,
 }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
   const [shareOpen, setShareOpen] = useState(false);
 
-  const hasTitleExtras = Boolean(subtitulo?.trim()) || Boolean(fechaStr);
+  const hasTitleExtras = Boolean(subtitulo?.trim()) || Boolean(fechaStr) || Boolean(cancionRelacionada?.trim());
 
   const shellStyle: CSSProperties = embedInSite
     ? {
@@ -197,6 +200,8 @@ export function StoryEndScreen({
             {subtitulo}
           </p>
         ) : null}
+
+        <CancionRelacionadaLine value={cancionRelacionada} />
 
         {fechaStr ? (
           <p

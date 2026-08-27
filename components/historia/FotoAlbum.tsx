@@ -5,6 +5,7 @@ import { neu } from '@/lib/historias-neumorph';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -26,6 +27,7 @@ export interface HistoriaFoto {
   };
   tags?: string[];
   demoStory?: DemoStoryFields;
+  cancionRelacionada?: string;
 }
 
 interface FotoAlbumProps {
@@ -393,6 +395,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               >
                 {historia.titulo}
               </h2>
+              <CancionRelacionadaLine value={historia.cancionRelacionada} />
               <div style={{ width: 48, height: 2, background: `${SEPIA}45`, margin: '0 auto 1.35rem', borderRadius: 999 }} />
               <img
                 src={historia.autor.avatar}

@@ -79,6 +79,7 @@ export type SiteUiMessages = {
   modalAliasPlaceholder: string;
   modalExtras: string;
   modalExtrasPlaceholder: string;
+  modalCancionRelacionada: string;
   modalFiles: string;
   modalAttach: string;
   modalProfilePhoto: string;
@@ -227,6 +228,8 @@ const es: SiteUiMessages = {
   modalAliasPlaceholder: 'Cómo quieres aparecer',
   modalExtras: 'Extras (opcional)',
   modalExtrasPlaceholder: 'Contexto breve si hace falta…',
+  modalCancionRelacionada:
+    '¿Existe una canción que conecte con esta historia? Puedes dejarnos el nombre o un enlace (opcional).',
   modalFiles: 'Archivos · máx. {mb}MB c/u',
   modalAttach: 'Adjuntar',
   modalProfilePhoto: 'Foto perfil (opc.) · máx. {mb}MB',
@@ -406,6 +409,8 @@ const pt: SiteUiMessages = {
   modalAliasPlaceholder: 'Como quer aparecer',
   modalExtras: 'Extras (opcional)',
   modalExtrasPlaceholder: 'Contexto breve se fizer falta…',
+  modalCancionRelacionada:
+    'Existe uma canção que se liga a esta história? Pode deixar o nome ou um link (opcional).',
   modalFiles: 'Ficheiros · máx. {mb}MB cada',
   modalAttach: 'Anexar',
   modalProfilePhoto: 'Foto de perfil (opc.) · máx. {mb}MB',
@@ -584,6 +589,8 @@ const en: SiteUiMessages = {
   modalAliasPlaceholder: 'How you want to appear',
   modalExtras: 'Extras (optional)',
   modalExtrasPlaceholder: 'Brief context if needed…',
+  modalCancionRelacionada:
+    'Is there a song that connects with this story? You can leave the name or a link (optional).',
   modalFiles: 'Files · max. {mb}MB each',
   modalAttach: 'Attach',
   modalProfilePhoto: 'Profile photo (opt.) · max. {mb}MB',

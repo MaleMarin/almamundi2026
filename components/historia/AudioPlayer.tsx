@@ -1,6 +1,7 @@
 'use client';
 
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
+import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
@@ -38,6 +39,7 @@ export interface HistoriaAudio {
   transcripcion?: string;
   transcript?: string;
   demoStory?: DemoStoryFields;
+  cancionRelacionada?: string;
 }
 
 interface AudioPlayerProps {
@@ -357,6 +359,7 @@ export default function AudioPlayer({
             >
               {historia.titulo}
             </h1>
+            <CancionRelacionadaLine value={historia.cancionRelacionada} />
 
             <div
               className={isPlaying ? 'ap-halo-pulse' : ''}
@@ -622,6 +625,7 @@ export default function AudioPlayer({
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
+          cancionRelacionada={historia.cancionRelacionada}
           embedInSite={presentation === 'embed'}
           replayLabel="Escuchar de nuevo"
           onReplay={restart}

@@ -8,6 +8,7 @@ import {
   stripHtml,
 } from "@/lib/api/input-validation";
 import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema";
+import { CANCION_RELACIONADA_MAX, normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import {
   clientIpFromRequest,
@@ -77,6 +78,9 @@ export async function POST(req: NextRequest) {
   const birthDate = data.birthDate?.trim()
     ? stripHtml(data.birthDate).slice(0, 80)
     : undefined;
+  const cancionRelacionada = normalizeCancionRelacionada(
+    data.cancionRelacionada ? stripHtml(data.cancionRelacionada).slice(0, CANCION_RELACIONADA_MAX) : undefined
+  );
 
   const textBodyRaw = data.payload.textBody?.trim();
   const textBody =
@@ -200,6 +204,9 @@ export async function POST(req: NextRequest) {
   }
   if (data.privateMediaPaths?.length) {
     (doc as SubmissionDoc).privateMediaPaths = data.privateMediaPaths;
+  }
+  if (cancionRelacionada) {
+    (doc as SubmissionDoc).cancionRelacionada = cancionRelacionada;
   }
 
   try {

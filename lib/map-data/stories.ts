@@ -56,6 +56,8 @@ export type StoryPoint = {
   tags?: string[];
   /** Cita destacada */
   quote?: string;
+  /** Nombre de canción o enlace asociado (opcional). */
+  cancionRelacionada?: string;
   /** URL WebVTT para subtítulos de vídeo. */
   captionsUrl?: string;
   /** Transcripción del audio o vídeo (texto accesible). */

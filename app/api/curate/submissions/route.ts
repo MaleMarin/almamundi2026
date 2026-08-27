@@ -99,6 +99,8 @@ export async function GET(request: NextRequest) {
               createdAt,
               updatedAt: null,
               _createdMs: ms,
+              cancionRelacionada:
+                typeof raw.cancionRelacionada === "string" ? raw.cancionRelacionada : undefined,
             };
           })
         : [];

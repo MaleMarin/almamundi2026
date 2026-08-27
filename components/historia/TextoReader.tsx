@@ -6,6 +6,7 @@ import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
@@ -29,6 +30,7 @@ export interface HistoriaTexto {
   };
   tags?: string[];
   demoStory?: DemoStoryFields;
+  cancionRelacionada?: string;
 }
 
 interface TextoReaderProps {
@@ -235,6 +237,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             {historia.subtitulo}
           </p>
         )}
+
+        <CancionRelacionadaLine value={historia.cancionRelacionada} />
 
         {/* Línea separadora */}
         <div

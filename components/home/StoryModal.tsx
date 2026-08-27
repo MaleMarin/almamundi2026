@@ -39,6 +39,7 @@ import {
   isAllowedExtraAttachmentFile,
   isAllowedVideoUploadFile,
 } from '@/lib/subir-limits';
+import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
 import {
   UPLOAD_DURATION_ERROR,
   UPLOAD_EXTRA_TYPE_ERROR,
@@ -375,6 +376,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [storyTitle, setStoryTitle] = useState('');
   const [alias, setAlias] = useState('');
   const [extraText, setExtraText] = useState('');
+  const [cancionRelacionada, setCancionRelacionada] = useState('');
   const [extraFiles, setExtraFiles] = useState<File[]>([]);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
@@ -462,6 +464,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setStoryTitle('');
       setAlias('');
       setExtraText('');
+      setCancionRelacionada('');
       setExtraFiles([]);
       setProfilePhoto(null);
       setSex('');
@@ -1064,6 +1067,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           ...(ageRange ? { ageRange } : {}),
           ...(extraAttachmentUrls.length ? { extraAttachmentUrls } : {}),
           ...(privateMediaPaths.length ? { privateMediaPaths } : {}),
+          ...(cancionRelacionada.trim()
+            ? { cancionRelacionada: cancionRelacionada.trim().slice(0, CANCION_RELACIONADA_MAX) }
+            : {}),
         }),
       });
 
@@ -1104,6 +1110,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     city,
     country,
     extraText,
+    cancionRelacionada,
     sex,
     ageRange,
     acceptedPrivacy,
@@ -1764,6 +1771,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         placeholder={t.modalExtrasPlaceholder}
                         rows={2}
                         className="w-full resize-none rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="story-cancion-relacionada"
+                        className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-500 md:text-[11px]"
+                      >
+                        {t.modalCancionRelacionada}
+                      </label>
+                      <input
+                        id="story-cancion-relacionada"
+                        value={cancionRelacionada}
+                        onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
+                        maxLength={CANCION_RELACIONADA_MAX}
+                        placeholder="Nombre o https://…"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>

@@ -2,6 +2,7 @@
 
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure'
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
+import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
@@ -26,6 +27,7 @@ export interface Historia {
   /** URL de archivo de subtítulos (WebVTT) para `<track kind="captions">`. */
   subtitulos?: string
   demoStory?: DemoStoryFields
+  cancionRelacionada?: string
 }
 
 interface VideoPlayerProps {
@@ -426,6 +428,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             </p>
           )}
 
+          <CancionRelacionadaLine value={historia.cancionRelacionada} tone="dark" />
+
           {/* Ornamental bottom line */}
           <div style={{
             width: intertitlePhase === 'hold' ? '280px' : '0px',
@@ -732,6 +736,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
+          cancionRelacionada={historia.cancionRelacionada}
           embedInSite={siteLayout}
           replayLabel="Ver de nuevo"
           onReplay={() => {
