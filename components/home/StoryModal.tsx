@@ -39,6 +39,7 @@ import {
   isAllowedExtraAttachmentFile,
   isAllowedVideoUploadFile,
 } from '@/lib/subir-limits';
+import { ANTECEDENTES_MAX } from '@/lib/antecedentes';
 import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
 import {
   UPLOAD_DURATION_ERROR,
@@ -1070,6 +1071,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           ...(cancionRelacionada.trim()
             ? { cancionRelacionada: cancionRelacionada.trim().slice(0, CANCION_RELACIONADA_MAX) }
             : {}),
+          ...(extraText.trim()
+            ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
+            : {}),
         }),
       });
 
@@ -1767,7 +1771,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       </div>
                       <textarea
                         value={extraText}
-                        onChange={(e) => setExtraText(e.target.value)}
+                        onChange={(e) => setExtraText(e.target.value.slice(0, ANTECEDENTES_MAX))}
+                        maxLength={ANTECEDENTES_MAX}
                         placeholder={t.modalExtrasPlaceholder}
                         rows={2}
                         className="w-full resize-none rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"

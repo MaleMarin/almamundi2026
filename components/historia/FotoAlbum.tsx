@@ -5,7 +5,7 @@ import { neu } from '@/lib/historias-neumorph';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
-import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
+import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -28,6 +28,7 @@ export interface HistoriaFoto {
   tags?: string[];
   demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
+  antecedentes?: string;
 }
 
 interface FotoAlbumProps {
@@ -395,7 +396,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               >
                 {historia.titulo}
               </h2>
-              <CancionRelacionadaLine value={historia.cancionRelacionada} />
               <div style={{ width: 48, height: 2, background: `${SEPIA}45`, margin: '0 auto 1.35rem', borderRadius: 999 }} />
               <img
                 src={historia.autor.avatar}
@@ -410,23 +410,13 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)',
                 }}
               />
-              <p
-                style={{
-                  fontFamily: SITE_FONT_STACK,
-                  fontWeight: 600,
-                  fontSize: '1.05rem',
-                  color: neu.textMain,
-                  marginBottom: historia.autor.ubicacion ? '0.35rem' : '1.2rem',
-                }}
-              >
-                {historia.autor.nombre}
-              </p>
-              {historia.autor.ubicacion ? (
-                <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: neu.textBody, marginBottom: '1.25rem' }}>
-                  {historia.autor.ubicacion}
-                </p>
-              ) : null}
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center', marginTop: historia.autor.ubicacion ? 0 : '0.25rem' }}>
+              <HistoriaCreditos
+                nombre={historia.autor.nombre}
+                ubicacion={historia.autor.ubicacion}
+                antecedentes={historia.antecedentes}
+                cancionRelacionada={historia.cancionRelacionada}
+              />
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center' }}>
                 {onClose ? (
                   <button
                     type="button"

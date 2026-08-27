@@ -11,6 +11,7 @@ import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlay
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
+import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 import {
   historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
@@ -49,7 +50,7 @@ function storyToHistoriaAudioOrDemo(s: StoryPoint): HistoriaAudio {
       autor: {
         nombre,
         avatar: s.author?.avatar ?? m.autor.avatar,
-        ubicacion: [s.city, s.country].filter(Boolean).join(', ') || m.autor.ubicacion,
+        ubicacion: storyUbicacionLabel(s) || m.autor.ubicacion,
         bio: (m.autor as { bio?: string }).bio,
       },
       tags: s.tags ?? m.tags,

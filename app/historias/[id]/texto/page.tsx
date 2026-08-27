@@ -10,6 +10,7 @@ import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata'
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
+import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -19,14 +20,14 @@ function defaultAvatar(name: string): string {
 
 function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const ubicacion = storyUbicacionLabel(s);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
   const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
-    subtitulo: s.subtitle ?? s.description ?? ubicacion,
+    subtitulo: s.subtitle ?? s.description,
     contenido,
     tiempoLectura,
     fecha: s.publishedAt ?? '',
@@ -38,6 +39,7 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
+    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }

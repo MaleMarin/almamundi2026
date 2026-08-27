@@ -4,7 +4,7 @@ import { useState, type CSSProperties } from 'react';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
-import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
+import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -38,6 +38,7 @@ export type StoryEndScreenProps = {
   thumbnailUrl?: string;
   demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
+  antecedentes?: string;
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
   embedInSite?: boolean;
   /** Datos para abrir el flujo de compartir; si está ausente, no se muestra botón. */
@@ -85,13 +86,20 @@ export function StoryEndScreen({
   thumbnailUrl,
   demoStory,
   cancionRelacionada,
+  antecedentes,
   embedInSite = false,
   share,
 }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
   const [shareOpen, setShareOpen] = useState(false);
 
-  const hasTitleExtras = Boolean(subtitulo?.trim()) || Boolean(fechaStr) || Boolean(cancionRelacionada?.trim());
+  const hasTitleExtras =
+    Boolean(subtitulo?.trim()) ||
+    Boolean(fechaStr) ||
+    Boolean(cancionRelacionada?.trim()) ||
+    Boolean(antecedentes?.trim()) ||
+    Boolean(autor.nombre?.trim()) ||
+    Boolean(autor.ubicacion?.trim());
 
   const shellStyle: CSSProperties = embedInSite
     ? {
@@ -186,6 +194,13 @@ export function StoryEndScreen({
           {titulo}
         </h2>
 
+        <HistoriaCreditos
+          nombre={autor.nombre}
+          ubicacion={autor.ubicacion}
+          antecedentes={antecedentes}
+          cancionRelacionada={cancionRelacionada}
+        />
+
         {subtitulo?.trim() ? (
           <p
             style={{
@@ -200,8 +215,6 @@ export function StoryEndScreen({
             {subtitulo}
           </p>
         ) : null}
-
-        <CancionRelacionadaLine value={cancionRelacionada} />
 
         {fechaStr ? (
           <p

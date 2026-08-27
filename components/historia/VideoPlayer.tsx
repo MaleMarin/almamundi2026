@@ -2,7 +2,7 @@
 
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure'
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
-import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine'
+import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
@@ -28,6 +28,7 @@ export interface Historia {
   subtitulos?: string
   demoStory?: DemoStoryFields
   cancionRelacionada?: string
+  antecedentes?: string
 }
 
 interface VideoPlayerProps {
@@ -413,22 +414,13 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             {historia.titulo}
           </h1>
 
-          {historia.subtitulo && (
-            <p style={{
-              fontFamily: SITE_FONT_STACK,
-              fontWeight: 300,
-              fontSize: '0.95rem',
-              letterSpacing: '0.12em',
-              color: 'rgba(245,240,232,0.45)',
-              marginTop: '1.4rem',
-              opacity: intertitlePhase === 'hold' ? 1 : 0,
-              transition: 'opacity 0.8s ease 0.6s',
-            }}>
-              {historia.subtitulo}
-            </p>
-          )}
-
-          <CancionRelacionadaLine value={historia.cancionRelacionada} tone="dark" />
+          <HistoriaCreditos
+            nombre={historia.autor.nombre}
+            ubicacion={historia.autor.ubicacion}
+            antecedentes={historia.antecedentes}
+            cancionRelacionada={historia.cancionRelacionada}
+            tone="dark"
+          />
 
           {/* Ornamental bottom line */}
           <div style={{
@@ -466,6 +458,18 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             }}>
               {historia.autor.nombre}
             </span>
+            {historia.autor.ubicacion ? (
+              <span style={{
+                fontFamily: SITE_FONT_STACK,
+                fontWeight: 300,
+                fontSize: '0.68rem',
+                letterSpacing: '0.16em',
+                color: 'rgba(245,240,232,0.4)',
+                textTransform: 'uppercase',
+              }}>
+                {historia.autor.ubicacion}
+              </span>
+            ) : null}
           </div>
         </div>
       )}
@@ -737,6 +741,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
           cancionRelacionada={historia.cancionRelacionada}
+          antecedentes={historia.antecedentes}
           embedInSite={siteLayout}
           replayLabel="Ver de nuevo"
           onReplay={() => {

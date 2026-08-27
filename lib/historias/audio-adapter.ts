@@ -6,6 +6,7 @@ import type { HistoriaAudio } from '@/components/historia/AudioPlayer';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { captionPhrasesFromTranscription } from '@/lib/historias/story-accessibility';
+import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 export function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -15,7 +16,7 @@ export function defaultAvatar(name: string): string {
 
 export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const ubicacion = storyUbicacionLabel(s);
   const thumb = s.imageUrl ?? s.thumbnailUrl ?? '';
   const demoStory = demoStoryFieldsFromPoint(s);
   const transcription = s.transcription?.trim();
@@ -25,7 +26,7 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
   return {
     id: s.id,
     titulo: s.title ?? 'Sin título',
-    subtitulo: s.subtitle ?? ubicacion,
+    subtitulo: s.subtitle,
     audioUrl: s.audioUrl!,
     thumbnailUrl: thumb || defaultAvatar(nombre),
     duracion: 0,
@@ -42,6 +43,7 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
+    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }

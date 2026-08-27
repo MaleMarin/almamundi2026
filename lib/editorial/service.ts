@@ -7,6 +7,7 @@ import type { DocumentReference, Firestore } from "firebase-admin/firestore";
 import { FieldValue } from "firebase-admin/firestore";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
+import { normalizeAntecedentes } from "@/lib/antecedentes";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
 import {
@@ -70,6 +71,7 @@ type SubmissionsPipelineDoc = {
   context?: string;
   countryLabel?: string;
   cancionRelacionada?: string;
+  antecedentes?: string;
   payload?: {
     textBody?: string;
     photoUrl?: string;
@@ -85,6 +87,13 @@ function mapSubmissionsTipoToStoryFormat(type: string | undefined): "text" | "au
   if (type === "audio") return "audio";
   if (type === "foto") return "image";
   return "text";
+}
+
+function copyOptionalPublicFields(story: Record<string, unknown>, source: Record<string, unknown>) {
+  const cancion = normalizeCancionRelacionada(source.cancionRelacionada);
+  if (cancion) story.cancionRelacionada = cancion;
+  const antecedentes = normalizeAntecedentes(source.antecedentes);
+  if (antecedentes) story.antecedentes = antecedentes;
 }
 
 function coerceFiniteNumber(v: unknown): number | null {
@@ -180,8 +189,7 @@ export async function editorialPublishFromSubmission(
     const countryKnown = typeof sub.country === "string" ? sub.country : undefined;
     if (cityKnown) story.city = cityKnown;
     if (countryKnown) story.country = countryKnown;
-    const cancionLegacy = normalizeCancionRelacionada(sub.cancionRelacionada);
-    if (cancionLegacy) story.cancionRelacionada = cancionLegacy;
+    copyOptionalPublicFields(story, sub);
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
@@ -262,8 +270,7 @@ export async function editorialPublishFromSubmission(
     country: sd.countryLabel ?? undefined,
     city: sd.placeLabel ?? undefined,
   };
-  const cancionRelacionada = normalizeCancionRelacionada(sd.cancionRelacionada);
-  if (cancionRelacionada) story.cancionRelacionada = cancionRelacionada;
+  copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
 
   await storyRef.set(story);
@@ -347,8 +354,7 @@ export async function editorialPublishApprovedStorySubmission(
         ? data.email.trim()
         : "";
   if (authorEmailLegacy) storyData.authorEmail = authorEmailLegacy;
-  const cancionPreapproved = normalizeCancionRelacionada(data.cancionRelacionada);
-  if (cancionPreapproved) storyData.cancionRelacionada = cancionPreapproved;
+  copyOptionalPublicFields(storyData, data);
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
   const storyRef = db.collection("stories").doc();

@@ -7,6 +7,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
+import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
@@ -31,6 +32,7 @@ export interface HistoriaTexto {
   tags?: string[];
   demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
+  antecedentes?: string;
 }
 
 interface TextoReaderProps {
@@ -238,9 +240,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           </p>
         )}
 
-        <CancionRelacionadaLine value={historia.cancionRelacionada} />
-
-        {/* Línea separadora */}
         <div
           style={{
             width: 60,
@@ -250,13 +249,14 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           }}
         />
 
-        {/* Metadatos: avatar + nombre + tiempo */}
+        {/* Metadatos: avatar + nombre + ubicación + tiempo */}
         <div
           style={{
             display: 'flex',
-            gap: '1.5rem',
+            flexWrap: 'wrap',
+            gap: '0.75rem 1.5rem',
             alignItems: 'center',
-            marginBottom: '3rem',
+            marginBottom: historia.antecedentes?.trim() || historia.cancionRelacionada?.trim() ? '1rem' : '3rem',
           }}
         >
           <img
@@ -272,19 +272,43 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           <span style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
             {historia.autor.nombre}
           </span>
-          <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
+          {historia.autor.ubicacion ? (
+            <>
+              <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
+              <span
+                style={{
+                  fontFamily: SITE_FONT_STACK,
+                  fontWeight: 400,
+                  fontSize: '0.8rem',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase',
+                  color: TINTA_SOFT,
+                }}
+              >
+                {historia.autor.ubicacion}
+              </span>
+            </>
+          ) : null}
           {historia.tiempoLectura != null && (
-            <span
-              style={{
-                fontFamily: SITE_FONT_STACK,
-                fontWeight: 200,
-                fontSize: '0.8rem',
-                color: SEPIA,
-              }}
-            >
-              {historia.tiempoLectura} min de lectura
-            </span>
+            <>
+              <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
+              <span
+                style={{
+                  fontFamily: SITE_FONT_STACK,
+                  fontWeight: 200,
+                  fontSize: '0.8rem',
+                  color: SEPIA,
+                }}
+              >
+                {historia.tiempoLectura} min de lectura
+              </span>
+            </>
           )}
+        </div>
+
+        <div style={{ textAlign: 'left', marginBottom: historia.antecedentes?.trim() || historia.cancionRelacionada?.trim() ? '2rem' : 0 }}>
+          <AntecedentesText value={historia.antecedentes} />
+          <CancionRelacionadaLine value={historia.cancionRelacionada} />
         </div>
 
         {/* Cuerpo: drop cap + párrafos con fade-in */}

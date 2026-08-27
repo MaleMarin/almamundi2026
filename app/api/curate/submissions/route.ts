@@ -101,6 +101,7 @@ export async function GET(request: NextRequest) {
               _createdMs: ms,
               cancionRelacionada:
                 typeof raw.cancionRelacionada === "string" ? raw.cancionRelacionada : undefined,
+              antecedentes: typeof raw.antecedentes === "string" ? raw.antecedentes : undefined,
             };
           })
         : [];

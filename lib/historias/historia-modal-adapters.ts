@@ -6,6 +6,7 @@ import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -35,14 +36,14 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
   ).trim();
   if (!contenido) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const ubicacion = storyUbicacionLabel(s);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
   const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
-    subtitulo: s.subtitle ?? s.description ?? ubicacion,
+    subtitulo: s.subtitle ?? s.description,
     contenido,
     tiempoLectura,
     fecha: s.publishedAt ?? '',
@@ -57,6 +58,7 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
+    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }
@@ -65,12 +67,12 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
   const imagenes = buildImagenesFromStory(s);
   if (imagenes.length === 0) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = [s.city, s.country].filter(Boolean).join(', ') || undefined;
+  const ubicacion = storyUbicacionLabel(s);
   const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
-    subtitulo: s.subtitle ?? s.description ?? ubicacion,
+    subtitulo: s.subtitle ?? s.description,
     fecha: s.publishedAt ?? '',
     imagenes,
     autor: {
@@ -83,6 +85,7 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
+    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }

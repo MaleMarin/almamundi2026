@@ -1,7 +1,7 @@
 'use client';
 
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
-import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
+import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
@@ -15,7 +15,6 @@ const TEXT_MAIN = neu.textMain;
 const TEXT_BODY = neu.textBody;
 /** Acento naranja AlmaMundi. */
 const SEPIA = '#FF4A1C';
-const SEPIA_DK = '#B53514';
 const BAR_COUNT = 16;
 
 export interface HistoriaAudio {
@@ -40,6 +39,7 @@ export interface HistoriaAudio {
   transcript?: string;
   demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
+  antecedentes?: string;
 }
 
 interface AudioPlayerProps {
@@ -359,7 +359,6 @@ export default function AudioPlayer({
             >
               {historia.titulo}
             </h1>
-            <CancionRelacionadaLine value={historia.cancionRelacionada} />
 
             <div
               className={isPlaying ? 'ap-halo-pulse' : ''}
@@ -380,14 +379,12 @@ export default function AudioPlayer({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 500, fontSize: '0.95rem', color: TEXT_MAIN, marginBottom: '0.25rem' }}>
-              {historia.autor.nombre}
-            </p>
-            {historia.autor.ubicacion ? (
-              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: SEPIA_DK, letterSpacing: '0.12em', marginBottom: '1.25rem' }}>
-                {historia.autor.ubicacion}
-              </p>
-            ) : null}
+            <HistoriaCreditos
+              nombre={historia.autor.nombre}
+              ubicacion={historia.autor.ubicacion}
+              antecedentes={historia.antecedentes}
+              cancionRelacionada={historia.cancionRelacionada}
+            />
 
             <div
               style={{
@@ -626,6 +623,7 @@ export default function AudioPlayer({
           thumbnailUrl={historia.thumbnailUrl}
           demoStory={historia.demoStory}
           cancionRelacionada={historia.cancionRelacionada}
+          antecedentes={historia.antecedentes}
           embedInSite={presentation === 'embed'}
           replayLabel="Escuchar de nuevo"
           onReplay={restart}

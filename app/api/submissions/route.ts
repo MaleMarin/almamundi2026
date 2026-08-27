@@ -9,6 +9,7 @@ import {
 } from "@/lib/api/input-validation";
 import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema";
 import { CANCION_RELACIONADA_MAX, normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
+import { ANTECEDENTES_MAX, normalizeAntecedentes } from "@/lib/antecedentes";
 import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import {
   clientIpFromRequest,
@@ -80,6 +81,9 @@ export async function POST(req: NextRequest) {
     : undefined;
   const cancionRelacionada = normalizeCancionRelacionada(
     data.cancionRelacionada ? stripHtml(data.cancionRelacionada).slice(0, CANCION_RELACIONADA_MAX) : undefined
+  );
+  const antecedentes = normalizeAntecedentes(
+    data.antecedentes ? stripHtml(data.antecedentes).slice(0, ANTECEDENTES_MAX) : undefined
   );
 
   const textBodyRaw = data.payload.textBody?.trim();
@@ -207,6 +211,9 @@ export async function POST(req: NextRequest) {
   }
   if (cancionRelacionada) {
     (doc as SubmissionDoc).cancionRelacionada = cancionRelacionada;
+  }
+  if (antecedentes) {
+    (doc as SubmissionDoc).antecedentes = antecedentes;
   }
 
   try {

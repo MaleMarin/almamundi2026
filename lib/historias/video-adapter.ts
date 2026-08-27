@@ -5,10 +5,7 @@ import type { Historia } from '@/components/historia/VideoPlayer';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { defaultAvatar } from '@/lib/historias/audio-adapter';
-
-function formatPlace(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '';
-}
+import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 function resolveThumbnail(s: StoryPoint): string {
   const raw =
@@ -31,14 +28,14 @@ function resolveThumbnail(s: StoryPoint): string {
 
 export function storyToVideoHistoria(s: StoryPoint): Historia {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = formatPlace(s) || undefined;
+  const ubicacion = storyUbicacionLabel(s);
   const demoStory = demoStoryFieldsFromPoint(s);
   const videoUrl = (s.videoUrl ?? '').trim();
 
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Historia',
-    subtitulo: s.subtitle ?? ubicacion,
+    subtitulo: s.subtitle,
     videoUrl: videoUrl || '#',
     thumbnailUrl: resolveThumbnail(s),
     duracion: 0,
@@ -53,6 +50,7 @@ export function storyToVideoHistoria(s: StoryPoint): Historia {
     citaDestacada: s.quote,
     subtitulos: s.captionsUrl,
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
+    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...(demoStory ? { demoStory } : {}),
   };
 }
