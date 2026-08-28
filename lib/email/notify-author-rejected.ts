@@ -62,6 +62,19 @@ async function lookupEmailFromLinkedDocs(
   return null;
 }
 
+/** Misma búsqueda que el aviso de rechazo: documento, autor anidado y envío vinculado. */
+export async function resolveAuthorEmailForStoryDoc(
+  db: Firestore,
+  docId: string,
+  data: Record<string, unknown>
+): Promise<string | null> {
+  return (
+    resolveAuthorEmailFromSubmission(data) ??
+    resolveAuthorEmailFromRecord(data) ??
+    (await lookupEmailFromLinkedDocs(db, docId, data))
+  );
+}
+
 export async function notifyAuthorStoryRejected(args: {
   db: Firestore;
   collection: RejectionMailCollection;
@@ -94,9 +107,7 @@ export async function notifyAuthorStoryRejected(args: {
   };
 
   const to =
-    resolveAuthorEmailFromSubmission(data) ??
-    resolveAuthorEmailFromRecord(data) ??
-    (await lookupEmailFromLinkedDocs(db, docId, data));
+    (await resolveAuthorEmailForStoryDoc(db, docId, data));
 
   if (!to) {
     return persist({
