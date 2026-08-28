@@ -1,25 +1,11 @@
 import type { MetadataRoute } from 'next';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from '@/lib/editorial/status';
+import { siteOrigin } from '@/lib/site-origin';
 
 // Regenerar la sitemap a lo sumo cada hora: balance entre frescura para
 // historias recién publicadas y costo de lecturas a Firestore.
 export const revalidate = 3600;
-
-function siteOrigin(): string {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (raw) {
-    try {
-      const normalized = raw.endsWith('/') ? raw.slice(0, -1) : raw;
-      return new URL(normalized).origin;
-    } catch {
-      /* fall through */
-    }
-  }
-  const vercel = process.env.VERCEL_URL?.trim();
-  if (vercel) return `https://${vercel}`;
-  return 'https://www.almamundi.org';
-}
 
 /**
  * Rutas estáticas públicas. NO incluir privadas/admin/preview/demos:

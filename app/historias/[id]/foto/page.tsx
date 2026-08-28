@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
+import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
 import { FotoAlbumClient } from './FotoAlbumClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
@@ -18,10 +19,10 @@ function defaultAvatar(name: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-function buildImagenes(s: StoryPoint): { url: string; caption?: string }[] {
+function buildImagenes(s: StoryPoint): { url: string; caption?: string; descripcion?: string }[] {
   const sp = s as StoryPoint & {
     images?: string[];
-    imagenes?: { url: string; caption?: string }[];
+    imagenes?: { url: string; caption?: string; descripcion?: string }[];
     photos?: { url: string; name?: string; date?: string }[];
   };
   if (sp.imagenes?.length) return sp.imagenes;
@@ -31,7 +32,7 @@ function buildImagenes(s: StoryPoint): { url: string; caption?: string }[] {
   return [];
 }
 
-function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string }[]): HistoriaFoto {
+function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string; descripcion?: string }[]): HistoriaFoto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = storyUbicacionLabel(s);
   const demoStory = demoStoryFieldsFromPoint(s);
@@ -67,5 +68,10 @@ export default async function HistoriasIdFotoPage({ params }: PageProps) {
   const imagenes = buildImagenes(story);
   if (imagenes.length === 0) redirect(`/historias/${id}`);
   const historia = storyToHistoriaFoto(story, imagenes);
-  return <FotoAlbumClient historia={historia} />;
+  return (
+    <>
+      <StoryJsonLd id={id} />
+      <FotoAlbumClient historia={historia} />
+    </>
+  );
 }

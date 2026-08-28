@@ -9,6 +9,7 @@ import { SUBIR_PHOTO_MAX, SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from "@/lib/subir-author-fields";
 import { CANCION_RELACIONADA_MAX } from "@/lib/cancion-relacionada";
 import { ANTECEDENTES_MAX } from "@/lib/antecedentes";
+import { PHOTO_ALT_MAX } from "@/lib/historias/story-imagenes";
 
 const privatePathRegex =
   /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
@@ -44,6 +45,8 @@ export const CreateSubmissionBody = z.object({
     photoUrl: z.string().url().optional(),
     /** Galería 1–8 imágenes; `photoUrl` suele repetir la primera para compatibilidad. */
     photoUrls: z.array(z.string().url()).max(SUBIR_PHOTO_MAX).optional(),
+    /** Texto `alt` por foto, mismo orden que `photoUrls`. */
+    photoAlts: z.array(z.string().max(PHOTO_ALT_MAX)).max(SUBIR_PHOTO_MAX).optional(),
     audioUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
   }),
@@ -109,6 +112,7 @@ export interface SubmissionDoc {
     textBody?: string;
     photoUrl?: string;
     photoUrls?: string[];
+    photoAlts?: string[];
     audioUrl?: string;
     videoUrl?: string;
   };

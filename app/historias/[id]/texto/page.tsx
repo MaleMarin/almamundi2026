@@ -7,6 +7,7 @@ import { redirect } from 'next/navigation';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
 import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
+import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
@@ -58,5 +59,10 @@ export default async function HistoriasIdTextoPage({ params }: PageProps) {
   const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
   if (!contenido) redirect(`/historias/${id}`);
   const historia = storyToHistoriaTexto(story, contenido);
-  return <TextoReaderClient historia={historia} />;
+  return (
+    <>
+      <StoryJsonLd id={id} />
+      <TextoReaderClient historia={historia} />
+    </>
+  );
 }

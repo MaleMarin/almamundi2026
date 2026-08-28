@@ -14,10 +14,10 @@ function defaultAvatar(name: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-export function buildImagenesFromStory(s: StoryPoint): { url: string; caption?: string }[] {
+export function buildImagenesFromStory(s: StoryPoint): { url: string; caption?: string; descripcion?: string }[] {
   const sp = s as StoryPoint & {
     images?: string[];
-    imagenes?: { url: string; caption?: string }[];
+    imagenes?: { url: string; caption?: string; descripcion?: string }[];
     photos?: { url: string; name?: string; date?: string }[];
   };
   if (sp.imagenes?.length) return sp.imagenes;

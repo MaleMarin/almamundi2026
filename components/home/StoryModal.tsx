@@ -40,6 +40,7 @@ import {
   isAllowedVideoUploadFile,
 } from '@/lib/subir-limits';
 import { ANTECEDENTES_MAX } from '@/lib/antecedentes';
+import { PHOTO_ALT_MAX } from '@/lib/historias/story-imagenes';
 import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
 import {
   UPLOAD_DURATION_ERROR,
@@ -372,6 +373,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [textoReviewAck, setTextoReviewAck] = useState(false);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photoAlts, setPhotoAlts] = useState<string[]>([]);
 
   // --- FORM: historia + extras (STEP 2 del modal: tras captura) ---
   const [storyTitle, setStoryTitle] = useState('');
@@ -462,6 +464,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setTextoReviewAck(false);
       setPhotoFiles([]);
       setPhotoPreviews([]);
+      setPhotoAlts([]);
       setStoryTitle('');
       setAlias('');
       setExtraText('');
@@ -768,6 +771,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           }
           next.push(f);
         }
+        setPhotoAlts((alts) => next.map((_, i) => (i < prev.length ? alts[i] ?? '' : '')));
         return next;
       });
     },
@@ -784,6 +788,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   const removePhotoAt = useCallback((index: number) => {
     setPhotoFiles((p) => p.filter((_, i) => i !== index));
+    setPhotoAlts((p) => p.filter((_, i) => i !== index));
     setErr('');
   }, []);
 
@@ -973,6 +978,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         textBody?: string;
         photoUrl?: string;
         photoUrls?: string[];
+        photoAlts?: string[];
         audioUrl?: string;
         videoUrl?: string;
       } = {};
@@ -1037,7 +1043,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             photoFiles.map((f, i) => trackUpload(f, 'submissions', `photo-${i}-${f.name}`))
           );
           const first = urls[0];
-          if (first) payload = { photoUrl: first, photoUrls: urls };
+          if (first) {
+            payload = {
+              photoUrl: first,
+              photoUrls: urls,
+              photoAlts: photoAlts.slice(0, urls.length).map((s) => s.trim().slice(0, PHOTO_ALT_MAX)),
+            };
+          }
         } else {
           setErr('Faltan las fotos de la historia.');
           return;
@@ -1109,6 +1121,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     videoShareUrl,
     audioShareUrl,
     photoFiles,
+    photoAlts,
     alias,
     email,
     city,
@@ -1648,13 +1661,45 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         )}
 
         {mode === 'foto' && (
-          <UploadModalFotoCapture
-            photoFiles={photoFiles}
-            photoPreviews={photoPreviews}
-            onAddFiles={addPhotos}
-            onRemove={removePhotoAt}
-            inlineError={err || undefined}
-          />
+          <>
+            <UploadModalFotoCapture
+              photoFiles={photoFiles}
+              photoPreviews={photoPreviews}
+              onAddFiles={addPhotos}
+              onRemove={removePhotoAt}
+              inlineError={err || undefined}
+            />
+            {photoPreviews.length > 0 ? (
+              <div className="mt-4 space-y-3">
+                {photoPreviews.map((_, i) => (
+                  <div key={`photo-alt-${i}`}>
+                    <label
+                      htmlFor={`story-photo-alt-${i}`}
+                      className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-600 md:text-[11px]"
+                    >
+                      Describe brevemente esta foto (para personas con discapacidad visual)
+                      {photoPreviews.length > 1 ? ` · ${i + 1}` : ''}
+                    </label>
+                    <input
+                      id={`story-photo-alt-${i}`}
+                      value={photoAlts[i] ?? ''}
+                      onChange={(e) => {
+                        const value = e.target.value.slice(0, PHOTO_ALT_MAX);
+                        setPhotoAlts((prev) => {
+                          const next = [...prev];
+                          next[i] = value;
+                          return next;
+                        });
+                      }}
+                      maxLength={PHOTO_ALT_MAX}
+                      placeholder="Opcional"
+                      className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                    />
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </>
         )}
       </FormatCaptureEditorialShell>
     );

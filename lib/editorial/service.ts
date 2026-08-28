@@ -8,6 +8,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
+import { imagenesFromUrlsAndAlts, parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
 import {
@@ -76,6 +77,7 @@ type SubmissionsPipelineDoc = {
     textBody?: string;
     photoUrl?: string;
     photoUrls?: string[];
+    photoAlts?: string[];
     audioUrl?: string;
     videoUrl?: string;
   };
@@ -94,6 +96,8 @@ function copyOptionalPublicFields(story: Record<string, unknown>, source: Record
   if (cancion) story.cancionRelacionada = cancion;
   const antecedentes = normalizeAntecedentes(source.antecedentes);
   if (antecedentes) story.antecedentes = antecedentes;
+  const imagenes = parseStoryImagenes(source.imagenes);
+  if (imagenes) story.imagenes = imagenes;
 }
 
 function coerceFiniteNumber(v: unknown): number | null {
@@ -241,10 +245,13 @@ export async function editorialPublishFromSubmission(
   const media: Record<string, string> = {};
   if (sd.payload?.videoUrl) media.videoUrl = sd.payload.videoUrl;
   if (sd.payload?.audioUrl) media.audioUrl = sd.payload.audioUrl;
+  let imagenes: ReturnType<typeof imagenesFromUrlsAndAlts> | undefined;
   if (sd.payload?.photoUrls?.length) {
     media.imageUrl = sd.payload.photoUrls[0]!;
+    imagenes = imagenesFromUrlsAndAlts(sd.payload.photoUrls, sd.payload.photoAlts);
   } else if (sd.payload?.photoUrl) {
     media.imageUrl = sd.payload.photoUrl;
+    imagenes = imagenesFromUrlsAndAlts([sd.payload.photoUrl], sd.payload.photoAlts);
   }
 
   const story: Record<string, unknown> = {
@@ -269,6 +276,7 @@ export async function editorialPublishFromSubmission(
     placeLabel: sd.placeLabel,
     country: sd.countryLabel ?? undefined,
     city: sd.placeLabel ?? undefined,
+    ...(imagenes?.length ? { imagenes } : {}),
   };
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));

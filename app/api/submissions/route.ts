@@ -11,6 +11,7 @@ import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema
 import { CANCION_RELACIONADA_MAX, normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { ANTECEDENTES_MAX, normalizeAntecedentes } from "@/lib/antecedentes";
 import { SUBIR_TEXT_MAX_CHARS } from "@/lib/subir-limits";
+import { PHOTO_ALT_MAX } from "@/lib/historias/story-imagenes";
 import {
   clientIpFromRequest,
   enforceRateLimit,
@@ -168,6 +169,13 @@ export async function POST(req: NextRequest) {
       ...(data.payload.photoUrls?.length
         ? {
             photoUrls: data.payload.photoUrls.map((u) => u.trim()).filter(Boolean),
+          }
+        : {}),
+      ...(data.payload.photoAlts?.length
+        ? {
+            photoAlts: data.payload.photoAlts.map((s) =>
+              stripHtml(s).slice(0, PHOTO_ALT_MAX)
+            ),
           }
         : {}),
       ...(audioUrl && { audioUrl }),

@@ -68,6 +68,8 @@ export type StoryPoint = {
   captionPhrases?: string[];
   /** Varias imágenes: presentación Ken Burns, una por vez (roadmap 1B) */
   images?: string[];
+  /** Fotos publicadas con texto alternativo opcional (`descripcion` → `alt`). */
+  imagenes?: { url: string; caption?: string; descripcion?: string }[];
   /** Fotos con nombre y fecha para Ken Burns en StoryViewer */
   photos?: {
     url: string;

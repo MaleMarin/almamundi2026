@@ -12,6 +12,7 @@ import { getDemoStoryPointById } from "@/lib/historias/historias-demo-stories";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
+import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
   GLOBE_PUBLIC_STORY_CAP,
@@ -131,6 +132,7 @@ function firestoreDocToStoryPoint(
     quote: (d.quote as string) ?? undefined,
     cancionRelacionada: normalizeCancionRelacionada(d.cancionRelacionada),
     antecedentes: normalizeAntecedentes(d.antecedentes),
+    imagenes: parseStoryImagenes(d.imagenes),
     format: formato,
     city: city || undefined,
     country: country || undefined,
