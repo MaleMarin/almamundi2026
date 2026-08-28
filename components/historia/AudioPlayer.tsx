@@ -2,6 +2,7 @@
 
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
+import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
@@ -342,6 +343,7 @@ export default function AudioPlayer({
               minHeight: 0,
             }}
           >
+            <StoryScrollBlock scene>
             <h1
               style={{
                 fontFamily: SITE_FONT_STACK,
@@ -359,7 +361,13 @@ export default function AudioPlayer({
             >
               {historia.titulo}
             </h1>
+            <HistoriaCreditos
+              nombre={historia.autor.nombre}
+              ubicacion={historia.autor.ubicacion}
+            />
+            </StoryScrollBlock>
 
+            <StoryScrollBlock scene>
             <div
               className={isPlaying ? 'ap-halo-pulse' : ''}
               style={{
@@ -379,12 +387,6 @@ export default function AudioPlayer({
                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
-            <HistoriaCreditos
-              nombre={historia.autor.nombre}
-              ubicacion={historia.autor.ubicacion}
-              antecedentes={historia.antecedentes}
-              cancionRelacionada={historia.cancionRelacionada}
-            />
 
             <div
               style={{
@@ -610,6 +612,14 @@ export default function AudioPlayer({
                 </details>
               ) : null}
             </div>
+            </StoryScrollBlock>
+
+            <StoryScrollBlock scene>
+            <HistoriaCreditos
+              antecedentes={historia.antecedentes}
+              cancionRelacionada={historia.cancionRelacionada}
+            />
+            </StoryScrollBlock>
           </div>
         </div>
       ) : (

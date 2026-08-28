@@ -6,6 +6,7 @@ import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
+import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
 const CREAM = 'rgba(245,240,232,0.85)';
@@ -220,6 +221,38 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               <DemoStoryDisclosure story={historia.demoStory} variant="page" />
             </div>
           ) : null}
+          <StoryScrollBlock scene>
+            <section
+              style={{
+                minHeight: 'min(72dvh, 40rem)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textAlign: 'center',
+                padding: 'clamp(2rem, 5vw, 3.5rem) 1.25rem 1.5rem',
+              }}
+            >
+              <h1
+                style={{
+                  fontFamily: SITE_FONT_STACK,
+                  fontStyle: 'italic',
+                  fontWeight: 300,
+                  fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                  color: CREAM,
+                  margin: '0 0 1rem',
+                  lineHeight: 1.2,
+                }}
+              >
+                {historia.titulo}
+              </h1>
+              <HistoriaCreditos
+                nombre={historia.autor.nombre}
+                ubicacion={historia.autor.ubicacion}
+                tone="dark"
+              />
+            </section>
+          </StoryScrollBlock>
           {imagenes.map((img, i) => (
             <section
               key={i}
@@ -347,9 +380,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
           ))}
 
           {/* Cierre del álbum — mismo criterio neumórfico claro que audio/vídeo al terminar */}
+          <StoryScrollBlock scene>
           <section
             style={{
-              minHeight: '58vh',
+              minHeight: 'min(72dvh, 40rem)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -411,8 +445,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 }}
               />
               <HistoriaCreditos
-                nombre={historia.autor.nombre}
-                ubicacion={historia.autor.ubicacion}
                 antecedentes={historia.antecedentes}
                 cancionRelacionada={historia.cancionRelacionada}
               />
@@ -461,6 +493,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               </div>
             </div>
           </section>
+          </StoryScrollBlock>
         </div>
 
         {/* Indicador lateral (solo escritorio) */}

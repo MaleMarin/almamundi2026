@@ -34,6 +34,9 @@ export const DEMO_TEXT_STORY_POINT: StoryPoint = ensurePublicDemoStoryFields({
   thumbnailUrl: 'https://picsum.photos/seed/almamundi-texto-demo/800/600',
   excerpt: `${MOCK_STORIES.texto.contenido.slice(0, 140).trim()}…`,
   quote: 'Eres un puente, no una fractura.',
+  antecedentes:
+    'Escribió esta carta al cumplir veintiocho años, después de mudarse a Montreal.',
+  cancionRelacionada: 'Mercedes Sosa — Gracias a la vida',
   isDemo: true,
 });
 

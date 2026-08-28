@@ -3,6 +3,7 @@
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure'
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos'
+import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
 import { useDataSaverAutoplay } from '@/hooks/useDataSaverAutoplay'
@@ -437,8 +438,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           <HistoriaCreditos
             nombre={historia.autor.nombre}
             ubicacion={historia.autor.ubicacion}
-            antecedentes={historia.antecedentes}
-            cancionRelacionada={historia.cancionRelacionada}
             tone="dark"
           />
 
@@ -787,6 +786,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
       )}
 
       {stage === 'ended' ? (
+        <StoryScrollBlock>
         <StoryEndScreen
           titulo={historia.titulo}
           fecha={historia.fecha}
@@ -815,6 +815,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           }}
           share={{ storyId: historia.id, formato: 'video', imageUrl: historia.thumbnailUrl }}
         />
+        </StoryScrollBlock>
       ) : null}
     </>
   )

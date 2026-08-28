@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -8,6 +8,7 @@ import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { AntecedentesText } from '@/components/historia/AntecedentesText';
+import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
@@ -67,8 +68,6 @@ function splitParrafos(contenido: string): string[] {
 export default function TextoReader({ historia, onClose, siteLayout = false }: TextoReaderProps) {
   const [readProgress, setReadProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
-  const paragraphRefs = useRef<(HTMLParagraphElement | null)[]>([]);
-  const [visibleParrafos, setVisibleParrafos] = useState<boolean[]>([]);
   const [shareOpen, setShareOpen] = useState(false);
 
   useEffect(() => {
@@ -91,36 +90,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
   }, [historia.id]);
 
   const { drop, rest: restOfFirst, otherParrafos } = getFirstParagraphDropAndRest(historia.contenido);
-  const totalParrafos = (drop || restOfFirst ? 1 : 0) + otherParrafos.length;
-
-  useEffect(() => {
-    const refs = paragraphRefs.current;
-    if (totalParrafos === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        setVisibleParrafos((prev) => {
-          const next = [...prev];
-          entries.forEach((e) => {
-            const i = refs.indexOf(e.target as HTMLParagraphElement);
-            if (i >= 0 && e.isIntersecting) next[i] = true;
-          });
-          return next;
-        });
-      },
-      { rootMargin: '0px 0px -80px 0px', threshold: 0.1 }
-    );
-    refs.forEach((r) => r && observer.observe(r));
-    queueMicrotask(() => {
-      setVisibleParrafos((prev) => {
-        const next = new Array(totalParrafos).fill(false);
-        prev.forEach((v, i) => {
-          if (i < totalParrafos) next[i] = v;
-        });
-        return next;
-      });
-    });
-    return () => observer.disconnect();
-  }, [totalParrafos, historia.id]);
 
   const maxWidth = isMobile ? '100%' : '640px';
   const maxWidthDesktop = '720px';
@@ -194,6 +163,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             <DemoStoryDisclosure story={historia.demoStory} variant="page" onLightBackground />
           </div>
         ) : null}
+
+        <StoryScrollBlock scene>
         {/* Fecha */}
         <p
           style={{
@@ -256,7 +227,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             flexWrap: 'wrap',
             gap: '0.75rem 1.5rem',
             alignItems: 'center',
-            marginBottom: historia.antecedentes?.trim() || historia.cancionRelacionada?.trim() ? '1rem' : '3rem',
+            marginBottom: '3rem',
           }}
         >
           <img
@@ -305,17 +276,13 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             </>
           )}
         </div>
+        </StoryScrollBlock>
 
-        <div style={{ textAlign: 'left', marginBottom: historia.antecedentes?.trim() || historia.cancionRelacionada?.trim() ? '2rem' : 0 }}>
-          <AntecedentesText value={historia.antecedentes} />
-          <CancionRelacionadaLine value={historia.cancionRelacionada} />
-        </div>
-
-        {/* Cuerpo: drop cap + párrafos con fade-in */}
+        <StoryScrollBlock>
+        {/* Cuerpo: drop cap + párrafos */}
         <div lang="es">
           {(drop || restOfFirst) && (
             <p
-              ref={(el) => { paragraphRefs.current[0] = el; }}
               style={{
                 fontFamily: SITE_FONT_STACK,
                 fontSize: 'clamp(1rem, 2vw, 1.15rem)',
@@ -323,9 +290,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 color: TINTA,
                 marginBottom: '1.6rem',
                 letterSpacing: '0.01em',
-                opacity: visibleParrafos[0] ? 1 : 0,
-                transform: visibleParrafos[0] ? 'translateY(0)' : 'translateY(16px)',
-                transition: 'opacity 0.7s ease, transform 0.7s ease',
               }}
             >
               {drop && (
@@ -350,11 +314,9 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
 
           {otherParrafos.map((texto, i) => {
             const idx = (drop || restOfFirst ? 1 : 0) + i;
-            const isVisible = visibleParrafos[idx] ?? false;
             return (
               <p
                 key={idx}
-                ref={(el) => { paragraphRefs.current[idx] = el; }}
                 style={{
                   fontFamily: SITE_FONT_STACK,
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
@@ -362,15 +324,19 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                   color: TINTA,
                   marginBottom: '1.6rem',
                   letterSpacing: '0.01em',
-                  opacity: isVisible ? 1 : 0,
-                  transform: isVisible ? 'translateY(0)' : 'translateY(16px)',
-                  transition: 'opacity 0.7s ease, transform 0.7s ease',
                 }}
               >
                 {texto}
               </p>
             );
           })}
+        </div>
+        </StoryScrollBlock>
+
+        <StoryScrollBlock scene>
+        <div style={{ textAlign: 'left', marginTop: '1rem' }}>
+          <AntecedentesText value={historia.antecedentes} />
+          <CancionRelacionadaLine value={historia.cancionRelacionada} />
         </div>
 
         {/* Firma del autor */}
@@ -495,6 +461,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             Compartir esta historia
           </button>
         </div>
+        </StoryScrollBlock>
       </div>
       <EthicalShareFlow
         open={shareOpen}

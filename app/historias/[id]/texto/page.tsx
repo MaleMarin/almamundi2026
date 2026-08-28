@@ -11,6 +11,7 @@ import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
+import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 function defaultAvatar(name: string): string {
@@ -54,7 +55,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HistoriasIdTextoPage({ params }: PageProps) {
   const { id } = await params;
-  const story = await getStoryByIdAsync(id);
+  const story =
+    (await getStoryByIdAsync(id)) ??
+    (id.startsWith('demo-texto-') ? getDemoStoryPointById(id) : null);
   if (!story) redirect(`/historias/${id}`);
   const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
   if (!contenido) redirect(`/historias/${id}`);
