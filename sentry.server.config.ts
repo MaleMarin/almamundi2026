@@ -1,7 +1,10 @@
 import * as Sentry from "@sentry/nextjs";
 
+const dsn = process.env.NEXT_PUBLIC_SENTRY_DSN?.trim();
+
 Sentry.init({
-  dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+  dsn,
+  enabled: Boolean(dsn) && process.env.NODE_ENV === "production",
   tracesSampleRate: 0.1,
-  enabled: process.env.NODE_ENV === "production",
+  sendDefaultPii: false,
 });

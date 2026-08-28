@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { isAllowedStoryMediaMime } from "@/lib/file-sniff";
 import {
   createPrivateResumableUpload,
@@ -90,6 +91,10 @@ export async function POST(req: NextRequest) {
       );
     }
     console.error("[story-media] init", e);
+    Sentry.captureException(e, {
+      tags: { source: "api.submissions.story-media" },
+      extra: { operation: "createPrivateResumableUpload" },
+    });
     return NextResponse.json({ error: "upload_init_failed" }, { status: 500 });
   }
 }

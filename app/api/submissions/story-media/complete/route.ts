@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import { isAllowedStoryMediaMime } from "@/lib/file-sniff";
 import { finalizePrivateSubmissionObject } from "@/lib/server-storage";
 import {
@@ -68,6 +69,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: msg }, { status });
     }
     console.error("[story-media] complete", e);
+    Sentry.captureException(e, {
+      tags: { source: "api.submissions.story-media.complete" },
+      extra: { operation: "finalizePrivateSubmissionObject" },
+    });
     return NextResponse.json({ error: "complete_failed" }, { status: 500 });
   }
 }

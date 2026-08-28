@@ -9,7 +9,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org",
+  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
   "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://*.firebaseapp.com https://challenges.cloudflare.com",
   "media-src 'self' blob: https:",
   "object-src 'none'",
@@ -96,6 +96,11 @@ const nextConfig: NextConfig = {
 
 export default withSentryConfig(nextConfig, {
   silent: true,
-  org: "precisar",
-  project: "almamundi",
+  org: process.env.SENTRY_ORG || "precisar",
+  project: process.env.SENTRY_PROJECT || "almamundi",
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+  sourcemaps: {
+    disable: !process.env.SENTRY_AUTH_TOKEN,
+  },
+  telemetry: false,
 });
