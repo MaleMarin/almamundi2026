@@ -108,6 +108,8 @@ export interface Story {
   captionsUrl?: string;
   /** Frases para subtítulos aproximados en audio. */
   captionPhrases?: string[];
+  /** Token opaco para `/historias/[id]/mi-eco` (solo el autor lo recibe por correo). */
+  authorEcoToken?: string;
 }
 
 /** mail_queue: para Cloud Functions / Firestore extension (correo al publicar). */

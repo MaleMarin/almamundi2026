@@ -29,6 +29,8 @@ type UseSubirHuellaOptions = {
   storyTitle?: string | null;
   city?: string | null;
   country?: string | null;
+  /** Fecha del pie (por defecto: ahora). En `/mi-eco` se pasa la del envío para no cambiar el texto. */
+  footerAt?: Date | null;
 };
 
 /**
@@ -43,6 +45,7 @@ export function useSubirHuella({
   storyTitle,
   city,
   country,
+  footerAt,
 }: UseSubirHuellaOptions) {
   const { locale } = useHomeLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,19 +60,20 @@ export function useSubirHuella({
     if (!ctx) return;
     const raw = narrativeText.trim();
     const textForPalette = raw.length > 0 ? raw : ' ';
+    const at = footerAt instanceof Date && !Number.isNaN(footerAt.getTime()) ? footerAt : new Date();
     drawVadResonanceOnCanvas(ctx, {
       storyId: stableStoryId(submissionId, raw || `subir-${format}`, format),
       text: textForPalette,
       locale,
       footer: {
-        at: new Date(),
+        at,
         title: storyTitle?.trim() || undefined,
         city: city?.trim() || undefined,
         country: country?.trim() || undefined,
         locale,
       },
     });
-  }, [format, narrativeText, submissionId, locale, storyTitle, city, country]);
+  }, [format, narrativeText, submissionId, locale, storyTitle, city, country, footerAt]);
 
   useLayoutEffect(() => {
     paintResonanceVisual();

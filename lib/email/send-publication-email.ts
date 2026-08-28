@@ -20,6 +20,8 @@ export type SendPublicationEmailParams = {
   storyTitle: string;
   storyId: string;
   placeName: string;
+  /** Rincón privado del autor (`/historias/[id]/mi-eco?t=`). */
+  ecoUrl?: string;
 };
 
 export function buildPublicationEmailHtml(
@@ -31,6 +33,26 @@ export function buildPublicationEmailHtml(
   const placeName = escapeHtml(params.placeName);
   const storyIdEnc = encodeURIComponent(params.storyId);
   const historiasUrl = `${EMAIL_PUBLIC_ORIGIN}/historias/${storyIdEnc}`;
+  const ecoHref = params.ecoUrl?.trim() ?? '';
+  const ecoBlock = ecoHref
+    ? `
+      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
+        En este rincón puedes ver cuántas personas resonaron con tu historia
+        y volver a descargar tu cinta de colores.
+      </p>
+      <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
+        <tr>
+          <td style="background:#FF4A1C;border-radius:100px;padding:14px 32px">
+            <a href="${escapeHtml(ecoHref)}"
+              style="color:white;text-decoration:none;
+              font-size:13px;font-weight:700;
+              letter-spacing:0.1em;text-transform:uppercase">
+              IR A MI ECO
+            </a>
+          </td>
+        </tr>
+      </table>`
+    : '';
 
   const bodyHtml = `
       <p style="margin:0 0 16px;font-size:16px;color:#4A5568">
@@ -57,6 +79,7 @@ export function buildPublicationEmailHtml(
           </td>
         </tr>
       </table>
+      ${ecoBlock}
       ${invitationHtml()}
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
         Un abrazo,<br>

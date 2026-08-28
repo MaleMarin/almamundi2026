@@ -1,9 +1,15 @@
 /**
  * Un solo camino: al publicar una historia, avisar al autor y dejar el resultado en el documento.
  */
-import type { Firestore } from 'firebase-admin/firestore';
+import type { DocumentReference, Firestore } from 'firebase-admin/firestore';
 import { isValidRecipientEmail } from '@/lib/email-html';
 import { sendPublicationEmail } from '@/lib/email/send-publication-email';
+import {
+  AUTHOR_ECO_TOKEN_FIELD,
+  buildAuthorEcoPath,
+  generateAuthorEcoToken,
+} from '@/lib/author-eco-token';
+import { EMAIL_PUBLIC_ORIGIN } from '@/lib/email/almamundi-email-layout';
 
 export type PublicationMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -59,6 +65,18 @@ async function lookupEmailFromSubmissions(
   return null;
 }
 
+async function ensureAuthorEcoToken(
+  ref: DocumentReference,
+  data: Record<string, unknown>
+): Promise<string> {
+  const existing =
+    typeof data[AUTHOR_ECO_TOKEN_FIELD] === 'string' ? data[AUTHOR_ECO_TOKEN_FIELD].trim() : '';
+  if (existing.length >= 32) return existing;
+  const token = generateAuthorEcoToken();
+  await ref.update({ [AUTHOR_ECO_TOKEN_FIELD]: token });
+  return token;
+}
+
 export async function notifyAuthorStoryPublished(args: {
   db: Firestore;
   storyId: string;
@@ -68,6 +86,16 @@ export async function notifyAuthorStoryPublished(args: {
   const snap = await ref.get();
   const data = (snap.exists ? snap.data() : {}) as Record<string, unknown>;
   const at = new Date().toISOString();
+
+  let ecoUrl: string | undefined;
+  if (snap.exists) {
+    try {
+      const token = await ensureAuthorEcoToken(ref, data);
+      ecoUrl = `${EMAIL_PUBLIC_ORIGIN}${buildAuthorEcoPath(storyId, token)}`;
+    } catch (err) {
+      console.error('notifyAuthorStoryPublished eco token', err);
+    }
+  }
 
   const to =
     resolveAuthorEmailFromRecord(data) ?? (await lookupEmailFromSubmissions(db, storyId, data));
@@ -106,6 +134,7 @@ export async function notifyAuthorStoryPublished(args: {
       typeof ubic?.ciudad === 'string' ? ubic.ciudad : '',
       'el mundo'
     ),
+    ecoUrl,
   });
 
   if (sent.ok) {
