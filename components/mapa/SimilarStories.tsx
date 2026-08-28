@@ -61,11 +61,12 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
 
   return (
     <div
+      className="am-related-stories"
       data-related-stories
+      data-related-variant={variant}
       style={{
         marginTop: light ? 28 : 48,
         paddingTop: light ? 24 : 40,
-        width: '100%',
         textAlign: 'left',
         borderTop: light ? `1px solid rgba(163,177,198,0.35)` : '1px solid rgba(255,255,255,0.06)',
       }}
@@ -84,20 +85,14 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
         Otras historias con un tono cercano
       </p>
 
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-          gap: 14,
-        }}
-      >
+      <div className="am-related-stories-grid">
         {stories.map((s, i) => (
           <Link
             key={s.id}
             href={storyReaderPath(s.id, s.format)}
+            className="am-related-stories-card"
             style={{
               textAlign: 'left',
-              padding: '18px 20px',
               borderRadius: 18,
               background: light ? '#ebeef4' : 'rgba(255,255,255,0.04)',
               border: light ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.08)',
@@ -115,8 +110,8 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <span
+                className="am-related-stories-format"
                 style={{
-                  fontSize: 10,
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
@@ -126,11 +121,11 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 {formatLabel(s.format)}
               </span>
               <span
+                className="am-related-stories-title"
                 style={{
-                  fontSize: 13,
                   fontWeight: 600,
                   color: light ? neu.textMain : 'rgba(255,255,255,0.88)',
-                  lineHeight: 1.2,
+                  lineHeight: 1.25,
                 }}
               >
                 {truncateAtWord(s.title, 45)}
@@ -138,8 +133,8 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             </div>
             {s.description && (
               <p
+                className="am-related-stories-desc"
                 style={{
-                  fontSize: 12,
                   color: light ? neu.textBody : 'rgba(255,255,255,0.40)',
                   margin: '0 0 8px',
                   lineHeight: 1.5,
@@ -160,6 +155,33 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
           </Link>
         ))}
       </div>
+      <style>{`
+        .am-related-stories { width: 100%; }
+        .am-related-stories-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          gap: 14px;
+        }
+        .am-related-stories-card { padding: 18px 20px; }
+        .am-related-stories-format { font-size: 10px; }
+        .am-related-stories-title { font-size: 13px; }
+        .am-related-stories-desc { font-size: 12px; }
+        @media (min-width: 640px) {
+          .am-related-stories[data-related-variant="light"] {
+            width: min(920px, calc(100vw - 2.5rem));
+            max-width: min(920px, calc(100vw - 2.5rem));
+            margin-left: calc(50% - min(460px, 50vw - 1.25rem));
+          }
+          .am-related-stories-grid {
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+          }
+          .am-related-stories-card { padding: 24px 26px; }
+          .am-related-stories-format { font-size: 11px; }
+          .am-related-stories-title { font-size: 15px; }
+          .am-related-stories-desc { font-size: 13.5px; }
+        }
+      `}</style>
     </div>
   );
 }
