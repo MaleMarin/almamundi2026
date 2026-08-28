@@ -18,6 +18,7 @@ import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { storyGlobeMarkerColor } from '@/lib/huella/story-globe-color';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -65,6 +66,15 @@ function storyHasValidGeo(s: { lat?: number; lng?: number }): boolean {
     Math.abs(lat) <= 90 &&
     Math.abs(lng) <= 180
   );
+}
+
+function pickSurpriseStory(stories: StoryPoint[], lastId: string | null): StoryPoint | null {
+  if (stories.length === 0) return null;
+  const pool =
+    lastId && stories.length > 1 ? stories.filter((s) => s.id !== lastId) : stories;
+  const list = pool.length > 0 ? pool : stories;
+  const i = Math.floor(Math.random() * list.length);
+  return list[i] ?? null;
 }
 
 function huellasFallbackDesdeBitsData(): HuellaPunto[] {
@@ -149,6 +159,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [openStory, setOpenStory] = useState<StoryPoint | null>(null);
   const [storyViewerClosing, setStoryViewerClosing] = useState(false);
   const storyCloseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastSurpriseIdRef = useRef<string | null>(null);
+  const pendingSurpriseRef = useRef<StoryPoint | null>(null);
+  const surpriseSafetyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [focusTarget, setFocusTarget] = useState<{ lat: number; lng: number; nonce: number } | null>(
+    null
+  );
+  const [surpriseFlying, setSurpriseFlying] = useState(false);
+  const [surpriseNotice, setSurpriseNotice] = useState<string | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   /** Portal del dock neumórfico bajo el título (`#map-dock-slot` en MapSectionLocked). */
@@ -209,6 +227,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const storiesOnGlobe = useMemo(
     () => stories.filter((s) => storyHasValidGeo(s)),
     [stories]
+  );
+
+  const realPublishedStories = useMemo(
+    () => storiesOnGlobe.filter((s) => !storyShowsDemoDisclaimer(s)),
+    [storiesOnGlobe]
   );
 
   useEffect(() => {
@@ -586,6 +609,38 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setOpenStory(story);
   }, []);
 
+  const finishSurpriseOpen = useCallback(() => {
+    const story = pendingSurpriseRef.current;
+    pendingSurpriseRef.current = null;
+    if (surpriseSafetyTimerRef.current) {
+      clearTimeout(surpriseSafetyTimerRef.current);
+      surpriseSafetyTimerRef.current = null;
+    }
+    setSurpriseFlying(false);
+    setFocusTarget(null);
+    if (story) openStoryViewer(story);
+  }, [openStoryViewer]);
+
+  const handleSurpriseMe = useCallback(() => {
+    setSurpriseNotice(null);
+    const pick = pickSurpriseStory(realPublishedStories, lastSurpriseIdRef.current);
+    if (!pick) {
+      setSurpriseNotice('Todavía no hay historias para sorprenderte, vuelve pronto');
+      return;
+    }
+    lastSurpriseIdRef.current = pick.id;
+    pendingSurpriseRef.current = pick;
+    setGlobeLayers((prev) => ({ ...prev, stories: true }));
+    setHighlightedStoryId(pick.id);
+    setDrawerOpen(false);
+    setSurpriseFlying(true);
+    setFocusTarget({ lat: pick.lat, lng: pick.lng, nonce: Date.now() });
+    if (surpriseSafetyTimerRef.current) clearTimeout(surpriseSafetyTimerRef.current);
+    surpriseSafetyTimerRef.current = setTimeout(() => {
+      finishSurpriseOpen();
+    }, 1400);
+  }, [realPublishedStories, finishSurpriseOpen]);
+
   const closeStoryViewer = useCallback(() => {
     setStoryViewerClosing(true);
     if (storyCloseTimerRef.current) clearTimeout(storyCloseTimerRef.current);
@@ -600,8 +655,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   useEffect(() => {
     return () => {
       if (storyCloseTimerRef.current) clearTimeout(storyCloseTimerRef.current);
+      if (surpriseSafetyTimerRef.current) clearTimeout(surpriseSafetyTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (!surpriseNotice) return;
+    const t = window.setTimeout(() => setSurpriseNotice(null), 6000);
+    return () => window.clearTimeout(t);
+  }, [surpriseNotice]);
 
   const selectedGlobeMarkerId = useMemo(() => {
     if (drawerMode === 'bits' && selectedBit) return selectedBit.id;
@@ -747,8 +809,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               layerVisibility={globeLayers}
-              pauseEarthSpinForUi={Boolean(openStory) || (drawerOpen && drawerMode === 'bits')}
+              pauseEarthSpinForUi={
+                Boolean(openStory) || surpriseFlying || (drawerOpen && drawerMode === 'bits')
+              }
               onBitClick={handleGlobeMarkerClick}
+              focusTarget={focusTarget}
+              onFocusArrived={finishSurpriseOpen}
             />
           </div>
         </div>
@@ -771,6 +837,13 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 onClick={() => onGlobeLayerPill('stories', 'stories')}
               >
                 Historias
+              </PillNavButton>
+              <PillNavButton
+                dock
+                title="Abrir una historia publicada al azar"
+                onClick={handleSurpriseMe}
+              >
+                Sorpréndeme
               </PillNavButton>
               <PillNavButton
                 dock
@@ -816,6 +889,18 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           onToggleSound={handleToggleSound}
         />
       </div>
+      {surpriseNotice ? (
+        <p
+          role="status"
+          className="pointer-events-none absolute bottom-28 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-full px-4 py-2 text-center text-sm text-white/90"
+          style={{
+            background: 'rgba(15, 23, 42, 0.82)',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
+          }}
+        >
+          {surpriseNotice}
+        </p>
+      ) : null}
 
       <MapDrawer open={drawerOpen} mode={drawerMode} onClose={close} isMobile={isMobile}>
           {drawerMode === 'stories' || drawerMode === 'search' ? (

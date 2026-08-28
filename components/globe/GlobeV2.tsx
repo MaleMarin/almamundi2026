@@ -57,7 +57,7 @@ import {
 } from '@/lib/globe/globe-v2-assets';
 import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { useViewerSolarNight } from '@/hooks/useViewerSolarNight';
-import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
+import { latLngToCartesianThetaLon, latLngToCartesianThreeJS } from '@/lib/globe-coords';
 import { earthGreenwichSpinYRadFromUtc, sunDayFactorAtLocation } from '@/lib/sunPosition';
 import {
   AUTO_ROTATE_HOVER_SPEED,
@@ -225,6 +225,74 @@ function InitialViewRig({
     c.target.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
     c.update();
   }, [camera, controls, lat, lng, distance, orbitTarget, sunScratch, alignToSun]);
+  return null;
+}
+
+/**
+ * Lleva la cámara al punto de una historia en el globo (misma convención que los marcadores).
+ * El destino se recalcula cada frame para seguir el giro de la Tierra.
+ */
+function StoryFocusFlyRig({
+  lat,
+  lng,
+  nonce,
+  distance,
+  orbitTarget,
+  planetSpinRef,
+  onArrived,
+}: {
+  lat: number;
+  lng: number;
+  nonce: number;
+  distance: number;
+  orbitTarget: [number, number, number];
+  planetSpinRef: RefObject<THREE.Group | null>;
+  onArrived?: () => void;
+}) {
+  const { camera, controls } = useThree();
+  const from = useRef(new THREE.Vector3());
+  const to = useRef(new THREE.Vector3());
+  const world = useRef(new THREE.Vector3());
+  const center = useRef(new THREE.Vector3());
+  const tRef = useRef(1);
+  const arrivedRef = useRef(false);
+  const onArrivedRef = useRef(onArrived);
+  onArrivedRef.current = onArrived;
+
+  useLayoutEffect(() => {
+    tRef.current = 0;
+    arrivedRef.current = false;
+    from.current.copy(camera.position);
+  }, [nonce, camera, lat, lng]);
+
+  useFrame((_, dt) => {
+    if (tRef.current >= 1) return;
+    const local = latLngToCartesianThreeJS(lat, lng, 1);
+    world.current.set(local.x, local.y, local.z);
+    const spin = planetSpinRef.current;
+    if (spin) {
+      spin.updateMatrixWorld(true);
+      spin.localToWorld(world.current);
+      spin.getWorldPosition(center.current);
+    } else {
+      center.current.set(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
+    }
+    to.current.copy(world.current).sub(center.current);
+    if (to.current.lengthSq() < 1e-10) return;
+    to.current.normalize().multiplyScalar(distance).add(center.current);
+
+    tRef.current = Math.min(1, tRef.current + dt / 0.9);
+    const ease = 1 - (1 - tRef.current) ** 3;
+    camera.position.lerpVectors(from.current, to.current, ease);
+    camera.lookAt(orbitTarget[0], orbitTarget[1], orbitTarget[2]);
+    const c = controls as unknown as OrbitControlsImpl | undefined;
+    c?.update?.();
+
+    if (tRef.current >= 1 && !arrivedRef.current) {
+      arrivedRef.current = true;
+      queueMicrotask(() => onArrivedRef.current?.());
+    }
+  });
   return null;
 }
 
@@ -942,6 +1010,8 @@ function GlobeScene({
   initialViewLat,
   initialViewLng,
   layerVisibility,
+  focusTarget,
+  onFocusArrived,
 }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
@@ -962,6 +1032,8 @@ function GlobeScene({
   initialViewLat?: number;
   initialViewLng?: number;
   layerVisibility?: GlobeLayerVisibility;
+  focusTarget?: { lat: number; lng: number; nonce: number } | null;
+  onFocusArrived?: () => void;
 }) {
   const { size, camera } = useThree();
   const embeddedGeoFit = embedded ? Math.min(1, size.width / 400, size.height / 620) : 1;
@@ -1232,6 +1304,17 @@ function GlobeScene({
           alignToSun={false}
         />
       ) : null}
+      {focusTarget ? (
+        <StoryFocusFlyRig
+          lat={focusTarget.lat}
+          lng={focusTarget.lng}
+          nonce={focusTarget.nonce}
+          distance={camDist}
+          orbitTarget={embedded ? GLOBE_V2_EMBEDDED_ORBIT_TARGET : GLOBE_V2_FULL_ORBIT_TARGET}
+          planetSpinRef={planetSpinRef}
+          onArrived={onFocusArrived}
+        />
+      ) : null}
     </>
   );
 }
@@ -1290,6 +1373,9 @@ export type GlobeV2Props = {
   /** Encuadre inicial (grados). Home: geolocalización o fallback editorial LATAM. */
   initialViewLat?: number;
   initialViewLng?: number;
+  /** Vuelo de cámara hacia una historia (Sorpréndeme). `nonce` fuerza un nuevo vuelo. */
+  focusTarget?: { lat: number; lng: number; nonce: number } | null;
+  onFocusArrived?: () => void;
   /** Ubicación del usuario para día/noche local (GPS); si no hay, zona IANA del navegador. */
   viewerLat?: number;
   viewerLng?: number;
@@ -1316,6 +1402,8 @@ export default function GlobeV2({
   initialViewLng,
   viewerLat,
   viewerLng,
+  focusTarget = null,
+  onFocusArrived,
 }: GlobeV2Props) {
   /**
    * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
@@ -1419,6 +1507,8 @@ export default function GlobeV2({
             initialViewLat={initialViewLat}
             initialViewLng={initialViewLng}
             layerVisibility={layerVisibility}
+            focusTarget={focusTarget}
+            onFocusArrived={onFocusArrived}
           />
         </Suspense>
       </Canvas>
