@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { storyReaderPath } from '@/lib/historias/story-json-ld';
 import { neu } from '@/lib/historias-neumorph';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -14,6 +15,7 @@ type SimilarStory = {
   city: string | null;
   country: string | null;
   format: string;
+  publishedAt: string | null;
 };
 
 const FORMAT_LABEL: Record<string, string> = {
@@ -29,6 +31,14 @@ const FORMAT_LABEL: Record<string, string> = {
 
 function formatLabel(format: string): string {
   return FORMAT_LABEL[format.toLowerCase()] ?? 'Historia';
+}
+
+function authorAndDateLine(label: string, publishedAt: string | null): string {
+  const name = (label || '').trim() || 'Anónimo';
+  if (!publishedAt) return name;
+  const date = formatPublishedAtEsStable(publishedAt);
+  if (!date || date === '—') return name;
+  return `${name} · ${date}`;
 }
 
 /** Corta en el último espacio dentro de `maxChars`, sin partir una palabra. */
@@ -152,6 +162,15 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             >
               {[s.city, s.country].filter(Boolean).join(', ') || '—'}
             </p>
+            <p
+              style={{
+                fontSize: 11,
+                color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
+                margin: '4px 0 0',
+              }}
+            >
+              {authorAndDateLine(s.label, s.publishedAt ?? null)}
+            </p>
           </Link>
         ))}
       </div>
@@ -168,12 +187,12 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
         .am-related-stories-desc { font-size: 12px; }
         @media (min-width: 640px) {
           .am-related-stories[data-related-variant="light"] {
-            width: min(920px, calc(100vw - 2.5rem));
-            max-width: min(920px, calc(100vw - 2.5rem));
-            margin-left: calc(50% - min(460px, 50vw - 1.25rem));
+            width: min(1160px, calc(100vw - 2.5rem));
+            max-width: min(1160px, calc(100vw - 2.5rem));
+            margin-left: calc(50% - min(580px, 50vw - 1.25rem));
           }
           .am-related-stories-grid {
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 18px;
           }
           .am-related-stories-card { padding: 24px 26px; }
