@@ -1,5 +1,7 @@
 'use client';
 
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+
 type AdultConsentCheckboxProps = {
   id?: string;
   checked: boolean;
@@ -10,6 +12,7 @@ type AdultConsentCheckboxProps = {
 /**
  * Casilla 18+ + privacidad en la pantalla de datos.
  * Un solo componente para home y /subir (ambos usan StoryModal).
+ * El texto vive en `modalConsentBefore` / `modalConsentPrivacy` (es/pt/en).
  */
 export function AdultConsentCheckbox({
   id = 'privacy',
@@ -17,6 +20,7 @@ export function AdultConsentCheckbox({
   onChange,
   privacyHref = '/privacidad',
 }: AdultConsentCheckboxProps) {
+  const { t } = useHomeLocale();
   return (
     <div className="flex items-start gap-2">
       <input
@@ -27,10 +31,9 @@ export function AdultConsentCheckbox({
         className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
       />
       <label htmlFor={id} className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
-        Declaro que soy mayor de 18 años, o que actúo como adulto responsable o representante de una institución y
-        cuento con la autorización expresa de quien aparece en esta historia. Leí y acepto la{' '}
+        {t.modalConsentBefore}{' '}
         <a className="text-orange-600 underline" href={privacyHref} target="_blank" rel="noreferrer">
-          política de privacidad
+          {t.modalConsentPrivacy}
         </a>
         .
       </label>

@@ -260,7 +260,8 @@ const es: SiteUiMessages = {
   modalBack: 'Volver',
   modalSending: 'Enviando…',
   modalSend: 'Enviar',
-  modalConsentBefore: 'Confirmo que soy mayor de 18 años y que leí y acepto la',
+  modalConsentBefore:
+    'Declaro que soy mayor de 18 años, o que actúo como adulto responsable o representante de una institución y cuento con la autorización expresa de quien aparece en esta historia. Leí y acepto la',
   modalConsentPrivacy: 'política de privacidad',
   modalRecordVideo: 'Grabar video',
   modalUploadOrLink: 'Subir o enlace',
@@ -441,7 +442,8 @@ const pt: SiteUiMessages = {
   modalBack: 'Voltar',
   modalSending: 'A enviar…',
   modalSend: 'Enviar',
-  modalConsentBefore: 'Confirmo que sou maior de 18 anos e que li e aceito a',
+  modalConsentBefore:
+    'Declaro que tenho 18 anos ou mais, ou que atuo como adulto responsável ou representante de uma instituição e conto com a autorização expressa de quem aparece nesta história. Li e aceito a',
   modalConsentPrivacy: 'política de privacidade',
   modalRecordVideo: 'Gravar vídeo',
   modalUploadOrLink: 'Enviar ou ligação',
@@ -621,7 +623,8 @@ const en: SiteUiMessages = {
   modalBack: 'Back',
   modalSending: 'Sending…',
   modalSend: 'Send',
-  modalConsentBefore: 'I confirm that I am 18 or older and that I have read and accept the',
+  modalConsentBefore:
+    'I declare that I am 18 or older, or that I am acting as a responsible adult or institutional representative and have the express authorization of the person who appears in this story. I have read and accept the',
   modalConsentPrivacy: 'privacy policy',
   modalRecordVideo: 'Record video',
   modalUploadOrLink: 'Upload or link',
