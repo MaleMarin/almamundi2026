@@ -90,6 +90,10 @@ export function messageForUploadError(
     return kind === 'audio' ? UPLOAD_DURATION_ERROR.audio : UPLOAD_DURATION_ERROR.video;
   }
 
+  if (code === 'uploads_paused') {
+    return 'Por ahora no podemos recibir historias nuevas, estamos revisando el sitio. Intenta de nuevo en un rato.';
+  }
+
   if (
     code === 'captcha_required' ||
     code === 'captcha_failed' ||

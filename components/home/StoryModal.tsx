@@ -1091,6 +1091,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
       if (!res.ok) {
+        if (data.error === 'uploads_paused') {
+          setErr(messageForUploadError(new Error('uploads_paused'), mode));
+          return;
+        }
         setErr(data.error || `Error ${res.status}. Intenta de nuevo.`);
         return;
       }
