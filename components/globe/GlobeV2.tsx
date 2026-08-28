@@ -55,6 +55,7 @@ import {
   type GlobeV2OceanSunDebug,
   type GlobeV2TextureUrls,
 } from '@/lib/globe/globe-v2-assets';
+import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { useViewerSolarNight } from '@/hooks/useViewerSolarNight';
 import { latLngToCartesianThetaLon } from '@/lib/globe-coords';
 import { earthGreenwichSpinYRadFromUtc, sunDayFactorAtLocation } from '@/lib/sunPosition';
@@ -962,13 +963,14 @@ function GlobeScene({
   initialViewLng?: number;
   layerVisibility?: GlobeLayerVisibility;
 }) {
-  const { size } = useThree();
+  const { size, camera } = useThree();
   const embeddedGeoFit = embedded ? Math.min(1, size.width / 400, size.height / 620) : 1;
   const geoScale = embedded ? Math.max(1, GLOBE_V2_EMBEDDED_GEO_SCALE * embeddedGeoFit) : 1;
   const camDist = embedded ? 3.62 : 3.14;
   const lockView = fixedCameraPreset != null;
   const planetSpinRef = useRef<THREE.Group>(null);
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
+  const camWorldRef = useRef(new THREE.Vector3());
 
   const sceneTimeMsRef = useRef<number | null>(null);
   const lastRealMsRef = useRef<number | null>(null);
@@ -1017,11 +1019,25 @@ function GlobeScene({
     sceneTimeMsRef.current! += deltaMs * scale * smoothedSpinRateRef.current;
 
     const g = planetSpinRef.current;
-    if (!g || lockView) return;
-    g.rotation.y = earthGreenwichSpinYRadFromUtc(
-      new Date(sceneTimeMsRef.current!),
-      GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
-    );
+    if (g && !lockView) {
+      g.rotation.y = earthGreenwichSpinYRadFromUtc(
+        new Date(sceneTimeMsRef.current!),
+        GLOBE_V2_GMST_TEXTURE_OFFSET_RAD
+      );
+    }
+    try {
+      camera.getWorldPosition(camWorldRef.current);
+      const p = camWorldRef.current;
+      publishGlobeCameraLive({
+        camX: p.x,
+        camY: p.y,
+        camZ: p.z,
+        dist: p.length(),
+        earthYaw: g?.rotation.y ?? 0,
+      });
+    } catch {
+      /* cámara aún no lista */
+    }
   }, -100);
   /* Estrellas: radio 420 < camera.far 1000. Tamaño en px (sin attenuation). */
   const starsCount = embedded ? 2500 : 4200;

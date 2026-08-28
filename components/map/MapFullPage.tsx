@@ -53,6 +53,7 @@ import type { StoryPoint } from '@/lib/map-data/stories';
 import { showPublicDemoStories } from '@/lib/demo-stories-public';
 import { STORIES_MOCK, SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
 import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT } from '@/lib/map-data/globe-pov';
+import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { MAP_HEADER_GRADIENT, MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
@@ -2742,6 +2743,21 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         rotateGlobeCamera(globe, GLOBE_SPIN_DEG_PER_SEC * dt);
       } else {
         globeSpinLastTsRef.current = ts;
+      }
+      try {
+        const cam = globe?.camera?.();
+        if (cam) {
+          const p = cam.position;
+          publishGlobeCameraLive({
+            camX: p.x,
+            camY: p.y,
+            camZ: p.z,
+            dist: p.length(),
+            earthYaw: earthMeshRef.current?.rotation.y ?? 0,
+          });
+        }
+      } catch {
+        /* globo aún no listo */
       }
       const now = performance.now();
       const breathing = 0.01 * Math.sin(now * 0.002);

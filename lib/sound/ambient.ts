@@ -1,3 +1,4 @@
+import { getGlobeCameraLive } from "@/lib/globe/globe-camera-live";
 import { isPublicAudioMoodId, publicAudioPathFromMoodId } from "@/lib/public-audio-mood";
 
 export type AmbientKey = "mar" | "ciudad" | "bosque" | "viento" | "animales" | "universo" | "personas" | "radio" | "lluvia" | "mercado";
@@ -9,6 +10,9 @@ type CurrentPlayback =
 type PlayerState = {
   ctx: AudioContext | null;
   master: GainNode | null;
+  /** Entre cada pista y el master. Si no se pudo crear, el audio sigue plano. */
+  panner: StereoPannerNode | null;
+  filter: BiquadFilterNode | null;
   current: CurrentPlayback | null;
   buffers: Partial<Record<AmbientKey, AudioBuffer>>;
   publicBuffers: Map<string, AudioBuffer>;
@@ -18,11 +22,15 @@ type PlayerState = {
 const state: PlayerState = {
   ctx: null,
   master: null,
+  panner: null,
+  filter: null,
   current: null,
   buffers: {},
   publicBuffers: new Map(),
   unlocked: false,
 };
+
+let spaceFollowRaf = 0;
 
 /**
  * Se incrementa en `stopAmbient()`. Las cargas async de `playAmbient` / `playAmbientFromPublicUrl`
@@ -223,8 +231,78 @@ export function initFromUserGesture(): void {
   state.ctx = new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
   state.master = state.ctx.createGain();
   state.master.gain.value = ambientMasterTarget();
+  attachAmbientSpaceChain(state.ctx, state.master);
   state.master.connect(state.ctx.destination);
   state.ctx.resume();
+}
+
+/** Paneo + lowpass opcionales. Si el navegador no los soporta, las pistas van directo al master. */
+function attachAmbientSpaceChain(ctx: AudioContext, master: GainNode) {
+  try {
+    const panner = ctx.createStereoPanner();
+    const filter = ctx.createBiquadFilter();
+    panner.pan.value = 0;
+    filter.type = "lowpass";
+    filter.frequency.value = 12000;
+    filter.Q.value = 0.65;
+    panner.connect(filter);
+    filter.connect(master);
+    state.panner = panner;
+    state.filter = filter;
+  } catch {
+    state.panner = null;
+    state.filter = null;
+  }
+}
+
+function trackOutput(): AudioNode | null {
+  return state.panner ?? state.master;
+}
+
+/**
+ * Paneo suave según rumbo cámara vs giro de la Tierra; lowpass un poco más cerrado si la cámara está lejos.
+ * Nunca corta el audio: si no hay nodos o no hay muestra de cámara, no hace nada.
+ */
+function applyAmbientSpaceFromGlobe() {
+  const ctx = state.ctx;
+  const panner = state.panner;
+  const filter = state.filter;
+  if (!ctx || ctx.state !== "running") return;
+  const live = getGlobeCameraLive();
+  if (!live) return;
+  const heading = Math.atan2(live.camX, live.camZ) - live.earthYaw;
+  const pan = Math.max(-1, Math.min(1, Math.sin(heading) * 0.38));
+  const tDist = Math.max(0, Math.min(1, (live.dist - 2.4) / 2.2));
+  const cutoff = 14000 - tDist * 9500;
+  const now = ctx.currentTime;
+  try {
+    if (panner) panner.pan.setTargetAtTime(pan, now, 0.22);
+    if (filter) filter.frequency.setTargetAtTime(cutoff, now, 0.28);
+  } catch {
+    try {
+      if (panner) panner.pan.value = pan;
+      if (filter) filter.frequency.value = cutoff;
+    } catch {
+      /* el audio sigue sonando plano */
+    }
+  }
+}
+
+function startSpaceFollow() {
+  if (spaceFollowRaf || (!state.panner && !state.filter)) return;
+  const loop = () => {
+    spaceFollowRaf = 0;
+    applyAmbientSpaceFromGlobe();
+    if (state.current && state.ctx) {
+      spaceFollowRaf = requestAnimationFrame(loop);
+    }
+  };
+  spaceFollowRaf = requestAnimationFrame(loop);
+}
+
+function stopSpaceFollow() {
+  if (spaceFollowRaf) cancelAnimationFrame(spaceFollowRaf);
+  spaceFollowRaf = 0;
 }
 
 function ensureCtx(): AudioContext | null {
@@ -336,8 +414,10 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
 
   const gain = ctx.createGain();
   gain.gain.value = 0;
+  const out = trackOutput() ?? state.master;
+  if (!out) return;
   source.connect(gain);
-  gain.connect(state.master!);
+  gain.connect(out);
 
   source.start(startT + 0.02);
   const userVol = getPublicAmbientVolume(pathNorm);
@@ -364,6 +444,7 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
   }
 
   state.current = { mode: "public", path: pathNorm, source, gain };
+  startSpaceFollow();
 }
 
 export async function unlockAmbientAudio() {
@@ -462,8 +543,10 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
 
   const gain = ctx.createGain();
   gain.gain.value = 0;
+  const out = trackOutput() ?? state.master;
+  if (!out) return;
   source.connect(gain);
-  gain.connect(state.master!);
+  gain.connect(out);
 
   source.start(startT + 0.02);
   const userVol = getAmbientTrackVolume(key);
@@ -490,14 +573,30 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   }
 
   state.current = { mode: "preset", key, source, gain };
+  startSpaceFollow();
 }
 
 export function stopAmbient() {
   ambientPlayGeneration += 1;
+  stopSpaceFollow();
   hardStopCurrent();
   state.current = null;
   hardStopGenerativeLayer();
   silenceAmbientMaster();
+  const ctx = state.ctx;
+  const t = ctx?.currentTime ?? 0;
+  try {
+    if (state.panner) {
+      state.panner.pan.cancelScheduledValues(t);
+      state.panner.pan.setValueAtTime(0, t);
+    }
+    if (state.filter) {
+      state.filter.frequency.cancelScheduledValues(t);
+      state.filter.frequency.setValueAtTime(12000, t);
+    }
+  } catch {
+    /* noop */
+  }
 }
 
 export function setAmbientEnabled(enabled: boolean) {
