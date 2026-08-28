@@ -909,7 +909,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
 
     if (!acceptedPrivacy) {
-      setErr('Para enviar, confirma que eres mayor de 18 años y aceptas la política de privacidad.');
+      setErr('Para enviar, declara que eres mayor de 18 años (o adulto responsable con autorización) y acepta la política de privacidad.');
       return false;
     }
 

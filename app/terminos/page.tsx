@@ -102,7 +102,7 @@ export default function TerminosPage() {
           Términos de uso
         </h1>
         <p style={{ margin: 0, fontSize: '0.9rem', color: TEXT_3 }}>
-          AlmaMundi · Fecha de vigencia: abril 2026
+          AlmaMundi · Fecha de vigencia: agosto 2026
         </p>
 
         <Section id="s1" title="1. Quién opera este servicio">
@@ -135,8 +135,13 @@ export default function TerminosPage() {
               Publicar contenido que incite al odio, la violencia o la discriminación.
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
+              Enviar una historia por cuenta propia si tienes menos de 18 años, en cualquiera de los cuatro formatos
+              (video, audio, texto o fotografía).
+            </li>
+            <li style={{ marginBottom: '0.5rem' }}>
               Subir material que identifique o exponga a menores sin consentimiento explícito de sus tutores
-              legales.
+              legales, o sin actuar como adulto responsable o representante de una institución con autorización
+              expresa de quien aparece.
             </li>
             <li style={{ marginBottom: '0.5rem' }}>
               Usar la plataforma con fines comerciales sin autorización de Precisar.
@@ -175,14 +180,23 @@ export default function TerminosPage() {
           </p>
         </Section>
 
-        <Section id="s8" title="8. Contacto">
+        <Section id="s8" title="8. Ley aplicable y jurisdicción">
+          <p>
+            Estos términos se rigen por las leyes de la República de Chile, país donde está constituida Precisar,
+            organización responsable de AlmaMundi. Cualquier controversia relativa a estos términos se someterá a los
+            tribunales ordinarios de justicia de Chile, sin perjuicio de los derechos que asistan a las personas en su
+            país de residencia, en particular en materia de protección de datos y de consumidores.
+          </p>
+        </Section>
+
+        <Section id="s9" title="9. Contacto">
           <p style={{ marginBottom: '1rem' }}>
             Para consultas sobre estos términos:{' '}
             <a href="mailto:hola@precisar.cl" style={{ color: ORANGE, textDecoration: 'none' }}>
               hola@precisar.cl
             </a>
           </p>
-          <p style={{ margin: 0 }}>Fecha de vigencia: abril 2026.</p>
+          <p style={{ margin: 0 }}>Fecha de vigencia: agosto 2026.</p>
         </Section>
 
         <p style={{ marginTop: '2rem', fontSize: '0.8rem', color: TEXT_3 }}>

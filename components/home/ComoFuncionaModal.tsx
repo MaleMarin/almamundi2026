@@ -78,9 +78,9 @@ export function ComoFuncionaModal({
           <p>AlmaMundi es un mapa vivo de historias humanas.</p>
           <p>
             Puedes compartir tu relato en{' '}
-            <strong style={{ color: soft.textMain }}>audio, texto o fotografía</strong>. La opción de{' '}
-            <strong style={{ color: soft.textMain }}>video es solo para personas mayores de 18 años</strong>.
-            Cada historia pasa por revisión editorial:{' '}
+            <strong style={{ color: soft.textMain }}>video, audio, texto o fotografía</strong>. El envío en cualquiera
+            de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una
+            institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial:{' '}
             <strong style={{ color: soft.textMain }}>nada se publica automáticamente</strong>.
           </p>
           <p>

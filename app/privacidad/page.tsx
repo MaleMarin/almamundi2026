@@ -113,7 +113,7 @@ export default function PrivacidadPage() {
           Aviso de Privacidad
         </h1>
         <p style={{ margin: 0, fontSize: '0.9rem', color: TEXT_3 }}>
-          AlmaMundi · Última actualización: 25 de mayo de 2026
+          AlmaMundi · Última actualización: 27 de agosto de 2026
         </p>
 
         <Section id="intro" title="Introducción">
@@ -396,16 +396,18 @@ export default function PrivacidadPage() {
 
         <Section id="s13" title="13. Transferencias internacionales">
           <p style={p}>
-            AlmaMundi puede usar servicios tecnológicos ubicados en distintos países. Por eso, algunos datos podrían ser
-            almacenados o procesados fuera del país desde el cual participas.
+            AlmaMundi usa proveedores tecnológicos con sede en Estados Unidos. En particular, Google Cloud/Firestore
+            para el almacenamiento de datos y Vercel para el alojamiento del sitio. El uso de estos servicios implica
+            transferencia internacional de datos: algunos datos pueden almacenarse o procesarse fuera del país desde el
+            cual participas.
           </p>
           <p style={p}>
             Cuando usamos estos servicios, buscamos que el tratamiento sea necesario, proporcional y compatible con los
             fines de AlmaMundi.
           </p>
           <p style={pLast}>
-            Esto puede ocurrir, por ejemplo, con servicios de alojamiento, bases de datos, almacenamiento de archivos,
-            correo electrónico, seguridad o analítica técnica.
+            También pueden intervenir, cuando sea necesario, otros servicios de correo electrónico, seguridad o
+            analítica técnica.
           </p>
         </Section>
 
@@ -416,9 +418,11 @@ export default function PrivacidadPage() {
             AlmaMundi busca proteger especialmente a niños, niñas y adolescentes.
           </p>
           <p style={p}>
-            Las personas menores de 18 años no pueden usar la opción de envío en video por cuenta propia. La
-            publicación de contenidos que involucren a menores de edad requiere especial cuidado y, cuando corresponda,
-            autorización de una persona adulta responsable o de una institución autorizada.
+            Las personas menores de 18 años no pueden enviar historias por cuenta propia en ninguno de los cuatro
+            formatos: video, audio, texto o fotografía. Un menor puede aparecer en un testimonio de cualquiera de esos
+            formatos; en ese caso, el envío debe hacerlo una persona adulta responsable o el representante de una
+            institución, con autorización expresa de quien aparece. La publicación de contenidos que involucren a
+            menores de edad requiere especial cuidado y, cuando corresponda, esa autorización.
           </p>
           <p style={p}>
             No publicamos contenidos que expongan indebidamente a niños, niñas o adolescentes, afecten su dignidad,
@@ -446,8 +450,19 @@ export default function PrivacidadPage() {
         </Section>
 
         <Section id="s16" title="16. Retención de datos personales">
-          <p style={p}>Conservamos los datos solo durante el tiempo necesario para cumplir los fines de AlmaMundi.</p>
-          <p style={{ marginBottom: '0.5rem' }}>Esto puede incluir:</p>
+          <p style={p}>
+            Los datos de historias publicadas se conservan mientras la historia esté publicada, o hasta que la persona
+            pida su eliminación (ver{' '}
+            <Link href="/mis-datos-personales" style={{ color: LINK, fontWeight: 600 }}>
+              /mis-datos-personales
+            </Link>
+            ).
+          </p>
+          <p style={p}>
+            Los datos de solicitudes rechazadas o no publicadas se eliminan a los 12 meses de la decisión, salvo que la
+            persona pida su eliminación antes.
+          </p>
+          <p style={{ marginBottom: '0.5rem' }}>También podemos conservar datos el tiempo necesario para:</p>
           <ul style={{ ...ul, marginBottom: '1rem' }}>
             <li style={{ marginBottom: '0.5rem' }}>revisar y gestionar historias enviadas;</li>
             <li style={{ marginBottom: '0.5rem' }}>mantener contenidos publicados con autorización;</li>
