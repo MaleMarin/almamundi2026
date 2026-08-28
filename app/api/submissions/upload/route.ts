@@ -73,7 +73,7 @@ export async function POST(req: Request) {
     }
 
     const buf = Buffer.from(await file.arrayBuffer());
-    if (!bufferMatchesDeclaredMime(buf, mime)) {
+    if (!(await bufferMatchesDeclaredMime(buf, mime))) {
       return NextResponse.json({ error: "content_type_mismatch" }, { status: 400 });
     }
 

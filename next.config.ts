@@ -20,6 +20,7 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  serverExternalPackages: ["sharp", "file-type"],
   /**
    * `public/` pesa ~380 MB (videos, texturas, audio). El file tracing de Next
    * lo metía entero en funciones como /api/submissions/photo (~414 MB) si algún

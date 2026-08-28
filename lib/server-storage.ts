@@ -1,5 +1,10 @@
 import "server-only";
-import { bufferMatchesDeclaredMime } from "@/lib/file-sniff";
+import {
+  bufferMatchesDeclaredMime,
+  FILE_TYPE_PROBE_BYTES,
+  isImageStoryMime,
+} from "@/lib/file-sniff";
+import { stripImageExif } from "@/lib/strip-image-exif";
 import { MAX_AUDIO_VIDEO_DURATION_SECONDS } from "@/lib/media-duration-rules";
 import {
   durationSecondsFromMediaBytes,
@@ -126,13 +131,13 @@ export async function finalizePrivateSubmissionObject(opts: {
   }
 
   const av = isAudioOrVideoMime(opts.declaredMime);
-  const headLen = Math.min(size, av ? 1024 * 1024 : 512);
+  const headLen = Math.min(size, av ? 1024 * 1024 : FILE_TYPE_PROBE_BYTES);
   const [head] = await file.download({
     start: 0,
     end: Math.max(0, headLen - 1),
   });
   const headBuf = Buffer.from(head);
-  if (!bufferMatchesDeclaredMime(headBuf, opts.declaredMime)) {
+  if (!(await bufferMatchesDeclaredMime(headBuf, opts.declaredMime))) {
     await file.delete({ ignoreNotFound: true }).catch(() => undefined);
     throw new Error("content_type_mismatch");
   }
@@ -159,6 +164,20 @@ export async function finalizePrivateSubmissionObject(opts: {
     }
   }
 
+  let outSize = size;
+  if (isImageStoryMime(opts.declaredMime)) {
+    const [full] = await file.download();
+    const stripped = await stripImageExif(Buffer.from(full), opts.declaredMime);
+    await file.save(stripped.buffer, {
+      contentType: stripped.contentType,
+      resumable: false,
+      metadata: {
+        cacheControl: "private, max-age=0, no-store",
+      },
+    });
+    outSize = stripped.buffer.length;
+  }
+
   const readMs = Math.min(
     opts.readUrlExpiresMs ?? DEFAULT_PRIVATE_READ_URL_MS,
     SIGNED_URL_MAX_MS
@@ -167,7 +186,7 @@ export async function finalizePrivateSubmissionObject(opts: {
     action: "read",
     expires: Date.now() + readMs,
   });
-  return { storagePath: opts.storagePath, signedReadUrl, size };
+  return { storagePath: opts.storagePath, signedReadUrl, size: outSize };
 }
 
 /**
@@ -182,16 +201,23 @@ export async function savePrivateSubmissionObject(opts: {
   readUrlExpiresMs?: number;
 }): Promise<{ storagePath: string; signedReadUrl: string }> {
   await assertUploadsAllowed();
+  let buffer = opts.buffer;
+  let contentType = opts.contentType;
+  if (isImageStoryMime(contentType)) {
+    const stripped = await stripImageExif(buffer, contentType);
+    buffer = stripped.buffer;
+    contentType = stripped.contentType;
+  }
   const id = crypto.randomUUID();
   const safe = sanitizeUploadFilename(opts.originalName);
-  const ext = pickExtension(opts.contentType, safe);
+  const ext = pickExtension(contentType, safe);
   const storagePath = `${PRIVATE_PREFIX}/${id}/${safe}${ext}`;
   assertSafeSubmissionsPath(storagePath);
 
   const bucket = getAdminBucket();
   const file = bucket.file(storagePath);
-  await file.save(opts.buffer, {
-    contentType: opts.contentType,
+  await file.save(buffer, {
+    contentType,
     resumable: false,
     metadata: {
       cacheControl: "private, max-age=0, no-store",

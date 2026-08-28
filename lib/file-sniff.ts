@@ -1,133 +1,44 @@
 /**
- * Comprobación mínima de tipo real (magic bytes) frente al Content-Type declarado.
+ * Tipo real del archivo (magic bytes) vs Content-Type declarado.
+ * Usa `file-type`; no se confía en la extensión ni en el MIME del navegador.
  */
 
-const SIGS: { mime: string; check: (b: Buffer) => boolean }[] = [
-  {
-    mime: "image/jpeg",
-    check: (b) => b.length >= 3 && b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff,
-  },
-  {
-    mime: "image/png",
-    check: (b) =>
-      b.length >= 8 &&
-      b[0] === 0x89 &&
-      b[1] === 0x50 &&
-      b[2] === 0x4e &&
-      b[3] === 0x47 &&
-      b[4] === 0x0d &&
-      b[5] === 0x0a &&
-      b[6] === 0x1a &&
-      b[7] === 0x0a,
-  },
-  {
-    mime: "image/gif",
-    check: (b) =>
-      b.length >= 6 &&
-      b[0] === 0x47 &&
-      b[1] === 0x49 &&
-      b[2] === 0x46 &&
-      b[3] === 0x38 &&
-      (b[4] === 0x37 || b[4] === 0x39) &&
-      b[5] === 0x61,
-  },
-  {
-    mime: "image/webp",
-    check: (b) =>
-      b.length >= 12 &&
-      b[0] === 0x52 &&
-      b[1] === 0x49 &&
-      b[2] === 0x46 &&
-      b[3] === 0x46 &&
-      b[8] === 0x57 &&
-      b[9] === 0x45 &&
-      b[10] === 0x42 &&
-      b[11] === 0x50,
-  },
-  {
-    mime: "video/mp4",
-    check: isIsoBmffNotHeic,
-  },
-  {
-    mime: "video/quicktime",
-    check: isIsoBmffNotHeic,
-  },
-  {
-    mime: "video/webm",
-    check: (b) =>
-      b.length >= 4 &&
-      b[0] === 0x1a &&
-      b[1] === 0x45 &&
-      b[2] === 0xdf &&
-      b[3] === 0xa3,
-  },
-  {
-    mime: "audio/mpeg",
-    check: (b) =>
-      b.length >= 3 &&
-      ((b[0] === 0xff && (b[1] & 0xe0) === 0xe0) || (b[0] === 0x49 && b[1] === 0x44 && b[2] === 0x33)),
-  },
-  {
-    mime: "audio/webm",
-    check: (b) =>
-      b.length >= 4 &&
-      b[0] === 0x1a &&
-      b[1] === 0x45 &&
-      b[2] === 0xdf &&
-      b[3] === 0xa3,
-  },
-  {
-    mime: "audio/mp4",
-    check: isIsoBmffNotHeic,
-  },
-  {
-    mime: "audio/wav",
-    check: isRiffWave,
-  },
-  {
-    mime: "image/heic",
-    check: isHeicLike,
-  },
-  {
-    mime: "image/heif",
-    check: isHeicLike,
-  },
-];
+export const FILE_TYPE_PROBE_BYTES = 4100;
 
-function isHeicLike(b: Buffer): boolean {
-  if (b.length < 12) return false;
-  const ftypAt = b.indexOf("ftyp", 0, "ascii");
-  if (ftypAt < 0 || ftypAt > 16) return false;
-  const brand = b.subarray(ftypAt + 4, ftypAt + 8).toString("ascii").toLowerCase();
-  return (
-    brand.startsWith("hei") ||
-    brand === "mif1" ||
-    brand === "msf1" ||
-    brand === "hevc"
-  );
-}
+const ALLOWED_DETECTED = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "image/heic",
+  "image/heif",
+  "video/mp4",
+  "video/quicktime",
+  "video/webm",
+  "audio/mpeg",
+  "audio/webm",
+  "audio/mp4",
+  "audio/x-m4a",
+  "audio/wav",
+  "audio/vnd.wave",
+]);
 
-/** MP4 / MOV / M4A: caja `ftyp` (iPhone usa tamaño 0x14, no solo 0x18/0x20). */
-function isIsoBmffNotHeic(b: Buffer): boolean {
-  if (b.length < 12) return false;
-  const ftypAt = b.indexOf("ftyp", 0, "ascii");
-  if (ftypAt < 4 || ftypAt > 32) return false;
-  return !isHeicLike(b);
-}
-
-function isRiffWave(b: Buffer): boolean {
-  return (
-    b.length >= 12 &&
-    b[0] === 0x52 &&
-    b[1] === 0x49 &&
-    b[2] === 0x46 &&
-    b[3] === 0x46 &&
-    b[8] === 0x57 &&
-    b[9] === 0x41 &&
-    b[10] === 0x56 &&
-    b[11] === 0x45
-  );
-}
+/** Familias ISO-BMFF: MP4/MOV/M4A comparten caja `ftyp`. */
+const DECLARED_TO_DETECTED: Record<string, readonly string[]> = {
+  "image/jpeg": ["image/jpeg"],
+  "image/png": ["image/png"],
+  "image/webp": ["image/webp"],
+  "image/gif": ["image/gif"],
+  "image/heic": ["image/heic", "image/heif"],
+  "image/heif": ["image/heic", "image/heif"],
+  "video/mp4": ["video/mp4", "video/quicktime"],
+  "video/quicktime": ["video/mp4", "video/quicktime"],
+  "video/webm": ["video/webm"],
+  "audio/mpeg": ["audio/mpeg"],
+  "audio/webm": ["audio/webm", "video/webm"],
+  "audio/mp4": ["audio/mp4", "audio/x-m4a", "video/mp4", "video/quicktime"],
+  "audio/wav": ["audio/wav", "audio/vnd.wave", "audio/x-wav"],
+};
 
 /** Alias de navegador → MIME canónico de esta lista. */
 export function canonicalizeStoryMediaMime(declaredMime: string): string {
@@ -136,14 +47,29 @@ export function canonicalizeStoryMediaMime(declaredMime: string): string {
   if (m === "audio/x-m4a" || m === "audio/m4a") return "audio/mp4";
   if (m === "audio/mp3") return "audio/mpeg";
   if (m === "video/x-quicktime") return "video/quicktime";
+  if (m === "image/jpg") return "image/jpeg";
   return m;
 }
 
-export function bufferMatchesDeclaredMime(buffer: Buffer, declaredMime: string): boolean {
+export function isImageStoryMime(m: string): boolean {
+  const c = canonicalizeStoryMediaMime(m);
+  return c.startsWith("image/");
+}
+
+export async function bufferMatchesDeclaredMime(
+  buffer: Buffer,
+  declaredMime: string
+): Promise<boolean> {
   const normalized = canonicalizeStoryMediaMime(declaredMime);
-  const entry = SIGS.find((s) => s.mime === normalized);
-  if (!entry) return false;
-  return entry.check(buffer);
+  const allowed = DECLARED_TO_DETECTED[normalized];
+  if (!allowed) return false;
+
+  const { fileTypeFromBuffer } = await import("file-type");
+  const detected = await fileTypeFromBuffer(new Uint8Array(buffer));
+  if (!detected?.mime) return false;
+  const mime = detected.mime.toLowerCase();
+  if (!ALLOWED_DETECTED.has(mime)) return false;
+  return allowed.includes(mime);
 }
 
 export const ALLOWED_STORY_MEDIA_MIMES = [

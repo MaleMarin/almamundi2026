@@ -20,6 +20,7 @@ import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 const MAX_BYTES = 8 * 1024 * 1024;
 const PROFILE_MAX_BYTES = 8 * 1024 * 1024;
@@ -27,7 +28,7 @@ const EXTRA_MAX_BYTES = 15 * 1024 * 1024;
 
 const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
 const PROFILE_ALLOWED = ALLOWED;
-/** Tipos con comprobación magic bytes en lib/file-sniff (PDF/WAV no incluidos). */
+/** Adjuntos extra: misma lista que file-type acepta (sin PDF). */
 const EXTRA_ALLOWED = new Set([
   "image/jpeg",
   "image/png",
@@ -139,7 +140,7 @@ export async function POST(req: Request) {
     }
 
     const buf = Buffer.from(await file.arrayBuffer());
-    if (!bufferMatchesDeclaredMime(buf, mime)) {
+    if (!(await bufferMatchesDeclaredMime(buf, mime))) {
       return NextResponse.json({ error: "content_type_mismatch" }, { status: 400 });
     }
 
@@ -158,7 +159,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "invalid_profile_type" }, { status: 400 });
       }
       const pbuf = Buffer.from(await profileRaw.arrayBuffer());
-      if (!bufferMatchesDeclaredMime(pbuf, pm)) {
+      if (!(await bufferMatchesDeclaredMime(pbuf, pm))) {
         return NextResponse.json({ error: "profile_content_mismatch" }, { status: 400 });
       }
       const pr = await savePrivateSubmissionObject({
@@ -178,7 +179,7 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: "invalid_extra_type" }, { status: 400 });
       }
       const ebuf = Buffer.from(await extraRaw.arrayBuffer());
-      if (!bufferMatchesDeclaredMime(ebuf, em)) {
+      if (!(await bufferMatchesDeclaredMime(ebuf, em))) {
         return NextResponse.json({ error: "extra_content_mismatch" }, { status: 400 });
       }
       const er = await savePrivateSubmissionObject({

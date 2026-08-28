@@ -10,6 +10,7 @@ import { noteBytesUploaded } from "@/lib/ops/usage-state";
 import { maxUploadBytesForMime } from "@/lib/subir-limits";
 
 export const runtime = "nodejs";
+export const maxDuration = 60;
 
 /** POST JSON: { storagePath, contentType }. Comprueba el objeto ya subido a GCS. */
 export async function POST(req: NextRequest) {
