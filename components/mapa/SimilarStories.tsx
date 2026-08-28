@@ -1,7 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { storyReaderPath } from '@/lib/historias/story-json-ld';
+import { neu } from '@/lib/historias-neumorph';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type SimilarStory = {
@@ -14,15 +16,29 @@ type SimilarStory = {
   format: string;
 };
 
-const FORMAT_ICON: Record<string, string> = {
-  audio: '🎙',
-  video: '🎬',
-  text: '✍️',
+const FORMAT_LABEL: Record<string, string> = {
+  audio: 'Audio',
+  video: 'Video',
+  text: 'Escrito',
+  texto: 'Escrito',
+  escrito: 'Escrito',
+  image: 'Foto',
+  foto: 'Foto',
+  photo: 'Foto',
 };
 
-export function SimilarStories({ storyId }: { storyId: string }) {
-  const router = useRouter();
+function formatLabel(format: string): string {
+  return FORMAT_LABEL[format.toLowerCase()] ?? 'Historia';
+}
+
+type SimilarStoriesProps = {
+  storyId: string;
+  variant?: 'light' | 'dark';
+};
+
+export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProps) {
   const [stories, setStories] = useState<SimilarStory[]>([]);
+  const light = variant === 'light';
 
   useEffect(() => {
     fetch(`/api/stories/${storyId}/similar`)
@@ -35,10 +51,13 @@ export function SimilarStories({ storyId }: { storyId: string }) {
 
   return (
     <div
+      data-related-stories
       style={{
-        marginTop: 48,
-        paddingTop: 40,
-        borderTop: '1px solid rgba(255,255,255,0.06)',
+        marginTop: light ? 28 : 48,
+        paddingTop: light ? 24 : 40,
+        width: '100%',
+        textAlign: 'left',
+        borderTop: light ? `1px solid rgba(163,177,198,0.35)` : '1px solid rgba(255,255,255,0.06)',
       }}
     >
       <p
@@ -46,12 +65,13 @@ export function SimilarStories({ storyId }: { storyId: string }) {
           fontSize: 11,
           letterSpacing: '0.18em',
           textTransform: 'uppercase',
-          color: 'rgba(255,255,255,0.28)',
+          color: light ? neu.textBody : 'rgba(255,255,255,0.28)',
           marginBottom: 20,
           fontFamily: SITE_FONT_STACK,
+          fontWeight: 600,
         }}
       >
-        También podría resonar contigo
+        Otras historias con un tono cercano
       </p>
 
       <div
@@ -62,39 +82,44 @@ export function SimilarStories({ storyId }: { storyId: string }) {
         }}
       >
         {stories.map((s, i) => (
-          <button
+          <Link
             key={s.id}
-            type="button"
-            onClick={() => router.push(`/mapa/historias/${s.id}`)}
+            href={storyReaderPath(s.id, s.format)}
             style={{
               textAlign: 'left',
               padding: '18px 20px',
               borderRadius: 18,
-              background: 'rgba(255,255,255,0.04)',
-              border: '1px solid rgba(255,255,255,0.08)',
+              background: light ? '#ebeef4' : 'rgba(255,255,255,0.04)',
+              border: light ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.08)',
+              boxShadow: light
+                ? '10px 10px 20px rgba(163,177,198,0.4), -8px -8px 16px rgba(255,255,255,0.85)'
+                : undefined,
               cursor: 'pointer',
-              transition: 'all 250ms ease',
+              transition: 'transform 250ms ease, box-shadow 250ms ease',
               fontFamily: SITE_FONT_STACK,
+              textDecoration: 'none',
+              color: 'inherit',
+              display: 'block',
               animation: `storyFadeIn 500ms ease-out ${i * 100}ms both`,
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-              e.currentTarget.style.borderColor = 'rgba(249,115,22,0.2)';
-              e.currentTarget.style.transform = 'translateY(-2px)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
-              e.currentTarget.style.transform = 'translateY(0)';
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <span style={{ fontSize: 16 }}>{FORMAT_ICON[s.format] ?? '📖'}</span>
+              <span
+                style={{
+                  fontSize: 10,
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  color: light ? neu.orange : 'rgba(249,115,22,0.85)',
+                }}
+              >
+                {formatLabel(s.format)}
+              </span>
               <span
                 style={{
                   fontSize: 13,
                   fontWeight: 600,
-                  color: 'rgba(255,255,255,0.88)',
+                  color: light ? neu.textMain : 'rgba(255,255,255,0.88)',
                   lineHeight: 1.2,
                 }}
               >
@@ -105,7 +130,7 @@ export function SimilarStories({ storyId }: { storyId: string }) {
               <p
                 style={{
                   fontSize: 12,
-                  color: 'rgba(255,255,255,0.40)',
+                  color: light ? neu.textBody : 'rgba(255,255,255,0.40)',
                   margin: '0 0 8px',
                   lineHeight: 1.5,
                 }}
@@ -116,13 +141,13 @@ export function SimilarStories({ storyId }: { storyId: string }) {
             <p
               style={{
                 fontSize: 11,
-                color: 'rgba(255,255,255,0.25)',
+                color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: 0,
               }}
             >
               {[s.city, s.country].filter(Boolean).join(', ') || '—'}
             </p>
-          </button>
+          </Link>
         ))}
       </div>
     </div>

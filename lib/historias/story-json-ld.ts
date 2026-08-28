@@ -7,17 +7,21 @@ function plainText(raw: unknown, max = 300): string | undefined {
   return text || undefined;
 }
 
+export function storyReaderPath(id: string, format?: string | null): string {
+  const f = (format ?? '').toLowerCase();
+  if (f === 'video') return `/historias/${id}/video`;
+  if (f === 'audio') return `/historias/${id}/audio`;
+  if (f === 'text' || f === 'texto' || f === 'escrito') {
+    return `/historias/${id}/texto`;
+  }
+  if (f === 'image' || f === 'foto' || f === 'photo') {
+    return `/historias/${id}/foto`;
+  }
+  return `/historias/${id}`;
+}
+
 function canonicalPath(story: StoryPoint): string {
-  const format = (story.format ?? '').toLowerCase();
-  if (format === 'video') return `/historias/${story.id}/video`;
-  if (format === 'audio') return `/historias/${story.id}/audio`;
-  if (format === 'text' || format === 'texto' || format === 'escrito') {
-    return `/historias/${story.id}/texto`;
-  }
-  if (format === 'image' || format === 'foto' || format === 'photo') {
-    return `/historias/${story.id}/foto`;
-  }
-  return `/historias/${story.id}`;
+  return storyReaderPath(story.id, story.format);
 }
 
 function schemaType(format: string | undefined): 'VideoObject' | 'AudioObject' | 'ImageObject' | 'Article' {

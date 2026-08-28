@@ -5,6 +5,7 @@ import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
+import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -43,6 +44,8 @@ export type StoryEndScreenProps = {
   embedInSite?: boolean;
   /** Datos para abrir el flujo de compartir; si está ausente, no se muestra botón. */
   share?: StoryEndShare;
+  /** Id de la historia actual: muestra 2–3 relatos de tono cercano al final. */
+  storyId?: string;
 };
 
 const FORMATO_TO_ROUTE: Record<StoryEndShareFormat, string> = {
@@ -89,6 +92,7 @@ export function StoryEndScreen({
   antecedentes,
   embedInSite = false,
   share,
+  storyId,
 }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
   const [shareOpen, setShareOpen] = useState(false);
@@ -164,10 +168,20 @@ export function StoryEndScreen({
       <div
         className="story-end-reveal"
         style={{
-          ...neu.cardProminent,
           zIndex: 2,
           width: '100%',
+          maxWidth: storyId ? 'min(720px, 100%)' : 'min(560px, 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+        }}
+      >
+      <div
+        style={{
+          ...neu.cardProminent,
+          width: '100%',
           maxWidth: 'min(560px, 100%)',
+          margin: '0 auto',
           padding: '2.65rem clamp(1.35rem, 4vw, 2.85rem)',
           borderRadius: 28,
           textAlign: 'center',
@@ -363,6 +377,9 @@ export function StoryEndScreen({
             Más historias
           </button>
         </div>
+      </div>
+
+      {storyId ? <SimilarStories storyId={storyId} variant="light" /> : null}
       </div>
 
       {share ? (

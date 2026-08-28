@@ -102,6 +102,15 @@ export const DEMO_FOTO_STORIES: StoryPoint[] = [
   ...DEMO_FOTO_STORIES_EXTRA.map((s) => ensurePublicDemoStoryFields(s)),
 ];
 
+export function listDemoStoryPoints(): StoryPoint[] {
+  return [
+    ...DEMO_VIDEO_STORIES,
+    ...DEMO_AUDIO_STORIES,
+    ...DEMO_TEXT_STORIES,
+    ...DEMO_FOTO_STORIES,
+  ];
+}
+
 export function getDemoStoryPointById(id: string): StoryPoint | null {
   if (!id) return null;
   if (id.startsWith('demo-video-')) {

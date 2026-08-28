@@ -9,6 +9,7 @@ import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
+import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 
 const PAPEL = '#faf8f4';
@@ -408,6 +409,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             )}
           </div>
         </div>
+
+        <SimilarStories storyId={historia.id} variant="light" />
 
         {/* Navegación final */}
         <div

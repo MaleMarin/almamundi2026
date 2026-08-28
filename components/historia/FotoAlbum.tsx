@@ -6,6 +6,7 @@ import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
+import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { useState, useEffect, useRef, useCallback } from 'react';
 
@@ -491,6 +492,9 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   Compartir
                 </button>
               </div>
+            </div>
+            <div style={{ width: '100%', maxWidth: 720, padding: '0 1.25rem' }}>
+              <SimilarStories storyId={historia.id} variant="light" />
             </div>
           </section>
           </StoryScrollBlock>

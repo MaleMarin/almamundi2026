@@ -814,6 +814,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             void onClose?.()
           }}
           share={{ storyId: historia.id, formato: 'video', imageUrl: historia.thumbnailUrl }}
+          storyId={historia.id}
         />
         </StoryScrollBlock>
       ) : null}
