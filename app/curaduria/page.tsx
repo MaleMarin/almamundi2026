@@ -18,6 +18,7 @@ import {
   REJECTION_REASON_OPTIONS,
   resolvePublicRejectionText,
 } from '@/lib/editorial/rejection-reasons';
+import { CONDUCT_GUIDE_HREF, moreInfoMailto } from '@/lib/editorial/edge-case-protocol';
 
 type Submission = {
   id: string;
@@ -157,7 +158,7 @@ export default function CuraduriaPage() {
   );
 
   const reject = useCallback(
-    async (submissionId: string, reasonId: string, reasonDetail: string) => {
+    async (submissionId: string, reasonId: string, reasonDetail: string, internalNote: string) => {
       if (!idToken) return;
       const resolved = resolvePublicRejectionText(reasonId, reasonDetail);
       if (!resolved.ok) {
@@ -177,6 +178,7 @@ export default function CuraduriaPage() {
             storyId: submissionId,
             reasonId: resolved.reasonId,
             reasonDetail: resolved.detail || undefined,
+            nota: internalNote || undefined,
           }),
         });
         const data = await res.json().catch(() => ({}));
@@ -323,6 +325,8 @@ export default function CuraduriaPage() {
           </button>
         </div>
 
+        <EdgeCaseProtocol />
+
         {error && (
           <div className="mb-4 p-4 rounded-xl bg-red-500/20 border border-red-500/50 text-red-200 text-sm">
             {error}
@@ -348,7 +352,17 @@ export default function CuraduriaPage() {
                 <div className="min-w-0 flex-1">
                   <div className="font-bold text-white">{s.title || 'Sin título'}</div>
                   <div className="text-sm text-white/60 mt-1">
-                    {s.placeLabel || '—'} · {s.format} · {s.authorEmail || '—'}
+                    {s.placeLabel || '—'} · {s.format} ·{' '}
+                    {s.authorEmail ? (
+                      <a
+                        href={`mailto:${s.authorEmail}`}
+                        className="text-orange-300 hover:underline"
+                      >
+                        {s.authorEmail}
+                      </a>
+                    ) : (
+                      'sin correo'
+                    )}
                     {s.lat == null || s.lng == null ? (
                       <span className="ml-2 text-amber-400">· Falta lat/lng en Firestore</span>
                     ) : null}
@@ -395,10 +409,22 @@ export default function CuraduriaPage() {
                   >
                     {publishingId === s.id ? 'Publicando…' : 'Publicar en mapa'}
                   </button>
+                  {s.authorEmail ? (
+                    <a
+                      href={moreInfoMailto({ authorEmail: s.authorEmail, storyTitle: s.title })}
+                      className="px-5 py-2.5 rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-100 font-bold text-sm text-center"
+                    >
+                      Pedir más información
+                    </a>
+                  ) : (
+                    <p className="text-xs text-white/50">Sin correo: no se puede pedir más información por aquí.</p>
+                  )}
                   <RejectionControls
                     disabled={publishingId === s.id || (rejectingId !== null && rejectingId !== s.id)}
                     busy={rejectingId === s.id}
-                    onReject={(reasonId, reasonDetail) => reject(s.id, reasonId, reasonDetail)}
+                    onReject={(reasonId, reasonDetail, nota) =>
+                      reject(s.id, reasonId, reasonDetail, nota)
+                    }
                   />
                 </div>
               </div>
@@ -410,6 +436,50 @@ export default function CuraduriaPage() {
   );
 }
 
+function EdgeCaseProtocol() {
+  return (
+    <details className="rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4 text-sm text-white/90">
+      <summary className="cursor-pointer font-bold text-amber-200">
+        Casos límite: no publicar si hay duda (menores, terceros)
+      </summary>
+      <div className="mt-3 space-y-2 text-white/80 leading-relaxed">
+        <p>
+          Este texto no reemplaza tu criterio. Si la decisión no es obvia después de leer la{' '}
+          <a
+            href={CONDUCT_GUIDE_HREF}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-orange-300 underline"
+          >
+            guía de conducta
+          </a>
+          , deja la historia pendiente unos días.
+        </p>
+        <ol className="list-decimal pl-5 space-y-1">
+          <li>No apruebes mientras haya duda.</li>
+          <li>
+            Pide más información a quien la subió (botón en cada ficha). Si parece involucrar a un
+            menor, confirma la autorización de un adulto responsable o institución.
+          </li>
+          <li>
+            Si sigue habiendo duda, busca una segunda opinión (equipo de Precisar o asesoría legal
+            puntual).
+          </li>
+          <li>
+            Documenta la decisión final en la nota interna al rechazar, o en un apunte tuyo si
+            apruebas.
+          </li>
+        </ol>
+        <p>
+          La casilla del formulario es una declaración, no una verificación de identidad. Si quien
+          envía parece menor y no hay mención de un adulto, trátalo como caso límite: pide datos,
+          no apruebes ni rechaces de inmediato.
+        </p>
+      </div>
+    </details>
+  );
+}
+
 function RejectionControls({
   disabled,
   busy,
@@ -417,15 +487,21 @@ function RejectionControls({
 }: {
   disabled: boolean;
   busy: boolean;
-  onReject: (reasonId: string, reasonDetail: string) => void;
+  onReject: (reasonId: string, reasonDetail: string, nota: string) => void;
 }) {
   const [reasonId, setReasonId] = useState('');
   const [detail, setDetail] = useState('');
+  const [nota, setNota] = useState('');
   const preview = reasonId ? resolvePublicRejectionText(reasonId, detail) : null;
   const canSubmit = Boolean(preview && preview.ok) && !disabled && !busy;
 
   return (
     <div className="flex flex-col gap-2">
+      {reasonId === 'minors' && (
+        <p className="text-amber-200 text-xs leading-relaxed">
+          Si hay duda, no rechaces aún: pide más información y deja la historia pendiente.
+        </p>
+      )}
       <label className="text-xs text-white/60">
         Motivo del rechazo (lo recibe la persona por correo)
         <select
@@ -455,12 +531,20 @@ function RejectionControls({
         }
         className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/40"
       />
+      <textarea
+        value={nota}
+        onChange={(e) => setNota(e.target.value)}
+        disabled={disabled || busy}
+        rows={2}
+        placeholder="Nota interna: por qué se decidió así (no se envía a la persona)"
+        className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/40"
+      />
       {preview && !preview.ok && (
         <p className="text-amber-300 text-xs">{preview.error}</p>
       )}
       <button
         type="button"
-        onClick={() => onReject(reasonId, detail)}
+        onClick={() => onReject(reasonId, detail, nota)}
         disabled={!canSubmit}
         className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-sm disabled:opacity-50"
       >

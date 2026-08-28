@@ -318,7 +318,7 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
       {/* ── Motivo público de rechazo ── */}
       <Section
         titulo="Motivo si rechazas"
-        subtitulo="La persona lo recibe por correo. Puede pedir una nueva revisión en hola@almamundi.org"
+        subtitulo="La persona lo recibe por correo, en tono claro. Si hay duda (menores, terceros), pide más información y deja pendiente; no apruebes ni rechaces de inmediato."
       >
         <select
           value={reasonId}
@@ -332,6 +332,11 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
             </option>
           ))}
         </select>
+        {reasonId === 'minors' && (
+          <p style={{ fontSize: '0.75rem', color: '#b45309', margin: '0 0 0.5rem' }}>
+            Si hay duda, no rechaces aún: pide más información y deja la historia pendiente.
+          </p>
+        )}
         <textarea
           value={reasonDetail}
           onChange={(e) => setReasonDetail(e.target.value)}
@@ -347,11 +352,14 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
       </Section>
 
       {/* ── Nota interna ── */}
-      <Section titulo="Nota del curador" subtitulo="Solo visible para el equipo, no se publica">
+      <Section
+        titulo="Nota del curador"
+        subtitulo="Respaldo interno: por qué se aprobó o rechazó. No se envía a la persona"
+      >
         <textarea
           value={nota}
           onChange={(e) => setNota(e.target.value)}
-          placeholder="Notas internas sobre esta historia..."
+          placeholder="Por qué se decidió así (fecha, si se pidió más información, segunda opinión…)"
           rows={2}
           style={{ ...inputStyle, width: '100%', resize: 'vertical' }}
         />

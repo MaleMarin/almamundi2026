@@ -36,13 +36,13 @@ export const REJECTION_REASON_OPTIONS: readonly Option[] = [
     id: "rights_third_party",
     label: "Derechos o datos de otras personas",
     publicText:
-      "No pudimos publicar esta historia porque involucra derechos o datos de otras personas.",
+      "No pudimos publicar esta historia: no cumple con nuestra guía de conducta en cuanto al respeto de otras personas (imagen, derechos o datos sin un consentimiento claro).",
   },
   {
     id: "minors",
     label: "Involucra a menores de edad",
     publicText:
-      "No pudimos publicar esta historia porque involucra a menores de edad.",
+      "No pudimos publicar esta historia: no cumple con nuestra guía de conducta en cuanto al cuidado de menores de edad. Hace falta que quede clara la autorización de un adulto responsable o de una institución.",
   },
   {
     id: "quality_incomplete",
