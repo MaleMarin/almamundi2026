@@ -12,6 +12,8 @@ import {
 } from '@/lib/historias/historias-exhibition-icons';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
+import { messageYieldsResonanceGift, ResonanceGift } from '@/components/stories/ResonanceGift';
 
 export type ResonanceMailboxTriggerLayout = 'floating' | 'inline';
 
@@ -41,6 +43,7 @@ export function ResonanceMailbox({
   triggerTitle,
   triggerAriaLabel,
 }: ResonanceMailboxProps) {
+  const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const mailboxAria =
     triggerAriaLabel ??
     'Carta de resonancia: escribir para quien narra; AlmaMundi revisa el mensaje antes de poder acercárselo';
@@ -52,26 +55,38 @@ export function ResonanceMailbox({
   const [error, setError] = useState<string | null>(null);
   const [reformulateHint, setReformulateHint] = useState<string | null>(null);
   const [glow, setGlow] = useState(false);
+  const [phase, setPhase] = useState<'compose' | 'thanks'>('compose');
+  const [sentText, setSentText] = useState('');
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setOpen(false);
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open]);
-
-  useEffect(() => {
+  const closeDialog = useCallback(() => {
+    setOpen(false);
+    setPhase('compose');
+    setSentText('');
     setText('');
     setError(null);
     setReformulateHint(null);
+  }, []);
+
+  useEffect(() => {
     if (!open) return;
-  }, [storyId, open]);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') closeDialog();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, closeDialog]);
+
+  useEffect(() => {
+    setPhase('compose');
+    setSentText('');
+    setText('');
+    setError(null);
+    setReformulateHint(null);
+  }, [storyId]);
 
   const send = useCallback(async () => {
     const trimmed = text.trim();
@@ -102,8 +117,8 @@ export function ResonanceMailbox({
         setError(data.error ?? 'No se pudo enviar. Intenta más tarde.');
         return;
       }
-      setOpen(false);
-      setText('');
+      setSentText(trimmed);
+      setPhase('thanks');
       setGlow(true);
       window.setTimeout(() => setGlow(false), 1800);
     } catch {
@@ -272,7 +287,7 @@ export function ResonanceMailbox({
               className="fixed inset-0 z-[220] flex items-center justify-center bg-black/55 p-4 backdrop-blur-md"
               role="presentation"
               onClick={(e) => {
-                if (e.target === e.currentTarget) setOpen(false);
+                if (e.target === e.currentTarget) closeDialog();
               }}
             >
               <div
@@ -285,63 +300,91 @@ export function ResonanceMailbox({
               >
                 <button
                   type="button"
-                  onClick={() => setOpen(false)}
+                  onClick={closeDialog}
                   className="absolute right-3 top-3 rounded-full p-2 text-white/70 transition hover:bg-white/10 hover:text-white"
                   aria-label="Cerrar"
                 >
                   <X className="h-5 w-5" strokeWidth={2} />
                 </button>
-                <h2
-                  id={`${dialogId}-title`}
-                  className="pr-10 text-base font-semibold leading-snug text-white sm:text-lg"
-                >
-                  ¿Esta historia resonó contigo?
-                </h2>
-                <p className="mt-3 text-sm leading-relaxed text-white/85">
-                  Escribe una carta breve de afecto y respeto pensada para{' '}
-                  <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu carta, la
-                  revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercársela a
-                  quien narró este relato. Es un camino con pausa y mirada humana: no hay envío directo sin este
-                  resguardo, y no hay plazo fijo de respuesta.
-                </p>
-                <label htmlFor={`${dialogId}-msg`} className="sr-only">
-                  Texto de tu carta de resonancia
-                </label>
-                <textarea
-                  id={`${dialogId}-msg`}
-                  value={text}
-                  onChange={(e) => setText(e.target.value.slice(0, 2000))}
-                  rows={5}
-                  placeholder="Escribe aquí con cariño…"
-                  className="mt-4 box-border w-full min-h-[120px] resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-white/15"
-                />
-                {reformulateHint ? (
-                  <p className="mt-3 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-100/95">
-                    {reformulateHint}
-                  </p>
-                ) : null}
-                {error ? (
-                  <p className="mt-2 text-sm text-rose-300/95" role="alert">
-                    {error}
-                  </p>
-                ) : null}
-                <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-                  <button
-                    type="button"
-                    onClick={() => setOpen(false)}
-                    className="w-full rounded-full border border-white/20 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 sm:w-auto"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    type="button"
-                    disabled={sending || text.trim().length < 3}
-                    onClick={() => void send()}
-                    className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-                  >
-                    {sending ? 'Enviando…' : 'Enviar'}
-                  </button>
-                </div>
+                {phase === 'thanks' ? (
+                  <>
+                    <h2
+                      id={`${dialogId}-title`}
+                      className="pr-10 text-base font-semibold leading-snug text-white sm:text-lg"
+                    >
+                      Gracias por tomarte el tiempo.
+                    </h2>
+                    <p className="mt-3 text-sm leading-relaxed text-white/85">
+                      Esto es un poco de lo que dejaste en esta historia.
+                    </p>
+                    {messageYieldsResonanceGift(sentText, locale) ? (
+                      <ResonanceGift text={sentText} locale={locale} canvasId={`${dialogId}-gift`} />
+                    ) : null}
+                    <div className="mt-5 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={closeDialog}
+                        className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25 sm:w-auto"
+                      >
+                        Cerrar
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h2
+                      id={`${dialogId}-title`}
+                      className="pr-10 text-base font-semibold leading-snug text-white sm:text-lg"
+                    >
+                      ¿Esta historia resonó contigo?
+                    </h2>
+                    <p className="mt-3 text-sm leading-relaxed text-white/85">
+                      Escribe una carta breve de afecto y respeto pensada para{' '}
+                      <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu carta, la
+                      revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercársela
+                      a quien narró este relato. Es un camino con pausa y mirada humana: no hay envío directo sin este
+                      resguardo, y no hay plazo fijo de respuesta.
+                    </p>
+                    <label htmlFor={`${dialogId}-msg`} className="sr-only">
+                      Texto de tu carta de resonancia
+                    </label>
+                    <textarea
+                      id={`${dialogId}-msg`}
+                      value={text}
+                      onChange={(e) => setText(e.target.value.slice(0, 2000))}
+                      rows={5}
+                      placeholder="Escribe aquí con cariño…"
+                      className="mt-4 box-border w-full min-h-[120px] resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-white/15"
+                    />
+                    {reformulateHint ? (
+                      <p className="mt-3 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-100/95">
+                        {reformulateHint}
+                      </p>
+                    ) : null}
+                    {error ? (
+                      <p className="mt-2 text-sm text-rose-300/95" role="alert">
+                        {error}
+                      </p>
+                    ) : null}
+                    <div className="mt-5 flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+                      <button
+                        type="button"
+                        onClick={closeDialog}
+                        className="w-full rounded-full border border-white/20 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 sm:w-auto"
+                      >
+                        Cancelar
+                      </button>
+                      <button
+                        type="button"
+                        disabled={sending || text.trim().length < 3}
+                        onClick={() => void send()}
+                        className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                      >
+                        {sending ? 'Enviando…' : 'Enviar'}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </div>,
             document.body
