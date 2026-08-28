@@ -3,6 +3,7 @@ import { CursorGlobal } from '@/components/ui/CursorGlobal';
 import { Footer } from '@/components/layout/Footer';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
+import { DataSaverAutoplayToggle } from '@/components/media/DataSaverAutoplayToggle';
 import { CookieBanner } from '@/components/ui/CookieBanner';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { GlobalSiteChrome } from '@/components/layout/GlobalSiteChrome';
@@ -150,6 +151,7 @@ export default async function RootLayout({
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
+        <DataSaverAutoplayToggle variant="compact" />
         <CookieBanner />
         <SpeedInsights />
       </body>

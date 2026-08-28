@@ -166,14 +166,13 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                 }}
               >
                 {story.videoUrl ? (
-                  <video
-                    src={story.videoUrl}
-                    className="w-full h-full object-cover pointer-events-none"
-                    muted
-                    playsInline
-                    preload="metadata"
-                    poster={story.imageUrl}
-                  />
+                  story.imageUrl ? (
+                    <img src={story.imageUrl} alt="" className="w-full h-full object-cover pointer-events-none" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
+                      <span className="text-2xl opacity-60">▶</span>
+                    </div>
+                  )
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
                     {story.imageUrl ? (

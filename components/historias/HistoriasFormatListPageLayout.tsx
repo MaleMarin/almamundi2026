@@ -21,6 +21,7 @@ import {
   HISTORIAS_SHARE_ICONS_LEGEND,
 } from '@/lib/historias/historias-format-list-ui';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
+import { DataSaverAutoplayToggle } from '@/components/media/DataSaverAutoplayToggle';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 export type HistoriasFormatListActiveTab = 'videos' | 'audios' | 'escrito' | 'fotos';
@@ -100,6 +101,7 @@ export function HistoriasFormatListPageLayout({
               <p className="mx-auto max-w-xl text-pretty text-sm leading-relaxed text-gray-600 sm:mx-0 md:text-[1.0625rem] md:leading-snug">
                 {HISTORIAS_LIST_HERO_SUBTITLE}
               </p>
+              {contentMode === 'video' ? <DataSaverAutoplayToggle /> : null}
             </header>
 
             <div className="mt-5 flex-shrink-0 md:mt-6" aria-label="Filtros de historias">

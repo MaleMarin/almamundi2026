@@ -12,6 +12,7 @@ import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { useDataSaverAutoplay } from '@/hooks/useDataSaverAutoplay';
 
 type Props = {
   story: StoryPoint;
@@ -200,6 +201,7 @@ function KenBurnsViewer({
 
 export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full' }: Props) {
   const compact = variant === 'compact';
+  const { blockAutoplay } = useDataSaverAutoplay();
   const [mounted, setMounted] = useState(false);
   const [ecoPanel, setEcoPanel] = useState<null | 'voice' | 'text'>(null);
   const [listening, setListening] = useState(false);
@@ -545,7 +547,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
                   <video
                     controls
-                    autoPlay
+                    autoPlay={!blockAutoplay}
+                    preload="none"
+                    poster={story.thumbnailUrl || story.imageUrl}
                     src={story.videoUrl}
                     onEnded={() => {
                       void registerPulse(story.id ?? '');
