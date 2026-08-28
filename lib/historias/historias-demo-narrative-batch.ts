@@ -534,7 +534,7 @@ Ahora soy docente. El primer día de clases siempre busco en el aula a alguien c
     city: 'São Paulo',
     country: 'Brasil',
     hasText: true,
-    body: `Mi avó hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.
+    body: `Mi abuela hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.
 
 No lo había.
 
@@ -544,7 +544,7 @@ Lo más extraño es que cuando alguna vez se acerca, cuando el olor a cebolla y 
 
 Hay cosas que solo existen mientras existe la persona que las hace. Eso no es una tragedia. Es solo la forma que tiene el amor de dejar espacio.`,
     excerpt:
-      'Mi avó hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.',
+      'Mi abuela hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.',
     thumbnailUrl: 'https://picsum.photos/seed/am-t5/1200/800',
     publishedAt: '2026-01-26T12:00:00.000Z',
     tags: ['familia', 'memoria', 'cuidado'],

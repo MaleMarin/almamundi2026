@@ -446,7 +446,7 @@ Lo que sí te queda es esto: el amor no necesita que te recuerden. Puedes amar a
     lng: -46.6333,
     country: "Brasil",
     format: "text",
-    text: `Mi avó hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.
+    text: `Mi abuela hacía un caldo que ninguna de nosotras aprendimos a hacer porque siempre creímos que habría tiempo.
 
 No lo había.
 
