@@ -18,6 +18,11 @@
 import { useState } from 'react';
 import { TEMAS, detectarTemas } from '@/lib/temas';
 import type { StoryData } from '@/lib/story-schema';
+import {
+  REJECTION_REASON_DETAIL_MAX,
+  REJECTION_REASON_OPTIONS,
+  resolvePublicRejectionText,
+} from '@/lib/editorial/rejection-reasons';
 
 // ─── Tipos UI ────────────────────────────────────────────────────────────────
 type CurationState = 'idle' | 'publishing' | 'rejecting' | 'done' | 'error';
@@ -61,6 +66,8 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
   const [ciudad, setCiudad] = useState(story.ubicacion?.ciudad ?? '');
   const [pais, setPais] = useState(story.ubicacion?.pais ?? '');
   const [nota, setNota] = useState('');
+  const [reasonId, setReasonId] = useState('');
+  const [reasonDetail, setReasonDetail] = useState('');
   const [state, setState] = useState<CurationState>('idle');
   const [errorMsg, setErrorMsg] = useState('');
 
@@ -105,18 +112,31 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
 
   // ── Rechazar ─────────────────────────────────────────────────────────────
   const rechazar = async () => {
+    const resolved = resolvePublicRejectionText(reasonId, reasonDetail);
+    if (!resolved.ok) {
+      setErrorMsg(resolved.error);
+      return;
+    }
     setState('rejecting');
+    setErrorMsg('');
     try {
-      await fetch('/api/curate/reject', {
+      const res = await fetch('/api/curate/reject', {
         method: 'POST',
         headers: mergeHeaders({ 'Content-Type': 'application/json' }, getAuthHeaders?.()),
-        body: JSON.stringify({ storyId: story.id, nota }),
+        body: JSON.stringify({
+          storyId: story.id,
+          nota: nota || undefined,
+          reasonId: resolved.reasonId,
+          reasonDetail: resolved.detail || undefined,
+        }),
       });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error ?? 'Error desconocido');
       setState('done');
       onDone(story.id, 'rejected');
-    } catch {
+    } catch (e: unknown) {
       setState('error');
-      setErrorMsg('Error al rechazar');
+      setErrorMsg(e instanceof Error ? e.message : 'Error al rechazar');
     }
   };
 
@@ -295,6 +315,37 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
         />
       </Section>
 
+      {/* ── Motivo público de rechazo ── */}
+      <Section
+        titulo="Motivo si rechazas"
+        subtitulo="La persona lo recibe por correo. Puede pedir una nueva revisión en hola@almamundi.org"
+      >
+        <select
+          value={reasonId}
+          onChange={(e) => setReasonId(e.target.value)}
+          style={{ ...inputStyle, width: '100%', marginBottom: '0.5rem' }}
+        >
+          <option value="">Elegir motivo…</option>
+          {REJECTION_REASON_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <textarea
+          value={reasonDetail}
+          onChange={(e) => setReasonDetail(e.target.value)}
+          maxLength={REJECTION_REASON_DETAIL_MAX}
+          placeholder={
+            reasonId === 'other'
+              ? 'Escribe el motivo que verá la persona…'
+              : 'Detalle opcional (también lo verá la persona)'
+          }
+          rows={2}
+          style={{ ...inputStyle, width: '100%', resize: 'vertical' }}
+        />
+      </Section>
+
       {/* ── Nota interna ── */}
       <Section titulo="Nota del curador" subtitulo="Solo visible para el equipo, no se publica">
         <textarea
@@ -335,7 +386,7 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
         <button
           type="button"
           onClick={rechazar}
-          disabled={state !== 'idle'}
+          disabled={state !== 'idle' || !reasonId}
           style={{
             padding: '0.6rem 1.4rem',
             border: '1.5px solid #e5e7eb',

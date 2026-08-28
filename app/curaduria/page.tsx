@@ -13,6 +13,11 @@ import {
 } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
+import {
+  REJECTION_REASON_DETAIL_MAX,
+  REJECTION_REASON_OPTIONS,
+  resolvePublicRejectionText,
+} from '@/lib/editorial/rejection-reasons';
 
 type Submission = {
   id: string;
@@ -42,6 +47,7 @@ export default function CuraduriaPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
+  const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [lastMailNotice, setLastMailNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -145,6 +151,56 @@ export default function CuraduriaPage() {
         setError('Error de conexión.');
       } finally {
         setPublishingId(null);
+      }
+    },
+    [idToken]
+  );
+
+  const reject = useCallback(
+    async (submissionId: string, reasonId: string, reasonDetail: string) => {
+      if (!idToken) return;
+      const resolved = resolvePublicRejectionText(reasonId, reasonDetail);
+      if (!resolved.ok) {
+        setError(resolved.error);
+        return;
+      }
+      setRejectingId(submissionId);
+      setError('');
+      try {
+        const res = await fetch('/api/curate/reject', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            storyId: submissionId,
+            reasonId: resolved.reasonId,
+            reasonDetail: resolved.detail || undefined,
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setError(data.error || 'Error al rechazar.');
+          return;
+        }
+        const mail = data.rejectionMail as
+          | { status?: string; to?: string | null; error?: string | null }
+          | undefined;
+        if (mail?.status === 'sent') {
+          setLastMailNotice(`Rechazada. Correo enviado a ${mail.to ?? 'el autor'}.`);
+        } else if (mail?.status === 'skipped_no_email') {
+          setLastMailNotice('Rechazada. No se avisó: el envío no tiene correo del autor.');
+        } else if (mail?.status === 'failed') {
+          setLastMailNotice(`Rechazada, pero el correo NO salió: ${mail.error ?? 'error de envío'}`);
+        } else {
+          setLastMailNotice(null);
+        }
+        setList((prev) => prev.filter((s) => s.id !== submissionId));
+      } catch {
+        setError('Error de conexión.');
+      } finally {
+        setRejectingId(null);
       }
     },
     [idToken]
@@ -325,11 +381,11 @@ export default function CuraduriaPage() {
                     )}
                   </div>
                 </div>
-                <div className="flex-shrink-0">
+                <div className="flex-shrink-0 flex flex-col gap-3 w-full md:w-72">
                   <button
                     type="button"
                     onClick={() => publish(s.id)}
-                    disabled={publishingId === s.id || s.lat == null || s.lng == null}
+                    disabled={publishingId === s.id || rejectingId === s.id || s.lat == null || s.lng == null}
                     className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold text-sm disabled:opacity-50"
                     title={
                       s.lat == null || s.lng == null
@@ -339,6 +395,11 @@ export default function CuraduriaPage() {
                   >
                     {publishingId === s.id ? 'Publicando…' : 'Publicar en mapa'}
                   </button>
+                  <RejectionControls
+                    disabled={publishingId === s.id || (rejectingId !== null && rejectingId !== s.id)}
+                    busy={rejectingId === s.id}
+                    onReject={(reasonId, reasonDetail) => reject(s.id, reasonId, reasonDetail)}
+                  />
                 </div>
               </div>
             </li>
@@ -346,5 +407,65 @@ export default function CuraduriaPage() {
         </ul>
       </div>
     </main>
+  );
+}
+
+function RejectionControls({
+  disabled,
+  busy,
+  onReject,
+}: {
+  disabled: boolean;
+  busy: boolean;
+  onReject: (reasonId: string, reasonDetail: string) => void;
+}) {
+  const [reasonId, setReasonId] = useState('');
+  const [detail, setDetail] = useState('');
+  const preview = reasonId ? resolvePublicRejectionText(reasonId, detail) : null;
+  const canSubmit = Boolean(preview && preview.ok) && !disabled && !busy;
+
+  return (
+    <div className="flex flex-col gap-2">
+      <label className="text-xs text-white/60">
+        Motivo del rechazo (lo recibe la persona por correo)
+        <select
+          value={reasonId}
+          onChange={(e) => setReasonId(e.target.value)}
+          disabled={disabled || busy}
+          className="mt-1 w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm"
+        >
+          <option value="">Elegir motivo…</option>
+          {REJECTION_REASON_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id} className="text-black">
+              {opt.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      <textarea
+        value={detail}
+        onChange={(e) => setDetail(e.target.value)}
+        disabled={disabled || busy}
+        maxLength={REJECTION_REASON_DETAIL_MAX}
+        rows={2}
+        placeholder={
+          reasonId === 'other'
+            ? 'Escribe el motivo que verá la persona…'
+            : 'Detalle opcional (también lo verá la persona)'
+        }
+        className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-sm placeholder-white/40"
+      />
+      {preview && !preview.ok && (
+        <p className="text-amber-300 text-xs">{preview.error}</p>
+      )}
+      <button
+        type="button"
+        onClick={() => onReject(reasonId, detail)}
+        disabled={!canSubmit}
+        className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-sm disabled:opacity-50"
+      >
+        {busy ? 'Rechazando…' : 'Rechazar y avisar'}
+      </button>
+    </div>
   );
 }

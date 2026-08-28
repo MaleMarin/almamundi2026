@@ -18,9 +18,11 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as {
       storyId: string;
       nota?: string;
+      reasonId?: string;
+      reasonDetail?: string;
     };
 
-    const { storyId, nota } = body;
+    const { storyId, nota, reasonId, reasonDetail } = body;
 
     if (!storyId) {
       return NextResponse.json({ error: "storyId es requerido" }, { status: 400 });
@@ -32,6 +34,8 @@ export async function POST(req: NextRequest) {
       docId: storyId,
       actorEmail,
       nota,
+      reasonId,
+      reasonDetail,
     });
     if (!r.ok) {
       return NextResponse.json({ error: r.error }, { status: r.httpStatus });
@@ -42,6 +46,7 @@ export async function POST(req: NextRequest) {
       storyId,
       collection: r.collection,
       rejectedAt: new Date().toISOString(),
+      rejectionMail: r.rejectionMail,
     });
   } catch (err) {
     console.error("[curate/reject]", err);

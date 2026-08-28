@@ -18,6 +18,12 @@ import {
   type StoryData,
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
+import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import {
+  notifyAuthorStoryRejected,
+  type RejectionMailCollection,
+  type RejectionMailRecord,
+} from "@/lib/email/notify-author-rejected";
 
 async function maybeArchiveOldestPublicIfOverCap(db: Firestore): Promise<string | undefined> {
   try {
@@ -453,47 +459,116 @@ export async function editorialPublishSpanishDraftInPlace(args: {
   return { ok: true };
 }
 
+const REJECT_LOOKUP_ORDER = ["submissions", "story_submissions", "stories"] as const;
+
+async function mirrorRejectionOntoSubmissions(args: {
+  db: Firestore;
+  docId: string;
+  primaryCollection: RejectionMailCollection;
+  prev: Record<string, unknown>;
+  payload: Record<string, unknown>;
+}): Promise<void> {
+  const { db, docId, primaryCollection, prev, payload } = args;
+  const ids = new Set<string>([docId]);
+  if (typeof prev.sourceSubmissionId === "string" && prev.sourceSubmissionId.trim()) {
+    ids.add(prev.sourceSubmissionId.trim());
+  }
+  for (const id of ids) {
+    if (primaryCollection === "submissions" && id === docId) continue;
+    const ref = db.collection("submissions").doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) continue;
+    await ref.update(payload);
+  }
+}
+
 /**
- * Rechazo desde panel (`/api/curate/reject`): prioriza `story_submissions`; si no existe, `stories`.
+ * Rechazo desde panel (`/api/curate/reject`): `submissions` (pipeline vivo), luego `story_submissions`, luego `stories`.
+ * Exige motivo público; el correo al autor no bloquea el rechazo si Resend falla.
  */
 export async function editorialRejectModerationDocument(args: {
   db: Firestore;
   docId: string;
   actorEmail: string;
   nota?: string | null;
-}): Promise<{ ok: true; collection: "story_submissions" | "stories" } | { ok: false; httpStatus: number; error: string }> {
+  reasonId?: unknown;
+  reasonDetail?: unknown;
+}): Promise<
+  | { ok: true; collection: RejectionMailCollection; rejectionMail: RejectionMailRecord }
+  | { ok: false; httpStatus: number; error: string }
+> {
   const { db, docId, actorEmail, nota } = args;
-  const subRef = db.collection("story_submissions").doc(docId);
-  const storiesRef = db.collection("stories").doc(docId);
-  const subSnap = await subRef.get();
-  const storySnap = await storiesRef.get();
-  const ref = subSnap.exists ? subRef : storySnap.exists ? storiesRef : null;
-  if (!ref) return { ok: false, httpStatus: 404, error: "Historia no encontrada" };
+  const reason = resolvePublicRejectionText(args.reasonId, args.reasonDetail);
+  if (!reason.ok) return { ok: false, httpStatus: 400, error: reason.error };
 
-  const prev = (subSnap.exists ? subSnap.data() : storySnap.data()) as Record<string, unknown>;
+  let ref: DocumentReference | null = null;
+  let prev: Record<string, unknown> = {};
+  let collection: RejectionMailCollection | null = null;
+  for (const col of REJECT_LOOKUP_ORDER) {
+    const candidate = db.collection(col).doc(docId);
+    const snap = await candidate.get();
+    if (!snap.exists) continue;
+    ref = candidate;
+    prev = (snap.data() ?? {}) as Record<string, unknown>;
+    collection = col;
+    break;
+  }
+  if (!ref || !collection) return { ok: false, httpStatus: 404, error: "Historia no encontrada" };
+
   const rejectedAt = new Date().toISOString();
   const updatedAt = new Date().toISOString();
-  await ref.update({
+  const payload: Record<string, unknown> = {
     status: "rejected",
     curadorId: actorEmail,
     curadorNota: nota ?? null,
+    rejectionReasonId: reason.reasonId,
+    rejectionReason: reason.publicText,
+    rejectionReasonDetail: reason.detail || null,
     rejectedAt,
     updatedAt,
+  };
+  await ref.update(payload);
+  await mirrorRejectionOntoSubmissions({
+    db,
+    docId,
+    primaryCollection: collection,
+    prev,
+    payload,
   });
   await appendEditorialAuditLog(db, actorEmail, "reject", {
-    storyId: subSnap.exists ? undefined : docId,
-    submissionId: subSnap.exists ? docId : undefined,
-    submissionCollection: subSnap.exists ? "story_submissions" : undefined,
+    storyId: collection === "stories" ? docId : undefined,
+    submissionId: collection === "stories" ? undefined : docId,
+    submissionCollection: collection === "stories" ? undefined : collection,
     fromStatus: String(prev?.status ?? ""),
     toStatus: "rejected",
     note: nota ?? undefined,
+    extras: { reasonId: reason.reasonId, rejectionReason: reason.publicText },
   });
   await db.collection("curation_log").add({
     storyId: docId,
     action: "rejected",
     curadorId: actorEmail,
     curadorNota: nota ?? null,
+    rejectionReasonId: reason.reasonId,
+    rejectionReason: reason.publicText,
     timestamp: rejectedAt,
   });
-  return { ok: true, collection: subSnap.exists ? "story_submissions" : "stories" };
+
+  const rejectionMail = await notifyAuthorStoryRejected({
+    db,
+    collection,
+    docId,
+    publicReason: reason.publicText,
+  });
+  if (collection !== "submissions") {
+    await mirrorRejectionOntoSubmissions({
+      db,
+      docId,
+      primaryCollection: collection,
+      prev,
+      payload: { rejectionMail },
+    });
+  }
+
+  return { ok: true, collection, rejectionMail };
 }
