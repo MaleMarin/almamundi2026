@@ -34,6 +34,7 @@ import {
   createStoryRippleMaterial,
   createStoryStarBurstMaterial,
   makeStoryRippleGeometry,
+  tintStoryMarkerMaterial,
 } from '@/components/globe/bitStarBurstMaterial';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
@@ -206,14 +207,52 @@ function BitDot({
     };
   }, [rippleGeom]);
 
+  const storyTint = isStory ? bit.color : undefined;
+  const tintedMats = useMemo(() => {
+    if (!storyTint) return null;
+    const disk = storyMatNormal.clone();
+    const diskSel = storyMatSelected.clone();
+    const ripple = storyRippleMat.clone();
+    const rippleHover = storyRippleMatHover.clone();
+    tintStoryMarkerMaterial(disk, storyTint);
+    tintStoryMarkerMaterial(diskSel, storyTint);
+    tintStoryMarkerMaterial(ripple, storyTint);
+    tintStoryMarkerMaterial(rippleHover, storyTint);
+    disk.name = 'GlobeStoryStarBurstTint';
+    diskSel.name = 'GlobeStoryStarBurstTintSel';
+    ripple.name = 'GlobeStoryRippleTint';
+    rippleHover.name = 'GlobeStoryRippleTintHover';
+    return { disk, diskSel, ripple, rippleHover };
+  }, [storyTint, storyMatNormal, storyMatSelected, storyRippleMat, storyRippleMatHover]);
+  const tintedMatsRef = useRef(tintedMats);
+  tintedMatsRef.current = tintedMats;
+  useEffect(() => {
+    return () => {
+      if (!tintedMats) return;
+      tintedMats.disk.dispose();
+      tintedMats.diskSel.dispose();
+      tintedMats.ripple.dispose();
+      tintedMats.rippleHover.dispose();
+    };
+  }, [tintedMats]);
+  useFrame(() => {
+    const mats = tintedMatsRef.current;
+    if (!mats) return;
+    const op = layerOpRef.current.stories;
+    setMatLayerOpacity(mats.disk, op);
+    setMatLayerOpacity(mats.diskSel, op);
+    setMatLayerOpacity(mats.ripple, op);
+    setMatLayerOpacity(mats.rippleHover, op);
+  });
+
   const starMat = isNews
     ? newsMat
     : selected || (isStory && magneticActive)
     ? isStory
-      ? storyMatSelected
+      ? tintedMats?.diskSel ?? storyMatSelected
       : starMatSelected
     : isStory
-      ? storyMatNormal
+      ? tintedMats?.disk ?? storyMatNormal
       : starMatNormal;
   const sel = selected ? 1.08 : 1.0;
   const mag = magneticActive && !selected ? (isStory ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
@@ -221,7 +260,9 @@ function BitDot({
     STAR_PLANE_SCALE * (isStory ? STORY_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
   const rippleScale = STAR_PLANE_SCALE * STORY_RIPPLE_MUL;
   const coreScale = CORE_SCALE * (isStory ? 1 : 2.4);
-  const rippleMat = selected || magneticActive ? storyRippleMatHover : storyRippleMat;
+  const rippleMat = selected || magneticActive
+    ? tintedMats?.rippleHover ?? storyRippleMatHover
+    : tintedMats?.ripple ?? storyRippleMat;
 
   return (
     <group ref={rootRef} position={surfacePos}>

@@ -226,8 +226,16 @@ export function makeStoryRippleGeometry(bitId: number): THREE.PlaneGeometry {
 }
 
 /**
- * Anillo fino, frío y hueco: noticias (efímeras). No compite con el disco coral.
+ * Tinta el disco/onda de una historia. No mutar los materiales compartidos de bits.
  */
+export function tintStoryMarkerMaterial(mat: THREE.ShaderMaterial, cssColor: string): void {
+  const core = new THREE.Color(cssColor).convertSRGBToLinear();
+  const rim = core.clone().lerp(new THREE.Color(0x000000), 0.28);
+  if (mat.uniforms.uCore) mat.uniforms.uCore.value = new THREE.Vector3(core.r, core.g, core.b);
+  if (mat.uniforms.uRim) mat.uniforms.uRim.value = new THREE.Vector3(rim.r, rim.g, rim.b);
+  if (mat.uniforms.uCoral) mat.uniforms.uCoral.value = new THREE.Vector3(core.r, core.g, core.b);
+}
+
 export function createNewsRingMaterial(
   intensity = 0.88,
   materialName = 'GlobeNewsRing'

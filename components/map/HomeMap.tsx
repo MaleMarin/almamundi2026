@@ -18,6 +18,8 @@ import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { storyGlobeMarkerColor } from '@/lib/huella/story-globe-color';
+import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import {
   getNewsTopicApiQuery,
@@ -189,6 +191,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [globeLayers.news]);
 
   const stories = useStories();
+  const locale = useHomeLocaleOptional()?.locale ?? 'es';
 
   const globeBitsMarkers = useMemo(
     () =>
@@ -562,9 +565,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       markerKind: 'story' as const,
       title: s.title ?? s.label,
       place: [s.city, s.country].filter(Boolean).join(', ') || undefined,
+      color: storyGlobeMarkerColor({
+        antecedentes: s.antecedentes,
+        body: s.body,
+        transcription: s.transcription,
+        locale,
+      }),
     }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers];
-  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers]);
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, locale]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {
