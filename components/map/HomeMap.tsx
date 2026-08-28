@@ -108,7 +108,6 @@ import {
 } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
-import { useUserPosition } from '@/hooks/useUserPosition';
 import { getApproxLocation } from '@/lib/userLocation';
 
 /** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
@@ -134,7 +133,6 @@ export type HomeMapProps = {
 };
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
-  const userPosition = useUserPosition();
   const [approxPosition, setApproxPosition] = useState<{ lat: number; lng: number } | null>(null);
 
   useEffect(() => {
@@ -147,8 +145,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     };
   }, []);
 
-  const viewerLat = userPosition?.lat ?? approxPosition?.lat ?? null;
-  const viewerLng = userPosition?.lng ?? approxPosition?.lng ?? null;
+  const viewerLat = approxPosition?.lat ?? null;
+  const viewerLng = approxPosition?.lng ?? null;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -800,7 +798,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
             <GlobeV2Home
               embedded
-              forceDaylight={false}
               earthVisualTimeScale={1050}
               initialViewLat={HOME_GLOBE_FRAME_LAT}
               initialViewLng={HOME_GLOBE_FRAME_LNG}

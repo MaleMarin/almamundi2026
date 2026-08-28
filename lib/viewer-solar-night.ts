@@ -1,6 +1,6 @@
 import {
   approximateCoordinatesForIANATimeZone,
-  sunDayFactorAtLocation,
+  isNightAtLocation,
 } from '@/lib/sunPosition';
 
 export type ViewerAnchor = { lat: number; lng: number };
@@ -29,19 +29,46 @@ export function resolveViewerAnchor(
   }
 }
 
+/** `?hour=12` fuerza día, `?hour=22` fuerza noche (mismo criterio que MapFullPage). */
+export function parseHourOverride(search?: string): number | undefined {
+  if (typeof window === 'undefined' && search == null) return undefined;
+  const q = search ?? window.location.search;
+  const raw = new URLSearchParams(q).get('hour');
+  if (raw == null) return undefined;
+  const n = parseInt(raw, 10);
+  return Number.isFinite(n) && n >= 0 && n <= 23 ? n : undefined;
+}
+
+function hasFiniteCoords(
+  lat?: number | null,
+  lng?: number | null
+): lat is number {
+  return (
+    typeof lat === 'number' &&
+    typeof lng === 'number' &&
+    Number.isFinite(lat) &&
+    Number.isFinite(lng) &&
+    Math.abs(lat) <= 90 &&
+    Math.abs(lng) <= 180
+  );
+}
+
 /**
- * Noche perceptible en la ubicación del usuario (terminador + luces de ciudad + HUD).
- * Umbral bajo 0.22 incluye crepúsculo para que coincida con “está oscuro” en Chile, etc.
+ * Noche en el lugar de quien mira: `isNightAtLocation` si hay coords;
+ * si no, hora local del dispositivo (antes de las 7 o desde las 19).
+ * `?hour=` fuerza el modo en pruebas.
  */
 export function isViewerNightNow(
   viewerLat?: number | null,
   viewerLng?: number | null,
-  date: Date = new Date()
+  date: Date = new Date(),
+  hourOverride?: number
 ): boolean {
-  const anchor = resolveViewerAnchor(viewerLat, viewerLng);
-  if (anchor) {
-    return sunDayFactorAtLocation(anchor.lat, anchor.lng, date) < 0.22;
+  const hour = hourOverride ?? parseHourOverride();
+  if (hour != null) return hour < 7 || hour >= 19;
+  if (hasFiniteCoords(viewerLat, viewerLng)) {
+    return isNightAtLocation(viewerLat, viewerLng, date);
   }
   const h = date.getHours();
-  return h >= 20 || h < 6;
+  return h < 7 || h >= 19;
 }

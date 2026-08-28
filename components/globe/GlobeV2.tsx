@@ -8,7 +8,7 @@
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
  *
- * `embedded`: home `#mapa` — `forceDaylight` por defecto salvo `forceDaylight={false}` (terminador UTC + halo tipo referencia órbita). Página completa: /globo-v2 sin `embedded`.
+ * `embedded`: home `#mapa` — día/noche según dónde está quien mira (`isNightAtLocation` / `?hour=`). `forceDaylight={true|false}` fuerza el modo. Página completa: /globo-v2 sin `embedded` (terminador UTC).
  */
 
 import type { RefObject } from 'react';
@@ -1346,8 +1346,8 @@ export type GlobeV2Props = {
   displacementScale?: number;
   /**
    * true = disco siempre como de día (sin terminador ni luces urbanas nocturnas).
-   * false = siempre terminador UTC (útil en `embedded` para volver al ciclo día/noche real).
-   * Omitido + `embedded`: se asume día (home `#mapa` legible y luminoso).
+   * false = siempre terminador UTC.
+   * Omitido + `embedded`: día o noche según la hora real de quien mira (mismo criterio que MapFullPage).
    */
   forceDaylight?: boolean;
   /**
@@ -1376,7 +1376,7 @@ export type GlobeV2Props = {
   /** Vuelo de cámara hacia una historia (Sorpréndeme). `nonce` fuerza un nuevo vuelo. */
   focusTarget?: { lat: number; lng: number; nonce: number } | null;
   onFocusArrived?: () => void;
-  /** Ubicación del usuario para día/noche local (GPS); si no hay, zona IANA del navegador. */
+  /** Ubicación aproximada de quien mira (GPS redondeado); si no hay, hora local del dispositivo. */
   viewerLat?: number;
   viewerLng?: number;
 };
@@ -1405,12 +1405,6 @@ export default function GlobeV2({
   focusTarget = null,
   onFocusArrived,
 }: GlobeV2Props) {
-  /**
-   * Día completo en shaders (sin terminador UTC) + luces “día” en la escena.
-   * En `embedded` (home `#mapa`), por defecto activo salvo `forceDaylight={false}` explícito.
-   */
-  const forceDaylightOn = forceDaylight === true || (embedded && forceDaylight !== false);
-
   const urls: GlobeV2TextureUrls = {
     day: textureUrls?.day ?? GLOBE_V2_DEFAULT_TEXTURES.day,
     normal: textureUrls?.normal ?? GLOBE_V2_DEFAULT_TEXTURES.normal,
@@ -1420,6 +1414,18 @@ export default function GlobeV2({
   };
 
   const localNight = useViewerSolarNight(viewerLat, viewerLng);
+  /**
+   * Disco de día vs look de noche según quien mira.
+   * `forceDaylight` explícito gana (QA / `/globo-v2`). En home (`embedded` sin prop): `!localNight`.
+   */
+  const forceDaylightOn =
+    forceDaylight === true
+      ? true
+      : forceDaylight === false
+        ? false
+        : embedded
+          ? !localNight
+          : false;
   const viewerNight = forceDaylightOn ? false : localNight;
   const sunLightRef = useRef<THREE.DirectionalLight | null>(null);
 

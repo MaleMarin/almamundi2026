@@ -12,16 +12,20 @@ export type ApproxLocation = {
 };
 
 let cachedLocation: ApproxLocation | null = null;
+let inFlight: Promise<ApproxLocation | null> | null = null;
 
 /**
  * Intenta obtener la ubicación del usuario de forma silenciosa.
  * Cachea el resultado para no pedir permiso múltiples veces.
+ * Llamadas concurrentes comparten la misma petición (un solo prompt).
  */
 export async function getApproxLocation(): Promise<ApproxLocation | null> {
   if (cachedLocation) return cachedLocation;
   if (typeof window === 'undefined') return null;
+  if (inFlight) return inFlight;
 
-  if (navigator.geolocation) {
+  inFlight = (async () => {
+    if (!navigator.geolocation) return null;
     try {
       const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
         navigator.geolocation.getCurrentPosition(resolve, reject, {
@@ -37,10 +41,15 @@ export async function getApproxLocation(): Promise<ApproxLocation | null> {
       return cachedLocation;
     } catch {
       // Sin permiso o timeout: no hay fallback por IP (privacidad + CSP).
+      return null;
     }
-  }
+  })();
 
-  return null;
+  try {
+    return await inFlight;
+  } finally {
+    inFlight = null;
+  }
 }
 
 /** Registra una huella en el servidor de forma silenciosa. */
