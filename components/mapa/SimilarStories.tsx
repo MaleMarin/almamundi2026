@@ -31,6 +31,16 @@ function formatLabel(format: string): string {
   return FORMAT_LABEL[format.toLowerCase()] ?? 'Historia';
 }
 
+/** Corta en el último espacio dentro de `maxChars`, sin partir una palabra. */
+function truncateAtWord(text: string, maxChars: number): string {
+  const t = text.replace(/\s+/g, ' ').trim();
+  if (t.length <= maxChars) return t;
+  const limited = t.slice(0, maxChars);
+  const lastSpace = limited.lastIndexOf(' ');
+  const cut = (lastSpace > 0 ? limited.slice(0, lastSpace) : limited).trimEnd();
+  return `${cut}…`;
+}
+
 type SimilarStoriesProps = {
   storyId: string;
   variant?: 'light' | 'dark';
@@ -123,7 +133,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                   lineHeight: 1.2,
                 }}
               >
-                {s.title.length > 45 ? s.title.slice(0, 45) + '…' : s.title}
+                {truncateAtWord(s.title, 45)}
               </span>
             </div>
             {s.description && (
@@ -135,7 +145,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                   lineHeight: 1.5,
                 }}
               >
-                {s.description.length > 80 ? s.description.slice(0, 80) + '…' : s.description}
+                {truncateAtWord(s.description, 80)}
               </p>
             )}
             <p
