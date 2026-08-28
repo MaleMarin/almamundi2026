@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { checkAffectiveTone } from '@/lib/affective-tone-check';
+import { foldEcoVad, meanVadFromText, parseEcoVadState } from '@/lib/huella/eco-vad';
 
 export const runtime = 'nodejs';
 
@@ -48,20 +49,32 @@ export async function POST(
 
     const db = getAdminDb();
     const storyRef = db.collection('stories').doc(id);
-    const storySnap = await storyRef.get();
-    if (!storySnap.exists) {
-      return NextResponse.json({ error: 'Historia no encontrada.' }, { status: 404 });
-    }
+    const messageVad = meanVadFromText(message, 'es');
 
-    await storyRef.collection('affective_messages').add({
-      text: message,
-      createdAt: FieldValue.serverTimestamp(),
-      source: 'exhibition',
+    await db.runTransaction(async (tx) => {
+      const storySnap = await tx.get(storyRef);
+      if (!storySnap.exists) {
+        throw new Error('story_not_found');
+      }
+      const msgRef = storyRef.collection('affective_messages').doc();
+      tx.set(msgRef, {
+        text: message,
+        createdAt: FieldValue.serverTimestamp(),
+        source: 'exhibition',
+      });
+      if (messageVad) {
+        const prev = parseEcoVadState(storySnap.data()?.ecoVad);
+        tx.update(storyRef, { ecoVad: foldEcoVad(prev, messageVad) });
+      }
     });
 
     return NextResponse.json({ ok: true });
   } catch (err) {
     console.error('[affective-message]', err);
+    const msg = err instanceof Error ? err.message : '';
+    if (msg === 'story_not_found') {
+      return NextResponse.json({ error: 'Historia no encontrada.' }, { status: 404 });
+    }
     return NextResponse.json({ error: 'No se pudo enviar el mensaje.' }, { status: 500 });
   }
 }

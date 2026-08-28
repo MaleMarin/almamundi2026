@@ -39,6 +39,7 @@ export default async function MiEcoPage({ params, searchParams }: PageProps) {
       country={data.country}
       footerAtIso={data.footerAtIso}
       resonanceCount={data.resonanceCount}
+      ecoVad={data.ecoVad}
     />
   );
 }

@@ -17,6 +17,7 @@ export type MiEcoClientProps = {
   country: string;
   footerAtIso: string;
   resonanceCount: number;
+  ecoVad: { v: number; a: number; d: number; n: number } | null;
 };
 
 function resonanceCopy(n: number): string {
@@ -34,12 +35,17 @@ export function MiEcoClient({
   country,
   footerAtIso,
   resonanceCount,
+  ecoVad,
 }: MiEcoClientProps) {
   const canvasId = 'mi-eco-resonancia';
   const footerAt = useMemo(() => {
     const d = new Date(footerAtIso);
     return Number.isNaN(d.getTime()) ? null : d;
   }, [footerAtIso]);
+  const ecoVadStable = useMemo(() => {
+    if (!ecoVad || ecoVad.n < 1) return null;
+    return { v: ecoVad.v, a: ecoVad.a, d: ecoVad.d, n: ecoVad.n };
+  }, [ecoVad]);
   const { canvasRef, err, setErr, downloadPng } = useSubirHuella({
     format,
     narrativeText,
@@ -49,6 +55,7 @@ export function MiEcoClient({
     city: city || null,
     country: country || null,
     footerAt,
+    ecoVad: ecoVadStable,
   });
 
   const orangeCta = 'linear-gradient(180deg, #FF4A1C 0%, #D13D17 100%)' as const;
@@ -73,8 +80,8 @@ export function MiEcoClient({
             {title}
           </h1>
           <p className="mt-3 max-w-2xl text-base md:text-lg" style={{ color: neu.textBody }}>
-            Un rincón solo para ti: cuántas personas resonaron con tu historia, y tu cinta de colores
-            para volver a descargarla.
+            Un rincón solo para ti: cuántas personas resonaron con tu historia, y tu cinta de colores,
+            que se va tiñendo con lo que esas voces dejaron.
           </p>
         </header>
 
@@ -90,7 +97,8 @@ export function MiEcoClient({
               {resonanceCopy(resonanceCount)}
             </p>
             <p className="mt-2 text-sm" style={{ color: neu.textBody }}>
-              El contenido de esos mensajes queda en el buzón; aquí solo ves el número.
+              El contenido de esos mensajes queda en el buzón; aquí solo ves el número. La cinta de abajo
+              sí se mueve, poco a poco, con cada mensaje nuevo.
             </p>
           </div>
 

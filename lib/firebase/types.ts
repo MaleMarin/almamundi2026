@@ -110,6 +110,8 @@ export interface Story {
   captionPhrases?: string[];
   /** Token opaco para `/historias/[id]/mi-eco` (solo el autor lo recibe por correo). */
   authorEcoToken?: string;
+  /** Promedio corriente VAD de mensajes de resonancia (cinta del eco; no color del globo). */
+  ecoVad?: { v: number; a: number; d: number; n: number };
 }
 
 /** mail_queue: para Cloud Functions / Firestore extension (correo al publicar). */

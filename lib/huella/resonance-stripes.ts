@@ -13,7 +13,9 @@ import {
   hslCss,
   stripeWidthForCounts,
   type ColorizedVadHit,
+  type VadTriple,
 } from '@/lib/huella/vad-color';
+import { blendHitsTowardVad, ecoBlendT } from '@/lib/huella/eco-vad';
 
 export const RESONANCE_BG = '#F7F4EE';
 export const RESONANCE_STRIPE_MIN_PX = 8;
@@ -83,6 +85,11 @@ export type DrawVadResonanceArgs = {
   footer?: ResonancePieceFooter;
   /** Si no hay `footer`, pinta solo fecha + sitio (compatibilidad). */
   footerAt?: Date;
+  /**
+   * Promedio de resonancia (cinta del eco). No cambia las palabras del relato:
+   * solo acerca poco a poco el color. Ausente = cinta del día de publicar.
+   */
+  ecoVad?: (VadTriple & { n: number }) | null;
 };
 
 function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
@@ -157,7 +164,9 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
   const hitsRaw = hitsFromText(args.text, args.locale);
-  const hits = hitsRaw.length > 0 ? hitsRaw : fallbackHits(args.storyId);
+  const hitsBase = hitsRaw.length > 0 ? hitsRaw : fallbackHits(args.storyId);
+  const t = args.ecoVad && args.ecoVad.n > 0 ? ecoBlendT(args.ecoVad.n) : 0;
+  const hits = t > 0 && args.ecoVad ? blendHitsTowardVad(hitsBase, args.ecoVad, t) : hitsBase;
   const colored = expandSparseVadColors(colorizeVadHits(hits));
   const counts = colored.map((h) => h.count);
   const units = orderForContrast(

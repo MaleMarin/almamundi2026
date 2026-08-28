@@ -1,6 +1,7 @@
 import 'server-only';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { AUTHOR_ECO_TOKEN_FIELD, authorEcoTokensMatch } from '@/lib/author-eco-token';
+import { parseEcoVadState, type EcoVadState } from '@/lib/huella/eco-vad';
 
 export type AuthorEcoPageData = {
   title: string;
@@ -11,6 +12,7 @@ export type AuthorEcoPageData = {
   country: string;
   footerAtIso: string;
   resonanceCount: number;
+  ecoVad: EcoVadState | null;
 };
 
 function asRecord(v: unknown): Record<string, unknown> | null {
@@ -107,5 +109,6 @@ export async function loadAuthorEcoPage(
     country,
     footerAtIso: footerAt.toISOString(),
     resonanceCount,
+    ecoVad: parseEcoVadState(data.ecoVad),
   };
 }

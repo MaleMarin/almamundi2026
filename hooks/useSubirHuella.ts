@@ -31,6 +31,8 @@ type UseSubirHuellaOptions = {
   country?: string | null;
   /** Fecha del pie (por defecto: ahora). En `/mi-eco` se pasa la del envío para no cambiar el texto. */
   footerAt?: Date | null;
+  /** Promedio de resonancia: solo la cinta del eco, no la del cierre al publicar. */
+  ecoVad?: { v: number; a: number; d: number; n: number } | null;
 };
 
 /**
@@ -46,6 +48,7 @@ export function useSubirHuella({
   city,
   country,
   footerAt,
+  ecoVad,
 }: UseSubirHuellaOptions) {
   const { locale } = useHomeLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -72,8 +75,9 @@ export function useSubirHuella({
         country: country?.trim() || undefined,
         locale,
       },
+      ecoVad: ecoVad && ecoVad.n > 0 ? ecoVad : null,
     });
-  }, [format, narrativeText, submissionId, locale, storyTitle, city, country, footerAt]);
+  }, [format, narrativeText, submissionId, locale, storyTitle, city, country, footerAt, ecoVad]);
 
   useLayoutEffect(() => {
     paintResonanceVisual();
