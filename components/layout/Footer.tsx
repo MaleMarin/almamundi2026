@@ -125,7 +125,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             <img
               src="/logo-precisar.png"
               alt="Precisar"
-              className="h-[3.65rem] w-auto object-contain md:h-16"
+              className="h-11 w-auto object-contain md:h-14"
             />
           </div>
 
