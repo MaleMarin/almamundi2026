@@ -123,7 +123,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               {t.footerInitiativeOf}
             </p>
             <img
-              src="/logo-precisar.png"
+              src="/logo-precisar.png?v=2"
               alt="Precisar"
               className="h-11 w-auto object-contain md:h-14"
             />
