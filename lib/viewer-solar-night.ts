@@ -39,18 +39,21 @@ export function parseHourOverride(search?: string): number | undefined {
   return Number.isFinite(n) && n >= 0 && n <= 23 ? n : undefined;
 }
 
-function hasFiniteCoords(
+function finiteCoords(
   lat?: number | null,
   lng?: number | null
-): lat is number {
-  return (
+): { lat: number; lng: number } | null {
+  if (
     typeof lat === 'number' &&
     typeof lng === 'number' &&
     Number.isFinite(lat) &&
     Number.isFinite(lng) &&
     Math.abs(lat) <= 90 &&
     Math.abs(lng) <= 180
-  );
+  ) {
+    return { lat, lng };
+  }
+  return null;
 }
 
 /**
@@ -66,8 +69,9 @@ export function isViewerNightNow(
 ): boolean {
   const hour = hourOverride ?? parseHourOverride();
   if (hour != null) return hour < 7 || hour >= 19;
-  if (hasFiniteCoords(viewerLat, viewerLng)) {
-    return isNightAtLocation(viewerLat, viewerLng, date);
+  const coords = finiteCoords(viewerLat, viewerLng);
+  if (coords) {
+    return isNightAtLocation(coords.lat, coords.lng, date);
   }
   const h = date.getHours();
   return h < 7 || h >= 19;
