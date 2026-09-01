@@ -60,8 +60,14 @@ export async function POST(req: Request) {
   });
   if (blocked) return blocked;
 
+  let form: FormData;
   try {
-    const form = await req.formData();
+    form = await req.formData();
+  } catch {
+    return NextResponse.json({ error: "invalid_request" }, { status: 400 });
+  }
+
+  try {
 
     const turnstile = form.get("cf-turnstile-response");
     const captcha = await verifyTurnstileIfConfigured(

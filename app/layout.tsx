@@ -89,12 +89,12 @@ export const metadata: Metadata = {
     images: ['/og-image.png'],
   },
   /**
-   * Favicon: `public/artemis.ico` → `/artemis.ico`.
-   * Apple: convención `app/apple-icon.png` (icono al guardar en pantalla de inicio).
+   * Favicon: `app/icon.png` (convención App Router).
+   * Apple: `app/apple-icon.png` (icono al guardar en pantalla de inicio).
    */
   icons: {
-    icon: '/artemis.ico',
-    shortcut: '/artemis.ico',
+    icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],
+    shortcut: '/icon.png',
   },
 };
 
