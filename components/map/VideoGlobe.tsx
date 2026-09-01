@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useEffect, useCallback, useMemo, useState } from 'react';
-import { useDataSaverAutoplay } from '@/hooks/useDataSaverAutoplay';
 
 /**
  * Globo NASA: día o noche según hora local (6–20 = día, 20–6 = noche).
@@ -158,8 +157,6 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
   const overlayRef = useRef<HTMLDivElement>(null);
   const globeRotationRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number>(0);
-  const { blockAutoplay, hydrated } = useDataSaverAutoplay();
-  const loadGlobeVideo = hydrated && !blockAutoplay;
 
   const rotationYRef = useRef(ROTATION_Y_INITIAL);
   const userOffsetYRef = useRef(0);
@@ -201,14 +198,6 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
   );
 
   useEffect(() => {
-    if (blockAutoplay) {
-      setShowFallbackImage(true);
-      setVideoReady(false);
-    }
-  }, [blockAutoplay]);
-
-  useEffect(() => {
-    if (!loadGlobeVideo) return;
     const video = videoRef.current;
     if (!video) return;
     const play = () => {
@@ -242,7 +231,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
       video.removeEventListener('loadeddata', onLoadedData);
       video.removeEventListener('error', onError);
     };
-  }, [videoSrc, loadGlobeVideo]);
+  }, [videoSrc]);
 
   useEffect(() => {
     if (showFallbackImage) return;
@@ -258,7 +247,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
   useEffect(() => {
     const el = containerRef.current;
     const video = videoRef.current;
-    if (!el || !video || !loadGlobeVideo) return;
+    if (!el || !video) return;
     const io = new IntersectionObserver(
       (entries) => {
         if (entries[0]?.isIntersecting && video.readyState >= 2) {
@@ -269,7 +258,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
     );
     io.observe(el);
     return () => io.disconnect();
-  }, [loadGlobeVideo]);
+  }, []);
 
   const timeOriginRef = useRef<number>(0);
 
@@ -465,13 +454,13 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
             {/* Vídeo encima solo cuando está listo; opacity 0 + visibility hidden evitan frame negro hasta que cargue. */}
             <video
               ref={videoRef}
-              src={loadGlobeVideo ? fullVideoSrc(videoSrc) : undefined}
+              src={fullVideoSrc(videoSrc)}
               poster={globeImgSrc}
-              autoPlay={loadGlobeVideo}
+              autoPlay
               loop
               muted
               playsInline
-              preload={loadGlobeVideo ? 'metadata' : 'none'}
+              preload="auto"
               className="absolute inset-0 w-full h-full object-cover outline-none border-0 globe-layer-reveal"
               style={{
                 opacity: showFallbackImage || !videoReady ? 0 : dayOpacity,

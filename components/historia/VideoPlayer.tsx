@@ -6,7 +6,6 @@ import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos'
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
 import { SITE_FONT_STACK } from '@/lib/typography'
-import { useDataSaverAutoplay } from '@/hooks/useDataSaverAutoplay'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -116,9 +115,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
   const videoRef = useRef<HTMLVideoElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const controlsTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const { blockAutoplay, hydrated } = useDataSaverAutoplay()
-  /** Sin `src` hasta Play (o autoplay permitido): no descarga el archivo al entrar. */
-  const [srcArmed, setSrcArmed] = useState(false)
 
   // ── Escape to close ───────────────────────────────────────────────────────
   useEffect(() => {
@@ -153,24 +149,12 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
     return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
   }, [stage])
 
-  // ── Cargar el archivo solo al reproducir; autoplay solo si no está bloqueado ─
+  // ── Auto-play when stage switches to playing ───────────────────────────────
   useEffect(() => {
-    setSrcArmed(false)
-    setIsPlaying(false)
-  }, [historia.videoUrl])
-
-  useEffect(() => {
-    if (stage !== 'playing' || !hydrated) return
-    if (blockAutoplay) return
-    setSrcArmed(true)
-  }, [stage, blockAutoplay, hydrated])
-
-  useEffect(() => {
-    if (stage !== 'playing' || !srcArmed) return
-    const v = videoRef.current
-    if (!v) return
-    v.play().then(() => setIsPlaying(true)).catch(() => {})
-  }, [stage, srcArmed, historia.videoUrl])
+    if (stage === 'playing' && videoRef.current) {
+      videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {})
+    }
+  }, [stage])
 
   // ── Controls auto-hide ─────────────────────────────────────────────────────
   const resetControlsTimer = useCallback(() => {
@@ -199,13 +183,9 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
   }
 
   const togglePlay = () => {
-    if (!srcArmed) {
-      setSrcArmed(true)
-      return
-    }
     if (!videoRef.current) return
     if (isPlaying) { videoRef.current.pause(); setIsPlaying(false) }
-    else { videoRef.current.play().then(() => setIsPlaying(true)).catch(() => {}) }
+    else { videoRef.current.play(); setIsPlaying(true) }
   }
 
   const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -531,12 +511,10 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             pointerEvents: 'none',
           }} />
 
-          {/* ── Video: poster liviano; el archivo solo se pide al armar src ── */}
+          {/* ── Video ── */}
           <video
             ref={videoRef}
-            poster={historia.thumbnailUrl}
-            src={srcArmed ? historia.videoUrl : undefined}
-            preload="none"
+            src={historia.videoUrl}
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleEnded}
@@ -553,39 +531,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               <track kind="captions" src={historia.subtitulos} label="Español" srcLang="es" default />
             ) : null}
           </video>
-          {!isPlaying ? (
-            <div
-              aria-hidden
-              style={{
-                position: 'absolute',
-                inset: 0,
-                zIndex: 3,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                pointerEvents: 'none',
-                backgroundImage: srcArmed ? undefined : `url(${historia.thumbnailUrl})`,
-                backgroundSize: 'contain',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat',
-              }}
-            >
-              <span
-                style={{
-                  display: 'flex',
-                  height: 64,
-                  width: 64,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  background: 'rgba(0,0,0,0.55)',
-                  color: '#fff',
-                }}
-              >
-                <PlayIcon />
-              </span>
-            </div>
-          ) : null}
 
           {/* ── Top bar: title + close ── */}
           <div style={{
