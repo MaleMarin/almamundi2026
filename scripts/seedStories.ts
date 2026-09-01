@@ -548,7 +548,7 @@ Decía que me quería. Lo sabía. Pero es diferente saberlo a leerlo con tus pro
     format: "text",
     text: `En 2020 no salí de casa durante nueve meses. No por el virus. Por mí.
 
-Hay dos tipos de encierro: el que te imponen y el que te construís. El mío tenía paredes que solo yo podía ver.
+Hay dos tipos de encierro: el que te imponen y el que te construyes. El mío tenía paredes que solo yo podía ver.
 
 Lo que aprendí es que la recuperación no tiene forma de línea recta. Tiene forma de espiral: vuelves al mismo punto pero un poco más arriba cada vez.
 
