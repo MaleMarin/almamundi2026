@@ -43,6 +43,9 @@ import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 
+/** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
+const SHOW_SURPRISE_ME_BUTTON = false;
+
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
 const NEWS_GLOBE_ID_BASE = 8_000_000;
@@ -835,6 +838,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 Historias
               </PillNavButton>
+              {SHOW_SURPRISE_ME_BUTTON ? (
               <PillNavButton
                 dock
                 title="Abrir una historia publicada al azar"
@@ -842,6 +846,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 Sorpréndeme
               </PillNavButton>
+              ) : null}
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'bits'}
