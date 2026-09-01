@@ -42,10 +42,6 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
         type: 'quote',
         text: 'Vivimos en la era más documentada de la historia. Y hay millones de historias reales esperando el lugar correcto para existir.',
       },
-      {
-        type: 'emphasis',
-        text: 'Esas son las historias que AlmaMundi existe para guardar.',
-      },
     ],
   },
   {
