@@ -192,8 +192,8 @@ export default function TerminosPage() {
         <Section id="s9" title="9. Contacto">
           <p style={{ marginBottom: '1rem' }}>
             Para consultas sobre estos términos:{' '}
-            <a href="mailto:hola@precisar.cl" style={{ color: ORANGE, textDecoration: 'none' }}>
-              hola@precisar.cl
+            <a href="mailto:hola@almamundi.org" style={{ color: ORANGE, textDecoration: 'none' }}>
+              hola@almamundi.org
             </a>
           </p>
           <p style={{ margin: 0 }}>Fecha de vigencia: agosto 2026.</p>
