@@ -79,7 +79,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     setErrorMsg(null);
     if (!db) {
       setErrorMsg(
-        'Ocurrió un error. Por favor intente de nuevo o contacte a hola@precisar.cl',
+        'Ocurrió un error. Por favor intente de nuevo o contacte a hola@almamundi.org',
       );
       return;
     }
@@ -145,7 +145,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
         return;
       }
       setErrorMsg(
-        'Ocurrió un error. Por favor intente de nuevo o contacte a hola@precisar.cl',
+        'Ocurrió un error. Por favor intente de nuevo o contacte a hola@almamundi.org',
       );
     }
   }, []);
