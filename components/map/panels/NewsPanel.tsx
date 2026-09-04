@@ -280,7 +280,16 @@ export function NewsPanel({
   })();
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 10, height: '100%' }}>
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 10,
+        height: '100%',
+        minHeight: 0,
+        overflow: 'hidden',
+      }}
+    >
       <div style={{ flexShrink: 0, margin: '0 0 4px' }}>
         <p
           style={{
@@ -339,10 +348,14 @@ export function NewsPanel({
       </div>
 
       <div
+        onWheel={(event) => event.stopPropagation()}
         style={{
           flex: 1,
+          minHeight: 0,
           overflowY: 'auto',
-          scrollbarWidth: 'none',
+          overflowX: 'hidden',
+          scrollbarWidth: 'thin',
+          overscrollBehavior: 'contain',
           display: 'flex',
           flexDirection: 'column',
           gap: 8,

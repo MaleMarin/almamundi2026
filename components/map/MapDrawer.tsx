@@ -76,7 +76,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   const title =
     mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
   const bitsMode = mode === 'bits';
+  const newsMode = mode === 'news';
   const dialogAriaLabel = title;
+  const drawerBodyClass = bitsMode
+    ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
+    : newsMode
+      ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4'
+      : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4';
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
   if (isMobile) {
@@ -116,13 +122,9 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
             </button>
           </div>
         <div
-          className={
-            mode === 'bits'
-              ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
-              : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4'
-          }
+          className={drawerBodyClass}
           style={{
-            scrollbarWidth: 'thin',
+            scrollbarWidth: newsMode ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
@@ -150,7 +152,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         className={`pointer-events-auto absolute right-6 flex flex-col overflow-hidden rounded-[28px] ${
           bitsMode
             ? 'top-6 max-h-[calc(100%-3rem)] w-[min(calc(100vw-3rem),400px)]'
-            : 'top-6 bottom-6 w-[360px]'
+            : 'top-6 bottom-6 max-h-[calc(100dvh-3rem)] w-[360px]'
         }`}
         style={{
           ...glassShell,
@@ -176,13 +178,9 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           </button>
         </div>
         <div
-          className={
-            mode === 'bits'
-              ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
-              : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4'
-          }
+          className={drawerBodyClass}
           style={{
-            scrollbarWidth: 'thin',
+            scrollbarWidth: newsMode ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
