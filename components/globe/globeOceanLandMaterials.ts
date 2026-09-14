@@ -130,9 +130,9 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       float diff = 0.40 + 0.46 * pow(ndl, 1.08);
       vec3 colDay = base * diff * 0.98;
       if (uFullDay > 0.5) {
-        float luma = dot(dDay, vec3(0.299, 0.587, 0.114));
-        float gain = mix(2.22, 0.88, smoothstep(0.04, 0.46, luma));
-        colDay = clamp(dDay * gain, 0.0, 1.0);
+        /* Gamma 2.6: el mar de earth-day-nasa.jpg es ~0.002–0.02 lineal; un *gain no lo saca. */
+        vec3 lifted = pow(clamp(dDay, 0.0, 1.0), vec3(1.0 / 2.6));
+        colDay = clamp(lifted, 0.0, 1.0);
       }
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
@@ -150,7 +150,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
 
       float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.42, mu);
       vec3 col = mix(colNight, colDay, dayW);
-      col = pow(clamp(col, 0.0, 1.0), uFullDay > 0.5 ? vec3(0.90) : vec3(0.98));
+      col = pow(clamp(col, 0.0, 1.0), uFullDay > 0.5 ? vec3(1.0) : vec3(0.98));
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -327,8 +327,8 @@ export function createLandSphereMaterial(
       vec3 litDay = d0 * (amb + dif) * mountainPopDay * mix(1.0, 1.08, uFullDay);
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       if (uFullDay > 0.5) {
-        float gain = mix(2.38, 0.80, smoothstep(0.05, 0.48, luma));
-        litDay = clamp(d0 * gain, 0.0, 1.0);
+        vec3 lifted = pow(clamp(d0, 0.0, 1.0), vec3(1.0 / 2.6));
+        litDay = clamp(lifted * mountainPopDay, 0.0, 1.0);
       } else {
         float hot = smoothstep(0.5, 0.86, luma);
         litDay *= mix(1.0, 0.82, hot);
