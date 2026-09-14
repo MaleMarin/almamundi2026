@@ -131,9 +131,10 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 colDay = base * diff * 0.98;
       if (uFullDay > 0.5) {
         float luma = dot(dDay, vec3(0.299, 0.587, 0.114));
-        vec3 photo = clamp(mix(vec3(luma), dDay, 1.08), 0.0, 1.0);
-        photo = clamp((photo - vec3(0.5)) * 1.05 + vec3(0.5), 0.0, 1.0);
-        colDay = photo * (0.90 + 0.12 * ndl);
+        vec3 photo = clamp(mix(vec3(luma), dDay, 1.12), 0.0, 1.0);
+        photo = pow(photo, vec3(0.78));
+        photo = clamp((photo - vec3(0.5)) * 1.08 + vec3(0.5), 0.0, 1.0);
+        colDay = photo * (1.22 + 0.16 * ndl);
       }
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
@@ -151,7 +152,7 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
 
       float dayW = uFullDay > 0.5 ? 1.0 : smoothstep(-0.28, 0.42, mu);
       vec3 col = mix(colNight, colDay, dayW);
-      col = pow(clamp(col, 0.0, 1.0), vec3(0.98));
+      col = pow(clamp(col, 0.0, 1.0), uFullDay > 0.5 ? vec3(0.90) : vec3(0.98));
 
       gl_FragColor = vec4(col, 1.0);
     }
@@ -321,9 +322,10 @@ export function createLandSphereMaterial(
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = mix(0.26, 0.52, uFullDay);
-      float dif = mix(0.74, 1.05, uFullDay) * pow(ndl, 0.85);
-      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.32, uFullDay);
+      float amb = mix(0.26, 0.58, uFullDay);
+      float dif = mix(0.74, 1.12, uFullDay) * pow(ndl, 0.85);
+      vec3 dLand = uFullDay > 0.5 ? pow(d0, vec3(0.82)) : d0;
+      vec3 litDay = dLand * (amb + dif) * mountainPop * mix(1.0, 1.48, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);

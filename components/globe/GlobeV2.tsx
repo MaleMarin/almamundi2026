@@ -713,7 +713,11 @@ function EarthGroup({
     normalMap.needsUpdate = true;
   }, [gl, dayMap, lightsMap, normalMap]);
 
-  const cloudOpacity = viewerNight ? GLOBE_V2_CLOUD_OPACITY_NIGHT : GLOBE_V2_CLOUD_OPACITY_DAY;
+  const cloudOpacity = viewerNight
+    ? GLOBE_V2_CLOUD_OPACITY_NIGHT
+    : fullDaySurface && embedded
+      ? GLOBE_V2_CLOUD_OPACITY_DAY * 0.55
+      : GLOBE_V2_CLOUD_OPACITY_DAY;
   const cloudOuterOpacityFactor = viewerNight
     ? GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_NIGHT
     : GLOBE_V2_CLOUD_OUTER_OPACITY_FACTOR_DAY;
@@ -1133,7 +1137,7 @@ function GlobeScene({
    * `forceDaylight` primero: no dejar que `viewerNight` baje la exposición de la portada. */
   const exp = embedded
     ? forceDaylight
-      ? 3.35
+      ? 4.15
       : viewerNight
         ? 1.9
         : 2.16
@@ -1505,7 +1509,7 @@ export default function GlobeV2({
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedUniverseChrome
             ? forceDaylightOn
-              ? 3.2
+              ? 3.9
               : 2.14
             : embedded
               ? 2.02
