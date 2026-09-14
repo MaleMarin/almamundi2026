@@ -169,7 +169,7 @@ export function StoriesPanel({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', minHeight: 0, overflow: 'hidden' }}>
       <div style={{ flexShrink: 0 }}>
         <div style={{ position: 'relative' }}>
           <Search size={16} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: 'rgba(255, 90, 35, 0.92)', pointerEvents: 'none' }} />
@@ -197,10 +197,15 @@ export function StoriesPanel({
         </div>
       </div>
 
-      <div style={{
+      <div
+        onWheel={(event) => event.stopPropagation()}
+        style={{
         flex: 1,
+        minHeight: 0,
         overflowY: 'auto',
-        scrollbarWidth: 'none',
+        overflowX: 'hidden',
+        scrollbarWidth: 'thin',
+        overscrollBehavior: 'contain',
         display: 'flex',
         flexDirection: 'column',
         gap: 8,

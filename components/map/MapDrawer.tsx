@@ -76,13 +76,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   const title =
     mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
   const bitsMode = mode === 'bits';
-  const newsMode = mode === 'news';
+  /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
+  const innerScrollPanel =
+    mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits';
   const dialogAriaLabel = title;
-  const drawerBodyClass = bitsMode
-    ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 py-4'
-    : newsMode
-      ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4'
-      : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4';
+  const drawerBodyClass = innerScrollPanel
+    ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4'
+    : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4';
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
   if (isMobile) {
@@ -97,7 +97,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           role="dialog"
           aria-modal="true"
           aria-label={dialogAriaLabel}
-          className={`absolute bottom-0 left-0 right-0 flex max-h-[70vh] flex-col rounded-t-[28px] p-0 ${bitsMode ? 'h-auto' : ''}`}
+          className={`absolute bottom-0 left-0 right-0 flex max-h-[70vh] flex-col rounded-t-[28px] p-0 ${innerScrollPanel ? 'h-[70vh]' : ''}`}
           style={{
             ...glassShell,
             transform: open ? 'translateY(0)' : 'translateY(100%)',
@@ -124,7 +124,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         <div
           className={drawerBodyClass}
           style={{
-            scrollbarWidth: newsMode ? undefined : 'thin',
+            scrollbarWidth: innerScrollPanel ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',
@@ -149,10 +149,8 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         role="dialog"
         aria-modal="true"
         aria-label={dialogAriaLabel}
-        className={`pointer-events-auto absolute right-6 flex flex-col overflow-hidden rounded-[28px] ${
-          bitsMode
-            ? 'top-6 max-h-[calc(100%-3rem)] w-[min(calc(100vw-3rem),400px)]'
-            : 'top-6 bottom-6 max-h-[calc(100dvh-3rem)] w-[360px]'
+        className={`pointer-events-auto absolute right-6 top-6 bottom-6 flex min-h-0 max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[28px] ${
+          bitsMode ? 'w-[min(calc(100vw-3rem),400px)]' : 'w-[360px]'
         }`}
         style={{
           ...glassShell,
@@ -180,7 +178,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         <div
           className={drawerBodyClass}
           style={{
-            scrollbarWidth: newsMode ? undefined : 'thin',
+            scrollbarWidth: innerScrollPanel ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
             touchAction: 'pan-y',

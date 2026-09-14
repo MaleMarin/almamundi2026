@@ -149,7 +149,6 @@ function BitDetailCompact({
   const s =
     density === 'readable'
       ? {
-          maxHeight: 'min(78vh, 620px)' as const,
           padding: '22px 20px 26px',
           radius: 16,
           meta: 11,
@@ -177,7 +176,6 @@ function BitDetailCompact({
           btnRadius: 999,
         }
       : {
-          maxHeight: 'min(52vh, 320px)' as const,
           padding: '12px 11px 14px',
           radius: 11,
           meta: 9,
@@ -207,9 +205,7 @@ function BitDetailCompact({
 
   const boxStyle: React.CSSProperties = {
     maxWidth: '100%',
-    maxHeight: s.maxHeight,
-    overflowY: 'auto',
-    overflowX: 'hidden',
+    overflow: 'visible',
     padding: s.padding,
     borderRadius: s.radius,
     border: '1px solid rgba(255,255,255,0.4)',
@@ -220,7 +216,6 @@ function BitDetailCompact({
     boxShadow: '0 12px 44px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.5)',
     boxSizing: 'border-box',
     fontFamily: SITE_FONT_STACK,
-    scrollbarWidth: 'thin',
   };
 
   return (
@@ -353,9 +348,16 @@ export function BitsPanel({
 }: BitsPanelProps) {
   if (!showIndexList) {
     return (
-      <div className="flex flex-col" style={{ fontFamily: SITE_FONT_STACK }}>
+      <div
+        className="flex h-full min-h-0 flex-col overflow-hidden"
+        style={{ fontFamily: SITE_FONT_STACK }}
+      >
         <BitsPanelIntro />
-        <div className="min-w-0 overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+        <div
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden"
+          onWheel={(event) => event.stopPropagation()}
+          style={{ scrollbarWidth: 'thin', overscrollBehavior: 'contain' }}
+        >
           {selectedBit ? (
             <BitDetailCompact
               bit={selectedBit}
@@ -387,7 +389,7 @@ export function BitsPanel({
 
   return (
     <div
-      className="flex min-h-[min(360px,52vh)] w-full flex-col gap-2"
+      className="flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
       <BitsPanelIntro />
@@ -417,7 +419,11 @@ export function BitsPanel({
           >
             {count} lugares
           </p>
-          <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden" style={{ scrollbarWidth: 'thin' }}>
+          <div
+            className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
+            onWheel={(event) => event.stopPropagation()}
+            style={{ scrollbarWidth: 'thin', overscrollBehavior: 'contain' }}
+          >
             {bitsList.map((_bit, index) => {
               const item = ensureHuellaPunto(getBitAt(bitsList, index));
               return (
@@ -433,7 +439,11 @@ export function BitsPanel({
         </div>
 
         {selectedBit ? (
-          <div className="min-h-0 min-w-0 flex-1 overflow-y-auto md:pl-2" style={{ scrollbarWidth: 'thin' }}>
+          <div
+            className="min-h-0 min-w-0 flex-1 overflow-y-auto md:pl-2"
+            onWheel={(event) => event.stopPropagation()}
+            style={{ scrollbarWidth: 'thin', overscrollBehavior: 'contain' }}
+          >
             <BitDetailCompact bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
           </div>
         ) : null}
