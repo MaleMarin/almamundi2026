@@ -364,7 +364,7 @@ const GLOBE_CANVAS_BG = 'rgba(0,0,0,0)';
 
 /** Textura del globo: local para que cargue siempre (unpkg daba CORS/círculo). */
 /** Texturas estáticas (mismo origen, más rápido que /api/globe-texture en primera carga). */
-const GLOBE_IMAGE_LOCAL = '/8k_earth_nightmap.jpg';
+const GLOBE_IMAGE_LOCAL = '/textures/earth-nightmap-4k.webp';
 const GLOBE_IMAGE_DAY_LOCAL = '/earth-day-nasa.jpg';
 const GLOBE_IMAGE_DAY_OR_FALLBACK = '/earth-day-nasa.jpg';
 /** Bump map deshabilitado (unpkg puede dar CORS y deja el globo en círculo oscuro). */
@@ -4133,7 +4133,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           const cloudGeo = new THREE.SphereGeometry(100.4, 64, 64);
           const cloudLoader = new THREE.TextureLoader();
           cloudLoader.load(
-            '/8k_earth_clouds.jpg',
+            '/textures/earth-clouds-photo-4k.webp',
             (cloudTex) => {
               if (cloudTex && cloudMeshRef.current === null) {
                 cloudTex.colorSpace = THREE.SRGBColorSpace;
