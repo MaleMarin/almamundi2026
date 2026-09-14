@@ -809,6 +809,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
             <GlobeV2Home
               embedded
+              forceDaylight
               earthVisualTimeScale={1050}
               initialViewLat={tzFrame.lat}
               initialViewLng={tzFrame.lng}

@@ -8,7 +8,8 @@
  *
  * Luna: órbita geocéntrica fuera del grupo inclinado; plano ~5,145°; traslación prograda; cara fija a Tierra.
  *
- * `embedded`: home `#mapa` — día/noche según dónde está quien mira (`isNightAtLocation` / `?hour=`). `forceDaylight={true|false}` fuerza el modo. Página completa: /globo-v2 sin `embedded` (terminador UTC).
+ * `embedded`: home `#mapa`. El look de día/noche lo decide `forceDaylight` (home lo fuerza a día).
+ * Página completa: /globo-v2 sin `embedded` (terminador UTC). /mapa usa MapFullPage, no este modo.
  */
 
 import type { RefObject } from 'react';
@@ -1347,7 +1348,8 @@ export type GlobeV2Props = {
   /**
    * true = disco siempre como de día (sin terminador ni luces urbanas nocturnas).
    * false = siempre terminador UTC.
-   * Omitido + `embedded`: día o noche según la hora real de quien mira (mismo criterio que MapFullPage).
+   * Omitido + `embedded`: día o noche según la hora real de quien mira.
+   * En home (`HomeMap`) se pasa `true`: carta de presentación siempre iluminada; `/mapa` no usa `embedded`.
    */
   forceDaylight?: boolean;
   /**
@@ -1416,7 +1418,8 @@ export default function GlobeV2({
   const localNight = useViewerSolarNight(viewerLat, viewerLng);
   /**
    * Disco de día vs look de noche según quien mira.
-   * `forceDaylight` explícito gana (QA / `/globo-v2`). En home (`embedded` sin prop): `!localNight`.
+   * `forceDaylight` explícito gana (home siempre día; QA / `/globo-v2`).
+   * Omitido + `embedded`: día o noche según la hora real de quien mira.
    */
   const forceDaylightOn =
     forceDaylight === true
