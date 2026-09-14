@@ -162,6 +162,15 @@ function ExposureSync({ exposure }: { exposure: number }) {
 }
 
 /**
+ * `forceDaylight` gana SIEMPRE a `viewerNight`.
+ * Si está en true (portada / QA), el globo usa look de día aunque quien mira esté de noche
+ * (`useViewerSolarNight`, `?hour=22`, etc.). `viewerNight` solo aplica cuando forceDaylight es false.
+ */
+function globeNightLook(forceDaylight: boolean, viewerNight: boolean): boolean {
+  return forceDaylight ? false : viewerNight;
+}
+
+/**
  * Encuadre fijo para validación: aplica lat/lon sobre la esfera (misma convención que bits).
  * Con preset activo, `GlobeScene` no incrementa `planetSpinRef` (corteza fija).
  */
@@ -513,7 +522,7 @@ function setHeightTextureParams(t: THREE.Texture, maxAniso: number) {
 
 function EarthGroup({
   urls,
-  viewerNight,
+  viewerNight: viewerNightRaw,
   sunLightRef,
   visualStage,
   displacementScale,
@@ -544,6 +553,8 @@ function EarthGroup({
   /** Mismo factor que modula GMST en GlobeScene (hover/proximidad). */
   spinRateRef: RefObject<number>;
 }) {
+  /** `fullDaySurface` (`forceDaylight`) gana a `viewerNight` también en nubes y luces urbanas. */
+  const viewerNight = globeNightLook(fullDaySurface, viewerNightRaw);
   const { gl } = useThree();
   const allowVertexTextureFetch = useMemo(() => {
     const ctx = gl.getContext();
@@ -997,7 +1008,7 @@ function GlobeScene({
   bits,
   selectedBitId,
   onBitClick,
-  viewerNight,
+  viewerNight: viewerNightRaw,
   sunLightRef,
   visualStage,
   fixedCameraPreset,
@@ -1036,6 +1047,8 @@ function GlobeScene({
   focusTarget?: { lat: number; lng: number; nonce: number } | null;
   onFocusArrived?: () => void;
 }) {
+  /** `forceDaylight` gana SIEMPRE a `viewerNight` (exposición, luces, nubes). */
+  const viewerNight = globeNightLook(forceDaylight, viewerNightRaw);
   const { size, camera } = useThree();
   const embeddedGeoFit = embedded ? Math.min(1, size.width / 400, size.height / 620) : 1;
   const geoScale = embedded ? Math.max(1, GLOBE_V2_EMBEDDED_GEO_SCALE * embeddedGeoFit) : 1;
@@ -1116,14 +1129,13 @@ function GlobeScene({
   const starsCount = embedded ? 2500 : 4200;
   const starsRadius = 420;
 
-  /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css). */
+  /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css).
+   * `forceDaylight` primero: no dejar que `viewerNight` baje la exposición de la portada. */
   const exp = embedded
-    ? viewerNight
-      ? forceDaylight
-        ? 1.72
-        : 1.9
-      : forceDaylight
-        ? 3.55
+    ? forceDaylight
+      ? 3.55
+      : viewerNight
+        ? 1.9
         : 2.16
     : viewerNight
       ? 1.65
@@ -1152,10 +1164,10 @@ function GlobeScene({
           embedded && !forceDaylight ? '#d8e4f2' : '#f0f3f8',
           embedded && !forceDaylight ? '#1a2838' : '#1a1f28',
           embedded
-            ? viewerNight
-              ? 0.52
-              : forceDaylight
-                ? 1.32
+            ? forceDaylight
+              ? 1.32
+              : viewerNight
+                ? 0.52
                 : 0.5
             : viewerNight
               ? 0.38
@@ -1165,20 +1177,20 @@ function GlobeScene({
       <ambientLight
         intensity={
           embedded
-            ? viewerNight
-              ? 0.42
-              : forceDaylight
-                ? 0.68
+            ? forceDaylight
+              ? 0.68
+              : viewerNight
+                ? 0.42
                 : 0.46
             : viewerNight
               ? 0.09
               : 0.16
         }
         color={
-          viewerNight
-            ? '#6a7d96'
-            : forceDaylight && embedded
-              ? '#eef1f6'
+          forceDaylight && embedded
+            ? '#eef1f6'
+            : viewerNight
+              ? '#6a7d96'
               : embedded
                 ? '#a8b8cc'
                 : '#dfe3ea'
@@ -1188,12 +1200,10 @@ function GlobeScene({
         ref={sunLightRef}
         intensity={
           embedded
-            ? viewerNight
-              ? forceDaylight
-                ? 3.65
-                : 3.95
-              : forceDaylight
-                ? 8.35
+            ? forceDaylight
+              ? 8.35
+              : viewerNight
+                ? 3.95
                 : 4.95
             : viewerNight
               ? 3.35
@@ -1203,7 +1213,11 @@ function GlobeScene({
       />
       {/* Fill débil permanente en home: evita cara frontal negra con sol editorial. */}
       {embedded ? (
-        <directionalLight position={[-5, 3, 4]} intensity={viewerNight ? 0.85 : 1.55} color="#c8e0ff" />
+        <directionalLight
+          position={[-5, 3, 4]}
+          intensity={forceDaylight || !viewerNight ? 1.55 : 0.85}
+          color="#c8e0ff"
+        />
       ) : null}
 
       <group scale={geoScale}>
