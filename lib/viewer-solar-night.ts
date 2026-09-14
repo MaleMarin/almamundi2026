@@ -57,8 +57,9 @@ function finiteCoords(
 }
 
 /**
- * Noche en el lugar de quien mira: `isNightAtLocation` si hay coords;
- * si no, hora local del dispositivo (antes de las 7 o desde las 19).
+ * Noche en el lugar de quien mira: `isNightAtLocation` con GPS o, si no hay,
+ * la capital de su zona IANA (`resolveViewerAnchor`). Solo si tampoco hay zona,
+ * usa la hora del reloj (antes de las 7 o desde las 19).
  * `?hour=` fuerza el modo en pruebas.
  */
 export function isViewerNightNow(
@@ -69,7 +70,8 @@ export function isViewerNightNow(
 ): boolean {
   const hour = hourOverride ?? parseHourOverride();
   if (hour != null) return hour < 7 || hour >= 19;
-  const coords = finiteCoords(viewerLat, viewerLng);
+  const coords =
+    finiteCoords(viewerLat, viewerLng) ?? resolveViewerAnchor(viewerLat, viewerLng);
   if (coords) {
     return isNightAtLocation(coords.lat, coords.lng, date);
   }

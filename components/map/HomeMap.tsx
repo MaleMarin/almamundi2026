@@ -112,6 +112,8 @@ import {
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
 import { getApproxLocation } from '@/lib/userLocation';
+import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
+import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 
 /** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
 /** Encuadre editorial fijo del globo en home (Sudamérica de frente). Geoloc solo para UI noche. */
@@ -137,6 +139,12 @@ export type HomeMapProps = {
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [approxPosition, setApproxPosition] = useState<{ lat: number; lng: number } | null>(null);
+  const [tzFrame, setTzFrame] = useState({ lat: HOME_GLOBE_FRAME_LAT, lng: HOME_GLOBE_FRAME_LNG });
+
+  useEffect(() => {
+    const anchor = resolveViewerAnchor();
+    if (anchor) setTzFrame(anchor);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -148,8 +156,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     };
   }, []);
 
-  const viewerLat = approxPosition?.lat ?? null;
-  const viewerLng = approxPosition?.lng ?? null;
+  const viewerLat = approxPosition?.lat ?? tzFrame.lat;
+  const viewerLng = approxPosition?.lng ?? tzFrame.lng;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
@@ -780,7 +788,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   };
 
   /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
-  const TIME_STRIP_HEIGHT = 128;
+  const TIME_STRIP_HEIGHT = 200;
   return (
     <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-hidden">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
@@ -802,10 +810,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <GlobeV2Home
               embedded
               earthVisualTimeScale={1050}
-              initialViewLat={HOME_GLOBE_FRAME_LAT}
-              initialViewLng={HOME_GLOBE_FRAME_LNG}
-              viewerLat={viewerLat ?? undefined}
-              viewerLng={viewerLng ?? undefined}
+              initialViewLat={tzFrame.lat}
+              initialViewLng={tzFrame.lng}
+              viewerLat={viewerLat}
+              viewerLng={viewerLng}
               bits={globeMarkers}
               selectedBitId={selectedGlobeMarkerId}
               layerVisibility={globeLayers}
@@ -820,10 +828,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="map-timebar-stage relative z-10 -mt-px flex w-full flex-shrink-0 items-end justify-center border-0 pb-4 pt-2 shadow-none outline-none"
+        className="map-timebar-stage relative z-10 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-4 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
         <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
+        <MapRealtimeSyncLine userLat={viewerLat} userLng={viewerLng} />
       </div>
 
       {/* Dock: Historias, También cuenta, Noticias (capas), luego Sonidos (audio), luego buscar. */}

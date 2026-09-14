@@ -17,7 +17,10 @@ import {
 } from 'lucide-react';
 import { TopicsModal, type TopicsModalStory } from '@/components/mapa/TopicsModal';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
+import { isNightAtLocation, sunDirectionUtc, terminatorCssGradientAngleDeg } from '@/lib/sunPosition';
+import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
 import { TimeBar } from '@/components/map/TimeBar';
+import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 import { UniverseBackground } from '@/components/UniverseBackground';
 import { AtmosphereOverlay } from '@/components/AtmosphereOverlay';
 import { useAtmosphere } from '@/hooks/useAtmosphere';
@@ -46,13 +49,12 @@ import type { MapView } from '@/lib/map-data/types';
 import { getStoriesReadIds, startSessionTimer } from '@/lib/sessionTracker';
 import { getApproxLocation } from '@/lib/userLocation';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
-import { isNightAtLocation, sunDirectionUtc, terminatorCssGradientAngleDeg } from '@/lib/sunPosition';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { showPublicDemoStories } from '@/lib/demo-stories-public';
 import { STORIES_MOCK, SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
-import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT } from '@/lib/map-data/globe-pov';
+import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT, globePovForViewerTimeZone } from '@/lib/map-data/globe-pov';
 import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { MAP_HEADER_GRADIENT, MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
@@ -2652,8 +2654,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (!embedded || !universeVisible || !globeReady || globeEntrancePlayedRef.current || !globeEl.current) return;
     globeEntrancePlayedRef.current = true;
     try {
-      globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_FAR }, 0);
-      globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_ORBIT }, 1400);
+      globeEl.current.pointOfView(globePovForViewerTimeZone(GLOBE_PACIFIC_POV_FAR.altitude), 0);
+      globeEl.current.pointOfView(globePovForViewerTimeZone(GLOBE_PACIFIC_POV_ORBIT.altitude), 1400);
     } catch {}
   }, [embedded, universeVisible, globeReady]);
 
@@ -2695,8 +2697,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         return;
       }
       const now = new Date();
-      if (userLocation) {
-        setIsNight(isNightAtLocation(userLocation.lat, userLocation.lng, now));
+      const loc = userLocation ?? resolveViewerAnchor();
+      if (loc) {
+        setIsNight(isNightAtLocation(loc.lat, loc.lng, now));
       } else {
         const hour = now.getHours();
         setIsNight(hour < 7 || hour >= 19);
@@ -3954,16 +3957,17 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       if ('enableRotate' in controls) {
         (controls as { enableRotate: boolean }).enableRotate = false;
       }
-      const pacificOrbit = { ...GLOBE_PACIFIC_POV_ORBIT };
-      basePOVRef.current = embedded ? { ...pacificOrbit } : { ...initialPOV };
+      const regionOrbit = globePovForViewerTimeZone(GLOBE_PACIFIC_POV_ORBIT.altitude);
+      const regionFar = globePovForViewerTimeZone(GLOBE_PACIFIC_POV_FAR.altitude);
+      basePOVRef.current = embedded ? { ...regionOrbit } : { ...initialPOV };
       setViewCenter(
         embedded
-          ? { lat: pacificOrbit.lat, lng: pacificOrbit.lng }
+          ? { lat: regionOrbit.lat, lng: regionOrbit.lng }
           : { lat: initialPOV.lat, lng: initialPOV.lng }
       );
 
       if (embedded) {
-        globeEl.current.pointOfView({ ...GLOBE_PACIFIC_POV_FAR }, 0);
+        globeEl.current.pointOfView({ ...regionFar }, 0);
       } else {
         globeEl.current.pointOfView(initialPOV, 0);
       }
@@ -5341,6 +5345,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
+        <MapRealtimeSyncLine userLat={userLocation?.lat} userLng={userLocation?.lng} />
       </div>
       </div>
     </div>
