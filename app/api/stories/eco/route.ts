@@ -1,37 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAdminDb, getAdminStorage } from '@/lib/firebase/admin';
+import { getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import { isPublicStoryDocumentStatus } from '@/lib/story-public';
+import {
+  assertSafeStoryId,
+  savePublishedMediaObject,
+} from '@/lib/server-storage';
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
+const MAX_ECO_BYTES = 8 * 1024 * 1024;
+
 export async function POST(req: NextRequest) {
+  const ip = clientIpFromRequest(req);
+  const rl = getRateLimiter('story-eco', 20, 3600);
+  const blocked = await enforceRateLimit(rl, `eco:${ip}`, {
+    max: 20,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
+
   try {
     const form = await req.formData();
     const audio = form.get('audio') as File | null;
-    const storyId = form.get('storyId') as string | null;
+    const storyIdRaw = form.get('storyId') as string | null;
 
-    if (!audio || !storyId) {
+    if (!audio || !storyIdRaw) {
       return NextResponse.json({ error: 'Faltan datos.' }, { status: 400 });
     }
 
-    const ecoId = `eco_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
-    const path = `ecos/${storyId}/${ecoId}.webm`;
-    const bucket = getAdminStorage().bucket(process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ?? undefined);
-    const file = bucket.file(path);
+    let storyId: string;
+    try {
+      storyId = assertSafeStoryId(storyIdRaw);
+    } catch {
+      return NextResponse.json({ error: 'Historia no válida.' }, { status: 400 });
+    }
 
-    await file.save(Buffer.from(await audio.arrayBuffer()), {
-      metadata: { contentType: 'audio/webm' },
-    });
-
-    const [url] = await file.getSignedUrl({
-      version: 'v4',
-      action: 'read',
-      expires: Date.now() + 365 * 24 * 60 * 60 * 1000,
-    });
+    if (audio.size <= 0 || audio.size > MAX_ECO_BYTES) {
+      return NextResponse.json({ error: 'Audio demasiado grande.' }, { status: 413 });
+    }
 
     const db = getAdminDb();
+    const storySnap = await db.collection('stories').doc(storyId).get();
+    const storyData = storySnap.data() as Record<string, unknown> | undefined;
+    if (!storySnap.exists || !isPublicStoryDocumentStatus(storyData?.status)) {
+      return NextResponse.json({ error: 'Historia no encontrada.' }, { status: 404 });
+    }
+
+    const ecoId = `eco_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+    const destPath = `published/ecos/${storyId}/${ecoId}.webm`;
+    const { publicUrl } = await savePublishedMediaObject({
+      destPath,
+      buffer: Buffer.from(await audio.arrayBuffer()),
+      contentType: 'audio/webm',
+    });
+
     await db.collection('stories').doc(storyId).collection('ecos').doc(ecoId).set({
-      audioUrl: url,
+      audioUrl: publicUrl,
+      storagePath: destPath,
       createdAt: FieldValue.serverTimestamp(),
     });
 
