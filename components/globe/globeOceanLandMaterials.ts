@@ -116,9 +116,9 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       /* Specular uniforme en mar (no seguir ruido de la mask). */
       float openWater = 1.0;
 
-      /* Océano azul profundo pero legible (NASA Earth Observatory / día) — sin mottling de mask. */
-      vec3 deep = mix(vec3(0.039, 0.165, 0.431), vec3(0.08, 0.34, 0.68), uFullDay);
-      vec3 mid = mix(vec3(0.06, 0.22, 0.48), vec3(0.14, 0.46, 0.74), uFullDay);
+      /* /mapa: azul procedural. Portada (uFullDay): color real de uDayTex (Blue Marble). */
+      vec3 deep = vec3(0.039, 0.165, 0.431);
+      vec3 mid = vec3(0.06, 0.22, 0.48);
       vec3 base = mix(deep, mid, 0.16);
 
       /* Fresnel solo en limbo (ndv bajo). Sin término extra que suba el centro del disco. */
@@ -126,9 +126,15 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 fresTint = vec3(0.28, 0.42, 0.55);
       float fresAmt = rim * 0.055;
 
-      /* Difuso: azul profundo de día; piso nocturno azul (no negro). */
-      float diff = mix(0.40 + 0.46 * pow(ndl, 1.08), 0.64 + 0.50 * pow(ndl, 1.0), uFullDay);
-      vec3 colDay = base * diff * mix(0.98, 1.32, uFullDay);
+      /* Difuso /mapa. Con uFullDay se reemplaza abajo por el albedo de la foto. */
+      float diff = 0.40 + 0.46 * pow(ndl, 1.08);
+      vec3 colDay = base * diff * 0.98;
+      if (uFullDay > 0.5) {
+        float luma = dot(dDay, vec3(0.299, 0.587, 0.114));
+        vec3 photo = clamp(mix(vec3(luma), dDay, 1.08), 0.0, 1.0);
+        photo = clamp((photo - vec3(0.5)) * 1.05 + vec3(0.5), 0.0, 1.0);
+        colDay = photo * (0.90 + 0.12 * ndl);
+      }
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
       vec3 H = normalize(L + V);

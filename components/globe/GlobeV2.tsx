@@ -1133,7 +1133,7 @@ function GlobeScene({
    * `forceDaylight` primero: no dejar que `viewerNight` baje la exposición de la portada. */
   const exp = embedded
     ? forceDaylight
-      ? 4.85
+      ? 3.35
       : viewerNight
         ? 1.9
         : 2.16
@@ -1505,7 +1505,7 @@ export default function GlobeV2({
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedUniverseChrome
             ? forceDaylightOn
-              ? 4.4
+              ? 3.2
               : 2.14
             : embedded
               ? 2.02
