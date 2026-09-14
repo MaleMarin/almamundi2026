@@ -315,15 +315,20 @@ function aestheticSunDirFromCamera(
   orbitTarget: THREE.Vector3,
   out: THREE.Vector3,
   rightScratch: THREE.Vector3,
-  upScratch: THREE.Vector3
+  upScratch: THREE.Vector3,
+  frontal = false
 ): THREE.Vector3 {
   camera.updateMatrixWorld();
   camera.getWorldPosition(out);
   out.sub(orbitTarget).normalize(); // desde el globo hacia la cámara
   rightScratch.setFromMatrixColumn(camera.matrixWorld, 0).normalize();
   upScratch.setFromMatrixColumn(camera.matrixWorld, 1).normalize();
-  // Mezcla: cara a cámara + arriba − derecha ≈ 35° hacia arriba-izquierda
-  out.addScaledVector(upScratch, 0.52).addScaledVector(rightScratch, -0.42).normalize();
+  /* Portada forceDaylight: sol casi de frente para no quemar un limbo. */
+  if (frontal) {
+    out.addScaledVector(upScratch, 0.14).addScaledVector(rightScratch, -0.05).normalize();
+  } else {
+    out.addScaledVector(upScratch, 0.52).addScaledVector(rightScratch, -0.42).normalize();
+  }
   return out;
 }
 
@@ -370,6 +375,7 @@ function SyncSunToGlobe({
   getEarthSceneDate,
   cameraRelativeSun = false,
   orbitTarget,
+  frontalSun = false,
 }: {
   oceanMat: THREE.ShaderMaterial;
   landMat: THREE.ShaderMaterial | null;
@@ -382,6 +388,8 @@ function SyncSunToGlobe({
   getEarthSceneDate: () => Date;
   /** Home: sol editorial fijo respecto a la cámara (no usa reloj acelerado). */
   cameraRelativeSun?: boolean;
+  /** Portada: sol de frente, sin limbo quemado. */
+  frontalSun?: boolean;
   orbitTarget: [number, number, number];
 }) {
   const { camera } = useThree();
@@ -397,7 +405,14 @@ function SyncSunToGlobe({
   useFrame(() => {
     camera.getWorldPosition(camWorld);
     const s = cameraRelativeSun
-      ? aestheticSunDirFromCamera(camera, targetScratch, sunScratch, rightScratch, upScratch)
+      ? aestheticSunDirFromCamera(
+          camera,
+          targetScratch,
+          sunScratch,
+          rightScratch,
+          upScratch,
+          frontalSun
+        )
       : computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
     const uSunO = oceanMat.uniforms.uSunDir as { value: THREE.Vector3 };
     uSunO.value.copy(s);
@@ -488,7 +503,14 @@ function AtmosphereGlow({
     camera.getWorldPosition(camWorld);
     (mat.uniforms.uCamPos as { value: THREE.Vector3 }).value.copy(camWorld);
     if (cameraRelativeSun) {
-      aestheticSunDirFromCamera(camera, targetScratch, sunScratch, rightScratch, upScratch);
+      aestheticSunDirFromCamera(
+        camera,
+        targetScratch,
+        sunScratch,
+        rightScratch,
+        upScratch,
+        fullDay
+      );
     } else {
       computeSunDirection(getEarthSceneDate(), obliquityXRad, sunScratch);
     }
@@ -1001,6 +1023,7 @@ function EarthGroup({
         getEarthSceneDate={getEarthSceneDate}
         cameraRelativeSun={cameraRelativeSun}
         orbitTarget={orbitTarget}
+        frontalSun={fullDaySurface}
       />
     </group>
   );
@@ -1137,7 +1160,7 @@ function GlobeScene({
    * `forceDaylight` primero: no dejar que `viewerNight` baje la exposición de la portada. */
   const exp = embedded
     ? forceDaylight
-      ? 4.15
+      ? 3.45
       : viewerNight
         ? 1.9
         : 2.16
@@ -1169,7 +1192,7 @@ function GlobeScene({
           embedded && !forceDaylight ? '#1a2838' : '#1a1f28',
           embedded
             ? forceDaylight
-              ? 2.15
+              ? 1.55
               : viewerNight
                 ? 0.52
                 : 0.5
@@ -1182,7 +1205,7 @@ function GlobeScene({
         intensity={
           embedded
             ? forceDaylight
-              ? 1.18
+              ? 1.42
               : viewerNight
                 ? 0.42
                 : 0.46
@@ -1205,7 +1228,7 @@ function GlobeScene({
         intensity={
           embedded
             ? forceDaylight
-              ? 11.4
+              ? 4.4
               : viewerNight
                 ? 3.95
                 : 4.95
@@ -1219,12 +1242,9 @@ function GlobeScene({
       {embedded ? (
         <directionalLight
           position={[-5, 3, 4]}
-          intensity={forceDaylight ? 3.15 : !viewerNight ? 1.55 : 0.85}
+          intensity={forceDaylight ? 1.15 : !viewerNight ? 1.55 : 0.85}
           color="#c8e0ff"
         />
-      ) : null}
-      {embedded && forceDaylight ? (
-        <directionalLight position={[0.2, 1.2, 6]} intensity={2.65} color="#fff6e8" />
       ) : null}
 
       <group scale={geoScale}>
@@ -1509,7 +1529,7 @@ export default function GlobeV2({
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedUniverseChrome
             ? forceDaylightOn
-              ? 3.9
+              ? 3.3
               : 2.14
             : embedded
               ? 2.02
