@@ -110,15 +110,15 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       vec3 L = uUseSunOverride > 0.5 ? normalize(uSunDirOverride) : normalize(uSunDir);
       float mu = dot(N, L);
       float ndlRaw = max(mu, 0.0);
-      /* Con uFullDay: disco legible sin empujar el centro a blanco puro (menos “continentes quemados”). */
-      float ndl = uFullDay > 0.5 ? clamp(0.68 + 0.32 * ndlRaw, 0.78, 1.0) : ndlRaw;
+      /* Con uFullDay: disco de día más luminoso (portada); el piso evita el lado en sombra. */
+      float ndl = uFullDay > 0.5 ? clamp(0.82 + 0.18 * ndlRaw, 0.88, 1.0) : ndlRaw;
       float ndv = clamp(dot(N, V), 0.0, 1.0);
       /* Specular uniforme en mar (no seguir ruido de la mask). */
       float openWater = 1.0;
 
       /* Océano azul profundo pero legible (NASA Earth Observatory / día) — sin mottling de mask. */
-      vec3 deep = mix(vec3(0.039, 0.165, 0.431), vec3(0.05, 0.22, 0.52), uFullDay);
-      vec3 mid = mix(vec3(0.06, 0.22, 0.48), vec3(0.1, 0.32, 0.58), uFullDay);
+      vec3 deep = mix(vec3(0.039, 0.165, 0.431), vec3(0.08, 0.34, 0.68), uFullDay);
+      vec3 mid = mix(vec3(0.06, 0.22, 0.48), vec3(0.14, 0.46, 0.74), uFullDay);
       vec3 base = mix(deep, mid, 0.16);
 
       /* Fresnel solo en limbo (ndv bajo). Sin término extra que suba el centro del disco. */
@@ -127,8 +127,8 @@ export function createOceanSphereMaterial(specTex: THREE.Texture, dayTex: THREE.
       float fresAmt = rim * 0.055;
 
       /* Difuso: azul profundo de día; piso nocturno azul (no negro). */
-      float diff = mix(0.40 + 0.46 * pow(ndl, 1.08), 0.48 + 0.52 * pow(ndl, 1.05), uFullDay);
-      vec3 colDay = base * diff * mix(0.98, 1.08, uFullDay);
+      float diff = mix(0.40 + 0.46 * pow(ndl, 1.08), 0.64 + 0.50 * pow(ndl, 1.0), uFullDay);
+      vec3 colDay = base * diff * mix(0.98, 1.32, uFullDay);
 
       /* Brillo solar: Blinn-Phong (H), lóbulo estrecho; solo agua abierta; sin segundo lóbulo amplio. */
       vec3 H = normalize(L + V);
@@ -307,7 +307,7 @@ export function createLandSphereMaterial(
       vec3 n = normalize(mTbn * normalize(tmap));
       vec3 s = normalize(uSunDir);
       float ndlRaw = max(dot(n, s), 0.0);
-      float ndl = uFullDay > 0.5 ? clamp(0.64 + 0.36 * ndlRaw, 0.74, 0.98) : ndlRaw;
+      float ndl = uFullDay > 0.5 ? clamp(0.82 + 0.18 * ndlRaw, 0.88, 1.0) : ndlRaw;
 
       vec3 geomN = normalize(vNw);
       float mu = dot(geomN, s);
@@ -315,13 +315,13 @@ export function createLandSphereMaterial(
       float slope = clamp(length(tmap.xy), 0.0, 1.85);
       float mountainPop = 1.0 + landMask * slope * 0.38;
 
-      float amb = mix(0.26, 0.36, uFullDay);
-      float dif = mix(0.74, 0.88, uFullDay) * pow(ndl, 0.94);
-      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.1, uFullDay);
+      float amb = mix(0.26, 0.52, uFullDay);
+      float dif = mix(0.74, 1.05, uFullDay) * pow(ndl, 0.85);
+      vec3 litDay = d0 * (amb + dif) * mountainPop * mix(1.0, 1.32, uFullDay);
       /* Atenúa zonas claras (arena/nieve) sin teñir el resto. */
       float luma = dot(d0, vec3(0.299, 0.587, 0.114));
       float hot = smoothstep(0.5, 0.86, luma);
-      litDay *= mix(1.0, 0.82, hot);
+      litDay *= mix(1.0, 0.88, hot);
 
       vec3 litNight = d0 * vec3(0.22, 0.26, 0.34) * (0.62 + 0.42 * mountainPop);
       litNight += vec3(0.045, 0.055, 0.075) * landMask;

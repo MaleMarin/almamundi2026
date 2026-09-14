@@ -776,7 +776,7 @@ function EarthGroup({
     cloudMaterial.roughness = 1;
     cloudMaterial.metalness = 0;
     cloudMaterial.emissive.set('#b8c8dc');
-    cloudMaterial.emissiveIntensity = viewerNight ? 0.01 : fullDaySurface && embedded ? 0.05 : 0.035;
+    cloudMaterial.emissiveIntensity = viewerNight ? 0.01 : fullDaySurface && embedded ? 0.12 : 0.035;
     cloudMaterial.needsUpdate = true;
   }, [cloudMaterial, cloudOpacity, viewerNight, fullDaySurface, embedded]);
 
@@ -1133,7 +1133,7 @@ function GlobeScene({
    * `forceDaylight` primero: no dejar que `viewerNight` baje la exposición de la portada. */
   const exp = embedded
     ? forceDaylight
-      ? 3.55
+      ? 4.85
       : viewerNight
         ? 1.9
         : 2.16
@@ -1165,7 +1165,7 @@ function GlobeScene({
           embedded && !forceDaylight ? '#1a2838' : '#1a1f28',
           embedded
             ? forceDaylight
-              ? 1.32
+              ? 2.15
               : viewerNight
                 ? 0.52
                 : 0.5
@@ -1178,7 +1178,7 @@ function GlobeScene({
         intensity={
           embedded
             ? forceDaylight
-              ? 0.68
+              ? 1.18
               : viewerNight
                 ? 0.42
                 : 0.46
@@ -1201,7 +1201,7 @@ function GlobeScene({
         intensity={
           embedded
             ? forceDaylight
-              ? 8.35
+              ? 11.4
               : viewerNight
                 ? 3.95
                 : 4.95
@@ -1215,9 +1215,12 @@ function GlobeScene({
       {embedded ? (
         <directionalLight
           position={[-5, 3, 4]}
-          intensity={forceDaylight || !viewerNight ? 1.55 : 0.85}
+          intensity={forceDaylight ? 3.15 : !viewerNight ? 1.55 : 0.85}
           color="#c8e0ff"
         />
+      ) : null}
+      {embedded && forceDaylight ? (
+        <directionalLight position={[0.2, 1.2, 6]} intensity={2.65} color="#fff6e8" />
       ) : null}
 
       <group scale={geoScale}>
@@ -1502,7 +1505,7 @@ export default function GlobeV2({
           /* Primer frame; <ExposureSync/> ajusta según modo (embebido día / noche / pantalla completa). */
           gl.toneMappingExposure = embeddedUniverseChrome
             ? forceDaylightOn
-              ? 3.05
+              ? 4.4
               : 2.14
             : embedded
               ? 2.02
