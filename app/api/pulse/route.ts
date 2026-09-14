@@ -6,10 +6,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { FieldValue } from 'firebase-admin/firestore';
+import {
+  clientIpFromRequest,
+  enforceRateLimit,
+  getRateLimiter,
+} from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
 export async function POST(req: NextRequest) {
+  const ip = clientIpFromRequest(req);
+  const rl = getRateLimiter('pulse-post', 40, 3600);
+  const blocked = await enforceRateLimit(rl, `pulse:${ip}`, {
+    max: 40,
+    windowMs: 3600_000,
+  });
+  if (blocked) return blocked;
+
   try {
     const body = (await req.json()) as {
       lat?: number;
