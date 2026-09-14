@@ -275,3 +275,100 @@ export async function signReadUrlForPath(
   });
   return url;
 }
+
+const PUBLISHED_PREFIX = "published";
+
+export function assertSafePublishedPath(storagePath: string): void {
+  if (!storagePath || typeof storagePath !== "string") {
+    throw new Error("invalid_storage_path");
+  }
+  if (storagePath.includes("\0") || storagePath.startsWith("/")) {
+    throw new Error("invalid_storage_path");
+  }
+  const parts = storagePath.split("/");
+  if (parts.some((p) => p === ".." || p === "." || p === "")) {
+    throw new Error("invalid_storage_path");
+  }
+  if (!storagePath.startsWith(`${PUBLISHED_PREFIX}/`)) {
+    throw new Error("invalid_storage_path");
+  }
+}
+
+export function assertSafeStoryId(storyId: string): string {
+  const id = storyId.trim();
+  if (!/^[A-Za-z0-9_-]{8,128}$/.test(id)) {
+    throw new Error("invalid_story_id");
+  }
+  return id;
+}
+
+function firebaseDownloadUrl(bucketName: string, storagePath: string, token: string): string {
+  return `https://firebasestorage.googleapis.com/v0/b/${bucketName}/o/${encodeURIComponent(storagePath)}?alt=media&token=${token}`;
+}
+
+async function finalizePublishedObject(storagePath: string): Promise<{
+  storagePath: string;
+  publicUrl: string;
+}> {
+  assertSafePublishedPath(storagePath);
+  const bucket = getAdminBucket();
+  const file = bucket.file(storagePath);
+  const token = crypto.randomUUID();
+  await file.setMetadata({
+    cacheControl: "public, max-age=31536000, immutable",
+    metadata: { firebaseStorageDownloadTokens: token },
+  });
+  try {
+    await file.makePublic();
+  } catch {
+    // Uniform bucket-level access: las reglas de /published/** cubren la lectura.
+  }
+  return {
+    storagePath,
+    publicUrl: firebaseDownloadUrl(bucket.name, storagePath, token),
+  };
+}
+
+/**
+ * Copia un objeto privado de envío a /published/{storyId}/… y devuelve
+ * una URL pública estable (sin expiración).
+ */
+export async function copyPrivateSubmissionToPublished(opts: {
+  sourcePath: string;
+  storyId: string;
+}): Promise<{ storagePath: string; publicUrl: string }> {
+  assertSafeSubmissionsPath(opts.sourcePath);
+  if (!opts.sourcePath.startsWith(`${PRIVATE_PREFIX}/`)) {
+    throw new Error("invalid_storage_path");
+  }
+  const storyId = assertSafeStoryId(opts.storyId);
+  const bucket = getAdminBucket();
+  const src = bucket.file(opts.sourcePath);
+  const [exists] = await src.exists();
+  if (!exists) throw new Error("not_found");
+
+  const base = sanitizeUploadFilename(opts.sourcePath.split("/").pop() || "file");
+  const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${base}`;
+  assertSafePublishedPath(destPath);
+  await src.copy(bucket.file(destPath));
+  return finalizePublishedObject(destPath);
+}
+
+/** Escribe bytes nuevos en /published/** (p. ej. ecos de audio). */
+export async function savePublishedMediaObject(opts: {
+  destPath: string;
+  buffer: Buffer;
+  contentType: string;
+}): Promise<{ storagePath: string; publicUrl: string }> {
+  assertSafePublishedPath(opts.destPath);
+  const bucket = getAdminBucket();
+  const file = bucket.file(opts.destPath);
+  await file.save(opts.buffer, {
+    contentType: opts.contentType,
+    resumable: false,
+    metadata: {
+      cacheControl: "public, max-age=31536000, immutable",
+    },
+  });
+  return finalizePublishedObject(opts.destPath);
+}

@@ -19,6 +19,7 @@ import {
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import { promotePublicStoryMedia } from "@/lib/published-media";
 import {
   notifyAuthorStoryRejected,
   type RejectionMailCollection,
@@ -88,6 +89,8 @@ type SubmissionsPipelineDoc = {
     videoUrl?: string;
   };
   publishedStoryId?: string;
+  privateMediaPaths?: string[];
+  profilePhotoUrl?: string;
 };
 
 function mapSubmissionsTipoToStoryFormat(type: string | undefined): "text" | "audio" | "video" | "image" {
@@ -168,6 +171,22 @@ export async function editorialPublishFromSubmission(
     const lng = coerceFiniteNumber(sub.lng);
     const now = FieldValue.serverTimestamp();
     const storyRef = db.collection("stories").doc();
+    const rawMedia: Record<string, string> = {};
+    if (sub.media && typeof sub.media === "object" && !Array.isArray(sub.media)) {
+      for (const [k, v] of Object.entries(sub.media as Record<string, unknown>)) {
+        if (typeof v === "string" && v.trim()) rawMedia[k] = v.trim();
+      }
+    }
+    const promoted = await promotePublicStoryMedia({
+      storyId: storyRef.id,
+      privateMediaPaths: sub.privateMediaPaths,
+      bag: {
+        media: rawMedia,
+        imagenes: parseStoryImagenes(sub.imagenes),
+        profilePhotoUrl:
+          typeof sub.profilePhotoUrl === "string" ? sub.profilePhotoUrl : undefined,
+      },
+    });
     const tags = sub.tags ?? { themes: [], moods: [], keywords: [] };
     const story: Record<string, unknown> = {
       status: "approved",
@@ -183,7 +202,7 @@ export async function editorialPublishFromSubmission(
       lng,
       format: sub.format,
       text: sub.text ?? null,
-      media: sub.media ?? {},
+      media: promoted.media ?? {},
       tags,
       excerpt: typeof sub.title === "string" ? sub.title.slice(0, 160) : undefined,
     };
@@ -200,6 +219,11 @@ export async function editorialPublishFromSubmission(
     if (cityKnown) story.city = cityKnown;
     if (countryKnown) story.country = countryKnown;
     copyOptionalPublicFields(story, sub);
+    if (promoted.imagenes?.length) story.imagenes = promoted.imagenes;
+    if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
+    if (promoted.publishedMediaPaths.length) {
+      story.publishedMediaPaths = promoted.publishedMediaPaths;
+    }
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
@@ -248,17 +272,28 @@ export async function editorialPublishFromSubmission(
       ? ([sd.themeId.trim()] as string[])
       : ([] as string[]);
   const textParts = [sd.context ?? "", sd.payload?.textBody ?? ""].filter((t) => t && t.trim()).join("\n\n");
-  const media: Record<string, string> = {};
-  if (sd.payload?.videoUrl) media.videoUrl = sd.payload.videoUrl;
-  if (sd.payload?.audioUrl) media.audioUrl = sd.payload.audioUrl;
-  let imagenes: ReturnType<typeof imagenesFromUrlsAndAlts> | undefined;
-  if (sd.payload?.photoUrls?.length) {
-    media.imageUrl = sd.payload.photoUrls[0]!;
-    imagenes = imagenesFromUrlsAndAlts(sd.payload.photoUrls, sd.payload.photoAlts);
-  } else if (sd.payload?.photoUrl) {
-    media.imageUrl = sd.payload.photoUrl;
-    imagenes = imagenesFromUrlsAndAlts([sd.payload.photoUrl], sd.payload.photoAlts);
-  }
+  const rawMedia: Record<string, string> = {};
+  if (sd.payload?.videoUrl) rawMedia.videoUrl = sd.payload.videoUrl;
+  if (sd.payload?.audioUrl) rawMedia.audioUrl = sd.payload.audioUrl;
+  const photoUrls = sd.payload?.photoUrls?.length
+    ? sd.payload.photoUrls
+    : sd.payload?.photoUrl
+      ? [sd.payload.photoUrl]
+      : [];
+  if (photoUrls[0]) rawMedia.imageUrl = photoUrls[0];
+  const promoted = await promotePublicStoryMedia({
+    storyId: storyRef.id,
+    privateMediaPaths: sd.privateMediaPaths,
+    bag: {
+      media: rawMedia,
+      imagenes: photoUrls.length
+        ? imagenesFromUrlsAndAlts(photoUrls, sd.payload?.photoAlts)
+        : undefined,
+      profilePhotoUrl: sd.profilePhotoUrl,
+    },
+  });
+  const media = promoted.media ?? {};
+  const imagenes = promoted.imagenes;
 
   const story: Record<string, unknown> = {
     status: "approved",
@@ -285,6 +320,11 @@ export async function editorialPublishFromSubmission(
     ...(imagenes?.length ? { imagenes } : {}),
   };
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
+  if (imagenes?.length) story.imagenes = imagenes;
+  if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
+  if (promoted.publishedMediaPaths.length) {
+    story.publishedMediaPaths = promoted.publishedMediaPaths;
+  }
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
 
   await storyRef.set(story);
@@ -341,6 +381,23 @@ export async function editorialPublishApprovedStorySubmission(
   }
 
   const now = FieldValue.serverTimestamp();
+  const storyRef = db.collection("stories").doc();
+  const rawMedia: Record<string, string> = {};
+  if (data.media && typeof data.media === "object" && !Array.isArray(data.media)) {
+    for (const [k, v] of Object.entries(data.media as Record<string, unknown>)) {
+      if (typeof v === "string" && v.trim()) rawMedia[k] = v.trim();
+    }
+  }
+  const promoted = await promotePublicStoryMedia({
+    storyId: storyRef.id,
+    privateMediaPaths: data.privateMediaPaths,
+    bag: {
+      media: rawMedia,
+      imagenes: parseStoryImagenes(data.imagenes),
+      profilePhotoUrl:
+        typeof data.profilePhotoUrl === "string" ? data.profilePhotoUrl : undefined,
+    },
+  });
   const storyData: Record<string, unknown> = {
     status: "approved",
     editorialSource: "story_submissions_preapproved",
@@ -358,7 +415,7 @@ export async function editorialPublishApprovedStorySubmission(
     excerpt:
       typeof data.title === "string" ? String(data.title).slice(0, 160) : undefined,
     text: data.text ?? null,
-    media: data.media ?? {},
+    media: promoted.media ?? {},
   };
   if (data.authorName) storyData.authorName = data.authorName;
   const authorEmailLegacy =
@@ -369,9 +426,13 @@ export async function editorialPublishApprovedStorySubmission(
         : "";
   if (authorEmailLegacy) storyData.authorEmail = authorEmailLegacy;
   copyOptionalPublicFields(storyData, data);
+  if (promoted.imagenes?.length) storyData.imagenes = promoted.imagenes;
+  if (promoted.profilePhotoUrl) storyData.profilePhotoUrl = promoted.profilePhotoUrl;
+  if (promoted.publishedMediaPaths.length) {
+    storyData.publishedMediaPaths = promoted.publishedMediaPaths;
+  }
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
-  const storyRef = db.collection("stories").doc();
   await storyRef.set(storyData);
   await subRef.update({
     status: "approved",
@@ -433,12 +494,42 @@ export async function editorialPublishSpanishDraftInPlace(args: {
     ubicacion: body.ubicacion,
     quote: body.quote,
   };
-  const update = {
+  const raw = snap.data() as Record<string, unknown>;
+  const rawMedia: Record<string, string> = {};
+  if (raw.media && typeof raw.media === "object" && !Array.isArray(raw.media)) {
+    for (const [k, v] of Object.entries(raw.media as Record<string, unknown>)) {
+      if (typeof v === "string" && v.trim()) rawMedia[k] = v.trim();
+    }
+  }
+  const promoted = await promotePublicStoryMedia({
+    storyId,
+    privateMediaPaths: raw.privateMediaPaths,
+    bag: {
+      media: rawMedia,
+      imagenes: parseStoryImagenes(raw.imagenes),
+      videoUrl: typeof raw.videoUrl === "string" ? raw.videoUrl : storyPartial.videoUrl,
+      audioUrl: typeof raw.audioUrl === "string" ? raw.audioUrl : storyPartial.audioUrl,
+      imageUrl: typeof raw.imageUrl === "string" ? raw.imageUrl : storyPartial.imageUrl,
+      images: Array.isArray(raw.images)
+        ? raw.images.filter((u): u is string => typeof u === "string")
+        : storyPartial.images,
+    },
+  });
+  const update: Record<string, unknown> = {
     ...buildPublishUpdate(payloadFull),
     formato,
   };
+  if (promoted.media) update.media = promoted.media;
+  if (promoted.imagenes?.length) update.imagenes = promoted.imagenes;
+  if (promoted.videoUrl) update.videoUrl = promoted.videoUrl;
+  if (promoted.audioUrl) update.audioUrl = promoted.audioUrl;
+  if (promoted.imageUrl) update.imageUrl = promoted.imageUrl;
+  if (promoted.images?.length) update.images = promoted.images;
+  if (promoted.publishedMediaPaths.length) {
+    update.publishedMediaPaths = promoted.publishedMediaPaths;
+  }
 
-  await ref.update(update as Record<string, unknown>);
+  await ref.update(update);
   await appendEditorialAuditLog(db, actorEmail, "publish_spanish_inplace", {
     storyId,
     fromStatus: String(cs),
