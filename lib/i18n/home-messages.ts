@@ -78,21 +78,21 @@ const es: HomeMessages = {
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBody:
-    'Una cámara puede guardar un gesto, una pausa, una voz, una mirada. Hasta 5 minutos.',
+    'Un gesto, una pausa, una mirada. Todo cabe en una cámara. Hasta 5 minutos.',
   cardVideoCta: 'Graba un video',
   cardAudioTitle: 'Dale voz',
   cardAudioSubtitle: 'a lo que recuerdas',
   cardAudioBody:
-    'Hay historias que no necesitan verse. Solo necesitan ser escuchadas. Hasta 5 minutos.',
+    'Hay historias que no necesitan verse, solo ser escuchadas. Hasta 5 minutos.',
   cardAudioCta: 'Graba un audio',
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
-    'Escribe una escena, una carta, una despedida o algo que todavía vuelve. Hasta 5000 caracteres.',
+    'Hay historias que no necesitan sonido ni imagen, solo palabras. Hasta 5000 caracteres.',
   cardWriteCta: 'Escribe una historia',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
-  cardPhotoBody: 'Sube una foto y cuenta la historia que guarda. Hasta 8 fotos.',
+  cardPhotoBody: 'Una foto guarda más de lo que se ve a simple vista. Hasta 8 fotos.',
   cardPhotoCta: 'Sube una foto',
 };
 

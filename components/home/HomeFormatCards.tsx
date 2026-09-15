@@ -258,7 +258,7 @@ export function HomeFormatCards({
         }
         style={{ color: soft.textBody }}
       >
-        <span className="font-normal text-gray-700">{t.historiasLead2}</span>
+        <span className="font-normal text-orange-500">{t.historiasLead2}</span>
       </p>
       <div
         className={
