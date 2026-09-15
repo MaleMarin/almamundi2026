@@ -260,7 +260,7 @@ export function HomeFormatCards({
       >
         <span className="font-normal text-orange-700">
           <span className="block">{t.historiasLead2}</span>
-          <span className="mt-1 block">{t.historiasLead2b}</span>
+          <span className="mt-1 block font-bold">{t.historiasLead2b}</span>
         </span>
       </p>
       <div
