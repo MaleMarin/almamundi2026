@@ -245,6 +245,24 @@ export function SoundsPanel({
           }}
         >
           Estos sonidos pueden traerte recuerdos de otros lugares. Elige el que quieras mientras exploras el mapa.
+          {' '}
+          Universo incluye una grabación real de la NASA y la Universidad de Iowa, con licencia CC BY 4.0 (
+          <a
+            href="https://space-audio.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              color: 'rgba(200, 230, 255, 0.98)',
+              fontFamily: SITE_FONT_STACK,
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: '0.04em',
+              textDecoration: 'none',
+            }}
+          >
+            space-audio.org
+          </a>
+          ).
         </p>
       </div>
       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
