@@ -38,6 +38,9 @@ export type Autor = {
 }
 
 // ─── Estado de curación ──────────────────────────────────────────────────────
+// Decisión de producto: estos estados son editoriales (curaduría), no un selector
+// de audiencia elegido por quien cuenta. No hay pública/privada/solo-enlace ni
+// edición del autor tras publicar — ver `claude/requisitos-y-decisiones.md`.
 export type EstadoCuracion =
   | 'draft'
   | 'pending' // recién subida, esperando revisión

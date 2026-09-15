@@ -77,7 +77,13 @@ export const CreateSubmissionBody = z.object({
 });
 export type CreateSubmissionBodyType = z.infer<typeof CreateSubmissionBody>;
 
-/** Documento en Firestore `submissions`. */
+/**
+ * Decisión de producto: las historias no tienen selector de audiencia
+ * (pública / privada / solo con enlace) ni edición por el autor después de publicadas.
+ * Es intencional, no una función pendiente — ver `claude/requisitos-y-decisiones.md`.
+ *
+ * `status` aquí es solo el flujo de envío (pending/approved/rejected), no visibilidad elegida por quien cuenta.
+ */
 export interface SubmissionDoc {
   id?: string;
   type: "video" | "audio" | "texto" | "foto";
