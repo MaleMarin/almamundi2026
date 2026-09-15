@@ -28,6 +28,8 @@ export type HomeMessages = {
   /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
   historiasLead1: string;
   historiasLead2: string;
+  /** Segunda línea de la frase naranja (misma familia y color que `historiasLead2`). */
+  historiasLead2b: string;
   /** Título grande sobre la sección del mapa (home #mapa y cabecera /mapa). */
   mapSectionTitle: string;
   cardVideoTitle: string;
@@ -73,7 +75,8 @@ const es: HomeMessages = {
   heroSubBefore: 'Aquí, cada relato importa.',
   heroSubBold: 'Cada historia es extraordinaria.',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
-  historiasLead2: 'No hay una sola forma de contar una historia. Elige la tuya.',
+  historiasLead2: 'Hay muchas formas de contar una historia.',
+  historiasLead2b: 'Elige la tuya.',
   mapSectionTitle: 'El Alma del Mundo',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
@@ -121,7 +124,8 @@ const pt: HomeMessages = {
   heroSubBefore: 'Aqui, cada relato importa.',
   heroSubBold: 'Cada história é extraordinária.',
   historiasLead1: 'Há histórias que só você pode contar.',
-  historiasLead2: 'Não há uma só forma de contar uma história. Escolha a sua.',
+  historiasLead2: 'Há muitas formas de contar uma história.',
+  historiasLead2b: 'Escolha a sua.',
   mapSectionTitle: 'A Alma do Mundo',
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
@@ -169,7 +173,8 @@ const en: HomeMessages = {
   heroSubBefore: 'Here, every story matters.',
   heroSubBold: 'Every story is extraordinary.',
   historiasLead1: 'There are stories only you can tell.',
-  historiasLead2: 'There isn’t only one way to tell a story. Choose yours.',
+  historiasLead2: 'There are many ways to tell a story.',
+  historiasLead2b: 'Choose yours.',
   mapSectionTitle: 'The Soul of the World',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',

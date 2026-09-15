@@ -63,7 +63,7 @@ export function HomeFirstPart({
       {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex scroll-mt-[9.75rem] flex-col items-center px-6 pb-4 pt-[12.75rem] text-center sm:pt-[13.75rem] sm:pb-5 md:scroll-mt-[12.25rem] md:px-10 md:pb-6 md:pt-[15.25rem] lg:scroll-mt-[13.5rem] lg:pt-[17.5rem] lg:pb-6"
+        className="home-intro-avenir relative z-[20] flex scroll-mt-[9.75rem] flex-col items-center px-6 pb-4 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-5 md:scroll-mt-[12.25rem] md:px-10 md:pb-6 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:pt-[15.25rem] lg:pb-6"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
