@@ -46,6 +46,8 @@ Alternativa (compatible con código existente):
 |----------|-------------|
 | `SUBMISSIONS_WRITE_TOKEN` | Token para **POST /api/submissions** (header `x-submissions-token`). |
 | `ADMIN_PUBLISH_TOKEN` | Token para **POST /api/admin/publish** (header `x-admin-token`). |
+| `CLAMAV_SCAN_URL` | URL del servicio ClamAV en Cloud Run (sin barra final). Si falta, el escaneo se omite. |
+| `MALWARE_SCAN_SECRET` | Bearer compartido entre Vercel y Cloud Run para encolar/callback. |
 
 ---
 

@@ -116,6 +116,8 @@ export interface SubmissionDoc {
     audioUrl?: string;
     videoUrl?: string;
   };
+  malwareScanStatus?: "pending" | "clean" | "infected" | "error" | "skipped";
+  malwareFlag?: boolean;
   createdAt: number;
   reviewedAt?: number;
   publicId?: string;

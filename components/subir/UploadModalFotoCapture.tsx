@@ -12,6 +12,7 @@ type Props = {
   onAddFiles: (files: FileList | null) => void;
   onRemove: (index: number) => void;
   inlineError?: string;
+  convertingLabel?: string;
   maxPhotos?: number;
 };
 
@@ -21,6 +22,7 @@ export function UploadModalFotoCapture({
   onAddFiles,
   onRemove,
   inlineError,
+  convertingLabel,
   maxPhotos = SUBIR_PHOTO_MAX,
 }: Props) {
   const inputId = useId();
@@ -59,6 +61,11 @@ export function UploadModalFotoCapture({
       >
         {primaryCta}
       </button>
+      {convertingLabel ? (
+        <p className={styles.amModalInlineError} role="status" aria-live="polite">
+          {convertingLabel}
+        </p>
+      ) : null}
       {inlineError ? <p className={styles.amModalInlineError}>{inlineError}</p> : null}
       <p className={styles.amFotoCounter}>
         {photoPreviews.length} de {maxPhotos} fotos

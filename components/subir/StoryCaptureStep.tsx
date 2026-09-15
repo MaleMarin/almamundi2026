@@ -32,6 +32,7 @@ import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCaptur
 import type { SubirHuellaFormat as SubirFormat } from '@/hooks/useSubirHuella';
 import { VoiceWaveform, type VoiceWaveformMode } from './VoiceWaveform';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
+import { convertHeicFiles, looksLikeHeic } from '@/lib/convert-heic-client';
 
 export type SubmissionSexApi = 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';
 
@@ -188,6 +189,7 @@ export function StoryCaptureStep({
   const [textStory, setTextStory] = useState('');
   const [fotoCaption, setFotoCaption] = useState('');
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [convertingHeic, setConvertingHeic] = useState(false);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   const [videoUrl, setVideoUrl] = useState('');
@@ -657,28 +659,37 @@ export function StoryCaptureStep({
   const formatWelcomeTitle = format === 'foto' ? modalCopy.title : modalCopy.title.replace(/\n/g, ' ');
   const formatWelcomeBody = [modalCopy.subtitle, modalCopy.limit].filter(Boolean).join(' ');
 
-  const addPhotoFiles = useCallback((list: FileList | null) => {
+  const addPhotoFiles = useCallback(async (list: FileList | null) => {
     if (!list?.length) return;
-    setPhotoFiles((prev) => {
-      const next = [...prev];
-      for (const f of Array.from(list)) {
-        if (next.length >= SUBIR_PHOTO_MAX) {
-          setLocalErr(UPLOAD_PHOTO_MAX_MESSAGE);
-          break;
+    const incoming = Array.from(list);
+    if (incoming.some(looksLikeHeic)) setConvertingHeic(true);
+    try {
+      const converted = await convertHeicFiles(incoming);
+      setPhotoFiles((prev) => {
+        const next = [...prev];
+        for (const f of converted) {
+          if (next.length >= SUBIR_PHOTO_MAX) {
+            setLocalErr(UPLOAD_PHOTO_MAX_MESSAGE);
+            break;
+          }
+          if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
+            setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB.`);
+            return prev;
+          }
+          const typeOk =
+            /^image\/(jpeg|png|webp|heic|heif|jpg)$/i.test(f.type) || looksLikeHeic(f);
+          if (!typeOk) {
+            setLocalErr('Formato: JPG, PNG, WEBP o HEIC.');
+            return prev;
+          }
+          next.push(f);
         }
-        if (f.size > PHOTO_MAX_MB * 1024 * 1024) {
-          setLocalErr(`Cada imagen: máximo ${PHOTO_MAX_MB} MB.`);
-          return prev;
-        }
-        if (!/^image\/(jpeg|png|webp|heic|heif|jpg)$/i.test(f.type)) {
-          setLocalErr('Formato: JPG, PNG, WEBP o HEIC.');
-          return prev;
-        }
-        next.push(f);
-      }
-      setLocalErr('');
-      return next;
-    });
+        setLocalErr('');
+        return next;
+      });
+    } finally {
+      setConvertingHeic(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -718,6 +729,7 @@ export function StoryCaptureStep({
             photoPreviews={photoPreviews}
             onAddFiles={addPhotoFiles}
             onRemove={removePhotoAt}
+            convertingLabel={convertingHeic ? 'Convirtiendo tu foto…' : undefined}
             inlineError={localErr || undefined}
           />
           <div className="mt-6 space-y-2">

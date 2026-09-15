@@ -19,7 +19,7 @@ import {
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
-import { promotePublicStoryMedia } from "@/lib/published-media";
+import { publishBlockedByMalware } from "@/lib/malware-scan";
 import {
   notifyAuthorStoryRejected,
   type RejectionMailCollection,
@@ -149,6 +149,11 @@ export async function editorialPublishFromSubmission(
 ): Promise<PublishFromSubmissionResult> {
   const resolved = await resolveSubmission(db, submissionId);
   if (!resolved) return { ok: false, httpStatus: 404, error: "submission not found" };
+
+  const malwareBlock = publishBlockedByMalware(resolved.data);
+  if (malwareBlock.blocked) {
+    return { ok: false, httpStatus: 409, error: malwareBlock.error };
+  }
 
   const existingPublished =
     resolved.data.publishedStoryId != null &&
@@ -368,6 +373,10 @@ export async function editorialPublishApprovedStorySubmission(
   const snap = await subRef.get();
   if (!snap.exists) return { ok: false, httpStatus: 404, error: "Submission not found" };
   const data = snap.data() as Record<string, unknown>;
+  const malwareBlock = publishBlockedByMalware(data);
+  if (malwareBlock.blocked) {
+    return { ok: false, httpStatus: 409, error: malwareBlock.error };
+  }
   if (String(data.status) !== "approved") {
     return {
       ok: false,

@@ -19,7 +19,7 @@ import {
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
-import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
+import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 
 export const runtime = "nodejs";
 
@@ -226,7 +226,19 @@ export async function POST(req: NextRequest) {
 
   try {
     const db = getAdminDb();
-    const ref = await db.collection("submissions").add(doc);
+    const ref = await db.collection("submissions").add({
+      ...doc,
+      malwareScanStatus:
+        process.env.CLAMAV_SCAN_URL?.trim() && data.privateMediaPaths?.length
+          ? "pending"
+          : "skipped",
+    });
+    enqueueMalwareScanAfterSave({
+      db,
+      collection: "submissions",
+      submissionId: ref.id,
+      storagePaths: data.privateMediaPaths ?? [],
+    });
     try {
       await appendEditorialAuditLog(db, "anonymous:web", "submit", {
         submissionId: ref.id,

@@ -5,11 +5,12 @@ const isDev = process.env.NODE_ENV === "development";
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' ${isDev ? "'unsafe-eval' " : ""}'unsafe-inline' https://*.firebaseapp.com https://www.google.com https://www.gstatic.com https://apis.google.com https://vercel.live https://challenges.cloudflare.com`,
+  `script-src 'self' ${isDev ? "'unsafe-eval' " : ""}'unsafe-inline' 'wasm-unsafe-eval' https://*.firebaseapp.com https://www.google.com https://www.gstatic.com https://apis.google.com https://vercel.live https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "img-src 'self' data: blob: https:",
   "font-src 'self' https://fonts.gstatic.com data:",
   "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
+  "worker-src 'self' blob:",
   "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://*.firebaseapp.com https://challenges.cloudflare.com",
   "media-src 'self' blob: https:",
   "object-src 'none'",
@@ -21,6 +22,7 @@ const csp = [
 
 const nextConfig: NextConfig = {
   serverExternalPackages: ["sharp", "file-type"],
+  transpilePackages: ["heic-to"],
   /**
    * `public/` pesa ~380 MB (videos, texturas, audio). El file tracing de Next
    * lo metía entero en funciones como /api/submissions/photo (~414 MB) si algún

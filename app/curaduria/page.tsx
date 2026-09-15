@@ -33,6 +33,8 @@ type Submission = {
   media?: { videoUrl?: string; imageUrl?: string; audioUrl?: string };
   lat?: number;
   lng?: number;
+  malwareScanStatus?: string;
+  malwareFlag?: boolean;
 };
 
 export default function CuraduriaPage() {
@@ -351,6 +353,15 @@ export default function CuraduriaPage() {
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="font-bold text-white">{s.title || 'Sin título'}</div>
+                  {s.malwareScanStatus === 'infected' || s.malwareFlag ? (
+                    <div className="mt-2 rounded-lg border border-red-400/50 bg-red-500/20 px-3 py-2 text-sm text-red-100">
+                      Malware: un archivo de este envío dio positivo. No se puede publicar.
+                    </div>
+                  ) : s.malwareScanStatus === 'pending' ? (
+                    <div className="mt-2 rounded-lg border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-100">
+                      Escaneo de archivos en curso. Espera para publicar.
+                    </div>
+                  ) : null}
                   <div className="text-sm text-white/60 mt-1">
                     {s.placeLabel || '—'} · {s.format} ·{' '}
                     {s.authorEmail ? (
@@ -399,12 +410,24 @@ export default function CuraduriaPage() {
                   <button
                     type="button"
                     onClick={() => publish(s.id)}
-                    disabled={publishingId === s.id || rejectingId === s.id || s.lat == null || s.lng == null}
+                    disabled={
+                      publishingId === s.id ||
+                      rejectingId === s.id ||
+                      s.lat == null ||
+                      s.lng == null ||
+                      s.malwareScanStatus === 'infected' ||
+                      s.malwareFlag === true ||
+                      s.malwareScanStatus === 'pending'
+                    }
                     className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold text-sm disabled:opacity-50"
                     title={
-                      s.lat == null || s.lng == null
-                        ? 'Añade lat y lng en Firestore para publicar en el mapa'
-                        : undefined
+                      s.malwareScanStatus === 'infected' || s.malwareFlag
+                        ? 'Bloqueado: el escaneo detectó malware'
+                        : s.malwareScanStatus === 'pending'
+                          ? 'Espera a que termine el escaneo'
+                          : s.lat == null || s.lng == null
+                            ? 'Añade lat y lng en Firestore para publicar en el mapa'
+                            : undefined
                     }
                   >
                     {publishingId === s.id ? 'Publicando…' : 'Publicar en mapa'}

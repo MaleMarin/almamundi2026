@@ -69,6 +69,7 @@ import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
+import { convertHeicFiles, convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 
 const jakartaHuella = Plus_Jakarta_Sans({
   subsets: ['latin'],
@@ -374,6 +375,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
   const [photoAlts, setPhotoAlts] = useState<string[]>([]);
+  const [convertingHeic, setConvertingHeic] = useState(false);
 
   // --- FORM: historia + extras (STEP 2 del modal: tras captura) ---
   const [storyTitle, setStoryTitle] = useState('');
@@ -750,18 +752,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     [resetCaptureMedia]
   );
 
-  const addPhotos = useCallback(
-    (list: FileList | null) => {
-      if (!list?.length) return;
-      setErr('');
+  const addPhotos = useCallback(async (list: FileList | null) => {
+    if (!list?.length) return;
+    setErr('');
+    const incoming = Array.from(list);
+    if (incoming.some(looksLikeHeic)) setConvertingHeic(true);
+    try {
+      const converted = await convertHeicFiles(incoming);
       setPhotoFiles((prev) => {
         const next = [...prev];
-        for (const f of Array.from(list)) {
+        for (const f of converted) {
           if (next.length >= SUBIR_PHOTO_MAX) {
             setErr(UPLOAD_PHOTO_MAX_MESSAGE);
             break;
           }
-          if (!/^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type)) {
+          const typeOk =
+            /^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type) || looksLikeHeic(f);
+          if (!typeOk) {
             setErr('Solo imágenes (JPG, PNG, WEBP, HEIC).');
             continue;
           }
@@ -774,9 +781,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         setPhotoAlts((alts) => next.map((_, i) => (i < prev.length ? alts[i] ?? '' : '')));
         return next;
       });
-    },
-    []
-  );
+    } finally {
+      setConvertingHeic(false);
+    }
+  }, []);
 
   useEffect(() => {
     const urls = photoFiles.map((f) => URL.createObjectURL(f));
@@ -830,10 +838,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     setExtraFiles((prev) => prev.filter((_, i) => i !== idx));
   }, []);
 
-  const onPickProfilePhoto = useCallback((file: File | null) => {
+  const onPickProfilePhoto = useCallback(async (file: File | null) => {
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith('image/') && !looksLikeHeic(file)) {
       setErr('La foto debe ser una imagen (JPG/PNG/WEBP).');
       return;
     }
@@ -843,7 +851,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
 
     setErr('');
-    setProfilePhoto(file);
+    if (looksLikeHeic(file)) setConvertingHeic(true);
+    try {
+      setProfilePhoto(await convertHeicToJpegIfNeeded(file));
+    } finally {
+      setConvertingHeic(false);
+    }
   }, []);
 
   const canContinueCapture = useCallback((): boolean => {
@@ -957,10 +970,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
       let profilePhotoUploaded: string | undefined;
       if (profilePhoto) {
+        const profileJpeg = await convertHeicToJpegIfNeeded(profilePhoto);
         profilePhotoUploaded = await trackUpload(
-          profilePhoto,
+          profileJpeg,
           'submissions/avatars',
-          `avatar-${profilePhoto.name}`
+          `avatar-${profileJpeg.name}`
         );
       }
 
@@ -1039,8 +1053,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         }
       } else if (mode === 'foto') {
         if (photoFiles.length > 0) {
+          const photosToUpload = await convertHeicFiles(photoFiles);
           const urls = await Promise.all(
-            photoFiles.map((f, i) => trackUpload(f, 'submissions', `photo-${i}-${f.name}`))
+            photosToUpload.map((f, i) => trackUpload(f, 'submissions', `photo-${i}-${f.name}`))
           );
           const first = urls[0];
           if (first) {
@@ -1671,6 +1686,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               photoPreviews={photoPreviews}
               onAddFiles={addPhotos}
               onRemove={removePhotoAt}
+              convertingLabel={convertingHeic ? 'Convirtiendo tu foto…' : undefined}
               inlineError={err || undefined}
             />
             {photoPreviews.length > 0 ? (
