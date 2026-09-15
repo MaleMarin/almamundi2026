@@ -19,6 +19,7 @@ import {
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import { promotePublicStoryMedia } from "@/lib/published-media";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import {
   notifyAuthorStoryRejected,

@@ -19,6 +19,7 @@ import {
 } from "@/lib/rate-limit";
 import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
+import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 
 export const runtime = "nodejs";
