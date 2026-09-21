@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { FieldValue } from 'firebase-admin/firestore';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { checkAffectiveTone } from '@/lib/affective-tone-check';
-import { notifyAuthorReaderMessage } from '@/lib/email/notify-author-reader-message';
 import { foldEcoVad, meanVadFromText, parseEcoVadState } from '@/lib/huella/eco-vad';
 
 export const runtime = 'nodejs';
@@ -62,30 +61,13 @@ export async function POST(
         text: message,
         createdAt: FieldValue.serverTimestamp(),
         source: 'exhibition',
+        status: 'pending',
       });
       if (messageVad) {
         const prev = parseEcoVadState(storySnap.data()?.ecoVad);
         tx.update(storyRef, { ecoVad: foldEcoVad(prev, messageVad) });
       }
     });
-
-    try {
-      const mail = await notifyAuthorReaderMessage({
-        db,
-        storyId: id,
-        readerMessage: message,
-      });
-      console.info('[affective-message] author-mail', {
-        storyId: id,
-        status: mail.status,
-        hasResendId: Boolean(mail.resendId),
-      });
-      if (mail.status === 'failed') {
-        console.error('[affective-message] author-mail-failed', mail.error);
-      }
-    } catch (mailErr) {
-      console.error('[affective-message] author-mail', mailErr);
-    }
 
     return NextResponse.json({ ok: true });
   } catch (err) {

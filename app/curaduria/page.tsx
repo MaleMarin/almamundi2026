@@ -37,6 +37,14 @@ type Submission = {
   malwareFlag?: boolean;
 };
 
+type PendingReaderMessage = {
+  storyId: string;
+  messageId: string;
+  storyTitle: string;
+  text: string;
+  createdAt: string | null;
+};
+
 export default function CuraduriaPage() {
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
@@ -47,10 +55,13 @@ export default function CuraduriaPage() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   const [list, setList] = useState<Submission[]>([]);
+  const [messages, setMessages] = useState<PendingReaderMessage[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
   const [rejectingId, setRejectingId] = useState<string | null>(null);
+  const [approvingMessageId, setApprovingMessageId] = useState<string | null>(null);
+  const [rejectingMessageId, setRejectingMessageId] = useState<string | null>(null);
   const [lastMailNotice, setLastMailNotice] = useState<string | null>(null);
 
   useEffect(() => {
@@ -64,6 +75,7 @@ export default function CuraduriaPage() {
         setIdToken(null);
         setAuthLoading(false);
         setList([]);
+        setMessages([]);
         return;
       }
       const token = await u.getIdToken();
@@ -94,19 +106,34 @@ export default function CuraduriaPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await fetch('/api/curate/submissions?status=pending', {
-        headers: { ...authHeaders() },
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
+      const [subRes, msgRes] = await Promise.all([
+        fetch('/api/curate/submissions?status=pending', {
+          headers: { ...authHeaders() },
+        }),
+        fetch('/api/curate/reader-messages', {
+          headers: { ...authHeaders() },
+        }),
+      ]);
+      const data = await subRes.json().catch(() => ({}));
+      const msgData = await msgRes.json().catch(() => ({}));
+      if (!subRes.ok) {
         setError(data.error || 'No autorizado.');
         setList([]);
+        setMessages([]);
+        return;
+      }
+      if (!msgRes.ok) {
+        setError(msgData.error || 'No se pudieron cargar los mensajes.');
+        setList(data.submissions || []);
+        setMessages([]);
         return;
       }
       setList(data.submissions || []);
+      setMessages(Array.isArray(msgData.messages) ? msgData.messages : []);
     } catch {
       setError('Error de conexión.');
       setList([]);
+      setMessages([]);
     } finally {
       setLoading(false);
     }
@@ -210,6 +237,53 @@ export default function CuraduriaPage() {
     [idToken]
   );
 
+  const reviewMessage = useCallback(
+    async (storyId: string, messageId: string, action: 'approve' | 'reject') => {
+      if (!idToken) return;
+      if (action === 'approve') setApprovingMessageId(messageId);
+      else setRejectingMessageId(messageId);
+      setError('');
+      try {
+        const res = await fetch('/api/curate/reader-messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({ storyId, messageId, action }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) {
+          setError(data.error || 'Error al revisar el mensaje.');
+          return;
+        }
+        if (action === 'approve') {
+          const mail = data.authorMail as
+            | { status?: string; error?: string | null }
+            | undefined;
+          if (mail?.status === 'sent') {
+            setLastMailNotice('Mensaje aprobado. Correo enviado al autor.');
+          } else if (mail?.status === 'skipped_no_email') {
+            setLastMailNotice('Mensaje aprobado. No se avisó: la historia no tiene correo del autor.');
+          } else if (mail?.status === 'failed') {
+            setLastMailNotice(`Mensaje aprobado, pero el correo NO salió: ${mail.error ?? 'error de envío'}`);
+          } else {
+            setLastMailNotice('Mensaje aprobado.');
+          }
+        } else {
+          setLastMailNotice('Mensaje rechazado. No se envió correo.');
+        }
+        setMessages((prev) => prev.filter((m) => m.messageId !== messageId));
+      } catch {
+        setError('Error de conexión.');
+      } finally {
+        setApprovingMessageId(null);
+        setRejectingMessageId(null);
+      }
+    },
+    [idToken]
+  );
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoginError('');
@@ -240,6 +314,7 @@ export default function CuraduriaPage() {
     setUser(null);
     setIdToken(null);
     setList([]);
+    setMessages([]);
   };
 
   if (!auth) {
@@ -340,6 +415,60 @@ export default function CuraduriaPage() {
           </div>
         )}
 
+        <section className="flex flex-col gap-4">
+          <h2 className="text-lg font-bold">Mensajes a quien cuenta</h2>
+          {messages.length === 0 && !loading && (
+            <p className="text-white/60">No hay mensajes pendientes de revisión.</p>
+          )}
+          <ul className="space-y-4">
+            {messages.map((m) => (
+              <li
+                key={`${m.storyId}-${m.messageId}`}
+                className="p-5 rounded-2xl bg-white/5 border border-white/10 flex flex-col gap-4"
+              >
+                <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+                  <div className="min-w-0 flex-1">
+                    <div className="font-bold text-white">{m.storyTitle || 'Sin título'}</div>
+                    <div className="text-sm text-white/60 mt-1">
+                      {m.createdAt
+                        ? new Date(m.createdAt).toLocaleString('es')
+                        : 'Sin fecha'}
+                    </div>
+                    <div className="mt-3 p-3 rounded-xl bg-black/20 text-sm text-white/90 whitespace-pre-wrap">
+                      {m.text}
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0 flex flex-col gap-3 w-full md:w-56">
+                    <button
+                      type="button"
+                      onClick={() => void reviewMessage(m.storyId, m.messageId, 'approve')}
+                      disabled={
+                        approvingMessageId === m.messageId ||
+                        rejectingMessageId === m.messageId
+                      }
+                      className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold text-sm disabled:opacity-50"
+                    >
+                      {approvingMessageId === m.messageId ? 'Enviando…' : 'Aprobar y enviar'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => void reviewMessage(m.storyId, m.messageId, 'reject')}
+                      disabled={
+                        approvingMessageId === m.messageId ||
+                        rejectingMessageId === m.messageId
+                      }
+                      className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-sm disabled:opacity-50"
+                    >
+                      {rejectingMessageId === m.messageId ? 'Rechazando…' : 'Rechazar'}
+                    </button>
+                  </div>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </section>
+
+        <h2 className="text-lg font-bold">Historias</h2>
         {list.length === 0 && !loading && (
           <p className="text-white/60">No hay envíos pendientes para curar.</p>
         )}

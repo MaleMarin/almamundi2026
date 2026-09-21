@@ -93,11 +93,11 @@ export async function loadAuthorEcoPage(
 
   let resonanceCount = 0;
   try {
-    const agg = await ref.collection('affective_messages').count().get();
+    const agg = await ref.collection('affective_messages').where('status', '==', 'approved').count().get();
     resonanceCount = agg.data().count;
   } catch {
     const all = await ref.collection('affective_messages').get();
-    resonanceCount = all.size;
+    resonanceCount = all.docs.filter((d) => d.data()?.status === 'approved').length;
   }
 
   return {
