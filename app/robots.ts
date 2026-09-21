@@ -26,6 +26,7 @@ const DISALLOWED_PATHS: string[] = [
   '/preview-home',
   '/vista-previa',
   '/prototipo',
+  '/cinematic',
   '/demo-huellas-v2',
   '/demo-impronta',
   '/demo-lexico',

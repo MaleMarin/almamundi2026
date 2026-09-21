@@ -28,7 +28,6 @@ const STATIC_PATHS: string[] = [
   '/privacidad',
   '/terminos',
   '/vision',
-  '/alma-almamundi',
 ];
 
 /** Acepta Firestore Timestamp, ISO string o nada. Devuelve Date válida o null. */
