@@ -1,6 +1,6 @@
 import { config } from "dotenv";
-import { Timestamp } from "firebase-admin/firestore";
-import { getAdminDb } from "./loadFirebase";
+import { Timestamp, type QueryDocumentSnapshot } from "firebase-admin/firestore";
+import { getAdminDb } from "../loadFirebase";
 
 config();
 config({ path: ".env.local" });
@@ -718,7 +718,7 @@ async function deleteDemoSeeds(db: ReturnType<typeof getAdminDb>) {
   const docs = snap.docs;
   for (let i = 0; i < docs.length; i += BATCH) {
     const batch = db.batch();
-    docs.slice(i, i + BATCH).forEach((d) => batch.delete(d.ref));
+    docs.slice(i, i + BATCH).forEach((d: QueryDocumentSnapshot) => batch.delete(d.ref));
     await batch.commit();
   }
   console.log("Deleted previous demo-seed stories:", docs.length);

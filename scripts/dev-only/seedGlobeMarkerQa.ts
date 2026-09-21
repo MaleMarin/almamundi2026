@@ -3,8 +3,8 @@
  * Tag: globe-marker-qa. Borrar: npx tsx scripts/seedGlobeMarkerQa.ts --delete
  */
 import { config } from 'dotenv';
-import { Timestamp } from 'firebase-admin/firestore';
-import { getAdminDb } from './loadFirebase';
+import { Timestamp, type QueryDocumentSnapshot } from 'firebase-admin/firestore';
+import { getAdminDb } from '../loadFirebase';
 
 config();
 config({ path: '.env.local' });
@@ -54,7 +54,7 @@ async function deleteQa(db: ReturnType<typeof getAdminDb>) {
   const byTag = await db.collection('stories').where('tags', 'array-contains', TAG).get();
   const batch = db.batch();
   const ids = new Set<string>();
-  byTag.docs.forEach((d) => {
+  byTag.docs.forEach((d: QueryDocumentSnapshot) => {
     ids.add(d.id);
     batch.delete(d.ref);
   });
@@ -81,7 +81,7 @@ async function countStories(db: ReturnType<typeof getAdminDb>) {
   const byStatus: Record<string, number> = {};
   let publicGeo = 0;
   const publicStatuses = new Set(['approved', 'featured', 'beta_demo', 'published', 'active']);
-  snap.docs.forEach((d) => {
+  snap.docs.forEach((d: QueryDocumentSnapshot) => {
     const data = d.data();
     const st = String(data.status ?? '(missing)');
     byStatus[st] = (byStatus[st] ?? 0) + 1;
