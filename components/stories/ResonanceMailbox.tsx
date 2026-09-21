@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Buzón de resonancia: carta breve al relato; modal y envío vía API (filtro de tono + registro;
+ * Buzón de resonancia: mensaje breve al relato; modal y envío vía API (filtro de tono + registro;
  * el equipo puede revisar antes de acercar el mensaje a quien narra).
  */
 import { X } from 'lucide-react';
@@ -30,7 +30,7 @@ export type ResonanceMailboxProps = {
   triggerTone?: 'dark' | 'light' | 'orange';
   /** Texto al pasar el cursor (p. ej. leyenda breve en barra de filtros). */
   triggerTitle?: string;
-  /** Sustituye el aria-label del botón (p. ej. «Carta a quien cuenta» en listados). */
+  /** Sustituye el aria-label del botón (p. ej. «Mensaje a quien cuenta» en listados). */
   triggerAriaLabel?: string;
 };
 
@@ -46,7 +46,7 @@ export function ResonanceMailbox({
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const mailboxAria =
     triggerAriaLabel ??
-    'Carta de resonancia: escribir para quien narra; AlmaMundi revisa el mensaje antes de poder acercárselo';
+    'Mensaje de resonancia: escribir para quien narra; AlmaMundi revisa el mensaje antes de poder acercárselo';
   const dialogId = useId();
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -339,14 +339,14 @@ export function ResonanceMailbox({
                       ¿Esta historia resonó contigo?
                     </h2>
                     <p className="mt-3 text-sm leading-relaxed text-white/85">
-                      Escribe una carta breve de afecto y respeto pensada para{' '}
-                      <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu carta, la
-                      revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercársela
+                      Escribe un mensaje breve de afecto y respeto pensado para{' '}
+                      <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu mensaje, lo
+                      revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercárselo
                       a quien narró este relato. Es un camino con pausa y mirada humana: no hay envío directo sin este
                       resguardo, y no hay plazo fijo de respuesta.
                     </p>
                     <label htmlFor={`${dialogId}-msg`} className="sr-only">
-                      Texto de tu carta de resonancia
+                      Texto de tu mensaje de resonancia
                     </label>
                     <textarea
                       id={`${dialogId}-msg`}

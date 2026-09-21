@@ -184,9 +184,9 @@ const es: SiteUiMessages = {
   listShareLabel: 'Compartir',
   listShareText:
     'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
-  listLetterLabel: 'Carta a quien cuenta',
+  listLetterLabel: 'Mensaje a quien cuenta',
   listLetterText:
-    'Escribir una carta breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
+    'Escribir un mensaje breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
   coleccionKicker: 'Tu colección',
   coleccionTitle: 'Historias que guardaste.',
   coleccionSubtitle: 'Compártelas o úsalas como inspiración para crear la tuya.',
@@ -366,9 +366,9 @@ const pt: SiteUiMessages = {
   listShareLabel: 'Partilhar',
   listShareText:
     'Partilhar a história com respeito: crédito a quem a conta, ligação e cartão para descarregar.',
-  listLetterLabel: 'Carta a quem conta',
+  listLetterLabel: 'Mensagem a quem conta',
   listLetterText:
-    'Escrever uma carta breve de ressonância para quem narra este relato. AlmaMundi recebe a sua mensagem, revê-a com cuidado (inclui um filtro automático de respeito) e, quando corresponder, pode aproximá-la de quem a contou. É um processo com pausa: não há envio direto sem este resguardo.',
+    'Escrever uma mensagem breve de ressonância para quem narra este relato. AlmaMundi recebe a sua mensagem, revê-a com cuidado (inclui um filtro automático de respeito) e, quando corresponder, pode aproximá-la de quem a contou. É um processo com pausa: não há envio direto sem este resguardo.',
   coleccionKicker: 'A sua coleção',
   coleccionTitle: 'Histórias que guardou.',
   coleccionSubtitle: 'Partilhe-as ou use-as como inspiração para criar a sua.',
@@ -547,9 +547,9 @@ const en: SiteUiMessages = {
   listShareLabel: 'Share',
   listShareText:
     'Share the story with care: credit the teller, a link, and a downloadable card.',
-  listLetterLabel: 'Letter to the teller',
+  listLetterLabel: 'Message to the teller',
   listLetterText:
-    'Write a short resonance letter to the person who told this story. AlmaMundi receives your message, reviews it with care (including an automatic respect filter) and, when it is right, may pass it on. There is a pause: nothing is sent through without this safeguard.',
+    'Write a short resonance message to the person who told this story. AlmaMundi receives your message, reviews it with care (including an automatic respect filter) and, when it is right, may pass it on. There is a pause: nothing is sent through without this safeguard.',
   coleccionKicker: 'Your collection',
   coleccionTitle: 'Stories you saved.',
   coleccionSubtitle: 'Share them, or use them as a spark to create yours.',

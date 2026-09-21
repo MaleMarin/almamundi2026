@@ -15,16 +15,16 @@ export const HISTORIAS_CAROUSEL_ARIA_LABEL = 'Carrusel de historias';
 
 export const HISTORIAS_FILTER_BLOCK_TITLE = 'Buscar por país, año o palabras clave';
 
-/** Tooltips (title) de los dos botones junto a «Limpiar filtros» en listados de historias. Orden: compartir, carta al autor. */
+/** Tooltips (title) de los dos botones junto a «Limpiar filtros» en listados de historias. Orden: compartir, mensaje al autor. */
 export const HISTORIAS_SHARE_ICONS_LEGEND = [
   {
     label: 'Compartir',
     text: 'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
   },
   {
-    label: 'Carta a quien cuenta',
+    label: 'Mensaje a quien cuenta',
     text:
-      'Escribir una carta breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
+      'Escribir un mensaje breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
   },
 ] as const;
 
