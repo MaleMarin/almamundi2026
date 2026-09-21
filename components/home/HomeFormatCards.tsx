@@ -11,7 +11,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 const APP_FONT = SITE_FONT_STACK;
 
 const soft = {
-  textBody: '#718096',
+  textBody: '#5A6578',
   flat: {
     backgroundColor: '#E8EBF2',
     borderRadius: '40px',

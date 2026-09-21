@@ -175,6 +175,7 @@ function KenBurnsViewer({
             <button
               key={i}
               type="button"
+              aria-label={`Ver foto ${i + 1}`}
               onClick={() => setCurrent(i)}
               style={{
                 width: i === current ? 18 : 6,
@@ -481,6 +482,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
 
               <button
                 type="button"
+                aria-label="Cerrar"
                 onClick={onClose}
                 style={{
                   width: 36,
@@ -722,7 +724,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                           borderRadius: 999,
                           background: 'transparent',
                           border: '1px solid rgba(255,255,255,0.10)',
-                          color: 'rgba(255,255,255,0.35)',
+                          color: 'rgba(255,255,255,0.55)',
                           cursor: 'pointer',
                           fontSize: 12,
                           fontFamily: SITE_FONT_STACK,

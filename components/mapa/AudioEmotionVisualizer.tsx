@@ -254,6 +254,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay 
       <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
         <button
           type="button"
+          aria-label={playing ? 'Pausar' : 'Reproducir'}
           onClick={() => void togglePlay()}
           style={{
             width:           48,

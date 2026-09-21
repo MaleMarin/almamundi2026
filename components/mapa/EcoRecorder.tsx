@@ -103,6 +103,7 @@ export function EcoRecorder({
     <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
       <button
         type="button"
+        aria-label={state === 'recording' ? 'Detener grabación' : 'Grabar eco'}
         onClick={state === 'idle' ? start : stop}
         style={{
           width: 48,

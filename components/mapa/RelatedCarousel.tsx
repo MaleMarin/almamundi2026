@@ -221,6 +221,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
           <button
             key={i}
             type="button"
+            aria-label={`Ver historia relacionada ${i + 1}`}
             onClick={() => setActive(i)}
             style={{
               width: i === active ? 20 : 6,

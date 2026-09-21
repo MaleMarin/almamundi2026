@@ -1250,7 +1250,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
       >
-        {err ? <p className={amStyles.amModalInlineError}>{err}</p> : null}
+        {err ? <p className={amStyles.amModalInlineError} role="alert">{err}</p> : null}
         {chosenTopic && mode !== 'texto' && (
           <div
             className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-base"
@@ -2183,7 +2183,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           )}
 
           {err && step !== 'details' && step !== 'received' && (
-            <p className="mt-4 text-base font-medium text-red-600 md:text-lg">{err}</p>
+            <p className="mt-4 text-base font-medium text-red-600 md:text-lg" role="alert">{err}</p>
           )}
         </div>
       </div>
