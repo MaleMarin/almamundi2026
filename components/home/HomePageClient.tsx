@@ -198,7 +198,7 @@ export function HomePageClient() {
   }, [syncModalsFromHash]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+    <main className="font-home min-h-screen overflow-x-hidden bg-[#E0E5EC]">
       {cuentaEliminadaToast ? (
         <div
           role="status"

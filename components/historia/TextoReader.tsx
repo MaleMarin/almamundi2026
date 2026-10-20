@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
@@ -124,7 +124,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             top: '1.2rem',
             left: '1.5rem',
             zIndex: 100,
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 300,
             fontSize: '0.75rem',
             color: SEPIA,
@@ -169,7 +169,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         {/* Fecha */}
         <p
           style={{
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 200,
             fontSize: '0.7rem',
             letterSpacing: '0.3em',
@@ -184,7 +184,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         {/* Título */}
         <h1
           style={{
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 300,
             fontStyle: 'italic',
             fontSize: 'clamp(2rem, 5vw, 3.2rem)',
@@ -200,7 +200,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         {historia.subtitulo && (
           <p
             style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 300,
               fontSize: '1rem',
               color: TINTA_SOFT,
@@ -241,7 +241,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               objectFit: 'cover',
             }}
           />
-          <span style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
+          <span style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
             {historia.autor.nombre}
           </span>
           {historia.autor.ubicacion ? (
@@ -249,7 +249,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
               <span
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 400,
                   fontSize: '0.8rem',
                   letterSpacing: '0.08em',
@@ -266,7 +266,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
               <span
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 200,
                   fontSize: '0.8rem',
                   color: SEPIA,
@@ -285,7 +285,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           {(drop || restOfFirst) && (
             <p
               style={{
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                 lineHeight: 2,
                 color: TINTA,
@@ -296,7 +296,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               {drop && (
                 <span
                   style={{
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontStyle: 'italic',
                     fontSize: isMobile ? '2.5rem' : 'clamp(2.5rem, 6vw, 4rem)',
                     color: SEPIA,
@@ -319,7 +319,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <p
                 key={idx}
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontSize: 'clamp(1rem, 2vw, 1.15rem)',
                   lineHeight: 2,
                   color: TINTA,
@@ -365,7 +365,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             />
             <p
               style={{
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
                 fontSize: '1.3rem',
                 color: TINTA,
@@ -377,7 +377,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             {historia.autor.ubicacion && (
               <p
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 200,
                   fontSize: '0.75rem',
                   textTransform: 'uppercase',
@@ -392,7 +392,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             {historia.autor.bio && (
               <p
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.85rem',
                   color: TINTA_SOFT,
@@ -428,7 +428,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               onClick={onClose}
               style={{
                 ...neu.button,
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
                 fontSize: '0.74rem',
                 letterSpacing: '0.12em',
@@ -447,7 +447,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             type="button"
             onClick={() => setShareOpen(true)}
             style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
               fontSize: '0.74rem',
               letterSpacing: '0.14em',

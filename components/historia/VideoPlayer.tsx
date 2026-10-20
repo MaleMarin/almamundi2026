@@ -5,7 +5,7 @@ import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos'
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock'
 import type { DemoStoryFields } from '@/lib/demo-stories-public'
-import { SITE_FONT_STACK } from '@/lib/typography'
+import { INTERIOR_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -382,7 +382,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
 
           {/* AlmaMundi wordmark */}
           <p style={{
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 200,
             fontSize: '0.7rem',
             letterSpacing: '0.55em',
@@ -399,7 +399,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           <h1
             className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
             style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
               fontWeight: 300,
               fontStyle: 'italic',
@@ -448,7 +448,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               }}
             />
             <span style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 300,
               fontSize: '0.8rem',
               letterSpacing: '0.2em',
@@ -459,7 +459,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             </span>
             {historia.autor.ubicacion ? (
               <span style={{
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 300,
                 fontSize: '0.68rem',
                 letterSpacing: '0.16em',
@@ -544,7 +544,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           }}>
             <div style={{ pointerEvents: 'none' }}>
               <p style={{
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 200,
                 fontSize: '0.65rem',
                 letterSpacing: '0.5em',
@@ -555,7 +555,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               AlmaMundi
             </p>
             <h2 style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
               fontStyle: 'italic',
               fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
@@ -682,7 +682,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
 
                 {/* Time */}
                 <span style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontSize: '0.78rem',
                   fontWeight: 300,
                   color: 'rgba(245,240,232,0.6)',
@@ -707,7 +707,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                     alt={historia.autor.nombre}
                   />
                   <span style={{
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontSize: '0.75rem',
                     fontWeight: 300,
                     color: 'rgba(245,240,232,0.55)',

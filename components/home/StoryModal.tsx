@@ -54,7 +54,6 @@ import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCaptur
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
-import { limpiarNombreFoto } from '@/lib/huella/huellaV2';
 import {
   drawVadResonanceOnCanvas,
   RESONANCE_EXPORT_PX,
@@ -234,10 +233,10 @@ function imprintHuellaSource(args: {
   textBody: string;
   storyTitle: string;
   extraText: string;
-  photoFiles: File[];
+  photoAlts?: string[];
   mediaBlob: Blob | null;
 }): { content: string; charCount: number } {
-  const { mode, textBody, storyTitle, extraText, photoFiles, mediaBlob } = args;
+  const { mode, textBody, storyTitle, extraText, photoAlts = [], mediaBlob } = args;
   const titleBlock = [storyTitle, extraText].filter((s) => s.trim()).join('\n').trim();
 
   if (mode === 'texto') {
@@ -246,12 +245,11 @@ function imprintHuellaSource(args: {
   }
 
   if (mode === 'foto') {
-    const fromNames = photoFiles.map((f) => limpiarNombreFoto(f.name)).filter(Boolean).join(' ');
-    const content = fromNames || titleBlock || textBody.trim() || storyTitle;
-    const rawLen = photoFiles.map((f) => f.name).join(' ').length;
+    const fromAlts = photoAlts.map((s) => s.trim()).filter(Boolean).join('\n');
+    const content = fromAlts || storyTitle.trim() || extraText.trim();
     return {
       content,
-      charCount: Math.max(rawLen + titleBlock.length, content.length, 400),
+      charCount: Math.max(content.length, 400),
     };
   }
 
@@ -270,7 +268,7 @@ type ImprintDrawArgs = {
   textBody: string;
   storyTitle: string;
   extraText: string;
-  photoFiles: File[];
+  photoAlts: string[];
   mediaBlob: Blob | null;
   locale: 'es' | 'pt' | 'en';
   city: string;
@@ -285,7 +283,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     textBody,
     storyTitle,
     extraText,
-    photoFiles,
+    photoAlts,
     mediaBlob,
     locale,
     city,
@@ -301,7 +299,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     textBody,
     storyTitle,
     extraText,
-    photoFiles,
+    photoAlts,
     mediaBlob,
   });
 
@@ -1315,7 +1313,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         textBody,
         storyTitle,
         extraText,
-        photoFiles,
+        photoAlts,
         mediaBlob,
         locale,
         city,
@@ -1332,7 +1330,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     textBody,
     storyTitle,
     extraText,
-    photoFiles,
+    photoAlts,
     mediaBlob,
     locale,
     city,

@@ -1,7 +1,7 @@
 'use client';
 
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 type CancionRelacionadaLineProps = {
   value?: string;
@@ -25,7 +25,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
     return (
       <p
         style={{
-          fontFamily: SITE_FONT_STACK,
+          fontFamily: INTERIOR_FONT_STACK,
           fontWeight: 500,
           fontSize: isDark ? '0.88rem' : '0.92rem',
           letterSpacing: isDark ? '0.06em' : undefined,
@@ -48,7 +48,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
   return (
     <p
       style={{
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         fontWeight: 400,
         fontSize: isDark ? '0.88rem' : '0.95rem',
         lineHeight: 1.5,

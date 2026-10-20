@@ -1,6 +1,6 @@
 'use client';
 
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { neu } from '@/lib/historias-neumorph';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
@@ -174,7 +174,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 type="button"
                 onClick={onClose}
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.75rem',
                   color: CREAM_SOFT,
@@ -193,10 +193,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               </button>
             )}
           </div>
-          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: SITE_FONT_STACK, fontStyle: 'italic', fontSize: '0.95rem', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: INTERIOR_FONT_STACK, fontStyle: 'italic', fontSize: '0.95rem', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {historia.titulo}
           </div>
-          <div style={{ fontFamily: SITE_FONT_STACK, fontWeight: 200, fontSize: '0.75rem', letterSpacing: '0.2em', color: CREAM_MUTED }}>
+          <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 200, fontSize: '0.75rem', letterSpacing: '0.2em', color: CREAM_MUTED }}>
             {fotoActivaIdx + 1} / {imagenes.length}
           </div>
         </header>
@@ -236,7 +236,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
             >
               <h1
                 style={{
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontStyle: 'italic',
                   fontWeight: 300,
                   fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
@@ -313,7 +313,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     {fotoActivaIdx === i && (
                       <p
                         style={{
-                          fontFamily: SITE_FONT_STACK,
+                          fontFamily: INTERIOR_FONT_STACK,
                           fontWeight: 300,
                           fontSize: '0.78rem',
                           color: '#3a3028',
@@ -348,7 +348,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
                   {img.caption && (
-                    <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
                       {img.caption}
                     </p>
                   )}
@@ -371,7 +371,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     }}
                   />
                   {img.caption && (
-                    <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
                       {img.caption}
                     </p>
                   )}
@@ -392,7 +392,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               textAlign: 'center',
               padding: 'clamp(2rem, 5vw, 3.25rem) 1.25rem',
               background: `linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)`,
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
             }}
           >
             <div
@@ -456,7 +456,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     onClick={onClose}
                     style={{
                       ...neu.button,
-                      fontFamily: SITE_FONT_STACK,
+                      fontFamily: INTERIOR_FONT_STACK,
                       fontWeight: 600,
                       fontSize: '0.74rem',
                       letterSpacing: '0.14em',
@@ -475,7 +475,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   type="button"
                   onClick={() => setShareOpen(true)}
                   style={{
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontWeight: 700,
                     fontSize: '0.74rem',
                     letterSpacing: '0.16em',
@@ -528,7 +528,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 border: '2px solid rgba(245,240,232,0.45)',
                 background: 'rgba(0,0,0,0.35)',
                 color: CREAM,
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontSize: '15px',
                 fontWeight: 500,
                 letterSpacing: '0.02em',
@@ -569,7 +569,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 border: '2px solid rgba(245,240,232,0.45)',
                 background: 'rgba(0,0,0,0.35)',
                 color: CREAM,
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontSize: '15px',
                 fontWeight: 500,
                 letterSpacing: '0.02em',

@@ -1,6 +1,5 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import type { Metadata } from 'next';
-import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
   title: 'Contacto · AlmaMundi',
@@ -22,7 +21,7 @@ export default function ContactoPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3rem',
-        fontFamily: INTERIOR_FONT_STACK,
+        fontFamily: 'inherit',
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -41,7 +40,7 @@ export default function ContactoPage() {
         <h1
           style={{
             margin: '0 0 0.5rem',
-            fontFamily: INTERIOR_FONT_STACK,
+            fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 600,
             fontSize: '1.75rem',
@@ -66,7 +65,7 @@ export default function ContactoPage() {
           <h2
             style={{
               margin: '0 0 1rem',
-              fontFamily: INTERIOR_FONT_STACK,
+              fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
               fontSize: '1.1rem',
@@ -78,7 +77,7 @@ export default function ContactoPage() {
           <p
             style={{
               margin: '0 0 1rem',
-              fontFamily: INTERIOR_FONT_STACK,
+              fontFamily: 'inherit',
               fontSize: '0.9rem',
               lineHeight: 1.65,
               color: TEXT_2,
@@ -93,7 +92,7 @@ export default function ContactoPage() {
           <p
             style={{
               margin: 0,
-              fontFamily: INTERIOR_FONT_STACK,
+              fontFamily: 'inherit',
               fontSize: '0.9rem',
               lineHeight: 1.65,
               color: TEXT_2,

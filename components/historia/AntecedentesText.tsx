@@ -1,7 +1,7 @@
 'use client';
 
 import { splitTextWithSafeHttpUrls } from '@/lib/safe-external-href';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 type AntecedentesTextProps = {
   value?: string;
@@ -22,7 +22,7 @@ export function AntecedentesText({ value, tone = 'light' }: AntecedentesTextProp
   return (
     <p
       style={{
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         fontWeight: 400,
         fontSize: isDark ? '0.88rem' : '0.95rem',
         lineHeight: 1.55,

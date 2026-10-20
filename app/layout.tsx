@@ -5,7 +5,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
 import { CookieBanner } from '@/components/ui/CookieBanner';
 import { LocaleProvider } from '@/components/i18n/LocaleProvider';
-import { GlobalSiteChrome } from '@/components/layout/GlobalSiteChrome';
+import { GlobalSiteChrome, SiteFontScope } from '@/components/layout/GlobalSiteChrome';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
@@ -43,24 +43,12 @@ const nunitoSans = Nunito_Sans({
 });
 
 function defaultMetadataBase(): URL {
-  const candidates = [
-    process.env.NEXT_PUBLIC_SITE_URL?.trim(),
-    process.env.NEXT_PUBLIC_APP_URL?.trim(),
-    process.env.PUBLIC_SITE_URL?.trim(),
-  ].filter(Boolean) as string[];
-  for (const raw of candidates) {
-    try {
-      const u = raw.endsWith('/') ? raw.slice(0, -1) : raw;
-      return new URL(u);
-    } catch {
-      /* siguiente */
-    }
+  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://almamundi.org';
+  try {
+    return new URL(raw.endsWith('/') ? raw.slice(0, -1) : raw);
+  } catch {
+    return new URL('https://almamundi.org');
   }
-  const vercel = process.env.VERCEL_URL?.trim();
-  if (vercel) {
-    return new URL(`https://${vercel}`);
-  }
-  return new URL('http://localhost:3000');
 }
 
 const SITE_TITLE = 'AlmaMundi — Entra y cuenta tu historia';
@@ -119,7 +107,7 @@ export default async function RootLayout({
       lang={locale}
       className={`${bebasNeue.variable} ${instrumentSerif.variable} ${syne.variable} ${nunitoSans.variable}`}
     >
-      <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
+      <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-interna">
         <CursorGlobal />
         <a
           href="#main-content"
@@ -151,8 +139,10 @@ export default async function RootLayout({
             */}
             <div className="flex w-full flex-1 flex-col min-h-[calc(100svh+32vh)] bg-[var(--home-bg)]">
               <LocaleProvider initialLocale={locale}>
-                <GlobalSiteChrome>{children}</GlobalSiteChrome>
-                <Footer initialLocale={locale} />
+                <SiteFontScope>
+                  <GlobalSiteChrome>{children}</GlobalSiteChrome>
+                  <Footer initialLocale={locale} />
+                </SiteFontScope>
               </LocaleProvider>
             </div>
           </SmoothScrollProvider>

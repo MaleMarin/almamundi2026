@@ -2,7 +2,7 @@
 
 import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export type HistoriaCreditosProps = {
   nombre?: string;
@@ -42,7 +42,7 @@ export function HistoriaCreditos({
       {nombre?.trim() ? (
         <p
           style={{
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: isDark ? 300 : 500,
             fontSize: isDark ? '0.8rem' : '0.95rem',
             letterSpacing: isDark ? '0.2em' : undefined,
@@ -57,7 +57,7 @@ export function HistoriaCreditos({
       {ubicacion?.trim() ? (
         <p
           style={{
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontWeight: isDark ? 300 : 400,
             fontSize: isDark ? '0.72rem' : '0.8rem',
             letterSpacing: '0.12em',

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { MisDatosPersonalesForm } from './MisDatosPersonalesForm';
 
 export const metadata: Metadata = {
@@ -12,7 +11,7 @@ export default function MisDatosPersonalesPage() {
   return (
     <main
       className="min-h-svh bg-[#e8ecf0]"
-      style={{ fontFamily: INTERIOR_FONT_STACK }}
+      style={{ fontFamily: 'inherit' }}
     >
       <MisDatosPersonalesForm />
     </main>

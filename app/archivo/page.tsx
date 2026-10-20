@@ -12,11 +12,10 @@ import { UniverseBackground } from '@/components/UniverseBackground';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 import { getThemeLabel } from '@/lib/themes';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 const BG = '#0a0f24';
 
-const APP_FONT = INTERIOR_FONT_STACK;
+const APP_FONT = 'inherit';
 
 type ViewMode = 'semana' | 'tema' | 'muestras';
 

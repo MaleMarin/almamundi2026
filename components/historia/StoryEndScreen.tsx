@@ -8,7 +8,7 @@ import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export type StoryEndAutor = {
   nombre: string;
@@ -115,7 +115,7 @@ export function StoryEndScreen({
         justifyContent: 'center',
         overflow: 'auto',
         zIndex: 1,
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         WebkitOverflowScrolling: 'touch',
         padding: '1.25rem',
         backgroundColor: neu.bg,
@@ -133,7 +133,7 @@ export function StoryEndScreen({
         justifyContent: 'center',
         overflow: 'auto',
         zIndex: 10001,
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         WebkitOverflowScrolling: 'touch',
         padding: '1.25rem',
         backgroundColor: neu.bg,
@@ -323,7 +323,7 @@ export function StoryEndScreen({
               flex: '1 1 160px',
               padding: '0.92rem 1rem',
               borderRadius: 999,
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 600,
               fontSize: '0.74rem',
               letterSpacing: '0.22em',
@@ -343,7 +343,7 @@ export function StoryEndScreen({
                 flex: '1 1 160px',
                 padding: '0.92rem 1rem',
                 borderRadius: 999,
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
                 fontSize: '0.74rem',
                 letterSpacing: '0.22em',
@@ -363,7 +363,7 @@ export function StoryEndScreen({
               padding: '0.92rem 1rem',
               borderRadius: 999,
               border: `1px solid rgba(255,74,28,0.32)`,
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
               fontSize: '0.74rem',
               letterSpacing: '0.22em',

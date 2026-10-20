@@ -6,7 +6,7 @@ import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -346,7 +346,7 @@ export default function AudioPlayer({
             <StoryScrollBlock scene>
             <h1
               style={{
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
                 fontWeight: 300,
                 fontSize: 'clamp(1.35rem, 3.6vw, 2.15rem)',
@@ -436,7 +436,7 @@ export default function AudioPlayer({
                 <p
                   className="ap-phrase-in"
                   style={{
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontStyle: 'italic',
                     fontSize: '1.05rem',
                     color: TEXT_BODY,
@@ -484,7 +484,7 @@ export default function AudioPlayer({
                   onChange={seek}
                 />
               </div>
-              <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: TEXT_BODY, letterSpacing: '0.06em' }}>
+              <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: TEXT_BODY, letterSpacing: '0.06em' }}>
                 {formatTime(currentTime)} · · · {formatTime(duration)}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
