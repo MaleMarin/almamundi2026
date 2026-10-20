@@ -1,5 +1,5 @@
 /**
- * Formato interno del carrusel de exposición (normalizado desde historias.json).
+ * Formato interno del carrusel de exposición.
  */
 export type HistoricalExhibitionStory = {
   id: string;

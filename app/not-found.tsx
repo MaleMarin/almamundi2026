@@ -1,4 +1,3 @@
-'use client';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 

@@ -1,5 +1,4 @@
-import { notFound } from 'next/navigation';
-import { getStoryForObservatory } from '@/lib/map-data/stories';
+import { requirePublicStory } from '@/lib/historias/require-public-story';
 import { StoryObservatoryPageClient } from './StoryObservatoryPageClient';
 
 interface PageProps {
@@ -8,7 +7,6 @@ interface PageProps {
 
 export default async function ObservatorioHistoriaPage({ params }: PageProps) {
   const { id } = await params;
-  const story = getStoryForObservatory(id);
-  if (!story) notFound();
+  const story = await requirePublicStory(id);
   return <StoryObservatoryPageClient story={story} />;
 }

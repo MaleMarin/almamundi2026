@@ -18,7 +18,6 @@ import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import { storyGlobeMarkerColor } from '@/lib/huella/story-globe-color';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -238,10 +237,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [stories]
   );
 
-  const realPublishedStories = useMemo(
-    () => storiesOnGlobe.filter((s) => !storyShowsDemoDisclaimer(s)),
-    [storiesOnGlobe]
-  );
+  const realPublishedStories = storiesOnGlobe;
 
   useEffect(() => {
     const handler = (e: Event) => {

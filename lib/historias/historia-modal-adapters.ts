@@ -4,7 +4,6 @@
  */
 import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
-import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
@@ -39,7 +38,6 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
   const ubicacion = storyUbicacionLabel(s);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
-  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -59,7 +57,6 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }
 
@@ -68,7 +65,6 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
   if (imagenes.length === 0) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = storyUbicacionLabel(s);
-  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -86,6 +82,5 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }

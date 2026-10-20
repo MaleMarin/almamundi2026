@@ -11,7 +11,7 @@ import {
   HistoricalExhibitionCarousel,
   type ExhibitionContentMode,
 } from '@/components/stories/HistoricalExhibitionCarousel';
-import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-demo';
+import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 import {
   HISTORIAS_CAROUSEL_ARIA_LABEL,
   HISTORIAS_FILTER_BLOCK_TITLE,

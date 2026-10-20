@@ -14,12 +14,10 @@ import {
   historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
-import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaTextoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
-import { DEMO_TEXT_STORIES } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function isTextStory(s: StoryPoint): boolean {
@@ -40,17 +38,10 @@ export default function HistoriasEscritoPage() {
     queueMicrotask(() => setMounted(true));
   }, []);
 
-  const textStoriesAll = useMemo(() => {
-    const fromApi = allStories.filter(
-      (s) => !isPublicGlobeFallbackDemoId(s.id) && isTextStory(s)
-    );
-    const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos =
-      showPublicDemoStories()
-        ? DEMO_TEXT_STORIES.filter((d) => !apiIds.has(d.id))
-        : [];
-    return [...fromApi, ...demos];
-  }, [allStories]);
+  const textStoriesAll = useMemo(
+    () => allStories.filter((s) => isTextStory(s)),
+    [allStories]
+  );
 
   const yearOptions = useMemo(() => {
     const set = new Set<number>();

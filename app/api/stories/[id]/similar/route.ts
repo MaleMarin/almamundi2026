@@ -5,25 +5,17 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { showPublicDemoStories } from '@/lib/demo-stories-public';
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
   GLOBE_PUBLIC_STORY_CAP,
   isAudiencePublicStoryStatus,
 } from '@/lib/editorial/status';
 import {
-  getDemoStoryPointById,
-  listDemoStoryPoints,
-} from '@/lib/historias/historias-demo-stories';
-import {
-  inferStoryFormat,
   rankRelatedByTone,
   storyToneProfile,
   toneSeedFromFirestoreDoc,
-  toneSeedFromStoryPoint,
   type StoryToneSeed,
 } from '@/lib/huella/related-by-tone';
-import type { StoryPoint } from '@/lib/map-data/stories';
 
 export const runtime = 'nodejs';
 
@@ -50,24 +42,6 @@ function publishedAtIso(raw: unknown): string | null {
   return null;
 }
 
-function similarFromStoryPoint(s: StoryPoint): Rankable {
-  const format = inferStoryFormat(s);
-  const description = (s.excerpt ?? s.quote ?? s.body ?? s.description ?? '').slice(0, 120);
-  return {
-    id: s.id,
-    lat: s.lat,
-    lng: s.lng,
-    title: s.title ?? s.label ?? '',
-    label: s.authorName ?? s.author?.name ?? 'Anónimo',
-    description,
-    city: s.city ?? null,
-    country: s.country ?? null,
-    format,
-    publishedAt: s.publishedAt ?? null,
-    seed: toneSeedFromStoryPoint(s),
-  };
-}
-
 function similarFromFirestore(id: string, d: Record<string, unknown>): Rankable {
   const text = typeof d.text === 'string' ? d.text : '';
   const body = typeof d.body === 'string' ? d.body : '';
@@ -89,7 +63,8 @@ function similarFromFirestore(id: string, d: Record<string, unknown>): Rankable 
 }
 
 function toPublic(item: Rankable): SimilarDoc {
-  const { seed: _seed, ...rest } = item;
+  const { seed, ...rest } = item;
+  void seed;
   return rest;
 }
 
@@ -103,7 +78,6 @@ export async function GET(
 
     let currentSeed: StoryToneSeed | null = null;
     const byId = new Map<string, Rankable>();
-    let includeDemos = id.startsWith('demo-') || showPublicDemoStories();
 
     try {
       const { getAdminDb } = await import('@/lib/firebase/admin');
@@ -127,26 +101,12 @@ export async function GET(
         byId.set(doc.id, similarFromFirestore(doc.id, doc.data() as Record<string, unknown>));
       }
     } catch (err) {
-      console.warn('[/api/stories/[id]/similar] Firestore no disponible; se sigue con demos si aplica.', err);
-    }
-
-    if (!currentSeed) {
-      const demo = getDemoStoryPointById(id);
-      if (demo) {
-        currentSeed = toneSeedFromStoryPoint(demo);
-        includeDemos = true;
-      }
+      console.warn('[/api/stories/[id]/similar] Firestore no disponible.', err);
     }
 
     const currentVad = currentSeed ? storyToneProfile(currentSeed) : null;
     if (!currentVad) {
       return NextResponse.json({ similar: [] });
-    }
-
-    if (includeDemos) {
-      for (const demo of listDemoStoryPoints()) {
-        if (!byId.has(demo.id)) byId.set(demo.id, similarFromStoryPoint(demo));
-      }
     }
 
     const similar = rankRelatedByTone({

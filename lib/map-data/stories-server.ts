@@ -8,7 +8,6 @@
  */
 import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
-import { getDemoStoryPointById } from "@/lib/historias/historias-demo-stories";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
@@ -18,11 +17,6 @@ import {
   GLOBE_PUBLIC_STORY_CAP,
   isAudiencePublicStoryStatus,
 } from "@/lib/editorial/status";
-import {
-  annotatePublicFirestoreStory,
-  DEMO_STORY_NOTICE,
-  showPublicDemoStories,
-} from "@/lib/demo-stories-public";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 
 function publishedAtIso(d: Record<string, unknown>): string | undefined {
@@ -149,17 +143,11 @@ function firestoreDocToStoryPoint(
     weatherTags: (d.weatherTags as string[] | undefined) ?? undefined,
     isBetaDemo: isBetaDemo ? true : undefined,
     editorialStatus: typeof status === "string" ? status : undefined,
+    isRealStory: !isBetaDemo,
     ...accessibility,
   };
 
-  if (isBetaDemo) {
-    return annotatePublicFirestoreStory({
-      ...base,
-      isDemo: true,
-      demoNotice: DEMO_STORY_NOTICE,
-    });
-  }
-  return annotatePublicFirestoreStory({ ...base, isRealStory: true });
+  return base;
 }
 
 export async function getStoriesAsync(): Promise<StoryPoint[]> {
@@ -207,11 +195,6 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
 export type GetStoryByIdOptions = {
   /** Si true, permite devolver documentos no visibles para audiencia (admin/curaduría con token). */
   privilegedReader?: boolean;
-  /**
-   * Relatos locales `demo-*` solo si NEXT_PUBLIC_SHOW_DEMO_STORIES=true
-   * (salvo privilegedReader, donde siempre pueden resolverse para moderación si hiciera falta).
-   */
-  allowPublicDemos?: boolean;
 };
 
 /** Obtiene una historia por id: audiencia general solo ve estados públicos canónicos + legacy. */
@@ -220,18 +203,12 @@ export async function getStoryByIdAsync(
   opts: GetStoryByIdOptions = {}
 ): Promise<StoryPoint | null> {
   if (!id) return null;
-  const { privilegedReader = false, allowPublicDemos = false } = opts;
+  const { privilegedReader = false } = opts;
   try {
     const { getAdminDb } = await import("@/lib/firebase/admin");
     const db = getAdminDb();
     const doc = await db.collection("stories").doc(id).get();
-    if (!doc.exists) {
-      if (privilegedReader || (allowPublicDemos && showPublicDemoStories())) {
-        const demo = getDemoStoryPointById(id);
-        return demo;
-      }
-      return null;
-    }
+    if (!doc.exists) return null;
     const d = doc.data() as Record<string, unknown>;
     if (!privilegedReader && !isAudiencePublicStoryStatus(d.status)) {
       return null;
@@ -239,10 +216,6 @@ export async function getStoryByIdAsync(
     return firestoreDocToStoryPoint(doc.id, d, false);
   } catch (err) {
     console.error("[getStoryByIdAsync]", err);
-    if (privilegedReader || (allowPublicDemos && showPublicDemoStories())) {
-      const demo = getDemoStoryPointById(id);
-      if (demo) return demo;
-    }
     return null;
   }
 }

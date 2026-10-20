@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
-import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { AntecedentesText } from '@/components/historia/AntecedentesText';
@@ -32,7 +30,6 @@ export interface HistoriaTexto {
     bio?: string;
   };
   tags?: string[];
-  demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
   antecedentes?: string;
 }
@@ -159,12 +156,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           boxSizing: 'border-box',
         }}
       >
-        {historia.demoStory ? (
-          <div style={{ marginBottom: '1.25rem', maxWidth }}>
-            <DemoStoryDisclosure story={historia.demoStory} variant="page" onLightBackground />
-          </div>
-        ) : null}
-
         <StoryScrollBlock scene>
         {/* Fecha */}
         <p

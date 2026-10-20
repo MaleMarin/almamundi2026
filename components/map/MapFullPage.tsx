@@ -52,8 +52,7 @@ import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { showPublicDemoStories } from '@/lib/demo-stories-public';
-import { STORIES_MOCK, SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
+import { SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
 import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT, globePovForViewerTimeZone } from '@/lib/map-data/globe-pov';
 import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { MAP_HEADER_GRADIENT, MAP_STAGE_GRADIENT } from '@/lib/map-data/stage-theme';
@@ -2493,8 +2492,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     return () => cancelAnimationFrame(raf);
   }, []);
 
-  /** true mientras el tour use STORIES_MOCK: no navegar a /historias/[id], solo highlight + pointOfView */
-  const tourUsesMockStoriesRef = useRef(true);
+  /** true solo si el tour usa metadatos locales (ya no hay mocks). */
+  const tourUsesMockStoriesRef = useRef(false);
   /** Timer de auto-avance del viaje (30s); se limpia al pausar y se reinicia al reanudar. */
   const tourTimerRef = useRef<number | null>(null);
   const nextChapterRef = useRef<() => void>(() => {});
@@ -2547,11 +2546,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   /** Al entrar a Sonidos del mundo, mood por defecto para no mostrar "—" */
   /** music_logic_make_it_obvious_v1: estado inicial sin mood; el usuario elige un chip. */
 
-  /** Metadatos demo del viaje “Sintoniza el Mundo”: solo si `NEXT_PUBLIC_SHOW_DEMO_STORIES=true`. */
-  const publicStoriesMock = useMemo(
-    () => (showPublicDemoStories() ? STORIES_MOCK : []),
-    []
-  );
+  const publicStoriesMock = useMemo(() => [] as StoryMeta[], []);
 
   /** Historias filtradas por sonido (mood); orden: con audio/video primero, luego por título. */
   const filteredStoriesForMusic = useMemo(() => {

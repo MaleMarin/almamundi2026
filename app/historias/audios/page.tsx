@@ -7,57 +7,21 @@
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ReactDOM from 'react-dom';
-import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer';
+import AudioPlayer from '@/components/historia/AudioPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
-import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 import {
   historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
-import {
-  demoStoryFieldsFromPoint,
-  isPublicGlobeFallbackDemoId,
-  showPublicDemoStories,
-} from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionAudio } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
-import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
-import { DEMO_AUDIO_STORIES } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function isAudioStory(s: StoryPoint): boolean {
   return Boolean(s.audioUrl || (s as StoryPoint & { hasAudio?: boolean }).hasAudio);
-}
-
-function storyToHistoriaAudioOrDemo(s: StoryPoint): HistoriaAudio {
-  const demoStory = demoStoryFieldsFromPoint(s);
-  if (s.id.startsWith('demo-audio-')) {
-    const m = MOCK_STORIES.audio;
-    const nombre = s.authorName ?? m.autor.nombre;
-    return {
-      id: s.id,
-      titulo: s.title ?? m.titulo,
-      subtitulo: s.subtitle ?? m.subtitulo,
-      audioUrl: (s.audioUrl ?? m.audioUrl).trim(),
-      thumbnailUrl: s.thumbnailUrl ?? m.thumbnailUrl,
-      duracion: m.duracion,
-      fecha: s.publishedAt?.slice(0, 10) ?? m.fecha,
-      citaDestacada: s.quote ?? m.citaDestacada,
-      frases: m.frases,
-      autor: {
-        nombre,
-        avatar: s.author?.avatar ?? m.autor.avatar,
-        ubicacion: storyUbicacionLabel(s) || m.autor.ubicacion,
-        bio: (m.autor as { bio?: string }).bio,
-      },
-      tags: s.tags ?? m.tags,
-      ...(demoStory ? { demoStory } : {}),
-    };
-  }
-  return storyToHistoriaAudio(s);
 }
 
 export default function HistoriasAudiosPage() {
@@ -74,17 +38,10 @@ export default function HistoriasAudiosPage() {
     queueMicrotask(() => setMounted(true));
   }, []);
 
-  const audioStoriesAll = useMemo(() => {
-    const fromApi = allStories.filter(
-      (s) => !isPublicGlobeFallbackDemoId(s.id) && isAudioStory(s)
-    );
-    const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos =
-      showPublicDemoStories()
-        ? DEMO_AUDIO_STORIES.filter((d) => !apiIds.has(d.id))
-        : [];
-    return [...fromApi, ...demos];
-  }, [allStories]);
+  const audioStoriesAll = useMemo(
+    () => allStories.filter((s) => isAudioStory(s)),
+    [allStories]
+  );
 
   const yearOptions = useMemo(() => {
     const set = new Set<number>();
@@ -172,7 +129,7 @@ export default function HistoriasAudiosPage() {
     setFilterKeywords('');
   }, []);
 
-  const historiaParaPlayer = selectedForAudio ? storyToHistoriaAudioOrDemo(selectedForAudio) : null;
+  const historiaParaPlayer = selectedForAudio ? storyToHistoriaAudio(selectedForAudio) : null;
 
   return (
     <>

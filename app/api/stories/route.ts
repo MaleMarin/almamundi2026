@@ -1,19 +1,16 @@
 /**
  * GET /api/stories
- * Retorna las historias publicadas para el globo.
- * Cache 60s para no sobrecargar Firestore.
+ * Historias publicadas para el globo (solo Firestore).
  */
 
 import { NextResponse } from 'next/server';
-import { mergeGlobeFirestoreWithDemoFallback, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { getStoriesAsync } from '@/lib/map-data/stories-server';
 
 export const revalidate = 60;
 
 export async function GET() {
   try {
-    const fromFs = await getStoriesAsync();
-    const stories = showPublicDemoStories() ? mergeGlobeFirestoreWithDemoFallback(fromFs) : fromFs;
+    const stories = await getStoriesAsync();
     return NextResponse.json(
       { stories },
       {

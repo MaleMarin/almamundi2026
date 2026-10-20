@@ -7,12 +7,9 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { useParams } from 'next/navigation';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
-import { showPublicDemoStories, storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
-import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
+
 type SimilarStory = {
   id: string;
   title: string;
@@ -41,78 +38,24 @@ function timeAgo(publishedAt: string | undefined): string {
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
 }
 
-export default function HistoriasIdPageClient() {
-  const params = useParams();
-  const id = params?.id as string;
-  const [story, setStory] = useState<StoryPoint | null>(null);
+export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) {
   const [similar, setSimilar] = useState<SimilarStory[]>([]);
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!id) return;
     let cancelled = false;
-    fetch(`/api/stories/${id}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data: { story?: StoryPoint } | null) => {
-        if (cancelled) return;
-        if (data?.story) {
-          setStory(data.story);
-        } else if (showPublicDemoStories() && id.startsWith('demo-')) {
-          const demo = getDemoStoryPointById(id);
-          if (demo) setStory(demo);
-        }
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [id]);
-
-  useEffect(() => {
-    if (!id) return;
-    let cancelled = false;
-    fetch(`/api/stories/${id}/similar`)
+    fetch(`/api/stories/${story.id}/similar`)
       .then((r) => (r.ok ? r.json() : { similar: [] }))
       .then((data: { similar?: SimilarStory[] }) => {
-        if (!cancelled && Array.isArray(data.similar)) setSimilar(data.similar.filter((s) => s.id !== id));
+        if (!cancelled && Array.isArray(data.similar)) setSimilar(data.similar.filter((s) => s.id !== story.id));
       });
     return () => {
       cancelled = true;
     };
-  }, [id]);
-
-  if (loading) {
-    return (
-      <main
-        className={`${historiasInterior.mainClassName} flex flex-col`}
-        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-      >
-          <div className="flex flex-1 flex-col items-center justify-center">
-            <p style={{ color: neu.textBody }}>Cargando…</p>
-          </div>
-        </main>
-    );
-  }
-  if (!story) {
-    return (
-      <main
-        className={`${historiasInterior.mainClassName} flex flex-col items-center justify-center gap-4 px-6`}
-        style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}
-      >
-          <p style={{ color: neu.textBody }}>No encontramos esta historia.</p>
-          <Link href="/historias" className="btn-almamundi px-6 py-3 rounded-full font-medium" style={{ ...neu.button, color: neu.textMain }}>
-            ← Historias
-        </Link>
-      </main>
-    );
-  }
+  }, [story.id]);
 
   const place = formatPlace(story);
   const hasVideo = Boolean(story.videoUrl || story.hasVideo);
   const hasAudio = Boolean(story.audioUrl || story.hasAudio);
-  const hasBody = Boolean((story.body ?? '').trim());
   const hasImage = Boolean(story.imageUrl || (story as StoryPoint & { images?: string[] }).images?.length);
 
   return (
@@ -122,12 +65,6 @@ export default function HistoriasIdPageClient() {
           <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>
             ← Historias
           </Link>
-
-          {storyShowsDemoDisclaimer(story) ? (
-            <div className="mb-8 max-w-2xl">
-              <DemoStoryDisclosure story={story} variant="page" onLightBackground />
-            </div>
-          ) : null}
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
             <div>

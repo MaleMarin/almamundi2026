@@ -14,12 +14,10 @@ import {
   historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
-import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaFotoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
-import { DEMO_FOTO_STORIES } from '@/lib/historias/historias-demo-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function isPhotoStory(s: StoryPoint): boolean {
@@ -41,17 +39,10 @@ export default function HistoriasFotosPage() {
     queueMicrotask(() => setMounted(true));
   }, []);
 
-  const photoStoriesAll = useMemo(() => {
-    const fromApi = allStories.filter(
-      (s) => !isPublicGlobeFallbackDemoId(s.id) && isPhotoStory(s)
-    );
-    const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos =
-      showPublicDemoStories()
-        ? DEMO_FOTO_STORIES.filter((d) => !apiIds.has(d.id))
-        : [];
-    return [...fromApi, ...demos];
-  }, [allStories]);
+  const photoStoriesAll = useMemo(
+    () => allStories.filter((s) => isPhotoStory(s)),
+    [allStories]
+  );
 
   const yearOptions = useMemo(() => {
     const set = new Set<number>();

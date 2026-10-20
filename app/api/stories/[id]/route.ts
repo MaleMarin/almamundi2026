@@ -19,7 +19,6 @@ export async function GET(
   const admin = await getAdminSessionIfPresent(req);
   const story = await getStoryByIdAsync(id, {
     privilegedReader: Boolean(admin),
-    allowPublicDemos: true,
   });
   if (!story) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(

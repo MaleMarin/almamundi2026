@@ -3,8 +3,6 @@
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
-import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { neu } from '@/lib/historias-neumorph';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
@@ -38,7 +36,6 @@ export interface HistoriaAudio {
   /** Texto accesible del audio (sinónimo API: `transcript`). */
   transcripcion?: string;
   transcript?: string;
-  demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
   antecedentes?: string;
 }
@@ -292,18 +289,6 @@ export default function AudioPlayer({
                 }),
           }}
         >
-          {historia.demoStory ? (
-            <div
-              style={{
-                width: '100%',
-                maxWidth: 520,
-                marginBottom: '1rem',
-                flexShrink: 0,
-              }}
-            >
-              <DemoStoryDisclosure story={historia.demoStory} variant="page" />
-            </div>
-          ) : null}
           {onClose ? (
             <button
               type="button"
@@ -631,7 +616,6 @@ export default function AudioPlayer({
           autor={historia.autor}
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
-          demoStory={historia.demoStory}
           cancionRelacionada={historia.cancionRelacionada}
           antecedentes={historia.antecedentes}
           embedInSite={presentation === 'embed'}

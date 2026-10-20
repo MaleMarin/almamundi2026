@@ -2,8 +2,6 @@
 
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { neu } from '@/lib/historias-neumorph';
-import type { DemoStoryFields } from '@/lib/demo-stories-public';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
@@ -28,7 +26,6 @@ export interface HistoriaFoto {
     ubicacion?: string;
   };
   tags?: string[];
-  demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
   antecedentes?: string;
 }
@@ -211,17 +208,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
             paddingTop: siteLayout ? 0 : 56,
           }}
         >
-          {historia.demoStory ? (
-            <div
-              style={{
-                padding: '12px 1.25rem 8px',
-                maxWidth: 640,
-                margin: '0 auto',
-              }}
-            >
-              <DemoStoryDisclosure story={historia.demoStory} variant="page" />
-            </div>
-          ) : null}
           <StoryScrollBlock scene>
             <section
               style={{

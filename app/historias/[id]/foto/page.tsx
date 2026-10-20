@@ -1,11 +1,10 @@
 /**
  * /historias/[id]/foto — Álbum de fotos (FotoAlbum).
- * Server component: carga la historia desde Firestore; si no tiene imágenes, redirige al detalle.
+ * Server component: historia inexistente → HTTP 404; sin imágenes → redirige al detalle.
  */
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
-import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
+import { requirePublicStory } from '@/lib/historias/require-public-story';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
 import { FotoAlbumClient } from './FotoAlbumClient';
@@ -35,7 +34,6 @@ function buildImagenes(s: StoryPoint): { url: string; caption?: string; descripc
 function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string; descripcion?: string }[]): HistoriaFoto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = storyUbicacionLabel(s);
-  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -50,7 +48,6 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }
 
@@ -63,8 +60,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HistoriasIdFotoPage({ params }: PageProps) {
   const { id } = await params;
-  const story = await getStoryByIdAsync(id);
-  if (!story) redirect(`/historias/${id}`);
+  const story = await requirePublicStory(id);
   const imagenes = buildImagenes(story);
   if (imagenes.length === 0) redirect(`/historias/${id}`);
   const historia = storyToHistoriaFoto(story, imagenes);

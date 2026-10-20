@@ -14,11 +14,9 @@ import {
   historiasListFormatExpoLabel,
   historiasListFormatOrangeKicker,
 } from '@/lib/historias/historias-format-list-ui';
-import { isPublicGlobeFallbackDemoId, showPublicDemoStories } from '@/lib/demo-stories-public';
 import { storyPointToHistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
-import { DEMO_VIDEO_STORIES } from '@/lib/demo-video-stories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyToVideoHistoria } from '@/lib/historias/video-adapter';
 
@@ -40,17 +38,10 @@ export default function HistoriasVideosPage() {
     queueMicrotask(() => setMounted(true));
   }, []);
 
-  const videoStoriesAll = useMemo(() => {
-    const fromApi = allStories.filter(
-      (s) => !isPublicGlobeFallbackDemoId(s.id) && isVideoStory(s)
-    );
-    const apiIds = new Set(fromApi.map((s) => s.id));
-    const demos =
-      showPublicDemoStories()
-        ? DEMO_VIDEO_STORIES.filter((d) => !apiIds.has(d.id))
-        : [];
-    return [...fromApi, ...demos];
-  }, [allStories]);
+  const videoStoriesAll = useMemo(
+    () => allStories.filter((s) => isVideoStory(s)),
+    [allStories]
+  );
 
   const yearOptions = useMemo(() => {
     const set = new Set<number>();

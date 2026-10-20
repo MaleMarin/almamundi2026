@@ -1,8 +1,6 @@
 'use client';
 
 import { useState, type CSSProperties } from 'react';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
-import type { DemoStoryFields } from '@/lib/demo-stories-public';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
@@ -37,7 +35,6 @@ export type StoryEndScreenProps = {
   onReplay: () => void;
   onMoreStories: () => void;
   thumbnailUrl?: string;
-  demoStory?: DemoStoryFields;
   cancionRelacionada?: string;
   antecedentes?: string;
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
@@ -87,7 +84,6 @@ export function StoryEndScreen({
   onReplay,
   onMoreStories,
   thumbnailUrl,
-  demoStory,
   cancionRelacionada,
   antecedentes,
   embedInSite = false,
@@ -188,12 +184,6 @@ export function StoryEndScreen({
           boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(163,177,198,0.26)`,
         }}
       >
-        {demoStory ? (
-          <div style={{ marginBottom: '1.35rem', textAlign: 'left' }}>
-            <DemoStoryDisclosure story={demoStory} variant="page" onLightBackground />
-          </div>
-        ) : null}
-
         <h2
           style={{
             fontWeight: 600,

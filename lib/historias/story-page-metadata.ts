@@ -49,22 +49,9 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
   if (!story) {
     return {
       metadataBase,
-      title: { absolute: 'Historia · AlmaMundi' },
+      title: { absolute: '404 · AlmaMundi' },
       description: FALLBACK_DESCRIPTION,
-      openGraph: {
-        title: 'Historia · AlmaMundi',
-        description: FALLBACK_DESCRIPTION,
-        images: [{ url: SITE_OG_IMAGE, width: 1200, height: 630, alt: 'AlmaMundi' }],
-        type: 'article',
-        locale: 'es_CL',
-        siteName: 'AlmaMundi',
-      },
-      twitter: {
-        card: 'summary_large_image',
-        title: 'Historia · AlmaMundi',
-        description: FALLBACK_DESCRIPTION,
-        images: [SITE_OG_IMAGE],
-      },
+      robots: { index: false, follow: false },
     };
   }
 

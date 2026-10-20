@@ -29,8 +29,7 @@ const HOME_HEADER_SHELL =
   'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[12.25rem] lg:h-[13.5rem] bg-[#E0E5EC]/70 backdrop-blur-lg border-b border-white/20 font-sans';
 
 /**
- * Reproductores en portal (audio z-9999, texto z-1000…): masthead debe quedar por encima
- * pero por debajo de `DemoStoryDisclosure` (z-12000 en video).
+ * Reproductores en portal (audio z-9999, texto z-1000…): masthead por encima del contenido.
  */
 const HEADER_Z_LAYER_IMMERSIVE = 'z-[11000]';
 

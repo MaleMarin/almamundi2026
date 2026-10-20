@@ -3,8 +3,6 @@
 import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
-import { storyShowsDemoDisclaimer } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 export type StoriesPanelProps = {
@@ -130,11 +128,6 @@ function StoryRow({
         </span>
       </div>
     </button>
-      {storyShowsDemoDisclaimer(story) ? (
-        <div style={{ padding: '0 12px 12px' }}>
-          <DemoStoryDisclosure story={story} variant="panel" />
-        </div>
-      ) : null}
     </div>
   );
 }

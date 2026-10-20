@@ -28,11 +28,10 @@ import {
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 
-import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-demo';
+import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 
 import { EthicalShareFlow, EthicalShareTriggerButton } from './EthicalShareFlow';
 import { ResonanceMailbox } from './ResonanceMailbox';
-import { DemoStoryDisclosure } from '@/components/stories/DemoStoryDisclosure';
 
 export type ExhibitionContentMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -75,9 +74,12 @@ export type HistoricalExhibitionCarouselProps = {
 /** Ligeramente mayor que 15 cm a 96dpi; sin pasarse de ancho móvil */
 const SLIDE_PX = 620;
 
-/** Galería minimalista (techos altos): plano Z lejano; el carrusel va delante con paralaje. */
+/** Fondo oscuro local (sin imagen externa) si no hay `backgroundImageUrl`. */
 const HALL_DEFAULT_IMAGE =
-  'https://images.unsplash.com/photo-1518996993268-4e0ccecd3e35?auto=format&fit=crop&w=2400&q=80';
+  'data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><rect fill="#0c0e16" width="16" height="9"/></svg>'
+  );
 
 function segmentForMode(mode: ExhibitionContentMode): string {
   if (mode === 'audio') return 'audio';
@@ -493,7 +495,7 @@ export function HistoricalExhibitionCarousel({
                       }}
                     >
                       <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.35)]">
-                        {/* eslint-disable-next-line @next/next/no-img-element -- URLs externas (picsum, etc.) */}
+                        {/* eslint-disable-next-line @next/next/no-img-element -- portada de la historia */}
                         <img
                           src={h.imagen_principal}
                           alt=""
@@ -522,20 +524,6 @@ export function HistoricalExhibitionCarousel({
                           </button>
                         ) : null}
                       </div>
-
-                      {h.isDemoStory ? (
-                        <div className="mt-2.5 shrink-0 rounded-xl border border-orange-400/35 bg-orange-400/8 px-1 py-0.5 sm:px-2">
-                          <DemoStoryDisclosure
-                            variant="card"
-                            story={{
-                              id: h.id,
-                              isDemo: true,
-                              isRealStory: false,
-                              demoNotice: h.demoNotice,
-                            }}
-                          />
-                        </div>
-                      ) : null}
 
                       <div className="relative z-10 mt-3 shrink-0 space-y-2 sm:mt-4">
                         <h3 className="text-[1.0625rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-[1.175rem]">
@@ -630,7 +618,7 @@ export function HistoricalExhibitionCarousel({
                           : 'relative min-h-0 flex-1 overflow-hidden rounded-xl bg-black/20'
                       }
                     >
-                      {/* eslint-disable-next-line @next/next/no-img-element -- URLs externas (picsum, etc.) */}
+                      {/* eslint-disable-next-line @next/next/no-img-element -- portada de la historia */}
                       <img src={h.imagen_principal} alt="" className="h-full w-full object-cover" />
                       <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/58 via-black/14 to-transparent" />
                       {slideIdx === activeIndex && openHandler && canOpenPrimary(h, contentMode) ? (
@@ -665,19 +653,6 @@ export function HistoricalExhibitionCarousel({
                         </div>
                       ) : null}
                     </div>
-                    {h.isDemoStory ? (
-                      <div className="mt-3 shrink-0">
-                        <DemoStoryDisclosure
-                          variant="card"
-                          story={{
-                            id: h.id,
-                            isDemo: true,
-                            isRealStory: false,
-                            demoNotice: h.demoNotice,
-                          }}
-                        />
-                      </div>
-                    ) : null}
                     <div className="mt-4 shrink-0 space-y-2">
                       <h3
                         className={
@@ -755,19 +730,6 @@ export function HistoricalExhibitionCarousel({
                 >
                   {metaLine}
                 </p>
-                {active.isDemoStory ? (
-                  <div className="pointer-events-auto mt-2 max-w-sm">
-                    <DemoStoryDisclosure
-                      variant="panel"
-                      story={{
-                        id: active.id,
-                        isDemo: true,
-                        isRealStory: false,
-                        demoNotice: active.demoNotice,
-                      }}
-                    />
-                  </div>
-                ) : null}
               </div>
             </div>
           </div>

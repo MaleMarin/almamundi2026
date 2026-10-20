@@ -1,17 +1,15 @@
 /**
  * /historias/[id]/texto — Página de lectura (TextoReader).
- * Server component: carga la historia desde Firestore; si no tiene texto, redirige al detalle.
+ * Server component: historia inexistente → HTTP 404; sin texto → redirige al detalle.
  */
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
-import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
+import { requirePublicStory } from '@/lib/historias/require-public-story';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
 import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
-import { getDemoStoryPointById } from '@/lib/historias/historias-demo-stories';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
 
 function defaultAvatar(name: string): string {
@@ -25,7 +23,6 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
   const ubicacion = storyUbicacionLabel(s);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
-  const demoStory = demoStoryFieldsFromPoint(s);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -42,7 +39,6 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }
 
@@ -55,10 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 export default async function HistoriasIdTextoPage({ params }: PageProps) {
   const { id } = await params;
-  const story =
-    (await getStoryByIdAsync(id)) ??
-    (id.startsWith('demo-texto-') ? getDemoStoryPointById(id) : null);
-  if (!story) redirect(`/historias/${id}`);
+  const story = await requirePublicStory(id);
   const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
   if (!contenido) redirect(`/historias/${id}`);
   const historia = storyToHistoriaTexto(story, contenido);

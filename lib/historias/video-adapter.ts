@@ -2,7 +2,6 @@
  * Adaptador StoryPoint → Historia para VideoPlayer.
  */
 import type { Historia } from '@/components/historia/VideoPlayer';
-import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { defaultAvatar } from '@/lib/historias/audio-adapter';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
@@ -29,7 +28,6 @@ function resolveThumbnail(s: StoryPoint): string {
 export function storyToVideoHistoria(s: StoryPoint): Historia {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = storyUbicacionLabel(s);
-  const demoStory = demoStoryFieldsFromPoint(s);
   const videoUrl = (s.videoUrl ?? '').trim();
 
   return {
@@ -51,6 +49,5 @@ export function storyToVideoHistoria(s: StoryPoint): Historia {
     subtitulos: s.captionsUrl,
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }

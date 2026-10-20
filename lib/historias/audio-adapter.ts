@@ -3,7 +3,6 @@
  * Compartido por /historias/audios (reproductor in-place) y /historias/[id]/audio.
  */
 import type { HistoriaAudio } from '@/components/historia/AudioPlayer';
-import { demoStoryFieldsFromPoint } from '@/lib/demo-stories-public';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { captionPhrasesFromTranscription } from '@/lib/historias/story-accessibility';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
@@ -18,7 +17,6 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
   const ubicacion = storyUbicacionLabel(s);
   const thumb = s.imageUrl ?? s.thumbnailUrl ?? '';
-  const demoStory = demoStoryFieldsFromPoint(s);
   const transcription = s.transcription?.trim();
   const frases =
     s.captionPhrases ??
@@ -44,6 +42,5 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...(demoStory ? { demoStory } : {}),
   };
 }
