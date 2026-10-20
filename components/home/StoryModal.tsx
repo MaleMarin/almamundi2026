@@ -1448,23 +1448,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
         {mode === 'video' && (
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
+            <div className={amStyles.amModalTabs}>
               <button
                 type="button"
                 onClick={() => switchAvSource('grabar')}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
+                className={amStyles.amModalTab}
                 style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
-                <Video className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                <Video className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVideo}
               </button>
               <button
                 type="button"
                 onClick={() => switchAvSource('archivo')}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
+                className={amStyles.amModalTab}
                 style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
-                <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
               </button>
             </div>
@@ -1664,23 +1664,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
         {mode === 'audio' && (
           <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
+            <div className={amStyles.amModalTabs}>
               <button
                 type="button"
                 onClick={() => switchAvSource('grabar')}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
+                className={amStyles.amModalTab}
                 style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
-                <Mic className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                <Mic className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVoice}
               </button>
               <button
                 type="button"
                 onClick={() => switchAvSource('archivo')}
-                className="rounded-full px-4 py-2 text-sm font-semibold"
+                className={amStyles.amModalTab}
                 style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
-                <Link2 className="mr-1.5 inline h-4 w-4 align-text-bottom" aria-hidden />
+                <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 Subir audio o pegar enlace
               </button>
             </div>
@@ -1946,10 +1946,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
   return (
     <div
-      className={`fixed inset-0 z-[220] flex items-center justify-center ${
+      className={`story-submit-modal font-interna fixed inset-0 z-[220] flex items-center justify-center ${
         step === 'received' ? 'p-4' : 'p-3 sm:p-4'
       }`}
-      style={{ backgroundColor: 'rgba(15, 23, 42, 0.45)', backdropFilter: 'blur(6px)' }}
+      style={{
+        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+        backdropFilter: 'blur(6px)',
+        fontFamily: APP_FONT,
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}

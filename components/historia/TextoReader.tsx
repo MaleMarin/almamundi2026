@@ -170,7 +170,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         <p
           style={{
             fontFamily: INTERIOR_FONT_STACK,
-            fontWeight: 200,
+            fontWeight: 400,
             fontSize: '0.7rem',
             letterSpacing: '0.3em',
             textTransform: 'uppercase',
@@ -185,7 +185,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         <h1
           style={{
             fontFamily: INTERIOR_FONT_STACK,
-            fontWeight: 300,
+            fontWeight: 400,
             fontStyle: 'italic',
             fontSize: 'clamp(2rem, 5vw, 3.2rem)',
             color: TINTA,
@@ -201,10 +201,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           <p
             style={{
               fontFamily: INTERIOR_FONT_STACK,
-              fontWeight: 300,
+              fontWeight: 400,
               fontSize: '1rem',
               color: TINTA_SOFT,
-              lineHeight: 1.6,
+              lineHeight: 1.7,
               marginBottom: '1.5rem',
             }}
           >

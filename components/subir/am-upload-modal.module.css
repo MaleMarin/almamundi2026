@@ -81,25 +81,26 @@
 }
 
 .amModalTitle {
-  font-size: clamp(26px, 4vw, 34px);
+  font-size: clamp(1rem, 4.5vw, 1.85rem);
   font-weight: 400;
   color: #1c1c2e;
-  line-height: 1.25;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
   margin: 0 0 16px;
   white-space: pre-line;
 }
 
 .amModalSubtitle {
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 400;
   color: #6b6b7b;
-  line-height: 1.6;
+  line-height: 1.55;
   margin: 0 0 6px;
 }
 
 .amModalLimit {
   font-size: 14px;
-  font-weight: 300;
+  font-weight: 400;
   color: #6b6b7b;
   margin: 0 0 32px;
 }
@@ -202,9 +203,9 @@
   padding: 16px;
   font-family: inherit;
   font-size: 15px;
-  font-weight: 300;
+  font-weight: 400;
   color: #1c1c2e;
-  line-height: 1.65;
+  line-height: 1.7;
   resize: vertical;
   outline: none;
   transition: border-color 0.2s;
@@ -338,14 +339,51 @@
   }
 }
 
+.amModalTabs {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+}
+
+.amModalTab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 44px;
+  border-radius: 999px;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+}
+
+.amModalTab svg {
+  flex-shrink: 0;
+}
+
 @media (max-width: 480px) {
   .amModalCard {
-    padding: 24px 20px;
+    padding: 24px 16px;
     border-radius: 16px;
   }
 
   .amModalTitle {
-    font-size: 24px;
+    font-size: clamp(1rem, 4.5vw, 1.22rem);
+    letter-spacing: -0.025em;
+  }
+
+  .amModalTab {
+    font-size: 10.5px;
+    padding: 8px 4px;
+    letter-spacing: -0.03em;
+  }
+
+  .amModalTab svg {
+    display: none;
   }
 
   .amFotoGrid {
@@ -355,5 +393,24 @@
   .amCaptureEditorialPanel {
     padding: 24px 20px;
     border-radius: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .amModalTitle {
+    font-size: clamp(0.98rem, 4.7vw, 1.1rem);
+  }
+
+  .amModalTab {
+    font-size: 10px;
+    padding: 8px 8px;
+  }
+
+  .amModalTab:first-child {
+    flex: 0 1 auto;
+  }
+
+  .amModalTab:last-child {
+    flex: 1 1 auto;
   }
 }

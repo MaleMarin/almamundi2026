@@ -198,7 +198,8 @@ export function HomePageClient() {
   }, [syncModalsFromHash]);
 
   return (
-    <main className="font-home min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+    <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+      <div className="font-home">
       {cuentaEliminadaToast ? (
         <div
           role="status"
@@ -252,19 +253,20 @@ export function HomePageClient() {
       />
       <MapSectionLocked />
 
+      <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
+      <PropositoModal
+        isOpen={propositoOpen}
+        onClose={closeProposito}
+        onGoToHistorias={goToHistoriasFromProposito}
+      />
+      </div>
+
       <StoryModal
         isOpen={storyOpen}
         onClose={closeStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
         onClearTopic={() => setChosenTopic(null)}
-      />
-
-      <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
-      <PropositoModal
-        isOpen={propositoOpen}
-        onClose={closeProposito}
-        onGoToHistorias={goToHistoriasFromProposito}
       />
     </main>
   );

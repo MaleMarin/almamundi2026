@@ -47,6 +47,15 @@
   font-family: var(--font-sans);
 }
 
+/* Modales de envío: Montserrat aunque el ancestro sea la pila de la home. */
+.story-submit-modal {
+  font-family: var(--font-interna), system-ui, sans-serif;
+}
+
+.story-submit-modal :is(input, textarea, select, button) {
+  font-family: inherit;
+}
+
 @layer base {
   html {
     font-family: var(--font-interna), system-ui, sans-serif;

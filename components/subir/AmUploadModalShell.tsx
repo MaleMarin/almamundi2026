@@ -73,5 +73,5 @@ export function AmUploadModalShell({
 
   if (cardOnly) return card;
 
-  return <div className={styles.amModalOverlay}>{card}</div>;
+  return <div className={`${styles.amModalOverlay} font-interna story-submit-modal`}>{card}</div>;
 }

@@ -65,8 +65,9 @@ function Section({
       <div
         style={{
           fontFamily: 'inherit',
-          fontSize: '0.9rem',
-          lineHeight: 1.65,
+          fontSize: '0.95rem',
+          lineHeight: 1.75,
+          letterSpacing: '0.01em',
           color: TEXT_2,
         }}
       >

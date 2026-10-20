@@ -11,10 +11,10 @@ import { SiteBreadcrumbs } from '@/components/layout/SiteBreadcrumbs';
 import { historiasInterior } from '@/lib/historias-neumorph';
 
 function isHomePath(pathname: string): boolean {
-  return pathname === '/' || pathname === '/contar' || pathname.startsWith('/contar/');
+  return pathname === '/';
 }
 
-/** Nunito en todo el sitio; la home y /contar conservan la pila actual. */
+/** Montserrat en todo el sitio; la home conserva la pila actual. */
 export function SiteFontScope({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/';
   return (
