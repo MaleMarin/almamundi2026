@@ -56,6 +56,13 @@
   font-family: inherit;
 }
 
+/* Mínimo 16px: iPhone no hace zoom automático al enfocar el campo. */
+input:not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']):not([type='color']):not([type='file']):not([type='button']):not([type='submit']):not([type='reset']):not([type='image']),
+textarea,
+select {
+  font-size: max(16px, 1em) !important;
+}
+
 @layer base {
   html {
     font-family: var(--font-interna), system-ui, sans-serif;
@@ -788,3 +795,7 @@ html[data-cursor-global="on"] *::after {
 }
 
 /* Muestras cinematográficas: hero en flujo (min 100svh); el footer global va debajo; scroll natural tras la última tarjeta. */
+
+html body :is(input, textarea, select):not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']):not([type='color']):not([type='file']) {
+  font-size: 16px !important;
+}

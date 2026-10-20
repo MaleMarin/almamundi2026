@@ -286,8 +286,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             <p
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
-                fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-                lineHeight: 2,
+                fontSize: '1rem',
+                lineHeight: 1.7,
                 color: TINTA,
                 marginBottom: '1.6rem',
                 letterSpacing: '0.01em',
@@ -320,8 +320,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 key={idx}
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: 'clamp(1rem, 2vw, 1.15rem)',
-                  lineHeight: 2,
+                  fontSize: '1rem',
+                  lineHeight: 1.7,
                   color: TINTA,
                   marginBottom: '1.6rem',
                   letterSpacing: '0.01em',

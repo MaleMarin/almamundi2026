@@ -1681,7 +1681,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
               >
                 <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
-                Subir audio o pegar enlace
+                {t.modalUploadOrLink}
               </button>
             </div>
             {avSource === 'grabar' && !mediaBlob && (
@@ -1932,7 +1932,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       }}
                       maxLength={PHOTO_ALT_MAX}
                       placeholder={t.modalPhotoAltPlaceholder}
-                      className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                      className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                     />
                   </div>
                 ))}
@@ -2038,7 +2038,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           if (fieldErr.title) setFieldErr((p) => ({ ...p, title: undefined }));
                         }}
                         placeholder={t.modalStoryNamePlaceholder}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       {fieldErr.title ? (
@@ -2058,7 +2058,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
                         placeholder={t.modalAliasPlaceholder}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
@@ -2076,7 +2076,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         maxLength={ANTECEDENTES_MAX}
                         placeholder={t.modalExtrasPlaceholder}
                         rows={2}
-                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
@@ -2093,7 +2093,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                         maxLength={CANCION_RELACIONADA_MAX}
                         placeholder={t.modalCancionPlaceholder}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
@@ -2190,7 +2190,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           if (fieldErr.country) setFieldErr((p) => ({ ...p, country: undefined }));
                         }}
                         placeholder={t.modalCountryPlaceholder}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="country-name"
                       />
@@ -2210,7 +2210,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           if (fieldErr.city) setFieldErr((p) => ({ ...p, city: undefined }));
                         }}
                         placeholder={t.modalCityPlaceholder}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] text-gray-600">{t.modalLocationHint}</p>
@@ -2228,7 +2228,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           setAgeRange(e.target.value as AgeRange);
                           if (fieldErr.age) setFieldErr((p) => ({ ...p, age: undefined }));
                         }}
-                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalAgeChoose}</option>
@@ -2256,7 +2256,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       <select
                         value={sex}
                         onChange={(e) => setSex(e.target.value as Sex)}
-                        className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalGenderBlank}</option>
@@ -2281,7 +2281,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         placeholder="tu@email.com"
                         type="email"
                         autoComplete="email"
-                        className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] leading-tight text-gray-600 md:text-[11px]">
