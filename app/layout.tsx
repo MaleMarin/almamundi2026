@@ -10,6 +10,7 @@ import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
+import Script from 'next/script';
 import { Bebas_Neue, Instrument_Serif, Syne } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
@@ -151,6 +152,18 @@ export default async function RootLayout({
         </div>
         <HighContrastToggle />
         <CookieBanner />
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=AW-17718043044"
+          strategy="afterInteractive"
+        />
+        <Script id="google-ads" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'AW-17718043044');
+          `}
+        </Script>
         <SpeedInsights />
       </body>
     </html>
