@@ -12,6 +12,7 @@ import { historiasInterior } from '@/lib/historias-neumorph';
 
 function showGlobalSiteChrome(pathname: string): boolean {
   if (pathname === '/') return false;
+  if (pathname === '/contar' || pathname.startsWith('/contar/')) return false;
   if (pathname === '/mapa' || pathname.startsWith('/mapa/')) return false;
   return true;
 }
@@ -31,7 +32,7 @@ export function GlobalSiteChrome({ children }: { children: ReactNode }) {
   const showBreadcrumbsSlot = !ROUTES_WITHOUT_BREADCRUMBS.has(pathname);
 
   return (
-    <>
+    <div className="font-interna flex min-h-0 w-full flex-1 flex-col">
       <HistoriasInteriorSiteHeader overImmersiveMedia={false} />
       <div
         className={`flex w-full min-h-0 flex-1 flex-col ${historiasInterior.fixedHeaderContentPadClassName}`}
@@ -45,6 +46,6 @@ export function GlobalSiteChrome({ children }: { children: ReactNode }) {
         ) : null}
         {children}
       </div>
-    </>
+    </div>
   );
 }

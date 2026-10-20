@@ -39,6 +39,10 @@
  * Si body queda con var(--background) #fff, el hueco flex bajo el contenido (min-h del layout)
  * muestra una franja blanca encima del footer.
  */
+.font-interna {
+  font-family: var(--font-interna), system-ui, sans-serif;
+}
+
 @layer base {
   html {
     font-family: var(--font-sans);

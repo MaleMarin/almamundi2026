@@ -86,6 +86,10 @@ const nextConfig: NextConfig = {
         destination: '/educacion-mediatica',
         permanent: false,
       },
+      { source: '/subir', destination: '/contar', permanent: true },
+      { source: '/subir/', destination: '/contar', permanent: true },
+      { source: '/subir/foto', destination: '/contar/foto', permanent: true },
+      { source: '/subir/foto/', destination: '/contar/foto', permanent: true },
       { source: '/historias', destination: '/historias/videos', permanent: false },
       {
         source: '/historias/videos/exhibicion-demo',

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 const REQUEST_OPTIONS = [
   { value: 'confirmar_tratamiento', label: 'Confirmar si tratamos datos personales tuyos.' },
@@ -64,7 +64,7 @@ export function MisDatosPersonalesForm() {
   }
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8 px-4 py-10 pb-16" style={{ fontFamily: SITE_FONT_STACK }}>
+    <div className="mx-auto max-w-2xl space-y-8 px-4 py-10 pb-16" style={{ fontFamily: INTERIOR_FONT_STACK }}>
       <header className="space-y-3 text-center sm:text-left">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Privacidad</p>
         <h1 id="solicitud-datos-personales" className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">

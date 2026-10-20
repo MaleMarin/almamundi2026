@@ -13,6 +13,7 @@ export type AmUploadModalShellProps = {
   onContinue?: () => void;
   continueLabel?: string;
   closeAriaLabel?: string;
+  kicker?: string;
   showContinue?: boolean;
   className?: string;
   /** Si true, solo renderiza la tarjeta (sin overlay). */
@@ -29,12 +30,13 @@ export function AmUploadModalShell({
   onContinue,
   continueLabel = 'Continuar',
   closeAriaLabel = 'Cerrar',
+  kicker,
   showContinue = true,
   className,
   cardOnly = false,
 }: AmUploadModalShellProps) {
   const card = (
-    <div className={`${styles.amModalCard} ${className ?? ''}`}>
+    <div className={`${styles.amModalCard} font-interna ${className ?? ''}`}>
       <header className={styles.amModalHeader}>
         <span className={styles.amModalBrand}>ALMAMUNDI</span>
         <button type="button" className={styles.amModalClose} onClick={onClose} aria-label={closeAriaLabel}>
@@ -43,6 +45,11 @@ export function AmUploadModalShell({
       </header>
 
       <div className={styles.amModalBody}>
+        {kicker ? (
+          <p className={styles.amModalKicker} aria-live="polite">
+            {kicker}
+          </p>
+        ) : null}
         <h2 className={styles.amModalTitle}>{title}</h2>
         <p className={styles.amModalSubtitle}>{subtitle}</p>
         {limit ? <p className={styles.amModalLimit}>{limit}</p> : null}

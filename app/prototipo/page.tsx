@@ -6,7 +6,7 @@ import AudioPlayer from '@/components/historia/AudioPlayer';
 import TextoReader from '@/components/historia/TextoReader';
 import FotoAlbum from '@/components/historia/FotoAlbum';
 import { MOCK_STORIES } from '@/lib/almamundi/mock-data';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 type ActiveFormat = 'video' | 'audio' | 'texto' | 'fotos' | null;
 
@@ -27,13 +27,13 @@ export default function PrototipoPage() {
       style={{
         minHeight: '100vh',
         background: '#f5f3ef',
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         padding: '3rem 2rem',
       }}
     >
       <h1
         style={{
-          fontFamily: SITE_FONT_STACK,
+          fontFamily: INTERIOR_FONT_STACK,
           fontSize: '2.5rem',
           fontWeight: 600,
           color: '#2a2520',
@@ -78,7 +78,7 @@ export default function PrototipoPage() {
                 border: 'none',
                 borderRadius: '4px',
                 color: '#fff',
-                fontFamily: SITE_FONT_STACK,
+                fontFamily: INTERIOR_FONT_STACK,
                 fontSize: '0.9rem',
                 fontWeight: 500,
                 cursor: 'pointer',

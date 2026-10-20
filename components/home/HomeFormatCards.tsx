@@ -1,11 +1,13 @@
 'use client';
 
 /**
- * Las 4 tarjetas de formato (home y /subir). Misma pieza: textos, neumorfismo y hover.
+ * Las 4 tarjetas de formato (home y /contar). Misma pieza: textos, neumorfismo y hover.
  * LOCK visual: no alterar tamaños, sombras ni animaciones sin petición explícita.
  */
 import type { ReactNode } from 'react';
+import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { contarHref } from '@/lib/contar-routes';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const APP_FONT = SITE_FONT_STACK;
@@ -137,6 +139,7 @@ function SoftCard({
   subtitle,
   children,
   buttonLabel,
+  href,
   onClick,
   delay,
   hoverKind,
@@ -146,6 +149,7 @@ function SoftCard({
   subtitle: string;
   children: ReactNode;
   buttonLabel: string;
+  href: string;
   onClick: () => void;
   delay: string;
   hoverKind: HistoriasCardHoverKind;
@@ -198,9 +202,13 @@ function SoftCard({
             <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
               {children}
             </p>
-            <button
-              type="button"
-              onClick={onClick}
+            <Link
+              href={href}
+              onClick={(e) => {
+                if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+                e.preventDefault();
+                onClick();
+              }}
               className="flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case tracking-wide transition-opacity hover:opacity-[0.92] active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
               style={{
                 background: '#FF4A1C',
@@ -211,7 +219,7 @@ function SoftCard({
               }}
             >
               {buttonLabel}
-            </button>
+            </Link>
           </div>
         </div>
       </div>
@@ -274,6 +282,7 @@ export function HomeFormatCards({
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
           buttonLabel={t.cardVideoCta}
+          href={contarHref('video')}
           onClick={onRecordVideo}
           delay="0s"
           hoverKind="video"
@@ -285,6 +294,7 @@ export function HomeFormatCards({
           title={t.cardAudioTitle}
           subtitle={t.cardAudioSubtitle}
           buttonLabel={t.cardAudioCta}
+          href={contarHref('audio')}
           onClick={onRecordAudio}
           delay="0.45s"
           hoverKind="audio"
@@ -296,6 +306,7 @@ export function HomeFormatCards({
           title={t.cardWriteTitle}
           subtitle={t.cardWriteSubtitle}
           buttonLabel={t.cardWriteCta}
+          href={contarHref('texto')}
           onClick={onWriteStory}
           delay="0.9s"
           hoverKind="text"
@@ -307,6 +318,7 @@ export function HomeFormatCards({
           title={t.cardPhotoTitle}
           subtitle={t.cardPhotoSubtitle}
           buttonLabel={t.cardPhotoCta}
+          href={contarHref('foto')}
           onClick={onRecordPhoto}
           delay="1.35s"
           hoverKind="photo"

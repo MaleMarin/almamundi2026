@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import type { Metadata } from 'next';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
   title: 'La visión de AlmaMundi',
@@ -134,7 +134,7 @@ export default function VisionPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3.5rem',
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
       }}
     >
       <article style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -167,7 +167,7 @@ export default function VisionPage() {
           <h1
             style={{
               margin: '0 0 0.65rem',
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontStyle: 'italic',
               fontWeight: 600,
               fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
@@ -191,7 +191,7 @@ export default function VisionPage() {
           </p>
           <div
             style={{
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontSize: '0.95rem',
               lineHeight: 1.72,
               color: TEXT_2,
@@ -234,7 +234,7 @@ export default function VisionPage() {
             id="vision-construccion"
             style={{
               margin: '0 0 1.25rem',
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontStyle: 'italic',
               fontWeight: 600,
               fontSize: '1.1rem',
@@ -263,7 +263,7 @@ export default function VisionPage() {
                 <h3
                   style={{
                     margin: '0 0 0.55rem',
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontSize: '0.95rem',
                     fontWeight: 600,
                     color: TEXT_1,
@@ -283,7 +283,7 @@ export default function VisionPage() {
                 <p
                   style={{
                     margin: 0,
-                    fontFamily: SITE_FONT_STACK,
+                    fontFamily: INTERIOR_FONT_STACK,
                     fontSize: '0.88rem',
                     lineHeight: 1.65,
                     color: TEXT_2,
@@ -309,7 +309,7 @@ export default function VisionPage() {
           <p
             style={{
               margin: 0,
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               fontSize: '0.95rem',
               lineHeight: 1.72,
               fontStyle: 'italic',

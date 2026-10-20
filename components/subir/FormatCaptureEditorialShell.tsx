@@ -11,6 +11,7 @@ type Props = {
   onContinue: () => void;
   continueLabel?: string;
   closeAriaLabel?: string;
+  kicker?: string;
   children: ReactNode;
   /** Título con saltos de línea (texto, foto). */
   titlePreLine?: boolean;
@@ -23,6 +24,7 @@ export function FormatCaptureEditorialShell({
   onContinue,
   continueLabel = 'Continuar',
   closeAriaLabel = 'Cerrar',
+  kicker,
   children,
   titlePreLine = false,
 }: Props) {
@@ -38,6 +40,7 @@ export function FormatCaptureEditorialShell({
       onContinue={onContinue}
       continueLabel={continueLabel}
       closeAriaLabel={closeAriaLabel}
+      kicker={kicker}
     >
       {children}
     </AmUploadModalShell>

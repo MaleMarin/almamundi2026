@@ -1,6 +1,5 @@
 'use client';
 
-import { Fraunces, Plus_Jakarta_Sans } from 'next/font/google';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import {
   X,
@@ -70,17 +69,12 @@ import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client'
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 import { convertHeicFiles, convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
-
-const jakartaHuella = Plus_Jakarta_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
-});
-
-const frauncesHuella = Fraunces({
-  subsets: ['latin'],
-  weight: ['300', '400', '600', '700'],
-  style: ['normal', 'italic'],
-});
+import { classifyMediaCaptureError, type MediaCaptureErrorKind } from '@/lib/media-capture-error';
+import {
+  clearStoryDraft,
+  loadStoryDraft,
+  saveStoryDraft,
+} from '@/lib/story-draft-storage';
 
 export type StoryModalMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -91,7 +85,7 @@ export type ChosenInspirationTopic = {
   questions: string[];
 };
 
-const APP_FONT = "'Avenir Light', Avenir, system-ui, sans-serif";
+const APP_FONT = 'var(--font-interna), system-ui, sans-serif';
 
 const soft = {
   bg: '#E0E5EC',
@@ -326,16 +320,19 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
 }
 
 function huellaPngFilename(storyTitle: string, imprintId: string): string {
-  const t = storyTitle
+  const slug = storyTitle
     .trim()
-    .replace(/[/\\?%*:|"<>]/g, '')
-    .replace(/\s+/g, ' ')
-    .trim();
-  if (t) {
-    const part = t.replace(/\s/g, '-').slice(0, 88);
-    return `AlmaMundi-${part}.png`;
-  }
-  return `AlmaMundi-resonancia-visual-${imprintId}.png`;
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+  return `almamundi-${slug || imprintId || 'historia'}.png`;
+}
+
+function fileWeightMb(file: File): string {
+  return (file.size / (1024 * 1024)).toFixed(1);
 }
 
 export type StoryModalProps = {
@@ -350,6 +347,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const { t, locale } = useHomeLocale();
   const [step, setStep] = useState<StoryModalStep>('capture');
   const [err, setErr] = useState('');
+  const [mediaErrKind, setMediaErrKind] = useState<MediaCaptureErrorKind | null>(null);
+  const [fieldErr, setFieldErr] = useState<Partial<Record<'title' | 'alias' | 'country' | 'city' | 'age' | 'email', string>>>({});
+  const [isCoarsePointer, setIsCoarsePointer] = useState(false);
 
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [uploadVideoFile, setUploadVideoFile] = useState<File | null>(null);
@@ -462,6 +462,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       resetCaptureMedia();
       setStep('capture');
       setErr('');
+      setMediaErrKind(null);
+      setFieldErr({});
       setTextBody('');
       setTextoReviewAck(false);
       setPhotoFiles([]);
@@ -504,19 +506,182 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       modeAtOpenRef.current = mode;
       setStep('capture');
       setErr('');
+      setMediaErrKind(null);
+      setFieldErr({});
       resetCaptureMedia();
       setUploadVideoFile(null);
       setUploadAudioFile(null);
-      setVideoShareUrl('');
-      setAudioShareUrl('');
       setAvSource('grabar');
-      if (mode === 'texto' && chosenTopic) {
+      const draft = loadStoryDraft();
+      if (draft) {
+        setTextBody(draft.textBody);
+        setStoryTitle(draft.storyTitle);
+        setAlias(draft.alias);
+        setExtraText(draft.extraText);
+        setCancionRelacionada(draft.cancionRelacionada);
+        setCountry(draft.country);
+        setCity(draft.city);
+        setAgeRange((draft.ageRange as AgeRange) || '');
+        setSex((draft.sex as Sex) || '');
+        setEmail(draft.email);
+        setVideoShareUrl(draft.videoShareUrl);
+        setAudioShareUrl(draft.audioShareUrl);
+        setPhotoAlts(draft.photoAlts);
+      } else if (mode === 'texto' && chosenTopic) {
         setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
-      } else if (mode === 'texto') {
-        setTextBody('');
+        setVideoShareUrl('');
+        setAudioShareUrl('');
+      } else {
+        if (mode === 'texto') setTextBody('');
+        setVideoShareUrl('');
+        setAudioShareUrl('');
       }
     }
   }, [isOpen, mode, chosenTopic, resetCaptureMedia]);
+
+  useEffect(() => {
+    if (!isOpen || step === 'received') return;
+    saveStoryDraft({
+      textBody,
+      storyTitle,
+      alias,
+      extraText,
+      cancionRelacionada,
+      country,
+      city,
+      ageRange,
+      sex,
+      email,
+      videoShareUrl,
+      audioShareUrl,
+      photoAlts,
+    });
+  }, [
+    isOpen,
+    step,
+    textBody,
+    storyTitle,
+    alias,
+    extraText,
+    cancionRelacionada,
+    country,
+    city,
+    ageRange,
+    sex,
+    email,
+    videoShareUrl,
+    audioShareUrl,
+    photoAlts,
+  ]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(pointer: coarse)');
+    const sync = () => {
+      setIsCoarsePointer(mq.matches || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    };
+    sync();
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, []);
+
+  const hasUnsavedContent = useCallback(() => {
+    return Boolean(
+      textBody.trim() ||
+        storyTitle.trim() ||
+        alias.trim() ||
+        extraText.trim() ||
+        cancionRelacionada.trim() ||
+        country.trim() ||
+        city.trim() ||
+        email.trim() ||
+        videoShareUrl.trim() ||
+        audioShareUrl.trim() ||
+        mediaBlob ||
+        uploadVideoFile ||
+        uploadAudioFile ||
+        photoFiles.length > 0
+    );
+  }, [
+    textBody,
+    storyTitle,
+    alias,
+    extraText,
+    cancionRelacionada,
+    country,
+    city,
+    email,
+    videoShareUrl,
+    audioShareUrl,
+    mediaBlob,
+    uploadVideoFile,
+    uploadAudioFile,
+    photoFiles.length,
+  ]);
+
+  const requestLeave = useCallback((): boolean => {
+    if (step === 'received') {
+      onClose();
+      return true;
+    }
+    if (hasUnsavedContent()) {
+      if (!window.confirm(t.modalLeaveConfirm)) return false;
+      clearStoryDraft();
+    }
+    onClose();
+    return true;
+  }, [hasUnsavedContent, onClose, step, t.modalLeaveConfirm]);
+
+  const applyMediaErr = useCallback(
+    (kind: MediaCaptureErrorKind, channel: 'video' | 'audio') => {
+      setMediaErrKind(kind);
+      if (channel === 'video') {
+        setErr(
+          kind === 'denied'
+            ? t.modalCameraDenied
+            : kind === 'unsupported'
+              ? t.modalCameraUnsupported
+              : t.modalCameraBusy
+        );
+        return;
+      }
+      setErr(
+        kind === 'denied'
+          ? t.modalMicDenied
+          : kind === 'unsupported'
+            ? t.modalMicUnsupported
+            : t.modalMicBusy
+      );
+    },
+    [t]
+  );
+
+  const stepRef = useRef(step);
+  stepRef.current = step;
+  const requestLeaveRef = useRef(requestLeave);
+  requestLeaveRef.current = requestLeave;
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const current = window.history.state as { amStory?: string } | null;
+    if (current?.amStory !== step) {
+      window.history.pushState({ amStory: step }, '', window.location.href);
+    }
+    const onPop = () => {
+      const now = stepRef.current;
+      if (now === 'details') {
+        setStep('capture');
+        setErr('');
+        window.history.pushState({ amStory: 'capture' }, '', window.location.href);
+        return;
+      }
+      if (!requestLeaveRef.current()) {
+        window.history.pushState({ amStory: now }, '', window.location.href);
+      }
+    };
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, [isOpen, step]);
 
   useEffect(() => {
     return () => {
@@ -538,9 +703,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
     } catch (e) {
       console.error('[StoryModal] video live preview', e);
-      setErr('No se pudo mostrar la cámara en este dispositivo. Prueba otro navegador.');
+      applyMediaErr(classifyMediaCaptureError(e, 'preview'), 'video');
     }
-  }, [isOpen, step, mode, streamReady, mediaBlob, recording]);
+  }, [applyMediaErr, isOpen, step, mode, streamReady, mediaBlob, recording]);
 
   const startVideoCapture = useCallback(async () => {
     setErr('');
@@ -557,12 +722,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         videoLiveRef.current.srcObject = stream;
         await videoLiveRef.current.play().catch(() => {});
       }
-    } catch {
+    } catch (e) {
       if (requestToken !== mediaRequestTokenRef.current) return;
-      setErr('No pudimos acceder a la cámara. Revisa permisos.');
+      applyMediaErr(classifyMediaCaptureError(e, 'getUserMedia'), 'video');
       setStreamReady(false);
     }
-  }, []);
+  }, [applyMediaErr]);
 
   const startAudioCapture = useCallback(async () => {
     setErr('');
@@ -575,23 +740,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
       streamRef.current = stream;
       setStreamReady(true);
-    } catch {
+    } catch (e) {
       if (requestToken !== mediaRequestTokenRef.current) return;
-      setErr('No pudimos acceder al micrófono.');
+      applyMediaErr(classifyMediaCaptureError(e, 'getUserMedia'), 'audio');
       setStreamReady(false);
     }
-  }, []);
+  }, [applyMediaErr]);
 
   const startRecordingVideo = useCallback(() => {
     const stream = streamRef.current;
     if (!stream) return;
     if (typeof MediaRecorder === 'undefined') {
-      setErr('Tu navegador no permite grabar video aquí. Prueba Chrome o Firefox actualizado.');
+      applyMediaErr('unsupported', 'video');
       return;
     }
     const mime = pickVideoMime();
     if (!mime) {
-      setErr('Tu navegador no permite grabar video en un formato compatible.');
+      applyMediaErr('unsupported', 'video');
       return;
     }
     chunksRef.current = [];
@@ -600,7 +765,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       mr = new MediaRecorder(stream, { mimeType: mime });
     } catch (e) {
       console.error('[StoryModal] MediaRecorder video', e);
-      setErr('No pudimos iniciar la grabación de video en este navegador. Prueba otro formato o actualiza el navegador.');
+      applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'video');
       return;
     }
     recorderRef.current = mr;
@@ -651,20 +816,20 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
       recorderRef.current = null;
       setRecording(false);
-      setErr('No se pudo iniciar la grabación. Cierra otras apps que usen la cámara e inténtalo de nuevo.');
+      applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'video');
     }
-  }, [revokePreview, stopStream, stopTimer]);
+  }, [applyMediaErr, revokePreview, stopStream, stopTimer]);
 
   const startRecordingAudio = useCallback(() => {
     const stream = streamRef.current;
     if (!stream) return;
     if (typeof MediaRecorder === 'undefined') {
-      setErr('Tu navegador no permite grabar audio aquí. Prueba Chrome o Firefox actualizado.');
+      applyMediaErr('unsupported', 'audio');
       return;
     }
     const mime = pickAudioMime();
     if (!mime) {
-      setErr('Tu navegador no permite grabar audio en un formato compatible.');
+      applyMediaErr('unsupported', 'audio');
       return;
     }
     chunksRef.current = [];
@@ -673,7 +838,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       mr = new MediaRecorder(stream, { mimeType: mime });
     } catch (e) {
       console.error('[StoryModal] MediaRecorder audio', e);
-      setErr('No pudimos iniciar la grabación de audio en este navegador.');
+      applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'audio');
       return;
     }
     recorderRef.current = mr;
@@ -721,9 +886,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
       recorderRef.current = null;
       setRecording(false);
-      setErr('No se pudo iniciar la grabación de audio. Revisa el micrófono e inténtalo de nuevo.');
+      applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'audio');
     }
-  }, [revokePreview, stopStream, stopTimer]);
+  }, [applyMediaErr, revokePreview, stopStream, stopTimer]);
 
   const stopRecording = useCallback(() => {
     const mr = recorderRef.current;
@@ -740,6 +905,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     (next: 'grabar' | 'archivo') => {
       setAvSource(next);
       setErr('');
+      setMediaErrKind(null);
       if (next === 'grabar') {
         setUploadVideoFile(null);
         setUploadAudioFile(null);
@@ -769,11 +935,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           const typeOk =
             /^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type) || looksLikeHeic(f);
           if (!typeOk) {
-            setErr('Solo imágenes (JPG, PNG, WEBP, HEIC).');
+            setErr(t.modalPhotoTypeError);
             continue;
           }
           if (f.size > SUBIR_PHOTO_FILE_MAX_MB * 1024 * 1024) {
-            setErr(`Cada foto: máximo ${SUBIR_PHOTO_FILE_MAX_MB} MB.`);
+            setErr(t.modalPhotoSizeError);
             continue;
           }
           next.push(f);
@@ -784,7 +950,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     } finally {
       setConvertingHeic(false);
     }
-  }, []);
+  }, [t.modalPhotoSizeError, t.modalPhotoTypeError]);
 
   useEffect(() => {
     const urls = photoFiles.map((f) => URL.createObjectURL(f));
@@ -891,71 +1057,52 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   ]);
 
   const goDetails = useCallback(() => {
-    if (!canContinueCapture()) {
-      setErr('Completa este paso antes de continuar.');
-      return;
-    }
+    if (!canContinueCapture()) return;
     stopStream();
     setErr('');
+    setMediaErrKind(null);
     setStep('details');
   }, [canContinueCapture, stopStream]);
 
   const validateDetails = useCallback(() => {
-    // Leer siempre el ref: evita falsos "Falta el nombre…" por closure stale.
     const title = storyTitleRef.current.trim();
-    if (!title) {
-      setErr('Falta el nombre de la historia.');
-      return false;
-    }
-    if (title.length < 2) {
-      setErr('El nombre de la historia debe tener al menos 2 caracteres.');
-      return false;
-    }
-    if (alias.trim().length < 2) {
-      setErr('Escribe tu nombre o alias (mínimo 2 caracteres).');
-      return false;
-    }
-
-    if (!ageRange || !city.trim() || !country.trim()) {
-      setErr('Faltan datos obligatorios: tramo de edad, ciudad y país.');
-      return false;
-    }
-
+    const next: typeof fieldErr = {};
+    if (!title || title.length < 2) next.title = t.modalFieldTitleMissing;
+    if (alias.trim().length < 2) next.alias = t.modalFieldAliasMissing;
+    if (!country.trim()) next.country = t.modalFieldCountryMissing;
+    if (!city.trim()) next.city = t.modalFieldCityMissing;
+    if (!ageRange) next.age = t.modalFieldAgeMissing;
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) {
-      setErr('Escribe un correo válido para avisarte cuando tu historia esté en el mapa.');
+      next.email = t.modalFieldEmailMissing;
+    }
+    setFieldErr(next);
+    if (Object.keys(next).length > 0) {
+      setErr('');
       return false;
     }
-
-    if (!acceptedPrivacy) {
-      setErr('Para enviar, declara que eres mayor de 18 años (o adulto responsable con autorización) y acepta la política de privacidad.');
+    if (!acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos) {
+      setErr(t.modalMarkThreeToSend);
       return false;
     }
-
-    if (!acceptedPublicacion) {
-      setErr('Para enviar, autoriza la publicación pública de tu imagen, voz y/o nombre (o alias).');
-      return false;
-    }
-
-    if (!acceptedTerminos) {
-      setErr('Para enviar, acepta los Términos de Uso.');
-      return false;
-    }
-
     setErr('');
     return true;
-  }, [acceptedPrivacy, acceptedPublicacion, acceptedTerminos, ageRange, alias, city, country, email]);
+  }, [
+    acceptedPrivacy,
+    acceptedPublicacion,
+    acceptedTerminos,
+    ageRange,
+    alias,
+    city,
+    country,
+    email,
+    t,
+  ]);
 
   const submitDetails = useCallback(async () => {
     if (saving) return;
     if (!validateDetails()) return;
-    if (captchaGate === 'need') {
-      setErr('Completa la verificación de seguridad antes de enviar.');
-      return;
-    }
-    if (captchaGate === 'wait') {
-      setErr(
-        'La verificación de seguridad todavía está cargando. Espera un momento o usa Reintentar.'
-      );
+    if (captchaGate === 'need' || captchaGate === 'wait') {
+      setErr(t.modalCaptchaFailed);
       return;
     }
     setSaving(true);
@@ -1110,7 +1257,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           setErr(messageForUploadError(new Error('uploads_paused'), mode));
           return;
         }
-        setErr(data.error || `Error ${res.status}. Intenta de nuevo.`);
+        setErr(t.modalSubmitFailedKeep);
         return;
       }
 
@@ -1120,10 +1267,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           : `AM-${Date.now().toString(36).toUpperCase()}`;
       setImprintId(id);
       setImprintReceivedAt(new Date());
+      clearStoryDraft();
       setStep('received');
     } catch (e) {
       console.error('[StoryModal] submit', e);
-      setErr(messageForUploadError(e, mode));
+      setErr(t.modalSubmitFailedKeep);
     } finally {
       setSaving(false);
     }
@@ -1153,6 +1301,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     acceptedPublicacion,
     acceptedTerminos,
     captchaGate,
+    t.modalCaptchaFailed,
+    t.modalSubmitFailedKeep,
   ]);
 
   useEffect(() => {
@@ -1201,13 +1351,25 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const downloadImprint = useCallback(async () => {
     const c = imprintCanvasRef.current;
     if (!c) return;
+    const filename = huellaPngFilename(storyTitle, imprintId);
     try {
       const blob = await canvasToPngBlob(c);
-      downloadPngBlob(blob, huellaPngFilename(storyTitle, imprintId));
+      if (isCoarsePointer && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        try {
+          const file = new File([blob], filename, { type: 'image/png' });
+          if (!navigator.canShare || navigator.canShare({ files: [file] })) {
+            await navigator.share({ files: [file] });
+            return;
+          }
+        } catch (e) {
+          if ((e as Error).name === 'AbortError') return;
+        }
+      }
+      downloadPngBlob(blob, filename);
     } catch {
-      flashShareNotice(t.modalShareFailed);
+      flashShareNotice(t.modalCopyImageFailed);
     }
-  }, [imprintId, storyTitle, t.modalShareFailed, flashShareNotice]);
+  }, [imprintId, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
 
   const shareImprint = useCallback(async () => {
     const c = imprintCanvasRef.current;
@@ -1218,21 +1380,21 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       const result = await shareOrCopyResonancePng(
         blob,
         huellaPngFilename(storyTitle, imprintId),
-        storyTitle.trim() || 'AlmaMundi'
+        storyTitle.trim() || 'AlmaMundi',
+        t.modalShareText
       );
       if (requestToken !== shareRequestTokenRef.current) return;
-      if (result === 'copied') flashShareNotice(t.modalShareCopied);
-      else if (result === 'downloaded') flashShareNotice(t.modalShareDownloaded);
+      if (result === 'downloaded') flashShareNotice(t.modalCopyImageFailed);
     } catch {
       if (requestToken !== shareRequestTokenRef.current) return;
-      flashShareNotice(t.modalShareFailed);
+      flashShareNotice(t.modalShareImageFailed);
     }
   }, [
     imprintId,
     storyTitle,
-    t.modalShareCopied,
-    t.modalShareDownloaded,
-    t.modalShareFailed,
+    t.modalCopyImageFailed,
+    t.modalShareImageFailed,
+    t.modalShareText,
     flashShareNotice,
   ]);
 
@@ -1244,13 +1406,27 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       <FormatCaptureEditorialShell
         copy={copy}
         titlePreLine={mode === 'foto' || mode === 'texto'}
-        onClose={onClose}
+        onClose={requestLeave}
         continueEnabled={canContinueCapture()}
         onContinue={goDetails}
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
+        kicker={t.modalStep1}
       >
-        {err ? <p className={amStyles.amModalInlineError} role="alert">{err}</p> : null}
+        {err ? (
+          <div className="mb-3 space-y-2">
+            <p className={amStyles.amModalInlineError} role="alert">{err}</p>
+            {mediaErrKind && (mode === 'video' || mode === 'audio') ? (
+              <button
+                type="button"
+                className={amStyles.amModalBtnPrimary}
+                onClick={() => switchAvSource('archivo')}
+              >
+                {mode === 'video' ? t.modalSwitchToUploadVideo : t.modalSwitchToUploadAudio}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
         {chosenTopic && mode !== 'texto' && (
           <div
             className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-base"
@@ -1297,14 +1473,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             {avSource === 'grabar' && !mediaBlob && (
               <>
                 {!streamReady && !recording && (
-                  <button
-                    type="button"
-                    onClick={() => void startVideoCapture()}
-                    className={amStyles.amModalBtnPrimary}
-                    aria-label="Activar cámara para grabar"
-                  >
-                    {copy.primaryCta}
-                  </button>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => void startVideoCapture()}
+                      className={amStyles.amModalBtnPrimary}
+                      aria-label="Activar cámara para grabar"
+                    >
+                      {copy.primaryCta}
+                    </button>
+                    <p className="text-center text-sm text-gray-700">{t.modalCameraPermissionHint}</p>
+                  </div>
                 )}
                 {streamReady && (
                   <div className="space-y-3 text-center">
@@ -1340,16 +1519,21 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     ) : (
                       <>
                         <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                          {t.modalRecording} {formatMmSs(recordSec)}
+                          {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                         </p>
+                        {recordSec >= 270 ? (
+                          <p className="text-sm font-semibold text-orange-700" aria-live="assertive">
+                            {t.modalRecordingSoonEnd}
+                          </p>
+                        ) : null}
                         <button
                           type="button"
                           onClick={stopRecording}
                           className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white shadow-lg md:text-xl"
-                          aria-label="Detener grabación de video"
+                          aria-label={t.modalStop}
                         >
                           <Square size={22} aria-hidden />
-                          Detener
+                          {t.modalStop}
                         </button>
                       </>
                     )}
@@ -1437,7 +1621,21 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   className="w-full text-sm text-gray-600"
                 />
                 {uploadVideoFile ? (
-                  <p className="text-sm font-medium text-gray-800">Listo: {uploadVideoFile.name}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-gray-800">
+                      {interpolate(t.modalFileReadyVideo, {
+                        nombre: uploadVideoFile.name,
+                        peso: fileWeightMb(uploadVideoFile),
+                      })}
+                    </p>
+                    <button
+                      type="button"
+                      className="text-sm font-semibold text-orange-700 underline"
+                      onClick={() => setUploadVideoFile(null)}
+                    >
+                      {t.modalRemove}
+                    </button>
+                  </div>
                 ) : null}
                 <label htmlFor="story-video-url" className="block text-sm font-semibold text-gray-800">
                   O pega un enlace (YouTube o Vimeo)
@@ -1455,6 +1653,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   style={{ ...soft.flat, borderRadius: '12px' }}
                   aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
                 />
+                <p className="text-xs text-gray-600">{t.modalVideoLinkHint}</p>
                 {videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl) ? (
                   <p className="text-xs text-amber-700" role="alert">
                     Usa un enlace de YouTube o Vimeo
@@ -1490,14 +1689,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             {avSource === 'grabar' && !mediaBlob && (
               <>
                 {!streamReady && !recording && (
-                  <button
-                    type="button"
-                    onClick={() => void startAudioCapture()}
-                    className={amStyles.amModalBtnPrimary}
-                    aria-label="Activar micrófono"
-                  >
-                    {copy.primaryCta}
-                  </button>
+                  <div className="space-y-2">
+                    <button
+                      type="button"
+                      onClick={() => void startAudioCapture()}
+                      className={amStyles.amModalBtnPrimary}
+                      aria-label="Activar micrófono"
+                    >
+                      {copy.primaryCta}
+                    </button>
+                    <p className="text-center text-sm text-gray-700">{t.modalMicPermissionHint}</p>
+                  </div>
                 )}
                 {streamReady && !recording && (
                   <div className="flex flex-col items-center gap-6 py-6">
@@ -1525,8 +1727,13 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
                     </div>
                     <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
-                      {t.modalRecording} {formatMmSs(recordSec)}
+                      {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                     </p>
+                    {recordSec >= 270 ? (
+                      <p className="text-sm font-semibold text-orange-700" aria-live="assertive">
+                        {t.modalRecordingSoonEnd}
+                      </p>
+                    ) : null}
                     <button
                       type="button"
                       onClick={stopRecording}
@@ -1610,10 +1817,24 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   className="w-full text-sm text-gray-600"
                 />
                 {uploadAudioFile ? (
-                  <p className="text-sm font-medium text-gray-800">Listo: {uploadAudioFile.name}</p>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-sm font-medium text-gray-800">
+                      {interpolate(t.modalFileReadyAudio, {
+                        nombre: uploadAudioFile.name,
+                        peso: fileWeightMb(uploadAudioFile),
+                      })}
+                    </p>
+                    <button
+                      type="button"
+                      className="text-sm font-semibold text-orange-700 underline"
+                      onClick={() => setUploadAudioFile(null)}
+                    >
+                      {t.modalRemove}
+                    </button>
+                  </div>
                 ) : null}
                 <label htmlFor="story-audio-url" className="block text-sm font-semibold text-gray-800">
-                  O pega un enlace
+                  {t.modalAudioLinkLabel}
                 </label>
                 <input
                   id="story-audio-url"
@@ -1697,7 +1918,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       htmlFor={`story-photo-alt-${i}`}
                       className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-600 md:text-[11px]"
                     >
-                      Describe brevemente esta foto (para personas con discapacidad visual)
+                      {t.modalPhotoAltLabel}
                       {photoPreviews.length > 1 ? ` · ${i + 1}` : ''}
                     </label>
                     <input
@@ -1712,7 +1933,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         });
                       }}
                       maxLength={PHOTO_ALT_MAX}
-                      placeholder="Opcional"
+                      placeholder={t.modalPhotoAltPlaceholder}
                       className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                     />
                   </div>
@@ -1761,7 +1982,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           </div>
           <button
             type="button"
-            onClick={onClose}
+            onClick={requestLeave}
             className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full text-gray-600 transition hover:text-red-600 active:scale-95 md:h-14 md:w-14"
             style={soft.button}
             aria-label={t.modalClose}
@@ -1782,24 +2003,28 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         >
           {step === 'details' && (
             <div className="flex min-h-0 flex-1 flex-col gap-2 md:gap-3">
-              <div className="shrink-0 space-y-0.5 px-0.5">
+              <div className="shrink-0 space-y-1 px-0.5">
+                <p className="text-xs font-semibold text-gray-700" aria-live="polite">
+                  {t.modalStep2}
+                </p>
                 <h3
                   id="story-modal-details-title"
                   className="text-lg font-light leading-tight text-gray-800 md:text-xl"
                 >
                   {t.modalDetailsTitle}
                 </h3>
+                <p className="text-[11px] text-gray-600">{t.modalRequiredFieldsNote}</p>
               </div>
 
               <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto overscroll-contain md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start md:overflow-hidden">
                 {/* Historia + extras — columna izquierda */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
+                  <div className="mb-2 text-[11px] font-semibold text-gray-700 md:text-xs">
                     {t.modalSectionStory}
                   </div>
                   <div className="space-y-2">
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <FileText size={12} className="text-orange-500" aria-hidden />
                         {t.modalStoryName}
                       </div>
@@ -1808,14 +2033,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         onChange={(e) => {
                           setStoryTitle(e.target.value);
                           if (err) setErr('');
+                          if (fieldErr.title) setFieldErr((p) => ({ ...p, title: undefined }));
                         }}
                         placeholder={t.modalStoryNamePlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
+                      {fieldErr.title ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.title}</p>
+                      ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
                       </div>
@@ -1824,14 +2053,19 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         onChange={(e) => {
                           setAlias(e.target.value);
                           if (err) setErr('');
+                          if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
                         placeholder={t.modalAliasPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
+                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
+                      {fieldErr.alias ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
+                      ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
                         {t.modalExtras}
                       </div>
                       <textarea
@@ -1847,7 +2081,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div>
                       <label
                         htmlFor="story-cancion-relacionada"
-                        className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-500 md:text-[11px]"
+                        className="mb-0.5 block text-[11px] font-semibold leading-snug text-gray-700"
                       >
                         {t.modalCancionRelacionada}
                       </label>
@@ -1856,15 +2090,15 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                         value={cancionRelacionada}
                         onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                         maxLength={CANCION_RELACIONADA_MAX}
-                        placeholder="Nombre o https://…"
+                        placeholder={t.modalCancionPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <Upload size={12} className="text-orange-500" aria-hidden />
-                        {interpolate(t.modalFiles, { mb: MAX_EXTRA_FILE_MB })}
+                        {t.modalFiles}
                       </div>
                       <label
                         className="flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-xs text-gray-600 md:text-sm"
@@ -1900,8 +2134,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       )}
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
-                        {interpolate(t.modalProfilePhoto, { mb: MAX_PROFILE_PHOTO_MB })}
+                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
+                        {t.modalProfilePhoto}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
@@ -1938,44 +2172,60 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
                 {/* Datos persona — columna derecha (alineado con /subir) */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[10px] font-black uppercase tracking-widest text-gray-500 md:text-xs">
+                  <div className="mb-2 text-[11px] font-semibold text-gray-700 md:text-xs">
                     {t.modalSectionPerson}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
                         {t.modalCountry}
                       </div>
                       <input
                         value={country}
-                        onChange={(e) => setCountry(e.target.value)}
+                        onChange={(e) => {
+                          setCountry(e.target.value);
+                          if (fieldErr.country) setFieldErr((p) => ({ ...p, country: undefined }));
+                        }}
                         placeholder={t.modalCountryPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="country-name"
                       />
+                      {fieldErr.country ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.country}</p>
+                      ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <MapPin size={12} className="text-orange-500" aria-hidden />
                         {t.modalCity}
                       </div>
                       <input
                         value={city}
-                        onChange={(e) => setCity(e.target.value)}
+                        onChange={(e) => {
+                          setCity(e.target.value);
+                          if (fieldErr.city) setFieldErr((p) => ({ ...p, city: undefined }));
+                        }}
                         placeholder={t.modalCityPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
+                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalLocationHint}</p>
+                      {fieldErr.city ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.city}</p>
+                      ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
                         {t.modalAge}
                       </div>
                       <select
                         value={ageRange}
-                        onChange={(e) => setAgeRange(e.target.value as AgeRange)}
+                        onChange={(e) => {
+                          setAgeRange(e.target.value as AgeRange);
+                          if (fieldErr.age) setFieldErr((p) => ({ ...p, age: undefined }));
+                        }}
                         className="w-full rounded-xl px-2 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
@@ -1992,9 +2242,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                           </option>
                         ))}
                       </select>
+                      {fieldErr.age ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.age}</p>
+                      ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <Users size={12} className="text-orange-500" aria-hidden />
                         {t.modalGender}
                       </div>
@@ -2013,22 +2266,28 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       </select>
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wide text-gray-500">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
                         <Mail size={12} className="text-orange-500" aria-hidden />
                         {t.modalEmail}
                       </div>
                       <input
                         value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (fieldErr.email) setFieldErr((p) => ({ ...p, email: undefined }));
+                        }}
                         placeholder="tu@email.com"
                         type="email"
                         autoComplete="email"
                         className="w-full rounded-xl px-2.5 py-1.5 text-xs outline-none text-gray-800 md:text-sm"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
-                      <p className="mt-0.5 text-[10px] leading-tight text-gray-500 md:text-[11px]">
+                      <p className="mt-0.5 text-[10px] leading-tight text-gray-600 md:text-[11px]">
                         {t.modalEmailHint}
                       </p>
+                      {fieldErr.email ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.email}</p>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -2044,19 +2303,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <AdultConsentCheckbox
                   checked={acceptedPrivacy}
                   onChange={setAcceptedPrivacy}
+                  label={t.modalConsentAdult}
                 />
-                <div className="flex items-start gap-2">
-                  <input
-                    id="consent-publicacion"
-                    type="checkbox"
-                    checked={acceptedPublicacion}
-                    onChange={(e) => setAcceptedPublicacion(e.target.checked)}
-                    className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
-                  />
-                  <label htmlFor="consent-publicacion" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
-                    Autorizo que mi imagen, voz y/o nombre (o alias) se publiquen públicamente en AlmaMundi.
-                  </label>
-                </div>
+                <AdultConsentCheckbox
+                  id="consent-publicacion"
+                  checked={acceptedPublicacion}
+                  onChange={setAcceptedPublicacion}
+                  label={t.modalConsentPublish}
+                />
                 <div className="flex items-start gap-2">
                   <input
                     id="consent-terminos"
@@ -2065,12 +2319,15 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     onChange={(e) => setAcceptedTerminos(e.target.checked)}
                     className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
                   />
-                  <label htmlFor="consent-terminos" className="text-[11px] font-semibold leading-snug text-gray-600 md:text-xs">
+                  <label htmlFor="consent-terminos" className="text-[11px] font-semibold leading-snug text-gray-700 md:text-xs">
                     Acepto los{' '}
                     <a className="text-orange-600 underline" href="/terminos" target="_blank" rel="noreferrer">
-                      Términos de Uso
+                      {t.modalConsentTermsLink}
                     </a>
-                    .
+                    {' y la '}
+                    <a className="text-orange-600 underline" href="/privacidad" target="_blank" rel="noreferrer">
+                      {t.modalConsentPrivacyLink}
+                    </a>.
                   </label>
                 </div>
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
@@ -2087,38 +2344,43 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       setErr('');
                       setStep('capture');
                     }}
-                    className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-gray-600 active:scale-95 md:px-6 md:text-xs"
+                    className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-gray-600 active:scale-95 md:px-6"
                     style={soft.button}
                   >
                     {t.modalBack}
                   </button>
-                  <button
-                    type="button"
-                    onClick={submitDetails}
-                    disabled={
-                      saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
-                    }
-                    className="rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-widest text-white active:scale-95 disabled:opacity-60 md:px-6 md:text-xs"
-                    style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
-                  >
-                    {saving ? t.modalSending : t.modalSend}
-                  </button>
+                  <div className="flex flex-col items-end gap-1">
+                    <button
+                      type="button"
+                      onClick={submitDetails}
+                      disabled={
+                        saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
+                      }
+                      className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-white active:scale-95 disabled:opacity-60 md:px-6"
+                      style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
+                    >
+                      {saving ? t.modalSending : t.modalSend}
+                    </button>
+                    {!saving && !(acceptedPrivacy && acceptedPublicacion && acceptedTerminos) ? (
+                      <p className="max-w-[16rem] text-right text-[10px] text-gray-600">
+                        {t.modalMarkThreeToSend}
+                      </p>
+                    ) : null}
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
           {step === 'received' && (
-            <div className={`flex min-h-0 flex-1 flex-col ${jakartaHuella.className}`}>
+            <div className="font-interna flex min-h-0 flex-1 flex-col">
               <div className="shrink-0 space-y-2 text-center">
                 <div className="flex justify-center">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#FF4A1C]">
                     <Check size={20} strokeWidth={2.2} aria-hidden />
                   </div>
                 </div>
-                <h3
-                  className={`text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26] ${frauncesHuella.className}`}
-                >
+                <h3 className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26]">
                   {alias.trim() ? (
                     <>
                       {alias.trim()}, {t.modalReceivedAfterName}
@@ -2127,8 +2389,11 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     t.modalReceivedAnonBefore
                   )}
                 </h3>
-                <p className="text-[13px] font-light leading-snug text-[#5C5C52] md:text-sm">
+                <p className="text-[13px] font-normal leading-snug text-[#5C5C52] md:text-sm">
                   {t.modalImprintExplain}
+                </p>
+                <p className="text-[13px] font-normal leading-snug text-[#5C5C52] md:text-sm">
+                  {t.modalReviewInProgress}
                 </p>
               </div>
 
@@ -2137,25 +2402,25 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
-                    aria-label={t.modalImprintAria}
+                    aria-label={interpolate(t.modalImprintAlt, { titulo: storyTitle.trim() || 'historia' })}
                   />
                 </div>
               </div>
 
               <div className="mt-3 shrink-0 space-y-2">
-                <div className="flex gap-2">
+                <div className="flex flex-col gap-2 sm:flex-row">
                   <button
                     type="button"
                     onClick={() => void downloadImprint()}
-                    className="inline-flex min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#D13D17]"
+                    className="inline-flex min-h-11 min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#D13D17]"
                   >
                     <Download size={16} strokeWidth={1.6} aria-hidden />
-                    {t.modalDownloadImprint}
+                    {isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint}
                   </button>
                   <button
                     type="button"
                     onClick={() => void shareImprint()}
-                    className="inline-flex min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
+                    className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
                   >
                     <Share2 size={15} aria-hidden />
                     {t.modalShareImprint}
@@ -2165,7 +2430,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                   <button
                     type="button"
                     onClick={onClose}
-                    className="text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
+                    className="min-h-11 px-3 text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
                   >
                     {t.modalBackToMap}
                   </button>

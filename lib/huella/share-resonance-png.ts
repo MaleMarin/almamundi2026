@@ -43,7 +43,8 @@ export type ShareResonanceResult = 'shared' | 'copied' | 'downloaded' | 'aborted
 export async function shareOrCopyResonancePng(
   blob: Blob,
   filename: string,
-  shareTitle: string
+  shareTitle: string,
+  shareText?: string
 ): Promise<ShareResonanceResult> {
   const file = new File([blob], filename, { type: 'image/png' });
   const preferShare =
@@ -51,7 +52,11 @@ export async function shareOrCopyResonancePng(
 
   if (preferShare && canShareFiles(file)) {
     try {
-      await navigator.share({ files: [file], title: shareTitle });
+      await navigator.share({
+        files: [file],
+        title: shareTitle,
+        ...(shareText ? { text: shareText } : {}),
+      });
       return 'shared';
     } catch (e) {
       if ((e as Error).name === 'AbortError') return 'aborted';

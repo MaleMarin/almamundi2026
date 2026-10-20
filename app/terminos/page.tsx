@@ -5,7 +5,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
  */
 
 import type { Metadata } from 'next';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
   title: 'Términos de uso · AlmaMundi',
@@ -43,7 +43,7 @@ function Section({
       <h2
         style={{
           margin: '0 0 1rem',
-          fontFamily: SITE_FONT_STACK,
+          fontFamily: INTERIOR_FONT_STACK,
           fontStyle: 'italic',
           fontWeight: 600,
           fontSize: '1.1rem',
@@ -54,7 +54,7 @@ function Section({
       </h2>
       <div
         style={{
-          fontFamily: SITE_FONT_STACK,
+          fontFamily: INTERIOR_FONT_STACK,
           fontSize: '0.9rem',
           lineHeight: 1.65,
           color: TEXT_2,
@@ -73,7 +73,7 @@ export default function TerminosPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3rem',
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
       }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
@@ -92,7 +92,7 @@ export default function TerminosPage() {
         <h1
           style={{
             margin: '0 0 0.5rem',
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontStyle: 'italic',
             fontWeight: 600,
             fontSize: '1.75rem',

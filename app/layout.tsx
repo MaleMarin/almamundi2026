@@ -10,7 +10,7 @@ import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
-import { Bebas_Neue, Instrument_Serif, Syne } from 'next/font/google';
+import { Bebas_Neue, Instrument_Serif, Nunito_Sans, Syne } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
@@ -32,6 +32,14 @@ const syne = Syne({
   subsets: ['latin'],
   variable: '--font-syne',
   display: 'swap',
+});
+
+const nunitoSans = Nunito_Sans({
+  weight: ['400', '600', '700'],
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-interna',
+  display: 'swap',
+  adjustFontFallback: true,
 });
 
 function defaultMetadataBase(): URL {
@@ -109,7 +117,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${bebasNeue.variable} ${instrumentSerif.variable} ${syne.variable}`}
+      className={`${bebasNeue.variable} ${instrumentSerif.variable} ${syne.variable} ${nunitoSans.variable}`}
     >
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-sans">
         <CursorGlobal />

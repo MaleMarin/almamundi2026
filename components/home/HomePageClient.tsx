@@ -1,12 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
+import { contarHref, parseContarFormat } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { navigateToHomeMapa, scrollToHomeMapaSection } from '@/lib/mapa-home-nav';
 
@@ -20,6 +21,7 @@ import { navigateToHomeMapa, scrollToHomeMapaSection } from '@/lib/mapa-home-nav
  */
 export function HomePageClient() {
   const router = useRouter();
+  const pathname = usePathname() ?? '/';
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
@@ -60,7 +62,30 @@ export function HomePageClient() {
     if (clearTopic) setChosenTopic(null);
     setStoryMode(mode);
     setStoryOpen(true);
-  }, []);
+    router.push(contarHref(mode));
+  }, [router]);
+
+  const closeStory = useCallback(() => {
+    setStoryOpen(false);
+    if (parseContarFormat(pathname)) {
+      router.replace('/contar');
+    }
+  }, [pathname, router]);
+
+  useLayoutEffect(() => {
+    const format = parseContarFormat(pathname);
+    if (format) {
+      setStoryMode(format);
+      setStoryOpen(true);
+      return;
+    }
+    setStoryOpen(false);
+    if (pathname === '/contar') {
+      window.requestAnimationFrame(() => {
+        document.getElementById('historias')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
+  }, [pathname]);
 
   const closeProposito = useCallback(() => {
     setPropositoOpen(false);
@@ -85,7 +110,7 @@ export function HomePageClient() {
       });
       return;
     }
-    hardNavigateTo('/#historias');
+    hardNavigateTo('/contar');
   }, [closeProposito]);
 
   const openProposito = useCallback(() => {
@@ -229,7 +254,7 @@ export function HomePageClient() {
 
       <StoryModal
         isOpen={storyOpen}
-        onClose={() => setStoryOpen(false)}
+        onClose={closeStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
         onClearTopic={() => setChosenTopic(null)}

@@ -16,11 +16,12 @@ import {
 } from '@/lib/i18n/locale';
 import { HOME_MESSAGES, type HomeMessages } from '@/lib/i18n/home-messages';
 import { SITE_UI_MESSAGES, type SiteUiMessages } from '@/lib/i18n/site-ui-messages';
+import { STORY_FLOW_MESSAGES, type StoryFlowMessages } from '@/lib/i18n/story-flow-messages';
 
-export type UiMessages = HomeMessages & SiteUiMessages;
+export type UiMessages = HomeMessages & SiteUiMessages & StoryFlowMessages;
 
 export function uiMessages(locale: AlmaLocale): UiMessages {
-  return { ...HOME_MESSAGES[locale], ...SITE_UI_MESSAGES[locale] };
+  return { ...HOME_MESSAGES[locale], ...SITE_UI_MESSAGES[locale], ...STORY_FLOW_MESSAGES[locale] };
 }
 
 type LocaleContextValue = {

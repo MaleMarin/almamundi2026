@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export const metadata: Metadata = {
   title: 'Educación mediática | AlmaMundi',
@@ -12,7 +12,7 @@ export default function EducacionMediaticaPage() {
   return (
     <main
       className="min-h-screen bg-[#E0E5EC] px-6 pb-32 pt-28 md:px-14 md:pb-44 md:pt-36"
-      style={{ fontFamily: SITE_FONT_STACK, color: '#1a1f2a' }}
+      style={{ fontFamily: INTERIOR_FONT_STACK, color: '#1a1f2a' }}
     >
       <div className="mx-auto max-w-3xl">
         <Link

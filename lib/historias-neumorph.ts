@@ -1,12 +1,12 @@
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 /**
  * Neumorfismo fuerte para páginas /historias y /temas.
  * Misma paleta que home (soft UI) pero sombras más marcadas.
  *
- * Tipografía: misma pila sans que la home (`lib/typography.ts`).
+ * Tipografía: Nunito Sans (`--font-interna`) en interiores; la home no usa esta pila.
  */
-export const APP_FONT = SITE_FONT_STACK;
+export const APP_FONT = INTERIOR_FONT_STACK;
 
 export const neu = {
   APP_FONT,

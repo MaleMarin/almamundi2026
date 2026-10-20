@@ -11,7 +11,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { getDoc, doc } from 'firebase/firestore';
 import { auth } from '@/lib/firebase/client';
 import { db } from '@/lib/firebase/client';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 
 export default function PerfilRedirectPage() {
@@ -58,7 +58,7 @@ export default function PerfilRedirectPage() {
           display: 'flex',
           flexDirection: 'column',
           background: '#e8ecf0',
-          fontFamily: SITE_FONT_STACK,
+          fontFamily: INTERIOR_FONT_STACK,
           color: '#4a5568',
           padding: '1.5rem',
         }}

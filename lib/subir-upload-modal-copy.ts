@@ -17,7 +17,7 @@ export const UPLOAD_MODAL_COPY: Record<SubirHuellaFormat, UploadModalCopy> = {
     uploadLabel: 'o subir un video desde tu dispositivo',
   },
   audio: {
-    title: 'Hay historias que se entienden mejor cuando se escuchan',
+    title: 'Hay historias que se cuentan mejor en voz alta',
     subtitle: 'Tu voz guarda lo que las palabras escritas no siempre pueden.',
     limit: 'Hasta 5 minutos de audio.',
     primaryCta: 'Activar micrófono',
@@ -31,9 +31,9 @@ export const UPLOAD_MODAL_COPY: Record<SubirHuellaFormat, UploadModalCopy> = {
   },
   foto: {
     title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
-    subtitle: 'Sube hasta 8 fotos. Cada una puede tener su historia.',
-    limit: 'Hasta 8 fotos.',
-    primaryCta: 'Seleccionar fotos',
+    subtitle: 'Cada una puede tener su historia.',
+    limit: 'Hasta 10 MB por foto.',
+    primaryCta: 'Elegir fotos',
     uploadLabel: '',
   },
 };

@@ -9,7 +9,7 @@ import { MuestraCard } from './MuestraCard';
 import { GuardadasGrid } from './GuardadasGrid';
 import { NuevaMuestraModal } from './NuevaMuestraModal';
 import { EliminarCuentaModal } from './EliminarCuentaModal';
-import { SITE_FONT_STACK } from '@/lib/typography';
+import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { isAudiencePublicStoryStatus } from '@/lib/editorial/status';
 
 const BG = '#e8ecf0';
@@ -88,7 +88,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
       style={{
         minHeight: '100vh',
         background: BG,
-        fontFamily: SITE_FONT_STACK,
+        fontFamily: INTERIOR_FONT_STACK,
         paddingBottom: 48,
       }}
     >
@@ -153,7 +153,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               <p
                 style={{
                   margin: 0,
-                  fontFamily: SITE_FONT_STACK,
+                  fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.92rem',
                   color: frase ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.4)',
@@ -249,7 +249,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
         <h1
           style={{
             margin: '0.75rem 0 0',
-            fontFamily: SITE_FONT_STACK,
+            fontFamily: INTERIOR_FONT_STACK,
             fontStyle: 'italic',
             fontWeight: 400,
             fontSize: '1.2rem',
@@ -329,7 +329,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
             }}
           >
-            <div style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '1.4rem', color: TEXT_1 }}>
+            <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '1.4rem', color: TEXT_1 }}>
               {num}
             </div>
             <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: TEXT_3, marginTop: 2 }}>
@@ -368,7 +368,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               border: 'none',
               cursor: 'pointer',
               fontSize: '0.85rem',
-              fontFamily: SITE_FONT_STACK,
+              fontFamily: INTERIOR_FONT_STACK,
               background: activeTab === id ? `linear-gradient(135deg, ${ORANGE}, ${ORANGE_2})` : BG,
               color: activeTab === id ? '#fff' : TEXT_2,
               boxShadow: activeTab === id ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
