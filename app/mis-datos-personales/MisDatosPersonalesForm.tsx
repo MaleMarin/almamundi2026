@@ -1,7 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { TurnstileWidget } from '@/components/home/TurnstileWidget';
+import { getTurnstileSiteKey } from '@/lib/turnstile-client';
 
 const REQUEST_OPTIONS = [
   { value: 'confirmar_tratamiento', label: 'Confirmar si tratamos datos personales tuyos.' },
@@ -15,6 +17,37 @@ const REQUEST_OPTIONS = [
   { value: 'otro', label: 'Otro tipo de solicitud.' },
 ] as const;
 
+const PRIVACY_COUNTRIES = [
+  'Chile',
+  'México',
+  'Argentina',
+  'Bolivia',
+  'Brasil',
+  'Canadá',
+  'Colombia',
+  'Costa Rica',
+  'Cuba',
+  'Ecuador',
+  'El Salvador',
+  'España',
+  'Estados Unidos',
+  'Francia',
+  'Guatemala',
+  'Honduras',
+  'Italia',
+  'Nicaragua',
+  'Panamá',
+  'Paraguay',
+  'Perú',
+  'Portugal',
+  'Puerto Rico',
+  'Reino Unido',
+  'República Dominicana',
+  'Uruguay',
+  'Venezuela',
+  'Alemania',
+] as const;
+
 const fieldClass =
   'mt-1 w-full rounded-xl border border-gray-300/50 bg-[#f0f2f7] px-3 py-2.5 text-sm text-gray-900 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.35),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/35';
 
@@ -26,10 +59,27 @@ export function MisDatosPersonalesForm() {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
-  const [country, setCountry] = useState('');
+  const [country, setCountry] = useState<string>(PRIVACY_COUNTRIES[0]);
   const [ownData, setOwnData] = useState<'yes' | 'no' | ''>('');
+  const [website, setWebsite] = useState('');
+  const [formToken, setFormToken] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle');
   const [errMsg, setErrMsg] = useState('');
+  const siteKey = getTurnstileSiteKey();
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch('/api/privacy-data-request', { method: 'GET' })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data: { token?: string } | null) => {
+        if (!cancelled && data?.token) setFormToken(data.token);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -45,8 +95,11 @@ export function MisDatosPersonalesForm() {
           fullName,
           email,
           phone: phone.trim() || undefined,
-          country: country.trim() || undefined,
+          country,
           ownData,
+          website,
+          formToken,
+          turnstileToken,
         }),
       });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
@@ -109,7 +162,20 @@ export function MisDatosPersonalesForm() {
           </Link>
         </div>
       ) : (
-        <form onSubmit={onSubmit} className="space-y-8">
+        <form onSubmit={onSubmit} className="relative space-y-8">
+          <div aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>
+            <label htmlFor="website">Sitio web</label>
+            <input
+              id="website"
+              name="website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+            />
+          </div>
+
           <section
             className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="campos-solicitud"
@@ -143,8 +209,8 @@ export function MisDatosPersonalesForm() {
                 <textarea
                   id="descripcion"
                   required
-                  minLength={10}
-                  maxLength={12000}
+                  minLength={1}
+                  maxLength={2000}
                   rows={7}
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
@@ -172,7 +238,16 @@ export function MisDatosPersonalesForm() {
                 <label htmlFor="nombre" className={labelClass}>
                   Nombre completo
                 </label>
-                <input id="nombre" required minLength={2} maxLength={200} value={fullName} onChange={(e) => setFullName(e.target.value)} className={fieldClass} autoComplete="name" />
+                <input
+                  id="nombre"
+                  required
+                  minLength={2}
+                  maxLength={100}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className={fieldClass}
+                  autoComplete="name"
+                />
               </div>
               <div>
                 <label htmlFor="correo" className={labelClass}>
@@ -193,13 +268,35 @@ export function MisDatosPersonalesForm() {
                 <label htmlFor="telefono" className={labelClass}>
                   Teléfono o medio de contacto alternativo <span className="font-normal text-gray-500">(opcional)</span>
                 </label>
-                <input id="telefono" type="text" maxLength={120} value={phone} onChange={(e) => setPhone(e.target.value)} className={fieldClass} autoComplete="tel" />
+                <input
+                  id="telefono"
+                  type="tel"
+                  inputMode="numeric"
+                  maxLength={20}
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className={fieldClass}
+                  autoComplete="tel"
+                />
               </div>
               <div>
                 <label htmlFor="pais" className={labelClass}>
-                  País <span className="font-normal text-gray-500">(opcional)</span>
+                  País
                 </label>
-                <input id="pais" type="text" maxLength={120} value={country} onChange={(e) => setCountry(e.target.value)} className={fieldClass} autoComplete="country-name" />
+                <select
+                  id="pais"
+                  required
+                  value={country}
+                  onChange={(e) => setCountry(e.target.value)}
+                  className={fieldClass}
+                  autoComplete="country-name"
+                >
+                  {PRIVACY_COUNTRIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
               </div>
               <fieldset>
                 <legend className={`${labelClass} mb-2`}>
@@ -236,10 +333,14 @@ export function MisDatosPersonalesForm() {
               Para proteger tu privacidad, es posible que solicitemos una verificación mínima de identidad antes de
               responder ciertas solicitudes.
             </p>
-            <p className="mt-3 text-sm leading-relaxed text-gray-600">
-              No envíes documentos sensibles salvo que te los pidamos expresamente. Si fuera necesario confirmar tu
-              identidad, te indicaremos qué información enviar y cómo hacerlo de forma segura.
-            </p>
+            {siteKey ? (
+              <div className="mt-4">
+                <TurnstileWidget
+                  onTokenChange={setTurnstileToken}
+                  onGateChange={() => {}}
+                />
+              </div>
+            ) : null}
           </section>
 
           <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#e8ebf2]/90 p-5 text-xs leading-relaxed text-gray-600 md:text-sm">
@@ -261,7 +362,7 @@ export function MisDatosPersonalesForm() {
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
             <button
               type="submit"
-              disabled={status === 'sending' || ownData === ''}
+              disabled={status === 'sending' || ownData === '' || !formToken}
               className="rounded-full bg-[#FF4A1C] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === 'sending' ? 'Enviando…' : 'Enviar solicitud'}

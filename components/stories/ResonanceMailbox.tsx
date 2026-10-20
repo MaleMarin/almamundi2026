@@ -14,6 +14,7 @@ import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { messageYieldsResonanceGift, ResonanceGift } from '@/components/stories/ResonanceGift';
+import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 
 export type ResonanceMailboxTriggerLayout = 'floating' | 'inline';
 
@@ -57,6 +58,7 @@ export function ResonanceMailbox({
   const [glow, setGlow] = useState(false);
   const [phase, setPhase] = useState<'compose' | 'thanks'>('compose');
   const [sentText, setSentText] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   useEffect(() => {
     setMounted(true);
@@ -101,7 +103,7 @@ export function ResonanceMailbox({
       const res = await fetch(`/api/stories/${encodeURIComponent(storyId)}/affective-message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed }),
+        body: JSON.stringify({ message: trimmed, turnstileToken }),
       });
       const data = (await res.json()) as {
         ok?: boolean;
@@ -126,7 +128,7 @@ export function ResonanceMailbox({
     } finally {
       setSending(false);
     }
-  }, [storyId, text]);
+  }, [storyId, text, turnstileToken]);
 
   return (
     <>
@@ -361,6 +363,9 @@ export function ResonanceMailbox({
                         {reformulateHint}
                       </p>
                     ) : null}
+                    <div className="mt-4">
+                      <TurnstileWidget onTokenChange={setTurnstileToken} onGateChange={() => {}} />
+                    </div>
                     {error ? (
                       <p className="mt-2 text-sm text-rose-300/95" role="alert">
                         {error}
