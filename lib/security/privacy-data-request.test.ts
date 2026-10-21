@@ -165,6 +165,30 @@ describe('privacy-data-request layers', () => {
     assert.equal(isAllowedTurnstileHostname('www.almamundi.org'), true);
   });
 
+  it('Turnstile: en preview la clave de prueba omite hostname', async () => {
+    process.env.VERCEL_ENV = 'preview';
+    process.env.TURNSTILE_SECRET_KEY = CLOUDFLARE_TURNSTILE_TEST_SECRET;
+    const fakeFetch: typeof fetch = async () =>
+      new Response(JSON.stringify({ success: true, hostname: 'evil.example' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    const r = await verifyTurnstileStrict('token-de-prueba-12345', '1.1.1.1', fakeFetch);
+    assert.equal(r.ok, true);
+  });
+
+  it('Turnstile: en producción la clave de prueba es rechazada', async () => {
+    process.env.VERCEL_ENV = 'production';
+    process.env.TURNSTILE_SECRET_KEY = CLOUDFLARE_TURNSTILE_TEST_SECRET;
+    const fakeFetch: typeof fetch = async () =>
+      new Response(JSON.stringify({ success: true, hostname: 'www.almamundi.org' }), {
+        status: 200,
+        headers: { 'content-type': 'application/json' },
+      });
+    const r = await verifyTurnstileStrict('token-de-prueba-12345', '1.1.1.1', fakeFetch);
+    assert.equal(r.ok, false);
+  });
+
   it('campos inválidos: nombre con números', () => {
     const parsed = privacyDataRequestSchema.safeParse(validFields({ fullName: 'Ana 123' }));
     assert.equal(parsed.success, false);
