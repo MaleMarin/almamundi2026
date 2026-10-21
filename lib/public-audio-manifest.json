@@ -11,7 +11,6 @@
     "/audio/ambients/people.mp3",
     "/audio/ambients/people.wav",
     "/audio/ambients/universe.mp3",
-    "/audio/ambients/universe.wav",
     "/audio/mar.m4a",
     "/audio/sonido arroyo.mp4",
     "/audio/sonido bajo el mar.mp4",
@@ -23,7 +22,6 @@
     "/audio/sonido lluvia.mp4",
     "/audio/sonido mercado.mp4",
     "/audio/sonido radio.mp4",
-    "/audio/sonido volcán.mp4",
-    "/universo.mp3"
+    "/audio/sonido volcán.mp4"
   ]
 }

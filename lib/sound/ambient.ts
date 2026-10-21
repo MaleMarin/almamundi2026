@@ -57,7 +57,7 @@ const URLS: Record<AmbientKey, string[]> = {
   /** No hay wind.* en repo: neblina + bosque como aire */
   viento: ["/audio/neblina.mp3", "/audio/ambients/forest.mp3", "/audio/ambients/forest.wav"],
   animales: ["/audio/ambients/animals.mp3", "/audio/ambients/animals.wav"],
-  universo: ["/audio/ambients/universe.mp3", "/audio/ambients/universe.wav", "/universo.mp3"],
+  universo: ["/audio/ambients/universe.mp3"],
   personas: ["/audio/ambients/people.mp3", "/audio/ambients/people.wav"],
   /** Grabaciones en `public/audio/sonido *.mp4` (no había radio.mp3 en carpeta) */
   radio: [pubAudio("sonido radio.mp4")],
@@ -390,6 +390,7 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
     }
   }
   if (ctx.state === "suspended") return;
+  if (!canFetchAmbient()) return;
   if (myGen !== ambientPlayGeneration) return;
   const fade = (opts?.fadeMs ?? 800) / 1000;
 
@@ -449,10 +450,15 @@ export async function playAmbientFromPublicUrl(urlPath: string, opts?: { fadeMs?
   startSpaceFollow();
 }
 
+function canFetchAmbient(): boolean {
+  return state.unlocked && state.ctx != null && state.ctx.state === "running";
+}
+
 export async function unlockAmbientAudio() {
   const ctx = ensureCtx();
   if (!ctx) return;
   if (ctx.state === "suspended") await ctx.resume();
+  if (ctx.state !== "running") return;
   const osc = ctx.createOscillator();
   const g = ctx.createGain();
   g.gain.value = 0.0001;
@@ -518,6 +524,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
     }
   }
   if (ctx.state === "suspended") return;
+  if (!canFetchAmbient()) return;
   if (myGen !== ambientPlayGeneration) return;
   const defaultFade = key === "universo" ? 2000 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;

@@ -50,13 +50,6 @@ async function main() {
   /** Solo `public/audio/**`: evita mezclar vídeos 4K de la raíz de `public/` en el panel Sonidos. */
   await walkAudioFiles(audioDir, publicRoot, paths);
 
-  try {
-    await stat(path.join(publicRoot, "universo.mp3"));
-    paths.add("/universo.mp3");
-  } catch {
-    /* no hay universo.mp3 en raíz */
-  }
-
   const sorted = [...paths].sort((a, b) => a.localeCompare(b, "es"));
   const outPath = path.join(root, "lib", "public-audio-manifest.json");
   await writeFile(
