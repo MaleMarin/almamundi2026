@@ -5,13 +5,13 @@ const isDev = process.env.NODE_ENV === "development";
 
 const csp = [
   "default-src 'self'",
-  `script-src 'self' ${isDev ? "'unsafe-eval' " : ""}'unsafe-inline' 'wasm-unsafe-eval' https://*.firebaseapp.com https://www.google.com https://www.gstatic.com https://apis.google.com https://vercel.live https://challenges.cloudflare.com`,
+  `script-src 'self' ${isDev ? "'unsafe-eval' " : ""}'unsafe-inline' 'wasm-unsafe-eval' https://*.firebaseapp.com https://www.google.com https://www.gstatic.com https://apis.google.com https://www.googletagmanager.com https://vercel.live https://challenges.cloudflare.com`,
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "img-src 'self' data: blob: https:",
+  "img-src 'self' data: blob: https: https://www.googletagmanager.com",
   "font-src 'self' https://fonts.gstatic.com data:",
-  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io",
+  "connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.cloudfunctions.net wss://*.firebaseio.com https://vercel.live https://*.cloudflare.com https://challenges.cloudflare.com https://storage.googleapis.com https://*.googleusercontent.com https://cdn.jsdelivr.net https://nominatim.openstreetmap.org https://*.ingest.sentry.io https://*.ingest.us.sentry.io https://*.ingest.de.sentry.io https://www.googletagmanager.com https://www.google.com https://google.com",
   "worker-src 'self' blob:",
-  "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://*.firebaseapp.com https://challenges.cloudflare.com",
+  "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://*.firebaseapp.com https://challenges.cloudflare.com https://www.googletagmanager.com",
   "media-src 'self' blob: https:",
   "object-src 'none'",
   "base-uri 'self'",
