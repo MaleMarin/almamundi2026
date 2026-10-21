@@ -147,6 +147,12 @@ function isHttpUrl(url: string): boolean {
   return /^https?:\/\//i.test(url.trim());
 }
 
+declare global {
+  interface Window {
+    gtag?: (...args: unknown[]) => void;
+  }
+}
+
 const MODE_CONTEXT_LABEL: Record<StoryModalMode, string> = {
   video: 'Video',
   audio: 'Audio',
@@ -395,6 +401,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [acceptedTerminos, setAcceptedTerminos] = useState(false);
   const [saving, setSaving] = useState(false);
   const captchaTokenRef = useRef('');
+  const adsConversionSentRef = useRef('');
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(
     getTurnstileSiteKey() ? 'wait' : 'skip'
   );
@@ -1118,6 +1125,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         typeof data.id === 'string' && data.id
           ? data.id
           : `AM-${Date.now().toString(36).toUpperCase()}`;
+      if (typeof data.id === 'string' && data.id && adsConversionSentRef.current !== data.id) {
+        adsConversionSentRef.current = data.id;
+        window.gtag?.('event', 'conversion', {
+          send_to: 'AW-17718043044/dK-ICKuv_KMdEKTDz4BC',
+        });
+      }
       setImprintId(id);
       setImprintReceivedAt(new Date());
       setStep('received');
