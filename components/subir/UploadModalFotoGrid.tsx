@@ -2,21 +2,28 @@
 
 import styles from '@/components/subir/am-upload-modal.module.css';
 import { SUBIR_PHOTO_MAX } from '@/lib/subir-limits';
+import type { StoryPhotoItem } from '@/lib/story-photo-item';
 
 type Props = {
-  photoPreviews: string[];
-  photoFiles: File[];
+  photos: StoryPhotoItem[];
   onAddFiles: (files: FileList | null) => void;
   onRemove: (index: number) => void;
+  onRetry: (id: string) => void;
+  convertingLabel: string;
+  retryLabel: string;
+  failedLabel: string;
   maxPhotos?: number;
   showCounter?: boolean;
 };
 
 export function UploadModalFotoGrid({
-  photoPreviews,
-  photoFiles,
+  photos,
   onAddFiles,
   onRemove,
+  onRetry,
+  convertingLabel,
+  retryLabel,
+  failedLabel,
   maxPhotos = SUBIR_PHOTO_MAX,
   showCounter = true,
 }: Props) {
@@ -26,11 +33,37 @@ export function UploadModalFotoGrid({
     <div>
       <div className={styles.amFotoGrid} role="list" aria-label="Fotos seleccionadas">
         {slots.map((i) => {
-          const preview = photoPreviews[i];
-          if (preview) {
+          const photo = photos[i];
+          if (photo) {
             return (
-              <div key={`filled-${i}`} className={`${styles.amFotoSlot} ${styles.amFotoSlotFilled}`} role="listitem">
-                <img src={preview} alt={photoFiles[i]?.name ?? `Foto ${i + 1}`} />
+              <div
+                key={photo.id}
+                className={`${styles.amFotoSlot} ${styles.amFotoSlotFilled}`}
+                role="listitem"
+              >
+                {photo.previewUrl ? (
+                  <img src={photo.previewUrl} alt={photo.name} />
+                ) : (
+                  <div className={styles.amFotoSlotPlaceholder} aria-hidden />
+                )}
+                {photo.converting ? (
+                  <p className={styles.amFotoSlotStatus} role="status">
+                    {convertingLabel}
+                  </p>
+                ) : null}
+                {photo.uploadStatus === 'uploading' ? (
+                  <p className={styles.amFotoSlotStatus} role="status">
+                    {Math.round(photo.progress * 100)}%
+                  </p>
+                ) : null}
+                {photo.uploadStatus === 'error' ? (
+                  <div className={styles.amFotoSlotError}>
+                    <p>{photo.error || failedLabel}</p>
+                    <button type="button" onClick={() => onRetry(photo.id)}>
+                      {retryLabel}
+                    </button>
+                  </div>
+                ) : null}
                 <button
                   type="button"
                   className={styles.amFotoSlotRemove}
@@ -42,7 +75,7 @@ export function UploadModalFotoGrid({
               </div>
             );
           }
-          if (i === photoPreviews.length && photoPreviews.length < maxPhotos) {
+          if (i === photos.length && photos.length < maxPhotos) {
             return (
               <label
                 key={`empty-${i}`}
@@ -77,7 +110,7 @@ export function UploadModalFotoGrid({
       </div>
       {showCounter ? (
         <p className={styles.amFotoCounter}>
-          {photoPreviews.length} de {maxPhotos} fotos
+          {photos.length} de {maxPhotos} fotos
         </p>
       ) : null}
     </div>

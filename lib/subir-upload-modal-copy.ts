@@ -31,7 +31,7 @@ export const UPLOAD_MODAL_COPY: Record<SubirHuellaFormat, UploadModalCopy> = {
   },
   foto: {
     title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
-    subtitle: 'Cada una puede tener su historia.',
+    subtitle: 'Sube hasta 8 fotos. Cada una puede tener su historia.',
     limit: 'Hasta 10 MB por foto.',
     primaryCta: 'Elegir fotos',
     uploadLabel: '',

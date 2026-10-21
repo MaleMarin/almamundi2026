@@ -24,6 +24,9 @@ export type StoryFlowMessages = {
   modalPhotoAltPlaceholder: string;
   modalPhotoTypeError: string;
   modalPhotoSizeError: string;
+  modalPhotoConverting: string;
+  modalPhotoUploadFailed: string;
+  modalPhotoRetry: string;
   modalRequiredFieldsNote: string;
   modalAliasHint: string;
   modalCancionPlaceholder: string;
@@ -81,6 +84,9 @@ const es: StoryFlowMessages = {
   modalPhotoAltPlaceholder: 'Ej: Mi abuela riendo en la playa, 1985',
   modalPhotoTypeError: 'Ese archivo no es una foto. Usa JPG, PNG, WEBP o HEIC.',
   modalPhotoSizeError: 'Esa foto pesa más de 10 MB. Prueba con una más liviana.',
+  modalPhotoConverting: 'Convirtiendo tu foto…',
+  modalPhotoUploadFailed: 'No pudimos subir esta foto.',
+  modalPhotoRetry: 'Reintentar',
   modalRequiredFieldsNote: 'Los campos con * son obligatorios.',
   modalAliasHint: 'Así aparecerás en el mapa.',
   modalCancionPlaceholder: 'Nombre o enlace',
@@ -114,10 +120,22 @@ const es: StoryFlowMessages = {
 
 const pt: StoryFlowMessages = {
   ...es,
+  modalPhotoTypeError: 'Esse ficheiro não é uma foto. Use JPG, PNG, WEBP ou HEIC.',
+  modalPhotoSizeError: 'Essa foto pesa mais de 10 MB. Tente uma mais leve.',
+  modalPhotoConverting: 'A converter a sua foto…',
+  modalPhotoUploadFailed: 'Não foi possível enviar esta foto.',
+  modalPhotoRetry: 'Tentar de novo',
+  modalRequiredFieldsNote: 'Os campos com * são obrigatórios.',
 };
 
 const en: StoryFlowMessages = {
   ...es,
+  modalPhotoTypeError: 'That file is not a photo. Use JPG, PNG, WEBP, or HEIC.',
+  modalPhotoSizeError: 'That photo is over 10 MB. Try a smaller one.',
+  modalPhotoConverting: 'Converting your photo…',
+  modalPhotoUploadFailed: 'We could not upload this photo.',
+  modalPhotoRetry: 'Try again',
+  modalRequiredFieldsNote: 'Fields marked with * are required.',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

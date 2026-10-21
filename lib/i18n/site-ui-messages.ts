@@ -72,6 +72,16 @@ export type SiteUiMessages = {
   modalCapture: string;
   modalConfirmSend: string;
   modalDetailsTitle: string;
+  modalDetailsSubtitle: string;
+  modalSendVideo: string;
+  modalSendAudio: string;
+  modalSendText: string;
+  modalSendPhoto: string;
+  modalSendPhotos: string;
+  modalSendingVideo: string;
+  modalSendingAudio: string;
+  modalSendingText: string;
+  modalSendingPhotos: string;
   modalSectionStory: string;
   modalStoryName: string;
   modalStoryNamePlaceholder: string;
@@ -220,7 +230,18 @@ const es: SiteUiMessages = {
   modalContinue: 'Continuar',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmación de envío',
-  modalDetailsTitle: 'Un par de datos más',
+  modalDetailsTitle: 'Por favor, déjanos tus datos',
+  modalDetailsSubtitle:
+    'Así podremos ubicar tu historia en el mapa y avisarte cuando esté publicada.',
+  modalSendVideo: 'Enviar mi video',
+  modalSendAudio: 'Enviar mi audio',
+  modalSendText: 'Enviar mi texto',
+  modalSendPhoto: 'Enviar mi foto',
+  modalSendPhotos: 'Enviar mis fotos',
+  modalSendingVideo: 'Enviando tu video…',
+  modalSendingAudio: 'Enviando tu audio…',
+  modalSendingText: 'Enviando tu texto…',
+  modalSendingPhotos: 'Enviando tus fotos…',
   modalSectionStory: 'Historia',
   modalStoryName: 'Título de tu historia *',
   modalStoryNamePlaceholder: 'Ej: El día que entendí algo',
@@ -317,7 +338,7 @@ const es: SiteUiMessages = {
     },
     foto: {
       title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
-      subtitle: 'Cada una puede tener su historia.',
+      subtitle: 'Sube hasta 8 fotos. Cada una puede tener su historia.',
       limit: 'Hasta 10 MB por foto.',
       primaryCta: 'Elegir fotos',
       uploadLabel: '',
@@ -401,7 +422,18 @@ const pt: SiteUiMessages = {
   modalContinue: 'Continuar',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmação de envio',
-  modalDetailsTitle: 'Mais alguns dados',
+  modalDetailsTitle: 'Por favor, deixe-nos os seus dados',
+  modalDetailsSubtitle:
+    'Assim podemos colocar a sua história no mapa e avisá-lo quando estiver publicada.',
+  modalSendVideo: 'Enviar o meu vídeo',
+  modalSendAudio: 'Enviar o meu áudio',
+  modalSendText: 'Enviar o meu texto',
+  modalSendPhoto: 'Enviar a minha foto',
+  modalSendPhotos: 'Enviar as minhas fotos',
+  modalSendingVideo: 'A enviar o seu vídeo…',
+  modalSendingAudio: 'A enviar o seu áudio…',
+  modalSendingText: 'A enviar o seu texto…',
+  modalSendingPhotos: 'A enviar as suas fotos…',
   modalSectionStory: 'História',
   modalStoryName: 'Nome da história *',
   modalStoryNamePlaceholder: 'Ex.: O dia em que percebi algo',
@@ -500,7 +532,7 @@ const pt: SiteUiMessages = {
     foto: {
       title: 'Uma imagem pode guardar\no que as palavras não alcançam',
       subtitle: 'Envie até 8 fotos. Cada uma pode ter a sua história.',
-      limit: 'Até 8 fotos.',
+      limit: 'Até 10 MB por foto.',
       primaryCta: 'Selecionar fotos',
       uploadLabel: '',
     },
@@ -582,7 +614,18 @@ const en: SiteUiMessages = {
   modalContinue: 'Continue',
   modalCapture: 'Capture',
   modalConfirmSend: 'Submission confirmation',
-  modalDetailsTitle: 'A few more details',
+  modalDetailsTitle: 'Please leave us your details',
+  modalDetailsSubtitle:
+    'This is how we can place your story on the map and let you know when it is published.',
+  modalSendVideo: 'Send my video',
+  modalSendAudio: 'Send my audio',
+  modalSendText: 'Send my text',
+  modalSendPhoto: 'Send my photo',
+  modalSendPhotos: 'Send my photos',
+  modalSendingVideo: 'Sending your video…',
+  modalSendingAudio: 'Sending your audio…',
+  modalSendingText: 'Sending your text…',
+  modalSendingPhotos: 'Sending your photos…',
   modalSectionStory: 'Story',
   modalStoryName: 'Story name *',
   modalStoryNamePlaceholder: 'e.g. The day I understood something',
@@ -681,7 +724,7 @@ const en: SiteUiMessages = {
     foto: {
       title: 'An image can hold\nwhat words cannot reach',
       subtitle: 'Upload up to 8 photos. Each one can have its story.',
-      limit: 'Up to 8 photos.',
+      limit: 'Up to 10 MB per photo.',
       primaryCta: 'Select photos',
       uploadLabel: '',
     },

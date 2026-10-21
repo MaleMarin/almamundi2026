@@ -32,7 +32,8 @@ function inferContentType(blob: Blob, filename: string): string {
 async function putResumable(
   uploadUrl: string,
   blob: Blob,
-  contentType: string
+  contentType: string,
+  onProgress?: (ratio: number) => void
 ): Promise<void> {
   const total = blob.size;
   let offset = 0;
@@ -49,19 +50,22 @@ async function putResumable(
     });
     if (res.status === 308) {
       offset = end;
+      onProgress?.(total > 0 ? offset / total : 1);
       continue;
     }
     if (!res.ok) {
       throw new Error(`upload_${res.status}`);
     }
     offset = end;
+    onProgress?.(total > 0 ? offset / total : 1);
   }
 }
 
 export async function uploadFileToStorage(
   file: File | Blob,
   _pathPrefix: string,
-  filename?: string
+  filename?: string,
+  onProgress?: (ratio: number) => void
 ): Promise<StoryMediaUploadResult> {
   const name =
     filename || (file instanceof File ? file.name : 'media');
@@ -86,7 +90,7 @@ export async function uploadFileToStorage(
     throw new Error(initData.error || `upload_${init.status}`);
   }
 
-  await putResumable(initData.uploadUrl, blob, mime);
+  await putResumable(initData.uploadUrl, blob, mime, onProgress);
 
   const done = await fetch('/api/submissions/story-media/complete', {
     method: 'POST',

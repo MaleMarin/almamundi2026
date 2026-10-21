@@ -261,7 +261,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   /** Primera vez que la sección del mapa entra en vista: fijar ambiente «universo» (luego el usuario puede cambiarlo en Sonidos). */
   const hasPrimedUniverseForMapRef = useRef(false);
   /** True solo si la persona apagó el sonido con el botón del mapa (no reactivar con IO ni con clics en #mapa). */
-  const userSilencedMapAmbientRef = useRef(false);
+  const userSilencedMapAmbientRef = useRef((() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return window.localStorage.getItem('almamundi_sound_enabled') === 'false';
+    } catch {
+      return false;
+    }
+  })());
 
   const startMapAmbientFromRefs = useCallback(() => {
     initFromUserGesture();
@@ -275,7 +282,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           if (path) await playAmbientFromPublicUrl(path);
           return;
         }
-        // «universo»: dejar el fade por defecto del motor (~2.2 s) al entrar al globo; otros presets, entrada más rápida.
+        // «universo»: fade de 2 s al entrar al globo; otros presets, entrada más rápida.
         await playAmbient(m as AmbientKey, m === 'universo' ? undefined : { fadeMs: 900 });
       })
       .catch(() => {});
@@ -442,6 +449,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         initFromUserGesture();
       } else {
         userSilencedMapAmbientRef.current = true;
+      }
+      try {
+        window.localStorage.setItem('almamundi_sound_enabled', String(next));
+      } catch {
+        /* noop */
       }
       return next;
     });

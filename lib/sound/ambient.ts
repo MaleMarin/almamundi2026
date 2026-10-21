@@ -214,12 +214,14 @@ export function setAmbientOrPublicTrackVolume(id: string, vol: number): void {
 
 /** Volumen base nominal del master. */
 const AMBIENT_MASTER_VOL = 1.0;
+/** Tope audible del universo / ambiente (0–1). */
+const AMBIENT_OUTPUT_MAX = 0.15;
 
 /** Volumen base actual (0–1) para la atmósfera del mapa. */
 let ambientBaseVolume = 0.1;
 
 function ambientMasterTarget(): number {
-  return ambientBaseVolume * AMBIENT_MASTER_VOL;
+  return Math.min(AMBIENT_OUTPUT_MAX, Math.max(0, ambientBaseVolume * AMBIENT_MASTER_VOL));
 }
 
 /** Crea el contexto solo tras un gesto del usuario (evita el aviso de AudioContext en consola). */
@@ -517,7 +519,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   }
   if (ctx.state === "suspended") return;
   if (myGen !== ambientPlayGeneration) return;
-  const defaultFade = key === "universo" ? 2200 : 250;
+  const defaultFade = key === "universo" ? 2000 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;
 
   let buf: AudioBuffer;
@@ -579,11 +581,31 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
 export function stopAmbient() {
   ambientPlayGeneration += 1;
   stopSpaceFollow();
-  hardStopCurrent();
-  state.current = null;
-  hardStopGenerativeLayer();
-  silenceAmbientMaster();
   const ctx = state.ctx;
+  const cur = state.current;
+  if (cur && ctx && typeof window !== "undefined") {
+    const t = ctx.currentTime;
+    try {
+      cur.gain.gain.cancelScheduledValues(t);
+      cur.gain.gain.setValueAtTime(cur.gain.gain.value, t);
+      cur.gain.gain.linearRampToValueAtTime(0, t + 2);
+    } catch {
+      /* noop */
+    }
+    const toStop = cur;
+    window.setTimeout(() => {
+      if (state.current === toStop) {
+        hardStopCurrent();
+        state.current = null;
+        silenceAmbientMaster();
+      }
+    }, 2000);
+  } else {
+    hardStopCurrent();
+    state.current = null;
+    silenceAmbientMaster();
+  }
+  hardStopGenerativeLayer();
   const t = ctx?.currentTime ?? 0;
   try {
     if (state.panner) {
@@ -607,7 +629,7 @@ export function setAmbientEnabled(enabled: boolean) {
 
 export function duckAmbient(duck: boolean) {
   if (!state.master || !state.ctx) return;
-  state.master.gain.setTargetAtTime(duck ? 0.05 : ambientMasterTarget(), state.ctx.currentTime, 0.08);
+  state.master.gain.setTargetAtTime(duck ? 0 : ambientMasterTarget(), state.ctx.currentTime, 0.04);
 }
 
 export function getAmbientUnlocked() {
@@ -721,4 +743,16 @@ export function startGenerativeLayer(hour: number, storyCount: number) {
 /** Corta de inmediato los osciladores que iban a `destination` (no pasan por `master`). */
 export function stopGenerativeLayer() {
   hardStopGenerativeLayer();
+}
+
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    const ctx = state.ctx;
+    if (!ctx) return;
+    if (document.hidden) {
+      void ctx.suspend();
+      return;
+    }
+    if (state.current) void ctx.resume();
+  });
 }

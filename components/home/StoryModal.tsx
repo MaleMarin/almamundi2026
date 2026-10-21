@@ -67,8 +67,16 @@ import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
-import { convertHeicFiles, convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
+import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
+import { prepareStoryPhotoForUpload } from '@/lib/prepare-story-photo';
+import { reportStorySubmitError } from '@/lib/story-submit-error';
+import {
+  createStoryPhotoId,
+  isDisplayableStoryPhoto,
+  type StoryPhotoItem,
+} from '@/lib/story-photo-item';
 import { classifyMediaCaptureError, type MediaCaptureErrorKind } from '@/lib/media-capture-error';
+import { duckAmbient } from '@/lib/sound/ambient';
 import {
   clearStoryDraft,
   loadStoryDraft,
@@ -376,10 +384,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [textBody, setTextBody] = useState('');
   /** Tras escribir, la persona confirma que leyó/revisó antes de Continuar (modo texto). */
   const [textoReviewAck, setTextoReviewAck] = useState(false);
-  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
-  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<StoryPhotoItem[]>([]);
   const [photoAlts, setPhotoAlts] = useState<string[]>([]);
-  const [convertingHeic, setConvertingHeic] = useState(false);
 
   // --- FORM: historia + extras (STEP 2 del modal: tras captura) ---
   const [storyTitle, setStoryTitle] = useState('');
@@ -398,6 +404,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [acceptedPublicacion, setAcceptedPublicacion] = useState(false);
   const [acceptedTerminos, setAcceptedTerminos] = useState(false);
   const [saving, setSaving] = useState(false);
+  const submitInFlightRef = useRef(false);
+  const extraUploadRef = useRef<{
+    key: string;
+    readUrl: string;
+    storagePath: string;
+  }[]>([]);
+  const profileUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
+  const avUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
   const captchaTokenRef = useRef('');
   const adsConversionSentRef = useRef('');
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(
@@ -406,6 +420,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   /** Evita validar un título stale si el closure del submit no se actualizó. */
   const storyTitleRef = useRef(storyTitle);
   storyTitleRef.current = storyTitle;
+
+  useEffect(() => {
+    avUploadRef.current = null;
+  }, [mediaBlob, uploadVideoFile, uploadAudioFile]);
+
+  useEffect(() => {
+    const reviewingAv =
+      (mode === 'video' || mode === 'audio') &&
+      (recording || previewUrl != null || mediaBlob != null);
+    duckAmbient(reviewingAv);
+    return () => duckAmbient(false);
+  }, [mode, recording, previewUrl, mediaBlob]);
 
   const [imprintId, setImprintId] = useState('');
   /** Fecha del envío mostrada en la resonancia visual (canvas y descarga). */
@@ -471,9 +497,17 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setFieldErr({});
       setTextBody('');
       setTextoReviewAck(false);
-      setPhotoFiles([]);
-      setPhotoPreviews([]);
+      setPhotos((prev) => {
+        prev.forEach((p) => {
+          if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+        });
+        return [];
+      });
       setPhotoAlts([]);
+      extraUploadRef.current = [];
+      profileUploadRef.current = null;
+      avUploadRef.current = null;
+      submitInFlightRef.current = false;
       setStoryTitle('');
       setAlias('');
       setExtraText('');
@@ -605,7 +639,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         mediaBlob ||
         uploadVideoFile ||
         uploadAudioFile ||
-        photoFiles.length > 0
+        photos.length > 0
     );
   }, [
     textBody,
@@ -621,7 +655,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     mediaBlob,
     uploadVideoFile,
     uploadAudioFile,
-    photoFiles.length,
+    photos.length,
   ]);
 
   const requestLeave = useCallback((): boolean => {
@@ -923,50 +957,72 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     [resetCaptureMedia]
   );
 
-  const addPhotos = useCallback(async (list: FileList | null) => {
+  const addPhotos = useCallback((list: FileList | null) => {
     if (!list?.length) return;
     setErr('');
     const incoming = Array.from(list);
-    if (incoming.some(looksLikeHeic)) setConvertingHeic(true);
-    try {
-      const converted = await convertHeicFiles(incoming);
-      setPhotoFiles((prev) => {
-        const next = [...prev];
-        for (const f of converted) {
-          if (next.length >= SUBIR_PHOTO_MAX) {
-            setErr(UPLOAD_PHOTO_MAX_MESSAGE);
-            break;
-          }
-          const typeOk =
-            /^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type) || looksLikeHeic(f);
-          if (!typeOk) {
-            setErr(t.modalPhotoTypeError);
-            continue;
-          }
-          if (f.size > SUBIR_PHOTO_FILE_MAX_MB * 1024 * 1024) {
-            setErr(t.modalPhotoSizeError);
-            continue;
-          }
-          next.push(f);
+    const pendingHeic: { id: string; file: File }[] = [];
+
+    setPhotos((prev) => {
+      const next = [...prev];
+      for (const f of incoming) {
+        if (next.length >= SUBIR_PHOTO_MAX) {
+          setErr(UPLOAD_PHOTO_MAX_MESSAGE);
+          break;
         }
-        setPhotoAlts((alts) => next.map((_, i) => (i < prev.length ? alts[i] ?? '' : '')));
-        return next;
+        const typeOk =
+          /^image\/(jpeg|png|webp|jpg|heic|heif)$/i.test(f.type) || looksLikeHeic(f);
+        if (!typeOk) {
+          setErr(t.modalPhotoTypeError);
+          continue;
+        }
+        if (f.size > SUBIR_PHOTO_FILE_MAX_MB * 1024 * 1024) {
+          setErr(t.modalPhotoSizeError);
+          continue;
+        }
+        const heic = looksLikeHeic(f);
+        const item: StoryPhotoItem = {
+          id: createStoryPhotoId(),
+          name: f.name,
+          readyFile: heic ? null : f,
+          previewUrl: isDisplayableStoryPhoto(f) ? URL.createObjectURL(f) : '',
+          converting: heic,
+          uploadStatus: 'idle',
+          progress: 0,
+          error: null,
+        };
+        next.push(item);
+        if (heic) pendingHeic.push({ id: item.id, file: f });
+      }
+      setPhotoAlts((alts) => next.map((_, i) => alts[i] ?? ''));
+      return next;
+    });
+
+    for (const { id, file } of pendingHeic) {
+      void convertHeicToJpegIfNeeded(file).then((converted) => {
+        setPhotos((prev) =>
+          prev.map((p) => {
+            if (p.id !== id) return p;
+            if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+            return {
+              ...p,
+              readyFile: converted,
+              previewUrl: URL.createObjectURL(converted),
+              converting: false,
+              name: converted.name,
+            };
+          })
+        );
       });
-    } finally {
-      setConvertingHeic(false);
     }
   }, [t.modalPhotoSizeError, t.modalPhotoTypeError]);
 
-  useEffect(() => {
-    const urls = photoFiles.map((f) => URL.createObjectURL(f));
-    setPhotoPreviews(urls);
-    return () => {
-      urls.forEach((u) => URL.revokeObjectURL(u));
-    };
-  }, [photoFiles]);
-
   const removePhotoAt = useCallback((index: number) => {
-    setPhotoFiles((p) => p.filter((_, i) => i !== index));
+    setPhotos((prev) => {
+      const target = prev[index];
+      if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+      return prev.filter((_, i) => i !== index);
+    });
     setPhotoAlts((p) => p.filter((_, i) => i !== index));
     setErr('');
   }, []);
@@ -1022,12 +1078,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     }
 
     setErr('');
-    if (looksLikeHeic(file)) setConvertingHeic(true);
-    try {
-      setProfilePhoto(await convertHeicToJpegIfNeeded(file));
-    } finally {
-      setConvertingHeic(false);
-    }
+    setProfilePhoto(await convertHeicToJpegIfNeeded(file));
+    profileUploadRef.current = null;
   }, []);
 
   const canContinueCapture = useCallback((): boolean => {
@@ -1049,7 +1101,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       const t = textBody.trim();
       return t.length > 0 && t.length <= SUBIR_TEXT_MAX_CHARS;
     }
-    return photoFiles.length >= SUBIR_PHOTO_MIN && photoFiles.length <= SUBIR_PHOTO_MAX;
+    const ready = photos.filter((p) => p.readyFile && !p.converting).length;
+    return (
+      ready >= SUBIR_PHOTO_MIN &&
+      photos.length <= SUBIR_PHOTO_MAX &&
+      !photos.some((p) => p.converting)
+    );
   }, [
     mode,
     mediaBlob,
@@ -1058,7 +1115,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     videoShareUrl,
     audioShareUrl,
     textBody,
-    photoFiles.length,
+    photos,
   ]);
 
   const goDetails = useCallback(() => {
@@ -1103,39 +1160,112 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     t,
   ]);
 
+  const uploadOnePhoto = useCallback(async (item: StoryPhotoItem): Promise<StoryPhotoItem> => {
+    if (item.uploadStatus === 'uploading') return item;
+    if (item.readUrl && item.storagePath) return item;
+    if (!item.readyFile) {
+      return { ...item, uploadStatus: 'error', error: t.modalPhotoUploadFailed };
+    }
+    setPhotos((prev) =>
+      prev.map((p) =>
+        p.id === item.id ? { ...p, uploadStatus: 'uploading', progress: 0, error: null } : p
+      )
+    );
+    try {
+      const prepared = await prepareStoryPhotoForUpload(item.readyFile);
+      const r = await uploadFileToStorage(
+        prepared,
+        'submissions',
+        `photo-${item.id}-${prepared.name}`,
+        (ratio) => {
+          setPhotos((prev) =>
+            prev.map((p) => (p.id === item.id ? { ...p, progress: ratio } : p))
+          );
+        }
+      );
+      const done: StoryPhotoItem = {
+        ...item,
+        readyFile: prepared,
+        uploadStatus: 'done',
+        progress: 1,
+        error: null,
+        readUrl: r.readUrl,
+        storagePath: r.storagePath,
+      };
+      setPhotos((prev) => prev.map((p) => (p.id === item.id ? done : p)));
+      return done;
+    } catch (e) {
+      reportStorySubmitError('photo_upload_failed', 'story-media', e);
+      const failed: StoryPhotoItem = {
+        ...item,
+        uploadStatus: 'error',
+        error: t.modalPhotoUploadFailed,
+      };
+      setPhotos((prev) => prev.map((p) => (p.id === item.id ? failed : p)));
+      return failed;
+    }
+  }, [t.modalPhotoUploadFailed]);
+
+  const retryPhotoUpload = useCallback(
+    (id: string) => {
+      const item = photos.find((p) => p.id === id);
+      if (!item || item.uploadStatus === 'uploading') return;
+      void uploadOnePhoto({ ...item, readUrl: undefined, storagePath: undefined, error: null });
+    },
+    [photos, uploadOnePhoto]
+  );
+
   const submitDetails = useCallback(async () => {
-    if (saving) return;
+    if (saving || submitInFlightRef.current) return;
     if (!validateDetails()) return;
     if (captchaGate === 'need' || captchaGate === 'wait') {
+      reportStorySubmitError('captcha_gate', 'captcha');
       setErr(t.modalCaptchaFailed);
       return;
     }
+    submitInFlightRef.current = true;
     setSaving(true);
     setErr('');
     try {
       const privateMediaPaths: string[] = [];
-      const trackUpload = async (file: File | Blob, prefix: string, name: string) => {
+      const trackUpload = async (
+        file: File | Blob,
+        prefix: string,
+        name: string,
+        cache?: { readUrl: string; storagePath: string } | null
+      ) => {
+        if (cache?.readUrl && cache.storagePath) {
+          privateMediaPaths.push(cache.storagePath);
+          return cache;
+        }
         const r = await uploadFileToStorage(file, prefix, name);
         privateMediaPaths.push(r.storagePath);
-        return r.readUrl;
+        return r;
       };
 
       let profilePhotoUploaded: string | undefined;
       if (profilePhoto) {
-        const profileJpeg = await convertHeicToJpegIfNeeded(profilePhoto);
-        profilePhotoUploaded = await trackUpload(
-          profileJpeg,
+        const r = await trackUpload(
+          profilePhoto,
           'submissions/avatars',
-          `avatar-${profileJpeg.name}`
+          `avatar-${profilePhoto.name}`,
+          profileUploadRef.current
         );
+        profileUploadRef.current = r;
+        profilePhotoUploaded = r.readUrl;
       }
 
       const extraAttachmentUrls: string[] = [];
+      const extraNext: { key: string; readUrl: string; storagePath: string }[] = [];
       for (let i = 0; i < extraFiles.length; i++) {
         const f = extraFiles[i]!;
-        const url = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`);
-        extraAttachmentUrls.push(url);
+        const key = `${i}-${f.name}-${f.size}`;
+        const cached = extraUploadRef.current.find((x) => x.key === key);
+        const r = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`, cached);
+        extraNext.push({ key, readUrl: r.readUrl, storagePath: r.storagePath });
+        extraAttachmentUrls.push(r.readUrl);
       }
+      extraUploadRef.current = extraNext;
 
       const title = storyTitleRef.current.trim();
       const placeCombined = `${city.trim()}, ${country.trim()}`;
@@ -1154,8 +1284,14 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       } else if (mode === 'video') {
         if (mediaBlob) {
           const ext = mediaBlob.type.includes('mp4') ? 'mp4' : 'webm';
-          const url = await trackUpload(mediaBlob, 'submissions', `video-grabado.${ext}`);
-          payload = { videoUrl: url };
+          const r = await trackUpload(
+            mediaBlob,
+            'submissions',
+            `video-grabado.${ext}`,
+            avUploadRef.current
+          );
+          avUploadRef.current = r;
+          payload = { videoUrl: r.readUrl };
         } else if (uploadVideoFile) {
           const sec = await probeVideoFileDurationSeconds(uploadVideoFile);
           if (sec != null && !isDurationWithinMax(sec)) {
@@ -1164,11 +1300,18 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
           }
           const extRaw = uploadVideoFile.name.split('.').pop()?.toLowerCase() || '';
           const safeExt = extRaw && /^[a-z0-9]+$/.test(extRaw) ? extRaw : 'mp4';
-          const url = await trackUpload(uploadVideoFile, 'submissions', `video-subido.${safeExt}`);
-          payload = { videoUrl: url };
+          const r = await trackUpload(
+            uploadVideoFile,
+            'submissions',
+            `video-subido.${safeExt}`,
+            avUploadRef.current
+          );
+          avUploadRef.current = r;
+          payload = { videoUrl: r.readUrl };
         } else if (isVideoShareUrl(videoShareUrl)) {
           payload = { videoUrl: videoShareUrl.trim() };
         } else {
+          reportStorySubmitError('missing_video', 'payload');
           setErr('Falta el video de la historia.');
           return;
         }
@@ -1183,43 +1326,60 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
             return;
           }
           const ext = mediaBlob.type.includes('mp4') ? 'm4a' : 'webm';
-          const url = await trackUpload(mediaBlob, 'submissions', `audio-grabado.${ext}`);
-          payload = { audioUrl: url };
+          const r = await trackUpload(
+            mediaBlob,
+            'submissions',
+            `audio-grabado.${ext}`,
+            avUploadRef.current
+          );
+          avUploadRef.current = r;
+          payload = { audioUrl: r.readUrl };
         } else if (uploadAudioFile) {
           const sec = await probeAudioFileDurationSeconds(uploadAudioFile);
           if (sec != null && !isDurationWithinMax(sec)) {
             setErr(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
             return;
           }
-          const url = await trackUpload(
+          const r = await trackUpload(
             uploadAudioFile,
             'submissions',
-            `audio.${uploadAudioFile.name.split('.').pop() || 'mp3'}`
+            `audio.${uploadAudioFile.name.split('.').pop() || 'mp3'}`,
+            avUploadRef.current
           );
-          payload = { audioUrl: url };
+          avUploadRef.current = r;
+          payload = { audioUrl: r.readUrl };
         } else if (isHttpUrl(audioShareUrl)) {
           payload = { audioUrl: audioShareUrl.trim() };
         } else {
+          reportStorySubmitError('missing_audio', 'payload');
           setErr('Falta el audio de la historia.');
           return;
         }
       } else if (mode === 'foto') {
-        if (photoFiles.length > 0) {
-          const photosToUpload = await convertHeicFiles(photoFiles);
-          const urls = await Promise.all(
-            photosToUpload.map((f, i) => trackUpload(f, 'submissions', `photo-${i}-${f.name}`))
-          );
-          const first = urls[0];
-          if (first) {
-            payload = {
-              photoUrl: first,
-              photoUrls: urls,
-              photoAlts: photoAlts.slice(0, urls.length).map((s) => s.trim().slice(0, PHOTO_ALT_MAX)),
-            };
-          }
-        } else {
+        const ready = photos.filter((p) => p.readyFile);
+        if (ready.length === 0) {
+          reportStorySubmitError('missing_photos', 'payload');
           setErr('Faltan las fotos de la historia.');
           return;
+        }
+        const uploaded = await Promise.all(ready.map((p) => uploadOnePhoto(p)));
+        const failed = uploaded.filter((p) => p.uploadStatus !== 'done' || !p.readUrl);
+        if (failed.length > 0) {
+          reportStorySubmitError('photo_partial_failed', 'story-media');
+          setErr(t.modalSubmitFailedKeep);
+          return;
+        }
+        const urls = uploaded.map((p) => p.readUrl!).filter(Boolean);
+        uploaded.forEach((p) => {
+          if (p.storagePath) privateMediaPaths.push(p.storagePath);
+        });
+        const first = urls[0];
+        if (first) {
+          payload = {
+            photoUrl: first,
+            photoUrls: urls,
+            photoAlts: photoAlts.slice(0, urls.length).map((s) => s.trim().slice(0, PHOTO_ALT_MAX)),
+          };
         }
       }
 
@@ -1258,6 +1418,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
       if (!res.ok) {
+        reportStorySubmitError(data.error || `submissions_${res.status}`, 'submissions', data.error);
         if (data.error === 'uploads_paused') {
           setErr(messageForUploadError(new Error('uploads_paused'), mode));
           return;
@@ -1281,9 +1442,10 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       clearStoryDraft();
       setStep('received');
     } catch (e) {
-      console.error('[StoryModal] submit', e);
+      reportStorySubmitError('submit_exception', 'submit', e);
       setErr(t.modalSubmitFailedKeep);
     } finally {
+      submitInFlightRef.current = false;
       setSaving(false);
     }
   }, [
@@ -1298,8 +1460,9 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     uploadAudioFile,
     videoShareUrl,
     audioShareUrl,
-    photoFiles,
+    photos,
     photoAlts,
+    uploadOnePhoto,
     alias,
     email,
     city,
@@ -1914,23 +2077,25 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         {mode === 'foto' && (
           <>
             <UploadModalFotoCapture
-              photoFiles={photoFiles}
-              photoPreviews={photoPreviews}
+              photos={photos}
               onAddFiles={addPhotos}
               onRemove={removePhotoAt}
-              convertingLabel={convertingHeic ? 'Convirtiendo tu foto…' : undefined}
+              onRetry={retryPhotoUpload}
+              convertingLabel={t.modalPhotoConverting}
+              retryLabel={t.modalPhotoRetry}
+              failedLabel={t.modalPhotoUploadFailed}
               inlineError={err || undefined}
             />
-            {photoPreviews.length > 0 ? (
+            {photos.length > 0 ? (
               <div className="mt-4 space-y-3">
-                {photoPreviews.map((_, i) => (
-                  <div key={`photo-alt-${i}`}>
+                {photos.map((photo, i) => (
+                  <div key={`photo-alt-${photo.id}`}>
                     <label
                       htmlFor={`story-photo-alt-${i}`}
                       className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-600 md:text-[11px]"
                     >
                       {t.modalPhotoAltLabel}
-                      {photoPreviews.length > 1 ? ` · ${i + 1}` : ''}
+                      {photos.length > 1 ? ` · ${i + 1}` : ''}
                     </label>
                     <input
                       id={`story-photo-alt-${i}`}
@@ -2028,7 +2193,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 >
                   {t.modalDetailsTitle}
                 </h3>
-                <p className="text-[11px] text-gray-600">{t.modalRequiredFieldsNote}</p>
+                <p className="text-[12px] leading-snug text-gray-600">{t.modalDetailsSubtitle}</p>
+                <p className="text-[10px] text-gray-500">{t.modalRequiredFieldsNote}</p>
               </div>
 
               <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto overscroll-contain md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start md:overflow-hidden">
@@ -2374,7 +2540,23 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-white active:scale-95 disabled:opacity-60 md:px-6"
                       style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
                     >
-                      {saving ? t.modalSending : t.modalSend}
+                      {saving
+                        ? mode === 'video'
+                          ? t.modalSendingVideo
+                          : mode === 'audio'
+                            ? t.modalSendingAudio
+                            : mode === 'texto'
+                              ? t.modalSendingText
+                              : t.modalSendingPhotos
+                        : mode === 'video'
+                          ? t.modalSendVideo
+                          : mode === 'audio'
+                            ? t.modalSendAudio
+                            : mode === 'texto'
+                              ? t.modalSendText
+                              : photos.length > 1
+                                ? t.modalSendPhotos
+                                : t.modalSendPhoto}
                     </button>
                     {!saving && !(acceptedPrivacy && acceptedPublicacion && acceptedTerminos) ? (
                       <p className="max-w-[16rem] text-right text-[10px] text-gray-600">

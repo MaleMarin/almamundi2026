@@ -12,6 +12,7 @@ import {
 } from "@/lib/media-duration-probe";
 import { getAdminBucket } from "@/lib/firebase/admin";
 import { areUploadsPaused } from "@/lib/ops/usage-state";
+import { resolveResumableUploadOrigin } from "@/lib/resumable-upload-origin";
 
 const PRIVATE_PREFIX = "submissions/private";
 const SIGNED_URL_MAX_MS = 7 * 24 * 60 * 60 * 1000; // 7 días (límite habitual GCS v4)
@@ -45,23 +46,11 @@ export function sanitizeUploadFilename(name: string): string {
   return base || "file";
 }
 
-const RESUMABLE_ORIGINS = new Set([
-  "https://www.almamundi.org",
-  "https://almamundi.org",
-  "http://localhost:3005",
-  "http://127.0.0.1:3005",
-  "http://localhost:3001",
-  "http://127.0.0.1:3001",
-  "http://localhost:3010",
-  "http://127.0.0.1:3010",
-]);
-
 export function resumableOriginFromRequest(req: Request): string {
-  const origin = (req.headers.get("origin") || "").trim();
-  if (origin && RESUMABLE_ORIGINS.has(origin)) return origin;
-  const vercel = process.env.VERCEL_URL?.trim();
-  if (origin && vercel && origin === `https://${vercel}`) return origin;
-  return "https://www.almamundi.org";
+  return resolveResumableUploadOrigin({
+    requestOrigin: req.headers.get("origin") || "",
+    vercelEnv: process.env.VERCEL_ENV,
+  });
 }
 
 export async function assertUploadsAllowed(): Promise<void> {
