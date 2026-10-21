@@ -1,8 +1,14 @@
 const SITEVERIFY = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
 const TIMEOUT_MS = 5_000;
+/** Clave secreta de prueba pública de Cloudflare. Solo se usa fuera de producción. */
+export const CLOUDFLARE_TURNSTILE_TEST_SECRET = '1x0000000000000000000000000000000AA';
 
 function isProductionEnv(): boolean {
   return process.env.VERCEL_ENV === 'production';
+}
+
+function isCloudflareTestSecret(secret: string): boolean {
+  return secret === CLOUDFLARE_TURNSTILE_TEST_SECRET;
 }
 
 export function isAllowedTurnstileHostname(hostname: string | undefined): boolean {
@@ -46,7 +52,9 @@ export async function verifyTurnstileStrict(
     });
     const data = (await res.json()) as { success?: boolean; hostname?: string };
     if (data.success !== true) return { ok: false };
-    if (!isAllowedTurnstileHostname(data.hostname)) return { ok: false };
+    if (isProductionEnv() && isCloudflareTestSecret(secret)) return { ok: false };
+    const skipHostname = !isProductionEnv() && isCloudflareTestSecret(secret);
+    if (!skipHostname && !isAllowedTurnstileHostname(data.hostname)) return { ok: false };
     return { ok: true };
   } catch {
     return { ok: false };

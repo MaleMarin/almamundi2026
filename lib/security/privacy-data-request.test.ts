@@ -7,7 +7,11 @@ import {
   issueFormToken,
   verifyFormToken,
 } from './form-token';
-import { isAllowedTurnstileHostname, verifyTurnstileStrict } from './turnstile-strict';
+import {
+  CLOUDFLARE_TURNSTILE_TEST_SECRET,
+  isAllowedTurnstileHostname,
+  verifyTurnstileStrict,
+} from './turnstile-strict';
 import {
   MAX_PRIVACY_BODY_BYTES,
   MSG_LIMIT,
