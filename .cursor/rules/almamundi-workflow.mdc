@@ -5,8 +5,8 @@ alwaysApply: true
 
 # Modo Ahorro (OBLIGATORIO)
 
-- Trabaja SOLO con archivos que el usuario marque con @. No leas el repo completo.
-- Si necesitas más contexto, pide 1-3 archivos específicos. Nunca más.
+- Para cambios acotados, trabaja con los archivos indicados y pide contexto adicional solo si hace falta.
+- Para auditorías, búsquedas de contenido o diagnósticos, la búsqueda global en todo el repositorio está permitida y es obligatoria.
 - Prohibido inventar archivos, rutas, componentes, APIs o tipos. Si no existen, dilo.
 - Antes de modificar código: plan de 3-6 bullets, luego cambios acotados.
 - Cambios pequeños, seguros, reversibles. Sin refactors no pedidos.
