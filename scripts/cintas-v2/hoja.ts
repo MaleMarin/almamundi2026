@@ -4,6 +4,8 @@ import type { Modo } from '@/lib/cintas-v2/compose/layout';
 import type { OrigenAnalisis } from '@/lib/cintas-v2/understand/analyze';
 import { escapeXml } from '@/scripts/cintas-v2/footer';
 
+type Capa = { input: Buffer; top: number; left: number };
+
 export function resumenAnalisis(analisis: Analisis, modo: Modo, origen: OrigenAnalisis, detalle: string | null): string {
   const a = analisis.animo;
   const emociones = [...analisis.emociones]
@@ -52,40 +54,43 @@ export async function hojaPorCaso(params: {
   titulo: string;
   actual: Buffer;
   v2: Buffer;
+  anterior: Buffer;
   resumen: string;
 }): Promise<Buffer> {
-  const margen = 40;
-  const hueco = 28;
+  const margen = 36;
+  const hueco = 24;
   const img = 1080;
-  const ancho = margen + img + hueco + img + margen;
+  const columnas = [params.actual, params.anterior, params.v2];
+  const etiquetasTxt = ['Algoritmo actual', 'V2 primera ronda', 'V2 nueva'];
+  const ancho = margen * 2 + columnas.length * img + (columnas.length - 1) * hueco;
   const tituloAlto = 56;
   const etiquetaAlto = 28;
-  const lineas = envolver(params.resumen, 118, 5);
+  const lineas = envolver(params.resumen, 190, 6);
   const captionAlto = 16 + lineas.length * 24;
   const alto = margen + tituloAlto + etiquetaAlto + img + 20 + captionAlto + margen;
-  const base = sharp({
-    create: { width: ancho, height: alto, channels: 3, background: '#F7F4EE' },
-  });
-  const titulo = svgTexto([params.titulo], ancho - margen * 2, tituloAlto, 28);
-  const etiquetas = svgTexto(['Algoritmo actual'], 400, 24, 16, '#8A8A7A');
-  const etiquetasV2 = svgTexto(['Cintas v2'], 400, 24, 16, '#8A8A7A');
-  const caption = svgTexto(lineas, ancho - margen * 2, captionAlto, 18);
   const yImg = margen + tituloAlto + etiquetaAlto;
-  return base
-    .composite([
-      { input: titulo, top: margen, left: margen },
-      { input: etiquetas, top: margen + tituloAlto, left: margen },
-      { input: etiquetasV2, top: margen + tituloAlto, left: margen + img + hueco },
-      { input: params.actual, top: yImg, left: margen },
-      { input: params.v2, top: yImg, left: margen + img + hueco },
-      { input: caption, top: yImg + img + 16, left: margen },
-    ])
+  const capas: Capa[] = [
+    { input: svgTexto([params.titulo], ancho - margen * 2, tituloAlto, 28, '#5E6E82'), top: margen, left: margen },
+  ];
+  columnas.forEach((png, i) => {
+    const x = margen + i * (img + hueco);
+    capas.push({ input: svgTexto([etiquetasTxt[i] ?? ''], 420, 24, 16, '#8A8A7A'), top: margen + tituloAlto, left: x });
+    capas.push({ input: png, top: yImg, left: x });
+  });
+  capas.push({
+    input: svgTexto(lineas, ancho - margen * 2, captionAlto, 18, '#5E6E82'),
+    top: yImg + img + 16,
+    left: margen,
+  });
+  return sharp({ create: { width: ancho, height: alto, channels: 3, background: '#F7F4EE' } })
+    .composite(capas)
     .png()
     .toBuffer();
 }
 
 export async function hojaTodas(
-  piezas: Array<{ titulo: string; modo: string; png: Buffer }>
+  piezas: Array<{ titulo: string; modo: string; png: Buffer }>,
+  titulo = 'Cintas v2, segunda ronda'
 ): Promise<Buffer> {
   const cols = 3;
   const margen = 36;
@@ -95,8 +100,8 @@ export async function hojaTodas(
   const filas = Math.ceil(piezas.length / cols);
   const ancho = margen * 2 + cols * img + (cols - 1) * hueco;
   const alto = margen + 48 + filas * (img + pie) + (filas - 1) * hueco;
-  const capas: sharp.OverlayOptions[] = [
-    { input: svgTexto(['Cintas v2, todas juntas'], 800, 40, 28), top: margen, left: margen },
+  const capas: Capa[] = [
+    { input: svgTexto([titulo], 900, 40, 28, '#5E6E82'), top: margen, left: margen },
   ];
   for (let i = 0; i < piezas.length; i++) {
     const col = i % cols;
@@ -106,7 +111,7 @@ export async function hojaTodas(
     const pieza = piezas[i]!;
     capas.push({ input: pieza.png, top: y, left: x });
     capas.push({
-      input: svgTexto(envolver(`${pieza.titulo} · ${pieza.modo}`, 42, 2), img, pie - 8, 18),
+      input: svgTexto(envolver(`${pieza.titulo} · ${pieza.modo}`, 42, 2), img, pie - 8, 18, '#5E6E82'),
       top: y + img + 8,
       left: x,
     });

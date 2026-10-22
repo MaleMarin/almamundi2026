@@ -4,20 +4,19 @@
  * Comprobación sin API:
  * node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs scripts/cintas-v2/run-textos.ts --comprobar
  */
-import { mkdir, writeFile } from 'node:fs/promises';
-import { spawn } from 'node:child_process';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import sharp from 'sharp';
 import { config } from 'dotenv';
 import { hitsFromText } from '@/lib/huella/almamundi-lexicon';
 import { CASOS_TEXTO, contarPalabras, FECHA_PIE, HISTORIAS } from '@/lib/cintas-v2/fixtures';
-import { armonizar, hexRgb, luminancia } from '@/lib/cintas-v2/palette';
+import { armonizar, CREMA, hexRgb, luminancia } from '@/lib/cintas-v2/palette';
 import { coloresDominantes } from '@/lib/cintas-v2/prepare/dominant-colors';
 import { analisisDesdeDiccionario } from '@/lib/cintas-v2/understand/lexicon-fallback';
 import { AnalisisSchema } from '@/lib/cintas-v2/understand/schema';
 import type { Analisis } from '@/lib/cintas-v2/understand/schema';
 import { comprenderRelato } from '@/lib/cintas-v2/understand/analyze';
-import { componerCintas, esPocoContenido, type Modo } from '@/lib/cintas-v2/compose/layout';
+import { componerCintas, esPocoContenido, revisarPlan, type Modo } from '@/lib/cintas-v2/compose/layout';
 import {
   MODELO_LENGUAJE,
   PRECIOS_LENGUAJE,
@@ -28,6 +27,8 @@ import { pngActual, pngV2, type Pie } from '@/scripts/cintas-v2/raster';
 import { hojaPorCaso, hojaTodas, resumenAnalisis } from '@/scripts/cintas-v2/hoja';
 
 const SALIDA = resolve('tmp-cintas-v2/salida');
+const ANALISIS = resolve('tmp-cintas-v2/analisis');
+const RONDA1 = resolve('tmp-cintas-v2/salida/ronda-1');
 
 function pieDe(caso: (typeof CASOS_TEXTO)[number]): Pie {
   return {
@@ -207,7 +208,7 @@ async function comprobar(): Promise<void> {
       a.bandas.every((x) => x.hex !== '#000000' && hexRgb(x.hex).reduce((s, n) => s + n, 0) > 40),
       `${caso.id} sin negro`
     );
-    const crema = a.bandas.filter((x) => x.hex === '#F2EAD8').reduce((s, x) => s + x.ancho, 0);
+    const crema = a.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
     const campos = a.bandas.filter((x) => x.clase === 'campo');
     stats.push(`${caso.id} bandas=${a.bandas.length} crema=${crema} campos=${campos.length} maxCampo=${Math.max(0, ...campos.map((c) => c.ancho))}`);
     const pngModo = await pngV2(a.bandas, {
@@ -225,8 +226,8 @@ async function comprobar(): Promise<void> {
   const calma = modos[2]!;
   const planI = componerCintas({ id: intensa.id, analisis: intensa.analisis, texto: intensa.texto, locale: 'es' });
   const planC = componerCintas({ id: calma.id, analisis: calma.analisis, texto: calma.texto, locale: 'es' });
-  const cremaI = planI.bandas.filter((x) => x.hex === '#F2EAD8').reduce((s, x) => s + x.ancho, 0);
-  const cremaC = planC.bandas.filter((x) => x.hex === '#F2EAD8').reduce((s, x) => s + x.ancho, 0);
+  const cremaI = planI.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
+  const cremaC = planC.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
   decir(cremaC > cremaI + 80, `calma tiene más crema (${cremaC}) que intensa (${cremaI})`);
   const planT = componerCintas({
     id: 'sint-triste',
@@ -244,6 +245,41 @@ async function comprobar(): Promise<void> {
   });
   decir(planP.bandas.length < planI.bandas.length, `poco tiene menos franjas (${planP.bandas.length}) que intensa (${planI.bandas.length})`);
 
+  for (const caso of modos) {
+    const plan = componerCintas({ id: caso.id, analisis: caso.analisis, texto: caso.texto, locale: caso.locale });
+    const errores = revisarPlan(plan);
+    decir(errores.length === 0, `${caso.id} reglas ${errores.join('; ') || 'ok'}`);
+  }
+  const lugarA = componerCintas({ id: 'sint-intensa', analisis: modos[0]!.analisis, texto: largo, locale: 'es' });
+  const lugarB = componerCintas({ id: 'sint-intensa-lugar', analisis: modos[0]!.analisis, texto: largo, locale: 'es' });
+  const xs = (plan: typeof lugarA) => plan.bandas.filter((b) => b.clase === 'campo').map((b) => b.x).join(',');
+  decir(xs(lugarA) !== xs(lugarB), `los campos cambian de lugar (${xs(lugarA)} / ${xs(lugarB)})`);
+  const planSil = componerCintas({
+    id: 'sint-calma',
+    analisis: modos[2]!.analisis,
+    texto: largo,
+    locale: 'es',
+    duracionSegundos: 10,
+    silencios: [
+      { inicio: 1, fin: 2, segundos: 1 },
+      { inicio: 5, fin: 7, segundos: 2 },
+    ],
+  });
+  const anchosSil = planSil.bandas.filter((b) => b.motivo === 'silencio').map((b) => b.ancho);
+  decir(anchosSil.length === 2 && anchosSil[1]! > anchosSil[0]! * 1.7, `silencios proporcionales ${anchosSil.join(',')}`);
+
+  for (const caso of CASOS_TEXTO) {
+    const crudo = await readFile(join(SALIDA, 'comparacion', 'gpt-6.1-sol', 'analisis', `${caso.id}.json`), 'utf8').catch(() => '');
+    if (!crudo) continue;
+    const json = JSON.parse(crudo) as { analisis: unknown };
+    const parsed = AnalisisSchema.safeParse(json.analisis);
+    decir(parsed.success, `${caso.id} análisis sol válido`);
+    if (!parsed.success) continue;
+    const plan = componerCintas({ id: caso.id, analisis: parsed.data, texto: caso.texto, locale: caso.locale });
+    const errores = revisarPlan(plan);
+    decir(errores.length === 0, `${caso.id} composición ${errores.join('; ') || 'ok'}`);
+  }
+
   for (const caso of CASOS_TEXTO) {
     const hits = hitsFromText(caso.texto, caso.locale).reduce((s, h) => s + h.count, 0);
     const tokens = caso.texto.trim().split(/\s+/).filter((w) => w.length > 1).length;
@@ -260,19 +296,86 @@ async function comprobar(): Promise<void> {
   console.log('Comprobación lista.');
 }
 
+type AnalisisGuardado = {
+  id: string;
+  titulo: string;
+  modelo: string;
+  origen: 'modelo' | 'respaldo-diccionario';
+  detalle: string | null;
+  reintentos: number;
+  tokensEntrada: number;
+  tokensSalida: number;
+  costoUsd: number;
+  analisis: unknown;
+};
+
+async function leerJson(ruta: string): Promise<AnalisisGuardado | null> {
+  const crudo = await readFile(ruta, 'utf8').catch(() => '');
+  if (!crudo) return null;
+  try {
+    return JSON.parse(crudo) as AnalisisGuardado;
+  } catch {
+    return null;
+  }
+}
+
+async function analisisDeCaso(
+  caso: (typeof CASOS_TEXTO)[number],
+  modelo: string,
+  apiKey: string
+): Promise<{ guardado: AnalisisGuardado; nuevo: boolean }> {
+  const destino = join(ANALISIS, `${caso.id}.json`);
+  const propio = await leerJson(destino);
+  const semilla =
+    propio ?? (await leerJson(join(SALIDA, 'comparacion', 'gpt-6.1-sol', 'analisis', `${caso.id}.json`)));
+  const parsed = semilla ? AnalisisSchema.safeParse(semilla.analisis) : null;
+  if (semilla && parsed?.success && semilla.origen === 'modelo') {
+    const guardado: AnalisisGuardado = {
+      ...semilla,
+      id: caso.id,
+      titulo: caso.titulo,
+      modelo: 'gpt-6.1-sol',
+      analisis: parsed.data,
+      detalle: semilla.detalle ?? null,
+      reintentos: semilla.reintentos ?? 0,
+      tokensEntrada: semilla.tokensEntrada ?? 0,
+      tokensSalida: semilla.tokensSalida ?? 0,
+      costoUsd: semilla.costoUsd ?? 0,
+    };
+    if (!propio) await writeFile(destino, JSON.stringify(guardado, null, 2));
+    return { guardado, nuevo: false };
+  }
+  if (!apiKey) {
+    throw new Error(`Falta el análisis guardado de ${caso.id} y no hay OPENAI_API_KEY en .env.local.`);
+  }
+  const resultado = await comprenderRelato({
+    texto: caso.texto,
+    locale: caso.locale,
+    apiKey,
+    modelo,
+  });
+  const guardado: AnalisisGuardado = {
+    id: caso.id,
+    titulo: caso.titulo,
+    modelo,
+    origen: resultado.origen,
+    detalle: resultado.detalle,
+    reintentos: resultado.reintentos,
+    tokensEntrada: resultado.tokensEntrada,
+    tokensSalida: resultado.tokensSalida,
+    costoUsd: resultado.costoUsd,
+    analisis: resultado.analisis,
+  };
+  await writeFile(destino, JSON.stringify(guardado, null, 2));
+  return { guardado, nuevo: true };
+}
+
 async function correr(opciones: { modelo: string; soloAnalisis: boolean }): Promise<void> {
   config({ path: resolve('.env.local') });
   const apiKey = process.env.OPENAI_API_KEY?.trim() ?? '';
-  if (!apiKey) {
-    console.error('Falta OPENAI_API_KEY en .env.local, en la raíz del repo.');
-    console.error('Agrega una línea nueva: OPENAI_API_KEY=tu_clave');
-    console.error('No la pegues en el chat. Avisa cuando el archivo esté guardado.');
-    process.exit(2);
-  }
-
-  const carpeta = opciones.soloAnalisis
-    ? join(SALIDA, 'comparacion', opciones.modelo)
-    : SALIDA;
+  await mkdir(ANALISIS, { recursive: true });
+  await mkdir(RONDA1, { recursive: true });
+  const carpeta = opciones.soloAnalisis ? join(SALIDA, 'comparacion', opciones.modelo) : SALIDA;
   await mkdir(join(carpeta, 'analisis'), { recursive: true });
   if (!opciones.soloAnalisis) {
     await mkdir(join(SALIDA, 'piezas'), { recursive: true });
@@ -284,24 +387,26 @@ async function correr(opciones: { modelo: string; soloAnalisis: boolean }): Prom
   let total = 0;
 
   for (const caso of CASOS_TEXTO) {
-    const resultado = await comprenderRelato({
-      texto: caso.texto,
-      locale: caso.locale,
-      apiKey,
-      modelo: opciones.modelo,
-    });
+    const { guardado, nuevo } = await analisisDeCaso(caso, opciones.modelo, apiKey);
+    const parsed = AnalisisSchema.parse(guardado.analisis);
     const plan = componerCintas({
       id: caso.id,
-      analisis: resultado.analisis,
+      analisis: parsed,
       texto: caso.texto,
       locale: caso.locale,
     });
     if (!opciones.soloAnalisis) {
+      const archivoPrevio = join(RONDA1, `${caso.id}.png`);
+      const origenPrevio = join(SALIDA, 'piezas', `${caso.id}-v2.png`);
+      if (!(await readFile(archivoPrevio).then(() => true, () => false))) {
+        await copyFile(origenPrevio, archivoPrevio).catch(() => undefined);
+      }
+      const anterior = await readFile(archivoPrevio);
       const pie = pieDe(caso);
       const actual = await pngActual({ id: caso.id, texto: caso.texto, pie });
       const v2 = await pngV2(plan.bandas, pie);
-      const resumen = resumenAnalisis(resultado.analisis, plan.modo, resultado.origen, resultado.detalle);
-      const hoja = await hojaPorCaso({ titulo: caso.titulo, actual, v2, resumen });
+      const resumen = resumenAnalisis(parsed, plan.modo, guardado.origen, guardado.detalle);
+      const hoja = await hojaPorCaso({ titulo: caso.titulo, actual, v2, anterior, resumen });
       await writeFile(join(SALIDA, 'piezas', `${caso.id}-actual.png`), actual);
       await writeFile(join(SALIDA, 'piezas', `${caso.id}-v2.png`), v2);
       await writeFile(join(SALIDA, 'por-caso', `${caso.id}.png`), hoja);
@@ -309,34 +414,21 @@ async function correr(opciones: { modelo: string; soloAnalisis: boolean }): Prom
     }
     await writeFile(
       join(carpeta, 'analisis', `${caso.id}.json`),
-      JSON.stringify(
-        {
-          id: caso.id,
-          titulo: caso.titulo,
-          origen: resultado.origen,
-          detalle: resultado.detalle,
-          reintentos: resultado.reintentos,
-          modo: plan.modo,
-          analisis: resultado.analisis,
-          bandas: plan.bandas,
-        },
-        null,
-        2
-      )
+      JSON.stringify({ ...guardado, modo: plan.modo, analisis: parsed, bandas: plan.bandas }, null, 2)
     );
-    const fila = {
+    const costo = nuevo ? guardado.costoUsd : 0;
+    costos.push({
       id: caso.id,
       minutosTranscritos: 0,
-      tokensEntrada: resultado.tokensEntrada,
-      tokensSalida: resultado.tokensSalida,
-      costoUsd: Number(resultado.costoUsd.toFixed(6)),
-      origen: resultado.origen,
-      reintentos: resultado.reintentos,
-      detalle: resultado.detalle,
-    };
-    costos.push(fila);
-    total += resultado.costoUsd;
-    console.log(`${caso.id}: ${resultado.origen} ${resultado.costoUsd.toFixed(6)} USD`);
+      tokensEntrada: nuevo ? guardado.tokensEntrada : 0,
+      tokensSalida: nuevo ? guardado.tokensSalida : 0,
+      costoUsd: Number(costo.toFixed(6)),
+      origen: guardado.origen,
+      reintentos: guardado.reintentos,
+      reusado: !nuevo,
+    });
+    total += costo;
+    console.log(`${caso.id}: ${nuevo ? guardado.origen : 'reusado'} ${costo.toFixed(6)} USD ${plan.modo}`);
   }
 
   if (!opciones.soloAnalisis) {
@@ -348,22 +440,16 @@ async function correr(opciones: { modelo: string; soloAnalisis: boolean }): Prom
     salida: PRECIO_SALIDA_POR_MILLON,
   };
   const informe = {
+    ronda: 2,
     modelo: opciones.modelo,
-    preciosUsd: {
-      entradaPorMillon: precio.entrada,
-      salidaPorMillon: precio.salida,
-    },
+    preciosUsd: { entradaPorMillon: precio.entrada, salidaPorMillon: precio.salida },
     casos: costos,
     totalUsd: Number(total.toFixed(6)),
     respaldo: costos.filter((c) => c.origen !== 'modelo').map((c) => c.id),
   };
-  await writeFile(join(carpeta, 'costos.json'), JSON.stringify(informe, null, 2));
-  console.log(`Total ${informe.totalUsd.toFixed(6)} USD`);
+  await writeFile(join(carpeta, opciones.soloAnalisis ? 'costos.json' : 'costos-ronda-2.json'), JSON.stringify(informe, null, 2));
+  console.log(`Total de esta ronda ${informe.totalUsd.toFixed(6)} USD`);
   console.log(`Salida ${carpeta}`);
-  if (!opciones.soloAnalisis) {
-    const abrir = spawn('open', [SALIDA], { stdio: 'ignore', detached: true });
-    abrir.unref();
-  }
 }
 
 function valorArg(nombre: string): string | null {

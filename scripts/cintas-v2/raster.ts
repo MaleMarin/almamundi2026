@@ -52,7 +52,7 @@ function parseCssColor(style: string): [number, number, number, number] {
   return [247, 244, 238, 255];
 }
 
-function lienzoActual(): CanvasRenderingContext2D {
+function lienzoActual(): CanvasRenderingContext2D & { rgba: Buffer } {
   const rgba = Buffer.alloc(LADO * LADO * 4);
   let fill = '#F7F4EE';
   const fillRect = (x: number, y: number, w: number, h: number) => {

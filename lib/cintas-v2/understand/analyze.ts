@@ -9,8 +9,18 @@ import {
   type Analisis,
 } from '@/lib/cintas-v2/understand/schema';
 
+/**
+ * El análisis es privado.
+ * Solo sirve para componer las cintas y para la curaduría en /admin.
+ * Nunca se publica ni se muestra en el sitio.
+ * No guarda nombres propios, direcciones ni datos identificables.
+ */
+export const ANALISIS_PRIVADO = true;
+export const PRIVACIDAD_ANALISIS = 1;
+
 const SISTEMA = `Eres el análisis de relatos de AlmaMundi. Lees el sentido, no un diccionario de palabras sueltas.
 Devuelves únicamente un JSON válido, sin markdown.
+El análisis es privado: solo compone las cintas y la curaduría en /admin. Nunca es público.
 
 Forma:
 {
@@ -33,6 +43,11 @@ Reglas:
 - Palabras clave: las que sostienen el sentido, no artículos ni muletillas.
 - Idioma: es, pt, en u otro.
 - Avisos solo marcan, no bloquean. contenidoSensible, violencia y menores en true solo si el texto lo sostiene. Un recuerdo familiar sin daño no es violencia.
+- Privacidad: nunca incluyas nombres propios de personas, apodos, iniciales, direcciones, teléfonos ni ningún dato que identifique a alguien.
+- Los momentos van en términos generales. Por ejemplo: «una visita familiar que no llega», «preocupación por la salud de un familiar».
+- Salud, dinero, conflictos y menores se nombran solo en términos generales, sin cifras, diagnósticos, montos ni detalles.
+- No uses parentescos concretos. Di «un familiar».
+- Las palabras clave tampoco llevan nombres ni datos identificables.
 - Si el texto no narra nada, un solo momento, pesos bajos e idioma otro.`;
 
 export type OrigenAnalisis = 'modelo' | 'respaldo-diccionario';
@@ -111,7 +126,46 @@ function validar(raw: string): { ok: true; analisis: Analisis } | { ok: false; e
   const normal = normalizarAnalisis(parsed);
   const result = AnalisisSchema.safeParse(normal);
   if (!result.success) return { ok: false, error: erroresDe(result.error) };
+  const privacidad = revisarPrivacidad(result.data);
+  if (privacidad) return { ok: false, error: privacidad };
   return { ok: true, analisis: result.data };
+}
+
+const PRIVADO =
+  'incluye nombres, parentescos, direcciones o detalles de salud, dinero, conflictos o menores. Reescribe momentos y palabras clave en términos generales, sin datos identificables';
+
+function revisarPrivacidad(analisis: Analisis): string | null {
+  const textos = [
+    ...analisis.momentos.map((m) => m.resumen),
+    ...analisis.palabrasClave.map((p) => p.palabra),
+  ];
+  for (const texto of textos) {
+    if (datoIdentifiable(texto)) return PRIVADO;
+  }
+  for (const clave of analisis.palabrasClave) {
+    if (/[A-ZÁÉÍÓÚÜÑ]/.test(clave.palabra)) return PRIVADO;
+  }
+  return null;
+}
+
+export function analisisTieneDatosIdentificables(analisis: Analisis): boolean {
+  return revisarPrivacidad(analisis) !== null;
+}
+
+function datoIdentifiable(texto: string): boolean {
+  if (/\b[A-ZÁÉÍÓÚÜÑ]{2,}\b/.test(texto)) return true;
+  if (/[a-záéíóúüñ][A-ZÁÉÍÓÚÜÑ]/.test(texto)) return true;
+  if (/\d{3,}/.test(texto) || texto.includes('@')) return true;
+  if (/\b(calle|avenida|avda|domicilio|direcci[oó]n|barrio)\b/i.test(texto)) return true;
+  if (/\b(mam[aá]|pap[aá]|hij[oa]s?|abuel[oa]s?|t[ií][oa]s?|herman[oa]s?|espos[oa]|novi[oa])\b/i.test(texto)) return true;
+  const frases = texto.split(/[.!?]+/);
+  for (const frase of frases) {
+    const palabras = frase.match(/[A-Za-zÁÉÍÓÚÜÑáéíóúüñ]+/g) ?? [];
+    for (let i = 1; i < palabras.length; i++) {
+      if (/^[A-ZÁÉÍÓÚÜÑ]/.test(palabras[i]!)) return true;
+    }
+  }
+  return false;
 }
 
 export async function comprenderRelato(params: {

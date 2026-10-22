@@ -1,3 +1,8 @@
+/**
+ * El análisis es privado.
+ * Solo compone las cintas y alimenta la curaduría en /admin.
+ * Nunca se publica ni se muestra en el sitio.
+ */
 import { z } from 'zod';
 import { EMOCIONES, type Emocion } from '@/lib/cintas-v2/palette';
 
@@ -170,7 +175,8 @@ export function normalizarAnalisis(raw: unknown): unknown {
 
   const palabrasClave = clavesRaw
     .map((item) => {
-      const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : { palabra: item };
+      const row: Record<string, unknown> =
+        item && typeof item === 'object' ? (item as Record<string, unknown>) : { palabra: item };
       const palabra = typeof row.palabra === 'string' ? row.palabra.trim() : typeof row.word === 'string' ? row.word.trim() : '';
       if (!palabra) return null;
       return { palabra: palabra.slice(0, 40), peso: num(row.peso ?? row.weight, 0.4) };
