@@ -1,0 +1,20 @@
+---
+description: Reglas permanentes de AlmaMundi. Aplican a toda interacción.
+alwaysApply: true
+---
+
+# AlmaMundi
+
+- Proyecto: AlmaMundi (www.almamundi.org). Vercel: precisar/almamundi2026. Repo: MaleMarin/almamundi2026.
+- Rama de trabajo: preview/adenda-revision. NUNCA push ni merge a main sin aprobación explícita de Ana.
+- Todo cambio se revisa primero en la preview de Vercel y solo después pasa a producción.
+- Antes de cualquier cambio: commit de checkpoint. Muestra el diff y espera aprobación antes de aplicar.
+- Muestra cada comando que cree, borre o suba algo y espera el OK.
+- .env.local tiene credenciales de producción de Firebase: no leer ni escribir Firestore o Storage de producción sin aprobación explícita. Las pruebas de reglas se hacen solo con el emulador.
+- Nunca imprimir valores de variables secretas.
+- Nunca debilitar la seguridad (Turnstile, límites, CSP, reglas) para que una prueba pase. Si falta algo, detenerse y avisar.
+- No reintroducir contenido falso, demos, seeds ni imágenes de picsum o pravatar.
+- Tipografía: Montserrat en páginas internas y modales; la home mantiene su tipografía.
+- Las cintas de colores no llevan negro.
+- Textos en español neutro latinoamericano, sin voseo y sin guiones largos.
+- Ninguna tarea está terminada sin commit, lista de archivos y verificación en navegador real.
