@@ -1,0 +1,88 @@
+import type { AlmaLocale } from '@/lib/i18n/locale';
+
+export type CasoTexto = {
+  id: string;
+  titulo: string;
+  texto: string;
+  ciudad: string;
+  pais: string;
+  locale: AlmaLocale;
+  grupo: 'inventada' | 'previo';
+};
+
+export const FECHA_PIE = new Date(2026, 9, 22, 12, 0, 0);
+
+export const HISTORIAS: CasoTexto[] = [
+  {
+    id: 'alegre',
+    titulo: 'El domingo del patio',
+    ciudad: 'Puebla',
+    pais: 'México',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `Hoy el patio se llenó antes del mediodía. Alguien puso la mesa bajo la parra, alguien trajo pan todavía tibio y el café salió más fuerte de lo normal. Los primos llegaron con una guitarra desafinada y eso, lejos de molestar, nos hizo reír. No estaba triste: estaba del otro lado, en esa zona donde la risa se adelanta a la frase. Se me apretó el pecho de alegría cuando mi hermana levantó el vaso y dijo que esta casa seguía siendo de todos. Bailamos descalzos sobre la baldosa caliente. El perro ladró al compás, o eso quisimos creer. Hubo un momento en que el sol pegaba de frente y nadie se corrió. Queríamos esa luz en la cara de la tarde. Al atardecer quedó el olor a naranja y a madera recién barrida. Guardé el delantal manchado de harina como si fuera un diploma modesto. Me dormí con la ventana abierta y con la certeza simple de que un domingo puede alcanzar para enderezar una semana entera, sin pedir permiso y sin dejar deudas.`,
+  },
+  {
+    id: 'triste',
+    titulo: 'La silla de más',
+    ciudad: 'Montevideo',
+    pais: 'Uruguay',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `La cocina sigue en su sitio y eso es lo más raro. La tetera silba si alguien la prende, pero nadie la prende. Qué maravilla de hogar, me digo, con su reloj puntual y su silla de más. Claro, todo salió perfecto: la sopa se enfría sola, el correo no trae nada y la tarde cabe en un vaso de agua. Extraño una voz que ya no cruza el pasillo. A veces abro el armario y el abrigo sigue ahí, con el hombro un poco caído, como si esperara un invierno que no va a volver. No hay pelea ni portazo, solo esta ausencia educada que se sienta a la mesa. Pongo dos platos por costumbre y después guardo uno. El segundo plato hace más ruido al volver al estante que toda la casa en el día. Afuera la gente habla de planes. Yo ordeno cajones que ya estaban en orden. Cuando apago la luz, el cuarto queda más grande. Me acuesto del lado que antes dejaba libre y el colchón no perdona ese hueco.`,
+  },
+  {
+    id: 'nostalgica',
+    titulo: 'La radio de verano',
+    ciudad: 'Oaxaca',
+    pais: 'México',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `El verano de aquella casa olía a jabón de lavanda y a radio mal sintonizada. Mi abuela dejaba la ventana del patio entreabierta para que el viento moviera la cortina de cuadros. Yo tenía las rodillas sucias de tierra y una moneda en el bolsillo que no alcanzaba para nada, y eso me hacía sentir rica de un modo que ya no sé repetir. Por las tardes comíamos sandía inclinados sobre el lavadero para no manchar el piso, y lo manchábamos igual. La voz del locutor anunciaba canciones que hoy no encuentro en ninguna parte. A veces creo que la nostalgia es un cuarto donde los muebles siguen en su sitio aunque uno ya no quepa. Recuerdo el fresco de las baldosas, el perro dormido como una alfombra y el grito breve de alguien que llamaba a comer. No era una vida importante. Era una vida tibia. Si pudiera entrar un minuto, no pediría cambiar nada: solo apoyar la mano en el marco y oír otra vez esa radio.`,
+  },
+  {
+    id: 'calma',
+    titulo: 'El río temprano',
+    ciudad: 'Valdivia',
+    pais: 'Chile',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `Me levanté sin despertador. El río iba bajo, del color del té claro, y la niebla todavía no se decidía a irse. Puse agua, corté pan y abrí la ventana del todo. No estaba triste. Tampoco estaba eufórica. Estaba en ese punto quieto en el que el cuerpo no pide nada urgente y la casa tampoco. El gato se sentó en el umbral y miró el mismo punto del patio durante un rato largo. Lo imité sin apuro. Pasó una bicicleta y después nadie. Lavé una taza que ya estaba limpia porque el gesto me ordenaba por dentro. En la radio, muy baja, alguien hablaba de mareas. No tomé nota. A media mañana caminé hasta el puente y volví sin haber llegado a ningún asunto. El corazón iba despacio, como el agua. Cuando el sol subió del todo, corrí la cortina y dejé que la pieza se iluminara sola. No hice planes. El día, por una vez, no me debía nada y yo no le debía al día.`,
+  },
+  {
+    id: 'intensa',
+    titulo: 'La noche del tren',
+    ciudad: 'Bogotá',
+    pais: 'Colombia',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `El tren salió con retraso y en el andén ya no quedaba espacio para dudar. Llevaba en el bolsillo una carta que había escrito tres veces y roto dos. El corazón me golpeaba en la garganta, no de alegría limpia, sino de esa mezcla de miedo y ganas que no deja respirar hondo. Cuando la vi al fondo del vagón, levanté la mano y enseguida la bajé. Qué ridículo es uno cuando le importa algo de verdad. Me senté enfrente. El paisaje iba demasiado rápido para mirarlo. Le dije que no podía seguir fingiendo calma, que la calma se me había acabado en la última estación. Ella no sonrió enseguida. Hubo un silencio que pesaba más que el ruido del tren. Después puso su mano sobre la mía y el vagón entero pareció inclinarse. No fue un final de película. Fue un temblor, un alivio feroz y una risa que se me escapó sin permiso. Bajamos en la ciudad equivocada y nos dio igual. Caminamos bajo la lluvia con la carta empapada, hablando los dos a la vez.`,
+  },
+  {
+    id: 'mixta',
+    titulo: 'La ventana que abre',
+    ciudad: 'Rosario',
+    pais: 'Argentina',
+    locale: 'es',
+    grupo: 'inventada',
+    texto: `El cuarto quedó a medias. En la cama, la marca de una maleta. En la mesa, una taza con el borde manchado y una nota de dos líneas que no supe leer en voz alta. Los primeros días fueron de contar: cuántas llamadas no hice y cuántas veces abrí la puerta por costumbre. La tristeza no hacía ruido. Se sentaba conmigo a desayunar y no probaba bocado. Una tarde de lluvia encontré, detrás de un libro, un mapa doblado con una cruz de lápiz en un pueblo que no conozco. No era una promesa. Era un lugar. Lo guardé en el bolsillo del abrigo y salí a caminar sin paraguas, como quien empieza a deberle algo al futuro. No se me arregló la vida en esa cuadra. Se me acomodó el pecho lo justo para poder decir, en voz baja, que mañana iba a escribir. Y escribí. Tres frases torpes, honestas, con un hueco todavía abierto y una luz pequeña al final, de esas que no alumbran la casa entera pero alcanzan para no chocarse con los muebles.`,
+  },
+  {
+    id: 'portugues',
+    titulo: 'A janela da rua de cima',
+    ciudad: 'Olinda',
+    pais: 'Brasil',
+    locale: 'pt',
+    grupo: 'inventada',
+    texto: `A casa da rua de cima ainda guarda o cheiro de café passado na hora. Não estava triste naquela manhã, embora o céu viesse baixo e o rádio tocasse uma canção antiga demais. Minha tia deixava a janela encostada para o vento mexer no papel de pão. Eu ficava na soleira, descalça, vendo a rua acordar devagar. O peito me apertou de uma alegria mansa, dessas que não pedem plateia nem aplauso. Havia mangas maduras no quintal e um cachorro que dormia como se o tempo não lhe cobrasse nada. Lembrei das férias em que a gente comia bolo frio em pé, rindo de coisas que hoje nem sei explicar direito. A saudade chegou sem bater, sentou-se um instante e depois deu licença. Fechei a janela só pela metade. Queria que o dia entrasse, mas sem pressa, como quem volta para um cômodo que continua sendo seu mesmo depois de tantos anos longe. Guardei uma manga no bolso e desci a ladeira devagar, com o coração quieto e acordado.`,
+  },
+  {
+    id: 'ingles',
+    titulo: 'The yellow kitchen',
+    ciudad: 'Halifax',
+    pais: 'Canadá',
+    locale: 'en',
+    grupo: 'inventada',
+    texto: `The kitchen was too yellow for a Monday, and I was not sad. That sentence surprised me, because the rain had every excuse to make a gray story and I refused the offer. My chest tightened with joy when the kettle finally sang, a small silly trumpet for an audience of one. I burned the toast and told the empty room it was on purpose, which is a kind way of saying the light on the table had distracted me. Outside, the street kept its serious face. Inside, I danced two steps and stopped, embarrassed by nobody at all. There was a letter I had not opened. I opened it. It was only a change of address, nothing dramatic, and still it felt like a window unstuck after winter. I laughed at the drama I had prepared and did not get to use. What a tragedy, I said to the toast, and then I ate it with butter and a ridiculous amount of honey. The day stayed ordinary. I let it. Ordinary, this morning, was a gift I did not have to unwrap or explain to anyone.`,
+  },
+];

@@ -22,6 +22,7 @@ pnpm-debug.log*
 /tmp-vad-compare/
 /tmp-resonance-preview/
 /tmp-launch-audit/
+/tmp-cintas-v2/
 
 # env local (claves y secretos; no commitear)
 .env*

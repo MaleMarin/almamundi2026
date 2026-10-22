@@ -1,0 +1,206 @@
+import { z } from 'zod';
+import { EMOCIONES, type Emocion } from '@/lib/cintas-v2/palette';
+
+export const IdiomaSchema = z.enum(['es', 'pt', 'en', 'otro']);
+export type Idioma = z.infer<typeof IdiomaSchema>;
+
+export const EmocionSchema = z.enum(EMOCIONES);
+
+const peso = z.coerce.number().finite().min(0).max(1);
+
+export const AnalisisSchema = z.object({
+  animo: z.object({
+    valencia: peso,
+    activacion: peso,
+    dominancia: peso,
+  }),
+  emociones: z
+    .array(
+      z.object({
+        emocion: EmocionSchema,
+        peso,
+      })
+    )
+    .min(1)
+    .max(12),
+  momentos: z
+    .array(
+      z.object({
+        resumen: z
+          .string()
+          .trim()
+          .min(1)
+          .refine((s) => s.split(/\s+/).filter(Boolean).length <= 8, 'máximo 8 palabras'),
+        emocion: EmocionSchema,
+        intensidad: peso,
+      })
+    )
+    .min(1)
+    .max(8),
+  palabrasClave: z
+    .array(
+      z.object({
+        palabra: z.string().trim().min(1).max(40),
+        peso,
+      })
+    )
+    .min(1)
+    .max(8),
+  idioma: IdiomaSchema,
+  avisos: z.object({
+    contenidoSensible: z.boolean(),
+    violencia: z.boolean(),
+    menores: z.boolean(),
+  }),
+});
+
+export type Analisis = z.infer<typeof AnalisisSchema>;
+
+const ALIAS: Record<string, Emocion> = {
+  nostalgia: 'nostalgia',
+  alegria: 'alegría',
+  alegría: 'alegría',
+  joy: 'alegría',
+  tristeza: 'tristeza',
+  sadness: 'tristeza',
+  triste: 'tristeza',
+  esperanza: 'esperanza',
+  hope: 'esperanza',
+  amor: 'amor',
+  love: 'amor',
+  miedo: 'miedo',
+  fear: 'miedo',
+  rabia: 'rabia',
+  ira: 'rabia',
+  anger: 'rabia',
+  calma: 'calma',
+  calm: 'calma',
+  orgullo: 'orgullo',
+  pride: 'orgullo',
+  gratitud: 'gratitud',
+  gratitude: 'gratitud',
+  perdida: 'pérdida',
+  pérdida: 'pérdida',
+  loss: 'pérdida',
+  asombro: 'asombro',
+  wonder: 'asombro',
+  awe: 'asombro',
+};
+
+function emocionDe(raw: unknown): Emocion | null {
+  if (typeof raw !== 'string') return null;
+  const key = raw
+    .trim()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
+  const directo = ALIAS[raw.trim().toLowerCase()] ?? ALIAS[key];
+  return directo ?? null;
+}
+
+function num(raw: unknown, fallback = 0.5): number {
+  const n = typeof raw === 'number' ? raw : typeof raw === 'string' ? Number(raw) : Number.NaN;
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(0, Math.min(1, n));
+}
+
+function flag(raw: unknown): boolean {
+  if (raw === true || raw === 1 || raw === 'true' || raw === 'si' || raw === 'sí') return true;
+  return false;
+}
+
+function ochoPalabras(raw: unknown): string {
+  const texto = typeof raw === 'string' ? raw.trim() : '';
+  return texto.split(/\s+/).filter(Boolean).slice(0, 8).join(' ');
+}
+
+function idiomaDe(raw: unknown): string {
+  const v = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  if (v.startsWith('es') || v.includes('spanish') || v.includes('español')) return 'es';
+  if (v.startsWith('pt') || v.includes('portug')) return 'pt';
+  if (v.startsWith('en') || v.includes('english') || v.includes('ingl')) return 'en';
+  if (v === 'otro' || v === 'other') return 'otro';
+  return v || 'otro';
+}
+
+function listaEmociones(raw: unknown): Array<{ emocion: Emocion; peso: number }> {
+  const out: Array<{ emocion: Emocion; peso: number }> = [];
+  const push = (emocion: Emocion | null, pesoRaw: unknown) => {
+    if (!emocion) return;
+    if (out.some((e) => e.emocion === emocion)) return;
+    out.push({ emocion, peso: num(pesoRaw, 0.4) });
+  };
+  if (Array.isArray(raw)) {
+    for (const item of raw) {
+      if (item && typeof item === 'object') {
+        const row = item as Record<string, unknown>;
+        push(emocionDe(row.emocion ?? row.emotion ?? row.nombre), row.peso ?? row.weight ?? row.valor);
+      } else {
+        push(emocionDe(item), 0.4);
+      }
+    }
+  } else if (raw && typeof raw === 'object') {
+    for (const [k, v] of Object.entries(raw as Record<string, unknown>)) push(emocionDe(k), v);
+  }
+  return out.slice(0, 12);
+}
+
+/** Acomoda la respuesta del modelo antes de validarla. */
+export function normalizarAnalisis(raw: unknown): unknown {
+  const base = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : {};
+  const animoRaw = (base.animo ?? base.mood ?? base.animoGeneral ?? {}) as Record<string, unknown>;
+  const avisosRaw = (base.avisos ?? base.flags ?? {}) as Record<string, unknown>;
+  const momentosRaw = Array.isArray(base.momentos) ? base.momentos : Array.isArray(base.moments) ? base.moments : [];
+  const clavesRaw = Array.isArray(base.palabrasClave)
+    ? base.palabrasClave
+    : Array.isArray(base.keywords)
+      ? base.keywords
+      : [];
+
+  const momentos = momentosRaw
+    .map((item) => {
+      const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+      const emocion = emocionDe(row.emocion ?? row.emotion);
+      const resumen = ochoPalabras(row.resumen ?? row.summary);
+      if (!emocion || !resumen) return null;
+      return { resumen, emocion, intensidad: num(row.intensidad ?? row.intensity, 0.5) };
+    })
+    .filter((x): x is { resumen: string; emocion: Emocion; intensidad: number } => Boolean(x))
+    .slice(0, 8);
+
+  const palabrasClave = clavesRaw
+    .map((item) => {
+      const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : { palabra: item };
+      const palabra = typeof row.palabra === 'string' ? row.palabra.trim() : typeof row.word === 'string' ? row.word.trim() : '';
+      if (!palabra) return null;
+      return { palabra: palabra.slice(0, 40), peso: num(row.peso ?? row.weight, 0.4) };
+    })
+    .filter((x): x is { palabra: string; peso: number } => Boolean(x))
+    .slice(0, 8);
+
+  return {
+    animo: {
+      valencia: num(animoRaw.valencia ?? animoRaw.valence, 0.5),
+      activacion: num(animoRaw.activacion ?? animoRaw.arousal ?? animoRaw.activation, 0.5),
+      dominancia: num(animoRaw.dominancia ?? animoRaw.dominance, 0.5),
+    },
+    emociones: listaEmociones(base.emociones ?? base.emotions),
+    momentos,
+    palabrasClave,
+    idioma: idiomaDe(base.idioma ?? base.language),
+    avisos: {
+      contenidoSensible: flag(avisosRaw.contenidoSensible ?? avisosRaw.sensible),
+      violencia: flag(avisosRaw.violencia ?? avisosRaw.violence),
+      menores: flag(avisosRaw.menores ?? avisosRaw.minors),
+    },
+  };
+}
+
+export function erroresDe(error: { issues?: Array<{ path?: PropertyKey[]; message: string }> }): string {
+  const issues = error.issues ?? [];
+  if (issues.length === 0) return 'respuesta inválida';
+  return issues
+    .slice(0, 8)
+    .map((i) => `${(i.path ?? []).join('.')}: ${i.message}`)
+    .join('; ');
+}
