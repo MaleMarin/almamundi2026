@@ -1,4 +1,4 @@
-import type { CasoTexto } from '@/lib/cintas-v2/fixtures/historias';
+import type { CasoTexto } from '@/lib/cintas-v2/fixtures/tipos';
 
 /** Los cinco casos del informe anterior. El texto que colorea es el mismo de entonces. */
 export const CASOS_PREVIOS: CasoTexto[] = [

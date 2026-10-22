@@ -9,8 +9,8 @@ import { join, resolve } from 'node:path';
 import sharp from 'sharp';
 import { config } from 'dotenv';
 import { hitsFromText } from '@/lib/huella/almamundi-lexicon';
-import { CASOS_TEXTO, contarPalabras, FECHA_PIE, HISTORIAS } from '@/lib/cintas-v2/fixtures';
-import { armonizar, CREMA, hexRgb, luminancia } from '@/lib/cintas-v2/palette';
+import { CASOS_TEXTO, contarPalabras, FECHA_PIE, HISTORIAS } from '@/scripts/cintas-v2/fixtures';
+import { armonizar, hexRgb, luminancia } from '@/lib/cintas-v2/palette';
 import { coloresDominantes } from '@/lib/cintas-v2/prepare/dominant-colors';
 import { analisisDesdeDiccionario } from '@/lib/cintas-v2/understand/lexicon-fallback';
 import { AnalisisSchema } from '@/lib/cintas-v2/understand/schema';
@@ -208,9 +208,9 @@ async function comprobar(): Promise<void> {
       a.bandas.every((x) => x.hex !== '#000000' && hexRgb(x.hex).reduce((s, n) => s + n, 0) > 40),
       `${caso.id} sin negro`
     );
-    const crema = a.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
+    const crema = a.bandas.filter((x) => x.clase === 'pausa').reduce((s, x) => s + x.ancho, 0);
     const campos = a.bandas.filter((x) => x.clase === 'campo');
-    stats.push(`${caso.id} bandas=${a.bandas.length} crema=${crema} campos=${campos.length} maxCampo=${Math.max(0, ...campos.map((c) => c.ancho))}`);
+    stats.push(`${caso.id} bandas=${a.bandas.length} pausa=${crema} campos=${campos.length} maxCampo=${Math.max(0, ...campos.map((c) => c.ancho))}`);
     const pngModo = await pngV2(a.bandas, {
       titulo: caso.id,
       ciudad: 'Puebla',
@@ -226,9 +226,9 @@ async function comprobar(): Promise<void> {
   const calma = modos[2]!;
   const planI = componerCintas({ id: intensa.id, analisis: intensa.analisis, texto: intensa.texto, locale: 'es' });
   const planC = componerCintas({ id: calma.id, analisis: calma.analisis, texto: calma.texto, locale: 'es' });
-  const cremaI = planI.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
-  const cremaC = planC.bandas.filter((x) => x.hex === CREMA).reduce((s, x) => s + x.ancho, 0);
-  decir(cremaC > cremaI + 80, `calma tiene más crema (${cremaC}) que intensa (${cremaI})`);
+  const cremaI = planI.bandas.filter((x) => x.clase === 'pausa').reduce((s, x) => s + x.ancho, 0);
+  const cremaC = planC.bandas.filter((x) => x.clase === 'pausa').reduce((s, x) => s + x.ancho, 0);
+  decir(cremaC > cremaI + 80, `calma tiene más silencio (${cremaC}) que intensa (${cremaI})`);
   const planT = componerCintas({
     id: 'sint-triste',
     analisis: modos[1]!.analisis,

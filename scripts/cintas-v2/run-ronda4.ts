@@ -5,7 +5,7 @@
 import { readFile, readdir, writeFile } from 'node:fs/promises';
 import { extname, join, resolve } from 'node:path';
 import { config } from 'dotenv';
-import { CASOS_TEXTO, FECHA_PIE } from '@/lib/cintas-v2/fixtures';
+import { CASOS_TEXTO, FECHA_PIE } from '@/scripts/cintas-v2/fixtures';
 import { componerCintas, type SilencioMarca } from '@/lib/cintas-v2/compose/layout';
 import { MODELO_LENGUAJE } from '@/lib/cintas-v2/modelos';
 import { armonizar, esAcentoIntenso, esSuave } from '@/lib/cintas-v2/palette';
