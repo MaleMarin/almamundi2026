@@ -1,4 +1,4 @@
-import { CASOS_PREVIOS } from '@/lib/cintas-v2/fixtures/casos-previos';
+import { CASOS_PREVIOS } from '@/scripts/cintas-v2/fixtures/casos-previos';
 import { HISTORIAS } from '@/scripts/cintas-v2/fixtures/historias';
 
 export type { CasoTexto } from '@/lib/cintas-v2/fixtures/tipos';

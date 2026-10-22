@@ -24,7 +24,7 @@ export const TINTA_PIE = '#8A8A7A';
 export const FAMILIA: Record<Emocion, readonly string[]> = {
   alegría: ['#FFD60A', '#FF7A00', '#FF4F5A', '#FF6FB5'],
   amor: ['#D90429', '#E0218A', '#FF5DA2'],
-  calma: ['#7DD3FC', '#6EE7B7', '#22D3EE', '#C4B5FD', '#E9C46A', '#FFB4A2', '#A3D9A5', '#FBCFE8'],
+  calma: ['#5EEAD4', '#6EE7B7', '#818CF8', '#C4B5FD', '#E9C46A', '#FFB4A2', '#A3D9A5', '#FBCFE8'],
   esperanza: ['#9BE15D', '#10B981', '#FDE047'],
   nostalgia: ['#F59E0B', '#E76F51', '#C084FC', '#0E7490'],
   tristeza: ['#1D4ED8', '#3730A3', '#1E2A5E', '#7C3AED', '#6B3F6E'],
@@ -45,7 +45,6 @@ export const INTENSOS = [
   '#D90429',
   '#E0218A',
   '#FF5DA2',
-  '#22D3EE',
   '#FDE047',
   '#9BE15D',
   '#F59E0B',
@@ -81,7 +80,7 @@ export function esIntenso(hex: string): boolean {
   return false;
 }
 
-/** Familias de calma y esperanza: celestes, mentas, aguas, lavandas y limas suaves. */
+/** Familias de calma y esperanza: menta, verde agua, pervinca, lavanda y limas suaves. */
 export const SUAVES = unicos([...FAMILIA.calma, ...FAMILIA.esperanza]);
 const SUAVE = new Set<string>(SUAVES);
 
@@ -117,6 +116,7 @@ export function coloresDeHistoria(emociones: Emocion[], rng: () => number, _modo
     intensos[j] = tmp;
   }
   for (const color of intensos) {
+    if (esCalipso(color) && !emociones.includes('asombro')) continue;
     if (vistos.filter((hex) => esIntenso(hex)).length >= 3 && vistos.length >= 7) break;
     add(color);
   }
@@ -164,23 +164,47 @@ export function medidaHsl(hex: string): { h: number; s: number; l: number } {
   return { h, s, l };
 }
 
+/** Calipso, turquesa y celeste: matiz entre 180° y 205°. */
+export function esCalipso(hex: string): boolean {
+  const grados = medidaHsl(hex).h * 360;
+  return grados >= 180 && grados <= 205;
+}
+
+/** Rojos, naranjas, amarillos y rosas. Ahí el silencio no puede quedar beige. */
+export function esCalido(h: number): boolean {
+  const grados = h * 360;
+  return grados <= 70 || grados >= 320;
+}
+
+/** Si el color cae en calipso, lo corre justo fuera de esa franja y conserva la tinta. */
+export function sinCalipso(hex: string): string {
+  if (!esCalipso(hex)) return hex.toUpperCase();
+  const { h, s, l } = medidaHsl(hex);
+  const destino = h * 360 <= 192.5 ? 168 / 360 : 214 / 360;
+  let out = ajustarTinta(rgbHex(...hslARgb(destino, Math.max(0.5, s), Math.min(0.74, Math.max(0.28, l)))));
+  if (esCalipso(out)) out = ajustarTinta(rgbHex(...hslARgb(214 / 360, 0.6, 0.46)));
+  return out;
+}
+
 /** Aclara el color del racimo: luminosidad 62–78 % y saturación 45–70 %, con el mismo tono. */
 export function variarSilencio(hex: string, paso: number, prohibido = ''): string {
   const [h] = rgbAHsl(...hexRgb(hex));
+  const calido = esCalido(h);
   const luces = [0.64, 0.68, 0.72, 0.76, 0.63, 0.7, 0.74, 0.77];
-  const sats = [0.48, 0.56, 0.64, 0.46, 0.6, 0.68, 0.52];
+  const sats = calido ? [0.66, 0.68, 0.7, 0.67, 0.69, 0.65] : [0.48, 0.56, 0.64, 0.46, 0.6, 0.68, 0.52];
   const veto = prohibido.toUpperCase();
+  const satMin = calido ? 0.65 : 0.45;
   for (let k = 0; k < luces.length * sats.length; k++) {
     const luz = luces[(paso + k) % luces.length]!;
     const sat = sats[(paso * 2 + k) % sats.length]!;
     const out = rgbHex(...hslARgb(h, sat, luz));
     if (out === veto) continue;
     const medida = medidaHsl(out);
-    if (medida.l < 0.62 || medida.l > 0.78 || medida.s < 0.45 || medida.s > 0.7) continue;
+    if (medida.l < 0.62 || medida.l > 0.78 || medida.s < satMin || medida.s > 0.7) continue;
     if (!enRango(out)) continue;
     return out;
   }
-  return rgbHex(...hslARgb(h, 0.55, 0.7));
+  return rgbHex(...hslARgb(h, calido ? 0.68 : 0.55, 0.7));
 }
 
 /** Misma tinta, más oscura, para que el silencio claro tenga con qué contrastar. */
@@ -350,7 +374,8 @@ export function colorDePalabra(palabra: string, valencia: number, activacion: nu
   let h = 0;
   for (let i = 0; i < palabra.length; i++) h = (h + palabra.charCodeAt(i) * (i + 1)) >>> 0;
   if (activacion >= 0.72 && peso >= 0.55) {
-    return ajustarTinta(INTENSOS[h % INTENSOS.length]!.toUpperCase());
+    const intensos = INTENSOS.filter((color) => !esCalipso(color));
+    return ajustarTinta(intensos[h % intensos.length]!.toUpperCase());
   }
   return ajustarTinta((familia[h % familia.length] ?? INTENSOS[0]).toUpperCase());
 }

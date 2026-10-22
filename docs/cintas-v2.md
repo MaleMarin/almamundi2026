@@ -1,6 +1,6 @@
 # Cintas v2
 
-Prototipo aparte del sitio. No cambia el envío de relatos, la cinta que ya está en producción, Firebase ni Vercel. Vive en la rama `exp/cintas-v2`. El código de composición está en `lib/cintas-v2/`. Los guiones que arman las hojas están en `scripts/cintas-v2/`. Las historias inventadas para probar están en `scripts/cintas-v2/fixtures/` y no las usa el sitio.
+Prototipo aparte del sitio. No cambia el envío de relatos, la cinta que ya está en producción, Firebase ni Vercel. Vive en la rama `exp/cintas-v2`. El código de composición está en `lib/cintas-v2/`. Los guiones que arman las hojas están en `scripts/cintas-v2/`. Las historias de prueba, inventadas y anteriores, están en `scripts/cintas-v2/fixtures/` y no las usa el sitio.
 
 ## De dónde sale cada cinta
 
@@ -23,6 +23,8 @@ El modo cambia la forma, no la emoción.
 
 El amor en modo calma sigue siendo rosa y carmín, más claro. No se vuelve turquesa.
 
+El calipso, el turquesa y el celeste (matiz entre 180° y 205°) no pasan del 12 % del ancho, y los silencios de ese tono también cuentan. Ese calipso vive en el asombro. En la calma, el agua y el celeste se cambian por azul pervinca y un verde agua más suave. Siguen la menta, la lavanda y los tonos cálidos: arena, durazno, salvia y rosa. Un campo grande solo puede ser calipso si el asombro es la emoción principal.
+
 ## Colores
 
 No hay blanco, crema, negro ni gris. Cada color, también los que vienen de una foto, tiene luminosidad entre 22 % y 80 % y saturación de al menos 40 %.
@@ -31,7 +33,7 @@ No hay líneas blancas ni crema entre las franjas. El pie de la hoja, con el tí
 
 ## Silencios
 
-Cada silencio toma el color que más ancho ocupa en el racimo de su izquierda y lo aclara, conservando el tono. La luminosidad queda entre 62 % y 78 % y la saturación entre 45 % y 70 %. Esos valores varían de un silencio a otro.
+Cada silencio toma el color que más ancho ocupa en el racimo de su izquierda y lo aclara, conservando el tono. La luminosidad queda entre 62 % y 78 % y la saturación entre 45 % y 70 %. En los tonos cálidos la saturación no baja de 65 %, para que no quede beige. Esos valores varían de un silencio a otro.
 
 Dos silencios seguidos de la misma historia nunca usan el mismo tono.
 
@@ -46,7 +48,7 @@ De cada foto se toman cinco colores dominantes. Cada uno se acerca a la paleta: 
 Desde la raíz del repositorio, sin llamar al modelo:
 
 ```
-node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs scripts/cintas-v2/run-ronda6.ts
+node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs scripts/cintas-v2/run-ronda6d.ts
 ```
 
-La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6.png`. Esa carpeta no se sube a git.
+La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6d.png`. Esa carpeta no se sube a git.
