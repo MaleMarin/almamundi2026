@@ -40,6 +40,34 @@ export function downloadPngBlob(blob: Blob, filename: string): void {
 
 export type ShareResonanceResult = 'shared' | 'copied' | 'downloaded' | 'aborted';
 
+export async function shareNativeStoryWithImage(opts: {
+  file: File;
+  title: string;
+  text: string;
+  url: string;
+}): Promise<'shared' | 'aborted' | 'unavailable'> {
+  if (typeof navigator === 'undefined' || typeof navigator.share !== 'function') {
+    return 'unavailable';
+  }
+  const isMobile = isCoarsePointer() || isMobileUa();
+  if (!isMobile) return 'unavailable';
+
+  if (canShareFiles(opts.file)) {
+    try {
+      await navigator.share({
+        files: [opts.file],
+        title: opts.title,
+        text: opts.text,
+      });
+      return 'shared';
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return 'aborted';
+    }
+  }
+
+  return 'unavailable';
+}
+
 export async function shareOrCopyResonancePng(
   blob: Blob,
   filename: string,

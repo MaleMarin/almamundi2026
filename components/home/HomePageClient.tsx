@@ -9,7 +9,11 @@ import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { navigateToHomeMapa, scrollToHomeMapaSection } from '@/lib/mapa-home-nav';
+import {
+  navigateToHomeMapa,
+  primeMapAmbientFromNavGesture,
+  scrollToHomeMapaSection,
+} from '@/lib/mapa-home-nav';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -71,6 +75,12 @@ export function HomePageClient() {
       router.replace('/contar');
     }
   }, [pathname, router]);
+
+  const exploreMapFromStory = useCallback(() => {
+    setStoryOpen(false);
+    primeMapAmbientFromNavGesture();
+    hardNavigateTo('/?section=mapa');
+  }, []);
 
   useLayoutEffect(() => {
     const format = parseContarFormat(pathname);
@@ -264,6 +274,7 @@ export function HomePageClient() {
       <StoryModal
         isOpen={storyOpen}
         onClose={closeStory}
+        onExploreMap={exploreMapFromStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
         onClearTopic={() => setChosenTopic(null)}

@@ -11,6 +11,9 @@ import {
   emailShell,
   invitationHtml,
   loadInlineWordmark,
+  primaryButtonHtml,
+  secondaryLinkHtml,
+  whatsappShareHref,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
@@ -24,63 +27,81 @@ export type SendPublicationEmailParams = {
   ecoUrl?: string;
 };
 
+function displayName(authorName: string): string {
+  return authorName.trim().replace(/[\r\n]+/g, " ").slice(0, 80);
+}
+
+export function publicationEmailSubject(): string {
+  return "Tu historia ya está en AlmaMundi";
+}
+
+function storyPublicUrl(storyId: string): string {
+  return `${EMAIL_PUBLIC_ORIGIN}/historias/${encodeURIComponent(storyId)}`;
+}
+
+export function buildPublicationEmailText(params: SendPublicationEmailParams): string {
+  const name = displayName(params.authorName);
+  const greeting = name ? `Hola ${name},` : "Hola,";
+  const storyUrl = storyPublicUrl(params.storyId);
+  const shareText = `Te invito a leer esta historia en AlmaMundi: ${storyUrl}`;
+  return [
+    greeting,
+    "",
+    `Tu historia "${params.storyTitle.trim() || "sin título"}" ya está en AlmaMundi.`,
+    `Puede verse desde cualquier parte del mundo, anclada en ${params.placeName.trim() || "el mapa"}.`,
+    "",
+    "Si quieres, compártela con quien quieras. Cada historia despierta otra.",
+    "",
+    `Ver mi historia: ${storyUrl}`,
+    `Compartir por WhatsApp: ${whatsappShareHref(shareText)}`,
+    `Contar otra historia: ${EMAIL_PUBLIC_ORIGIN}/contar`,
+    params.ecoUrl?.trim() ? `Tu rincón privado: ${params.ecoUrl.trim()}` : "",
+    "",
+    "Un abrazo,",
+    "Equipo AlmaMundi",
+    "",
+    `${EMAIL_PUBLIC_ORIGIN} · Política de privacidad: ${EMAIL_PUBLIC_ORIGIN}/privacidad`,
+    "Recibiste este correo porque enviaste una historia en AlmaMundi.",
+  ]
+    .filter((line, i, arr) => line !== "" || arr[i - 1] !== "")
+    .join("\n");
+}
+
 export function buildPublicationEmailHtml(
   params: SendPublicationEmailParams,
   hasInlineLogo = false
 ): string {
-  const authorName = escapeHtml(params.authorName);
-  const storyTitle = escapeHtml(params.storyTitle);
-  const placeName = escapeHtml(params.placeName);
-  const storyIdEnc = encodeURIComponent(params.storyId);
-  const historiasUrl = `${EMAIL_PUBLIC_ORIGIN}/historias/${storyIdEnc}`;
-  const ecoHref = params.ecoUrl?.trim() ?? '';
+  const authorName = escapeHtml(displayName(params.authorName));
+  const storyTitle = escapeHtml(params.storyTitle.trim() || "sin título");
+  const placeName = escapeHtml(params.placeName.trim() || "el mapa");
+  const historiasUrl = storyPublicUrl(params.storyId);
+  const shareText = `Te invito a leer esta historia en AlmaMundi: ${historiasUrl}`;
+  const ecoHref = params.ecoUrl?.trim() ?? "";
+  const greeting = authorName ? `Hola ${authorName},` : "Hola,";
   const ecoBlock = ecoHref
     ? `
       <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
         En este rincón puedes ver cuántas personas resonaron con tu historia
         y volver a descargar tu cinta de colores.
       </p>
-      <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
-        <tr>
-          <td style="background:#FF4A1C;border-radius:100px;padding:14px 32px">
-            <a href="${escapeHtml(ecoHref)}"
-              style="color:white;text-decoration:none;
-              font-size:13px;font-weight:700;
-              letter-spacing:0.1em;text-transform:uppercase">
-              IR A MI ECO
-            </a>
-          </td>
-        </tr>
-      </table>`
-    : '';
+      ${secondaryLinkHtml("Ir a mi eco", ecoHref)}`
+    : "";
 
   const bodyHtml = `
       <p style="margin:0 0 16px;font-size:16px;color:#4A5568">
-        Hola ${authorName},
+        ${greeting}
       </p>
-      <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
-        Tu historia <strong>"${storyTitle}"</strong> ya está
-        publicada en el mapa de AlmaMundi.
-        Puede verse desde cualquier parte del mundo.
+      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
+        Tu historia <strong>"${storyTitle}"</strong> ya está en AlmaMundi.
+        Puede verse desde cualquier parte del mundo, anclada en <strong>${placeName}</strong>.
       </p>
-      <p style="margin:0 0 32px;font-size:16px;color:#4A5568;line-height:1.6">
-        La historia fue anclada en <strong>${placeName}</strong>
-        y forma parte del archivo de historias humanas de Precisar.
+      <p style="margin:0 0 28px;font-size:16px;color:#4A5568;line-height:1.6">
+        Si quieres, compártela con quien quieras. Cada historia despierta otra.
       </p>
-      <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
-        <tr>
-          <td style="background:#FF4A1C;border-radius:100px;padding:14px 32px">
-            <a href="${historiasUrl}"
-              style="color:white;text-decoration:none;
-              font-size:13px;font-weight:700;
-              letter-spacing:0.1em;text-transform:uppercase">
-              VER MI HISTORIA EN EL MAPA
-            </a>
-          </td>
-        </tr>
-      </table>
-      ${ecoBlock}
+      ${primaryButtonHtml("Ver mi historia", historiasUrl)}
+      ${secondaryLinkHtml("Compartir por WhatsApp", whatsappShareHref(shareText))}
       ${invitationHtml()}
+      ${ecoBlock}
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
         Un abrazo,<br>
         Equipo AlmaMundi
@@ -115,7 +136,7 @@ export async function sendPublicationEmail(
   }
 
   const from = mailFromAddress();
-  const subject = "Tu historia ya está en AlmaMundi";
+  const subject = publicationEmailSubject();
   const logo = await loadInlineWordmark();
 
   try {
@@ -124,6 +145,7 @@ export async function sendPublicationEmail(
       to: params.authorEmail,
       subject,
       html: buildPublicationEmailHtml(params, Boolean(logo)),
+      text: buildPublicationEmailText(params),
       ...(logo ? { attachments: [emailLogoAttachment(logo)] } : {}),
     });
     if (sent.error) {

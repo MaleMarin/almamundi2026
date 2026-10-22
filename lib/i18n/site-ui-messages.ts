@@ -308,7 +308,7 @@ const es: SiteUiMessages = {
   modalShareFailed: 'No pudimos compartir la imagen. Guárdala y compártela desde tu galería.',
   modalCopyLink: 'Copiar enlace',
   modalAnotherStory: 'Otra historia',
-  modalLinkCopied: '¡Enlace copiado!',
+  modalLinkCopied: 'Enlace copiado',
   modalImprintWhat: '¿Qué es esta resonancia visual?',
   modalImprintExplain:
     'Las palabras de tu historia se volvieron colores. Nadie más tiene esta combinación.',
@@ -435,7 +435,7 @@ const pt: SiteUiMessages = {
   modalSendingText: 'A enviar o seu texto…',
   modalSendingPhotos: 'A enviar as suas fotos…',
   modalSectionStory: 'História',
-  modalStoryName: 'Nome da história *',
+  modalStoryName: 'Título da sua história *',
   modalStoryNamePlaceholder: 'Ex.: O dia em que percebi algo',
   modalAlias: 'Nome ou alias *',
   modalAliasPlaceholder: 'Como quer aparecer',
@@ -501,11 +501,11 @@ const pt: SiteUiMessages = {
   modalShareFailed: 'Não foi possível partilhar a imagem.',
   modalCopyLink: 'Copiar ligação',
   modalAnotherStory: 'Outra história',
-  modalLinkCopied: 'Ligação copiada!',
+  modalLinkCopied: 'Ligação copiada',
   modalImprintWhat: 'O que é esta ressonância visual?',
   modalImprintExplain:
     'Cada palavra que contou escolheu uma cor. Ninguém tem esta combinação.',
-  modalBackToMap: 'Voltar ao mapa',
+  modalBackToMap: 'Explorar o mapa',
   modalTopicActive: 'Tema guia ativo',
   upload: {
     video: {
@@ -627,7 +627,7 @@ const en: SiteUiMessages = {
   modalSendingText: 'Sending your text…',
   modalSendingPhotos: 'Sending your photos…',
   modalSectionStory: 'Story',
-  modalStoryName: 'Story name *',
+  modalStoryName: 'Title of your story *',
   modalStoryNamePlaceholder: 'e.g. The day I understood something',
   modalAlias: 'Name or alias *',
   modalAliasPlaceholder: 'How you want to appear',
@@ -693,11 +693,11 @@ const en: SiteUiMessages = {
   modalShareFailed: 'Could not share the image.',
   modalCopyLink: 'Copy link',
   modalAnotherStory: 'Another story',
-  modalLinkCopied: 'Link copied!',
+  modalLinkCopied: 'Link copied',
   modalImprintWhat: 'What is this visual resonance?',
   modalImprintExplain:
     'Every word you told chose a color. No one else has this combination.',
-  modalBackToMap: 'Back to the map',
+  modalBackToMap: 'Explore the map',
   modalTopicActive: 'Active guide theme',
   upload: {
     video: {

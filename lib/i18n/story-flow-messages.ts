@@ -51,6 +51,22 @@ export type StoryFlowMessages = {
   modalCopyImageFailed: string;
   modalShareImageFailed: string;
   modalImprintAlt: string;
+  modalShareMenuTitle: string;
+  modalShareWhatsApp: string;
+  modalShareFacebook: string;
+  modalShareX: string;
+  modalShareLinkedIn: string;
+  modalShareEmail: string;
+  modalShareLinkCopied: string;
+  modalAnotherPromptFoto: string;
+  modalAnotherCtaFoto: string;
+  modalAnotherPromptVideo: string;
+  modalAnotherCtaVideo: string;
+  modalAnotherPromptAudio: string;
+  modalAnotherCtaAudio: string;
+  modalAnotherPromptTexto: string;
+  modalAnotherCtaTexto: string;
+  modalAnotherFormatLink: string;
 };
 
 const es: StoryFlowMessages = {
@@ -114,8 +130,24 @@ const es: StoryFlowMessages = {
     'Mis palabras se volvieron colores en AlmaMundi. ¿De qué color es tu historia? almamundi.org/contar',
   modalCopyImageFailed: 'No pudimos copiar la imagen. Prueba con Descargar.',
   modalShareImageFailed:
-    'No pudimos compartir la imagen. Guárdala y compártela desde tu galería.',
+    'No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo.',
   modalImprintAlt: 'Cintas de colores creadas a partir de tu historia «{titulo}»',
+  modalShareMenuTitle: 'Compartir',
+  modalShareWhatsApp: 'WhatsApp',
+  modalShareFacebook: 'Facebook',
+  modalShareX: 'X',
+  modalShareLinkedIn: 'LinkedIn',
+  modalShareEmail: 'Correo',
+  modalShareLinkCopied: 'Enlace copiado',
+  modalAnotherPromptFoto: '¿Quieres subir más fotos?',
+  modalAnotherCtaFoto: 'Subir más fotos',
+  modalAnotherPromptVideo: '¿Quieres grabar otro momento?',
+  modalAnotherCtaVideo: 'Grabar otro video',
+  modalAnotherPromptAudio: '¿Quieres grabar otro momento?',
+  modalAnotherCtaAudio: 'Grabar otro audio',
+  modalAnotherPromptTexto: '¿Quieres escribir otra historia?',
+  modalAnotherCtaTexto: 'Escribir otra historia',
+  modalAnotherFormatLink: 'o cuéntala en otro formato',
 };
 
 const pt: StoryFlowMessages = {
@@ -126,6 +158,19 @@ const pt: StoryFlowMessages = {
   modalPhotoUploadFailed: 'Não foi possível enviar esta foto.',
   modalPhotoRetry: 'Tentar de novo',
   modalRequiredFieldsNote: 'Os campos com * são obrigatórios.',
+  modalShareImageFailed:
+    'Não foi possível partilhar. Descarregue a imagem e partilhe-a a partir do seu dispositivo.',
+  modalShareEmail: 'Correio',
+  modalShareLinkCopied: 'Ligação copiada',
+  modalAnotherPromptFoto: 'Quer enviar mais fotos?',
+  modalAnotherCtaFoto: 'Enviar mais fotos',
+  modalAnotherPromptVideo: 'Quer gravar outro momento?',
+  modalAnotherCtaVideo: 'Gravar outro vídeo',
+  modalAnotherPromptAudio: 'Quer gravar outro momento?',
+  modalAnotherCtaAudio: 'Gravar outro áudio',
+  modalAnotherPromptTexto: 'Quer escrever outra história?',
+  modalAnotherCtaTexto: 'Escrever outra história',
+  modalAnotherFormatLink: 'ou conte-a noutro formato',
 };
 
 const en: StoryFlowMessages = {
@@ -136,6 +181,20 @@ const en: StoryFlowMessages = {
   modalPhotoUploadFailed: 'We could not upload this photo.',
   modalPhotoRetry: 'Try again',
   modalRequiredFieldsNote: 'Fields marked with * are required.',
+  modalShareImageFailed:
+    'We could not share this. Download the image and share it from your device.',
+  modalShareMenuTitle: 'Share',
+  modalShareEmail: 'Email',
+  modalShareLinkCopied: 'Link copied',
+  modalAnotherPromptFoto: 'Want to upload more photos?',
+  modalAnotherCtaFoto: 'Upload more photos',
+  modalAnotherPromptVideo: 'Want to record another moment?',
+  modalAnotherCtaVideo: 'Record another video',
+  modalAnotherPromptAudio: 'Want to record another moment?',
+  modalAnotherCtaAudio: 'Record another audio',
+  modalAnotherPromptTexto: 'Want to write another story?',
+  modalAnotherCtaTexto: 'Write another story',
+  modalAnotherFormatLink: 'or tell it in another format',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

@@ -61,8 +61,17 @@ import {
 import {
   canvasToPngBlob,
   downloadPngBlob,
-  shareOrCopyResonancePng,
+  shareNativeStoryWithImage,
 } from '@/lib/huella/share-resonance-png';
+import {
+  PENDING_STORY_SHARE_URL,
+  PENDING_STORY_SHARE_TEXT,
+} from '@/lib/huella/share-story-channels';
+import { StoryShareMenu } from '@/components/home/StoryShareMenu';
+import {
+  loadStoryAuthorSession,
+  saveStoryAuthorSession,
+} from '@/lib/story-author-session';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
@@ -350,12 +359,13 @@ function fileWeightMb(file: File): string {
 export type StoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  onExploreMap: () => void;
   mode: StoryModalMode;
   chosenTopic: ChosenInspirationTopic | null;
   onClearTopic: () => void;
 };
 
-export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }: StoryModalProps) {
+export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic }: StoryModalProps) {
   const { t, locale } = useHomeLocale();
   const [step, setStep] = useState<StoryModalStep>('capture');
   const [err, setErr] = useState('');
@@ -438,6 +448,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
   const [shareNotice, setShareNotice] = useState('');
+  const [shareMenuOpen, setShareMenuOpen] = useState(false);
+  const [shareMenuShowDownload, setShareMenuShowDownload] = useState(false);
   const shareNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareRequestTokenRef = useRef(0);
 
@@ -532,6 +544,8 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setImprintId('');
       setImprintReceivedAt(null);
       setShareNotice('');
+      setShareMenuOpen(false);
+      setShareMenuShowDownload(false);
       shareRequestTokenRef.current += 1;
       if (shareNoticeTimerRef.current) {
         clearTimeout(shareNoticeTimerRef.current);
@@ -552,6 +566,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       setUploadAudioFile(null);
       setAvSource('grabar');
       const draft = loadStoryDraft();
+      const authorSession = loadStoryAuthorSession();
       if (draft) {
         setTextBody(draft.textBody);
         setStoryTitle(draft.storyTitle);
@@ -566,6 +581,16 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
         setVideoShareUrl(draft.videoShareUrl);
         setAudioShareUrl(draft.audioShareUrl);
         setPhotoAlts(draft.photoAlts);
+      } else if (authorSession) {
+        setAlias(authorSession.alias);
+        setCountry(authorSession.country);
+        setCity(authorSession.city);
+        setEmail(authorSession.email);
+        if (mode === 'texto' && chosenTopic) {
+          setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
+        }
+        setVideoShareUrl('');
+        setAudioShareUrl('');
       } else if (mode === 'texto' && chosenTopic) {
         setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
         setVideoShareUrl('');
@@ -1439,6 +1464,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
       }
       setImprintId(id);
       setImprintReceivedAt(new Date());
+      saveStoryAuthorSession({
+        alias: alias.trim(),
+        country: country.trim(),
+        city: city.trim(),
+        email: email.trim(),
+      });
       clearStoryDraft();
       setStep('received');
     } catch (e) {
@@ -1549,28 +1580,78 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
     const c = imprintCanvasRef.current;
     if (!c) return;
     const requestToken = ++shareRequestTokenRef.current;
+    const shareText = t.modalShareText || PENDING_STORY_SHARE_TEXT;
     try {
       const blob = await canvasToPngBlob(c);
-      const result = await shareOrCopyResonancePng(
-        blob,
-        huellaPngFilename(storyTitle, imprintId),
-        storyTitle.trim() || 'AlmaMundi',
-        t.modalShareText
-      );
+      const file = new File([blob], huellaPngFilename(storyTitle, imprintId), {
+        type: 'image/png',
+      });
+      const native = await shareNativeStoryWithImage({
+        file,
+        title: storyTitle.trim() || 'AlmaMundi',
+        text: shareText,
+        url: PENDING_STORY_SHARE_URL,
+      });
       if (requestToken !== shareRequestTokenRef.current) return;
-      if (result === 'downloaded') flashShareNotice(t.modalCopyImageFailed);
+      if (native === 'shared' || native === 'aborted') return;
+      setShareMenuShowDownload(false);
+      setShareMenuOpen(true);
     } catch {
       if (requestToken !== shareRequestTokenRef.current) return;
+      setShareMenuShowDownload(true);
+      setShareMenuOpen(true);
       flashShareNotice(t.modalShareImageFailed);
     }
-  }, [
-    imprintId,
-    storyTitle,
-    t.modalCopyImageFailed,
-    t.modalShareImageFailed,
-    t.modalShareText,
-    flashShareNotice,
-  ]);
+  }, [imprintId, storyTitle, t.modalShareImageFailed, t.modalShareText, flashShareNotice]);
+
+  const startAnotherStory = useCallback(() => {
+    saveStoryAuthorSession({
+      alias: alias.trim(),
+      country: country.trim(),
+      city: city.trim(),
+      email: email.trim(),
+    });
+    setShareMenuOpen(false);
+    setShareMenuShowDownload(false);
+    setShareNotice('');
+    setErr('');
+    setMediaErrKind(null);
+    setFieldErr({});
+    resetCaptureMedia();
+    setTextBody('');
+    setTextoReviewAck(false);
+    setPhotos((prev) => {
+      prev.forEach((p) => {
+        if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+      });
+      return [];
+    });
+    setPhotoAlts([]);
+    extraUploadRef.current = [];
+    profileUploadRef.current = null;
+    avUploadRef.current = null;
+    submitInFlightRef.current = false;
+    setStoryTitle('');
+    setExtraText('');
+    setCancionRelacionada('');
+    setExtraFiles([]);
+    setProfilePhoto(null);
+    setSex('');
+    setAgeRange('');
+    setAcceptedPrivacy(false);
+    setAcceptedPublicacion(false);
+    setAcceptedTerminos(false);
+    setUploadVideoFile(null);
+    setUploadAudioFile(null);
+    setVideoShareUrl('');
+    setAudioShareUrl('');
+    setAvSource('grabar');
+    setDurationInlineErr('');
+    setSaving(false);
+    setImprintId('');
+    setImprintReceivedAt(null);
+    setStep('capture');
+  }, [alias, city, country, email, resetCaptureMedia]);
 
   if (!isOpen) return null;
 
@@ -2200,12 +2281,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto overscroll-contain md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start md:overflow-hidden">
                 {/* Historia + extras — columna izquierda */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[11px] font-semibold text-gray-700 md:text-xs">
+                  <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
                     {t.modalSectionStory}
                   </div>
                   <div className="space-y-2">
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <FileText size={12} className="text-orange-500" aria-hidden />
                         {t.modalStoryName}
                       </div>
@@ -2225,7 +2306,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
                       </div>
@@ -2246,7 +2327,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalExtras}
                       </div>
                       <textarea
@@ -2262,7 +2343,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                     <div>
                       <label
                         htmlFor="story-cancion-relacionada"
-                        className="mb-0.5 block text-[11px] font-semibold leading-snug text-gray-700"
+                        className="mb-0.5 block text-[11px] font-semibold normal-case leading-snug text-gray-700"
                       >
                         {t.modalCancionRelacionada}
                       </label>
@@ -2277,7 +2358,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       />
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Upload size={12} className="text-orange-500" aria-hidden />
                         {t.modalFiles}
                       </div>
@@ -2315,7 +2396,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       )}
                     </div>
                     <div>
-                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalProfilePhoto}
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
@@ -2353,12 +2434,12 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
 
                 {/* Datos persona — columna derecha (alineado con /subir) */}
                 <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[11px] font-semibold text-gray-700 md:text-xs">
+                  <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
                     {t.modalSectionPerson}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
                         {t.modalCountry}
                       </div>
@@ -2378,7 +2459,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <MapPin size={12} className="text-orange-500" aria-hidden />
                         {t.modalCity}
                       </div>
@@ -2398,7 +2479,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalAge}
                       </div>
                       <select
@@ -2428,7 +2509,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       ) : null}
                     </div>
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Users size={12} className="text-orange-500" aria-hidden />
                         {t.modalGender}
                       </div>
@@ -2447,7 +2528,7 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                       </select>
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Mail size={12} className="text-orange-500" aria-hidden />
                         {t.modalEmail}
                       </div>
@@ -2626,12 +2707,44 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
                 <p className="text-center">
                   <button
                     type="button"
-                    onClick={onClose}
+                    onClick={onExploreMap}
                     className="min-h-11 px-3 text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
                   >
                     {t.modalBackToMap}
                   </button>
                 </p>
+                <div className="space-y-1.5 pt-1 text-center">
+                  <p className="text-[13px] text-[#5C5C52]">
+                    {mode === 'foto'
+                      ? t.modalAnotherPromptFoto
+                      : mode === 'video'
+                        ? t.modalAnotherPromptVideo
+                        : mode === 'audio'
+                          ? t.modalAnotherPromptAudio
+                          : t.modalAnotherPromptTexto}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={startAnotherStory}
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
+                  >
+                    {mode === 'foto'
+                      ? t.modalAnotherCtaFoto
+                      : mode === 'video'
+                        ? t.modalAnotherCtaVideo
+                        : mode === 'audio'
+                          ? t.modalAnotherCtaAudio
+                          : t.modalAnotherCtaTexto}
+                  </button>
+                  <p>
+                    <a
+                      href="/contar"
+                      className="text-[12px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
+                    >
+                      {t.modalAnotherFormatLink}
+                    </a>
+                  </p>
+                </div>
                 <p
                   className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#FF4A1C] ${
                     shareNotice ? 'opacity-100' : 'opacity-0'
@@ -2643,6 +2756,38 @@ export function StoryModal({ isOpen, onClose, mode, chosenTopic, onClearTopic }:
               </div>
             </div>
           )}
+
+          {shareMenuOpen ? (
+            <StoryShareMenu
+              shareUrl={PENDING_STORY_SHARE_URL}
+              shareText={t.modalShareText || PENDING_STORY_SHARE_TEXT}
+              labels={{
+                title: t.modalShareMenuTitle,
+                whatsapp: t.modalShareWhatsApp,
+                facebook: t.modalShareFacebook,
+                x: t.modalShareX,
+                linkedin: t.modalShareLinkedIn,
+                email: t.modalShareEmail,
+                copyLink: t.modalCopyLink,
+                download: isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint,
+                close: t.modalClose,
+              }}
+              showDownload={shareMenuShowDownload}
+              onCopied={() => {
+                flashShareNotice(t.modalShareLinkCopied);
+                setShareMenuOpen(false);
+              }}
+              onCopyFailed={() => {
+                setShareMenuShowDownload(true);
+                flashShareNotice(t.modalShareImageFailed);
+              }}
+              onDownload={() => {
+                setShareMenuOpen(false);
+                void downloadImprint();
+              }}
+              onClose={() => setShareMenuOpen(false)}
+            />
+          ) : null}
 
           {err && step !== 'details' && step !== 'received' && (
             <p className="mt-4 text-base font-medium text-red-600 md:text-lg" role="alert">{err}</p>
