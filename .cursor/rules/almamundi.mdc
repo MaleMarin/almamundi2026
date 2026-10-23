@@ -17,4 +17,5 @@ alwaysApply: true
 - Tipografía: Montserrat en páginas internas y modales; la home mantiene su tipografía.
 - Las cintas de colores no llevan negro.
 - Textos en español neutro latinoamericano, sin voseo y sin guiones largos.
+- Los informes para Ana van en lenguaje simple y breve (máximo 15 líneas): qué se hizo, qué resultado dio, qué falta y cuánto costó. Sin códigos de color, tablas técnicas ni rutas de archivos, salvo que Ana los pida.
 - Ninguna tarea está terminada sin commit, lista de archivos y verificación en navegador real.

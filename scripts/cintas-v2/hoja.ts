@@ -88,6 +88,48 @@ export async function hojaPorCaso(params: {
     .toBuffer();
 }
 
+export async function hojaPareja(params: {
+  titulo: string;
+  actual: Buffer;
+  nueva: Buffer;
+  lineasColor: string[];
+  mensaje: string | null;
+}): Promise<Buffer> {
+  const margen = 36;
+  const hueco = 28;
+  const img = 1080;
+  const ancho = margen * 2 + img * 2 + hueco;
+  const tituloAlto = 52;
+  const etiquetaAlto = 28;
+  const aviso = params.mensaje ? [params.mensaje] : [];
+  const colores = params.lineasColor.length > 0 ? params.lineasColor : ['Sin colores para mostrar.'];
+  const texto = [...aviso, ...colores];
+  const lineas = texto.flatMap((linea) => envolver(linea, 92, 2)).slice(0, 18);
+  const captionAlto = 16 + lineas.length * 26;
+  const alto = margen + tituloAlto + etiquetaAlto + img + 20 + captionAlto + margen;
+  const yImg = margen + tituloAlto + etiquetaAlto;
+  const capas: Capa[] = [
+    { input: svgTexto([params.titulo], ancho - margen * 2, tituloAlto, 28, '#5E6E82'), top: margen, left: margen },
+  ];
+  [
+    { png: params.actual, etiqueta: 'Cinta actual' },
+    { png: params.nueva, etiqueta: 'Versión 3' },
+  ].forEach((col, i) => {
+    const x = margen + i * (img + hueco);
+    capas.push({ input: svgTexto([col.etiqueta], 420, 24, 16, '#8A8A7A'), top: margen + tituloAlto, left: x });
+    capas.push({ input: col.png, top: yImg, left: x });
+  });
+  capas.push({
+    input: svgTexto(lineas, ancho - margen * 2, captionAlto, 18, '#5E6E82'),
+    top: yImg + img + 16,
+    left: margen,
+  });
+  return sharp({ create: { width: ancho, height: alto, channels: 3, background: '#F7F4EE' } })
+    .composite(capas)
+    .png()
+    .toBuffer();
+}
+
 export async function hojaTodas(
   piezas: Array<{ titulo: string; modo: string; png: Buffer }>,
   titulo = 'Cintas v2, segunda ronda'

@@ -4,6 +4,7 @@
  * Nunca se publica ni se muestra en el sitio.
  */
 import { z } from 'zod';
+import { TONOS_MADRE, type TonoMadre } from '@/lib/cintas-v2/paleta-madre';
 import { EMOCIONES, type Emocion } from '@/lib/cintas-v2/palette';
 
 export const IdiomaSchema = z.enum(['es', 'pt', 'en', 'otro']);
@@ -12,6 +13,20 @@ export type Idioma = z.infer<typeof IdiomaSchema>;
 export const EmocionSchema = z.enum(EMOCIONES);
 
 const peso = z.coerce.number().finite().min(0).max(1);
+
+export const TonoImagenSchema = z.enum(TONOS_MADRE);
+
+export const ImagenMomentoSchema = z.object({
+  descripcion: z
+    .string()
+    .trim()
+    .min(1)
+    .refine((s) => s.split(/\s+/).filter(Boolean).length <= 5, 'máximo 5 palabras'),
+  tono: TonoImagenSchema,
+  peso,
+});
+
+export type ImagenMomento = z.infer<typeof ImagenMomentoSchema>;
 
 export const AnalisisSchema = z.object({
   animo: z.object({
@@ -38,6 +53,8 @@ export const AnalisisSchema = z.object({
           .refine((s) => s.split(/\s+/).filter(Boolean).length <= 8, 'máximo 8 palabras'),
         emocion: EmocionSchema,
         intensidad: peso,
+        valencia: peso.optional(),
+        imagenes: z.union([z.literal('sin imagen'), z.array(ImagenMomentoSchema).min(1).max(4)]).optional(),
       })
     )
     .min(1)
@@ -119,6 +136,53 @@ function ochoPalabras(raw: unknown): string {
   return texto.split(/\s+/).filter(Boolean).slice(0, 8).join(' ');
 }
 
+function cincoPalabras(raw: unknown): string {
+  const texto = typeof raw === 'string' ? raw.trim() : '';
+  return texto.split(/\s+/).filter(Boolean).slice(0, 5).join(' ');
+}
+
+const TONO_ALIAS: Record<string, TonoMadre> = {
+  rojo: 'rojo',
+  naranja: 'naranja',
+  amarillo: 'amarillo',
+  lima: 'lima',
+  verde: 'verde',
+  'verde azulado': 'verde azulado',
+  verdeazulado: 'verde azulado',
+  turquesa: 'calipso',
+  calipso: 'calipso',
+  azul: 'azul',
+  'azul violeta': 'azul violeta',
+  azulvioleta: 'azul violeta',
+  violeta: 'morado',
+  morado: 'morado',
+  fucsia: 'magenta',
+  magenta: 'magenta',
+  rosa: 'rosa',
+  rosado: 'rosa',
+};
+
+function tonoDe(raw: unknown): TonoMadre | null {
+  if (typeof raw !== 'string') return null;
+  const key = raw.trim().toLowerCase();
+  return TONO_ALIAS[key] ?? null;
+}
+
+function imagenesDe(raw: unknown): 'sin imagen' | ImagenMomento[] {
+  if (typeof raw === 'string' && raw.trim().toLowerCase().includes('sin imagen')) return 'sin imagen';
+  if (!Array.isArray(raw)) return 'sin imagen';
+  const out: ImagenMomento[] = [];
+  for (const item of raw) {
+    const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
+    const descripcion = cincoPalabras(row.descripcion ?? row.description ?? row.imagen);
+    const tono = tonoDe(row.tono ?? row.tone ?? row.matiz);
+    if (!descripcion || !tono) continue;
+    out.push({ descripcion, tono, peso: num(row.peso ?? row.weight, 0.5) });
+    if (out.length === 4) break;
+  }
+  return out.length > 0 ? out : 'sin imagen';
+}
+
 function idiomaDe(raw: unknown): string {
   const v = typeof raw === 'string' ? raw.trim().toLowerCase() : '';
   if (v.startsWith('es') || v.includes('spanish') || v.includes('español')) return 'es';
@@ -168,9 +232,16 @@ export function normalizarAnalisis(raw: unknown): unknown {
       const emocion = emocionDe(row.emocion ?? row.emotion);
       const resumen = ochoPalabras(row.resumen ?? row.summary);
       if (!emocion || !resumen) return null;
-      return { resumen, emocion, intensidad: num(row.intensidad ?? row.intensity, 0.5) };
+      const valenciaRaw = row.valencia ?? row.valence;
+      return {
+        resumen,
+        emocion,
+        intensidad: num(row.intensidad ?? row.intensity, 0.5),
+        ...(typeof valenciaRaw === 'number' || typeof valenciaRaw === 'string' ? { valencia: num(valenciaRaw, 0.5) } : {}),
+        imagenes: imagenesDe(row.imagenes ?? row.images ?? row.imagen),
+      };
     })
-    .filter((x): x is { resumen: string; emocion: Emocion; intensidad: number } => Boolean(x))
+    .filter((x): x is { resumen: string; emocion: Emocion; intensidad: number; valencia?: number; imagenes: 'sin imagen' | ImagenMomento[] } => Boolean(x))
     .slice(0, 8);
 
   const palabrasClave = clavesRaw
