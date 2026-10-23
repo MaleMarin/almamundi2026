@@ -23,7 +23,7 @@ El modo cambia la forma, no la emoción.
 
 El amor en modo calma sigue siendo rosa y carmín, más claro. No se vuelve turquesa.
 
-El calipso, el turquesa y el celeste (matiz entre 180° y 205°) no pasan del 12 % del ancho, y los silencios de ese tono también cuentan. Ese calipso vive en el asombro. En la calma, el agua y el celeste se cambian por azul pervinca y un verde agua más suave. Siguen la menta, la lavanda y los tonos cálidos: arena, durazno, salvia y rosa. Un campo grande solo puede ser calipso si el asombro es la emoción principal.
+Las mentas, los verdes agua, los turquesas, los calipsos y los celestes (matiz entre 150° y 210°) no pasan del 8 % del ancho, silencios incluidos. Ese tope no corre cuando el asombro es la emoción principal: ahí el turquesa puede ocupar más. En el resto de la paleta ese tono no existe. La calma usa pervinca, lavanda, salvia, arena, durazno y rosa. La esperanza usa lima, verde hoja y amarillo. La nostalgia usa azul pizarra en lugar del petróleo.
 
 ## Colores
 
@@ -48,7 +48,7 @@ De cada foto se toman cinco colores dominantes. Cada uno se acerca a la paleta: 
 Desde la raíz del repositorio, sin llamar al modelo:
 
 ```
-node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs scripts/cintas-v2/run-ronda6d.ts
+node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs scripts/cintas-v2/run-ronda6e.ts
 ```
 
-La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6d.png`. Esa carpeta no se sube a git.
+La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6e.png`. Esa carpeta no se sube a git.

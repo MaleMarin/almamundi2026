@@ -21,6 +21,7 @@ import {
   oscurecerTono,
   silencioDe,
   sinCalipso,
+  desplazarTono,
   variarSilencio,
   type Emocion,
 } from '@/lib/cintas-v2/palette';
@@ -76,7 +77,7 @@ const PLENO_MIN = Math.round(ANCHO * 0.15);
 const PLENO_MAX = Math.round(ANCHO * 0.2);
 const TOPE_CREMA = Math.round(ANCHO * 0.15);
 const TOPE_CREMA_CALMA = Math.round(ANCHO * 0.25);
-const TOPE_CALIPSO = Math.round(ANCHO * 0.12);
+const TOPE_CALIPSO = Math.round(ANCHO * 0.08);
 const BORDE = Math.round(ANCHO * 0.03);
 
 function topeCrema(modo: Modo): number {
@@ -720,7 +721,7 @@ function repararContraste(piezas: Pieza[]): void {
     if (mover.motivo === 'borde') {
       const idx = piezas.indexOf(mover);
       const propuesto = tonoPleno(mover, [piezas[idx - 1]?.hex ?? '', piezas[idx + 1]?.hex ?? '']);
-      const presentes = new Set(piezas.map((p) => p.hex));
+      const presentes = new Set(piezas.filter((p) => !p.cream).map((p) => p.hex));
       if ((presentes.has(propuesto) || presentes.size < 12) && propuesto !== piezas[idx - 1]?.hex && propuesto !== piezas[idx + 1]?.hex) {
         mover.hex = propuesto;
       }
@@ -735,7 +736,7 @@ function repararContraste(piezas: Pieza[]): void {
         : yaUsados();
     const aplicar = (pieza: Pieza, ladoPrev: string, ladoNext: string): boolean => {
       const vecinos = [ladoPrev, ladoNext].filter(Boolean);
-      const presentes = new Set(piezas.map((p) => p.hex));
+      const presentes = new Set(piezas.filter((p) => !p.cream).map((p) => p.hex));
       const usadosCampo = new Set(piezas.filter((otro) => otro.kind === 'campo' && otro !== pieza).map((otro) => otro.hex));
       const pool = propiosDe(pieza).filter((hex) => presentes.has(hex) || presentes.size < 12);
       const elegido = pool.find((hex) => hex !== CREMA && !usadosCampo.has(hex) && vecinos.every((v) => contrastan(hex, v)));
@@ -746,16 +747,26 @@ function repararContraste(piezas: Pieza[]): void {
       if (presentes.size >= 12) return false;
       const semilla = propiosDe(pieza)[0] ?? pieza.hex;
       const variante = mismaTinta(pieza.pleno ? semilla : aclarar(semilla), vecinos);
-      if (vecinos.some((v) => v === variante)) return false;
+      if (!vecinos.every((v) => contrastan(variante, v))) return false;
       pieza.hex = variante;
       return true;
     };
     const idx = piezas.indexOf(mover);
     if (aplicar(mover, piezas[idx - 1]?.hex ?? '', piezas[idx + 1]?.hex ?? '')) continue;
     const otro = mover === cur ? prev : cur;
-    if (!otro.cream && otro.motivo !== 'color-imagen') {
+    if (!otro.cream && otro.motivo !== 'color-imagen' && otro.kind !== 'campo') {
       const j = piezas.indexOf(otro);
-      aplicar(otro, piezas[j - 1]?.hex ?? '', piezas[j + 1]?.hex ?? '');
+      if (aplicar(otro, piezas[j - 1]?.hex ?? '', piezas[j + 1]?.hex ?? '')) continue;
+    }
+    const nuevo = desplazarTono(mover.hex, [piezas[idx - 1]?.hex ?? '', piezas[idx + 1]?.hex ?? '']);
+    if (nuevo === mover.hex) continue;
+    const viejo = mover.hex;
+    mover.hex = nuevo;
+    const cuenta = () => new Set(piezas.filter((p) => !p.cream).map((p) => p.hex)).size;
+    if (cuenta() > 12) {
+      for (const q of piezas) {
+        if (!q.cream && q.kind !== 'campo' && q.hex === viejo) q.hex = nuevo;
+      }
     }
   }
 }
@@ -914,11 +925,11 @@ function teñirPorEmocion(piezas: Pieza[], analisis: Analisis, modo: Modo): void
       giro += 1;
     }
     let giroCal = 0;
-    while (esCalipso(hex) && (!asombroPrincipal || p.width > TOPE_CALIPSO) && giroCal < 8) {
+    while (esCalipso(hex) && !asombroPrincipal && giroCal < 8) {
       hex = colorDeFamilia(preferida, i + giro + giroCal + 3, modo, modo !== 'calma');
       giroCal += 1;
     }
-    if (esCalipso(hex) && (!asombroPrincipal || p.width > TOPE_CALIPSO)) hex = sinCalipso(hex);
+    if (esCalipso(hex) && !asombroPrincipal) hex = sinCalipso(hex);
     p.hex = hex;
     p.familia = preferida;
     p.pleno = modo !== 'calma';
@@ -1381,7 +1392,7 @@ export function revisarPlan(plan: PlanCintas): string[] {
     silencioPrevio = banda.hex;
   }
   const calipso = plan.bandas.filter((b) => esCalipso(b.hex)).reduce((s, b) => s + b.ancho, 0);
-  if (calipso > TOPE_CALIPSO) errores.push(`calipso ${calipso}px`);
+  if (!plan.asombroPrincipal && calipso > TOPE_CALIPSO) errores.push(`calipso ${calipso}px`);
   if (!plan.asombroPrincipal) {
     for (const campo of campos) {
       if (esCalipso(campo.hex)) errores.push('campo calipso');
@@ -1486,15 +1497,13 @@ function tonoFueraDeCalipso(pieza: Pieza, prev: string, next: string): string {
   for (const hex of pool) {
     if (sirve(hex, true)) return hex;
   }
-  for (const hex of pool) {
-    if (sirve(hex, false)) return hex;
-  }
-  return sinCalipso(pieza.hex);
+  return sinCalipso(pieza.hex, [prev, next]);
 }
 
-/** Baja el calipso al 12 % y saca los campos que no corresponden al asombro. */
+/** Baja el rango 150°–210° al 8 %, salvo cuando el asombro es la emoción principal. */
 function limitarCalipso(piezas: Pieza[], asombroPrincipal: boolean): void {
-  const ilegal = (p: Pieza) => p.kind === 'campo' && esCalipso(p.hex) && (!asombroPrincipal || p.width > TOPE_CALIPSO);
+  if (asombroPrincipal) return;
+  const ilegal = (p: Pieza) => p.kind === 'campo' && esCalipso(p.hex);
   for (let guard = 0; guard < 80; guard++) {
     const campo = piezas.find((p) => ilegal(p));
     const sobra = anchoCalipso(piezas) > TOPE_CALIPSO;
@@ -1506,7 +1515,6 @@ function limitarCalipso(piezas: Pieza[], asombroPrincipal: boolean): void {
     const elegido = candidatos[0] ?? piezas.map((p, i) => ({ p, i })).find(({ p }) => ilegal(p) || (sobra && esCalipso(p.hex) && !p.cream));
     if (!elegido) return;
     const { p, i } = elegido;
-    if (p.kind === 'campo' && asombroPrincipal && p.width <= TOPE_CALIPSO && anchoCalipso(piezas) - p.width === 0) return;
     p.hex = tonoFueraDeCalipso(p, piezas[i - 1]?.hex ?? '', piezas[i + 1]?.hex ?? '');
     if (p.motivo === 'borde') p.pleno = true;
   }
@@ -1578,7 +1586,7 @@ export function componerCintas(params: {
   const asombroPrincipal = [...params.analisis.emociones].sort((a, b) => b.peso - a.peso)[0]?.emocion === 'asombro';
   for (let ronda = 0; ronda < 6; ronda++) {
     teñirSilencios(finales);
-    if (anchoCalipso(finales) <= TOPE_CALIPSO && !finales.some((p) => p.kind === 'campo' && esCalipso(p.hex) && (!asombroPrincipal || p.width > TOPE_CALIPSO))) {
+    if (asombroPrincipal || (anchoCalipso(finales) <= TOPE_CALIPSO && !finales.some((p) => p.kind === 'campo' && esCalipso(p.hex)))) {
       break;
     }
     const antes = finales.map((p) => p.hex).join(',');
@@ -1589,10 +1597,14 @@ export function componerCintas(params: {
   for (let ronda = 0; ronda < 4; ronda++) {
     limitarCalipso(finales, asombroPrincipal);
     teñirSilencios(finales);
-    const cabe =
-      anchoCalipso(finales) <= TOPE_CALIPSO &&
-      !finales.some((p) => p.kind === 'campo' && esCalipso(p.hex) && (!asombroPrincipal || p.width > TOPE_CALIPSO));
+    const cabe = asombroPrincipal || (anchoCalipso(finales) <= TOPE_CALIPSO && !finales.some((p) => p.kind === 'campo' && esCalipso(p.hex)));
     if (cabe) break;
+  }
+  repararContraste(finales);
+  if (!(asombroPrincipal || (anchoCalipso(finales) <= TOPE_CALIPSO && !finales.some((p) => p.kind === 'campo' && esCalipso(p.hex))))) {
+    limitarCalipso(finales, asombroPrincipal);
+    teñirSilencios(finales);
+    repararContraste(finales);
   }
   let x = 0;
   const bandas: Banda[] = finales.map((p) => {

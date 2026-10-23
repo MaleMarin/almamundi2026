@@ -24,16 +24,16 @@ export const TINTA_PIE = '#8A8A7A';
 export const FAMILIA: Record<Emocion, readonly string[]> = {
   alegría: ['#FFD60A', '#FF7A00', '#FF4F5A', '#FF6FB5'],
   amor: ['#D90429', '#E0218A', '#FF5DA2'],
-  calma: ['#5EEAD4', '#6EE7B7', '#818CF8', '#C4B5FD', '#E9C46A', '#FFB4A2', '#A3D9A5', '#FBCFE8'],
-  esperanza: ['#9BE15D', '#10B981', '#FDE047'],
-  nostalgia: ['#F59E0B', '#E76F51', '#C084FC', '#0E7490'],
+  calma: ['#818CF8', '#C4B5FD', '#A3D9A5', '#E9C46A', '#FFB4A2', '#FBCFE8'],
+  esperanza: ['#9BE15D', '#4ADE80', '#FDE047'],
+  nostalgia: ['#F59E0B', '#E76F51', '#C084FC', '#4F6FA8'],
   tristeza: ['#1D4ED8', '#3730A3', '#1E2A5E', '#7C3AED', '#6B3F6E'],
   pérdida: ['#1D4ED8', '#3730A3', '#1E2A5E', '#7C3AED', '#6B3F6E'],
   asombro: ['#00B4D8', '#2563EB', '#C026D3'],
   rabia: ['#E63946', '#D62828', '#8B5CF6', '#5B2A86'],
   miedo: ['#E63946', '#D62828', '#8B5CF6', '#5B2A86'],
   orgullo: ['#FFD60A', '#FF7A00', '#F59E0B', '#E0218A'],
-  gratitud: ['#FDE047', '#9BE15D', '#FF6FB5', '#6EE7B7'],
+  gratitud: ['#FDE047', '#9BE15D', '#FF6FB5'],
 };
 
 /** Los más saturados. Toda historia usa al menos tres, también en calma. */
@@ -80,7 +80,7 @@ export function esIntenso(hex: string): boolean {
   return false;
 }
 
-/** Familias de calma y esperanza: menta, verde agua, pervinca, lavanda y limas suaves. */
+/** Familias de calma y esperanza: pervinca, lavanda, salvia, lima y verde hoja. */
 export const SUAVES = unicos([...FAMILIA.calma, ...FAMILIA.esperanza]);
 const SUAVE = new Set<string>(SUAVES);
 
@@ -164,10 +164,10 @@ export function medidaHsl(hex: string): { h: number; s: number; l: number } {
   return { h, s, l };
 }
 
-/** Calipso, turquesa y celeste: matiz entre 180° y 205°. */
+/** Menta, verde agua, turquesa, calipso y celeste: matiz entre 150° y 210°. */
 export function esCalipso(hex: string): boolean {
   const grados = medidaHsl(hex).h * 360;
-  return grados >= 180 && grados <= 205;
+  return grados >= 150 && grados <= 210;
 }
 
 /** Rojos, naranjas, amarillos y rosas. Ahí el silencio no puede quedar beige. */
@@ -176,14 +176,27 @@ export function esCalido(h: number): boolean {
   return grados <= 70 || grados >= 320;
 }
 
-/** Si el color cae en calipso, lo corre justo fuera de esa franja y conserva la tinta. */
-export function sinCalipso(hex: string): string {
+/** Si el color cae entre 150° y 210°, lo corre fuera de esa franja y conserva la tinta. */
+export function sinCalipso(hex: string, vecinos: string[] = []): string {
   if (!esCalipso(hex)) return hex.toUpperCase();
+  const { s, l } = medidaHsl(hex);
+  const luz = Math.min(0.74, Math.max(0.28, l));
+  const sat = Math.max(0.5, s);
+  const candidatos = [138 / 360, 222 / 360, 120 / 360, 250 / 360].map((h) => ajustarTinta(rgbHex(...hslARgb(h, sat, luz))));
+  const separa = (out: string) => !esCalipso(out) && vecinos.every((v) => !v || contrastan(out, v));
+  return candidatos.find(separa) ?? candidatos.find((out) => !esCalipso(out)) ?? ajustarTinta(rgbHex(...hslARgb(250 / 360, 0.55, 0.46)));
+}
+
+/** Mueve el matiz hasta que el color se separe de sus vecinos, fuera de 150°–210°. */
+export function desplazarTono(hex: string, vecinos: string[]): string {
   const { h, s, l } = medidaHsl(hex);
-  const destino = h * 360 <= 192.5 ? 168 / 360 : 214 / 360;
-  let out = ajustarTinta(rgbHex(...hslARgb(destino, Math.max(0.5, s), Math.min(0.74, Math.max(0.28, l)))));
-  if (esCalipso(out)) out = ajustarTinta(rgbHex(...hslARgb(214 / 360, 0.6, 0.46)));
-  return out;
+  for (const delta of [80, -80, 120, -120, 160, 55, -55]) {
+    const grados = (((h * 360 + delta) % 360) + 360) % 360;
+    const out = ajustarTinta(rgbHex(...hslARgb(grados / 360, Math.max(0.55, Math.min(0.85, s)), Math.min(0.62, Math.max(0.32, l)))));
+    if (esCalipso(out)) continue;
+    if (vecinos.every((v) => !v || contrastan(out, v))) return out;
+  }
+  return hex.toUpperCase();
 }
 
 /** Aclara el color del racimo: luminosidad 62–78 % y saturación 45–70 %, con el mismo tono. */
