@@ -1,11 +1,11 @@
 /**
- * Ronda 9. El protagonista sale de un color propio y central.
- * Si la historia no lo tiene, usa una paleta armónica.
+ * Ronda 10. El protagonista sale de un color propio y central.
+ * Si la historia no lo tiene, usa una paleta de respaldo de su casilla.
  */
-import { TONOS_MADRE, type NivelPaleta, type TonoMadre } from '@/lib/cintas-v2/paleta-madre';
+import type { NivelPaleta, TonoMadre } from '@/lib/cintas-v2/paleta-madre';
 import { MENSAJE_SIN_IMAGEN, type RazonColor } from '@/lib/cintas-v2/compose/color-v3';
 import { colorearConPapeles, type Papel, type PlanV8 } from '@/lib/cintas-v2/compose/color-v8';
-import { paletaAfin } from '@/lib/cintas-v2/compose/paletas-armonicas';
+import { elegirPaletaRespaldo } from '@/lib/cintas-v2/compose/paletas-respaldo';
 import type { PlanCintas } from '@/lib/cintas-v2/compose/layout';
 import {
   clasificarLuz,
@@ -40,7 +40,7 @@ export function colorearV9(params: {
 }): PlanV8 & { paleta: string | null } {
   const luz = valenciaMedia(params.analisis);
   const intensidad = params.analisis.animo.activacion;
-  const paleta = paletaAfin(luz, intensidad, params.id);
+  const paleta = elegirPaletaRespaldo(luz, intensidad, params.id);
   const candidatos: Array<{ tono: TonoMadre; importancia: number; razon: string; paisaje: boolean }> = [];
   for (const momento of params.analisis.momentos) {
     if (!Array.isArray(momento.imagenes)) continue;
@@ -69,49 +69,36 @@ export function colorearV9(params: {
   const sinRelato = centrales.length === 0;
   const usados = new Set<TonoMadre>();
   const papeles: Papel[] = [];
-  const tomar = (tono: TonoMadre, rol: Papel['rol'], razon: string) => {
+  const tomar = (tono: TonoMadre, rol: Papel['rol'], razon: string, nivel?: NivelPaleta) => {
     if (usados.has(tono)) return;
     if (rol !== 'prota' && params.evitar?.includes(tono)) return;
     usados.add(tono);
-    papeles.push({ tono, rol, razon });
+    papeles.push({ tono, rol, razon, nivel });
   };
 
   if (!sinRelato) {
     const prota = centrales[0]!;
     tomar(prota.tono, 'prota', prota.razon);
     for (const item of centrales.slice(1)) {
-      if (papeles.filter((p) => p.rol === 'sec').length >= 2) break;
+      if (papeles.filter((p) => p.rol === 'sec').length >= 3) break;
       tomar(item.tono, 'sec', item.razon);
     }
     for (const item of centrales.slice(1)) {
-      if (papeles.filter((p) => p.rol === 'acento').length >= 2) break;
+      if (papeles.filter((p) => p.rol === 'acento').length >= 3) break;
       tomar(item.tono, 'acento', item.razon);
     }
   }
 
   for (const color of paleta.colores) {
     if (papeles.some((p) => p.rol === 'prota') && color.rol === 'prota') continue;
-    if (papeles.filter((p) => p.rol === color.rol).length >= (color.rol === 'prota' ? 1 : 2)) continue;
-    tomar(color.tono, color.rol, MENSAJE_SIN_IMAGEN);
+    const cupo = color.rol === 'prota' ? 1 : 3;
+    if (papeles.filter((p) => p.rol === color.rol).length >= cupo) continue;
+    tomar(color.tono, color.rol, MENSAJE_SIN_IMAGEN, color.nivel);
   }
   if (!papeles.some((p) => p.rol === 'prota')) {
     const primero = paleta.colores.find((color) => color.rol === 'prota' && !params.evitar?.includes(color.tono)) ?? paleta.colores[0]!;
-    papeles.unshift({ tono: primero.tono, rol: 'prota', razon: MENSAJE_SIN_IMAGEN });
+    papeles.unshift({ tono: primero.tono, rol: 'prota', razon: MENSAJE_SIN_IMAGEN, nivel: primero.nivel });
     usados.add(primero.tono);
-  }
-  const calida = paleta.id.startsWith('calida');
-  const familia = TONOS_MADRE.filter((tono) => {
-    const esCalida = tono === 'rojo' || tono === 'naranja' || tono === 'amarillo' || tono === 'rosa' || tono === 'magenta' || tono === 'lima';
-    return calida ? esCalida : !esCalida;
-  });
-  const huecos: Array<Papel['rol']> = [];
-  if (!papeles.some((p) => p.rol === 'prota')) huecos.push('prota');
-  while (papeles.filter((p) => p.rol === 'sec').length + huecos.filter((rol) => rol === 'sec').length < 2) huecos.push('sec');
-  while (papeles.filter((p) => p.rol === 'acento').length + huecos.filter((rol) => rol === 'acento').length < 2) huecos.push('acento');
-  for (const rol of huecos) {
-    const tono = [...familia, ...TONOS_MADRE].find((item) => !usados.has(item) && (rol === 'prota' || !params.evitar?.includes(item)));
-    if (!tono) continue;
-    tomar(tono, rol, MENSAJE_SIN_IMAGEN);
   }
 
   const vistos = new Set<string>();
@@ -131,7 +118,7 @@ export function colorearV9(params: {
     tope,
     clarosChicos: true,
   });
-  return { ...cinta, paleta: sinRelato ? paleta.id : null };
+  return { ...cinta, paleta: paleta.nombre };
 }
 
 export type { RazonColor };

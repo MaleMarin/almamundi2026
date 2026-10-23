@@ -52,3 +52,9 @@ node --experimental-strip-types --import ./scripts/cintas-v2/register.mjs script
 ```
 
 La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6e.png`. Esa carpeta no se sube a git.
+
+## Paletas de respaldo en el sitio
+
+Cuando una historia no trae un color propio, entra en una casilla de ánimo. La luz de la casilla sale de la valencia y la intensidad sale de la activación. Cada casilla tiene cuatro paletas.
+
+En el sitio real, dentro de esa casilla se elegirá la paleta menos usada entre las últimas historias publicadas, para que el mapa se vea variado. Eso todavía no está implementado. En este prototipo, la semilla elige una de las cuatro.
