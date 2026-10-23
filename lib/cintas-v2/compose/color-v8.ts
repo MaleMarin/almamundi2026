@@ -43,7 +43,11 @@ const VALENCIA_EMOCION: Record<Emocion, number> = {
 
 type Rol = 'prota' | 'sec' | 'acento';
 
-type Papel = { tono: TonoMadre; rol: Rol; razon: string };
+export type Papel = { tono: TonoMadre; rol: Rol; razon: string };
+
+function nivelesPosibles(tope: NivelPaleta): NivelPaleta[] {
+  return ([1, 5, 2, 4, 3] as NivelPaleta[]).filter((nivel) => nivel <= tope);
+}
 
 export type PlanV8 = {
   plan: PlanCintas;
@@ -277,10 +281,10 @@ function asignarPapeles(bandas: Banda[], papeles: Papel[], rng: () => number): A
   return marca;
 }
 
-function nivelBase(analisis: Analisis, indice: number, borde: boolean): NivelPaleta {
-  if (borde) return 2;
+function nivelBase(analisis: Analisis, indice: number, borde: boolean, tope: NivelPaleta = 5): NivelPaleta {
+  if (borde) return Math.min(2, tope) as NivelPaleta;
   const momento = indice >= 0 && indice < analisis.momentos.length ? indice : 0;
-  return clampNivel(nivelCentral(valenciaDe(analisis, momento)) + ajusteLuz(analisis, momento));
+  return clampNivel(Math.min(tope, nivelCentral(valenciaDe(analisis, momento)) + ajusteLuz(analisis, momento)));
 }
 
 function elegirNivel(
@@ -288,12 +292,13 @@ function elegirNivel(
   base: NivelPaleta,
   intenso: boolean,
   previo: string,
-  siguienteBase: string
+  siguienteBase: string,
+  tope: NivelPaleta = 5
 ): NivelPaleta {
   const salto = intenso ? [2, 1, 0] : [1, 0, 2];
   const candidatos: NivelPaleta[] = [];
   for (const paso of salto) {
-    candidatos.push(clampNivel(base - paso), clampNivel(base + paso));
+    candidatos.push(clampNivel(Math.min(tope, base - paso)), clampNivel(Math.min(tope, base + paso)));
   }
   for (const nivel of candidatos) {
     const hex = colorMadre(tono, nivel).hex;
@@ -304,7 +309,13 @@ function elegirNivel(
   return base;
 }
 
-function pintarNiveles(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], analisis: Analisis): void {
+function pintarNiveles(
+  bandas: Banda[],
+  marca: Array<Papel | null>,
+  niveles: NivelPaleta[],
+  analisis: Analisis,
+  tope: NivelPaleta = 5
+): void {
   for (let i = 0; i < bandas.length; i++) {
     const banda = bandas[i]!;
     const papel = marca[i];
@@ -312,7 +323,7 @@ function pintarNiveles(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
     const momento = banda.momento >= 0 ? banda.momento : 0;
     const intenso = intensidadDe(analisis, momento) >= 0.62;
     const previo = i > 0 ? bandas[i - 1]!.hex : '';
-    niveles[i] = elegirNivel(papel.tono, niveles[i] ?? 3, intenso, previo, '');
+    niveles[i] = elegirNivel(papel.tono, niveles[i] ?? 3, intenso, previo, '', tope);
     banda.hex = colorMadre(papel.tono, niveles[i]!).hex;
   }
   let silencioPrevio = '';
@@ -327,9 +338,10 @@ function pintarNiveles(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
       }
     }
     const candidatos = [tono, ...TONOS_MADRE.filter((item) => item !== tono)];
-    let hex = colorMadre(tono, 5).hex;
+    const nivelSilencio: NivelPaleta = tope >= 5 ? 5 : 3;
+    let hex = colorMadre(tono, nivelSilencio).hex;
     for (const candidato of candidatos) {
-      const prueba = colorMadre(candidato, 5).hex;
+      const prueba = colorMadre(candidato, nivelSilencio).hex;
       if (prueba === silencioPrevio) continue;
       const antes = bandas[i - 1]?.hex ?? '';
       const despues = bandas[i + 1]?.hex ?? '';
@@ -343,13 +355,13 @@ function pintarNiveles(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
   }
 }
 
-function repararGris(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[]): void {
+function repararGris(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], tope: NivelPaleta = 5): void {
   for (let vuelta = 0; vuelta < 4; vuelta++) {
     for (let i = 1; i < bandas.length; i++) {
       if (Math.abs(luminancia(bandas[i]!.hex) - luminancia(bandas[i - 1]!.hex)) >= 22) continue;
       const papel = marca[i];
       if (!papel || bandas[i]!.clase === 'pausa') continue;
-      for (const nivel of [1, 5, 2, 4, 3] as NivelPaleta[]) {
+      for (const nivel of nivelesPosibles(tope)) {
         const hex = colorMadre(papel.tono, nivel).hex;
         const antes = bandas[i - 1]!.hex;
         const despues = bandas[i + 1]?.hex ?? '';
@@ -372,7 +384,13 @@ function cuota(papel: Papel, nivel: NivelPaleta): number {
   return Math.min(0.05, Math.max(0.02, 0.032 * (PARTE[papel.tono] / 6) * luz));
 }
 
-function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], papeles: Papel[]): void {
+function escalarAnchos(
+  bandas: Banda[],
+  marca: Array<Papel | null>,
+  niveles: NivelPaleta[],
+  papeles: Papel[],
+  tope: NivelPaleta = 5
+): void {
   const protaPapel = papeles.find((p) => p.rol === 'prota')!;
   for (const papel of papeles.filter((p) => p.rol === 'acento')) {
     const suyas = bandas.map((_, i) => i).filter((i) => marca[i]?.tono === papel.tono && bandas[i]!.clase !== 'pausa');
@@ -391,7 +409,7 @@ function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
     });
     if (idx < 0 || bandas[idx]!.ancho < 12) break;
     const banda = bandas[idx]!;
-    const nivelCorte = (niveles[idx] ?? 3) <= 3 ? 5 : 1;
+    const nivelCorte: NivelPaleta = (niveles[idx] ?? 3) <= 2 ? (tope >= 5 ? 5 : 3) : 1;
     const corte = banda.ancho >= 28 ? 10 : 4;
     const resto = Math.max(8, banda.ancho - corte);
     const izq = Math.max(4, Math.floor(resto / 2));
@@ -532,23 +550,40 @@ function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
     crom += paso;
     guard += 1;
   }
-  if (bandas.reduce((s, b) => s + b.ancho, 0) !== ANCHO) {
-    const pausaBanda = bandas.find((b) => b.clase === 'pausa');
-    const destino = pausaBanda ?? bandas.find((b) => b.clase !== 'pausa');
-    if (destino) destino.ancho += ANCHO - bandas.reduce((s, b) => s + b.ancho, 0);
+  let guardiaFinal = 0;
+  while (bandas.reduce((s, b) => s + b.ancho, 0) !== ANCHO && guardiaFinal < 2000) {
+    const totalAhora = bandas.reduce((s, b) => s + b.ancho, 0);
+    const paso = totalAhora < ANCHO ? 1 : -1;
+    const sumaTono = (tono: TonoMadre) =>
+      bandas.reduce((s, banda, i) => s + (marca[i]?.tono === tono && banda.clase !== 'pausa' ? banda.ancho : 0), 0);
+    const candidata = bandas
+      .map((banda, i) => ({ banda, i }))
+      .filter(({ banda, i }) => {
+        if (paso < 0) return banda.ancho > 6;
+        const papel = marca[i];
+        if (!papel || banda.clase === 'pausa') return banda.clase === 'pausa';
+        const techo = papel.rol === 'prota' ? Math.round(0.35 * ANCHO) : papel.rol === 'acento' ? Math.round(0.05 * ANCHO) : Math.round(0.18 * ANCHO);
+        return sumaTono(papel.tono) < techo && banda.ancho < (papel.rol === 'prota' ? 120 : 160);
+      })
+      .sort((a, b) => a.banda.ancho - b.banda.ancho)[0];
+    if (!candidata) break;
+    candidata.banda.ancho += paso;
+    guardiaFinal += 1;
   }
   bandas.forEach((banda, i) => {
     const papel = marca[i];
     if (!papel || banda.clase === 'pausa') return;
     banda.hex = colorMadre(papel.tono, niveles[i] ?? 3).hex;
   });
-  repararGris(bandas, marca, niveles);
+  repararGris(bandas, marca, niveles, tope);
+  const posibles = nivelesPosibles(tope);
+  const silencioNivel: NivelPaleta = tope >= 5 ? 5 : 3;
   for (let i = 1; i < bandas.length; i++) {
     if (separan(bandas[i]!.hex, bandas[i - 1]!.hex)) continue;
     const izq = marca[i - 1];
     const der = marca[i];
-    const nivelesIzq: NivelPaleta[] = izq && bandas[i - 1]!.clase !== 'pausa' ? [1, 5, 2, 4, 3] : [5];
-    const nivelesDer: NivelPaleta[] = der && bandas[i]!.clase !== 'pausa' ? [1, 5, 2, 4, 3] : [5];
+    const nivelesIzq: NivelPaleta[] = izq && bandas[i - 1]!.clase !== 'pausa' ? posibles : [silencioNivel];
+    const nivelesDer: NivelPaleta[] = der && bandas[i]!.clase !== 'pausa' ? posibles : [silencioNivel];
     const tonoIzq = izq?.tono ?? tonoCercano(bandas[i - 1]!.hex);
     const tonoDer = der?.tono ?? tonoCercano(bandas[i]!.hex);
     let listo = false;
@@ -576,7 +611,7 @@ function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
     if (!tonoT || bandas[i + 1]?.clase === 'pausa') continue;
     for (const ni of nivelesIzq) {
       for (const nd of nivelesDer) {
-        for (const nt of [1, 5, 2, 4, 3] as NivelPaleta[]) {
+        for (const nt of posibles) {
           const hexI = colorMadre(tonoIzq, ni).hex;
           const hexD = colorMadre(tonoDer, nd).hex;
           const hexT = colorMadre(tonoT, nt).hex;
@@ -609,7 +644,7 @@ function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: Niv
       continue;
     }
     for (const tono of TONOS_MADRE) {
-      const hex = colorMadre(tono, 5).hex;
+      const hex = colorMadre(tono, silencioNivel).hex;
       if (hex === silencioPrevio) continue;
       if (antes && !separan(hex, antes)) continue;
       if (despues && !separan(hex, despues)) continue;
@@ -676,30 +711,103 @@ export function revisarV8(plan: PlanCintas, protagonista: TonoMadre): string[] {
   return errores;
 }
 
-export function colorearV8(params: {
+function recortarClaros(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], tope: NivelPaleta): void {
+  const maxClaro = Math.round(ANCHO * 0.1);
+  if (tope < 4) {
+    for (let i = 0; i < bandas.length; i++) {
+      const actual = PALETA_MADRE.find((item) => item.hex.toUpperCase() === bandas[i]!.hex.toUpperCase());
+      if (!actual || actual.nivel < 4) continue;
+      const tono = marca[i]?.tono ?? actual.tono;
+      bandas[i]!.hex = colorMadre(tono, tope).hex;
+      niveles[i] = tope;
+    }
+  }
+  for (let i = 0; i < bandas.length; i++) {
+    const actual = PALETA_MADRE.find((item) => item.hex.toUpperCase() === bandas[i]!.hex.toUpperCase());
+    if (!actual || actual.nivel < 4 || bandas[i]!.ancho <= maxClaro) continue;
+    const tono = marca[i]?.tono ?? actual.tono;
+    if (bandas[i]!.clase === 'pausa') {
+      const nivelPausa: NivelPaleta = Math.min(3, tope) as NivelPaleta;
+      const vecinos = new Set<TonoMadre>();
+      for (const lado of [i - 1, i + 1]) {
+        if (lado < 0 || lado >= bandas.length) continue;
+        const ladoColor = PALETA_MADRE.find((item) => item.hex.toUpperCase() === bandas[lado]!.hex.toUpperCase());
+        if (ladoColor) vecinos.add(ladoColor.tono);
+      }
+      const enCinta = [...new Set(marca.flatMap((papel) => (papel ? [papel.tono] : [])))];
+      const opciones = [...enCinta.filter((item) => !vecinos.has(item)), ...TONOS_MADRE.filter((item) => !vecinos.has(item))];
+      let elegido = tono;
+      let hex = colorMadre(elegido, nivelPausa).hex;
+      for (const candidato of opciones) {
+        const prueba = colorMadre(candidato, nivelPausa).hex;
+        const izq = bandas[i - 1]?.hex;
+        const der = bandas[i + 1]?.hex;
+        if (izq && !separan(prueba, izq)) continue;
+        if (der && !separan(prueba, der)) continue;
+        elegido = candidato;
+        hex = prueba;
+        break;
+      }
+      bandas[i]!.hex = hex;
+      niveles[i] = nivelPausa;
+      const papelPausa = marca[i];
+      if (papelPausa) marca[i] = { tono: elegido, rol: papelPausa.rol, razon: papelPausa.razon };
+      continue;
+    }
+    const sobra = bandas[i]!.ancho - maxClaro;
+    bandas[i]!.ancho = maxClaro;
+    const profundo: NivelPaleta = Math.min(2, tope) as NivelPaleta;
+    bandas.splice(i + 1, 0, {
+      ...bandas[i]!,
+      ancho: sobra,
+      clase: bandas[i]!.clase,
+      hex: colorMadre(tono, profundo).hex,
+    });
+    marca.splice(i + 1, 0, marca[i] ?? { tono, rol: 'sec', razon: '' });
+    niveles.splice(i + 1, 0, profundo);
+  }
+  reponerX(bandas);
+  for (let i = 1; i < bandas.length; i++) {
+    if (separan(bandas[i]!.hex, bandas[i - 1]!.hex)) continue;
+    const papel = marca[i];
+    if (!papel) continue;
+    for (const nivel of nivelesPosibles(tope)) {
+      const hex = colorMadre(papel.tono, nivel).hex;
+      if (!separan(hex, bandas[i - 1]!.hex)) continue;
+      bandas[i]!.hex = hex;
+      niveles[i] = nivel;
+      break;
+    }
+  }
+}
+
+export function colorearConPapeles(params: {
   id: string;
   analisis: Analisis;
   plan: PlanCintas;
-  coloresPorMomento?: TonoMadre[][];
-  forzarColores?: boolean;
+  papeles: Papel[];
+  sinRelato: boolean;
+  tope?: NivelPaleta;
+  clarosChicos?: boolean;
 }): PlanV8 {
+  const tope = params.tope ?? 5;
   const rng = rngDeId(`${params.id}:v8`);
-  const { papeles, sinRelato } = papelesDe(params);
   const bandas = partirAnchas(params.plan.bandas, rng);
-  const marca = asignarPapeles(bandas, papeles, rng);
+  const marca = asignarPapeles(bandas, params.papeles, rng);
   const niveles: NivelPaleta[] = bandas.map((banda) =>
-    nivelBase(params.analisis, banda.momento, banda.motivo === 'borde' || Boolean(banda.pleno))
+    nivelBase(params.analisis, banda.momento, banda.motivo === 'borde' || Boolean(banda.pleno), tope)
   );
   for (let i = 0; i < bandas.length; i++) {
     const papel = marca[i];
     if (!papel) continue;
-    bandas[i]!.hex = colorMadre(papel.tono, niveles[i]!).hex;
+    bandas[i]!.hex = colorMadre(papel.tono, Math.min(tope, niveles[i]!) as NivelPaleta).hex;
   }
-  pintarNiveles(bandas, marca, niveles, params.analisis);
-  repararGris(bandas, marca, niveles);
-  escalarAnchos(bandas, marca, niveles, papeles);
-  const prota = papeles.find((p) => p.rol === 'prota')!;
-  const razones: RazonColor[] = papeles.map((papel) => ({
+  pintarNiveles(bandas, marca, niveles, params.analisis, tope);
+  repararGris(bandas, marca, niveles, tope);
+  escalarAnchos(bandas, marca, niveles, params.papeles, tope);
+  if (params.clarosChicos) recortarClaros(bandas, marca, niveles, tope);
+  const prota = params.papeles.find((p) => p.rol === 'prota')!;
+  const razones: RazonColor[] = params.papeles.map((papel) => ({
     tono: papel.tono,
     nombre: nombreDe(papel.tono, bandas, marca),
     razon: papel.razon,
@@ -708,6 +816,17 @@ export function colorearV8(params: {
     plan: { ...params.plan, bandas },
     razones,
     protagonista: { tono: prota.tono, nombre: nombreDe(prota.tono, bandas, marca), razon: prota.razon },
-    mensaje: sinRelato ? MENSAJE_SIN_IMAGEN : null,
+    mensaje: params.sinRelato ? MENSAJE_SIN_IMAGEN : null,
   };
+}
+
+export function colorearV8(params: {
+  id: string;
+  analisis: Analisis;
+  plan: PlanCintas;
+  coloresPorMomento?: TonoMadre[][];
+  forzarColores?: boolean;
+}): PlanV8 {
+  const { papeles, sinRelato } = papelesDe(params);
+  return colorearConPapeles({ ...params, papeles, sinRelato });
 }

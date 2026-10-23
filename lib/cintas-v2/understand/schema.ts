@@ -29,6 +29,46 @@ export function clasificarLuz(descripcion: string): 'sube' | 'baja' | null {
   return null;
 }
 
+const COLOR_DICHO: Array<[RegExp, TonoMadre]> = [
+  [/\b(amarill\w*|dourad\w*|dorad\w*|yellow|golden)\b/i, 'amarillo'],
+  [/\b(azules?|azul|blue|celestes?)\b/i, 'azul'],
+  [/\b(rojos?|rojas?|red|granates?|carm[ií]n\w*)\b/i, 'rojo'],
+  [/\b(verdes?|green)\b/i, 'verde'],
+  [/\b(naranjas?|orange)\b/i, 'naranja'],
+  [/\b(rosas?|rosad\w*|pink)\b/i, 'rosa'],
+  [/\b(morad\w*|violet\w*|lilas?|purple)\b/i, 'morado'],
+  [/\b(fucsias?|magenta)\b/i, 'magenta'],
+  [/\b(color\s+t[eé]|t[eé]\s+claro)\b/i, 'amarillo'],
+];
+
+const COLOR_TIPICO: Array<[RegExp, TonoMadre]> = [
+  [/\b(ma[ií]z|milho)\b/i, 'amarillo'],
+  [/\b(lim[oó]n(?:es)?|lim[aã]o|lemons?)\b/i, 'lima'],
+  [/\b(tomates?|tomatoes?)\b/i, 'rojo'],
+  [/\b(sangre|blood)\b/i, 'rojo'],
+  [/\b(pasto|grama|hierba|c[eé]sped|grass)\b/i, 'verde'],
+  [/\b(cielos?|c[eé]u|skies|sky)\b/i, 'azul'],
+  [/\b(mares?|mar|oc[eé]anos?|oceans?|sea)\b/i, 'calipso'],
+];
+
+const SIN_COLOR_TIPICO = /\b(nieve|neve|snow|blanc\w*|whites?|negr\w*|blacks?)\b/i;
+
+/** Color dicho en la historia, o color típico universal. La nieve no cuenta. */
+export function colorPropio(descripcion: string): TonoMadre | null {
+  if (SIN_COLOR_TIPICO.test(descripcion)) return null;
+  for (const [regla, tono] of COLOR_DICHO) {
+    if (regla.test(descripcion)) return tono;
+  }
+  for (const [regla, tono] of COLOR_TIPICO) {
+    if (regla.test(descripcion)) return tono;
+  }
+  return null;
+}
+
+export function esPaisajeDeFondo(descripcion: string): boolean {
+  return /\b(jard[ií]n|gardens?|campo|fields?|vegeta(?:ci[oó]n|ção)|vegetacion|cielos?|c[eé]u|skies|sky|de fondo|al fondo|ao fundo|background)\b/i.test(descripcion);
+}
+
 export const ImagenMomentoSchema = z
   .object({
     descripcion: z
@@ -38,9 +78,10 @@ export const ImagenMomentoSchema = z
       .refine((s) => s.split(/\s+/).filter(Boolean).length <= 5, 'máximo 5 palabras'),
     tono: TonoImagenSchema.optional(),
     luz: LuzImagenSchema.optional(),
+    importancia: peso.optional(),
     peso,
   })
-  .refine((img) => Boolean(img.tono) !== Boolean(img.luz), 'la imagen lleva tono o luz');
+  .refine((img) => !(img.tono && img.luz), 'la imagen no lleva tono y luz a la vez');
 
 export type ImagenMomento = z.infer<typeof ImagenMomentoSchema>;
 
@@ -195,12 +236,17 @@ function imagenesDe(raw: unknown): 'sin imagen' | ImagenMomento[] {
     const luzDicha = row.luz === 'sube' || row.luz === 'baja' ? row.luz : null;
     const luz = clasificarLuz(descripcion) ?? luzDicha;
     const pesoImagen = num(row.peso ?? row.weight, 0.5);
+    const importancia = num(row.importancia ?? row.importance, pesoImagen);
     if (luz) {
-      out.push({ descripcion, luz, peso: pesoImagen });
+      out.push({ descripcion, luz, peso: pesoImagen, importancia });
     } else {
-      const tono = tonoDe(row.tono ?? row.tone ?? row.matiz);
-      if (!tono) continue;
-      out.push({ descripcion, tono, peso: pesoImagen });
+      const propio = colorPropio(descripcion);
+      if (!propio) {
+        out.push({ descripcion, peso: pesoImagen, importancia });
+      } else {
+        const tope = esPaisajeDeFondo(descripcion) && importancia < 0.8 ? Math.min(importancia, 0.4) : importancia;
+        out.push({ descripcion, tono: propio, peso: pesoImagen, importancia: tope });
+      }
     }
     if (out.length === 4) break;
   }

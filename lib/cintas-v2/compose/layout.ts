@@ -1538,6 +1538,7 @@ export function componerCintas(params: {
   silencios?: SilencioMarca[];
   duracionSegundos?: number;
   coloresImagen?: string[];
+  soloGeometria?: boolean;
 }): PlanCintas {
   const poco = esPocoContenido(params.texto, params.locale);
   const modo = modoDe(params.analisis, poco);
@@ -1622,7 +1623,7 @@ export function componerCintas(params: {
     return banda;
   });
   const plan = { modo, bandas, ancho: ANCHO, asombroPrincipal };
-  const errores = revisarPlan(plan);
+  const errores = revisarPlan(plan).filter((error) => !params.soloGeometria || !/^\d+ colores$/.test(error));
   if (errores.length > 0) {
     throw new Error(`La composición de ${params.id} no cumple: ${errores.join('; ')}`);
   }

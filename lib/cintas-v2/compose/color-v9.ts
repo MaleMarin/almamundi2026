@@ -1,0 +1,137 @@
+/**
+ * Ronda 9. El protagonista sale de un color propio y central.
+ * Si la historia no lo tiene, usa una paleta armónica.
+ */
+import { TONOS_MADRE, type NivelPaleta, type TonoMadre } from '@/lib/cintas-v2/paleta-madre';
+import { MENSAJE_SIN_IMAGEN, type RazonColor } from '@/lib/cintas-v2/compose/color-v3';
+import { colorearConPapeles, type Papel, type PlanV8 } from '@/lib/cintas-v2/compose/color-v8';
+import { paletaAfin } from '@/lib/cintas-v2/compose/paletas-armonicas';
+import type { PlanCintas } from '@/lib/cintas-v2/compose/layout';
+import {
+  clasificarLuz,
+  colorPropio,
+  esPaisajeDeFondo,
+  type Analisis,
+  type ImagenMomento,
+} from '@/lib/cintas-v2/understand/schema';
+
+const VALENCIA_BAJA = 0.4;
+
+function valenciaMedia(analisis: Analisis): number {
+  const dichas = analisis.momentos
+    .map((momento) => momento.valencia)
+    .filter((valor): valor is number => typeof valor === 'number');
+  if (dichas.length === 0) return analisis.animo.valencia;
+  return dichas.reduce((suma, valor) => suma + valor, 0) / dichas.length;
+}
+
+function conColor(img: ImagenMomento): img is ImagenMomento & { tono: TonoMadre } {
+  if (!img.tono || img.luz || clasificarLuz(img.descripcion)) return false;
+  return colorPropio(img.descripcion) === img.tono;
+}
+
+export function colorearV9(params: {
+  id: string;
+  analisis: Analisis;
+  plan: PlanCintas;
+  coloresPorMomento?: TonoMadre[][];
+  forzarColores?: boolean;
+  evitar?: TonoMadre[];
+}): PlanV8 & { paleta: string | null } {
+  const luz = valenciaMedia(params.analisis);
+  const intensidad = params.analisis.animo.activacion;
+  const paleta = paletaAfin(luz, intensidad, params.id);
+  const candidatos: Array<{ tono: TonoMadre; importancia: number; razon: string; paisaje: boolean }> = [];
+  for (const momento of params.analisis.momentos) {
+    if (!Array.isArray(momento.imagenes)) continue;
+    for (const img of momento.imagenes) {
+      if (!conColor(img)) continue;
+      const paisaje = esPaisajeDeFondo(img.descripcion);
+      const importancia = paisaje && (img.importancia ?? 0) < 0.8 ? Math.min(img.importancia ?? 0, 0.4) : (img.importancia ?? img.peso);
+      candidatos.push({ tono: img.tono, importancia, razon: img.descripcion, paisaje });
+    }
+  }
+  params.analisis.momentos.forEach((_, indice) => {
+    const extra = params.coloresPorMomento?.[indice] ?? [];
+    if (extra.length === 0) return;
+    const sinTexto = !params.analisis.momentos[indice]?.imagenes || !Array.isArray(params.analisis.momentos[indice]?.imagenes)
+      ? true
+      : !(params.analisis.momentos[indice]?.imagenes as ImagenMomento[]).some((img) => conColor(img));
+    if (!params.forzarColores && !sinTexto) return;
+    for (const tono of extra) {
+      candidatos.push({ tono, importancia: 0.35, razon: 'un color de la imagen', paisaje: false });
+    }
+  });
+
+  const centrales = candidatos
+    .filter((item) => !item.paisaje || item.importancia >= 0.75)
+    .sort((a, b) => b.importancia - a.importancia);
+  const sinRelato = centrales.length === 0;
+  const usados = new Set<TonoMadre>();
+  const papeles: Papel[] = [];
+  const tomar = (tono: TonoMadre, rol: Papel['rol'], razon: string) => {
+    if (usados.has(tono)) return;
+    if (rol !== 'prota' && params.evitar?.includes(tono)) return;
+    usados.add(tono);
+    papeles.push({ tono, rol, razon });
+  };
+
+  if (!sinRelato) {
+    const prota = centrales[0]!;
+    tomar(prota.tono, 'prota', prota.razon);
+    for (const item of centrales.slice(1)) {
+      if (papeles.filter((p) => p.rol === 'sec').length >= 2) break;
+      tomar(item.tono, 'sec', item.razon);
+    }
+    for (const item of centrales.slice(1)) {
+      if (papeles.filter((p) => p.rol === 'acento').length >= 2) break;
+      tomar(item.tono, 'acento', item.razon);
+    }
+  }
+
+  for (const color of paleta.colores) {
+    if (papeles.some((p) => p.rol === 'prota') && color.rol === 'prota') continue;
+    if (papeles.filter((p) => p.rol === color.rol).length >= (color.rol === 'prota' ? 1 : 2)) continue;
+    tomar(color.tono, color.rol, MENSAJE_SIN_IMAGEN);
+  }
+  if (!papeles.some((p) => p.rol === 'prota')) {
+    const primero = paleta.colores.find((color) => color.rol === 'prota' && !params.evitar?.includes(color.tono)) ?? paleta.colores[0]!;
+    papeles.unshift({ tono: primero.tono, rol: 'prota', razon: MENSAJE_SIN_IMAGEN });
+    usados.add(primero.tono);
+  }
+  const calida = paleta.id.startsWith('calida');
+  const familia = TONOS_MADRE.filter((tono) => {
+    const esCalida = tono === 'rojo' || tono === 'naranja' || tono === 'amarillo' || tono === 'rosa' || tono === 'magenta' || tono === 'lima';
+    return calida ? esCalida : !esCalida;
+  });
+  const huecos: Array<Papel['rol']> = [];
+  if (!papeles.some((p) => p.rol === 'prota')) huecos.push('prota');
+  while (papeles.filter((p) => p.rol === 'sec').length + huecos.filter((rol) => rol === 'sec').length < 2) huecos.push('sec');
+  while (papeles.filter((p) => p.rol === 'acento').length + huecos.filter((rol) => rol === 'acento').length < 2) huecos.push('acento');
+  for (const rol of huecos) {
+    const tono = [...familia, ...TONOS_MADRE].find((item) => !usados.has(item) && (rol === 'prota' || !params.evitar?.includes(item)));
+    if (!tono) continue;
+    tomar(tono, rol, MENSAJE_SIN_IMAGEN);
+  }
+
+  const vistos = new Set<string>();
+  const unicos = papeles.filter((papel) => {
+    const clave = `${papel.rol}:${papel.tono}`;
+    if (vistos.has(clave)) return false;
+    vistos.add(clave);
+    return true;
+  });
+  const tope: NivelPaleta = luz < VALENCIA_BAJA ? 3 : 5;
+  const cinta = colorearConPapeles({
+    id: params.id,
+    analisis: params.analisis,
+    plan: params.plan,
+    papeles: unicos,
+    sinRelato,
+    tope,
+    clarosChicos: true,
+  });
+  return { ...cinta, paleta: sinRelato ? paleta.id : null };
+}
+
+export type { RazonColor };
