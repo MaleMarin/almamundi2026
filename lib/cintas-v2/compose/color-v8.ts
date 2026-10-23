@@ -1,0 +1,713 @@
+/**
+ * Color de la ronda 8.
+ * El tono sale de los objetos. La luz solo mueve la luminosidad.
+ * El ancho sigue la ley de la extensión y la jerarquía de la cinta.
+ */
+import { PALETA_MADRE, TONOS_MADRE, type NivelPaleta, type TonoMadre } from '@/lib/cintas-v2/paleta-madre';
+import { luminancia, medidaHsl, type Emocion } from '@/lib/cintas-v2/palette';
+import { rngDeId } from '@/lib/cintas-v2/seed';
+import { clasificarLuz, type Analisis, type ImagenMomento } from '@/lib/cintas-v2/understand/schema';
+import { ANCHO, type Banda, type PlanCintas } from '@/lib/cintas-v2/compose/layout';
+import { MENSAJE_SIN_IMAGEN, colorMadre, tonoCercano, type RazonColor } from '@/lib/cintas-v2/compose/color-v3';
+
+/** Partes de área de Goethe e Itten. Un número alto puede ocupar más ancho. */
+const PARTE: Record<TonoMadre, number> = {
+  rojo: 6,
+  naranja: 4,
+  amarillo: 3,
+  lima: 4.5,
+  verde: 6,
+  'verde azulado': 6.67,
+  calipso: 7.33,
+  azul: 8,
+  'azul violeta': 8.5,
+  morado: 9,
+  magenta: 8,
+  rosa: 7,
+};
+
+const VALENCIA_EMOCION: Record<Emocion, number> = {
+  alegría: 0.9,
+  amor: 0.82,
+  esperanza: 0.78,
+  gratitud: 0.8,
+  orgullo: 0.72,
+  calma: 0.66,
+  asombro: 0.6,
+  nostalgia: 0.42,
+  tristeza: 0.18,
+  pérdida: 0.15,
+  miedo: 0.22,
+  rabia: 0.28,
+};
+
+type Rol = 'prota' | 'sec' | 'acento';
+
+type Papel = { tono: TonoMadre; rol: Rol; razon: string };
+
+export type PlanV8 = {
+  plan: PlanCintas;
+  razones: RazonColor[];
+  protagonista: { tono: TonoMadre; nombre: string; razon: string };
+  mensaje: string | null;
+};
+
+function clampNivel(n: number): NivelPaleta {
+  return Math.min(5, Math.max(1, Math.round(n))) as NivelPaleta;
+}
+
+function reponerX(bandas: Banda[]): void {
+  let x = 0;
+  for (const banda of bandas) {
+    banda.x = x;
+    x += banda.ancho;
+  }
+}
+
+function distanciaTono(a: string, b: string): number {
+  const ha = medidaHsl(a).h * 360;
+  const hb = medidaHsl(b).h * 360;
+  return Math.min(Math.abs(ha - hb), 360 - Math.abs(ha - hb));
+}
+
+export function separan(a: string, b: string): boolean {
+  if (!a || !b || a.toUpperCase() === b.toUpperCase()) return false;
+  return distanciaTono(a, b) >= 28 || Math.abs(luminancia(a) - luminancia(b)) >= 24;
+}
+
+function valenciaDe(analisis: Analisis, indice: number): number {
+  const momento = analisis.momentos[indice];
+  if (momento && typeof momento.valencia === 'number') return momento.valencia;
+  if (momento) return VALENCIA_EMOCION[momento.emocion];
+  return analisis.animo.valencia;
+}
+
+function intensidadDe(analisis: Analisis, indice: number): number {
+  return analisis.momentos[indice]?.intensidad ?? analisis.animo.activacion;
+}
+
+function nivelCentral(valencia: number): NivelPaleta {
+  if (valencia < 0.22) return 1;
+  if (valencia < 0.42) return 2;
+  if (valencia < 0.62) return 3;
+  if (valencia < 0.82) return 4;
+  return 5;
+}
+
+function esColor(img: ImagenMomento): img is ImagenMomento & { tono: TonoMadre } {
+  return Boolean(img.tono) && !img.luz && !clasificarLuz(img.descripcion);
+}
+
+function ajusteLuz(analisis: Analisis, indice: number): number {
+  const imagenes = analisis.momentos[indice]?.imagenes;
+  if (!Array.isArray(imagenes)) return 0;
+  let suma = 0;
+  for (const img of imagenes) {
+    const luz = img.luz ?? clasificarLuz(img.descripcion);
+    if (luz === 'sube') suma += img.peso;
+    if (luz === 'baja') suma -= img.peso;
+  }
+  if (suma >= 0.5) return 1;
+  if (suma <= -0.5) return -1;
+  return 0;
+}
+
+function momentoSinColor(analisis: Analisis, indice: number): boolean {
+  const imagenes = analisis.momentos[indice]?.imagenes;
+  if (!Array.isArray(imagenes)) return true;
+  return !imagenes.some((img) => esColor(img));
+}
+
+function tonosSemilla(id: string, usados: TonoMadre[], cantidad: number): TonoMadre[] {
+  const rng = rngDeId(`${id}:tonos8`);
+  const pool = TONOS_MADRE.filter((tono) => !usados.includes(tono));
+  for (let i = pool.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    const tmp = pool[i]!;
+    pool[i] = pool[j]!;
+    pool[j] = tmp;
+  }
+  return pool.slice(0, cantidad);
+}
+
+function papelesDe(params: {
+  id: string;
+  analisis: Analisis;
+  coloresPorMomento?: TonoMadre[][];
+  forzarColores?: boolean;
+}): { papeles: Papel[]; sinRelato: boolean } {
+  const mapa = new Map<TonoMadre, { peso: number; razon: string }>();
+  const sumar = (tono: TonoMadre, peso: number, razon: string) => {
+    const previo = mapa.get(tono);
+    if (!previo) mapa.set(tono, { peso, razon });
+    else if (peso > previo.peso) {
+      previo.peso += peso;
+      previo.razon = razon;
+    } else previo.peso += peso;
+  };
+  for (const momento of params.analisis.momentos) {
+    if (!Array.isArray(momento.imagenes)) continue;
+    for (const img of momento.imagenes) {
+      if (!esColor(img)) continue;
+      sumar(img.tono, img.peso, img.descripcion);
+    }
+  }
+  params.analisis.momentos.forEach((_, indice) => {
+    const extra = params.coloresPorMomento?.[indice] ?? [];
+    if (extra.length === 0) return;
+    if (!params.forzarColores && !momentoSinColor(params.analisis, indice)) return;
+    for (const tono of extra) sumar(tono, 0.45, 'un color de la imagen');
+  });
+  const orden = [...mapa.entries()].sort((a, b) => b[1].peso - a[1].peso);
+  const sinRelato = orden.length === 0;
+  const nSec = orden.length >= 4 ? 3 : 2;
+  const nAcc = orden.length >= 6 ? 3 : 2;
+  const usados: TonoMadre[] = [];
+  const tomar = (rol: Rol, cantidad: number, razonRespaldo: string): Papel[] => {
+    const out: Papel[] = [];
+    while (out.length < cantidad) {
+      const siguiente = orden.find(([tono]) => !usados.includes(tono));
+      if (siguiente) {
+        usados.push(siguiente[0]);
+        out.push({ tono: siguiente[0], rol, razon: siguiente[1].razon });
+        continue;
+      }
+      const semilla = tonosSemilla(params.id, usados, 1)[0];
+      if (!semilla) break;
+      usados.push(semilla);
+      out.push({ tono: semilla, rol, razon: razonRespaldo });
+    }
+    return out;
+  };
+  const respaldo = sinRelato ? MENSAJE_SIN_IMAGEN : 'un hilo de contraste';
+  const prota = tomar('prota', 1, respaldo)[0] ?? {
+    tono: tonosSemilla(params.id, [], 1)[0] ?? 'azul',
+    rol: 'prota' as const,
+    razon: MENSAJE_SIN_IMAGEN,
+  };
+  if (!usados.includes(prota.tono)) usados.push(prota.tono);
+  return {
+    papeles: [prota, ...tomar('sec', nSec, respaldo), ...tomar('acento', nAcc, respaldo)],
+    sinRelato,
+  };
+}
+
+function partirAnchas(bandas: Banda[], rng: () => number): Banda[] {
+  const out: Banda[] = [];
+  for (const banda of bandas) {
+    if (banda.clase === 'pausa' || banda.ancho <= 96) {
+      out.push({ ...banda });
+      continue;
+    }
+    let queda = banda.ancho;
+    while (queda > 96) {
+      const corte = 36 + Math.floor(rng() * 48);
+      out.push({ ...banda, ancho: corte });
+      queda -= corte;
+    }
+    out.push({ ...banda, ancho: queda });
+  }
+  reponerX(out);
+  return out;
+}
+
+function asignarPapeles(bandas: Banda[], papeles: Papel[], rng: () => number): Array<Papel | null> {
+  const prota = papeles.find((p) => p.rol === 'prota')!;
+  const secs = papeles.filter((p) => p.rol === 'sec');
+  const acentos = papeles.filter((p) => p.rol === 'acento');
+  const marca: Array<Papel | null> = bandas.map(() => null);
+  const crom = bandas.map((banda, i) => i).filter((i) => bandas[i]!.clase !== 'pausa');
+  let siguiente = 0;
+  let accTurno = 0;
+  let secTurno = 0;
+  const hueco = () => 2 + Math.floor(rng() * 3);
+  crom.forEach((indice, orden) => {
+    const banda = bandas[indice]!;
+    const fino = banda.clase === 'hilo' || banda.ancho <= 18;
+    if (fino && acentos.length > 0 && orden !== siguiente) {
+      marca[indice] = acentos[accTurno % acentos.length]!;
+      accTurno += 1;
+      return;
+    }
+    if (orden >= siguiente) {
+      marca[indice] = prota;
+      siguiente = orden + hueco();
+      return;
+    }
+    const previo = orden > 0 ? marca[crom[orden - 1]!]?.tono : undefined;
+    let elegido = secs[secTurno % Math.max(secs.length, 1)];
+    if (elegido && elegido.tono === previo) elegido = secs[(secTurno + 1) % secs.length];
+    marca[indice] = elegido ?? prota;
+    secTurno += 1;
+  });
+  const cromaticos = () => bandas.map((_, i) => i).filter((i) => bandas[i]!.clase !== 'pausa');
+  const asegurar = (papel: Papel) => {
+    if (marca.some((item) => item?.tono === papel.tono)) return;
+    const donante = cromaticos().find((indice) => {
+      const actual = marca[indice];
+      if (!actual || actual.rol === 'prota' || actual.tono === papel.tono) return false;
+      return marca.filter((item) => item?.tono === actual.tono).length > 1;
+    });
+    if (donante !== undefined) {
+      marca[donante] = papel;
+      return;
+    }
+    const ancho = cromaticos()
+      .filter((indice) => marca[indice]?.rol === 'sec')
+      .sort((a, b) => bandas[b]!.ancho - bandas[a]!.ancho)[0];
+    if (ancho === undefined) return;
+    const banda = bandas[ancho]!;
+    const mitad = Math.max(8, Math.floor(banda.ancho / 2));
+    banda.ancho -= mitad;
+    bandas.splice(ancho + 1, 0, { ...banda, ancho: mitad });
+    marca.splice(ancho + 1, 0, papel);
+  };
+  for (const papel of [...secs, ...acentos]) asegurar(papel);
+  const protas = () => marca.filter((item) => item?.rol === 'prota').length;
+  while (protas() < 4) {
+    const donante = cromaticos().find((indice) => {
+      const actual = marca[indice];
+      if (!actual || actual.rol === 'prota') return false;
+      return marca.filter((item) => item?.tono === actual.tono).length > 1;
+    });
+    if (donante === undefined) break;
+    marca[donante] = prota;
+  }
+  reponerX(bandas);
+  return marca;
+}
+
+function nivelBase(analisis: Analisis, indice: number, borde: boolean): NivelPaleta {
+  if (borde) return 2;
+  const momento = indice >= 0 && indice < analisis.momentos.length ? indice : 0;
+  return clampNivel(nivelCentral(valenciaDe(analisis, momento)) + ajusteLuz(analisis, momento));
+}
+
+function elegirNivel(
+  tono: TonoMadre,
+  base: NivelPaleta,
+  intenso: boolean,
+  previo: string,
+  siguienteBase: string
+): NivelPaleta {
+  const salto = intenso ? [2, 1, 0] : [1, 0, 2];
+  const candidatos: NivelPaleta[] = [];
+  for (const paso of salto) {
+    candidatos.push(clampNivel(base - paso), clampNivel(base + paso));
+  }
+  for (const nivel of candidatos) {
+    const hex = colorMadre(tono, nivel).hex;
+    if (previo && !separan(hex, previo)) continue;
+    if (siguienteBase && !separan(hex, siguienteBase)) continue;
+    return nivel;
+  }
+  return base;
+}
+
+function pintarNiveles(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], analisis: Analisis): void {
+  for (let i = 0; i < bandas.length; i++) {
+    const banda = bandas[i]!;
+    const papel = marca[i];
+    if (!papel || banda.clase === 'pausa') continue;
+    const momento = banda.momento >= 0 ? banda.momento : 0;
+    const intenso = intensidadDe(analisis, momento) >= 0.62;
+    const previo = i > 0 ? bandas[i - 1]!.hex : '';
+    niveles[i] = elegirNivel(papel.tono, niveles[i] ?? 3, intenso, previo, '');
+    banda.hex = colorMadre(papel.tono, niveles[i]!).hex;
+  }
+  let silencioPrevio = '';
+  for (let i = 0; i < bandas.length; i++) {
+    const banda = bandas[i]!;
+    if (banda.clase !== 'pausa') continue;
+    let tono: TonoMadre = 'azul';
+    for (let j = i - 1; j >= 0; j--) {
+      if (marca[j]) {
+        tono = marca[j]!.tono;
+        break;
+      }
+    }
+    const candidatos = [tono, ...TONOS_MADRE.filter((item) => item !== tono)];
+    let hex = colorMadre(tono, 5).hex;
+    for (const candidato of candidatos) {
+      const prueba = colorMadre(candidato, 5).hex;
+      if (prueba === silencioPrevio) continue;
+      const antes = bandas[i - 1]?.hex ?? '';
+      const despues = bandas[i + 1]?.hex ?? '';
+      if (antes && !separan(prueba, antes)) continue;
+      if (despues && !separan(prueba, despues)) continue;
+      hex = prueba;
+      break;
+    }
+    banda.hex = hex;
+    silencioPrevio = hex;
+  }
+}
+
+function repararGris(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[]): void {
+  for (let vuelta = 0; vuelta < 4; vuelta++) {
+    for (let i = 1; i < bandas.length; i++) {
+      if (Math.abs(luminancia(bandas[i]!.hex) - luminancia(bandas[i - 1]!.hex)) >= 22) continue;
+      const papel = marca[i];
+      if (!papel || bandas[i]!.clase === 'pausa') continue;
+      for (const nivel of [1, 5, 2, 4, 3] as NivelPaleta[]) {
+        const hex = colorMadre(papel.tono, nivel).hex;
+        const antes = bandas[i - 1]!.hex;
+        const despues = bandas[i + 1]?.hex ?? '';
+        if (Math.abs(luminancia(hex) - luminancia(antes)) < 22) continue;
+        if (!separan(hex, antes)) continue;
+        if (despues && !separan(hex, despues)) continue;
+        bandas[i]!.hex = hex;
+        niveles[i] = nivel;
+        break;
+      }
+    }
+  }
+}
+
+function cuota(papel: Papel, nivel: NivelPaleta): number {
+  const t = (PARTE[papel.tono] - 3) / 6;
+  const luz = nivel >= 5 ? 0.82 : nivel >= 4 ? 0.9 : 1;
+  if (papel.rol === 'prota') return Math.min(0.35, Math.max(0.25, (0.25 + t * 0.1) * luz));
+  if (papel.rol === 'sec') return Math.min(0.18, Math.max(0.1, 0.15 * (PARTE[papel.tono] / 6) * luz));
+  return Math.min(0.05, Math.max(0.02, 0.032 * (PARTE[papel.tono] / 6) * luz));
+}
+
+function escalarAnchos(bandas: Banda[], marca: Array<Papel | null>, niveles: NivelPaleta[], papeles: Papel[]): void {
+  const protaPapel = papeles.find((p) => p.rol === 'prota')!;
+  for (const papel of papeles.filter((p) => p.rol === 'acento')) {
+    const suyas = bandas.map((_, i) => i).filter((i) => marca[i]?.tono === papel.tono && bandas[i]!.clase !== 'pausa');
+    for (const indice of suyas.slice(2)) marca[indice] = protaPapel;
+  }
+  const separador = papeles.find((p) => p.rol === 'acento') ?? papeles.find((p) => p.rol === 'sec') ?? protaPapel;
+  let cortes = 0;
+  while (marca.filter((item) => item?.tono === protaPapel.tono).length < 4 && cortes < 8) {
+    let idx = -1;
+    let mejor = 0;
+    bandas.forEach((banda, i) => {
+      if (marca[i]?.tono === protaPapel.tono && banda.ancho > mejor) {
+        mejor = banda.ancho;
+        idx = i;
+      }
+    });
+    if (idx < 0 || bandas[idx]!.ancho < 12) break;
+    const banda = bandas[idx]!;
+    const nivelCorte = (niveles[idx] ?? 3) <= 3 ? 5 : 1;
+    const corte = banda.ancho >= 28 ? 10 : 4;
+    const resto = Math.max(8, banda.ancho - corte);
+    const izq = Math.max(4, Math.floor(resto / 2));
+    const der = Math.max(4, resto - izq);
+    banda.ancho = izq;
+    const hilo = { ...banda, ancho: corte, clase: 'hilo' as const, hex: colorMadre(separador.tono, nivelCorte).hex };
+    bandas.splice(idx + 1, 0, hilo, { ...banda, ancho: der });
+    marca.splice(idx + 1, 0, separador, protaPapel);
+    niveles.splice(idx + 1, 0, nivelCorte, niveles[idx] ?? 3);
+    cortes += 1;
+  }
+  let cursor = 1;
+  while (cursor < bandas.length) {
+    const izq = marca[cursor - 1];
+    const der = marca[cursor];
+    if (!izq || !der || izq.tono !== der.tono || bandas[cursor]!.clase === 'pausa' || bandas[cursor - 1]!.clase === 'pausa') {
+      cursor += 1;
+      continue;
+    }
+    const otro = papeles.find((p) => p.tono !== izq.tono);
+    if (!otro || bandas[cursor - 1]!.ancho < 14) {
+      cursor += 1;
+      continue;
+    }
+    bandas[cursor - 1]!.ancho -= 8;
+    const nivel = (niveles[cursor] ?? 3) <= 3 ? 5 : 1;
+    bandas.splice(cursor, 0, {
+      ...bandas[cursor - 1]!,
+      ancho: 8,
+      clase: 'hilo',
+      hex: colorMadre(otro.tono, nivel).hex,
+    });
+    marca.splice(cursor, 0, otro);
+    niveles.splice(cursor, 0, nivel);
+    cursor += 2;
+  }
+  const pausa = bandas.filter((b) => b.clase === 'pausa').reduce((s, b) => s + b.ancho, 0);
+  const cromatico = ANCHO - pausa;
+  const grupos = new Map<TonoMadre, Banda[]>();
+  bandas.forEach((banda, i) => {
+    const papel = marca[i];
+    if (!papel || banda.clase === 'pausa') return;
+    const lista = grupos.get(papel.tono) ?? [];
+    lista.push(banda);
+    grupos.set(papel.tono, lista);
+  });
+  const metas = new Map<TonoMadre, number>();
+  for (const papel of papeles) {
+    const nivelesTono = bandas
+      .map((_, i) => (marca[i]?.tono === papel.tono && bandas[i]!.clase !== 'pausa' ? niveles[i]! : null))
+      .filter((n): n is NivelPaleta => n !== null);
+    const promedio = nivelesTono.length
+      ? clampNivel(nivelesTono.reduce((s, n) => s + n, 0) / nivelesTono.length)
+      : 3;
+    metas.set(papel.tono, Math.round(cuota(papel, promedio) * ANCHO));
+  }
+  let suma = [...metas.values()].reduce((s, n) => s + n, 0);
+  const prota = papeles.find((p) => p.rol === 'prota')!;
+  const pisoProta = Math.round(0.25 * ANCHO);
+  const ajustar = (tono: TonoMadre, px: number) => metas.set(tono, Math.max(8, Math.round(px)));
+  const cabeEn = (papel: Papel, px: number) => {
+    const t = (PARTE[papel.tono] - 3) / 6;
+    if (papel.rol === 'prota') {
+      const techo = Math.round((0.25 + t * 0.1) * ANCHO);
+      return Math.min(Math.max(techo, pisoProta), Math.max(pisoProta, px));
+    }
+    if (papel.rol === 'acento') return Math.min(Math.round(0.05 * ANCHO), Math.max(16, px));
+    const techoSec = Math.round(Math.min(0.18, 0.1 + t * 0.08) * ANCHO);
+    return Math.min(techoSec, Math.max(Math.round(0.1 * ANCHO), px));
+  };
+  for (const papel of papeles) ajustar(papel.tono, cabeEn(papel, metas.get(papel.tono) ?? 0));
+  suma = [...metas.values()].reduce((s, n) => s + n, 0);
+  let guardia = 0;
+  while (suma !== cromatico && guardia < 2000) {
+    const subir = suma < cromatico;
+    const orden = papeles.filter((p) => (subir ? p.rol !== 'acento' : true));
+    let movio = false;
+    for (const papel of orden) {
+      const actual = metas.get(papel.tono) ?? 0;
+      const destino = cabeEn(papel, actual + (subir ? 1 : -1));
+      if (destino === actual) continue;
+      metas.set(papel.tono, destino);
+      suma += destino - actual;
+      movio = true;
+      if (suma === cromatico) break;
+    }
+    if (!movio) break;
+    guardia += 1;
+  }
+  if (suma > cromatico) {
+    const pausas = bandas.filter((b) => b.clase === 'pausa' && b.ancho > 6);
+    for (const banda of pausas) {
+      if (suma <= cromatico) break;
+      const baja = Math.min(banda.ancho - 6, suma - cromatico);
+      banda.ancho -= baja;
+      suma -= baja;
+    }
+  }
+
+  for (const [tono, lista] of grupos) {
+    const meta = metas.get(tono) ?? lista.reduce((s, b) => s + b.ancho, 0);
+    const actual = lista.reduce((s, b) => s + b.ancho, 0) || 1;
+    const tope = papeles.find((p) => p.tono === tono)?.rol === 'prota' ? 120 : papeles.find((p) => p.tono === tono)?.rol === 'acento' ? 36 : 160;
+    const anchos = lista.map((b) => Math.max(4, Math.round((b.ancho / actual) * meta)));
+    let guard = 0;
+    while (anchos.some((n) => n > tope) && guard < 60) {
+      const grande = anchos.indexOf(Math.max(...anchos));
+      const sobra = anchos[grande]! - tope;
+      anchos[grande] = tope;
+      const chico = anchos.findIndex((n, i) => i !== grande && n < tope);
+      if (chico < 0) break;
+      anchos[chico] = anchos[chico]! + sobra;
+      guard += 1;
+    }
+    let drift = meta - anchos.reduce((s, n) => s + n, 0);
+    let vueltas = 0;
+    while (drift !== 0 && vueltas < meta + 20) {
+      const i = drift > 0 ? anchos.findIndex((n) => n < tope) : anchos.findIndex((n) => n > 4);
+      if (i < 0) break;
+      const paso = drift > 0 ? 1 : -1;
+      anchos[i] = anchos[i]! + paso;
+      drift -= paso;
+      vueltas += 1;
+    }
+    lista.forEach((banda, i) => {
+      banda.ancho = anchos[i]!;
+    });
+  }
+  let crom = bandas.reduce((s, b) => s + b.ancho, 0);
+  let guard = 0;
+  while (crom !== ANCHO && guard < 2000) {
+    const paso = crom < ANCHO ? 1 : -1;
+    const candidata = bandas
+      .filter((b) => b.clase === 'pausa' && (paso > 0 || b.ancho > 6))
+      .sort((a, b) => b.ancho - a.ancho)[0];
+    if (!candidata) break;
+    candidata.ancho += paso;
+    crom += paso;
+    guard += 1;
+  }
+  if (bandas.reduce((s, b) => s + b.ancho, 0) !== ANCHO) {
+    const pausaBanda = bandas.find((b) => b.clase === 'pausa');
+    const destino = pausaBanda ?? bandas.find((b) => b.clase !== 'pausa');
+    if (destino) destino.ancho += ANCHO - bandas.reduce((s, b) => s + b.ancho, 0);
+  }
+  bandas.forEach((banda, i) => {
+    const papel = marca[i];
+    if (!papel || banda.clase === 'pausa') return;
+    banda.hex = colorMadre(papel.tono, niveles[i] ?? 3).hex;
+  });
+  repararGris(bandas, marca, niveles);
+  for (let i = 1; i < bandas.length; i++) {
+    if (separan(bandas[i]!.hex, bandas[i - 1]!.hex)) continue;
+    const izq = marca[i - 1];
+    const der = marca[i];
+    const nivelesIzq: NivelPaleta[] = izq && bandas[i - 1]!.clase !== 'pausa' ? [1, 5, 2, 4, 3] : [5];
+    const nivelesDer: NivelPaleta[] = der && bandas[i]!.clase !== 'pausa' ? [1, 5, 2, 4, 3] : [5];
+    const tonoIzq = izq?.tono ?? tonoCercano(bandas[i - 1]!.hex);
+    const tonoDer = der?.tono ?? tonoCercano(bandas[i]!.hex);
+    let listo = false;
+    for (const ni of nivelesIzq) {
+      for (const nd of nivelesDer) {
+        const hexI = colorMadre(tonoIzq, ni).hex;
+        const hexD = colorMadre(tonoDer, nd).hex;
+        if (!separan(hexI, hexD)) continue;
+        const antes = bandas[i - 2]?.hex ?? '';
+        const despues = bandas[i + 1]?.hex ?? '';
+        if (antes && !separan(hexI, antes)) continue;
+        if (despues && !separan(hexD, despues)) continue;
+        bandas[i - 1]!.hex = hexI;
+        bandas[i]!.hex = hexD;
+        if (izq) niveles[i - 1] = ni;
+        if (der) niveles[i] = nd;
+        listo = true;
+        break;
+      }
+      if (listo) break;
+    }
+    if (listo || separan(bandas[i]!.hex, bandas[i - 1]!.hex)) continue;
+    const tercero = marca[i + 1];
+    const tonoT = tercero?.tono;
+    if (!tonoT || bandas[i + 1]?.clase === 'pausa') continue;
+    for (const ni of nivelesIzq) {
+      for (const nd of nivelesDer) {
+        for (const nt of [1, 5, 2, 4, 3] as NivelPaleta[]) {
+          const hexI = colorMadre(tonoIzq, ni).hex;
+          const hexD = colorMadre(tonoDer, nd).hex;
+          const hexT = colorMadre(tonoT, nt).hex;
+          if (!separan(hexI, hexD) || !separan(hexD, hexT)) continue;
+          const antes = bandas[i - 2]?.hex ?? '';
+          const despues = bandas[i + 2]?.hex ?? '';
+          if (antes && !separan(hexI, antes)) continue;
+          if (despues && !separan(hexT, despues)) continue;
+          bandas[i - 1]!.hex = hexI;
+          bandas[i]!.hex = hexD;
+          bandas[i + 1]!.hex = hexT;
+          if (izq) niveles[i - 1] = ni;
+          if (der) niveles[i] = nd;
+          niveles[i + 1] = nt;
+          listo = true;
+          break;
+        }
+        if (listo) break;
+      }
+      if (listo) break;
+    }
+  }
+  let silencioPrevio = '';
+  for (let i = 0; i < bandas.length; i++) {
+    if (bandas[i]!.clase !== 'pausa') continue;
+    const antes = bandas[i - 1]?.hex ?? '';
+    const despues = bandas[i + 1]?.hex ?? '';
+    if (antes && separan(bandas[i]!.hex, antes) && (!despues || separan(bandas[i]!.hex, despues)) && bandas[i]!.hex !== silencioPrevio) {
+      silencioPrevio = bandas[i]!.hex;
+      continue;
+    }
+    for (const tono of TONOS_MADRE) {
+      const hex = colorMadre(tono, 5).hex;
+      if (hex === silencioPrevio) continue;
+      if (antes && !separan(hex, antes)) continue;
+      if (despues && !separan(hex, despues)) continue;
+      bandas[i]!.hex = hex;
+      silencioPrevio = hex;
+      break;
+    }
+  }
+  reponerX(bandas);
+}
+
+function nombreDe(tono: TonoMadre, bandas: Banda[], marca: Array<Papel | null>): string {
+  const anchos = new Map<string, number>();
+  bandas.forEach((banda, i) => {
+    if (marca[i]?.tono !== tono || banda.clase === 'pausa') return;
+    anchos.set(banda.hex, (anchos.get(banda.hex) ?? 0) + banda.ancho);
+  });
+  const hex = [...anchos.entries()].sort((a, b) => b[1] - a[1])[0]?.[0];
+  return PALETA_MADRE.find((item) => item.hex.toUpperCase() === hex?.toUpperCase())?.nombre ?? colorMadre(tono, 2).nombre;
+}
+
+export function ritmoGris(bandas: Banda[]): number {
+  if (bandas.length < 2) return 1;
+  let cambios = 0;
+  for (let i = 1; i < bandas.length; i++) {
+    if (Math.abs(luminancia(bandas[i]!.hex) - luminancia(bandas[i - 1]!.hex)) >= 22) cambios += 1;
+  }
+  return cambios / (bandas.length - 1);
+}
+
+export function revisarV8(plan: PlanCintas, protagonista: TonoMadre): string[] {
+  const errores: string[] = [];
+  const anchos = new Map<TonoMadre, number>();
+  for (const banda of plan.bandas) {
+    if (banda.clase === 'pausa') continue;
+    const exacto = PALETA_MADRE.find((item) => item.hex.toUpperCase() === banda.hex.toUpperCase());
+    const tono = exacto?.tono ?? tonoCercano(banda.hex);
+    anchos.set(tono, (anchos.get(tono) ?? 0) + banda.ancho);
+  }
+  const prota = anchos.get(protagonista) ?? 0;
+  if (prota < Math.round(0.25 * ANCHO) || prota > Math.round(0.35 * ANCHO)) {
+    errores.push(`protagonista ${Math.round((prota / ANCHO) * 100)}%`);
+  }
+  for (const [tono, px] of anchos) {
+    if (tono !== protagonista && px > Math.round(0.2 * ANCHO)) errores.push(`${tono} pasa del 20 %`);
+  }
+  const acentos = [...anchos.values()].filter((px) => px <= Math.round(0.05 * ANCHO)).length;
+  if (anchos.size < 5) errores.push(`solo ${anchos.size} tonos`);
+  if (acentos < 2) errores.push(`solo ${acentos} acentos`);
+  let corrido = 0;
+  let peor = 0;
+  for (const banda of plan.bandas) {
+    const tono = PALETA_MADRE.find((item) => item.hex.toUpperCase() === banda.hex.toUpperCase())?.tono;
+    if (banda.clase !== 'pausa' && tono === protagonista) {
+      corrido += banda.ancho;
+      peor = Math.max(peor, corrido);
+    } else corrido = 0;
+  }
+  if (peor > Math.round(0.12 * ANCHO)) errores.push('el protagonista quedó en un solo bloque');
+  for (let i = 1; i < plan.bandas.length; i++) {
+    if (!separan(plan.bandas[i]!.hex, plan.bandas[i - 1]!.hex)) errores.push(`poco contraste en ${i}`);
+  }
+  if (ritmoGris(plan.bandas) < 0.45) errores.push('grises parejos');
+  return errores;
+}
+
+export function colorearV8(params: {
+  id: string;
+  analisis: Analisis;
+  plan: PlanCintas;
+  coloresPorMomento?: TonoMadre[][];
+  forzarColores?: boolean;
+}): PlanV8 {
+  const rng = rngDeId(`${params.id}:v8`);
+  const { papeles, sinRelato } = papelesDe(params);
+  const bandas = partirAnchas(params.plan.bandas, rng);
+  const marca = asignarPapeles(bandas, papeles, rng);
+  const niveles: NivelPaleta[] = bandas.map((banda) =>
+    nivelBase(params.analisis, banda.momento, banda.motivo === 'borde' || Boolean(banda.pleno))
+  );
+  for (let i = 0; i < bandas.length; i++) {
+    const papel = marca[i];
+    if (!papel) continue;
+    bandas[i]!.hex = colorMadre(papel.tono, niveles[i]!).hex;
+  }
+  pintarNiveles(bandas, marca, niveles, params.analisis);
+  repararGris(bandas, marca, niveles);
+  escalarAnchos(bandas, marca, niveles, papeles);
+  const prota = papeles.find((p) => p.rol === 'prota')!;
+  const razones: RazonColor[] = papeles.map((papel) => ({
+    tono: papel.tono,
+    nombre: nombreDe(papel.tono, bandas, marca),
+    razon: papel.razon,
+  }));
+  return {
+    plan: { ...params.plan, bandas },
+    razones,
+    protagonista: { tono: prota.tono, nombre: nombreDe(prota.tono, bandas, marca), razon: prota.razon },
+    mensaje: sinRelato ? MENSAJE_SIN_IMAGEN : null,
+  };
+}

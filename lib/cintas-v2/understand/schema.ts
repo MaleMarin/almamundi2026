@@ -15,16 +15,32 @@ export const EmocionSchema = z.enum(EMOCIONES);
 const peso = z.coerce.number().finite().min(0).max(1);
 
 export const TonoImagenSchema = z.enum(TONOS_MADRE);
+export const LuzImagenSchema = z.enum(['sube', 'baja']);
 
-export const ImagenMomentoSchema = z.object({
-  descripcion: z
-    .string()
-    .trim()
-    .min(1)
-    .refine((s) => s.split(/\s+/).filter(Boolean).length <= 5, 'máximo 5 palabras'),
-  tono: TonoImagenSchema,
-  peso,
-});
+const BAJA_LUZ =
+  /\b(atardecer|ocaso|anochecer|anochece|entardecer|dusk|sunset|penumbra|sombra|apaga\w*|noche|night)\b/i;
+const SUBE_LUZ =
+  /\b(amanecer|amanhecer|alba|mediod[ií]a|mañana|manana|manhã|morning|dawn|sunrise|sunlight|sunshine|sol|luces|luz|light|brilho?|glow|iluminad[oa]s?|ilumina)\b/i;
+
+/** La luz, la hora y el brillo no son un tono. Suben o bajan la luminosidad. */
+export function clasificarLuz(descripcion: string): 'sube' | 'baja' | null {
+  if (BAJA_LUZ.test(descripcion)) return 'baja';
+  if (SUBE_LUZ.test(descripcion)) return 'sube';
+  return null;
+}
+
+export const ImagenMomentoSchema = z
+  .object({
+    descripcion: z
+      .string()
+      .trim()
+      .min(1)
+      .refine((s) => s.split(/\s+/).filter(Boolean).length <= 5, 'máximo 5 palabras'),
+    tono: TonoImagenSchema.optional(),
+    luz: LuzImagenSchema.optional(),
+    peso,
+  })
+  .refine((img) => Boolean(img.tono) !== Boolean(img.luz), 'la imagen lleva tono o luz');
 
 export type ImagenMomento = z.infer<typeof ImagenMomentoSchema>;
 
@@ -175,9 +191,17 @@ function imagenesDe(raw: unknown): 'sin imagen' | ImagenMomento[] {
   for (const item of raw) {
     const row = item && typeof item === 'object' ? (item as Record<string, unknown>) : {};
     const descripcion = cincoPalabras(row.descripcion ?? row.description ?? row.imagen);
-    const tono = tonoDe(row.tono ?? row.tone ?? row.matiz);
-    if (!descripcion || !tono) continue;
-    out.push({ descripcion, tono, peso: num(row.peso ?? row.weight, 0.5) });
+    if (!descripcion) continue;
+    const luzDicha = row.luz === 'sube' || row.luz === 'baja' ? row.luz : null;
+    const luz = clasificarLuz(descripcion) ?? luzDicha;
+    const pesoImagen = num(row.peso ?? row.weight, 0.5);
+    if (luz) {
+      out.push({ descripcion, luz, peso: pesoImagen });
+    } else {
+      const tono = tonoDe(row.tono ?? row.tone ?? row.matiz);
+      if (!tono) continue;
+      out.push({ descripcion, tono, peso: pesoImagen });
+    }
     if (out.length === 4) break;
   }
   return out.length > 0 ? out : 'sin imagen';
@@ -271,6 +295,13 @@ export function normalizarAnalisis(raw: unknown): unknown {
       menores: flag(avisosRaw.menores ?? avisosRaw.minors),
     },
   };
+}
+
+export function relatoTieneLuz(analisis: Analisis): boolean {
+  return analisis.momentos.some((momento) => {
+    if (!Array.isArray(momento.imagenes)) return false;
+    return momento.imagenes.some((img) => img.luz || clasificarLuz(img.descripcion));
+  });
 }
 
 export function erroresDe(error: { issues?: Array<{ path?: PropertyKey[]; message: string }> }): string {

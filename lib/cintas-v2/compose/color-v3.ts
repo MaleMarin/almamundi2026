@@ -107,6 +107,7 @@ function imagenesDe(analisis: Analisis, indice: number): ImagenMomento[] | 'sin 
 function pesosDe(imagenes: ImagenMomento[]): PesoTono[] {
   const mapa = new Map<TonoMadre, PesoTono>();
   for (const imagen of imagenes) {
+    if (!imagen.tono) continue;
     const previo = mapa.get(imagen.tono);
     if (!previo || imagen.peso > previo.peso) {
       mapa.set(imagen.tono, { tono: imagen.tono, peso: imagen.peso, razon: imagen.descripcion });
@@ -209,7 +210,7 @@ export function colorearV3(params: {
         .filter((i) => i >= 0 && i < params.analisis.momentos.length)
         .flatMap((i) => {
           const imgs = imagenesDe(params.analisis, i);
-          return imgs === 'sin imagen' ? [] : imgs.map((img) => img.tono);
+          return imgs === 'sin imagen' ? [] : imgs.flatMap((img) => (img.tono ? [img.tono] : []));
         });
       lista = mezclar([], vecinos.length > 0 ? vecinos : deMedio, 'un momento vecino');
     }

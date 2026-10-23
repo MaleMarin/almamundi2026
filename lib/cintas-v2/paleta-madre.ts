@@ -1,6 +1,6 @@
 /**
- * Paleta madre de las cintas, versión 3.
- * 12 tonos por 5 niveles. Todavía no entra en la composición.
+ * Paleta madre de las cintas, congelada.
+ * 12 tonos por 5 niveles.
  * En cada fila se iguala la intensidad. La luz queda la natural de cada tono:
  * el amarillo y la lima son más luminosos que el azul y el morado.
  */
@@ -66,7 +66,7 @@ export const PALETA_MADRE: readonly ColorMadre[] = [
   { tono: 'calipso', nivel: 3, nombre: 'mar de Valparaíso', hex: '#01B3EE' },
   { tono: 'azul', nivel: 3, nombre: 'lapislázuli', hex: '#6584EC' },
   { tono: 'azul violeta', nivel: 3, nombre: 'flor morada', hex: '#9176E3' },
-  { tono: 'morado', nivel: 3, nombre: 'violeta', hex: '#C000E0' },
+  { tono: 'morado', nivel: 3, nombre: 'violeta', hex: '#C26ADC' },
   { tono: 'magenta', nivel: 3, nombre: 'fucsia de patio', hex: '#FF3EC8' },
   { tono: 'rosa', nivel: 3, nombre: 'rosa mosqueta', hex: '#FF4D7A' },
 

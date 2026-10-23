@@ -26,7 +26,7 @@ Forma:
 {
   "animo": { "valencia": 0, "activacion": 0, "dominancia": 0 },
   "emociones": [{ "emocion": "calma", "peso": 0 }],
-  "momentos": [{ "resumen": "hasta ocho palabras", "emocion": "calma", "intensidad": 0, "valencia": 0, "imagenes": [{ "descripcion": "hasta cinco palabras", "tono": "azul", "peso": 0 }] }],
+  "momentos": [{ "resumen": "hasta ocho palabras", "emocion": "calma", "intensidad": 0, "valencia": 0, "imagenes": [{ "descripcion": "mar en calma", "tono": "azul", "peso": 0 }, { "descripcion": "sol de la tarde", "luz": "baja", "peso": 0 }] }],
   "palabrasClave": [{ "palabra": "ejemplo", "peso": 0 }],
   "idioma": "es",
   "avisos": { "contenidoSensible": false, "violencia": false, "menores": false }
@@ -38,9 +38,10 @@ Reglas:
 - Emociones permitidas, solo las presentes: nostalgia, alegría, tristeza, esperanza, amor, miedo, rabia, calma, orgullo, gratitud, pérdida, asombro. Peso de 0 a 1.
 - Momentos en el orden del relato. Resumen de máximo 8 palabras. Entre 1 y 8 momentos.
 - Cada momento lleva su valencia, de 0 desagradable a 1 agradable.
-- Cada momento lleva «imagenes»: de 1 a 4 imágenes concretas que estén escritas en ese momento (lugar, objeto, luz, hora del día o naturaleza). Cada imagen tiene una descripción de máximo 5 palabras, un tono y un peso de 0 a 1.
-- Tonos permitidos, uno solo por imagen: rojo, naranja, amarillo, lima, verde, verde azulado, calipso, azul, azul violeta, morado, magenta, rosa. Elige el tono que mejor representa esa imagen.
-- Si el momento no tiene ninguna imagen concreta, escribe «imagenes»: «sin imagen». Nunca inventes un lugar, un objeto ni una luz que el relato no diga.
+- Cada momento lleva «imagenes»: de 1 a 4 imágenes concretas que estén escritas en ese momento (lugar, objeto, luz, hora del día o naturaleza). Cada descripción tiene máximo 5 palabras y un peso de 0 a 1.
+- Solo eligen tono los objetos, lugares y elementos con un color propio: el mar, el maíz, una cocina amarilla, las flores, la tierra, el cielo. Tonos permitidos, uno solo: rojo, naranja, amarillo, lima, verde, verde azulado, calipso, azul, azul violeta, morado, magenta, rosa.
+- La luz, la hora del día y el brillo no eligen tono. Sol, luz, mañana, amanecer, atardecer, ventana iluminada y brillo llevan «luz» en vez de tono: «sube» si aclaran el momento y «baja» si lo oscurecen. Mañana, sol, mediodía y brillo suben. Atardecer, anochecer y noche bajan.
+- Una imagen lleva tono o lleva luz, nunca las dos. Si el momento no tiene ninguna imagen concreta, escribe «imagenes»: «sin imagen». Nunca inventes un lugar, un objeto ni una luz que el relato no diga.
 - Las descripciones de imagen también son privadas: sin nombres, parentescos ni datos identificables.
 - La negación invierte el sentido. «No estaba triste» no es tristeza.
 - La metáfora vale por la emoción que nombra. «Se me apretó el pecho de alegría» es alegría.
