@@ -55,6 +55,6 @@ La hoja queda en `tmp-cintas-v2/salida/hoja-general-ronda-6e.png`. Esa carpeta n
 
 ## Paletas de respaldo en el sitio
 
-Cuando una historia no trae un color propio, entra en una casilla de ánimo. La luz de la casilla sale de la valencia y la intensidad sale de la activación. Cada casilla tiene cuatro paletas.
+Cuando una historia no trae un color propio, entra en una casilla de ánimo. La luz de la casilla sale de la valencia y la intensidad sale de la activación. Cada casilla tiene cuatro paletas. La semilla de la historia elige una de las cuatro.
 
-En el sitio real, dentro de esa casilla se elegirá la paleta menos usada entre las últimas historias publicadas, para que el mapa se vea variado. Eso todavía no está implementado. En este prototipo, la semilla elige una de las cuatro.
+Las cintas son privadas. La persona las recibe en la pantalla final y por correo apenas envía su relato. No se publican en el mapa ni en ninguna página pública. La elección de paleta por semilla de la historia es suficiente.

@@ -61,7 +61,7 @@ export const PALETAS_RESPALDO: readonly PaletaRespaldo[] = [
     nombre: 'Tarde en el cerro',
     luz: 'luminosa',
     intensidad: 'calma',
-    colores: [c('amarillo', 3, 'prota'), c('calipso', 3, 'sec'), c('magenta', 3, 'sec'), c('verde', 3, 'acento'), c('naranja', 4, 'acento')],
+    colores: [c('amarillo', 3, 'prota'), c('calipso', 3, 'sec'), c('azul violeta', 3, 'sec'), c('verde', 3, 'acento'), c('naranja', 4, 'acento')],
   },
   {
     id: 'malecon-de-tarde',
@@ -145,7 +145,7 @@ export const PALETAS_RESPALDO: readonly PaletaRespaldo[] = [
     nombre: 'Huerta en calma',
     luz: 'media',
     intensidad: 'calma',
-    colores: [c('lima', 3, 'prota'), c('azul', 3, 'sec'), c('magenta', 3, 'sec'), c('calipso', 3, 'acento'), c('rosa', 5, 'acento')],
+    colores: [c('lima', 3, 'prota'), c('azul', 3, 'sec'), c('morado', 3, 'sec'), c('calipso', 3, 'acento'), c('rosa', 5, 'acento')],
   },
   {
     id: 'plaza-de-naranjos',
