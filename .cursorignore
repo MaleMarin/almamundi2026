@@ -1,0 +1,11 @@
+node_modules
+.next
+tmp-cintas-v2
+tmp-resonance-preview
+*.png
+*.jpg
+*.mp4
+*.m4a
+*.heic
+lib/huella/lexicon/*.json
+package-lock.json

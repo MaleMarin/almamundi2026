@@ -10,6 +10,11 @@ alwaysApply: true
 - Prohibido inventar archivos, rutas, componentes, APIs o tipos. Si no existen, dilo.
 - Antes de modificar código: plan de 3-6 bullets, luego cambios acotados.
 - Cambios pequeños, seguros, reversibles. Sin refactors no pedidos.
+- Lee solo los archivos que el prompt nombra o que necesitas, nunca el repositorio completo.
+- No uses Playwright ni capturas salvo que el prompt lo pida explícitamente. Verificación por defecto: npm run build. Ana prueba en el navegador.
+- Un solo build al final, no después de cada cambio.
+- Informe de máximo 10 líneas: qué cambió, archivos, commit y enlace del despliegue.
+- Si una tarea necesita más de 3 archivos nuevos o una investigación, pregunta antes de seguir.
 
 # Stack
 
