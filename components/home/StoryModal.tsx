@@ -2294,7 +2294,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             step === 'details'
               ? 'flex flex-col overflow-hidden'
               : step === 'received'
-                ? 'flex flex-col overflow-hidden px-4 py-3 md:px-5 md:py-4'
+                ? 'overflow-y-auto px-4 py-3 md:px-5 md:py-4'
                 : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
           }`}
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
@@ -2701,7 +2701,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           )}
 
           {step === 'received' && (
-            <div className="font-interna flex min-h-0 flex-1 flex-col">
+            <div className="font-interna flex flex-col">
               <div className="shrink-0 space-y-2 text-center">
                 <div className="flex justify-center">
                   <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#FF4A1C]">
@@ -2725,14 +2725,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </p>
               </div>
 
-              <div className="mt-3 flex min-h-0 flex-1 items-center justify-center [container-type:size]">
-                <div className="aspect-square w-[min(100cqw,100cqh)] max-h-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[min(420px,100cqw,100cqh)]">
+              <div className="mx-auto mt-3 aspect-square w-full shrink-0 overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[420px]">
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
                     aria-label={interpolate(t.modalImprintAlt, { titulo: storyTitle.trim() || 'historia' })}
                   />
-                </div>
               </div>
 
               <div className="mt-3 shrink-0 space-y-2">
