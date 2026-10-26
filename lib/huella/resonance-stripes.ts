@@ -102,6 +102,13 @@ function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: n
   return t ? t + ell : ell;
 }
 
+/** Mayúscula de la primera letra, solo al pintar. El texto guardado no cambia. */
+function displayInitialCapital(value: string, locale: AlmaLocale): string {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+  return trimmed.charAt(0).toLocaleUpperCase(locale) + trimmed.slice(1);
+}
+
 function footerFontStack(): string {
   const fallback = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
   if (typeof document === 'undefined') return fallback;
@@ -131,10 +138,11 @@ function drawResonancePieceFooter(
 ): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
-  const title = footer.title?.trim() ?? '';
+  const title = displayInitialCapital(footer.title ?? '', footer.locale);
   const m = footerMetrics(W, Boolean(title));
   const maxW = W - m.padX * 2;
-  const place = [footer.city?.trim(), footer.country?.trim()].filter(Boolean).join(', ');
+  const city = displayInitialCapital(footer.city ?? '', footer.locale);
+  const place = [city, footer.country?.trim()].filter(Boolean).join(', ');
   const date = formatLongDate(footer.at, footer.locale);
   const meta = place ? `${place} · ${date}` : date;
 

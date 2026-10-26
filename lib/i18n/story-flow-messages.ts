@@ -85,7 +85,9 @@ export type StoryFlowMessages = {
   modalProfilePhotoNote: string;
   modalImprintHowTexto: string;
   modalImprintHowFoto: string;
-  modalImprintHowAv: string;
+  modalImprintHowAudio: string;
+  modalImprintHowVideo: string;
+  modalExtrasColorHint: string;
   modalNowWhat: string;
   modalContactLead: string;
 };
@@ -187,11 +189,14 @@ const es: StoryFlowMessages = {
   modalProfilePhotoNote:
     'Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla.',
   modalImprintHowTexto:
-    'Leímos tu relato palabra por palabra. Cada palabra con carga emocional se volvió una franja: su color sale de la emoción que transmite y su ancho, de cuántas veces la usaste.',
+    'Los colores salen de las palabras de tu relato. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
   modalImprintHowFoto:
-    'Leímos el nombre, el lugar y la descripción de cada foto. Cada palabra con carga emocional se volvió una franja de color, y su ancho depende de cuántas veces aparece.',
-  modalImprintHowAv:
-    'Leímos el título y lo que nos contaste sobre tu historia. Cada palabra con carga emocional se volvió una franja de color, y su ancho depende de cuántas veces aparece.',
+    'Los colores salen de los nombres, los lugares y las descripciones que diste a tus fotos. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+  modalImprintHowAudio:
+    'Los colores salen de las palabras con que presentaste tu audio. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+  modalImprintHowVideo:
+    'Los colores salen de las palabras con que presentaste tu video. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+  modalExtrasColorHint: 'Lo que escribas aquí también da color a tu imagen.',
   modalNowWhat: '¿Y ahora?',
   modalContactLead: '¿Tienes dudas? Escríbenos a',
 };
@@ -241,11 +246,14 @@ const pt: StoryFlowMessages = {
   modalProfilePhotoNote:
     'A sua foto (opcional, até 10 MB). Aparecerá junto à sua história quando for publicada. Pode não a enviar.',
   modalImprintHowTexto:
-    'Lemos o seu relato palavra por palavra. Cada palavra com carga emocional tornou-se uma faixa: a cor sai da emoção que transmite e a largura, de quantas vezes a usou.',
+    'As cores saem das palavras do seu relato. Cada palavra com carga emocional tornou-se uma faixa: a cor vem da emoção que transmite e a largura, de quantas vezes aparece.',
   modalImprintHowFoto:
-    'Lemos o nome, o lugar e a descrição de cada foto. Cada palavra com carga emocional tornou-se uma faixa de cor, e a largura depende de quantas vezes aparece.',
-  modalImprintHowAv:
-    'Lemos o título e o que nos contou sobre a sua história. Cada palavra com carga emocional tornou-se uma faixa de cor, e a largura depende de quantas vezes aparece.',
+    'As cores saem dos nomes, dos lugares e das descrições que deu às suas fotos. Cada palavra com carga emocional tornou-se uma faixa: a cor vem da emoção que transmite e a largura, de quantas vezes aparece.',
+  modalImprintHowAudio:
+    'As cores saem das palavras com que apresentou o seu áudio. Cada palavra com carga emocional tornou-se uma faixa: a cor vem da emoção que transmite e a largura, de quantas vezes aparece.',
+  modalImprintHowVideo:
+    'As cores saem das palavras com que apresentou o seu vídeo. Cada palavra com carga emocional tornou-se uma faixa: a cor vem da emoção que transmite e a largura, de quantas vezes aparece.',
+  modalExtrasColorHint: 'O que escrever aqui também dá cor à sua imagem.',
   modalNowWhat: 'E agora?',
   modalContactLead: 'Tem dúvidas? Escreva para',
 };
@@ -296,11 +304,14 @@ const en: StoryFlowMessages = {
   modalProfilePhotoNote:
     'Your photo (optional, up to 10 MB). It will appear next to your story when it is published. You can skip it.',
   modalImprintHowTexto:
-    'We read your story word by word. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times you used it.',
+    'The colors come from the words of your story. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
   modalImprintHowFoto:
-    'We read the name, the place and the description of each photo. Each word with emotional weight became a color stripe, and its width depends on how many times it appears.',
-  modalImprintHowAv:
-    'We read the title and what you told us about your story. Each word with emotional weight became a color stripe, and its width depends on how many times it appears.',
+    'The colors come from the names, the places and the descriptions you gave your photos. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+  modalImprintHowAudio:
+    'The colors come from the words you used to present your audio. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+  modalImprintHowVideo:
+    'The colors come from the words you used to present your video. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+  modalExtrasColorHint: 'What you write here also gives color to your image.',
   modalNowWhat: 'What now?',
   modalContactLead: 'Questions? Write to us at',
 };

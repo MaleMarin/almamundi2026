@@ -2397,6 +2397,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalExtras}
                       </div>
+                      {mode === 'audio' || mode === 'video' ? (
+                        <p className="mb-0.5 text-[10px] leading-snug text-gray-600">
+                          {t.modalExtrasColorHint}
+                        </p>
+                      ) : null}
                       <textarea
                         value={extraText}
                         onChange={(e) => setExtraText(e.target.value.slice(0, ANTECEDENTES_MAX))}
@@ -2847,7 +2852,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   ? t.modalImprintHowTexto
                   : mode === 'foto'
                     ? t.modalImprintHowFoto
-                    : t.modalImprintHowAv}
+                    : mode === 'audio'
+                      ? t.modalImprintHowAudio
+                      : t.modalImprintHowVideo}
               </p>
 
               <div className="mt-4 shrink-0">
