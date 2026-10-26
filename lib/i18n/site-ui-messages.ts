@@ -84,11 +84,8 @@ export type SiteUiMessages = {
   modalSendingPhotos: string;
   modalSectionStory: string;
   modalStoryName: string;
-  modalStoryNamePlaceholder: string;
   modalAlias: string;
-  modalAliasPlaceholder: string;
   modalExtras: string;
-  modalExtrasPlaceholder: string;
   modalCancionRelacionada: string;
   modalFiles: string;
   modalAttach: string;
@@ -98,9 +95,7 @@ export type SiteUiMessages = {
   modalRemove: string;
   modalSectionPerson: string;
   modalCountry: string;
-  modalCountryPlaceholder: string;
   modalCity: string;
-  modalCityPlaceholder: string;
   modalAge: string;
   modalAgeChoose: string;
   modalAgeMenos18: string;
@@ -131,7 +126,6 @@ export type SiteUiMessages = {
   modalRerecord: string;
   modalStop: string;
   modalListenClip: string;
-  modalWritePlaceholder: string;
   modalChars: string;
   modalReceivedNamed: string;
   modalReceivedAnon: string;
@@ -244,11 +238,8 @@ const es: SiteUiMessages = {
   modalSendingPhotos: 'Enviando tus fotos…',
   modalSectionStory: 'Historia',
   modalStoryName: 'Título de tu historia *',
-  modalStoryNamePlaceholder: 'Ej: El día que entendí algo',
   modalAlias: 'Nombre o alias *',
-  modalAliasPlaceholder: 'Cómo quieres aparecer',
   modalExtras: '¿Algo más que quieras contarnos? (opcional)',
-  modalExtrasPlaceholder: 'Contexto breve si hace falta…',
   modalCancionRelacionada: 'Una canción para esta historia (opcional)',
   modalFiles: 'Fotos extra (opcional, hasta 10 MB cada una)',
   modalAttach: 'Agregar fotos',
@@ -258,9 +249,7 @@ const es: SiteUiMessages = {
   modalRemove: 'Quitar',
   modalSectionPerson: 'Datos y avisos',
   modalCountry: 'País *',
-  modalCountryPlaceholder: 'Ej: Chile',
   modalCity: 'Ciudad o localidad *',
-  modalCityPlaceholder: 'Ej: Santiago',
   modalAge: 'Edad *',
   modalAgeChoose: 'Elige una opción',
   modalAgeMenos18: 'Menos de 18',
@@ -293,7 +282,6 @@ const es: SiteUiMessages = {
   modalRerecord: 'Volver a grabar',
   modalStop: 'Detener',
   modalListenClip: 'Escúchalo antes de continuar. Si no te convence, vuelve a grabar.',
-  modalWritePlaceholder: 'Empieza por un lugar, una persona o un momento…',
   modalChars: '{n} / {max} caracteres',
   modalReceivedNamed: '{name},\ntu relato en colores.',
   modalReceivedAnon: 'Tu relato en colores.',
@@ -435,11 +423,8 @@ const pt: SiteUiMessages = {
   modalSendingPhotos: 'A enviar as suas fotos…',
   modalSectionStory: 'História',
   modalStoryName: 'Título da sua história *',
-  modalStoryNamePlaceholder: 'Ex.: O dia em que percebi algo',
   modalAlias: 'Nome ou alias *',
-  modalAliasPlaceholder: 'Como quer aparecer',
   modalExtras: 'Quer contar mais alguma coisa? (opcional)',
-  modalExtrasPlaceholder: 'Contexto breve se fizer falta…',
   modalCancionRelacionada:
     'Existe uma canção que se liga a esta história? Pode deixar o nome ou um link (opcional).',
   modalFiles: 'Ficheiros · máx. {mb}MB cada',
@@ -450,9 +435,7 @@ const pt: SiteUiMessages = {
   modalRemove: 'Remover',
   modalSectionPerson: 'Dados e avisos',
   modalCountry: 'País *',
-  modalCountryPlaceholder: 'Ex.: Chile',
   modalCity: 'Cidade ou localidade *',
-  modalCityPlaceholder: 'Ex.: Santiago',
   modalAge: 'Faixa etária *',
   modalAgeChoose: 'Escolha uma opção',
   modalAgeMenos18: 'Menos de 18',
@@ -485,7 +468,6 @@ const pt: SiteUiMessages = {
   modalRerecord: 'Voltar a gravar',
   modalStop: 'Parar',
   modalListenClip: 'Escute o clip completo antes de continuar.',
-  modalWritePlaceholder: 'Escreva aqui…',
   modalChars: '{n} / {max} caracteres',
   modalReceivedNamed: '{name},\no seu relato em cores.',
   modalReceivedAnon: 'O seu relato em cores.',
@@ -626,11 +608,8 @@ const en: SiteUiMessages = {
   modalSendingPhotos: 'Sending your photos…',
   modalSectionStory: 'Story',
   modalStoryName: 'Title of your story *',
-  modalStoryNamePlaceholder: 'e.g. The day I understood something',
   modalAlias: 'Name or alias *',
-  modalAliasPlaceholder: 'How you want to appear',
   modalExtras: 'Anything else you want to tell us? (optional)',
-  modalExtrasPlaceholder: 'Brief context if needed…',
   modalCancionRelacionada:
     'Is there a song that connects with this story? You can leave the name or a link (optional).',
   modalFiles: 'Files · max. {mb}MB each',
@@ -641,9 +620,7 @@ const en: SiteUiMessages = {
   modalRemove: 'Remove',
   modalSectionPerson: 'Details and notices',
   modalCountry: 'Country *',
-  modalCountryPlaceholder: 'e.g. Chile',
   modalCity: 'City or town *',
-  modalCityPlaceholder: 'e.g. Santiago',
   modalAge: 'Age range *',
   modalAgeChoose: 'Choose an option',
   modalAgeMenos18: 'Under 18',
@@ -676,7 +653,6 @@ const en: SiteUiMessages = {
   modalRerecord: 'Record again',
   modalStop: 'Stop',
   modalListenClip: 'Listen to the full clip before continuing.',
-  modalWritePlaceholder: 'Write here…',
   modalChars: '{n} / {max} characters',
   modalReceivedNamed: '{name},\nyour story in colors.',
   modalReceivedAnon: 'Your story in colors.',

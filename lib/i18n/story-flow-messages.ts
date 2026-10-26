@@ -21,14 +21,12 @@ export type StoryFlowMessages = {
   modalVideoLinkHint: string;
   modalAudioLinkLabel: string;
   modalPhotoAltLabel: string;
-  modalPhotoAltPlaceholder: string;
   modalPhotoName: string;
   modalPhotoYear: string;
   modalPhotoYearUnknown: string;
   modalPhotoDecade: string;
   modalPhotoDecadeChoose: string;
   modalPhotoPlace: string;
-  modalPhotoPlacePlaceholder: string;
   modalPhotoDecadeOption: string;
   modalPhotoMissingName: string;
   modalPhotoMissingYear: string;
@@ -42,7 +40,6 @@ export type StoryFlowMessages = {
   modalPhotoRetry: string;
   modalRequiredFieldsNote: string;
   modalAliasHint: string;
-  modalCancionPlaceholder: string;
   modalLocationHint: string;
   modalConsentAdult: string;
   modalConsentPublish: string;
@@ -120,14 +117,12 @@ const es: StoryFlowMessages = {
   modalAudioLinkLabel: 'O pega un enlace público (SoundCloud, Google Drive, YouTube…)',
   modalPhotoAltLabel:
     'Describe esta foto en una frase. Así personas ciegas o con baja visión también podrán conocerla. (opcional)',
-  modalPhotoAltPlaceholder: 'Ej: Mi abuela riendo en la playa, 1985',
   modalPhotoName: 'Nombre de la foto *',
   modalPhotoYear: 'Año *',
   modalPhotoYearUnknown: 'No sé el año exacto',
   modalPhotoDecade: 'Década *',
   modalPhotoDecadeChoose: 'Elige una década',
   modalPhotoPlace: 'Lugar *',
-  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
   modalPhotoDecadeOption: 'años {year}',
   modalPhotoMissingName: 'Falta el nombre de la foto {foto}.',
   modalPhotoMissingYear: 'Falta el año de la foto {foto}.',
@@ -141,7 +136,6 @@ const es: StoryFlowMessages = {
   modalPhotoRetry: 'Reintentar',
   modalRequiredFieldsNote: 'Los campos con * son obligatorios.',
   modalAliasHint: 'Así aparecerás en el mapa.',
-  modalCancionPlaceholder: 'Nombre o enlace',
   modalLocationHint: 'Así ubicamos tu historia en el mapa.',
   modalConsentAdult:
     'Soy mayor de 18 años, o adulto responsable o representante de una institución, y tengo autorización de quienes aparecen en esta historia.',
@@ -210,14 +204,12 @@ const pt: StoryFlowMessages = {
   modalPhotoRetry: 'Tentar de novo',
   modalPhotoAltLabel:
     'Descreva esta foto numa frase. Assim, pessoas cegas ou com baixa visão também poderão conhecê-la. (opcional)',
-  modalPhotoAltPlaceholder: 'Ex.: A minha avó a rir na praia, 1985',
   modalPhotoName: 'Nome da foto *',
   modalPhotoYear: 'Ano *',
   modalPhotoYearUnknown: 'Não sei o ano exato',
   modalPhotoDecade: 'Década *',
   modalPhotoDecadeChoose: 'Escolha uma década',
   modalPhotoPlace: 'Lugar *',
-  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
   modalPhotoDecadeOption: 'anos {year}',
   modalPhotoMissingName: 'Falta o nome da foto {foto}.',
   modalPhotoMissingYear: 'Falta o ano da foto {foto}.',
@@ -267,14 +259,12 @@ const en: StoryFlowMessages = {
   modalPhotoRetry: 'Try again',
   modalPhotoAltLabel:
     'Describe this photo in one sentence so people who are blind or have low vision can know it too. (optional)',
-  modalPhotoAltPlaceholder: 'E.g. My grandmother laughing at the beach, 1985',
   modalPhotoName: 'Photo name *',
   modalPhotoYear: 'Year *',
   modalPhotoYearUnknown: 'I do not know the exact year',
   modalPhotoDecade: 'Decade *',
   modalPhotoDecadeChoose: 'Choose a decade',
   modalPhotoPlace: 'Place *',
-  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
   modalPhotoDecadeOption: '{year}s',
   modalPhotoMissingName: 'Photo {foto} is missing a name.',
   modalPhotoMissingYear: 'Photo {foto} is missing the year.',

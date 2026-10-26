@@ -1950,7 +1950,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     setVideoShareUrl(e.target.value);
                     if (e.target.value.trim()) setUploadVideoFile(null);
                   }}
-                  placeholder="https://www.youtube.com/…"
                   className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
                   aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
@@ -2146,7 +2145,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     setAudioShareUrl(e.target.value);
                     if (e.target.value.trim()) setUploadAudioFile(null);
                   }}
-                  placeholder="https://…"
                   className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
                 />
@@ -2184,7 +2182,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               onChange={(e) => setTextBody(e.target.value.slice(0, SUBIR_TEXT_MAX_CHARS))}
               rows={10}
               className={amStyles.amTextarea}
-              placeholder={t.modalWritePlaceholder}
               aria-label={t.modalSectionStory}
               maxLength={SUBIR_TEXT_MAX_CHARS}
             />
@@ -2349,18 +2346,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <div className="space-y-2">
                     {mode !== 'foto' ? (
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-title"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <FileText size={12} className="text-orange-500" aria-hidden />
                         {t.modalStoryName}
-                      </div>
+                      </label>
                       <input
+                        id="story-title"
                         value={storyTitle}
                         onChange={(e) => {
                           setStoryTitle(e.target.value);
                           if (err) setErr('');
                           if (fieldErr.title) setFieldErr((p) => ({ ...p, title: undefined }));
                         }}
-                        placeholder={t.modalStoryNamePlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2371,18 +2371,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     ) : null}
                     {mode === 'foto' ? (
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-alias"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
-                      </div>
+                      </label>
                       <input
+                        id="story-alias"
                         value={alias}
                         onChange={(e) => {
                           setAlias(e.target.value);
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        placeholder={t.modalAliasPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2394,19 +2397,22 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     ) : null}
                     {mode !== 'foto' ? (
                     <div>
-                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-extras"
+                        className="mb-0.5 block text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         {t.modalExtras}
-                      </div>
+                      </label>
                       {mode === 'audio' || mode === 'video' ? (
                         <p className="mb-0.5 text-[10px] leading-snug text-gray-600">
                           {t.modalExtrasColorHint}
                         </p>
                       ) : null}
                       <textarea
+                        id="story-extras"
                         value={extraText}
                         onChange={(e) => setExtraText(e.target.value.slice(0, ANTECEDENTES_MAX))}
                         maxLength={ANTECEDENTES_MAX}
-                        placeholder={t.modalExtrasPlaceholder}
                         rows={2}
                         className="w-full resize-none rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
@@ -2426,7 +2432,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         value={cancionRelacionada}
                         onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                         maxLength={CANCION_RELACIONADA_MAX}
-                        placeholder={t.modalCancionPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2519,18 +2524,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     {mode !== 'foto' ? (
                     <>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-alias"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
-                      </div>
+                      </label>
                       <input
+                        id="story-alias"
                         value={alias}
                         onChange={(e) => {
                           setAlias(e.target.value);
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        placeholder={t.modalAliasPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2576,17 +2584,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     </>
                     ) : null}
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-country"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
                         {t.modalCountry}
-                      </div>
+                      </label>
                       <input
+                        id="story-country"
                         value={country}
                         onChange={(e) => {
                           setCountry(e.target.value);
                           if (fieldErr.country) setFieldErr((p) => ({ ...p, country: undefined }));
                         }}
-                        placeholder={t.modalCountryPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="country-name"
@@ -2596,17 +2607,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-city"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <MapPin size={12} className="text-orange-500" aria-hidden />
                         {t.modalCity}
-                      </div>
+                      </label>
                       <input
+                        id="story-city"
                         value={city}
                         onChange={(e) => {
                           setCity(e.target.value);
                           if (fieldErr.city) setFieldErr((p) => ({ ...p, city: undefined }));
                         }}
-                        placeholder={t.modalCityPlaceholder}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2616,10 +2630,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-age"
+                        className="mb-0.5 block text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         {t.modalAge}
-                      </div>
+                      </label>
                       <select
+                        id="story-age"
                         value={ageRange}
                         onChange={(e) => {
                           setAgeRange(e.target.value as AgeRange);
@@ -2646,11 +2664,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-gender"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <Users size={12} className="text-orange-500" aria-hidden />
                         {t.modalGender}
-                      </div>
+                      </label>
                       <select
+                        id="story-gender"
                         value={sex}
                         onChange={(e) => setSex(e.target.value as Sex)}
                         className="w-full rounded-xl px-2 py-1.5 text-base outline-none text-gray-800"
@@ -2665,17 +2687,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       </select>
                     </div>
                     <div className="sm:col-span-2">
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <label
+                        htmlFor="story-email"
+                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                      >
                         <Mail size={12} className="text-orange-500" aria-hidden />
                         {t.modalEmail}
-                      </div>
+                      </label>
                       <input
+                        id="story-email"
                         value={email}
                         onChange={(e) => {
                           setEmail(e.target.value);
                           if (fieldErr.email) setFieldErr((p) => ({ ...p, email: undefined }));
                         }}
-                        placeholder="tu@email.com"
                         type="email"
                         autoComplete="email"
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
@@ -2705,7 +2730,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     value={cancionRelacionada}
                     onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                     maxLength={CANCION_RELACIONADA_MAX}
-                    placeholder={t.modalCancionPlaceholder}
                     className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                     style={{ ...soft.flat, borderRadius: '12px' }}
                   />

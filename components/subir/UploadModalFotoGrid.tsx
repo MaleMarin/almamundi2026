@@ -124,7 +124,6 @@ export function UploadModalFotoGrid({
                       inputMode="numeric"
                       value={photo.anio}
                       maxLength={4}
-                      placeholder="1985"
                       aria-invalid={marked && photo.anio.trim().length !== 4}
                       onChange={(e) =>
                         onPatch(photo.id, { anio: e.target.value.replace(/\D/g, '').slice(0, 4) })
@@ -148,7 +147,6 @@ export function UploadModalFotoGrid({
                     id={`story-photo-place-${photo.id}`}
                     value={photo.lugar}
                     maxLength={PHOTO_PLACE_MAX}
-                    placeholder={t.modalPhotoPlacePlaceholder}
                     aria-invalid={marked && !photo.lugar.trim()}
                     onChange={(e) => onPatch(photo.id, { lugar: e.target.value.slice(0, PHOTO_PLACE_MAX) })}
                   />
@@ -160,7 +158,6 @@ export function UploadModalFotoGrid({
                     id={`story-photo-alt-${photo.id}`}
                     value={photo.alt}
                     maxLength={300}
-                    placeholder={t.modalPhotoAltPlaceholder}
                     onChange={(e) => onPatch(photo.id, { alt: e.target.value.slice(0, 300) })}
                   />
                 </div>
