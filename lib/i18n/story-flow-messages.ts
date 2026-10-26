@@ -80,6 +80,13 @@ export type StoryFlowMessages = {
   modalAnotherPromptTexto: string;
   modalAnotherCtaTexto: string;
   modalAnotherFormatLink: string;
+  modalSectionYourStory: string;
+  modalSectionAbout: string;
+  modalSectionWhere: string;
+  modalProfilePhotoNote: string;
+  modalImprintHowTexto: string;
+  modalImprintHowAv: string;
+  modalNowWhat: string;
 };
 
 const es: StoryFlowMessages = {
@@ -150,7 +157,7 @@ const es: StoryFlowMessages = {
   modalFieldAgeMissing: 'Falta la edad.',
   modalFieldEmailMissing: 'Falta un correo válido.',
   modalReviewInProgress:
-    'Tu historia ya está en revisión. Te avisaremos por correo cuando aparezca en el mapa.',
+    'Tu historia está en revisión. Te escribiremos cuando aparezca en el mapa.',
   modalSaveImage: 'Guardar imagen',
   modalShareText:
     'Mis palabras se volvieron colores en AlmaMundi. ¿De qué color es tu historia? almamundi.org/contar',
@@ -174,6 +181,16 @@ const es: StoryFlowMessages = {
   modalAnotherPromptTexto: '¿Quieres escribir otra historia?',
   modalAnotherCtaTexto: 'Escribir otra historia',
   modalAnotherFormatLink: 'o cuéntala en otro formato',
+  modalSectionYourStory: 'Tu historia',
+  modalSectionAbout: 'Sobre ti',
+  modalSectionWhere: 'Dónde estás y cómo avisarte',
+  modalProfilePhotoNote:
+    'Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla.',
+  modalImprintHowTexto:
+    'Leímos tu relato palabra por palabra. Cada palabra con carga emocional se volvió una franja: su color sale de la emoción que transmite y su ancho, de cuántas veces la usaste.',
+  modalImprintHowAv:
+    'Leímos el título y lo que nos contaste sobre tu historia. Cada palabra con carga emocional se volvió una franja de color, y su ancho depende de cuántas veces aparece.',
+  modalNowWhat: '¿Y ahora?',
 };
 
 const pt: StoryFlowMessages = {
@@ -213,6 +230,18 @@ const pt: StoryFlowMessages = {
   modalAnotherPromptTexto: 'Quer escrever outra história?',
   modalAnotherCtaTexto: 'Escrever outra história',
   modalAnotherFormatLink: 'ou conte-a noutro formato',
+  modalReviewInProgress:
+    'A sua história está em revisão. Escreveremos quando aparecer no mapa.',
+  modalSectionYourStory: 'A sua história',
+  modalSectionAbout: 'Sobre si',
+  modalSectionWhere: 'Onde está e como avisar',
+  modalProfilePhotoNote:
+    'A sua foto (opcional, até 10 MB). Aparecerá junto à sua história quando for publicada. Pode não a enviar.',
+  modalImprintHowTexto:
+    'Lemos o seu relato palavra por palavra. Cada palavra com carga emocional tornou-se uma faixa: a cor sai da emoção que transmite e a largura, de quantas vezes a usou.',
+  modalImprintHowAv:
+    'Lemos o título e o que nos contou sobre a sua história. Cada palavra com carga emocional tornou-se uma faixa de cor, e a largura depende de quantas vezes aparece.',
+  modalNowWhat: 'E agora?',
 };
 
 const en: StoryFlowMessages = {
@@ -253,6 +282,18 @@ const en: StoryFlowMessages = {
   modalAnotherPromptTexto: 'Want to write another story?',
   modalAnotherCtaTexto: 'Write another story',
   modalAnotherFormatLink: 'or tell it in another format',
+  modalReviewInProgress:
+    'Your story is in review. We will write to you when it appears on the map.',
+  modalSectionYourStory: 'Your story',
+  modalSectionAbout: 'About you',
+  modalSectionWhere: 'Where you are and how to reach you',
+  modalProfilePhotoNote:
+    'Your photo (optional, up to 10 MB). It will appear next to your story when it is published. You can skip it.',
+  modalImprintHowTexto:
+    'We read your story word by word. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times you used it.',
+  modalImprintHowAv:
+    'We read the title and what you told us about your story. Each word with emotional weight became a color stripe, and its width depends on how many times it appears.',
+  modalNowWhat: 'What now?',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

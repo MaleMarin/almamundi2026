@@ -245,7 +245,7 @@ const es: SiteUiMessages = {
   modalSectionStory: 'Historia',
   modalStoryName: 'Título de tu historia *',
   modalStoryNamePlaceholder: 'Ej: El día que entendí algo',
-  modalAlias: 'Tu nombre o alias *',
+  modalAlias: 'Nombre o alias *',
   modalAliasPlaceholder: 'Cómo quieres aparecer',
   modalExtras: '¿Algo más que quieras contarnos? (opcional)',
   modalExtrasPlaceholder: 'Contexto breve si hace falta…',
@@ -310,8 +310,7 @@ const es: SiteUiMessages = {
   modalAnotherStory: 'Otra historia',
   modalLinkCopied: 'Enlace copiado',
   modalImprintWhat: '¿Qué es esta resonancia visual?',
-  modalImprintExplain:
-    'Las palabras de tu historia se volvieron colores. Nadie más tiene esta combinación.',
+  modalImprintExplain: 'Esta imagen nace de tu historia y es solo tuya.',
   modalBackToMap: 'Explorar el mapa',
   modalTopicActive: 'Tema guía activo',
   upload: {
@@ -439,7 +438,7 @@ const pt: SiteUiMessages = {
   modalStoryNamePlaceholder: 'Ex.: O dia em que percebi algo',
   modalAlias: 'Nome ou alias *',
   modalAliasPlaceholder: 'Como quer aparecer',
-  modalExtras: 'Extras (opcional)',
+  modalExtras: 'Quer contar mais alguma coisa? (opcional)',
   modalExtrasPlaceholder: 'Contexto breve se fizer falta…',
   modalCancionRelacionada:
     'Existe uma canção que se liga a esta história? Pode deixar o nome ou um link (opcional).',
@@ -503,8 +502,7 @@ const pt: SiteUiMessages = {
   modalAnotherStory: 'Outra história',
   modalLinkCopied: 'Ligação copiada',
   modalImprintWhat: 'O que é esta ressonância visual?',
-  modalImprintExplain:
-    'Cada palavra que contou escolheu uma cor. Ninguém tem esta combinação.',
+  modalImprintExplain: 'Esta imagem nasce da sua história e é só sua.',
   modalBackToMap: 'Explorar o mapa',
   modalTopicActive: 'Tema guia ativo',
   upload: {
@@ -631,7 +629,7 @@ const en: SiteUiMessages = {
   modalStoryNamePlaceholder: 'e.g. The day I understood something',
   modalAlias: 'Name or alias *',
   modalAliasPlaceholder: 'How you want to appear',
-  modalExtras: 'Extras (optional)',
+  modalExtras: 'Anything else you want to tell us? (optional)',
   modalExtrasPlaceholder: 'Brief context if needed…',
   modalCancionRelacionada:
     'Is there a song that connects with this story? You can leave the name or a link (optional).',
@@ -695,8 +693,7 @@ const en: SiteUiMessages = {
   modalAnotherStory: 'Another story',
   modalLinkCopied: 'Link copied',
   modalImprintWhat: 'What is this visual resonance?',
-  modalImprintExplain:
-    'Every word you told chose a color. No one else has this combination.',
+  modalImprintExplain: 'This image comes from your story and is yours alone.',
   modalBackToMap: 'Explore the map',
   modalTopicActive: 'Active guide theme',
   upload: {

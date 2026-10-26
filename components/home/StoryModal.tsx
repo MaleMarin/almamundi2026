@@ -1153,7 +1153,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   }, [canContinueCapture, stopStream]);
 
   const validateDetails = useCallback(() => {
-    const title = storyTitleRef.current.trim();
+    const title =
+      mode === 'foto' ? (photos[0]?.titulo ?? '').trim() : storyTitleRef.current.trim();
     const next: typeof fieldErr = {};
     if (!title || title.length < 2) next.title = t.modalFieldTitleMissing;
     if (alias.trim().length < 2) next.alias = t.modalFieldAliasMissing;
@@ -1183,6 +1184,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     city,
     country,
     email,
+    mode,
+    photos,
     t,
   ]);
 
@@ -1293,7 +1296,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       }
       extraUploadRef.current = extraNext;
 
-      const title = storyTitleRef.current.trim();
+      const title =
+        mode === 'foto' ? (photos[0]?.titulo ?? '').trim() : storyTitleRef.current.trim();
       const placeCombined = `${city.trim()}, ${country.trim()}`;
 
       let payload: {
@@ -2326,13 +2330,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 <p className="text-[10px] text-gray-500">{t.modalRequiredFieldsNote}</p>
               </div>
 
-              <div className="mt-2 grid grid-cols-1 items-start gap-2 md:grid-cols-2 md:gap-3">
+              <div className="mt-2 grid grid-cols-1 items-start gap-2 md:grid-cols-2 md:gap-4">
                 {/* Historia + extras — columna izquierda */}
                 <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
-                    {t.modalSectionStory}
+                    {mode === 'foto' ? t.modalSectionAbout : t.modalSectionYourStory}
                   </div>
                   <div className="space-y-2">
+                    {mode !== 'foto' ? (
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <FileText size={12} className="text-orange-500" aria-hidden />
@@ -2353,6 +2358,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.title}</p>
                       ) : null}
                     </div>
+                    ) : null}
+                    {mode === 'foto' ? (
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <User size={12} className="text-orange-500" aria-hidden />
@@ -2374,6 +2381,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
                       ) : null}
                     </div>
+                    ) : null}
                     {mode !== 'foto' ? (
                     <div>
                       <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
@@ -2390,6 +2398,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       />
                     </div>
                     ) : null}
+                    {mode !== 'foto' ? (
                     <div>
                       <label
                         htmlFor="story-cancion-relacionada"
@@ -2407,6 +2416,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
+                    ) : null}
                     {mode !== 'foto' ? (
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
@@ -2447,13 +2457,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       )}
                     </div>
                     ) : null}
+                    {mode === 'foto' ? (
                     <div>
-                      <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
-                        {t.modalProfilePhoto}
-                      </div>
+                      <p className="mb-2 text-[13px] leading-snug text-gray-700">
+                        {t.modalProfilePhotoNote}
+                      </p>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
-                          className="cursor-pointer rounded-xl px-2.5 py-1 text-[10px] text-gray-600 md:text-xs"
+                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-xs text-gray-600"
                           style={{ ...soft.flat, borderRadius: '12px' }}
                         >
                           {profilePhoto ? t.modalChange : t.modalUpload}
@@ -2473,7 +2484,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                             <button
                               type="button"
                               onClick={() => setProfilePhoto(null)}
-                              className="text-[10px] font-bold uppercase text-gray-500 hover:text-red-500"
+                              className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-gray-500 hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
@@ -2481,15 +2492,74 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         )}
                       </div>
                     </div>
+                    ) : null}
                   </div>
                 </div>
 
-                {/* Datos persona — columna derecha (alineado con /subir) */}
                 <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
-                    {t.modalSectionPerson}
+                    {mode === 'foto' ? t.modalSectionWhere : t.modalSectionAbout}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    {mode !== 'foto' ? (
+                    <>
+                    <div className="sm:col-span-2">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                        <User size={12} className="text-orange-500" aria-hidden />
+                        {t.modalAlias}
+                      </div>
+                      <input
+                        value={alias}
+                        onChange={(e) => {
+                          setAlias(e.target.value);
+                          if (err) setErr('');
+                          if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
+                        }}
+                        placeholder={t.modalAliasPlaceholder}
+                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        style={{ ...soft.flat, borderRadius: '12px' }}
+                      />
+                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
+                      {fieldErr.alias ? (
+                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
+                      ) : null}
+                    </div>
+                    <div className="sm:col-span-2">
+                      <p className="mb-2 text-[13px] leading-snug text-gray-700">
+                        {t.modalProfilePhotoNote}
+                      </p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <label
+                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-xs text-gray-600"
+                          style={{ ...soft.flat, borderRadius: '12px' }}
+                        >
+                          {profilePhoto ? t.modalChange : t.modalUpload}
+                          <input
+                            type="file"
+                            accept="image/*"
+                            className="hidden"
+                            onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
+                          />
+                        </label>
+                        {profilePhotoUrl && (
+                          <>
+                            <div className="h-8 w-8 overflow-hidden rounded-lg" style={{ ...soft.flat, borderRadius: '8px' }}>
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => setProfilePhoto(null)}
+                              className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-gray-500 hover:text-red-500"
+                            >
+                              {t.modalRemove}
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    </>
+                    ) : null}
                     <div className="sm:col-span-2">
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
@@ -2607,13 +2677,37 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
               </div>
 
+              {mode === 'foto' ? (
+                <div className="mt-2 rounded-2xl p-3 md:p-4" style={soft.inset}>
+                  <label
+                    htmlFor="story-cancion-relacionada"
+                    className="mb-2 block text-[13px] font-semibold leading-snug text-gray-700"
+                  >
+                    {t.modalCancionRelacionada}
+                  </label>
+                  <input
+                    id="story-cancion-relacionada"
+                    value={cancionRelacionada}
+                    onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
+                    maxLength={CANCION_RELACIONADA_MAX}
+                    placeholder={t.modalCancionPlaceholder}
+                    className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                    style={{ ...soft.flat, borderRadius: '12px' }}
+                  />
+                </div>
+              ) : null}
+
+              {mode === 'foto' && fieldErr.title ? (
+                <p className="mt-2 text-[13px] text-red-600" role="alert">{fieldErr.title}</p>
+              ) : null}
+
               {err && (
                 <p className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium text-red-600 md:text-xs" role="alert">
                   {err}
                 </p>
               )}
 
-              <div className="mt-3 flex flex-col gap-2">
+              <div className="mt-4 flex flex-col gap-2">
                 <AdultConsentCheckbox
                   checked={acceptedPrivacy}
                   onChange={setAcceptedPrivacy}
@@ -2653,11 +2747,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   onGateChange={setCaptchaGate}
                 />
               </div>
-              </div>
-              <div
-                className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-white/40 px-3 py-2 sm:px-4 md:px-5"
-                style={{ backgroundColor: soft.bg }}
-              >
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -2704,6 +2794,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     ) : null}
                   </div>
               </div>
+              </div>
             </div>
           )}
 
@@ -2724,15 +2815,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     t.modalReceivedAnonBefore
                   )}
                 </h3>
-                <p className="text-[13px] font-normal leading-snug text-[#5C5C52] md:text-sm">
+                <p className="text-[13px] font-normal leading-snug text-[#5C5C52]">
                   {t.modalImprintExplain}
                 </p>
-                <p className="text-[13px] font-normal leading-snug text-[#5C5C52] md:text-sm">
+                <p className="text-[13px] font-normal leading-snug text-[#5C5C52]">
                   {t.modalReviewInProgress}
                 </p>
               </div>
 
-              <div className="mx-auto mt-3 aspect-square w-full shrink-0 overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[420px]">
+              <div className="mx-auto mt-4 aspect-square w-full shrink-0 overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[420px]">
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
@@ -2741,59 +2832,56 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     })}
                   />
               </div>
+              {mode !== 'foto' ? (
+                <p className="mx-auto mt-2 w-full text-[13px] leading-snug text-[#5C5C52] md:w-[420px]">
+                  {mode === 'texto' ? t.modalImprintHowTexto : t.modalImprintHowAv}
+                </p>
+              ) : null}
 
-              <div className="mt-3 shrink-0 space-y-2">
-                <div className="flex flex-col gap-2 sm:flex-row">
+              <div className="mt-4 shrink-0">
+                <div className="flex flex-col gap-2 md:flex-row">
                   <button
                     type="button"
                     onClick={() => void downloadImprint()}
-                    className="inline-flex min-h-11 min-w-0 flex-[1.35] items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#D13D17]"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 text-sm font-semibold text-white transition hover:bg-[#D13D17] md:flex-1"
                   >
                     <Download size={16} strokeWidth={1.6} aria-hidden />
-                    {isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint}
+                    {t.modalDownloadImprint}
                   </button>
                   <button
                     type="button"
                     onClick={() => void shareImprint()}
-                    className="inline-flex min-h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 py-3 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
+                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
                   >
                     <Share2 size={15} aria-hidden />
                     {t.modalShareImprint}
                   </button>
                 </div>
-                <p className="text-center">
-                  <button
-                    type="button"
-                    onClick={onExploreMap}
-                    className="min-h-11 px-3 text-[13px] font-medium text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
-                  >
-                    {t.modalBackToMap}
-                  </button>
-                </p>
-                <div className="space-y-1.5 pt-1 text-center">
-                  <p className="text-[13px] text-[#5C5C52]">
-                    {mode === 'foto'
-                      ? t.modalAnotherPromptFoto
-                      : mode === 'video'
-                        ? t.modalAnotherPromptVideo
-                        : mode === 'audio'
-                          ? t.modalAnotherPromptAudio
-                          : t.modalAnotherPromptTexto}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={startAnotherStory}
-                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]"
-                  >
-                    {mode === 'foto'
-                      ? t.modalAnotherCtaFoto
-                      : mode === 'video'
-                        ? t.modalAnotherCtaVideo
-                        : mode === 'audio'
-                          ? t.modalAnotherCtaAudio
-                          : t.modalAnotherCtaTexto}
-                  </button>
-                  <p>
+                <div className="mt-8">
+                  <p className="mb-2 text-[13px] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
+                  <div className="flex flex-col gap-2 md:flex-row">
+                    <button
+                      type="button"
+                      onClick={startAnotherStory}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
+                    >
+                      {mode === 'foto'
+                        ? t.modalAnotherCtaFoto
+                        : mode === 'video'
+                          ? t.modalAnotherCtaVideo
+                          : mode === 'audio'
+                            ? t.modalAnotherCtaAudio
+                            : t.modalAnotherCtaTexto}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={onExploreMap}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
+                    >
+                      {t.modalBackToMap}
+                    </button>
+                  </div>
+                  <p className="mt-2 text-center">
                     <a
                       href="/contar"
                       onClick={(event) => {
@@ -2808,7 +2896,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         });
                         router.push('/contar');
                       }}
-                      className="text-[12px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
+                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
                     >
                       {t.modalAnotherFormatLink}
                     </a>
