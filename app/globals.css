@@ -763,7 +763,7 @@ html[data-cursor-global="on"] *::after {
     inset 0 0 16px rgba(255, 255, 255, 0.08);
 }
 
-@media (pointer: coarse) {
+@media (pointer: coarse), (hover: none) {
   html[data-cursor-global="on"] *,
   html[data-cursor-global="on"] *::before,
   html[data-cursor-global="on"] *::after {
@@ -771,6 +771,44 @@ html[data-cursor-global="on"] *::after {
   }
   .cursor-dot, .cursor-ring {
     display: none !important;
+  }
+}
+
+/* El círculo no entra a los modales de envío: el puntero nativo queda libre. */
+html:has(.story-submit-modal) .cursor-dot,
+html:has(.story-submit-modal) .cursor-ring {
+  display: none !important;
+}
+
+html[data-cursor-global="on"]:has(.story-submit-modal),
+html[data-cursor-global="on"]:has(.story-submit-modal) *,
+html[data-cursor-global="on"]:has(.story-submit-modal) *::before,
+html[data-cursor-global="on"]:has(.story-submit-modal) *::after {
+  cursor: auto !important;
+}
+
+.story-submit-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(92, 92, 82, 0.55) transparent;
+}
+
+.story-submit-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.story-submit-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.story-submit-scroll::-webkit-scrollbar-thumb {
+  background: rgba(92, 92, 82, 0.45);
+  border-radius: 999px;
+}
+
+@media (max-width: 767px) {
+  .story-submit-card--details {
+    border-radius: 0 !important;
+    box-shadow: none !important;
   }
 }
 

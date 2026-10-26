@@ -436,6 +436,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   }, [mediaBlob, uploadVideoFile, uploadAudioFile]);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const lenis = window.__almamundiLenis as { stop?: () => void; start?: () => void } | undefined;
+    lenis?.stop?.();
+    return () => {
+      lenis?.start?.();
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     const reviewingAv =
       (mode === 'video' || mode === 'audio') &&
       (recording || previewUrl != null || mediaBlob != null);
@@ -2205,9 +2214,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   return (
     <div
-      className={`story-submit-modal font-interna fixed inset-0 z-[220] flex items-center justify-center ${
-        step === 'received' ? 'p-4' : 'p-3 sm:p-4'
+      className={`story-submit-modal font-interna fixed inset-0 z-[220] flex ${
+        step === 'received'
+          ? 'items-center justify-center p-4'
+          : 'items-stretch p-0 md:items-center md:justify-center md:p-4'
       }`}
+      data-lenis-prevent=""
       style={{
         backgroundColor: 'rgba(15, 23, 42, 0.45)',
         backdropFilter: 'blur(6px)',
@@ -2216,12 +2228,30 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       role="dialog"
       aria-modal="true"
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}
+      onKeyDown={(event) => {
+        if (event.key !== 'Tab' || step !== 'details') return;
+        const root = event.currentTarget;
+        const focusable = [...root.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])',
+        )].filter((el) => el.offsetWidth > 0 || el.offsetHeight > 0);
+        if (focusable.length === 0) return;
+        const first = focusable[0]!;
+        const last = focusable[focusable.length - 1]!;
+        const active = document.activeElement;
+        if (event.shiftKey && (active === first || !root.contains(active))) {
+          event.preventDefault();
+          last.focus();
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault();
+          first.focus();
+        }
+      }}
     >
       <div
         className={`flex min-h-0 w-full flex-col overflow-hidden transition-all duration-200 ease-out ${
           step === 'received'
             ? 'h-[min(90vh,92dvh)] max-h-[min(90vh,92dvh)] max-w-[720px]'
-            : 'max-h-[min(90vh,92dvh)] max-w-4xl'
+            : 'story-submit-card--details h-[100dvh] max-h-[100dvh] max-w-none pt-[env(safe-area-inset-top)] pr-[env(safe-area-inset-right)] pb-[env(safe-area-inset-bottom)] pl-[env(safe-area-inset-left)] md:h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] md:max-h-[calc(100dvh-env(safe-area-inset-top)-env(safe-area-inset-bottom)-2rem)] md:max-w-4xl md:pt-0 md:pr-0 md:pb-0 md:pl-0'
         }`}
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
@@ -2255,7 +2285,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         <div
           className={`min-h-0 flex-1 overflow-x-hidden overscroll-contain ${
             step === 'details'
-              ? 'flex flex-col overflow-hidden px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4'
+              ? 'flex flex-col overflow-hidden'
               : step === 'received'
                 ? 'flex flex-col overflow-hidden px-4 py-3 md:px-5 md:py-4'
                 : 'overflow-y-auto px-5 py-5 md:px-8 md:py-6'
@@ -2263,8 +2293,17 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           style={{ backgroundColor: step === 'received' ? '#FAFAF5' : soft.bg }}
         >
           {step === 'details' && (
-            <div className="flex min-h-0 flex-1 flex-col gap-2 md:gap-3">
-              <div className="shrink-0 space-y-1 px-0.5">
+            <div className="flex min-h-0 flex-1 flex-col">
+              <div
+                className="story-submit-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4"
+                onFocusCapture={(event) => {
+                  const target = event.target;
+                  if (!(target instanceof HTMLElement)) return;
+                  if (!target.matches('input, textarea, select')) return;
+                  target.scrollIntoView({ block: 'center', inline: 'nearest' });
+                }}
+              >
+              <div className="space-y-1 px-0.5">
                 <p className="text-xs font-semibold text-gray-700" aria-live="polite">
                   {t.modalStep2}
                 </p>
@@ -2278,9 +2317,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 <p className="text-[10px] text-gray-500">{t.modalRequiredFieldsNote}</p>
               </div>
 
-              <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-y-auto overscroll-contain md:grid-cols-2 md:grid-rows-1 md:gap-3 md:items-start md:overflow-hidden">
+              <div className="mt-2 grid grid-cols-1 items-start gap-2 md:grid-cols-2 md:gap-3">
                 {/* Historia + extras — columna izquierda */}
-                <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
+                <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
                     {t.modalSectionStory}
                   </div>
@@ -2379,7 +2418,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         JPG, PNG, WEBP o HEIC.
                       </p>
                       {extraFiles.length > 0 && (
-                        <ul className="mt-1 max-h-14 space-y-0.5 overflow-y-auto text-[10px] text-gray-700">
+                        <ul className="mt-1 space-y-0.5 text-[10px] text-gray-700">
                           {extraFiles.map((f, idx) => (
                             <li key={f.name + idx} className="flex items-center justify-between gap-1">
                               <span className="truncate">{f.name}</span>
@@ -2433,7 +2472,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
 
                 {/* Datos persona — columna derecha (alineado con /subir) */}
-                <div className="min-h-0 overflow-y-auto overscroll-contain rounded-2xl p-3 md:self-stretch md:p-4" style={soft.inset}>
+                <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
                   <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
                     {t.modalSectionPerson}
                   </div>
@@ -2561,7 +2600,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </p>
               )}
 
-              <div className="mt-auto flex shrink-0 flex-col gap-2 border-t border-white/25 pt-2">
+              <div className="mt-3 flex flex-col gap-2">
                 <AdultConsentCheckbox
                   checked={acceptedPrivacy}
                   onChange={setAcceptedPrivacy}
@@ -2599,7 +2638,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   }}
                   onGateChange={setCaptchaGate}
                 />
-                <div className="flex flex-wrap justify-end gap-2">
+              </div>
+              </div>
+              <div
+                className="flex shrink-0 flex-wrap justify-end gap-2 border-t border-white/40 px-3 py-2 sm:px-4 md:px-5"
+                style={{ backgroundColor: soft.bg }}
+              >
                   <button
                     type="button"
                     onClick={() => {
@@ -2645,7 +2689,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       </p>
                     ) : null}
                   </div>
-                </div>
               </div>
             </div>
           )}
