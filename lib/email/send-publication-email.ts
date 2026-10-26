@@ -3,19 +3,16 @@
  */
 
 import { escapeHtml } from "@/lib/email-html";
-import { getResend } from "@/lib/emailSubmission";
 import {
-  brandHeaderHtml,
-  EMAIL_PUBLIC_ORIGIN,
-  emailLogoAttachment,
+  absoluteEmailUrl,
   emailShell,
+  greetingHtml,
   invitationHtml,
-  loadInlineWordmark,
+  paragraphHtml,
   primaryButtonHtml,
   secondaryLinkHtml,
   whatsappShareHref,
 } from "@/lib/email/almamundi-email-layout";
-import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export type SendPublicationEmailParams = {
   authorName: string;
@@ -36,7 +33,7 @@ export function publicationEmailSubject(): string {
 }
 
 function storyPublicUrl(storyId: string): string {
-  return `${EMAIL_PUBLIC_ORIGIN}/historias/${encodeURIComponent(storyId)}`;
+  return absoluteEmailUrl(`/historias/${encodeURIComponent(storyId)}`);
 }
 
 export function buildPublicationEmailText(params: SendPublicationEmailParams): string {
@@ -54,23 +51,20 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     "",
     `Ver mi historia: ${storyUrl}`,
     `Compartir por WhatsApp: ${whatsappShareHref(shareText)}`,
-    `Contar otra historia: ${EMAIL_PUBLIC_ORIGIN}/contar`,
+    `Contar otra historia: ${absoluteEmailUrl("/contar")}`,
     params.ecoUrl?.trim() ? `Tu rincón privado: ${params.ecoUrl.trim()}` : "",
     "",
     "Un abrazo,",
     "Equipo AlmaMundi",
     "",
-    `${EMAIL_PUBLIC_ORIGIN} · Política de privacidad: ${EMAIL_PUBLIC_ORIGIN}/privacidad`,
+    `${absoluteEmailUrl("/")} · Política de privacidad: ${absoluteEmailUrl("/privacidad")}`,
     "Recibiste este correo porque enviaste una historia en AlmaMundi.",
   ]
     .filter((line, i, arr) => line !== "" || arr[i - 1] !== "")
     .join("\n");
 }
 
-export function buildPublicationEmailHtml(
-  params: SendPublicationEmailParams,
-  hasInlineLogo = false
-): string {
+export function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
   const authorName = escapeHtml(displayName(params.authorName));
   const storyTitle = escapeHtml(params.storyTitle.trim() || "sin título");
   const placeName = escapeHtml(params.placeName.trim() || "el mapa");
@@ -80,37 +74,23 @@ export function buildPublicationEmailHtml(
   const greeting = authorName ? `Hola ${authorName},` : "Hola,";
   const ecoBlock = ecoHref
     ? `
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
-        En este rincón puedes ver cuántas personas resonaron con tu historia
-        y volver a descargar tu cinta de colores.
-      </p>
+      ${paragraphHtml(`En este rincón puedes ver cuántas personas resonaron con tu historia
+        y volver a descargar tu cinta de colores.`)}
       ${secondaryLinkHtml("Ir a mi eco", ecoHref)}`
     : "";
 
   const bodyHtml = `
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568">
-        ${greeting}
-      </p>
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
-        Tu historia <strong>"${storyTitle}"</strong> ya está en AlmaMundi.
-        Puede verse desde cualquier parte del mundo, anclada en <strong>${placeName}</strong>.
-      </p>
-      <p style="margin:0 0 28px;font-size:16px;color:#4A5568;line-height:1.6">
-        Si quieres, compártela con quien quieras. Cada historia despierta otra.
-      </p>
+      ${greetingHtml(greeting)}
+      ${paragraphHtml(`Tu historia <strong>"${storyTitle}"</strong> ya está en AlmaMundi.
+        Puede verse desde cualquier parte del mundo, anclada en <strong>${placeName}</strong>.`)}
+      ${paragraphHtml("Si quieres, compártela con quien quieras. Cada historia despierta otra.", "0 0 28px")}
       ${primaryButtonHtml("Ver mi historia", historiasUrl)}
       ${secondaryLinkHtml("Compartir por WhatsApp", whatsappShareHref(shareText))}
       ${invitationHtml()}
       ${ecoBlock}
-      <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
-        Un abrazo,<br>
-        Equipo AlmaMundi
-      </p>`;
+      ${paragraphHtml("Un abrazo,<br>Equipo AlmaMundi", "0")}`;
 
-  return emailShell({
-    headerHtml: brandHeaderHtml(hasInlineLogo),
-    bodyHtml,
-  });
+  return emailShell({ bodyHtml });
 }
 
 export type SendPublicationEmailResult =
@@ -130,6 +110,8 @@ function mailFromAddress(): string {
 export async function sendPublicationEmail(
   params: SendPublicationEmailParams
 ): Promise<SendPublicationEmailResult> {
+  const { getResend } = await import("@/lib/emailSubmission");
+  const { noteEmailSent } = await import("@/lib/ops/usage-state");
   const resend = getResend();
   if (!resend) {
     return { ok: false, error: "Resend no configurado (falta RESEND_API_KEY)" };
@@ -137,16 +119,14 @@ export async function sendPublicationEmail(
 
   const from = mailFromAddress();
   const subject = publicationEmailSubject();
-  const logo = await loadInlineWordmark();
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
-      html: buildPublicationEmailHtml(params, Boolean(logo)),
+      html: buildPublicationEmailHtml(params),
       text: buildPublicationEmailText(params),
-      ...(logo ? { attachments: [emailLogoAttachment(logo)] } : {}),
     });
     if (sent.error) {
       const msg = sent.error.message || "Error de Resend";

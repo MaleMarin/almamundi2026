@@ -9,7 +9,7 @@ import {
   buildAuthorEcoPath,
   generateAuthorEcoToken,
 } from '@/lib/author-eco-token';
-import { EMAIL_PUBLIC_ORIGIN } from '@/lib/email/almamundi-email-layout';
+import { emailPublicOrigin } from '@/lib/email/almamundi-email-layout';
 
 export type PublicationMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -91,7 +91,7 @@ export async function notifyAuthorStoryPublished(args: {
   if (snap.exists) {
     try {
       const token = await ensureAuthorEcoToken(ref, data);
-      ecoUrl = `${EMAIL_PUBLIC_ORIGIN}${buildAuthorEcoPath(storyId, token)}`;
+      ecoUrl = `${emailPublicOrigin()}${buildAuthorEcoPath(storyId, token)}`;
     } catch (err) {
       console.error('notifyAuthorStoryPublished eco token', err);
     }

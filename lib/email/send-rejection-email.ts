@@ -6,16 +6,21 @@
 import { escapeHtml } from "@/lib/email-html";
 import { getResend } from "@/lib/emailSubmission";
 import {
-  brandHeaderHtml,
-  EMAIL_PUBLIC_ORIGIN,
-  emailLogoAttachment,
+  absoluteEmailUrl,
+  EMAIL_BOX,
+  EMAIL_FONT,
+  EMAIL_INK,
   emailShell,
-  loadInlineWordmark,
+  greetingHtml,
+  paragraphHtml,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export const REJECTION_CONTACT_EMAIL = "hola@almamundi.org";
-export const REJECTION_CONTACT_URL = `${EMAIL_PUBLIC_ORIGIN}/contacto`;
+
+export function rejectionContactUrl(): string {
+  return absoluteEmailUrl("/contacto");
+}
 
 export type SendRejectionEmailParams = {
   authorName: string;
@@ -29,49 +34,55 @@ function greetingLine(authorName: string): string {
   return n ? `Hola ${escapeHtml(n)},` : "Hola,";
 }
 
-export function buildRejectionEmailHtml(
-  params: SendRejectionEmailParams,
-  hasInlineLogo = false
-): string {
+export function buildRejectionEmailHtml(params: SendRejectionEmailParams): string {
   const greeting = greetingLine(params.authorName);
   const storyTitle = escapeHtml(params.storyTitle.trim() || "tu historia");
   const reason = escapeHtml(params.publicReason);
   const contact = escapeHtml(REJECTION_CONTACT_EMAIL);
-  const contactUrl = REJECTION_CONTACT_URL;
+  const contactUrl = escapeHtml(rejectionContactUrl());
 
   const bodyHtml = `
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568">
-        ${greeting}
-      </p>
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
-        Revisamos tu historia <strong>"${storyTitle}"</strong> y, en esta ocasión,
-        no la vamos a publicar en AlmaMundi.
-      </p>
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
-        El motivo es este:
-      </p>
-      <p style="margin:0 0 24px;padding:16px 18px;background:#f7f8fb;border-radius:12px;font-size:16px;color:#4A5568;line-height:1.6">
+      ${greetingHtml(greeting)}
+      ${paragraphHtml(`Revisamos tu historia <strong>"${storyTitle}"</strong> y, en esta ocasión,
+        no la vamos a publicar en AlmaMundi.`)}
+      ${paragraphHtml("El motivo es este:")}
+      <p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">
         ${reason}
       </p>
-      <p style="margin:0 0 16px;font-size:16px;color:#4A5568;line-height:1.6">
-        Si no estás de acuerdo, puedes escribirnos a
-        <a href="mailto:${contact}" style="color:#FF4A1C;text-decoration:underline">${contact}</a>
+      ${paragraphHtml(`Si no estás de acuerdo, puedes escribirnos a
+        <a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">${contact}</a>
         y pedir que volvamos a revisar la decisión.
         También puedes usar
-        <a href="${contactUrl}" style="color:#FF4A1C;text-decoration:underline">el formulario de contacto</a>.
-      </p>
-      <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
-        Gracias por habernos confiado tu historia.
-      </p>
-      <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
-        Un abrazo,<br>
-        Equipo AlmaMundi
-      </p>`;
+        <a href="${contactUrl}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">el formulario de contacto</a>.`)}
+      ${paragraphHtml("Gracias por habernos confiado tu historia.")}
+      ${paragraphHtml("Un abrazo,<br>Equipo AlmaMundi", "0")}`;
 
-  return emailShell({
-    headerHtml: brandHeaderHtml(hasInlineLogo),
-    bodyHtml,
-  });
+  return emailShell({ bodyHtml });
+}
+
+export function buildRejectionEmailText(params: SendRejectionEmailParams): string {
+  const name = params.authorName.trim();
+  const greeting = name ? `Hola ${name},` : "Hola,";
+  const storyTitle = params.storyTitle.trim() || "tu historia";
+  return [
+    greeting,
+    "",
+    `Revisamos tu historia "${storyTitle}" y, en esta ocasión, no la vamos a publicar en AlmaMundi.`,
+    "",
+    "El motivo es este:",
+    params.publicReason.trim(),
+    "",
+    `Si no estás de acuerdo, puedes escribirnos a ${REJECTION_CONTACT_EMAIL} y pedir que volvamos a revisar la decisión.`,
+    `También puedes usar el formulario de contacto: ${rejectionContactUrl()}`,
+    "",
+    "Gracias por habernos confiado tu historia.",
+    "",
+    "Un abrazo,",
+    "Equipo AlmaMundi",
+    "",
+    `Política de privacidad: ${absoluteEmailUrl("/privacidad")}`,
+    "Recibiste este correo porque enviaste una historia en AlmaMundi.",
+  ].join("\n");
 }
 
 export type SendRejectionEmailResult =
@@ -98,15 +109,14 @@ export async function sendRejectionEmail(
 
   const from = mailFromAddress();
   const subject = "Sobre tu historia en AlmaMundi";
-  const logo = await loadInlineWordmark();
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
-      html: buildRejectionEmailHtml(params, Boolean(logo)),
-      ...(logo ? { attachments: [emailLogoAttachment(logo)] } : {}),
+      html: buildRejectionEmailHtml(params),
+      text: buildRejectionEmailText(params),
     });
     if (sent.error) {
       const msg = sent.error.message || "Error de Resend";

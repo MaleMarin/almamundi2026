@@ -5,6 +5,7 @@
 import type { DocumentSnapshot, Firestore } from 'firebase-admin/firestore';
 import { isValidRecipientEmail } from '@/lib/email-html';
 import { sendReceivedEmail } from '@/lib/email/send-received-email';
+import { storyFormatLabel } from '@/lib/email/received-email-template';
 
 export type ReceivedMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -45,6 +46,38 @@ export function resolveAuthorEmailFromSubmission(data: Record<string, unknown>):
 export function resolveAuthorNameFromSubmission(data: Record<string, unknown>): string {
   const autor = asRecord(data.autor);
   return pickText(data.alias, data.authorName, data.nombre, autor?.nombre, autor?.alias);
+}
+
+export function resolveStoryTitleFromSubmission(data: Record<string, unknown>): string {
+  return pickText(data.storyTitle, data.title, data.titulo);
+}
+
+export function resolveFormatFromSubmission(data: Record<string, unknown>): string {
+  return storyFormatLabel(pickText(data.type, data.format));
+}
+
+export function resolveSubmittedAtFromSubmission(data: Record<string, unknown>): Date {
+  const raw = data.createdAt ?? data.consentedAt ?? data.submittedAt;
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) return raw;
+  if (typeof raw === 'number' && Number.isFinite(raw)) {
+    const date = new Date(raw);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  if (typeof raw === 'string' && raw.trim()) {
+    const date = new Date(raw);
+    if (!Number.isNaN(date.getTime())) return date;
+  }
+  if (raw && typeof raw === 'object') {
+    const stamp = raw as { toDate?: () => Date; seconds?: number };
+    if (typeof stamp.toDate === 'function') {
+      const date = stamp.toDate();
+      if (date instanceof Date && !Number.isNaN(date.getTime())) return date;
+    }
+    if (typeof stamp.seconds === 'number' && Number.isFinite(stamp.seconds)) {
+      return new Date(stamp.seconds * 1000);
+    }
+  }
+  return new Date();
 }
 
 export async function notifyAuthorStoryReceived(args: {
@@ -97,6 +130,9 @@ export async function notifyAuthorStoryReceived(args: {
   const sent = await sendReceivedEmail({
     authorName: resolveAuthorNameFromSubmission(data),
     authorEmail: to,
+    storyTitle: resolveStoryTitleFromSubmission(data),
+    format: resolveFormatFromSubmission(data),
+    submittedAt: resolveSubmittedAtFromSubmission(data),
   });
 
   if (sent.ok) {

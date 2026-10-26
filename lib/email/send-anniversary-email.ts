@@ -5,12 +5,9 @@
 import { escapeHtml } from "@/lib/email-html";
 import { getResend } from "@/lib/emailSubmission";
 import {
-  brandHeaderHtml,
-  EMAIL_PUBLIC_ORIGIN,
-  emailLogoAttachment,
+  absoluteEmailUrl,
   emailShell,
   invitationHtml,
-  loadInlineWordmark,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
@@ -26,13 +23,10 @@ function greetingLine(authorName: string): string {
   return n ? `Hola ${escapeHtml(n)},` : "Hola,";
 }
 
-export function buildAnniversaryEmailHtml(
-  params: SendAnniversaryEmailParams,
-  hasInlineLogo = false
-): string {
+export function buildAnniversaryEmailHtml(params: SendAnniversaryEmailParams): string {
   const greeting = greetingLine(params.authorName);
   const storyTitle = escapeHtml(params.storyTitle.trim() || "tu historia");
-  const historiasUrl = `${EMAIL_PUBLIC_ORIGIN}/historias/${encodeURIComponent(params.storyId)}`;
+  const historiasUrl = absoluteEmailUrl(`/historias/${encodeURIComponent(params.storyId)}`);
 
   const bodyHtml = `
       <p style="margin:0 0 16px;font-size:16px;color:#4A5568">
@@ -65,10 +59,7 @@ export function buildAnniversaryEmailHtml(
         Equipo AlmaMundi
       </p>`;
 
-  return emailShell({
-    headerHtml: brandHeaderHtml(hasInlineLogo),
-    bodyHtml,
-  });
+  return emailShell({ bodyHtml });
 }
 
 export type SendAnniversaryEmailResult =
@@ -95,15 +86,13 @@ export async function sendAnniversaryEmail(
 
   const from = mailFromAddress();
   const subject = "Hace un año contaste tu historia en AlmaMundi";
-  const logo = await loadInlineWordmark();
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
-      html: buildAnniversaryEmailHtml(params, Boolean(logo)),
-      ...(logo ? { attachments: [emailLogoAttachment(logo)] } : {}),
+      html: buildAnniversaryEmailHtml(params),
     });
     if (sent.error) {
       const msg = sent.error.message || "Error de Resend";

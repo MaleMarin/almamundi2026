@@ -6,11 +6,8 @@
 import { escapeHtml } from "@/lib/email-html";
 import { getResend } from "@/lib/emailSubmission";
 import {
-  brandHeaderHtml,
-  emailLogoAttachment,
   emailShell,
   invitationHtml,
-  loadInlineWordmark,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
@@ -32,10 +29,7 @@ function messageBlockHtml(readerMessage: string): string {
   return `<p style="margin:0;font-size:16px;color:#2D3748;line-height:1.7">${escaped}</p>`;
 }
 
-export function buildReaderMessageEmailHtml(
-  params: SendReaderMessageEmailParams,
-  hasInlineLogo = false
-): string {
+export function buildReaderMessageEmailHtml(params: SendReaderMessageEmailParams): string {
   const storyTitle = escapeHtml(params.storyTitle.trim() || "tu historia");
   const greeting = greetingLine(params.authorName);
   const bodyHtml = `
@@ -64,10 +58,7 @@ export function buildReaderMessageEmailHtml(
         Equipo AlmaMundi
       </p>`;
 
-  return emailShell({
-    headerHtml: brandHeaderHtml(hasInlineLogo),
-    bodyHtml,
-  });
+  return emailShell({ bodyHtml });
 }
 
 export type SendReaderMessageEmailResult =
@@ -94,15 +85,13 @@ export async function sendReaderMessageEmail(
 
   const from = mailFromAddress();
   const subject = "Alguien leyó tu historia en AlmaMundi";
-  const logo = await loadInlineWordmark();
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
       subject,
-      html: buildReaderMessageEmailHtml(params, Boolean(logo)),
-      ...(logo ? { attachments: [emailLogoAttachment(logo)] } : {}),
+      html: buildReaderMessageEmailHtml(params),
     });
     if (sent.error) {
       const msg = sent.error.message || "Error de Resend";
