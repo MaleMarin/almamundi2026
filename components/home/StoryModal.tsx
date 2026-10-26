@@ -43,7 +43,6 @@ import { ANTECEDENTES_MAX } from '@/lib/antecedentes';
 import { PHOTO_ALT_MAX, photoStripeSourceText } from '@/lib/historias/story-imagenes';
 import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
 import {
-  UPLOAD_DURATION_ERROR,
   UPLOAD_EXTRA_TYPE_ERROR,
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
@@ -77,6 +76,7 @@ import {
 } from '@/lib/story-author-carry';
 import { currentPhotoYear, photoFichaIssue, type PhotoFichaIssue } from '@/lib/story-photo-ficha';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
+import { previewCommitStamp } from '@/lib/preview-version';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
@@ -369,7 +369,7 @@ function huellaPngFilename(storyTitle: string, imprintId: string): string {
   return `almamundi-${slug || imprintId || 'historia'}.png`;
 }
 
-function fileWeightMb(file: File): string {
+function fileWeightMb(file: { size: number }): string {
   return (file.size / (1024 * 1024)).toFixed(1);
 }
 
@@ -399,6 +399,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [avSource, setAvSource] = useState<'grabar' | 'archivo'>('grabar');
   const [durationInlineErr, setDurationInlineErr] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [avDurationSec, setAvDurationSec] = useState<number | null>(null);
+  const [avCardError, setAvCardError] = useState('');
+  const [avProbePending, setAvProbePending] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number | null>(null);
   const [recording, setRecording] = useState(false);
   const [streamReady, setStreamReady] = useState(false);
   const [recordSec, setRecordSec] = useState(0);
@@ -406,6 +410,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const recorderRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<BlobPart[]>([]);
   const videoLiveRef = useRef<HTMLVideoElement>(null);
+  const videoFileRef = useRef<HTMLInputElement>(null);
+  const audioFileRef = useRef<HTMLInputElement>(null);
+  const wantFilePickerRef = useRef(false);
+  const fileProbeRef = useRef(0);
+  const recordSecRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const mediaRequestTokenRef = useRef(0);
 
@@ -526,7 +535,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setRecording(false);
     setStreamReady(false);
     setRecordSec(0);
+    recordSecRef.current = 0;
     setMediaBlob(null);
+    setAvCardError('');
+    setAvDurationSec(null);
+    setAvProbePending(false);
+    fileProbeRef.current += 1;
     revokePreview();
     chunksRef.current = [];
   }, [revokePreview, stopStream, stopTimer]);
@@ -830,30 +844,32 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     mr.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mr.mimeType });
       const probeToken = mediaRequestTokenRef.current;
+      setAvProbePending(true);
+      setAvCardError('');
+      setUploadVideoFile(null);
+      setUploadAudioFile(null);
       void probeVideoBlobDurationSeconds(blob).then((sec) => {
         if (probeToken !== mediaRequestTokenRef.current) return;
-        if (sec != null && !isDurationWithinMax(sec)) {
-          setErr(`El video supera ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
-          setMediaBlob(null);
-          revokePreview();
-          stopStream();
-          stopTimer();
-          setRecording(false);
-          return;
-        }
+        const duration = sec ?? recordSecRef.current;
         setMediaBlob(blob);
         revokePreview();
-        const url = URL.createObjectURL(blob);
-        setPreviewUrl(url);
+        setPreviewUrl(URL.createObjectURL(blob));
+        setAvDurationSec(duration);
+        setAvProbePending(false);
+        if (duration != null && !isDurationWithinMax(duration)) {
+          setAvCardError(t.modalFileTooLongVideo);
+        }
         stopStream();
         stopTimer();
         setRecording(false);
       });
     };
     setRecordSec(0);
+    recordSecRef.current = 0;
     timerRef.current = setInterval(() => {
       setRecordSec((s) => {
         const next = s + 1;
+        recordSecRef.current = next;
         if (next >= MAX_AUDIO_VIDEO_DURATION_SECONDS) {
           mr.stop();
         }
@@ -873,7 +889,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setRecording(false);
       applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'video');
     }
-  }, [applyMediaErr, revokePreview, stopStream, stopTimer]);
+  }, [applyMediaErr, revokePreview, stopStream, stopTimer, t.modalFileTooLongVideo]);
 
   const startRecordingAudio = useCallback(() => {
     const stream = streamRef.current;
@@ -903,29 +919,32 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     mr.onstop = () => {
       const blob = new Blob(chunksRef.current, { type: mr.mimeType });
       const probeToken = mediaRequestTokenRef.current;
+      setAvProbePending(true);
+      setAvCardError('');
+      setUploadVideoFile(null);
+      setUploadAudioFile(null);
       void probeAudioFileDurationSeconds(new File([blob], 'rec.webm', { type: blob.type })).then((sec) => {
         if (probeToken !== mediaRequestTokenRef.current) return;
-        if (sec != null && !isDurationWithinMax(sec)) {
-          setErr(`El audio supera ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
-          setMediaBlob(null);
-          revokePreview();
-          stopStream();
-          stopTimer();
-          setRecording(false);
-          return;
-        }
+        const duration = sec ?? recordSecRef.current;
         setMediaBlob(blob);
         revokePreview();
         setPreviewUrl(URL.createObjectURL(blob));
+        setAvDurationSec(duration);
+        setAvProbePending(false);
+        if (duration != null && !isDurationWithinMax(duration)) {
+          setAvCardError(t.modalFileTooLongAudio);
+        }
         stopStream();
         stopTimer();
         setRecording(false);
       });
     };
     setRecordSec(0);
+    recordSecRef.current = 0;
     timerRef.current = setInterval(() => {
       setRecordSec((s) => {
         const next = s + 1;
+        recordSecRef.current = next;
         if (next >= MAX_AUDIO_VIDEO_DURATION_SECONDS) mr.stop();
         return next;
       });
@@ -943,7 +962,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setRecording(false);
       applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'audio');
     }
-  }, [applyMediaErr, revokePreview, stopStream, stopTimer]);
+  }, [applyMediaErr, revokePreview, stopStream, stopTimer, t.modalFileTooLongAudio]);
 
   const stopRecording = useCallback(() => {
     const mr = recorderRef.current;
@@ -966,12 +985,97 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         setUploadAudioFile(null);
         setVideoShareUrl('');
         setAudioShareUrl('');
+        setAvCardError('');
+        setAvDurationSec(null);
+        setAvProbePending(false);
+        fileProbeRef.current += 1;
+        revokePreview();
       } else {
         resetCaptureMedia();
       }
     },
-    [resetCaptureMedia]
+    [resetCaptureMedia, revokePreview]
   );
+
+  const acceptUploadFile = useCallback(
+    (kind: 'video' | 'audio', file: File) => {
+      setErr('');
+      setMediaErrKind(null);
+      setAvCardError('');
+      setAvDurationSec(null);
+      setMediaBlob(null);
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+      setPreviewUrl(URL.createObjectURL(file));
+      if (kind === 'video') {
+        setUploadVideoFile(file);
+        setUploadAudioFile(null);
+        setVideoShareUrl('');
+      } else {
+        setUploadAudioFile(file);
+        setUploadVideoFile(null);
+        setAudioShareUrl('');
+      }
+      const typeOk = kind === 'video' ? isAllowedVideoUploadFile(file) : isAllowedAudioUploadFile(file);
+      if (!typeOk) {
+        setAvProbePending(false);
+        setAvCardError(kind === 'video' ? t.modalFileTypeVideo : t.modalFileTypeAudio);
+        return;
+      }
+      const maxMb = kind === 'video' ? SUBIR_VIDEO_UPLOAD_MAX_MB : SUBIR_AUDIO_UPLOAD_MAX_MB;
+      if (file.size > maxMb * 1024 * 1024) {
+        setAvProbePending(false);
+        setAvCardError(interpolate(t.modalFileTooHeavy, { max: String(maxMb) }));
+        return;
+      }
+      const token = ++fileProbeRef.current;
+      setAvProbePending(true);
+      const probe =
+        kind === 'video' ? probeVideoFileDurationSeconds(file) : probeAudioFileDurationSeconds(file);
+      void probe.then((sec) => {
+        if (token !== fileProbeRef.current) return;
+        setAvProbePending(false);
+        setAvDurationSec(sec);
+        if (sec != null && !isDurationWithinMax(sec)) {
+          setAvCardError(kind === 'video' ? t.modalFileTooLongVideo : t.modalFileTooLongAudio);
+        }
+      });
+    },
+    [
+      previewUrl,
+      t.modalFileTooHeavy,
+      t.modalFileTooLongAudio,
+      t.modalFileTooLongVideo,
+      t.modalFileTypeAudio,
+      t.modalFileTypeVideo,
+    ]
+  );
+
+  const removePickedFile = useCallback(() => {
+    setUploadVideoFile(null);
+    setUploadAudioFile(null);
+    setAvCardError('');
+    setAvDurationSec(null);
+    setAvProbePending(false);
+    fileProbeRef.current += 1;
+    setErr('');
+    revokePreview();
+  }, [revokePreview]);
+
+  const changeAvFile = useCallback(() => {
+    if (avSource === 'archivo') {
+      (mode === 'video' ? videoFileRef : audioFileRef).current?.click();
+      return;
+    }
+    wantFilePickerRef.current = true;
+    switchAvSource('archivo');
+  }, [avSource, mode, switchAvSource]);
+
+  useEffect(() => {
+    if (!wantFilePickerRef.current || avSource !== 'archivo') return;
+    wantFilePickerRef.current = false;
+    const el = mode === 'video' ? videoFileRef.current : audioFileRef.current;
+    el?.click();
+  }, [avSource, mode]);
 
   const addPhotos = useCallback((list: FileList | null) => {
     if (!list?.length) return;
@@ -1114,14 +1218,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   }, []);
 
   const canContinueCapture = useCallback((): boolean => {
-    if (mode === 'video') {
-      return (
-        (mediaBlob != null && mediaBlob.size > 0) ||
-        uploadVideoFile != null ||
-        isVideoShareUrl(videoShareUrl)
-      );
-    }
-    if (mode === 'audio') {
+    if (mode === 'video' || mode === 'audio') {
+      if (avProbePending || avCardError) return false;
+      if (mode === 'video') {
+        return (
+          (mediaBlob != null && mediaBlob.size > 0) ||
+          uploadVideoFile != null ||
+          isVideoShareUrl(videoShareUrl)
+        );
+      }
       return (
         (mediaBlob != null && mediaBlob.size > 0) ||
         uploadAudioFile != null ||
@@ -1148,6 +1253,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     audioShareUrl,
     textBody,
     photos,
+    avProbePending,
+    avCardError,
   ]);
 
   const goDetails = useCallback(() => {
@@ -1261,6 +1368,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     submitInFlightRef.current = true;
     setSaving(true);
     setErr('');
+    if (mode === 'audio' || mode === 'video') setUploadProgress(0);
     try {
       const privateMediaPaths: string[] = [];
       const trackUpload = async (
@@ -1273,7 +1381,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           privateMediaPaths.push(cache.storagePath);
           return cache;
         }
-        const r = await uploadFileToStorage(file, prefix, name);
+        const r = await uploadFileToStorage(
+          file,
+          prefix,
+          name,
+          mode === 'audio' || mode === 'video'
+            ? (ratio) => setUploadProgress(Math.min(100, Math.round(ratio * 100)))
+            : undefined
+        );
         privateMediaPaths.push(r.storagePath);
         return r;
       };
@@ -1541,6 +1656,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     } finally {
       submitInFlightRef.current = false;
       setSaving(false);
+      setUploadProgress(null);
     }
   }, [
     saving,
@@ -1702,6 +1818,81 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   if (!isOpen) return null;
 
+  const previewSha = previewCommitStamp();
+  const previewLine = previewSha ? interpolate(t.modalPreviewVersion, { sha: previewSha }) : null;
+
+  const renderReadyCard = (kind: 'video' | 'audio', name: string, bytes: number) => {
+    const ready = !avCardError;
+    const durationLabel =
+      avDurationSec != null && Number.isFinite(avDurationSec)
+        ? formatMmSs(Math.round(avDurationSec))
+        : '--:--';
+    return (
+      <div className="space-y-3 rounded-2xl p-4" style={soft.inset} role="status">
+        {ready && !avProbePending ? (
+          <div className="flex items-center gap-2">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1F7A4D] text-white">
+              <Check size={16} strokeWidth={2.4} aria-hidden />
+            </span>
+            <p className="text-base font-semibold text-gray-800 md:text-lg">
+              {kind === 'video' ? t.modalReadyTitleVideo : t.modalReadyTitleAudio}
+            </p>
+          </div>
+        ) : null}
+        <p className="text-sm text-gray-700 md:text-base">
+          {name} · {durationLabel} · {fileWeightMb({ size: bytes })} MB
+        </p>
+        {avCardError ? (
+          <p className="text-sm font-medium text-red-600" role="alert">
+            {avCardError}
+          </p>
+        ) : null}
+        {previewUrl ? (
+          kind === 'video' ? (
+            <div className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-2xl bg-[#1c1c2e]">
+              <video
+                key={previewUrl}
+                src={previewUrl}
+                className="h-full max-h-[280px] w-full object-contain"
+                playsInline
+                controls
+                preload="metadata"
+                aria-label={t.modalReadyTitleVideo}
+              />
+            </div>
+          ) : (
+            <audio
+              key={previewUrl}
+              src={previewUrl}
+              controls
+              preload="metadata"
+              className="w-full"
+              aria-label={t.modalReadyTitleAudio}
+            />
+          )
+        ) : null}
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={changeAvFile}
+            className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700"
+            style={soft.button}
+          >
+            {t.modalChangeFile}
+          </button>
+          <button
+            type="button"
+            onClick={mediaBlob ? discardRecording : removePickedFile}
+            className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700"
+            style={soft.button}
+          >
+            {t.modalRemove}
+          </button>
+        </div>
+      </div>
+    );
+  };
+
   if (step === 'capture') {
     const copy = t.upload[mode];
     return (
@@ -1709,6 +1900,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         copy={copy}
         titlePreLine={mode === 'foto' || mode === 'texto'}
         onClose={requestLeave}
+        footnote={previewLine}
         continueEnabled={canContinueCapture()}
         onContinue={goDetails}
         continueLabel={t.modalContinue}
@@ -1843,51 +2035,22 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 )}
               </>
             )}
-            {mediaBlob && previewUrl && (
-              <div className="space-y-3">
-                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">{t.modalReviewVideo}</p>
-                <p className="text-center text-sm text-gray-600 md:text-base">
-                  Comprueba el sonido y la imagen. Si no se ve bien, vuelve a grabar.
-                </p>
-                <div
-                  className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-black/80"
-                  style={soft.inset}
-                >
-                  <video
-                    key={previewUrl}
-                    src={previewUrl}
-                    className="h-full max-h-[280px] w-full object-contain"
-                    playsInline
-                    controls
-                    preload="auto"
-                    aria-label="Reproducción del video grabado"
-                    onLoadedData={() => setErr('')}
-                    onError={() => {
-                      console.error('[StoryModal] video blob preview error');
-                      setErr(
-                        'Tu navegador no pudo reproducir esta vista previa. Prueba «Volver a grabar» o usa Chrome/Firefox actualizado.'
-                      );
-                    }}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={discardRecording}
-                  className="w-full rounded-full py-3 text-base font-semibold text-gray-600 md:text-lg"
-                  style={soft.button}
-                  aria-label={t.modalRerecord}
-                >
-                  {t.modalRerecord}
-                </button>
-              </div>
-            )}
+            {mediaBlob && previewUrl && avSource === 'grabar' &&
+              renderReadyCard(
+                'video',
+                `${t.modalRecordingName}.${mediaBlob.type.includes('mp4') ? 'mp4' : 'webm'}`,
+                mediaBlob.size
+              )}
             {avSource === 'archivo' && (
               <div className="space-y-4">
-                <label htmlFor="story-video-file" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
-                  <Upload className="h-4 w-4 text-orange-500" aria-hidden />
-                  Video desde tu equipo (máx. {SUBIR_VIDEO_UPLOAD_MAX_MB} MB)
-                </label>
+                {uploadVideoFile ? null : (
+                  <label htmlFor="story-video-file" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                    <Upload className="h-4 w-4 text-orange-500" aria-hidden />
+                    Video desde tu equipo (máx. {SUBIR_VIDEO_UPLOAD_MAX_MB} MB)
+                  </label>
+                )}
                 <input
+                  ref={videoFileRef}
                   id="story-video-file"
                   type="file"
                   accept={SUBIR_VIDEO_FILE_ACCEPT}
@@ -1895,50 +2058,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
-                    if (!f) {
-                      setUploadVideoFile(null);
-                      return;
-                    }
-                    if (!isAllowedVideoUploadFile(f)) {
-                      setErr('Este formato de video no es compatible. Prueba con .mp4, .webm o .mov.');
-                      setUploadVideoFile(null);
-                      return;
-                    }
-                    if (f.size > SUBIR_VIDEO_UPLOAD_MAX_MB * 1024 * 1024) {
-                      setErr(`Ese video supera los ${SUBIR_VIDEO_UPLOAD_MAX_MB} MB. Prueba con uno más liviano.`);
-                      setUploadVideoFile(null);
-                      return;
-                    }
-                    void probeVideoFileDurationSeconds(f).then((sec) => {
-                      if (sec != null && !isDurationWithinMax(sec)) {
-                        setErr(UPLOAD_DURATION_ERROR.video);
-                        setUploadVideoFile(null);
-                        return;
-                      }
-                      setErr('');
-                      setUploadVideoFile(f);
-                      setVideoShareUrl('');
-                    });
+                    if (!f) return;
+                    acceptUploadFile('video', f);
                   }}
-                  className="w-full text-sm text-gray-600"
+                  className={uploadVideoFile ? 'sr-only' : 'w-full text-sm text-gray-600'}
                 />
-                {uploadVideoFile ? (
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-gray-800">
-                      {interpolate(t.modalFileReadyVideo, {
-                        nombre: uploadVideoFile.name,
-                        peso: fileWeightMb(uploadVideoFile),
-                      })}
-                    </p>
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-orange-700 underline"
-                      onClick={() => setUploadVideoFile(null)}
-                    >
-                      {t.modalRemove}
-                    </button>
-                  </div>
-                ) : null}
+                {uploadVideoFile
+                  ? renderReadyCard('video', uploadVideoFile.name, uploadVideoFile.size)
+                  : null}
                 <label htmlFor="story-video-url" className="block text-sm font-semibold text-gray-800">
                   O pega un enlace (YouTube o Vimeo)
                 </label>
@@ -1948,7 +2075,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   value={videoShareUrl}
                   onChange={(e) => {
                     setVideoShareUrl(e.target.value);
-                    if (e.target.value.trim()) setUploadVideoFile(null);
+                    if (e.target.value.trim()) removePickedFile();
                   }}
                   className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
@@ -2047,42 +2174,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 )}
               </>
             )}
-            {mediaBlob && previewUrl && (
-              <div className="space-y-3">
-                <p className="text-center text-lg font-semibold text-gray-800 md:text-xl">{t.modalReviewAudio}</p>
-                <p className="text-center text-sm text-gray-600 md:text-base">{t.modalListenClip}</p>
-                <div className="rounded-2xl px-3 py-2" style={soft.inset}>
-                  <audio
-                    key={previewUrl}
-                    src={previewUrl}
-                    controls
-                    preload="metadata"
-                    className="w-full"
-                    aria-label="Audio grabado"
-                    onLoadedData={() => setErr('')}
-                    onError={() => {
-                      console.error('[StoryModal] audio blob preview error');
-                      setErr('No se pudo reproducir el audio aquí. Prueba «Volver a grabar» o abre en otro navegador.');
-                    }}
-                  />
-                </div>
-                <button
-                  type="button"
-                  onClick={discardRecording}
-                  className="w-full rounded-full py-3 text-base font-semibold md:text-lg"
-                  style={soft.button}
-                  aria-label={t.modalRerecord}
-                >
-                  {t.modalRerecord}
-                </button>
-              </div>
-            )}
+            {mediaBlob && previewUrl && avSource === 'grabar' &&
+              renderReadyCard(
+                'audio',
+                `${t.modalRecordingName}.${mediaBlob.type.includes('mp4') ? 'm4a' : 'webm'}`,
+                mediaBlob.size
+              )}
             {avSource === 'archivo' && (
               <div className="space-y-4">
-                <label htmlFor="story-audio-file" className="block text-sm font-semibold text-gray-800">
-                  Audio desde tu equipo (hasta {SUBIR_AUDIO_UPLOAD_MAX_MB} MB)
-                </label>
+                {uploadAudioFile ? null : (
+                  <label htmlFor="story-audio-file" className="block text-sm font-semibold text-gray-800">
+                    Audio desde tu equipo (hasta {SUBIR_AUDIO_UPLOAD_MAX_MB} MB)
+                  </label>
+                )}
                 <input
+                  ref={audioFileRef}
                   id="story-audio-file"
                   type="file"
                   accept={SUBIR_AUDIO_FILE_ACCEPT}
@@ -2090,50 +2196,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
-                    if (!f) {
-                      setUploadAudioFile(null);
-                      return;
-                    }
-                    if (!isAllowedAudioUploadFile(f)) {
-                      setErr('Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav.');
-                      setUploadAudioFile(null);
-                      return;
-                    }
-                    if (f.size > SUBIR_AUDIO_UPLOAD_MAX_MB * 1024 * 1024) {
-                      setErr(`Ese audio supera los ${SUBIR_AUDIO_UPLOAD_MAX_MB} MB. Prueba con uno más liviano.`);
-                      setUploadAudioFile(null);
-                      return;
-                    }
-                    void probeAudioFileDurationSeconds(f).then((sec) => {
-                      if (sec != null && !isDurationWithinMax(sec)) {
-                        setErr(UPLOAD_DURATION_ERROR.audio);
-                        setUploadAudioFile(null);
-                        return;
-                      }
-                      setErr('');
-                      setUploadAudioFile(f);
-                      setAudioShareUrl('');
-                    });
+                    if (!f) return;
+                    acceptUploadFile('audio', f);
                   }}
-                  className="w-full text-sm text-gray-600"
+                  className={uploadAudioFile ? 'sr-only' : 'w-full text-sm text-gray-600'}
                 />
-                {uploadAudioFile ? (
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-medium text-gray-800">
-                      {interpolate(t.modalFileReadyAudio, {
-                        nombre: uploadAudioFile.name,
-                        peso: fileWeightMb(uploadAudioFile),
-                      })}
-                    </p>
-                    <button
-                      type="button"
-                      className="text-sm font-semibold text-orange-700 underline"
-                      onClick={() => setUploadAudioFile(null)}
-                    >
-                      {t.modalRemove}
-                    </button>
-                  </div>
-                ) : null}
+                {uploadAudioFile
+                  ? renderReadyCard('audio', uploadAudioFile.name, uploadAudioFile.size)
+                  : null}
                 <label htmlFor="story-audio-url" className="block text-sm font-semibold text-gray-800">
                   {t.modalAudioLinkLabel}
                 </label>
@@ -2143,7 +2213,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   value={audioShareUrl}
                   onChange={(e) => {
                     setAudioShareUrl(e.target.value);
-                    if (e.target.value.trim()) setUploadAudioFile(null);
+                    if (e.target.value.trim()) removePickedFile();
                   }}
                   className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
@@ -2787,6 +2857,24 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 />
               </div>
               <div className="mt-4 flex flex-wrap justify-end gap-2">
+                  {uploadProgress != null ? (
+                    <div className="basis-full">
+                      <div
+                        className="h-2 w-full overflow-hidden rounded-full bg-[#d5d8e0]"
+                        role="progressbar"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={uploadProgress}
+                        aria-label={t.modalUploadProgress}
+                      >
+                        <div
+                          className="h-full bg-[#FF4A1C]"
+                          style={{ width: `${uploadProgress}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-right text-[11px] font-semibold text-gray-700">{uploadProgress}%</p>
+                    </div>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() => {
@@ -3002,6 +3090,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             <p className="mt-4 text-base font-medium text-red-600 md:text-lg" role="alert">{err}</p>
           )}
         </div>
+        {previewLine ? <p className={`${amStyles.amModalFootnote} px-4 pb-3`}>{previewLine}</p> : null}
       </div>
     </div>
   );

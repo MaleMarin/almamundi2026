@@ -18,6 +18,17 @@ export type StoryFlowMessages = {
   modalRecordingSoonEnd: string;
   modalFileReadyVideo: string;
   modalFileReadyAudio: string;
+  modalReadyTitleVideo: string;
+  modalReadyTitleAudio: string;
+  modalChangeFile: string;
+  modalRecordingName: string;
+  modalFileTypeVideo: string;
+  modalFileTypeAudio: string;
+  modalFileTooHeavy: string;
+  modalFileTooLongVideo: string;
+  modalFileTooLongAudio: string;
+  modalUploadProgress: string;
+  modalPreviewVersion: string;
   modalVideoLinkHint: string;
   modalAudioLinkLabel: string;
   modalPhotoAltLabel: string;
@@ -113,6 +124,17 @@ const es: StoryFlowMessages = {
   modalRecordingSoonEnd: 'Quedan 30 segundos',
   modalFileReadyVideo: 'Video listo: {nombre} ({peso} MB)',
   modalFileReadyAudio: 'Audio listo: {nombre} ({peso} MB)',
+  modalReadyTitleVideo: 'Video listo',
+  modalReadyTitleAudio: 'Audio listo',
+  modalChangeFile: 'Cambiar archivo',
+  modalRecordingName: 'Grabación',
+  modalFileTypeVideo: 'Este formato de video no es compatible. Prueba con .mp4, .webm o .mov.',
+  modalFileTypeAudio: 'Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav.',
+  modalFileTooHeavy: 'Este archivo supera los {max} MB. Prueba con uno más liviano.',
+  modalFileTooLongVideo: 'Este video dura más de 5 minutos. Puedes recortarlo o subir otro.',
+  modalFileTooLongAudio: 'Este audio dura más de 5 minutos. Puedes recortarlo o subir otro.',
+  modalUploadProgress: 'Progreso de la subida',
+  modalPreviewVersion: 'Versión de prueba · {sha}',
   modalVideoLinkHint: 'El video debe ser público o no listado.',
   modalAudioLinkLabel: 'O pega un enlace público (SoundCloud, Google Drive, YouTube…)',
   modalPhotoAltLabel:
@@ -197,6 +219,17 @@ const es: StoryFlowMessages = {
 
 const pt: StoryFlowMessages = {
   ...es,
+  modalReadyTitleVideo: 'Vídeo pronto',
+  modalReadyTitleAudio: 'Áudio pronto',
+  modalChangeFile: 'Mudar ficheiro',
+  modalRecordingName: 'Gravação',
+  modalFileTypeVideo: 'Este formato de vídeo não é compatível. Tente .mp4, .webm ou .mov.',
+  modalFileTypeAudio: 'Este formato de áudio não é compatível. Tente .mp3, .m4a ou .wav.',
+  modalFileTooHeavy: 'Este ficheiro supera os {max} MB. Tente um mais leve.',
+  modalFileTooLongVideo: 'Este vídeo dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
+  modalFileTooLongAudio: 'Este áudio dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
+  modalUploadProgress: 'Progresso do envio',
+  modalPreviewVersion: 'Versão de teste · {sha}',
   modalPhotoTypeError: 'Esse ficheiro não é uma foto. Use JPG, PNG, WEBP ou HEIC.',
   modalPhotoSizeError: 'Essa foto pesa mais de 10 MB. Tente uma mais leve.',
   modalPhotoConverting: 'A converter a sua foto…',
@@ -252,6 +285,17 @@ const pt: StoryFlowMessages = {
 
 const en: StoryFlowMessages = {
   ...es,
+  modalReadyTitleVideo: 'Video ready',
+  modalReadyTitleAudio: 'Audio ready',
+  modalChangeFile: 'Change file',
+  modalRecordingName: 'Recording',
+  modalFileTypeVideo: 'This video format is not supported. Try .mp4, .webm, or .mov.',
+  modalFileTypeAudio: 'This audio format is not supported. Try .mp3, .m4a, or .wav.',
+  modalFileTooHeavy: 'This file is over {max} MB. Try a smaller one.',
+  modalFileTooLongVideo: 'This video is longer than 5 minutes. You can trim it or upload another.',
+  modalFileTooLongAudio: 'This audio is longer than 5 minutes. You can trim it or upload another.',
+  modalUploadProgress: 'Upload progress',
+  modalPreviewVersion: 'Test version · {sha}',
   modalPhotoTypeError: 'That file is not a photo. Use JPG, PNG, WEBP, or HEIC.',
   modalPhotoSizeError: 'That photo is over 10 MB. Try a smaller one.',
   modalPhotoConverting: 'Converting your photo…',

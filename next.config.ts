@@ -21,6 +21,10 @@ const csp = [
 ].join("; ");
 
 const nextConfig: NextConfig = {
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
+    NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA ?? "",
+  },
   serverExternalPackages: ["sharp", "file-type"],
   transpilePackages: ["heic-to"],
   /**

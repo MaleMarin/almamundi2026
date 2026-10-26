@@ -18,6 +18,8 @@ export type AmUploadModalShellProps = {
   className?: string;
   /** Si true, solo renderiza la tarjeta (sin overlay). */
   cardOnly?: boolean;
+  /** Línea al pie, solo en builds que no son production. */
+  footnote?: string | null;
 };
 
 export function AmUploadModalShell({
@@ -34,6 +36,7 @@ export function AmUploadModalShell({
   showContinue = true,
   className,
   cardOnly = false,
+  footnote,
 }: AmUploadModalShellProps) {
   const card = (
     <div className={`${styles.amModalCard} font-interna ${className ?? ''}`}>
@@ -56,16 +59,19 @@ export function AmUploadModalShell({
         {children}
       </div>
 
-      {showContinue ? (
+      {showContinue || footnote ? (
         <footer className={styles.amModalFooter}>
-          <button
-            type="button"
-            className={`${styles.amModalBtnContinue} ${continueEnabled ? styles.amModalBtnContinueActive : ''}`}
-            disabled={!continueEnabled}
-            onClick={continueEnabled ? onContinue : undefined}
-          >
-            {continueLabel}
-          </button>
+          {showContinue ? (
+            <button
+              type="button"
+              className={`${styles.amModalBtnContinue} ${continueEnabled ? styles.amModalBtnContinueActive : ''}`}
+              disabled={!continueEnabled}
+              onClick={continueEnabled ? onContinue : undefined}
+            >
+              {continueLabel}
+            </button>
+          ) : null}
+          {footnote ? <p className={styles.amModalFootnote}>{footnote}</p> : null}
         </footer>
       ) : null}
     </div>
