@@ -14,6 +14,7 @@ type TurnstileApi = {
     opts: {
       sitekey: string;
       theme?: 'light' | 'dark' | 'auto';
+      appearance?: 'always' | 'execute' | 'interaction-only';
       callback?: (token: string) => void;
       'error-callback'?: () => void;
       'expired-callback'?: () => void;
@@ -109,6 +110,7 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
         widgetIdRef.current = window.turnstile.render(hostRef.current, {
           sitekey: siteKey,
           theme: 'light',
+          appearance: 'interaction-only',
           callback: (token: string) => {
             onTokenRef.current(token);
             onGateRef.current('ok');
@@ -154,7 +156,7 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
 
   return (
     <div className="space-y-1.5">
-      <div ref={hostRef} className="min-h-[65px]" />
+      <div ref={hostRef} />
       {status === 'loading' ? (
         <p className="text-[10px] leading-tight text-gray-500 md:text-[11px]">
           Cargando verificación de seguridad…

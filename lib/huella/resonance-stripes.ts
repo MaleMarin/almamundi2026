@@ -22,7 +22,7 @@ export const RESONANCE_STRIPE_MIN_PX = 8;
 export const RESONANCE_STRIPE_MAX_PX = 60;
 export const RESONANCE_EXPORT_PX = 1080;
 export const RESONANCE_FOOTER_SITE = 'almamundi.org';
-const FOOTER_INK = '#8A8A7A';
+const FOOTER_INK = '#1A1916';
 
 function hueDist(a: number, b: number): number {
   const d = Math.abs(a - b) % 360;
@@ -102,14 +102,23 @@ function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: n
   return t ? t + ell : ell;
 }
 
-function footerMetrics(W: number, H: number, hasTitle: boolean) {
-  const padX = Math.round(W * 0.056);
-  const padBottom = Math.round(H * 0.042);
-  const padTop = Math.round(H * 0.028);
-  const titlePx = Math.max(15, Math.round(W * 0.022));
-  const metaPx = Math.max(12, Math.round(W * 0.015));
-  const sitePx = Math.max(11, Math.round(W * 0.013));
-  const gap = Math.max(4, Math.round(H * 0.008));
+function footerFontStack(): string {
+  const fallback = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
+  if (typeof document === 'undefined') return fallback;
+  const custom = getComputedStyle(document.documentElement).getPropertyValue('--font-interna').trim();
+  return custom ? `${custom}, ${fallback}` : fallback;
+}
+
+/** Tamaños del pie en el PNG de 1080. En otros anchos se escalan con la misma proporción. */
+function footerMetrics(W: number, hasTitle: boolean) {
+  const scale = W / RESONANCE_EXPORT_PX;
+  const padX = Math.max(12, Math.round(64 * scale));
+  const padBottom = Math.max(16, Math.round(48 * scale));
+  const padTop = Math.max(16, Math.round(40 * scale));
+  const titlePx = Math.max(1, Math.round(44 * scale));
+  const metaPx = Math.max(1, Math.round(28 * scale));
+  const sitePx = Math.max(1, Math.round(24 * scale));
+  const gap = Math.max(1, Math.round(16 * scale));
   const titleBlock = hasTitle ? titlePx + gap : 0;
   const height = padTop + titleBlock + metaPx + gap + sitePx + padBottom;
   return { padX, padBottom, padTop, titlePx, metaPx, sitePx, gap, height };
@@ -123,7 +132,7 @@ function drawResonancePieceFooter(
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
   const title = footer.title?.trim() ?? '';
-  const m = footerMetrics(W, H, Boolean(title));
+  const m = footerMetrics(W, Boolean(title));
   const maxW = W - m.padX * 2;
   const place = [footer.city?.trim(), footer.country?.trim()].filter(Boolean).join(', ');
   const date = formatLongDate(footer.at, footer.locale);
@@ -143,19 +152,19 @@ function drawResonancePieceFooter(
   ctx.fillStyle = FOOTER_INK;
   ctx.textAlign = 'left';
   ctx.textBaseline = 'alphabetic';
-  const fontStack = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
+  const fontStack = footerFontStack();
   let y = fieldH + m.padTop;
   if (title) {
     y += m.titlePx;
-    ctx.font = `400 ${m.titlePx}px ${fontStack}`;
+    ctx.font = `600 ${m.titlePx}px ${fontStack}`;
     ctx.fillText(truncateCanvasLine(ctx, title, maxW), m.padX, y);
     y += m.gap;
   }
   y += m.metaPx;
-  ctx.font = `400 ${m.metaPx}px ${fontStack}`;
+  ctx.font = `500 ${m.metaPx}px ${fontStack}`;
   ctx.fillText(truncateCanvasLine(ctx, meta, maxW), m.padX, y);
   y += m.gap + m.sitePx;
-  ctx.font = `400 ${m.sitePx}px ${fontStack}`;
+  ctx.font = `500 ${m.sitePx}px ${fontStack}`;
   ctx.fillText(RESONANCE_FOOTER_SITE, m.padX, y);
   ctx.restore();
 }
@@ -188,7 +197,7 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
     : args.footerAt
       ? { at: args.footerAt, locale: args.locale }
       : null;
-  const footerH = footer ? footerMetrics(W, H, Boolean(footer.title?.trim())).height : 0;
+  const footerH = footer ? footerMetrics(W, Boolean(footer.title?.trim())).height : 0;
   const fieldH = H - footerH;
 
   let x = 0;

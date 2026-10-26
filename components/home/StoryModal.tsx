@@ -298,6 +298,13 @@ type ImprintDrawArgs = {
   country: string;
 };
 
+function aliasForGreeting(alias: string, locale: string): string {
+  const trimmed = alias.trim();
+  const first = trimmed.charAt(0);
+  if (!first) return trimmed;
+  return first.toLocaleUpperCase(locale) + trimmed.slice(1);
+}
+
 function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
   const {
     storyId,
@@ -2704,7 +2711,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 <h3 className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26]">
                   {alias.trim() ? (
                     <>
-                      {alias.trim()}, {t.modalReceivedAfterName}
+                      {aliasForGreeting(alias, locale)}, {t.modalReceivedAfterName}
                     </>
                   ) : (
                     t.modalReceivedAnonBefore
@@ -2719,7 +2726,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               </div>
 
               <div className="mt-3 flex min-h-0 flex-1 items-center justify-center [container-type:size]">
-                <div className="aspect-square max-h-full w-[min(100%,100cqh)] overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:min-w-[min(480px,100cqh,100%)]">
+                <div className="aspect-square w-[min(100cqw,100cqh)] max-h-full overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[min(420px,100cqw,100cqh)]">
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
