@@ -776,8 +776,7 @@ html[data-cursor-global="on"] *::after {
 
 /* El círculo no entra a los modales de envío: el puntero nativo queda libre. */
 html:has(.story-submit-modal) .cursor-dot,
-html:has(.story-submit-modal) .cursor-ring,
-html:has(.story-submit-modal) .am-contrast-toggle {
+html:has(.story-submit-modal) .cursor-ring {
   display: none !important;
 }
 
