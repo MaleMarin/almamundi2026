@@ -1,11 +1,12 @@
 /**
  * Correo al autor cuando alguien deja un mensaje al leer su historia.
- * No incluye datos de quien escribió ni replyTo: no se puede responder directo.
+ * No incluye datos de quien escribió. Responder llega al equipo.
  */
 
 import { escapeHtml } from "@/lib/email-html";
 import { getResend } from "@/lib/emailSubmission";
 import {
+  AUTHOR_REPLY_TO,
   emailShell,
   invitationHtml,
 } from "@/lib/email/almamundi-email-layout";
@@ -49,8 +50,8 @@ export function buildReaderMessageEmailHtml(params: SendReaderMessageEmailParams
         </tr>
       </table>
       <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
-        Este correo es un reenvío. No incluye datos de quien escribió,
-        y no se puede responder directo desde aquí.
+        Este correo es un reenvío. No incluye datos de quien escribió.
+        Si respondes, el mensaje llega al equipo de AlmaMundi.
       </p>
       ${invitationHtml()}
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
@@ -90,6 +91,7 @@ export async function sendReaderMessageEmail(
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
+      replyTo: AUTHOR_REPLY_TO,
       subject,
       html: buildReaderMessageEmailHtml(params),
     });

@@ -40,7 +40,7 @@ import {
   isAllowedVideoUploadFile,
 } from '@/lib/subir-limits';
 import { ANTECEDENTES_MAX } from '@/lib/antecedentes';
-import { PHOTO_ALT_MAX } from '@/lib/historias/story-imagenes';
+import { PHOTO_ALT_MAX, photoStripeSourceText } from '@/lib/historias/story-imagenes';
 import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
 import {
   UPLOAD_DURATION_ERROR,
@@ -260,10 +260,10 @@ function imprintHuellaSource(args: {
   textBody: string;
   storyTitle: string;
   extraText: string;
-  photoAlts?: string[];
+  photoFichas?: { nombre: string; lugar: string; descripcion: string }[];
   mediaBlob: Blob | null;
 }): { content: string; charCount: number } {
-  const { mode, textBody, storyTitle, extraText, photoAlts = [], mediaBlob } = args;
+  const { mode, textBody, storyTitle, extraText, photoFichas = [], mediaBlob } = args;
   const titleBlock = [storyTitle, extraText].filter((s) => s.trim()).join('\n').trim();
 
   if (mode === 'texto') {
@@ -272,8 +272,14 @@ function imprintHuellaSource(args: {
   }
 
   if (mode === 'foto') {
-    const fromAlts = photoAlts.map((s) => s.trim()).filter(Boolean).join('\n');
-    const content = fromAlts || storyTitle.trim() || extraText.trim();
+    const fromPhotos = photoStripeSourceText(
+      photoFichas.map((ficha) => ({
+        nombre: ficha.nombre,
+        lugar: ficha.lugar,
+        descripcion: ficha.descripcion,
+      }))
+    );
+    const content = fromPhotos || storyTitle.trim() || extraText.trim();
     return {
       content,
       charCount: Math.max(content.length, 400),
@@ -295,7 +301,7 @@ type ImprintDrawArgs = {
   textBody: string;
   storyTitle: string;
   extraText: string;
-  photoAlts: string[];
+  photoFichas: { nombre: string; lugar: string; descripcion: string }[];
   mediaBlob: Blob | null;
   locale: 'es' | 'pt' | 'en';
   city: string;
@@ -317,7 +323,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     textBody,
     storyTitle,
     extraText,
-    photoAlts,
+    photoFichas,
     mediaBlob,
     locale,
     city,
@@ -333,7 +339,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     textBody,
     storyTitle,
     extraText,
-    photoAlts,
+    photoFichas,
     mediaBlob,
   });
 
@@ -472,7 +478,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     textBody: string;
     storyTitle: string;
     extraText: string;
-    photoAlts: string[];
+    photoFichas: { nombre: string; lugar: string; descripcion: string }[];
     mediaBlob: Blob | null;
     city: string;
     country: string;
@@ -1491,7 +1497,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         textBody,
         storyTitle: title,
         extraText: mode === 'foto' ? '' : extraText,
-        photoAlts: photos.map((p) => p.alt),
+        photoFichas: photos.map((p) => ({
+          nombre: p.titulo.trim(),
+          lugar: p.lugar.trim(),
+          descripcion: p.alt.trim(),
+        })),
         mediaBlob,
         city,
         country,
@@ -1574,7 +1584,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         textBody: snap?.textBody ?? '',
         storyTitle: snap?.storyTitle ?? imprintStoryTitle,
         extraText: snap?.extraText ?? '',
-        photoAlts: snap?.photoAlts ?? [],
+        photoFichas: snap?.photoFichas ?? [],
         mediaBlob: snap?.mediaBlob ?? null,
         locale,
         city: snap?.city ?? city,
@@ -2832,11 +2842,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     })}
                   />
               </div>
-              {mode !== 'foto' ? (
-                <p className="mx-auto mt-2 w-full text-[13px] leading-snug text-[#5C5C52] md:w-[420px]">
-                  {mode === 'texto' ? t.modalImprintHowTexto : t.modalImprintHowAv}
-                </p>
-              ) : null}
+              <p className="mx-auto mt-2 w-full text-[13px] leading-snug text-[#5C5C52] md:w-[420px]">
+                {mode === 'texto'
+                  ? t.modalImprintHowTexto
+                  : mode === 'foto'
+                    ? t.modalImprintHowFoto
+                    : t.modalImprintHowAv}
+              </p>
 
               <div className="mt-4 shrink-0">
                 <div className="flex flex-col gap-2 md:flex-row">
@@ -2901,6 +2913,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       {t.modalAnotherFormatLink}
                     </a>
                   </p>
+                  <p className="mt-4 text-center text-[13px] leading-snug text-[#5C5C52]">
+                    {t.modalContactLead}{' '}
+                    <a
+                      href="mailto:hola@almamundi.org"
+                      className="text-[#FF4A1C] underline underline-offset-2"
+                    >
+                      hola@almamundi.org
+                    </a>
+                    .
+                  </p>
                 </div>
                 <p
                   className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#FF4A1C] ${
@@ -2920,7 +2942,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               shareText={t.modalShareText || PENDING_STORY_SHARE_TEXT}
               labels={{
                 title: t.modalShareMenuTitle,
-                whatsapp: t.modalShareWhatsApp,
                 facebook: t.modalShareFacebook,
                 x: t.modalShareX,
                 linkedin: t.modalShareLinkedIn,

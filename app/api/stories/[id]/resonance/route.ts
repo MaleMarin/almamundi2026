@@ -8,6 +8,7 @@ import {
   getRateLimiter,
 } from '@/lib/rate-limit';
 import { isValidRecipientEmail, safeEmailText, safeHrefForEmail } from '@/lib/email-html';
+import { AUTHOR_REPLY_TO } from '@/lib/email/almamundi-email-layout';
 import { noteEmailSent } from '@/lib/ops/usage-state';
 
 export const runtime = 'nodejs';
@@ -79,6 +80,7 @@ export async function POST(
           from:
             process.env.RESEND_FROM_EMAIL ?? 'AlmaMundi <hola@almamundi.org>',
           to: authorEmail,
+          replyTo: AUTHOR_REPLY_TO,
           subject: 'Tu historia llegó a alguien',
           html: `
           <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:40px;border-radius:12px;max-width:520px;margin:0 auto">

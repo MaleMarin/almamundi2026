@@ -6,6 +6,7 @@ import { escapeHtml } from "@/lib/email-html";
 import { getResend } from "@/lib/emailSubmission";
 import {
   absoluteEmailUrl,
+  AUTHOR_REPLY_TO,
   emailShell,
   invitationHtml,
 } from "@/lib/email/almamundi-email-layout";
@@ -91,6 +92,7 @@ export async function sendAnniversaryEmail(
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
+      replyTo: AUTHOR_REPLY_TO,
       subject,
       html: buildAnniversaryEmailHtml(params),
     });

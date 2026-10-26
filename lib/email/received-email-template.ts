@@ -9,7 +9,6 @@ import {
   EMAIL_CONTACT_ADDRESS,
   EMAIL_FONT,
   EMAIL_INK,
-  emailContactWhatsappHref,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -115,9 +114,8 @@ function stepsHtml(): string {
 
 function contactHtml(): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
-  const whatsapp = escapeHtml(emailContactWhatsappHref());
   return paragraphHtml(
-    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">${mail}</a> o por <a href="${whatsapp}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;text-decoration:underline;">WhatsApp</a>.`,
+    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">${mail}</a>.`,
     "0"
   );
 }
@@ -170,7 +168,7 @@ export function buildReceivedEmailText(params: ReceivedEmailContent): string {
     `Contar otra historia: ${absoluteEmailUrl("/contar")}`,
     `Explorar el mapa: ${originHome}`,
     "",
-    `¿Tienes dudas? Escríbenos a ${EMAIL_CONTACT_ADDRESS} o por WhatsApp: ${emailContactWhatsappHref()}`,
+    `¿Tienes dudas? Escríbenos a ${EMAIL_CONTACT_ADDRESS}.`,
     "",
     "Recibes este correo porque enviaste una historia a AlmaMundi. AlmaMundi es una iniciativa de Precisar.",
     `Política de privacidad: ${absoluteEmailUrl("/privacidad")}`,

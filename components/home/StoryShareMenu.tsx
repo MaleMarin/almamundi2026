@@ -8,7 +8,6 @@ import {
 
 export type StoryShareMenuLabels = {
   title: string;
-  whatsapp: string;
   facebook: string;
   x: string;
   linkedin: string;
@@ -76,9 +75,6 @@ export function StoryShareMenu({
           </button>
         </div>
         <div className="grid grid-cols-1 gap-2">
-          <a className={itemClass} href={channels.whatsapp} target="_blank" rel="noreferrer">
-            {labels.whatsapp}
-          </a>
           <a className={itemClass} href={channels.facebook} target="_blank" rel="noreferrer">
             {labels.facebook}
           </a>

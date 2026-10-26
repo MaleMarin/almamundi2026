@@ -13,6 +13,11 @@ import {
   buildPublicationEmailText,
   publicationEmailSubject,
 } from '../email/send-publication-email';
+import {
+  buildRejectionEmailHtml,
+  buildRejectionEmailText,
+  rejectionEmailSubject,
+} from '../email/send-rejection-email';
 
 const sampleReceived = {
   authorName: 'ana',
@@ -62,7 +67,9 @@ describe('correos al autor', () => {
     assert.match(html, /Contar otra historia/);
     assert.match(html, /Explorar el mapa/);
     assert.match(html, /hola@almamundi\.org/);
-    assert.match(html, /WhatsApp/);
+    assert.doesNotMatch(html, /WhatsApp/);
+    assert.doesNotMatch(html, /wa\.me/);
+    assert.doesNotMatch(text, /WhatsApp/);
     assert.match(html, /Política de privacidad/);
     assert.match(html, /prefers-color-scheme:\s*dark/);
     assert.match(html, /height:48px/);
@@ -110,14 +117,76 @@ describe('correos al autor', () => {
       storyId: 'abc123',
       placeName: 'Santiago',
     });
-    assert.equal(publicationEmailSubject(), 'Tu historia ya está en AlmaMundi');
+    assert.equal(
+      publicationEmailSubject('El río'),
+      'Tu historia «El río» ya está en AlmaMundi'
+    );
     assert.match(html, /https:\/\/www\.almamundi\.org\/historias\/abc123/);
+    assert.match(html, /Hola, Male:/);
+    assert.match(html, /Tu historia «El río» ya está publicada en el mapa de AlmaMundi, en Santiago/);
+    assert.match(html, /Si quieres, compártela con quien tú elijas/);
     assert.match(html, /Ver mi historia/);
-    assert.match(html, /Compartir por WhatsApp/);
     assert.match(html, /Contar otra historia/);
-    assert.match(html, /Hola Male,/);
+    assert.match(html, /Compartir por WhatsApp/);
+    assert.match(html, /wa\.me\/\?text=/);
+    assert.match(html, /Gracias por contarla/);
+    assert.doesNotMatch(html, /Un abrazo/);
     assert.match(html, /ALMAMUNDI/);
+    const ver = html.indexOf('Ver mi historia');
+    const contar = html.indexOf('Contar otra historia');
+    const compartir = html.indexOf('Compartir por WhatsApp');
+    assert.ok(ver < contar && contar < compartir);
     assert.match(text, /El río/);
     assert.match(text, /Santiago/);
+    assert.match(text, /Compartir por WhatsApp: https:\/\/wa\.me\/\?text=/);
+  });
+
+  it('publicación con eco ofrece el espacio personal', () => {
+    rememberEnv();
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL_URL;
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    const html = buildPublicationEmailHtml({
+      authorName: 'Male',
+      authorEmail: 'a@b.c',
+      storyTitle: 'El río',
+      storyId: 'abc123',
+      placeName: 'Santiago',
+      ecoUrl: 'https://www.almamundi.org/historias/abc123/mi-eco?t=token',
+    });
+    assert.match(
+      html,
+      /En tu espacio personal puedes ver cuántas personas respondieron a tu historia/
+    );
+    assert.match(html, /Ir a mi espacio/);
+    assert.match(html, /mi-eco\?t=token/);
+  });
+
+  it('rechazo usa los textos pedidos y no ofrece WhatsApp', () => {
+    rememberEnv();
+    delete process.env.VERCEL_ENV;
+    delete process.env.VERCEL_URL;
+    delete process.env.NEXT_PUBLIC_SITE_URL;
+    const params = {
+      authorName: 'ana',
+      authorEmail: 'a@b.c',
+      storyTitle: 'El río',
+      publicReason: 'Incluye datos de otra persona sin su autorización.',
+    };
+    const html = buildRejectionEmailHtml(params);
+    const text = buildRejectionEmailText(params);
+    assert.equal(
+      rejectionEmailSubject('El río'),
+      'Sobre tu historia «El río» en AlmaMundi'
+    );
+    assert.match(html, /Hola, Ana:/);
+    assert.match(html, /Revisamos tu historia «El río» y esta vez no podremos publicarla/);
+    assert.match(html, /Motivo: Incluye datos de otra persona sin su autorización/);
+    assert.match(html, /responde este correo o escríbenos a/);
+    assert.match(html, /hola@almamundi\.org/);
+    assert.match(html, /Gracias por confiarnos tu historia/);
+    assert.doesNotMatch(html, /WhatsApp/);
+    assert.doesNotMatch(html, /formulario de contacto/);
+    assert.match(text, /Motivo: Incluye datos de otra persona sin su autorización/);
   });
 });

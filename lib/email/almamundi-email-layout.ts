@@ -13,6 +13,8 @@ export const EMAIL_BOX = "#F6F7FA";
 export const EMAIL_FONT = "Montserrat, Arial, Helvetica, sans-serif";
 export const LOGO_CID = "almamundi-logo";
 export const EMAIL_CONTACT_ADDRESS = "hola@almamundi.org";
+/** Responder un correo dirigido a quien contó la historia llega al equipo. */
+export const AUTHOR_REPLY_TO = EMAIL_CONTACT_ADDRESS;
 
 const WORDMARK_PATH = fileURLToPath(
   new URL("./almamundi-wordmark-orange.png", import.meta.url)
@@ -75,13 +77,9 @@ export function emailLogoAttachment(logo: Buffer) {
   };
 }
 
+/** La persona elige a quién enviarle su historia. No es un canal hacia AlmaMundi. */
 export function whatsappShareHref(text: string): string {
   return `https://wa.me/?text=${encodeURIComponent(text)}`;
-}
-
-/** Abre WhatsApp con un mensaje listo. El sitio no publica un número propio. */
-export function emailContactWhatsappHref(): string {
-  return whatsappShareHref("Hola, tengo una duda sobre mi historia en AlmaMundi.");
 }
 
 export function brandHeaderHtml(): string {

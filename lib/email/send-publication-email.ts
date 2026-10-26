@@ -5,6 +5,7 @@
 import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
+  AUTHOR_REPLY_TO,
   emailShell,
   greetingHtml,
   invitationHtml,
@@ -13,6 +14,7 @@ import {
   secondaryLinkHtml,
   whatsappShareHref,
 } from "@/lib/email/almamundi-email-layout";
+import { capitalizeAlias } from "@/lib/email/received-email-template";
 
 export type SendPublicationEmailParams = {
   authorName: string;
@@ -24,12 +26,23 @@ export type SendPublicationEmailParams = {
   ecoUrl?: string;
 };
 
-function displayName(authorName: string): string {
-  return authorName.trim().replace(/[\r\n]+/g, " ").slice(0, 80);
+function storyTitleLine(storyTitle: string): string {
+  return storyTitle.replace(/[\r\n]+/g, " ").trim().slice(0, 200) || "tu historia";
 }
 
-export function publicationEmailSubject(): string {
-  return "Tu historia ya está en AlmaMundi";
+function placeLine(placeName: string): string {
+  return placeName.replace(/[\r\n]+/g, " ").trim();
+}
+
+function publishedLead(title: string, place: string): string {
+  const where = placeLine(place);
+  const base = `Tu historia «${title}» ya está publicada en el mapa de AlmaMundi`;
+  const located = where ? `${base}, en ${where}` : base;
+  return `${located}. Desde hoy, cualquier persona que visite el sitio puede verla.`;
+}
+
+export function publicationEmailSubject(storyTitle: string): string {
+  return `Tu historia «${storyTitleLine(storyTitle)}» ya está en AlmaMundi`;
 }
 
 function storyPublicUrl(storyId: string): string {
@@ -37,58 +50,61 @@ function storyPublicUrl(storyId: string): string {
 }
 
 export function buildPublicationEmailText(params: SendPublicationEmailParams): string {
-  const name = displayName(params.authorName);
-  const greeting = name ? `Hola ${name},` : "Hola,";
+  const name = capitalizeAlias(params.authorName);
+  const greeting = name ? `Hola, ${name}:` : "Hola:";
+  const title = storyTitleLine(params.storyTitle);
   const storyUrl = storyPublicUrl(params.storyId);
   const shareText = `Te invito a leer esta historia en AlmaMundi: ${storyUrl}`;
+  const ecoUrl = params.ecoUrl?.trim() ?? "";
   return [
     greeting,
     "",
-    `Tu historia "${params.storyTitle.trim() || "sin título"}" ya está en AlmaMundi.`,
-    `Puede verse desde cualquier parte del mundo, anclada en ${params.placeName.trim() || "el mapa"}.`,
+    publishedLead(title, params.placeName),
     "",
-    "Si quieres, compártela con quien quieras. Cada historia despierta otra.",
+    "Si quieres, compártela con quien tú elijas.",
     "",
     `Ver mi historia: ${storyUrl}`,
-    `Compartir por WhatsApp: ${whatsappShareHref(shareText)}`,
     `Contar otra historia: ${absoluteEmailUrl("/contar")}`,
-    params.ecoUrl?.trim() ? `Tu rincón privado: ${params.ecoUrl.trim()}` : "",
+    `Compartir por WhatsApp: ${whatsappShareHref(shareText)}`,
+    ...(ecoUrl
+      ? [
+          "",
+          "En tu espacio personal puedes ver cuántas personas respondieron a tu historia y volver a descargar tu relato en colores.",
+          `Ir a mi espacio: ${ecoUrl}`,
+        ]
+      : []),
     "",
-    "Un abrazo,",
+    "Gracias por contarla.",
     "Equipo AlmaMundi",
     "",
     `${absoluteEmailUrl("/")} · Política de privacidad: ${absoluteEmailUrl("/privacidad")}`,
     "Recibiste este correo porque enviaste una historia en AlmaMundi.",
-  ]
-    .filter((line, i, arr) => line !== "" || arr[i - 1] !== "")
-    .join("\n");
+  ].join("\n");
 }
 
 export function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
-  const authorName = escapeHtml(displayName(params.authorName));
-  const storyTitle = escapeHtml(params.storyTitle.trim() || "sin título");
-  const placeName = escapeHtml(params.placeName.trim() || "el mapa");
+  const authorName = escapeHtml(capitalizeAlias(params.authorName));
+  const place = placeLine(params.placeName);
   const historiasUrl = storyPublicUrl(params.storyId);
   const shareText = `Te invito a leer esta historia en AlmaMundi: ${historiasUrl}`;
   const ecoHref = params.ecoUrl?.trim() ?? "";
-  const greeting = authorName ? `Hola ${authorName},` : "Hola,";
+  const greeting = authorName ? `Hola, ${authorName}:` : "Hola:";
+  const lead = escapeHtml(publishedLead(storyTitleLine(params.storyTitle), place));
   const ecoBlock = ecoHref
     ? `
-      ${paragraphHtml(`En este rincón puedes ver cuántas personas resonaron con tu historia
-        y volver a descargar tu cinta de colores.`)}
-      ${secondaryLinkHtml("Ir a mi eco", ecoHref)}`
+      ${paragraphHtml("En tu espacio personal puedes ver cuántas personas respondieron a tu historia y volver a descargar tu relato en colores.")}
+      ${primaryButtonHtml("Ir a mi espacio", ecoHref)}`
     : "";
 
   const bodyHtml = `
       ${greetingHtml(greeting)}
-      ${paragraphHtml(`Tu historia <strong>"${storyTitle}"</strong> ya está en AlmaMundi.
-        Puede verse desde cualquier parte del mundo, anclada en <strong>${placeName}</strong>.`)}
-      ${paragraphHtml("Si quieres, compártela con quien quieras. Cada historia despierta otra.", "0 0 28px")}
+      ${paragraphHtml(lead)}
+      ${paragraphHtml("Si quieres, compártela con quien tú elijas.", "0 0 28px")}
       ${primaryButtonHtml("Ver mi historia", historiasUrl)}
-      ${secondaryLinkHtml("Compartir por WhatsApp", whatsappShareHref(shareText))}
       ${invitationHtml()}
+      ${secondaryLinkHtml("Compartir por WhatsApp", whatsappShareHref(shareText))}
       ${ecoBlock}
-      ${paragraphHtml("Un abrazo,<br>Equipo AlmaMundi", "0")}`;
+      ${paragraphHtml("Gracias por contarla.<br>Equipo AlmaMundi", "0")}`;
 
   return emailShell({ bodyHtml });
 }
@@ -118,12 +134,13 @@ export async function sendPublicationEmail(
   }
 
   const from = mailFromAddress();
-  const subject = publicationEmailSubject();
+  const subject = publicationEmailSubject(params.storyTitle);
 
   try {
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
+      replyTo: AUTHOR_REPLY_TO,
       subject,
       html: buildPublicationEmailHtml(params),
       text: buildPublicationEmailText(params),

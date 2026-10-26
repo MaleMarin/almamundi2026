@@ -4,6 +4,7 @@
  */
 
 import { getResend } from "@/lib/emailSubmission";
+import { AUTHOR_REPLY_TO } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 import {
   buildReceivedEmailHtml,
@@ -61,6 +62,7 @@ export async function sendReceivedEmail(
     const sent = await resend.emails.send({
       from,
       to: params.authorEmail,
+      replyTo: AUTHOR_REPLY_TO,
       subject,
       html: buildReceivedEmailHtml(content),
       text: buildReceivedEmailText(content),

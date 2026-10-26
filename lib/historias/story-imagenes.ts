@@ -96,3 +96,24 @@ export function parseStoryImagenes(raw: unknown): StoryImagen[] | undefined {
   }
   return out.length ? out : undefined;
 }
+
+/** Texto que alimenta las franjas: nombre, lugar y descripción de cada foto. El año no entra. */
+export function photoStripeSourceText(
+  photos: Array<{
+    titulo?: string;
+    nombre?: string;
+    lugar?: string;
+    descripcion?: string;
+    alt?: string;
+  }>
+): string {
+  return photos
+    .map((photo) =>
+      [photo.titulo || photo.nombre, photo.lugar, photo.descripcion || photo.alt]
+        .map((part) => (typeof part === 'string' ? part.replace(/\s+/g, ' ').trim() : ''))
+        .filter(Boolean)
+        .join('. ')
+    )
+    .filter(Boolean)
+    .join('\n');
+}

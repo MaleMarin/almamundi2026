@@ -7,6 +7,7 @@
  */
 
 import { Resend } from "resend";
+import { AUTHOR_REPLY_TO } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export function getResend(): Resend | null {
@@ -42,6 +43,7 @@ export async function sendSubmissionStatusEmail(
     await resend.emails.send({
       from,
       to: email,
+      replyTo: AUTHOR_REPLY_TO,
       subject,
       html: `<div style="font-family:system-ui,sans-serif;line-height:1.5">${body}</div>`,
     });

@@ -65,7 +65,6 @@ export type StoryFlowMessages = {
   modalShareImageFailed: string;
   modalImprintAlt: string;
   modalShareMenuTitle: string;
-  modalShareWhatsApp: string;
   modalShareFacebook: string;
   modalShareX: string;
   modalShareLinkedIn: string;
@@ -85,8 +84,10 @@ export type StoryFlowMessages = {
   modalSectionWhere: string;
   modalProfilePhotoNote: string;
   modalImprintHowTexto: string;
+  modalImprintHowFoto: string;
   modalImprintHowAv: string;
   modalNowWhat: string;
+  modalContactLead: string;
 };
 
 const es: StoryFlowMessages = {
@@ -166,7 +167,6 @@ const es: StoryFlowMessages = {
     'No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo.',
   modalImprintAlt: 'Cintas de colores creadas a partir de tu historia «{titulo}»',
   modalShareMenuTitle: 'Compartir',
-  modalShareWhatsApp: 'WhatsApp',
   modalShareFacebook: 'Facebook',
   modalShareX: 'X',
   modalShareLinkedIn: 'LinkedIn',
@@ -188,9 +188,12 @@ const es: StoryFlowMessages = {
     'Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla.',
   modalImprintHowTexto:
     'Leímos tu relato palabra por palabra. Cada palabra con carga emocional se volvió una franja: su color sale de la emoción que transmite y su ancho, de cuántas veces la usaste.',
+  modalImprintHowFoto:
+    'Leímos el nombre, el lugar y la descripción de cada foto. Cada palabra con carga emocional se volvió una franja de color, y su ancho depende de cuántas veces aparece.',
   modalImprintHowAv:
     'Leímos el título y lo que nos contaste sobre tu historia. Cada palabra con carga emocional se volvió una franja de color, y su ancho depende de cuántas veces aparece.',
   modalNowWhat: '¿Y ahora?',
+  modalContactLead: '¿Tienes dudas? Escríbenos a',
 };
 
 const pt: StoryFlowMessages = {
@@ -239,9 +242,12 @@ const pt: StoryFlowMessages = {
     'A sua foto (opcional, até 10 MB). Aparecerá junto à sua história quando for publicada. Pode não a enviar.',
   modalImprintHowTexto:
     'Lemos o seu relato palavra por palavra. Cada palavra com carga emocional tornou-se uma faixa: a cor sai da emoção que transmite e a largura, de quantas vezes a usou.',
+  modalImprintHowFoto:
+    'Lemos o nome, o lugar e a descrição de cada foto. Cada palavra com carga emocional tornou-se uma faixa de cor, e a largura depende de quantas vezes aparece.',
   modalImprintHowAv:
     'Lemos o título e o que nos contou sobre a sua história. Cada palavra com carga emocional tornou-se uma faixa de cor, e a largura depende de quantas vezes aparece.',
   modalNowWhat: 'E agora?',
+  modalContactLead: 'Tem dúvidas? Escreva para',
 };
 
 const en: StoryFlowMessages = {
@@ -291,9 +297,12 @@ const en: StoryFlowMessages = {
     'Your photo (optional, up to 10 MB). It will appear next to your story when it is published. You can skip it.',
   modalImprintHowTexto:
     'We read your story word by word. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times you used it.',
+  modalImprintHowFoto:
+    'We read the name, the place and the description of each photo. Each word with emotional weight became a color stripe, and its width depends on how many times it appears.',
   modalImprintHowAv:
     'We read the title and what you told us about your story. Each word with emotional weight became a color stripe, and its width depends on how many times it appears.',
   modalNowWhat: 'What now?',
+  modalContactLead: 'Questions? Write to us at',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

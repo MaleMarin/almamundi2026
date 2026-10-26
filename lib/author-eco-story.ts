@@ -2,6 +2,7 @@ import 'server-only';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { AUTHOR_ECO_TOKEN_FIELD, authorEcoTokensMatch } from '@/lib/author-eco-token';
 import { parseEcoVadState, type EcoVadState } from '@/lib/huella/eco-vad';
+import { parseStoryImagenes, photoStripeSourceText } from '@/lib/historias/story-imagenes';
 
 export type AuthorEcoPageData = {
   title: string;
@@ -77,15 +78,20 @@ export async function loadAuthorEcoPage(
 
   const ubic = asRecord(data.ubicacion);
   const title = pickText(data.title, data.titulo, 'Tu historia');
-  const narrativeText = pickText(
-    data.text,
-    data.transcription,
-    data.context,
-    data.quote,
-    data.body,
-    data.excerpt,
-    title
-  );
+  const format = toSubirFormat(data.format ?? data.formato);
+  const fromPhotos = photoStripeSourceText(parseStoryImagenes(data.imagenes) ?? []);
+  const narrativeText =
+    format === 'foto' && fromPhotos
+      ? fromPhotos
+      : pickText(
+          data.text,
+          data.transcription,
+          data.context,
+          data.quote,
+          data.body,
+          data.excerpt,
+          title
+        );
   const submissionId = pickText(data.sourceSubmissionId, id);
   const city = pickText(data.city, data.ciudad, ubic?.ciudad, ubic?.nombre);
   const country = pickText(data.country, data.pais, data.countryLabel, ubic?.pais);
@@ -104,7 +110,7 @@ export async function loadAuthorEcoPage(
     title,
     narrativeText,
     submissionId,
-    format: toSubirFormat(data.format ?? data.formato),
+    format,
     city,
     country,
     footerAtIso: footerAt.toISOString(),
