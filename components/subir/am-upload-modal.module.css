@@ -153,6 +153,9 @@
   gap: 12px;
   margin-top: 8px;
   flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  background: #eaebf0;
 }
 
 .amModalBtnContinue {
@@ -232,6 +235,108 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 8px;
   margin-bottom: 24px;
+}
+
+.amFotoList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.amFotoCard {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1.5px solid transparent;
+}
+
+.amFotoCardIncomplete {
+  border-color: #e8441a;
+}
+
+.amFotoCardMedia {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  max-height: 240px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #d8dbe3;
+}
+
+.amFotoCardMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.amFotoFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.amFotoField label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #3d3d4a;
+}
+
+.amFotoField input,
+.amFotoField select {
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #e0e0e6;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 16px;
+  color: #1c1c2e;
+  background: #fff;
+}
+
+.amFotoField .amFotoCheck {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 13px;
+  font-weight: 500;
+  color: #3d3d4a;
+}
+
+.amFotoField .amFotoCheck input {
+  width: 16px;
+  height: 16px;
+  margin-top: 2px;
+  padding: 0;
+  accent-color: #e8441a;
+}
+
+.amFotoAdd {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 72px;
+  border-radius: 14px;
+  border: 1.5px dashed #d0d0da;
+  background: #ffffff;
+  color: #bbbbcc;
+  font-size: 28px;
+  cursor: pointer;
+}
+
+.amFotoAdd:hover {
+  border-color: #e8441a;
+  color: #e8441a;
 }
 
 .amFotoSlot {

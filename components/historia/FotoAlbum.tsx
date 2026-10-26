@@ -7,6 +7,8 @@ import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { interpolate } from '@/lib/i18n/locale';
 
 const CREAM = 'rgba(245,240,232,0.85)';
 const CREAM_SOFT = 'rgba(245,240,232,0.7)';
@@ -19,7 +21,7 @@ export interface HistoriaFoto {
   titulo: string;
   subtitulo?: string;
   fecha: string;
-  imagenes: { url: string; caption?: string; descripcion?: string; titulo?: string }[];
+  imagenes: { url: string; caption?: string; descripcion?: string; titulo?: string; anio?: string; anioAprox?: boolean; lugar?: string }[];
   autor: {
     nombre: string;
     avatar: string;
@@ -59,6 +61,20 @@ function extractColor(imgUrl: string): Promise<string> {
 
 export default function FotoAlbum({ historia, onClose, siteLayout = false }: FotoAlbumProps) {
   const { imagenes } = historia;
+  const { t } = useHomeLocale();
+  const fichaCaption = useCallback(
+    (img: HistoriaFoto['imagenes'][number]) => {
+      const when = img.anio?.trim()
+        ? img.anioAprox
+          ? interpolate(t.modalPhotoDecadeOption, { year: img.anio.trim() })
+          : img.anio.trim()
+        : '';
+      const bits = [img.titulo?.trim(), when, img.lugar?.trim()].filter(Boolean);
+      if (bits.length) return bits.join(' · ');
+      return img.caption?.trim() ?? '';
+    },
+    [t.modalPhotoDecadeOption]
+  );
   const [bgColor, setBgColor] = useState(DEFAULT_BG);
   const [fotoActivaIdx, setFotoActivaIdx] = useState(0);
   const [caption, setCaption] = useState(imagenes[0]?.caption ?? '');
@@ -93,15 +109,15 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
   const photoAlt = useCallback(
     (img: HistoriaFoto['imagenes'][number]) =>
       img.descripcion?.trim() ||
-      img.caption?.trim() ||
-      img.titulo?.trim() ||
+      fichaCaption(img) ||
       `Fotografía de ${historia.titulo}`,
-    [historia.titulo]
+    [fichaCaption, historia.titulo]
   );
 
   const photoAriaLabel = useCallback(
-    (img: HistoriaFoto['imagenes'][number]) => img.descripcion?.trim() || img.caption?.trim() || img.titulo?.trim() || `Foto del álbum: ${historia.titulo}`,
-    [historia.titulo]
+    (img: HistoriaFoto['imagenes'][number]) =>
+      img.descripcion?.trim() || fichaCaption(img) || `Foto del álbum: ${historia.titulo}`,
+    [fichaCaption, historia.titulo]
   );
 
   useEffect(() => {
@@ -309,7 +325,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                           margin: 0,
                         }}
                       >
-                        {img.caption || ''}
+                        {fichaCaption(img)}
                       </p>
                     )}
                   </div>
@@ -333,11 +349,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   />
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
-                  {img.caption && (
+                  {fichaCaption(img) ? (
                     <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
-                      {img.caption}
+                      {fichaCaption(img)}
                     </p>
-                  )}
+                  ) : null}
                 </div>
               ) : (
                 <div
@@ -356,11 +372,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       objectFit: 'cover',
                     }}
                   />
-                  {img.caption && (
+                  {fichaCaption(img) ? (
                     <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
-                      {img.caption}
+                      {fichaCaption(img)}
                     </p>
-                  )}
+                  ) : null}
                 </div>
               )}
             </section>

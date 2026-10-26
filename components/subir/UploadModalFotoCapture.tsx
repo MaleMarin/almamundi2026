@@ -7,15 +7,22 @@ import { UPLOAD_MODAL_COPY } from '@/lib/subir-upload-modal-copy';
 import { SUBIR_PHOTO_MAX } from '@/lib/subir-limits';
 import type { StoryPhotoItem } from '@/lib/story-photo-item';
 
+type PhotoPatch = Partial<
+  Pick<StoryPhotoItem, 'titulo' | 'anio' | 'anioDesconocido' | 'decada' | 'lugar' | 'alt'>
+>;
+
 type Props = {
   photos: StoryPhotoItem[];
   onAddFiles: (files: FileList | null) => void;
   onRemove: (index: number) => void;
   onRetry: (id: string) => void;
+  onPatch: (id: string, patch: PhotoPatch) => void;
   convertingLabel: string;
   retryLabel: string;
   failedLabel: string;
   inlineError?: string;
+  incompleteIds?: string[];
+  fichaMessage?: string;
   maxPhotos?: number;
 };
 
@@ -24,10 +31,13 @@ export function UploadModalFotoCapture({
   onAddFiles,
   onRemove,
   onRetry,
+  onPatch,
   convertingLabel,
   retryLabel,
   failedLabel,
   inlineError,
+  incompleteIds,
+  fichaMessage,
   maxPhotos = SUBIR_PHOTO_MAX,
 }: Props) {
   const inputId = useId();
@@ -42,9 +52,12 @@ export function UploadModalFotoCapture({
         onAddFiles={onAddFiles}
         onRemove={onRemove}
         onRetry={onRetry}
+        onPatch={onPatch}
         convertingLabel={convertingLabel}
         retryLabel={retryLabel}
         failedLabel={failedLabel}
+        incompleteIds={incompleteIds}
+        fichaMessage={fichaMessage}
         maxPhotos={maxPhotos}
         showCounter={false}
       />

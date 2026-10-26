@@ -179,6 +179,17 @@ export async function POST(req: NextRequest) {
             ),
           }
         : {}),
+      ...(data.payload.photoFichas?.length
+        ? {
+            photoFichas: data.payload.photoFichas.map((ficha) => ({
+              nombre: stripHtml(ficha.nombre).slice(0, 80),
+              lugar: stripHtml(ficha.lugar).slice(0, 80),
+              ...(ficha.anio ? { anio: ficha.anio } : {}),
+              ...(ficha.decada ? { decada: ficha.decada } : {}),
+              ...(ficha.alt ? { alt: stripHtml(ficha.alt).slice(0, PHOTO_ALT_MAX) } : {}),
+            })),
+          }
+        : {}),
       ...(audioUrl && { audioUrl }),
       ...(videoUrl && { videoUrl }),
     },

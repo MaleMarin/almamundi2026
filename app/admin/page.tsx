@@ -50,6 +50,14 @@ const glassCard = {
 type StoryStatus = 'pending' | 'active' | 'archived' | 'rejected';
 type StoryFormat = 'video' | 'audio' | 'text' | 'photos';
 
+type AdminImagen = {
+  url: string;
+  titulo?: string;
+  anio?: string;
+  anioAprox?: boolean;
+  lugar?: string;
+};
+
 type Story = {
   id: string;
   title: string;
@@ -73,6 +81,7 @@ type Story = {
     error: string | null;
     at?: string;
   } | null;
+  imagenes?: AdminImagen[];
 };
 
 type Collection = {
@@ -117,6 +126,38 @@ function daysRemaining(activeSince: number | null): number | null {
   const now = Date.now();
   const left = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
   return Math.max(0, left);
+}
+
+function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
+  if (!imagenes?.length) return null;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 12 }}>
+      {imagenes.map((img, i) => {
+        const when = img.anio ? (img.anioAprox ? `años ${img.anio}` : img.anio) : '';
+        return (
+          <div key={`${img.url}-${i}`} style={{ width: 132 }}>
+            {img.url ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={img.url}
+                alt=""
+                style={{ width: 132, height: 96, objectFit: 'cover', borderRadius: 8, display: 'block' }}
+              />
+            ) : null}
+            <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+              {img.titulo || `Foto ${i + 1}`}
+            </p>
+            {when ? (
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{when}</p>
+            ) : null}
+            {img.lugar ? (
+              <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{img.lugar}</p>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 export default function AdminPage() {
@@ -564,6 +605,7 @@ export default function AdminPage() {
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
                     {s.authorEmail ? `Se avisará a ${s.authorEmail}` : 'Sin correo del autor: no se podrá avisar al publicar'}
                   </p>
+                  <StoryPhotoFichas imagenes={s.imagenes} />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
@@ -640,6 +682,7 @@ export default function AdminPage() {
                     </div>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
+                    <StoryPhotoFichas imagenes={s.imagenes} />
                     {s.publicationMail?.status === 'sent' ? (
                       <p style={{ fontSize: 12, margin: '6px 0 0', color: '#86efac' }}>
                         Correo enviado a {s.publicationMail.to}
@@ -778,6 +821,7 @@ export default function AdminPage() {
                     </span>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
+                    <StoryPhotoFichas imagenes={s.imagenes} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Agregar a colección:</span>

@@ -10,6 +10,13 @@ import { AGE_RANGE_OPTIONS, type AgeRangeId } from "@/lib/subir-author-fields";
 import { CANCION_RELACIONADA_MAX } from "@/lib/cancion-relacionada";
 import { ANTECEDENTES_MAX } from "@/lib/antecedentes";
 import { PHOTO_ALT_MAX } from "@/lib/historias/story-imagenes";
+import {
+  PHOTO_DECADE_YEARS,
+  PHOTO_NAME_MAX,
+  PHOTO_PLACE_MAX,
+  PHOTO_YEAR_MIN,
+  currentPhotoYear,
+} from "@/lib/story-photo-ficha";
 
 const privatePathRegex =
   /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
@@ -47,6 +54,36 @@ export const CreateSubmissionBody = z.object({
     photoUrls: z.array(z.string().url()).max(SUBIR_PHOTO_MAX).optional(),
     /** Texto `alt` por foto, mismo orden que `photoUrls`. */
     photoAlts: z.array(z.string().max(PHOTO_ALT_MAX)).max(SUBIR_PHOTO_MAX).optional(),
+    /** Nombre, año o década y lugar de cada foto, mismo orden que `photoUrls`. */
+    photoFichas: z
+      .array(
+        z
+          .object({
+            nombre: z.string().trim().min(1).max(PHOTO_NAME_MAX),
+            anio: z.string().regex(/^\d{4}$/).optional(),
+            decada: z
+              .string()
+              .regex(new RegExp(`^(${PHOTO_DECADE_YEARS.join("|")})$`))
+              .optional(),
+            lugar: z.string().trim().min(1).max(PHOTO_PLACE_MAX),
+            alt: z.string().max(PHOTO_ALT_MAX).optional(),
+          })
+          .superRefine((ficha, ctx) => {
+            const hasYear = Boolean(ficha.anio);
+            const hasDecade = Boolean(ficha.decada);
+            if (hasYear === hasDecade) {
+              ctx.addIssue({ code: "custom", message: "photo_year", path: ["anio"] });
+              return;
+            }
+            if (!ficha.anio) return;
+            const year = Number(ficha.anio);
+            if (year < PHOTO_YEAR_MIN || year > currentPhotoYear()) {
+              ctx.addIssue({ code: "custom", message: "photo_year", path: ["anio"] });
+            }
+          })
+      )
+      .max(SUBIR_PHOTO_MAX)
+      .optional(),
     audioUrl: z.string().url().optional(),
     videoUrl: z.string().url().optional(),
   }),
@@ -74,6 +111,18 @@ export const CreateSubmissionBody = z.object({
   cancionRelacionada: z.string().max(CANCION_RELACIONADA_MAX).optional(),
   /** Solo el textarea "Extras (opcional)"; no el relleno de `context`. */
   antecedentes: z.string().max(ANTECEDENTES_MAX).optional(),
+}).superRefine((data, ctx) => {
+  if (data.type !== "foto") return;
+  const urls = data.payload.photoUrls?.filter((url) => url.trim()) ?? [];
+  const count = urls.length || (data.payload.photoUrl ? 1 : 0);
+  if (count < 1) return;
+  if (data.payload.photoFichas?.length !== count) {
+    ctx.addIssue({
+      code: "custom",
+      message: "photo_fichas",
+      path: ["payload", "photoFichas"],
+    });
+  }
 });
 export type CreateSubmissionBodyType = z.infer<typeof CreateSubmissionBody>;
 
@@ -119,6 +168,13 @@ export interface SubmissionDoc {
     photoUrl?: string;
     photoUrls?: string[];
     photoAlts?: string[];
+    photoFichas?: {
+      nombre: string;
+      anio?: string;
+      decada?: string;
+      lugar: string;
+      alt?: string;
+    }[];
     audioUrl?: string;
     videoUrl?: string;
   };

@@ -5,6 +5,19 @@ export type StoryImagen = {
   url: string;
   descripcion?: string;
   caption?: string;
+  titulo?: string;
+  /** Año exacto (`1985`) o inicio de década (`1980`) si `anioAprox`. */
+  anio?: string;
+  anioAprox?: boolean;
+  lugar?: string;
+};
+
+export type SubmissionPhotoFicha = {
+  nombre?: string;
+  anio?: string;
+  decada?: string;
+  lugar?: string;
+  alt?: string;
 };
 
 export function normalizePhotoAlt(raw: unknown): string | undefined {
@@ -13,14 +26,47 @@ export function normalizePhotoAlt(raw: unknown): string | undefined {
   return text || undefined;
 }
 
+function shortText(raw: unknown, max: number): string | undefined {
+  if (typeof raw !== 'string') return undefined;
+  const text = raw.trim().slice(0, max);
+  return text || undefined;
+}
+
 export function imagenesFromUrlsAndAlts(urls: string[], alts?: unknown): StoryImagen[] {
-  const list = Array.isArray(alts) ? alts : [];
+  return imagenesFromSubmissionPhotos(urls, undefined, alts);
+}
+
+export function imagenesFromSubmissionPhotos(
+  urls: string[],
+  fichas?: SubmissionPhotoFicha[] | null,
+  alts?: unknown
+): StoryImagen[] {
+  const altList = Array.isArray(alts) ? alts : [];
+  const fichaList = Array.isArray(fichas) ? fichas : [];
   return urls
     .map((url) => url.trim())
     .filter(Boolean)
     .map((url, i) => {
-      const descripcion = normalizePhotoAlt(list[i]);
-      return descripcion ? { url, descripcion } : { url };
+      const ficha = fichaList[i];
+      const titulo = shortText(ficha?.nombre, 80);
+      const lugar = shortText(ficha?.lugar, 80);
+      const anioExacto = shortText(ficha?.anio, 4);
+      const decada = shortText(ficha?.decada, 4);
+      const anio = anioExacto || decada;
+      const anioAprox = !anioExacto && Boolean(decada);
+      const descripcion = normalizePhotoAlt(ficha?.alt ?? altList[i]);
+      const caption = [titulo, anioAprox && decada ? `años ${decada}` : anio, lugar]
+        .filter(Boolean)
+        .join(' · ');
+      return {
+        url,
+        ...(titulo ? { titulo } : {}),
+        ...(anio ? { anio } : {}),
+        ...(anioAprox ? { anioAprox: true } : {}),
+        ...(lugar ? { lugar } : {}),
+        ...(descripcion ? { descripcion } : {}),
+        ...(caption ? { caption } : {}),
+      };
     });
 }
 
@@ -32,12 +78,20 @@ export function parseStoryImagenes(raw: unknown): StoryImagen[] | undefined {
     const rec = item as Record<string, unknown>;
     const url = typeof rec.url === 'string' ? rec.url.trim() : '';
     if (!url) continue;
-    const descripcion = normalizePhotoAlt(rec.descripcion ?? rec.caption);
-    const caption = typeof rec.caption === 'string' ? rec.caption.trim() : undefined;
+    const descripcion = normalizePhotoAlt(rec.descripcion);
+    const caption = shortText(rec.caption, 240);
+    const titulo = shortText(rec.titulo, 80);
+    const anio = shortText(rec.anio, 4);
+    const lugar = shortText(rec.lugar, 80);
+    const anioAprox = rec.anioAprox === true && Boolean(anio);
     out.push({
       url,
       ...(descripcion ? { descripcion } : {}),
       ...(caption ? { caption } : {}),
+      ...(titulo ? { titulo } : {}),
+      ...(anio ? { anio } : {}),
+      ...(anioAprox ? { anioAprox: true } : {}),
+      ...(lugar ? { lugar } : {}),
     });
   }
   return out.length ? out : undefined;

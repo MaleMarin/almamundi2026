@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
+import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 
 export const runtime = "nodejs";
 
@@ -65,6 +66,13 @@ export async function GET(request: NextRequest) {
         authorEmail: d.authorEmail ?? null,
         rightsAccepted: Boolean(d.rightsAccepted),
         publicationMail: d.publicationMail ?? null,
+        imagenes: (parseStoryImagenes(d.imagenes) ?? []).map((img) => ({
+          url: img.url,
+          ...(img.titulo ? { titulo: img.titulo } : {}),
+          ...(img.anio ? { anio: img.anio } : {}),
+          ...(img.anioAprox ? { anioAprox: true } : {}),
+          ...(img.lugar ? { lugar: img.lugar } : {}),
+        })),
       };
     });
 

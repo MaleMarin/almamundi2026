@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   X,
   Mic,
@@ -68,10 +69,13 @@ import {
   PENDING_STORY_SHARE_TEXT,
 } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
+import { clearStoryAuthorSession } from '@/lib/story-author-session';
 import {
-  loadStoryAuthorSession,
-  saveStoryAuthorSession,
-} from '@/lib/story-author-session';
+  armStoryAuthorCarry,
+  clearStoryAuthorCarryIfStale,
+  readStoryAuthorCarry,
+} from '@/lib/story-author-carry';
+import { currentPhotoYear, photoFichaIssue, type PhotoFichaIssue } from '@/lib/story-photo-ficha';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { TurnstileWidget } from '@/components/home/TurnstileWidget';
@@ -374,6 +378,7 @@ export type StoryModalProps = {
 
 export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic }: StoryModalProps) {
   const { t, locale } = useHomeLocale();
+  const router = useRouter();
   const [step, setStep] = useState<StoryModalStep>('capture');
   const [err, setErr] = useState('');
   const [mediaErrKind, setMediaErrKind] = useState<MediaCaptureErrorKind | null>(null);
@@ -402,7 +407,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   /** Tras escribir, la persona confirma que leyó/revisó antes de Continuar (modo texto). */
   const [textoReviewAck, setTextoReviewAck] = useState(false);
   const [photos, setPhotos] = useState<StoryPhotoItem[]>([]);
-  const [photoAlts, setPhotoAlts] = useState<string[]>([]);
 
   // --- FORM: historia + extras (STEP 2 del modal: tras captura) ---
   const [storyTitle, setStoryTitle] = useState('');
@@ -434,6 +438,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(
     getTurnstileSiteKey() ? 'wait' : 'skip'
   );
+  const [captchaEpoch, setCaptchaEpoch] = useState(0);
   /** Evita validar un título stale si el closure del submit no se actualizó. */
   const storyTitleRef = useRef(storyTitle);
   storyTitleRef.current = storyTitle;
@@ -460,9 +465,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   }, [mode, recording, previewUrl, mediaBlob]);
 
   const [imprintId, setImprintId] = useState('');
-  /** Fecha del envío mostrada en la resonancia visual (canvas y descarga). */
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
+  const [imprintStoryTitle, setImprintStoryTitle] = useState('');
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
+  const imprintSnapRef = useRef<{
+    textBody: string;
+    storyTitle: string;
+    extraText: string;
+    photoAlts: string[];
+    mediaBlob: Blob | null;
+    city: string;
+    country: string;
+  } | null>(null);
   const [shareNotice, setShareNotice] = useState('');
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [shareMenuShowDownload, setShareMenuShowDownload] = useState(false);
@@ -516,8 +530,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   useEffect(() => {
     if (!isOpen) {
+      if (wasOpenRef.current) clearStoryAuthorCarryIfStale();
       wasOpenRef.current = false;
       modeAtOpenRef.current = null;
+      clearStoryAuthorSession();
+      imprintSnapRef.current = null;
+      captchaTokenRef.current = '';
+      setCaptchaEpoch((n) => n + 1);
       resetCaptureMedia();
       setStep('capture');
       setErr('');
@@ -531,7 +550,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         });
         return [];
       });
-      setPhotoAlts([]);
       extraUploadRef.current = [];
       profileUploadRef.current = null;
       avUploadRef.current = null;
@@ -559,6 +577,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setSaving(false);
       setImprintId('');
       setImprintReceivedAt(null);
+      setImprintStoryTitle('');
       setShareNotice('');
       setShareMenuOpen(false);
       setShareMenuShowDownload(false);
@@ -569,8 +588,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       }
       return;
     }
+    const opening = !wasOpenRef.current;
     const modeChanged = modeAtOpenRef.current !== null && modeAtOpenRef.current !== mode;
-    if (!wasOpenRef.current || modeChanged) {
+    if (opening || modeChanged) {
       wasOpenRef.current = true;
       modeAtOpenRef.current = mode;
       setStep('capture');
@@ -581,78 +601,35 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setUploadVideoFile(null);
       setUploadAudioFile(null);
       setAvSource('grabar');
-      const draft = loadStoryDraft();
-      const authorSession = loadStoryAuthorSession();
-      if (draft) {
-        setTextBody(draft.textBody);
-        setStoryTitle(draft.storyTitle);
-        setAlias(draft.alias);
-        setExtraText(draft.extraText);
-        setCancionRelacionada(draft.cancionRelacionada);
-        setCountry(draft.country);
-        setCity(draft.city);
-        setAgeRange((draft.ageRange as AgeRange) || '');
-        setSex((draft.sex as Sex) || '');
-        setEmail(draft.email);
-        setVideoShareUrl(draft.videoShareUrl);
-        setAudioShareUrl(draft.audioShareUrl);
-        setPhotoAlts(draft.photoAlts);
-      } else if (authorSession) {
-        setAlias(authorSession.alias);
-        setCountry(authorSession.country);
-        setCity(authorSession.city);
-        setEmail(authorSession.email);
-        if (mode === 'texto' && chosenTopic) {
-          setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
+      setVideoShareUrl('');
+      setAudioShareUrl('');
+      if (opening) {
+        clearStoryAuthorSession();
+        const carry = readStoryAuthorCarry();
+        const draft = loadStoryDraft();
+        if (carry) {
+          setAlias(carry.alias);
+          setCountry(carry.country);
+          setCity(carry.city);
+          setEmail(carry.email);
+          setAgeRange((carry.ageRange as AgeRange) || '');
+          setSex((carry.sex as Sex) || '');
         }
-        setVideoShareUrl('');
-        setAudioShareUrl('');
-      } else if (mode === 'texto' && chosenTopic) {
-        setTextBody(chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n'));
-        setVideoShareUrl('');
-        setAudioShareUrl('');
-      } else {
-        if (mode === 'texto') setTextBody('');
-        setVideoShareUrl('');
-        setAudioShareUrl('');
+        if (mode === 'texto') {
+          const topicSeed =
+            chosenTopic && !draft?.textBody
+              ? chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n')
+              : '';
+          setTextBody(draft?.textBody || topicSeed);
+        }
       }
     }
   }, [isOpen, mode, chosenTopic, resetCaptureMedia]);
 
   useEffect(() => {
-    if (!isOpen || step === 'received') return;
-    saveStoryDraft({
-      textBody,
-      storyTitle,
-      alias,
-      extraText,
-      cancionRelacionada,
-      country,
-      city,
-      ageRange,
-      sex,
-      email,
-      videoShareUrl,
-      audioShareUrl,
-      photoAlts,
-    });
-  }, [
-    isOpen,
-    step,
-    textBody,
-    storyTitle,
-    alias,
-    extraText,
-    cancionRelacionada,
-    country,
-    city,
-    ageRange,
-    sex,
-    email,
-    videoShareUrl,
-    audioShareUrl,
-    photoAlts,
-  ]);
+    if (!isOpen || step === 'received' || mode !== 'texto') return;
+    saveStoryDraft({ textBody });
+  }, [isOpen, step, mode, textBody]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -669,12 +646,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     return Boolean(
       textBody.trim() ||
         storyTitle.trim() ||
-        alias.trim() ||
         extraText.trim() ||
         cancionRelacionada.trim() ||
-        country.trim() ||
-        city.trim() ||
-        email.trim() ||
         videoShareUrl.trim() ||
         audioShareUrl.trim() ||
         mediaBlob ||
@@ -685,12 +658,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   }, [
     textBody,
     storyTitle,
-    alias,
     extraText,
     cancionRelacionada,
-    country,
-    city,
-    email,
     videoShareUrl,
     audioShareUrl,
     mediaBlob,
@@ -1031,11 +1000,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           uploadStatus: 'idle',
           progress: 0,
           error: null,
+          titulo: '',
+          anio: '',
+          anioDesconocido: false,
+          decada: '',
+          lugar: '',
+          alt: '',
         };
         next.push(item);
         if (heic) pendingHeic.push({ id: item.id, file: f });
       }
-      setPhotoAlts((alts) => next.map((_, i) => alts[i] ?? ''));
       return next;
     });
 
@@ -1064,9 +1038,19 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
       return prev.filter((_, i) => i !== index);
     });
-    setPhotoAlts((p) => p.filter((_, i) => i !== index));
     setErr('');
   }, []);
+
+  const patchPhoto = useCallback(
+    (
+      id: string,
+      patch: Partial<Pick<StoryPhotoItem, 'titulo' | 'anio' | 'anioDesconocido' | 'decada' | 'lugar' | 'alt'>>
+    ) => {
+      setPhotos((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+      if (err) setErr('');
+    },
+    [err]
+  );
 
   useEffect(() => {
     if (!profilePhoto) {
@@ -1146,7 +1130,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     return (
       ready >= SUBIR_PHOTO_MIN &&
       photos.length <= SUBIR_PHOTO_MAX &&
-      !photos.some((p) => p.converting)
+      !photos.some((p) => p.converting) &&
+      photos.every((p) => photoFichaIssue(p) == null)
     );
   }, [
     mode,
@@ -1298,7 +1283,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
       const extraAttachmentUrls: string[] = [];
       const extraNext: { key: string; readUrl: string; storagePath: string }[] = [];
-      for (let i = 0; i < extraFiles.length; i++) {
+      for (let i = 0; i < (mode === 'foto' ? 0 : extraFiles.length); i++) {
         const f = extraFiles[i]!;
         const key = `${i}-${f.name}-${f.size}`;
         const cached = extraUploadRef.current.find((x) => x.key === key);
@@ -1316,6 +1301,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         photoUrl?: string;
         photoUrls?: string[];
         photoAlts?: string[];
+        photoFichas?: {
+          nombre: string;
+          anio?: string;
+          decada?: string;
+          lugar: string;
+          alt?: string;
+        }[];
         audioUrl?: string;
         videoUrl?: string;
       } = {};
@@ -1419,7 +1411,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           payload = {
             photoUrl: first,
             photoUrls: urls,
-            photoAlts: photoAlts.slice(0, urls.length).map((s) => s.trim().slice(0, PHOTO_ALT_MAX)),
+            photoAlts: uploaded.map((p) => p.alt.trim().slice(0, PHOTO_ALT_MAX)),
+            photoFichas: uploaded.map((p) => ({
+              nombre: p.titulo.trim().slice(0, 80),
+              lugar: p.lugar.trim().slice(0, 80),
+              ...(p.anioDesconocido ? { decada: p.decada } : { anio: p.anio.trim() }),
+              ...(p.alt.trim() ? { alt: p.alt.trim().slice(0, PHOTO_ALT_MAX) } : {}),
+            })),
           };
         }
       }
@@ -1437,7 +1435,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           dateApprox: false,
           placeLabel: placeCombined,
           countryLabel: country.trim(),
-          context: buildModalSubmissionContext(mode, textBody, title, city, country, extraText),
+          context: buildModalSubmissionContext(
+            mode,
+            textBody,
+            title,
+            city,
+            country,
+            mode === 'foto' ? '' : extraText
+          ),
           payload,
           consentPrivacyPolicy: acceptedPrivacy,
           consentPublicacion: acceptedPublicacion,
@@ -1451,7 +1456,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ...(cancionRelacionada.trim()
             ? { cancionRelacionada: cancionRelacionada.trim().slice(0, CANCION_RELACIONADA_MAX) }
             : {}),
-          ...(extraText.trim()
+          ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
             : {}),
         }),
@@ -1478,15 +1483,43 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           send_to: 'AW-17718043044/dK-ICKuv_KMdEKTDz4BC',
         });
       }
+      imprintSnapRef.current = {
+        textBody,
+        storyTitle: title,
+        extraText: mode === 'foto' ? '' : extraText,
+        photoAlts: photos.map((p) => p.alt),
+        mediaBlob,
+        city,
+        country,
+      };
+      setImprintStoryTitle(title);
       setImprintId(id);
       setImprintReceivedAt(new Date());
-      saveStoryAuthorSession({
-        alias: alias.trim(),
-        country: country.trim(),
-        city: city.trim(),
-        email: email.trim(),
-      });
       clearStoryDraft();
+      setStoryTitle('');
+      setTextBody('');
+      setTextoReviewAck(false);
+      setExtraText('');
+      setCancionRelacionada('');
+      setExtraFiles([]);
+      setPhotos((prev) => {
+        prev.forEach((p) => {
+          if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
+        });
+        return [];
+      });
+      setProfilePhoto(null);
+      setUploadVideoFile(null);
+      setUploadAudioFile(null);
+      setVideoShareUrl('');
+      setAudioShareUrl('');
+      resetCaptureMedia();
+      setAcceptedPrivacy(false);
+      setAcceptedPublicacion(false);
+      setAcceptedTerminos(false);
+      captchaTokenRef.current = '';
+      setCaptchaGate(getTurnstileSiteKey() ? 'wait' : 'skip');
+      setCaptchaEpoch((n) => n + 1);
       setStep('received');
     } catch (e) {
       reportStorySubmitError('submit_exception', 'submit', e);
@@ -1508,7 +1541,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     videoShareUrl,
     audioShareUrl,
     photos,
-    photoAlts,
     uploadOnePhoto,
     alias,
     email,
@@ -1522,43 +1554,32 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     acceptedPublicacion,
     acceptedTerminos,
     captchaGate,
+    resetCaptureMedia,
     t.modalCaptchaFailed,
     t.modalSubmitFailedKeep,
   ]);
 
   useEffect(() => {
     if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
+    const snap = imprintSnapRef.current;
     try {
       drawImprintPreview(imprintCanvasRef.current, {
         storyId: imprintId,
         receivedAt: imprintReceivedAt,
         mode,
-        textBody,
-        storyTitle,
-        extraText,
-        photoAlts,
-        mediaBlob,
+        textBody: snap?.textBody ?? '',
+        storyTitle: snap?.storyTitle ?? imprintStoryTitle,
+        extraText: snap?.extraText ?? '',
+        photoAlts: snap?.photoAlts ?? [],
+        mediaBlob: snap?.mediaBlob ?? null,
         locale,
-        city,
-        country,
+        city: snap?.city ?? city,
+        country: snap?.country ?? country,
       });
     } catch (e) {
       console.error('[StoryModal] drawImprintPreview', e);
     }
-  }, [
-    step,
-    imprintId,
-    imprintReceivedAt,
-    mode,
-    textBody,
-    storyTitle,
-    extraText,
-    photoAlts,
-    mediaBlob,
-    locale,
-    city,
-    country,
-  ]);
+  }, [step, imprintId, imprintReceivedAt, imprintStoryTitle, mode, locale, city, country]);
 
   const flashShareNotice = useCallback((msg: string) => {
     if (shareNoticeTimerRef.current) clearTimeout(shareNoticeTimerRef.current);
@@ -1572,7 +1593,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const downloadImprint = useCallback(async () => {
     const c = imprintCanvasRef.current;
     if (!c) return;
-    const filename = huellaPngFilename(storyTitle, imprintId);
+    const filename = huellaPngFilename(imprintStoryTitle || storyTitle, imprintId);
     try {
       const blob = await canvasToPngBlob(c);
       if (isCoarsePointer && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
@@ -1590,7 +1611,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     } catch {
       flashShareNotice(t.modalCopyImageFailed);
     }
-  }, [imprintId, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
+  }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
 
   const shareImprint = useCallback(async () => {
     const c = imprintCanvasRef.current;
@@ -1599,12 +1620,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     const shareText = t.modalShareText || PENDING_STORY_SHARE_TEXT;
     try {
       const blob = await canvasToPngBlob(c);
-      const file = new File([blob], huellaPngFilename(storyTitle, imprintId), {
+      const file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
         type: 'image/png',
       });
       const native = await shareNativeStoryWithImage({
         file,
-        title: storyTitle.trim() || 'AlmaMundi',
+        title: (imprintStoryTitle || storyTitle).trim() || 'AlmaMundi',
         text: shareText,
         url: PENDING_STORY_SHARE_URL,
       });
@@ -1618,15 +1639,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setShareMenuOpen(true);
       flashShareNotice(t.modalShareImageFailed);
     }
-  }, [imprintId, storyTitle, t.modalShareImageFailed, t.modalShareText, flashShareNotice]);
+  }, [imprintId, imprintStoryTitle, storyTitle, t.modalShareImageFailed, t.modalShareText, flashShareNotice]);
 
   const startAnotherStory = useCallback(() => {
-    saveStoryAuthorSession({
-      alias: alias.trim(),
-      country: country.trim(),
-      city: city.trim(),
-      email: email.trim(),
-    });
     setShareMenuOpen(false);
     setShareMenuShowDownload(false);
     setShareNotice('');
@@ -1642,7 +1657,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       });
       return [];
     });
-    setPhotoAlts([]);
     extraUploadRef.current = [];
     profileUploadRef.current = null;
     avUploadRef.current = null;
@@ -1652,8 +1666,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setCancionRelacionada('');
     setExtraFiles([]);
     setProfilePhoto(null);
-    setSex('');
-    setAgeRange('');
     setAcceptedPrivacy(false);
     setAcceptedPublicacion(false);
     setAcceptedTerminos(false);
@@ -1666,8 +1678,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setSaving(false);
     setImprintId('');
     setImprintReceivedAt(null);
+    setImprintStoryTitle('');
+    imprintSnapRef.current = null;
+    captchaTokenRef.current = '';
+    setCaptchaGate(getTurnstileSiteKey() ? 'wait' : 'skip');
+    setCaptchaEpoch((n) => n + 1);
     setStep('capture');
-  }, [alias, city, country, email, resetCaptureMedia]);
+  }, [resetCaptureMedia]);
 
   if (!isOpen) return null;
 
@@ -2172,48 +2189,33 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         )}
 
         {mode === 'foto' && (
-          <>
-            <UploadModalFotoCapture
-              photos={photos}
-              onAddFiles={addPhotos}
-              onRemove={removePhotoAt}
-              onRetry={retryPhotoUpload}
-              convertingLabel={t.modalPhotoConverting}
-              retryLabel={t.modalPhotoRetry}
-              failedLabel={t.modalPhotoUploadFailed}
-              inlineError={err || undefined}
-            />
-            {photos.length > 0 ? (
-              <div className="mt-4 space-y-3">
-                {photos.map((photo, i) => (
-                  <div key={`photo-alt-${photo.id}`}>
-                    <label
-                      htmlFor={`story-photo-alt-${i}`}
-                      className="mb-0.5 block text-[10px] font-semibold leading-snug text-gray-600 md:text-[11px]"
-                    >
-                      {t.modalPhotoAltLabel}
-                      {photos.length > 1 ? ` · ${i + 1}` : ''}
-                    </label>
-                    <input
-                      id={`story-photo-alt-${i}`}
-                      value={photoAlts[i] ?? ''}
-                      onChange={(e) => {
-                        const value = e.target.value.slice(0, PHOTO_ALT_MAX);
-                        setPhotoAlts((prev) => {
-                          const next = [...prev];
-                          next[i] = value;
-                          return next;
-                        });
-                      }}
-                      maxLength={PHOTO_ALT_MAX}
-                      placeholder={t.modalPhotoAltPlaceholder}
-                      className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </>
+          <UploadModalFotoCapture
+            photos={photos}
+            onAddFiles={addPhotos}
+            onRemove={removePhotoAt}
+            onRetry={retryPhotoUpload}
+            onPatch={patchPhoto}
+            convertingLabel={t.modalPhotoConverting}
+            retryLabel={t.modalPhotoRetry}
+            failedLabel={t.modalPhotoUploadFailed}
+            inlineError={err || undefined}
+            incompleteIds={photos.filter((p) => photoFichaIssue(p) != null).map((p) => p.id)}
+            fichaMessage={(() => {
+              const year = currentPhotoYear();
+              const index = photos.findIndex((p) => photoFichaIssue(p, year) != null);
+              if (index < 0) return undefined;
+              const photo = photos[index]!;
+              const issue = photoFichaIssue(photo, year) as PhotoFichaIssue;
+              const foto = photo.titulo.trim() ? `«${photo.titulo.trim()}»` : String(index + 1);
+              if (issue === 'nombre') return interpolate(t.modalPhotoMissingName, { foto });
+              if (issue === 'anio') return interpolate(t.modalPhotoMissingYear, { foto });
+              if (issue === 'anio-invalido') {
+                return interpolate(t.modalPhotoInvalidYear, { foto, max: year });
+              }
+              if (issue === 'decada') return interpolate(t.modalPhotoMissingDecade, { foto });
+              return interpolate(t.modalPhotoMissingPlace, { foto });
+            })()}
+          />
         )}
       </FormatCaptureEditorialShell>
     );
@@ -2372,6 +2374,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
                       ) : null}
                     </div>
+                    {mode !== 'foto' ? (
                     <div>
                       <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalExtras}
@@ -2386,6 +2389,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
+                    ) : null}
                     <div>
                       <label
                         htmlFor="story-cancion-relacionada"
@@ -2403,6 +2407,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
+                    {mode !== 'foto' ? (
                     <div>
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Upload size={12} className="text-orange-500" aria-hidden />
@@ -2441,6 +2446,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         </ul>
                       )}
                     </div>
+                    ) : null}
                     <div>
                       <div className="mb-0.5 text-[11px] font-semibold normal-case text-gray-700">
                         {t.modalProfilePhoto}
@@ -2640,6 +2646,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
                 <TurnstileWidget
+                  key={captchaEpoch}
                   onTokenChange={(token) => {
                     captchaTokenRef.current = token;
                   }}
@@ -2729,7 +2736,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
-                    aria-label={interpolate(t.modalImprintAlt, { titulo: storyTitle.trim() || 'historia' })}
+                    aria-label={interpolate(t.modalImprintAlt, {
+                      titulo: (imprintStoryTitle || storyTitle).trim() || 'historia',
+                    })}
                   />
               </div>
 
@@ -2787,6 +2796,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <p>
                     <a
                       href="/contar"
+                      onClick={(event) => {
+                        event.preventDefault();
+                        armStoryAuthorCarry({
+                          alias,
+                          country,
+                          city,
+                          ageRange,
+                          sex,
+                          email,
+                        });
+                        router.push('/contar');
+                      }}
                       className="text-[12px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
                     >
                       {t.modalAnotherFormatLink}

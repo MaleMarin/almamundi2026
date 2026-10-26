@@ -11,6 +11,16 @@ export type StoryPhotoItem = {
   error: string | null;
   readUrl?: string;
   storagePath?: string;
+  /** Nombre de la foto (ficha). */
+  titulo: string;
+  /** Año exacto, 4 dígitos. */
+  anio: string;
+  anioDesconocido: boolean;
+  /** Inicio de década: 1900…2020. */
+  decada: string;
+  lugar: string;
+  /** Descripción para personas con discapacidad visual. Opcional. */
+  alt: string;
 };
 
 export function createStoryPhotoId(): string {

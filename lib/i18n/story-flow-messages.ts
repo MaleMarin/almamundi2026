@@ -22,6 +22,19 @@ export type StoryFlowMessages = {
   modalAudioLinkLabel: string;
   modalPhotoAltLabel: string;
   modalPhotoAltPlaceholder: string;
+  modalPhotoName: string;
+  modalPhotoYear: string;
+  modalPhotoYearUnknown: string;
+  modalPhotoDecade: string;
+  modalPhotoDecadeChoose: string;
+  modalPhotoPlace: string;
+  modalPhotoPlacePlaceholder: string;
+  modalPhotoDecadeOption: string;
+  modalPhotoMissingName: string;
+  modalPhotoMissingYear: string;
+  modalPhotoInvalidYear: string;
+  modalPhotoMissingDecade: string;
+  modalPhotoMissingPlace: string;
   modalPhotoTypeError: string;
   modalPhotoSizeError: string;
   modalPhotoConverting: string;
@@ -96,8 +109,21 @@ const es: StoryFlowMessages = {
   modalVideoLinkHint: 'El video debe ser público o no listado.',
   modalAudioLinkLabel: 'O pega un enlace público (SoundCloud, Google Drive, YouTube…)',
   modalPhotoAltLabel:
-    'Describe esta foto en una frase. Así personas ciegas o con baja visión también podrán conocerla.',
+    'Describe esta foto en una frase. Así personas ciegas o con baja visión también podrán conocerla. (opcional)',
   modalPhotoAltPlaceholder: 'Ej: Mi abuela riendo en la playa, 1985',
+  modalPhotoName: 'Nombre de la foto *',
+  modalPhotoYear: 'Año *',
+  modalPhotoYearUnknown: 'No sé el año exacto',
+  modalPhotoDecade: 'Década *',
+  modalPhotoDecadeChoose: 'Elige una década',
+  modalPhotoPlace: 'Lugar *',
+  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
+  modalPhotoDecadeOption: 'años {year}',
+  modalPhotoMissingName: 'Falta el nombre de la foto {foto}.',
+  modalPhotoMissingYear: 'Falta el año de la foto {foto}.',
+  modalPhotoInvalidYear: 'El año de la foto {foto} debe tener 4 dígitos, entre 1850 y {max}.',
+  modalPhotoMissingDecade: 'Falta la década de la foto {foto}.',
+  modalPhotoMissingPlace: 'Falta el lugar de la foto {foto}.',
   modalPhotoTypeError: 'Ese archivo no es una foto. Usa JPG, PNG, WEBP o HEIC.',
   modalPhotoSizeError: 'Esa foto pesa más de 10 MB. Prueba con una más liviana.',
   modalPhotoConverting: 'Convirtiendo tu foto…',
@@ -157,6 +183,22 @@ const pt: StoryFlowMessages = {
   modalPhotoConverting: 'A converter a sua foto…',
   modalPhotoUploadFailed: 'Não foi possível enviar esta foto.',
   modalPhotoRetry: 'Tentar de novo',
+  modalPhotoAltLabel:
+    'Descreva esta foto numa frase. Assim, pessoas cegas ou com baixa visão também poderão conhecê-la. (opcional)',
+  modalPhotoAltPlaceholder: 'Ex.: A minha avó a rir na praia, 1985',
+  modalPhotoName: 'Nome da foto *',
+  modalPhotoYear: 'Ano *',
+  modalPhotoYearUnknown: 'Não sei o ano exato',
+  modalPhotoDecade: 'Década *',
+  modalPhotoDecadeChoose: 'Escolha uma década',
+  modalPhotoPlace: 'Lugar *',
+  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
+  modalPhotoDecadeOption: 'anos {year}',
+  modalPhotoMissingName: 'Falta o nome da foto {foto}.',
+  modalPhotoMissingYear: 'Falta o ano da foto {foto}.',
+  modalPhotoInvalidYear: 'O ano da foto {foto} deve ter 4 dígitos, entre 1850 e {max}.',
+  modalPhotoMissingDecade: 'Falta a década da foto {foto}.',
+  modalPhotoMissingPlace: 'Falta o lugar da foto {foto}.',
   modalRequiredFieldsNote: 'Os campos com * são obrigatórios.',
   modalShareImageFailed:
     'Não foi possível partilhar. Descarregue a imagem e partilhe-a a partir do seu dispositivo.',
@@ -180,6 +222,22 @@ const en: StoryFlowMessages = {
   modalPhotoConverting: 'Converting your photo…',
   modalPhotoUploadFailed: 'We could not upload this photo.',
   modalPhotoRetry: 'Try again',
+  modalPhotoAltLabel:
+    'Describe this photo in one sentence so people who are blind or have low vision can know it too. (optional)',
+  modalPhotoAltPlaceholder: 'E.g. My grandmother laughing at the beach, 1985',
+  modalPhotoName: 'Photo name *',
+  modalPhotoYear: 'Year *',
+  modalPhotoYearUnknown: 'I do not know the exact year',
+  modalPhotoDecade: 'Decade *',
+  modalPhotoDecadeChoose: 'Choose a decade',
+  modalPhotoPlace: 'Place *',
+  modalPhotoPlacePlaceholder: 'Valparaíso, Chile',
+  modalPhotoDecadeOption: '{year}s',
+  modalPhotoMissingName: 'Photo {foto} is missing a name.',
+  modalPhotoMissingYear: 'Photo {foto} is missing the year.',
+  modalPhotoInvalidYear: 'The year of photo {foto} must be 4 digits, from 1850 to {max}.',
+  modalPhotoMissingDecade: 'Photo {foto} is missing a decade.',
+  modalPhotoMissingPlace: 'Photo {foto} is missing the place.',
   modalRequiredFieldsNote: 'Fields marked with * are required.',
   modalShareImageFailed:
     'We could not share this. Download the image and share it from your device.',

@@ -37,3 +37,13 @@ export function saveStoryAuthorSession(session: StoryAuthorSession): void {
     /* modo privado */
   }
 }
+
+/** Borra restos de sesiones viejas. El flujo nuevo no guarda datos de la persona. */
+export function clearStoryAuthorSession(): void {
+  try {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.removeItem(AUTHOR_SESSION_KEY);
+  } catch {
+    /* modo privado */
+  }
+}

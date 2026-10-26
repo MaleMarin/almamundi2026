@@ -338,7 +338,7 @@ const es: SiteUiMessages = {
     },
     foto: {
       title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
-      subtitle: 'Sube hasta 8 fotos. Cada una puede tener su historia.',
+      subtitle: 'Sube hasta 8 fotos. Cada una lleva su nombre, el año y el lugar donde fue tomada.',
       limit: 'Hasta 10 MB por foto.',
       primaryCta: 'Elegir fotos',
       uploadLabel: '',
@@ -531,7 +531,7 @@ const pt: SiteUiMessages = {
     },
     foto: {
       title: 'Uma imagem pode guardar\no que as palavras não alcançam',
-      subtitle: 'Envie até 8 fotos. Cada uma pode ter a sua história.',
+      subtitle: 'Envie até 8 fotos. Cada uma leva o seu nome, o ano e o lugar onde foi tirada.',
       limit: 'Até 10 MB por foto.',
       primaryCta: 'Selecionar fotos',
       uploadLabel: '',
@@ -723,7 +723,7 @@ const en: SiteUiMessages = {
     },
     foto: {
       title: 'An image can hold\nwhat words cannot reach',
-      subtitle: 'Upload up to 8 photos. Each one can have its story.',
+      subtitle: 'Upload up to 8 photos. Each one includes its name, the year, and the place where it was taken.',
       limit: 'Up to 10 MB per photo.',
       primaryCta: 'Select photos',
       uploadLabel: '',

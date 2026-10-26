@@ -115,6 +115,7 @@ export function CursorGlobal() {
     <>
       <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={ringRef} className="cursor-ring" aria-hidden="true" />
+      <style>{`html:has(.story-submit-modal) .cursor-dot,html:has(.story-submit-modal) .cursor-ring{display:none !important}html[data-cursor-global="on"]:has(.story-submit-modal),html[data-cursor-global="on"]:has(.story-submit-modal) *,html[data-cursor-global="on"]:has(.story-submit-modal) *::before,html[data-cursor-global="on"]:has(.story-submit-modal) *::after{cursor:auto !important}`}</style>
     </>
   );
 }

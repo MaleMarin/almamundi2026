@@ -8,7 +8,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
-import { imagenesFromUrlsAndAlts, parseStoryImagenes } from "@/lib/historias/story-imagenes";
+import { imagenesFromSubmissionPhotos, parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
 import {
@@ -86,6 +86,13 @@ type SubmissionsPipelineDoc = {
     photoUrl?: string;
     photoUrls?: string[];
     photoAlts?: string[];
+    photoFichas?: {
+      nombre?: string;
+      anio?: string;
+      decada?: string;
+      lugar?: string;
+      alt?: string;
+    }[];
     audioUrl?: string;
     videoUrl?: string;
   };
@@ -293,7 +300,7 @@ export async function editorialPublishFromSubmission(
     bag: {
       media: rawMedia,
       imagenes: photoUrls.length
-        ? imagenesFromUrlsAndAlts(photoUrls, sd.payload?.photoAlts)
+        ? imagenesFromSubmissionPhotos(photoUrls, sd.payload?.photoFichas, sd.payload?.photoAlts)
         : undefined,
       profilePhotoUrl: sd.profilePhotoUrl,
     },
