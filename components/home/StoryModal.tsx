@@ -2547,7 +2547,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.age}</p>
                       ) : null}
                     </div>
-                    <div>
+                    <div className="sm:col-span-2">
                       <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
                         <Users size={12} className="text-orange-500" aria-hidden />
                         {t.modalGender}

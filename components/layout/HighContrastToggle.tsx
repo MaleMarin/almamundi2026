@@ -25,6 +25,7 @@ export function HighContrastToggle() {
       aria-pressed={on}
       aria-label={on ? 'Desactivar alto contraste' : 'Activar alto contraste'}
       title={on ? 'Desactivar alto contraste' : 'Activar alto contraste'}
+      className="am-contrast-toggle"
       style={{
         position: 'fixed',
         bottom: '20px',
