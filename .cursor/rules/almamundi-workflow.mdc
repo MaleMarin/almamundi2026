@@ -1,32 +1,18 @@
 ---
-description: AlmaMundi — Modo Ahorro y precisión. Aplica a toda interacción.
-alwaysApply: true
+description: Aplicar cuando el cambio toca textos visibles, correos, traducciones, tipografía, cintas de colores, o cuando el prompt pide una auditoría.
+alwaysApply: false
 ---
+# Textos
+- Español neutro latinoamericano, sin voseo (vos, tenés, escribí). Portugués e inglés con el mismo sentido.
+- Sin guiones largos como puntuación; usa comas.
+- Copia exactos los textos que entrega Ana, sin reescribirlos.
 
-# Modo Ahorro (OBLIGATORIO)
+# Diseño
+- Montserrat en páginas internas y modales; la home mantiene su tipografía.
+- Cintas de colores sin negro ni blanco (ni cremas casi blancos).
 
-- Para cambios acotados, trabaja con los archivos indicados y pide contexto adicional solo si hace falta.
-- Para auditorías, búsquedas de contenido o diagnósticos, la búsqueda global en todo el repositorio está permitida y es obligatoria.
-- Prohibido inventar archivos, rutas, componentes, APIs o tipos. Si no existen, dilo.
-- Antes de modificar código: plan de 3-6 bullets, luego cambios acotados.
-- Cambios pequeños, seguros, reversibles. Sin refactors no pedidos.
-- Lee solo los archivos que el prompt nombra o que necesitas, nunca el repositorio completo.
-- No uses Playwright ni capturas salvo que el prompt lo pida explícitamente. Verificación por defecto: npm run build. Ana prueba en el navegador.
-- Un solo build al final, no después de cada cambio.
-- Informe de máximo 10 líneas: qué cambió, archivos, commit y enlace del despliegue.
-- Si una tarea necesita más de 3 archivos nuevos o una investigación, pregunta antes de seguir.
+# Auditorías
+- Solo si el prompt pide auditoría o diagnóstico: búsqueda global permitida, con informe de hallazgos y sin cambiar código.
 
-# Stack
-
-Next.js 14+ (App Router), React 19, TypeScript, Tailwind CSS 4, Firebase, Three.js, Vercel.
-
-# Lenguaje
-
-Español neutro latinoamericano siempre. Nunca voseo (vos, tenés, escribí, subís, etc.).
-
-# Entrega
-
-- Lista "Archivos modificados" al final.
-- Snippets completos o diff claro, sin "// resto del código".
-- Helpers nuevos van donde el proyecto ya organiza utilidades.
-- No instalar librerías nuevas sin permiso.
+# Código
+- Snippets completos, sin "// resto del código". Helpers nuevos donde el proyecto ya organiza utilidades.
