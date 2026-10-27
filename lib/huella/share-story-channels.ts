@@ -1,7 +1,18 @@
 export const PENDING_STORY_SHARE_URL = 'https://www.almamundi.org/contar';
 
+export const PENDING_STORY_SHARE_TEXT_SHORT =
+  'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar';
+
 export const PENDING_STORY_SHARE_TEXT =
-  'Mis palabras se volvieron colores en AlmaMundi. ¿De qué color es tu historia? https://www.almamundi.org/contar';
+  'Todos guardamos una historia que vale la pena contar. Yo conté la mía en AlmaMundi y estos son sus colores. Te toca. https://www.almamundi.org/contar';
+
+export const PENDING_STORY_SHARE_EMAIL_SUBJECT = 'Conté una historia en AlmaMundi';
+
+export type StoryShareCopy = {
+  short: string;
+  long: string;
+  emailSubject: string;
+};
 
 export type StoryShareChannelUrls = {
   whatsapp: string;
@@ -37,16 +48,18 @@ function messageWithCanonicalUrl(text: string): string {
 
 export function buildStoryShareChannelUrls(
   url: string,
-  text: string
+  copy: StoryShareCopy
 ): StoryShareChannelUrls {
   const shareUrl = canonicalStoryShareUrl(url);
-  const message = messageWithCanonicalUrl(text);
+  const shortMessage = messageWithCanonicalUrl(copy.short);
+  const longMessage = messageWithCanonicalUrl(copy.long);
+  const subject = copy.emailSubject.trim() || PENDING_STORY_SHARE_EMAIL_SUBJECT;
   return {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(message)}`,
+    whatsapp: `https://wa.me/?text=${encodeURIComponent(longMessage)}`,
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
-    x: `https://twitter.com/intent/tweet?text=${encodeURIComponent(message)}`,
+    x: `https://x.com/intent/post?text=${encodeURIComponent(shortMessage)}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,
-    email: `mailto:?subject=${encodeURIComponent('AlmaMundi')}&body=${encodeURIComponent(message)}`,
+    email: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(longMessage)}`,
   };
 }
 

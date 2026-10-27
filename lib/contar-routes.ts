@@ -10,6 +10,12 @@ const OG_IMAGE = {
   alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
 } as const;
 
+/** Tarjeta que arman Facebook y LinkedIn al recibir solo el enlace de /contar. */
+const CONTAR_SHARE_CARD = {
+  title: 'Cuenta tu historia en AlmaMundi',
+  description: 'Tu historia, con tu voz, en el mapa del mundo.',
+} as const;
+
 const CONTAR_META: Record<
   ContarFormat | 'index',
   { title: string; description: string }
@@ -57,12 +63,14 @@ export function modeFromContarFormat(format: ContarFormat): ContarFormat {
 
 export function contarMetadata(kind: ContarFormat | 'index'): Metadata {
   const { title, description } = CONTAR_META[kind];
+  const socialTitle = kind === 'index' ? CONTAR_SHARE_CARD.title : `${title} · AlmaMundi`;
+  const socialDescription = kind === 'index' ? CONTAR_SHARE_CARD.description : description;
   return {
     title,
     description,
     openGraph: {
-      title: `${title} · AlmaMundi`,
-      description,
+      title: socialTitle,
+      description: socialDescription,
       type: 'website',
       locale: 'es_CL',
       siteName: 'AlmaMundi',
@@ -70,8 +78,8 @@ export function contarMetadata(kind: ContarFormat | 'index'): Metadata {
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} · AlmaMundi`,
-      description,
+      title: socialTitle,
+      description: socialDescription,
       images: [OG_IMAGE.url],
     },
   };

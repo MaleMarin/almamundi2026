@@ -65,8 +65,10 @@ import {
   shareNativeStoryWithImage,
 } from '@/lib/huella/share-resonance-png';
 import {
-  PENDING_STORY_SHARE_URL,
+  PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
+  PENDING_STORY_SHARE_TEXT_SHORT,
+  PENDING_STORY_SHARE_URL,
 } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
@@ -1747,7 +1749,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     const c = imprintCanvasRef.current;
     if (!c) return;
     const requestToken = ++shareRequestTokenRef.current;
-    const shareText = t.modalShareText || PENDING_STORY_SHARE_TEXT;
+    const shareText = t.modalShareTextLong || PENDING_STORY_SHARE_TEXT;
     try {
       const blob = await canvasToPngBlob(c);
       const file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
@@ -1769,7 +1771,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setShareMenuOpen(true);
       flashShareNotice(t.modalShareImageFailed);
     }
-  }, [imprintId, imprintStoryTitle, storyTitle, t.modalShareImageFailed, t.modalShareText, flashShareNotice]);
+  }, [imprintId, imprintStoryTitle, storyTitle, t.modalShareImageFailed, t.modalShareTextLong, flashShareNotice]);
 
   const startAnotherStory = useCallback(() => {
     setShareMenuOpen(false);
@@ -3053,7 +3055,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           {shareMenuOpen ? (
             <StoryShareMenu
               shareUrl={PENDING_STORY_SHARE_URL}
-              shareText={t.modalShareText || PENDING_STORY_SHARE_TEXT}
+              shareTextShort={t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT}
+              shareTextLong={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
+              emailSubject={t.modalShareEmailSubject || PENDING_STORY_SHARE_EMAIL_SUBJECT}
               labels={{
                 title: t.modalShareMenuTitle,
                 facebook: t.modalShareFacebook,

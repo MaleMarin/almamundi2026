@@ -20,7 +20,9 @@ export type StoryShareMenuLabels = {
 
 type StoryShareMenuProps = {
   shareUrl: string;
-  shareText: string;
+  shareTextShort: string;
+  shareTextLong: string;
+  emailSubject: string;
   labels: StoryShareMenuLabels;
   showDownload: boolean;
   onCopied: () => void;
@@ -31,7 +33,9 @@ type StoryShareMenuProps = {
 
 export function StoryShareMenu({
   shareUrl,
-  shareText,
+  shareTextShort,
+  shareTextLong,
+  emailSubject,
   labels,
   showDownload,
   onCopied,
@@ -39,7 +43,11 @@ export function StoryShareMenu({
   onDownload,
   onClose,
 }: StoryShareMenuProps) {
-  const channels = buildStoryShareChannelUrls(shareUrl, shareText);
+  const channels = buildStoryShareChannelUrls(shareUrl, {
+    short: shareTextShort,
+    long: shareTextLong,
+    emailSubject,
+  });
 
   const copyLink = async () => {
     const ok = await copyTextToClipboard(canonicalStoryShareUrl(shareUrl));
