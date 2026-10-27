@@ -47,6 +47,7 @@ import {
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
   messageForUploadError,
+  TURNSTILE_REJECT_MESSAGE,
 } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
@@ -69,16 +70,12 @@ import {
 } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
-import {
-  armStoryAuthorCarry,
-  clearStoryAuthorCarryIfStale,
-  readStoryAuthorCarry,
-} from '@/lib/story-author-carry';
+import { clearStoryAuthorCarryIfStale } from '@/lib/story-author-carry';
 import { currentPhotoYear, photoFichaIssue, type PhotoFichaIssue } from '@/lib/story-photo-ficha';
 import { uploadFileToStorage } from '@/lib/firebase/upload';
 import { previewCommitStamp } from '@/lib/preview-version';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
-import { TurnstileWidget } from '@/components/home/TurnstileWidget';
+import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { AdultConsentCheckbox } from '@/components/subir/AdultConsentCheckbox';
 import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 import { prepareStoryPhotoForUpload } from '@/lib/prepare-story-photo';
@@ -449,6 +446,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const profileUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
   const avUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
   const captchaTokenRef = useRef('');
+  const turnstileRef = useRef<TurnstileWidgetHandle>(null);
   const adsConversionSentRef = useRef('');
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(
     getTurnstileSiteKey() ? 'wait' : 'skip'
@@ -625,16 +623,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setAudioShareUrl('');
       if (opening) {
         clearStoryAuthorSession();
-        const carry = readStoryAuthorCarry();
+        setAlias('');
+        setCountry('');
+        setCity('');
+        setEmail('');
+        setAgeRange('');
+        setSex('');
         const draft = loadStoryDraft();
-        if (carry) {
-          setAlias(carry.alias);
-          setCountry(carry.country);
-          setCity(carry.city);
-          setEmail(carry.email);
-          setAgeRange((carry.ageRange as AgeRange) || '');
-          setSex((carry.sex as Sex) || '');
-        }
         if (mode === 'texto') {
           const topicSeed =
             chosenTopic && !draft?.textBody
@@ -1590,8 +1585,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
       if (!res.ok) {
         reportStorySubmitError(data.error || `submissions_${res.status}`, 'submissions', data.error);
+        if (res.status === 400) turnstileRef.current?.reset();
         if (data.error === 'uploads_paused') {
           setErr(messageForUploadError(new Error('uploads_paused'), mode));
+          return;
+        }
+        if (data.error === TURNSTILE_REJECT_MESSAGE) {
+          setErr(t.modalCaptchaFailed);
           return;
         }
         setErr(t.modalSubmitFailedKeep);
@@ -1792,10 +1792,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     avUploadRef.current = null;
     submitInFlightRef.current = false;
     setStoryTitle('');
+    setAlias('');
     setExtraText('');
     setCancionRelacionada('');
     setExtraFiles([]);
     setProfilePhoto(null);
+    setSex('');
+    setAgeRange('');
+    setCity('');
+    setCountry('');
+    setEmail('');
     setAcceptedPrivacy(false);
     setAcceptedPublicacion(false);
     setAcceptedTerminos(false);
@@ -2670,7 +2676,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         }}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
-                        autoComplete="country-name"
+                        autoComplete="off"
                       />
                       {fieldErr.country ? (
                         <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.country}</p>
@@ -2693,6 +2699,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         }}
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
+                        autoComplete="off"
                       />
                       <p className="mt-0.5 text-[10px] text-gray-600">{t.modalLocationHint}</p>
                       {fieldErr.city ? (
@@ -2772,7 +2779,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (fieldErr.email) setFieldErr((p) => ({ ...p, email: undefined }));
                         }}
                         type="email"
-                        autoComplete="email"
+                        autoComplete="off"
                         className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
@@ -2849,6 +2856,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
                 <TurnstileWidget
+                  ref={turnstileRef}
                   key={captchaEpoch}
                   onTokenChange={(token) => {
                     captchaTokenRef.current = token;
@@ -3017,14 +3025,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       href="/contar"
                       onClick={(event) => {
                         event.preventDefault();
-                        armStoryAuthorCarry({
-                          alias,
-                          country,
-                          city,
-                          ageRange,
-                          sex,
-                          email,
-                        });
                         router.push('/contar');
                       }}
                       className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"

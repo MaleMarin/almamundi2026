@@ -1,5 +1,8 @@
 import type { SubirHuellaFormat } from '@/hooks/useSubirHuella';
 
+export const TURNSTILE_REJECT_MESSAGE =
+  'No pudimos confirmar el envío. Espera unos segundos e inténtalo de nuevo.';
+
 export type UploadModalCopy = {
   title: string;
   subtitle: string;
@@ -100,7 +103,7 @@ export function messageForUploadError(
     code === 'captcha_verify_error' ||
     code.toLowerCase().includes('anti-bot')
   ) {
-    return 'No pudimos confirmar que eres una persona. Completa la verificación e intenta de nuevo.';
+    return TURNSTILE_REJECT_MESSAGE;
   }
 
   const lower = code.toLowerCase();

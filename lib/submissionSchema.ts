@@ -93,7 +93,7 @@ export const CreateSubmissionBody = z.object({
   consentPublicacion: z.literal(true),
   /** Aceptación explícita de los Términos de Uso. */
   consentTerminos: z.literal(true),
-  /** Cloudflare Turnstile (opcional si TURNSTILE_SECRET_KEY está definida). */
+  /** Token de Turnstile. POST /api/submissions lo verifica en siteverify. */
   captchaToken: z.string().max(4000).optional(),
   /** Foto personal opcional (avatar) para mostrar junto al nombre público si se aprueba. */
   profilePhotoUrl: z.string().url().optional(),

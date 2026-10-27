@@ -168,7 +168,7 @@ const es: StoryFlowMessages = {
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
     'No pudimos enviar tu historia. Lo que grabaste y escribiste sigue aquí. Revisa tu conexión e intenta de nuevo.',
-  modalCaptchaFailed: 'No pudimos completar la verificación de seguridad. Intenta de nuevo.',
+  modalCaptchaFailed: 'No pudimos confirmar el envío. Espera unos segundos e inténtalo de nuevo.',
   modalFieldTitleMissing: 'Falta el título de tu historia.',
   modalFieldAliasMissing: 'Falta tu nombre o alias.',
   modalFieldCountryMissing: 'Falta el país.',
@@ -281,6 +281,7 @@ const pt: StoryFlowMessages = {
   modalExtrasColorHint: 'O que escrever aqui também dá cor à sua imagem.',
   modalNowWhat: 'E agora?',
   modalContactLead: 'Tem dúvidas? Escreva para',
+  modalCaptchaFailed: 'Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo.',
 };
 
 const en: StoryFlowMessages = {
@@ -348,6 +349,7 @@ const en: StoryFlowMessages = {
   modalExtrasColorHint: 'What you write here also gives color to your image.',
   modalNowWhat: 'What now?',
   modalContactLead: 'Questions? Write to us at',
+  modalCaptchaFailed: 'We could not confirm the submission. Wait a few seconds and try again.',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

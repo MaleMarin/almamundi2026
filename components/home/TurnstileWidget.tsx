@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 
 const SCRIPT_SRC =
@@ -15,12 +15,14 @@ type TurnstileApi = {
       sitekey: string;
       theme?: 'light' | 'dark' | 'auto';
       appearance?: 'always' | 'execute' | 'interaction-only';
+      'refresh-expired'?: 'auto' | 'manual' | 'never';
       callback?: (token: string) => void;
       'error-callback'?: () => void;
       'expired-callback'?: () => void;
       'timeout-callback'?: () => void;
     }
   ) => string;
+  reset: (widgetId?: string) => void;
   remove: (widgetId: string) => void;
 };
 
@@ -65,7 +67,12 @@ export type TurnstileWidgetProps = {
   onGateChange: (gate: TurnstileGate) => void;
 };
 
-export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidgetProps) {
+export type TurnstileWidgetHandle = {
+  reset: () => void;
+};
+
+export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidgetProps>(
+  function TurnstileWidget({ onTokenChange, onGateChange }, ref) {
   const siteKey = getTurnstileSiteKey();
   const hostRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
@@ -78,6 +85,16 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
     'loading'
   );
   const [retryKey, setRetryKey] = useState(0);
+
+  useImperativeHandle(ref, () => ({
+    reset() {
+      onTokenRef.current('');
+      onGateRef.current('wait');
+      setStatus('ready');
+      const widgetId = widgetIdRef.current;
+      if (widgetId && window.turnstile) window.turnstile.reset(widgetId);
+    },
+  }));
 
   useEffect(() => {
     if (!siteKey) {
@@ -107,11 +124,14 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
           window.turnstile.remove(widgetIdRef.current);
           widgetIdRef.current = null;
         }
+        let issued = 0;
         widgetIdRef.current = window.turnstile.render(hostRef.current, {
           sitekey: siteKey,
           theme: 'light',
           appearance: 'interaction-only',
+          'refresh-expired': 'auto',
           callback: (token: string) => {
+            issued += 1;
             onTokenRef.current(token);
             onGateRef.current('ok');
             setStatus('solved');
@@ -122,9 +142,13 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
             setStatus('error');
           },
           'expired-callback': () => {
-            onTokenRef.current('');
-            onGateRef.current('need');
-            setStatus('ready');
+            const atExpiry = issued;
+            window.setTimeout(() => {
+              if (cancelled || issued !== atExpiry) return;
+              onTokenRef.current('');
+              onGateRef.current('wait');
+              setStatus('ready');
+            }, 50);
           },
           'timeout-callback': () => {
             onTokenRef.current('');
@@ -155,7 +179,7 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
   if (!siteKey) return null;
 
   return (
-    <div className="space-y-1.5">
+    <div className={status === 'solved' ? 'h-0 overflow-hidden' : 'space-y-1.5'}>
       <div ref={hostRef} />
       {status === 'loading' ? (
         <p className="text-[10px] leading-tight text-gray-500 md:text-[11px]">
@@ -184,4 +208,4 @@ export function TurnstileWidget({ onTokenChange, onGateChange }: TurnstileWidget
       ) : null}
     </div>
   );
-}
+});

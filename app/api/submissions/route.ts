@@ -17,7 +17,8 @@ import {
   enforceRateLimit,
   getRateLimiter,
 } from "@/lib/rate-limit";
-import { verifyTurnstileIfConfigured } from "@/lib/turnstile";
+import { verifyTurnstileStrict } from "@/lib/security/turnstile-strict";
+import { TURNSTILE_REJECT_MESSAGE } from "@/lib/subir-upload-modal-copy";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
@@ -130,9 +131,9 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  const captcha = await verifyTurnstileIfConfigured(data.captchaToken, ip);
+  const captcha = await verifyTurnstileStrict(data.captchaToken, ip);
   if (!captcha.ok) {
-    return NextResponse.json({ error: "Verificación anti-bot requerida." }, { status: 400 });
+    return NextResponse.json({ error: TURNSTILE_REJECT_MESSAGE }, { status: 400 });
   }
 
   const { type } = data;
