@@ -2,6 +2,7 @@
 
 import { Download, Mail, X } from 'lucide-react';
 import {
+  canonicalStoryShareUrl,
   buildStoryShareChannelUrls,
   copyTextToClipboard,
 } from '@/lib/huella/share-story-channels';
@@ -41,7 +42,7 @@ export function StoryShareMenu({
   const channels = buildStoryShareChannelUrls(shareUrl, shareText);
 
   const copyLink = async () => {
-    const ok = await copyTextToClipboard(shareUrl);
+    const ok = await copyTextToClipboard(canonicalStoryShareUrl(shareUrl));
     if (ok) onCopied();
     else onCopyFailed();
   };

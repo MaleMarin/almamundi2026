@@ -179,7 +179,7 @@ const es: StoryFlowMessages = {
     'Tu historia está en revisión. Te escribiremos cuando aparezca en el mapa.',
   modalSaveImage: 'Guardar imagen',
   modalShareText:
-    'Mis palabras se volvieron colores en AlmaMundi. ¿De qué color es tu historia? almamundi.org/contar',
+    'Mis palabras se volvieron colores en AlmaMundi. ¿De qué color es tu historia? https://www.almamundi.org/contar',
   modalCopyImageFailed: 'No pudimos copiar la imagen. Prueba con Descargar.',
   modalShareImageFailed:
     'No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo.',

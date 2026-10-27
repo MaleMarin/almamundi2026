@@ -2,6 +2,8 @@
  * PNG de resonancia: descargar, compartir (móvil) o copiar al portapapeles (desktop).
  */
 
+import { canonicalStoryShareUrl } from '@/lib/huella/share-story-channels';
+
 function isCoarsePointer(): boolean {
   if (typeof window === 'undefined') return false;
   return window.matchMedia('(pointer: coarse)').matches;
@@ -53,11 +55,13 @@ export async function shareNativeStoryWithImage(opts: {
   if (!isMobile) return 'unavailable';
 
   if (canShareFiles(opts.file)) {
+    const url = canonicalStoryShareUrl(opts.url);
+    const text = opts.text.includes(url) ? opts.text : `${opts.text.trim()} ${url}`.trim();
     try {
       await navigator.share({
         files: [opts.file],
         title: opts.title,
-        text: opts.text,
+        text,
       });
       return 'shared';
     } catch (e) {
