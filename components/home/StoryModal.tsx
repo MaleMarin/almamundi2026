@@ -2936,11 +2936,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           {step === 'received' && (
             <div className="font-interna flex flex-col">
               <div className="shrink-0 space-y-2 text-center">
-                <div className="flex justify-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-[12px] border border-[#D4D4C4] bg-white text-[#FF4A1C]">
-                    <Check size={20} strokeWidth={2.2} aria-hidden />
-                  </div>
-                </div>
                 <h3 className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26]">
                   {alias.trim() ? (
                     <>
