@@ -18,6 +18,16 @@ import {
   scrollToHomeMapaSection,
 } from '@/lib/mapa-home-nav';
 
+/** Las cuatro tarjetas quedan bajo el header fijo, con «Respondes a:» a la vista. */
+function scrollToFormatCards() {
+  const el = document.getElementById('historias');
+  if (!el) return;
+  const header = document.querySelector('header');
+  const offset = header instanceof HTMLElement ? header.getBoundingClientRect().height : 0;
+  const top = el.getBoundingClientRect().top + window.scrollY - offset;
+  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+}
+
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
  * Las tarjetas abren StoryModal; el flujo por temas de inspiración no está en el header.
@@ -32,6 +42,7 @@ export function HomePageClient() {
   const searchParams = useSearchParams();
   const { locale } = useHomeLocale();
   const pregunta = preguntaFromSearch(searchParams);
+  const preguntaKey = pregunta ? `${pregunta.id}:${pregunta.mode}` : '';
   const preguntaVigente = preguntasDeLaSemana().vigente;
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -99,10 +110,10 @@ export function HomePageClient() {
     setStoryOpen(false);
     if (pathname === '/contar') {
       window.requestAnimationFrame(() => {
-        document.getElementById('historias')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        scrollToFormatCards();
       });
     }
-  }, [pathname]);
+  }, [pathname, preguntaKey]);
 
   const closeProposito = useCallback(() => {
     setPropositoOpen(false);
@@ -268,27 +279,42 @@ export function HomePageClient() {
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
-      <div className="home-intro-avenir mx-auto mb-8 w-full max-w-[min(100%,90rem)] px-6 md:mb-12 md:px-10">
-        <div
-          className="flex flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
-          style={{
-            background: 'rgba(255, 255, 255, 0.35)',
-            backdropFilter: 'blur(16px) saturate(140%)',
-            WebkitBackdropFilter: 'blur(16px) saturate(140%)',
-            border: '1px solid rgba(255, 255, 255, 0.6)',
-            boxShadow: '0 8px 28px rgba(74, 85, 104, 0.12)',
-          }}
-        >
-          <p className="m-0 max-w-full text-[0.95rem] leading-snug sm:text-base xl:whitespace-nowrap" style={{ color: '#4A5568' }}>
-            <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
-            {preguntaVigente.tu[locale]}
-          </p>
-          <Link
-            href={contarIndexHref({ id: preguntaVigente.id, mode: 'tu' })}
-            className="btn-am-principal inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
+      <div className="home-intro-avenir relative z-20 mx-auto mb-8 flex w-full justify-center px-6 md:mb-12 md:px-10">
+        <div className="relative w-max max-w-full">
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -left-12 top-1/2 z-0 h-40 w-40 -translate-y-1/2 rounded-full"
+            style={{ background: 'rgba(209,61,23,0.18)', filter: 'blur(40px)' }}
+          />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute -right-10 top-1/2 z-0 h-36 w-36 -translate-y-1/2 rounded-full"
+            style={{ background: 'rgba(90,120,160,0.15)', filter: 'blur(40px)' }}
+          />
+          <div
+            className="relative z-[1] flex w-max max-w-full flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
+            style={{
+              background: 'linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))',
+              backdropFilter: 'blur(18px) saturate(160%)',
+              WebkitBackdropFilter: 'blur(18px) saturate(160%)',
+              border: '1px solid rgba(255,255,255,0.8)',
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)',
+            }}
           >
-            {PREGUNTA_UI.responder[locale]}
-          </Link>
+            <p className="m-0 text-[0.95rem] leading-snug sm:text-base xl:whitespace-nowrap" style={{ color: '#4A5568' }}>
+              <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
+              {preguntaVigente.tu[locale]}
+            </p>
+            <Link
+              href={contarIndexHref({ id: preguntaVigente.id, mode: 'tu' })}
+              onClick={() => {
+                window.setTimeout(scrollToFormatCards, 60);
+              }}
+              className="btn-am-principal relative z-[1] inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
+            >
+              {PREGUNTA_UI.responder[locale]}
+            </Link>
+          </div>
         </div>
       </div>
       <MapSectionLocked />
