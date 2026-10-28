@@ -28,6 +28,8 @@ export type StoryFlowMessages = {
   modalFileTooLongVideo: string;
   modalFileTooLongAudio: string;
   modalUploadProgress: string;
+  modalUploadColorsWait: string;
+  modalCreatingColors: string;
   modalPreviewVersion: string;
   modalVideoLinkHint: string;
   modalAudioLinkLabel: string;
@@ -136,6 +138,9 @@ const es: StoryFlowMessages = {
   modalFileTooLongVideo: 'Este video dura más de 5 minutos. Puedes recortarlo o subir otro.',
   modalFileTooLongAudio: 'Este audio dura más de 5 minutos. Puedes recortarlo o subir otro.',
   modalUploadProgress: 'Progreso de la subida',
+  modalUploadColorsWait:
+    'Tu archivo ya subió. Ahora creamos tus colores, puede tardar unos segundos.',
+  modalCreatingColors: 'Creando tus colores…',
   modalPreviewVersion: 'Versión de prueba · {sha}',
   modalVideoLinkHint: 'El video debe ser público o no listado.',
   modalAudioLinkLabel: 'O pega un enlace público (SoundCloud, Google Drive, YouTube…)',
@@ -234,6 +239,9 @@ const pt: StoryFlowMessages = {
   modalFileTooLongVideo: 'Este vídeo dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
   modalFileTooLongAudio: 'Este áudio dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
   modalUploadProgress: 'Progresso do envio',
+  modalUploadColorsWait:
+    'Seu arquivo já foi enviado. Agora criamos suas cores, pode levar alguns segundos.',
+  modalCreatingColors: 'Criando suas cores…',
   modalPreviewVersion: 'Versão de teste · {sha}',
   modalPhotoTypeError: 'Esse ficheiro não é uma foto. Use JPG, PNG, WEBP ou HEIC.',
   modalPhotoSizeError: 'Essa foto pesa mais de 10 MB. Tente uma mais leve.',
@@ -306,6 +314,9 @@ const en: StoryFlowMessages = {
   modalFileTooLongVideo: 'This video is longer than 5 minutes. You can trim it or upload another.',
   modalFileTooLongAudio: 'This audio is longer than 5 minutes. You can trim it or upload another.',
   modalUploadProgress: 'Upload progress',
+  modalUploadColorsWait:
+    'Your file is uploaded. We\'re creating your colors now, it may take a few seconds.',
+  modalCreatingColors: 'Creating your colors…',
   modalPreviewVersion: 'Test version · {sha}',
   modalPhotoTypeError: 'That file is not a photo. Use JPG, PNG, WEBP, or HEIC.',
   modalPhotoSizeError: 'That photo is over 10 MB. Try a smaller one.',

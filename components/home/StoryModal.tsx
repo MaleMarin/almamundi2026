@@ -402,6 +402,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [avCardError, setAvCardError] = useState('');
   const [avProbePending, setAvProbePending] = useState(false);
   const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+  const [creatingColors, setCreatingColors] = useState(false);
   const [recording, setRecording] = useState(false);
   const [streamReady, setStreamReady] = useState(false);
   const [recordSec, setRecordSec] = useState(0);
@@ -1365,6 +1366,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     submitInFlightRef.current = true;
     setSaving(true);
     setErr('');
+    setCreatingColors(false);
     if (mode === 'audio' || mode === 'video') setUploadProgress(0);
     try {
       const privateMediaPaths: string[] = [];
@@ -1544,6 +1546,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         }
       }
 
+      const storyFileUploaded =
+        (mode === 'video' && (mediaBlob != null || uploadVideoFile != null)) ||
+        (mode === 'audio' && (mediaBlob != null || uploadAudioFile != null));
+      if (storyFileUploaded) {
+        setUploadProgress(100);
+        setCreatingColors(true);
+      }
+
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1658,6 +1668,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     } finally {
       submitInFlightRef.current = false;
       setSaving(false);
+      setCreatingColors(false);
       setUploadProgress(null);
     }
   }, [
@@ -2867,7 +2878,37 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 />
               </div>
               <div className="mt-4 flex flex-wrap justify-end gap-2">
-                  {uploadProgress != null ? (
+                  {creatingColors ? (
+                    <div className="basis-full">
+                      <style>{`
+                        @keyframes story-upload-indeterminate {
+                          0% { transform: translateX(-120%); }
+                          100% { transform: translateX(420%); }
+                        }
+                        @media (prefers-reduced-motion: reduce) {
+                          .story-upload-indeterminate {
+                            animation: none !important;
+                            width: 100% !important;
+                            transform: none !important;
+                          }
+                        }
+                      `}</style>
+                      <div
+                        className="relative h-2 w-full overflow-hidden rounded-full bg-[#d5d8e0]"
+                        role="progressbar"
+                        aria-busy="true"
+                        aria-label={t.modalCreatingColors}
+                      >
+                        <div
+                          className="story-upload-indeterminate absolute inset-y-0 left-0 w-1/3 rounded-full bg-[#FF4A1C]"
+                          style={{ animation: 'story-upload-indeterminate 1.15s ease-in-out infinite' }}
+                        />
+                      </div>
+                      <p className="mt-1 text-left text-[11px] leading-snug text-gray-700" aria-live="polite">
+                        {t.modalUploadColorsWait}
+                      </p>
+                    </div>
+                  ) : uploadProgress != null ? (
                     <div className="basis-full">
                       <div
                         className="h-2 w-full overflow-hidden rounded-full bg-[#d5d8e0]"
@@ -2906,7 +2947,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-white active:scale-95 disabled:opacity-60 md:px-6"
                       style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
                     >
-                      {saving
+                      {creatingColors
+                        ? t.modalCreatingColors
+                        : saving
                         ? mode === 'video'
                           ? t.modalSendingVideo
                           : mode === 'audio'
