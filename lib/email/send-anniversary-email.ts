@@ -44,7 +44,7 @@ export function buildAnniversaryEmailHtml(params: SendAnniversaryEmailParams): s
       </p>
       <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
         <tr>
-          <td style="background:#D13D17;border-radius:100px;padding:14px 32px">
+          <td style="background:#FF4A1C;border-radius:100px;padding:14px 32px">
             <a href="${historiasUrl}"
               style="color:white;text-decoration:none;
               font-size:13px;font-weight:700;

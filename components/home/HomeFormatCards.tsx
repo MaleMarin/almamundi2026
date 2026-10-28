@@ -37,7 +37,7 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
     return (
       <div className={wrap} aria-hidden>
         <svg
-          className="h-full w-full text-[#D13D17] drop-shadow-[0_0_12px_rgba(209,61,23,0.35)]"
+          className="h-full w-full text-[#FF4A1C] drop-shadow-[0_0_12px_rgba(255,74,28,0.35)]"
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
@@ -97,7 +97,7 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
         {heightsPx.map((h, i) => (
           <span
             key={i}
-            className="home-historias-card-audio-bar w-[8px] rounded-full bg-[#D13D17]/70 shadow-[0_0_14px_rgba(209,61,23,0.45)]"
+            className="home-historias-card-audio-bar w-[8px] rounded-full bg-[#FF4A1C]/70 shadow-[0_0_14px_rgba(255,74,28,0.45)]"
             style={{
               height: h,
               animationDelay: `${i * 0.08}s`,
@@ -111,8 +111,8 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
   if (kind === 'text') {
     return (
       <div className={`${wrap} flex flex-col items-center justify-center gap-4 pt-[6%]`} aria-hidden>
-        <div className="relative h-11 w-[82%] max-w-[240px] rounded-md border-2 border-[#D13D17]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]">
-          <span className="home-historias-card-type-cursor absolute bottom-3 left-3.5 inline-block h-4 w-[3px] rounded-sm bg-[#D13D17] shadow-[0_0_10px_rgba(209,61,23,0.65)]" />
+        <div className="relative h-11 w-[82%] max-w-[240px] rounded-md border-2 border-[#FF4A1C]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]">
+          <span className="home-historias-card-type-cursor absolute bottom-3 left-3.5 inline-block h-4 w-[3px] rounded-sm bg-[#FF4A1C] shadow-[0_0_10px_rgba(255,74,28,0.65)]" />
           <span
             className="home-historias-card-type-line absolute bottom-3 left-3.5 h-[2px] rounded-full bg-gray-600/45"
             style={{ width: '48%' }}

@@ -11,7 +11,7 @@ export const SITE_NAV_CTA_CLASS =
 
 /** Enlaces internos del dropdown de Historias: livianos, sin pastillas. */
 export const SITE_NAV_STORIES_ITEM_CLASS =
-  'block whitespace-nowrap rounded-md px-1.5 py-1 text-left text-[0.78rem] font-medium !text-gray-600 visited:!text-gray-600 transition-colors hover:bg-white/50 hover:!text-[var(--almamundi-orange-strong)] md:text-[0.82rem]';
+  'block whitespace-nowrap rounded-md px-1.5 py-1 text-left text-[0.78rem] font-medium !text-gray-600 visited:!text-gray-600 transition-colors hover:bg-white/50 hover:!text-[var(--almamundi-orange)] hover:font-semibold md:text-[0.82rem]';
 
 /** Píldora en navs secundarios (subir, exposiciones, temas, etc.). */
 export const SITE_NAV_PILL_LINK_CLASS =

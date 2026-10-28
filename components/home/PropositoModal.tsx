@@ -14,7 +14,7 @@ const soft = {
   bg: '#E0E5EC',
   textMain: '#3d4a5c',
   textBody: '#5c6b7e',
-  orange: '#D13D17',
+  orange: '#FF4A1C',
   card: {
     backgroundColor: '#E9ECF3',
     borderRadius: 20,
@@ -65,7 +65,7 @@ function sectionChipStyle(active: boolean) {
       color: '#fff8f2',
       background: `linear-gradient(180deg, rgba(255, 88, 28, 0.85) 0%, ${soft.orange} 100%)`,
       border: '1px solid rgba(255, 150, 90, 0.75)',
-      boxShadow: '0 2px 10px rgba(209, 61, 23, 0.22)',
+      boxShadow: '0 2px 10px rgba(255, 74, 28, 0.22)',
     };
   }
   return {
@@ -106,7 +106,7 @@ function SectionHeader({ title, index }: { title: string; index: number }) {
         <div
           className="mt-2 h-0.5 w-14 rounded-full"
           style={{
-            background: `linear-gradient(90deg, ${soft.orange} 0%, rgba(209, 61, 23, 0.15) 100%)`,
+            background: `linear-gradient(90deg, ${soft.orange} 0%, rgba(255, 74, 28, 0.15) 100%)`,
           }}
           aria-hidden
         />
@@ -148,7 +148,7 @@ function BeliefsList({ items }: { items: string[] }) {
         <li key={i} className="flex gap-3">
           <span
             className="mt-2 h-2 w-2 shrink-0 rounded-full"
-            style={{ backgroundColor: soft.orange, boxShadow: '0 0 8px rgba(209, 61, 23, 0.45)' }}
+            style={{ backgroundColor: soft.orange, boxShadow: '0 0 8px rgba(255, 74, 28, 0.45)' }}
             aria-hidden
           />
           <p
@@ -168,9 +168,9 @@ function ClosingBlock({ lines }: { lines: string[] }) {
     <div
       className="rounded-3xl px-6 py-8 text-center md:px-10 md:py-10"
       style={{
-        background: 'linear-gradient(145deg, rgba(209, 61, 23, 0.08) 0%, rgba(233, 236, 243, 0.95) 48%, #E9ECF3 100%)',
+        background: 'linear-gradient(145deg, rgba(255, 74, 28, 0.08) 0%, rgba(233, 236, 243, 0.95) 48%, #E9ECF3 100%)',
         border: '1px solid rgba(255, 140, 90, 0.25)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(209, 61, 23, 0.08)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(255, 74, 28, 0.08)',
       }}
     >
       {lines.map((line, i) => (
@@ -284,7 +284,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
         background: `linear-gradient(180deg, rgba(255, 88, 28, 0.9) 0%, ${soft.orange} 100%)`,
         color: '#fff',
         border: '1px solid rgba(255, 160, 100, 0.6)',
-        boxShadow: '0 6px 20px rgba(209, 61, 23, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
+        boxShadow: '0 6px 20px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
         fontFamily: SITE_FONT_STACK,
       }}
     >
@@ -413,7 +413,7 @@ export function PropositoModal({
           role="tabpanel"
           aria-labelledby={`manifiesto-tab-${activeSection.id}`}
           className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6 md:px-10 md:py-8"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(209, 61, 23,0.35) transparent' }}
+          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255, 74, 28,0.35) transparent' }}
         >
           <ManifiestoSectionView
             section={activeSection}

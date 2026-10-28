@@ -93,7 +93,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
               <p className="mb-8">
                 <HomeHardLink
                   href="/#historias"
-                  className="text-sm font-medium tracking-wide !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)]"
+                  className="text-sm font-medium tracking-wide !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)] hover:font-semibold"
                 >
                   Cuenta la tuya
                 </HomeHardLink>
@@ -106,7 +106,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                     <video src={story.videoUrl} controls className="w-full h-full object-contain" />
                     <Link
                       href={`/historias/${story.id}/video`}
-                      className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                      className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-[15px] font-semibold text-white border border-orange-500/50 transition-colors"
                       style={{ backgroundColor: 'var(--almamundi-orange)' }}
                     >
                       Ver en cine
@@ -117,7 +117,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                     <audio src={story.audioUrl} controls className="w-full max-w-md" />
                     <Link
                       href={`/historias/${story.id}/audio`}
-                      className="px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                      className="px-4 py-2 rounded-full text-[15px] font-semibold text-white border border-orange-500/50 transition-colors"
                       style={{ backgroundColor: 'var(--almamundi-orange)' }}
                     >
                       Abrir reproductor
@@ -134,7 +134,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                     )}
                     <Link
                       href={`/historias/${story.id}/foto`}
-                      className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-xs font-medium text-white border border-orange-500/50 transition-colors"
+                      className="absolute bottom-3 right-3 px-4 py-2 rounded-full text-[15px] font-semibold text-white border border-orange-500/50 transition-colors"
                       style={{ backgroundColor: 'var(--almamundi-orange)' }}
                     >
                       Ver álbum

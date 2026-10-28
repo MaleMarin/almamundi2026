@@ -270,7 +270,7 @@ export function HomePageClient() {
           <span
             aria-hidden
             className="pointer-events-none absolute -left-12 top-1/2 z-0 h-40 w-40 -translate-y-1/2 rounded-full"
-            style={{ background: 'rgba(209,61,23,0.18)', filter: 'blur(40px)' }}
+            style={{ background: 'rgba(255,74,28,0.18)', filter: 'blur(40px)' }}
           />
           <span
             aria-hidden

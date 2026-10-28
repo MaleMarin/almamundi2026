@@ -655,7 +655,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       markerKind: 'respuesta' as const,
       title: item.alias,
       place: item.city,
-      color: '#D13D17',
+      color: '#FF4A1C',
     }));
   }, [respuestasOnGlobe]);
 
@@ -950,7 +950,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                   <span
                     aria-hidden
                     className="pointer-events-none absolute right-1.5 top-1.5 z-[1] size-2 rounded-full"
-                    style={{ background: 'var(--almamundi-orange-strong)' }}
+                    style={{ background: 'var(--almamundi-orange)' }}
                   />
                 ) : null}
               </span>

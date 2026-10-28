@@ -423,7 +423,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     fontSize: 11,
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
-                    color: 'rgba(var(--almamundi-orange-strong-rgb), 0.70)',
+                    color: 'rgba(var(--almamundi-orange-rgb), 0.70)',
                     margin: '0 0 6px',
                     fontFamily: SITE_FONT_STACK,
                   }}

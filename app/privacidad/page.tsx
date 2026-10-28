@@ -16,11 +16,11 @@ export const metadata: Metadata = {
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
 const SH_DARK = 'rgba(163,177,198,0.6)';
-const ORANGE = 'var(--almamundi-orange-strong)';
+const ORANGE = 'var(--almamundi-orange)';
 const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';
 const TEXT_3 = '#8896a5';
-const LINK = 'var(--almamundi-orange-strong)';
+const LINK = 'var(--almamundi-orange)';
 
 const p = { marginBottom: '1rem' } as const;
 const pLast = { marginBottom: 0 } as const;

@@ -69,19 +69,19 @@ export function CookieBanner() {
   };
 
   const linkStyle: CSSProperties = {
-    color: '#D13D17',
+    color: '#FF4A1C',
+    fontWeight: 600,
     textDecoration: 'none',
   };
 
   const buttonStyle: CSSProperties = {
-    background: '#D13D17',
+    background: '#FF4A1C',
     color: 'white',
     border: 'none',
     padding: '7px 16px',
     borderRadius: 100,
-    fontSize: 12,
-    fontWeight: 800,
-    letterSpacing: '0.06em',
+    fontSize: 15,
+    fontWeight: 600,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,
@@ -106,7 +106,17 @@ export function CookieBanner() {
         </a>
         .
       </p>
-      <button type="button" style={buttonStyle} onClick={onAccept}>
+      <button
+        type="button"
+        style={buttonStyle}
+        onClick={onAccept}
+        onMouseEnter={(event) => {
+          event.currentTarget.style.filter = 'brightness(0.92)';
+        }}
+        onMouseLeave={(event) => {
+          event.currentTarget.style.filter = '';
+        }}
+      >
         Entendido
       </button>
     </div>

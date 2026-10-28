@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
 const SH_DARK = 'rgba(163,177,198,0.6)';
-const ORANGE = 'var(--almamundi-orange-strong)';
+const ORANGE = 'var(--almamundi-orange)';
 const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';
 const TEXT_3 = '#8896a5';
@@ -33,7 +33,7 @@ const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
     letterSpacing: '0.04em',
     textTransform: 'uppercase' as const,
     borderRadius: 999,
-    color: 'var(--almamundi-orange-strong)',
+    color: 'var(--almamundi-orange)',
     background: 'rgba(var(--almamundi-orange-rgb), 0.14)',
     border: '1px solid rgba(var(--almamundi-orange-rgb), 0.28)',
   },

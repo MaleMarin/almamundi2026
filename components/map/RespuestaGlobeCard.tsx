@@ -34,7 +34,7 @@ export function RespuestaGlobeCard({
         <img src={item.previewUrl} alt={item.contenido} className="max-h-40 w-full rounded-xl object-cover" />
       ) : null}
       {item.kind === 'foto' && item.contenido ? <p className="mb-0 mt-2 text-sm leading-relaxed">{item.contenido}</p> : null}
-      <Link href={preguntaPageHref(item.questionId)} className="mt-3 inline-flex text-sm font-semibold text-[#D13D17]">
+      <Link href={preguntaPageHref(item.questionId)} className="mt-3 inline-flex text-sm font-semibold text-[#FF4A1C]">
         {PREGUNTA_COPY.seeWorld[locale]}
       </Link>
     </div>

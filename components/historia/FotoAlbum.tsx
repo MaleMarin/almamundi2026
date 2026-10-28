@@ -14,7 +14,7 @@ import { RespondeALine } from '@/components/historia/RespondeALine';
 const CREAM = 'rgba(245,240,232,0.85)';
 const CREAM_SOFT = 'rgba(245,240,232,0.7)';
 const CREAM_MUTED = 'rgba(245,240,232,0.5)';
-const SEPIA = '#D13D17';
+const SEPIA = '#FF4A1C';
 const DEFAULT_BG = '#1a1410';
 
 export interface HistoriaFoto {

@@ -4,7 +4,7 @@ import { escapeHtml } from "@/lib/email-html";
 
 const PRODUCTION_SITE_FALLBACK = "https://www.almamundi.org";
 
-export const BRAND_ORANGE = "#D13D17";
+export const BRAND_ORANGE = "#FF4A1C";
 export const EMAIL_INK = "#1C1C2E";
 export const EMAIL_MUTED = "#4E5160";
 export const EMAIL_CANVAS = "#F2F3F7";
@@ -116,7 +116,7 @@ export function primaryButtonHtml(label: string, href: string): string {
           <td align="center" bgcolor="${BRAND_ORANGE}" height="48"
             style="height:48px;background-color:${BRAND_ORANGE};border-radius:8px;text-align:center;">
             <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="email-btn"
-              style="display:inline-block;height:48px;line-height:48px;padding:0 28px;background-color:${BRAND_ORANGE};color:#ffffff;text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:700;border-radius:8px;">
+              style="display:inline-block;height:48px;line-height:48px;padding:0 28px;background-color:${BRAND_ORANGE};color:#ffffff;text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:600;border-radius:8px;">
               ${safeLabel}
             </a>
           </td>
@@ -127,7 +127,7 @@ export function primaryButtonHtml(label: string, href: string): string {
 export function secondaryLinkHtml(label: string, href: string): string {
   return `<p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link"
-          style="color:${BRAND_ORANGE};text-decoration:underline;">
+          style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">
           ${escapeHtml(label)}
         </a>
       </p>`;
@@ -173,15 +173,18 @@ function accountFooterHtml(): string {
 function darkModeCss(): string {
   return `
     :root { color-scheme: light dark; supported-color-schemes: light dark; }
+    .email-btn:hover { filter: brightness(0.92); }
+    .email-link { font-weight: 600; }
     @media (prefers-color-scheme: dark) {
       .email-bg { background: #12121C !important; }
       .email-card, .email-pad { background: #1C1C2E !important; }
       .email-text, .email-text p, .email-text li { color: #F7F8FC !important; }
       .email-box { background: #2A2A40 !important; }
-      .email-link { color: #FFB199 !important; }
+      .email-link { color: #FF4A1C !important; font-weight: 600 !important; }
       .email-footer, .email-footer-link { color: #D5D7E2 !important; }
-      .email-brand { color: #D13D17 !important; }
-      .email-btn, .email-btn span { color: #ffffff !important; background: #D13D17 !important; }
+      .email-brand { color: #FF4A1C !important; font-weight: 600 !important; }
+      .email-btn:hover { filter: brightness(0.92); }
+      .email-btn, .email-btn span { color: #ffffff !important; background: #FF4A1C !important; font-weight: 600 !important; }
     }
     @media only screen and (max-width: 620px) {
       .email-card { width: 100% !important; }

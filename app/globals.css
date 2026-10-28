@@ -10,14 +10,9 @@
   /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
   --map-space-deep: #050811;
   --map-space-mid: #0a1520;
-  /* #D13D17: logo, íconos, puntos del globo y acentos sin texto. */
-  --almamundi-orange: #D13D17;
-  --almamundi-orange-rgb: 209, 61, 23;
-  /* Texto chico, píldora principal y hover de enlaces. */
-  --almamundi-orange-strong: #D13D17;
-  --almamundi-orange-strong-rgb: 209, 61, 23;
-  /* Hover de la píldora principal. */
-  --almamundi-orange-deep: #B53514;
+  /* Un solo naranja: botones, enlaces, íconos, puntos y anillos. */
+  --almamundi-orange: #FF4A1C;
+  --almamundi-orange-rgb: 255, 74, 28;
 }
 
 @theme inline {
@@ -25,11 +20,11 @@
   --color-foreground: var(--foreground);
   --font-sans: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   --font-mono: ui-monospace, monospace;
-  /* Naranja AlmaMundi: tonalidad #D13D17 en toda la web */
-  --color-orange-400: #D13D17;
+  /* Naranja AlmaMundi: tonalidad #FF4A1C en toda la web */
+  --color-orange-400: #FF4A1C;
   --color-orange-500: var(--almamundi-orange);
-  --color-orange-600: var(--almamundi-orange-strong);
-  --color-orange-700: var(--almamundi-orange-deep);
+  --color-orange-600: var(--almamundi-orange);
+  --color-orange-700: var(--almamundi-orange);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -228,15 +223,18 @@ select {
   }
 }
 
-/* Enlaces: naranja AlmaMundi por defecto. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
+/* Enlaces naranjos sobre fondo claro: negrita para que se lean. Las utilidades Tailwind (p. ej. text-gray-700) siguen ganando por especificidad. */
 a {
   color: var(--almamundi-orange);
+  font-weight: 600;
 }
 a:visited {
-  color: #B53514;
+  color: #FF4A1C;
+  font-weight: 600;
 }
 a:hover {
-  color: var(--almamundi-orange-strong);
+  color: var(--almamundi-orange);
+  font-weight: 600;
 }
 
 /* Botones neumórficos: borde y color unificados al hover y al estar activo */
@@ -250,16 +248,18 @@ a:hover {
 .btn-almamundi:active,
 .btn-almamundi-active,
 .btn-almamundi[data-active="true"] {
-  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.5) !important;
-  color: var(--almamundi-orange-strong) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
+  color: var(--almamundi-orange) !important;
 }
 
 /* Tres píldoras. Una definición cada una. */
 .btn-am-principal,
 a.btn-am-principal,
 a.btn-am-principal:visited {
-  background: var(--almamundi-orange-strong) !important;
+  background: #FF4A1C !important;
   color: #fff !important;
+  font-weight: 600 !important;
+  font-size: max(15px, 100%) !important;
   border: 1px solid transparent !important;
   border-radius: 9999px !important;
   text-decoration: none;
@@ -269,7 +269,7 @@ a.btn-am-principal:visited {
 a.btn-am-principal:hover,
 .btn-am-principal:focus-visible,
 a.btn-am-principal:focus-visible {
-  background: var(--almamundi-orange-deep) !important;
+  filter: brightness(0.92);
   color: #fff !important;
 }
 .btn-am-principal:disabled {
@@ -281,8 +281,9 @@ a.btn-am-principal:focus-visible {
 a.btn-am-secundario,
 a.btn-am-secundario:visited {
   background: #E9ECF3 !important;
-  color: var(--almamundi-orange-strong) !important;
-  border: 1px solid rgba(var(--almamundi-orange-strong-rgb), 0.38) !important;
+  color: var(--almamundi-orange) !important;
+  font-weight: 600 !important;
+  border: 1px solid rgba(var(--almamundi-orange-rgb), 0.38) !important;
   border-radius: 9999px !important;
   box-shadow:
     8px 8px 20px rgba(136, 150, 170, 0.34),
@@ -296,8 +297,8 @@ a.btn-am-secundario:visited {
 a.btn-am-secundario:hover,
 .btn-am-secundario:focus-visible,
 a.btn-am-secundario:focus-visible {
-  color: var(--almamundi-orange-strong) !important;
-  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.55) !important;
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.55) !important;
 }
 
 .btn-am-neutro,
@@ -322,8 +323,8 @@ a.btn-am-neutro:focus-visible,
 .btn-am-neutro:active,
 .btn-am-neutro[aria-pressed='true'],
 .btn-am-neutro[data-active='true'] {
-  color: var(--almamundi-orange-strong) !important;
-  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.5) !important;
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
 }
 
 /* Avenir: título «Mapa de AlmaMundi», cabecera /mapa y hero #intro (misma pila; fallbacks si no está instalada). */
@@ -369,7 +370,7 @@ a.home-map-neu-pill.btn-almamundi:hover,
 a.home-map-neu-pill.btn-almamundi:focus-visible,
 a.home-map-neu-pill.btn-almamundi:active,
 a.home-map-neu-pill.btn-almamundi[data-active='true'] {
-  color: var(--almamundi-orange-strong) !important;
+  color: var(--almamundi-orange) !important;
 }
 
 /*
@@ -430,8 +431,8 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'] {
-  color: var(--almamundi-orange-strong) !important;
-  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.7) !important;
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
@@ -440,8 +441,8 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
-  color: var(--almamundi-orange-strong) !important;
-  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.7) !important;
+  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
 }
 
 /*
@@ -722,9 +723,11 @@ a:focus,
 footer a.almamundi-footer-link,
 footer a.almamundi-footer-link:visited {
   color: #4b5563 !important;
+  font-weight: 400;
 }
 footer a.almamundi-footer-link:hover {
-  color: var(--almamundi-orange-strong) !important;
+  color: var(--almamundi-orange) !important;
+  font-weight: 600;
 }
 
 /* Modo alto contraste AlmaMundi */
@@ -733,7 +736,7 @@ footer a.almamundi-footer-link:hover {
   --color-surface: #111111 !important;
   --color-text-primary: #ffffff !important;
   --color-text-secondary: #eeeeee !important;
-  --color-accent: #D13D17 !important;
+  --color-accent: #FF4A1C !important;
   --color-border: #ffffff !important;
   background-color: #000000 !important;
   color: #ffffff !important;
@@ -762,7 +765,7 @@ footer a.almamundi-footer-link:hover {
 
 /* Foco visible global — aplica siempre, no solo en alto contraste */
 :focus-visible {
-  outline: 3px solid #D13D17;
+  outline: 3px solid #FF4A1C;
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -792,11 +795,11 @@ html[data-cursor-global="on"] *::after {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(209, 61, 23, 0.88);
+  background: rgba(255, 74, 28, 0.88);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 0 12px rgba(209, 61, 23, 0.35),
-    0 0 28px rgba(209, 61, 23, 0.12);
+    0 0 12px rgba(255, 74, 28, 0.35),
+    0 0 28px rgba(255, 74, 28, 0.12);
   pointer-events: none;
   z-index: 99999;
   will-change: transform;
@@ -815,9 +818,9 @@ html[data-cursor-global="on"] *::after {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(209, 61, 23, 0.18);
+  border: 1px solid rgba(255, 74, 28, 0.18);
   box-shadow:
-    0 0 24px rgba(209, 61, 23, 0.1),
+    0 0 24px rgba(255, 74, 28, 0.1),
     inset 0 0 12px rgba(255, 255, 255, 0.06);
   pointer-events: none;
   z-index: 99998;
@@ -832,17 +835,17 @@ html[data-cursor-global="on"] *::after {
 .cursor-dot.cursor-hover {
   width: 40px;
   height: 40px;
-  background: rgba(209, 61, 23, 0.1);
+  background: rgba(255, 74, 28, 0.1);
   box-shadow:
-    0 0 0 1px rgba(209, 61, 23, 0.12),
-    0 0 32px rgba(209, 61, 23, 0.18);
+    0 0 0 1px rgba(255, 74, 28, 0.12),
+    0 0 32px rgba(255, 74, 28, 0.18);
 }
 .cursor-ring.cursor-hover {
   width: 54px;
   height: 54px;
-  border-color: rgba(209, 61, 23, 0.28);
+  border-color: rgba(255, 74, 28, 0.28);
   box-shadow:
-    0 0 36px rgba(209, 61, 23, 0.14),
+    0 0 36px rgba(255, 74, 28, 0.14),
     inset 0 0 16px rgba(255, 255, 255, 0.08);
 }
 

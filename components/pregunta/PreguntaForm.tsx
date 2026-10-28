@@ -29,11 +29,11 @@ import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client'
 type Kind = 'texto' | 'voz' | 'foto';
 
 const fieldClass =
-  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-base text-[#1C1C2E] outline-none focus:border-[#D13D17]';
+  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-base text-[#1C1C2E] outline-none focus:border-[#FF4A1C]';
 
 function pickClass(on: boolean): string {
   return on
-    ? 'border-2 border-[#D13D17] bg-transparent text-[#D13D17]'
+    ? 'border-2 border-[#FF4A1C] bg-transparent text-[#FF4A1C]'
     : 'border-2 border-black/15 bg-transparent text-[#1C1C2E]';
 }
 
@@ -370,7 +370,7 @@ function PreguntaFormInner({
           className={`${pickClass(mode === 'tu')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
           <span className="text-base font-semibold">{copy.modeYou[locale]}</span>
-          <span className="text-sm font-normal leading-snug">{copy.modeYouLine[locale]}</span>
+          <span className="text-sm font-semibold leading-snug">{copy.modeYouLine[locale]}</span>
         </button>
         <button
           type="button"
@@ -379,12 +379,12 @@ function PreguntaFormInner({
           className={`${pickClass(mode === 'alguien')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
           <span className="text-base font-semibold">{copy.modeAsk[locale]}</span>
-          <span className="text-sm font-normal leading-snug">{copy.modeAskLine[locale]}</span>
+          <span className="text-sm font-semibold leading-snug">{copy.modeAskLine[locale]}</span>
         </button>
       </div>
 
       <div>
-        <p className="m-0 text-sm font-semibold text-[#D13D17]">{pregunta.tema[locale]}</p>
+        <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
         <h1 className="m-0 mt-2 text-2xl font-semibold leading-snug">{question}</h1>
       </div>
 
@@ -449,7 +449,7 @@ function PreguntaFormInner({
                 aria-pressed={recording}
                 aria-label={recording ? copy.tapStop[locale] : copy.tapRecord[locale]}
                 className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
-                  recording ? 'border-[#D13D17] text-[#D13D17]' : 'border-black/20 text-[#1C1C2E]'
+                  recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
                 }`}
               >
                 <Mic size={28} aria-hidden />
@@ -459,7 +459,7 @@ function PreguntaFormInner({
                 {mmss(elapsed)} / 2:00
               </p>
               {recording && elapsed >= 90 ? (
-                <p className="m-0 text-sm font-semibold text-[#B53514]">{t.modalRecordingSoonEnd}</p>
+                <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{t.modalRecordingSoonEnd}</p>
               ) : null}
             </>
           )}
@@ -548,11 +548,11 @@ function PreguntaFormInner({
           <input type="checkbox" checked={terms} onChange={(event) => setTerms(event.target.checked)} className="mt-1" />
           <span>
             {termsBits[0]}
-            <a className="text-[#D13D17] underline" href="/terminos" target="_blank" rel="noreferrer">
+            <a className="text-[#FF4A1C] underline" href="/terminos" target="_blank" rel="noreferrer">
               {t.modalConsentTermsLink}
             </a>
             {afterTerms[0]}
-            <a className="text-[#D13D17] underline" href="/privacidad" target="_blank" rel="noreferrer">
+            <a className="text-[#FF4A1C] underline" href="/privacidad" target="_blank" rel="noreferrer">
               {t.modalConsentPrivacyLink}
             </a>
             {afterTerms[1] ?? ''}
@@ -570,7 +570,7 @@ function PreguntaFormInner({
 
       {progress != null && (
         <div className="h-2 overflow-hidden rounded-full bg-black/10" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
-          <div className="h-full bg-[#D13D17]" style={{ width: `${progress}%` }} />
+          <div className="h-full bg-[#FF4A1C]" style={{ width: `${progress}%` }} />
         </div>
       )}
       {error ? (

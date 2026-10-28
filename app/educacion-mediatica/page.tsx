@@ -36,13 +36,13 @@ export default function EducacionMediaticaPage() {
         <div className="mt-12 flex flex-wrap gap-4">
           <Link
             href="/#historias"
-            className="inline-flex items-center justify-center rounded-full bg-[#D13D17] px-6 py-3 text-sm font-bold uppercase tracking-widest text-white transition-opacity hover:opacity-90"
+            className="inline-flex items-center justify-center rounded-full bg-[#FF4A1C] px-6 py-3 text-[15px] font-semibold uppercase tracking-widest text-white hover:brightness-92"
           >
             Ver formatos en la home
           </Link>
           <Link
             href="/#mapa"
-            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-widest text-[#2d3748] transition-colors hover:border-[#D13D17] hover:text-[#D13D17]"
+            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-widest text-[#2d3748] transition-colors hover:border-[#FF4A1C] hover:text-[#FF4A1C]"
           >
             Ir al mapa
           </Link>

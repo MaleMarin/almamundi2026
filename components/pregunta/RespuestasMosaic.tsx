@@ -92,7 +92,7 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 text-[#1C1C2E]">
       <div className="flex flex-col gap-3">
-        <p className="m-0 text-sm font-semibold text-[#D13D17]">{pregunta.tema[locale]}</p>
+        <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
         <h1 className="m-0 text-2xl font-semibold leading-snug">{pregunta.tu[locale]}</h1>
         <p className="m-0 text-base leading-relaxed text-[#4A5568]">{pregunta.alguien[locale]}</p>
         <Link href={preguntaPageHref(pregunta.id)} className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-sm font-semibold">

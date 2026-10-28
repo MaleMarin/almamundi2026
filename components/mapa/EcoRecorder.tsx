@@ -74,7 +74,7 @@ export function EcoRecorder({
       <p
         style={{
           fontSize: 13,
-          color: 'rgba(var(--almamundi-orange-strong-rgb), 0.80)',
+          color: 'rgba(var(--almamundi-orange-rgb), 0.80)',
           margin: 0,
           fontFamily: SITE_FONT_STACK,
         }}
@@ -128,7 +128,7 @@ export function EcoRecorder({
             width: state === 'recording' ? 14 : 18,
             height: state === 'recording' ? 14 : 18,
             borderRadius: state === 'recording' ? 3 : '50%',
-            background: state === 'recording' ? '#ef4444' : '#D13D17',
+            background: state === 'recording' ? '#ef4444' : '#FF4A1C',
             transition: 'all 200ms ease',
           }}
         />

@@ -58,7 +58,7 @@ export function MiEcoClient({
     ecoVad: ecoVadStable,
   });
 
-  const orangeCta = 'linear-gradient(180deg, #D13D17 0%, #D13D17 100%)' as const;
+  const orangeCta = 'linear-gradient(180deg, #FF4A1C 0%, #FF4A1C 100%)' as const;
 
   return (
     <main
@@ -132,7 +132,7 @@ export function MiEcoClient({
                 downloadPng('almamundi-resonancia-visual.png');
               }}
               className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white"
-              style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(209, 61, 23,0.32)' }}
+              style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255, 74, 28,0.32)' }}
             >
               <Download size={18} aria-hidden />
               Descargar cinta

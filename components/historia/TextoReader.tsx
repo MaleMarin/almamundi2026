@@ -14,8 +14,8 @@ import { RespondeALine } from '@/components/historia/RespondeALine';
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
 const TINTA_SOFT = '#4a3f32';
-const SEPIA = '#D13D17';
-const SEPIA_DK = '#B53514';
+const SEPIA = '#FF4A1C';
+const SEPIA_DK = '#FF4A1C';
 
 export interface HistoriaTexto {
   id: string;

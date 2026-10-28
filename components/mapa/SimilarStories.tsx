@@ -125,7 +125,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: light ? 'var(--almamundi-orange-strong)' : 'rgba(var(--almamundi-orange-strong-rgb), 0.85)',
+                  color: light ? 'var(--almamundi-orange)' : 'rgba(var(--almamundi-orange-rgb), 0.85)',
                 }}
               >
                 {formatLabel(s.format)}

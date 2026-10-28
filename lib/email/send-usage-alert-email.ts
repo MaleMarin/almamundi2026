@@ -58,7 +58,7 @@ export function buildUsageAlertHtml(
 <html>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;color:#111">
   <div style="max-width:560px;margin:32px auto;padding:32px 28px;background:#fff;border-radius:16px">
-    <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#D13D17">AlmaMundi · aviso de uso</p>
+    <p style="margin:0 0 8px;font-size:12px;letter-spacing:0.08em;text-transform:uppercase;color:#FF4A1C;font-weight:600">AlmaMundi · aviso de uso</p>
     <h1 style="margin:0 0 20px;font-size:22px;font-weight:600;line-height:1.3">${escapeHtml(alert.subject.replace("AlmaMundi — ", ""))}</h1>
     <p style="margin:0 0 16px;font-size:16px;line-height:1.55">${escapeHtml(alert.what)}</p>
     <p style="margin:0 0 8px;font-size:16px"><strong>Usado ahora:</strong> ${escapeHtml(alert.usedLabel)}</p>

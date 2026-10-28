@@ -349,7 +349,7 @@ function BitDot({
         >
           <sphereGeometry args={[1, 10, 10]} />
           <meshBasicMaterial
-            color="#D13D17"
+            color="#FF4A1C"
             transparent
             opacity={magneticActive && !selected ? 0.88 : 0.72}
             depthWrite={false}
@@ -451,7 +451,7 @@ function GlobeBitsLayerMounted({
   const newsMat = useMemo(() => createNewsRingMaterial(0.9, 'GlobeNewsRing'), []);
   const respuestaMat = useMemo(() => {
     const mat = createNewsRingMaterial(0.95, 'GlobeRespuestaRing');
-    const color = new THREE.Color('#D13D17').convertSRGBToLinear();
+    const color = new THREE.Color('#FF4A1C').convertSRGBToLinear();
     mat.uniforms.uCore.value = new THREE.Vector3(color.r, color.g, color.b);
     mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
     return mat;

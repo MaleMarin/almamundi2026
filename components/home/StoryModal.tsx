@@ -2029,7 +2029,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
               >
                 <Video className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVideo}
@@ -2038,7 +2038,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
               >
                 <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
@@ -2083,7 +2083,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           type="button"
                           onClick={startRecordingVideo}
                           className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
-                          style={{ background: 'linear-gradient(180deg,#D13D17,#D13D17)', boxShadow: '0 8px 24px rgba(209, 61, 23,0.35)' }}
+                          style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                           aria-label="Comenzar a grabar video"
                         >
                           <Video size={22} aria-hidden />
@@ -2179,7 +2179,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
               >
                 <Mic className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVoice}
@@ -2188,7 +2188,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
               >
                 <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
@@ -2221,7 +2221,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       type="button"
                       onClick={startRecordingAudio}
                       className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
-                      style={{ background: 'linear-gradient(180deg,#D13D17,#D13D17)', boxShadow: '0 8px 24px rgba(209, 61, 23,0.35)' }}
+                      style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                       aria-label={t.modalRecordVoice}
                     >
                       {t.modalRecord}
@@ -3104,7 +3104,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     onClick={() => {
                       router.push('/pregunta');
                     }}
-                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)]"
+                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]"
                   >
                     {t.modalAnswerWeekQuestion}
                   </button>
@@ -3112,7 +3112,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={startAnotherStory}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {mode === 'foto'
                         ? t.modalAnotherCtaFoto
@@ -3125,7 +3125,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={onExploreMap}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {t.modalBackToMap}
                     </button>
@@ -3137,7 +3137,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         event.preventDefault();
                         router.push('/contar');
                       }}
-                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange-strong)] hover:underline"
+                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange)] hover:underline"
                     >
                       {t.modalAnotherFormatLink}
                     </a>
@@ -3146,7 +3146,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     {t.modalContactLead}{' '}
                     <a
                       href="mailto:hola@almamundi.org"
-                      className="text-[var(--almamundi-orange-strong)] underline underline-offset-2"
+                      className="text-[var(--almamundi-orange)] underline underline-offset-2"
                     >
                       hola@almamundi.org
                     </a>
@@ -3154,7 +3154,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   </p>
                 </div>
                 <p
-                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[var(--almamundi-orange-strong)] ${
+                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-semibold text-[var(--almamundi-orange)] ${
                     shareNotice ? 'opacity-100' : 'opacity-0'
                   }`}
                   aria-live="polite"

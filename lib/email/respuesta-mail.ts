@@ -37,7 +37,7 @@ function hello(alias: string): string {
 function contactLine(): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
-    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#D13D17;text-decoration:underline;">${mail}</a>.`,
+    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${mail}</a>.`,
     "0 0 16px"
   );
 }

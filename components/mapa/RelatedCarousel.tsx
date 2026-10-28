@@ -161,7 +161,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                       letterSpacing: '0.14em',
                       textTransform: 'uppercase',
                       color: isCurrent
-                        ? 'rgba(var(--almamundi-orange-strong-rgb), 0.70)'
+                        ? 'rgba(var(--almamundi-orange-rgb), 0.70)'
                         : 'rgba(255,255,255,0.25)',
                       margin: '0 0 4px',
                       fontFamily: SITE_FONT_STACK,
@@ -193,7 +193,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                     <p
                       style={{
                         fontSize: 10,
-                        color: 'rgba(var(--almamundi-orange-strong-rgb), 0.60)',
+                        color: 'rgba(var(--almamundi-orange-rgb), 0.60)',
                         margin: '8px 0 0',
                         fontFamily: SITE_FONT_STACK,
                         letterSpacing: '0.04em',

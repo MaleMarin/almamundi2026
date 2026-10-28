@@ -155,7 +155,7 @@ function StoryCard({
           {story.alias || '—'} · {story.place || '—'}
         </p>
         {story.topic?.[0] && (
-          <p style={{ fontSize: 11, color: 'rgba(var(--almamundi-orange-strong-rgb), 0.70)', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 11, color: 'rgba(var(--almamundi-orange-rgb), 0.70)', margin: '4px 0 0' }}>
             {getThemeLabel(story.topic[0]) || story.topic[0]}
           </p>
         )}
@@ -281,9 +281,9 @@ export default function ArchivoPage() {
               style={{
                 padding: '12px 24px',
                 borderRadius: 999,
-                border: `1px solid ${view === tab.id ? 'rgba(209, 61, 23,0.5)' : 'rgba(255,255,255,0.2)'}`,
-                background: view === tab.id ? 'rgba(209, 61, 23,0.15)' : 'rgba(255,255,255,0.05)',
-                color: view === tab.id ? '#D13D17' : 'rgba(255,255,255,0.85)',
+                border: `1px solid ${view === tab.id ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
+                background: view === tab.id ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.05)',
+                color: view === tab.id ? '#FF4A1C' : 'rgba(255,255,255,0.85)',
                 fontSize: 15,
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -333,9 +333,9 @@ export default function ArchivoPage() {
                   style={{
                     padding: '10px 18px',
                     borderRadius: 999,
-                    border: `1px solid ${temaFilter === null ? 'rgba(209, 61, 23,0.5)' : 'rgba(255,255,255,0.2)'}`,
-                    background: temaFilter === null ? 'rgba(209, 61, 23,0.15)' : 'rgba(255,255,255,0.06)',
-                    color: temaFilter === null ? '#D13D17' : 'rgba(255,255,255,0.8)',
+                    border: `1px solid ${temaFilter === null ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
+                    background: temaFilter === null ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.06)',
+                    color: temaFilter === null ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
                     fontSize: 14,
                     cursor: 'pointer',
                     fontFamily: APP_FONT,
@@ -351,9 +351,9 @@ export default function ArchivoPage() {
                     style={{
                       padding: '10px 18px',
                       borderRadius: 999,
-                      border: `1px solid ${temaFilter === t ? 'rgba(209, 61, 23,0.5)' : 'rgba(255,255,255,0.2)'}`,
-                      background: temaFilter === t ? 'rgba(209, 61, 23,0.15)' : 'rgba(255,255,255,0.06)',
-                      color: temaFilter === t ? '#D13D17' : 'rgba(255,255,255,0.8)',
+                      border: `1px solid ${temaFilter === t ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
+                      background: temaFilter === t ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.06)',
+                      color: temaFilter === t ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
                       fontSize: 14,
                       cursor: 'pointer',
                       fontFamily: APP_FONT,
@@ -404,8 +404,8 @@ export default function ArchivoPage() {
                     marginTop: 14,
                     padding: '10px 18px',
                     borderRadius: 999,
-                    background: 'rgba(209, 61, 23,0.2)',
-                    border: '1px solid rgba(209, 61, 23,0.4)',
+                    background: 'rgba(255, 74, 28,0.2)',
+                    border: '1px solid rgba(255, 74, 28,0.4)',
                     color: '#fdba74',
                     fontSize: 14,
                     fontWeight: 600,

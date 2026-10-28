@@ -29,7 +29,13 @@ export default function GlobalError({
           <button
             type="button"
             onClick={() => reset()}
-            style={{ padding: '8px 16px', borderRadius: 12, background: '#D13D17', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 500 }}
+            style={{ padding: '8px 16px', borderRadius: 12, background: '#FF4A1C', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 15 }}
+            onMouseEnter={(event) => {
+              event.currentTarget.style.filter = 'brightness(0.92)';
+            }}
+            onMouseLeave={(event) => {
+              event.currentTarget.style.filter = '';
+            }}
           >
             Intentar de nuevo
           </button>

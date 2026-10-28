@@ -5,7 +5,7 @@ import { NOT_FOUND_MESSAGES } from '@/lib/i18n/not-found-messages';
 import Link from 'next/link';
 
 const cardClass =
-  'flex min-h-11 flex-col items-start gap-1 rounded-2xl border border-[#E7E2D6] bg-white px-5 py-4 text-left no-underline transition hover:border-[#D13D17] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#D13D17]';
+  'flex min-h-11 flex-col items-start gap-1 rounded-2xl border border-[#E7E2D6] bg-white px-5 py-4 text-left no-underline transition hover:border-[#FF4A1C] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]';
 
 export function NotFoundView() {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
@@ -17,11 +17,11 @@ export function NotFoundView() {
         <h1 className="text-[1.75rem] font-semibold leading-tight sm:text-4xl">{t.lead}</h1>
         <div className="mx-auto mt-8 grid w-full max-w-lg gap-3 sm:max-w-none sm:grid-cols-2">
           <Link href="/mapa" className={cardClass}>
-            <span className="text-base font-semibold text-[#D13D17]">{t.mapTitle}</span>
+            <span className="text-base font-semibold text-[#FF4A1C]">{t.mapTitle}</span>
             <span className="text-sm leading-snug text-[#5C5C52]">{t.mapBody}</span>
           </Link>
           <Link href="/historias" className={cardClass}>
-            <span className="text-base font-semibold text-[#D13D17]">{t.storiesTitle}</span>
+            <span className="text-base font-semibold text-[#FF4A1C]">{t.storiesTitle}</span>
             <span className="text-sm leading-snug text-[#5C5C52]">{t.storiesBody}</span>
           </Link>
         </div>
