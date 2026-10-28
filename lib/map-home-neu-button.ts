@@ -40,22 +40,22 @@ export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
  * Texto del dock en `.pill-nav-dock-label` (misma tipografía en todos; «Buscar…» solo recorta con ellipsis).
  */
 export const MAP_HOME_NEU_BUTTON_CLASS =
-  'btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+  'btn-am-neutro btn-almamundi home-map-neu-pill box-border flex h-[3.75rem] min-h-[3.75rem] max-h-[3.75rem] min-w-0 w-full max-w-none items-center justify-center px-6 py-0 text-center text-base font-semibold leading-none whitespace-nowrap overflow-hidden text-ellipsis';
 
 /** Dock: caja fija 44px. Alto/padding los fija `#map-dock-slot` en CSS para no pelear con Tailwind. */
 export const MAP_HOME_NEU_BUTTON_CLASS_DOCK =
-  'btn-almamundi home-map-neu-pill box-border flex h-[2.75rem] min-h-[2.75rem] max-h-[2.75rem] min-w-0 w-auto shrink-0 items-center justify-center px-[1.1rem] py-0 text-center text-gray-600 whitespace-nowrap overflow-hidden';
+  'btn-am-neutro btn-almamundi home-map-neu-pill box-border flex h-[2.75rem] min-h-[2.75rem] max-h-[2.75rem] min-w-0 w-auto shrink-0 items-center justify-center px-[1.1rem] py-0 text-center whitespace-nowrap overflow-hidden';
 
 /** Home header: píldoras más bajas y texto más pequeño (dock / mapa siguen con `MAP_HOME_NEU_BUTTON_CLASS`). */
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT =
-  'btn-almamundi home-map-neu-pill box-border flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-full max-w-none items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+  'btn-am-neutro btn-almamundi home-map-neu-pill box-border flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-full max-w-none items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none whitespace-nowrap overflow-hidden text-ellipsis';
 
 /**
  * Misma altura/tipografía que COMPACT, pero **sin `w-full`**.
  * En `display:flex` del header de historias, `w-full` en cada hijo fuerza barras casi a todo el ancho; en la home el nav es **grid** y ahí sigue usándose COMPACT.
  */
 export const MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE =
-  'btn-almamundi home-map-neu-pill box-border inline-flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-auto max-w-none shrink-0 items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none text-gray-600 whitespace-nowrap overflow-hidden text-ellipsis';
+  'btn-am-neutro btn-almamundi home-map-neu-pill box-border inline-flex h-[2.5rem] min-h-[2.5rem] max-h-[2.5rem] min-w-0 w-auto max-w-none shrink-0 items-center justify-center px-3 py-0 text-center text-xs font-semibold leading-none whitespace-nowrap overflow-hidden text-ellipsis';
 
 /** Base común: max-width y gaps idénticos. Columnas con minmax(0,1fr) = mismo ancho por celda, sin auto-width por contenido. */
 export const MAP_HOME_PILL_ROW_LAYOUT = 'w-full max-w-5xl grid gap-3 text-gray-600 lg:gap-4';

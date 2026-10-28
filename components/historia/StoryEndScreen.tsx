@@ -338,19 +338,16 @@ export function StoryEndScreen({
           {share ? (
             <button
               type="button"
+              className="btn-am-secundario"
               onClick={() => setShareOpen(true)}
               style={{
-                ...neu.button,
                 flex: '1 1 160px',
                 padding: '0.92rem 1rem',
-                borderRadius: 999,
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
                 fontSize: '0.74rem',
                 letterSpacing: '0.22em',
                 textTransform: 'uppercase',
-                color: neu.textMain,
-                boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)`,
               }}
             >
               Compartir

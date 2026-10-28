@@ -50,30 +50,11 @@ const baseBtnStyle: CSSProperties = {
   justifyContent: 'center',
   textAlign: 'center',
   padding: '10px 12px',
-  borderRadius: 9999,
   fontSize: 13,
   lineHeight: 1.2,
-  color: 'rgba(255,255,255,0.85)',
-  background: 'rgba(255,255,255,0.06)',
-  backdropFilter: 'blur(12px)',
-  WebkitBackdropFilter: 'blur(12px)',
-  borderWidth: 1,
-  borderStyle: 'solid',
-  borderColor: 'rgba(255,255,255,0.10)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)',
-  cursor: 'pointer',
   fontFamily: 'inherit',
   fontWeight: 600,
-  transition: 'background 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease',
   whiteSpace: 'normal',
-};
-
-const activeBtnStyle: CSSProperties = {
-  borderColor: 'rgba(249,115,22,0.5)',
-  boxShadow: '0 0 0 1px rgba(249,115,22,0.35), 0 12px 40px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)',
-  outline: '1px solid rgba(249,115,22,0.55)',
-  outlineOffset: -1,
-  fontWeight: 600,
 };
 
 export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerOpen, embedded, topOffset, navbarZIndex }: MapDockProps) {
@@ -102,22 +83,10 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
           <button
             key={mode}
             type="button"
+            className="btn-am-neutro"
             onClick={() => onModeChange(mode)}
             aria-pressed={isActive}
-            style={{
-              ...baseBtnStyle,
-              ...(isActive ? activeBtnStyle : {}),
-            }}
-            onMouseEnter={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = 'rgba(255,255,255,0.08)';
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (!isActive) {
-                e.currentTarget.style.background = baseBtnStyle.background as string;
-              }
-            }}
+            style={baseBtnStyle}
           >
             {label}
           </button>

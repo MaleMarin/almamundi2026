@@ -201,15 +201,15 @@ function glassOrange(active = true, size: 'sm' | 'md' | 'lg' = 'md') {
   const radius = size === 'sm' ? 999    : size === 'lg' ? 24      : 999;
 
   return {
-    background:     'rgba(249, 115, 22, 0.15)',
-    border:         '1px solid rgba(249, 115, 22, 0.40)',
+    background:     'rgba(var(--almamundi-orange-rgb), 0.15)',
+    border:         '1px solid rgba(var(--almamundi-orange-rgb), 0.40)',
     backdropFilter: `blur(${blur}) saturate(200%)`,
     WebkitBackdropFilter: `blur(${blur}) saturate(200%)`,
     boxShadow: `
       inset 0 1.5px 0 rgba(255, 180, 80, 0.45),
       inset 0 -1px 0 rgba(180, 60, 0, 0.30),
       inset 1px 0 0 rgba(255, 160, 60, 0.15),
-      0 0 20px rgba(249, 115, 22, 0.20),
+      0 0 20px rgba(var(--almamundi-orange-rgb), 0.20),
       0 8px 32px rgba(0, 0, 0, 0.40)
     `,
     borderRadius: radius,
@@ -246,12 +246,12 @@ function chipStyle(active: boolean) {
     WebkitTapHighlightColor: 'transparent',
     transition:     'all 180ms ease',
     color:          '#fff',
-    background:     'linear-gradient(180deg, rgba(249,115,22,0.28) 0%, rgba(249,115,22,0.16) 100%)',
+    background:     'linear-gradient(180deg, rgba(var(--almamundi-orange-rgb), 0.28) 0%, rgba(var(--almamundi-orange-rgb), 0.16) 100%)',
     border:         '1px solid rgba(255,155,60,0.45)',
     boxShadow: `
       inset 0 1.5px 0 rgba(255,185,70,0.45),
       inset 0 -1px 0 rgba(180,55,0,0.20),
-      0 0 12px rgba(249,115,22,0.15),
+      0 0 12px rgba(var(--almamundi-orange-rgb), 0.15),
       0 4px 8px rgba(0,0,0,0.25)
     `,
   };
@@ -500,12 +500,12 @@ const globalStyles = `
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border: 1px solid rgba(255,255,255,0.10);
-  border-top: 1px solid rgba(249,115,22,0.15);
+  border-top: 1px solid rgba(var(--almamundi-orange-rgb), 0.15);
   box-shadow:
     0 28px 70px rgba(0,0,0,0.5),
     0 0 0 1px rgba(255,255,255,0.06),
-    0 20px 40px -12px rgba(249,115,22,0.12),
-    0 0 60px -10px rgba(249,115,22,0.08);
+    0 20px 40px -12px rgba(var(--almamundi-orange-rgb), 0.12),
+    0 0 60px -10px rgba(var(--almamundi-orange-rgb), 0.08);
   animation: newsIn 240ms ease-out both;
   position: relative;
   }
@@ -516,7 +516,7 @@ const globalStyles = `
   left: 0;
   right: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, rgba(249,115,22,0.9), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--almamundi-orange-rgb), 0.9), transparent);
   border-radius: 22px 22px 0 0;
   }
   @keyframes newsIn {
@@ -528,7 +528,7 @@ const globalStyles = `
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.12em;
-  color: rgba(249,115,22,0.95);
+  color: rgba(var(--almamundi-orange-strong-rgb), 0.95);
   margin-bottom: 10px;
   }
   .newsCard .newsTitle {
@@ -555,8 +555,8 @@ const globalStyles = `
   .newsCard .newsBtnPrimary {
   padding: 10px 14px;
   border-radius: 14px;
-  background: rgba(249,115,22,0.16);
-  border: 1px solid rgba(249,115,22,0.25);
+  background: rgba(var(--almamundi-orange-rgb), 0.16);
+  border: 1px solid rgba(var(--almamundi-orange-rgb), 0.25);
   color: #FF4A1C;
   font-weight: 700;
   font-size: 14px;
@@ -568,7 +568,7 @@ const globalStyles = `
   gap: 6px;
   }
   .newsCard .newsBtnPrimary:hover {
-  background: rgba(249,115,22,0.25);
+  background: rgba(var(--almamundi-orange-rgb), 0.25);
   transform: translateY(-1px);
   }
   .newsCard .newsBtnGhost {
@@ -1363,12 +1363,7 @@ function RightPanel({
           <button
             type="button"
             onClick={onToggleAudio}
-            className="lm-btn-ghost flex items-center gap-2"
-            style={
-              soundEnabled
-                ? { borderColor: 'var(--almamundi-orange)', background: 'var(--almamundi-orange)', color: '#ffffff' }
-                : undefined
-            }
+            className="btn-am-neutro h-11 px-3.5 flex items-center gap-2"
             title={soundEnabled ? 'Cortar sonido del universo' : 'Activar sonido del universo'}
             aria-pressed={soundEnabled}
             aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
@@ -1408,7 +1403,7 @@ function RightPanel({
             ref={topicsButtonRef}
             type="button"
             onClick={onTopicsToggle}
-            className="lm-btn-ghost flex items-center gap-2"
+            className="btn-am-neutro h-11 px-3.5 flex items-center gap-2"
           >
             <Filter size={18} />
             Temas
@@ -1542,7 +1537,7 @@ function RightPanel({
                     Por qué aparece: tema y fuente curada del proyecto.
                   </p>
                   {selectedNews.url && (
-                    <a href={selectedNews.url} target="_blank" rel="noopener noreferrer" className="lm-btn-primary inline-flex items-center justify-center mt-2">
+                    <a href={selectedNews.url} target="_blank" rel="noopener noreferrer" className="btn-am-principal inline-flex h-[52px] w-full items-center justify-center mt-2">
                       Abrir en la fuente
                     </a>
                   )}
@@ -1651,7 +1646,7 @@ function RightPanel({
                     type="button"
                     disabled={!selectedMood}
                     onClick={selectedMood ? onStartTour : undefined}
-                    className="lm-btn-ghost inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="btn-am-neutro h-11 px-3.5 inline-flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     aria-label="Iniciar recorrido automático"
                   >
                     <span aria-hidden>▶</span>
@@ -1660,11 +1655,11 @@ function RightPanel({
                 )}
                 {isTourRunning && (
                   <>
-                    <button type="button" onClick={onNextChapter} className="lm-btn-ghost">
+                    <button type="button" onClick={onNextChapter} className="btn-am-neutro h-11 px-3.5">
                       Siguiente
                     </button>
                     {onStopTour && (
-                      <button type="button" onClick={onStopTour} className="lm-btn-ghost">
+                      <button type="button" onClick={onStopTour} className="btn-am-neutro h-11 px-3.5">
                         Detener
                       </button>
                     )}
@@ -1771,9 +1766,9 @@ function PulseIndicator({
       ctx.clearRect(0, 0, w, h);
 
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(249, 115, 22, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 74, 28, 0.85)';
       ctx.lineWidth = 1.5;
-      ctx.shadowColor = 'rgba(249, 115, 22, 0.5)';
+      ctx.shadowColor = 'rgba(255, 74, 28, 0.5)';
       ctx.shadowBlur = 4;
 
       const total = ekgPoints.length;
@@ -1879,9 +1874,9 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
         textAlign: 'left',
         padding: '15px 16px',
         borderRadius: 14,
-        background: isActive ? 'rgba(249,115,22,0.10)' : 'rgba(255,255,255,0.04)',
-        border: `1px solid ${isActive ? 'rgba(249,115,22,0.30)' : 'rgba(255,255,255,0.07)'}`,
-        borderLeft: isActive ? '3px solid rgba(249,115,22,0.6)' : '3px solid transparent',
+        background: isActive ? 'rgba(var(--almamundi-orange-rgb), 0.10)' : 'rgba(255,255,255,0.04)',
+        border: `1px solid ${isActive ? 'rgba(var(--almamundi-orange-rgb), 0.30)' : 'rgba(255,255,255,0.07)'}`,
+        borderLeft: isActive ? '3px solid rgba(var(--almamundi-orange-rgb), 0.6)' : '3px solid transparent',
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
@@ -2151,7 +2146,7 @@ function NoticiasPanel({
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {withLocation.length > 0 && (
           <>
-            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(249,115,22,0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
+            <p style={{ fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'rgba(var(--almamundi-orange-strong-rgb), 0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
             {withLocation.map((n, i) => (
               <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} nowMs={nowMs} />
             ))}
@@ -3179,9 +3174,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       time += 0.015;
       ctx.clearRect(0, 0, w, h);
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(249, 115, 22, 0.85)';
+      ctx.strokeStyle = 'rgba(255, 74, 28, 0.85)';
       ctx.lineWidth = 1.5;
-      ctx.shadowColor = 'rgba(249, 115, 22, 0.5)';
+      ctx.shadowColor = 'rgba(255, 74, 28, 0.5)';
       ctx.shadowBlur = 4;
       const total = ekgPoints.length;
       const offset = (time * 30) % total;
@@ -3352,7 +3347,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           repeatPeriod: cfg ? 1000 / cfg.speed : 1800,
           color: (t: number) => {
             const opacity = (cfg?.ringOpacity ?? 0.3) * (1 - t);
-            const base = cfg?.color ?? 'rgba(249,115,22,1)';
+            const base = cfg?.color ?? 'rgba(255, 74, 28, 1)';
             return base.replace(/[\d.]+\)$/, `${opacity})`);
           },
         };
@@ -3834,7 +3829,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     (d: { startIndex?: number }) => {
       const active = typeof d?.startIndex === 'number' && d.startIndex === currentChapterIndex;
       const alpha = active ? 0.85 + 0.15 * beatPhase : 0.22;
-      return active ? `rgba(249,115,22,${alpha})` : `rgba(255,255,255,${alpha})`;
+      return active ? `rgba(255, 74, 28, ${alpha})` : `rgba(255,255,255,${alpha})`;
     },
     [currentChapterIndex, beatPhase]
   );
@@ -3859,7 +3854,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       return (t: number) => {
         const u = Number.isFinite(t) ? Math.min(1, Math.max(0, t)) : 0;
         const alpha = Math.max(0, Math.min(1, baseAlpha * (1 - u) * beatMul));
-        return active ? `rgba(249,115,22,${alpha})` : `rgba(255,255,255,${alpha})`;
+        return active ? `rgba(255, 74, 28, ${alpha})` : `rgba(255,255,255,${alpha})`;
       };
     }
     const baseAlpha = selectedNews?.id === d?.newsId ? 0.8 : 0.25;
@@ -3897,7 +3892,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (view === 'music') {
       if (p.id === highlightedStoryId) return 'rgba(255,200,100,0.98)';
       const active = typeof (p as { chapterIndex?: number }).chapterIndex === 'number' && (p as { chapterIndex?: number }).chapterIndex === currentChapterIndex;
-      return active ? 'rgba(249,140,60,0.95)' : 'rgba(249,115,22,0.6)';
+      return active ? 'rgba(249,140,60,0.95)' : 'rgba(255, 74, 28, 0.6)';
     }
     const ids = typeof p?.id === 'string' && p.id.startsWith('news:') ? [p.id.slice(5)] : (p?.newsIds ?? (p?.newsId ? [p.newsId] : []));
     if (ids.length > 0) {
@@ -3911,7 +3906,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       if (p.id === highlightedStoryId) return 'rgba(255, 220, 100, 1.0)';
       return cfg.color;
     }
-    return atm?.glowColor ?? 'rgba(249,115,22,0.85)';
+    return atm?.glowColor ?? 'rgba(255, 74, 28, 0.85)';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, currentChapterIndex, selectedNews?.id, highlightedStoryId, atm, storyPulseConfigs, pulseFrame]);
 
@@ -4536,7 +4531,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             letterSpacing: '0.01em',
             transition: 'all 250ms ease',
             borderRadius: 999,
-            background: 'linear-gradient(180deg, rgba(249,115,22,0.30) 0%, rgba(249,115,22,0.20) 100%)',
+            background: 'linear-gradient(180deg, rgba(var(--almamundi-orange-rgb), 0.30) 0%, rgba(var(--almamundi-orange-rgb), 0.20) 100%)',
             backdropFilter: 'blur(24px) saturate(220%)',
             WebkitBackdropFilter: 'blur(24px) saturate(220%)',
             border: '1px solid rgba(255,155,60,0.50)',
@@ -4544,27 +4539,27 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               inset 0 2px 0 rgba(255,200,80,0.55),
               inset 0 -1.5px 0 rgba(180,55,0,0.35),
               inset 1px 0 0 rgba(255,165,60,0.15),
-              0 0 28px rgba(249,115,22,0.30),
+              0 0 28px rgba(var(--almamundi-orange-rgb), 0.30),
               0 12px 40px rgba(0,0,0,0.45),
-              0 4px 12px rgba(249,115,22,0.20)
+              0 4px 12px rgba(var(--almamundi-orange-rgb), 0.20)
             `,
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, rgba(249,115,22,0.40) 0%, rgba(249,115,22,0.28) 100%)';
+            e.currentTarget.style.background = 'linear-gradient(180deg, rgba(var(--almamundi-orange-rgb), 0.40) 0%, rgba(var(--almamundi-orange-rgb), 0.28) 100%)';
             e.currentTarget.style.boxShadow = `
               inset 0 2px 0 rgba(255,210,90,0.65),
               inset 0 -1.5px 0 rgba(180,55,0,0.35),
-              0 0 40px rgba(249,115,22,0.45),
+              0 0 40px rgba(var(--almamundi-orange-rgb), 0.45),
               0 12px 40px rgba(0,0,0,0.45)
             `;
             e.currentTarget.style.transform = 'translateY(-2px)';
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'linear-gradient(180deg, rgba(249,115,22,0.30) 0%, rgba(249,115,22,0.20) 100%)';
+            e.currentTarget.style.background = 'linear-gradient(180deg, rgba(var(--almamundi-orange-rgb), 0.30) 0%, rgba(var(--almamundi-orange-rgb), 0.20) 100%)';
             e.currentTarget.style.boxShadow = `
               inset 0 2px 0 rgba(255,200,80,0.55),
               inset 0 -1.5px 0 rgba(180,55,0,0.35),
-              0 0 28px rgba(249,115,22,0.30),
+              0 0 28px rgba(var(--almamundi-orange-rgb), 0.30),
               0 12px 40px rgba(0,0,0,0.45)
             `;
             e.currentTarget.style.transform = 'translateY(0)';
@@ -4780,12 +4775,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                     WebkitTapHighlightColor: 'transparent',
                     transition:     'all 220ms ease',
                     color:          '#ffffff',
-                    background:     'linear-gradient(180deg, rgba(249,115,22,0.32) 0%, rgba(249,115,22,0.18) 100%)',
+                    background:     'linear-gradient(180deg, rgba(var(--almamundi-orange-rgb), 0.32) 0%, rgba(var(--almamundi-orange-rgb), 0.18) 100%)',
                     border:         '1px solid rgba(255, 150, 50, 0.50)',
                     boxShadow: `
                       inset 0 1.5px 0 rgba(255, 190, 80, 0.50),
                       inset 0 -1px 0 rgba(160, 50, 0, 0.30),
-                      0 0 16px rgba(249, 115, 22, 0.20),
+                      0 0 16px rgba(var(--almamundi-orange-rgb), 0.20),
                       0 4px 12px rgba(0, 0, 0, 0.30)
                     `,
                   } : {
@@ -5029,8 +5024,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                 style={{
                   padding: '10px 22px',
                   borderRadius: 999,
-                  background: 'rgba(249,115,22,0.18)',
-                  border: '1px solid rgba(249,115,22,0.35)',
+                  background: 'rgba(var(--almamundi-orange-rgb), 0.18)',
+                  border: '1px solid rgba(var(--almamundi-orange-rgb), 0.35)',
                   color: '#fdba74',
                   cursor: 'pointer',
                   fontSize: 13,

@@ -86,7 +86,7 @@ export async function POST(
       subject: 'Alguien pensó en ti cuando leyó esto',
       html: `
         <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:48px 32px;max-width:520px;margin:0 auto;border-radius:16px">
-          <p style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(249,115,22,0.7);margin:0 0 16px">
+          <p style="font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(209, 61, 23, 0.7);margin:0 0 16px">
             ${locHtml}
           </p>
           <h1 style="font-size:26px;font-weight:300;margin:0 0 20px;letter-spacing:-0.02em;line-height:1.2">
@@ -94,7 +94,7 @@ export async function POST(
           </h1>
           ${excerpt ? `<p style="font-size:15px;color:rgba(255,255,255,0.60);line-height:1.7;margin:0 0 32px;font-style:italic">"${excerptHtml}"</p>` : ''}
           <a href="${url.replace(/"/g, '')}"
-             style="display:inline-block;padding:14px 28px;background:rgba(249,115,22,0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:14px">
+             style="display:inline-block;padding:14px 28px;background:rgba(209, 61, 23, 0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:14px">
             Leer la historia completa
           </a>
           <p style="font-size:11px;color:rgba(255,255,255,0.20);margin:32px 0 0">

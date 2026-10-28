@@ -21,7 +21,7 @@ export default function ObservatorioCamarasModalPage() {
           <button
             type="button"
             onClick={handleClose}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition"
+            className="btn-am-neutro inline-flex items-center gap-2 px-5 py-3"
           >
             Volver al globo
           </button>

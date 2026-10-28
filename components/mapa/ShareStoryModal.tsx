@@ -154,7 +154,7 @@ export function ShareStoryModal({
                 marginBottom: 12,
               }}
               onFocus={(e) =>
-                (e.target.style.borderColor = 'rgba(249,115,22,0.40)')
+                (e.target.style.borderColor = 'rgba(var(--almamundi-orange-rgb), 0.40)')
               }
               onBlur={(e) =>
                 (e.target.style.borderColor = 'rgba(255,255,255,0.10)')
@@ -205,26 +205,14 @@ export function ShareStoryModal({
               </button>
               <button
                 type="button"
+                className="btn-am-principal"
                 disabled={!email.trim() || sending}
                 onClick={() => void send()}
                 style={{
                   flex: 2,
                   padding: '10px',
-                  borderRadius: 999,
-                  background: email.trim()
-                    ? 'rgba(249,115,22,0.20)'
-                    : 'rgba(255,255,255,0.04)',
-                  border: `1px solid ${
-                    email.trim()
-                      ? 'rgba(249,115,22,0.40)'
-                      : 'rgba(255,255,255,0.06)'
-                  }`,
-                  color: email.trim() ? '#fdba74' : 'rgba(255,255,255,0.25)',
-                  cursor: email.trim() ? 'pointer' : 'not-allowed',
                   fontSize: 13,
-                  outline: 'none',
                   fontFamily: SITE_FONT_STACK,
-                  transition: 'all 180ms ease',
                 }}
               >
                 {sending ? 'Enviando...' : 'Enviar'}

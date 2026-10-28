@@ -37,13 +37,13 @@ export function ReadingChain({ storyId }: { storyId: string }) {
     pulses.forEach((p) => {
       const { x, y } = project(p.lat, p.lng);
       const g = ctx.createRadialGradient(x, y, 0, x, y, 8);
-      g.addColorStop(0, 'rgba(249,115,22,0.6)');
-      g.addColorStop(1, 'rgba(249,115,22,0)');
+      g.addColorStop(0, 'rgba(255, 74, 28, 0.6)');
+      g.addColorStop(1, 'rgba(255, 74, 28, 0)');
       ctx.fillStyle = g;
       ctx.beginPath();
       ctx.arc(x, y, 8, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = 'rgba(249,115,22,0.9)';
+      ctx.fillStyle = 'rgba(255, 74, 28, 0.9)';
       ctx.beginPath();
       ctx.arc(x, y, 2.5, 0, Math.PI * 2);
       ctx.fill();

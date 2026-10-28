@@ -118,6 +118,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
       {onClose && (
         <button
           type="button"
+          className="btn-am-neutro"
           onClick={onClose}
           style={{
             position: 'fixed',
@@ -127,10 +128,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 300,
             fontSize: '0.75rem',
-            color: SEPIA,
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
+            padding: '0.4rem 0.75rem',
             display: 'flex',
             alignItems: 'center',
             gap: 6,
@@ -420,19 +418,15 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           {onClose && (
             <button
               type="button"
+              className="btn-am-neutro"
               onClick={onClose}
               style={{
-                ...neu.button,
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
                 fontSize: '0.74rem',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 padding: '0.85rem 1.35rem',
-                color: neu.textMain,
-                cursor: 'pointer',
-                borderRadius: 999,
-                boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.82)`,
               }}
             >
               ← Volver a las historias
@@ -440,6 +434,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           )}
           <button
             type="button"
+            className="btn-am-secundario"
             onClick={() => setShareOpen(true)}
             style={{
               fontFamily: INTERIOR_FONT_STACK,
@@ -448,12 +443,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               padding: '0.85rem 1.35rem',
-              borderRadius: 999,
-              border: `1px solid rgba(255,74,28,0.32)`,
-              color: '#fff',
-              cursor: 'pointer',
-              background: `linear-gradient(165deg, #FF6E49 0%, ${neu.orange} 100%)`,
-              boxShadow: '0 18px 40px rgba(255,74,28,0.18), inset 0 -1px 0 rgba(0,0,0,0.06)',
             }}
           >
             Compartir esta historia

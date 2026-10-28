@@ -383,7 +383,7 @@ export function ResonanceMailbox({
                         type="button"
                         disabled={sending || text.trim().length < 3}
                         onClick={() => void send()}
-                        className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                        className="btn-am-principal w-full px-5 py-2.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                       >
                         {sending ? 'Enviando…' : 'Enviar'}
                       </button>

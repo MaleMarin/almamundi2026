@@ -151,7 +151,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
           <div className="mt-8 flex justify-center">
             <Link
               href={backHref}
-              className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
+              className="btn-am-neutro inline-flex items-center gap-2 px-5 py-3 font-medium"
             >
               <ArrowLeft size={18} />
               Volver al globo
@@ -162,7 +162,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
           <button
             type="button"
             onClick={onClose}
-            className="mt-6 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition text-sm font-medium"
+            className="btn-am-neutro mt-6 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium"
           >
             <ArrowLeft size={16} />
             Volver al globo

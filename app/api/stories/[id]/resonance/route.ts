@@ -90,7 +90,7 @@ export async function POST(
               ${safeEmailText(cityStr, 200)}.
             </p>
             <a href="${href.replace(/"/g, '')}"
-               style="display:inline-block;padding:12px 24px;background:rgba(249,115,22,0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:13px">
+               style="display:inline-block;padding:12px 24px;background:rgba(209, 61, 23, 0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:13px">
               Ver tu historia
             </a>
           </div>

@@ -60,8 +60,8 @@ export function StoryShareMenu({
   };
 
   const itemClass =
-    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[#ea580c]';
-  const buttonClass = `${itemClass} text-[#FF4A1C] hover:text-[#FF6E49]`;
+    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[var(--almamundi-orange-strong)]';
+  const buttonClass = `${itemClass} text-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)]`;
 
   return (
     <div
@@ -82,7 +82,7 @@ export function StoryShareMenu({
           <button
             type="button"
             onClick={onClose}
-            className="flex h-10 w-10 items-center justify-center rounded-full text-[#6B6B60] hover:text-[#FF4A1C]"
+            className="flex h-10 w-10 items-center justify-center rounded-full text-[#6B6B60] hover:text-[var(--almamundi-orange-strong)]"
             aria-label={labels.close}
           >
             <X size={18} />
@@ -114,7 +114,7 @@ export function StoryShareMenu({
           {showDownload ? (
             <button
               type="button"
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#D13D17]"
+              className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
               onClick={onDownload}
             >
               <Download size={15} aria-hidden />

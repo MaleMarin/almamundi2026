@@ -74,7 +74,7 @@ export function EcoRecorder({
       <p
         style={{
           fontSize: 13,
-          color: 'rgba(249,115,22,0.80)',
+          color: 'rgba(var(--almamundi-orange-strong-rgb), 0.80)',
           margin: 0,
           fontFamily: SITE_FONT_STACK,
         }}
@@ -110,9 +110,9 @@ export function EcoRecorder({
           height: 48,
           borderRadius: '50%',
           background:
-            state === 'recording' ? 'rgba(239,68,68,0.20)' : 'rgba(249,115,22,0.15)',
+            state === 'recording' ? 'rgba(239,68,68,0.20)' : 'rgba(var(--almamundi-orange-rgb), 0.15)',
           border: `1px solid ${
-            state === 'recording' ? 'rgba(239,68,68,0.50)' : 'rgba(249,115,22,0.35)'
+            state === 'recording' ? 'rgba(239,68,68,0.50)' : 'rgba(var(--almamundi-orange-rgb), 0.35)'
           }`,
           cursor: 'pointer',
           outline: 'none',

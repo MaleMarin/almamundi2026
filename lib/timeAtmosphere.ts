@@ -71,7 +71,7 @@ export function getAtmosphere(hour?: number): Atmosphere {
       accentSaturation: 100,
       bgOverlay: 'rgba(15, 23, 42, 0.25)',
       featuredMoods: ['ciudad', 'personas'],
-      glowColor: 'rgba(249, 115, 22, 0.90)',
+      glowColor: 'rgba(255, 74, 28, 0.90)',
     };
   }
   if (h >= 13 && h < 18) {
@@ -86,7 +86,7 @@ export function getAtmosphere(hour?: number): Atmosphere {
       accentSaturation: 95,
       bgOverlay: 'rgba(15, 23, 42, 0.30)',
       featuredMoods: ['ciudad', 'animales'],
-      glowColor: 'rgba(249, 115, 22, 0.85)',
+      glowColor: 'rgba(255, 74, 28, 0.85)',
     };
   }
   if (h >= 18 && h < 21) {

@@ -39,16 +39,13 @@ function PreguntaCard({
       </p>
       <Link
         href={contarIndexHref({ id: pregunta.id, mode })}
+        className="btn-am-principal"
         style={{
           display: 'inline-flex',
           marginTop: 12,
           padding: '8px 14px',
-          borderRadius: 999,
-          background: 'rgba(249,115,22,0.88)',
-          color: '#fff',
           fontWeight: 700,
           fontSize: 13,
-          textDecoration: 'none',
           fontFamily: SITE_FONT_STACK,
         }}
       >

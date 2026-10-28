@@ -161,7 +161,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                   transformStyle: 'preserve-3d',
                   zIndex: isCenter ? 20 : 10 - Math.abs(offset),
                   opacity: isCenter ? 1 : 0.4 + 0.3 * (1 - Math.min(Math.abs(offset), 4) / 4),
-                  borderColor: isCenter ? 'rgba(249, 115, 22, 0.9)' : 'rgba(0,0,0,0.08)',
+                  borderColor: isCenter ? 'rgba(var(--almamundi-orange-rgb), 0.9)' : 'rgba(0,0,0,0.08)',
                   boxShadow: isCenter ? '0 12px 40px rgba(0,0,0,0.6)' : '0 4px 16px rgba(0,0,0,0.4)',
                 }}
               >
@@ -247,7 +247,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               )}
 
               <div className="flex items-center gap-4 text-gray-600">
-                <button type="button" className="flex items-center gap-1.5 hover:text-gray-900 transition-colors" aria-label="Compartir">
+                <button type="button" className="btn-am-secundario flex items-center gap-1.5 px-3 py-1.5" aria-label="Compartir">
                   <span className="text-lg">↗</span>
                   <span className="text-xs">Compartir</span>
                 </button>

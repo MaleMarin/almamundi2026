@@ -10,9 +10,14 @@
   /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
   --map-space-deep: #050811;
   --map-space-mid: #0a1520;
-  /* Naranja AlmaMundi en todo el sitio (#FF4A1C) */
+  /* #FF4A1C: logo, íconos, puntos del globo y acentos sin texto. */
   --almamundi-orange: #FF4A1C;
   --almamundi-orange-rgb: 255, 74, 28;
+  /* Texto chico, píldora principal y hover de enlaces. */
+  --almamundi-orange-strong: #D13D17;
+  --almamundi-orange-strong-rgb: 209, 61, 23;
+  /* Hover de la píldora principal. */
+  --almamundi-orange-deep: #B53514;
 }
 
 @theme inline {
@@ -23,8 +28,8 @@
   /* Naranja AlmaMundi: tonalidad #FF4A1C en toda la web */
   --color-orange-400: #FF6E49;
   --color-orange-500: var(--almamundi-orange);
-  --color-orange-600: #D13D17;
-  --color-orange-700: #B53514;
+  --color-orange-600: var(--almamundi-orange-strong);
+  --color-orange-700: var(--almamundi-orange-deep);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -231,10 +236,10 @@ a:visited {
   color: #B53514;
 }
 a:hover {
-  color: #FF6E49;
+  color: var(--almamundi-orange-strong);
 }
 
-/* Botones neumórficos: borde y color unificados al hover y al estar activo (naranja) */
+/* Botones neumórficos: borde y color unificados al hover y al estar activo */
 .btn-almamundi {
   border-radius: 9999px;
   border-width: 1px;
@@ -245,8 +250,80 @@ a:hover {
 .btn-almamundi:active,
 .btn-almamundi-active,
 .btn-almamundi[data-active="true"] {
-  border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
-  color: var(--almamundi-orange) !important;
+  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.5) !important;
+  color: var(--almamundi-orange-strong) !important;
+}
+
+/* Tres píldoras. Una definición cada una. */
+.btn-am-principal,
+a.btn-am-principal,
+a.btn-am-principal:visited {
+  background: var(--almamundi-orange-strong) !important;
+  color: #fff !important;
+  border: 1px solid transparent !important;
+  border-radius: 9999px !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-am-principal:hover,
+a.btn-am-principal:hover,
+.btn-am-principal:focus-visible,
+a.btn-am-principal:focus-visible {
+  background: var(--almamundi-orange-deep) !important;
+  color: #fff !important;
+}
+.btn-am-principal:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.btn-am-secundario,
+a.btn-am-secundario,
+a.btn-am-secundario:visited {
+  background: #E9ECF3 !important;
+  color: var(--almamundi-orange-strong) !important;
+  border: 1px solid rgba(var(--almamundi-orange-strong-rgb), 0.38) !important;
+  border-radius: 9999px !important;
+  box-shadow:
+    8px 8px 20px rgba(136, 150, 170, 0.34),
+    -8px -8px 20px rgba(255, 255, 255, 0.9),
+    inset 1px 1px 2px rgba(255, 255, 255, 0.58),
+    inset -2px -2px 5px rgba(163, 177, 198, 0.16) !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-am-secundario:hover,
+a.btn-am-secundario:hover,
+.btn-am-secundario:focus-visible,
+a.btn-am-secundario:focus-visible {
+  color: var(--almamundi-orange-strong) !important;
+  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.55) !important;
+}
+
+.btn-am-neutro,
+a.btn-am-neutro,
+a.btn-am-neutro:visited {
+  background: #E0E5EC !important;
+  color: #4b5563 !important;
+  border: 1px solid rgba(255, 255, 255, 0.48) !important;
+  border-radius: 9999px !important;
+  box-shadow:
+    14px 14px 30px rgba(136, 150, 170, 0.58),
+    -14px -14px 32px rgba(255, 255, 255, 0.96),
+    inset 3px 3px 6px rgba(255, 255, 255, 0.82),
+    inset -4px -4px 12px rgba(163, 177, 198, 0.32) !important;
+  text-decoration: none;
+  cursor: pointer;
+}
+.btn-am-neutro:hover,
+a.btn-am-neutro:hover,
+.btn-am-neutro:focus-visible,
+a.btn-am-neutro:focus-visible,
+.btn-am-neutro:active,
+.btn-am-neutro[aria-pressed='true'],
+.btn-am-neutro[data-active='true'] {
+  color: var(--almamundi-orange-strong) !important;
+  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.5) !important;
 }
 
 /* Avenir: título «Mapa de AlmaMundi», cabecera /mapa y hero #intro (misma pila; fallbacks si no está instalada). */
@@ -287,6 +364,12 @@ a:hover {
 a.home-map-neu-pill.btn-almamundi,
 a.home-map-neu-pill.btn-almamundi:visited {
   color: #4b5563 !important;
+}
+a.home-map-neu-pill.btn-almamundi:hover,
+a.home-map-neu-pill.btn-almamundi:focus-visible,
+a.home-map-neu-pill.btn-almamundi:active,
+a.home-map-neu-pill.btn-almamundi[data-active='true'] {
+  color: var(--almamundi-orange-strong) !important;
 }
 
 /*
@@ -347,8 +430,8 @@ a.home-map-neu-pill.btn-almamundi:visited {
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='true'] {
-  color: var(--almamundi-orange) !important;
-  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
+  color: var(--almamundi-orange-strong) !important;
+  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.7) !important;
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
@@ -357,8 +440,8 @@ a.home-map-neu-pill.btn-almamundi:visited {
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
-  color: var(--almamundi-orange) !important;
-  border-color: rgba(var(--almamundi-orange-rgb), 0.7) !important;
+  color: var(--almamundi-orange-strong) !important;
+  border-color: rgba(var(--almamundi-orange-strong-rgb), 0.7) !important;
 }
 
 /*
@@ -585,7 +668,7 @@ a.home-map-neu-pill.btn-almamundi:visited {
 button:focus,
 a:focus,
 [role="button"]:focus {
-  outline: 2px solid rgba(249, 115, 22, 0.55);
+  outline: 2px solid rgba(var(--almamundi-orange-rgb), 0.55);
   outline-offset: 0;
   border-color: transparent;
 }
@@ -641,7 +724,7 @@ footer a.almamundi-footer-link:visited {
   color: #4b5563 !important;
 }
 footer a.almamundi-footer-link:hover {
-  color: var(--almamundi-orange) !important;
+  color: var(--almamundi-orange-strong) !important;
 }
 
 /* Modo alto contraste AlmaMundi */

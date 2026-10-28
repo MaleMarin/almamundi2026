@@ -98,7 +98,7 @@ export async function POST(
         <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:0;max-width:520px;margin:0 auto;border-radius:16px;overflow:hidden">
           ${bgUrl ? `<div style="${bgStyle}"></div>` : ''}
           <div style="padding:32px 28px">
-            <p style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(249,115,22,0.7);margin:0 0 12px">
+            <p style="font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:rgba(209, 61, 23, 0.7);margin:0 0 12px">
               Postal · ${locHtml}
             </p>
             <h1 style="font-size:24px;font-weight:300;margin:0 0 16px;letter-spacing:-0.02em;line-height:1.2;color:#fff">
@@ -106,7 +106,7 @@ export async function POST(
             </h1>
             ${excerpt ? `<p style="font-size:14px;color:rgba(255,255,255,0.65);line-height:1.65;margin:0 0 24px;font-style:italic">"${excerptHtml}"</p>` : ''}
             <a href="${storyUrl.replace(/"/g, '')}"
-               style="display:inline-block;padding:12px 24px;background:rgba(249,115,22,0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:13px">
+               style="display:inline-block;padding:12px 24px;background:rgba(209, 61, 23, 0.85);color:#fff;border-radius:999px;text-decoration:none;font-size:13px">
               Ver en el mapa
             </a>
             <p style="font-size:10px;color:rgba(255,255,255,0.25);margin:24px 0 0">

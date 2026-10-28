@@ -156,7 +156,7 @@ export function MisDatosPersonalesForm() {
           </p>
           <Link
             href="/"
-            className="mt-6 inline-block rounded-full border border-gray-400/40 bg-[#e4e7ee] px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-sm hover:bg-[#dde1ea]"
+            className="btn-am-neutro mt-6 inline-block px-5 py-2.5 text-sm font-semibold"
           >
             Volver al inicio
           </Link>
@@ -363,7 +363,7 @@ export function MisDatosPersonalesForm() {
             <button
               type="submit"
               disabled={status === 'sending' || ownData === '' || !formToken}
-              className="rounded-full bg-[#FF4A1C] px-8 py-3 text-sm font-semibold text-white shadow-md transition hover:opacity-95 disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-am-principal px-8 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === 'sending' ? 'Enviando…' : 'Enviar solicitud'}
             </button>

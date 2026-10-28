@@ -133,51 +133,10 @@
 }
 .lm-chip:hover{ transform: translateY(-1px); }
 .lm-chip--active{
-  border-color: #FF4A1C !important;
-  background: rgba(255,74,28,.18) !important;
+  border-color: var(--almamundi-orange) !important;
+  background: rgba(var(--almamundi-orange-rgb), .18) !important;
   color: #fff !important;
-  box-shadow: 0 6px 20px rgba(255,74,28,.15);
-}
-
-/* =========================
-   Buttons Apple-like
-========================= */
-.lm-btn-primary{
-  height: 52px;
-  width: 100%;
-  border-radius: 999px;
-  border: 1px solid rgba(255,154,61,.55);
-  background: linear-gradient(180deg, #FFB100 0%, #FF4A1C 55%, #D13D17 100%);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: .01em;
-  cursor: pointer;
-  box-shadow: 0 16px 45px rgba(255,74,28,.22);
-  transition: transform .12s ease, filter .2s ease;
-}
-.lm-btn-primary:hover{ transform: translateY(-1px); filter: saturate(1.15) brightness(1.05); }
-.lm-btn-primary:disabled{
-  opacity: 0.4;
-  cursor: not-allowed;
-  filter: none;
-  transform: none;
-}
-.lm-btn-ghost{
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,.14);
-  background: rgba(255,255,255,.05);
-  color: rgba(255,255,255,.88);
-  font-size: 14px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: transform .12s ease, background .2s ease;
-}
-.lm-btn-ghost:hover{
-  transform: translateY(-1px);
-  background: rgba(255,255,255,.10);
+  box-shadow: 0 6px 20px rgba(var(--almamundi-orange-rgb), .15);
 }
 
 /* =========================

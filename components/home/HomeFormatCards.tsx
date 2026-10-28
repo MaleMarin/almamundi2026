@@ -211,14 +211,8 @@ function SoftCard({
                 e.preventDefault();
                 onClick();
               }}
-              className="flex w-full shrink-0 cursor-pointer items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case tracking-wide transition-opacity hover:opacity-[0.92] active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
-              style={{
-                background: '#FF4A1C',
-                color: 'white',
-                border: 'none',
-                borderRadius: '100px',
-                fontFamily: APP_FONT,
-              }}
+              className="btn-am-principal flex w-full shrink-0 items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case tracking-wide active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
+              style={{ fontFamily: APP_FONT }}
             >
               {buttonLabel}
             </Link>

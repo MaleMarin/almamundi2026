@@ -16,7 +16,7 @@ export default function EducacionMediaticaPage() {
       <div className="mx-auto max-w-3xl">
         <Link
           href="/"
-          className="inline-block text-sm font-semibold tracking-wide text-[#FF4A1C] underline decoration-2 underline-offset-[6px] transition-opacity hover:opacity-85"
+          className="btn-am-neutro inline-block px-4 py-2 text-sm font-semibold tracking-wide"
         >
           ← Volver al inicio
         </Link>

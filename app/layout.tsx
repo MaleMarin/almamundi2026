@@ -11,29 +11,9 @@ import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
-import { Bebas_Neue, Instrument_Serif, Montserrat, Syne } from 'next/font/google';
+import { Montserrat } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
-
-const bebasNeue = Bebas_Neue({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-bebas',
-  display: 'swap',
-});
-
-const instrumentSerif = Instrument_Serif({
-  weight: '400',
-  subsets: ['latin'],
-  variable: '--font-instrument',
-  display: 'swap',
-});
-
-const syne = Syne({
-  subsets: ['latin'],
-  variable: '--font-syne',
-  display: 'swap',
-});
 
 const montserrat = Montserrat({
   weight: ['400', '500', '600', '700'],
@@ -106,7 +86,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${bebasNeue.variable} ${instrumentSerif.variable} ${syne.variable} ${montserrat.variable}`}
+      className={montserrat.variable}
     >
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-interna">
         <CursorGlobal />

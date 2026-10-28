@@ -64,7 +64,7 @@ export default function ExposicionDetailPage() {
       <main className="min-h-screen flex flex-col gap-6 px-6 py-10" style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
         <div className="flex flex-1 flex-col items-center justify-center">
           <p className="text-gray-600 mb-4">No se encontró esta exposición.</p>
-          <Link href="/exposiciones" className="text-orange-500 font-semibold hover:underline">
+          <Link href="/exposiciones" className="btn-am-neutro px-4 py-2 font-semibold">
             Volver al listado
           </Link>
         </div>
@@ -90,7 +90,7 @@ export default function ExposicionDetailPage() {
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
-        <Link href="/exposiciones" className="inline-block text-sm font-medium mb-6" style={{ color: neu.textBody }}>
+        <Link href="/exposiciones" className="btn-am-neutro inline-block px-4 py-2 text-sm font-medium mb-6">
           ← Volver al listado
         </Link>
 
@@ -156,7 +156,7 @@ export default function ExposicionDetailPage() {
               </>
             ) : (
               <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={onDescargarPostal} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-sm" style={neu.button}>
+                <button type="button" onClick={onDescargarPostal} className="btn-am-principal px-5 py-2.5 font-semibold text-sm">
                   Descargar PNG
                 </button>
                 <button type="button" onClick={onCopiarEnlace} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-sm" style={neu.button}>

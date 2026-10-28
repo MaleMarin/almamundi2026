@@ -79,8 +79,8 @@ export function StoryInvitation({ onInvite }: Props) {
           gap: 8,
           padding: '12px 28px',
           borderRadius: 999,
-          background: 'rgba(249,115,22,0.12)',
-          border: '1px solid rgba(249,115,22,0.28)',
+          background: 'rgba(var(--almamundi-orange-rgb), 0.12)',
+          border: '1px solid rgba(var(--almamundi-orange-rgb), 0.28)',
           color: '#fdba74',
           cursor: 'pointer',
           fontSize: 14,
@@ -90,13 +90,13 @@ export function StoryInvitation({ onInvite }: Props) {
           transition: 'all 250ms ease',
         }}
         onMouseEnter={(e) => {
-          e.currentTarget.style.background = 'rgba(249,115,22,0.20)';
-          e.currentTarget.style.borderColor = 'rgba(249,115,22,0.50)';
+          e.currentTarget.style.background = 'rgba(var(--almamundi-orange-rgb), 0.20)';
+          e.currentTarget.style.borderColor = 'rgba(var(--almamundi-orange-rgb), 0.50)';
           e.currentTarget.style.transform = 'translateY(-1px)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.background = 'rgba(249,115,22,0.12)';
-          e.currentTarget.style.borderColor = 'rgba(249,115,22,0.28)';
+          e.currentTarget.style.background = 'rgba(var(--almamundi-orange-rgb), 0.12)';
+          e.currentTarget.style.borderColor = 'rgba(var(--almamundi-orange-rgb), 0.28)';
           e.currentTarget.style.transform = 'translateY(0)';
         }}
       >

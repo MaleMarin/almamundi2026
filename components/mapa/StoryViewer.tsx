@@ -424,7 +424,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     fontSize: 11,
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
-                    color: 'rgba(249,115,22,0.70)',
+                    color: 'rgba(var(--almamundi-orange-strong-rgb), 0.70)',
                     margin: '0 0 6px',
                     fontFamily: SITE_FONT_STACK,
                   }}
@@ -574,7 +574,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     marginTop: 16,
                     padding: '14px 16px',
                     background: 'rgba(8,12,25,0.55)',
-                    border: '1px solid rgba(249,115,22,0.18)',
+                    border: '1px solid rgba(var(--almamundi-orange-rgb), 0.18)',
                     borderRadius: 16,
                   }}
                 >
@@ -697,6 +697,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       </button>
                       <button
                         type="button"
+                        className="btn-am-principal"
                         disabled={!lastSecondText.trim()}
                         onClick={async () => {
                           try {
@@ -711,11 +712,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                         }}
                         style={{
                           padding: '7px 16px',
-                          borderRadius: 999,
-                          background: lastSecondText.trim() ? 'rgba(249,115,22,0.18)' : 'rgba(255,255,255,0.04)',
-                          border: `1px solid ${lastSecondText.trim() ? 'rgba(249,115,22,0.35)' : 'rgba(255,255,255,0.06)'}`,
-                          color: lastSecondText.trim() ? '#fdba74' : 'rgba(255,255,255,0.25)',
-                          cursor: lastSecondText.trim() ? 'pointer' : 'not-allowed',
                           fontSize: 12,
                           fontFamily: SITE_FONT_STACK,
                         }}
@@ -765,8 +761,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     style={{
                       padding: '8px 18px',
                       borderRadius: 999,
-                      background: 'rgba(249,115,22,0.18)',
-                      border: '1px solid rgba(249,115,22,0.35)',
+                      background: 'rgba(var(--almamundi-orange-rgb), 0.18)',
+                      border: '1px solid rgba(var(--almamundi-orange-rgb), 0.35)',
                       color: '#fdba74',
                       cursor: 'pointer',
                       fontSize: 13,
@@ -809,7 +805,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   {listening ? 'Detener lectura' : 'Cerrar los ojos'}
                 </button>
               ) : null}
-              <ActionButton label="Compartir" onClick={() => setShareOpen(true)} />
+              <ActionButton className="btn-am-secundario" label="Compartir" onClick={() => setShareOpen(true)} />
               {!alreadySent && !resonanceSent ? (
                 <button
                   type="button"
@@ -901,20 +897,23 @@ function ActionButton({
   label,
   onClick,
   accent = false,
+  className,
 }: {
   label: string;
   onClick: () => void;
   accent?: boolean;
+  className?: string;
 }) {
   return (
     <button
       type="button"
+      className={className}
       onClick={onClick}
       style={{
         padding: '9px 18px',
         borderRadius: 999,
-        background: accent ? 'rgba(249,115,22,0.14)' : 'rgba(255,255,255,0.06)',
-        border: `1px solid ${accent ? 'rgba(249,115,22,0.30)' : 'rgba(255,255,255,0.10)'}`,
+        background: accent ? 'rgba(var(--almamundi-orange-rgb), 0.14)' : 'rgba(255,255,255,0.06)',
+        border: `1px solid ${accent ? 'rgba(var(--almamundi-orange-rgb), 0.30)' : 'rgba(255,255,255,0.10)'}`,
         color: accent ? '#fdba74' : 'rgba(255,255,255,0.55)',
         cursor: 'pointer',
         fontSize: 13,

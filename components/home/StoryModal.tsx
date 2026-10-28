@@ -2037,7 +2037,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
               >
                 <Video className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVideo}
@@ -2046,7 +2046,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
               >
                 <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
@@ -2187,7 +2187,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('grabar')}
                 className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
+                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
               >
                 <Mic className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalRecordVoice}
@@ -2196,7 +2196,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 type="button"
                 onClick={() => switchAvSource('archivo')}
                 className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: '#FF4A1C' } : soft.button}
+                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange-strong)' } : soft.button}
               >
                 <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
                 {t.modalUploadOrLink}
@@ -2977,7 +2977,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         aria-label={t.modalCreatingColors}
                       >
                         <div
-                          className="story-upload-indeterminate absolute inset-y-0 left-0 w-1/3 rounded-full bg-[#FF4A1C]"
+                          className="story-upload-indeterminate absolute inset-y-0 left-0 w-1/3 rounded-full bg-[var(--almamundi-orange)]"
                           style={{ animation: 'story-upload-indeterminate 1.15s ease-in-out infinite' }}
                         />
                       </div>
@@ -2996,7 +2996,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         aria-label={t.modalUploadProgress}
                       >
                         <div
-                          className="h-full bg-[#FF4A1C]"
+                          className="h-full bg-[var(--almamundi-orange)]"
                           style={{ width: `${uploadProgress}%` }}
                         />
                       </div>
@@ -3009,8 +3009,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       setErr('');
                       setStep('capture');
                     }}
-                    className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-gray-600 active:scale-95 md:px-6"
-                    style={soft.button}
+                    className="btn-am-neutro min-h-11 px-5 py-2 text-xs font-semibold active:scale-95 md:px-6"
+                    style={{ fontFamily: APP_FONT }}
                   >
                     {t.modalBack}
                   </button>
@@ -3021,8 +3021,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       disabled={
                         saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
                       }
-                      className="min-h-11 rounded-full px-5 py-2 text-xs font-semibold text-white active:scale-95 disabled:opacity-60 md:px-6"
-                      style={{ ...soft.button, backgroundColor: '#FF4A1C' }}
+                      className="btn-am-principal min-h-11 px-5 py-2 text-xs font-semibold active:scale-95 disabled:opacity-60 md:px-6"
+                      style={{ fontFamily: APP_FONT }}
                     >
                       {creatingColors
                         ? t.modalCreatingColors
@@ -3099,7 +3099,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <button
                     type="button"
                     onClick={() => void downloadImprint()}
-                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full bg-[#FF4A1C] px-4 text-sm font-semibold text-white transition hover:bg-[#D13D17] md:flex-1"
+                    className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-semibold md:flex-1"
                   >
                     <Download size={16} strokeWidth={1.6} aria-hidden />
                     {t.modalDownloadImprint}
@@ -3107,7 +3107,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <button
                     type="button"
                     onClick={() => void shareImprint()}
-                    className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
+                    className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-medium md:flex-1"
                   >
                     <Share2 size={15} aria-hidden />
                     {t.modalShareImprint}
@@ -3119,7 +3119,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={startAnotherStory}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)] md:flex-1"
                     >
                       {mode === 'foto'
                         ? t.modalAnotherCtaFoto
@@ -3132,7 +3132,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={onExploreMap}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)] md:flex-1"
                     >
                       {t.modalBackToMap}
                     </button>
@@ -3144,7 +3144,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         event.preventDefault();
                         router.push('/contar');
                       }}
-                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[#FF4A1C] hover:underline"
+                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange-strong)] hover:underline"
                     >
                       {t.modalAnotherFormatLink}
                     </a>
@@ -3153,7 +3153,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     {t.modalContactLead}{' '}
                     <a
                       href="mailto:hola@almamundi.org"
-                      className="text-[#FF4A1C] underline underline-offset-2"
+                      className="text-[var(--almamundi-orange-strong)] underline underline-offset-2"
                     >
                       hola@almamundi.org
                     </a>
@@ -3161,7 +3161,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   </p>
                 </div>
                 <p
-                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[#FF4A1C] ${
+                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-medium text-[var(--almamundi-orange-strong)] ${
                     shareNotice ? 'opacity-100' : 'opacity-0'
                   }`}
                   aria-live="polite"

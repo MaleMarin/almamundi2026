@@ -103,7 +103,7 @@ export function NewsObservatoryPageClient({ newsId }: { newsId: string }) {
         <p className="text-white/80">Noticia no encontrada.</p>
         <HomeHardLink
           href="/#mapa"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
+          className="btn-am-neutro inline-flex items-center gap-2 px-5 py-3 font-medium"
         >
           Volver al globo
         </HomeHardLink>
@@ -133,7 +133,7 @@ export function NewsObservatoryPageClient({ newsId }: { newsId: string }) {
         <div className="mt-8">
           <HomeHardLink
             href="/#mapa"
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white/10 text-white border border-white/20 hover:bg-white/15 transition font-medium"
+            className="btn-am-neutro inline-flex items-center gap-2 px-5 py-3 font-medium"
           >
             Volver al globo
           </HomeHardLink>

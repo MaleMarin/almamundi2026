@@ -72,7 +72,7 @@ function MuestraDetailBody() {
         <p style={{ margin: 0 }}>No se encontró esta muestra.</p>
         <Link
           href="/muestras"
-          className="text-blue-600 font-semibold underline underline-offset-[5px] hover:text-blue-800"
+          className="btn-am-neutro px-4 py-2 font-semibold"
         >
           Volver al listado
         </Link>

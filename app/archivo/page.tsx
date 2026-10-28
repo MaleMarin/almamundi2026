@@ -155,7 +155,7 @@ function StoryCard({
           {story.alias || '—'} · {story.place || '—'}
         </p>
         {story.topic?.[0] && (
-          <p style={{ fontSize: 11, color: 'rgba(249,115,22,0.70)', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 11, color: 'rgba(var(--almamundi-orange-strong-rgb), 0.70)', margin: '4px 0 0' }}>
             {getThemeLabel(story.topic[0]) || story.topic[0]}
           </p>
         )}

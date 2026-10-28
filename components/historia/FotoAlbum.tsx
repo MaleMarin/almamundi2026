@@ -188,15 +188,13 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
             {onClose && (
               <button
                 type="button"
+                className="btn-am-neutro"
                 onClick={onClose}
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
                   fontSize: '0.75rem',
-                  color: CREAM_SOFT,
-                  background: 'transparent',
-                  border: 'none',
-                  cursor: 'pointer',
+                  padding: '0.4rem 0.75rem',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
@@ -490,6 +488,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 ) : null}
                 <button
                   type="button"
+                  className="btn-am-secundario"
                   onClick={() => setShareOpen(true)}
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
@@ -498,12 +497,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     letterSpacing: '0.16em',
                     textTransform: 'uppercase',
                     padding: '0.85rem 1.35rem',
-                    borderRadius: 999,
-                    border: `1px solid rgba(255,74,28,0.32)`,
-                    color: '#fff',
-                    cursor: 'pointer',
-                    background: `linear-gradient(165deg, #FF6E49 0%, ${neu.orange} 100%)`,
-                    boxShadow: '0 18px 40px rgba(255,74,28,0.2), inset 0 -1px 0 rgba(0,0,0,0.08)',
                   }}
                 >
                   Compartir

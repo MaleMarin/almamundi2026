@@ -248,7 +248,7 @@ export function EthicalShareFlow({
                 <button
                   type="button"
                   onClick={() => void nativeShare()}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
+                  className="btn-am-secundario px-4 py-2.5 text-left text-sm font-medium"
                 >
                   Compartir con el sistema
                 </button>
@@ -256,7 +256,7 @@ export function EthicalShareFlow({
                   type="button"
                   disabled={downloading}
                   onClick={() => void downloadCard()}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20 disabled:opacity-50"
+                  className="btn-am-principal px-4 py-2.5 text-left text-sm font-medium disabled:opacity-50"
                 >
                   {downloading ? 'Generando tarjeta…' : 'Descargar tarjeta'}
                 </button>
