@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import Link from 'next/link';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
@@ -9,6 +11,7 @@ import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat, contarIndexHref, preguntaFromSearch } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
+import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
@@ -27,7 +30,9 @@ export function HomePageClient() {
   const router = useRouter();
   const pathname = usePathname() ?? '/';
   const searchParams = useSearchParams();
+  const { locale } = useHomeLocale();
   const pregunta = preguntaFromSearch(searchParams);
+  const preguntaVigente = preguntasDeLaSemana().vigente;
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
@@ -263,6 +268,26 @@ export function HomePageClient() {
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
+      <div className="home-intro-avenir mx-auto mb-8 w-full max-w-[min(100%,46rem)] px-6 md:mb-12 md:px-10">
+        <div
+          className="flex flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
+          style={{
+            backgroundColor: 'rgba(255,255,255,0.42)',
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
+          }}
+        >
+          <p className="m-0 max-w-full text-[0.95rem] leading-snug sm:max-w-[36rem] sm:text-base" style={{ color: '#4A5568' }}>
+            <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
+            {preguntaVigente.tu[locale]}
+          </p>
+          <Link
+            href={contarIndexHref({ id: preguntaVigente.id, mode: 'tu' })}
+            className="btn-am-principal inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
+          >
+            {PREGUNTA_UI.responder[locale]}
+          </Link>
+        </div>
+      </div>
       <MapSectionLocked />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />

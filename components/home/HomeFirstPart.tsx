@@ -1,11 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
 import { HomeFormatCards } from '@/components/home/HomeFormatCards';
-import { contarIndexHref } from '@/lib/contar-routes';
-import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
@@ -53,8 +50,7 @@ export function HomeFirstPart({
   onMediaEducation: _onMediaEducation,
   basePath: _basePath = ''
 }: HomeFirstPartProps) {
-  const { t, locale } = useHomeLocale();
-  const preguntaVigente = preguntasDeLaSemana().vigente;
+  const { t } = useHomeLocale();
 
   return (
     <>
@@ -103,26 +99,6 @@ export function HomeFirstPart({
                 }}
               />
             </svg>
-          </div>
-        </div>
-        <div className="mx-auto mt-6 w-full max-w-[min(100%,46rem)]">
-          <div
-            className="flex flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
-            style={{
-              backgroundColor: 'rgba(255,255,255,0.42)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
-            }}
-          >
-            <p className="m-0 max-w-full text-[0.95rem] leading-snug sm:max-w-[36rem] sm:text-base" style={{ color: soft.textMain }}>
-              <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
-              {preguntaVigente.tu[locale]}
-            </p>
-            <Link
-              href={contarIndexHref({ id: preguntaVigente.id, mode: 'tu' })}
-              className="btn-am-principal inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
-            >
-              {PREGUNTA_UI.responder[locale]}
-            </Link>
           </div>
         </div>
       </section>

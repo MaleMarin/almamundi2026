@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { contarHref, preguntaFromSearch } from '@/lib/contar-routes';
-import { AnsweringStrip } from '@/components/home/AnsweringStrip';
+import { preguntaTexto } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const APP_FONT = SITE_FONT_STACK;
@@ -242,8 +242,9 @@ export function HomeFormatCards({
   sectionId,
   fillViewport = false,
 }: HomeFormatCardsProps) {
-  const { t } = useHomeLocale();
+  const { t, locale } = useHomeLocale();
   const pregunta = preguntaFromSearch(useSearchParams());
+  const preguntaLinea = pregunta ? preguntaTexto(pregunta.id, pregunta.mode, locale) : null;
 
   return (
     <section
@@ -255,9 +256,6 @@ export function HomeFormatCards({
           : 'relative z-[18] mb-8 px-6 pb-10 pt-0 sm:pt-1 md:mb-12 md:px-10 md:pb-12 md:pt-2 lg:pt-3'
       }
     >
-      {pregunta ? (
-        <AnsweringStrip questionId={pregunta.id} questionMode={pregunta.mode} />
-      ) : null}
       <p
         className={
           fillViewport
@@ -267,8 +265,12 @@ export function HomeFormatCards({
         style={{ color: soft.textBody }}
       >
         <span className="font-normal text-orange-500">
-          <span className="block">{t.historiasLead2}</span>
-          <span className="mt-1 block font-bold">{t.historiasLead2b}</span>
+          <span className="block">
+            {preguntaLinea ? `${t.modalAnsweringPrefix} ${preguntaLinea}` : t.historiasLead2}
+          </span>
+          <span className="mt-1 block font-bold">
+            {preguntaLinea ? t.historiasLeadChoose : t.historiasLead2b}
+          </span>
         </span>
       </p>
       <div
