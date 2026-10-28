@@ -47,7 +47,6 @@ import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
 import type { MapView } from '@/lib/map-data/types';
 import { getStoriesReadIds, startSessionTimer } from '@/lib/sessionTracker';
-import { getApproxLocation } from '@/lib/userLocation';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
@@ -2237,7 +2236,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const lastBreathingUpdateRef = useRef(0);
   const globeDayTexRef = useRef<import('three').Texture | null>(null);
   const globeNightTexRef = useRef<import('three').Texture | null>(null);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   /** Recalcula vector sol y velo del terminador cada 30 s (UTC en vivo). */
   const [solarTick, setSolarTick] = useState(0);
   useEffect(() => {
@@ -2677,14 +2675,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     }
   }, [searchParams, embedded, universeVisible]);
 
-  // Ubicación aproximada del usuario para día/noche según su lugar
-  useEffect(() => {
-    getApproxLocation().then((loc) => {
-      if (loc) setUserLocation({ lat: loc.lat, lng: loc.lng });
-    });
-  }, []);
-
-  // Modo día/noche: ?hour=12 fuerza día, ?hour=22 fuerza noche; si no, según sol en ubicación del usuario o hora local
+  // Modo día/noche: ?hour=12 fuerza día, ?hour=22 fuerza noche; si no, según la zona horaria.
   useEffect(() => {
     const updateDayNight = () => {
       if (hourOverride != null) {
@@ -2692,7 +2683,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         return;
       }
       const now = new Date();
-      const loc = userLocation ?? resolveViewerAnchor();
+      const loc = resolveViewerAnchor();
       if (loc) {
         setIsNight(isNightAtLocation(loc.lat, loc.lng, now));
       } else {
@@ -2703,7 +2694,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     updateDayNight();
     const id = setInterval(updateDayNight, 60_000);
     return () => clearInterval(id);
-  }, [userLocation, hourOverride]);
+  }, [hourOverride]);
 
   // Opción C: gira solo en modo contemplar (sin tour/panel/arrastre). Un solo motor: cámara.
   useEffect(() => {
@@ -4182,21 +4173,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     setDrawerOpen((prev) => (prev && drawerMode === mode ? false : true));
   }, [drawerMode, embedded, universeVisible]);
 
-  /** Centrar el globo en la ubicación del usuario (ej. Región Metropolitana). Actualiza base orbit para return-to-base. */
-  useEffect(() => {
-    if (!globeReady || !globeEl.current) return;
-    if (embedded) return;
-    getApproxLocation().then((loc) => {
-      if (!loc || !globeEl.current) return;
-      try {
-        const pov = { lat: loc.lat, lng: loc.lng, altitude: 1.8 };
-        globeEl.current.pointOfView(pov, 1200);
-        basePOVRef.current = pov;
-        setViewCenter({ lat: loc.lat, lng: loc.lng });
-      } catch {}
-    });
-  }, [globeReady, embedded]);
-
   useEffect(() => {
     if (activeView !== 'actualidad') {
       queueMicrotask(() => {
@@ -5340,7 +5316,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           selectedLocation={selectedLocation}
           className="text-[11px] md:text-[12px] tracking-[0.32em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
-        <MapRealtimeSyncLine userLat={userLocation?.lat} userLng={userLocation?.lng} />
+        <MapRealtimeSyncLine />
       </div>
       </div>
     </div>

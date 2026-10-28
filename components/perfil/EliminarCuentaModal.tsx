@@ -107,7 +107,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
         query(
           collection(db, STORIES),
           where('autor.id', '==', uid),
-          where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]),
+          where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES, 'beta_demo']),
         ),
       );
       const now = new Date().toISOString();

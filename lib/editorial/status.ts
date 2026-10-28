@@ -18,11 +18,12 @@ export type CanonicalStoryStatus = (typeof CANONICAL_STORY_STATUSES)[number];
 /**
  * Estados que la audiencia general puede ver (listados, `/api/stories`, detalle público sin privilegio).
  * Incluye alias legacy escritos antes de esta capa editorial.
+ * `beta_demo` sigue siendo un estado canónico, pero no se muestra en páginas públicas
+ * y no entra en el tope de `GLOBE_PUBLIC_STORY_CAP`.
  */
 export const AUDIENCE_PUBLIC_STORY_STATUSES = [
   "approved",
   "featured",
-  "beta_demo",
   /** @deprecated usar `approved` en escrituras nuevas */
   "published",
   /** @deprecated panel admin antiguo; tratar como visible */
@@ -34,7 +35,6 @@ export type AudiencePublicStoryStatus = (typeof AUDIENCE_PUBLIC_STORY_STATUSES)[
 export const FIRESTORE_AUDIENCE_PUBLIC_STATUSES: readonly AudiencePublicStoryStatus[] = [
   "approved",
   "featured",
-  "beta_demo",
   "published",
   "active",
 ];

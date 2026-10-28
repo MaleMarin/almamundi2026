@@ -5,7 +5,6 @@ import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
 import { registerPulse, getApproxLocation } from '@/lib/userLocation';
 import { incrementStoriesRead, shouldShowMomentoJusto, markMomentoJustoShown } from '@/lib/sessionTracker';
-import { getUserWeather } from '@/lib/weather';
 import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
@@ -210,7 +209,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const [shareOpen, setShareOpen] = useState(false);
   const [showMomentoJusto, setShowMomentoJusto] = useState(false);
   const [liveReaders, setLiveReaders] = useState(0);
-  const [weather, setWeather] = useState<string>('unknown');
   const endRef = useRef<HTMLDivElement>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const readerIdRef = useRef<string | null>(null);
@@ -314,14 +312,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
       }
     };
   }, [story.id]);
-
-  useEffect(() => {
-    if (!story.weatherTags?.length) return;
-    getApproxLocation().then((loc) => {
-      if (!loc) return;
-      getUserWeather(loc.lat, loc.lng).then((w) => setWeather(w));
-    });
-  }, [story.id, story.weatherTags]);
 
   return (
     <>
@@ -516,33 +506,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 flex: 1,
               }}
             >
-              {story.weatherTags?.includes(weather) && weather === 'rain' && (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    borderRadius: 28,
-                    background: 'radial-gradient(ellipse at 50% 0%, rgba(60,100,180,0.08) 0%, transparent 70%)',
-                    animation: 'rainAtm 3s ease-in-out infinite',
-                  }}
-                />
-              )}
-              {story.weatherTags?.includes(weather) && weather === 'storm' && (
-                <div
-                  aria-hidden
-                  style={{
-                    position: 'absolute',
-                    inset: 0,
-                    zIndex: 0,
-                    pointerEvents: 'none',
-                    borderRadius: 28,
-                    background: 'radial-gradient(ellipse at 50% 0%, rgba(80,40,200,0.10) 0%, transparent 70%)',
-                  }}
-                />
-              )}
               {format === 'video' && story.videoUrl && (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
                   <video

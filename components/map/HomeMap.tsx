@@ -110,12 +110,10 @@ import {
 } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
-import { getApproxLocation } from '@/lib/userLocation';
 import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
 import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 
-/** Vista editorial por defecto si no hay geolocalización (centro América Latina). */
-/** Encuadre editorial fijo del globo en home (Sudamérica de frente). Geoloc solo para UI noche. */
+/** Encuadre inicial del globo en home (Sudamérica de frente). La noche usa la zona horaria, sin GPS. */
 const HOME_GLOBE_FRAME_LAT = -15;
 const HOME_GLOBE_FRAME_LNG = -60;
 
@@ -137,7 +135,6 @@ export type HomeMapProps = {
 };
 
 export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
-  const [approxPosition, setApproxPosition] = useState<{ lat: number; lng: number } | null>(null);
   const [tzFrame, setTzFrame] = useState({ lat: HOME_GLOBE_FRAME_LAT, lng: HOME_GLOBE_FRAME_LNG });
 
   useEffect(() => {
@@ -145,18 +142,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     if (anchor) setTzFrame(anchor);
   }, []);
 
-  useEffect(() => {
-    let cancelled = false;
-    void getApproxLocation().then((loc) => {
-      if (!cancelled && loc) setApproxPosition(loc);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const viewerLat = approxPosition?.lat ?? tzFrame.lat;
-  const viewerLng = approxPosition?.lng ?? tzFrame.lng;
+  const viewerLat = tzFrame.lat;
+  const viewerLng = tzFrame.lng;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');

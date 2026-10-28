@@ -25,7 +25,6 @@ service cloud.firestore {
       let s = resource.data.status;
       return s == "approved"
         || s == "featured"
-        || s == "beta_demo"
         || s == "published"
         || s == "active";
     }

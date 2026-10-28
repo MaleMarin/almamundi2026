@@ -25,29 +25,6 @@ function getCityFromTimeZone(timeZone: string): string {
   return part.replace(/_/g, ' ').toUpperCase();
 }
 
-/** Reverse geocoding con Nominatim para obtener ciudad desde lat/lng. */
-async function getCityFromCoords(lat: number, lon: number): Promise<string | null> {
-  try {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
-    const res = await fetch(url, {
-      headers: {
-        Accept: 'application/json',
-        'Accept-Language': 'es',
-        'User-Agent': 'AlmaMundi-Mapa/1.0 (https://almamundi.cl)',
-      },
-      signal: AbortSignal.timeout(5000),
-    });
-    if (!res.ok) return null;
-    const data = (await res.json()) as { address?: { city?: string; town?: string; village?: string; state?: string; municipality?: string } };
-    const a = data.address;
-    if (!a) return null;
-    const name = a.city ?? a.town ?? a.village ?? a.municipality ?? a.state ?? null;
-    return name ? String(name).toUpperCase() : null;
-  } catch {
-    return null;
-  }
-}
-
 /** Abreviatura de zona horaria (ej. CLT, EST). */
 function getTimeZoneShortName(now: Date, timeZone: string): string {
   try {
@@ -73,7 +50,6 @@ type Props = {
 function WorldClockInner({ selectedLocation, light, className }: Props) {
   /** null hasta el primer tick en cliente: evita hydration mismatch (SSR vs cliente difieren en el segundo). */
   const [now, setNow] = useState<Date | null>(null);
-  const [geoCity, setGeoCity] = useState<string | null>(null);
 
   useEffect(() => {
     const tick = () => setNow(new Date());
@@ -82,30 +58,10 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
     return () => window.clearInterval(id);
   }, []);
 
-  // Coordenadas reales con navigator.geolocation y ciudad vía Nominatim (solo cuando no hay selectedLocation)
-  useEffect(() => {
-    if (selectedLocation?.city) return;
-    if (typeof window === 'undefined' || !navigator.geolocation) return;
-    let cancelled = false;
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (cancelled) return;
-        const lat = pos.coords.latitude;
-        const lon = pos.coords.longitude;
-        getCityFromCoords(lat, lon).then((city) => {
-          if (!cancelled && city) setGeoCity(city);
-        });
-      },
-      () => {},
-      { timeout: 8000, maximumAge: 300_000, enableHighAccuracy: false }
-    );
-    return () => { cancelled = true; };
-  }, [selectedLocation?.city]);
-
   const timeZone = useMemo(() => selectedLocation?.timezone ?? getLocalTimeZone(), [selectedLocation?.timezone]);
   const cityLabel = useMemo(
-    () => selectedLocation?.city ?? geoCity ?? getCityFromTimeZone(timeZone),
-    [selectedLocation?.city, geoCity, timeZone]
+    () => selectedLocation?.city ?? getCityFromTimeZone(timeZone),
+    [selectedLocation?.city, timeZone]
   );
 
   const dateLine = useMemo(() => {
