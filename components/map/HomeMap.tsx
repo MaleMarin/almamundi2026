@@ -38,13 +38,16 @@ import {
   peekMapAmbientPending,
 } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
-import { PREGUNTA_UI } from '@/lib/pregunta-semana';
+import { PREGUNTA_UI, preguntaSemanaClave } from '@/lib/pregunta-semana';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 
 /** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
 const SHOW_SURPRISE_ME_BUTTON = false;
+
+/** Semana de «La pregunta» ya abierta en el dock. El valor es preguntaSemanaClave(). */
+const PREGUNTA_SEMANA_VISTA_KEY = 'almamundi_pregunta_semana_vista';
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
@@ -205,6 +208,31 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const stories = useStories();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
+  const [preguntaSemanaVista, setPreguntaSemanaVista] = useState<string | null>(null);
+  const [preguntaDotReady, setPreguntaDotReady] = useState(false);
+
+  useEffect(() => {
+    let vista: string | null = null;
+    try {
+      vista = window.localStorage.getItem(PREGUNTA_SEMANA_VISTA_KEY);
+    } catch {
+      vista = null;
+    }
+    setPreguntaSemanaVista(vista);
+    setPreguntaDotReady(true);
+  }, []);
+
+  const showPreguntaDot = preguntaDotReady && preguntaSemanaVista !== preguntaSemanaClave();
+
+  function markPreguntaSemanaVista() {
+    const clave = preguntaSemanaClave();
+    try {
+      window.localStorage.setItem(PREGUNTA_SEMANA_VISTA_KEY, clave);
+    } catch {
+      /* localStorage puede estar bloqueado */
+    }
+    setPreguntaSemanaVista(clave);
+  }
 
   const globeBitsMarkers = useMemo(
     () =>
@@ -722,6 +750,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setOpenStory(null);
     setStoryViewerClosing(false);
     setHighlightedStoryId(null);
+    if (mode === 'news') markPreguntaSemanaVista();
     setDrawerMode(mode);
     setDrawerOpen(true);
   }
@@ -838,20 +867,29 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 También cuenta
               </PillNavButton>
-              <PillNavButton
-                dock
-                active={drawerOpen && drawerMode === 'news'}
-                title={PREGUNTA_UI.tab[locale]}
-                onClick={() => {
-                  if (drawerOpen && drawerMode === 'news') {
-                    close();
-                    return;
-                  }
-                  open('news');
-                }}
-              >
-                {PREGUNTA_UI.tab[locale]}
-              </PillNavButton>
+              <span className="relative inline-flex">
+                <PillNavButton
+                  dock
+                  active={drawerOpen && drawerMode === 'news'}
+                  title={PREGUNTA_UI.tab[locale]}
+                  onClick={() => {
+                    if (drawerOpen && drawerMode === 'news') {
+                      close();
+                      return;
+                    }
+                    open('news');
+                  }}
+                >
+                  {PREGUNTA_UI.tab[locale]}
+                </PillNavButton>
+                {showPreguntaDot ? (
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute right-1.5 top-1.5 z-[1] size-2 rounded-full"
+                    style={{ background: 'var(--almamundi-orange-strong)' }}
+                  />
+                ) : null}
+              </span>
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'sounds'}

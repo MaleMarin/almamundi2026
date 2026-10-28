@@ -38,6 +38,11 @@ export type PreguntaSemana = {
 
 export const PREGUNTA_UI = {
   tab: { es: 'La pregunta', pt: 'A pergunta', en: 'The question' },
+  semana: {
+    es: 'La pregunta de la semana:',
+    pt: 'A pergunta da semana:',
+    en: "This week's question:",
+  },
   tu: { es: 'Cuéntanos tú', pt: 'Conte você', en: 'Tell us yourself' },
   alguien: { es: 'Pregúntale a alguien', pt: 'Pergunte a alguém', en: 'Ask someone' },
   responder: { es: 'Responder', pt: 'Responder', en: 'Answer' },
@@ -294,6 +299,19 @@ function civilDayNumber(y: number, m: number, d: number): number {
   return Math.floor(Date.UTC(y, m - 1, d) / 86_400_000);
 }
 
+/** Semanas de 7 días civiles desde el inicio. Antes de esa fecha, es la semana 0. */
+function semanaElapsed(now: Date): number {
+  const start = civilParts(PREGUNTA_SEMANA_INICIO);
+  const today = santiagoCivil(now);
+  const days = civilDayNumber(today.y, today.m, today.d) - civilDayNumber(start.y, start.m, start.d);
+  return days < 0 ? 0 : Math.floor(days / 7);
+}
+
+/** Identificador de los 7 días vigentes. Cambia al empezar la semana siguiente. */
+export function preguntaSemanaClave(now = new Date()): string {
+  return String(semanaElapsed(now));
+}
+
 /**
  * Semana vigente y las ya pasadas (de la más reciente a la más antigua, sin repetir la vigente).
  * Antes de PREGUNTA_SEMANA_INICIO, la vigente es la semana 1 y no hay anteriores.
@@ -302,10 +320,7 @@ export function preguntasDeLaSemana(now = new Date()): {
   vigente: PreguntaSemana;
   anteriores: PreguntaSemana[];
 } {
-  const start = civilParts(PREGUNTA_SEMANA_INICIO);
-  const today = santiagoCivil(now);
-  const days = civilDayNumber(today.y, today.m, today.d) - civilDayNumber(start.y, start.m, start.d);
-  const elapsed = days < 0 ? 0 : Math.floor(days / 7);
+  const elapsed = semanaElapsed(now);
   const currentIndex = elapsed % PREGUNTAS.length;
   const pastCount = Math.min(elapsed, PREGUNTAS.length - 1);
   const anteriores: PreguntaSemana[] = [];

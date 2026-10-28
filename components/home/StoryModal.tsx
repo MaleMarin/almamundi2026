@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { contarIndexHref } from '@/lib/contar-routes';
+import { preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import {
   X,
   Mic,
@@ -3115,6 +3117,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
                 <div className="mt-8">
                   <p className="mb-2 text-[13px] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const { vigente } = preguntasDeLaSemana();
+                      router.push(contarIndexHref({ id: vigente.id, mode: 'tu' }));
+                    }}
+                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)]"
+                  >
+                    {t.modalAnswerWeekQuestion}
+                  </button>
                   <div className="flex flex-col gap-2 md:flex-row">
                     <button
                       type="button"
