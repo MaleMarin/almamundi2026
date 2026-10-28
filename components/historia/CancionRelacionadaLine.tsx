@@ -37,7 +37,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
           href={href}
           target="_blank"
           rel="noopener noreferrer nofollow ugc"
-          style={{ color: isDark ? 'rgba(255, 180, 140, 0.95)' : '#FF4A1C', textDecoration: 'underline' }}
+          style={{ color: isDark ? 'rgba(255, 180, 140, 0.95)' : '#D13D17', textDecoration: 'underline' }}
         >
           Escuchar
         </a>

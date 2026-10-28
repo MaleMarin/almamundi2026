@@ -69,12 +69,12 @@ export function CookieBanner() {
   };
 
   const linkStyle: CSSProperties = {
-    color: '#FF4A1C',
+    color: '#D13D17',
     textDecoration: 'none',
   };
 
   const buttonStyle: CSSProperties = {
-    background: '#FF4A1C',
+    background: '#D13D17',
     color: 'white',
     border: 'none',
     padding: '7px 16px',

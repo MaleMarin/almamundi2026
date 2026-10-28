@@ -228,7 +228,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
         :root {
           --cream:    #f5f0e8;
           /* Acento AlmaMundi (naranja), antes sepia/dorado */
-          --sepia:    var(--almamundi-orange, #FF4A1C);
+          --sepia:    var(--almamundi-orange, #D13D17);
           --sepia-dk: #B53514;
           --ink:      #0d0b09;
           --ink-soft: #1a1612;
@@ -302,8 +302,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
 
         /* ── Author pulse ── */
         @keyframes pulse {
-          0%,100% { box-shadow: 0 0 0 0 rgba(255,74,28,0.45); }
-          50%      { box-shadow: 0 0 0 10px rgba(255,74,28,0); }
+          0%,100% { box-shadow: 0 0 0 0 rgba(209, 61, 23,0.45); }
+          50%      { box-shadow: 0 0 0 10px rgba(209, 61, 23,0); }
         }
         .avatar-pulse { animation: pulse 2.4s ease infinite; }
 
@@ -337,13 +337,13 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 position: 'absolute', top: '1.5rem', right: '1.5rem',
                 width: '40px', height: '40px', borderRadius: '50%',
                 background: 'rgba(255,255,255,0.06)',
-                border: '1px solid rgba(255,74,28,0.25)',
+                border: '1px solid rgba(209, 61, 23,0.25)',
                 color: 'rgba(245,240,232,0.6)',
                 cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
                 zIndex: 200, transition: 'background 0.2s, color 0.2s',
               }}
-              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,74,28,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
+              onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(209, 61, 23,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #D13D17)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.6)'; }}
               aria-label="Cerrar"
             >
@@ -430,7 +430,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               style={{
                 width: '36px', height: '36px',
                 borderRadius: '50%',
-                border: '1px solid rgba(255,74,28,0.4)',
+                border: '1px solid rgba(209, 61, 23,0.4)',
                 objectFit: 'cover',
               }}
             />
@@ -565,13 +565,13 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 style={{
                   width: '40px', height: '40px', borderRadius: '50%', flexShrink: 0,
                   background: 'rgba(255,255,255,0.06)',
-                  border: '1px solid rgba(255,74,28,0.25)',
+                  border: '1px solid rgba(209, 61, 23,0.25)',
                   color: 'rgba(245,240,232,0.7)',
                   cursor: 'pointer', display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
                   transition: 'background 0.2s, color 0.2s',
                 }}
-                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,74,28,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(209, 61, 23,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #D13D17)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.7)'; }}
                 aria-label="Cerrar"
               >
@@ -590,8 +590,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 position: 'absolute', zIndex: 10,
                 width: '80px', height: '80px',
                 borderRadius: '50%',
-                background: 'rgba(255,74,28,0.15)',
-                border: '1px solid rgba(255,74,28,0.5)',
+                background: 'rgba(209, 61, 23,0.15)',
+                border: '1px solid rgba(209, 61, 23,0.5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                 backdropFilter: 'blur(8px)',
               }}
@@ -693,7 +693,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                     style={{
                       width: '28px', height: '28px',
                       borderRadius: '50%',
-                      border: '1px solid rgba(255,74,28,0.35)',
+                      border: '1px solid rgba(209, 61, 23,0.35)',
                       objectFit: 'cover',
                     }}
                     alt={historia.autor.nombre}

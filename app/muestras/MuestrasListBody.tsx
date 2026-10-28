@@ -55,7 +55,7 @@ export function MuestrasListBody() {
         backgroundColor: neu.bg,
         fontFamily: neu.APP_FONT,
         backgroundImage:
-          'radial-gradient(circle at 50% 0%, rgba(255, 74, 28, 0.14) 0%, rgba(255, 74, 28, 0.04) 28%, transparent 52%)',
+          'radial-gradient(circle at 50% 0%, rgba(209, 61, 23, 0.14) 0%, rgba(209, 61, 23, 0.04) 28%, transparent 52%)',
         backgroundRepeat: 'no-repeat',
         backgroundSize: '100% min(70vh, 640px)',
       }}
@@ -78,7 +78,7 @@ export function MuestrasListBody() {
               href="/muestras"
               className="btn-almamundi shrink-0 self-start rounded-full px-5 py-3 text-sm font-bold uppercase tracking-[0.12em] sm:self-center"
               style={{
-                background: '#FF4A1C',
+                background: '#D13D17',
                 color: '#fff',
                 boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.5)',
               }}

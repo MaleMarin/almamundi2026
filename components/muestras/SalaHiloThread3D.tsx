@@ -18,7 +18,7 @@ import {
 } from 'react';
 import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
 
-const ACCENT = '#FF4A1C';
+const ACCENT = '#D13D17';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_MUTED = '#9299a8';
 /** Hilo principal: dorado cálido (menos blanco, más metal / ámbar). */
@@ -238,10 +238,10 @@ function KnotStoryLabel({
             textAlign: 'center',
             userSelect: 'none',
             border: unraveled
-              ? '1.5px solid rgba(255,74,28,0)'
+              ? '1.5px solid rgba(209, 61, 23,0)'
               : hover
-                ? '1.5px solid rgba(255,74,28,0.5)'
-                : '1.5px solid rgba(255,74,28,0)',
+                ? '1.5px solid rgba(209, 61, 23,0.5)'
+                : '1.5px solid rgba(209, 61, 23,0)',
             opacity: unraveled ? 0.45 : 1,
           }}
         >

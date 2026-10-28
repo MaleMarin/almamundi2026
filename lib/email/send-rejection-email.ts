@@ -51,7 +51,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
         Motivo: ${reason}
       </p>
       ${paragraphHtml(`Si crees que hubo un error, responde este correo o escríbenos a
-        <a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">${contact}</a>
+        <a href="mailto:${contact}" class="email-link" style="color:#D13D17;text-decoration:underline;">${contact}</a>
         y volveremos a revisarla.`)}
       ${paragraphHtml("Gracias por confiarnos tu historia.<br>Equipo AlmaMundi", "0")}`;
 

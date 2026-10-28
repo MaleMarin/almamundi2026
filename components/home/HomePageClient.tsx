@@ -268,15 +268,18 @@ export function HomePageClient() {
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
-      <div className="home-intro-avenir mx-auto mb-8 w-full max-w-[min(100%,46rem)] px-6 md:mb-12 md:px-10">
+      <div className="home-intro-avenir mx-auto mb-8 w-full max-w-[min(100%,90rem)] px-6 md:mb-12 md:px-10">
         <div
           className="flex flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
           style={{
-            backgroundColor: 'rgba(255,255,255,0.42)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8)',
+            background: 'rgba(255, 255, 255, 0.35)',
+            backdropFilter: 'blur(16px) saturate(140%)',
+            WebkitBackdropFilter: 'blur(16px) saturate(140%)',
+            border: '1px solid rgba(255, 255, 255, 0.6)',
+            boxShadow: '0 8px 28px rgba(74, 85, 104, 0.12)',
           }}
         >
-          <p className="m-0 max-w-full text-[0.95rem] leading-snug sm:max-w-[36rem] sm:text-base" style={{ color: '#4A5568' }}>
+          <p className="m-0 max-w-full text-[0.95rem] leading-snug sm:text-base xl:whitespace-nowrap" style={{ color: '#4A5568' }}>
             <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
             {preguntaVigente.tu[locale]}
           </p>

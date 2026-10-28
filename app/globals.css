@@ -10,9 +10,9 @@
   /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
   --map-space-deep: #050811;
   --map-space-mid: #0a1520;
-  /* #FF4A1C: logo, íconos, puntos del globo y acentos sin texto. */
-  --almamundi-orange: #FF4A1C;
-  --almamundi-orange-rgb: 255, 74, 28;
+  /* #D13D17: logo, íconos, puntos del globo y acentos sin texto. */
+  --almamundi-orange: #D13D17;
+  --almamundi-orange-rgb: 209, 61, 23;
   /* Texto chico, píldora principal y hover de enlaces. */
   --almamundi-orange-strong: #D13D17;
   --almamundi-orange-strong-rgb: 209, 61, 23;
@@ -25,8 +25,8 @@
   --color-foreground: var(--foreground);
   --font-sans: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   --font-mono: ui-monospace, monospace;
-  /* Naranja AlmaMundi: tonalidad #FF4A1C en toda la web */
-  --color-orange-400: #FF6E49;
+  /* Naranja AlmaMundi: tonalidad #D13D17 en toda la web */
+  --color-orange-400: #D13D17;
   --color-orange-500: var(--almamundi-orange);
   --color-orange-600: var(--almamundi-orange-strong);
   --color-orange-700: var(--almamundi-orange-deep);
@@ -733,7 +733,7 @@ footer a.almamundi-footer-link:hover {
   --color-surface: #111111 !important;
   --color-text-primary: #ffffff !important;
   --color-text-secondary: #eeeeee !important;
-  --color-accent: #ff4a1c !important;
+  --color-accent: #D13D17 !important;
   --color-border: #ffffff !important;
   background-color: #000000 !important;
   color: #ffffff !important;
@@ -762,7 +762,7 @@ footer a.almamundi-footer-link:hover {
 
 /* Foco visible global — aplica siempre, no solo en alto contraste */
 :focus-visible {
-  outline: 3px solid #ff4a1c;
+  outline: 3px solid #D13D17;
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -792,11 +792,11 @@ html[data-cursor-global="on"] *::after {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: rgba(255, 74, 28, 0.88);
+  background: rgba(209, 61, 23, 0.88);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.35),
-    0 0 12px rgba(255, 74, 28, 0.35),
-    0 0 28px rgba(255, 74, 28, 0.12);
+    0 0 12px rgba(209, 61, 23, 0.35),
+    0 0 28px rgba(209, 61, 23, 0.12);
   pointer-events: none;
   z-index: 99999;
   will-change: transform;
@@ -815,9 +815,9 @@ html[data-cursor-global="on"] *::after {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 74, 28, 0.18);
+  border: 1px solid rgba(209, 61, 23, 0.18);
   box-shadow:
-    0 0 24px rgba(255, 74, 28, 0.1),
+    0 0 24px rgba(209, 61, 23, 0.1),
     inset 0 0 12px rgba(255, 255, 255, 0.06);
   pointer-events: none;
   z-index: 99998;
@@ -832,17 +832,17 @@ html[data-cursor-global="on"] *::after {
 .cursor-dot.cursor-hover {
   width: 40px;
   height: 40px;
-  background: rgba(255, 74, 28, 0.1);
+  background: rgba(209, 61, 23, 0.1);
   box-shadow:
-    0 0 0 1px rgba(255, 74, 28, 0.12),
-    0 0 32px rgba(255, 74, 28, 0.18);
+    0 0 0 1px rgba(209, 61, 23, 0.12),
+    0 0 32px rgba(209, 61, 23, 0.18);
 }
 .cursor-ring.cursor-hover {
   width: 54px;
   height: 54px;
-  border-color: rgba(255, 74, 28, 0.28);
+  border-color: rgba(209, 61, 23, 0.28);
   box-shadow:
-    0 0 36px rgba(255, 74, 28, 0.14),
+    0 0 36px rgba(209, 61, 23, 0.14),
     inset 0 0 16px rgba(255, 255, 255, 0.08);
 }
 

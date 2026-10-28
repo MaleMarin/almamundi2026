@@ -107,9 +107,9 @@ function BitIndexRow({
       onClick={onClick}
       style={{
         ...rowBase,
-        background: isActive ? 'rgba(255, 74, 28, 0.28)' : 'rgba(255,255,255,0.08)',
+        background: isActive ? 'rgba(209, 61, 23, 0.28)' : 'rgba(255,255,255,0.08)',
         border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.16)'}`,
-        borderLeft: isActive ? '2px solid #FF4A1C' : '2px solid transparent',
+        borderLeft: isActive ? '2px solid #D13D17' : '2px solid transparent',
       }}
     >
       <span style={{ fontSize: 11, color: '#ff5719', letterSpacing: '0.08em', fontWeight: 600, lineHeight: 1.2 }}>
@@ -327,9 +327,9 @@ function BitDetailCompact({
             fontWeight: 600,
             letterSpacing: '0.04em',
             width: '100%',
-            background: 'linear-gradient(180deg, #FF4A1C 0%, #D13D17 100%)',
+            background: 'linear-gradient(180deg, #D13D17 0%, #D13D17 100%)',
             border: '1px solid rgba(255, 170, 110, 0.9)',
-            boxShadow: '0 8px 28px rgba(255, 74, 28, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
+            boxShadow: '0 8px 28px rgba(209, 61, 23, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
           }}
         >
           Cuenta tu historia
@@ -374,7 +374,7 @@ export function BitsPanel({
                 letterSpacing: '0.01em',
               }}
             >
-              Toca un punto <span style={{ color: '#FF4A1C', fontWeight: 700 }}>brillante</span> en el
+              Toca un punto <span style={{ color: '#D13D17', fontWeight: 700 }}>brillante</span> en el
               globo para leer el hecho curioso de ese lugar.
             </p>
           )}

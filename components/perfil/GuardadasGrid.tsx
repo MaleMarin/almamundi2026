@@ -7,7 +7,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 
 const SH_DARK = 'rgba(163,177,198,0.6)';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
-const ORANGE = '#FF4A1C';
+const ORANGE = '#D13D17';
 
 const FORMAT_EMOJI: Record<string, string> = {
   video: '🎬',
@@ -67,7 +67,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
               fontSize: '0.8rem',
               background:
                 filter === key
-                  ? `linear-gradient(135deg, ${ORANGE}, #FF6E49)`
+                  ? `linear-gradient(135deg, ${ORANGE}, #D13D17)`
                   : '#e8ecf0',
               color: filter === key ? '#fff' : '#4a5568',
               boxShadow:

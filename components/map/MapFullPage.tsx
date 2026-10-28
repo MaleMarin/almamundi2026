@@ -557,7 +557,7 @@ const globalStyles = `
   border-radius: 14px;
   background: rgba(var(--almamundi-orange-rgb), 0.16);
   border: 1px solid rgba(var(--almamundi-orange-rgb), 0.25);
-  color: #FF4A1C;
+  color: #D13D17;
   font-weight: 700;
   font-size: 14px;
   cursor: pointer;
@@ -1766,9 +1766,9 @@ function PulseIndicator({
       ctx.clearRect(0, 0, w, h);
 
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255, 74, 28, 0.85)';
+      ctx.strokeStyle = 'rgba(209, 61, 23, 0.85)';
       ctx.lineWidth = 1.5;
-      ctx.shadowColor = 'rgba(255, 74, 28, 0.5)';
+      ctx.shadowColor = 'rgba(209, 61, 23, 0.5)';
       ctx.shadowBlur = 4;
 
       const total = ekgPoints.length;
@@ -1827,7 +1827,7 @@ function PulseIndicator({
         {newbornCount > 0 && (
           <p style={{
             fontSize: 11,
-            color: '#FF4A1C',
+            color: '#D13D17',
             margin: '2px 0 0',
             fontFamily: SITE_FONT_STACK,
           }}>
@@ -3174,9 +3174,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       time += 0.015;
       ctx.clearRect(0, 0, w, h);
       ctx.beginPath();
-      ctx.strokeStyle = 'rgba(255, 74, 28, 0.85)';
+      ctx.strokeStyle = 'rgba(209, 61, 23, 0.85)';
       ctx.lineWidth = 1.5;
-      ctx.shadowColor = 'rgba(255, 74, 28, 0.5)';
+      ctx.shadowColor = 'rgba(209, 61, 23, 0.5)';
       ctx.shadowBlur = 4;
       const total = ekgPoints.length;
       const offset = (time * 30) % total;
@@ -3347,7 +3347,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           repeatPeriod: cfg ? 1000 / cfg.speed : 1800,
           color: (t: number) => {
             const opacity = (cfg?.ringOpacity ?? 0.3) * (1 - t);
-            const base = cfg?.color ?? 'rgba(255, 74, 28, 1)';
+            const base = cfg?.color ?? 'rgba(209, 61, 23, 1)';
             return base.replace(/[\d.]+\)$/, `${opacity})`);
           },
         };
@@ -3829,7 +3829,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     (d: { startIndex?: number }) => {
       const active = typeof d?.startIndex === 'number' && d.startIndex === currentChapterIndex;
       const alpha = active ? 0.85 + 0.15 * beatPhase : 0.22;
-      return active ? `rgba(255, 74, 28, ${alpha})` : `rgba(255,255,255,${alpha})`;
+      return active ? `rgba(209, 61, 23, ${alpha})` : `rgba(255,255,255,${alpha})`;
     },
     [currentChapterIndex, beatPhase]
   );
@@ -3854,7 +3854,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       return (t: number) => {
         const u = Number.isFinite(t) ? Math.min(1, Math.max(0, t)) : 0;
         const alpha = Math.max(0, Math.min(1, baseAlpha * (1 - u) * beatMul));
-        return active ? `rgba(255, 74, 28, ${alpha})` : `rgba(255,255,255,${alpha})`;
+        return active ? `rgba(209, 61, 23, ${alpha})` : `rgba(255,255,255,${alpha})`;
       };
     }
     const baseAlpha = selectedNews?.id === d?.newsId ? 0.8 : 0.25;
@@ -3892,7 +3892,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     if (view === 'music') {
       if (p.id === highlightedStoryId) return 'rgba(255,200,100,0.98)';
       const active = typeof (p as { chapterIndex?: number }).chapterIndex === 'number' && (p as { chapterIndex?: number }).chapterIndex === currentChapterIndex;
-      return active ? 'rgba(249,140,60,0.95)' : 'rgba(255, 74, 28, 0.6)';
+      return active ? 'rgba(209, 61, 23, 0.95)' : 'rgba(209, 61, 23, 0.6)';
     }
     const ids = typeof p?.id === 'string' && p.id.startsWith('news:') ? [p.id.slice(5)] : (p?.newsIds ?? (p?.newsId ? [p.newsId] : []));
     if (ids.length > 0) {
@@ -3906,7 +3906,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       if (p.id === highlightedStoryId) return 'rgba(255, 220, 100, 1.0)';
       return cfg.color;
     }
-    return atm?.glowColor ?? 'rgba(255, 74, 28, 0.85)';
+    return atm?.glowColor ?? 'rgba(209, 61, 23, 0.85)';
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view, currentChapterIndex, selectedNews?.id, highlightedStoryId, atm, storyPulseConfigs, pulseFrame]);
 

@@ -139,7 +139,7 @@ type Particle = {
 type Phase = 'portal' | 'hilo';
 
 const BG = '#e6e9ee';
-const ACCENT = '#FF4A1C';
+const ACCENT = '#D13D17';
 const TEXT_PRIMARY = '#1a1f2a';
 const TEXT_MUTED = '#9299a8';
 const TEXT_HINT = '#b0b6c2';
@@ -460,7 +460,7 @@ export function SalaHilo({
               fontSize: 10,
               letterSpacing: '0.24em',
               textTransform: 'uppercase',
-              color: '#FF4A1C',
+              color: '#D13D17',
               marginTop: 0,
               marginRight: 0,
               marginBottom: 20,
@@ -538,7 +538,7 @@ export function SalaHilo({
             style={{
               alignSelf: 'flex-start',
               background: '#e6e9ee',
-              color: '#FF4A1C',
+              color: '#D13D17',
               border: 'none',
               padding: '15px 36px',
               borderRadius: 100,

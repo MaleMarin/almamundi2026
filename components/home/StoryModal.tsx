@@ -2093,7 +2093,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           type="button"
                           onClick={startRecordingVideo}
                           className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
-                          style={{ background: 'linear-gradient(180deg,#FF4A1C,#D13D17)', boxShadow: '0 8px 24px rgba(255,74,28,0.35)' }}
+                          style={{ background: 'linear-gradient(180deg,#D13D17,#D13D17)', boxShadow: '0 8px 24px rgba(209, 61, 23,0.35)' }}
                           aria-label="Comenzar a grabar video"
                         >
                           <Video size={22} aria-hidden />
@@ -2231,7 +2231,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       type="button"
                       onClick={startRecordingAudio}
                       className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
-                      style={{ background: 'linear-gradient(180deg,#FF4A1C,#D13D17)', boxShadow: '0 8px 24px rgba(255,74,28,0.35)' }}
+                      style={{ background: 'linear-gradient(180deg,#D13D17,#D13D17)', boxShadow: '0 8px 24px rgba(209, 61, 23,0.35)' }}
                       aria-label={t.modalRecordVoice}
                     >
                       {t.modalRecord}

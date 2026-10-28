@@ -56,7 +56,7 @@ export function getPulseConfig(story: {
       speed:       1.4,
       baseOpacity: 1.0,
       ringOpacity: 0.6,
-      color:       'rgba(255, 74, 28, 1)',   // naranja puro = nueva
+      color:       'rgba(209, 61, 23, 1)',   // naranja puro = nueva
       glowRadius:  0.7,
     };
   }
@@ -68,7 +68,7 @@ export function getPulseConfig(story: {
       speed:       0.9,
       baseOpacity: 0.90,
       ringOpacity: 0.40,
-      color:       'rgba(255, 74, 28, 0.9)',
+      color:       'rgba(209, 61, 23, 0.9)',
       glowRadius:  0.5,
     };
   }
@@ -80,7 +80,7 @@ export function getPulseConfig(story: {
       speed:       0.55,
       baseOpacity: 0.75,
       ringOpacity: 0.28,
-      color:       'rgba(255, 74, 28, 0.75)',
+      color:       'rgba(209, 61, 23, 0.75)',
       glowRadius:  0.35,
     };
   }

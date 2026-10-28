@@ -88,7 +88,7 @@ export function HomeFirstPart({
               <path
                 pathLength={1}
                 d="M4 8 Q90 12 180 8 Q270 4 356 8"
-                stroke="#FF4A1C"
+                stroke="#D13D17"
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"

@@ -4,7 +4,7 @@ import { escapeHtml } from "@/lib/email-html";
 
 const PRODUCTION_SITE_FALLBACK = "https://www.almamundi.org";
 
-export const BRAND_ORANGE = "#FF4A1C";
+export const BRAND_ORANGE = "#D13D17";
 export const EMAIL_INK = "#1C1C2E";
 export const EMAIL_MUTED = "#4E5160";
 export const EMAIL_CANVAS = "#F2F3F7";
@@ -171,8 +171,8 @@ function darkModeCss(): string {
       .email-box { background: #2A2A40 !important; }
       .email-link { color: #FFB199 !important; }
       .email-footer, .email-footer-link { color: #D5D7E2 !important; }
-      .email-brand { color: #FF4A1C !important; }
-      .email-btn, .email-btn span { color: #ffffff !important; background: #FF4A1C !important; }
+      .email-brand { color: #D13D17 !important; }
+      .email-btn, .email-btn span { color: #ffffff !important; background: #D13D17 !important; }
     }
     @media only screen and (max-width: 620px) {
       .email-card { width: 100% !important; }

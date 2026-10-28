@@ -95,7 +95,7 @@ function summaryBoxHtml(params: ReceivedEmailContent): string {
 function stepsHtml(): string {
   const steps = [
     "Revisamos tu historia.",
-    `Si cumple los <a href="${escapeHtml(absoluteEmailUrl("/terminos"))}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;text-decoration:underline;">términos de uso</a>, la publicamos en el mapa.`,
+    `Si cumple los <a href="${escapeHtml(absoluteEmailUrl("/terminos"))}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#D13D17;text-decoration:underline;">términos de uso</a>, la publicamos en el mapa.`,
     "Te enviamos el enlace por correo.",
   ];
   const rows = steps
@@ -115,7 +115,7 @@ function stepsHtml(): string {
 function contactHtml(): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
-    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;text-decoration:underline;">${mail}</a>.`,
+    `¿Tienes dudas? Escríbenos a <a href="mailto:${mail}" class="email-link" style="color:#D13D17;text-decoration:underline;">${mail}</a>.`,
     "0"
   );
 }
@@ -132,7 +132,7 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
       ${stepsHtml()}
       ${primaryButtonHtml("Contar otra historia", tellUrl)}
       <p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
-        <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;text-decoration:underline;">Explorar el mapa</a>
+        <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#D13D17;text-decoration:underline;">Explorar el mapa</a>
       </p>
       ${contactHtml()}`;
 

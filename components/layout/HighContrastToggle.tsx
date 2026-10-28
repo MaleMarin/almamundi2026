@@ -35,7 +35,7 @@ export function HighContrastToggle() {
           zIndex: 9998,
           background: on ? '#ffffff' : '#000000',
           color: on ? '#000000' : '#ffffff',
-          border: '2px solid #FF4A1C',
+          border: '2px solid #D13D17',
           borderRadius: '100px',
           padding: '8px 14px',
           fontSize: '12px',

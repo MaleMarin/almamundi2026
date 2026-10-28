@@ -9,7 +9,7 @@ const W = 1200;
 const H = 630;
 const BG = '#E0E5EC';
 const TEXT_MAIN = '#4A5568';
-const ACCENT = '#FF4A1C';
+const ACCENT = '#D13D17';
 
 export async function generatePostalPNG(alias: string, fecha: string): Promise<Blob> {
   const canvas = document.createElement('canvas');

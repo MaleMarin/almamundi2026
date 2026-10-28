@@ -64,8 +64,8 @@ const FORMATO_TO_LABEL: Record<StoryEndShareFormat, string> = {
 
 const TEXT_TITLE = neu.textMain;
 const TEXT_BODY = neu.textBody;
-const ORANGE = 'var(--almamundi-orange, #FF4A1C)';
-const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(255,74,28,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
+const ORANGE = 'var(--almamundi-orange, #D13D17)';
+const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(209, 61, 23,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
 
 function formatEndFecha(raw: string | undefined): string | null {
   if (!raw || !String(raw).trim()) return null;
@@ -121,7 +121,7 @@ export function StoryEndScreen({
         padding: '1.25rem',
         backgroundColor: neu.bg,
         backgroundImage: `
-          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,74,28,0.085) 0%, transparent 55%),
+          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(209, 61, 23,0.085) 0%, transparent 55%),
           radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
           linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
         `,
@@ -139,7 +139,7 @@ export function StoryEndScreen({
         padding: '1.25rem',
         backgroundColor: neu.bg,
         backgroundImage: `
-          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255,74,28,0.085) 0%, transparent 55%),
+          radial-gradient(ellipse 120% 80% at 50% -20%, rgba(209, 61, 23,0.085) 0%, transparent 55%),
           radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
           linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
         `,
@@ -360,7 +360,7 @@ export function StoryEndScreen({
               flex: '1 1 160px',
               padding: '0.92rem 1rem',
               borderRadius: 999,
-              border: `1px solid rgba(255,74,28,0.32)`,
+              border: `1px solid rgba(209, 61, 23,0.32)`,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
               fontSize: '0.74rem',
@@ -368,7 +368,7 @@ export function StoryEndScreen({
               textTransform: 'uppercase',
               cursor: 'pointer',
               color: '#fff',
-              background: `linear-gradient(165deg, #FF6E49 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
+              background: `linear-gradient(165deg, #D13D17 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
               boxShadow: SOFT_ORANGE_SHADOW,
             }}
           >
