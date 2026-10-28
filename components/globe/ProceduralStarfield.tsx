@@ -24,8 +24,7 @@ function hash01(i: number, salt: number): number {
 export function ProceduralStarfield({
   count = 2500,
   radius = 420,
-  twinkle = 0.03,
-}: ProceduralStarfieldProps) {
+  twinkle = 0.03 }: ProceduralStarfieldProps) {
   const matRef = useRef<THREE.ShaderMaterial>(null);
 
   const { positions, colors, opacities, phases } = useMemo(() => {
@@ -61,8 +60,7 @@ export function ProceduralStarfield({
         uTime: { value: 0 },
         uTwinkle: { value: twinkle },
         uPixelRatio: { value: 1 },
-        uPointSize: { value: 2 },
-      },
+        uPointSize: { value: 2 } },
       vertexShader: /* glsl */ `
         attribute float aPhase;
         attribute float aOpacity;
@@ -104,8 +102,7 @@ export function ProceduralStarfield({
       depthTest: false,
       blending: THREE.AdditiveBlending,
       toneMapped: false,
-      vertexColors: true,
-    });
+      vertexColors: true });
     return mat;
   }, [twinkle]);
 

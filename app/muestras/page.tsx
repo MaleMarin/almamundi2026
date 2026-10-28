@@ -7,8 +7,7 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'Muestras',
   description:
-    'Recorrido cinematográfico por las muestras demo (entrada en /muestras). Listado de piezas aprobadas: /muestras?list=1.',
-};
+    'Recorrido cinematográfico por las muestras demo (entrada en /muestras). Listado de piezas aprobadas: /muestras?list=1.' };
 
 function isListMode(sp: { list?: string | string[] }): boolean {
   const raw = sp.list;
@@ -23,8 +22,7 @@ function isListMode(sp: { list?: string | string[] }): boolean {
  * Los enlaces antiguos con `?cinematic=1` siguen abriendo el recorrido (mismo resultado que sin query).
  */
 export default async function MuestrasPage({
-  searchParams,
-}: {
+  searchParams }: {
   searchParams: Promise<{ list?: string | string[]; cinematic?: string | string[] }>;
 }) {
   const sp = (await searchParams) ?? {};

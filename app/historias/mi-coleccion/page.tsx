@@ -33,13 +33,13 @@ export default function MiColeccionPage() {
     >
       <div className={historiasInterior.contentWrapClassName}>
       <header className={historiasInterior.headerClassName}>
-        <p className="text-xs font-semibold tracking-[0.18em] uppercase mb-2" style={{ color: 'var(--almamundi-orange)' }}>
+        <p className="text-xs font-semibold uppercase mb-2 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
           Tu colección
         </p>
-        <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] text-gray-800">
+        <h1 className="text-[27px] md:text-[43px] font-semibold leading-[1.1] text-gray-800">
           Historias que guardaste.
         </h1>
-        <p className="text-gray-600 text-base md:text-lg mt-2 max-w-2xl">
+        <p className="text-gray-600 text-[15px] md:text-[16px] mt-2 max-w-2xl">
           Compartilas o usalas como inspiración para crear la tuya.
         </p>
       </header>
@@ -59,15 +59,15 @@ export default function MiColeccionPage() {
                   {s.thumbnailUrl || s.imageUrl ? (
                     <img src={s.thumbnailUrl ?? s.imageUrl ?? ''} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-4xl opacity-50">📖</div>
+                    <div className="w-full h-full flex items-center justify-center text-[32px] opacity-50">📖</div>
                   )}
                 </Link>
                 <div className="p-4">
-                  <p className="text-[10px] font-semibold tracking-widest uppercase mb-1" style={{ color: 'var(--almamundi-orange)' }}>
+                  <p className="text-[10px] font-semibold uppercase mb-1 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
                     {[s.city, s.country].filter(Boolean).join(', ') || '—'} · {formatLabel(s.format)}
                   </p>
                   <Link href={`/historias/${s.id}`}>
-                    <h2 className="font-semibold tracking-tight text-gray-800 line-clamp-2 hover:underline">{s.title ?? 'Sin título'}</h2>
+                    <h2 className="font-semibold text-gray-800 line-clamp-2 hover:underline">{s.title ?? 'Sin título'}</h2>
                   </Link>
                   <p className="text-sm text-gray-600 mt-1">{s.authorName ?? '—'}</p>
                   <div className="flex flex-wrap gap-2 mt-4">

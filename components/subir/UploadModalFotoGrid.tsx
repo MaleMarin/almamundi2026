@@ -38,8 +38,7 @@ export function UploadModalFotoGrid({
   incompleteIds = [],
   fichaMessage,
   maxPhotos = SUBIR_PHOTO_MAX,
-  showCounter = true,
-}: Props) {
+  showCounter = true }: Props) {
   const { t } = useHomeLocale();
   const incomplete = new Set(incompleteIds);
 

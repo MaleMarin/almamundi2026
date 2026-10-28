@@ -66,8 +66,7 @@ function getHourInTimeZone(date: Date, timeZone: string): number {
     const parts = new Intl.DateTimeFormat('en-GB', {
       hour: 'numeric',
       hour12: false,
-      timeZone,
-    }).formatToParts(date);
+      timeZone }).formatToParts(date);
     const h = parts.find((p) => p.type === 'hour')?.value;
     if (h != null) return parseInt(h, 10);
   } catch {
@@ -376,8 +375,7 @@ export function MapCanvas({
   embedded = false,
   bottomReservePx,
   topReservePx,
-  showOrbitalMoon = true,
-}: MapCanvasProps) {
+  showOrbitalMoon = true }: MapCanvasProps) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     queueMicrotask(() => setMounted(true));
@@ -501,8 +499,7 @@ export function MapCanvas({
         width: '100%',
         height: '100%',
         minWidth: embedded ? 'min(400px, 100%)' : 400,
-        minHeight: embedded ? 'min(620px, 100%)' : 620,
-      }}
+        minHeight: embedded ? 'min(620px, 100%)' : 620 }}
     >
       <div
         className="pointer-events-auto globe-halo-wrap"
@@ -517,14 +514,12 @@ export function MapCanvas({
                 minWidth: 200,
                 minHeight: 200,
                 filter:
-                  'drop-shadow(0 0 1px rgba(255,255,255,0.92)) drop-shadow(0 0 12px rgba(255,255,255,0.38)) drop-shadow(0 0 32px rgba(190,220,255,0.28))',
-              }
+                  'drop-shadow(0 0 1px rgba(255,255,255,0.92)) drop-shadow(0 0 12px rgba(255,255,255,0.38)) drop-shadow(0 0 32px rgba(190,220,255,0.28))' }
             : {
                 width: Math.max(400, width),
                 height: Math.max(400, height),
                 filter:
-                  'drop-shadow(0 0 1px rgba(255,255,255,0.9)) drop-shadow(0 0 18px rgba(255,255,255,0.28)) drop-shadow(0 0 36px rgba(180,210,255,0.22))',
-              }
+                  'drop-shadow(0 0 1px rgba(255,255,255,0.9)) drop-shadow(0 0 18px rgba(255,255,255,0.28)) drop-shadow(0 0 36px rgba(180,210,255,0.22))' }
         }
       >
         <div className="relative h-full w-full">
@@ -591,8 +586,7 @@ export function MapCanvas({
                   rgba(5, 5, 16, 0.7) 50%,
                   rgba(95, 55, 135, 0.2) 55%,
                   rgba(255, 130, 70, 0.12) 62%,
-                  transparent 100%)`,
-              }}
+                  transparent 100%)` }}
               aria-hidden
             />
           ) : null}
@@ -609,8 +603,7 @@ export function MapCanvas({
           height: '100%',
           minHeight: 600,
           background: MAP_STAGE_SOLID,
-          borderRadius: '50%',
-        }}
+          borderRadius: '50%' }}
         aria-hidden
       />
     );
@@ -638,8 +631,7 @@ export function MapCanvas({
               inset: 0,
               overflow: 'hidden',
               isolation: 'isolate',
-              touchAction: 'none',
-            }}
+              touchAction: 'none' }}
             onMouseMove={onStageMouseMove}
           >
             {block}

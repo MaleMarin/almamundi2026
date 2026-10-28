@@ -16,8 +16,7 @@ import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
-  scrollToHomeMapaSection,
-} from '@/lib/mapa-home-nav';
+  scrollToHomeMapaSection } from '@/lib/mapa-home-nav';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -228,8 +227,7 @@ export function HomePageClient() {
             fontSize: 13,
             maxWidth: 'min(420px, calc(100vw - 32px))',
             textAlign: 'center',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.08)',
-          }}
+            boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
         >
           Tu cuenta ha sido eliminada. Hasta pronto.
         </div>
@@ -285,27 +283,25 @@ export function HomePageClient() {
               backdropFilter: 'blur(18px) saturate(160%)',
               WebkitBackdropFilter: 'blur(18px) saturate(160%)',
               border: '1px solid rgba(255,255,255,0.8)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)',
-            }}
+              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)' }}
           >
             <div className="mx-auto flex w-full max-w-[760px] flex-col items-center">
-            <p className="m-0 text-xs font-semibold uppercase tracking-[0.18em] text-[#FF4A1C]">
+            <p className="m-0 text-xs font-semibold uppercase text-[#FF4A1C] tracking-[0.12em]">
               {PREGUNTA_COPY.homeEyebrow[locale]}
             </p>
             <h2
               id="pregunta-semana-titulo"
-              className="mb-0 mt-5 text-[26px] leading-[1.25] md:text-[36px]"
+              className="mb-0 mt-5 text-[23px] leading-[1.25] md:text-[32px]"
               style={{
                 fontFamily: 'var(--font-interna), sans-serif',
                 fontWeight: 500,
                 color: '#4A5568',
-                textWrap: 'balance',
-              }}
+                textWrap: 'balance' }}
             >
               {preguntaVigente.tu[locale]}
             </h2>
             <p
-              className="mb-0 mt-4 text-[17px] leading-relaxed"
+              className="mb-0 mt-4 text-[15px] leading-relaxed"
               style={{ color: '#718096', textWrap: 'balance' }}
             >
               {PREGUNTA_COPY.intro[locale]}

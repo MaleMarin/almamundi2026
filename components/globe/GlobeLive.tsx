@@ -22,8 +22,7 @@ export function GlobeLive({ cameras, width = 800, height = 600 }: Props) {
       lat: cam.lat,
       lng: cam.lng,
       size: 0.15,
-      color: cam.category === "space" ? "#ff6b6b" : cam.category === "nature" ? "#51cf66" : "#4dabf7",
-    }));
+      color: cam.category === "space" ? "#ff6b6b" : cam.category === "nature" ? "#51cf66" : "#4dabf7" }));
   }, [cameras]);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- react-globe.gl point type

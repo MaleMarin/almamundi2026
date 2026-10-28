@@ -82,21 +82,18 @@ function archivoToStoryPoint(s: ArchivoStory): StoryPoint {
     photos: (s.photos ?? []).map((p) => ({ url: p.url, name: p.name ?? '', date: p.date ?? '' })),
     hasText: Boolean(s.body),
     hasAudio: Boolean(s.audioUrl),
-    hasVideo: Boolean(s.videoUrl),
-  };
+    hasVideo: Boolean(s.videoUrl) };
 }
 
 const FORMAT_ICON: Record<string, string> = {
   video: '🎥',
   audio: '🎙️',
   photos: '📷',
-  text: '📝',
-};
+  text: '📝' };
 
 function StoryCard({
   story,
-  onClick,
-}: {
+  onClick }: {
   story: ArchivoStory;
   onClick: () => void;
 }) {
@@ -117,8 +114,7 @@ function StoryCard({
         textAlign: 'left',
         width: '100%',
         padding: 0,
-        fontFamily: APP_FONT,
-      }}
+        fontFamily: APP_FONT }}
       className="hover:border-white/20 hover:bg-white/[0.08]"
     >
       <div style={{ aspectRatio: '16/9', background: '#111', position: 'relative' }}>
@@ -137,13 +133,12 @@ function StoryCard({
               alignItems: 'center',
               justifyContent: 'center',
               color: 'rgba(255,255,255,0.2)',
-              fontSize: 48,
-            }}
+              fontSize: 43 }}
           >
             {icon}
           </div>
         )}
-        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 18 }}>
+        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 16 }}>
           {icon}
         </span>
       </div>
@@ -247,7 +242,7 @@ export default function ArchivoPage() {
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
           <HomeHardLink
             href="/"
-            style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: 18, fontWeight: 600 }}
+            style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}
           >
             ← AlmaMundi
           </HomeHardLink>
@@ -258,10 +253,10 @@ export default function ArchivoPage() {
           </nav>
         </header>
 
-        <h1 style={{ fontSize: 'clamp(28px, 4vw, 40px)', fontWeight: 300, marginBottom: 8, letterSpacing: '-0.02em' }}>
+        <h1 style={{ fontSize: 'clamp(25px, 3.6vw, 36px)', fontWeight: 300, marginBottom: 8 }}>
           Archivo
         </h1>
-        <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
+        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
           Historias que ya pasaron por el mapa y permanecen en el archivo.
         </p>
 
@@ -287,8 +282,7 @@ export default function ArchivoPage() {
                 fontSize: 15,
                 fontWeight: 600,
                 cursor: 'pointer',
-                fontFamily: APP_FONT,
-              }}
+                fontFamily: APP_FONT }}
             >
               {tab.label}
             </button>
@@ -309,7 +303,7 @@ export default function ArchivoPage() {
             )}
             {byWeek.map(({ key, list, start, weekNum }) => (
               <section key={key}>
-                <h2 style={{ fontSize: 20, fontWeight: 600, marginBottom: 16, color: 'rgba(255,255,255,0.9)' }}>
+                <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: 'rgba(255,255,255,0.9)' }}>
                   {formatWeekTitle(weekNum, start)}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ gap: 24 }}>
@@ -338,8 +332,7 @@ export default function ArchivoPage() {
                     color: temaFilter === null ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
                     fontSize: 14,
                     cursor: 'pointer',
-                    fontFamily: APP_FONT,
-                  }}
+                    fontFamily: APP_FONT }}
                 >
                   Todos
                 </button>
@@ -356,8 +349,7 @@ export default function ArchivoPage() {
                       color: temaFilter === t ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
                       fontSize: 14,
                       cursor: 'pointer',
-                      fontFamily: APP_FONT,
-                    }}
+                      fontFamily: APP_FONT }}
                   >
                     {getThemeLabel(t) || t}
                   </button>
@@ -388,10 +380,9 @@ export default function ArchivoPage() {
                   overflow: 'hidden',
                   background: 'rgba(255,255,255,0.05)',
                   border: '1px solid rgba(255,255,255,0.10)',
-                  padding: 20,
-                }}
+                  padding: 20 }}
               >
-                <p style={{ fontSize: 18, fontWeight: 600, color: 'rgba(255,255,255,0.95)', margin: '0 0 4px' }}>
+                <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.95)', margin: '0 0 4px' }}>
                   {m.topicLabel}
                 </p>
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
@@ -410,8 +401,7 @@ export default function ArchivoPage() {
                     fontSize: 14,
                     fontWeight: 600,
                     textDecoration: 'none',
-                    fontFamily: APP_FONT,
-                  }}
+                    fontFamily: APP_FONT }}
                 >
                   Ver muestra
                 </Link>
@@ -437,8 +427,7 @@ export default function ArchivoPage() {
             backdropFilter: 'blur(8px)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-          }}
+            justifyContent: 'center' }}
         >
           <StoryViewer
             story={archivoToStoryPoint(selectedStory)}

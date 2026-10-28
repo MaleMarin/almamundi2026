@@ -75,8 +75,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${idToken}`,
-        },
+          Authorization: `Bearer ${idToken}` },
         body: JSON.stringify({
           autorId,
           autorNombre,
@@ -85,9 +84,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           portadaUrl: portadaUrl.trim() || undefined,
           historias: [],
           historiasCount: 0,
-          isPublic,
-        }),
-      });
+          isPublic }) });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
         setError(data.detail || data.error || 'Error al crear la muestra');
@@ -105,8 +102,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
         historias: [],
         historiasCount: 0,
         createdAt: now,
-        isPublic,
-      };
+        isPublic };
       onCreated(nuevaMuestra);
       onClose();
     } catch (err) {
@@ -135,8 +131,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
         alignItems: 'center',
         justifyContent: 'center',
         padding: 16,
-        boxSizing: 'border-box',
-      }}
+        boxSizing: 'border-box' }}
     >
       <div
         id="modal-title"
@@ -148,8 +143,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           width: 360,
           maxWidth: '92vw',
           animation: 'slideUp 0.3s cubic-bezier(0.22,1,0.36,1) forwards',
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
         onClick={(e) => e.stopPropagation()}
       >
         <style>{`
@@ -159,12 +153,12 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           }
         `}</style>
         <form onSubmit={handleSubmit}>
-          <h2 style={{ margin: '0 0 1.2rem', fontSize: '1.1rem', fontWeight: 600, color: TEXT_1 }}>
+          <h2 style={{ margin: '0 0 1.2rem', fontSize: '16px', fontWeight: 600, color: TEXT_1 }}>
             Nueva muestra
           </h2>
 
           {/* Título */}
-          <label style={{ display: 'block', marginBottom: 4, fontSize: '0.8rem', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
             Título de la muestra
           </label>
           <input
@@ -181,9 +175,8 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               padding: '0.65rem 0.8rem',
               border: 'none',
               outline: 'none',
-              fontSize: '0.9rem',
-              color: TEXT_1,
-            }}
+              fontSize: '14.4px',
+              color: TEXT_1 }}
             onFocus={(e) => {
               e.currentTarget.style.boxShadow = `inset 3px 3px 6px ${SH_DARK}, inset -3px -3px 6px ${SH_LIGHT}, 0 0 0 2px rgba(255,107,43,0.3)`;
             }}
@@ -192,11 +185,11 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
             }}
           />
           {tituloError && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#c53030' }}>{tituloError}</p>
+            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#c53030' }}>{tituloError}</p>
           )}
 
           {/* Sentido */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '0.8rem', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
             ¿Por qué esta muestra? <span style={{ color: ORANGE }}>*</span>
           </label>
           <textarea
@@ -213,10 +206,9 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               padding: '0.65rem 0.8rem',
               border: 'none',
               outline: 'none',
-              fontSize: '0.9rem',
+              fontSize: '14.4px',
               color: TEXT_1,
-              resize: 'vertical',
-            }}
+              resize: 'vertical' }}
             onFocus={(e) => {
               e.currentTarget.style.boxShadow = `inset 3px 3px 6px ${SH_DARK}, inset -3px -3px 6px ${SH_LIGHT}, 0 0 0 2px rgba(255,107,43,0.3)`;
             }}
@@ -224,15 +216,15 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               e.currentTarget.style.boxShadow = `inset 3px 3px 6px ${SH_DARK}, inset -3px -3px 6px ${SH_LIGHT}`;
             }}
           />
-          <p style={{ margin: '4px 0 0', fontSize: '0.7rem', fontStyle: 'italic', color: TEXT_3 }}>
+          <p style={{ margin: '4px 0 0', fontSize: '11.2px', fontStyle: 'italic', color: TEXT_3 }}>
             Esta es la parte más importante. Una muestra sin sentido es solo una lista.
           </p>
           {sentidoError && (
-            <p style={{ margin: '4px 0 0', fontSize: '0.75rem', color: '#c53030' }}>{sentidoError}</p>
+            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#c53030' }}>{sentidoError}</p>
           )}
 
           {/* Imagen portada (opcional) */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '0.8rem', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
             Imagen de portada (opcional)
           </label>
           <button
@@ -246,15 +238,14 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               borderRadius: 10,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '0.8rem',
-              color: TEXT_3,
-            }}
+              fontSize: '12.8px',
+              color: TEXT_3 }}
           >
             Elegir imagen →
           </button>
 
           {/* Visibilidad */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 6, fontSize: '0.8rem', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 6, fontSize: '12.8px', color: TEXT_2 }}>
             Visibilidad
           </label>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -267,12 +258,11 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 50,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '0.8rem',
+                fontSize: '12.8px',
                 fontFamily: SITE_FONT_STACK,
                 background: isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)` : BG,
                 color: isPublic ? '#fff' : TEXT_2,
-                boxShadow: isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-              }}
+                boxShadow: isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
             >
               Muestra pública
             </button>
@@ -285,19 +275,18 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 50,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '0.8rem',
+                fontSize: '12.8px',
                 fontFamily: SITE_FONT_STACK,
                 background: !isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)` : BG,
                 color: !isPublic ? '#fff' : TEXT_2,
-                boxShadow: !isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-              }}
+                boxShadow: !isPublic ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
             >
               Solo yo
             </button>
           </div>
 
           {error && (
-            <p style={{ margin: '1rem 0 0', fontSize: '0.8rem', color: '#c53030' }}>{error}</p>
+            <p style={{ margin: '1rem 0 0', fontSize: '12.8px', color: '#c53030' }}>{error}</p>
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: '1.5rem' }}>
@@ -310,12 +299,11 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 12,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '0.9rem',
+                fontSize: '14.4px',
                 fontFamily: SITE_FONT_STACK,
                 background: BG,
                 color: TEXT_2,
-                boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-              }}
+                boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
             >
               Cancelar
             </button>
@@ -328,12 +316,11 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 12,
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '0.9rem',
+                fontSize: '14.4px',
                 fontFamily: SITE_FONT_STACK,
                 background: `linear-gradient(135deg, ${ORANGE}, #FF4A1C)`,
                 color: '#fff',
-                boxShadow: `5px 5px 12px rgba(255,107,43,0.4), -2px -2px 6px ${SH_LIGHT}`,
-              }}
+                boxShadow: `5px 5px 12px rgba(255,107,43,0.4), -2px -2px 6px ${SH_LIGHT}` }}
             >
               {loading ? 'Creando...' : 'Crear muestra'}
             </button>

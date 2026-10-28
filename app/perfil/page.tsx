@@ -59,8 +59,7 @@ export default function PerfilRedirectPage() {
           background: '#e8ecf0',
           fontFamily: 'inherit',
           color: '#4a5568',
-          padding: '1.5rem',
-        }}
+          padding: '1.5rem' }}
       >
         <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>Cargando...</div>
       </div>

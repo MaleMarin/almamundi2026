@@ -14,8 +14,7 @@ import {
   Link2,
   Play,
   Share2,
-  UserRound,
-} from 'lucide-react';
+  UserRound } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
@@ -87,8 +86,7 @@ export function storyPointToHistoriaSpatial(s: StoryPoint): HistoriaSpatial {
     foto_perfil: foto,
     detalles: s.topic ?? s.subtitle ?? undefined,
     fecha: formatPublishedAt(s.publishedAt),
-    lugar: lugar || undefined,
-  };
+    lugar: lugar || undefined };
 }
 
 export type SpatialGlassExpoProps = {
@@ -136,8 +134,7 @@ export function SpatialGlassExpo({
   favoriteActive,
   onToggleFavorite,
   disableKeyboardNav = false,
-  onPerfil,
-}: SpatialGlassExpoProps) {
+  onPerfil }: SpatialGlassExpoProps) {
   const reduceMotion = useReducedMotion();
   const [activeIndex, setActiveIndex] = useState(0);
   const [favOn, setFavOn] = useState(false);
@@ -201,8 +198,7 @@ export function SpatialGlassExpo({
         await navigator.share({
           title: active?.titulo ?? tituloExposicion,
           text: active?.cita,
-          url,
-        });
+          url });
         return;
       }
     } catch {
@@ -254,11 +250,9 @@ export function SpatialGlassExpo({
     ? {
         backgroundImage: `linear-gradient(rgba(15, 15, 20, 0.75), rgba(15, 15, 22, 0.85)), url(${backgroundImageUrl})`,
         backgroundSize: 'cover',
-        backgroundPosition: 'center',
-      }
+        backgroundPosition: 'center' }
     : {
-        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, #2a2a35 0%, #0f0f14 55%, #08080c 100%)',
-      };
+        background: 'radial-gradient(ellipse 120% 80% at 50% 20%, #2a2a35 0%, #0f0f14 55%, #08080c 100%)' };
 
   const rootShell =
     embedded
@@ -277,7 +271,7 @@ export function SpatialGlassExpo({
       {/* Top bar */}
       <header className="relative z-20 flex items-center justify-between gap-3 px-4 pt-6 pb-2 sm:px-8">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="truncate rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium tracking-wide text-white/90 backdrop-blur-md sm:text-sm">
+          <span className="truncate rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md sm:text-sm">
             {tituloExposicion}
           </span>
         </div>
@@ -395,15 +389,13 @@ export function SpatialGlassExpo({
                         opacity: isCenter ? 1 : 0.45,
                         scale,
                         rotateY,
-                        filter: `blur(${blurPx}px)`,
-                      }
+                        filter: `blur(${blurPx}px)` }
                     : {
                         x: translateX,
                         opacity: isCenter ? 1 : 0.55 - abs * 0.12,
                         scale,
                         rotateY,
-                        filter: `blur(${blurPx}px)`,
-                      }
+                        filter: `blur(${blurPx}px)` }
                 }
                 transition={{ type: 'spring', stiffness: 280, damping: 28 }}
               >
@@ -447,7 +439,7 @@ export function SpatialGlassExpo({
                       </div>
                     ) : null}
                     <div className="absolute bottom-0 left-0 right-0 p-5 text-left">
-                      <p className="font-semibold tracking-tight text-white drop-shadow-md sm:text-lg">
+                      <p className="font-semibold text-white drop-shadow-md sm:text-[16px]">
                         {h.titulo}
                       </p>
                       <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/90">

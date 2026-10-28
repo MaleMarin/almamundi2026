@@ -46,8 +46,7 @@ export function NewsObservatoryModalClient({ newsId }: { newsId: string }) {
         limit: '50',
         lang: 'es',
         tz,
-        day,
-      });
+        day });
       return fetch(`/api/world?${q.toString()}`)
         .then((res) => (res.ok ? res.json() : Promise.reject(new Error('fetch failed'))))
         .then((data: { items?: unknown[] }) => {
@@ -71,8 +70,7 @@ export function NewsObservatoryModalClient({ newsId }: { newsId: string }) {
             source,
             publishedAt: found.publishedAt != null ? String(found.publishedAt) : null,
             sourceCountry: found.sourceCountry != null ? String(found.sourceCountry) : null,
-            topic: typeof found.topic === 'string' ? found.topic : 'Actualidad',
-          });
+            topic: typeof found.topic === 'string' ? found.topic : 'Actualidad' });
           setLoading(false);
           setNotFound(false);
         })

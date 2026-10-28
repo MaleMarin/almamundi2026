@@ -35,8 +35,7 @@ export function MiEcoClient({
   country,
   footerAtIso,
   resonanceCount,
-  ecoVad,
-}: MiEcoClientProps) {
+  ecoVad }: MiEcoClientProps) {
   const canvasId = 'mi-eco-resonancia';
   const footerAt = useMemo(() => {
     const d = new Date(footerAtIso);
@@ -55,8 +54,7 @@ export function MiEcoClient({
     city: city || null,
     country: country || null,
     footerAt,
-    ecoVad: ecoVadStable,
-  });
+    ecoVad: ecoVadStable });
 
   const orangeCta = 'linear-gradient(180deg, #FF4A1C 0%, #FF4A1C 100%)' as const;
 
@@ -68,18 +66,18 @@ export function MiEcoClient({
       <div className={`${historiasInterior.contentWrapClassName} px-6 md:px-12 pb-16`}>
         <header className={historiasInterior.headerClassName}>
           <p
-            className="text-xs font-semibold tracking-[0.18em] uppercase mb-2"
+            className="text-xs font-semibold uppercase mb-2 tracking-[0.12em]"
             style={{ color: 'var(--almamundi-orange)' }}
           >
             Tu eco
           </p>
           <h1
-            className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1]"
+            className="text-[27px] md:text-[43px] font-semibold leading-[1.1]"
             style={{ color: neu.textMain }}
           >
             {title}
           </h1>
-          <p className="mt-3 max-w-2xl text-base md:text-lg" style={{ color: neu.textBody }}>
+          <p className="mt-3 max-w-2xl text-[15px] md:text-[16px]" style={{ color: neu.textBody }}>
             Un rincón solo para ti: cuántas personas resonaron con tu historia, y tu cinta de colores,
             que se va tiñendo con lo que esas voces dejaron.
           </p>
@@ -88,12 +86,12 @@ export function MiEcoClient({
         <section className="mx-auto w-full max-w-2xl space-y-6">
           <div className="rounded-[1.5rem] p-6 md:p-8" style={neu.card}>
             <h2
-              className="text-sm font-semibold uppercase tracking-wider"
+              className="text-sm font-semibold uppercase tracking-[0.12em]"
               style={{ color: 'var(--almamundi-orange)' }}
             >
               Resonancia
             </h2>
-            <p className="mt-3 text-lg md:text-xl font-medium" style={{ color: neu.textMain }}>
+            <p className="mt-3 text-[16px] md:text-[18px] font-medium" style={{ color: neu.textMain }}>
               {resonanceCopy(resonanceCount)}
             </p>
             <p className="mt-2 text-sm" style={{ color: neu.textBody }}>
@@ -104,7 +102,7 @@ export function MiEcoClient({
 
           <div className="rounded-[1.5rem] p-6 md:p-8 space-y-4" style={neu.card}>
             <h2
-              className="text-sm font-semibold uppercase tracking-wider"
+              className="text-sm font-semibold uppercase tracking-[0.12em]"
               style={{ color: 'var(--almamundi-orange)' }}
             >
               Tu cinta de arte
@@ -131,7 +129,7 @@ export function MiEcoClient({
                 setErr('');
                 downloadPng('almamundi-resonancia-visual.png');
               }}
-              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase tracking-wide text-white"
+              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase text-white tracking-[0.12em]"
               style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255, 74, 28,0.32)' }}
             >
               <Download size={18} aria-hidden />

@@ -12,9 +12,7 @@ const soft = {
     backgroundColor: '#E0E5EC',
     boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
     border: '1px solid rgba(255,255,255,0.3)',
-    borderRadius: '40px',
-  },
-} as const;
+    borderRadius: '40px' } } as const;
 
 export default function RecorridosListPage() {
   const recorridos = getRecorridos();
@@ -26,24 +24,24 @@ export default function RecorridosListPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Recorridos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={neu.cardInset}>Recorridos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
+        <h1 className="text-[27px] md:text-[32px] font-light mb-2" style={{ color: neu.textMain }}>
           Recorridos
         </h1>
-        <p className="text-lg font-light mb-2" style={{ color: neu.textBody }}>
+        <p className="text-[16px] font-light mb-2" style={{ color: neu.textBody }}>
           Historias que, juntas, trazan un camino.
         </p>
-        <p className="text-base font-light mb-10" style={{ color: neu.textBody }}>
+        <p className="text-[15px] font-light mb-10" style={{ color: neu.textBody }}>
           Cada recorrido conecta voces que no se conocen, pero que comparten una experiencia.
         </p>
 
@@ -66,7 +64,7 @@ export default function RecorridosListPage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold mb-2" style={{ color: neu.textMain }}>
+                  <h2 className="text-[18px] font-semibold mb-2" style={{ color: neu.textMain }}>
                     {r.title}
                   </h2>
                   <p className="text-sm font-light mb-3" style={{ color: neu.textBody }}>

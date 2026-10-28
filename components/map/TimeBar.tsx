@@ -50,8 +50,7 @@ export function TimeBar({ selectedLocation, className }: Props) {
     () => ({
       timezone: selectedLocation?.timezone ?? browserTz,
       city: selectedLocation?.city,
-      country: selectedLocation?.country,
-    }),
+      country: selectedLocation?.country }),
     [selectedLocation?.city, selectedLocation?.country, selectedLocation?.timezone, browserTz]
   );
 

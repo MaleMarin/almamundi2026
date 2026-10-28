@@ -27,8 +27,7 @@ export function ObservatoryShell({
   children,
   variant = 'page',
   backHref = '/#mapa',
-  onClose,
-}: ObservatoryShellProps) {
+  onClose }: ObservatoryShellProps) {
   const isModal = variant === 'modal';
 
   return (
@@ -75,7 +74,7 @@ export function ObservatoryShell({
           )}
           <div className="min-w-0">
             <h1
-              className={`font-bold text-white truncate ${isModal ? 'text-lg' : 'text-xl md:text-2xl'}`}
+              className={`font-bold text-white truncate ${isModal ? 'text-[16px]' : 'text-[18px] md:text-[22px]'}`}
             >
               {title}
             </h1>

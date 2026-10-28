@@ -37,8 +37,7 @@ const dockWrapperStyle: CSSProperties = {
   border: '1px solid rgba(255,255,255,0.10)',
   boxShadow: '0 18px 60px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 0 rgba(0,0,0,0.35)',
   outline: '1px solid rgba(56,189,248,0.18)',
-  outlineOffset: -1,
-};
+  outlineOffset: -1 };
 
 const baseBtnStyle: CSSProperties = {
   flex: '1 1 140px',
@@ -54,8 +53,7 @@ const baseBtnStyle: CSSProperties = {
   lineHeight: 1.2,
   fontFamily: 'inherit',
   fontWeight: 600,
-  whiteSpace: 'normal',
-};
+  whiteSpace: 'normal' };
 
 export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerOpen, embedded, topOffset, navbarZIndex }: MapDockProps) {
   const { locale } = useHomeLocale();

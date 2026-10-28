@@ -44,13 +44,11 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
     autor: {
       nombre,
       avatar: s.author?.avatar ?? (s as StoryPoint & { authorAvatar?: string }).authorAvatar ?? defaultAvatar(nombre),
-      ubicacion,
-    },
+      ubicacion },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...questionPublicFields(s),
-  };
+    ...questionPublicFields(s) };
 }
 
 type PageProps = { params: Promise<{ id: string }> };

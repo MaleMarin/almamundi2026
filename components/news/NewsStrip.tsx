@@ -90,8 +90,7 @@ export default function NewsStrip() {
           '-14px 0 48px rgba(0,0,0,0.36), inset 1px 0 0 rgba(255,255,255,0.45), inset 0 1px 0 rgba(255,255,255,0.2)',
         borderTopLeftRadius: 20,
         borderBottomLeftRadius: 20,
-        overflow: 'hidden',
-      }}
+        overflow: 'hidden' }}
     >
       {/* Header */}
       <div
@@ -100,8 +99,7 @@ export default function NewsStrip() {
           borderBottom: '1px solid rgba(255,255,255,0.28)',
           background: 'linear-gradient(180deg, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0.08) 100%)',
           backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-        }}
+          WebkitBackdropFilter: 'blur(18px)' }}
       >
         <div
           style={{
@@ -111,8 +109,7 @@ export default function NewsStrip() {
             textTransform: 'uppercase',
             color: '#ff5a14',
             marginBottom: '10px',
-            textShadow: '0 0 18px rgba(255, 74, 28, 0.45)',
-          }}
+            textShadow: '0 0 18px rgba(255, 74, 28, 0.45)' }}
         >
           Noticias en vivo
         </div>
@@ -124,8 +121,7 @@ export default function NewsStrip() {
             gap: '6px',
             overflowX: 'auto',
             paddingBottom: '2px',
-            scrollbarWidth: 'none',
-          }}
+            scrollbarWidth: 'none' }}
         >
           {TOPICS.map((t) => (
             <button
@@ -153,8 +149,7 @@ export default function NewsStrip() {
                 color: activeTopic === t.id ? '#ffffff' : 'rgba(255,255,255,0.52)',
                 fontSize: '11px',
                 cursor: 'pointer',
-                transition: 'all 0.15s',
-              }}
+                transition: 'all 0.15s' }}
             >
               {t.label}
             </button>
@@ -168,8 +163,7 @@ export default function NewsStrip() {
           flex: 1,
           overflowY: 'auto',
           scrollbarWidth: 'thin',
-          scrollbarColor: 'rgba(255,255,255,0.1) transparent',
-        }}
+          scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}
       >
         {loading ? (
           <div style={{ padding: '12px 16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -180,8 +174,7 @@ export default function NewsStrip() {
                 style={{
                   height: '64px',
                   background: 'rgba(255,255,255,0.05)',
-                  borderRadius: '6px',
-                }}
+                  borderRadius: '6px' }}
               />
             ))}
           </div>
@@ -191,8 +184,7 @@ export default function NewsStrip() {
               padding: '24px 16px',
               textAlign: 'center',
               fontSize: '12px',
-              color: 'rgba(255,255,255,0.3)',
-            }}
+              color: 'rgba(255,255,255,0.3)' }}
           >
             No hay noticias disponibles
           </div>
@@ -208,8 +200,7 @@ export default function NewsStrip() {
                 padding: '12px 16px',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                 textDecoration: 'none',
-                transition: 'background 0.15s',
-              }}
+                transition: 'background 0.15s' }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
               }}
@@ -223,8 +214,7 @@ export default function NewsStrip() {
                   color: 'rgba(255,255,255,0.35)',
                   marginBottom: '4px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                }}
+                  justifyContent: 'space-between' }}
               >
                 <span>{item.source}</span>
                 <span>{timeAgo(item.publishedAt)}</span>
@@ -238,8 +228,7 @@ export default function NewsStrip() {
                   display: '-webkit-box',
                   WebkitLineClamp: 3,
                   WebkitBoxOrient: 'vertical' as const,
-                  overflow: 'hidden',
-                }}
+                  overflow: 'hidden' }}
               >
                 {item.title}
               </div>
@@ -253,8 +242,7 @@ export default function NewsStrip() {
                     display: '-webkit-box',
                     WebkitLineClamp: 2,
                     WebkitBoxOrient: 'vertical' as const,
-                    overflow: 'hidden',
-                  }}
+                    overflow: 'hidden' }}
                 >
                   {item.summary}
                 </div>
@@ -271,8 +259,7 @@ export default function NewsStrip() {
           borderTop: '1px solid rgba(255,255,255,0.08)',
           fontSize: '10px',
           color: 'rgba(255,255,255,0.2)',
-          textAlign: 'center',
-        }}
+          textAlign: 'center' }}
       >
         Hoy (tu zona) · actualiza cada 2 min
       </div>

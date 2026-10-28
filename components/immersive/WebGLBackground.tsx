@@ -4,8 +4,7 @@ import {
   Environment,
   Float,
   Lightformer,
-  Outlines,
-} from '@react-three/drei';
+  Outlines } from '@react-three/drei';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { useEffect, useRef, type MutableRefObject } from 'react';
 import * as THREE from 'three';
@@ -26,8 +25,7 @@ const SPHERE_ATTENUATION = '#ff7a33';
 
 function GlassSphereScene({
   progressRef,
-  mouseRef,
-}: {
+  mouseRef }: {
   progressRef: MutableRefObject<number>;
   mouseRef: LabMouseRef;
 }) {
@@ -158,8 +156,7 @@ function ProceduralEnvGlass() {
 
 function Scene({
   progressRef,
-  mouseRef,
-}: {
+  mouseRef }: {
   progressRef: MutableRefObject<number>;
   mouseRef: LabMouseRef;
 }) {
@@ -174,8 +171,7 @@ function Scene({
 export default function WebGLBackground({
   progressRef,
   mouseRef,
-  showSphere = true,
-}: WebGLBackgroundProps) {
+  showSphere = true }: WebGLBackgroundProps) {
   const internalMouse = useRef({ x: 0, y: 0 });
   const m = mouseRef ?? internalMouse;
 
@@ -202,8 +198,7 @@ export default function WebGLBackground({
         gl={{
           alpha: true,
           antialias: true,
-          powerPreference: 'high-performance',
-        }}
+          powerPreference: 'high-performance' }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}

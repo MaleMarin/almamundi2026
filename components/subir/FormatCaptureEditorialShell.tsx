@@ -28,8 +28,7 @@ export function FormatCaptureEditorialShell({
   kicker,
   children,
   titlePreLine = false,
-  footnote,
-}: Props) {
+  footnote }: Props) {
   const title = titlePreLine ? copy.title : copy.title.replace(/\n/g, ' ');
 
   return (

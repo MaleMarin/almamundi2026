@@ -5,8 +5,7 @@ import {
   analyzeEmotion,
   EMOTION_VISUALS,
   type EmotionState,
-  type EmotionVisual,
-} from '@/lib/audioEmotion';
+  type EmotionVisual } from '@/lib/audioEmotion';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
@@ -215,8 +214,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
           overflow:     'hidden',
           marginBottom: 16,
           transition:   'box-shadow 800ms ease',
-          boxShadow:    `0 0 ${40 * vis.glowIntensity}px ${vis.particleColor}${vis.glowIntensity * 0.3})`,
-        }}
+          boxShadow:    `0 0 ${40 * vis.glowIntensity}px ${vis.particleColor}${vis.glowIntensity * 0.3})` }}
       >
         <canvas
           ref={canvasRef}
@@ -226,8 +224,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
             width:     '100%',
             height:    120,
             display:   'block',
-            transition: 'filter 600ms ease',
-          }}
+            transition: 'filter 600ms ease' }}
         />
 
         {emotion !== 'silence' && vis.label && (
@@ -236,13 +233,12 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
               position:      'absolute',
               top:           12,
               right:         14,
-              fontSize:      10,
-              letterSpacing: '0.18em',
+              fontSize: 10,
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color:         `${vis.particleColor}0.7)`,
               fontFamily:    SITE_FONT_STACK,
-              transition:    'color 600ms ease',
-            }}
+              transition:    'color 600ms ease' }}
           >
             {vis.label}
           </div>
@@ -261,7 +257,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
             background:      `${vis.particleColor}0.12)`,
             border:          `1px solid ${vis.particleColor}0.35)`,
             color:           `${vis.particleColor}1)`,
-            fontSize:        20,
+            fontSize: 18,
             cursor:          'pointer',
             display:         'flex',
             alignItems:      'center',
@@ -270,8 +266,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
             transition:      'all 400ms ease',
             boxShadow:       playing
               ? `0 0 20px ${vis.particleColor}${vis.glowIntensity * 0.4})`
-              : 'none',
-          }}
+              : 'none' }}
         >
           {playing ? '⏸' : '▶'}
         </button>
@@ -293,8 +288,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
               position:     'absolute',
               inset:        0,
               background:   'rgba(255,255,255,0.08)',
-              borderRadius: 999,
-            }}
+              borderRadius: 999 }}
           />
           <div
             style={{
@@ -305,8 +299,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
               width:        `${duration ? (progress / duration) * 100 : 0}%`,
               background:   `${vis.particleColor}0.9)`,
               borderRadius: 999,
-              transition:   'background 600ms ease, width 0.1s linear',
-            }}
+              transition:   'background 600ms ease, width 0.1s linear' }}
           />
           <div
             style={{
@@ -319,20 +312,18 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
               borderRadius: '50%',
               background:   `${vis.particleColor}1)`,
               transition:  'background 600ms ease',
-              boxShadow:   `0 0 8px ${vis.particleColor}0.6)`,
-            }}
+              boxShadow:   `0 0 8px ${vis.particleColor}0.6)` }}
           />
         </div>
 
         <span
           style={{
-            fontSize:    12,
+            fontSize: 12,
             color:       'rgba(255,255,255,0.40)',
             flexShrink:  0,
             fontFamily:  SITE_FONT_STACK,
             minWidth:    '4.5ch',
-            textAlign:   'right',
-          }}
+            textAlign:   'right' }}
         >
           {formatTime(progress)} / {formatTime(duration)}
         </span>

@@ -75,8 +75,7 @@ export function NASAEpicEarthVideo({
   source = 'spinning',
   fallbackImage = FALLBACK_IMAGE,
   fallbackImages,
-  className = '',
-}: NASAEpicEarthVideoProps) {
+  className = '' }: NASAEpicEarthVideoProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const [playing, setPlaying] = useState(false);
@@ -269,8 +268,7 @@ export function NASAEpicEarthVideo({
         clipPath: 'circle(50% at 50% 50%)',
         WebkitClipPath: 'circle(50% at 50% 50%)',
         minWidth: 'min(280px, 50vmin)',
-        minHeight: 'min(280px, 50vmin)',
-      }}
+        minHeight: 'min(280px, 50vmin)' }}
     >
       <div className="absolute inset-0 z-0 bg-black pointer-events-none" aria-hidden />
       {useCrossfade && (
@@ -313,7 +311,7 @@ export function NASAEpicEarthVideo({
           className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
           aria-hidden
         >
-          <span className="text-white/70 text-sm tracking-widest uppercase px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm">
+          <span className="text-white/70 text-sm uppercase px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm tracking-[0.12em]">
             Toca el globo para que gire
           </span>
         </div>

@@ -5,8 +5,7 @@ import PreguntaForm from '@/components/pregunta/PreguntaForm';
 export const metadata: Metadata = {
   title: 'La pregunta · AlmaMundi',
   description:
-    'Además de contar tu historia, aquí puedes responder. Cada semana lanzamos una pregunta al mundo, y cada respuesta enciende un punto en el mapa.',
-};
+    'Además de contar tu historia, aquí puedes responder. Cada semana lanzamos una pregunta al mundo, y cada respuesta enciende un punto en el mapa.' };
 
 export default function PreguntaPage() {
   return (

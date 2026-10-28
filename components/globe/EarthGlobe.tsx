@@ -22,8 +22,7 @@ export type EarthGlobeProps = {
 export function EarthGlobe({
   radius = 1,
   autoRotate = true,
-  rotationSpeed = 0.052,
-}: EarthGlobeProps) {
+  rotationSpeed = 0.052 }: EarthGlobeProps) {
   const spinRef = useRef<THREE.Group>(null);
 
   useFrame((_, dt) => {

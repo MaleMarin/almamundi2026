@@ -43,14 +43,14 @@
    Typography
 ========================= */
 .lm-h1{
-  font-size: 40px;
+  font-size: 36px;
   line-height: 1.02;
-  letter-spacing: -0.02em;
+  
   color: var(--lm-text);
 }
 .lm-p{
   margin-top: 10px;
-  font-size: 16px;
+  font-size: 15px;
   line-height: 1.55;
   color: var(--lm-muted);
 }
@@ -98,7 +98,7 @@
   align-items: center;
   justify-content: center;
   font-weight: 600;
-  letter-spacing: .01em;
+  
   user-select: none;
   cursor: pointer;
   transition: transform .12s ease, background .2s ease, border-color .2s ease;
@@ -180,6 +180,6 @@
 .lm-switch-label{
   font-size: 14px;
   font-weight: 800;
-  letter-spacing: .02em;
+  
   color: rgba(255,255,255,.85);
 }

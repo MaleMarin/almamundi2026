@@ -6,8 +6,7 @@ import type {
   GlobeV2CameraPreset,
   GlobeV2LayerBuildStage,
   GlobeV2OceanSunDebug,
-  GlobeV2VisualStage,
-} from '@/components/globe/GlobeV2';
+  GlobeV2VisualStage } from '@/components/globe/GlobeV2';
 import type { GlobeBitMarker } from '@/components/globe/GlobeBitsLayer';
 import { BITS_DATA } from '@/lib/bits-data';
 import { GLOBE_V2_CAMERA_PRESETS } from '@/lib/globe/globe-v2-assets';
@@ -16,31 +15,26 @@ const GlobeV2 = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m
   ssr: false,
   loading: () => (
     <div className="flex flex-1 items-center justify-center bg-black text-sm text-white/50">Cargando globo…</div>
-  ),
-});
+  ) });
 
 const BITS_FOR_VALIDATION: GlobeBitMarker[] = BITS_DATA.map((b) => ({
   id: b.id,
   lat: b.lat,
-  lon: b.lon,
-}));
+  lon: b.lon }));
 
 const STAGES: { id: GlobeV2VisualStage; label: string; hint: string }[] = [
   {
     id: 'surface',
     label: 'A · Superficie',
-    hint: 'Océano + tierra (capas separadas) + nubes. Sin atmósfera, sin luces urbanas, sin bits.',
-  },
+    hint: 'Océano + tierra (capas separadas) + nubes. Sin atmósfera, sin luces urbanas, sin bits.' },
   {
     id: 'nightLights',
     label: 'B · Luces',
-    hint: 'A + GlobeCityLightsOverlay. Sin atmósfera ni bits.',
-  },
+    hint: 'A + GlobeCityLightsOverlay. Sin atmósfera ni bits.' },
   {
     id: 'full',
     label: 'C · Completo',
-    hint: 'B + GlobeAtmosphereGlow + marcadores (GlobeBitStarBurst / Selected).',
-  },
+    hint: 'B + GlobeAtmosphereGlow + marcadores (GlobeBitStarBurst / Selected).' },
 ];
 
 /**
@@ -54,18 +48,15 @@ const OCCLUSION_MODES: {
   {
     id: 'ocean',
     title: 'Solo océano',
-    detail: 'Únicamente OceanSphere (mar). Comprobar agua sin manchas de foco.',
-  },
+    detail: 'Únicamente OceanSphere (mar). Comprobar agua sin manchas de foco.' },
   {
     id: 'land',
     title: 'Solo tierra',
-    detail: 'Únicamente LandSphere sobre fondo negro. Máscara y descarte.',
-  },
+    detail: 'Únicamente LandSphere sobre fondo negro. Máscara y descarte.' },
   {
     id: 'ocean_land',
     title: 'Océano + tierra',
-    detail: 'Ambas capas: oclusión real, costas, archipiélagos.',
-  },
+    detail: 'Ambas capas: oclusión real, costas, archipiélagos.' },
 ];
 
 const EXTRA_LAYERS: { id: GlobeV2LayerBuildStage; label: string }[] = [
@@ -102,7 +93,7 @@ export default function GloboValidacionPage() {
         <div className="mx-auto flex max-w-4xl flex-col gap-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-sm font-semibold tracking-wide text-white/95">Validación visual del globo</h1>
+              <h1 className="text-sm font-semibold text-white/95">Validación visual del globo</h1>
               <p className="text-xs text-white/50">
                 Pipeline visual · {STAGES.find((s) => s.id === stage)?.hint}
               </p>
@@ -126,7 +117,7 @@ export default function GloboValidacionPage() {
           </div>
 
           <div className="rounded-lg border border-emerald-500/35 bg-emerald-950/30 px-3 py-2.5">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-emerald-200/95">
+            <p className="mb-2 text-[11px] font-semibold uppercase text-emerald-200/95 tracking-[0.12em]">
               1 · Oclusión océano / tierra (prioridad)
             </p>
             <p className="mb-2 text-[11px] leading-relaxed text-white/65">
@@ -141,7 +132,7 @@ export default function GloboValidacionPage() {
               <li>Modo solo mar / solo tierra / ambos para aislar fallos.</li>
               <li>Usa vistas &quot;Costas difíciles&quot; (Caribe, Indonesia, Japón).</li>
             </ul>
-            <p className="mb-1.5 text-[10px] font-medium uppercase tracking-wide text-white/40">
+            <p className="mb-1.5 text-[10px] font-medium uppercase text-white/40 tracking-[0.12em]">
               Los tres modos
             </p>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -164,7 +155,7 @@ export default function GloboValidacionPage() {
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-white/40">
+            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
               2 · Más capas (después de oclusión)
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -187,7 +178,7 @@ export default function GloboValidacionPage() {
 
           {layerBuildStage === 'ocean' ? (
             <div>
-              <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-white/40">
+              <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
                 Océano · dirección de luz (shader, solo QA)
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -231,7 +222,7 @@ export default function GloboValidacionPage() {
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-white/40">
+            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
               Vistas fijas · costas difíciles (archipiélagos, bordes finos)
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -267,7 +258,7 @@ export default function GloboValidacionPage() {
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase tracking-wide text-white/40">
+            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
               Otras regiones
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -294,7 +285,7 @@ export default function GloboValidacionPage() {
           {fixedPreset != null ? (
             <div className="text-[11px] leading-relaxed text-white/55">
               <p className="mb-1 font-medium text-white/70">{GLOBE_V2_CAMERA_PRESETS[fixedPreset].title}</p>
-              <p className="mb-2 rounded-md border border-emerald-500/45 bg-emerald-950/50 px-2.5 py-1.5 text-[11px] font-semibold tracking-wide text-emerald-100/95">
+              <p className="mb-2 rounded-md border border-emerald-500/45 bg-emerald-950/50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-100/95">
                 {GLOBE_V2_CAMERA_PRESETS[fixedPreset].validationLegend}
               </p>
               <ul className="list-inside list-disc space-y-0.5">

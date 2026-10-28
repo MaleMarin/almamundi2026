@@ -7,8 +7,7 @@ import {
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT,
   MAP_HOME_NEU_BUTTON_CLASS_COMPACT_INLINE,
   MAP_HOME_NEU_BUTTON_CLASS_DOCK,
-  MAP_HOME_NEU_BUTTON_STYLE,
-} from '@/lib/map-home-neu-button';
+  MAP_HOME_NEU_BUTTON_STYLE } from '@/lib/map-home-neu-button';
 
 export type PillNavButtonProps = {
   children: ReactNode;
@@ -56,8 +55,7 @@ export function PillNavButton({
   href,
   onClick,
   onAfterClick,
-  type = 'button',
-}: PillNavButtonProps) {
+  type = 'button' }: PillNavButtonProps) {
   const pillClass =
     dock === true
       ? MAP_HOME_NEU_BUTTON_CLASS_DOCK

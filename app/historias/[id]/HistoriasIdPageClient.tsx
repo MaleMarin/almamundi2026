@@ -63,22 +63,22 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
       <div className={`${historiasInterior.contentWrapClassName} ${historiasInterior.sectionGrowClassName}`}>
         <section className="px-6 md:px-12 py-10 md:py-14 max-w-6xl mx-auto flex-1">
-          <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-base mb-8" style={{ color: neu.textBody }}>
+          <Link href="/historias" className="inline-flex items-center gap-2 text-sm md:text-[15px] mb-8" style={{ color: neu.textBody }}>
             ← Historias
           </Link>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-12">
             <div>
-              <div className="text-xs font-semibold tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--almamundi-orange)' }}>
+              <div className="text-xs font-semibold uppercase mb-3 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
                 {place} · {hasVideo ? 'Videos' : hasAudio ? 'Audios' : hasImage ? 'Fotografías' : 'Escritos'} · {timeAgo(story.publishedAt)}
               </div>
               <RespondeALine questionId={story.questionId} questionMode={story.questionMode} color={neu.textBody} />
-              <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>
+              <h1 className="text-[27px] md:text-[43px] font-semibold leading-[1.1] mb-4" style={{ color: neu.textMain }}>
                 {story.title || 'Sin título'}
               </h1>
               {story.body && (
                 <>
-                  <div className="text-base leading-relaxed mb-4" style={{ color: neu.textBody }}>
+                  <div className="text-[15px] leading-relaxed mb-4" style={{ color: neu.textBody }}>
                     {story.body}
                   </div>
                   <Link
@@ -93,7 +93,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
               <p className="mb-8">
                 <HomeHardLink
                   href="/#historias"
-                  className="text-sm font-medium tracking-wide !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)] hover:font-semibold"
+                  className="text-sm font-medium !text-gray-500 transition-colors hover:!text-[var(--almamundi-orange)] hover:font-semibold"
                 >
                   Cuenta la tuya
                 </HomeHardLink>
@@ -129,7 +129,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                       <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={neu.cardInset}>
-                        <span className="text-4xl opacity-50">📷</span>
+                        <span className="text-[32px] opacity-50">📷</span>
                       </div>
                     )}
                     <Link
@@ -142,7 +142,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                   </>
                 ) : (
                   <div className="w-20 h-20 rounded-full flex items-center justify-center" style={neu.cardInset}>
-                    <span className="text-4xl opacity-50">📖</span>
+                    <span className="text-[32px] opacity-50">📖</span>
                   </div>
                 )}
               </div>
@@ -150,7 +150,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
           </div>
 
           <div className="border-t border-gray-300/40 pt-8">
-            <p className="text-xs font-semibold tracking-widest text-gray-500 uppercase mb-4">
+            <p className="text-xs font-semibold text-gray-500 uppercase mb-4 tracking-[0.12em]">
               {story.country ? `Más historias de ${story.country}` : 'Más historias'}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mb-6">
@@ -161,10 +161,10 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
                   className="block p-4 rounded-2xl transition-all hover:scale-[1.02] active:scale-[0.99]"
                   style={neu.card}
                 >
-                  <div className="text-[10px] font-semibold tracking-widest uppercase mb-1" style={{ color: 'var(--almamundi-orange)' }}>
+                  <div className="text-[10px] font-semibold uppercase mb-1 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
                     {[s.city, s.country].filter(Boolean).join(', ') || '—'}
                   </div>
-                  <h3 className="font-semibold tracking-tight text-gray-800 line-clamp-2 text-sm">{s.title || 'Sin título'}</h3>
+                  <h3 className="font-semibold text-gray-800 line-clamp-2 text-sm">{s.title || 'Sin título'}</h3>
                 </Link>
               ))}
             </div>

@@ -2,8 +2,7 @@
 
 import {
   EXHIBITION_COMPROMISO_BODY,
-  EXHIBITION_COMPROMISO_TITLE,
-} from '@/lib/historias/exhibition-compromiso';
+  EXHIBITION_COMPROMISO_TITLE } from '@/lib/historias/exhibition-compromiso';
 
 export type ExhibitionCompromisoVariant = 'band' | 'footer' | 'modal' | 'share-intro';
 
@@ -12,8 +11,7 @@ export function ExhibitionCompromisoStatement({
   className = '',
   id,
   /** Solo aplica con `variant="band"`: contraste sobre sala clara (p. ej. /historias/videos). */
-  bandTone = 'dark',
-}: {
+  bandTone = 'dark' }: {
   variant: ExhibitionCompromisoVariant;
   className?: string;
   id?: string;
@@ -41,7 +39,7 @@ export function ExhibitionCompromisoStatement({
 
   const bodyCls =
     variant === 'footer' || variant === 'share-intro'
-      ? 'font-serif text-base font-light italic leading-relaxed text-gray-700 md:text-lg'
+      ? 'font-serif text-[15px] font-light italic leading-relaxed text-gray-700 md:text-[16px]'
       : 'font-serif text-sm font-light italic leading-relaxed text-white/88 sm:text-[15px]';
 
   return (

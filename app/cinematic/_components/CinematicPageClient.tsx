@@ -44,8 +44,7 @@ export type CinematicPageClientProps = {
 
 export function CinematicPageClient({
   exitHref = '/muestras',
-  exitLabel = 'Volver al listado',
-}: CinematicPageClientProps) {
+  exitLabel = 'Volver al listado' }: CinematicPageClientProps) {
   const slides = getGlassCarouselSlides();
   const last = slides.length - 1;
   const { containerRef, progressRef, webglOn, reduceMotion, uiIndex, goToIndex } =
@@ -141,8 +140,7 @@ export function CinematicPageClient({
                               style={{
                                 backgroundImage: `url(${MUESTRAS_CINEMATIC_BACKDROP_SRC})`,
                                 backgroundSize: `${n * 100}% 108%`,
-                                backgroundPosition: `${posX}% 40%`,
-                              }}
+                                backgroundPosition: `${posX}% 40%` }}
                             />
                           </div>
                         </div>

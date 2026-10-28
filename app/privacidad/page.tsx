@@ -10,8 +10,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Aviso de Privacidad · AlmaMundi',
   description:
-    'Qué datos podemos recopilar en AlmaMundi, para qué los usamos, cómo los cuidamos y qué derechos puedes ejercer.',
-};
+    'Qué datos podemos recopilar en AlmaMundi, para qué los usamos, cómo los cuidamos y qué derechos puedes ejercer.' };
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -27,14 +26,12 @@ const pLast = { marginBottom: 0 } as const;
 const ul = {
   margin: '0 0 1rem',
   paddingLeft: '1.25rem',
-  listStyleType: 'disc' as const,
-};
+  listStyleType: 'disc' as const };
 
 function Section({
   id,
   title,
-  children,
-}: {
+  children }: {
   id: string;
   title: string;
   children: React.ReactNode;
@@ -47,8 +44,7 @@ function Section({
         padding: '1.25rem 1.5rem',
         background: BG,
         borderRadius: 16,
-        boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
-      }}
+        boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}` }}
     >
       <h2
         style={{
@@ -56,20 +52,17 @@ function Section({
           fontFamily: 'inherit',
           fontStyle: 'italic',
           fontWeight: 600,
-          fontSize: '1.1rem',
-          color: ORANGE,
-        }}
+          fontSize: '16px',
+          color: ORANGE }}
       >
         {title}
       </h2>
       <div
         style={{
           fontFamily: 'inherit',
-          fontSize: '1rem',
+          fontSize: '15px',
           lineHeight: 1.75,
-          letterSpacing: '0.01em',
-          color: TEXT_2,
-        }}
+          color: TEXT_2 }}
       >
         {children}
       </div>
@@ -84,8 +77,7 @@ export default function PrivacidadPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3rem',
-        fontFamily: 'inherit',
-      }}
+        fontFamily: 'inherit' }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
         <HomeHardLink
@@ -94,9 +86,8 @@ export default function PrivacidadPage() {
           style={{
             display: 'inline-block',
             marginBottom: '1.5rem',
-            fontSize: '0.85rem',
-            padding: '0.45rem 0.9rem',
-          }}
+            fontSize: '13.6px',
+            padding: '0.45rem 0.9rem' }}
         >
           ← Volver al inicio
         </HomeHardLink>
@@ -106,13 +97,12 @@ export default function PrivacidadPage() {
             fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 600,
-            fontSize: '1.75rem',
-            color: TEXT_1,
-          }}
+            fontSize: '25px',
+            color: TEXT_1 }}
         >
           Aviso de Privacidad
         </h1>
-        <p style={{ margin: 0, fontSize: '0.9rem', color: TEXT_3 }}>
+        <p style={{ margin: 0, fontSize: '14.4px', color: TEXT_3 }}>
           AlmaMundi · Última actualización: 27 de agosto de 2026
         </p>
 
@@ -537,7 +527,7 @@ export default function PrivacidadPage() {
           <p style={pLast}>La versión vigente será la publicada en la página oficial de privacidad de AlmaMundi.</p>
         </Section>
 
-        <p style={{ marginTop: '2rem', fontSize: '0.8rem', color: TEXT_3 }}>
+        <p style={{ marginTop: '2rem', fontSize: '12.8px', color: TEXT_3 }}>
           AlmaMundi · Aviso de Privacidad
         </p>
       </div>

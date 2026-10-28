@@ -17,21 +17,21 @@ export default function ExposicionesListPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={neu.cardInset}>Exposiciones</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={neu.cardInset}>Exposiciones</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
+        <h1 className="text-[27px] md:text-[32px] font-light mb-2" style={{ color: neu.textMain }}>
           Exposiciones
         </h1>
-        <p className="text-lg font-light mb-10" style={{ color: neu.textBody }}>
+        <p className="text-[16px] font-light mb-10" style={{ color: neu.textBody }}>
           Colecciones de piezas para explorar.
         </p>
 
@@ -43,11 +43,11 @@ export default function ExposicionesListPage() {
                 className="block p-6 md:p-8 rounded-[40px] transition-all hover:shadow-lg active:scale-[0.99]"
                 style={neu.card}
               >
-                <h2 className="text-xl md:text-2xl font-semibold mb-2" style={{ color: neu.textMain }}>
+                <h2 className="text-[18px] md:text-[22px] font-semibold mb-2" style={{ color: neu.textMain }}>
                   {expo.titulo}
                 </h2>
                 {expo.descripcion && (
-                  <p className="text-base font-light mb-3" style={{ color: neu.textBody }}>
+                  <p className="text-[15px] font-light mb-3" style={{ color: neu.textBody }}>
                     {expo.descripcion}
                   </p>
                 )}

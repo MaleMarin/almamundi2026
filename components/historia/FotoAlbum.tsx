@@ -161,8 +161,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
           background: bgColor,
           minHeight: siteLayout ? undefined : '100vh',
           width: '100%',
-          transition: 'background 0.8s ease',
-        }}
+          transition: 'background 0.8s ease' }}
       >
         {/* Header fijo (solo en modal / vista sin masthead global) */}
         {!siteLayout ? (
@@ -181,8 +180,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
             alignItems: 'center',
             justifyContent: 'space-between',
             paddingLeft: '1.25rem',
-            paddingRight: '1.25rem',
-          }}
+            paddingRight: '1.25rem' }}
         >
           <div>
             {onClose && (
@@ -193,12 +191,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
-                  fontSize: '0.75rem',
+                  fontSize: '12px',
                   padding: '0.4rem 0.75rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: 6,
-                }}
+                  gap: 6 }}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <polyline points="15,18 9,12 15,6" />
@@ -207,10 +204,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               </button>
             )}
           </div>
-          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: INTERIOR_FONT_STACK, fontStyle: 'italic', fontSize: '0.95rem', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: INTERIOR_FONT_STACK, fontStyle: 'italic', fontSize: '15px', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {historia.titulo}
           </div>
-          <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 200, fontSize: '0.75rem', letterSpacing: '0.2em', color: CREAM_MUTED }}>
+          <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 200, fontSize: '12px', color: CREAM_MUTED }}>
             {fotoActivaIdx + 1} / {imagenes.length}
           </div>
         </header>
@@ -222,8 +219,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
             overflowY: 'auto',
             height: siteLayout ? undefined : '100vh',
             minHeight: siteLayout ? 'min(88dvh, 48rem)' : undefined,
-            paddingTop: siteLayout ? 0 : 56,
-          }}
+            paddingTop: siteLayout ? 0 : 56 }}
         >
           <StoryScrollBlock scene>
             <section
@@ -234,8 +230,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 alignItems: 'center',
                 justifyContent: 'center',
                 textAlign: 'center',
-                padding: 'clamp(2rem, 5vw, 3.5rem) 1.25rem 1.5rem',
-              }}
+                padding: 'clamp(2rem, 5vw, 3.5rem) 1.25rem 1.5rem' }}
             >
               <RespondeALine
                 questionId={historia.questionId}
@@ -248,11 +243,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   fontFamily: INTERIOR_FONT_STACK,
                   fontStyle: 'italic',
                   fontWeight: 300,
-                  fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
+                  fontSize: 'clamp(1.438rem, 3.6vw, 2.188rem)',
                   color: CREAM,
                   margin: '0 0 1rem',
-                  lineHeight: 1.2,
-                }}
+                  lineHeight: 1.2 }}
               >
                 {historia.titulo}
               </h1>
@@ -274,8 +268,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                position: 'relative',
-              }}
+                position: 'relative' }}
             >
               {isDesktop ? (
                 <div
@@ -285,8 +278,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     position: 'relative',
                     overflow: 'hidden',
                     width: 'min(75vw, 900px)',
-                    height: 'calc(85vh - 80px)',
-                  }}
+                    height: 'calc(85vh - 80px)' }}
                 >
                   <img
                     src={img.url}
@@ -295,16 +287,14 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
-                    }}
+                      objectFit: 'cover' }}
                   />
                   <div
                     style={{
                       position: 'absolute',
                       inset: 0,
                       boxShadow: 'inset 0 0 0 14px rgba(255,255,255,0.92), inset 0 0 0 15px rgba(200,190,170,0.3)',
-                      pointerEvents: 'none',
-                    }}
+                      pointerEvents: 'none' }}
                   />
                   <div
                     style={{
@@ -316,21 +306,19 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       background: 'rgba(255,255,255,0.92)',
                       display: 'flex',
                       alignItems: 'center',
-                      justifyContent: 'center',
-                    }}
+                      justifyContent: 'center' }}
                   >
                     {fotoActivaIdx === i && (
                       <p
                         style={{
                           fontFamily: INTERIOR_FONT_STACK,
                           fontWeight: 300,
-                          fontSize: '0.78rem',
+                          fontSize: '12.48px',
                           color: '#3a3028',
                           fontStyle: 'italic',
                           textAlign: 'center',
                           padding: '0 16px',
-                          margin: 0,
-                        }}
+                          margin: 0 }}
                       >
                         {fichaCaption(img)}
                       </p>
@@ -351,13 +339,12 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
-                    }}
+                      objectFit: 'cover' }}
                   />
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
                   {fichaCaption(img) ? (
-                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '13.12px', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
                       {fichaCaption(img)}
                     </p>
                   ) : null}
@@ -376,11 +363,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       width: '100%',
                       height: 'auto',
                       maxHeight: 'calc(100vw * 1.2 - 80px)',
-                      objectFit: 'cover',
-                    }}
+                      objectFit: 'cover' }}
                   />
                   {fichaCaption(img) ? (
-                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '0.82rem', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '13.12px', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
                       {fichaCaption(img)}
                     </p>
                   ) : null}
@@ -401,8 +387,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               textAlign: 'center',
               padding: 'clamp(2rem, 5vw, 3.25rem) 1.25rem',
               background: `linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)`,
-              fontFamily: INTERIOR_FONT_STACK,
-            }}
+              fontFamily: INTERIOR_FONT_STACK }}
           >
             <div
               style={{
@@ -411,19 +396,17 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 maxWidth: 520,
                 padding: '2.25rem clamp(1.25rem, 4vw, 2.5rem)',
                 borderRadius: 28,
-                boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(163,177,198,0.22)`,
-              }}
+                boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(163,177,198,0.22)` }}
             >
               {imagenes.length > 0 ? (
                 <p
                   style={{
-                    fontSize: '0.72rem',
+                    fontSize: '11.52px',
                     fontWeight: 600,
-                    letterSpacing: '0.2em',
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     color: neu.textBody,
-                    marginBottom: '0.85rem',
-                  }}
+                    marginBottom: '0.85rem' }}
                 >
                   {imagenes.length} fotografías
                 </p>
@@ -438,11 +421,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 style={{
                   fontStyle: 'italic',
                   fontWeight: 600,
-                  fontSize: 'clamp(1.35rem, 3.8vw, 1.85rem)',
+                  fontSize: 'clamp(1.188rem, 3.42vw, 1.688rem)',
                   color: neu.textMain,
                   marginBottom: '1.25rem',
-                  lineHeight: 1.2,
-                }}
+                  lineHeight: 1.2 }}
               >
                 {historia.titulo}
               </h2>
@@ -457,8 +439,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   objectFit: 'cover',
                   border: `2px solid ${SEPIA}55`,
                   marginBottom: '0.85rem',
-                  boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)',
-                }}
+                  boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)' }}
               />
               <HistoriaCreditos
                 antecedentes={historia.antecedentes}
@@ -473,15 +454,14 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       ...neu.button,
                       fontFamily: INTERIOR_FONT_STACK,
                       fontWeight: 600,
-                      fontSize: '0.74rem',
-                      letterSpacing: '0.14em',
+                      fontSize: '11.84px',
+                      letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       padding: '0.85rem 1.35rem',
                       color: neu.textMain,
                       cursor: 'pointer',
                       borderRadius: 999,
-                      boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)`,
-                    }}
+                      boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)` }}
                   >
                     ← Ver más historias
                   </button>
@@ -493,11 +473,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
                     fontWeight: 700,
-                    fontSize: '0.74rem',
-                    letterSpacing: '0.16em',
+                    fontSize: '11.84px',
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    padding: '0.85rem 1.35rem',
-                  }}
+                    padding: '0.85rem 1.35rem' }}
                 >
                   Compartir
                 </button>
@@ -522,8 +501,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               display: 'flex',
               flexDirection: 'column',
               gap: 14,
-              alignItems: 'center',
-            }}
+              alignItems: 'center' }}
           >
             <button
               type="button"
@@ -541,10 +519,8 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 fontFamily: INTERIOR_FONT_STACK,
                 fontSize: '15px',
                 fontWeight: 500,
-                letterSpacing: '0.02em',
                 cursor: fotoActivaIdx <= 0 ? 'not-allowed' : 'pointer',
-                opacity: fotoActivaIdx <= 0 ? 0.45 : 1,
-              }}
+                opacity: fotoActivaIdx <= 0 ? 0.45 : 1 }}
             >
               ← Ant.
             </button>
@@ -562,8 +538,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   border: 'none',
                   cursor: 'pointer',
                   padding: 0,
-                  transition: 'all 0.3s',
-                }}
+                  transition: 'all 0.3s' }}
               />
             ))}
             <button
@@ -582,10 +557,8 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 fontFamily: INTERIOR_FONT_STACK,
                 fontSize: '15px',
                 fontWeight: 500,
-                letterSpacing: '0.02em',
                 cursor: fotoActivaIdx >= imagenes.length - 1 ? 'not-allowed' : 'pointer',
-                opacity: fotoActivaIdx >= imagenes.length - 1 ? 0.45 : 1,
-              }}
+                opacity: fotoActivaIdx >= imagenes.length - 1 ? 0.45 : 1 }}
             >
               Sig. →
             </button>

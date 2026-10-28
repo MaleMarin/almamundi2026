@@ -6,22 +6,20 @@ import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
-  reset,
-}: {
+  reset }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
   useEffect(() => {
     Sentry.captureException(error, {
       tags: { source: 'boundary.global' },
-      extra: { digest: error.digest },
-    });
+      extra: { digest: error.digest } });
   }, [error]);
 
   return (
     <html lang="es">
       <body style={{ margin: 0, background: '#0F172A', color: '#fff', fontFamily: 'Montserrat, sans-serif', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <h1 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Algo salió mal</h1>
+        <h1 style={{ fontSize: '18px', fontWeight: 600 }}>Algo salió mal</h1>
         <p style={{ opacity: 0.8, fontSize: 14, textAlign: 'center', maxWidth: 400 }}>
           Ha ocurrido un error. Puedes intentar de nuevo o volver al inicio.
         </p>

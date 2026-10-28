@@ -45,8 +45,7 @@ function loadTurnstileScript(): Promise<void> {
       }
       existing.addEventListener('load', () => resolve(), { once: true });
       existing.addEventListener('error', () => reject(new Error('script_error')), {
-        once: true,
-      });
+        once: true });
     });
   }
 
@@ -93,8 +92,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
       setStatus('ready');
       const widgetId = widgetIdRef.current;
       if (widgetId && window.turnstile) window.turnstile.reset(widgetId);
-    },
-  }));
+    } }));
 
   useEffect(() => {
     if (!siteKey) {
@@ -154,8 +152,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
             onTokenRef.current('');
             onGateRef.current('degraded');
             setStatus('timeout');
-          },
-        });
+          } });
         onGateRef.current('need');
         setStatus('ready');
       })
@@ -200,7 +197,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
               onGateRef.current('wait');
               setRetryKey((k) => k + 1);
             }}
-            className="text-[10px] font-bold uppercase tracking-wide text-orange-600 underline md:text-[11px]"
+            className="text-[10px] font-bold uppercase text-orange-600 underline md:text-[11px] tracking-[0.12em]"
           >
             Reintentar
           </button>

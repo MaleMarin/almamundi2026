@@ -29,8 +29,7 @@ export function AntecedentesText({ value, tone = 'light' }: AntecedentesTextProp
         margin: isDark ? '0.85rem 0 0' : '0 0 1rem',
         maxWidth: '36rem',
         color: isDark ? 'rgba(245, 240, 232, 0.72)' : 'inherit',
-        textAlign: 'inherit',
-      }}
+        textAlign: 'inherit' }}
     >
       {parts.map((part, i) =>
         part.type === 'link' ? (
@@ -42,8 +41,7 @@ export function AntecedentesText({ value, tone = 'light' }: AntecedentesTextProp
             style={{
               color: isDark ? 'rgba(255, 180, 140, 0.95)' : '#FF4A1C',
               textDecoration: 'underline',
-              wordBreak: 'break-word',
-            }}
+              wordBreak: 'break-word' }}
           >
             {part.value}
           </a>

@@ -85,7 +85,7 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
           <div className="flex items-start justify-between gap-4 p-4 border-b border-white/10 shrink-0">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-xl font-bold text-white truncate">{camera.title}</h3>
+                <h3 className="text-[18px] font-bold text-white truncate">{camera.title}</h3>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-semibold shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                   LIVE
@@ -134,7 +134,7 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
                     <ExternalLink size={24} className="text-white/40" />
                   </div>
-                  <h4 className="text-lg font-semibold text-white mb-2">Esta cámara se ve en su fuente oficial</h4>
+                  <h4 className="text-[16px] font-semibold text-white mb-2">Esta cámara se ve en su fuente oficial</h4>
                   <p className="text-sm text-white/60 mb-6">
                     Para ver la transmisión en vivo, abre el enlace en una nueva pestaña.
                   </p>

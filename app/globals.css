@@ -501,9 +501,8 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 /* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
 .map-section-hero-title {
   font-weight: 300;
-  font-size: clamp(2.5rem, 6.2vw + 0.5rem, 6.875rem);
+  font-size: clamp(2.25rem, 5.58vw + 0.45rem, 6.188rem);
   line-height: 0.95;
-  letter-spacing: -0.03em;
 }
 
 /* Pills del mapa: una sola fila; si no caben, scroll horizontal (nunca dos renglones). */
@@ -555,7 +554,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'],
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
     padding: 0 8px !important;
-    font-size: 0.6875rem !important;
+    font-size: 0.688rem !important;
   }
 
   #map-dock-slot .map-dock-row {

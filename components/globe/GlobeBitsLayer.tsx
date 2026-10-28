@@ -26,16 +26,14 @@ import {
   HOVER_HYSTERESIS_PX,
   PICK_RADIUS_PX,
   PICKING_SPHERE_RADIUS,
-  type GlobeBitInteractionStore,
-} from '@/lib/globe/globe-bits-magnetic-config';
+  type GlobeBitInteractionStore } from '@/lib/globe/globe-bits-magnetic-config';
 import {
   createBitStarBurstMaterial,
   createNewsRingMaterial,
   createStoryRippleMaterial,
   createStoryStarBurstMaterial,
   makeStoryRippleGeometry,
-  tintStoryMarkerMaterial,
-} from '@/components/globe/bitStarBurstMaterial';
+  tintStoryMarkerMaterial } from '@/components/globe/bitStarBurstMaterial';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 export type GlobeBitMarker = {
@@ -59,8 +57,7 @@ export type GlobeLayerVisibility = {
 const DEFAULT_LAYER_VISIBILITY: GlobeLayerVisibility = {
   stories: true,
   bits: true,
-  news: false,
-};
+  news: false };
 
 function markerLayerKind(bit: GlobeBitMarker): keyof GlobeLayerVisibility {
   if (bit.markerKind === 'story') return 'stories';
@@ -134,8 +131,7 @@ function BitDot({
   storyRippleMatHover,
   newsMat,
   respuestaMat,
-  layerOpRef,
-}: {
+  layerOpRef }: {
   bit: GlobeBitMarker;
   selected: boolean;
   magneticActive: boolean;
@@ -323,8 +319,7 @@ function BitDot({
                   color: '#fff',
                   fontFamily: 'var(--font-interna), sans-serif',
                   pointerEvents: 'none',
-                  whiteSpace: 'normal',
-                }}
+                  whiteSpace: 'normal' }}
               >
                 {bit.title ? (
                   <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.95)' }}>
@@ -371,8 +366,7 @@ export function GlobeBitsLayer({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
-  layerVisibility = DEFAULT_LAYER_VISIBILITY,
-}: {
+  layerVisibility = DEFAULT_LAYER_VISIBILITY }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
   onBitClick?: (id: number) => void;
@@ -407,8 +401,7 @@ function GlobeBitsLayerMounted({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
-  layerVisibility,
-}: {
+  layerVisibility }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
   onBitClick?: (id: number) => void;
@@ -437,8 +430,7 @@ function GlobeBitsLayerMounted({
       bitWorld: new THREE.Vector3(),
       camWorld: new THREE.Vector3(),
       ndc: new THREE.Vector3(),
-      distById: new Map<number, number>(),
-    }),
+      distById: new Map<number, number>() }),
     []
   );
 
@@ -659,8 +651,7 @@ function GlobeBitsLayerMounted({
     storyRippleMatHover,
     newsMat,
     respuestaMat,
-    layerOpRef,
-  };
+    layerOpRef };
 
   return (
     <group ref={bitsRootRef} name="globe-bits">

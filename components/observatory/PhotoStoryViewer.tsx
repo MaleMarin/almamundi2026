@@ -29,8 +29,7 @@ export function PhotoStoryViewer({
   images,
   title,
   date,
-  durationMs = DURATION_MS,
-}: PhotoStoryViewerProps) {
+  durationMs = DURATION_MS }: PhotoStoryViewerProps) {
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -63,15 +62,13 @@ export function PhotoStoryViewer({
           className="absolute inset-0 bg-cover bg-center"
           style={{
             backgroundImage: `url(${src})`,
-            animation: `ken-burns ${KEN_BURNS_DURATION_MS}ms ease-out forwards`,
-          }}
+            animation: `ken-burns ${KEN_BURNS_DURATION_MS}ms ease-out forwards` }}
         />
         {/* Overlay suave para legibilidad del subtítulo */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 45%)',
-          }}
+            background: 'linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 45%)' }}
         />
       </div>
       <div className="shrink-0 px-4 py-3 text-center border-t border-white/10">

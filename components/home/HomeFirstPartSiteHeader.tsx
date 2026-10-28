@@ -18,8 +18,7 @@ import {
   SITE_HEADER_STORIES_LINKS,
   SITE_NAV_CTA_CLASS,
   SITE_NAV_LINK_CLASS,
-  SITE_NAV_STORIES_ITEM_CLASS,
-} from '@/components/layout/siteNavLinkStyles';
+  SITE_NAV_STORIES_ITEM_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { storiesLinkLabel } from '@/lib/i18n/home-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
@@ -51,8 +50,7 @@ const softHeaderButton = {
     '-11px -11px 26px rgba(255, 255, 255, 0.96)',
     'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
     'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
-  ].join(', '),
-} as const;
+  ].join(', ') } as const;
 
 type Base = {
   scope: 'home';

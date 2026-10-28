@@ -40,9 +40,7 @@ export function HighContrastToggle() {
           padding: '8px 14px',
           fontSize: '12px',
           fontWeight: 700,
-          cursor: 'pointer',
-          letterSpacing: '0.05em',
-        }}
+          cursor: 'pointer' }}
       >
         {on ? 'AA ✓' : 'AA'}
       </button>

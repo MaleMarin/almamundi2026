@@ -58,12 +58,11 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
       <p
         style={{
           fontSize: 10,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.25)',
           margin: '0 0 20px',
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
       >
         También podría resonar contigo
       </p>
@@ -75,8 +74,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
             height: 220,
             cursor: dragging ? 'grabbing' : 'grab',
             userSelect: 'none',
-            overflow: 'hidden',
-          }}
+            overflow: 'hidden' }}
           onMouseDown={onMouseDown}
           onMouseUp={onMouseUp}
           onMouseLeave={() => setDragging(false)}
@@ -137,8 +135,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'flex-end',
-                  overflow: 'hidden',
-                }}
+                  overflow: 'hidden' }}
               >
                 {isCurrent && (
                   <div
@@ -149,8 +146,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                       background:
                         'radial-gradient(ellipse at 50% 0%, rgba(var(--almamundi-orange-rgb), 0.08) 0%, transparent 70%)',
                       borderRadius: 16,
-                      pointerEvents: 'none',
-                    }}
+                      pointerEvents: 'none' }}
                   />
                 )}
 
@@ -158,14 +154,13 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                   <p
                     style={{
                       fontSize: 9,
-                      letterSpacing: '0.14em',
+                      letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       color: isCurrent
                         ? 'rgba(var(--almamundi-orange-rgb), 0.70)'
                         : 'rgba(255,255,255,0.25)',
                       margin: '0 0 4px',
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     {[s.city, s.country].filter(Boolean).join(', ')}
                   </p>
@@ -183,8 +178,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                       display: '-webkit-box',
                       WebkitLineClamp: 2,
                       WebkitBoxOrient: 'vertical',
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     {s.title ?? s.label}
                   </p>
@@ -195,9 +189,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                         fontSize: 10,
                         color: 'rgba(var(--almamundi-orange-rgb), 0.60)',
                         margin: '8px 0 0',
-                        fontFamily: SITE_FONT_STACK,
-                        letterSpacing: '0.04em',
-                      }}
+                        fontFamily: SITE_FONT_STACK }}
                     >
                       Toca para abrir →
                     </p>
@@ -214,8 +206,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
           display: 'flex',
           justifyContent: 'center',
           gap: 6,
-          marginTop: 16,
-        }}
+          marginTop: 16 }}
       >
         {stories.map((_, i) => (
           <button
@@ -233,8 +224,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
               cursor: 'pointer',
               padding: 0,
               outline: 'none',
-              transition: 'all 300ms ease',
-            }}
+              transition: 'all 300ms ease' }}
           />
         ))}
       </div>

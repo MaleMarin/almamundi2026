@@ -22,8 +22,7 @@ function chipStyle(active: boolean) {
       backdropFilter: 'blur(10px) saturate(1.25)',
       WebkitBackdropFilter: 'blur(10px) saturate(1.25)',
       border: '1px solid rgba(255, 150, 90, 0.75)',
-      boxShadow: 'inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 10px rgba(255, 74, 28, 0.22)',
-    };
+      boxShadow: 'inset 0 1px 0 rgba(255, 220, 180, 0.4), 0 2px 10px rgba(255, 74, 28, 0.22)' };
   }
   return {
     padding: '7px 14px',
@@ -40,8 +39,7 @@ function chipStyle(active: boolean) {
     backdropFilter: 'blur(12px) saturate(1.15)',
     WebkitBackdropFilter: 'blur(12px) saturate(1.15)',
     border: '1px solid rgba(255,255,255,0.16)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)',
-  };
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.12)' };
 }
 
 const topicShortLabel: Record<string, string> = {
@@ -53,15 +51,13 @@ const topicShortLabel: Record<string, string> = {
   'medio-ambiente': 'Medio ambiente',
   deportes: 'Deportes',
   ciencia: 'Ciencia',
-  'migracion-derechos': 'Migración',
-};
+  'migracion-derechos': 'Migración' };
 
 function NewsRow({
   news,
   isActive,
   onClick,
-  dimmed = false,
-}: {
+  dimmed = false }: {
   news: NewsItem;
   isActive: boolean;
   onClick: () => void;
@@ -118,12 +114,11 @@ function NewsRow({
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
         width: '100%',
-        opacity: dimmed ? 0.72 : 1,
-      }}
+        opacity: dimmed ? 0.72 : 1 }}
     >
       <p
         style={{
-          fontSize: 16,
+          fontSize: 15,
           fontWeight: 600,
           color: 'rgba(248, 250, 255, 0.98)',
           margin: '0 0 8px',
@@ -131,8 +126,7 @@ function NewsRow({
           display: '-webkit-box',
           WebkitLineClamp: 3,
           WebkitBoxOrient: 'vertical',
-          overflow: 'hidden',
-        }}
+          overflow: 'hidden' }}
       >
         {news.title}
       </p>
@@ -162,8 +156,7 @@ function NewsListSection({
   selectedNews,
   onNewsFocus,
   sectionLabel,
-  dimAll = false,
-}: {
+  dimAll = false }: {
   items: NewsItem[];
   selectedNews: NewsItem | null;
   onNewsFocus: (n: NewsItem) => void;
@@ -181,13 +174,12 @@ function NewsListSection({
         <p
           style={{
             fontSize: 11,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: sectionLabel === '◎ En el mapa' ? '#FF4A1C' : 'rgba(200, 214, 235, 0.72)',
             margin: '8px 0 2px 2px',
             fontFamily: SITE_FONT_STACK,
-            lineHeight: 1.35,
-          }}
+            lineHeight: 1.35 }}
         >
           {sectionLabel}
         </p>
@@ -196,13 +188,12 @@ function NewsListSection({
         <p
           style={{
             fontSize: 11,
-            letterSpacing: '0.08em',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: '#FF4A1C',
             margin: '4px 0 2px 2px',
             fontFamily: SITE_FONT_STACK,
-            lineHeight: 1.35,
-          }}
+            lineHeight: 1.35 }}
         >
           ◎ En el mapa
         </p>
@@ -258,8 +249,7 @@ export function NewsPanel({
   selectedTopicId,
   onTopicIdChange,
   onNewsFocus,
-  selectedNews,
-}: NewsPanelProps) {
+  selectedNews }: NewsPanelProps) {
   const isAllTopics = selectedTopicId == null;
   const displayTopic = topicNews.length > 0 ? topicNews : isAllTopics ? news : [];
   const displayGeneral = !isAllTopics && relaxedTopic ? generalNews : [];
@@ -287,8 +277,7 @@ export function NewsPanel({
         gap: 10,
         height: '100%',
         minHeight: 0,
-        overflow: 'hidden',
-      }}
+        overflow: 'hidden' }}
     >
       <div style={{ flexShrink: 0, margin: '0 0 4px' }}>
         <p
@@ -297,8 +286,7 @@ export function NewsPanel({
             color: 'rgba(248, 250, 255, 0.82)',
             lineHeight: 1.5,
             margin: 0,
-            fontFamily: SITE_FONT_STACK,
-          }}
+            fontFamily: SITE_FONT_STACK }}
         >
           El mundo sigue su curso mientras se cuentan estas historias. Aquí tienes noticias reales para entenderlo mejor.
         </p>
@@ -309,8 +297,7 @@ export function NewsPanel({
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(96px, 1fr))',
             gap: 7,
-            alignContent: 'start',
-          }}
+            alignContent: 'start' }}
         >
           <button
             type="button"
@@ -321,8 +308,7 @@ export function NewsPanel({
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
               textAlign: 'center',
-              minWidth: 0,
-            }}
+              minWidth: 0 }}
           >
             Todas
           </button>
@@ -337,8 +323,7 @@ export function NewsPanel({
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 textAlign: 'center',
-                minWidth: 0,
-              }}
+                minWidth: 0 }}
               title={g.label}
             >
               {topicShortLabel[g.id] ?? (g.label.length > 14 ? g.label.slice(0, 12) + '…' : g.label)}
@@ -358,8 +343,7 @@ export function NewsPanel({
           overscrollBehavior: 'contain',
           display: 'flex',
           flexDirection: 'column',
-          gap: 8,
-        }}
+          gap: 8 }}
       >
         {isRefreshing && totalVisible > 0 ? (
           <p
@@ -368,8 +352,7 @@ export function NewsPanel({
               color: 'rgba(180, 198, 220, 0.65)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.35,
-              padding: '0 4px',
-            }}
+              padding: '0 4px' }}
           >
             Actualizando…
           </p>
@@ -382,8 +365,7 @@ export function NewsPanel({
               color: loading || loadingTimedOut ? 'rgba(212,220,232,0.82)' : 'rgba(255,200,170,0.92)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.5,
-              padding: '10px 4px',
-            }}
+              padding: '10px 4px' }}
           >
             {statusMessage}
           </p>
@@ -396,8 +378,7 @@ export function NewsPanel({
               color: 'rgba(212, 220, 232, 0.88)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.5,
-              padding: '4px 4px 0',
-            }}
+              padding: '4px 4px 0' }}
           >
             No encontramos titulares recientes para esta categoría.
           </p>
@@ -414,15 +395,14 @@ export function NewsPanel({
             <p
               style={{
                 fontSize: 11,
-                letterSpacing: '0.08em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: 'rgba(200, 214, 235, 0.72)',
                 margin: '12px 0 4px 2px',
                 fontFamily: SITE_FONT_STACK,
                 lineHeight: 1.35,
                 borderTop: '1px solid rgba(255,255,255,0.1)',
-                paddingTop: 12,
-              }}
+                paddingTop: 12 }}
             >
               Titulares generales
             </p>

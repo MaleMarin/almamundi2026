@@ -21,8 +21,7 @@ export function HistoriaCreditos({
   ubicacion,
   antecedentes,
   cancionRelacionada,
-  tone = 'light',
-}: HistoriaCreditosProps) {
+  tone = 'light' }: HistoriaCreditosProps) {
   const isDark = tone === 'dark';
   const nameColor = isDark ? 'rgba(245, 240, 232, 0.82)' : undefined;
   const placeColor = isDark ? 'rgba(245, 240, 232, 0.5)' : undefined;
@@ -36,8 +35,7 @@ export function HistoriaCreditos({
         textAlign: 'center',
         width: '100%',
         marginTop: isDark ? '1.15rem' : 0,
-        marginBottom: isDark ? 0 : '1.15rem',
-      }}
+        marginBottom: isDark ? 0 : '1.15rem' }}
     >
       {nombre?.trim() ? (
         <p
@@ -48,8 +46,7 @@ export function HistoriaCreditos({
             letterSpacing: isDark ? '0.2em' : undefined,
             textTransform: isDark ? 'uppercase' : undefined,
             margin: 0,
-            color: nameColor,
-          }}
+            color: nameColor }}
         >
           {nombre}
         </p>
@@ -63,8 +60,7 @@ export function HistoriaCreditos({
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             margin: isDark ? '0.35rem 0 0' : '0.2rem 0 0',
-            color: placeColor,
-          }}
+            color: placeColor }}
         >
           {ubicacion}
         </p>

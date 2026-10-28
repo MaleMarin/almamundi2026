@@ -22,8 +22,7 @@ type Props = {
 };
 
 function KenBurnsViewer({
-  photos,
-}: {
+  photos }: {
   photos: { url: string; name: string; date: string }[];
 }) {
   const [current, setCurrent] = useState(0);
@@ -63,8 +62,7 @@ function KenBurnsViewer({
         width: '100%',
         borderRadius: 16,
         overflow: 'hidden',
-        marginBottom: 24,
-      }}
+        marginBottom: 24 }}
     >
       <div
         style={{
@@ -73,8 +71,7 @@ function KenBurnsViewer({
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 16,
-          background: '#0a0f1e',
-        }}
+          background: '#0a0f1e' }}
       >
         <img
           key={photo.url}
@@ -96,8 +93,7 @@ function KenBurnsViewer({
                 ? 'opacity 1500ms ease, transform 6000ms ease-out'
                 : phase === 'exit'
                   ? 'opacity 1000ms ease'
-                  : 'transform 6000ms ease-out',
-          }}
+                  : 'transform 6000ms ease-out' }}
         />
         <div
           style={{
@@ -108,8 +104,7 @@ function KenBurnsViewer({
             height: 120,
             background:
               'linear-gradient(to top, rgba(5,8,20,0.95) 0%, transparent 100%)',
-            borderRadius: '0 0 16px 16px',
-          }}
+            borderRadius: '0 0 16px 16px' }}
         />
         <div
           style={{
@@ -119,8 +114,7 @@ function KenBurnsViewer({
             right: 18,
             zIndex: 2,
             opacity: phase === 'hold' ? 1 : 0,
-            transition: 'opacity 800ms ease',
-          }}
+            transition: 'opacity 800ms ease' }}
         >
           <p
             style={{
@@ -129,8 +123,7 @@ function KenBurnsViewer({
               color: 'rgba(255,255,255,0.92)',
               margin: '0 0 3px',
               fontFamily: SITE_FONT_STACK,
-              fontStyle: 'italic',
-            }}
+              fontStyle: 'italic' }}
           >
             {photo.name}
           </p>
@@ -139,9 +132,7 @@ function KenBurnsViewer({
               fontSize: 11,
               color: 'rgba(255,255,255,0.40)',
               margin: 0,
-              fontFamily: SITE_FONT_STACK,
-              letterSpacing: '0.06em',
-            }}
+              fontFamily: SITE_FONT_STACK }}
           >
             {photo.date}
           </p>
@@ -154,9 +145,7 @@ function KenBurnsViewer({
             fontSize: 10,
             color: 'rgba(255,255,255,0.35)',
             fontFamily: SITE_FONT_STACK,
-            letterSpacing: '0.08em',
-            zIndex: 2,
-          }}
+            zIndex: 2 }}
         >
           {current + 1} / {photos.length}
         </div>
@@ -167,8 +156,7 @@ function KenBurnsViewer({
             display: 'flex',
             justifyContent: 'center',
             gap: 6,
-            marginTop: 12,
-          }}
+            marginTop: 12 }}
         >
           {photos.map((_, i) => (
             <button
@@ -188,8 +176,7 @@ function KenBurnsViewer({
                 cursor: 'pointer',
                 padding: 0,
                 outline: 'none',
-                transition: 'all 300ms ease',
-              }}
+                transition: 'all 300ms ease' }}
             />
           ))}
         </div>
@@ -343,20 +330,17 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 left: 'auto',
                 top: 'auto',
                 width: 'min(460px, 48vw)',
-                maxHeight: '50vh',
-              }
+                maxHeight: '50vh' }
             : {
                 left: 'clamp(0px, 30vw, 420px)',
                 right: 0,
                 bottom: 0,
-                top: 0,
-              }),
+                top: 0 }),
           zIndex: 40,
           display: 'flex',
           alignItems: compact ? 'stretch' : 'flex-end',
           justifyContent: compact ? 'flex-end' : 'center',
-          pointerEvents: 'none',
-        }}
+          pointerEvents: 'none' }}
       >
         <div
           style={{
@@ -371,8 +355,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               : mounted
                 ? 'storySlideUp 500ms cubic-bezier(0.22,1,0.36,1) forwards'
                 : 'none',
-            opacity: mounted ? 1 : 0,
-          }}
+            opacity: mounted ? 1 : 0 }}
         >
           <div
             style={{
@@ -391,8 +374,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               maxHeight:      '50vh',
               display:        'flex',
               flexDirection:  'column',
-              position:       'relative',
-            }}
+              position:       'relative' }}
           >
             {/* Reflejo de luz en el borde superior */}
             <div aria-hidden style={{
@@ -403,8 +385,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               height:       1,
               background:    'linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)',
               pointerEvents: 'none',
-              zIndex:        1,
-            }} />
+              zIndex:        1 }} />
             <div
               style={{
                 position: 'relative',
@@ -414,32 +395,28 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 flexShrink: 0,
                 display: 'flex',
                 justifyContent: 'space-between',
-                alignItems: 'flex-start',
-              }}
+                alignItems: 'flex-start' }}
             >
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p
                   style={{
                     fontSize: 11,
-                    letterSpacing: '0.16em',
+                    letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     color: 'rgba(var(--almamundi-orange-rgb), 0.70)',
                     margin: '0 0 6px',
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   {[story.city, story.country].filter(Boolean).join(', ')}
                 </p>
                 <h2
                   style={{
-                    fontSize: 'clamp(20px, 3vw, 30px)',
+                    fontSize: 'clamp(18px, 2.7vw, 27px)',
                     fontWeight: 300,
                     color: 'rgba(255,255,255,0.96)',
                     margin: '0 0 4px',
-                    letterSpacing: '-0.02em',
                     lineHeight: 1.2,
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   {story.title ?? story.label}
                 </h2>
@@ -449,8 +426,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     color: 'rgba(255,255,255,0.35)',
                     margin: 0,
                     fontStyle: 'italic',
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   — {story.authorName || story.label}
                 </p>
@@ -461,8 +437,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       color: 'rgba(255,255,255,0.28)',
                       margin: '6px 0 0',
                       fontFamily: SITE_FONT_STACK,
-                      fontStyle: 'italic',
-                    }}
+                      fontStyle: 'italic' }}
                   >
                     Alguien más está aquí ahora.
                   </p>
@@ -481,15 +456,14 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   border: '1px solid rgba(255,255,255,0.12)',
                   color: 'rgba(255,255,255,0.60)',
                   cursor: 'pointer',
-                  fontSize: 18,
+                  fontSize: 16,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
                   marginLeft: 16,
                   outline: 'none',
-                  transition: 'all 150ms ease',
-                }}
+                  transition: 'all 150ms ease' }}
               >
                 ×
               </button>
@@ -502,8 +476,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 overflowY: 'auto',
                 scrollbarWidth: 'none',
                 padding: '24px 24px 28px',
-                flex: 1,
-              }}
+                flex: 1 }}
             >
               {format === 'video' && story.videoUrl && (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
@@ -523,8 +496,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     border: '1px solid rgba(255,255,255,0.08)',
                     borderRadius: 16,
                     padding: '20px',
-                    marginBottom: 24,
-                  }}
+                    marginBottom: 24 }}
                 >
                   <audio
                     controls
@@ -542,11 +514,10 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               {format === 'text' && story.body && (
                 <div
                   style={{
-                    fontSize: 'clamp(15px, 2vw, 18px)',
+                    fontSize: 'clamp(15px, 1.8vw, 16px)',
                     lineHeight: 1.85,
                     color: 'rgba(255,255,255,0.78)',
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   {story.body
                     .split('\n')
@@ -568,16 +539,14 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     padding: '14px 16px',
                     background: 'rgba(8,12,25,0.55)',
                     border: '1px solid rgba(var(--almamundi-orange-rgb), 0.18)',
-                    borderRadius: 16,
-                  }}
+                    borderRadius: 16 }}
                 >
                   <p
                     style={{
                       fontSize: 13,
                       color: 'rgba(255,255,255,0.70)',
                       margin: '0 0 10px',
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     ¿Quieres dejar tu reacción?
                     <span style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
@@ -596,8 +565,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       cursor: 'pointer',
                       fontSize: 12,
                       fontFamily: SITE_FONT_STACK,
-                      padding: 0,
-                    }}
+                      padding: 0 }}
                   >
                     Prefiero escribir
                   </button>
@@ -611,16 +579,14 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     padding: '14px 16px',
                     background: 'rgba(8,12,25,0.55)',
                     border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: 16,
-                  }}
+                    borderRadius: 16 }}
                 >
                   <p
                     style={{
                       fontSize: 13,
                       color: 'rgba(255,255,255,0.70)',
                       margin: '0 0 4px',
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     ¿Hay algo que no dijiste en esta historia?
                   </p>
@@ -629,8 +595,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       fontSize: 11,
                       color: 'rgba(255,255,255,0.28)',
                       margin: '0 0 10px',
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     El autor lo recibirá. Máximo dos líneas.
                   </p>
@@ -652,8 +617,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       fontFamily: SITE_FONT_STACK,
                       resize: 'none',
                       outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
+                      boxSizing: 'border-box' }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
                     <button
@@ -666,8 +630,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                         cursor: 'pointer',
                         fontSize: 12,
                         fontFamily: SITE_FONT_STACK,
-                        padding: 0,
-                      }}
+                        padding: 0 }}
                     >
                       Prefiero grabar voz
                     </button>
@@ -683,8 +646,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                           color: 'rgba(255,255,255,0.55)',
                           cursor: 'pointer',
                           fontSize: 12,
-                          fontFamily: SITE_FONT_STACK,
-                        }}
+                          fontFamily: SITE_FONT_STACK }}
                       >
                         Cerrar
                       </button>
@@ -697,8 +659,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                             await fetch(`/api/stories/${story.id}/addendum`, {
                               method: 'POST',
                               headers: { 'Content-Type': 'application/json' },
-                              body: JSON.stringify({ text: lastSecondText }),
-                            });
+                              body: JSON.stringify({ text: lastSecondText }) });
                           } catch {}
                           setLastSecondSent(true);
                           setEcoPanel(null);
@@ -706,8 +667,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                         style={{
                           padding: '7px 16px',
                           fontSize: 12,
-                          fontFamily: SITE_FONT_STACK,
-                        }}
+                          fontFamily: SITE_FONT_STACK }}
                       >
                         Enviar
                       </button>
@@ -733,10 +693,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     background: 'rgba(8,12,25,0.55)',
                     border: '1px solid rgba(255,255,255,0.07)',
                     borderRadius: 16,
-                    textAlign: 'center',
-                  }}
+                    textAlign: 'center' }}
                 >
-                  <p style={{ fontSize: 16, color: 'rgba(255,255,255,0.82)', margin: '0 0 6px', fontFamily: SITE_FONT_STACK }}>
+                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.82)', margin: '0 0 6px', fontFamily: SITE_FONT_STACK }}>
                     Llevas un rato aquí.
                   </p>
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', margin: '0 0 14px', fontFamily: SITE_FONT_STACK }}>
@@ -759,8 +718,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       color: '#fdba74',
                       cursor: 'pointer',
                       fontSize: 13,
-                      fontFamily: SITE_FONT_STACK,
-                    }}
+                      fontFamily: SITE_FONT_STACK }}
                   >
                     Sí, quiero contarlo
                   </button>
@@ -777,8 +735,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 flexWrap: 'wrap',
                 padding: '12px 16px 14px',
                 borderTop: '1px solid rgba(255,255,255,0.07)',
-                zIndex: 2,
-              }}
+                zIndex: 2 }}
             >
               {format === 'text' && story.body ? (
                 <button
@@ -792,8 +749,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
                     fontSize: 12,
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   {listening ? 'Detener lectura' : 'Cerrar los ojos'}
                 </button>
@@ -808,8 +764,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       await fetch(`/api/stories/${story.id}/resonance`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }),
-                      });
+                        body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }) });
                     } catch {}
                     if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
                     setResonanceSent(true);
@@ -822,8 +777,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     color: 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
                     fontSize: 12,
-                    fontFamily: SITE_FONT_STACK,
-                  }}
+                    fontFamily: SITE_FONT_STACK }}
                 >
                   Esto me llegó
                 </button>
@@ -841,9 +795,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   color: 'rgba(255,255,255,0.38)',
                   fontSize: 12,
                   fontFamily: SITE_FONT_STACK,
-                  textDecoration: 'none',
-                  letterSpacing: '0.01em',
-                }}
+                  textDecoration: 'none' }}
               >
                 Cuenta la tuya
               </HomeHardLink>
@@ -890,8 +842,7 @@ function ActionButton({
   label,
   onClick,
   accent = false,
-  className,
-}: {
+  className }: {
   label: string;
   onClick: () => void;
   accent?: boolean;
@@ -912,8 +863,7 @@ function ActionButton({
         fontSize: 13,
         fontFamily: SITE_FONT_STACK,
         outline: 'none',
-        transition: 'all 180ms ease',
-      }}
+        transition: 'all 180ms ease' }}
     >
       {label}
     </button>

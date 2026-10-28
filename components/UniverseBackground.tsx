@@ -7,8 +7,7 @@ const UNIVERSE_Z_INDEX = -10;
 function StarfieldCanvas({
   width,
   height,
-  enabled,
-}: {
+  enabled }: {
   width: number;
   height: number;
   enabled: boolean;
@@ -55,8 +54,7 @@ function StarfieldCanvas({
         y: Math.random() * h,
         r: 0.5 + Math.random() * 1.1,
         a: 0.4 + Math.random() * 0.4,
-        v: 0.0006 + Math.random() * 0.004,
-      });
+        v: 0.0006 + Math.random() * 0.004 });
     }
     starsRef.current = stars;
 
@@ -78,8 +76,7 @@ function StarfieldCanvas({
           r: 0.35 + Math.random() * 0.9,
           a: 0.52 + Math.random() * 0.38,
           v: 0.0002 + Math.random() * 0.001,
-          cool: Math.random() > 0.65,
-        });
+          cool: Math.random() > 0.65 });
       }
     }
     clustersRef.current = clusters;
@@ -167,8 +164,7 @@ export function UniverseBackground({ enabled = true }: { enabled?: boolean }) {
         zIndex: UNIVERSE_Z_INDEX,
         pointerEvents: 'none',
         overflow: 'hidden',
-        background: 'radial-gradient(ellipse 140% 100% at 50% 100%, #0b1020 0%, #06080f 55%)',
-      }}
+        background: 'radial-gradient(ellipse 140% 100% at 50% 100%, #0b1020 0%, #06080f 55%)' }}
     >
       <StarfieldCanvas width={size.w} height={size.h} enabled={enabled} />
     </div>

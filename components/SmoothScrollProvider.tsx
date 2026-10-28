@@ -7,8 +7,7 @@ import {
   createContext,
   useLayoutEffect,
   useState,
-  type ReactNode,
-} from 'react';
+  type ReactNode } from 'react';
 import 'lenis/dist/lenis.css';
 
 if (typeof window !== 'undefined') {
@@ -31,8 +30,7 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
         easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
         orientation: 'vertical',
         smoothWheel: true,
-        autoRaf: false,
-      });
+        autoRaf: false });
       window.__almamundiLenis = lenisInstance as Window['__almamundiLenis'];
       ScrollTrigger.scrollerProxy(scroller, {
         scrollTop(value) {
@@ -47,10 +45,8 @@ export function SmoothScrollProvider({ children }: { children: ReactNode }) {
             top: 0,
             left: 0,
             width: window.innerWidth,
-            height: window.innerHeight,
-          };
-        },
-      });
+            height: window.innerHeight };
+        } });
       lenisInstance.on('scroll', ScrollTrigger.update);
       tickerCb = (time: number) => {
         lenisInstance?.raf(time * 1000);

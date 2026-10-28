@@ -30,8 +30,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
           fontSize: isDark ? '0.88rem' : '0.92rem',
           letterSpacing: isDark ? '0.06em' : undefined,
           margin: isDark ? '1.1rem 0 0' : '0 0 1rem',
-          color,
-        }}
+          color }}
       >
         <a
           href={href}
@@ -53,8 +52,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
         fontSize: isDark ? '0.88rem' : '0.95rem',
         lineHeight: 1.5,
         margin: isDark ? '1.1rem 0 0' : '0 0 1rem',
-        color,
-      }}
+        color }}
     >
       Esta historia suena a: {text}
     </p>

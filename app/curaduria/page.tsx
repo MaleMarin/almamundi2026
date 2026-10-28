@@ -9,15 +9,13 @@ import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
-  type User,
-} from 'firebase/auth';
+  type User } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   REJECTION_REASON_DETAIL_MAX,
   REJECTION_REASON_OPTIONS,
-  resolvePublicRejectionText,
-} from '@/lib/editorial/rejection-reasons';
+  resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
 import { CONDUCT_GUIDE_HREF, moreInfoMailto } from '@/lib/editorial/edge-case-protocol';
 
 type Submission = {
@@ -108,11 +106,9 @@ export default function CuraduriaPage() {
     try {
       const [subRes, msgRes] = await Promise.all([
         fetch('/api/curate/submissions?status=pending', {
-          headers: { ...authHeaders() },
-        }),
+          headers: { ...authHeaders() } }),
         fetch('/api/curate/reader-messages', {
-          headers: { ...authHeaders() },
-        }),
+          headers: { ...authHeaders() } }),
       ]);
       const data = await subRes.json().catch(() => ({}));
       const msgData = await msgRes.json().catch(() => ({}));
@@ -155,10 +151,8 @@ export default function CuraduriaPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ submissionId }),
-        });
+            Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ submissionId }) });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           setError(data.error || 'Error al publicar.');
@@ -201,15 +195,12 @@ export default function CuraduriaPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
+            Authorization: `Bearer ${idToken}` },
           body: JSON.stringify({
             storyId: submissionId,
             reasonId: resolved.reasonId,
             reasonDetail: resolved.detail || undefined,
-            nota: internalNote || undefined,
-          }),
-        });
+            nota: internalNote || undefined }) });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           setError(data.error || 'Error al rechazar.');
@@ -248,10 +239,8 @@ export default function CuraduriaPage() {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${idToken}`,
-          },
-          body: JSON.stringify({ storyId, messageId, action }),
-        });
+            Authorization: `Bearer ${idToken}` },
+          body: JSON.stringify({ storyId, messageId, action }) });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) {
           setError(data.error || 'Error al revisar el mensaje.');
@@ -339,7 +328,7 @@ export default function CuraduriaPage() {
     return (
       <main className="min-h-screen bg-[#0a0f24] text-white p-8 font-sans flex flex-col gap-6">
         <div className="max-w-md mx-auto mt-16 p-8 rounded-2xl bg-white/5 border border-white/10">
-          <h1 className="text-xl font-bold mb-2">Curaduría Alma Mundi</h1>
+          <h1 className="text-[18px] font-bold mb-2">Curaduría Alma Mundi</h1>
           <p className="text-white/60 text-sm mb-6">Acceso con la misma cuenta que el panel admin.</p>
           <form onSubmit={handleLogin} className="space-y-4">
             <input
@@ -384,7 +373,7 @@ export default function CuraduriaPage() {
       <div className="max-w-4xl mx-auto flex flex-col gap-6">
         <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
           <div>
-            <h1 className="text-2xl font-bold">Curaduría Alma Mundi</h1>
+            <h1 className="text-[22px] font-bold">Curaduría Alma Mundi</h1>
             <p className="text-white/70 text-sm mt-1">
               Sesión: {user.email}{' '}
               <button type="button" onClick={handleLogout} className="text-orange-400 hover:underline ml-2">
@@ -416,7 +405,7 @@ export default function CuraduriaPage() {
         )}
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-lg font-bold">Mensajes a quien cuenta</h2>
+          <h2 className="text-[16px] font-bold">Mensajes a quien cuenta</h2>
           {messages.length === 0 && !loading && (
             <p className="text-white/60">No hay mensajes pendientes de revisión.</p>
           )}
@@ -468,7 +457,7 @@ export default function CuraduriaPage() {
           </ul>
         </section>
 
-        <h2 className="text-lg font-bold">Historias</h2>
+        <h2 className="text-[16px] font-bold">Historias</h2>
         {list.length === 0 && !loading && (
           <p className="text-white/60">No hay envíos pendientes para curar.</p>
         )}
@@ -635,8 +624,7 @@ function EdgeCaseProtocol() {
 function RejectionControls({
   disabled,
   busy,
-  onReject,
-}: {
+  onReject }: {
   disabled: boolean;
   busy: boolean;
   onReject: (reasonId: string, reasonDetail: string, nota: string) => void;

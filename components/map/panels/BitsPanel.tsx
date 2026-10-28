@@ -25,14 +25,12 @@ const linkButtonStyle = (density: 'compact' | 'readable'): React.CSSProperties =
   fontFamily: SITE_FONT_STACK,
   fontSize: density === 'readable' ? 13 : 11,
   fontWeight: 600,
-  letterSpacing: '0.04em',
   textDecoration: 'none',
   border: '1px solid rgba(120, 180, 255, 0.45)',
   background: 'rgba(30, 70, 120, 0.35)',
   color: 'rgba(200, 230, 255, 0.98)',
   boxShadow: '0 4px 18px rgba(0, 40, 90, 0.25)',
-  transition: 'background 160ms ease, border-color 160ms ease',
-});
+  transition: 'background 160ms ease, border-color 160ms ease' });
 
 export type BitsPanelProps = {
   bits: BitLike[] | HuellaPunto[];
@@ -66,8 +64,7 @@ function BitsPanelIntro() {
           fontSize: 13,
           color: 'rgba(248, 250, 255, 0.82)',
           lineHeight: 1.5,
-          margin: 0,
-        }}
+          margin: 0 }}
       >
         El mundo está lleno de historias sorprendentes. La tuya también merece contarse.
       </p>
@@ -88,14 +85,12 @@ const rowBase: React.CSSProperties = {
   borderRadius: 8,
   padding: '8px 10px',
   marginBottom: 4,
-  transition: 'background 160ms ease, border-color 160ms ease',
-};
+  transition: 'background 160ms ease, border-color 160ms ease' };
 
 function BitIndexRow({
   bit,
   isActive,
-  onClick,
-}: {
+  onClick }: {
   bit: BitLike | HuellaPunto;
   isActive: boolean;
   onClick: () => void;
@@ -109,10 +104,9 @@ function BitIndexRow({
         ...rowBase,
         background: isActive ? 'rgba(255, 74, 28, 0.28)' : 'rgba(255,255,255,0.08)',
         border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.16)'}`,
-        borderLeft: isActive ? '2px solid #FF4A1C' : '2px solid transparent',
-      }}
+        borderLeft: isActive ? '2px solid #FF4A1C' : '2px solid transparent' }}
     >
-      <span style={{ fontSize: 11, color: '#ff5719', letterSpacing: '0.08em', fontWeight: 600, lineHeight: 1.2 }}>
+      <span style={{ fontSize: 11, color: '#ff5719', fontWeight: 600, lineHeight: 1.2 }}>
         #{num}
       </span>
       <span
@@ -120,8 +114,7 @@ function BitIndexRow({
           fontSize: 13,
           color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
           lineHeight: 1.35,
-          fontWeight: 500,
-        }}
+          fontWeight: 500 }}
       >
         {bit.lugar}
       </span>
@@ -135,8 +128,7 @@ type BitDetailDensity = 'compact' | 'readable';
 function BitDetailCompact({
   bit,
   onSubirMiHistoria,
-  relaxedHeight,
-}: {
+  relaxedHeight }: {
   bit: BitLike | HuellaPunto;
   onSubirMiHistoria: () => void;
   relaxedHeight?: boolean;
@@ -173,8 +165,7 @@ function BitDetailCompact({
           btnPy: 12,
           btnPx: 22,
           btnFs: 14,
-          btnRadius: 999,
-        }
+          btnRadius: 999 }
       : {
           padding: '12px 11px 14px',
           radius: 11,
@@ -200,8 +191,7 @@ function BitDetailCompact({
           btnPy: 9,
           btnPx: 16,
           btnFs: 12,
-          btnRadius: 999,
-        };
+          btnRadius: 999 };
 
   const boxStyle: React.CSSProperties = {
     maxWidth: '100%',
@@ -215,8 +205,7 @@ function BitDetailCompact({
     WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
     boxShadow: '0 12px 44px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.5)',
     boxSizing: 'border-box',
-    fontFamily: SITE_FONT_STACK,
-  };
+    fontFamily: SITE_FONT_STACK };
 
   return (
     <div style={boxStyle}>
@@ -227,8 +216,7 @@ function BitDetailCompact({
           letterSpacing: s.metaTrack,
           textTransform: 'uppercase',
           margin: `0 0 ${s.metaMb}px`,
-          lineHeight: 1.35,
-        }}
+          lineHeight: 1.35 }}
       >
         #{num} · {bit.pais}
       </p>
@@ -238,8 +226,7 @@ function BitDetailCompact({
           fontWeight: 600,
           color: 'rgba(255,255,255,0.94)',
           margin: `0 0 ${s.lugarMb}px`,
-          lineHeight: s.lugarLh,
-        }}
+          lineHeight: s.lugarLh }}
       >
         {bit.lugar}
       </p>
@@ -251,8 +238,7 @@ function BitDetailCompact({
           letterSpacing: s.labelTrack,
           textTransform: 'uppercase',
           margin: `0 0 ${s.labelMb}px`,
-          lineHeight: 1.35,
-        }}
+          lineHeight: 1.35 }}
       >
         Qué pasó aquí
       </p>
@@ -262,8 +248,7 @@ function BitDetailCompact({
           fontWeight: 600,
           color: 'rgba(240,245,255,0.96)',
           lineHeight: s.tituloLh,
-          margin: `0 0 ${s.tituloMb}px`,
-        }}
+          margin: `0 0 ${s.tituloMb}px` }}
       >
         {titulo}
       </p>
@@ -275,8 +260,7 @@ function BitDetailCompact({
             color: s.historiaColor,
             lineHeight: s.historiaLh,
             margin: `0 0 ${s.historiaMb}px`,
-            whiteSpace: 'pre-wrap',
-          }}
+            whiteSpace: 'pre-wrap' }}
         >
           {historia}
         </p>
@@ -286,8 +270,7 @@ function BitDetailCompact({
             fontSize: s.emptyFs,
             color: 'rgba(255,255,255,0.42)',
             lineHeight: s.emptyLh,
-            margin: `0 0 ${s.historiaMb}px`,
-          }}
+            margin: `0 0 ${s.historiaMb}px` }}
         >
           Este mapa se construye con historias como la tuya.
         </p>
@@ -298,8 +281,7 @@ function BitDetailCompact({
           marginTop: density === 'readable' ? 20 : 14,
           display: 'flex',
           flexDirection: 'column',
-          gap: density === 'readable' ? 10 : 8,
-        }}
+          gap: density === 'readable' ? 10 : 8 }}
       >
         <a
           href={googleMapsUrl(bit.lat, bit.lon)}
@@ -325,12 +307,10 @@ function BitDetailCompact({
             color: '#ffffff',
             fontSize: s.btnFs,
             fontWeight: 600,
-            letterSpacing: '0.04em',
             width: '100%',
             background: 'linear-gradient(180deg, #FF4A1C 0%, #FF4A1C 100%)',
             border: '1px solid rgba(255, 170, 110, 0.9)',
-            boxShadow: '0 8px 28px rgba(255, 74, 28, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)',
-          }}
+            boxShadow: '0 8px 28px rgba(255, 74, 28, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)' }}
         >
           Cuenta tu historia
         </button>
@@ -344,8 +324,7 @@ export function BitsPanel({
   selectedBit,
   onSelectBit,
   onSubirMiHistoria,
-  showIndexList = true,
-}: BitsPanelProps) {
+  showIndexList = true }: BitsPanelProps) {
   if (!showIndexList) {
     return (
       <div
@@ -370,9 +349,7 @@ export function BitsPanel({
                 fontSize: 15,
                 color: 'rgba(255,255,255,0.58)',
                 lineHeight: 1.65,
-                margin: '8px 4px 0',
-                letterSpacing: '0.01em',
-              }}
+                margin: '8px 4px 0' }}
             >
               Toca un punto <span style={{ color: '#FF4A1C', fontWeight: 700 }}>brillante</span> en el
               globo para leer el hecho curioso de ese lugar.
@@ -410,12 +387,11 @@ export function BitsPanel({
           <p
             style={{
               fontSize: 9,
-              letterSpacing: '0.14em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.45)',
               margin: '0 0 6px',
-              flexShrink: 0,
-            }}
+              flexShrink: 0 }}
           >
             {count} lugares
           </p>

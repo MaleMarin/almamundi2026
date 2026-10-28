@@ -9,8 +9,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const pregunta = preguntaPorId(resolveQuestionId(id));
   return {
-    title: pregunta ? `${pregunta.tema.es} · AlmaMundi` : 'La pregunta · AlmaMundi',
-  };
+    title: pregunta ? `${pregunta.tema.es} · AlmaMundi` : 'La pregunta · AlmaMundi' };
 }
 
 export default async function PreguntaRespuestasPage({ params }: Props) {

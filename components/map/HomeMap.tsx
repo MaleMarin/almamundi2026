@@ -12,8 +12,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type RefObject,
-} from 'react';
+  type RefObject } from 'react';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
@@ -23,8 +22,7 @@ import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import {
   getNewsTopicApiQuery,
-  NEWS_TOPIC_GROUPS,
-} from '@/lib/news-topics';
+  NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { filterRealNewsItems } from '@/components/NewsLayer';
 import { type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
@@ -35,8 +33,7 @@ import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   consumeMapAmbientPending,
   MAP_NAV_GESTURE_EVENT,
-  peekMapAmbientPending,
-} from '@/lib/mapa-home-nav';
+  peekMapAmbientPending } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import { RespuestaGlobeCard } from '@/components/map/RespuestaGlobeCard';
@@ -94,8 +91,7 @@ function huellasFallbackDesdeBitsData(): HuellaPunto[] {
     color: '#f59e0b',
     titulo: b.titulo ?? b.lugar,
     historia: b.historia ?? '',
-    ...(b.fuenteUrl ? { fuenteUrl: b.fuenteUrl } : {}),
-  }));
+    ...(b.fuenteUrl ? { fuenteUrl: b.fuenteUrl } : {}) }));
 }
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
 import { PreguntaPanel } from '@/components/map/panels/PreguntaPanel';
@@ -110,8 +106,7 @@ import {
   stopAmbient,
   setAmbientEnabled,
   hasActiveAmbientPlayback,
-  type AmbientKey,
-} from '@/lib/sound/ambient';
+  type AmbientKey } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
 import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
@@ -127,8 +122,7 @@ const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) 
     <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-transparent text-sm text-white/40">
       Cargando mapa…
     </div>
-  ),
-});
+  ) });
 
 export type HomeMapProps = {
   /**
@@ -175,8 +169,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [globeLayers, setGlobeLayers] = useState<GlobeLayerVisibility>({
     stories: true,
     bits: true,
-    news: false,
-  });
+    news: false });
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
   const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
 
@@ -238,8 +231,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         lat: b.lat,
         lon: b.lon,
         color: b.color,
-        markerKind: 'bit' as const,
-      })),
+        markerKind: 'bit' as const })),
     [huellasPuntos]
   );
 
@@ -332,8 +324,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     const io = new IntersectionObserver(onIntersect, {
       threshold: thresholds,
       root: null,
-      rootMargin: '0px',
-    });
+      rootMargin: '0px' });
     io.observe(section);
     return () => io.disconnect();
   }, [universeSectionRef]);
@@ -509,8 +500,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             geo,
             lat: geo?.lat ?? null,
             lng: geo?.lng ?? null,
-            topic: typeof i.topic === 'string' ? i.topic : topicLabel ?? 'Actualidad',
-          } as NewsItem;
+            topic: typeof i.topic === 'string' ? i.topic : topicLabel ?? 'Actualidad' } as NewsItem;
         });
 
       const apiTopic = topic.length > 80 ? topic.slice(0, 80) : topic;
@@ -518,8 +508,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         kind: 'news',
         topic: apiTopic,
         limit: '20',
-        lang: 'es',
-      });
+        lang: 'es' });
       if (selectedTopicId != null) {
         q.set('topicId', selectedTopicId);
       }
@@ -546,8 +535,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         console.debug('[news] topic', selectedTopicId, apiTopic, {
           topic: topicItems.length,
           general: generalItems.length,
-          relaxedTopic: data.relaxedTopic,
-        });
+          relaxedTopic: data.relaxedTopic });
       }
 
       return {
@@ -555,23 +543,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         generalItems,
         topicMatched: Boolean(data.topicMatched) && topicItems.length > 0,
         relaxedTopic: Boolean(data.relaxedTopic) && generalItems.length > 0,
-        isFallback: Boolean(data.isFallback) && topicItems.length === 0 && generalItems.length === 0,
-      };
+        isFallback: Boolean(data.isFallback) && topicItems.length === 0 && generalItems.length === 0 };
     },
     [selectedTopicId]
   );
 
   const {
     topicItems: topicNewsItems,
-    generalItems: generalNewsItems,
-  } = useNewsLayer(
+    generalItems: generalNewsItems } = useNewsLayer(
     selectedTopicId,
     topicQuery,
     'actualidad',
     fetchNews,
     {
-      refreshIntervalMs: 120_000,
-    }
+      refreshIntervalMs: 120_000 }
   );
   const filteredNewsItems = useMemo(
     () => [...topicNewsItems, ...generalNewsItems],
@@ -598,8 +583,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         markerKind: 'news' as const,
         title: n.title,
         place: n.geo?.label || n.source || n.outletName || undefined,
-        url: n.url,
-      };
+        url: n.url };
     });
   }, [filteredNewsItems, newsMarkersMounted]);
 
@@ -627,8 +611,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       markerKind: 'respuesta' as const,
       title: item.alias,
       place: item.city,
-      color: '#FF4A1C',
-    }));
+      color: '#FF4A1C' }));
   }, [respuestasOnGlobe]);
 
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
@@ -643,9 +626,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         antecedentes: s.antecedentes,
         body: s.body,
         transcription: s.transcription,
-        locale,
-      }),
-    }));
+        locale }) }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
   }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 
@@ -811,15 +792,13 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     exploreQuery,
     onExploreQueryChange: setExploreQuery,
     onStoryFocus: openStoryViewer,
-    highlightedStoryId,
-  };
+    highlightedStoryId };
 
   const sonidosProps = {
     currentMood: selectedMood,
     onMoodChange: (m: string) => setSelectedMood(m),
     soundEnabled,
-    onToggleSound: handleToggleSound,
-  };
+    onToggleSound: handleToggleSound };
 
   /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
   const TIME_STRIP_HEIGHT = 200;
@@ -869,7 +848,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         className="map-timebar-stage relative z-10 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-4 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
-        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] tracking-[0.3em] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
+        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
         <MapRealtimeSyncLine userLat={viewerLat} userLng={viewerLng} />
       </div>
 
@@ -950,8 +929,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           className="pointer-events-none absolute bottom-28 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-full px-4 py-2 text-center text-sm text-white/90"
           style={{
             background: 'rgba(15, 23, 42, 0.82)',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.35)',
-          }}
+            boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}
         >
           {surpriseNotice}
         </p>

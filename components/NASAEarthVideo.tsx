@@ -24,8 +24,7 @@ export type NASAEarthVideoProps = {
 export function NASAEarthVideo({
   src = DEFAULT_VIDEO_SRC,
   fallbackImage = FALLBACK_IMAGE,
-  className = '',
-}: NASAEarthVideoProps) {
+  className = '' }: NASAEarthVideoProps) {
   const [loaded, setLoaded] = useState(false);
   const [error, setError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -48,8 +47,7 @@ export function NASAEarthVideo({
     <div
       className={`relative w-full overflow-hidden rounded-2xl bg-gray-900/10 aspect-video min-h-[200px] ${className}`}
       style={{
-        boxShadow: '0 4px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)',
-      }}
+        boxShadow: '0 4px 24px rgba(0,0,0,0.08), 0 2px 8px rgba(0,0,0,0.04)' }}
     >
       {/* Fallback: imagen de fondo hasta que el vídeo esté listo o si falla */}
       <div
@@ -57,8 +55,7 @@ export function NASAEarthVideo({
         style={{
           backgroundImage: `url(${fallbackImage})`,
           opacity: error || !loaded ? 1 : 0,
-          pointerEvents: error || !loaded ? 'auto' : 'none',
-        }}
+          pointerEvents: error || !loaded ? 'auto' : 'none' }}
         aria-hidden
       />
       <video
@@ -71,8 +68,7 @@ export function NASAEarthVideo({
         preload="auto"
         className="relative w-full h-full object-cover rounded-2xl transition-opacity duration-500"
         style={{
-          opacity: error ? 0 : loaded ? 1 : 0,
-        }}
+          opacity: error ? 0 : loaded ? 1 : 0 }}
         poster={fallbackImage}
         aria-label="Vídeo de la Tierra (NASA Blue Marble)"
       />

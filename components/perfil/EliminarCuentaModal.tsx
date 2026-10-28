@@ -11,8 +11,7 @@ import {
   query,
   where,
   writeBatch,
-  type DocumentReference,
-} from 'firebase/firestore';
+  type DocumentReference } from 'firebase/firestore';
 import { deleteUser, getAuth } from 'firebase/auth';
 import { db } from '@/lib/firebase/client';
 import { clearSavedCollection } from '@/lib/collection';
@@ -61,8 +60,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     padding: '10px 24px',
     fontSize: 12,
     boxShadow: '3px 3px 6px #c4c7cd, -3px -3px 6px #ffffff',
-    cursor: 'pointer',
-  };
+    cursor: 'pointer' };
 
   const dangerBtnStyle: CSSProperties = {
     background: '#C62828',
@@ -72,8 +70,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     padding: '10px 24px',
     fontSize: 12,
     fontWeight: 800,
-    cursor: 'pointer',
-  };
+    cursor: 'pointer' };
 
   const runDelete = useCallback(async () => {
     setErrorMsg(null);
@@ -117,9 +114,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
           'autor.nombre': 'Autor anónimo',
           'autor.avatar': deleteField(),
           'autor.id': deleteField(),
-          updatedAt: now,
-        } as Record<string, unknown>,
-      }));
+          updatedAt: now } as Record<string, unknown> }));
 
       await batchDeleteRefs(guardadasRefs);
       await batchDeleteRefs(muestrasRefs);
@@ -157,8 +152,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     zIndex: 9000,
     display: 'flex',
     alignItems: 'center',
-    justifyContent: 'center',
-  };
+    justifyContent: 'center' };
 
   const panel: CSSProperties = {
     background: '#e6e9ee',
@@ -167,33 +161,28 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     padding: 36,
     maxWidth: 440,
     width: '90%',
-    boxSizing: 'border-box',
-  };
+    boxSizing: 'border-box' };
 
   const titleStyle: CSSProperties = {
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: 800,
     color: '#1a1f2a',
-    letterSpacing: '-0.02em',
     marginBottom: 16,
-    marginTop: 0,
-  };
+    marginTop: 0 };
 
   const paraStyle: CSSProperties = {
     fontSize: 14,
     color: '#5a6070',
     lineHeight: 1.75,
     marginBottom: 24,
-    marginTop: 0,
-  };
+    marginTop: 0 };
 
   const rowStyle: CSSProperties = {
     display: 'flex',
     gap: 12,
     justifyContent: 'flex-end',
     marginTop: 24,
-    flexWrap: 'wrap',
-  };
+    flexWrap: 'wrap' };
 
   return (
     <div
@@ -265,8 +254,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
                 width: '100%',
                 marginBottom: 16,
                 boxSizing: 'border-box',
-                color: '#1a1f2a',
-              }}
+                color: '#1a1f2a' }}
             />
             {errorMsg ? (
               <p style={{ ...paraStyle, marginTop: 0, marginBottom: 12, color: '#C62828' }} role="alert">
@@ -284,8 +272,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
                 style={{
                   ...dangerBtnStyle,
                   opacity: confirmText !== 'ELIMINAR' || loading ? 0.4 : 1,
-                  cursor: confirmText !== 'ELIMINAR' || loading ? 'not-allowed' : 'pointer',
-                }}
+                  cursor: confirmText !== 'ELIMINAR' || loading ? 'not-allowed' : 'pointer' }}
               >
                 Confirmar eliminación
               </button>

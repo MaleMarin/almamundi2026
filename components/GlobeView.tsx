@@ -7,8 +7,7 @@ import { GLOBE_PACIFIC_POV } from '@/lib/map-data/globe-pov';
 const POV_BASE = {
   lat: GLOBE_PACIFIC_POV.lat,
   lng: GLOBE_PACIFIC_POV.lng,
-  altitude: GLOBE_PACIFIC_POV.altitude,
-} as const;
+  altitude: GLOBE_PACIFIC_POV.altitude } as const;
 const POV_LNG_OFFSET_DEG_PER_PANEL = 50;
 /** Espacio entre el panel izquierdo y el globo (solo escritorio). */
 const GAP_PANEL_GLOBE_PX = 24;
@@ -25,8 +24,7 @@ export function computeInitialPOV(panelWidth: number): { lat: number; lng: numbe
   return {
     lat: POV_BASE.lat,
     lng: POV_BASE.lng + lngOffset,
-    altitude: POV_BASE.altitude,
-  };
+    altitude: POV_BASE.altitude };
 }
 
 export type GlobeViewInjected = {
@@ -73,8 +71,7 @@ export function GlobeView({ panelWidth, onGlobeReady, bottomReservePx, topReserv
         maxHeight: totalVerticalReserve > 0 ? `calc(100vh - ${totalVerticalReserve}px)` : '100vh',
         minHeight: 620,
         overflow: 'hidden',
-        zIndex: 10,
-      }}
+        zIndex: 10 }}
     >
       <div
         style={{
@@ -83,8 +80,7 @@ export function GlobeView({ panelWidth, onGlobeReady, bottomReservePx, topReserv
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          paddingTop: totalVerticalReserve > 0 ? '8vh' : 0,
-        }}
+          paddingTop: totalVerticalReserve > 0 ? '8vh' : 0 }}
       >
         <div className="relative" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}>
           {children({ onGlobeReady: injectedOnGlobeReady })}

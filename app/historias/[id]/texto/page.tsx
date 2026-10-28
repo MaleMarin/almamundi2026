@@ -35,13 +35,11 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
       nombre,
       avatar: s.author?.avatar ?? (s as StoryPoint & { authorAvatar?: string }).authorAvatar ?? defaultAvatar(nombre),
       ubicacion,
-      bio: s.author?.bio,
-    },
+      bio: s.author?.bio },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
-    ...questionPublicFields(s),
-  };
+    ...questionPublicFields(s) };
 }
 
 type PageProps = { params: Promise<{ id: string }> };

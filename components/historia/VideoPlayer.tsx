@@ -57,8 +57,7 @@ const btnStyle: React.CSSProperties = {
   alignItems: 'center',
   justifyContent: 'center',
   color: 'rgba(245,240,232,0.75)',
-  transition: 'color 0.15s',
-}
+  transition: 'color 0.15s' }
 
 const PlayIcon = () => (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
@@ -324,8 +323,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             background: 'var(--film)',
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', justifyContent: 'center',
-            zIndex: 100,
-          }}
+            zIndex: 100 }}
           className={`grain ${irisOpen ? 'iris-expand' : ''}`}
         >
           {/* X close button */}
@@ -341,8 +339,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 color: 'rgba(245,240,232,0.6)',
                 cursor: 'pointer', display: 'flex',
                 alignItems: 'center', justifyContent: 'center',
-                zIndex: 200, transition: 'background 0.2s, color 0.2s',
-              }}
+                zIndex: 200, transition: 'background 0.2s, color 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 74, 28,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.6)'; }}
               aria-label="Cerrar"
@@ -358,21 +355,19 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             height: '1px',
             background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
             transition: 'width 1.2s ease',
-            marginBottom: '3rem',
-          }} />
+            marginBottom: '3rem' }} />
 
           {/* AlmaMundi wordmark */}
           <p style={{
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 200,
-            fontSize: '0.7rem',
-            letterSpacing: '0.55em',
+            fontSize: '11.2px',
+            letterSpacing: '0.12em',
             color: 'var(--sepia)',
             textTransform: 'uppercase',
             opacity: intertitlePhase === 'hold' ? 1 : 0,
             transition: 'opacity 0.8s ease 0.3s',
-            marginBottom: '2rem',
-          }}>
+            marginBottom: '2rem' }}>
             AlmaMundi · Historia Personal
           </p>
 
@@ -387,17 +382,15 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
             style={{
               fontFamily: INTERIOR_FONT_STACK,
-              fontSize: 'clamp(2.2rem, 6vw, 4.5rem)',
+              fontSize: 'clamp(2rem, 5.4vw, 4.063rem)',
               fontWeight: 300,
               fontStyle: 'italic',
               color: 'var(--cream)',
               textAlign: 'center',
-              letterSpacing: '0.15em',
               lineHeight: 1.15,
               maxWidth: '72vw',
               opacity: intertitlePhase === 'in' ? 0 : 1,
-              padding: '0 2rem',
-            }}
+              padding: '0 2rem' }}
           >
             {historia.titulo}
           </h1>
@@ -414,16 +407,14 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             height: '1px',
             background: 'linear-gradient(90deg, transparent, var(--sepia), transparent)',
             transition: 'width 1.2s ease',
-            marginTop: '3rem',
-          }} />
+            marginTop: '3rem' }} />
 
           {/* Author pre-credit */}
           <div style={{
             position: 'absolute', bottom: '3.5rem',
             display: 'flex', alignItems: 'center', gap: '1rem',
             opacity: intertitlePhase === 'hold' ? 1 : 0,
-            transition: 'opacity 0.8s ease 0.9s',
-          }}>
+            transition: 'opacity 0.8s ease 0.9s' }}>
             <img
               src={historia.autor.avatar}
               alt={historia.autor.nombre}
@@ -431,28 +422,25 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 width: '36px', height: '36px',
                 borderRadius: '50%',
                 border: '1px solid rgba(255, 74, 28,0.4)',
-                objectFit: 'cover',
-              }}
+                objectFit: 'cover' }}
             />
             <span style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 300,
-              fontSize: '0.8rem',
-              letterSpacing: '0.2em',
+              fontSize: '12.8px',
+              letterSpacing: '0.12em',
               color: 'rgba(245,240,232,0.5)',
-              textTransform: 'uppercase',
-            }}>
+              textTransform: 'uppercase' }}>
               {historia.autor.nombre}
             </span>
             {historia.autor.ubicacion ? (
               <span style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 300,
-                fontSize: '0.68rem',
-                letterSpacing: '0.16em',
+                fontSize: '10.88px',
+                letterSpacing: '0.12em',
                 color: 'rgba(245,240,232,0.4)',
-                textTransform: 'uppercase',
-              }}>
+                textTransform: 'uppercase' }}>
                 {historia.autor.ubicacion}
               </span>
             ) : null}
@@ -475,8 +463,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             background: 'var(--film)',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             cursor: showControls ? 'default' : 'none',
-            overflow: 'hidden',
-          }}
+            overflow: 'hidden' }}
           className="grain iris-expand"
         >
           {/* ── Blurred background (ambiance) ── */}
@@ -487,16 +474,14 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             backgroundPosition: 'center',
             filter: 'blur(40px) brightness(0.2) saturate(0.5)',
             transform: 'scale(1.1)',
-            zIndex: 0,
-          }} />
+            zIndex: 0 }} />
 
           {/* ── Vignette ── */}
           <div style={{
             position: 'absolute', inset: 0,
             background: 'radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.85) 100%)',
             zIndex: 1,
-            pointerEvents: 'none',
-          }} />
+            pointerEvents: 'none' }} />
 
           {/* ── Video ── */}
           <video
@@ -510,8 +495,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               position: 'relative', zIndex: 2,
               width: '100%', height: '100%',
               objectFit: 'contain',
-              maxHeight: siteLayout ? 'min(85dvh, 100%)' : '100vh',
-            }}
+              maxHeight: siteLayout ? 'min(85dvh, 100%)' : '100vh' }}
             playsInline
           >
             {historia.subtitulos ? (
@@ -527,18 +511,16 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             zIndex: 10,
             opacity: showControls ? 1 : 0,
             transition: 'opacity 0.5s ease',
-            display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
-          }}>
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
             <div style={{ pointerEvents: 'none' }}>
               <p style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 200,
-                fontSize: '0.65rem',
-                letterSpacing: '0.5em',
+                fontSize: '10.4px',
+                letterSpacing: '0.12em',
               color: 'var(--sepia)',
               textTransform: 'uppercase',
-              marginBottom: '0.4rem',
-            }}>
+              marginBottom: '0.4rem' }}>
               AlmaMundi
             </p>
               <RespondeALine
@@ -550,10 +532,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
               fontStyle: 'italic',
-              fontSize: 'clamp(1.1rem, 2.5vw, 1.8rem)',
-              color: 'var(--cream)',
-              letterSpacing: '0.05em',
-            }}>
+              fontSize: 'clamp(1rem, 2.25vw, 1.625rem)',
+              color: 'var(--cream)' }}>
               {historia.titulo}
             </h2>
             </div>
@@ -569,8 +549,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                   color: 'rgba(245,240,232,0.7)',
                   cursor: 'pointer', display: 'flex',
                   alignItems: 'center', justifyContent: 'center',
-                  transition: 'background 0.2s, color 0.2s',
-                }}
+                  transition: 'background 0.2s, color 0.2s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 74, 28,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.7)'; }}
                 aria-label="Cerrar"
@@ -593,8 +572,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 background: 'rgba(255, 74, 28,0.15)',
                 border: '1px solid rgba(255, 74, 28,0.5)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                backdropFilter: 'blur(8px)',
-              }}
+                backdropFilter: 'blur(8px)' }}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" fill="var(--sepia)">
                 <polygon points="5,3 19,12 5,21" />
@@ -612,8 +590,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               background: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)',
               zIndex: 10,
               opacity: showControls ? 1 : 0,
-              transition: 'opacity 0.5s ease',
-            }}
+              transition: 'opacity 0.5s ease' }}
           >
             {/* Progress bar */}
             <div style={{ position: 'relative', marginBottom: '1rem' }}>
@@ -625,8 +602,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 borderRadius: '2px',
                 transform: 'translateY(-50%)',
                 pointerEvents: 'none',
-                zIndex: 1,
-              }} />
+                zIndex: 1 }} />
               <input
                 type="range"
                 min={0}
@@ -640,8 +616,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
 
             {/* Controls row */}
             <div style={{
-              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-            }}>
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
               {/* Left: play + volume + time */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.2rem' }}>
                 {/* Play/Pause */}
@@ -675,12 +650,10 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 {/* Time */}
                 <span style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: '0.78rem',
+                  fontSize: '12.48px',
                   fontWeight: 300,
                   color: 'rgba(245,240,232,0.6)',
-                  letterSpacing: '0.08em',
-                  whiteSpace: 'nowrap',
-                }}>
+                  whiteSpace: 'nowrap' }}>
                   {formatTime(currentTime)} / {formatTime(duration)}
                 </span>
               </div>
@@ -694,17 +667,14 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                       width: '28px', height: '28px',
                       borderRadius: '50%',
                       border: '1px solid rgba(255, 74, 28,0.35)',
-                      objectFit: 'cover',
-                    }}
+                      objectFit: 'cover' }}
                     alt={historia.autor.nombre}
                   />
                   <span style={{
                     fontFamily: INTERIOR_FONT_STACK,
-                    fontSize: '0.75rem',
+                    fontSize: '12px',
                     fontWeight: 300,
-                    color: 'rgba(245,240,232,0.55)',
-                    letterSpacing: '0.12em',
-                  }}>
+                    color: 'rgba(245,240,232,0.55)' }}>
                     {historia.autor.nombre}
                   </span>
                 </div>

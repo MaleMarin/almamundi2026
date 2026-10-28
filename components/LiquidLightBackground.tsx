@@ -32,8 +32,7 @@ function attachShaderErrorLogger(renderer: THREE.WebGLRenderer) {
     console.error('[LiquidLightBackground] Error de shader GLSL', {
       programLog: programLog.trim() || '(vacío)',
       vertexLog: vsLog.trim() || '(vacío)',
-      fragmentLog: fsLog.trim() || '(vacío)',
-    });
+      fragmentLog: fsLog.trim() || '(vacío)' });
   };
 }
 
@@ -69,8 +68,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       uSimResolution: { value: new THREE.Vector2(1, 1) },
       uDecay: { value: 0.976 },
       uSplatAmp: { value: 0.11 },
-      uAdvectStr: { value: 4.65 },
-    };
+      uAdvectStr: { value: 4.65 } };
 
     const dispUniforms = {
       uTime: { value: 0 },
@@ -84,8 +82,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       uMetaB: { value: new THREE.Vector2(0.5, 0.5) },
       uMetaC: { value: new THREE.Vector2(0.5, 0.5) },
       uMetaD: { value: new THREE.Vector2(0.5, 0.5) },
-      uMetaE: { value: new THREE.Vector2(0.5, 0.5) },
-    };
+      uMetaE: { value: new THREE.Vector2(0.5, 0.5) } };
 
     const simMaterial = new THREE.ShaderMaterial({
       name: 'LiquidLightSim',
@@ -159,8 +156,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
           float outv = clamp(c + contact + atRest * (1.0 - min(stretch * 0.85, 0.92)), 0.0, 1.0);
           fragColor = vec4(outv, outv, outv, 1.0);
         }
-      `,
-    });
+      ` });
 
     const dispMaterial = new THREE.ShaderMaterial({
       name: 'LiquidLightDisplay',
@@ -326,8 +322,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
 
           fragColor = vec4(col, 1.0);
         }
-      `,
-    });
+      ` });
 
     const geometry = new THREE.PlaneGeometry(2, 2);
     const meshSim = new THREE.Mesh(geometry, simMaterial);
@@ -343,8 +338,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: false,
-      powerPreference: 'high-performance',
-    });
+      powerPreference: 'high-performance' });
     renderer.setClearColor(CLEAR_NEUTRAL, 1);
     attachShaderErrorLogger(renderer);
 
@@ -356,8 +350,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       height: '100%',
       display: 'block',
       zIndex: '0',
-      pointerEvents: 'none',
-    });
+      pointerEvents: 'none' });
 
     mount.appendChild(canvas);
 
@@ -367,16 +360,14 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       wrapS: THREE.ClampToEdgeWrapping,
       wrapT: THREE.ClampToEdgeWrapping,
       depthBuffer: false,
-      stencilBuffer: false,
-    });
+      stencilBuffer: false });
     let rtWrite = new THREE.WebGLRenderTarget(4, 4, {
       minFilter: THREE.LinearFilter,
       magFilter: THREE.LinearFilter,
       wrapS: THREE.ClampToEdgeWrapping,
       wrapT: THREE.ClampToEdgeWrapping,
       depthBuffer: false,
-      stencilBuffer: false,
-    });
+      stencilBuffer: false });
 
     const resizeTargets = (sw: number, sh: number) => {
       rtRead.dispose();
@@ -387,16 +378,14 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
         wrapS: THREE.ClampToEdgeWrapping,
         wrapT: THREE.ClampToEdgeWrapping,
         depthBuffer: false,
-        stencilBuffer: false,
-      });
+        stencilBuffer: false });
       rtWrite = new THREE.WebGLRenderTarget(sw, sh, {
         minFilter: THREE.LinearFilter,
         magFilter: THREE.LinearFilter,
         wrapS: THREE.ClampToEdgeWrapping,
         wrapT: THREE.ClampToEdgeWrapping,
         depthBuffer: false,
-        stencilBuffer: false,
-      });
+        stencilBuffer: false });
       simUniforms.uSimResolution.value.set(sw, sh);
       renderer.setRenderTarget(rtRead);
       renderer.clear(true, true, true);
@@ -432,8 +421,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
       const r = mount.getBoundingClientRect();
       return {
         w: Math.max(1, Math.floor(r.width)),
-        h: Math.max(1, Math.floor(r.height)),
-      };
+        h: Math.max(1, Math.floor(r.height)) };
     };
 
     const setSize = () => {
@@ -570,8 +558,7 @@ export function LiquidLightBackground({ fillParent = false }: LiquidLightBackgro
         zIndex: 0,
         pointerEvents: 'none',
         width: '100%',
-        height: '100%',
-      }}
+        height: '100%' }}
     />
   );
 }

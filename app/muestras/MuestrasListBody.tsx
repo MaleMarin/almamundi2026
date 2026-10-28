@@ -57,8 +57,7 @@ export function MuestrasListBody() {
         backgroundImage:
           'radial-gradient(circle at 50% 0%, rgba(255, 74, 28, 0.14) 0%, rgba(255, 74, 28, 0.04) 28%, transparent 52%)',
         backgroundRepeat: 'no-repeat',
-        backgroundSize: '100% min(70vh, 640px)',
-      }}
+        backgroundSize: '100% min(70vh, 640px)' }}
     >
       <MuestrasInteriorNav />
 
@@ -69,28 +68,27 @@ export function MuestrasListBody() {
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h1
-              className="text-3xl font-semibold leading-tight tracking-tight md:text-4xl"
+              className="text-[27px] font-semibold leading-tight md:text-[32px]"
               style={{ color: neu.textMain }}
             >
               Muestras
             </h1>
             <Link
               href="/muestras"
-              className="shrink-0 self-start rounded-full px-5 py-3 text-[15px] font-semibold uppercase tracking-[0.12em] text-white hover:brightness-92 sm:self-center"
+              className="shrink-0 self-start rounded-full px-5 py-3 text-[14px] font-semibold uppercase text-white hover:brightness-92 sm:self-center tracking-[0.12em]"
               style={{
                 background: '#FF4A1C',
                 color: '#fff',
-                boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.5)',
-              }}
+                boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.5)' }}
             >
               Recorrido cinematográfico
             </Link>
           </div>
         </header>
-        <p className="mb-2 text-lg font-light" style={{ color: neu.textBody }}>
+        <p className="mb-2 text-[16px] font-light" style={{ color: neu.textBody }}>
           Curadurías que conectan historias del mundo.
         </p>
-        <p className="mb-6 text-base font-light" style={{ color: neu.textBody }}>
+        <p className="mb-6 text-[15px] font-light" style={{ color: neu.textBody }}>
           Solo se muestran piezas ya aprobadas por curaduría.
         </p>
 
@@ -112,7 +110,7 @@ export function MuestrasListBody() {
             style={neu.cardProminent}
           >
             <h2
-              className="text-sm font-semibold uppercase tracking-[0.14em]"
+              className="text-sm font-semibold uppercase tracking-[0.12em]"
               style={{ color: neu.textMain }}
             >
               Salas curadas (demo)
@@ -140,7 +138,7 @@ export function MuestrasListBody() {
               <li key={m.slug} className="space-y-2">
                 <MuestrasSalaEntranceLink
                   href={`/muestras/${m.slug}`}
-                  className="block rounded-[22px] px-5 py-4 text-base font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] md:text-lg"
+                  className="block rounded-[22px] px-5 py-4 text-[15px] font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] md:text-[16px]"
                   style={neu.cardProminent}
                 >
                   {m.title}
@@ -169,10 +167,10 @@ export function MuestrasListBody() {
 
         {showEmpty && (
           <section className="rounded-[40px] px-8 py-16 text-center" style={neu.cardProminent}>
-            <p className="text-xl font-light" style={{ color: neu.textMain }}>
+            <p className="text-[18px] font-light" style={{ color: neu.textMain }}>
               Aún no hay muestras publicadas.
             </p>
-            <p className="mt-2 text-base font-light" style={{ color: neu.textBody }}>
+            <p className="mt-2 text-[15px] font-light" style={{ color: neu.textBody }}>
               Cuando la curaduría apruebe piezas, aparecerán aquí agrupadas por tema.
             </p>
           </section>
@@ -185,7 +183,7 @@ export function MuestrasListBody() {
                 t.items.length > 0 && (
                   <section key={t.topic}>
                     <h2
-                      className="mb-4 text-lg font-semibold uppercase tracking-wider"
+                      className="mb-4 text-[16px] font-semibold uppercase tracking-[0.12em]"
                       style={{ color: neu.textMain }}
                     >
                       {t.topicLabel}

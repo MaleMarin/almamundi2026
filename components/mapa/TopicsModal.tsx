@@ -118,7 +118,7 @@ export function TopicsModal({
           {/* Header: Temas + X */}
           <div className="shrink-0 p-5 md:p-6 border-b border-white/10 flex flex-col gap-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 id="temas-modal-title" className="text-white font-semibold tracking-tight text-lg">
+              <h3 id="temas-modal-title" className="text-white font-semibold text-[16px]">
                 Temas
               </h3>
               <button
@@ -166,7 +166,7 @@ export function TopicsModal({
           <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
             {/* Lista de temas filtrados */}
             <section>
-              <div className="text-[11px] font-black tracking-widest uppercase text-white/55 mb-3">
+              <div className="text-[11px] font-black uppercase text-white/55 mb-3 tracking-[0.12em]">
                 Temas
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -190,7 +190,7 @@ export function TopicsModal({
             {q.length > 0 && (
               <section>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] font-black tracking-widest uppercase text-white/55">
+                  <div className="text-[11px] font-black uppercase text-white/55 tracking-[0.12em]">
                     Historias
                   </div>
                   <div className="text-xs text-white/40">

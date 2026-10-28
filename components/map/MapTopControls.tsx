@@ -33,8 +33,7 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
     <div
       style={{
         ...positionStyle,
-        zIndex: navbarZIndex ?? 22,
-      }}
+        zIndex: navbarZIndex ?? 22 }}
     >
       <button
         type="button"
@@ -57,8 +56,7 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
           cursor: 'pointer',
           outline: 'none',
           transition: 'all 200ms ease',
-          boxShadow: soundEnabled ? NEO_PRESSED : NEO_RAISED,
-        }}
+          boxShadow: soundEnabled ? NEO_PRESSED : NEO_RAISED }}
       >
         {soundEnabled ? <Volume2 size={iconSize} /> : <VolumeX size={iconSize} />}
       </button>

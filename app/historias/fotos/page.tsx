@@ -12,8 +12,7 @@ import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasF
 import { useStories } from '@/hooks/useStories';
 import {
   historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker,
-} from '@/lib/historias/historias-format-list-ui';
+  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaFotoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';

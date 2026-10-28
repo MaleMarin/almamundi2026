@@ -38,9 +38,7 @@ function toSalaMuestra(muestra: Muestra): SalaHiloMuestraInput {
       meta: `${it.alias} · ${it.date}`,
       alias: it.alias,
       date: it.date,
-      formato: it.type,
-    })),
-  };
+      formato: it.type })) };
 }
 
 function MuestraDetailBody() {
@@ -66,8 +64,7 @@ function MuestraDetailBody() {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 16,
-          fontFamily: 'var(--font-interna), sans-serif',
-        }}
+          fontFamily: 'var(--font-interna), sans-serif' }}
       >
         <p style={{ margin: 0 }}>No se encontró esta muestra.</p>
         <Link
@@ -89,8 +86,7 @@ function MuestraDetailBody() {
         backgroundColor: '#e6e9ee',
         color: '#1a1f2a',
         position: 'relative',
-        zIndex: 1,
-      }}
+        zIndex: 1 }}
     >
       <SalaHilo muestra={toSalaMuestra(muestra)} skipPortal={skipPortal} />
     </div>
@@ -105,8 +101,7 @@ export default function MuestraDetailPage() {
           style={{
             width: '100%',
             minHeight: 'calc(100vh - 6rem)',
-            backgroundColor: '#e6e9ee',
-          }}
+            backgroundColor: '#e6e9ee' }}
         />
       }
     >

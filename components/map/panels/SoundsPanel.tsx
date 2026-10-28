@@ -7,12 +7,10 @@ import {
   dedupePublicAudioPaths,
   folderHintFromPublicPath,
   friendlyTitleFromPublicPath,
-  publicAudioMoodIdFromPath,
-} from '@/lib/public-audio-mood';
+  publicAudioMoodIdFromPath } from '@/lib/public-audio-mood';
 import {
   getAmbientOrPublicTrackVolume,
-  setAmbientOrPublicTrackVolume,
-} from '@/lib/sound/ambient';
+  setAmbientOrPublicTrackVolume } from '@/lib/sound/ambient';
 
 const AMBIENT_OPTS = [
   { id: 'universo' as const, label: 'Universo', desc: '', place: 'Universo', country: '' },
@@ -43,8 +41,7 @@ function SoundRow({
   isPlaying,
   volume01,
   onSelect,
-  onVolumeChange,
-}: {
+  onVolumeChange }: {
   mood: SoundRowMood;
   isActive: boolean;
   isPlaying: boolean;
@@ -75,8 +72,7 @@ function SoundRow({
         overflow: 'hidden',
         fontFamily: SITE_FONT_STACK,
         flexShrink: 0,
-        minWidth: 0,
-      }}
+        minWidth: 0 }}
     >
       <button
         type="button"
@@ -94,8 +90,7 @@ function SoundRow({
           gap: 12,
           background: 'transparent',
           border: 'none',
-          color: 'inherit',
-        }}
+          color: 'inherit' }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.4 }}>
@@ -113,8 +108,7 @@ function SoundRow({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            color: isPlaying ? '#ffffff' : 'rgba(255,255,255,0.6)',
-          }}
+            color: isPlaying ? '#ffffff' : 'rgba(255,255,255,0.6)' }}
           aria-hidden
         >
           {isPlaying ? <Square size={14} fill="currentColor" /> : <Play size={14} style={{ marginLeft: 2 }} />}
@@ -171,8 +165,7 @@ export function SoundsPanel({
   currentMood,
   onMoodChange,
   soundEnabled,
-  onToggleSound,
-}: SoundsPanelProps) {
+  onToggleSound }: SoundsPanelProps) {
   const [publicPaths, setPublicPaths] = useState<string[]>([]);
   const [publicListError, setPublicListError] = useState<string | null>(null);
   const [volTick, setVolTick] = useState(0);
@@ -241,8 +234,7 @@ export function SoundsPanel({
             color: 'rgba(248, 250, 255, 0.82)',
             lineHeight: 1.5,
             margin: 0,
-            fontFamily: SITE_FONT_STACK,
-          }}
+            fontFamily: SITE_FONT_STACK }}
         >
           Estos sonidos pueden traerte recuerdos de otros lugares. Elige el que quieras mientras exploras el mapa.
         </p>
@@ -268,8 +260,7 @@ export function SoundsPanel({
             fontSize: 13,
             fontFamily: SITE_FONT_STACK,
             outline: 'none',
-            transition: 'all 200ms ease',
-          }}
+            transition: 'all 200ms ease' }}
         >
           {soundEnabled ? 'ON' : 'OFF'}
         </button>
@@ -298,7 +289,7 @@ export function SoundsPanel({
         {publicPathsDeduped.length > 0 ? (
           <>
             <p
-              className="text-[10px] uppercase tracking-wider text-white/35"
+              className="text-[10px] uppercase text-white/35 tracking-[0.12em]"
               style={{ fontFamily: SITE_FONT_STACK, margin: '10px 0 2px', flexShrink: 0 }}
             >
               Más sonidos (tu carpeta public)
@@ -315,8 +306,7 @@ export function SoundsPanel({
                   label: title,
                   desc: '',
                   place: title,
-                  country: folderHintFromPublicPath(p),
-                };
+                  country: folderHintFromPublicPath(p) };
                 return (
                   <div key={id} style={{ minWidth: 0 }} title={p}>
                     <SoundRow

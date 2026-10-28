@@ -28,8 +28,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
 
     const project = (lat: number, lng: number) => ({
       x: ((lng + 180) / 360) * W,
-      y: ((90 - lat) / 180) * H,
-    });
+      y: ((90 - lat) / 180) * H });
 
     ctx.fillStyle = 'rgba(8,12,25,0.0)';
     ctx.fillRect(0, 0, W, H);
@@ -57,12 +56,11 @@ export function ReadingChain({ storyId }: { storyId: string }) {
       <p
         style={{
           fontSize: 10,
-          letterSpacing: '0.16em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.22)',
           margin: '0 0 10px',
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
       >
         Esta historia llegó a
       </p>
@@ -73,8 +71,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
           border: '1px solid rgba(255,255,255,0.07)',
           background: 'rgba(8,12,25,0.60)',
           position: 'relative',
-          height: 100,
-        }}
+          height: 100 }}
       >
         <canvas
           ref={canvasRef}
@@ -88,8 +85,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
             fontSize: 10,
             color: 'rgba(255,255,255,0.20)',
             margin: 0,
-            fontFamily: SITE_FONT_STACK,
-          }}
+            fontFamily: SITE_FONT_STACK }}
         >
           {pulses.length} {pulses.length === 1 ? 'lugar' : 'lugares'}
         </p>

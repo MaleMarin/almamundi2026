@@ -15,21 +15,19 @@ import {
   preguntasDeLaSemana,
   resolveQuestionId,
   type PreguntaSemana,
-  type QuestionMode,
-} from '@/lib/pregunta-semana';
+  type QuestionMode } from '@/lib/pregunta-semana';
 import {
   RESPUESTA_CAPTION_MAX,
   RESPUESTA_PHOTO_MAX_BYTES,
   RESPUESTA_TEXT_MAX,
   RESPUESTA_VOICE_MAX_BYTES,
-  RESPUESTA_VOICE_MAX_SECONDS,
-} from '@/lib/respuestas/constants';
+  RESPUESTA_VOICE_MAX_SECONDS } from '@/lib/respuestas/constants';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 
 type Kind = 'texto' | 'voz' | 'foto';
 
 const fieldClass =
-  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-base text-[#1C1C2E] outline-none focus:border-[#FF4A1C]';
+  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[15px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]';
 
 function pickClass(on: boolean): string {
   return on
@@ -79,8 +77,7 @@ function uploadMedia(
 
 function PreguntaFormInner({
   pregunta,
-  initialMode,
-}: {
+  initialMode }: {
   pregunta: PreguntaSemana;
   initialMode: QuestionMode;
 }) {
@@ -305,9 +302,7 @@ function PreguntaFormInner({
           email,
           consentPrivacyPolicy: adult,
           consentPublicacion: publish,
-          consentTerminos: terms,
-        }),
-      });
+          consentTerminos: terms }) });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error || 'send_failed');
       setSentAlias(alias.trim());
@@ -325,7 +320,7 @@ function PreguntaFormInner({
   if (sentAlias) {
     return (
       <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-8 text-[#1C1C2E]">
-        <p className="text-lg leading-relaxed">{preguntaThanks(locale, sentAlias)}</p>
+        <p className="text-[16px] leading-relaxed">{preguntaThanks(locale, sentAlias)}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
@@ -360,7 +355,7 @@ function PreguntaFormInner({
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
-      <p className="m-0 text-sm leading-relaxed text-[#4A5568] md:text-base">{copy.intro[locale]}</p>
+      <p className="m-0 text-sm leading-relaxed text-[#4A5568] md:text-[15px]">{copy.intro[locale]}</p>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
@@ -369,7 +364,7 @@ function PreguntaFormInner({
           onClick={() => setMode('tu')}
           className={`${pickClass(mode === 'tu')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
-          <span className="text-base font-semibold">{copy.modeYou[locale]}</span>
+          <span className="text-[15px] font-semibold">{copy.modeYou[locale]}</span>
           <span className="text-sm font-semibold leading-snug">{copy.modeYouLine[locale]}</span>
         </button>
         <button
@@ -378,18 +373,18 @@ function PreguntaFormInner({
           onClick={() => setMode('alguien')}
           className={`${pickClass(mode === 'alguien')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
-          <span className="text-base font-semibold">{copy.modeAsk[locale]}</span>
+          <span className="text-[15px] font-semibold">{copy.modeAsk[locale]}</span>
           <span className="text-sm font-semibold leading-snug">{copy.modeAskLine[locale]}</span>
         </button>
       </div>
 
       <div>
         <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
-        <h1 className="m-0 mt-2 text-2xl font-semibold leading-snug">{question}</h1>
+        <h1 className="m-0 mt-2 text-[22px] font-semibold leading-snug">{question}</h1>
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="m-0 text-base font-semibold">{copy.how[locale]}</p>
+        <p className="m-0 text-[15px] font-semibold">{copy.how[locale]}</p>
         <div className="grid grid-cols-3 gap-2">
           {(
             [

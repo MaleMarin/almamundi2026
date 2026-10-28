@@ -28,8 +28,7 @@ export function SunLight({
   fillGround = '#08080a',
   hemisphereIntensity = 0.28,
   ambientIntensity = 0.12,
-  ambientColor = '#5c6572',
-}: SunLightProps) {
+  ambientColor = '#5c6572' }: SunLightProps) {
   const position = useMemo(
     () =>
       [

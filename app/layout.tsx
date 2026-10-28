@@ -20,8 +20,7 @@ const montserrat = Montserrat({
   subsets: ['latin', 'latin-ext'],
   variable: '--font-interna',
   display: 'swap',
-  adjustFontFallback: true,
-});
+  adjustFontFallback: true });
 
 function defaultMetadataBase(): URL {
   const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://almamundi.org';
@@ -40,8 +39,7 @@ export const metadata: Metadata = {
   metadataBase: defaultMetadataBase(),
   title: {
     default: SITE_TITLE,
-    template: '%s · AlmaMundi',
-  },
+    template: '%s · AlmaMundi' },
   description: SITE_DESCRIPTION,
   openGraph: {
     title: SITE_TITLE,
@@ -54,29 +52,23 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
-      },
-    ],
-  },
+        alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto' },
+    ] },
   twitter: {
     card: 'summary_large_image',
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
-    images: ['/og-image.png'],
-  },
+    images: ['/og-image.png'] },
   /**
    * Favicon: `app/icon.png` (convención App Router).
    * Apple: `app/apple-icon.png` (icono al guardar en pantalla de inicio).
    */
   icons: {
     icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],
-    shortcut: '/icon.png',
-  },
-};
+    shortcut: '/icon.png' } };
 
 export default async function RootLayout({
-  children,
-}: Readonly<{
+  children }: Readonly<{
   children: React.ReactNode;
 }>) {
   const jar = await cookies();
@@ -98,7 +90,7 @@ export default async function RootLayout({
         </a>
         <noscript>
           <div className="p-8 text-center">
-            <h1 className="text-2xl font-light text-white/95">{ns.title}</h1>
+            <h1 className="text-[22px] font-light text-white/95">{ns.title}</h1>
             <p className="mt-2 text-white/60">{ns.p}</p>
             <HomeHardLink href="/" className="mt-4 inline-block text-orange-400 hover:underline">
               {ns.link}

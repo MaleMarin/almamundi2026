@@ -18,8 +18,7 @@ import * as THREE from 'three';
 import {
   GLOBE_V2_CLOUD_OUTER_RADIUS_DELTA,
   GLOBE_V2_CLOUD_ROOT_SCALE,
-  GLOBE_V2_TEXTURE_BASE,
-} from '@/lib/globe/globe-v2-assets';
+  GLOBE_V2_TEXTURE_BASE } from '@/lib/globe/globe-v2-assets';
 
 /**
  * ¿El segmento cámara → centro lunar atraviesa la esfera terrestre antes de llegar a la Luna?
@@ -134,8 +133,7 @@ export function MoonSatellite({
   emissiveIntensity = 0.04,
   clipToViewport = false,
   keepBehindEarth = true,
-  nearSideYawRad = Math.PI,
-}: MoonSatelliteProps) {
+  nearSideYawRad = Math.PI }: MoonSatelliteProps) {
   const { camera } = useThree();
   const moonOrbitRootRef = useRef<THREE.Group>(null);
   const moonMeshRef = useRef<THREE.Mesh>(null);
@@ -157,8 +155,7 @@ export function MoonSatellite({
       scratchOc: new THREE.Vector3(),
       worldScale: new THREE.Vector3(),
       ndc: new THREE.Vector3(),
-      invParent: new THREE.Matrix4(),
-    }),
+      invParent: new THREE.Matrix4() }),
     []
   );
 

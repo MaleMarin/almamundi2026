@@ -79,13 +79,13 @@ export default function ExposicionDetailPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Exposiciones</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Exposiciones</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[0.9375rem]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
@@ -94,11 +94,11 @@ export default function ExposicionDetailPage() {
           ← Volver al listado
         </Link>
 
-        <h1 className="text-3xl md:text-4xl font-light mb-2" style={{ color: neu.textMain }}>
+        <h1 className="text-[27px] md:text-[32px] font-light mb-2" style={{ color: neu.textMain }}>
           {exposicion.titulo}
         </h1>
         {exposicion.descripcion && (
-          <p className="text-lg font-light mb-8" style={{ color: neu.textBody }}>
+          <p className="text-[16px] font-light mb-8" style={{ color: neu.textBody }}>
             {exposicion.descripcion}
           </p>
         )}
@@ -179,14 +179,14 @@ export default function ExposicionDetailPage() {
           <section className="rounded-[40px] overflow-hidden" style={neu.card}>
             <div className="p-8 md:p-10 min-h-[280px] flex flex-col">
               <div className="flex-1">
-                <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: neu.textBody }}>
+                <p className="text-xs font-bold uppercase mb-2 tracking-[0.12em]" style={{ color: neu.textBody }}>
                   Pieza {indexPieza + 1} de {total}
                 </p>
-                <h2 className="text-2xl md:text-3xl font-semibold mb-4" style={{ color: neu.textMain }}>
+                <h2 className="text-[22px] md:text-[27px] font-semibold mb-4" style={{ color: neu.textMain }}>
                   {piezaActual?.titulo}
                 </h2>
                 {piezaActual?.descripcion && (
-                  <p className="text-base font-light leading-relaxed" style={{ color: neu.textBody }}>
+                  <p className="text-[15px] font-light leading-relaxed" style={{ color: neu.textBody }}>
                     {piezaActual.descripcion}
                   </p>
                 )}

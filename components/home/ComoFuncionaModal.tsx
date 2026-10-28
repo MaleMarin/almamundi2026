@@ -22,14 +22,11 @@ const soft = {
       '-11px -11px 26px rgba(255, 255, 255, 0.96)',
       'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
       'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
-    ].join(', '),
-  },
-} as const;
+    ].join(', ') } } as const;
 
 export function ComoFuncionaModal({
   isOpen,
-  onClose,
-}: {
+  onClose }: {
   isOpen: boolean;
   onClose: () => void;
 }) {
@@ -60,19 +57,18 @@ export function ComoFuncionaModal({
           ...soft.button,
           backgroundColor: soft.bg,
           borderRadius: 28,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
         onClick={(e) => e.stopPropagation()}
       >
         <h2
           id="como-funciona-titulo"
-          className="text-xl font-semibold md:text-2xl"
+          className="text-[18px] font-semibold md:text-[22px]"
           style={{ color: soft.textMain }}
         >
           ¿Cómo funciona?
         </h2>
         <div
-          className="mt-5 space-y-3 text-[0.8125rem] leading-relaxed md:space-y-3.5 md:text-sm"
+          className="mt-5 space-y-3 text-[13px] leading-relaxed md:space-y-3.5 md:text-sm"
           style={{ color: soft.textBody }}
         >
           <p>AlmaMundi es un mapa vivo de historias humanas.</p>

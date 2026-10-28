@@ -11,8 +11,7 @@ import {
   useId,
   useLayoutEffect,
   useRef,
-  useState,
-} from 'react';
+  useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
@@ -37,8 +36,7 @@ function HiloSvgGuide({
   w,
   h,
   knotCount,
-  t,
-}: {
+  t }: {
   w: number;
   h: number;
   /** Puntos del hilo (mismas posiciones que `kpos` en 3D). */
@@ -64,8 +62,7 @@ function HiloSvgGuide({
         inset: 0,
         zIndex: 1,
         pointerEvents: 'none',
-        opacity: 1,
-      }}
+        opacity: 1 }}
       aria-hidden
     >
       <polyline
@@ -148,8 +145,7 @@ const SHADOW_LIGHT = '#ffffff';
 
 export function SalaHilo({
   muestra,
-  skipPortal,
-}: {
+  skipPortal }: {
   muestra: SalaHiloMuestraInput;
   /** Si es true, se omite la tarjeta «SALA · MUESTRA CURADA» y se entra al hilo; «Salir» vuelve al listado o al portal. `?portal=1` en la URL muestra primero la tarjeta. */
   skipPortal: boolean;
@@ -192,8 +188,7 @@ export function SalaHilo({
         top: cy,
         tx: Math.cos(angle) * dist,
         ty: Math.sin(angle) * dist,
-        size: 3 + Math.random() * 3,
-      });
+        size: 3 + Math.random() * 3 });
     }
     setParticles((p) => [...p, ...next]);
     window.setTimeout(() => {
@@ -307,8 +302,7 @@ export function SalaHilo({
     const r = wrap.getBoundingClientRect();
     mouseRef.current = {
       x: clientX - r.left,
-      y: clientY - r.top,
-    };
+      y: clientY - r.top };
   };
 
   const onThreadPointerMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -382,8 +376,7 @@ export function SalaHilo({
   from { opacity: 0.7; transform: translate(0,0) scale(1); }
   to { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.1); }
 }
-`,
-      }}
+` }}
     />
   );
 
@@ -399,8 +392,7 @@ export function SalaHilo({
         minHeight: 'max(32rem, calc(100dvh - 7rem))',
         background: BG,
         color: TEXT_PRIMARY,
-        fontFamily: 'var(--font-interna), sans-serif',
-      }}
+        fontFamily: 'var(--font-interna), sans-serif' }}
     >
       {styleTag}
 
@@ -416,8 +408,7 @@ export function SalaHilo({
             opacity: portalOpacity,
             transition: 'opacity 0.7s ease',
             pointerEvents: portalOpacity > 0 ? 'auto' : 'none',
-            overflow: 'auto',
-          }}
+            overflow: 'auto' }}
         >
           <div
             aria-hidden
@@ -426,8 +417,7 @@ export function SalaHilo({
               inset: 0,
               zIndex: 0,
               pointerEvents: 'none',
-              background: portalBackdrop,
-            }}
+              background: portalBackdrop }}
           />
           <div
             style={{
@@ -437,8 +427,7 @@ export function SalaHilo({
               flexDirection: 'column',
               justifyContent: 'center',
               padding: '0 8vw',
-              perspective: '1600px',
-            }}
+              perspective: '1600px' }}
           >
             <div
               style={{
@@ -452,37 +441,33 @@ export function SalaHilo({
                 WebkitBackdropFilter: 'blur(16px) saturate(120%)',
                 boxShadow:
                   '22px 32px 56px rgba(85, 98, 118, 0.28), -14px -20px 44px rgba(255, 255, 255, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.7)',
-                border: '1px solid rgba(255, 255, 255, 0.5)',
-              }}
+                border: '1px solid rgba(255, 255, 255, 0.5)' }}
             >
           <p
             style={{
               fontSize: 10,
-              letterSpacing: '0.24em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#FF4A1C',
               marginTop: 0,
               marginRight: 0,
               marginBottom: 20,
-              marginLeft: 0,
-            }}
+              marginLeft: 0 }}
           >
             sala · muestra curada
           </p>
 
           <h1
             style={{
-              fontSize: 'clamp(42px, 7vw, 80px)',
+              fontSize: 'clamp(38px, 6.3vw, 72px)',
               fontWeight: 800,
-              letterSpacing: '-0.03em',
               lineHeight: 1.02,
               color: '#1a1f2a',
               maxWidth: 700,
               marginTop: 0,
               marginRight: 0,
               marginBottom: 16,
-              marginLeft: 0,
-            }}
+              marginLeft: 0 }}
           >
             {muestra.titulo}
           </h1>
@@ -494,16 +479,14 @@ export function SalaHilo({
               marginTop: 0,
               marginRight: 0,
               marginBottom: 16,
-              marginLeft: 0,
-              letterSpacing: '0.02em',
-            }}
+              marginLeft: 0 }}
           >
             Curada por {muestra.curadora}
           </p>
 
           <p
             style={{
-              fontSize: 16,
+              fontSize: 15,
               color: '#5a6070',
               lineHeight: 1.75,
               maxWidth: 480,
@@ -511,8 +494,7 @@ export function SalaHilo({
               marginRight: 0,
               marginBottom: 8,
               marginLeft: 0,
-              whiteSpace: 'pre-line',
-            }}
+              whiteSpace: 'pre-line' }}
           >
             {muestra.descripcion}
           </p>
@@ -520,14 +502,13 @@ export function SalaHilo({
           <p
             style={{
               fontSize: 11,
-              letterSpacing: '0.18em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#b0b6c2',
               marginTop: 0,
               marginRight: 0,
               marginBottom: 44,
-              marginLeft: 0,
-            }}
+              marginLeft: 0 }}
           >
             {muestra.historias.length} historias
           </p>
@@ -544,11 +525,10 @@ export function SalaHilo({
               borderRadius: 100,
               fontSize: 13,
               fontWeight: 800,
-              letterSpacing: '0.08em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: 'none',
-              boxShadow: '6px 6px 12px #c4c7cd, -6px -6px 12px #ffffff',
-            }}
+              boxShadow: '6px 6px 12px #c4c7cd, -6px -6px 12px #ffffff' }}
           >
             Entrar a la sala →
           </button>
@@ -562,8 +542,7 @@ export function SalaHilo({
               zIndex: 3,
               display: 'flex',
               alignItems: 'center',
-              gap: 12,
-            }}
+              gap: 12 }}
           >
             <div
               style={{
@@ -571,16 +550,14 @@ export function SalaHilo({
                 height: 1,
                 background: '#b0b6c2',
                 position: 'relative',
-                overflow: 'hidden',
-              }}
+                overflow: 'hidden' }}
             />
             <span
               style={{
                 fontSize: 10,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                color: '#b0b6c2',
-              }}
+                color: '#b0b6c2' }}
             >
               AlmaMundi
             </span>
@@ -599,8 +576,7 @@ export function SalaHilo({
             overflowX: 'hidden',
             overflowY: 'auto',
             opacity: salaOpacity,
-            transition: 'opacity 0.7s ease',
-          }}
+            transition: 'opacity 0.7s ease' }}
         >
           <div
             aria-hidden
@@ -609,8 +585,7 @@ export function SalaHilo({
               inset: 0,
               zIndex: 0,
               pointerEvents: 'none',
-              background: portalBackdrop,
-            }}
+              background: portalBackdrop }}
           />
           <div
             style={{
@@ -621,17 +596,15 @@ export function SalaHilo({
               gridTemplateColumns: '1fr auto 1fr',
               alignItems: 'center',
               gap: 12,
-              pointerEvents: 'none',
-            }}
+              pointerEvents: 'none' }}
           >
             <span
               style={{
                 fontSize: 10,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: TEXT_HINT,
-                justifySelf: 'start',
-              }}
+                justifySelf: 'start' }}
             >
               AlmaMundi · sala
             </span>
@@ -643,8 +616,7 @@ export function SalaHilo({
                 transition: 'opacity 0.3s ease',
                 pointerEvents: 'none',
                 textAlign: 'center',
-                whiteSpace: 'nowrap',
-              }}
+                whiteSpace: 'nowrap' }}
             >
               {discoveredCount} / {total} descubiertas
             </span>
@@ -661,8 +633,7 @@ export function SalaHilo({
                 borderRadius: 100,
                 boxShadow: `3px 3px 6px ${SHADOW_DARK}, -3px -3px 6px ${SHADOW_LIGHT}`,
                 cursor: 'pointer',
-                fontSize: 12,
-              }}
+                fontSize: 12 }}
             >
               ✕ Salir
             </button>
@@ -689,8 +660,7 @@ export function SalaHilo({
               background:
                 'linear-gradient(180deg, rgba(255,252,240,0.22) 0%, rgba(236,240,248,0.14) 45%, rgba(224,230,240,0.18) 100%)',
               overflow: 'hidden',
-              boxSizing: 'border-box',
-            }}
+              boxSizing: 'border-box' }}
           >
             {!threadMounted ? (
               <div
@@ -701,11 +671,10 @@ export function SalaHilo({
                   alignItems: 'center',
                   justifyContent: 'center',
                   fontSize: 12,
-                  letterSpacing: '0.14em',
+                  letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   color: '#b0b6c2',
-                  zIndex: 3,
-                }}
+                  zIndex: 3 }}
                 aria-busy
               >
                 Cargando hilo…
@@ -749,8 +718,7 @@ export function SalaHilo({
                   zIndex: 5,
                   animation: `salaHiloParticle_${uid} 0.8s forwards`,
                   ['--tx' as string]: `${p.tx}px`,
-                  ['--ty' as string]: `${p.ty}px`,
-                }}
+                  ['--ty' as string]: `${p.ty}px` }}
               />
             ))}
           </div>
@@ -761,7 +729,7 @@ export function SalaHilo({
                 position: 'relative',
                 zIndex: 8,
                 fontSize: 10,
-                letterSpacing: '0.2em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: TEXT_HINT,
                 margin: 0,
@@ -769,8 +737,7 @@ export function SalaHilo({
                 textAlign: 'center',
                 maxWidth: '90%',
                 marginLeft: 'auto',
-                marginRight: 'auto',
-              }}
+                marginRight: 'auto' }}
             >
               Acércate a un nudo del hilo y haz clic para descubrir la historia
             </p>
@@ -793,8 +760,7 @@ export function SalaHilo({
                 padding: '28px 36px 36px',
                 transform: knotPanelOpen ? 'translateY(0)' : 'translateY(100%)',
                 transition: 'transform 0.65s cubic-bezier(0.16, 1, 0.3, 1)',
-                pointerEvents: knotPanelOpen ? 'auto' : 'none',
-              }}
+                pointerEvents: knotPanelOpen ? 'auto' : 'none' }}
             >
               {(() => {
                 const historia = stories[selectedKnot];
@@ -816,8 +782,7 @@ export function SalaHilo({
                       display: 'flex',
                       justifyContent: 'space-between',
                       alignItems: 'flex-start',
-                      gap: 24,
-                    }}
+                      gap: 24 }}
                   >
                     <div style={{ minWidth: 0, flex: 1 }}>
                       <div
@@ -825,8 +790,7 @@ export function SalaHilo({
                           display: 'flex',
                           alignItems: 'center',
                           gap: 7,
-                          marginBottom: 10,
-                        }}
+                          marginBottom: 10 }}
                       >
                         <span
                           style={{
@@ -834,31 +798,27 @@ export function SalaHilo({
                             height: 5,
                             borderRadius: '50%',
                             background: ACCENT,
-                            flexShrink: 0,
-                          }}
+                            flexShrink: 0 }}
                           aria-hidden
                         />
                         <span
                           style={{
                             fontSize: 10,
                             textTransform: 'uppercase',
-                            letterSpacing: '0.2em',
-                            color: ACCENT,
-                          }}
+                            letterSpacing: '0.12em',
+                            color: ACCENT }}
                         >
                           {formatoLabel}
                         </span>
                       </div>
                       <h2
                         style={{
-                          fontSize: 32,
+                          fontSize: 29,
                           fontWeight: 800,
-                          letterSpacing: '-0.025em',
                           lineHeight: 1.1,
                           color: TEXT_PRIMARY,
                           maxWidth: 520,
-                          margin: '0 0 10px 0',
-                        }}
+                          margin: '0 0 10px 0' }}
                       >
                         {historia.titulo}
                       </h2>
@@ -869,8 +829,7 @@ export function SalaHilo({
                           color: '#7a8292',
                           lineHeight: 1.75,
                           maxWidth: 480,
-                          margin: '0 0 12px 0',
-                        }}
+                          margin: '0 0 12px 0' }}
                       >
                         {quoteBody}
                       </p>
@@ -878,8 +837,7 @@ export function SalaHilo({
                         style={{
                           fontSize: 12,
                           color: '#b0b6c2',
-                          margin: 0,
-                        }}
+                          margin: 0 }}
                       >
                         {metaLine}
                       </p>
@@ -890,8 +848,7 @@ export function SalaHilo({
                         flexDirection: 'column',
                         gap: 10,
                         paddingTop: 4,
-                        flexShrink: 0,
-                      }}
+                        flexShrink: 0 }}
                     >
                       <button
                         type="button"
@@ -908,10 +865,9 @@ export function SalaHilo({
                           borderRadius: 100,
                           fontSize: 12,
                           fontWeight: 800,
-                          letterSpacing: '0.08em',
+                          letterSpacing: '0.12em',
                           textTransform: 'uppercase',
-                          cursor: 'pointer',
-                        }}
+                          cursor: 'pointer' }}
                       >
                         Abrir esta historia →
                       </button>
@@ -926,8 +882,7 @@ export function SalaHilo({
                           borderRadius: 100,
                           fontSize: 12,
                           boxShadow: `3px 3px 6px ${SHADOW_DARK}, -3px -3px 6px ${SHADOW_LIGHT}`,
-                          cursor: 'pointer',
-                        }}
+                          cursor: 'pointer' }}
                       >
                         ← Cerrar
                       </button>

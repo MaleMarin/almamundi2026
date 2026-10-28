@@ -58,21 +58,18 @@ export function CookieBanner() {
     alignItems: 'center',
     flexDirection: narrow ? 'column' : 'row',
     gap: narrow ? 10 : 16,
-    border: '1px solid rgba(163,177,198,0.35)',
-  };
+    border: '1px solid rgba(163,177,198,0.35)' };
 
   const textStyle: CSSProperties = {
     fontSize: 12,
     color: '#5a6070',
     lineHeight: 1.45,
-    margin: 0,
-  };
+    margin: 0 };
 
   const linkStyle: CSSProperties = {
     color: '#FF4A1C',
     fontWeight: 600,
-    textDecoration: 'none',
-  };
+    textDecoration: 'none' };
 
   const buttonStyle: CSSProperties = {
     background: '#FF4A1C',
@@ -85,8 +82,7 @@ export function CookieBanner() {
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,
-    alignSelf: narrow ? 'stretch' : 'auto',
-  };
+    alignSelf: narrow ? 'stretch' : 'auto' };
 
   const onAccept = () => {
     try {

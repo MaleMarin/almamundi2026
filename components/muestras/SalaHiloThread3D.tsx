@@ -14,8 +14,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
-  type MutableRefObject,
-} from 'react';
+  type MutableRefObject } from 'react';
 import { kpos, ty } from '@/lib/muestras/sala-hilo-thread-math';
 
 const ACCENT = '#FF4A1C';
@@ -69,8 +68,7 @@ function CameraRig({ W, H }: { W: number; H: number }) {
 function ThreadStrands({
   W,
   H,
-  tRef,
-}: {
+  tRef }: {
   W: number;
   H: number;
   tRef: MutableRefObject<number>;
@@ -129,8 +127,7 @@ function ThreadStrands({
           opacity: s.opacity,
           resolution: res.clone(),
           depthTest: true,
-          depthWrite: true,
-        });
+          depthWrite: true });
         const line = new Line2(geom, mat);
         line.frustumCulled = false;
         /* Sin dashed en LineMaterial: no hace falta computeLineDistances (requiere posiciones ya cargadas). */
@@ -184,8 +181,7 @@ function KnotStoryLabel({
   index,
   story,
   unraveledRef,
-  onKnotPick,
-}: {
+  onKnotPick }: {
   index: number;
   story: SalaHiloThreadStory;
   unraveledRef: MutableRefObject<Set<number>>;
@@ -242,8 +238,7 @@ function KnotStoryLabel({
               : hover
                 ? '1.5px solid rgba(255, 74, 28,0.5)'
                 : '1.5px solid rgba(255, 74, 28,0)',
-            opacity: unraveled ? 0.45 : 1,
-          }}
+            opacity: unraveled ? 0.45 : 1 }}
         >
           <div
             style={{
@@ -251,12 +246,10 @@ function KnotStoryLabel({
               fontWeight: 700,
               color: TEXT_PRIMARY,
               lineHeight: 1.2,
-              letterSpacing: '-0.01em',
               overflow: 'hidden',
               whiteSpace: 'nowrap',
               textOverflow: 'ellipsis',
-              maxWidth: 140,
-            }}
+              maxWidth: 140 }}
             title={story.titulo}
           >
             {titleTrunc}
@@ -267,8 +260,7 @@ function KnotStoryLabel({
               fontWeight: 500,
               color: ACCENT,
               letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-            }}
+              textTransform: 'uppercase' }}
           >
             {fmt}
           </div>
@@ -286,8 +278,7 @@ function Knots3D({
   mouseRef,
   activeKnotRef,
   unraveledRef,
-  onKnotPick,
-}: Pick<
+  onKnotPick }: Pick<
   SalaHiloThread3DProps,
   | 'stories'
   | 'tRef'
@@ -446,8 +437,7 @@ function GroundShadows({
   H,
   stories,
   tRef,
-  unraveledRef,
-}: {
+  unraveledRef }: {
   W: number;
   H: number;
   stories: SalaHiloThreadStory[];
@@ -494,8 +484,7 @@ function Scene(props: SalaHiloThread3DProps) {
     activeKnotRef,
     unraveledRef,
     onKnotPick,
-    discoveredCount: _discoveredTick,
-  } = props;
+    discoveredCount: _discoveredTick } = props;
   void _discoveredTick;
 
   return (
@@ -537,8 +526,7 @@ export function SalaHiloThread3D(props: SalaHiloThread3DProps) {
   const { width: propW, height: propH } = props;
   const [dims, setDims] = useState(() => ({
     w: Math.max(64, propW),
-    h: Math.max(64, propH),
-  }));
+    h: Math.max(64, propH) }));
 
   useLayoutEffect(() => {
     const el = wrapRef.current;
@@ -576,8 +564,7 @@ export function SalaHiloThread3D(props: SalaHiloThread3DProps) {
         width: '100%',
         height: '100%',
         minWidth: 64,
-        minHeight: 64,
-      }}
+        minHeight: 64 }}
     >
       <Canvas
         shadows
@@ -585,8 +572,7 @@ export function SalaHiloThread3D(props: SalaHiloThread3DProps) {
           antialias: true,
           alpha: true,
           /* 'high-performance' a veces elige GPU que no pinta bien en algunos Mac */
-          powerPreference: 'default',
-        }}
+          powerPreference: 'default' }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
@@ -594,8 +580,7 @@ export function SalaHiloThread3D(props: SalaHiloThread3DProps) {
           width: W,
           height: H,
           display: 'block',
-          touchAction: 'none',
-        }}
+          touchAction: 'none' }}
         dpr={[1, 2]}
       >
         <Scene {...sceneProps} />

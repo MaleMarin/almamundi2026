@@ -39,15 +39,13 @@ export function Breadcrumbs({ items, tone = 'light', className = '' }: Breadcrum
     tone === 'light'
       ? {
           ...neu.cardInset,
-          borderRadius: 14,
-        }
+          borderRadius: 14 }
       : {
           backgroundColor: 'rgba(255,255,255,0.06)',
           boxShadow:
             'inset 4px 4px 10px rgba(0,0,0,0.35), inset -3px -3px 8px rgba(255,255,255,0.06)',
           border: '1px solid rgba(255,255,255,0.1)',
-          borderRadius: 14,
-        };
+          borderRadius: 14 };
 
   return (
     <nav aria-label="Migas de pan" className={`w-full min-w-0 ${className}`.trim()}>
@@ -56,10 +54,9 @@ export function Breadcrumbs({ items, tone = 'light', className = '' }: Breadcrum
         style={{
           ...barStyle,
           scrollbarColor:
-            tone === 'dark' ? 'rgba(255,255,255,0.25) transparent' : 'rgba(148,163,184,0.45) transparent',
-        }}
+            tone === 'dark' ? 'rgba(255,255,255,0.25) transparent' : 'rgba(148,163,184,0.45) transparent' }}
       >
-        <ol className="m-0 flex w-max min-w-full list-none flex-nowrap items-center gap-1 px-3 py-2 text-[0.6875rem] leading-snug sm:text-[0.8125rem]">
+        <ol className="m-0 flex w-max min-w-full list-none flex-nowrap items-center gap-1 px-3 py-2 text-[11px] leading-snug sm:text-[13px]">
           {items.map((item, index) => {
             const isLast = index === items.length - 1;
             const key = `${item.label}-${index}`;

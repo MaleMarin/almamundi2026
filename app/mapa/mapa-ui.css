@@ -105,7 +105,7 @@
   border: 1px solid rgba(255,255,255,0.10);
   color: var(--text);
   font-weight: 600;
-  letter-spacing: 0.2px;
+  
 }
 
 .segBtnActive{
@@ -122,9 +122,9 @@
 }
 
 .heroTitle{
-  font-size: 34px;
+  font-size: 31px;
   font-weight: 750;
-  letter-spacing: -0.4px;
+  
   color: var(--text);
   margin: 4px 0 6px;
 }

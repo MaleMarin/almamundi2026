@@ -7,13 +7,11 @@ import {
   useEffect,
   useMemo,
   useState,
-  type ReactNode,
-} from 'react';
+  type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   ALMA_LOCALE_COOKIE,
-  type AlmaLocale,
-} from '@/lib/i18n/locale';
+  type AlmaLocale } from '@/lib/i18n/locale';
 import { HOME_MESSAGES, type HomeMessages } from '@/lib/i18n/home-messages';
 import { SITE_UI_MESSAGES, type SiteUiMessages } from '@/lib/i18n/site-ui-messages';
 import { STORY_FLOW_MESSAGES, type StoryFlowMessages } from '@/lib/i18n/story-flow-messages';
@@ -34,8 +32,7 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 export function LocaleProvider({
   initialLocale,
-  children,
-}: {
+  children }: {
   initialLocale: AlmaLocale;
   children: ReactNode;
 }) {

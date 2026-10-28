@@ -44,8 +44,7 @@ function executeAction(action: VoiceAction) {
   if (action.type === 'openDrawer') {
     window.dispatchEvent(
       new CustomEvent('almamundi:voice:openDrawer', {
-        detail: { mode: action.mode, query: action.query },
-      })
+        detail: { mode: action.mode, query: action.query } })
     );
     return;
   }

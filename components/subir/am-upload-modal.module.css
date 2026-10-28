@@ -40,7 +40,7 @@
 .amModalBrand {
   font-size: 11px;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: #e8441a;
 }
@@ -52,7 +52,7 @@
   background: #f2f2f5;
   border: none;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
   color: #6b6b7b;
   display: flex;
@@ -75,17 +75,17 @@
 .amModalKicker {
   font-size: 12px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  
   color: #3d3d4a;
   margin: 0 0 10px;
 }
 
 .amModalTitle {
-  font-size: clamp(1rem, 4.5vw, 1.85rem);
+  font-size: clamp(0.938rem, 4.05vw, 1.688rem);
   font-weight: 400;
   color: #1c1c2e;
   line-height: 1.18;
-  letter-spacing: -0.02em;
+  
   margin: 0 0 16px;
   white-space: pre-line;
 }
@@ -113,7 +113,7 @@
   border: none;
   border-radius: 50px;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
   color: #1c1c2e;
   cursor: pointer;
@@ -214,7 +214,7 @@
   border-radius: 12px;
   padding: 16px;
   font-family: inherit;
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 400;
   color: #1c1c2e;
   line-height: 1.7;
@@ -306,7 +306,7 @@
   border-radius: 10px;
   padding: 8px 10px;
   font: inherit;
-  font-size: 16px;
+  font-size: 15px;
   color: #1c1c2e;
   background: #fff;
 }
@@ -342,7 +342,7 @@
   border: 1.5px dashed #d0d0da;
   background: #ffffff;
   color: #bbbbcc;
-  font-size: 28px;
+  font-size: 25px;
   cursor: pointer;
 }
 
@@ -378,7 +378,7 @@
   justify-content: center;
   cursor: pointer;
   color: #bbbbcc;
-  font-size: 24px;
+  font-size: 22px;
   transition: border-color 0.2s, color 0.2s;
 }
 
@@ -520,7 +520,7 @@
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  
   white-space: nowrap;
 }
 
@@ -535,14 +535,14 @@
   }
 
   .amModalTitle {
-    font-size: clamp(1rem, 4.5vw, 1.22rem);
-    letter-spacing: -0.025em;
+    font-size: clamp(0.938rem, 4.05vw, 1.125rem);
+    
   }
 
   .amModalTab {
     font-size: 10.5px;
     padding: 8px 4px;
-    letter-spacing: -0.03em;
+    
   }
 
   .amModalTab svg {
@@ -561,7 +561,7 @@
 
 @media (max-width: 360px) {
   .amModalTitle {
-    font-size: clamp(0.98rem, 4.7vw, 1.1rem);
+    font-size: clamp(0.938rem, 4.23vw, 1rem);
   }
 
   .amModalTab {

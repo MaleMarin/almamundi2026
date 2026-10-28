@@ -52,15 +52,13 @@ const FORMATO_TO_ROUTE: Record<StoryEndShareFormat, string> = {
   video: 'video',
   audio: 'audio',
   escrito: 'texto',
-  foto: 'foto',
-};
+  foto: 'foto' };
 
 const FORMATO_TO_LABEL: Record<StoryEndShareFormat, string> = {
   video: 'Video',
   audio: 'Audio',
   escrito: 'Escrito',
-  foto: 'Fotografías',
-};
+  foto: 'Fotografías' };
 
 const TEXT_TITLE = neu.textMain;
 const TEXT_BODY = neu.textBody;
@@ -93,8 +91,7 @@ export function StoryEndScreen({
   questionMode,
   embedInSite = false,
   share,
-  storyId,
-}: StoryEndScreenProps) {
+  storyId }: StoryEndScreenProps) {
   const fechaStr = formatEndFecha(fecha);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -124,8 +121,7 @@ export function StoryEndScreen({
           radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 74, 28,0.085) 0%, transparent 55%),
           radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
           linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
-        `,
-      }
+        ` }
     : {
         position: 'fixed',
         inset: 0,
@@ -142,8 +138,7 @@ export function StoryEndScreen({
           radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 74, 28,0.085) 0%, transparent 55%),
           radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
           linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
-        `,
-      };
+        ` };
 
   return (
     <div
@@ -161,8 +156,7 @@ export function StoryEndScreen({
             backgroundPosition: 'center',
             opacity: 0.2,
             filter: 'blur(64px) saturate(1.15) brightness(1.06)',
-            transform: 'scale(1.05)',
-          }}
+            transform: 'scale(1.05)' }}
         />
       ) : null}
 
@@ -174,8 +168,7 @@ export function StoryEndScreen({
           maxWidth: storyId ? 'min(720px, 100%)' : 'min(560px, 100%)',
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'stretch',
-        }}
+          alignItems: 'stretch' }}
       >
       <div
         style={{
@@ -186,8 +179,7 @@ export function StoryEndScreen({
           padding: '2.65rem clamp(1.35rem, 4vw, 2.85rem)',
           borderRadius: 28,
           textAlign: 'center',
-          boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(163,177,198,0.26)`,
-        }}
+          boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(163,177,198,0.26)` }}
       >
         <RespondeALine
           questionId={questionId}
@@ -199,12 +191,10 @@ export function StoryEndScreen({
           style={{
             fontWeight: 600,
             fontStyle: 'italic',
-            fontSize: 'clamp(1.45rem, 4.2vw, 2.15rem)',
+            fontSize: 'clamp(1.313rem, 3.78vw, 1.938rem)',
             color: TEXT_TITLE,
-            letterSpacing: '0.02em',
             lineHeight: 1.2,
-            marginBottom: hasTitleExtras ? '0.55rem' : '1.35rem',
-          }}
+            marginBottom: hasTitleExtras ? '0.55rem' : '1.35rem' }}
         >
           {titulo}
         </h2>
@@ -221,11 +211,10 @@ export function StoryEndScreen({
             style={{
               margin: '0 auto 1rem',
               maxWidth: '36rem',
-              fontSize: '1rem',
+              fontSize: '15px',
               lineHeight: 1.55,
               color: TEXT_BODY,
-              fontWeight: 500,
-            }}
+              fontWeight: 500 }}
           >
             {subtitulo}
           </p>
@@ -235,12 +224,11 @@ export function StoryEndScreen({
           <p
             style={{
               margin: '0 0 1.35rem',
-              fontSize: '0.72rem',
+              fontSize: '11.52px',
               fontWeight: 600,
-              letterSpacing: '0.14em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: TEXT_BODY,
-            }}
+              color: TEXT_BODY }}
           >
             {fechaStr}
           </p>
@@ -251,9 +239,8 @@ export function StoryEndScreen({
             style={{
               fontStyle: 'italic',
               fontWeight: 500,
-              fontSize: '1.0625rem',
+              fontSize: '15px',
               lineHeight: 1.7,
-              letterSpacing: '0.03em',
               color: neu.textMain,
               borderLeft: `3px solid ${ORANGE}`,
               paddingLeft: '1.2rem',
@@ -264,8 +251,7 @@ export function StoryEndScreen({
               paddingTop: '0.65rem',
               paddingBottom: '0.65rem',
               paddingRight: '0.75rem',
-              boxShadow: neu.cardInset.boxShadow as string,
-            }}
+              boxShadow: neu.cardInset.boxShadow as string }}
           >
             &quot;{citaDestacada}&quot;
           </blockquote>
@@ -280,8 +266,7 @@ export function StoryEndScreen({
             padding: '1.15rem 1.35rem',
             marginBottom: '1.95rem',
             width: '100%',
-            textAlign: 'left',
-          }}
+            textAlign: 'left' }}
         >
           <img
             src={autor.avatar}
@@ -295,20 +280,19 @@ export function StoryEndScreen({
               objectFit: 'cover',
               border: `2px solid ${ORANGE}50`,
               flexShrink: 0,
-              boxShadow: '8px 8px 14px rgba(163,177,198,0.42), -4px -4px 10px rgba(255,255,255,0.65)',
-            }}
+              boxShadow: '8px 8px 14px rgba(163,177,198,0.42), -4px -4px 10px rgba(255,255,255,0.65)' }}
           />
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontWeight: 600, fontSize: '0.98rem', color: TEXT_TITLE, marginBottom: autor.ubicacion ? '0.2rem' : 0 }}>
+            <p style={{ fontWeight: 600, fontSize: '15px', color: TEXT_TITLE, marginBottom: autor.ubicacion ? '0.2rem' : 0 }}>
               {autor.nombre}
             </p>
             {autor.ubicacion ? (
-              <p style={{ fontWeight: 500, fontSize: '0.72rem', letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_BODY }}>
+              <p style={{ fontWeight: 500, fontSize: '11.52px', letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_BODY }}>
                 {autor.ubicacion}
               </p>
             ) : null}
             {autor.bio ? (
-              <p style={{ fontWeight: 400, fontSize: '0.8rem', lineHeight: 1.52, color: TEXT_BODY, marginTop: '0.4rem', opacity: 0.94 }}>
+              <p style={{ fontWeight: 400, fontSize: '12.8px', lineHeight: 1.52, color: TEXT_BODY, marginTop: '0.4rem', opacity: 0.94 }}>
                 {autor.bio}
               </p>
             ) : null}
@@ -326,12 +310,11 @@ export function StoryEndScreen({
               borderRadius: 999,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 600,
-              fontSize: '0.74rem',
-              letterSpacing: '0.22em',
+              fontSize: '11.84px',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: neu.textMain,
-              boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)`,
-            }}
+              boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)` }}
           >
             {replayLabel}
           </button>
@@ -345,10 +328,9 @@ export function StoryEndScreen({
                 padding: '0.92rem 1rem',
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
-                fontSize: '0.74rem',
-                letterSpacing: '0.22em',
-                textTransform: 'uppercase',
-              }}
+                fontSize: '11.84px',
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase' }}
             >
               Compartir
             </button>
@@ -363,14 +345,13 @@ export function StoryEndScreen({
               border: `1px solid rgba(255, 74, 28,0.32)`,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
-              fontSize: '0.74rem',
-              letterSpacing: '0.22em',
+              fontSize: '11.84px',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: 'pointer',
               color: '#fff',
               background: `linear-gradient(165deg, #FF4A1C 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
-              boxShadow: SOFT_ORANGE_SHADOW,
-            }}
+              boxShadow: SOFT_ORANGE_SHADOW }}
           >
             Más historias
           </button>

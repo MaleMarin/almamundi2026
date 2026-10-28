@@ -28,8 +28,7 @@ export function ImageCrossfade({
   intervalMs = DEFAULT_INTERVAL,
   fadeDurationMs = DEFAULT_FADE,
   className = '',
-  style,
-}: ImageCrossfadeProps) {
+  style }: ImageCrossfadeProps) {
   const [index, setIndex] = useState(0);
   const [showingA, setShowingA] = useState(true);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -73,8 +72,7 @@ export function ImageCrossfade({
         style={{
           backgroundImage: `url(${images[index]})`,
           opacity: showingA ? 1 : 0,
-          transition,
-        }}
+          transition }}
       />
       {/* Capa B: siguiente imagen */}
       {hasMultiple && (
@@ -83,8 +81,7 @@ export function ImageCrossfade({
           style={{
             backgroundImage: `url(${images[(index + 1) % n]})`,
             opacity: showingA ? 0 : 1,
-            transition,
-          }}
+            transition }}
         />
       )}
     </div>

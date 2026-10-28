@@ -27,8 +27,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
         borderRadius: 16,
         overflow: 'hidden',
         transition: 'transform 0.2s, box-shadow 0.2s',
-        cursor: onClick ? 'pointer' : 'default',
-      }}
+        cursor: onClick ? 'pointer' : 'default' }}
       onMouseEnter={(e) => {
         if (onClick) {
           e.currentTarget.style.transform = 'translateY(-3px)';
@@ -50,16 +49,14 @@ export function MuestraCard({ muestra, onClick }: Props) {
               width: '100%',
               height: '100%',
               objectFit: 'cover',
-              filter: 'brightness(0.7)',
-            }}
+              filter: 'brightness(0.7)' }}
           />
         ) : (
           <div
             style={{
               position: 'absolute',
               inset: 0,
-              background: 'linear-gradient(135deg, #1a2332 0%, #2d3748 100%)',
-            }}
+              background: 'linear-gradient(135deg, #1a2332 0%, #2d3748 100%)' }}
           />
         )}
         <div
@@ -68,8 +65,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
             inset: 0,
             top: 'auto',
             height: '60%',
-            background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)',
-          }}
+            background: 'linear-gradient(to top, rgba(0,0,0,0.6), transparent)' }}
         />
         <div
           style={{
@@ -78,11 +74,10 @@ export function MuestraCard({ muestra, onClick }: Props) {
             left: 10,
             fontFamily: SITE_FONT_STACK,
             fontWeight: 200,
-            fontSize: '0.6rem',
+            fontSize: '9.6px',
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            color: 'rgba(255,255,255,0.9)',
-          }}
+            letterSpacing: '0.12em',
+            color: 'rgba(255,255,255,0.9)' }}
         >
           {muestra.historiasCount} historias
         </div>
@@ -94,9 +89,8 @@ export function MuestraCard({ muestra, onClick }: Props) {
             margin: 0,
             fontFamily: SITE_FONT_STACK,
             fontStyle: 'italic',
-            fontSize: '0.88rem',
-            color: TEXT_1,
-          }}
+            fontSize: '14.08px',
+            color: TEXT_1 }}
         >
           {muestra.titulo}
         </h3>
@@ -104,25 +98,23 @@ export function MuestraCard({ muestra, onClick }: Props) {
           style={{
             height: 1,
             background: 'rgba(163,177,198,0.25)',
-            margin: '4px 0',
-          }}
+            margin: '4px 0' }}
         />
         <span
           style={{
             display: 'block',
-            fontSize: '0.58rem',
+            fontSize: '9.28px',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             color: ORANGE,
-            marginBottom: 2,
-          }}
+            marginBottom: 2 }}
         >
           Por qué esta muestra
         </span>
         <p
           style={{
             margin: 0,
-            fontSize: '0.68rem',
+            fontSize: '10.88px',
             fontWeight: 300,
             color: TEXT_3,
             fontStyle: 'italic',
@@ -130,8 +122,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
             display: '-webkit-box',
             WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-          }}
+            overflow: 'hidden' }}
         >
           {muestra.sentido}
         </p>

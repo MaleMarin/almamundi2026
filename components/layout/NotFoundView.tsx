@@ -14,14 +14,14 @@ export function NotFoundView() {
   return (
     <main className="font-interna flex flex-1 items-center justify-center px-6 py-16 text-center text-[#1C1C2E]">
       <div className="mx-auto w-full max-w-xl">
-        <h1 className="text-[1.75rem] font-semibold leading-tight sm:text-4xl">{t.lead}</h1>
+        <h1 className="text-[25px] font-semibold leading-tight sm:text-[32px]">{t.lead}</h1>
         <div className="mx-auto mt-8 grid w-full max-w-lg gap-3 sm:max-w-none sm:grid-cols-2">
           <Link href="/mapa" className={cardClass}>
-            <span className="text-base font-semibold text-[#FF4A1C]">{t.mapTitle}</span>
+            <span className="text-[15px] font-semibold text-[#FF4A1C]">{t.mapTitle}</span>
             <span className="text-sm leading-snug text-[#5C5C52]">{t.mapBody}</span>
           </Link>
           <Link href="/historias" className={cardClass}>
-            <span className="text-base font-semibold text-[#FF4A1C]">{t.storiesTitle}</span>
+            <span className="text-[15px] font-semibold text-[#FF4A1C]">{t.storiesTitle}</span>
             <span className="text-sm leading-snug text-[#5C5C52]">{t.storiesBody}</span>
           </Link>
         </div>

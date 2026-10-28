@@ -21,23 +21,20 @@ const glassShell: CSSProperties = {
   WebkitBackdropFilter: 'blur(40px) saturate(1.6)',
   border: '1px solid rgba(255,255,255,0.48)',
   boxShadow:
-    '0 28px 80px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.62), inset 0 0 0 1px rgba(255,255,255,0.12)',
-};
+    '0 28px 80px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.62), inset 0 0 0 1px rgba(255,255,255,0.12)' };
 
 const glassHeaderBar: CSSProperties = {
   background: 'linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.1) 100%)',
   backdropFilter: 'blur(22px)',
   WebkitBackdropFilter: 'blur(22px)',
-  borderBottom: '1px solid rgba(255,255,255,0.32)',
-};
+  borderBottom: '1px solid rgba(255,255,255,0.32)' };
 
 const glassCloseBtn: CSSProperties = {
   background: 'linear-gradient(180deg, rgba(255,255,255,0.34) 0%, rgba(255,255,255,0.14) 100%)',
   backdropFilter: 'blur(16px)',
   WebkitBackdropFilter: 'blur(16px)',
   border: '1px solid rgba(255,255,255,0.5)',
-  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.55)',
-};
+  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.55)' };
 
 type MapDrawerProps = {
   open: boolean;
@@ -104,14 +101,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           style={{
             ...glassShell,
             transform: open ? 'translateY(0)' : 'translateY(100%)',
-            transition: 'transform 280ms cubic-bezier(0.32, 0.72, 0, 1)',
-          }}
+            transition: 'transform 280ms cubic-bezier(0.32, 0.72, 0, 1)' }}
         >
           <div
             className="flex flex-shrink-0 items-center justify-between px-5 py-4"
             style={glassHeaderBar}
           >
-            <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+            <span className="text-[16px] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
               {title}
             </span>
             <button
@@ -130,8 +126,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
             scrollbarWidth: innerScrollPanel ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
-            touchAction: 'pan-y',
-          }}
+            touchAction: 'pan-y' }}
         >
           {children}
         </div>
@@ -158,14 +153,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         style={{
           ...glassShell,
           transform: animatingIn ? 'translateX(0)' : 'translateX(100%)',
-          transition: DRAWER_TRANSITION,
-        }}
+          transition: DRAWER_TRANSITION }}
       >
         <div
           className="flex flex-shrink-0 items-center justify-between px-5 py-4"
           style={glassHeaderBar}
         >
-          <span className="text-lg font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+          <span className="text-[16px] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
             {title}
           </span>
           <button
@@ -184,8 +178,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
             scrollbarWidth: innerScrollPanel ? undefined : 'thin',
             overscrollBehavior: 'contain',
             WebkitOverflowScrolling: 'touch',
-            touchAction: 'pan-y',
-          }}
+            touchAction: 'pan-y' }}
         >
           {children}
         </div>

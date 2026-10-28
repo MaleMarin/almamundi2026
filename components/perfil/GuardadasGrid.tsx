@@ -13,8 +13,7 @@ const FORMAT_EMOJI: Record<string, string> = {
   video: '🎬',
   audio: '🎙️',
   texto: '✍️',
-  foto: '📸',
-};
+  foto: '📸' };
 
 type Props = {
   historias: StoryData[];
@@ -50,8 +49,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
           gap: 8,
           overflowX: 'auto',
           paddingBottom: 8,
-          marginBottom: 16,
-        }}
+          marginBottom: 16 }}
       >
         {FILTERS.map(({ key, label }) => (
           <button
@@ -64,7 +62,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '0.8rem',
+              fontSize: '12.8px',
               background:
                 filter === key
                   ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)`
@@ -73,8 +71,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
               boxShadow:
                 filter === key
                   ? `3px 3px 10px rgba(255,107,43,0.35)`
-                  : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-            }}
+                  : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
           >
             {label}
           </button>
@@ -84,8 +81,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
         style={{
           display: 'grid',
           gridTemplateColumns: `repeat(${columns}, 1fr)`,
-          gap: 12,
-        }}
+          gap: 12 }}
       >
         {filtered.map((h) => {
           const thumb =
@@ -103,24 +99,21 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
                 boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
                 overflow: 'hidden',
                 textDecoration: 'none',
-                color: 'inherit',
-              }}
+                color: 'inherit' }}
             >
               <div
                 style={{
                   height: 70,
                   background: thumb
                     ? `url(${thumb}) center/cover`
-                    : 'linear-gradient(135deg, #1a2332, #2d3748)',
-                }}
+                    : 'linear-gradient(135deg, #1a2332, #2d3748)' }}
               />
               <div style={{ padding: '0.5rem 0.6rem' }}>
                 <span
                   style={{
-                    fontSize: '0.58rem',
+                    fontSize: '9.28px',
                     textTransform: 'uppercase',
-                    color: ORANGE,
-                  }}
+                    color: ORANGE }}
                 >
                   {icon}
                 </span>
@@ -129,10 +122,9 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
                     margin: '2px 0 0',
                     fontFamily: SITE_FONT_STACK,
                     fontStyle: 'italic',
-                    fontSize: '0.72rem',
+                    fontSize: '11.52px',
                     color: '#1a2332',
-                    lineHeight: 1.3,
-                  }}
+                    lineHeight: 1.3 }}
                 >
                   {h.titulo}
                 </p>
@@ -151,11 +143,10 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
             borderRadius: 12,
             border: 'none',
             cursor: 'pointer',
-            fontSize: '0.85rem',
+            fontSize: '13.6px',
             background: '#e8ecf0',
             color: '#4a5568',
-            boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-          }}
+            boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
         >
           Cargar más
         </button>

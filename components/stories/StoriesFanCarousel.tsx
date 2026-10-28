@@ -48,8 +48,7 @@ function audioWaveBarStyle(storyId: string, barIndex: number): CSSProperties {
   return {
     height: `${heightPx}px`,
     animationDelay: `${barIndex * 0.08}s`,
-    animationDuration: `${durationSec}s`,
-  }
+    animationDuration: `${durationSec}s` }
 }
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -85,8 +84,7 @@ function getPos(index: number, active: number) {
     scale:  abs === 0 ? 1 : abs === 1 ? 0.84 : 0.70,
     opacity: abs === 0 ? 1 : abs === 1 ? 0.72 : 0.42,
     zIndex: 10 - abs,
-    isCenter: abs === 0,
-  }
+    isCenter: abs === 0 }
 }
 
 // ─── Component ───────────────────────────────────────────────────────────────
@@ -130,11 +128,9 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         nombre: s.authorName ?? s.author?.name ?? '',
         avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(s.authorName ?? ''),
         ubicacion: formatPlace(s) || undefined,
-        bio: s.author?.bio,
-      },
+        bio: s.author?.bio },
       tags: s.tags,
-      citaDestacada: s.quote,
-    })
+      citaDestacada: s.quote })
   }
 
   const openAudio = (s: StoryPoint) => {
@@ -157,14 +153,12 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         nombre: s.authorName ?? s.author?.name ?? '',
         avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(s.authorName ?? ''),
         ubicacion: formatPlace(s) || undefined,
-        bio: s.author?.bio,
-      },
-      tags: s.tags,
-    })
+        bio: s.author?.bio },
+      tags: s.tags })
   }
 
   if (!stories.length) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: SITE_FONT_STACK, fontSize: '1rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: SITE_FONT_STACK, fontSize: '15px' }}>
       No hay historias por ahora.
     </div>
   )
@@ -274,8 +268,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           flexDirection: 'column',
           alignItems: 'center',
           minHeight: 'min(72vh, 760px)',
-          width: '100%',
-        }}
+          width: '100%' }}
       >
         {/* ── Stage ── */}
         <div style={{ position: 'relative', width: '100%' }}>
@@ -329,8 +322,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                     transform: `translateX(${p.x}px) translateZ(${p.z}px) rotateY(${p.rotY}deg) scale(${p.scale})`,
                     opacity: p.opacity,
                     zIndex: p.zIndex,
-                    filter: !p.isCenter ? 'brightness(0.75) saturate(0.5)' : undefined,
-                  }}
+                    filter: !p.isCenter ? 'brightness(0.75) saturate(0.5)' : undefined }}
                 >
                   {/* Card inner by format */}
                   {fmt === 'texto' ? (
@@ -420,10 +412,10 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         {/* ── Info ── */}
         {current && (
           <div className="sfc-info" key={active}>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '1.45rem', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '21px', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
               {current.title ?? current.label}
             </p>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.18em', textTransform: 'uppercase' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               {authorName}
               <span style={{ display: 'inline-block', width: '1px', height: '10px', background: '#FF4A1C', margin: '0 8px', verticalAlign: 'middle', opacity: 0.5 }} />
               {formatPlace(current)}
@@ -466,7 +458,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 router.push(`/historias/${current.id}`)
               }
             }}
-            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '11px', letterSpacing: '0.28em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             {mode === 'audio' ? 'Escuchar →' : 'Ver esta historia →'}
           </button>
@@ -487,8 +479,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 cursor: isSavedInCollection?.(current.id) ? 'default' : 'pointer',
-                opacity: isSavedInCollection?.(current.id) ? 0.9 : 1,
-              }}
+                opacity: isSavedInCollection?.(current.id) ? 0.9 : 1 }}
             >
               {isSavedInCollection?.(current.id) ? 'En tu colección' : 'Guardar en mi colección'}
             </button>

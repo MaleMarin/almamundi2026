@@ -23,12 +23,10 @@ import { ProceduralStarfield } from '@/components/globe/ProceduralStarfield';
 import {
   computeSunDirection,
   createAtmosphereGlowMaterial,
-  createCityLightsOverlayMaterial,
-} from '@/components/globe/dayNightMaterial';
+  createCityLightsOverlayMaterial } from '@/components/globe/dayNightMaterial';
 import {
   createLandSphereMaterial,
-  createOceanSphereMaterial,
-} from '@/components/globe/globeOceanLandMaterials';
+  createOceanSphereMaterial } from '@/components/globe/globeOceanLandMaterials';
 import {
   applyGlobeV2CameraPreset,
   createGlobeV2NeutralHeightTexture,
@@ -54,8 +52,7 @@ import {
   type GlobeV2CameraPreset,
   type GlobeV2LayerBuildStage,
   type GlobeV2OceanSunDebug,
-  type GlobeV2TextureUrls,
-} from '@/lib/globe/globe-v2-assets';
+  type GlobeV2TextureUrls } from '@/lib/globe/globe-v2-assets';
 import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
 import { useViewerSolarNight } from '@/hooks/useViewerSolarNight';
 import { latLngToCartesianThetaLon, latLngToCartesianThreeJS } from '@/lib/globe-coords';
@@ -68,8 +65,7 @@ import {
   AUTO_ROTATE_POINTER_SPEED,
   AUTO_ROTATE_PROXIMITY_BLEND_DIST,
   MAGNETIC_SPIN_RATE_SMOOTH,
-  type GlobeBitInteractionStore,
-} from '@/lib/globe/globe-bits-magnetic-config';
+  type GlobeBitInteractionStore } from '@/lib/globe/globe-bits-magnetic-config';
 import earthNightStyles from '@/components/globe/globe-earth-night.module.css';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
@@ -176,8 +172,7 @@ function globeNightLook(forceDaylight: boolean, viewerNight: boolean): boolean {
  */
 function CameraPresetRig({
   preset,
-  distance,
-}: {
+  distance }: {
   preset: GlobeV2CameraPreset;
   distance: number;
 }) {
@@ -205,8 +200,7 @@ function InitialViewRig({
   lng,
   distance,
   orbitTarget,
-  alignToSun = true,
-}: {
+  alignToSun = true }: {
   lat: number;
   lng: number;
   distance: number;
@@ -249,8 +243,7 @@ function StoryFocusFlyRig({
   distance,
   orbitTarget,
   planetSpinRef,
-  onArrived,
-}: {
+  onArrived }: {
   lat: number;
   lng: number;
   nonce: number;
@@ -375,8 +368,7 @@ function SyncSunToGlobe({
   getEarthSceneDate,
   cameraRelativeSun = false,
   orbitTarget,
-  frontalSun = false,
-}: {
+  frontalSun = false }: {
   oceanMat: THREE.ShaderMaterial;
   landMat: THREE.ShaderMaterial | null;
   cityLightsMat: THREE.ShaderMaterial | null;
@@ -461,8 +453,7 @@ function AtmosphereGlow({
   getEarthSceneDate,
   homeCinematic,
   cameraRelativeSun = false,
-  orbitTarget,
-}: {
+  orbitTarget }: {
   scale: number;
   fullDay: boolean;
   obliquityXRad: number;
@@ -484,8 +475,7 @@ function AtmosphereGlow({
               power: 5.8,
               innerColor: 0x5aa8ff,
               outerColor: 0x081828,
-              warmColor: 0xffd0b0,
-            }
+              warmColor: 0xffd0b0 }
           : undefined
       ),
     [homeCinematic]
@@ -556,8 +546,7 @@ function EarthGroup({
   embedded,
   cameraRelativeSun = false,
   orbitTarget,
-  spinRateRef,
-}: {
+  spinRateRef }: {
   urls: GlobeV2TextureUrls;
   viewerNight: boolean;
   sunLightRef: RefObject<THREE.DirectionalLight | null>;
@@ -757,8 +746,7 @@ function EarthGroup({
       metalness: 0,
       color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
       emissive: new THREE.Color(0xb8c8dc),
-      emissiveIntensity: viewerNight ? 0.01 : 0.035,
-    });
+      emissiveIntensity: viewerNight ? 0.01 : 0.035 });
   }, [cloudMap, cloudOpacity, viewerNight]);
 
   const cloudUnderlayMaterial = useMemo(() => {
@@ -774,8 +762,7 @@ function EarthGroup({
       metalness: 0,
       color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
       emissive: new THREE.Color(0xb8c8dc),
-      emissiveIntensity: viewerNight ? 0.008 : 0.02,
-    });
+      emissiveIntensity: viewerNight ? 0.008 : 0.02 });
   }, [cloudMap, cloudOpacity, viewerNight]);
 
   const cloudOuterMaterial = useMemo(() => {
@@ -791,8 +778,7 @@ function EarthGroup({
       metalness: 0,
       color: viewerNight ? new THREE.Color(0.88, 0.9, 0.94) : new THREE.Color(0xffffff),
       emissive: new THREE.Color(0xb8c8dc),
-      emissiveIntensity: viewerNight ? 0.01 : 0.025,
-    });
+      emissiveIntensity: viewerNight ? 0.01 : 0.025 });
   }, [cloudMap, cloudOpacity, cloudOuterOpacityFactor, viewerNight]);
 
   useLayoutEffect(() => {
@@ -1050,8 +1036,7 @@ function GlobeScene({
   initialViewLng,
   layerVisibility,
   focusTarget,
-  onFocusArrived,
-}: {
+  onFocusArrived }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
   bits: GlobeBitMarker[];
@@ -1091,8 +1076,7 @@ function GlobeScene({
   const bitInteractionStoreRef = useRef<GlobeBitInteractionStore>({
     pointerOnCanvas: false,
     magneticHoverId: null,
-    pointerGlobeCenterDist: 1,
-  });
+    pointerGlobeCenterDist: 1 });
 
   const getEarthSceneDate = useCallback((): Date => new Date(sceneTimeMsRef.current ?? Date.now()), []);
 
@@ -1146,8 +1130,7 @@ function GlobeScene({
         camY: p.y,
         camZ: p.z,
         dist: p.length(),
-        earthYaw: g?.rotation.y ?? 0,
-      });
+        earthYaw: g?.rotation.y ?? 0 });
     } catch {
       /* cámara aún no lista */
     }
@@ -1446,15 +1429,13 @@ export default function GlobeV2({
   viewerLat,
   viewerLng,
   focusTarget = null,
-  onFocusArrived,
-}: GlobeV2Props) {
+  onFocusArrived }: GlobeV2Props) {
   const urls: GlobeV2TextureUrls = {
     day: textureUrls?.day ?? GLOBE_V2_DEFAULT_TEXTURES.day,
     normal: textureUrls?.normal ?? GLOBE_V2_DEFAULT_TEXTURES.normal,
     clouds: textureUrls?.clouds ?? GLOBE_V2_DEFAULT_TEXTURES.clouds,
     nightLights: textureUrls?.nightLights ?? GLOBE_V2_DEFAULT_TEXTURES.nightLights,
-    heightMap: textureUrls?.heightMap ?? GLOBE_V2_DEFAULT_TEXTURES.heightMap,
-  };
+    heightMap: textureUrls?.heightMap ?? GLOBE_V2_DEFAULT_TEXTURES.heightMap };
 
   const localNight = useViewerSolarNight(viewerLat, viewerLng);
   /**
@@ -1518,8 +1499,7 @@ export default function GlobeV2({
           alpha: false,
           powerPreference: 'high-performance',
           stencil: false,
-          depth: true,
-        }}
+          depth: true }}
         className="relative z-0 h-full w-full"
         dpr={[1, dprMax]}
         onCreated={({ gl }) => {

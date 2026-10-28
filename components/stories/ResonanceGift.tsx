@@ -18,8 +18,7 @@ export function messageYieldsResonanceGift(text: string, locale: AlmaLocale): bo
 export function ResonanceGift({
   text,
   locale,
-  canvasId = 'resonance-gift-canvas',
-}: {
+  canvasId = 'resonance-gift-canvas' }: {
   text: string;
   locale: AlmaLocale;
   canvasId?: string;
@@ -38,8 +37,7 @@ export function ResonanceGift({
       storyId: 'resonance-gift',
       text,
       locale,
-      footer: { at: new Date(), locale },
-    });
+      footer: { at: new Date(), locale } });
   }, [text, locale]);
 
   const downloadPng = useCallback(() => {

@@ -14,8 +14,7 @@ type PageProps = {
 export const metadata: Metadata = {
   title: { absolute: 'AlmaMundi' },
   description: 'AlmaMundi',
-  robots: { index: false, follow: false, nocache: true },
-};
+  robots: { index: false, follow: false, nocache: true } };
 
 function tokenFromSearch(raw: string | string[] | undefined): string | undefined {
   if (typeof raw === 'string') return raw;

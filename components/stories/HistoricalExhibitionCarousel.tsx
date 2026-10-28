@@ -11,8 +11,7 @@ import {
   useRef,
   useState,
   type MouseEvent as ReactMouseEvent,
-  type ReactNode,
-} from 'react';
+  type ReactNode } from 'react';
 import type { Swiper as SwiperType } from 'swiper';
 import { EffectCoverflow, Keyboard } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -22,8 +21,7 @@ import {
   ChevronRight,
   Headphones,
   Images,
-  Play,
-} from 'lucide-react';
+  Play } from 'lucide-react';
 
 import 'swiper/css';
 import 'swiper/css/effect-coverflow';
@@ -129,8 +127,7 @@ function ExpoCardTiltInteractive({ children }: { children: ReactNode }) {
       className="h-full w-full"
       style={{
         transformStyle: 'preserve-3d',
-        transition: 'transform 0.2s ease-out',
-      }}
+        transition: 'transform 0.2s ease-out' }}
       onMouseMove={onMove}
       onMouseLeave={onLeave}
     >
@@ -144,8 +141,7 @@ function ExpoCardTiltInteractive({ children }: { children: ReactNode }) {
  */
 function ExpoCardTiltShell({
   children,
-  disableTilt = false,
-}: {
+  disableTilt = false }: {
   children: ReactNode;
   /** Listados /historias/*: tarjeta estable (sin inclinación por mouse). */
   disableTilt?: boolean;
@@ -171,8 +167,7 @@ export function HistoricalExhibitionCarousel({
   expoPaddingTopClassName,
   expoMaxWidthClassName,
   shareInGalleryChrome = true,
-  showMailboxInGalleryChrome = true,
-}: HistoricalExhibitionCarouselProps) {
+  showMailboxInGalleryChrome = true }: HistoricalExhibitionCarouselProps) {
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
   /** Listados /historias/* (layout comparte filtros y carrusel sin chrome de compartir en la expo). */
@@ -257,15 +252,13 @@ export function HistoricalExhibitionCarousel({
               <div
                 className="absolute inset-0"
                 style={{
-                  background: 'radial-gradient(ellipse at top, #f0f0f5 0%, #d9d9e3 100%)',
-                }}
+                  background: 'radial-gradient(ellipse at top, #f0f0f5 0%, #d9d9e3 100%)' }}
               />
               <div
                 className="absolute inset-0"
                 style={{
                   boxShadow:
-                    'inset 0 0 160px rgba(0,0,0,0.14), inset 0 0 72px rgba(0,0,0,0.09), inset 0 -100px 120px rgba(0,0,0,0.06)',
-                }}
+                    'inset 0 0 160px rgba(0,0,0,0.14), inset 0 0 72px rgba(0,0,0,0.09), inset 0 -100px 120px rgba(0,0,0,0.06)' }}
               />
             </>
           ) : (
@@ -278,8 +271,7 @@ export function HistoricalExhibitionCarousel({
                 className="absolute inset-0 backdrop-blur-[7px]"
                 style={{
                   background:
-                    'radial-gradient(circle at top center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.5) 100%)',
-                }}
+                    'radial-gradient(circle at top center, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.5) 100%)' }}
               />
               <div
                 className="absolute inset-0"
@@ -287,8 +279,7 @@ export function HistoricalExhibitionCarousel({
                   background: [
                     'radial-gradient(ellipse 72% 58% at 50% 4%, rgba(255, 252, 248, 0.18) 0%, transparent 52%)',
                     'linear-gradient(180deg, rgba(12, 14, 22, 0.35) 0%, rgba(6, 7, 14, 0.88) 100%)',
-                  ].join(', '),
-                }}
+                  ].join(', ') }}
               />
             </>
           )}
@@ -371,8 +362,7 @@ export function HistoricalExhibitionCarousel({
           }`}
           style={{
             perspective: '1500px',
-            perspectiveOrigin: 'center center',
-          }}
+            perspectiveOrigin: 'center center' }}
         >
           <div
             className={`relative w-full ${
@@ -480,8 +470,7 @@ export function HistoricalExhibitionCarousel({
                   className="!h-auto pb-8 pt-1"
                   style={{
                     width: 'clamp(288px, 79vw, 428px)',
-                    height: 'auto',
-                  }}
+                    height: 'auto' }}
                 >
                   <ExpoCardTiltShell disableTilt>
                     <div
@@ -491,8 +480,7 @@ export function HistoricalExhibitionCarousel({
                         WebkitBackdropFilter: 'blur(20px) saturate(170%)',
                         border: '1px solid rgba(255, 255, 255, 0.58)',
                         background: 'linear-gradient(168deg, rgba(255,255,255,0.58) 0%, rgba(235,239,246,0.42) 100%)',
-                        boxShadow: '0 28px 58px rgba(15,23,42,0.1), inset 1px 1px 0 rgba(255,255,255,0.92)',
-                      }}
+                        boxShadow: '0 28px 58px rgba(15,23,42,0.1), inset 1px 1px 0 rgba(255,255,255,0.92)' }}
                     >
                       <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.35)]">
                         {/* eslint-disable-next-line @next/next/no-img-element -- portada de la historia */}
@@ -526,13 +514,13 @@ export function HistoricalExhibitionCarousel({
                       </div>
 
                       <div className="relative z-10 mt-3 shrink-0 space-y-2 sm:mt-4">
-                        <h3 className="text-[1.0625rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-[1.175rem]">
+                        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 sm:text-[17px]">
                           {h.titulo}
                         </h3>
-                        <p className="line-clamp-4 text-[0.895rem] leading-relaxed text-gray-700 sm:line-clamp-5">
+                        <p className="line-clamp-4 text-[14.32px] leading-relaxed text-gray-700 sm:line-clamp-5">
                           “{h.cita}”
                         </p>
-                        <p className="text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-gray-600">
+                        <p className="text-[11px] font-semibold uppercase text-gray-600 tracking-[0.12em]">
                           {[h.fecha, h.lugar].filter(Boolean).join(' · ')}
                         </p>
                       </div>
@@ -542,15 +530,14 @@ export function HistoricalExhibitionCarousel({
                         style={{
                           backgroundColor: '#ebeef4',
                           boxShadow:
-                            'inset 6px 6px 12px rgba(163,177,198,0.38), inset -5px -5px 12px rgba(255,255,255,0.88)',
-                        }}
+                            'inset 6px 6px 12px rgba(163,177,198,0.38), inset -5px -5px 12px rgba(255,255,255,0.88)' }}
                       >
                         <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/76 bg-gray-200/92 shadow-[2px_2px_6px_rgba(163,177,198,0.45)]">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={h.foto_perfil} alt="" className="h-full w-full object-cover" />
                         </div>
                         <div className="min-w-0 text-left leading-tight">
-                          <p className="truncate text-[0.68rem] font-semibold uppercase tracking-[0.12em] text-gray-500">
+                          <p className="truncate text-[10.88px] font-semibold uppercase text-gray-500 tracking-[0.12em]">
                             Narrador
                           </p>
                           <p className="truncate text-sm font-semibold text-gray-900">{h.nombre}</p>
@@ -586,8 +573,7 @@ export function HistoricalExhibitionCarousel({
                 key={h.id}
                 style={{
                   width: `min(92vw, ${SLIDE_PX}px)`,
-                  height: `min(92vw, ${SLIDE_PX}px)`,
-                }}
+                  height: `min(92vw, ${SLIDE_PX}px)` }}
               >
                 <ExpoCardTiltShell disableTilt={historiasListEmbedded}>
                   <div
@@ -604,11 +590,9 @@ export function HistoricalExhibitionCarousel({
                             border: '1px solid rgba(255, 255, 255, 0.52)',
                             boxShadow:
                               '0 28px 64px rgba(15,23,42,0.09), inset 1px 1px 0 rgba(255,255,255,0.85)',
-                            background: 'linear-gradient(165deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.24) 100%)',
-                          }
+                            background: 'linear-gradient(165deg, rgba(255,255,255,0.46) 0%, rgba(255,255,255,0.24) 100%)' }
                         : {
-                            boxShadow: '0 20px 50px rgba(0,0,0,0.5)',
-                          }
+                            boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }
                     }
                   >
                     <div
@@ -657,8 +641,8 @@ export function HistoricalExhibitionCarousel({
                       <h3
                         className={
                           isLightHall
-                            ? 'text-[1.05rem] font-semibold leading-snug tracking-tight text-gray-900 sm:text-xl'
-                            : 'text-lg font-semibold leading-tight tracking-tight sm:text-xl'
+                            ? 'text-[15px] font-semibold leading-snug text-gray-900 sm:text-[18px]'
+                            : 'text-[16px] font-semibold leading-tight sm:text-[18px]'
                         }
                       >
                         {h.titulo}

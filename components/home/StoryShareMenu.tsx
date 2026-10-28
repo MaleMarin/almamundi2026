@@ -4,8 +4,7 @@ import { Download, Mail, X } from 'lucide-react';
 import {
   canonicalStoryShareUrl,
   buildStoryShareChannelUrls,
-  copyTextToClipboard,
-} from '@/lib/huella/share-story-channels';
+  copyTextToClipboard } from '@/lib/huella/share-story-channels';
 
 export type StoryShareMenuLabels = {
   title: string;
@@ -45,13 +44,11 @@ export function StoryShareMenu({
   onCopyFailed,
   onDownload,
   onShareImageApp,
-  onClose,
-}: StoryShareMenuProps) {
+  onClose }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(shareUrl, {
     short: shareTextShort,
     long: shareTextLong,
-    emailSubject,
-  });
+    emailSubject });
 
   const copyLink = async () => {
     const ok = await copyTextToClipboard(canonicalStoryShareUrl(shareUrl));
@@ -76,7 +73,7 @@ export function StoryShareMenu({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h4 id="story-share-menu-title" className="text-base font-semibold text-[#141D26]">
+          <h4 id="story-share-menu-title" className="text-[15px] font-semibold text-[#141D26]">
             {labels.title}
           </h4>
           <button

@@ -70,7 +70,7 @@ export function CameraPanel({ camera, onClose }: Props) {
       {/* Header */}
       <div className="shrink-0 p-4 border-b border-white/10 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="text-white font-semibold text-base truncate">{camera.title}</h3>
+          <h3 className="text-white font-semibold text-[15px] truncate">{camera.title}</h3>
           <p className="text-white/60 text-xs mt-0.5">{camera.source} · {camera.country}</p>
         </div>
         <button

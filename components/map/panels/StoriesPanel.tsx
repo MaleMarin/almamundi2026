@@ -66,8 +66,7 @@ function timeAgo(publishedAt: string | undefined): string {
 function StoryRow({
   story,
   isActive,
-  onClick,
-}: {
+  onClick }: {
   story: StoryPoint;
   isActive: boolean;
   onClick: () => void;
@@ -88,8 +87,7 @@ function StoryRow({
       : 'inset 0 1px 0 rgba(255,255,255,0.22)',
     transition: 'all 200ms ease',
     fontFamily: SITE_FONT_STACK,
-    width: '100%' as const,
-  };
+    width: '100%' as const };
   return (
     <div style={cardShell}>
     <button
@@ -103,8 +101,7 @@ function StoryRow({
         cursor: 'pointer',
         transition: 'all 200ms ease',
         fontFamily: SITE_FONT_STACK,
-        width: '100%',
-      }}
+        width: '100%' }}
     >
       <p style={{
         fontSize: 14,
@@ -114,8 +111,7 @@ function StoryRow({
         lineHeight: 1.35,
         overflow: 'hidden',
         textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}>
+        whiteSpace: 'nowrap' }}>
         {story.title ?? story.label}
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
@@ -139,8 +135,7 @@ export function StoriesPanel({
   onStoryFocus,
   highlightedStoryId,
   onContarMiHistoria,
-  panelMode = 'stories',
-}: StoriesPanelProps) {
+  panelMode = 'stories' }: StoriesPanelProps) {
   const isSearchPanel = panelMode === 'search';
   const qTrim = exploreQuery.trim();
   const searchMatches = useMemo(
@@ -158,8 +153,7 @@ export function StoriesPanel({
     WebkitBackdropFilter: 'blur(22px) saturate(1.3)',
     borderRadius: 18,
     border: '1px solid rgba(255,255,255,0.22)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28)',
-  };
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.28)' };
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%', minHeight: 0, overflow: 'hidden' }}>
@@ -184,8 +178,7 @@ export function StoriesPanel({
               color: '#fff',
               fontSize: 13,
               fontFamily: SITE_FONT_STACK,
-              outline: 'none',
-            }}
+              outline: 'none' }}
           />
         </div>
       </div>
@@ -201,8 +194,7 @@ export function StoriesPanel({
         overscrollBehavior: 'contain',
         display: 'flex',
         flexDirection: 'column',
-        gap: 8,
-      }}>
+        gap: 8 }}>
         {isSearchPanel ? (
           !qTrim ? (
             <div style={hintBoxStyle}>
@@ -212,8 +204,7 @@ export function StoriesPanel({
                   color: 'rgba(255,255,255,0.88)',
                   margin: 0,
                   lineHeight: 1.55,
-                  fontFamily: SITE_FONT_STACK,
-                }}
+                  fontFamily: SITE_FONT_STACK }}
               >
                 Escribe palabras clave para buscar entre las historias del mapa (lugar, tema o texto).
               </p>
@@ -223,8 +214,7 @@ export function StoriesPanel({
                   color: 'rgba(255,255,255,0.45)',
                   margin: '12px 0 0',
                   lineHeight: 1.45,
-                  fontFamily: SITE_FONT_STACK,
-                }}
+                  fontFamily: SITE_FONT_STACK }}
               >
                 Para ver el listado completo, usa la pestaña Historias.
               </p>
@@ -237,8 +227,7 @@ export function StoriesPanel({
                   color: 'rgba(255,255,255,0.85)',
                   margin: 0,
                   lineHeight: 1.5,
-                  fontFamily: SITE_FONT_STACK,
-                }}
+                  fontFamily: SITE_FONT_STACK }}
               >
                 No hay historias que coincidan con tu búsqueda.
               </p>
@@ -267,15 +256,13 @@ export function StoriesPanel({
             WebkitBackdropFilter: 'blur(22px) saturate(1.3)',
             borderRadius: 18,
             border: '1px solid rgba(255,255,255,0.32)',
-            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)',
-          }}>
+            boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)' }}>
             <p style={{
               fontSize: 15,
               color: 'rgba(255,255,255,0.85)',
               margin: '0 0 12px',
               lineHeight: 1.5,
-              fontFamily: SITE_FONT_STACK,
-            }}>
+              fontFamily: SITE_FONT_STACK }}>
               Este mapa se construye con historias como la tuya.
             </p>
             {onContarMiHistoria && (
@@ -293,8 +280,7 @@ export function StoriesPanel({
                   fontWeight: 600,
                   cursor: 'pointer',
                   fontFamily: SITE_FONT_STACK,
-                  transition: 'all 200ms ease',
-                }}
+                  transition: 'all 200ms ease' }}
               >
                 Cuenta tu historia
               </button>

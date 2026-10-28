@@ -8,8 +8,7 @@ import { X } from 'lucide-react';
 import {
   HISTORIAS_FILTER_ICON_IMG_CLASS,
   HISTORIAS_FILTER_ICON_WELL_CLASS,
-  HISTORIAS_MAILBOX_ICON_SRC,
-} from '@/lib/historias/historias-exhibition-icons';
+  HISTORIAS_MAILBOX_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
 import { useCallback, useEffect, useId, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
@@ -42,8 +41,7 @@ export function ResonanceMailbox({
   triggerLayout = 'floating',
   triggerTone = 'dark',
   triggerTitle,
-  triggerAriaLabel,
-}: ResonanceMailboxProps) {
+  triggerAriaLabel }: ResonanceMailboxProps) {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const mailboxAria =
     triggerAriaLabel ??
@@ -103,8 +101,7 @@ export function ResonanceMailbox({
       const res = await fetch(`/api/stories/${encodeURIComponent(storyId)}/affective-message`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: trimmed, turnstileToken }),
-      });
+        body: JSON.stringify({ message: trimmed, turnstileToken }) });
       const data = (await res.json()) as {
         ok?: boolean;
         reformulate?: boolean;
@@ -312,7 +309,7 @@ export function ResonanceMailbox({
                   <>
                     <h2
                       id={`${dialogId}-title`}
-                      className="pr-10 text-base font-semibold leading-snug text-white sm:text-lg"
+                      className="pr-10 text-[15px] font-semibold leading-snug text-white sm:text-[16px]"
                     >
                       Gracias por tomarte el tiempo.
                     </h2>
@@ -336,7 +333,7 @@ export function ResonanceMailbox({
                   <>
                     <h2
                       id={`${dialogId}-title`}
-                      className="pr-10 text-base font-semibold leading-snug text-white sm:text-lg"
+                      className="pr-10 text-[15px] font-semibold leading-snug text-white sm:text-[16px]"
                     >
                       ¿Esta historia resonó contigo?
                     </h2>

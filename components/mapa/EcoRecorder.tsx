@@ -5,8 +5,7 @@ import { useRef, useState } from 'react';
 
 export function EcoRecorder({
   storyId,
-  onDone,
-}: {
+  onDone }: {
   storyId: string;
   onDone: () => void;
 }) {
@@ -76,8 +75,7 @@ export function EcoRecorder({
           fontSize: 13,
           color: 'rgba(var(--almamundi-orange-rgb), 0.80)',
           margin: 0,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
       >
         Eco enviado. Gracias.
       </p>
@@ -91,8 +89,7 @@ export function EcoRecorder({
           fontSize: 13,
           color: 'rgba(255,255,255,0.40)',
           margin: 0,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
       >
         Enviando...
       </p>
@@ -120,8 +117,7 @@ export function EcoRecorder({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          animation: state === 'recording' ? 'noticiaPulse 1s ease infinite' : 'none',
-        }}
+          animation: state === 'recording' ? 'noticiaPulse 1s ease infinite' : 'none' }}
       >
         <div
           style={{
@@ -129,8 +125,7 @@ export function EcoRecorder({
             height: state === 'recording' ? 14 : 18,
             borderRadius: state === 'recording' ? 3 : '50%',
             background: state === 'recording' ? '#ef4444' : '#FF4A1C',
-            transition: 'all 200ms ease',
-          }}
+            transition: 'all 200ms ease' }}
         />
       </button>
 
@@ -141,8 +136,7 @@ export function EcoRecorder({
               height: 3,
               borderRadius: 999,
               background: 'rgba(255,255,255,0.08)',
-              overflow: 'hidden',
-            }}
+              overflow: 'hidden' }}
           >
             <div
               style={{
@@ -150,8 +144,7 @@ export function EcoRecorder({
                 borderRadius: 999,
                 background: '#ef4444',
                 width: `${(seconds / 10) * 100}%`,
-                transition: 'width 1s linear',
-              }}
+                transition: 'width 1s linear' }}
             />
           </div>
           <p
@@ -159,8 +152,7 @@ export function EcoRecorder({
               fontSize: 11,
               color: 'rgba(255,255,255,0.35)',
               margin: '4px 0 0',
-              fontFamily: SITE_FONT_STACK,
-            }}
+              fontFamily: SITE_FONT_STACK }}
           >
             {10 - seconds}s restantes · toca para terminar
           </p>
@@ -173,8 +165,7 @@ export function EcoRecorder({
             fontSize: 12,
             color: 'rgba(255,255,255,0.35)',
             margin: 0,
-            fontFamily: SITE_FONT_STACK,
-          }}
+            fontFamily: SITE_FONT_STACK }}
         >
           Toca para grabar
         </p>

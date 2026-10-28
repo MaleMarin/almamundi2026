@@ -8,8 +8,7 @@ import { MAPA_HOME_REDIRECT_PATH } from '@/lib/mapa-home-nav';
  */
 export default function MapaError({
   error,
-  reset: _reset,
-}: {
+  reset: _reset }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {

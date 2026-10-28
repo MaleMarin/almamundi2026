@@ -17,14 +17,12 @@ import {
   MapPin,
   Globe2,
   Mail,
-  Link2,
-} from 'lucide-react';
+  Link2 } from 'lucide-react';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
   probeAudioFileDurationSeconds,
   probeVideoFileDurationSeconds,
-  isDurationWithinMax,
-} from '@/lib/media-duration-rules';
+  isDurationWithinMax } from '@/lib/media-duration-rules';
 import {
   SUBIR_AUDIO_FILE_ACCEPT,
   SUBIR_AUDIO_UPLOAD_MAX_MB,
@@ -37,8 +35,7 @@ import {
   SUBIR_VIDEO_UPLOAD_MAX_MB,
   isAllowedAudioUploadFile,
   isAllowedExtraAttachmentFile,
-  isAllowedVideoUploadFile,
-} from '@/lib/subir-limits';
+  isAllowedVideoUploadFile } from '@/lib/subir-limits';
 import { ANTECEDENTES_MAX } from '@/lib/antecedentes';
 import { PHOTO_ALT_MAX, photoStripeSourceText } from '@/lib/historias/story-imagenes';
 import { CANCION_RELACIONADA_MAX } from '@/lib/cancion-relacionada';
@@ -47,8 +44,7 @@ import {
   UPLOAD_PHOTO_MAX_MESSAGE,
   SUBIR_TEXT_COUNTER_WARN_CHARS,
   messageForUploadError,
-  TURNSTILE_REJECT_MESSAGE,
-} from '@/lib/subir-upload-modal-copy';
+  TURNSTILE_REJECT_MESSAGE } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
@@ -57,20 +53,17 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
 import {
   drawVadResonanceOnCanvas,
-  RESONANCE_EXPORT_PX,
-} from '@/lib/huella/resonance-stripes';
+  RESONANCE_EXPORT_PX } from '@/lib/huella/resonance-stripes';
 import {
   canvasToPngBlob,
   downloadPngBlob,
-  shareNativeStoryWithImage,
-} from '@/lib/huella/share-resonance-png';
+  shareNativeStoryWithImage } from '@/lib/huella/share-resonance-png';
 import {
   PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
   PENDING_STORY_SHARE_TEXT_SHORT,
   PENDING_STORY_SHARE_URL,
-  copyTextToClipboard,
-} from '@/lib/huella/share-story-channels';
+  copyTextToClipboard } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
 import { clearStoryAuthorCarryIfStale } from '@/lib/story-author-carry';
@@ -86,15 +79,13 @@ import { reportStorySubmitError } from '@/lib/story-submit-error';
 import {
   createStoryPhotoId,
   isDisplayableStoryPhoto,
-  type StoryPhotoItem,
-} from '@/lib/story-photo-item';
+  type StoryPhotoItem } from '@/lib/story-photo-item';
 import { classifyMediaCaptureError, type MediaCaptureErrorKind } from '@/lib/media-capture-error';
 import { duckAmbient } from '@/lib/sound/ambient';
 import {
   clearStoryDraft,
   loadStoryDraft,
-  saveStoryDraft,
-} from '@/lib/story-draft-storage';
+  saveStoryDraft } from '@/lib/story-draft-storage';
 
 export type StoryModalMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -120,15 +111,13 @@ const soft = {
       '-14px -14px 38px rgba(255, 255, 255, 0.98)',
       'inset 2px 2px 4px rgba(255, 255, 255, 0.75)',
       'inset -3px -3px 8px rgba(163, 177, 198, 0.22)',
-    ].join(', '),
-  },
+    ].join(', ') },
   inset: {
     backgroundColor: '#E0E5EC',
     borderRadius: '20px',
     border: '1px solid rgba(255,255,255,0.15)',
     boxShadow:
-      'inset 8px 8px 14px rgba(163,177,198,0.7), inset -8px -8px 14px rgba(255,255,255,0.85)',
-  },
+      'inset 8px 8px 14px rgba(163,177,198,0.7), inset -8px -8px 14px rgba(255,255,255,0.85)' },
   button: {
     backgroundColor: '#E9ECF3',
     borderRadius: '9999px',
@@ -141,9 +130,7 @@ const soft = {
       '-11px -11px 26px rgba(255, 255, 255, 0.96)',
       'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
       'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
-    ].join(', '),
-  },
-} as const;
+    ].join(', ') } } as const;
 
 const MAX_PROFILE_PHOTO_MB = SUBIR_PHOTO_FILE_MAX_MB;
 const MAX_EXTRA_FILE_MB = SUBIR_PHOTO_FILE_MAX_MB;
@@ -171,8 +158,7 @@ const MODE_CONTEXT_LABEL: Record<StoryModalMode, string> = {
   video: 'Video',
   audio: 'Audio',
   texto: 'Escrito',
-  foto: 'Fotografía',
-};
+  foto: 'Fotografía' };
 
 /** Contexto ≥30 chars exigido por /api/submissions. */
 function buildModalSubmissionContext(
@@ -276,22 +262,19 @@ function imprintHuellaSource(args: {
       photoFichas.map((ficha) => ({
         nombre: ficha.nombre,
         lugar: ficha.lugar,
-        descripcion: ficha.descripcion,
-      }))
+        descripcion: ficha.descripcion }))
     );
     const content = fromPhotos || storyTitle.trim() || extraText.trim();
     return {
       content,
-      charCount: Math.max(content.length, 400),
-    };
+      charCount: Math.max(content.length, 400) };
   }
 
   const content = titleBlock || storyTitle.trim() || 'historia';
   const avBonus = Math.min(Math.floor((mediaBlob?.size ?? 0) / 120), 14000);
   return {
     content,
-    charCount: Math.max(content.length + avBonus, 900),
-  };
+    charCount: Math.max(content.length + avBonus, 900) };
 }
 
 type ImprintDrawArgs = {
@@ -327,8 +310,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     mediaBlob,
     locale,
     city,
-    country,
-  } = args;
+    country } = args;
   canvas.width = RESONANCE_EXPORT_PX;
   canvas.height = RESONANCE_EXPORT_PX;
   const ctx = canvas.getContext('2d');
@@ -340,8 +322,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     storyTitle,
     extraText,
     photoFichas,
-    mediaBlob,
-  });
+    mediaBlob });
 
   drawVadResonanceOnCanvas(ctx, {
     storyId,
@@ -352,9 +333,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
       title: storyTitle,
       city,
       country,
-      locale,
-    },
-  });
+      locale } });
 }
 
 function huellaPngFilename(storyTitle: string, imprintId: string): string {
@@ -1114,8 +1093,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           anioDesconocido: false,
           decada: '',
           lugar: '',
-          alt: '',
-        };
+          alt: '' };
         next.push(item);
         if (heic) pendingHeic.push({ id: item.id, file: f });
       }
@@ -1133,8 +1111,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               readyFile: converted,
               previewUrl: URL.createObjectURL(converted),
               converting: false,
-              name: converted.name,
-            };
+              name: converted.name };
           })
         );
       });
@@ -1338,8 +1315,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         progress: 1,
         error: null,
         readUrl: r.readUrl,
-        storagePath: r.storagePath,
-      };
+        storagePath: r.storagePath };
       setPhotos((prev) => prev.map((p) => (p.id === item.id ? done : p)));
       return done;
     } catch (e) {
@@ -1347,8 +1323,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       const failed: StoryPhotoItem = {
         ...item,
         uploadStatus: 'error',
-        error: t.modalPhotoUploadFailed,
-      };
+        error: t.modalPhotoUploadFailed };
       setPhotos((prev) => prev.map((p) => (p.id === item.id ? failed : p)));
       return failed;
     }
@@ -1483,8 +1458,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       } else if (mode === 'audio') {
         if (mediaBlob) {
           const af = new File([mediaBlob], 'grabacion.webm', {
-            type: mediaBlob.type || 'audio/webm',
-          });
+            type: mediaBlob.type || 'audio/webm' });
           const sec = await probeAudioFileDurationSeconds(af);
           if (sec != null && !isDurationWithinMax(sec)) {
             setErr(`El audio supera los ${MAX_AUDIO_VIDEO_DURATION_SECONDS / 60} minutos.`);
@@ -1564,9 +1538,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               nombre: p.titulo.trim().slice(0, 80),
               lugar: p.lugar.trim().slice(0, 80),
               ...(p.anioDesconocido ? { decada: p.decada } : { anio: p.anio.trim() }),
-              ...(p.alt.trim() ? { alt: p.alt.trim().slice(0, PHOTO_ALT_MAX) } : {}),
-            })),
-          };
+              ...(p.alt.trim() ? { alt: p.alt.trim().slice(0, PHOTO_ALT_MAX) } : {}) })) };
         }
       }
 
@@ -1617,9 +1589,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             : {}),
           ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
-            : {}),
-        }),
-      });
+            : {}) }) });
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
       if (!res.ok) {
@@ -1644,8 +1614,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       if (typeof data.id === 'string' && data.id && adsConversionSentRef.current !== data.id) {
         adsConversionSentRef.current = data.id;
         window.gtag?.('event', 'conversion', {
-          send_to: 'AW-17718043044/dK-ICKuv_KMdEKTDz4BC',
-        });
+          send_to: 'AW-17718043044/dK-ICKuv_KMdEKTDz4BC' });
       }
       imprintSnapRef.current = {
         textBody,
@@ -1654,12 +1623,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         photoFichas: photos.map((p) => ({
           nombre: p.titulo.trim(),
           lugar: p.lugar.trim(),
-          descripcion: p.alt.trim(),
-        })),
+          descripcion: p.alt.trim() })),
         mediaBlob,
         city,
-        country,
-      };
+        country };
       setImprintStoryTitle(title);
       setImprintId(id);
       setImprintReceivedAt(new Date());
@@ -1744,8 +1711,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         mediaBlob: snap?.mediaBlob ?? null,
         locale,
         city: snap?.city ?? city,
-        country: snap?.country ?? country,
-      });
+        country: snap?.country ?? country });
     } catch (e) {
       console.error('[StoryModal] drawImprintPreview', e);
     }
@@ -1808,8 +1774,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         file,
         title: (imprintStoryTitle || storyTitle).trim() || 'AlmaMundi',
         text: shareText,
-        url: PENDING_STORY_SHARE_URL,
-      });
+        url: PENDING_STORY_SHARE_URL });
       if (requestToken !== shareRequestTokenRef.current) return;
       if (native === 'aborted') {
         fallbackWindow?.close();
@@ -1914,12 +1879,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1F7A4D] text-white">
               <Check size={16} strokeWidth={2.4} aria-hidden />
             </span>
-            <p className="text-base font-semibold text-gray-800 md:text-lg">
+            <p className="text-[15px] font-semibold text-gray-800 md:text-[16px]">
               {kind === 'video' ? t.modalReadyTitleVideo : t.modalReadyTitleAudio}
             </p>
           </div>
         ) : null}
-        <p className="text-sm text-gray-700 md:text-base">
+        <p className="text-sm text-gray-700 md:text-[15px]">
           {name} · {durationLabel} · {fileWeightMb({ size: bytes })} MB
         </p>
         {avCardError ? (
@@ -2003,17 +1968,17 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         ) : null}
         {chosenTopic && mode !== 'texto' && (
           <div
-            className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-base"
+            className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-[15px]"
             style={soft.inset}
           >
             <div className="min-w-0">
               <p className="font-semibold text-gray-700">{t.modalTopicActive}</p>
-              <p className="truncate text-gray-600 md:text-lg">{chosenTopic.title}</p>
+              <p className="truncate text-gray-600 md:text-[16px]">{chosenTopic.title}</p>
             </div>
             <button
               type="button"
               onClick={onClearTopic}
-              className="rounded-full px-4 py-2 text-xs font-bold uppercase tracking-wide text-orange-700"
+              className="rounded-full px-4 py-2 text-xs font-bold uppercase text-orange-700 tracking-[0.12em]"
               style={soft.button}
               aria-label={t.modalRemove}
             >
@@ -2076,13 +2041,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     </div>
                     {!recording ? (
                       <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                        <span className="text-xl font-mono font-semibold text-gray-700 md:text-2xl" aria-live="polite">
+                        <span className="text-[18px] font-mono font-semibold text-gray-700 md:text-[22px]" aria-live="polite">
                           {formatMmSs(recordSec)}
                         </span>
                         <button
                           type="button"
                           onClick={startRecordingVideo}
-                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-lg font-bold text-white md:text-xl"
+                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[16px] font-bold text-white md:text-[18px]"
                           style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                           aria-label="Comenzar a grabar video"
                         >
@@ -2092,7 +2057,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       </div>
                     ) : (
                       <>
-                        <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
+                        <p className="text-[18px] font-semibold text-orange-600 md:text-[22px]" aria-live="polite">
                           {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                         </p>
                         {recordSec >= 270 ? (
@@ -2103,7 +2068,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         <button
                           type="button"
                           onClick={stopRecording}
-                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-lg font-bold text-white shadow-lg md:text-xl"
+                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-[16px] font-bold text-white shadow-lg md:text-[18px]"
                           aria-label={t.modalStop}
                         >
                           <Square size={22} aria-hidden />
@@ -2214,13 +2179,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div className="flex h-32 w-32 items-center justify-center rounded-full" style={soft.inset} aria-hidden>
                       <Mic className="h-14 w-14 text-orange-500" />
                     </div>
-                    <p className="font-mono text-2xl text-gray-700 md:text-3xl" aria-live="polite">
+                    <p className="font-mono text-[22px] text-gray-700 md:text-[27px]" aria-live="polite">
                       {formatMmSs(recordSec)}
                     </p>
                     <button
                       type="button"
                       onClick={startRecordingAudio}
-                      className="rounded-full px-10 py-4 text-lg font-bold text-white md:text-xl"
+                      className="rounded-full px-10 py-4 text-[16px] font-bold text-white md:text-[18px]"
                       style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                       aria-label={t.modalRecordVoice}
                     >
@@ -2234,7 +2199,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       <span className="absolute inset-3 animate-pulse rounded-full bg-orange-400/25" aria-hidden />
                       <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
                     </div>
-                    <p className="text-xl font-semibold text-orange-600 md:text-2xl" aria-live="polite">
+                    <p className="text-[18px] font-semibold text-orange-600 md:text-[22px]" aria-live="polite">
                       {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                     </p>
                     {recordSec >= 270 ? (
@@ -2245,7 +2210,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={stopRecording}
-                      className="rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white md:text-xl"
+                      className="rounded-full bg-red-600 px-10 py-4 text-[16px] font-bold text-white md:text-[18px]"
                       aria-label={t.modalStop}
                     >
                       {t.modalStop}
@@ -2308,7 +2273,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {chosenTopic && (
               <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <p className="text-lg font-semibold text-gray-800 md:text-xl">Inspiración · {chosenTopic.title}</p>
+                  <p className="text-[16px] font-semibold text-gray-800 md:text-[18px]">Inspiración · {chosenTopic.title}</p>
                   <button
                     type="button"
                     onClick={onClearTopic}
@@ -2319,7 +2284,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     Quitar inspiración
                   </button>
                 </div>
-                <ul className="list-inside list-disc space-y-2 text-base text-gray-600 md:text-lg">
+                <ul className="list-inside list-disc space-y-2 text-[15px] text-gray-600 md:text-[16px]">
                   {chosenTopic.questions.slice(0, 3).map((q) => (
                     <li key={q}>{q}</li>
                   ))}
@@ -2343,8 +2308,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             >
               {interpolate(t.modalChars, {
                 n: String(textBody.length),
-                max: String(SUBIR_TEXT_MAX_CHARS),
-              })}
+                max: String(SUBIR_TEXT_MAX_CHARS) })}
             </p>
           </div>
         )}
@@ -2393,8 +2357,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       style={{
         backgroundColor: 'rgba(15, 23, 42, 0.45)',
         backdropFilter: 'blur(6px)',
-        fontFamily: APP_FONT,
-      }}
+        fontFamily: APP_FONT }}
       role="dialog"
       aria-modal="true"
       aria-labelledby={step === 'details' ? 'story-modal-details-title' : 'story-modal-title'}
@@ -2432,7 +2395,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           style={{ backgroundColor: soft.bg }}
         >
           <div className="min-w-0 space-y-1">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-orange-600 md:text-sm md:tracking-[0.2em]">
+            <p className="text-xs font-bold uppercase text-orange-600 md:text-sm tracking-[0.12em]">
               ALMAMUNDI
             </p>
             {step !== 'details' && (
@@ -2479,7 +2442,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </p>
                 <h3
                   id="story-modal-details-title"
-                  className="text-lg font-light leading-tight text-gray-800 md:text-xl"
+                  className="text-[16px] font-light leading-tight text-gray-800 md:text-[18px]"
                 >
                   {t.modalDetailsTitle}
                 </h3>
@@ -2511,7 +2474,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.title) setFieldErr((p) => ({ ...p, title: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       {fieldErr.title ? (
@@ -2536,7 +2499,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
@@ -2564,7 +2527,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         onChange={(e) => setExtraText(e.target.value.slice(0, ANTECEDENTES_MAX))}
                         maxLength={ANTECEDENTES_MAX}
                         rows={2}
-                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
@@ -2582,7 +2545,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         value={cancionRelacionada}
                         onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                         maxLength={CANCION_RELACIONADA_MAX}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
@@ -2617,7 +2580,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                               <button
                                 type="button"
                                 onClick={() => removeExtraFile(idx)}
-                                className="shrink-0 text-[9px] font-bold uppercase text-gray-500 hover:text-red-500"
+                                className="shrink-0 text-[9px] font-bold uppercase text-gray-500 hover:text-red-500 tracking-[0.12em]"
                               >
                                 ×
                               </button>
@@ -2689,7 +2652,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
@@ -2748,7 +2711,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setCountry(e.target.value);
                           if (fieldErr.country) setFieldErr((p) => ({ ...p, country: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="off"
                       />
@@ -2771,7 +2734,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setCity(e.target.value);
                           if (fieldErr.city) setFieldErr((p) => ({ ...p, city: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="off"
                       />
@@ -2794,7 +2757,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setAgeRange(e.target.value as AgeRange);
                           if (fieldErr.age) setFieldErr((p) => ({ ...p, age: undefined }));
                         }}
-                        className="w-full rounded-xl px-2 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalAgeChoose}</option>
@@ -2826,7 +2789,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         id="story-gender"
                         value={sex}
                         onChange={(e) => setSex(e.target.value as Sex)}
-                        className="w-full rounded-xl px-2 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalGenderBlank}</option>
@@ -2854,7 +2817,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         }}
                         type="email"
                         autoComplete="off"
-                        className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       <p className="mt-0.5 text-[10px] leading-tight text-gray-600 md:text-[11px]">
@@ -2881,7 +2844,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     value={cancionRelacionada}
                     onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                     maxLength={CANCION_RELACIONADA_MAX}
-                    className="w-full rounded-xl px-2.5 py-1.5 text-base outline-none text-gray-800"
+                    className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
                     style={{ ...soft.flat, borderRadius: '12px' }}
                   />
                 </div>
@@ -3064,8 +3027,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
                     aria-label={interpolate(t.modalImprintAlt, {
-                      titulo: (imprintStoryTitle || storyTitle).trim() || 'historia',
-                    })}
+                      titulo: (imprintStoryTitle || storyTitle).trim() || 'historia' })}
                   />
               </div>
               <p className="mx-auto mt-2 w-full text-[13px] leading-snug text-[#5C5C52] md:w-[420px]">
@@ -3181,8 +3143,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 email: t.modalShareEmail,
                 copyLink: t.modalCopyLink,
                 download: isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint,
-                close: t.modalClose,
-              }}
+                close: t.modalClose }}
               showDownload={shareMenuShowDownload}
               onCopied={() => {
                 flashShareNotice(t.modalShareLinkCopied);
@@ -3204,7 +3165,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ) : null}
 
           {err && step !== 'details' && step !== 'received' && (
-            <p className="mt-4 text-base font-medium text-red-600 md:text-lg" role="alert">{err}</p>
+            <p className="mt-4 text-[15px] font-medium text-red-600 md:text-[16px]" role="alert">{err}</p>
           )}
         </div>
         {previewLine ? <p className={`${amStyles.amModalFootnote} px-4 pb-3`}>{previewLine}</p> : null}

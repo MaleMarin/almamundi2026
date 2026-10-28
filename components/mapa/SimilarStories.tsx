@@ -26,8 +26,7 @@ const FORMAT_LABEL: Record<string, string> = {
   escrito: 'Escrito',
   image: 'Foto',
   foto: 'Foto',
-  photo: 'Foto',
-};
+  photo: 'Foto' };
 
 function formatLabel(format: string): string {
   return FORMAT_LABEL[format.toLowerCase()] ?? 'Historia';
@@ -78,19 +77,17 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
         marginTop: light ? 28 : 48,
         paddingTop: light ? 24 : 40,
         textAlign: 'left',
-        borderTop: light ? `1px solid rgba(163,177,198,0.35)` : '1px solid rgba(255,255,255,0.06)',
-      }}
+        borderTop: light ? `1px solid rgba(163,177,198,0.35)` : '1px solid rgba(255,255,255,0.06)' }}
     >
       <p
         style={{
           fontSize: 11,
-          letterSpacing: '0.18em',
+          letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: light ? neu.textBody : 'rgba(255,255,255,0.28)',
           marginBottom: 20,
           fontFamily: SITE_FONT_STACK,
-          fontWeight: 600,
-        }}
+          fontWeight: 600 }}
       >
         Otras historias con un tono cercano
       </p>
@@ -115,8 +112,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
               textDecoration: 'none',
               color: 'inherit',
               display: 'block',
-              animation: `storyFadeIn 500ms ease-out ${i * 100}ms both`,
-            }}
+              animation: `storyFadeIn 500ms ease-out ${i * 100}ms both` }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <span
@@ -125,8 +121,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                   fontWeight: 700,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: light ? 'var(--almamundi-orange)' : 'rgba(var(--almamundi-orange-rgb), 0.85)',
-                }}
+                  color: light ? 'var(--almamundi-orange)' : 'rgba(var(--almamundi-orange-rgb), 0.85)' }}
               >
                 {formatLabel(s.format)}
               </span>
@@ -135,8 +130,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 style={{
                   fontWeight: 600,
                   color: light ? neu.textMain : 'rgba(255,255,255,0.88)',
-                  lineHeight: 1.25,
-                }}
+                  lineHeight: 1.25 }}
               >
                 {truncateAtWord(s.title, 45)}
               </span>
@@ -147,8 +141,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 style={{
                   color: light ? neu.textBody : 'rgba(255,255,255,0.40)',
                   margin: '0 0 8px',
-                  lineHeight: 1.5,
-                }}
+                  lineHeight: 1.5 }}
               >
                 {truncateAtWord(s.description, 80)}
               </p>
@@ -157,8 +150,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
               style={{
                 fontSize: 11,
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
-                margin: 0,
-              }}
+                margin: 0 }}
             >
               {[s.city, s.country].filter(Boolean).join(', ') || '—'}
             </p>
@@ -166,8 +158,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
               style={{
                 fontSize: 11,
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
-                margin: '4px 0 0',
-              }}
+                margin: '4px 0 0' }}
             >
               {authorAndDateLine(s.label, s.publishedAt ?? null)}
             </p>

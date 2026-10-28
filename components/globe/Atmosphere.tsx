@@ -34,8 +34,7 @@ export function Atmosphere({ radius, sunDirection, segments = 64 }: AtmospherePr
   const material = useMemo(() => {
     const uniforms = {
       uSunDir: { value: new THREE.Vector3(1, 0, 0) },
-      uCamPos: { value: new THREE.Vector3(0, 0, 5) },
-    };
+      uCamPos: { value: new THREE.Vector3(0, 0, 5) } };
 
     const mat = new THREE.ShaderMaterial({
       name: 'GlobeAtmosphere',
@@ -86,8 +85,7 @@ export function Atmosphere({ radius, sunDirection, segments = 64 }: AtmospherePr
       side: THREE.FrontSide,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      toneMapped: false,
-    });
+      toneMapped: false });
 
     mat.name = 'GlobeAtmosphere';
     return mat;

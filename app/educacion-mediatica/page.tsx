@@ -4,8 +4,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Educación mediática | AlmaMundi',
   description:
-    'Marcos y recursos para analizar la información, la ciudadanía digital y el pensamiento crítico con enfoque en derechos humanos.',
-};
+    'Marcos y recursos para analizar la información, la ciudadanía digital y el pensamiento crítico con enfoque en derechos humanos.' };
 
 export default function EducacionMediaticaPage() {
   return (
@@ -16,19 +15,19 @@ export default function EducacionMediaticaPage() {
       <div className="mx-auto max-w-3xl">
         <Link
           href="/"
-          className="btn-am-neutro inline-block px-4 py-2 text-sm font-semibold tracking-wide"
+          className="btn-am-neutro inline-block px-4 py-2 text-sm font-semibold"
         >
           ← Volver al inicio
         </Link>
-        <h1 className="mt-10 text-3xl font-bold leading-tight tracking-tight text-[#2d3748] md:text-4xl">
+        <h1 className="mt-10 text-[27px] font-bold leading-tight text-[#2d3748] md:text-[32px]">
           Educación mediática
         </h1>
-        <p className="mt-6 text-lg leading-relaxed text-[#4A5568] md:text-xl">
+        <p className="mt-6 text-[16px] leading-relaxed text-[#4A5568] md:text-[18px]">
           Esta sección reúne el enfoque de AlmaMundi sobre alfabetización mediática y ciudadanía
           digital: leer fuentes con criterio, entender formatos y contextos, y participar en el
           espacio público con respeto a los derechos humanos.
         </p>
-        <p className="mt-5 text-lg leading-relaxed text-[#4A5568] md:text-xl">
+        <p className="mt-5 text-[16px] leading-relaxed text-[#4A5568] md:text-[18px]">
           Pronto ampliaremos aquí guías, materiales para aula y comunidad, y enlaces a iniciativas
           aliadas. Mientras tanto, puedes seguir explorando historias en el mapa y los formatos de
           la home.
@@ -36,13 +35,13 @@ export default function EducacionMediaticaPage() {
         <div className="mt-12 flex flex-wrap gap-4">
           <Link
             href="/#historias"
-            className="inline-flex items-center justify-center rounded-full bg-[#FF4A1C] px-6 py-3 text-[15px] font-semibold uppercase tracking-widest text-white hover:brightness-92"
+            className="inline-flex items-center justify-center rounded-full bg-[#FF4A1C] px-6 py-3 text-[14px] font-semibold uppercase text-white hover:brightness-92 tracking-[0.12em]"
           >
             Ver formatos en la home
           </Link>
           <Link
             href="/#mapa"
-            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-sm font-bold uppercase tracking-widest text-[#2d3748] transition-colors hover:border-[#FF4A1C] hover:text-[#FF4A1C]"
+            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-sm font-bold uppercase text-[#2d3748] transition-colors hover:border-[#FF4A1C] hover:text-[#FF4A1C] tracking-[0.12em]"
           >
             Ir al mapa
           </Link>

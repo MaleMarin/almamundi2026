@@ -23,9 +23,7 @@ const soft = {
       '-20px -20px 52px rgba(255, 255, 255, 1)',
       'inset 3px 3px 6px rgba(255, 255, 255, 0.92)',
       'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
-    ].join(', '),
-  },
-} as const;
+    ].join(', ') } } as const;
 
 export type HomeFirstPartProps = {
   onShowPurpose: () => void;
@@ -67,11 +65,9 @@ export function HomeFirstPart({
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
+              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 text-[clamp(1.238rem,1.08vw+0.938rem,2.25rem)]"
               style={{
-                color: soft.textMain,
-                letterSpacing: '-0.02em',
-              }}
+                color: soft.textMain }}
             >
               {t.heroBeforeBold}{' '}
               <span className="font-extrabold">{t.heroBold}</span>
@@ -94,8 +90,7 @@ export function HomeFirstPart({
                 strokeDasharray={1}
                 strokeDashoffset={1}
                 style={{
-                  animation: 'drawUnderline 2.75s linear forwards 0.4s',
-                }}
+                  animation: 'drawUnderline 2.75s linear forwards 0.4s' }}
               />
             </svg>
           </div>

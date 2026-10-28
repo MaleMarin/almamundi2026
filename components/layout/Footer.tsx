@@ -8,8 +8,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import {
   SITE_FOOTER_GUIA_CONDUCTA_HREF,
   SITE_FOOTER_LEGAL_LINKS,
-  SITE_HEADER_STORIES_LINKS,
-} from '@/components/layout/siteNavLinkStyles';
+  SITE_HEADER_STORIES_LINKS } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -38,15 +37,13 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       id: href,
       kind: 'internal' as const,
       href,
-      label: storiesLinkLabel(t, href),
-    })),
+      label: storiesLinkLabel(t, href) })),
     {
       id: 'mapa',
       kind: 'hard',
       href: MAPA_HOME_HREF,
       label: t.navMap,
-      onNavigate: () => primeMapAmbientFromNavGesture(),
-    },
+      onNavigate: () => primeMapAmbientFromNavGesture() },
     { id: 'pregunta', kind: 'internal', href: '/pregunta', label: PREGUNTA_UI.tab[locale] },
   ];
 
@@ -116,7 +113,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           { title: t.footerAbout, links: aboutLinks },
         ].map((group) => (
           <div key={group.title} className="flex flex-col items-center text-center">
-            <p className="m-0 mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#718096]">
+            <p className="m-0 mb-3 text-xs font-semibold uppercase text-[#718096] tracking-[0.12em]">
               {group.title}
             </p>
             <ul className="m-0 flex list-none flex-col items-center gap-2 p-0">
@@ -133,7 +130,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex w-full justify-center lg:w-auto lg:justify-start">
             <div className="flex flex-col items-start">
-              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+              <p className="mb-3 text-[11px] font-semibold uppercase text-gray-500 tracking-[0.12em]">
                 {t.footerInitiativeOf}
               </p>
               <img
@@ -181,7 +178,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 {t.footerContact}
               </ActiveInternalNavLink>
             </nav>
-            <p className="text-[11px] font-medium tracking-wide text-gray-500">
+            <p className="text-[11px] font-medium text-gray-500">
               © 2026 AlmaMundi
             </p>
           </div>

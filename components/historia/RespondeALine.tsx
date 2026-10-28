@@ -8,8 +8,7 @@ export function RespondeALine({
   questionId,
   questionMode,
   color = '#718096',
-  align = 'left',
-}: {
+  align = 'left' }: {
   questionId?: string | null;
   questionMode?: string | null;
   color?: string;
@@ -22,14 +21,13 @@ export function RespondeALine({
     <p
       style={{
         fontFamily: INTERIOR_FONT_STACK,
-        fontSize: '0.78rem',
+        fontSize: '12.48px',
         lineHeight: 1.45,
         fontWeight: 500,
         color,
         textAlign: align,
         margin: align === 'center' ? '0 auto 0.45rem' : '0 0 0.45rem',
-        maxWidth: '40rem',
-      }}
+        maxWidth: '40rem' }}
     >
       {RESPONDE_A_PUBLICO[locale]} {text}
     </p>

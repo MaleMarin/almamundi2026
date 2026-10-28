@@ -6,8 +6,7 @@ import { historiasInterior } from '@/lib/historias-neumorph';
  * Salas curadas («el hilo»): nav + área flexible para que SalaHilo / WebGL tengan altura real (min-h-0).
  */
 export default function MuestraSlugLayout({
-  children,
-}: Readonly<{ children: ReactNode }>) {
+  children }: Readonly<{ children: ReactNode }>) {
   return (
     <div className={`${historiasInterior.mainClassName} w-full min-w-0`}>
       <MuestrasInteriorNav />

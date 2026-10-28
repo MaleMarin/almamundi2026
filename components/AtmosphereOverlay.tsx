@@ -17,8 +17,7 @@ import { setAmbientBaseVolume } from '@/lib/sound/ambient';
 export function AtmosphereOverlay({
   soundEnabled,
   hourOverride,
-  embedded,
-}: {
+  embedded }: {
   soundEnabled: boolean;
   /** Hora 0–23 para forzar atmósfera (ej. /mapa?hour=22). Solo pruebas. */
   hourOverride?: number;
@@ -46,8 +45,7 @@ export function AtmosphereOverlay({
           background: embedded
             ? 'linear-gradient(to bottom, rgba(12,18,32,0.7) 0%, rgba(10,14,26,0.35) 20%, transparent 55%)'
             : 'linear-gradient(to bottom, rgba(12,18,32,0.5) 0%, rgba(10,14,26,0.2) 12%, transparent 22%)',
-          transition: 'background 4000ms ease',
-        }}
+          transition: 'background 4000ms ease' }}
       />
 
       {/* Etiqueta poética del momento — solo la frase, desaparece sola */}
@@ -85,18 +83,15 @@ function AtmosphereLabel({ label }: { label: string }) {
         textAlign: 'center',
         opacity: visible ? 1 : 0,
         transition: 'opacity 1500ms ease',
-        whiteSpace: 'nowrap',
-      }}
+        whiteSpace: 'nowrap' }}
     >
       <p style={{
-        fontSize: 28,
+        fontSize: 25,
         fontWeight: 300,
         color: 'rgba(255,255,255,0.75)',
         margin: 0,
-        letterSpacing: '-0.01em',
         fontFamily: 'var(--font-sans)',
-        textShadow: '0 2px 40px rgba(0,0,0,0.9)',
-      }}>
+        textShadow: '0 2px 40px rgba(0,0,0,0.9)' }}>
         {label}
       </p>
     </div>

@@ -15,8 +15,7 @@ export function AdultConsentCheckbox({
   id = 'privacy',
   checked,
   onChange,
-  label,
-}: AdultConsentCheckboxProps) {
+  label }: AdultConsentCheckboxProps) {
   return (
     <div className="flex items-start gap-2">
       <input

@@ -25,8 +25,7 @@ function formatTime(publishedAt: string | null): string {
     if (Number.isNaN(d.getTime())) return publishedAt;
     return d.toLocaleString('es', {
       dateStyle: 'short',
-      timeStyle: 'short',
-    });
+      timeStyle: 'short' });
   } catch {
     return publishedAt;
   }

@@ -18,8 +18,7 @@ export function CloudLayer({
   map,
   autoRotate = true,
   cloudRotationSpeed = 0.018,
-  quality = 'high',
-}: CloudLayerProps) {
+  quality = 'high' }: CloudLayerProps) {
   const groupRef = useRef<THREE.Group>(null);
   const seg = quality === 'high' ? 80 : quality === 'medium' ? 56 : 36;
 
@@ -44,8 +43,7 @@ export function CloudLayer({
         color: new THREE.Color(0xffffff),
         emissive: new THREE.Color(0xd8e2ee),
         emissiveIntensity: 0.08,
-        side: THREE.DoubleSide,
-      }),
+        side: THREE.DoubleSide }),
     [map]
   );
 

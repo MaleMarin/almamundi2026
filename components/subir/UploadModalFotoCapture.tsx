@@ -36,8 +36,7 @@ export function UploadModalFotoCapture({
   inlineError,
   incompleteIds,
   fichaMessage,
-  maxPhotos = SUBIR_PHOTO_MAX,
-}: Props) {
+  maxPhotos = SUBIR_PHOTO_MAX }: Props) {
   const converting = photos.some((p) => p.converting);
 
   return (

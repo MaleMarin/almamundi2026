@@ -10,8 +10,7 @@ import { X } from 'lucide-react';
 import {
   HISTORIAS_FILTER_ICON_IMG_CLASS,
   HISTORIAS_FILTER_ICON_WELL_CLASS,
-  HISTORIAS_SHARE_ICON_SRC,
-} from '@/lib/historias/historias-exhibition-icons';
+  HISTORIAS_SHARE_ICON_SRC } from '@/lib/historias/historias-exhibition-icons';
 import Image from 'next/image';
 import { useCallback, useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 
@@ -52,8 +51,7 @@ export function EthicalShareFlow({
   quote,
   imageUrl,
   shareUrl,
-  exhibitionLabel = 'AlmaMundi',
-}: EthicalShareFlowProps) {
+  exhibitionLabel = 'AlmaMundi' }: EthicalShareFlowProps) {
   const dialogId = useId();
   const [step, setStep] = useState<Step>('notice');
   const [toast, setToast] = useState<string | null>(null);
@@ -108,8 +106,7 @@ export function EthicalShareFlow({
         await navigator.share({
           title: `${storyTitle} · ${authorName}`,
           text: shareText,
-          url: shareUrl,
-        });
+          url: shareUrl });
       } else {
         await copyLink();
       }
@@ -138,8 +135,7 @@ export function EthicalShareFlow({
         authorName,
         storyTitle,
         exhibitionLabel,
-        qrDataUrl,
-      });
+        qrDataUrl });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = `almamundi-${authorName.replace(/\s+/g, '-').slice(0, 32) || 'historia'}.png`;
@@ -189,7 +185,7 @@ export function EthicalShareFlow({
 
           {step === 'notice' ? (
             <div className="pr-8">
-              <h2 id={`${dialogId}-h`} className="text-lg font-semibold leading-snug">
+              <h2 id={`${dialogId}-h`} className="text-[16px] font-semibold leading-snug">
                 {NOTICE_TITLE}
               </h2>
               <p className="mt-4 text-sm leading-relaxed text-white/90">
@@ -217,7 +213,7 @@ export function EthicalShareFlow({
             </div>
           ) : (
             <div className="pr-8">
-              <h2 id={`${dialogId}-h`} className="text-lg font-semibold">
+              <h2 id={`${dialogId}-h`} className="text-[16px] font-semibold">
                 Compartir historia
               </h2>
               <p className="mt-2 text-sm font-light text-white/70">
@@ -291,8 +287,7 @@ export function EthicalShareTriggerButton({
   onClick,
   className = '',
   ariaLabel = 'Compartir esta historia',
-  title: titleProp = 'Compartir esta historia',
-}: {
+  title: titleProp = 'Compartir esta historia' }: {
   onClick: () => void;
   className?: string;
   ariaLabel?: string;
@@ -332,8 +327,7 @@ export function EthicalShareTriggerWithCartaCompanion({
   companionAlt = '',
   companionTitle,
   shareButtonTitle,
-  shareButtonAriaLabel,
-}: {
+  shareButtonAriaLabel }: {
   onClick: () => void;
   buttonClassName?: string;
   /** Iconos neumórficos entre la carta y «llevar historia» (p. ej. ResonanceMailbox). */

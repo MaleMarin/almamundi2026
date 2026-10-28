@@ -3,8 +3,7 @@ import {
   getUserByUsername,
   getMuestrasByUser,
   getHistoriasGuardadas,
-  getHistoriasPropias,
-} from '@/lib/almamundi/perfil-queries';
+  getHistoriasPropias } from '@/lib/almamundi/perfil-queries';
 import { PerfilPage } from '@/components/perfil/PerfilPage';
 
 export const revalidate = 60;
@@ -17,8 +16,7 @@ export async function generateMetadata({ params }: Props) {
   if (!perfil || !perfil.isPublic) return { title: 'Usuario · AlmaMundi' };
   return {
     title: `${perfil.nombre} · AlmaMundi`,
-    description: perfil.bio ?? `Perfil de ${perfil.nombre} en AlmaMundi`,
-  };
+    description: perfil.bio ?? `Perfil de ${perfil.nombre} en AlmaMundi` };
 }
 
 export default async function UserProfilePage({ params }: Props) {

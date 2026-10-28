@@ -100,8 +100,7 @@ const MutedIcon = () => (
 export default function AudioPlayer({
   historia,
   onClose,
-  presentation = 'portal',
-}: AudioPlayerProps) {
+  presentation = 'portal' }: AudioPlayerProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(historia.duracion || 0);
@@ -273,8 +272,7 @@ export default function AudioPlayer({
                   paddingRight: '0.25rem',
                   paddingBottom: '1rem',
                   zIndex: 1,
-                  overflowY: 'visible',
-                }
+                  overflowY: 'visible' }
               : {
                   position: 'fixed',
                   inset: 0,
@@ -288,9 +286,7 @@ export default function AudioPlayer({
                   paddingRight: '1rem',
                   paddingBottom: '1.5rem',
                   zIndex: 9999,
-                  overflowY: 'auto',
-                }),
-          }}
+                  overflowY: 'auto' }) }}
         >
           {onClose ? (
             <button
@@ -310,8 +306,7 @@ export default function AudioPlayer({
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 10,
-              }}
+                zIndex: 10 }}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
@@ -328,8 +323,7 @@ export default function AudioPlayer({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              minHeight: 0,
-            }}
+              minHeight: 0 }}
           >
             <StoryScrollBlock scene>
             <RespondeALine
@@ -343,15 +337,14 @@ export default function AudioPlayer({
                 fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
                 fontWeight: 300,
-                fontSize: 'clamp(1.35rem, 3.6vw, 2.15rem)',
+                fontSize: 'clamp(1.188rem, 3.24vw, 1.938rem)',
                 color: TEXT_MAIN,
                 textAlign: 'center',
                 maxWidth: '100%',
                 marginBottom: '1.25rem',
                 lineHeight: 1.3,
                 opacity: titleVisible ? 1 : 0,
-                transition: 'opacity 0.6s ease',
-              }}
+                transition: 'opacity 0.6s ease' }}
             >
               {historia.titulo}
             </h1>
@@ -372,8 +365,7 @@ export default function AudioPlayer({
                 border: '2px solid rgba(255, 74, 28,0.45)',
                 marginBottom: '1.25rem',
                 flexShrink: 0,
-                boxShadow: '8px 8px 20px rgba(163,177,198,0.35), -6px -6px 16px rgba(255,255,255,0.85)',
-              }}
+                boxShadow: '8px 8px 20px rgba(163,177,198,0.35), -6px -6px 16px rgba(255,255,255,0.85)' }}
             >
               <img
                 src={historia.autor.avatar}
@@ -391,8 +383,7 @@ export default function AudioPlayer({
                 height: '36px',
                 width: waveformWidth,
                 maxWidth: '100%',
-                marginBottom: '1.25rem',
-              }}
+                marginBottom: '1.25rem' }}
             >
               {barHeights.map((h, i) => (
                 <div
@@ -410,17 +401,14 @@ export default function AudioPlayer({
                           animationTimingFunction: 'ease-in-out',
                           animationIterationCount: 'infinite',
                           animationDirection: 'alternate',
-                          animationDelay: `${i * 0.06}s`,
-                        }
+                          animationDelay: `${i * 0.06}s` }
                       : {
                           animationName: 'none',
                           animationDuration: '0s',
                           animationTimingFunction: 'ease',
                           animationIterationCount: 1,
                           animationDirection: 'normal',
-                          animationDelay: '0s',
-                        }),
-                  }}
+                          animationDelay: '0s' }) }}
                 />
               ))}
             </div>
@@ -432,11 +420,10 @@ export default function AudioPlayer({
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
                     fontStyle: 'italic',
-                    fontSize: '1.05rem',
+                    fontSize: '15px',
                     color: TEXT_BODY,
                     lineHeight: 1.6,
-                    margin: 0,
-                  }}
+                    margin: 0 }}
                 >
                   {currentPhrase}
                 </p>
@@ -452,8 +439,7 @@ export default function AudioPlayer({
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
-                gap: '0.85rem',
-              }}
+                gap: '0.85rem' }}
             >
               <div style={{ position: 'relative', width: '100%', maxWidth: '480px' }}>
                 <div
@@ -466,8 +452,7 @@ export default function AudioPlayer({
                     background: SEPIA,
                     borderRadius: '2px',
                     transform: 'translateY(-50%)',
-                    pointerEvents: 'none',
-                  }}
+                    pointerEvents: 'none' }}
                 />
                 <input
                   type="range"
@@ -478,7 +463,7 @@ export default function AudioPlayer({
                   onChange={seek}
                 />
               </div>
-              <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '0.8rem', color: TEXT_BODY, letterSpacing: '0.06em' }}>
+              <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '12.8px', color: TEXT_BODY }}>
                 {formatTime(currentTime)} · · · {formatTime(duration)}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -495,8 +480,7 @@ export default function AudioPlayer({
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                    justifyContent: 'center' }}
                 >
                   <SkipBackIcon />
                 </button>
@@ -516,8 +500,7 @@ export default function AudioPlayer({
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                    justifyContent: 'center' }}
                 >
                   {isPlaying ? <PauseIcon /> : <PlayIcon />}
                 </button>
@@ -534,8 +517,7 @@ export default function AudioPlayer({
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                    justifyContent: 'center' }}
                 >
                   <SkipFwdIcon />
                 </button>
@@ -552,8 +534,7 @@ export default function AudioPlayer({
                     color: TEXT_MAIN,
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
+                    justifyContent: 'center' }}
                 >
                   {isMuted ? <MutedIcon /> : <VolumeIcon />}
                 </button>
@@ -567,8 +548,7 @@ export default function AudioPlayer({
                 style={{
                   width: '100%',
                   maxWidth: '480px',
-                  marginTop: '4px',
-                }}
+                  marginTop: '4px' }}
               />
               {transcripcionText ? (
                 <details style={{ marginTop: '12px', width: '100%', maxWidth: '480px' }}>
@@ -577,14 +557,13 @@ export default function AudioPlayer({
                       cursor: 'pointer',
                       fontSize: '13px',
                       fontWeight: 600,
-                      letterSpacing: '0.08em',
+                      letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       color: '#FF4A1C',
                       listStyle: 'none',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '8px',
-                    }}
+                      gap: '8px' }}
                   >
                     <span aria-hidden="true">▶</span>
                     Leer transcripción
@@ -598,8 +577,7 @@ export default function AudioPlayer({
                       lineHeight: '1.8',
                       color: TEXT_MAIN,
                       borderLeft: '3px solid #FF4A1C',
-                      paddingLeft: '16px',
-                    }}
+                      paddingLeft: '16px' }}
                   >
                     {transcripcionText}
                   </div>

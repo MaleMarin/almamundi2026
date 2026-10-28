@@ -37,9 +37,7 @@ export function StoryScrollBlock({ children, scene = false }: StoryScrollBlockPr
           trigger: el,
           start: 'top 86%',
           toggleActions: 'play none none none',
-          once: true,
-        },
-      });
+          once: true } });
     }, el);
 
     ScrollTrigger.refresh();
@@ -56,10 +54,8 @@ export function StoryScrollBlock({ children, scene = false }: StoryScrollBlockPr
               minHeight: 'min(78dvh, 44rem)',
               display: 'flex',
               flexDirection: 'column',
-              justifyContent: 'center',
-            }
-          : null),
-      }}
+              justifyContent: 'center' }
+          : null) }}
     >
       {children}
     </div>

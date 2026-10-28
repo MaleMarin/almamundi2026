@@ -22,8 +22,7 @@ export function EarthGlobeDemoScene() {
       gl={{
         antialias: true,
         alpha: false,
-        powerPreference: 'high-performance',
-      }}
+        powerPreference: 'high-performance' }}
       onCreated={({ gl }) => {
         gl.setClearColor('#000000', 1);
         gl.outputColorSpace = THREE.SRGBColorSpace;

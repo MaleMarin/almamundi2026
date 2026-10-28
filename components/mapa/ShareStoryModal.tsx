@@ -9,8 +9,7 @@ type Mode = 'share' | 'postal';
 export function ShareStoryModal({
   story,
   mode,
-  onClose,
-}: {
+  onClose }: {
   story: StoryPoint;
   mode: Mode;
   onClose: () => void;
@@ -29,8 +28,7 @@ export function ShareStoryModal({
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.trim(), anonymous: anon }),
-        }
+          body: JSON.stringify({ email: email.trim(), anonymous: anon }) }
       );
       setSent(true);
     } catch {}
@@ -47,8 +45,7 @@ export function ShareStoryModal({
         alignItems: 'center',
         justifyContent: 'center',
         background: 'rgba(0,0,0,0.60)',
-        backdropFilter: 'blur(8px)',
-      }}
+        backdropFilter: 'blur(8px)' }}
       onClick={onClose}
     >
       <div
@@ -60,19 +57,17 @@ export function ShareStoryModal({
           background: 'rgba(8,12,25,0.95)',
           border: '1px solid rgba(255,255,255,0.10)',
           backdropFilter: 'blur(40px)',
-          boxShadow: '0 32px 64px rgba(0,0,0,0.7)',
-        }}
+          boxShadow: '0 32px 64px rgba(0,0,0,0.7)' }}
       >
         {sent ? (
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <p
               style={{
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: 300,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 8px',
-                fontFamily: SITE_FONT_STACK,
-              }}
+                fontFamily: SITE_FONT_STACK }}
             >
               {mode === 'share' ? 'Enviado.' : 'Postal enviada.'}
             </p>
@@ -81,8 +76,7 @@ export function ShareStoryModal({
                 fontSize: 13,
                 color: 'rgba(255,255,255,0.40)',
                 margin: '0 0 20px',
-                fontFamily: SITE_FONT_STACK,
-              }}
+                fontFamily: SITE_FONT_STACK }}
             >
               {mode === 'share'
                 ? 'Alguien recibirá esta historia.'
@@ -100,8 +94,7 @@ export function ShareStoryModal({
                 cursor: 'pointer',
                 fontSize: 13,
                 outline: 'none',
-                fontFamily: SITE_FONT_STACK,
-              }}
+                fontFamily: SITE_FONT_STACK }}
             >
               Cerrar
             </button>
@@ -110,12 +103,11 @@ export function ShareStoryModal({
           <>
             <p
               style={{
-                fontSize: 18,
+                fontSize: 16,
                 fontWeight: 300,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 6px',
-                fontFamily: SITE_FONT_STACK,
-              }}
+                fontFamily: SITE_FONT_STACK }}
             >
               {mode === 'share'
                 ? 'Enviar esta historia a alguien'
@@ -127,8 +119,7 @@ export function ShareStoryModal({
                 color: 'rgba(255,255,255,0.35)',
                 margin: '0 0 20px',
                 fontFamily: SITE_FONT_STACK,
-                lineHeight: 1.5,
-              }}
+                lineHeight: 1.5 }}
             >
               {mode === 'share'
                 ? 'Recibirán un email que dice: "Alguien pensó en ti cuando leyó esto."'
@@ -151,8 +142,7 @@ export function ShareStoryModal({
                 outline: 'none',
                 boxSizing: 'border-box',
                 fontFamily: SITE_FONT_STACK,
-                marginBottom: 12,
-              }}
+                marginBottom: 12 }}
               onFocus={(e) =>
                 (e.target.style.borderColor = 'rgba(var(--almamundi-orange-rgb), 0.40)')
               }
@@ -168,8 +158,7 @@ export function ShareStoryModal({
                 gap: 10,
                 cursor: 'pointer',
                 marginBottom: 20,
-                fontFamily: SITE_FONT_STACK,
-              }}
+                fontFamily: SITE_FONT_STACK }}
             >
               <input
                 type="checkbox"
@@ -198,8 +187,7 @@ export function ShareStoryModal({
                   cursor: 'pointer',
                   fontSize: 13,
                   outline: 'none',
-                  fontFamily: SITE_FONT_STACK,
-                }}
+                  fontFamily: SITE_FONT_STACK }}
               >
                 Cancelar
               </button>
@@ -212,8 +200,7 @@ export function ShareStoryModal({
                   flex: 2,
                   padding: '10px',
                   fontSize: 13,
-                  fontFamily: SITE_FONT_STACK,
-                }}
+                  fontFamily: SITE_FONT_STACK }}
               >
                 {sending ? 'Enviando...' : 'Enviar'}
               </button>

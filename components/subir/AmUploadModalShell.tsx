@@ -36,8 +36,7 @@ export function AmUploadModalShell({
   showContinue = true,
   className,
   cardOnly = false,
-  footnote,
-}: AmUploadModalShellProps) {
+  footnote }: AmUploadModalShellProps) {
   const card = (
     <div className={`${styles.amModalCard} font-interna ${className ?? ''}`}>
       <header className={styles.amModalHeader}>

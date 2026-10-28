@@ -129,8 +129,7 @@ function getPulseStyle(index: number) {
   const delay = (index * 0.2) % 1.5;
   return {
     animation: `bitPulse ${duration}s ease-in-out infinite`,
-    animationDelay: `${delay}s`,
-  };
+    animationDelay: `${delay}s` };
 }
 
 /** Puntos dorados pequeños: núcleo claro + halos ámbar/oro. */
@@ -409,8 +408,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
             boxShadow: atmosphereShadow,
             perspective: 2400,
             perspectiveOrigin: '50% 50%',
-            transformStyle: 'preserve-3d',
-          }}
+            transformStyle: 'preserve-3d' }}
         >
           <div
             className="absolute inset-0 rounded-full overflow-hidden"
@@ -431,8 +429,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
               backgroundColor: 'transparent',
               backgroundImage: 'url(/textures/earth-day.jpg)',
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
+              backgroundPosition: 'center' }}
             aria-hidden
           >
             {/* Capa base: imagen de la Tierra (mapa mundi día); fallback por si la ruta falla. */}
@@ -448,8 +445,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                 transform: 'none',
                 transformOrigin: '50% 50%',
                 zIndex: 0,
-                filter: GLOBE_OCEAN_FILTER,
-              }}
+                filter: GLOBE_OCEAN_FILTER }}
             />
             {/* Vídeo encima solo cuando está listo; opacity 0 + visibility hidden evitan frame negro hasta que cargue. */}
             <video
@@ -471,8 +467,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                 transform: 'none',
                 transformOrigin: '50% 50%',
                 zIndex: 1,
-                filter: GLOBE_OCEAN_FILTER,
-              }}
+                filter: GLOBE_OCEAN_FILTER }}
               aria-hidden
             />
             <div
@@ -496,8 +491,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                 opacity: revealOpacity,
                 pointerEvents: 'none',
                 transform: VIDEO_TRANSFORM,
-                transformOrigin: '50% 50%',
-              }}
+                transformOrigin: '50% 50%' }}
               aria-hidden
             >
               {validPoints.map((point, index) => {
@@ -517,8 +511,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                       transform: BIT_CENTER,
                       transformOrigin: '50% 50%',
                       transition: 'none',
-                      pointerEvents: 'auto',
-                    }}
+                      pointerEvents: 'auto' }}
                     onClick={(e) => {
                       e.stopPropagation();
                       onPointClick?.(point);
@@ -533,8 +526,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
                           ? '0 0 0 1.5px rgba(255,200,90,0.95), 0 0 12px rgba(255,190,60,0.55), 0 0 22px rgba(212,160,30,0.35)'
                           : undefined,
                         filter: isHighlighted ? 'brightness(1.28) saturate(1.15)' : undefined,
-                        ...pulseStyles[index],
-                      }}
+                        ...pulseStyles[index] }}
                     />
                   </button>
                 );

@@ -8,16 +8,14 @@ import {
   preguntaPageHref,
   preguntasDeLaSemana,
   type PreguntaSemana,
-  type QuestionMode,
-} from '@/lib/pregunta-semana';
+  type QuestionMode } from '@/lib/pregunta-semana';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 function PreguntaCard({
   pregunta,
   mode,
-  locale,
-}: {
+  locale }: {
   pregunta: PreguntaSemana;
   mode: QuestionMode;
   locale: AlmaLocale;
@@ -29,8 +27,7 @@ function PreguntaCard({
         padding: '14px 14px 12px',
         borderRadius: 16,
         background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.16)',
-      }}
+        border: '1px solid rgba(255,255,255,0.16)' }}
     >
       <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
         {title}
@@ -47,8 +44,7 @@ function PreguntaCard({
           padding: '8px 14px',
           fontWeight: 700,
           fontSize: 13,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
       >
         {PREGUNTA_UI.responder[locale]}
       </Link>
@@ -59,14 +55,13 @@ function PreguntaCard({
 function SemanaBlock({
   pregunta,
   locale,
-  linkTema = false,
-}: {
+  linkTema = false }: {
   pregunta: PreguntaSemana;
   locale: AlmaLocale;
   linkTema?: boolean;
 }) {
   const title = (
-    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
+    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
       {linkTema ? (
         <Link href={`/pregunta/${pregunta.id}`} style={{ color: 'inherit' }}>
           {pregunta.tema[locale]}
@@ -96,8 +91,7 @@ export function PreguntaPanel() {
         flexDirection: 'column',
         gap: 22,
         fontFamily: SITE_FONT_STACK,
-        paddingBottom: 8,
-      }}
+        paddingBottom: 8 }}
     >
       <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.78)' }}>
         {PREGUNTA_COPY.intro[locale]}
@@ -110,10 +104,9 @@ export function PreguntaPanel() {
               margin: 0,
               fontSize: 13,
               fontWeight: 700,
-              letterSpacing: '0.04em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.55)',
-            }}
+              color: 'rgba(255,255,255,0.55)' }}
           >
             {PREGUNTA_UI.anteriores[locale]}
           </h3>

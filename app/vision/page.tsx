@@ -5,8 +5,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'La visión de AlmaMundi',
   description:
-    'Hacia dónde va AlmaMundi: memoria viva de relatos, mapa y caminos futuros, con honestidad sobre lo que ya existe y lo que viene.',
-};
+    'Hacia dónde va AlmaMundi: memoria viva de relatos, mapa y caminos futuros, con honestidad sobre lo que ya existe y lo que viene.' };
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
@@ -21,109 +20,92 @@ type RoadmapStatus = 'disponible' | 'desarrollo' | 'futuro';
 const STATUS_LABEL: Record<RoadmapStatus, string> = {
   disponible: 'Disponible',
   desarrollo: 'En desarrollo',
-  futuro: 'A futuro',
-};
+  futuro: 'A futuro' };
 
 const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
   disponible: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '0.68rem',
+    fontSize: '10.88px',
     fontWeight: 600,
-    letterSpacing: '0.04em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     borderRadius: 999,
     color: 'var(--almamundi-orange)',
     background: 'rgba(var(--almamundi-orange-rgb), 0.14)',
-    border: '1px solid rgba(var(--almamundi-orange-rgb), 0.28)',
-  },
+    border: '1px solid rgba(var(--almamundi-orange-rgb), 0.28)' },
   desarrollo: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '0.68rem',
+    fontSize: '10.88px',
     fontWeight: 600,
-    letterSpacing: '0.04em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     borderRadius: 999,
     color: '#334155',
     background: 'rgba(71, 85, 105, 0.12)',
-    border: '1px solid rgba(100, 116, 139, 0.28)',
-  },
+    border: '1px solid rgba(100, 116, 139, 0.28)' },
   futuro: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '0.68rem',
+    fontSize: '10.88px',
     fontWeight: 600,
-    letterSpacing: '0.04em',
+    letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
     borderRadius: 999,
     color: '#4b5563',
     background: 'rgba(107, 114, 128, 0.12)',
-    border: '1px solid rgba(156, 163, 175, 0.35)',
-  },
-};
+    border: '1px solid rgba(156, 163, 175, 0.35)' } };
 
 const ROADMAP: { title: string; status: RoadmapStatus; body: string }[] = [
   {
     title: 'Historias que no se pierden',
     status: 'disponible',
-    body: 'Relatos en audio, texto, fotografía o video que no quedan enterrados en un feed. Cada historia se revisa, se cuida y puede encontrar un lugar en esta colección viva.',
-  },
+    body: 'Relatos en audio, texto, fotografía o video que no quedan enterrados en un feed. Cada historia se revisa, se cuida y puede encontrar un lugar en esta colección viva.' },
   {
     title: 'Mapa vivo',
     status: 'disponible',
-    body: 'Un globo donde cada historia puede aparecer como una señal humana conectada a un lugar. No es solo una ubicación: es una memoria que puede despertar otra.',
-  },
+    body: 'Un globo donde cada historia puede aparecer como una señal humana conectada a un lugar. No es solo una ubicación: es una memoria que puede despertar otra.' },
   {
     title: 'Recorridos de memoria',
     status: 'desarrollo',
-    body: 'Rutas futuras que conecten historias por temas, emociones o territorios: partir, volver, cuidar, migrar, perder, amar, resistir, empezar de nuevo.',
-  },
+    body: 'Rutas futuras que conecten historias por temas, emociones o territorios: partir, volver, cuidar, migrar, perder, amar, resistir, empezar de nuevo.' },
   {
     title: 'Exposiciones digitales',
     status: 'futuro',
-    body: 'Muestras curatoriales hechas a partir de historias seleccionadas. Una forma de transformar relatos dispersos en experiencias con sentido.',
-  },
+    body: 'Muestras curatoriales hechas a partir de historias seleccionadas. Una forma de transformar relatos dispersos en experiencias con sentido.' },
   {
     title: 'Memoria sonora',
     status: 'futuro',
-    body: 'Un espacio para voces, pausas, acentos y formas de contar. Porque una historia no vive solo en lo que dice, sino también en cómo suena.',
-  },
+    body: 'Un espacio para voces, pausas, acentos y formas de contar. Porque una historia no vive solo en lo que dice, sino también en cómo suena.' },
   {
     title: 'Legado familiar',
     status: 'futuro',
-    body: 'Herramientas futuras para ordenar recuerdos, fotografías, testimonios y líneas de tiempo familiares.',
-  },
+    body: 'Herramientas futuras para ordenar recuerdos, fotografías, testimonios y líneas de tiempo familiares.' },
   {
     title: 'Memoria de comunidades',
     status: 'futuro',
-    body: 'Proyectos con barrios, escuelas, organizaciones y territorios que quieran construir memoria colectiva desde sus propias voces.',
-  },
+    body: 'Proyectos con barrios, escuelas, organizaciones y territorios que quieran construir memoria colectiva desde sus propias voces.' },
   {
     title: 'Proyectos educativos',
     status: 'futuro',
-    body: 'Materiales para aprender a escuchar, entrevistar, documentar y compartir historias con cuidado ético.',
-  },
+    body: 'Materiales para aprender a escuchar, entrevistar, documentar y compartir historias con cuidado ético.' },
   {
     title: 'Mapa de señales',
     status: 'desarrollo',
-    body: 'Una herramienta futura para reflexionar antes de compartir: qué estoy contando, a quién menciono, qué permisos necesito, qué riesgos debo cuidar.',
-  },
+    body: 'Una herramienta futura para reflexionar antes de compartir: qué estoy contando, a quién menciono, qué permisos necesito, qué riesgos debo cuidar.' },
   {
     title: 'Postales de memoria',
     status: 'futuro',
-    body: 'Fragmentos de historias compartidos con intención: una frase, una imagen, una voz o una memoria breve que invite a descubrir el relato completo.',
-  },
+    body: 'Fragmentos de historias compartidos con intención: una frase, una imagen, una voz o una memoria breve que invite a descubrir el relato completo.' },
   {
     title: 'Publicaciones',
     status: 'futuro',
-    body: 'Cuadernos, informes o libros digitales basados en las historias reunidas, cuando existan suficientes relatos para leer patrones, preguntas y memorias comunes.',
-  },
+    body: 'Cuadernos, informes o libros digitales basados en las historias reunidas, cuando existan suficientes relatos para leer patrones, preguntas y memorias comunes.' },
   {
     title: 'Observatorio de historias humanas',
     status: 'futuro',
-    body: 'Una lectura ética de los temas, emociones y señales que emergen de las historias reunidas: no para convertir personas en datos, sino para comprender mejor lo que nos atraviesa.',
-  },
+    body: 'Una lectura ética de los temas, emociones y señales que emergen de las historias reunidas: no para convertir personas en datos, sino para comprender mejor lo que nos atraviesa.' },
 ];
 
 export default function VisionPage() {
@@ -133,8 +115,7 @@ export default function VisionPage() {
         minHeight: '100vh',
         background: BG,
         padding: '2rem 1rem 3.5rem',
-        fontFamily: 'inherit',
-      }}
+        fontFamily: 'inherit' }}
     >
       <article style={{ maxWidth: 720, margin: '0 auto' }}>
         <HomeHardLink
@@ -143,9 +124,8 @@ export default function VisionPage() {
           style={{
             display: 'inline-block',
             marginBottom: '1.5rem',
-            fontSize: '0.85rem',
-            padding: '0.45rem 0.9rem',
-          }}
+            fontSize: '13.6px',
+            padding: '0.45rem 0.9rem' }}
         >
           ← Volver al inicio
         </HomeHardLink>
@@ -154,12 +134,11 @@ export default function VisionPage() {
           <p
             style={{
               margin: '0 0 0.5rem',
-              fontSize: '0.75rem',
+              fontSize: '12px',
               fontWeight: 600,
-              letterSpacing: '0.14em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: TEXT_3,
-            }}
+              color: TEXT_3 }}
           >
             AlmaMundi
           </p>
@@ -169,32 +148,29 @@ export default function VisionPage() {
               fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
-              fontSize: 'clamp(1.5rem, 2.5vw, 2rem)',
+              fontSize: 'clamp(1.375rem, 2.25vw, 1.813rem)',
               lineHeight: 1.2,
-              color: TEXT_1,
-            }}
+              color: TEXT_1 }}
           >
             La visión de AlmaMundi
           </h1>
           <p
             style={{
               margin: '0 0 1.25rem',
-              fontSize: '0.8rem',
+              fontSize: '12.8px',
               fontWeight: 600,
-              letterSpacing: '0.06em',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: '#9a3412',
-            }}
+              color: '#9a3412' }}
           >
             Beta pública — esta hoja de ruta puede actualizarse mientras el proyecto avanza.
           </p>
           <div
             style={{
               fontFamily: 'inherit',
-              fontSize: '0.95rem',
+              fontSize: '15px',
               lineHeight: 1.72,
-              color: TEXT_2,
-            }}
+              color: TEXT_2 }}
           >
             <p style={{ margin: '0 0 1.1rem' }}>
               AlmaMundi nace de una idea simple: que las historias humanas no deberían perderse en el scroll.
@@ -226,8 +202,7 @@ export default function VisionPage() {
             padding: '1.35rem 1.5rem 1.5rem',
             background: BG,
             borderRadius: 16,
-            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
-          }}
+            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}` }}
         >
           <h2
             id="vision-construccion"
@@ -236,17 +211,15 @@ export default function VisionPage() {
               fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
-              fontSize: '1.1rem',
-              color: ORANGE,
-            }}
+              fontSize: '16px',
+              color: ORANGE }}
           >
             Lo que estamos construyendo
           </h2>
           <div
             style={{
               display: 'grid',
-              gap: '1rem',
-            }}
+              gap: '1rem' }}
           >
             {ROADMAP.map((item, i) => (
               <div
@@ -256,22 +229,20 @@ export default function VisionPage() {
                   borderRadius: 14,
                   background: 'rgba(255,255,255,0.35)',
                   border: '1px solid rgba(255,255,255,0.55)',
-                  boxShadow: `inset 1px 1px 3px ${SH_LIGHT}, inset -1px -1px 4px ${SH_DARK}`,
-                }}
+                  boxShadow: `inset 1px 1px 3px ${SH_LIGHT}, inset -1px -1px 4px ${SH_DARK}` }}
               >
                 <h3
                   style={{
                     margin: '0 0 0.55rem',
                     fontFamily: 'inherit',
-                    fontSize: '0.95rem',
+                    fontSize: '15px',
                     fontWeight: 600,
                     color: TEXT_1,
                     lineHeight: 1.45,
                     display: 'flex',
                     flexWrap: 'wrap',
                     alignItems: 'baseline',
-                    gap: '0.35rem',
-                  }}
+                    gap: '0.35rem' }}
                 >
                   <span>
                     <span style={{ color: TEXT_3, fontWeight: 500 }}>{i + 1}. </span>
@@ -283,10 +254,9 @@ export default function VisionPage() {
                   style={{
                     margin: 0,
                     fontFamily: 'inherit',
-                    fontSize: '0.88rem',
+                    fontSize: '14.08px',
                     lineHeight: 1.65,
-                    color: TEXT_2,
-                  }}
+                    color: TEXT_2 }}
                 >
                   {item.body}
                 </p>
@@ -302,18 +272,16 @@ export default function VisionPage() {
             borderRadius: 16,
             background: 'rgba(255,255,255,0.28)',
             border: '1px solid rgba(255,255,255,0.5)',
-            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
-          }}
+            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}` }}
         >
           <p
             style={{
               margin: 0,
               fontFamily: 'inherit',
-              fontSize: '0.95rem',
+              fontSize: '15px',
               lineHeight: 1.72,
               fontStyle: 'italic',
-              color: TEXT_2,
-            }}
+              color: TEXT_2 }}
           >
             No estamos construyendo otra red social. Estamos construyendo un lugar para que las historias salgan del
             scroll y encuentren memoria, conexión y cuidado.

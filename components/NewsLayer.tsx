@@ -70,8 +70,7 @@ function normalizeFetchResult(
     generalItems: [],
     topicMatched: topicItems.length > 0,
     relaxedTopic: Boolean(result.relaxedTopic),
-    isFallback: result.isFallback,
-  };
+    isFallback: result.isFallback };
 }
 
 export type UseNewsLayerOptions = {
@@ -101,8 +100,7 @@ function newsToGlobePoint(n: NewsItem): { id: string; lat: number; lng: number; 
     geoLabel: geo.label,
     weight: n.publishedAt ? new Date(n.publishedAt).getTime() : Date.now(),
     altitude: 0.02,
-    radius: 0.2,
-  };
+    radius: 0.2 };
 }
 
 export function useNewsLayer(
@@ -210,8 +208,7 @@ export function useNewsLayer(
         topicItems: tItems,
         generalItems: gItems,
         topicMatched: result.topicMatched,
-        relaxedTopic: result.relaxedTopic,
-      };
+        relaxedTopic: result.relaxedTopic };
       cacheByTopicRef.current[requestKey] = entry;
       setTopicItems(tItems);
       setGeneralItems(gItems);
@@ -333,6 +330,5 @@ export function useNewsLayer(
     effectiveNewsItems: [...effectiveTopicItems, ...effectiveGeneralItems],
     isFallback: false,
     newsPoints,
-    newsObjectsForGlobe,
-  };
+    newsObjectsForGlobe };
 }

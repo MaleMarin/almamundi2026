@@ -99,9 +99,7 @@ export function MisDatosPersonalesForm() {
           ownData,
           website,
           formToken,
-          turnstileToken,
-        }),
-      });
+          turnstileToken }) });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) {
         setErrMsg(data.error ?? 'No se pudo enviar. Prueba de nuevo.');
@@ -118,11 +116,11 @@ export function MisDatosPersonalesForm() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 px-4 py-10 pb-16" style={{ fontFamily: 'inherit' }}>
       <header className="space-y-3 text-center sm:text-left">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-orange-600">Privacidad</p>
-        <h1 id="solicitud-datos-personales" className="text-2xl font-semibold tracking-tight text-gray-900 md:text-3xl">
+        <p className="text-xs font-semibold uppercase text-orange-600 tracking-[0.12em]">Privacidad</p>
+        <h1 id="solicitud-datos-personales" className="text-[22px] font-semibold text-gray-900 md:text-[27px]">
           Solicitud sobre tus datos personales
         </h1>
-        <div className="space-y-3 text-sm leading-relaxed text-gray-600 md:text-[0.9375rem]">
+        <div className="space-y-3 text-sm leading-relaxed text-gray-600 md:text-[15px]">
           <p>
             Puedes usar este formulario para solicitar información o ejercer tus derechos sobre los datos personales
             que hayas compartido con AlmaMundi. Es el mismo canal que describe el{' '}
@@ -230,7 +228,7 @@ export function MisDatosPersonalesForm() {
             className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="identificacion"
           >
-            <h2 id="identificacion" className="text-base font-semibold text-gray-900">
+            <h2 id="identificacion" className="text-[15px] font-semibold text-gray-900">
               Identificación de la persona solicitante
             </h2>
             <div className="mt-5 space-y-4">
@@ -326,7 +324,7 @@ export function MisDatosPersonalesForm() {
             className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="verificacion"
           >
-            <h2 id="verificacion" className="text-base font-semibold text-gray-900">
+            <h2 id="verificacion" className="text-[15px] font-semibold text-gray-900">
               Verificación de identidad
             </h2>
             <p className="mt-3 text-sm leading-relaxed text-gray-600">

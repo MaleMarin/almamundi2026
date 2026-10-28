@@ -19,8 +19,7 @@ type HistoriasFilterCountrySelectProps = {
 export function HistoriasFilterCountrySelect({
   id: idProp,
   value,
-  onChange,
-}: HistoriasFilterCountrySelectProps) {
+  onChange }: HistoriasFilterCountrySelectProps) {
   const reactId = useId();
   const buttonId = idProp ?? `historias-pais-${reactId.replace(/:/g, '')}`;
   const listboxId = `${buttonId}-listbox`;

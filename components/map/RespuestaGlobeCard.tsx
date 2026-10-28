@@ -8,8 +8,7 @@ import type { RespuestaPublica } from '@/lib/respuestas/public';
 
 export function RespuestaGlobeCard({
   item,
-  onClose,
-}: {
+  onClose }: {
   item: RespuestaPublica;
   onClose: () => void;
 }) {
@@ -21,7 +20,7 @@ export function RespuestaGlobeCard({
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div>
-          <p className="m-0 text-base font-semibold">{item.alias}</p>
+          <p className="m-0 text-[15px] font-semibold">{item.alias}</p>
           <p className="m-0 text-sm text-[#4A5568]">{item.city}</p>
         </div>
         <button type="button" onClick={onClose} className="text-sm font-semibold text-[#4A5568]">

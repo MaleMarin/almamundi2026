@@ -110,8 +110,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           background: `linear-gradient(90deg, ${SEPIA_DK}, ${SEPIA})`,
           width: `${readProgress}%`,
           zIndex: 1000,
-          transition: 'width 0.15s ease-out',
-        }}
+          transition: 'width 0.15s ease-out' }}
       />
 
       {/* Botón Volver */}
@@ -127,12 +126,11 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             zIndex: 100,
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 300,
-            fontSize: '0.75rem',
+            fontSize: '12px',
             padding: '0.4rem 0.75rem',
             display: 'flex',
             alignItems: 'center',
-            gap: 6,
-          }}
+            gap: 6 }}
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <polyline points="15,18 9,12 15,6" />
@@ -154,8 +152,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           paddingRight: paddingX,
           maxWidth: isMobile ? '100%' : maxWidthDesktop,
           margin: '0 auto',
-          boxSizing: 'border-box',
-        }}
+          boxSizing: 'border-box' }}
       >
         <StoryScrollBlock scene>
         {/* Fecha */}
@@ -163,12 +160,11 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           style={{
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 400,
-            fontSize: '0.7rem',
-            letterSpacing: '0.3em',
+            fontSize: '11.2px',
+            letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: SEPIA,
-            marginBottom: '1.5rem',
-          }}
+            marginBottom: '1.5rem' }}
         >
           {formatFecha(historia.fecha)}
         </p>
@@ -180,11 +176,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 400,
             fontStyle: 'italic',
-            fontSize: 'clamp(2rem, 5vw, 3.2rem)',
+            fontSize: 'clamp(1.813rem, 4.5vw, 2.875rem)',
             color: TINTA,
             lineHeight: 1.15,
-            marginBottom: '0.8rem',
-          }}
+            marginBottom: '0.8rem' }}
         >
           {historia.titulo}
         </h1>
@@ -195,11 +190,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
-              fontSize: '1rem',
+              fontSize: '15px',
               color: TINTA_SOFT,
               lineHeight: 1.7,
-              marginBottom: '1.5rem',
-            }}
+              marginBottom: '1.5rem' }}
           >
             {historia.subtitulo}
           </p>
@@ -210,8 +204,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             width: 60,
             height: 1,
             background: `linear-gradient(90deg, ${SEPIA_DK}, transparent)`,
-            marginBottom: '1.5rem',
-          }}
+            marginBottom: '1.5rem' }}
         />
 
         {/* Metadatos: avatar + nombre + ubicación + tiempo */}
@@ -221,8 +214,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             flexWrap: 'wrap',
             gap: '0.75rem 1.5rem',
             alignItems: 'center',
-            marginBottom: '3rem',
-          }}
+            marginBottom: '3rem' }}
         >
           <img
             src={historia.autor.avatar}
@@ -231,10 +223,9 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               width: 36,
               height: 36,
               borderRadius: '50%',
-              objectFit: 'cover',
-            }}
+              objectFit: 'cover' }}
           />
-          <span style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '0.88rem', color: TINTA }}>
+          <span style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '14.08px', color: TINTA }}>
             {historia.autor.nombre}
           </span>
           {historia.autor.ubicacion ? (
@@ -244,11 +235,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 400,
-                  fontSize: '0.8rem',
-                  letterSpacing: '0.08em',
+                  fontSize: '12.8px',
+                  letterSpacing: '0.12em',
                   textTransform: 'uppercase',
-                  color: TINTA_SOFT,
-                }}
+                  color: TINTA_SOFT }}
               >
                 {historia.autor.ubicacion}
               </span>
@@ -261,9 +251,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 200,
-                  fontSize: '0.8rem',
-                  color: SEPIA,
-                }}
+                  fontSize: '12.8px',
+                  color: SEPIA }}
               >
                 {historia.tiempoLectura} min de lectura
               </span>
@@ -279,12 +268,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             <p
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
-                fontSize: '1rem',
+                fontSize: '15px',
                 lineHeight: 1.7,
                 color: TINTA,
-                marginBottom: '1.6rem',
-                letterSpacing: '0.01em',
-              }}
+                marginBottom: '1.6rem' }}
             >
               {drop && (
                 <span
@@ -296,8 +283,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                     float: 'left',
                     lineHeight: 0.85,
                     marginRight: 8,
-                    marginTop: 6,
-                  }}
+                    marginTop: 6 }}
                 >
                   {drop}
                 </span>
@@ -313,12 +299,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 key={idx}
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: '1rem',
+                  fontSize: '15px',
                   lineHeight: 1.7,
                   color: TINTA,
-                  marginBottom: '1.6rem',
-                  letterSpacing: '0.01em',
-                }}
+                  marginBottom: '1.6rem' }}
               >
                 {texto}
               </p>
@@ -340,8 +324,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               width: 40,
               height: 1,
               background: SEPIA,
-              margin: '0 auto 2rem',
-            }}
+              margin: '0 auto 2rem' }}
           />
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <img
@@ -353,17 +336,15 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 borderRadius: '50%',
                 objectFit: 'cover',
                 border: `1.5px solid ${SEPIA}`,
-                marginBottom: '0.75rem',
-              }}
+                marginBottom: '0.75rem' }}
             />
             <p
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
-                fontSize: '1.3rem',
+                fontSize: '19px',
                 color: TINTA,
-                marginBottom: '0.25rem',
-              }}
+                marginBottom: '0.25rem' }}
             >
               {historia.autor.nombre}
             </p>
@@ -372,12 +353,11 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 200,
-                  fontSize: '0.75rem',
+                  fontSize: '12px',
                   textTransform: 'uppercase',
-                  letterSpacing: '0.15em',
+                  letterSpacing: '0.12em',
                   color: SEPIA,
-                  marginBottom: '0.5rem',
-                }}
+                  marginBottom: '0.5rem' }}
               >
                 {historia.autor.ubicacion}
               </p>
@@ -387,15 +367,14 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 300,
-                  fontSize: '0.85rem',
+                  fontSize: '13.6px',
                   color: TINTA_SOFT,
                   maxWidth: 360,
                   marginBottom: '1rem',
                   display: '-webkit-box',
                   WebkitLineClamp: 2,
                   WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden',
-                }}
+                  overflow: 'hidden' }}
               >
                 {historia.autor.bio}
               </p>
@@ -412,8 +391,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             flexWrap: 'wrap',
             gap: '1rem',
             justifyContent: 'center',
-            marginTop: '3rem',
-          }}
+            marginTop: '3rem' }}
         >
           {onClose && (
             <button
@@ -423,11 +401,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
-                fontSize: '0.74rem',
+                fontSize: '11.84px',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
-                padding: '0.85rem 1.35rem',
-              }}
+                padding: '0.85rem 1.35rem' }}
             >
               ← Volver a las historias
             </button>
@@ -439,11 +416,10 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
-              fontSize: '0.74rem',
-              letterSpacing: '0.14em',
+              fontSize: '11.84px',
+              letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              padding: '0.85rem 1.35rem',
-            }}
+              padding: '0.85rem 1.35rem' }}
           >
             Compartir esta historia
           </button>

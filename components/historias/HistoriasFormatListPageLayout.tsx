@@ -9,8 +9,7 @@ import { EthicalShareFlow, EthicalShareTriggerButton } from '@/components/storie
 import { ResonanceMailbox } from '@/components/stories/ResonanceMailbox';
 import {
   HistoricalExhibitionCarousel,
-  type ExhibitionContentMode,
-} from '@/components/stories/HistoricalExhibitionCarousel';
+  type ExhibitionContentMode } from '@/components/stories/HistoricalExhibitionCarousel';
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 import {
   HISTORIAS_CAROUSEL_ARIA_LABEL,
@@ -18,8 +17,7 @@ import {
   HISTORIAS_FILTER_KEYWORD_PLACEHOLDER,
   HISTORIAS_LIST_HERO_SUBTITLE,
   HISTORIAS_LIST_HERO_TITLE,
-  HISTORIAS_SHARE_ICONS_LEGEND,
-} from '@/lib/historias/historias-format-list-ui';
+  HISTORIAS_SHARE_ICONS_LEGEND } from '@/lib/historias/historias-format-list-ui';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
@@ -76,8 +74,7 @@ export function HistoriasFormatListPageLayout({
   contentMode,
   onOpenContent,
   onSlideChange,
-  disableKeyboardNav,
-}: HistoriasFormatListPageLayoutProps) {
+  disableKeyboardNav }: HistoriasFormatListPageLayoutProps) {
   return (
     <>
       <main
@@ -89,15 +86,15 @@ export function HistoriasFormatListPageLayout({
           <div className="mx-auto w-full max-w-[52rem]">
             <header className="flex flex-shrink-0 flex-col gap-2 border-b border-gray-400/18 pb-5 text-center sm:gap-2.5 sm:text-left md:pb-6">
               <p
-                className="mb-0 text-[0.6875rem] font-semibold uppercase tracking-[0.2em] sm:text-xs"
+                className="mb-0 text-[11px] font-semibold uppercase sm:text-xs tracking-[0.12em]"
                 style={{ color: 'var(--almamundi-orange)' }}
               >
                 {orangeKicker}
               </p>
-              <h1 className="text-balance text-[1.6rem] font-semibold leading-[1.12] tracking-tight text-gray-800 sm:text-3xl md:text-[2.15rem] md:leading-[1.1] lg:text-5xl lg:tracking-tight">
+              <h1 className="text-balance text-[23px] font-semibold leading-[1.12] text-gray-800 sm:text-[27px] md:text-[31px] md:leading-[1.1] lg:text-[43px]">
                 {HISTORIAS_LIST_HERO_TITLE}
               </h1>
-              <p className="mx-auto max-w-xl text-pretty text-sm leading-relaxed text-gray-600 sm:mx-0 md:text-[1.0625rem] md:leading-snug">
+              <p className="mx-auto max-w-xl text-pretty text-sm leading-relaxed text-gray-600 sm:mx-0 md:text-[15px] md:leading-snug">
                 {HISTORIAS_LIST_HERO_SUBTITLE}
               </p>
             </header>
@@ -107,10 +104,9 @@ export function HistoriasFormatListPageLayout({
                 className="w-full overflow-visible rounded-[22px] px-3 py-3.5 shadow-[inset_6px_6px_12px_rgba(163,177,198,0.35),inset_-5px_-5px_12px_rgba(255,255,255,0.88)] sm:px-4 sm:py-4 md:rounded-3xl"
                 style={{
                   ...neu.cardInset,
-                  borderRadius: 22,
-                }}
+                  borderRadius: 22 }}
               >
-                <p className="mb-2.5 text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-gray-600 sm:text-xs">
+                <p className="mb-2.5 text-[11px] font-semibold uppercase text-gray-600 sm:text-xs tracking-[0.12em]">
                   {HISTORIAS_FILTER_BLOCK_TITLE}
                 </p>
                 <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end lg:gap-x-3 lg:gap-y-3">
@@ -184,8 +180,7 @@ export function HistoriasFormatListPageLayout({
                       }`}
                       style={{
                         ...neu.button,
-                        opacity: hasActiveFilters ? 1 : 0.88,
-                      }}
+                        opacity: hasActiveFilters ? 1 : 0.88 }}
                     >
                       Limpiar filtros
                     </button>

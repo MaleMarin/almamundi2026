@@ -6,8 +6,7 @@ import { Breadcrumbs, type BreadcrumbNavItem } from '@/components/layout/Breadcr
 import {
   buildSiteBreadcrumbs,
   shouldShowSiteBreadcrumbs,
-  siteBreadcrumbTone,
-} from '@/lib/layout/site-breadcrumbs';
+  siteBreadcrumbTone } from '@/lib/layout/site-breadcrumbs';
 
 export type SiteBreadcrumbsProps = {
   /**

@@ -31,8 +31,7 @@ export function HlsPlayer({ url, poster, className = "" }: HlsPlayerProps) {
     if (Hls.isSupported()) {
       hls = new Hls({
         enableWorker: true,
-        lowLatencyMode: true,
-      });
+        lowLatencyMode: true });
       hls.attachMedia(video);
       hls.on(Hls.Events.MEDIA_ATTACHED, () => {
         hls?.loadSource(url);

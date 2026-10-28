@@ -40,8 +40,7 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
       className="min-h-screen flex flex-col relative overflow-x-hidden"
       style={{
         background: 'linear-gradient(160deg, #090e1a 0%, #0f1729 100%)',
-        transition: 'background 800ms ease',
-      }}
+        transition: 'background 800ms ease' }}
     >
       {/* Fondo vivo: sugestión de globo girando detrás (roadmap 1A) */}
       <div
@@ -53,15 +52,13 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
             radial-gradient(ellipse 100% 80% at 30% 20%, rgba(20,40,80,0.25) 0%, transparent 45%),
             radial-gradient(ellipse 70% 70% at 70% 60%, rgba(15,35,70,0.2) 0%, transparent 40%)
           `,
-          animation: 'cinema-bg-drift 20s ease-in-out infinite alternate',
-        }}
+          animation: 'cinema-bg-drift 20s ease-in-out infinite alternate' }}
       />
       <div
         className="relative z-[1] flex flex-col min-h-screen transition-all duration-[900ms] ease-out"
         style={{
           opacity: entranceDone ? 1 : 0,
-          transform: entranceDone ? 'translateY(0)' : 'translateY(28px)',
-        }}
+          transform: entranceDone ? 'translateY(0)' : 'translateY(28px)' }}
       >
         <ObservatoryShell
         title={story.label}
@@ -100,8 +97,7 @@ export function StoryObservatoryPageClient({ story }: { story: StoryPoint }) {
           zIndex:         5,
           pointerEvents:  'none',
           background:     currentEmotion.overlayColor,
-          transition:     'background 800ms ease',
-        }}
+          transition:     'background 800ms ease' }}
       />
     </main>
   );

@@ -46,7 +46,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
             <ExternalLink size={28} className="text-white/40" />
           </div>
-          <h2 className="text-lg font-semibold text-white mb-2">Ver en la fuente oficial</h2>
+          <h2 className="text-[16px] font-semibold text-white mb-2">Ver en la fuente oficial</h2>
           <a
             href={sourceUrl}
             target="_blank"
@@ -112,7 +112,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
             </Link>
           )}
           <div className="min-w-0">
-            <h1 className={`font-bold text-white truncate ${isModal ? 'text-lg' : 'text-xl md:text-2xl'}`}>
+            <h1 className={`font-bold text-white truncate ${isModal ? 'text-[16px]' : 'text-[18px] md:text-[22px]'}`}>
               {camera.title}
             </h1>
             {location && (

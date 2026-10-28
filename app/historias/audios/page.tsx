@@ -13,8 +13,7 @@ import { useStories } from '@/hooks/useStories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
 import {
   historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker,
-} from '@/lib/historias/historias-format-list-ui';
+  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionAudio } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';

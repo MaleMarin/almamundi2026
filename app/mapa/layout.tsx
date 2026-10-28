@@ -11,8 +11,7 @@ export const dynamic = 'force-dynamic';
  */
 export default function MapaLayout({
   children,
-  modal,
-}: {
+  modal }: {
   children: React.ReactNode;
   modal: React.ReactNode;
 }) {

@@ -88,8 +88,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
         minHeight: '100vh',
         background: BG,
         fontFamily: 'inherit',
-        paddingBottom: 48,
-      }}
+        paddingBottom: 48 }}
     >
       {/* Hero */}
       <div
@@ -100,8 +99,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           background: 'linear-gradient(135deg, #1a2332, #0f1a2e, #1a1a14)',
           boxShadow: `8px 8px 24px ${SH_DARK}, -4px -4px 16px ${SH_LIGHT}`,
           position: 'relative',
-          overflow: 'hidden',
-        }}
+          overflow: 'hidden' }}
       >
         <div
           style={{
@@ -111,8 +109,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(255,107,43,0.3) 0%, transparent 70%)',
             top: -40,
-            left: -40,
-          }}
+            left: -40 }}
         />
         <div
           style={{
@@ -122,8 +119,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             borderRadius: '50%',
             background: 'radial-gradient(circle, rgba(0,212,170,0.2) 0%, transparent 70%)',
             bottom: -30,
-            right: -30,
-          }}
+            right: -30 }}
         />
         <div
           style={{
@@ -134,8 +130,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             background: 'radial-gradient(circle, rgba(255,140,85,0.2) 0%, transparent 70%)',
             top: 10,
             left: '50%',
-            transform: 'translateX(-50%)',
-          }}
+            transform: 'translateX(-50%)' }}
         />
         <div
           style={{
@@ -144,8 +139,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             height: '100%',
             boxSizing: 'border-box',
             display: 'flex',
-            alignItems: 'center',
-          }}
+            alignItems: 'center' }}
         >
           {!editingFrase ? (
             <>
@@ -154,11 +148,10 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   margin: 0,
                   fontFamily: 'inherit',
                   fontWeight: 300,
-                  fontSize: '0.92rem',
+                  fontSize: '14.72px',
                   color: frase ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.4)',
                   fontStyle: 'italic',
-                  flex: 1,
-                }}
+                  flex: 1 }}
               >
                 {frase || 'Escribe tu frase...'}
               </p>
@@ -174,10 +167,9 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                     borderRadius: 10,
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '0.75rem',
+                    fontSize: '12px',
                     background: 'rgba(255,255,255,0.1)',
-                    color: 'rgba(255,255,255,0.8)',
-                  }}
+                    color: 'rgba(255,255,255,0.8)' }}
                 >
                   Editar frase
                 </button>
@@ -199,8 +191,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   borderRadius: 10,
                   padding: '0.5rem 0.8rem',
                   color: '#fff',
-                  fontSize: '0.92rem',
-                }}
+                  fontSize: '14.72px' }}
               />
               <button
                 type="button"
@@ -210,10 +201,9 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   borderRadius: 10,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '0.75rem',
+                  fontSize: '12px',
                   background: ORANGE,
-                  color: '#fff',
-                }}
+                  color: '#fff' }}
               >
                 Guardar
               </button>
@@ -232,8 +222,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           zIndex: 2,
           display: 'flex',
           flexDirection: 'column',
-          alignItems: 'center',
-        }}
+          alignItems: 'center' }}
       >
         <div
           style={{
@@ -242,8 +231,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             borderRadius: '50%',
             background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_2})`,
             border: `3px solid ${BG}`,
-            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
-          }}
+            boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}` }}
         />
         <h1
           style={{
@@ -251,9 +239,8 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 400,
-            fontSize: '1.2rem',
-            color: TEXT_1,
-          }}
+            fontSize: '17px',
+            color: TEXT_1 }}
         >
           {perfil.nombre}
         </h1>
@@ -261,11 +248,10 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           <p
             style={{
               margin: '4px 0 0',
-              fontSize: '0.65rem',
+              fontSize: '10.4px',
               textTransform: 'uppercase',
-              letterSpacing: '0.18em',
-              color: ORANGE,
-            }}
+              letterSpacing: '0.12em',
+              color: ORANGE }}
           >
             {perfil.ubicacion}
           </p>
@@ -274,12 +260,11 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           <p
             style={{
               margin: '0.5rem 0 0',
-              fontSize: '0.78rem',
+              fontSize: '12.48px',
               fontWeight: 300,
               color: TEXT_2,
               textAlign: 'center',
-              maxWidth: 320,
-            }}
+              maxWidth: 320 }}
           >
             {perfil.bio}
           </p>
@@ -293,11 +278,10 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               borderRadius: 12,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '0.8rem',
+              fontSize: '12.8px',
               background: BG,
               color: TEXT_2,
-              boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-            }}
+              boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
           >
             Editar perfil
           </button>
@@ -310,8 +294,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           margin: '1.2rem 1.2rem 0',
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 10,
-        }}
+          gap: 10 }}
       >
         {[
           { num: muestras.length, label: 'Muestras' },
@@ -325,13 +308,12 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               borderRadius: 14,
               padding: '0.9rem 0.5rem',
               textAlign: 'center',
-              boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-            }}
+              boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
           >
-            <div style={{ fontFamily: 'inherit', fontWeight: 300, fontSize: '1.4rem', color: TEXT_1 }}>
+            <div style={{ fontFamily: 'inherit', fontWeight: 300, fontSize: '20px', color: TEXT_1 }}>
               {num}
             </div>
-            <div style={{ fontSize: '0.6rem', textTransform: 'uppercase', letterSpacing: '0.12em', color: TEXT_3, marginTop: 2 }}>
+            <div style={{ fontSize: '9.6px', textTransform: 'uppercase', letterSpacing: '0.12em', color: TEXT_3, marginTop: 2 }}>
               {label}
             </div>
           </div>
@@ -345,8 +327,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           display: 'flex',
           gap: 8,
           overflowX: 'auto',
-          paddingBottom: 4,
-        }}
+          paddingBottom: 4 }}
       >
         {(
           [
@@ -366,12 +347,11 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '0.85rem',
+              fontSize: '13.6px',
               fontFamily: 'inherit',
               background: activeTab === id ? `linear-gradient(135deg, ${ORANGE}, ${ORANGE_2})` : BG,
               color: activeTab === id ? '#fff' : TEXT_2,
-              boxShadow: activeTab === id ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
-            }}
+              boxShadow: activeTab === id ? `3px 3px 10px rgba(255,107,43,0.35)` : `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
           >
             {label}
           </button>
@@ -385,8 +365,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             style={{
               display: 'grid',
               gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
-              gap: 14,
-            }}
+              gap: 14 }}
           >
             {muestras.map((m) => (
               <MuestraCard key={m.id} muestra={m} onClick={() => {}} />
@@ -406,9 +385,8 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  fontSize: '0.9rem',
-                  color: TEXT_3,
-                }}
+                  fontSize: '14.4px',
+                  color: TEXT_3 }}
               >
                 + Nueva muestra
               </div>
@@ -440,8 +418,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   borderRadius: 12,
                   boxShadow: `5px 5px 12px ${SH_DARK}, -3px -3px 8px ${SH_LIGHT}`,
                   textDecoration: 'none',
-                  color: 'inherit',
-                }}
+                  color: 'inherit' }}
               >
                 <div
                   style={{
@@ -449,21 +426,19 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                     height: 50,
                     borderRadius: 8,
                     background: h.imageUrl ? `url(${h.imageUrl}) center/cover` : 'linear-gradient(135deg, #1a2332, #2d3748)',
-                    flexShrink: 0,
-                  }}
+                    flexShrink: 0 }}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: '0.88rem', fontWeight: 500, color: TEXT_1 }}>{h.titulo}</p>
+                  <p style={{ margin: 0, fontSize: '14.08px', fontWeight: 500, color: TEXT_1 }}>{h.titulo}</p>
                   <span
                     style={{
-                      fontSize: '0.7rem',
+                      fontSize: '11.2px',
                       padding: '2px 6px',
                       borderRadius: 6,
                       background: isAudiencePublicStoryStatus(h.status)
                         ? 'rgba(0,212,170,0.12)'
                         : 'rgba(255,107,43,0.15)',
-                      color: isAudiencePublicStoryStatus(h.status) ? '#047857' : ORANGE,
-                    }}
+                      color: isAudiencePublicStoryStatus(h.status) ? '#047857' : ORANGE }}
                   >
                     {isAudiencePublicStoryStatus(h.status) ? 'Publicada' : 'En revisión'}
                   </span>
@@ -484,8 +459,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   background: BG,
                   boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}`,
                   fontSize: i < 3 ? '0.8rem' : '0.7rem',
-                  color: TEXT_2,
-                }}
+                  color: TEXT_2 }}
               >
                 {tema} <span style={{ color: ORANGE, marginLeft: 4 }}>{count}</span>
               </span>
@@ -510,18 +484,16 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               marginTop: 48,
               paddingTop: 32,
               marginLeft: '1.2rem',
-              marginRight: '1.2rem',
-            }}
+              marginRight: '1.2rem' }}
           >
             <p
               style={{
                 fontSize: 11,
-                letterSpacing: '0.18em',
+                letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: '#C62828',
                 marginBottom: 12,
-                marginTop: 0,
-              }}
+                marginTop: 0 }}
             >
               Zona de peligro
             </p>
@@ -530,8 +502,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                 fontSize: 14,
                 color: '#9299a8',
                 marginBottom: 20,
-                marginTop: 0,
-              }}
+                marginTop: 0 }}
             >
               Una vez que se elimine la cuenta, no hay vuelta atrás.
             </p>
@@ -546,8 +517,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                 padding: '10px 24px',
                 fontSize: 12,
                 fontWeight: 700,
-                cursor: 'pointer',
-              }}
+                cursor: 'pointer' }}
             >
               Eliminar mi cuenta
             </button>

@@ -22,9 +22,7 @@ const soft = {
       '-20px -20px 52px rgba(255, 255, 255, 1)',
       'inset 3px 3px 6px rgba(255, 255, 255, 0.92)',
       'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
-    ].join(', '),
-  },
-} as const;
+    ].join(', ') } } as const;
 
 type HistoriasCardHoverKind = 'video' | 'audio' | 'text' | 'photo';
 
@@ -99,8 +97,7 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
             className="home-historias-card-audio-bar w-[8px] rounded-full bg-[#FF4A1C]/70 shadow-[0_0_14px_rgba(255,74,28,0.45)]"
             style={{
               height: h,
-              animationDelay: `${i * 0.08}s`,
-            }}
+              animationDelay: `${i * 0.08}s` }}
           />
         ))}
       </div>
@@ -142,8 +139,7 @@ function SoftCard({
   onClick,
   delay,
   hoverKind,
-  fillViewport = false,
-}: {
+  fillViewport = false }: {
   title: string;
   subtitle: string;
   children: ReactNode;
@@ -172,8 +168,7 @@ function SoftCard({
         style={{
           ...soft.flat,
           borderRadius: '28px',
-          fontFamily: APP_FONT,
-        }}
+          fontFamily: APP_FONT }}
       >
         <HistoriasCardHoverDecor kind={hoverKind} />
         <div
@@ -184,10 +179,10 @@ function SoftCard({
           }
         >
           <div className="shrink-0 min-w-0">
-            <p className="text-base font-light leading-snug text-gray-600 md:text-lg lg:text-xl">
+            <p className="text-[15px] font-light leading-snug text-gray-600 md:text-[16px] lg:text-[18px]">
               {title}
             </p>
-            <h2 className="mt-1 text-lg font-bold leading-snug tracking-tight text-gray-800 md:text-xl lg:text-2xl">
+            <h2 className="mt-1 text-[16px] font-bold leading-snug text-gray-800 md:text-[18px] lg:text-[22px]">
               {subtitle}
             </h2>
           </div>
@@ -198,7 +193,7 @@ function SoftCard({
                 : 'flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4'
             }
           >
-            <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-base md:leading-[1.62] lg:text-[1.05rem]">
+            <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-[15px] md:leading-[1.62] lg:text-[15px]">
               {children}
             </p>
             <Link
@@ -208,7 +203,7 @@ function SoftCard({
                 e.preventDefault();
                 onClick();
               }}
-              className="btn-am-principal flex w-full shrink-0 items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case tracking-wide active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
+              className="btn-am-principal flex w-full shrink-0 items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
               style={{ fontFamily: APP_FONT }}
             >
               {buttonLabel}
@@ -237,8 +232,7 @@ export function HomeFormatCards({
   onWriteStory,
   onRecordPhoto,
   sectionId,
-  fillViewport = false,
-}: HomeFormatCardsProps) {
+  fillViewport = false }: HomeFormatCardsProps) {
   const { t } = useHomeLocale();
 
   return (
@@ -258,10 +252,10 @@ export function HomeFormatCards({
             : 'home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] px-1 text-center leading-snug tracking-normal sm:mb-5 md:mb-6'
         }
       >
-        <span className="block text-[19px] font-medium tracking-normal text-[#FF4A1C] md:text-[26px]">
+        <span className="block text-[17px] font-medium tracking-normal text-[#FF4A1C] md:text-[23px]">
           {t.historiasLead2}
         </span>
-        <span className="mt-1 block text-[24px] font-bold tracking-normal text-[#FF4A1C] md:text-[34px]">
+        <span className="mt-1 block text-[22px] font-bold tracking-normal text-[#FF4A1C] md:text-[31px]">
           {t.historiasLead2b}
         </span>
       </p>

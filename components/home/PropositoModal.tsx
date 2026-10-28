@@ -6,8 +6,7 @@ import {
   MANIFIESTO_SECTIONS,
   MANIFIESTO_TITLE,
   type ManifiestoBlock,
-  type ManifiestoSection,
-} from '@/lib/proposito-text';
+  type ManifiestoSection } from '@/lib/proposito-text';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const soft = {
@@ -23,8 +22,7 @@ const soft = {
       '10px 10px 24px rgba(136, 150, 170, 0.38)',
       '-10px -10px 26px rgba(255, 255, 255, 0.92)',
       'inset 1px 1px 2px rgba(255, 255, 255, 0.7)',
-    ].join(', '),
-  },
+    ].join(', ') },
   shell: {
     backgroundColor: '#E0E5EC',
     borderRadius: 32,
@@ -33,8 +31,7 @@ const soft = {
       '16px 16px 40px rgba(136, 150, 170, 0.42)',
       '-12px -12px 36px rgba(255, 255, 255, 0.95)',
       'inset 2px 2px 4px rgba(255, 255, 255, 0.65)',
-    ].join(', '),
-  },
+    ].join(', ') },
   button: {
     backgroundColor: '#E9ECF3',
     borderRadius: 9999,
@@ -45,9 +42,7 @@ const soft = {
       '8px 8px 20px rgba(136, 150, 170, 0.4)',
       '-8px -8px 20px rgba(255, 255, 255, 0.94)',
       'inset 1px 1px 2px rgba(255, 255, 255, 0.65)',
-    ].join(', '),
-  },
-} as const;
+    ].join(', ') } } as const;
 
 const DEFAULT_SECTION_ID = MANIFIESTO_SECTIONS[0]?.id ?? 'por-que';
 
@@ -57,29 +52,27 @@ function sectionChipStyle(active: boolean) {
       padding: '7px 12px',
       borderRadius: 999,
       cursor: 'pointer' as const,
-      fontSize: '0.65rem',
+      fontSize: '10.4px',
       fontWeight: 600,
       textTransform: 'uppercase' as const,
-      letterSpacing: '0.06em',
+      letterSpacing: '0.12em',
       fontFamily: SITE_FONT_STACK,
       color: '#fff8f2',
       background: `linear-gradient(180deg, rgba(255, 88, 28, 0.85) 0%, ${soft.orange} 100%)`,
       border: '1px solid rgba(255, 150, 90, 0.75)',
-      boxShadow: '0 2px 10px rgba(255, 74, 28, 0.22)',
-    };
+      boxShadow: '0 2px 10px rgba(255, 74, 28, 0.22)' };
   }
   return {
     ...soft.card,
     padding: '7px 12px',
     borderRadius: 999,
     cursor: 'pointer' as const,
-    fontSize: '0.65rem',
+    fontSize: '10.4px',
     fontWeight: 500,
     textTransform: 'uppercase' as const,
-    letterSpacing: '0.06em',
+    letterSpacing: '0.12em',
     fontFamily: SITE_FONT_STACK,
-    color: soft.textBody,
-  };
+    color: soft.textBody };
 }
 
 function SectionHeader({ title, index }: { title: string; index: number }) {
@@ -90,15 +83,14 @@ function SectionHeader({ title, index }: { title: string; index: number }) {
         style={{
           ...soft.card,
           color: soft.orange,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
         aria-hidden
       >
         {String(index + 1).padStart(2, '0')}
       </span>
       <div className="min-w-0 flex-1 pt-0.5">
         <h3
-          className="text-lg font-semibold tracking-tight md:text-xl"
+          className="text-[16px] font-semibold md:text-[18px]"
           style={{ color: soft.textMain, fontFamily: SITE_FONT_STACK }}
         >
           {title}
@@ -106,8 +98,7 @@ function SectionHeader({ title, index }: { title: string; index: number }) {
         <div
           className="mt-2 h-0.5 w-14 rounded-full"
           style={{
-            background: `linear-gradient(90deg, ${soft.orange} 0%, rgba(255, 74, 28, 0.15) 100%)`,
-          }}
+            background: `linear-gradient(90deg, ${soft.orange} 0%, rgba(255, 74, 28, 0.15) 100%)` }}
           aria-hidden
         />
       </div>
@@ -121,18 +112,17 @@ function PullQuote({ text }: { text: string }) {
       className="relative my-6 rounded-2xl px-5 py-5 md:px-6 md:py-6"
       style={{
         ...soft.card,
-        borderLeft: `4px solid ${soft.orange}`,
-      }}
+        borderLeft: `4px solid ${soft.orange}` }}
     >
       <span
-        className="pointer-events-none absolute left-4 top-2 select-none font-serif text-5xl leading-none opacity-[0.12]"
+        className="pointer-events-none absolute left-4 top-2 select-none font-serif text-[43px] leading-none opacity-[0.12]"
         style={{ color: soft.orange }}
         aria-hidden
       >
         “
       </span>
       <p
-        className="relative z-[1] text-base font-medium italic leading-relaxed md:text-[1.05rem] md:leading-[1.65]"
+        className="relative z-[1] text-[15px] font-medium italic leading-relaxed md:text-[15px] md:leading-[1.65]"
         style={{ color: soft.textMain, fontFamily: SITE_FONT_STACK }}
       >
         {text}
@@ -152,7 +142,7 @@ function BeliefsList({ items }: { items: string[] }) {
             aria-hidden
           />
           <p
-            className="text-sm leading-relaxed md:text-[0.9375rem] md:leading-[1.7]"
+            className="text-sm leading-relaxed md:text-[15px] md:leading-[1.7]"
             style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
           >
             {belief}
@@ -170,25 +160,23 @@ function ClosingBlock({ lines }: { lines: string[] }) {
       style={{
         background: 'linear-gradient(145deg, rgba(255, 74, 28, 0.08) 0%, rgba(233, 236, 243, 0.95) 48%, #E9ECF3 100%)',
         border: '1px solid rgba(255, 140, 90, 0.25)',
-        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(255, 74, 28, 0.08)',
-      }}
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(255, 74, 28, 0.08)' }}
     >
       {lines.map((line, i) => (
         <p
           key={i}
           className={
             lines.length === 1
-              ? 'text-base font-medium leading-relaxed md:text-lg md:leading-[1.65]'
+              ? 'text-[15px] font-medium leading-relaxed md:text-[16px] md:leading-[1.65]'
               : i === 0 || i === 1
-                ? 'text-xl font-semibold leading-tight md:text-2xl'
+                ? 'text-[18px] font-semibold leading-tight md:text-[22px]'
                 : i >= lines.length - 2
-                  ? 'mt-4 text-sm font-medium md:text-base'
+                  ? 'mt-4 text-sm font-medium md:text-[15px]'
                   : 'mt-3 text-sm leading-relaxed md:text-[0.9375rem]'
           }
           style={{
             color: lines.length === 1 ? soft.textMain : i < 2 ? soft.textMain : soft.textBody,
-            fontFamily: SITE_FONT_STACK,
-          }}
+            fontFamily: SITE_FONT_STACK }}
         >
           {line}
         </p>
@@ -207,8 +195,8 @@ function renderBlock(block: ManifiestoBlock, key: string) {
               key={i}
               className={
                 i === 0
-                  ? 'text-2xl font-light leading-tight md:text-3xl'
-                  : 'text-2xl font-bold leading-tight md:text-3xl'
+                  ? 'text-[22px] font-light leading-tight md:text-[27px]'
+                  : 'text-[22px] font-bold leading-tight md:text-[27px]'
               }
               style={{ color: i === 0 ? soft.textBody : soft.textMain, fontFamily: SITE_FONT_STACK }}
             >
@@ -221,7 +209,7 @@ function renderBlock(block: ManifiestoBlock, key: string) {
       return (
         <p
           key={key}
-          className="mb-4 text-sm leading-relaxed last:mb-0 md:text-[0.9375rem] md:leading-[1.75]"
+          className="mb-4 text-sm leading-relaxed last:mb-0 md:text-[15px] md:leading-[1.75]"
           style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
         >
           {block.text}
@@ -235,7 +223,7 @@ function renderBlock(block: ManifiestoBlock, key: string) {
       return (
         <p
           key={key}
-          className="my-5 text-center text-base font-semibold md:text-lg"
+          className="my-5 text-center text-[15px] font-semibold md:text-[16px]"
           style={{ color: soft.orange, fontFamily: SITE_FONT_STACK }}
         >
           {block.text}
@@ -285,8 +273,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
         color: '#fff',
         border: '1px solid rgba(255, 160, 100, 0.6)',
         boxShadow: '0 6px 20px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
-        fontFamily: SITE_FONT_STACK,
-      }}
+        fontFamily: SITE_FONT_STACK }}
     >
       Cuenta tu historia, ver los 4 formatos
     </button>
@@ -296,8 +283,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
 export function PropositoModal({
   isOpen,
   onClose,
-  onGoToHistorias,
-}: {
+  onGoToHistorias }: {
   isOpen: boolean;
   onClose: () => void;
   onGoToHistorias?: () => void;
@@ -347,8 +333,7 @@ export function PropositoModal({
         className="flex max-h-[min(92dvh,880px)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] sm:max-h-[min(90dvh,900px)] sm:rounded-[32px]"
         style={{
           ...soft.shell,
-          fontFamily: SITE_FONT_STACK,
-        }}
+          fontFamily: SITE_FONT_STACK }}
         onClick={(e) => e.stopPropagation()}
       >
         <div
@@ -358,14 +343,14 @@ export function PropositoModal({
           <div className="flex items-start justify-between gap-4">
             <div>
               <p
-                className="mb-1 text-[11px] font-semibold uppercase tracking-[0.2em]"
+                className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em]"
                 style={{ color: soft.orange }}
               >
                 AlmaMundi
               </p>
               <h2
                 id="proposito-titulo"
-                className="text-2xl font-semibold tracking-tight md:text-3xl"
+                className="text-[22px] font-semibold md:text-[27px]"
                 style={{ color: soft.textMain }}
               >
                 {MANIFIESTO_TITLE}
@@ -374,7 +359,7 @@ export function PropositoModal({
             <button
               type="button"
               onClick={onClose}
-              className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold uppercase tracking-wider transition active:scale-[0.97]"
+              className="shrink-0 rounded-full px-4 py-2 text-xs font-semibold uppercase transition active:scale-[0.97] tracking-[0.12em]"
               style={{ ...soft.button, color: soft.textMain }}
               aria-label="Cerrar propósito"
             >
@@ -425,8 +410,7 @@ export function PropositoModal({
           <div
             className="flex shrink-0 justify-center border-t border-white/35 bg-[#E0E5EC] px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:px-10 md:py-5"
             style={{
-              boxShadow: '0 -8px 24px rgba(136, 150, 170, 0.12)',
-            }}
+              boxShadow: '0 -8px 24px rgba(136, 150, 170, 0.12)' }}
           >
             <HistoriasCtaButton onClick={onGoToHistorias} />
           </div>

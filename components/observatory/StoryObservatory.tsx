@@ -17,8 +17,7 @@ type TabId = 'audio' | 'video' | 'text' | 'photos';
 function StoryTextBody({
   body,
   onSpeak,
-  isSpeaking,
-}: {
+  isSpeaking }: {
   body: string;
   onSpeak: () => void;
   isSpeaking: boolean;
@@ -109,7 +108,7 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
   const photoImages = story.images?.length ? story.images : (story.imageUrl ? [story.imageUrl] : []);
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode; disabled: boolean }[] = [
-    { id: 'photos', label: 'Fotos', icon: <span className="text-base">📷</span>, disabled: !hasPhotos },
+    { id: 'photos', label: 'Fotos', icon: <span className="text-[15px]">📷</span>, disabled: !hasPhotos },
     { id: 'audio', label: 'Escuchar', icon: <Headphones size={18} />, disabled: !hasAudio },
     { id: 'video', label: 'Ver', icon: <Video size={18} />, disabled: !hasVideo },
     { id: 'text', label: 'Leer', icon: <FileText size={18} />, disabled: !hasText },
