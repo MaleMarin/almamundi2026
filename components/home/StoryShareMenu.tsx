@@ -30,7 +30,7 @@ type StoryShareMenuProps = {
   onCopied: () => void;
   onCopyFailed: () => void;
   onDownload: () => void;
-  onShareImageApp: () => void;
+  onShareImageApp: (app: 'instagram' | 'tiktok') => void;
   onClose: () => void;
 };
 
@@ -60,7 +60,8 @@ export function StoryShareMenu({
   };
 
   const itemClass =
-    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium text-[#141D26] transition hover:border-[#ea580c] hover:text-[#c2410c]';
+    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[#ea580c]';
+  const buttonClass = `${itemClass} text-[#FF4A1C] hover:text-[#FF6E49]`;
 
   return (
     <div
@@ -97,17 +98,17 @@ export function StoryShareMenu({
           <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
             {labels.linkedin}
           </a>
-          <button type="button" className={itemClass} onClick={onShareImageApp}>
+          <button type="button" className={buttonClass} onClick={() => onShareImageApp('instagram')}>
             {labels.instagram}
           </button>
-          <button type="button" className={itemClass} onClick={onShareImageApp}>
+          <button type="button" className={buttonClass} onClick={() => onShareImageApp('tiktok')}>
             {labels.tiktok}
           </button>
           <a className={itemClass} href={channels.email}>
             <Mail size={15} className="mr-2" aria-hidden />
             {labels.email}
           </a>
-          <button type="button" className={itemClass} onClick={() => void copyLink()}>
+          <button type="button" className={buttonClass} onClick={() => void copyLink()}>
             {labels.copyLink}
           </button>
           {showDownload ? (

@@ -208,7 +208,7 @@ const es: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Descargamos tu imagen y copiamos el texto. Ábrelos en la app para compartirlos.',
+    'Descargamos tu imagen y copiamos el texto. Te abrimos la app en otra pestaña para que los subas.',
   modalShareEmail: 'Correo',
   modalShareLinkCopied: 'Enlace copiado',
   modalAnotherPromptFoto: '¿Quieres subir más fotos?',
@@ -286,7 +286,7 @@ const pt: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Baixamos sua imagem e copiamos o texto. Abra o app para compartilhar.',
+    'Baixamos sua imagem e copiamos o texto. Abrimos o app em outra aba para você publicar.',
   modalShareEmail: 'Correio',
   modalShareLinkCopied: 'Ligação copiada',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
@@ -368,7 +368,7 @@ const en: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'We downloaded your image and copied the text. Open the app to share them.',
+    'We downloaded your image and copied the text. We opened the app in another tab so you can post them.',
   modalShareEmail: 'Email',
   modalShareLinkCopied: 'Link copied',
   modalAnotherPromptFoto: 'Want to upload more photos?',

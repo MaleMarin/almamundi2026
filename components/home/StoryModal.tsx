@@ -1788,12 +1788,19 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setShareMenuOpen(true);
   }, []);
 
-  const shareImageToApp = useCallback(async () => {
+  const shareImageToApp = useCallback(async (app: 'instagram' | 'tiktok') => {
     const c = imprintCanvasRef.current;
     if (!c) return;
     const requestToken = ++shareRequestTokenRef.current;
     const shareText = t.modalShareTextLong || PENDING_STORY_SHARE_TEXT;
     const filename = huellaPngFilename(imprintStoryTitle || storyTitle, imprintId);
+    const appUrl = app === 'tiktok' ? 'https://www.tiktok.com/upload' : 'https://www.instagram.com/';
+    const systemShare =
+      typeof navigator !== 'undefined' &&
+      typeof navigator.share === 'function' &&
+      (window.matchMedia('(pointer: coarse)').matches ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    if (!systemShare) window.open(appUrl, '_blank', 'noopener,noreferrer');
     try {
       const blob = await canvasToPngBlob(c);
       const file = new File([blob], filename, { type: 'image/png' });
@@ -1808,6 +1815,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         if (native === 'shared') setShareMenuOpen(false);
         return;
       }
+      if (systemShare) window.open(appUrl, '_blank', 'noopener,noreferrer');
       downloadPngBlob(blob, filename);
       const copied = await copyTextToClipboard(shareText);
       if (requestToken !== shareRequestTokenRef.current) return;
@@ -3169,8 +3177,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 setShareMenuOpen(false);
                 void downloadImprint();
               }}
-              onShareImageApp={() => {
-                void shareImageToApp();
+              onShareImageApp={(app) => {
+                void shareImageToApp(app);
               }}
               onClose={() => setShareMenuOpen(false)}
             />
