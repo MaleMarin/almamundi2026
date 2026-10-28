@@ -12,6 +12,8 @@ export type StoryShareMenuLabels = {
   facebook: string;
   x: string;
   linkedin: string;
+  instagram: string;
+  tiktok: string;
   email: string;
   copyLink: string;
   download: string;
@@ -28,6 +30,7 @@ type StoryShareMenuProps = {
   onCopied: () => void;
   onCopyFailed: () => void;
   onDownload: () => void;
+  onShareImageApp: () => void;
   onClose: () => void;
 };
 
@@ -41,6 +44,7 @@ export function StoryShareMenu({
   onCopied,
   onCopyFailed,
   onDownload,
+  onShareImageApp,
   onClose,
 }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(shareUrl, {
@@ -93,6 +97,12 @@ export function StoryShareMenu({
           <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
             {labels.linkedin}
           </a>
+          <button type="button" className={itemClass} onClick={onShareImageApp}>
+            {labels.instagram}
+          </button>
+          <button type="button" className={itemClass} onClick={onShareImageApp}>
+            {labels.tiktok}
+          </button>
           <a className={itemClass} href={channels.email}>
             <Mail size={15} className="mr-2" aria-hidden />
             {labels.email}

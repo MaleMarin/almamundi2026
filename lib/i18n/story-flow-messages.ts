@@ -82,6 +82,9 @@ export type StoryFlowMessages = {
   modalShareFacebook: string;
   modalShareX: string;
   modalShareLinkedIn: string;
+  modalShareInstagram: string;
+  modalShareTikTok: string;
+  modalShareAppHandoff: string;
   modalShareEmail: string;
   modalShareLinkCopied: string;
   modalAnotherPromptFoto: string;
@@ -202,6 +205,10 @@ const es: StoryFlowMessages = {
   modalShareFacebook: 'Facebook',
   modalShareX: 'X',
   modalShareLinkedIn: 'LinkedIn',
+  modalShareInstagram: 'Instagram',
+  modalShareTikTok: 'TikTok',
+  modalShareAppHandoff:
+    'Descargamos tu imagen y copiamos el texto. Ábrelos en la app para compartirlos.',
   modalShareEmail: 'Correo',
   modalShareLinkCopied: 'Enlace copiado',
   modalAnotherPromptFoto: '¿Quieres subir más fotos?',
@@ -276,6 +283,10 @@ const pt: StoryFlowMessages = {
   modalShareEmailSubject: 'Contei uma história no AlmaMundi',
   modalShareImageFailed:
     'Não foi possível partilhar. Descarregue a imagem e partilhe-a a partir do seu dispositivo.',
+  modalShareInstagram: 'Instagram',
+  modalShareTikTok: 'TikTok',
+  modalShareAppHandoff:
+    'Baixamos sua imagem e copiamos o texto. Abra o app para compartilhar.',
   modalShareEmail: 'Correio',
   modalShareLinkCopied: 'Ligação copiada',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
@@ -354,6 +365,10 @@ const en: StoryFlowMessages = {
   modalShareImageFailed:
     'We could not share this. Download the image and share it from your device.',
   modalShareMenuTitle: 'Share',
+  modalShareInstagram: 'Instagram',
+  modalShareTikTok: 'TikTok',
+  modalShareAppHandoff:
+    'We downloaded your image and copied the text. Open the app to share them.',
   modalShareEmail: 'Email',
   modalShareLinkCopied: 'Link copied',
   modalAnotherPromptFoto: 'Want to upload more photos?',

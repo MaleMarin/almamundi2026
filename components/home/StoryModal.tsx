@@ -69,6 +69,7 @@ import {
   PENDING_STORY_SHARE_TEXT,
   PENDING_STORY_SHARE_TEXT_SHORT,
   PENDING_STORY_SHARE_URL,
+  copyTextToClipboard,
 } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
@@ -1782,16 +1783,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
   }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
 
-  const shareImprint = useCallback(async () => {
+  const shareImprint = useCallback(() => {
+    setShareMenuShowDownload(false);
+    setShareMenuOpen(true);
+  }, []);
+
+  const shareImageToApp = useCallback(async () => {
     const c = imprintCanvasRef.current;
     if (!c) return;
     const requestToken = ++shareRequestTokenRef.current;
     const shareText = t.modalShareTextLong || PENDING_STORY_SHARE_TEXT;
+    const filename = huellaPngFilename(imprintStoryTitle || storyTitle, imprintId);
     try {
       const blob = await canvasToPngBlob(c);
-      const file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
-        type: 'image/png',
-      });
+      const file = new File([blob], filename, { type: 'image/png' });
       const native = await shareNativeStoryWithImage({
         file,
         title: (imprintStoryTitle || storyTitle).trim() || 'AlmaMundi',
@@ -1799,16 +1804,28 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         url: PENDING_STORY_SHARE_URL,
       });
       if (requestToken !== shareRequestTokenRef.current) return;
-      if (native === 'shared' || native === 'aborted') return;
-      setShareMenuShowDownload(false);
-      setShareMenuOpen(true);
+      if (native === 'shared' || native === 'aborted') {
+        if (native === 'shared') setShareMenuOpen(false);
+        return;
+      }
+      downloadPngBlob(blob, filename);
+      const copied = await copyTextToClipboard(shareText);
+      if (requestToken !== shareRequestTokenRef.current) return;
+      setShareMenuOpen(false);
+      flashShareNotice(copied ? t.modalShareAppHandoff : t.modalShareImageFailed);
     } catch {
       if (requestToken !== shareRequestTokenRef.current) return;
-      setShareMenuShowDownload(true);
-      setShareMenuOpen(true);
       flashShareNotice(t.modalShareImageFailed);
     }
-  }, [imprintId, imprintStoryTitle, storyTitle, t.modalShareImageFailed, t.modalShareTextLong, flashShareNotice]);
+  }, [
+    flashShareNotice,
+    imprintId,
+    imprintStoryTitle,
+    storyTitle,
+    t.modalShareAppHandoff,
+    t.modalShareImageFailed,
+    t.modalShareTextLong,
+  ]);
 
   const startAnotherStory = useCallback(() => {
     setShareMenuOpen(false);
@@ -3132,6 +3149,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 facebook: t.modalShareFacebook,
                 x: t.modalShareX,
                 linkedin: t.modalShareLinkedIn,
+                instagram: t.modalShareInstagram,
+                tiktok: t.modalShareTikTok,
                 email: t.modalShareEmail,
                 copyLink: t.modalCopyLink,
                 download: isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint,
@@ -3149,6 +3168,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               onDownload={() => {
                 setShareMenuOpen(false);
                 void downloadImprint();
+              }}
+              onShareImageApp={() => {
+                void shareImageToApp();
               }}
               onClose={() => setShareMenuOpen(false)}
             />
