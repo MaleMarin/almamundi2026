@@ -61,12 +61,12 @@ export function HomeFirstPart({
       <div className="lg:mt-[13.5rem] lg:flex lg:h-[calc(100svh-13.5rem)] lg:min-h-0 lg:flex-col">
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
+        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-16"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 text-[clamp(1.238rem,1.08vw+0.938rem,2.25rem)]"
+              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 lg:mb-10 text-[clamp(1.238rem,1.08vw+0.938rem,2.25rem)]"
               style={{
                 color: soft.textMain }}
             >
@@ -77,8 +77,7 @@ export function HomeFirstPart({
               width="360"
               height="12"
               viewBox="0 0 360 12"
-              className="mx-auto block w-[min(100%,280px)] max-w-full"
-              style={{ margin: '10px auto 10px' }}
+              className="home-intro-underline mx-auto mb-[10px] mt-[10px] block w-[min(100%,280px)] max-w-full lg:mt-0"
               aria-hidden="true"
             >
               <path
@@ -88,10 +87,6 @@ export function HomeFirstPart({
                 strokeWidth="2.5"
                 fill="none"
                 strokeLinecap="round"
-                strokeDasharray={1}
-                strokeDashoffset={1}
-                style={{
-                  animation: 'drawUnderline 2.75s linear forwards 0.4s' }}
               />
             </svg>
           </div>

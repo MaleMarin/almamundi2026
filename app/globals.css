@@ -83,6 +83,23 @@ select {
   }
 }
 
+.home-intro-underline {
+  pointer-events: none;
+}
+
+.home-intro-underline path {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: drawUnderline 1.2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-intro-underline path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
 /* HomeFirstPart: sin styled-jsx (evita mismatch de hidratación jsx-* en Turbopack) */
 @keyframes home-first-part-float {
   0%,
