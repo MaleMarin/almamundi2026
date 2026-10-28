@@ -288,7 +288,7 @@ const pt: StoryFlowMessages = {
   modalShareAppHandoff:
     'Baixamos sua imagem e copiamos o texto. Abrimos o app em outra aba para você publicar.',
   modalShareEmail: 'E-mail',
-  modalShareLinkCopied: 'Ligação copiada',
+  modalShareLinkCopied: 'Link copiado',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
   modalAnotherCtaFoto: 'Enviar mais fotos',
   modalAnotherPromptVideo: 'Quer gravar outro momento?',
