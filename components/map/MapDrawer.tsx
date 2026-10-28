@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 import type { MapDockMode } from './MapDock';
 
 const DRAWER_WIDTH_DESKTOP = 360;
@@ -49,6 +51,7 @@ type MapDrawerProps = {
 };
 
 export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawerProps) {
+  const { locale } = useHomeLocale();
   const [animatingIn, setAnimatingIn] = useState(false);
 
   useEffect(() => {
@@ -74,7 +77,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   if (!open) return null;
 
   const title =
-    mode === 'stories' ? 'Historias' : mode === 'news' ? 'Noticias' : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
+    mode === 'stories' ? 'Historias' : mode === 'news' ? PREGUNTA_UI.tab[locale] : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
   const bitsMode = mode === 'bits';
   /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
   const innerScrollPanel =

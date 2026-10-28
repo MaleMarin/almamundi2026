@@ -33,6 +33,8 @@ export type StoryPoint = {
   quote?: string;
   cancionRelacionada?: string;
   antecedentes?: string;
+  questionId?: string;
+  questionMode?: 'tu' | 'alguien';
   captionsUrl?: string;
   transcription?: string;
   captionPhrases?: string[];

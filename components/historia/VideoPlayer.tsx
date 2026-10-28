@@ -3,6 +3,7 @@
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen'
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos'
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock'
+import { RespondeALine } from '@/components/historia/RespondeALine'
 import { INTERIOR_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
 
@@ -27,6 +28,8 @@ export interface Historia {
   subtitulos?: string
   cancionRelacionada?: string
   antecedentes?: string
+  questionId?: string
+  questionMode?: 'tu' | 'alguien'
 }
 
 interface VideoPlayerProps {
@@ -374,6 +377,12 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           </p>
 
           {/* Title */}
+          <RespondeALine
+            questionId={historia.questionId}
+            questionMode={historia.questionMode}
+            align="center"
+            color="rgba(245,240,232,0.82)"
+          />
           <h1
             className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
             style={{
@@ -532,6 +541,11 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             }}>
               AlmaMundi
             </p>
+              <RespondeALine
+                questionId={historia.questionId}
+                questionMode={historia.questionMode}
+                color="rgba(245,240,232,0.82)"
+              />
             <h2 style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
@@ -719,6 +733,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           thumbnailUrl={historia.thumbnailUrl}
           cancionRelacionada={historia.cancionRelacionada}
           antecedentes={historia.antecedentes}
+          questionId={historia.questionId}
+          questionMode={historia.questionMode}
           embedInSite={siteLayout}
           replayLabel="Ver de nuevo"
           onReplay={() => {

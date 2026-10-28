@@ -66,6 +66,8 @@ export async function GET(request: NextRequest) {
         authorEmail: d.authorEmail ?? null,
         rightsAccepted: Boolean(d.rightsAccepted),
         publicationMail: d.publicationMail ?? null,
+        questionId: typeof d.questionId === "string" ? d.questionId : null,
+        questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
         imagenes: (parseStoryImagenes(d.imagenes) ?? []).map((img) => ({
           url: img.url,
           ...(img.titulo ? { titulo: img.titulo } : {}),

@@ -9,6 +9,7 @@ import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
+import { RespondeALine } from '@/components/historia/RespondeALine';
 
 const CREAM = 'rgba(245,240,232,0.85)';
 const CREAM_SOFT = 'rgba(245,240,232,0.7)';
@@ -30,6 +31,8 @@ export interface HistoriaFoto {
   tags?: string[];
   cancionRelacionada?: string;
   antecedentes?: string;
+  questionId?: string;
+  questionMode?: 'tu' | 'alguien';
 }
 
 interface FotoAlbumProps {
@@ -236,6 +239,12 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 padding: 'clamp(2rem, 5vw, 3.5rem) 1.25rem 1.5rem',
               }}
             >
+              <RespondeALine
+                questionId={historia.questionId}
+                questionMode={historia.questionMode}
+                align="center"
+                color={CREAM_SOFT}
+              />
               <h1
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
@@ -421,6 +430,12 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   {imagenes.length} fotografías
                 </p>
               ) : null}
+              <RespondeALine
+                questionId={historia.questionId}
+                questionMode={historia.questionMode}
+                align="center"
+                color={neu.textBody}
+              />
               <h2
                 style={{
                   fontStyle: 'italic',

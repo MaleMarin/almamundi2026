@@ -32,6 +32,7 @@ import {
   FolderOpen,
 } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 
 const BG = '#0a0f24';
 
@@ -81,6 +82,8 @@ type Story = {
     error: string | null;
     at?: string;
   } | null;
+  questionId: string | null;
+  questionMode: 'tu' | 'alguien' | null;
   imagenes?: AdminImagen[];
 };
 
@@ -126,6 +129,16 @@ function daysRemaining(activeSince: number | null): number | null {
   const now = Date.now();
   const left = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
   return Math.max(0, left);
+}
+
+function StoryQuestionLine({ story }: { story: Story }) {
+  const line = preguntaAdminResumen(story.questionId, story.questionMode);
+  if (!line) return null;
+  return (
+    <p style={{ fontSize: 13, margin: '6px 0 0', color: 'rgba(255,255,255,0.72)', lineHeight: 1.4 }}>
+      {line}
+    </p>
+  );
 }
 
 function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
@@ -601,6 +614,7 @@ export default function AdminPage() {
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                  <StoryQuestionLine story={s} />
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
                     {s.authorEmail ? `Se avisará a ${s.authorEmail}` : 'Sin correo del autor: no se podrá avisar al publicar'}
@@ -681,6 +695,7 @@ export default function AdminPage() {
                       )}
                     </div>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
                     <StoryPhotoFichas imagenes={s.imagenes} />
                     {s.publicationMail?.status === 'sent' ? (
@@ -820,6 +835,7 @@ export default function AdminPage() {
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
                     <StoryPhotoFichas imagenes={s.imagenes} />
                   </div>

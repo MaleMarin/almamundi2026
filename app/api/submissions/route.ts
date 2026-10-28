@@ -236,6 +236,10 @@ export async function POST(req: NextRequest) {
   if (antecedentes) {
     (doc as SubmissionDoc).antecedentes = antecedentes;
   }
+  if (data.questionId && data.questionMode) {
+    (doc as SubmissionDoc).questionId = data.questionId;
+    (doc as SubmissionDoc).questionMode = data.questionMode;
+  }
 
   try {
     const db = getAdminDb();

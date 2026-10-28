@@ -11,6 +11,7 @@ import { TextoReaderClient } from './TextoReaderClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import { questionPublicFields } from '@/lib/pregunta-semana';
 
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -39,6 +40,7 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
+    ...questionPublicFields(s),
   };
 }
 

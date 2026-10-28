@@ -31,7 +31,7 @@ import { MapDock, type MapDockMode } from '@/components/map/MapDock';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
-import { NewsPanel } from '@/components/map/panels/NewsPanel';
+import { PreguntaPanel } from '@/components/map/panels/PreguntaPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel } from '@/components/map/panels/BitsPanel';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -2253,7 +2253,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const pathname = usePathname();
   const [activeView, setActiveView] = useState<'historias' | 'actualidad' | 'musica' | 'bits'>(() => {
     const tab = searchParams.get('tab');
-    if (tab === 'actualidad') return 'actualidad';
+    if (tab === 'actualidad') return 'historias';
     if (tab === 'sonidos') return 'musica';
     if (tab === 'bits') return 'bits';
     if (tab === 'historias') return 'historias';
@@ -2282,8 +2282,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
   const [isClosing, setIsClosing] = useState(false);
   const [panelHidden, setPanelHidden] = useState(false);
   /** Dock + Drawer UI: drawer abierto y modo (stories | news | sounds | search). */
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [drawerMode, setDrawerMode] = useState<MapDockMode>('stories');
+  const [drawerOpen, setDrawerOpen] = useState(() => searchParams.get('tab') === 'actualidad');
+  const [drawerMode, setDrawerMode] = useState<MapDockMode>(() =>
+    searchParams.get('tab') === 'actualidad' ? 'news' : 'stories'
+  );
   /** Bit seleccionado al hacer click en un dot del globo; abre panel derecho y resalta el dot. */
   const [selectedBit, setSelectedBit] = useState<BitEntry | null>(null);
   const selectedBitIdRef = useRef<number | null>(null);
@@ -4165,8 +4167,12 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   const handleDockModeChange = useCallback((mode: MapDockMode) => {
     if (embedded && !universeVisible) return; // no abrir drawer cuando el usuario está arriba (hero)
+    if (mode === 'news') {
+      setDrawerMode('news');
+      setDrawerOpen((prev) => (prev && drawerMode === 'news' ? false : true));
+      return;
+    }
     if (mode === 'stories' || mode === 'search') setActiveView('historias');
-    else if (mode === 'news') setActiveView('actualidad');
     else if (mode === 'sounds') setActiveView('musica');
     else if (mode === 'bits') setActiveView('bits');
     setDrawerMode(mode);
@@ -4573,7 +4579,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           <>
             <MapTopControls soundEnabled={soundEnabled} onToggleSound={toggleSound} topOffset={MAP_TOP_BAR_PX + 8} navbarZIndex={50} />
             <MapDock
-              activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
+              activeMode={drawerMode === 'news' ? 'news' : drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
               onModeChange={handleDockModeChange}
               onResetView={handleResetView}
               drawerOpen={drawerOpen}
@@ -4599,7 +4605,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   }}
                 />
               ) : drawerMode === 'news' ? (
-                <NewsPanel {...noticiasProps} />
+                <PreguntaPanel />
               ) : drawerMode === 'bits' ? (
                 <BitsPanel
                   bits={BITS_DATA}
@@ -5056,7 +5062,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             <div className="absolute top-6 md:top-8 left-1/2 -translate-x-1/2 z-30 flex justify-center w-full [&>*]:pointer-events-auto pointer-events-none">
               <div className="max-w-[980px] w-[min(980px,calc(100vw-48px))]">
                 <MapDock
-                activeMode={drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
+                activeMode={drawerMode === 'news' ? 'news' : drawerMode === 'search' ? 'search' : activeView === 'historias' ? 'stories' : activeView === 'actualidad' ? 'news' : activeView === 'bits' ? 'bits' : 'sounds'}
                 onModeChange={handleDockModeChange}
                 onResetView={handleResetView}
                 drawerOpen={drawerOpen}
@@ -5086,7 +5092,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   }}
                 />
               ) : drawerMode === 'news' ? (
-                <NewsPanel {...noticiasProps} />
+                <PreguntaPanel />
               ) : drawerMode === 'bits' ? (
                 <BitsPanel
                   bits={BITS_DATA}

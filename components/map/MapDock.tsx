@@ -1,6 +1,8 @@
 'use client';
 
 import type { CSSProperties } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 
 export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search';
 
@@ -75,8 +77,8 @@ const activeBtnStyle: CSSProperties = {
 };
 
 export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerOpen, embedded, topOffset, navbarZIndex }: MapDockProps) {
+  const { locale } = useHomeLocale();
   if (hidden) return null;
-
   const topPx = topOffset ?? (drawerOpen ? 8 : 24);
   const dockZ = navbarZIndex ?? 25;
   const positionStyle: CSSProperties = embedded
@@ -87,7 +89,7 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
     { mode: 'bits', label: 'También cuenta' },
-    { mode: 'news', label: 'Noticias' },
+    { mode: 'news', label: PREGUNTA_UI.tab[locale] },
     { mode: 'sounds', label: 'Sonidos' },
     { mode: 'search', label: 'Buscar por palabras clave' },
   ];

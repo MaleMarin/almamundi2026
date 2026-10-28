@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { isQuestionId, isQuestionMode, type QuestionId, type QuestionMode } from '@/lib/pregunta-semana';
 
 export const CONTAR_FORMATS = ['video', 'audio', 'foto', 'texto'] as const;
 export type ContarFormat = (typeof CONTAR_FORMATS)[number];
@@ -53,8 +54,27 @@ export function parseContarFormat(pathname: string): ContarFormat | null {
   return isContarFormat(match[1]) ? match[1] : null;
 }
 
-export function contarHref(format: ContarFormat): string {
-  return `/contar/${format}`;
+export type ContarPregunta = { id: QuestionId; mode: QuestionMode };
+
+export function preguntaFromSearch(params: { get(name: string): string | null }): ContarPregunta | null {
+  const id = params.get('pregunta');
+  const mode = params.get('modo');
+  if (!isQuestionId(id) || !isQuestionMode(mode)) return null;
+  return { id, mode };
+}
+
+function withPregunta(path: string, pregunta?: ContarPregunta | null): string {
+  if (!pregunta) return path;
+  const q = new URLSearchParams({ pregunta: pregunta.id, modo: pregunta.mode });
+  return `${path}?${q.toString()}`;
+}
+
+export function contarIndexHref(pregunta?: ContarPregunta | null): string {
+  return withPregunta('/contar', pregunta);
+}
+
+export function contarHref(format: ContarFormat, pregunta?: ContarPregunta | null): string {
+  return withPregunta(`/contar/${format}`, pregunta);
 }
 
 export function modeFromContarFormat(format: ContarFormat): ContarFormat {

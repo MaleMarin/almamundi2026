@@ -38,6 +38,7 @@ import {
   peekMapAmbientPending,
 } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
+import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
@@ -94,7 +95,7 @@ function huellasFallbackDesdeBitsData(): HuellaPunto[] {
   }));
 }
 import { StoriesPanel } from '@/components/map/panels/StoriesPanel';
-import { NewsPanel } from '@/components/map/panels/NewsPanel';
+import { PreguntaPanel } from '@/components/map/panels/PreguntaPanel';
 import { SoundsPanel } from '@/components/map/panels/SoundsPanel';
 import { BitsPanel, type BitLike } from '@/components/map/panels/BitsPanel';
 import { isPublicAudioMoodId, publicAudioPathFromMoodId } from '@/lib/public-audio-mood';
@@ -162,8 +163,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   );
   const [surpriseFlying, setSurpriseFlying] = useState(false);
   const [surpriseNotice, setSurpriseNotice] = useState<string | null>(null);
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
-  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const selectedTopicId: string | null = null;
   /** Portal del dock neumórfico bajo el título (`#map-dock-slot` en MapSectionLocked). */
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null);
   /** Textos curiosos y categorías: `public/huellas2.json`. Fallback = BITS_DATA (solo lugar/país) si falla la carga. */
@@ -539,12 +539,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const {
     topicItems: topicNewsItems,
     generalItems: generalNewsItems,
-    loading: newsLoading,
-    error: newsError,
-    topicMatched,
-    relaxedTopic,
-    loadingTimedOut,
-    isRefreshing,
   } = useNewsLayer(
     selectedTopicId,
     topicQuery,
@@ -759,22 +753,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     highlightedStoryId,
   };
 
-  const noticiasProps = {
-    topicNews: topicNewsItems,
-    generalNews: generalNewsItems,
-    news: filteredNewsItems,
-    loading: newsLoading,
-    isRefreshing,
-    loadingTimedOut,
-    topicMatched,
-    relaxedTopic,
-    error: newsError,
-    selectedTopicId,
-    onTopicIdChange: setSelectedTopicId,
-    onNewsFocus: (n: NewsItem) => setSelectedNews(n),
-    selectedNews,
-  };
-
   const sonidosProps = {
     currentMood: selectedMood,
     onMoodChange: (m: string) => setSelectedMood(m),
@@ -863,10 +841,16 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'news'}
-                title={globeLayers.news ? 'Noticias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar noticias en el globo'}
-                onClick={() => onGlobeLayerPill('news', 'news')}
+                title={PREGUNTA_UI.tab[locale]}
+                onClick={() => {
+                  if (drawerOpen && drawerMode === 'news') {
+                    close();
+                    return;
+                  }
+                  open('news');
+                }}
               >
-                Noticias
+                {PREGUNTA_UI.tab[locale]}
               </PillNavButton>
               <PillNavButton
                 dock
@@ -917,7 +901,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               onContarMiHistoria={handleSubirMiHistoria}
             />
           ) : drawerMode === 'news' ? (
-            <NewsPanel {...noticiasProps} />
+            <PreguntaPanel />
           ) : drawerMode === 'bits' ? (
             <BitsPanel
               showIndexList={false}

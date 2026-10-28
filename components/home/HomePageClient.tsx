@@ -1,13 +1,13 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
-import { contarHref, parseContarFormat } from '@/lib/contar-routes';
+import { contarHref, parseContarFormat, contarIndexHref, preguntaFromSearch } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   navigateToHomeMapa,
@@ -26,6 +26,8 @@ import {
 export function HomePageClient() {
   const router = useRouter();
   const pathname = usePathname() ?? '/';
+  const searchParams = useSearchParams();
+  const pregunta = preguntaFromSearch(searchParams);
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
@@ -66,15 +68,15 @@ export function HomePageClient() {
     if (clearTopic) setChosenTopic(null);
     setStoryMode(mode);
     setStoryOpen(true);
-    router.push(contarHref(mode));
-  }, [router]);
+    router.push(contarHref(mode, pregunta));
+  }, [pregunta, router]);
 
   const closeStory = useCallback(() => {
     setStoryOpen(false);
     if (parseContarFormat(pathname)) {
-      router.replace('/contar');
+      router.replace(contarIndexHref(pregunta));
     }
-  }, [pathname, router]);
+  }, [pathname, pregunta, router]);
 
   const exploreMapFromStory = useCallback(() => {
     setStoryOpen(false);
@@ -277,6 +279,7 @@ export function HomePageClient() {
         onExploreMap={exploreMapFromStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
+        answering={pregunta}
         onClearTopic={() => setChosenTopic(null)}
       />
     </main>

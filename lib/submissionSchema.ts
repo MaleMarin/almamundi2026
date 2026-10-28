@@ -17,6 +17,7 @@ import {
   PHOTO_YEAR_MIN,
   currentPhotoYear,
 } from "@/lib/story-photo-ficha";
+import { QUESTION_IDS } from "@/lib/pregunta-semana";
 
 const privatePathRegex =
   /^submissions\/private\/[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\/.+$/i;
@@ -111,7 +112,13 @@ export const CreateSubmissionBody = z.object({
   cancionRelacionada: z.string().max(CANCION_RELACIONADA_MAX).optional(),
   /** Solo el textarea "Extras (opcional)"; no el relleno de `context`. */
   antecedentes: z.string().max(ANTECEDENTES_MAX).optional(),
+  /** Semana de «La pregunta». No entra en el texto que colorea la cinta. */
+  questionId: z.enum(QUESTION_IDS).optional(),
+  questionMode: z.enum(["tu", "alguien"]).optional(),
 }).superRefine((data, ctx) => {
+  if ((data.questionId == null) !== (data.questionMode == null)) {
+    ctx.addIssue({ code: "custom", message: "pregunta", path: ["questionId"] });
+  }
   if (data.type !== "foto") return;
   const urls = data.payload.photoUrls?.filter((url) => url.trim()) ?? [];
   const count = urls.length || (data.payload.photoUrl ? 1 : 0);
@@ -163,6 +170,10 @@ export interface SubmissionDoc {
   cancionRelacionada?: string;
   /** Extras escritos por la persona; opcional. */
   antecedentes?: string;
+  /** Id de la pregunta de la semana, p. ej. `s01`. */
+  questionId?: (typeof QUESTION_IDS)[number];
+  /** `tu` = Cuéntanos tú. `alguien` = Pregúntale a alguien. */
+  questionMode?: "tu" | "alguien";
   payload: {
     textBody?: string;
     photoUrl?: string;

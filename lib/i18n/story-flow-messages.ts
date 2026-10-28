@@ -107,6 +107,11 @@ export type StoryFlowMessages = {
   modalExtrasColorHint: string;
   modalNowWhat: string;
   modalContactLead: string;
+  modalAnsweringPrefix: string;
+  modalAskAdviceTexto: string;
+  modalAskAdviceAudio: string;
+  modalAskAdviceVideo: string;
+  modalAskAdviceFoto: string;
 };
 
 const es: StoryFlowMessages = {
@@ -236,6 +241,11 @@ const es: StoryFlowMessages = {
   modalExtrasColorHint: 'Lo que escribas aquí también da color a tu imagen.',
   modalNowWhat: '¿Y ahora?',
   modalContactLead: '¿Tienes dudas? Escríbenos a',
+  modalAnsweringPrefix: 'Respondes a:',
+  modalAskAdviceTexto: 'Escribe lo que te contó, con sus palabras si puedes.',
+  modalAskAdviceAudio: 'Graba la conversación: tú preguntas y la otra persona responde.',
+  modalAskAdviceVideo: 'Pon el celular horizontal y que se vean ambos.',
+  modalAskAdviceFoto: 'Pídele una foto de esa época y cuéntanos qué hay en ella.',
 };
 
 const pt: StoryFlowMessages = {
@@ -317,6 +327,11 @@ const pt: StoryFlowMessages = {
   modalNowWhat: 'E agora?',
   modalContactLead: 'Tem dúvidas? Escreva para',
   modalCaptchaFailed: 'Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo.',
+  modalAnsweringPrefix: 'Você está respondendo:',
+  modalAskAdviceTexto: 'Escreva o que a pessoa contou, com as palavras dela se puder.',
+  modalAskAdviceAudio: 'Grave a conversa: você pergunta e a outra pessoa responde.',
+  modalAskAdviceVideo: 'Deixe o celular na horizontal e que os dois apareçam.',
+  modalAskAdviceFoto: 'Peça uma foto daquela época e conte o que há nela.',
 };
 
 const en: StoryFlowMessages = {
@@ -399,6 +414,11 @@ const en: StoryFlowMessages = {
   modalNowWhat: 'What now?',
   modalContactLead: 'Questions? Write to us at',
   modalCaptchaFailed: 'We could not confirm the submission. Wait a few seconds and try again.',
+  modalAnsweringPrefix: "You're answering:",
+  modalAskAdviceTexto: 'Write what they told you, in their own words if you can.',
+  modalAskAdviceAudio: 'Record the conversation: you ask, the other person answers.',
+  modalAskAdviceVideo: 'Hold your phone horizontally so you both appear.',
+  modalAskAdviceFoto: "Ask them for a photo from that time and tell us what's in it.",
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

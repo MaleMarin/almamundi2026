@@ -3,6 +3,7 @@
 import { StoryEndScreen } from '@/components/historia/StoryEndScreen';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
+import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu } from '@/lib/historias-neumorph';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
@@ -38,6 +39,8 @@ export interface HistoriaAudio {
   transcript?: string;
   cancionRelacionada?: string;
   antecedentes?: string;
+  questionId?: string;
+  questionMode?: 'tu' | 'alguien';
 }
 
 interface AudioPlayerProps {
@@ -329,6 +332,12 @@ export default function AudioPlayer({
             }}
           >
             <StoryScrollBlock scene>
+            <RespondeALine
+              questionId={historia.questionId}
+              questionMode={historia.questionMode}
+              align="center"
+              color={TEXT_BODY}
+            />
             <h1
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
@@ -618,6 +627,8 @@ export default function AudioPlayer({
           thumbnailUrl={historia.thumbnailUrl}
           cancionRelacionada={historia.cancionRelacionada}
           antecedentes={historia.antecedentes}
+          questionId={historia.questionId}
+          questionMode={historia.questionMode}
           embedInSite={presentation === 'embed'}
           replayLabel="Escuchar de nuevo"
           onReplay={restart}

@@ -9,6 +9,7 @@ import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
+import { RespondeALine } from '@/components/historia/RespondeALine';
 
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
@@ -32,6 +33,8 @@ export interface HistoriaTexto {
   tags?: string[];
   cancionRelacionada?: string;
   antecedentes?: string;
+  questionId?: string;
+  questionMode?: 'tu' | 'alguien';
 }
 
 interface TextoReaderProps {
@@ -173,6 +176,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         </p>
 
         {/* Título */}
+        <RespondeALine questionId={historia.questionId} questionMode={historia.questionMode} color={TINTA_SOFT} />
         <h1
           style={{
             fontFamily: INTERIOR_FONT_STACK,

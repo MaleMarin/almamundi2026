@@ -21,6 +21,7 @@ import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-access
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { promotePublicStoryMedia } from "@/lib/published-media";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
+import { isQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
 import {
   notifyAuthorStoryRejected,
   type RejectionMailCollection,
@@ -115,6 +116,8 @@ function copyOptionalPublicFields(story: Record<string, unknown>, source: Record
   if (antecedentes) story.antecedentes = antecedentes;
   const imagenes = parseStoryImagenes(source.imagenes);
   if (imagenes) story.imagenes = imagenes;
+  if (isQuestionId(source.questionId)) story.questionId = source.questionId;
+  if (isQuestionMode(source.questionMode)) story.questionMode = source.questionMode;
 }
 
 function coerceFiniteNumber(v: unknown): number | null {

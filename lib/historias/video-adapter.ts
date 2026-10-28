@@ -5,6 +5,7 @@ import type { Historia } from '@/components/historia/VideoPlayer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { defaultAvatar } from '@/lib/historias/audio-adapter';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import { questionPublicFields } from '@/lib/pregunta-semana';
 
 function resolveThumbnail(s: StoryPoint): string {
   const raw =
@@ -49,5 +50,6 @@ export function storyToVideoHistoria(s: StoryPoint): Historia {
     subtitulos: s.captionsUrl,
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
+    ...questionPublicFields(s),
   };
 }

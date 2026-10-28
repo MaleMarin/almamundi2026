@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import { RespondeALine } from '@/components/historia/RespondeALine';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 type SimilarStory = {
@@ -71,6 +72,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
               <div className="text-xs font-semibold tracking-[0.12em] uppercase mb-3" style={{ color: 'var(--almamundi-orange)' }}>
                 {place} · {hasVideo ? 'Videos' : hasAudio ? 'Audios' : hasImage ? 'Fotografías' : 'Escritos'} · {timeAgo(story.publishedAt)}
               </div>
+              <RespondeALine questionId={story.questionId} questionMode={story.questionMode} color={neu.textBody} />
               <h1 className="text-3xl md:text-5xl font-semibold tracking-tight leading-[1.1] mb-4" style={{ color: neu.textMain }}>
                 {story.title || 'Sin título'}
               </h1>

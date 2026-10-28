@@ -11,6 +11,7 @@ import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
+import { isQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
@@ -126,6 +127,8 @@ function firestoreDocToStoryPoint(
     quote: (d.quote as string) ?? undefined,
     cancionRelacionada: normalizeCancionRelacionada(d.cancionRelacionada),
     antecedentes: normalizeAntecedentes(d.antecedentes),
+    ...(isQuestionId(d.questionId) ? { questionId: d.questionId } : {}),
+    ...(isQuestionMode(d.questionMode) ? { questionMode: d.questionMode } : {}),
     imagenes: parseStoryImagenes(d.imagenes),
     format: formato,
     city: city || undefined,

@@ -7,6 +7,7 @@ import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
+import { RespondeALine } from '@/components/historia/RespondeALine';
 
 export type StoryEndAutor = {
   nombre: string;
@@ -37,6 +38,8 @@ export type StoryEndScreenProps = {
   thumbnailUrl?: string;
   cancionRelacionada?: string;
   antecedentes?: string;
+  questionId?: string;
+  questionMode?: 'tu' | 'alguien';
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
   embedInSite?: boolean;
   /** Datos para abrir el flujo de compartir; si está ausente, no se muestra botón. */
@@ -86,6 +89,8 @@ export function StoryEndScreen({
   thumbnailUrl,
   cancionRelacionada,
   antecedentes,
+  questionId,
+  questionMode,
   embedInSite = false,
   share,
   storyId,
@@ -184,6 +189,12 @@ export function StoryEndScreen({
           boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(163,177,198,0.26)`,
         }}
       >
+        <RespondeALine
+          questionId={questionId}
+          questionMode={questionMode}
+          align="center"
+          color={TEXT_BODY}
+        />
         <h2
           style={{
             fontWeight: 600,

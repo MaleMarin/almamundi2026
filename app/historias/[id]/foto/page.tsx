@@ -11,6 +11,7 @@ import { FotoAlbumClient } from './FotoAlbumClient';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import { questionPublicFields } from '@/lib/pregunta-semana';
 
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -48,6 +49,7 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
+    ...questionPublicFields(s),
   };
 }
 

@@ -6,6 +6,7 @@ import type { HistoriaAudio } from '@/components/historia/AudioPlayer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { captionPhrasesFromTranscription } from '@/lib/historias/story-accessibility';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import { questionPublicFields } from '@/lib/pregunta-semana';
 
 export function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase();
@@ -42,5 +43,6 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
     ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
+    ...questionPublicFields(s),
   };
 }
