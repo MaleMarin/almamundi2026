@@ -2,8 +2,8 @@
  * lib/userLocation.ts
  *
  * Obtiene la ubicación aproximada del usuario.
- * Solo se usa cuando el usuario termina de leer una historia.
- * No se guarda ningún dato de identificación.
+ * Solo se pide al tocar Resonar («Esto me llegó»).
+ * No se pide al terminar de leer, oír o ver una historia.
  */
 
 export type ApproxLocation = {
@@ -49,21 +49,5 @@ export async function getApproxLocation(): Promise<ApproxLocation | null> {
     return await inFlight;
   } finally {
     inFlight = null;
-  }
-}
-
-/** Registra una huella en el servidor de forma silenciosa. */
-export async function registerPulse(storyId: string): Promise<void> {
-  const loc = await getApproxLocation();
-  if (!loc) return;
-
-  try {
-    await fetch('/api/pulse', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ lat: loc.lat, lng: loc.lng, storyId }),
-    });
-  } catch {
-    // Silencioso
   }
 }

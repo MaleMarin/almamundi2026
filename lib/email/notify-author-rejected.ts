@@ -9,6 +9,7 @@ import {
   resolveAuthorNameFromSubmission,
 } from "@/lib/email/notify-author-received";
 import { resolveAuthorEmailFromRecord } from "@/lib/email/notify-author-published";
+import { readAuthorContactEmail } from "@/lib/author-contacts";
 
 export type RejectionMailStatus = "sent" | "skipped_no_email" | "failed";
 
@@ -68,6 +69,8 @@ export async function resolveAuthorEmailForStoryDoc(
   docId: string,
   data: Record<string, unknown>
 ): Promise<string | null> {
+  const contact = await readAuthorContactEmail(db, docId);
+  if (contact && isValidRecipientEmail(contact)) return contact;
   return (
     resolveAuthorEmailFromSubmission(data) ??
     resolveAuthorEmailFromRecord(data) ??

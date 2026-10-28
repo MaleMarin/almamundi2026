@@ -6,6 +6,7 @@
 import type { Firestore } from 'firebase-admin/firestore';
 import { isValidRecipientEmail } from '@/lib/email-html';
 import { resolveAuthorEmailFromRecord } from '@/lib/email/notify-author-published';
+import { readAuthorContactEmail } from '@/lib/author-contacts';
 import { sendReaderMessageEmail } from '@/lib/email/send-reader-message-email';
 
 export type ReaderMessageMailStatus = 'sent' | 'skipped_no_email' | 'failed';
@@ -65,8 +66,11 @@ export async function notifyAuthorReaderMessage(args: {
   const snap = await ref.get();
   const data = (snap.exists ? snap.data() : {}) as Record<string, unknown>;
 
+  const contact = await readAuthorContactEmail(db, storyId);
   const to =
-    resolveAuthorEmailFromRecord(data) ?? (await lookupEmailFromSubmissions(db, storyId, data));
+    (contact && isValidRecipientEmail(contact) ? contact : null) ??
+    resolveAuthorEmailFromRecord(data) ??
+    (await lookupEmailFromSubmissions(db, storyId, data));
 
   if (!to) {
     return {

@@ -7,19 +7,18 @@ import {
   type EmotionState,
   type EmotionVisual,
 } from '@/lib/audioEmotion';
-import { registerPulse } from '@/lib/userLocation';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
   audioUrl:  string;
   /** Callback para que el visor padre cambie su fondo según la emoción */
   onEmotion?: (visual: EmotionVisual) => void;
-  /** Si se pasa, al terminar el audio se registra una huella anónima en el mapa */
+  /** Se conserva para quien ya pasa el id. Terminar el audio no pide ubicación. */
   storyId?: string;
   autoPlay?: boolean;
 };
 
-export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay = false }: Props) {
+export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }: Props) {
   const canvasRef   = useRef<HTMLCanvasElement>(null);
   const audioRef    = useRef<HTMLAudioElement>(null);
   const animRef     = useRef<number>(0);
@@ -186,7 +185,6 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay 
       setEmotion('silence');
       onEmotion?.(EMOTION_VISUALS.silence);
       cancelAnimationFrame(animRef.current);
-      if (storyId) void registerPulse(storyId);
     };
     audio.addEventListener('timeupdate',     onTime);
     audio.addEventListener('loadedmetadata', onLoad);
@@ -197,7 +195,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, storyId, autoPlay 
       audio.removeEventListener('ended',          onEnd);
       cancelAnimationFrame(animRef.current);
     };
-  }, [onEmotion, storyId]);
+  }, [onEmotion]);
 
   useEffect(() => {
     return () => {

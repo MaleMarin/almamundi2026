@@ -1,13 +1,11 @@
 'use client';
 
-import { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { Headphones, Video, FileText } from 'lucide-react';
 import { AudioEmotionVisualizer } from '@/components/mapa/AudioEmotionVisualizer';
 import { PhotoStoryViewer } from '@/components/observatory/PhotoStoryViewer';
 import { EMOTION_VISUALS, type EmotionVisual } from '@/lib/audioEmotion';
-import { registerPulse } from '@/lib/userLocation';
-
 interface StoryObservatoryProps {
   story: StoryPoint;
   /** Callback para que el fondo de la página responda a la emoción del audio */
@@ -16,38 +14,15 @@ interface StoryObservatoryProps {
 
 type TabId = 'audio' | 'video' | 'text' | 'photos';
 
-/** Cuerpo de texto con detección de fin de lectura (scroll 90%) para registrar huella. */
 function StoryTextBody({
   body,
-  storyId,
   onSpeak,
   isSpeaking,
 }: {
   body: string;
-  storyId: string;
   onSpeak: () => void;
   isSpeaking: boolean;
 }) {
-  const endRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!storyId || !endRef.current) return;
-    let fired = false;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && !fired) {
-          fired = true;
-          void registerPulse(storyId);
-        }
-      },
-      { threshold: 0.9 }
-    );
-
-    observer.observe(endRef.current);
-    return () => observer.disconnect();
-  }, [storyId]);
-
   return (
     <div className="p-6 md:p-8">
       <div className="flex flex-wrap items-center gap-3 mb-4">
@@ -64,7 +39,6 @@ function StoryTextBody({
       <p className="text-white/90 leading-relaxed whitespace-pre-wrap">
         {body}
       </p>
-      <div ref={endRef} style={{ height: 1 }} aria-hidden />
     </div>
   );
 }
@@ -208,7 +182,6 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
                 src={story.videoUrl!}
                 className="w-full max-w-2xl rounded-xl border border-white/10"
                 playsInline
-                onEnded={() => void registerPulse(story.id)}
               />
             ) : (
               <p className="text-white/50">No hay video disponible para esta historia.</p>
@@ -218,7 +191,6 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
         {tab === 'text' && (
           <StoryTextBody
             body={story.body || story.description || 'Sin contenido de texto aún.'}
-            storyId={story.id}
             onSpeak={speak}
             isSpeaking={isSpeaking}
           />

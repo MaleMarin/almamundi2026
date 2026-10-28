@@ -4,6 +4,7 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
+import { AUTHOR_CONTACTS_COLLECTION, authorEmailOnStory } from "@/lib/author-contacts";
 
 export const runtime = "nodejs";
 
@@ -44,6 +45,19 @@ export async function GET(request: NextRequest) {
             .limit(200)
             .get();
 
+    const contactSnaps = snap.docs.length
+      ? await db.getAll(
+          ...snap.docs.map((doc) => db.collection(AUTHOR_CONTACTS_COLLECTION).doc(doc.id))
+        )
+      : [];
+    const emailByStory = new Map<string, string>();
+    for (const contact of contactSnaps) {
+      const email = contact.get("email");
+      if (contact.exists && typeof email === "string" && email.trim()) {
+        emailByStory.set(contact.id, email.trim());
+      }
+    }
+
     const list = snap.docs.map((doc) => {
       const d = doc.data();
       const createdAt = toMillis(d.createdAt);
@@ -63,7 +77,7 @@ export async function GET(request: NextRequest) {
         isFeatured: Boolean(d.isFeatured),
         resonances: typeof d.resonances === "number" ? d.resonances : 0,
         createdAt,
-        authorEmail: d.authorEmail ?? null,
+        authorEmail: emailByStory.get(doc.id) ?? authorEmailOnStory(d),
         rightsAccepted: Boolean(d.rightsAccepted),
         publicationMail: d.publicationMail ?? null,
         questionId: typeof d.questionId === "string" ? d.questionId : null,

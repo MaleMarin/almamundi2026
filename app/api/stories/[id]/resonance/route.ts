@@ -10,6 +10,7 @@ import {
 import { isValidRecipientEmail, safeEmailText, safeHrefForEmail } from '@/lib/email-html';
 import { AUTHOR_REPLY_TO } from '@/lib/email/almamundi-email-layout';
 import { noteEmailSent } from '@/lib/ops/usage-state';
+import { resolveStoredAuthorEmail } from '@/lib/author-contacts';
 
 export const runtime = 'nodejs';
 
@@ -61,7 +62,8 @@ export async function POST(
     const storySnap = await storyRef.get();
     const data = storySnap.data() as Record<string, unknown> | undefined;
     const notifyEmail = data?.notifyEmail === true;
-    const authorEmail = typeof data?.authorEmail === 'string' ? data.authorEmail : '';
+    const storedEmail = await resolveStoredAuthorEmail(db, id, data);
+    const authorEmail = storedEmail && isValidRecipientEmail(storedEmail) ? storedEmail : '';
     const titleRaw = typeof data?.title === 'string' ? data.title : '';
 
     if (notifyEmail && authorEmail && isValidRecipientEmail(authorEmail) && process.env.RESEND_API_KEY) {

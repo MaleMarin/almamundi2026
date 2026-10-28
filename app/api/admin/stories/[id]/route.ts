@@ -7,6 +7,7 @@ import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { editorialDeleteStory } from "@/lib/editorial/service";
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
+import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
 
 export const runtime = "nodejs";
 
@@ -62,6 +63,11 @@ export async function PATCH(
     };
     if (action === "approve") {
       updates.publishedAt = FieldValue.serverTimestamp();
+      const email = authorEmailOnStory(data);
+      if (email) {
+        await saveAuthorContact(db, id, email);
+        updates.authorEmail = FieldValue.delete();
+      }
     }
     if (action === "feature") {
       updates.isFeatured = true;

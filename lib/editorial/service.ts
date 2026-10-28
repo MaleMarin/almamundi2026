@@ -27,6 +27,7 @@ import {
 } from "@/lib/server-storage";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
+import { deleteAuthorContact, saveAuthorContact } from "@/lib/author-contacts";
 import {
   notifyAuthorStoryRejected,
   type RejectionMailCollection,
@@ -235,7 +236,6 @@ export async function editorialPublishFromSubmission(
         : typeof sub.email === "string"
           ? sub.email.trim()
           : "";
-    if (authorEmailOnSub) story.authorEmail = authorEmailOnSub;
     const cityKnown = typeof sub.city === "string" ? sub.city : undefined;
     const countryKnown = typeof sub.country === "string" ? sub.country : undefined;
     if (cityKnown) story.city = cityKnown;
@@ -249,6 +249,7 @@ export async function editorialPublishFromSubmission(
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
+    if (authorEmailOnSub) await saveAuthorContact(db, storyRef.id, authorEmailOnSub);
     const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
     await resolved.ref.update({
       status: "approved",
@@ -335,7 +336,6 @@ export async function editorialPublishFromSubmission(
     media,
     tags: { themes: themes.length ? themes : [], moods: [], keywords: [] },
     authorName: sd.alias,
-    authorEmail: typeof sd.email === "string" && sd.email.trim() ? sd.email.trim() : undefined,
     placeLabel: sd.placeLabel,
     country: sd.countryLabel ?? undefined,
     city: sd.placeLabel ?? undefined,
@@ -350,6 +350,8 @@ export async function editorialPublishFromSubmission(
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
 
   await storyRef.set(story);
+  const pipelineEmail = typeof sd.email === "string" ? sd.email.trim() : "";
+  if (pipelineEmail) await saveAuthorContact(db, storyRef.id, pipelineEmail);
   const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
   await resolved.ref.update({
     status: "approved" as SubmissionsPipelineDoc["status"],
@@ -450,7 +452,6 @@ export async function editorialPublishApprovedStorySubmission(
       : typeof data.email === "string"
         ? data.email.trim()
         : "";
-  if (authorEmailLegacy) storyData.authorEmail = authorEmailLegacy;
   copyOptionalPublicFields(storyData, data);
   if (promoted.imagenes?.length) storyData.imagenes = promoted.imagenes;
   if (promoted.profilePhotoUrl) storyData.profilePhotoUrl = promoted.profilePhotoUrl;
@@ -460,6 +461,7 @@ export async function editorialPublishApprovedStorySubmission(
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
   await storyRef.set(storyData);
+  if (authorEmailLegacy) await saveAuthorContact(db, storyRef.id, authorEmailLegacy);
   await subRef.update({
     status: "approved",
     updatedAt: FieldValue.serverTimestamp(),
@@ -553,6 +555,11 @@ export async function editorialPublishSpanishDraftInPlace(args: {
   if (promoted.images?.length) update.images = promoted.images;
   if (promoted.publishedMediaPaths.length) {
     update.publishedMediaPaths = promoted.publishedMediaPaths;
+  }
+  const draftEmail = typeof raw.authorEmail === "string" ? raw.authorEmail.trim() : "";
+  if (draftEmail) {
+    await saveAuthorContact(db, storyId, draftEmail);
+    update.authorEmail = FieldValue.delete();
   }
 
   await ref.update(update);
@@ -840,6 +847,7 @@ export async function editorialDeleteStory(args: {
   await deleteStoryStorageFiles(storyId, paths);
   await deleteOriginSubmission(db, storyId, data);
   await deleteDocumentTree(ref);
+  await deleteAuthorContact(db, storyId);
   try {
     await detachStoryFromCollections(db, storyId);
   } catch (e) {

@@ -10,6 +10,7 @@ import {
   generateAuthorEcoToken,
 } from '@/lib/author-eco-token';
 import { emailPublicOrigin } from '@/lib/email/almamundi-email-layout';
+import { readAuthorContactEmail } from '@/lib/author-contacts';
 
 export type PublicationMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -97,14 +98,15 @@ export async function notifyAuthorStoryPublished(args: {
     }
   }
 
+  const contact = await readAuthorContactEmail(db, storyId);
   const to =
-    resolveAuthorEmailFromRecord(data) ?? (await lookupEmailFromSubmissions(db, storyId, data));
+    (contact && isValidRecipientEmail(contact) ? contact : null) ??
+    resolveAuthorEmailFromRecord(data) ??
+    (await lookupEmailFromSubmissions(db, storyId, data));
 
   const persist = async (rec: PublicationMailRecord) => {
     if (!snap.exists) return rec;
-    const extra: Record<string, unknown> = { publicationMail: rec };
-    if (rec.to && !data.authorEmail) extra.authorEmail = rec.to;
-    await ref.update(extra);
+    await ref.update({ publicationMail: rec });
     return rec;
   };
 

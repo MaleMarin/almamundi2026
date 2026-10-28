@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
-import { registerPulse, getApproxLocation } from '@/lib/userLocation';
+import { getApproxLocation } from '@/lib/userLocation';
 import { incrementStoriesRead, shouldShowMomentoJusto, markMomentoJustoShown } from '@/lib/sessionTracker';
 import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
@@ -236,7 +236,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
       ([entry]) => {
         if (entry?.isIntersecting && !fired) {
           fired = true;
-          void registerPulse(story.id ?? '');
           if (!compact && shouldShowMomentoJusto()) {
             markMomentoJustoShown();
             setTimeout(() => setShowMomentoJusto(true), 2000);
@@ -512,9 +511,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     controls
                     autoPlay
                     src={story.videoUrl}
-                    onEnded={() => {
-                      void registerPulse(story.id ?? '');
-                    }}
                     style={{ width: '100%', display: 'block', maxHeight: compact ? '22vh' : '40vh', objectFit: 'cover' }}
                   />
                 </div>
@@ -534,9 +530,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     controls
                     autoPlay
                     src={story.audioUrl}
-                    onEnded={() => {
-                      void registerPulse(story.id ?? '');
-                    }}
                     style={{ width: '100%' }}
                   />
                 </div>

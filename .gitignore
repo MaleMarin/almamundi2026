@@ -30,6 +30,9 @@ pnpm-debug.log*
 # JSON de cuenta de servicio (solo para setup; no commitear)
 firebase-service-account.json
 
+# Respaldo local del script de correos de autores (contiene correos)
+/scripts/backups/
+
 # Stray / noise (do not commit)
 /almamundi@0.1.0
 /next
