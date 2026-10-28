@@ -11,7 +11,7 @@ import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat, contarIndexHref } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { preguntaPageHref, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import {
   navigateToHomeMapa,
@@ -262,24 +262,25 @@ export function HomePageClient() {
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
-      <div className="home-intro-avenir relative z-20 mx-auto mb-8 flex w-full flex-col items-center px-6 md:mb-12 md:px-10">
-        <p className="mb-4 max-w-3xl text-center text-sm leading-relaxed md:text-base" style={{ color: '#4A5568' }}>
-          {PREGUNTA_COPY.intro[locale]}
-        </p>
-        <div className="relative w-max max-w-full">
+      <section
+        className="relative z-20 mx-auto mt-[56px] mb-[72px] w-full px-6 md:mt-[96px] md:mb-[120px] md:px-10"
+        aria-labelledby="pregunta-semana-titulo"
+      >
+        <div className="relative mx-auto w-full max-w-[880px]">
           <span
             aria-hidden
-            className="pointer-events-none absolute -left-12 top-1/2 z-0 h-40 w-40 -translate-y-1/2 rounded-full"
+            className="pointer-events-none absolute -left-8 top-1/2 z-0 h-48 w-48 -translate-y-1/2 rounded-full"
             style={{ background: 'rgba(255,74,28,0.18)', filter: 'blur(40px)' }}
           />
           <span
             aria-hidden
-            className="pointer-events-none absolute -right-10 top-1/2 z-0 h-36 w-36 -translate-y-1/2 rounded-full"
+            className="pointer-events-none absolute -right-6 top-1/2 z-0 h-44 w-44 -translate-y-1/2 rounded-full"
             style={{ background: 'rgba(90,120,160,0.15)', filter: 'blur(40px)' }}
           />
           <div
-            className="relative z-[1] flex w-max max-w-full flex-col items-center justify-center gap-3 rounded-[1.75rem] px-4 py-3 text-center sm:flex-row sm:px-5 sm:py-3.5"
+            className="relative z-[1] flex flex-col items-center px-7 py-7 text-center md:px-12 md:py-12"
             style={{
+              borderRadius: '1.75rem',
               background: 'linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))',
               backdropFilter: 'blur(18px) saturate(160%)',
               WebkitBackdropFilter: 'blur(18px) saturate(160%)',
@@ -287,19 +288,44 @@ export function HomePageClient() {
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)',
             }}
           >
-            <p className="m-0 text-[0.95rem] leading-snug sm:text-base xl:whitespace-nowrap" style={{ color: '#4A5568' }}>
-              <span className="font-semibold">{PREGUNTA_UI.semana[locale]}</span>{' '}
-              {preguntaVigente.tu[locale]}
+            <p className="m-0 text-xs font-semibold uppercase tracking-[0.18em] text-[#FF4A1C]">
+              {PREGUNTA_COPY.homeEyebrow[locale].replace('[tema]', preguntaVigente.tema[locale])}
             </p>
-            <Link
-              href="/pregunta"
-              className="btn-am-principal relative z-[1] inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
+            <h2
+              id="pregunta-semana-titulo"
+              className="mb-0 mt-5 text-[26px] leading-[1.25] md:text-[36px]"
+              style={{
+                fontFamily: 'var(--font-interna), system-ui, sans-serif',
+                fontWeight: 500,
+                color: '#4A5568',
+                textWrap: 'balance',
+              }}
             >
-              {PREGUNTA_UI.responder[locale]}
-            </Link>
+              {preguntaVigente.tu[locale]}
+            </h2>
+            <p
+              className="mx-auto mb-0 mt-4 max-w-[56ch] text-[17px] leading-relaxed"
+              style={{ color: '#718096', textWrap: 'balance' }}
+            >
+              {PREGUNTA_COPY.intro[locale]}
+            </p>
+            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <Link
+                href={preguntaPageHref(preguntaVigente.id, 'tu')}
+                className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 py-3"
+              >
+                {PREGUNTA_COPY.modeYou[locale]}
+              </Link>
+              <Link
+                href={preguntaPageHref(preguntaVigente.id, 'alguien')}
+                className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3"
+              >
+                {PREGUNTA_COPY.modeAsk[locale]}
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </section>
       <MapSectionLocked />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />

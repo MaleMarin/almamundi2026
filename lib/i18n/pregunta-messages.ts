@@ -8,6 +8,11 @@ export const PREGUNTA_COPY = {
     pt: 'Toda semana, uma pergunta para o mundo inteiro. Responda em um minuto e descubra como os outros respondem.',
     en: 'Every week, one question for the whole world. Answer in a minute and see how others reply.',
   },
+  homeEyebrow: {
+    es: 'La pregunta de la semana · [tema]',
+    pt: 'A pergunta da semana · [tema]',
+    en: "This week's question · [tema]",
+  },
   submit: {
     es: 'Enviar mi respuesta',
     pt: 'Enviar minha resposta',
