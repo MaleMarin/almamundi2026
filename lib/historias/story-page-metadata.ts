@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
-import { siteOrigin } from '@/lib/site-origin';
+import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 
 const SITE_OG_IMAGE = '/og-image.png';
 const FALLBACK_DESCRIPTION = 'Una historia en AlmaMundi, el mapa de historias humanas.';
@@ -45,7 +45,7 @@ function ogImageForStory(story: {
  */
 export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> {
   const story = await getStoryByIdAsync(id).catch(() => null);
-  const metadataBase = new URL(siteOrigin());
+  const metadataBase = new URL(PUBLIC_SITE_ORIGIN);
   if (!story) {
     return {
       metadataBase,
@@ -63,9 +63,11 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
     metadataBase,
     title: { absolute: `${titulo} · AlmaMundi` },
     description,
+    alternates: { canonical: './' },
     openGraph: {
       title: `${titulo} · AlmaMundi`,
       description,
+      url: './',
       images: [image],
       type: 'article',
       locale: 'es_CL',

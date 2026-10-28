@@ -1,3 +1,6 @@
+/** Origen canónico público. Apex y hosts de vista previa no se publican. */
+export const PUBLIC_SITE_ORIGIN = 'https://www.almamundi.org';
+
 /**
  * Origen público del sitio (metadata, JSON-LD, sitemap).
  * Sin imports de servidor.
@@ -11,12 +14,16 @@ export function siteOrigin(): string {
   for (const raw of candidates) {
     try {
       const normalized = raw.endsWith('/') ? raw.slice(0, -1) : raw;
-      return new URL(normalized).origin;
+      const origin = new URL(normalized).origin;
+      if (origin === 'https://almamundi.org' || origin === PUBLIC_SITE_ORIGIN) {
+        return PUBLIC_SITE_ORIGIN;
+      }
+      const host = new URL(origin).hostname;
+      if (host === 'vercel.app' || host.endsWith('.vercel.app')) continue;
+      return origin;
     } catch {
       /* siguiente */
     }
   }
-  const vercel = process.env.VERCEL_URL?.trim();
-  if (vercel) return `https://${vercel}`;
-  return 'https://www.almamundi.org';
+  return PUBLIC_SITE_ORIGIN;
 }

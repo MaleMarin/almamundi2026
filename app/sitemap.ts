@@ -8,19 +8,16 @@ import { siteOrigin } from '@/lib/site-origin';
 export const revalidate = 3600;
 
 /**
- * Rutas estáticas públicas. NO incluir privadas/admin/preview/demos:
- * esas viven en `app/robots.ts` (disallow) y deben quedar fuera del sitemap.
+ * Rutas estáticas que responden 200. Sin /historias ni /mapa (redirigen)
+ * ni /muestras (recorrido demo).
  */
 const STATIC_PATHS: string[] = [
   '/',
-  '/historias',
   '/historias/videos',
   '/historias/audios',
   '/historias/fotos',
   '/historias/escrito',
-  '/mapa',
   '/temas',
-  '/muestras',
   '/exposiciones',
   '/educacion-mediatica',
   '/recorridos',
@@ -53,11 +50,9 @@ function toDateOrNull(value: unknown): Date | null {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteOrigin();
-  const now = new Date();
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map((path) => ({
     url: path === '/' ? `${base}/` : `${base}${path}`,
-    lastModified: now,
     changeFrequency: 'weekly' as const,
     priority: path === '/' ? 1.0 : 0.7,
   }));
@@ -76,11 +71,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       const lastModified =
         toDateOrNull(data.updatedAt) ??
         toDateOrNull(data.publishedAt) ??
-        toDateOrNull(data.createdAt) ??
-        now;
+        toDateOrNull(data.createdAt);
       return {
         url: `${base}/historias/${doc.id}`,
-        lastModified,
+        ...(lastModified ? { lastModified } : {}),
         changeFrequency: 'monthly' as const,
         priority: 0.6,
       };

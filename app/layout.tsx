@@ -8,6 +8,7 @@ import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { GlobalSiteChrome, SiteFontScope } from '@/components/layout/GlobalSiteChrome';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
+import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
@@ -23,12 +24,7 @@ const montserrat = Montserrat({
   adjustFontFallback: true });
 
 function defaultMetadataBase(): URL {
-  const raw = process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'https://almamundi.org';
-  try {
-    return new URL(raw.endsWith('/') ? raw.slice(0, -1) : raw);
-  } catch {
-    return new URL('https://almamundi.org');
-  }
+  return new URL(PUBLIC_SITE_ORIGIN);
 }
 
 const SITE_TITLE = 'AlmaMundi — Entra y cuenta tu historia';
@@ -41,9 +37,11 @@ export const metadata: Metadata = {
     default: SITE_TITLE,
     template: '%s · AlmaMundi' },
   description: SITE_DESCRIPTION,
+  alternates: { canonical: './' },
   openGraph: {
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+    url: './',
     type: 'website',
     locale: 'es_CL',
     siteName: 'AlmaMundi',

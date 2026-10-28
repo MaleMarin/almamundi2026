@@ -91,6 +91,7 @@ export function contarMetadata(kind: ContarFormat | 'index'): Metadata {
     openGraph: {
       title: socialTitle,
       description: socialDescription,
+      url: './',
       type: 'website',
       locale: 'es_CL',
       siteName: 'AlmaMundi',
