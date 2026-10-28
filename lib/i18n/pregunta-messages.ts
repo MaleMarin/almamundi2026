@@ -4,14 +4,14 @@ type L3 = Record<AlmaLocale, string>;
 
 export const PREGUNTA_COPY = {
   intro: {
-    es: 'Cada semana, una pregunta para todo el mundo. Responde en un minuto y descubre cómo contestan otros.',
-    pt: 'Toda semana, uma pergunta para o mundo inteiro. Responda em um minuto e descubra como os outros respondem.',
-    en: 'Every week, one question for the whole world. Answer in a minute and see how others reply.',
+    es: 'Además de contar tu historia, aquí puedes responder. Cada semana lanzamos una pregunta al mundo, y cada respuesta enciende un punto en el mapa.',
+    pt: 'Além de contar sua história, aqui você pode responder. Toda semana lançamos uma pergunta ao mundo, e cada resposta acende um ponto no mapa.',
+    en: 'Besides telling your story, here you can answer. Every week we ask the world a question, and every answer lights up a point on the map.',
   },
   homeEyebrow: {
-    es: 'La pregunta de la semana · [tema]',
-    pt: 'A pergunta da semana · [tema]',
-    en: "This week's question · [tema]",
+    es: 'La pregunta de la semana',
+    pt: 'A pergunta da semana',
+    en: "This week's question",
   },
   submit: {
     es: 'Enviar mi respuesta',

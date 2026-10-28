@@ -266,7 +266,7 @@ export function HomePageClient() {
         className="relative z-20 mx-auto mt-[56px] mb-[72px] w-full px-6 md:mt-[96px] md:mb-[120px] md:px-10"
         aria-labelledby="pregunta-semana-titulo"
       >
-        <div className="relative mx-auto w-full max-w-[880px]">
+        <div className="relative mx-auto w-full max-w-[min(100%,1560px)] px-1 sm:px-0">
           <span
             aria-hidden
             className="pointer-events-none absolute -left-8 top-1/2 z-0 h-48 w-48 -translate-y-1/2 rounded-full"
@@ -288,8 +288,9 @@ export function HomePageClient() {
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)',
             }}
           >
+            <div className="mx-auto flex w-full max-w-[760px] flex-col items-center">
             <p className="m-0 text-xs font-semibold uppercase tracking-[0.18em] text-[#FF4A1C]">
-              {PREGUNTA_COPY.homeEyebrow[locale].replace('[tema]', preguntaVigente.tema[locale])}
+              {PREGUNTA_COPY.homeEyebrow[locale]}
             </p>
             <h2
               id="pregunta-semana-titulo"
@@ -304,7 +305,7 @@ export function HomePageClient() {
               {preguntaVigente.tu[locale]}
             </h2>
             <p
-              className="mx-auto mb-0 mt-4 max-w-[56ch] text-[17px] leading-relaxed"
+              className="mb-0 mt-4 text-[17px] leading-relaxed"
               style={{ color: '#718096', textWrap: 'balance' }}
             >
               {PREGUNTA_COPY.intro[locale]}
@@ -322,6 +323,7 @@ export function HomePageClient() {
               >
                 {PREGUNTA_COPY.modeAsk[locale]}
               </Link>
+            </div>
             </div>
           </div>
         </div>
