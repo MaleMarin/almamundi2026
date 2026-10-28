@@ -6,10 +6,8 @@
  */
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { contarHref, preguntaFromSearch } from '@/lib/contar-routes';
-import { preguntaTexto } from '@/lib/pregunta-semana';
+import { contarHref } from '@/lib/contar-routes';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const APP_FONT = SITE_FONT_STACK;
@@ -242,9 +240,7 @@ export function HomeFormatCards({
   sectionId,
   fillViewport = false,
 }: HomeFormatCardsProps) {
-  const { t, locale } = useHomeLocale();
-  const pregunta = preguntaFromSearch(useSearchParams());
-  const preguntaLinea = pregunta ? preguntaTexto(pregunta.id, pregunta.mode, locale) : null;
+  const { t } = useHomeLocale();
 
   return (
     <section
@@ -266,10 +262,10 @@ export function HomeFormatCards({
       >
         <span className="font-normal text-orange-500">
           <span className="block">
-            {preguntaLinea ? `${t.modalAnsweringPrefix} ${preguntaLinea}` : t.historiasLead2}
+            {t.historiasLead2}
           </span>
           <span className="mt-1 block font-bold">
-            {preguntaLinea ? t.historiasLeadChoose : t.historiasLead2b}
+            {t.historiasLead2b}
           </span>
         </span>
       </p>
@@ -284,7 +280,7 @@ export function HomeFormatCards({
           title={t.cardVideoTitle}
           subtitle={t.cardVideoSubtitle}
           buttonLabel={t.cardVideoCta}
-          href={contarHref('video', pregunta)}
+          href={contarHref('video')}
           onClick={onRecordVideo}
           delay="0s"
           hoverKind="video"
@@ -296,7 +292,7 @@ export function HomeFormatCards({
           title={t.cardAudioTitle}
           subtitle={t.cardAudioSubtitle}
           buttonLabel={t.cardAudioCta}
-          href={contarHref('audio', pregunta)}
+          href={contarHref('audio')}
           onClick={onRecordAudio}
           delay="0.45s"
           hoverKind="audio"
@@ -308,7 +304,7 @@ export function HomeFormatCards({
           title={t.cardWriteTitle}
           subtitle={t.cardWriteSubtitle}
           buttonLabel={t.cardWriteCta}
-          href={contarHref('texto', pregunta)}
+          href={contarHref('texto')}
           onClick={onWriteStory}
           delay="0.9s"
           hoverKind="text"
@@ -320,7 +316,7 @@ export function HomeFormatCards({
           title={t.cardPhotoTitle}
           subtitle={t.cardPhotoSubtitle}
           buttonLabel={t.cardPhotoCta}
-          href={contarHref('foto', pregunta)}
+          href={contarHref('foto')}
           onClick={onRecordPhoto}
           delay="1.35s"
           hoverKind="photo"

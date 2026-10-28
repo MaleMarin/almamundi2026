@@ -105,10 +105,11 @@ export async function POST(req: Request) {
     await getAdminBucket().file(saved.storagePath).setMetadata({
       contentType: mime,
       cacheControl: "private, max-age=0, no-store",
-      metadata: {
-        respuestaKind: kind,
-        ...(durationSeconds != null ? { durationSeconds: String(Math.ceil(durationSeconds)) } : {}),
-      },
+        metadata: {
+          respuestaKind: kind,
+          captchaVerified: "1",
+          ...(durationSeconds != null ? { durationSeconds: String(Math.ceil(durationSeconds)) } : {}),
+        },
     });
     return NextResponse.json({ ok: true, storagePath: saved.storagePath });
   } catch (e) {

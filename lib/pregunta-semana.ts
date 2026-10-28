@@ -267,6 +267,15 @@ export function preguntaPorId(id: string | null | undefined): PreguntaSemana | n
   return resolved ? PREGUNTA_POR_ID[resolved] : null;
 }
 
+/** /pregunta es la semana vigente. Con id, abre esa pregunta. */
+export function preguntaPageHref(id?: string | null, mode?: string | null): string {
+  const resolved = resolveQuestionId(id);
+  if (!resolved) return '/pregunta';
+  const q = new URLSearchParams({ pregunta: resolved });
+  if (isQuestionMode(mode)) q.set('modo', mode);
+  return `/pregunta?${q.toString()}`;
+}
+
 /** Texto de la pregunta en el idioma activo. Sin modo, usa el tema. */
 export function preguntaTexto(
   id: string | null | undefined,

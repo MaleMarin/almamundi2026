@@ -2,9 +2,10 @@
 
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { contarIndexHref } from '@/lib/contar-routes';
+import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import {
   PREGUNTA_UI,
+  preguntaPageHref,
   preguntasDeLaSemana,
   type PreguntaSemana,
   type QuestionMode,
@@ -38,7 +39,7 @@ function PreguntaCard({
         {pregunta[mode][locale]}
       </p>
       <Link
-        href={contarIndexHref({ id: pregunta.id, mode })}
+        href={preguntaPageHref(pregunta.id, mode)}
         className="btn-am-principal"
         style={{
           display: 'inline-flex',
@@ -87,6 +88,9 @@ export function PreguntaPanel() {
         paddingBottom: 8,
       }}
     >
+      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.78)' }}>
+        {PREGUNTA_COPY.intro[locale]}
+      </p>
       <SemanaBlock pregunta={vigente} locale={locale} />
       {anteriores.length > 0 ? (
         <section style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>

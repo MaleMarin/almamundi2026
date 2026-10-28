@@ -2,8 +2,6 @@
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { contarIndexHref } from '@/lib/contar-routes';
-import { preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import {
   X,
   Mic,
@@ -97,8 +95,6 @@ import {
   loadStoryDraft,
   saveStoryDraft,
 } from '@/lib/story-draft-storage';
-import { AnsweringStrip } from '@/components/home/AnsweringStrip';
-import type { QuestionId, QuestionMode } from '@/lib/pregunta-semana';
 
 export type StoryModalMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -384,11 +380,9 @@ export type StoryModalProps = {
   mode: StoryModalMode;
   chosenTopic: ChosenInspirationTopic | null;
   onClearTopic: () => void;
-  /** Pregunta de la semana. No se mezcla con el texto que colorea la cinta. */
-  answering?: { id: QuestionId; mode: QuestionMode } | null;
 };
 
-export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic, answering = null }: StoryModalProps) {
+export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic }: StoryModalProps) {
   const { t, locale } = useHomeLocale();
   const router = useRouter();
   const [step, setStep] = useState<StoryModalStep>('capture');
@@ -1624,9 +1618,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
             : {}),
-          ...(answering
-            ? { questionId: answering.id, questionMode: answering.mode }
-            : {}),
         }),
       });
 
@@ -1727,7 +1718,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     country,
     extraText,
     cancionRelacionada,
-    answering,
     sex,
     ageRange,
     acceptedPrivacy,
@@ -2435,14 +2425,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         }`}
         style={{ ...soft.flat, fontFamily: APP_FONT }}
       >
-        {answering ? (
-          <AnsweringStrip
-            questionId={answering.id}
-            questionMode={answering.mode}
-            format={mode}
-            variant="modal"
-          />
-        ) : null}
         <header
           className={`flex shrink-0 items-start justify-between gap-4 border-b border-white/30 ${
             step === 'received' ? 'px-4 py-3 md:px-5' : 'px-5 py-4 md:px-8 md:py-5'
@@ -3120,8 +3102,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <button
                     type="button"
                     onClick={() => {
-                      const { vigente } = preguntasDeLaSemana();
-                      router.push(contarIndexHref({ id: vigente.id, mode: 'tu' }));
+                      router.push('/pregunta');
                     }}
                     className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange-strong)] hover:text-[var(--almamundi-orange-strong)]"
                   >

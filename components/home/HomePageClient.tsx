@@ -2,31 +2,22 @@
 
 import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
-import { contarHref, parseContarFormat, contarIndexHref, preguntaFromSearch } from '@/lib/contar-routes';
+import { contarHref, parseContarFormat, contarIndexHref } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
   scrollToHomeMapaSection,
 } from '@/lib/mapa-home-nav';
-
-/** Las cuatro tarjetas quedan bajo el header fijo, con «Respondes a:» a la vista. */
-function scrollToFormatCards() {
-  const el = document.getElementById('historias');
-  if (!el) return;
-  const header = document.querySelector('header');
-  const offset = header instanceof HTMLElement ? header.getBoundingClientRect().height : 0;
-  const top = el.getBoundingClientRect().top + window.scrollY - offset;
-  window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
-}
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -39,10 +30,7 @@ function scrollToFormatCards() {
 export function HomePageClient() {
   const router = useRouter();
   const pathname = usePathname() ?? '/';
-  const searchParams = useSearchParams();
   const { locale } = useHomeLocale();
-  const pregunta = preguntaFromSearch(searchParams);
-  const preguntaKey = pregunta ? `${pregunta.id}:${pregunta.mode}` : '';
   const preguntaVigente = preguntasDeLaSemana().vigente;
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
@@ -84,15 +72,15 @@ export function HomePageClient() {
     if (clearTopic) setChosenTopic(null);
     setStoryMode(mode);
     setStoryOpen(true);
-    router.push(contarHref(mode, pregunta));
-  }, [pregunta, router]);
+    router.push(contarHref(mode));
+  }, [router]);
 
   const closeStory = useCallback(() => {
     setStoryOpen(false);
     if (parseContarFormat(pathname)) {
-      router.replace(contarIndexHref(pregunta));
+      router.replace(contarIndexHref());
     }
-  }, [pathname, pregunta, router]);
+  }, [pathname, router]);
 
   const exploreMapFromStory = useCallback(() => {
     setStoryOpen(false);
@@ -108,12 +96,7 @@ export function HomePageClient() {
       return;
     }
     setStoryOpen(false);
-    if (pathname === '/contar') {
-      window.requestAnimationFrame(() => {
-        scrollToFormatCards();
-      });
-    }
-  }, [pathname, preguntaKey]);
+  }, [pathname]);
 
   const closeProposito = useCallback(() => {
     setPropositoOpen(false);
@@ -279,7 +262,10 @@ export function HomePageClient() {
         onMediaEducation={() => router.push('/educacion-mediatica')}
         basePath="/"
       />
-      <div className="home-intro-avenir relative z-20 mx-auto mb-8 flex w-full justify-center px-6 md:mb-12 md:px-10">
+      <div className="home-intro-avenir relative z-20 mx-auto mb-8 flex w-full flex-col items-center px-6 md:mb-12 md:px-10">
+        <p className="mb-4 max-w-3xl text-center text-sm leading-relaxed md:text-base" style={{ color: '#4A5568' }}>
+          {PREGUNTA_COPY.intro[locale]}
+        </p>
         <div className="relative w-max max-w-full">
           <span
             aria-hidden
@@ -306,10 +292,7 @@ export function HomePageClient() {
               {preguntaVigente.tu[locale]}
             </p>
             <Link
-              href={contarIndexHref({ id: preguntaVigente.id, mode: 'tu' })}
-              onClick={() => {
-                window.setTimeout(scrollToFormatCards, 60);
-              }}
+              href="/pregunta"
               className="btn-am-principal relative z-[1] inline-flex min-h-11 w-full shrink-0 items-center justify-center px-5 py-2.5 text-sm font-semibold sm:w-auto"
             >
               {PREGUNTA_UI.responder[locale]}
@@ -333,7 +316,6 @@ export function HomePageClient() {
         onExploreMap={exploreMapFromStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
-        answering={pregunta}
         onClearTopic={() => setChosenTopic(null)}
       />
     </main>

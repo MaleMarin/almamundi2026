@@ -72,16 +72,17 @@ export async function POST(req: Request) {
     return jsonError("invalid_request", 400);
   }
 
-  const captcha = await verifyTurnstileStrict(
-    typeof body.captchaToken === "string" ? body.captchaToken : null,
-    ip
-  );
-  if (!captcha.ok) return jsonError("captcha_required", 400);
-
+  if (!isRespuestaKind(body.kind)) return jsonError("invalid_kind", 400);
   const questionId = resolveQuestionId(body.questionId);
   if (!questionId) return jsonError("invalid_question", 400);
   if (!isQuestionMode(body.mode)) return jsonError("invalid_mode", 400);
-  if (!isRespuestaKind(body.kind)) return jsonError("invalid_kind", 400);
+  if (body.kind === "texto") {
+    const captcha = await verifyTurnstileStrict(
+      typeof body.captchaToken === "string" ? body.captchaToken : null,
+      ip
+    );
+    if (!captcha.ok) return jsonError("captcha_required", 400);
+  }
 
   const alias = cleanLine(body.alias, 80);
   const city = cleanLine(body.city, 120);
@@ -137,6 +138,7 @@ export async function POST(req: Request) {
       if (!exists) return jsonError(body.kind === "foto" ? "photo_required" : "audio_required", 400);
       const [meta] = await file.getMetadata();
       const custom = (meta.metadata ?? {}) as Record<string, string | undefined>;
+      if (custom.captchaVerified !== "1") return jsonError("captcha_required", 400);
       if (custom.respuestaKind !== body.kind) {
         return jsonError(body.kind === "foto" ? "photo_type" : "audio_type", 400);
       }
