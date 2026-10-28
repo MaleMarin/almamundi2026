@@ -40,6 +40,8 @@ export type StoryFlowMessages = {
   modalPhotoDecade: string;
   modalPhotoDecadeChoose: string;
   modalPhotoPlace: string;
+  modalPhotoChoose: string;
+  modalPhotoAddAnother: string;
   modalPhotoDecadeOption: string;
   modalPhotoMissingName: string;
   modalPhotoMissingYear: string;
@@ -152,6 +154,8 @@ const es: StoryFlowMessages = {
   modalPhotoDecade: 'Década *',
   modalPhotoDecadeChoose: 'Elige una década',
   modalPhotoPlace: 'Lugar *',
+  modalPhotoChoose: 'Elige tus fotos',
+  modalPhotoAddAnother: 'Agrega otra foto',
   modalPhotoDecadeOption: 'años {year}',
   modalPhotoMissingName: 'Falta el nombre de la foto {foto}.',
   modalPhotoMissingYear: 'Falta el año de la foto {foto}.',
@@ -256,6 +260,8 @@ const pt: StoryFlowMessages = {
   modalPhotoDecade: 'Década *',
   modalPhotoDecadeChoose: 'Escolha uma década',
   modalPhotoPlace: 'Lugar *',
+  modalPhotoChoose: 'Escolha suas fotos',
+  modalPhotoAddAnother: 'Adicione outra foto',
   modalPhotoDecadeOption: 'anos {year}',
   modalPhotoMissingName: 'Falta o nome da foto {foto}.',
   modalPhotoMissingYear: 'Falta o ano da foto {foto}.',
@@ -331,6 +337,8 @@ const en: StoryFlowMessages = {
   modalPhotoDecade: 'Decade *',
   modalPhotoDecadeChoose: 'Choose a decade',
   modalPhotoPlace: 'Place *',
+  modalPhotoChoose: 'Choose your photos',
+  modalPhotoAddAnother: 'Add another photo',
   modalPhotoDecadeOption: '{year}s',
   modalPhotoMissingName: 'Photo {foto} is missing a name.',
   modalPhotoMissingYear: 'Photo {foto} is missing the year.',

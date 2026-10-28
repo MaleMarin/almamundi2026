@@ -167,8 +167,15 @@ export function UploadModalFotoGrid({
         })}
 
         {photos.length < maxPhotos ? (
-          <label className={styles.amFotoAdd} role="listitem" aria-label="Agregar foto">
+          <label
+            className={styles.amFotoAdd}
+            role="listitem"
+            aria-label={photos.length === 0 ? t.modalPhotoChoose : t.modalPhotoAddAnother}
+          >
             <span aria-hidden>＋</span>
+            <span className={styles.amFotoAddCaption}>
+              {photos.length === 0 ? t.modalPhotoChoose : t.modalPhotoAddAnother}
+            </span>
             <input
               type="file"
               accept="image/jpeg,image/png,image/webp,image/heic"

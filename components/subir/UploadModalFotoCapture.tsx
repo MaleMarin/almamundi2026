@@ -1,9 +1,7 @@
 'use client';
 
-import { useId, useRef } from 'react';
 import styles from '@/components/subir/am-upload-modal.module.css';
 import { UploadModalFotoGrid } from '@/components/subir/UploadModalFotoGrid';
-import { UPLOAD_MODAL_COPY } from '@/lib/subir-upload-modal-copy';
 import { SUBIR_PHOTO_MAX } from '@/lib/subir-limits';
 import type { StoryPhotoItem } from '@/lib/story-photo-item';
 
@@ -40,9 +38,6 @@ export function UploadModalFotoCapture({
   fichaMessage,
   maxPhotos = SUBIR_PHOTO_MAX,
 }: Props) {
-  const inputId = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
-  const primaryCta = UPLOAD_MODAL_COPY.foto.primaryCta;
   const converting = photos.some((p) => p.converting);
 
   return (
@@ -61,28 +56,6 @@ export function UploadModalFotoCapture({
         maxPhotos={maxPhotos}
         showCounter={false}
       />
-      <input
-        ref={inputRef}
-        id={inputId}
-        type="file"
-        accept="image/jpeg,image/png,image/webp,image/heic"
-        multiple
-        className="sr-only"
-        tabIndex={-1}
-        aria-hidden
-        onChange={(e) => {
-          onAddFiles(e.target.files);
-          e.target.value = '';
-        }}
-      />
-      <button
-        type="button"
-        className={styles.amModalBtnPrimary}
-        disabled={photos.length >= maxPhotos}
-        onClick={() => inputRef.current?.click()}
-      >
-        {primaryCta}
-      </button>
       {converting ? (
         <p className={styles.amModalInlineError} role="status" aria-live="polite">
           {convertingLabel}
