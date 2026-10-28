@@ -1800,7 +1800,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       typeof navigator.share === 'function' &&
       (window.matchMedia('(pointer: coarse)').matches ||
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-    if (!systemShare) window.open(appUrl, '_blank', 'noopener,noreferrer');
+    const fallbackWindow = systemShare ? null : window.open(appUrl, '_blank');
     try {
       const blob = await canvasToPngBlob(c);
       const file = new File([blob], filename, { type: 'image/png' });
@@ -1811,18 +1811,28 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         url: PENDING_STORY_SHARE_URL,
       });
       if (requestToken !== shareRequestTokenRef.current) return;
-      if (native === 'shared' || native === 'aborted') {
-        if (native === 'shared') setShareMenuOpen(false);
+      if (native === 'aborted') {
+        fallbackWindow?.close();
         return;
       }
-      if (systemShare) window.open(appUrl, '_blank', 'noopener,noreferrer');
+      if (native === 'shared') {
+        fallbackWindow?.close();
+        setShareMenuOpen(false);
+        return;
+      }
+      if (!fallbackWindow) window.open(appUrl, '_blank', 'noopener,noreferrer');
       downloadPngBlob(blob, filename);
       const copied = await copyTextToClipboard(shareText);
       if (requestToken !== shareRequestTokenRef.current) return;
       setShareMenuOpen(false);
       flashShareNotice(copied ? t.modalShareAppHandoff : t.modalShareImageFailed);
-    } catch {
+    } catch (error) {
       if (requestToken !== shareRequestTokenRef.current) return;
+      const name = error instanceof Error ? error.name : '';
+      if (name === 'AbortError') {
+        fallbackWindow?.close();
+        return;
+      }
       flashShareNotice(t.modalShareImageFailed);
     }
   }, [

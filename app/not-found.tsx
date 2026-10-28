@@ -2,7 +2,7 @@ import { NotFoundView } from '@/components/layout/NotFoundView';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Esta página se perdió en el camino',
+  title: 'Esta página no está en el mapa',
   robots: { index: false, follow: false },
 };
 

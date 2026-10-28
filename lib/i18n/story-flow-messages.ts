@@ -287,7 +287,7 @@ const pt: StoryFlowMessages = {
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
     'Baixamos sua imagem e copiamos o texto. Abrimos o app em outra aba para você publicar.',
-  modalShareEmail: 'Correio',
+  modalShareEmail: 'E-mail',
   modalShareLinkCopied: 'Ligação copiada',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
   modalAnotherCtaFoto: 'Enviar mais fotos',

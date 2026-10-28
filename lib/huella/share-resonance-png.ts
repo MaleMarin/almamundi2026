@@ -14,6 +14,13 @@ function isMobileUa(): boolean {
   return /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 }
 
+function shareWasAborted(error: unknown): boolean {
+  if (!error || typeof error !== 'object') return false;
+  const name = 'name' in error ? String((error as { name: unknown }).name) : '';
+  const code = 'code' in error ? (error as { code: unknown }).code : undefined;
+  return name === 'AbortError' || code === 20;
+}
+
 function canShareFiles(file: File): boolean {
   try {
     return typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
@@ -65,7 +72,7 @@ export async function shareNativeStoryWithImage(opts: {
       });
       return 'shared';
     } catch (e) {
-      if ((e as Error).name === 'AbortError') return 'aborted';
+      if (shareWasAborted(e)) return 'aborted';
     }
   }
 

@@ -1,31 +1,35 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 export type NotFoundMessages = {
-  title: string;
-  body: string;
-  exploreMap: string;
-  tellStory: string;
+  lead: string;
+  mapTitle: string;
+  mapBody: string;
+  storiesTitle: string;
+  storiesBody: string;
 };
 
 const es: NotFoundMessages = {
-  title: 'Esta página se perdió en el camino',
-  body: 'Puede que el enlace esté incompleto o que la historia todavía esté en revisión. Mientras tanto, hay muchas otras esperando en el mapa.',
-  exploreMap: 'Explorar el mapa',
-  tellStory: 'Contar mi historia',
+  lead: 'Esta página no está en el mapa. Volvamos a donde están las historias.',
+  mapTitle: 'Volver al mapa',
+  mapBody: 'Sigue explorando el mundo',
+  storiesTitle: 'Ver historias',
+  storiesBody: 'Relatos en video, audio, foto y texto',
 };
 
 const pt: NotFoundMessages = {
-  title: 'Esta página se perdeu no caminho',
-  body: 'O link pode estar incompleto ou a história ainda pode estar em revisão. Enquanto isso, há muitas outras esperando no mapa.',
-  exploreMap: 'Explorar o mapa',
-  tellStory: 'Contar minha história',
+  lead: 'Esta página não está no mapa. Vamos voltar para onde estão as histórias.',
+  mapTitle: 'Voltar ao mapa',
+  mapBody: 'Continue explorando o mundo',
+  storiesTitle: 'Ver histórias',
+  storiesBody: 'Relatos em vídeo, áudio, foto e texto',
 };
 
 const en: NotFoundMessages = {
-  title: 'This page got lost along the way',
-  body: 'The link may be incomplete, or the story may still be in review. Meanwhile, many others are waiting on the map.',
-  exploreMap: 'Explore the map',
-  tellStory: 'Tell my story',
+  lead: "This page isn't on the map. Let's go back to where the stories are.",
+  mapTitle: 'Back to the map',
+  mapBody: 'Keep exploring the world',
+  storiesTitle: 'See stories',
+  storiesBody: 'Stories in video, audio, photo and text',
 };
 
 export const NOT_FOUND_MESSAGES: Record<AlmaLocale, NotFoundMessages> = { es, pt, en };
