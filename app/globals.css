@@ -506,12 +506,54 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   background: transparent;
 }
 
-/* Franja TimeBar: continúa el tono del espacio profundo. */
+/* Fundido sobre el negro del globo. No recibe clics ni cambia el alto. */
+.map-universe-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 4;
+  height: 100px;
+  pointer-events: none;
+}
+
+@media (min-width: 768px) {
+  .map-universe-fade {
+    height: 160px;
+  }
+}
+
+.map-universe-fade-top {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    var(--home-bg) 0%,
+    color-mix(in srgb, var(--home-bg) 62%, transparent) 32%,
+    color-mix(in srgb, var(--home-bg) 28%, transparent) 58%,
+    color-mix(in srgb, var(--home-bg) 8%, transparent) 80%,
+    transparent 100%
+  );
+}
+
+.map-universe-fade-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    color-mix(in srgb, var(--home-bg) 8%, transparent) 20%,
+    color-mix(in srgb, var(--home-bg) 28%, transparent) 42%,
+    color-mix(in srgb, var(--home-bg) 62%, transparent) 68%,
+    var(--home-bg) 100%
+  );
+}
+
+/* Franja TimeBar: el centro sigue oscuro; los bordes empalman con el fundido y con el pie. */
 .map-timebar-stage {
   background: linear-gradient(
     180deg,
-    var(--map-space-deep) 0%,
-    #03060c 100%
+    var(--home-bg) 0%,
+    var(--map-space-deep) 32px,
+    #03060c 32px,
+    #03060c calc(100% - 32px),
+    var(--home-bg) 100%
   );
 }
 
