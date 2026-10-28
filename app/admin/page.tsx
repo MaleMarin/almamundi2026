@@ -31,9 +31,11 @@ import {
   Video,
   FolderOpen,
   Trash2,
+  MessageCircle,
 } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
+import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
 
 const BG = '#0a0f24';
 
@@ -215,7 +217,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const [section, setSection] = useState<'pendientes' | 'mapa' | 'archivo' | 'colecciones' | 'stats'>('pendientes');
+  const [section, setSection] = useState<'pendientes' | 'mapa' | 'archivo' | 'respuestas' | 'colecciones' | 'stats'>('pendientes');
   const [pendingStories, setPendingStories] = useState<Story[]>([]);
   const [activeStories, setActiveStories] = useState<Story[]>([]);
   const [archivedStories, setArchivedStories] = useState<Story[]>([]);
@@ -551,6 +553,7 @@ export default function AdminPage() {
     { id: 'pendientes', label: 'Historias pendientes', icon: <FileText size={18} /> },
     { id: 'mapa', label: 'En el mapa', icon: <MapPin size={18} /> },
     { id: 'archivo', label: 'Archivo', icon: <Archive size={18} /> },
+    { id: 'respuestas', label: 'Respuestas', icon: <MessageCircle size={18} /> },
     { id: 'colecciones', label: 'Colecciones', icon: <FolderOpen size={18} /> },
     { id: 'stats', label: 'Estadísticas', icon: <BarChart3 size={18} /> },
   ];
@@ -644,9 +647,11 @@ export default function AdminPage() {
         ))}
       </nav>
 
-      {loading && section !== 'stats' && (
+      {loading && section !== 'stats' && section !== 'respuestas' && (
         <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Cargando…</p>
       )}
+
+      {section === 'respuestas' && idToken && <RespuestasAdmin token={idToken} />}
 
       {/* 1. Historias pendientes */}
       {section === 'pendientes' && !loading && (

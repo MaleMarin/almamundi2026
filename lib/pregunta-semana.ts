@@ -10,18 +10,18 @@ export const PREGUNTA_SEMANA_INICIO = '2026-11-02';
 export const PREGUNTA_ZONA = 'America/Santiago';
 
 export const QUESTION_IDS = [
-  's01',
-  's02',
-  's03',
-  's04',
-  's05',
-  's06',
-  's07',
-  's08',
-  's09',
-  's10',
-  's11',
-  's12',
+  'musica',
+  'amabilidad',
+  'risa',
+  'amor',
+  'lugares',
+  'giros',
+  'olores',
+  'objetos',
+  'ausencias',
+  'raices',
+  'valentia',
+  'legado',
 ] as const;
 
 export type QuestionId = (typeof QUESTION_IDS)[number];
@@ -58,35 +58,7 @@ export const RESPONDE_A_PUBLICO: L3 = {
 
 const PREGUNTAS: PreguntaSemana[] = [
   {
-    id: 's01',
-    tema: { es: 'Olores', pt: 'Cheiros', en: 'Smells' },
-    tu: {
-      es: '¿Qué olor te devuelve de golpe a tu infancia?',
-      pt: 'Que cheiro te leva de volta à infância de repente?',
-      en: 'What smell takes you straight back to your childhood?',
-    },
-    alguien: {
-      es: 'Pregúntale a alguien de tu familia qué se cocinaba en su casa los domingos.',
-      pt: 'Pergunte a alguém da sua família o que se cozinhava na casa dele aos domingos.',
-      en: 'Ask someone in your family what was cooked at home on Sundays.',
-    },
-  },
-  {
-    id: 's02',
-    tema: { es: 'Amabilidad', pt: 'Gentileza', en: 'Kindness' },
-    tu: {
-      es: '¿Quién fue amable contigo cuando nadie más lo fue?',
-      pt: 'Quem foi gentil com você quando ninguém mais foi?',
-      en: 'Who was kind to you when no one else was?',
-    },
-    alguien: {
-      es: 'Pregúntale a alguien mayor quién lo cuidó cuando era niño.',
-      pt: 'Pergunte a alguém mais velho quem cuidava dele quando era criança.',
-      en: 'Ask an older person who took care of them as a child.',
-    },
-  },
-  {
-    id: 's03',
+    id: 'musica',
     tema: { es: 'Música', pt: 'Música', en: 'Music' },
     tu: {
       es: '¿Qué canción no puedes escuchar sin pensar en alguien?',
@@ -100,21 +72,21 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's04',
-    tema: { es: 'Giros', pt: 'Viradas', en: 'Turning points' },
+    id: 'amabilidad',
+    tema: { es: 'Amabilidad', pt: 'Gentileza', en: 'Kindness' },
     tu: {
-      es: '¿Cuál fue el día en que tu vida cambió de rumbo?',
-      pt: 'Qual foi o dia em que sua vida mudou de rumo?',
-      en: 'What was the day your life changed course?',
+      es: '¿Quién fue amable contigo cuando nadie más lo fue?',
+      pt: 'Quem foi gentil com você quando ninguém mais foi?',
+      en: 'Who was kind to you when no one else was?',
     },
     alguien: {
-      es: 'Pregúntale a alguien cuál fue la decisión más valiente que tomó.',
-      pt: 'Pergunte a alguém qual foi a decisão mais corajosa que ele tomou.',
-      en: 'Ask someone about the bravest decision they ever made.',
+      es: 'Pregúntale a alguien mayor quién lo cuidó cuando era niño.',
+      pt: 'Pergunte a alguém mais velho quem cuidava dele quando era criança.',
+      en: 'Ask an older person who took care of them as a child.',
     },
   },
   {
-    id: 's05',
+    id: 'risa',
     tema: { es: 'Risa', pt: 'Riso', en: 'Laughter' },
     tu: {
       es: '¿Qué historia cuenta tu familia una y otra vez, y siempre da risa?',
@@ -128,21 +100,7 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's06',
-    tema: { es: 'Lugares', pt: 'Lugares', en: 'Places' },
-    tu: {
-      es: '¿Qué lugar ya no existe, pero sigue vivo en tu memoria?',
-      pt: 'Que lugar já não existe, mas continua vivo na sua memória?',
-      en: 'What place no longer exists but is still alive in your memory?',
-    },
-    alguien: {
-      es: 'Pregúntale a alguien cómo era su barrio cuando era niño.',
-      pt: 'Pergunte a alguém como era o bairro dele quando era criança.',
-      en: 'Ask someone what their neighborhood was like when they were a child.',
-    },
-  },
-  {
-    id: 's07',
+    id: 'amor',
     tema: { es: 'Amor', pt: 'Amor', en: 'Love' },
     tu: {
       es: '¿Cómo supiste que estabas enamorado o enamorada?',
@@ -156,21 +114,49 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's08',
-    tema: { es: 'Ausencias', pt: 'Ausências', en: 'Absences' },
+    id: 'lugares',
+    tema: { es: 'Lugares', pt: 'Lugares', en: 'Places' },
     tu: {
-      es: '¿Qué le dirías hoy a alguien que ya no está?',
-      pt: 'O que você diria hoje a alguém que já não está?',
-      en: 'What would you say today to someone who is gone?',
+      es: '¿Qué lugar ya no existe, pero sigue vivo en tu memoria?',
+      pt: 'Que lugar já não existe, mas continua vivo na sua memória?',
+      en: 'What place no longer exists but is still alive in your memory?',
     },
     alguien: {
-      es: 'Pregúntale a alguien a quién extraña y qué le enseñó esa persona.',
-      pt: 'Pergunte a alguém de quem ele sente saudade e o que essa pessoa lhe ensinou.',
-      en: 'Ask someone who they miss and what that person taught them.',
+      es: 'Pregúntale a alguien cómo era su barrio cuando era niño.',
+      pt: 'Pergunte a alguém como era o bairro dele quando era criança.',
+      en: 'Ask someone what their neighborhood was like when they were a child.',
     },
   },
   {
-    id: 's09',
+    id: 'giros',
+    tema: { es: 'Giros', pt: 'Viradas', en: 'Turning points' },
+    tu: {
+      es: '¿Cuál fue el día en que tu vida cambió de rumbo?',
+      pt: 'Qual foi o dia em que sua vida mudou de rumo?',
+      en: 'What was the day your life changed course?',
+    },
+    alguien: {
+      es: 'Pregúntale a alguien cuál fue la decisión más valiente que tomó.',
+      pt: 'Pergunte a alguém qual foi a decisão mais corajosa que ele tomou.',
+      en: 'Ask someone about the bravest decision they ever made.',
+    },
+  },
+  {
+    id: 'olores',
+    tema: { es: 'Olores', pt: 'Cheiros', en: 'Smells' },
+    tu: {
+      es: '¿Qué olor te devuelve de golpe a tu infancia?',
+      pt: 'Que cheiro te leva de volta à infância de repente?',
+      en: 'What smell takes you straight back to your childhood?',
+    },
+    alguien: {
+      es: 'Pregúntale a alguien de tu familia qué se cocinaba en su casa los domingos.',
+      pt: 'Pergunte a alguém da sua família o que se cozinhava na casa dele aos domingos.',
+      en: 'Ask someone in your family what was cooked at home on Sundays.',
+    },
+  },
+  {
+    id: 'objetos',
     tema: { es: 'Objetos', pt: 'Objetos', en: 'Objects' },
     tu: {
       es: '¿Qué objeto guardas aunque ya no sirva para nada?',
@@ -184,7 +170,21 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's10',
+    id: 'ausencias',
+    tema: { es: 'Ausencias', pt: 'Ausências', en: 'Absences' },
+    tu: {
+      es: '¿Qué le dirías hoy a alguien que ya no está?',
+      pt: 'O que você diria hoje a alguém que já não está?',
+      en: 'What would you say today to someone who is gone?',
+    },
+    alguien: {
+      es: 'Pregúntale a alguien a quién extraña y qué le enseñó esa persona.',
+      pt: 'Pergunte a alguém de quem ele sente saudade e o que essa pessoa lhe ensinou.',
+      en: 'Ask someone who they miss and what that person taught them.',
+    },
+  },
+  {
+    id: 'raices',
     tema: { es: 'Raíces', pt: 'Raízes', en: 'Roots' },
     tu: {
       es: '¿Qué te llevaste contigo cuando te fuiste de un lugar?',
@@ -198,7 +198,7 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's11',
+    id: 'valentia',
     tema: { es: 'Valentía', pt: 'Coragem', en: 'Courage' },
     tu: {
       es: '¿Cuándo tuviste más miedo y qué hiciste con él?',
@@ -212,7 +212,7 @@ const PREGUNTAS: PreguntaSemana[] = [
     },
   },
   {
-    id: 's12',
+    id: 'legado',
     tema: { es: 'Legado', pt: 'Legado', en: 'Legacy' },
     tu: {
       es: '¿Qué te gustaría que recordaran de ti?',
@@ -231,8 +231,31 @@ const PREGUNTA_POR_ID: Record<QuestionId, PreguntaSemana> = Object.fromEntries(
   PREGUNTAS.map((p) => [p.id, p])
 ) as Record<QuestionId, PreguntaSemana>;
 
+/** Ids s01–s12 ya guardados en historias. El texto sigue en el tema, no en el índice viejo. */
+const LEGACY_QUESTION_IDS = {
+  s01: 'olores',
+  s02: 'amabilidad',
+  s03: 'musica',
+  s04: 'giros',
+  s05: 'risa',
+  s06: 'lugares',
+  s07: 'amor',
+  s08: 'ausencias',
+  s09: 'objetos',
+  s10: 'raices',
+  s11: 'valentia',
+  s12: 'legado',
+} as const satisfies Record<string, QuestionId>;
+
 export function isQuestionId(value: unknown): value is QuestionId {
   return typeof value === 'string' && (QUESTION_IDS as readonly string[]).includes(value);
+}
+
+export function resolveQuestionId(value: unknown): QuestionId | null {
+  if (isQuestionId(value)) return value;
+  if (typeof value !== 'string') return null;
+  const mapped = LEGACY_QUESTION_IDS[value as keyof typeof LEGACY_QUESTION_IDS];
+  return mapped ?? null;
 }
 
 export function isQuestionMode(value: unknown): value is QuestionMode {
@@ -240,7 +263,8 @@ export function isQuestionMode(value: unknown): value is QuestionMode {
 }
 
 export function preguntaPorId(id: string | null | undefined): PreguntaSemana | null {
-  return isQuestionId(id) ? PREGUNTA_POR_ID[id] : null;
+  const resolved = resolveQuestionId(id);
+  return resolved ? PREGUNTA_POR_ID[resolved] : null;
 }
 
 /** Texto de la pregunta en el idioma activo. Sin modo, usa el tema. */
@@ -259,9 +283,10 @@ export function questionPublicFields(source: {
   questionId?: string | null;
   questionMode?: string | null;
 }): { questionId?: QuestionId; questionMode?: QuestionMode } {
-  if (!isQuestionId(source.questionId)) return {};
+  const questionId = resolveQuestionId(source.questionId);
+  if (!questionId) return {};
   return {
-    questionId: source.questionId,
+    questionId,
     ...(isQuestionMode(source.questionMode) ? { questionMode: source.questionMode } : {}),
   };
 }

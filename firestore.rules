@@ -113,6 +113,14 @@ service cloud.firestore {
       allow create, read, update, delete: if false;
     }
 
+    match /respuestas/{id} {
+      allow create, read, update, delete: if false;
+    }
+
+    match /respuesta_contacts/{id} {
+      allow create, read, update, delete: if false;
+    }
+
     match /mail_queue/{id} {
       allow create, read, update, delete: if false;
     }

@@ -146,6 +146,15 @@ function receivedFooterHtml(): string {
       </p>`;
 }
 
+function respuestaFooterHtml(): string {
+  const privacy = absoluteEmailUrl("/privacidad");
+  return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
+        Recibes este correo porque enviaste una respuesta a AlmaMundi. AlmaMundi es una iniciativa de Precisar.
+        <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
+          style="color:${EMAIL_MUTED};text-decoration:underline;">Política de privacidad</a>.
+      </p>`;
+}
+
 function accountFooterHtml(): string {
   const home = absoluteEmailUrl("/");
   const privacy = absoluteEmailUrl("/privacidad");
@@ -184,14 +193,19 @@ function darkModeCss(): string {
 export function emailShell(opts: {
   preheader?: string;
   bodyHtml: string;
-  footer?: "received" | "account";
+  footer?: "received" | "account" | "respuesta";
 }): string {
   const preheader = opts.preheader
     ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
         ${escapeHtml(opts.preheader)}
       </div>`
     : "";
-  const footer = opts.footer === "received" ? receivedFooterHtml() : accountFooterHtml();
+  const footer =
+    opts.footer === "received"
+      ? receivedFooterHtml()
+      : opts.footer === "respuesta"
+        ? respuestaFooterHtml()
+        : accountFooterHtml();
 
   return `<!DOCTYPE html>
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">

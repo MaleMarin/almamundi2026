@@ -447,3 +447,59 @@ export async function deleteStoryStorageFiles(
     await bucket.file(path).delete({ ignoreNotFound: true });
   }
 }
+
+const RESPUESTA_PUBLISHED_PREFIX = "published/respuestas";
+
+/**
+ * Copia la voz o la foto de una respuesta a /published/respuestas/{id}/…
+ * El globo y las páginas públicas leen esa copia, no el archivo privado.
+ */
+export async function copyPrivateSubmissionToPublishedRespuesta(opts: {
+  sourcePath: string;
+  respuestaId: string;
+}): Promise<{ storagePath: string; publicUrl: string }> {
+  assertSafeSubmissionsPath(opts.sourcePath);
+  if (!opts.sourcePath.startsWith(`${PRIVATE_PREFIX}/`)) {
+    throw new Error("invalid_storage_path");
+  }
+  const respuestaId = assertSafeStoryId(opts.respuestaId);
+  const bucket = getAdminBucket();
+  const src = bucket.file(opts.sourcePath);
+  const [exists] = await src.exists();
+  if (!exists) throw new Error("not_found");
+
+  const base = sanitizeUploadFilename(opts.sourcePath.split("/").pop() || "file");
+  const destPath = `${RESPUESTA_PUBLISHED_PREFIX}/${respuestaId}/${crypto.randomUUID()}/${base}`;
+  assertSafePublishedPath(destPath);
+  await src.copy(bucket.file(destPath));
+  return finalizePublishedObject(destPath);
+}
+
+/** Borra published/respuestas/{id}/** y los paths privados citados. */
+export async function deleteRespuestaStorageFiles(
+  respuestaId: string,
+  referencedPaths: string[]
+): Promise<void> {
+  const id = assertSafeStoryId(respuestaId);
+  const bucket = getAdminBucket();
+  const prefix = `${RESPUESTA_PUBLISHED_PREFIX}/${id}/`;
+  const [files] = await bucket.getFiles({ prefix });
+  for (const file of files) {
+    if (!file.name.startsWith(prefix)) continue;
+    await file.delete({ ignoreNotFound: true });
+  }
+  const seen = new Set<string>();
+  for (const raw of referencedPaths) {
+    const path = raw.trim();
+    if (!path || seen.has(path) || path.includes("..") || path.includes("\0")) continue;
+    seen.add(path);
+    if (path.startsWith(prefix)) continue;
+    if (!path.startsWith(`${PRIVATE_PREFIX}/`)) continue;
+    try {
+      assertSafeSubmissionsPath(path);
+    } catch {
+      continue;
+    }
+    await bucket.file(path).delete({ ignoreNotFound: true });
+  }
+}

@@ -7,7 +7,8 @@ export type EditorialAuditEventType =
   | "approve_from_submission"
   | "reject_moderation"
   | "publish_spanish_inplace"
-  | "delete_story";
+  | "delete_story"
+  | "delete_respuesta";
 
 export type EditorialAuditPayload = {
   storyId?: string;

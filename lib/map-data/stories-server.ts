@@ -11,7 +11,7 @@ import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
-import { isQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
+import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
@@ -113,6 +113,7 @@ function firestoreDocToStoryPoint(
   const lngOut = globeOnly ? (lng as number) : lng ?? 0;
 
   const accessibility = storyAccessibilityFieldsFromRecord(d);
+  const questionId = resolveQuestionId(d.questionId);
 
   const base: StoryPoint = {
     id,
@@ -127,7 +128,7 @@ function firestoreDocToStoryPoint(
     quote: (d.quote as string) ?? undefined,
     cancionRelacionada: normalizeCancionRelacionada(d.cancionRelacionada),
     antecedentes: normalizeAntecedentes(d.antecedentes),
-    ...(isQuestionId(d.questionId) ? { questionId: d.questionId } : {}),
+    ...(questionId ? { questionId } : {}),
     ...(isQuestionMode(d.questionMode) ? { questionMode: d.questionMode } : {}),
     imagenes: parseStoryImagenes(d.imagenes),
     format: formato,
