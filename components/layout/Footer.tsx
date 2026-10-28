@@ -1,14 +1,13 @@
 'use client';
 
 import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvider';
-import { storiesLinkLabel } from '@/lib/i18n/home-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import {
   SITE_FOOTER_GUIA_CONDUCTA_HREF,
   SITE_FOOTER_LEGAL_LINKS,
-  SITE_HEADER_STORIES_LINKS } from '@/components/layout/siteNavLinkStyles';
+} from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -32,22 +31,16 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
   const t = localeCtx?.t ?? uiMessages(initialLocale);
   const locale = localeCtx?.locale ?? initialLocale;
 
-  const exploreLinks: FooterPillItem[] = [
-    ...SITE_HEADER_STORIES_LINKS.map(({ href }) => ({
-      id: href,
-      kind: 'internal' as const,
-      href,
-      label: storiesLinkLabel(t, href) })),
+  const rowLinks: FooterPillItem[] = [
+    { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
     {
       id: 'mapa',
       kind: 'hard',
       href: MAPA_HOME_HREF,
       label: t.navMap,
-      onNavigate: () => primeMapAmbientFromNavGesture() },
+      onNavigate: () => primeMapAmbientFromNavGesture(),
+    },
     { id: 'pregunta', kind: 'internal', href: '/pregunta', label: PREGUNTA_UI.tab[locale] },
-  ];
-
-  const aboutLinks: FooterPillItem[] = [
     { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
     { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
   ];
@@ -90,12 +83,6 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             </span>
           </HomeHardLink>
         </div>
-        <p
-          className="almamundi-footer-tagline mx-auto max-w-[640px] px-3 text-[15px] font-medium leading-relaxed"
-          style={{ textWrap: 'balance' }}
-        >
-          {t.heroBeforeBold} {t.heroBold}
-        </p>
         <HomeHardLink
           href="/#historias"
           className="btn-am-principal mt-8 inline-flex min-h-11 items-center justify-center px-6 py-3"
@@ -104,25 +91,19 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         </HomeHardLink>
       </div>
 
-      <nav
-        className="mt-12 flex w-full max-w-3xl flex-col items-center gap-10 md:mt-14 md:flex-row md:items-start md:justify-center md:gap-24"
-        aria-label={t.ariaMainNav}
-      >
-        {[
-          { title: t.footerExplore, links: exploreLinks },
-          { title: t.footerAbout, links: aboutLinks },
-        ].map((group) => (
-          <div key={group.title} className="flex flex-col items-center text-center">
-            <p className="m-0 mb-3 text-xs font-semibold uppercase text-[#718096] tracking-[0.12em]">
-              {group.title}
-            </p>
-            <ul className="m-0 flex list-none flex-col items-center gap-2 p-0">
-              {group.links.map((item) => (
-                <li key={item.id}>{renderTextLink(item)}</li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <nav className="mt-8 w-full max-w-4xl px-2 md:mt-10" aria-label={t.ariaMainNav}>
+        <ul className="m-0 flex list-none flex-wrap items-center justify-center p-0">
+          {rowLinks.map((item, index) => (
+            <li key={item.id} className="inline-flex items-center">
+              {index > 0 ? (
+                <span aria-hidden className="text-[15px] text-[#718096]">
+                  {' · '}
+                </span>
+              ) : null}
+              {renderTextLink(item)}
+            </li>
+          ))}
+        </ul>
       </nav>
 
       {/* 3. Bloque institucional */}

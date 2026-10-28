@@ -3,8 +3,6 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 
 export type SiteUiMessages = {
   footerClosingLine: string;
-  footerExplore: string;
-  footerAbout: string;
   footerInitiativeOf: string;
   footerLegalAria: string;
   footerPrivacy: string;
@@ -153,8 +151,6 @@ export type SiteUiMessages = {
 const es: SiteUiMessages = {
   footerClosingLine:
     'Historias que no se pierden, sino que despiertan otras historias.',
-  footerExplore: 'Explora',
-  footerAbout: 'Conoce AlmaMundi',
   footerInitiativeOf: 'Una iniciativa de',
   footerLegalAria: 'Información legal y datos personales',
   footerPrivacy: 'Aviso de privacidad',
@@ -340,8 +336,6 @@ const es: SiteUiMessages = {
 const pt: SiteUiMessages = {
   footerClosingLine:
     'Histórias que não se perdem, mas despertam outras histórias.',
-  footerExplore: 'Explore',
-  footerAbout: 'Conheça o AlmaMundi',
   footerInitiativeOf: 'Uma iniciativa de',
   footerLegalAria: 'Informação legal e dados pessoais',
   footerPrivacy: 'Aviso de privacidade',
@@ -527,8 +521,6 @@ const pt: SiteUiMessages = {
 
 const en: SiteUiMessages = {
   footerClosingLine: 'Stories that are not lost—they awaken other stories.',
-  footerExplore: 'Explore',
-  footerAbout: 'About AlmaMundi',
   footerInitiativeOf: 'An initiative of',
   footerLegalAria: 'Legal information and personal data',
   footerPrivacy: 'Privacy notice',
