@@ -24,7 +24,7 @@ export function AntecedentesText({ value, tone = 'light' }: AntecedentesTextProp
       style={{
         fontFamily: INTERIOR_FONT_STACK,
         fontWeight: 400,
-        fontSize: isDark ? '0.88rem' : '0.95rem',
+        fontSize: 'var(--fs-texto)',
         lineHeight: 1.55,
         margin: isDark ? '0.85rem 0 0' : '0 0 1rem',
         maxWidth: '36rem',

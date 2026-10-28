@@ -73,8 +73,8 @@ export function MuestraCard({ muestra, onClick }: Props) {
             bottom: 6,
             left: 10,
             fontFamily: SITE_FONT_STACK,
-            fontWeight: 200,
-            fontSize: '9.6px',
+            fontWeight: 400,
+            fontSize: 'var(--fs-etiqueta)',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             color: 'rgba(255,255,255,0.9)' }}
@@ -89,7 +89,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
             margin: 0,
             fontFamily: SITE_FONT_STACK,
             fontStyle: 'italic',
-            fontSize: '14.08px',
+            fontSize: 'var(--fs-pequeno)',
             color: TEXT_1 }}
         >
           {muestra.titulo}
@@ -103,7 +103,7 @@ export function MuestraCard({ muestra, onClick }: Props) {
         <span
           style={{
             display: 'block',
-            fontSize: '9.28px',
+            fontSize: 'var(--fs-etiqueta)',
             textTransform: 'uppercase',
             letterSpacing: '0.12em',
             color: ORANGE,
@@ -114,8 +114,8 @@ export function MuestraCard({ muestra, onClick }: Props) {
         <p
           style={{
             margin: 0,
-            fontSize: '10.88px',
-            fontWeight: 300,
+            fontSize: 'var(--fs-etiqueta)',
+            fontWeight: 400,
             color: TEXT_3,
             fontStyle: 'italic',
             lineHeight: 1.5,

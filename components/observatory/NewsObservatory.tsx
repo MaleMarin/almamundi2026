@@ -37,7 +37,7 @@ export function NewsObservatory({ item }: NewsObservatoryProps) {
   return (
     <div className="flex flex-col gap-6">
       <div className="rounded-2xl border border-white/10 bg-black/20 backdrop-blur-sm p-5">
-        <p className="text-sm text-white/80">
+        <p className="text-[length:var(--fs-pequeno)] text-white/80">
           <span className="text-white/50">Hora: </span>
           <span>{timeStr}</span>
           <span className="text-white/50"> · Medio: </span>
@@ -49,7 +49,7 @@ export function NewsObservatory({ item }: NewsObservatoryProps) {
         href={item.url}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-amber-500/20 text-amber-200 border border-amber-500/40 hover:bg-amber-500/30 transition-colors text-sm font-semibold w-fit"
+        className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-amber-500/20 text-amber-200 border border-amber-500/40 hover:bg-amber-500/30 transition-colors text-[length:var(--fs-pequeno)] font-semibold w-fit"
       >
         <ExternalLink size={18} />
         Abrir fuente
@@ -57,7 +57,7 @@ export function NewsObservatory({ item }: NewsObservatoryProps) {
 
       <HomeHardLink
         href="/#mapa"
-        className="inline-flex items-center gap-2 text-sm font-medium text-white/70 hover:text-white transition"
+        className="inline-flex items-center gap-2 text-[length:var(--fs-pequeno)] font-medium text-white/70 hover:text-white transition"
       >
         <Tag size={16} />
         Más de este tema

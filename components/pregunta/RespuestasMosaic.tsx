@@ -23,11 +23,11 @@ function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }
             className={large ? 'max-h-[70vh] w-full rounded-2xl object-contain' : 'h-40 w-full rounded-xl object-cover'}
           />
         ) : null}
-        {item.contenido ? <p className={large ? 'text-[16px] leading-relaxed' : 'text-sm leading-relaxed'}>{item.contenido}</p> : null}
+        {item.contenido ? <p className="text-[length:var(--fs-texto)] font-normal leading-relaxed">{item.contenido}</p> : null}
       </div>
     );
   }
-  return <p className={large ? 'whitespace-pre-wrap text-[16px] leading-relaxed' : 'line-clamp-4 whitespace-pre-wrap text-sm leading-relaxed'}>{item.contenido}</p>;
+  return <p className={large ? 'whitespace-pre-wrap text-[length:var(--fs-texto)] font-normal leading-relaxed' : 'line-clamp-4 whitespace-pre-wrap text-[length:var(--fs-texto)] font-normal leading-relaxed'}>{item.contenido}</p>;
 }
 
 export default function RespuestasMosaic({ questionId }: { questionId: string }) {
@@ -92,10 +92,10 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 px-4 py-8 text-[#1C1C2E]">
       <div className="flex flex-col gap-3">
-        <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
-        <h1 className="m-0 text-[22px] font-semibold leading-snug">{pregunta.tu[locale]}</h1>
-        <p className="m-0 text-[15px] leading-relaxed text-[#4A5568]">{pregunta.alguien[locale]}</p>
-        <Link href={preguntaPageHref(pregunta.id)} className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-sm font-semibold">
+        <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
+        <h1 className="m-0 text-[length:var(--fs-titular)] font-normal leading-snug">{pregunta.tu[locale]}</h1>
+        <p className="m-0 text-[length:var(--fs-pequeno)] leading-relaxed text-[#4A5568]">{pregunta.alguien[locale]}</p>
+        <Link href={preguntaPageHref(pregunta.id)} className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-[length:var(--fs-pequeno)] font-semibold">
           {PREGUNTA_UI.responder[locale]}
         </Link>
       </div>
@@ -105,13 +105,13 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
             key={item.id}
             type="button"
             onClick={() => setFilter(item.id)}
-            className={`${filter === item.id ? 'btn-am-principal' : 'btn-am-neutro'} inline-flex min-h-11 items-center px-4 text-sm font-semibold`}
+            className={`${filter === item.id ? 'btn-am-principal' : 'btn-am-neutro'} inline-flex min-h-11 items-center px-4 text-[length:var(--fs-pequeno)] font-semibold`}
           >
             {item.label}
           </button>
         ))}
       </div>
-      {!loading && items.length === 0 ? <p className="m-0 text-[15px]">{PREGUNTA_COPY.empty[locale]}</p> : null}
+      {!loading && items.length === 0 ? <p className="m-0 text-[length:var(--fs-pequeno)]">{PREGUNTA_COPY.empty[locale]}</p> : null}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
           <button
@@ -120,8 +120,8 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
             onClick={() => setOpen(item)}
             className="rounded-2xl border border-black/10 bg-white p-4 text-left"
           >
-            <p className="m-0 text-sm font-semibold">{item.alias}</p>
-            <p className="mb-2 mt-0.5 text-xs text-[#4A5568]">{item.city}</p>
+            <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{item.alias}</p>
+            <p className="mb-2 mt-0.5 text-[length:var(--fs-etiqueta)] text-[#4A5568]">{item.city}</p>
             <AnswerBody item={item} />
           </button>
         ))}
@@ -137,10 +137,10 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <p className="m-0 text-[16px] font-semibold">{open.alias}</p>
-                <p className="m-0 text-sm text-[#4A5568]">{open.city}</p>
+                <p className="m-0 text-[length:var(--fs-texto)] font-semibold">{open.alias}</p>
+                <p className="m-0 text-[length:var(--fs-pequeno)] text-[#4A5568]">{open.city}</p>
               </div>
-              <button type="button" onClick={() => setOpen(null)} className="btn-am-neutro inline-flex min-h-11 items-center px-4 text-sm font-semibold">
+              <button type="button" onClick={() => setOpen(null)} className="btn-am-neutro inline-flex min-h-11 items-center px-4 text-[length:var(--fs-pequeno)] font-semibold">
                 {t.modalClose}
               </button>
             </div>

@@ -125,8 +125,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             left: '1.5rem',
             zIndex: 100,
             fontFamily: INTERIOR_FONT_STACK,
-            fontWeight: 300,
-            fontSize: '12px',
+            fontWeight: 400,
+            fontSize: 'var(--fs-etiqueta)',
             padding: '0.4rem 0.75rem',
             display: 'flex',
             alignItems: 'center',
@@ -160,7 +160,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           style={{
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 400,
-            fontSize: '11.2px',
+            fontSize: 'var(--fs-etiqueta)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: SEPIA,
@@ -176,7 +176,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: 400,
             fontStyle: 'italic',
-            fontSize: 'clamp(1.813rem, 4.5vw, 2.875rem)',
+            fontSize: 'var(--fs-titular)',
             color: TINTA,
             lineHeight: 1.15,
             marginBottom: '0.8rem' }}
@@ -190,7 +190,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
-              fontSize: '15px',
+              fontSize: 'var(--fs-pequeno)',
               color: TINTA_SOFT,
               lineHeight: 1.7,
               marginBottom: '1.5rem' }}
@@ -225,7 +225,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               borderRadius: '50%',
               objectFit: 'cover' }}
           />
-          <span style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '14.08px', color: TINTA }}>
+          <span style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-pequeno)', color: TINTA }}>
             {historia.autor.nombre}
           </span>
           {historia.autor.ubicacion ? (
@@ -235,7 +235,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontWeight: 400,
-                  fontSize: '12.8px',
+                  fontSize: 'var(--fs-etiqueta)',
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   color: TINTA_SOFT }}
@@ -250,8 +250,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <span
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 200,
-                  fontSize: '12.8px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: SEPIA }}
               >
                 {historia.tiempoLectura} min de lectura
@@ -268,7 +268,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             <p
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
-                fontSize: '15px',
+                fontSize: 'var(--fs-texto)',
                 lineHeight: 1.7,
                 color: TINTA,
                 marginBottom: '1.6rem' }}
@@ -278,7 +278,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
                     fontStyle: 'italic',
-                    fontSize: isMobile ? '2.5rem' : 'clamp(2.5rem, 6vw, 4rem)',
+                    fontSize: 'var(--fs-titular)',
                     color: SEPIA,
                     float: 'left',
                     lineHeight: 0.85,
@@ -299,7 +299,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 key={idx}
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: '15px',
+                  fontSize: 'var(--fs-texto)',
                   lineHeight: 1.7,
                   color: TINTA,
                   marginBottom: '1.6rem' }}
@@ -342,7 +342,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
-                fontSize: '19px',
+                fontSize: 'var(--fs-subtitulo)',
                 color: TINTA,
                 marginBottom: '0.25rem' }}
             >
@@ -352,8 +352,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <p
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 200,
-                  fontSize: '12px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-etiqueta)',
                   textTransform: 'uppercase',
                   letterSpacing: '0.12em',
                   color: SEPIA,
@@ -366,8 +366,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               <p
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 300,
-                  fontSize: '13.6px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-pequeno)',
                   color: TINTA_SOFT,
                   maxWidth: 360,
                   marginBottom: '1rem',
@@ -401,7 +401,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
-                fontSize: '11.84px',
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 padding: '0.85rem 1.35rem' }}
@@ -416,7 +416,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             style={{
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
-              fontSize: '11.84px',
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               padding: '0.85rem 1.35rem' }}

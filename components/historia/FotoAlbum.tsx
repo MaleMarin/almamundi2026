@@ -190,8 +190,8 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 onClick={onClose}
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 300,
-                  fontSize: '12px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-etiqueta)',
                   padding: '0.4rem 0.75rem',
                   display: 'flex',
                   alignItems: 'center',
@@ -204,10 +204,10 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               </button>
             )}
           </div>
-          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: INTERIOR_FONT_STACK, fontStyle: 'italic', fontSize: '15px', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          <div style={{ display: isDesktop ? 'block' : 'none', fontFamily: INTERIOR_FONT_STACK, fontStyle: 'italic', fontSize: 'var(--fs-pequeno)', color: CREAM, maxWidth: '50%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
             {historia.titulo}
           </div>
-          <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 200, fontSize: '12px', color: CREAM_MUTED }}>
+          <div style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: CREAM_MUTED }}>
             {fotoActivaIdx + 1} / {imagenes.length}
           </div>
         </header>
@@ -242,8 +242,8 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 style={{
                   fontFamily: INTERIOR_FONT_STACK,
                   fontStyle: 'italic',
-                  fontWeight: 300,
-                  fontSize: 'clamp(1.438rem, 3.6vw, 2.188rem)',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-titular)',
                   color: CREAM,
                   margin: '0 0 1rem',
                   lineHeight: 1.2 }}
@@ -312,8 +312,8 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       <p
                         style={{
                           fontFamily: INTERIOR_FONT_STACK,
-                          fontWeight: 300,
-                          fontSize: '12.48px',
+                          fontWeight: 400,
+                          fontSize: 'var(--fs-etiqueta)',
                           color: '#3a3028',
                           fontStyle: 'italic',
                           textAlign: 'center',
@@ -344,7 +344,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
                   {fichaCaption(img) ? (
-                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '13.12px', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: CREAM_SOFT, marginTop: 12, padding: '0 16px', textAlign: 'center' }}>
                       {fichaCaption(img)}
                     </p>
                   ) : null}
@@ -366,7 +366,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       objectFit: 'cover' }}
                   />
                   {fichaCaption(img) ? (
-                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 300, fontSize: '13.12px', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
+                    <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>
                       {fichaCaption(img)}
                     </p>
                   ) : null}
@@ -401,7 +401,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               {imagenes.length > 0 ? (
                 <p
                   style={{
-                    fontSize: '11.52px',
+                    fontSize: 'var(--fs-etiqueta)',
                     fontWeight: 600,
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
@@ -421,7 +421,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 style={{
                   fontStyle: 'italic',
                   fontWeight: 600,
-                  fontSize: 'clamp(1.188rem, 3.42vw, 1.688rem)',
+                  fontSize: 'var(--fs-titular)',
                   color: neu.textMain,
                   marginBottom: '1.25rem',
                   lineHeight: 1.2 }}
@@ -454,7 +454,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       ...neu.button,
                       fontFamily: INTERIOR_FONT_STACK,
                       fontWeight: 600,
-                      fontSize: '11.84px',
+                      fontSize: 'var(--fs-etiqueta)',
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       padding: '0.85rem 1.35rem',
@@ -473,7 +473,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
                     fontWeight: 700,
-                    fontSize: '11.84px',
+                    fontSize: 'var(--fs-etiqueta)',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     padding: '0.85rem 1.35rem' }}
@@ -517,7 +517,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 background: 'rgba(0,0,0,0.35)',
                 color: CREAM,
                 fontFamily: INTERIOR_FONT_STACK,
-                fontSize: '15px',
+                fontSize: 'var(--fs-pequeno)',
                 fontWeight: 500,
                 cursor: fotoActivaIdx <= 0 ? 'not-allowed' : 'pointer',
                 opacity: fotoActivaIdx <= 0 ? 0.45 : 1 }}
@@ -555,7 +555,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 background: 'rgba(0,0,0,0.35)',
                 color: CREAM,
                 fontFamily: INTERIOR_FONT_STACK,
-                fontSize: '15px',
+                fontSize: 'var(--fs-pequeno)',
                 fontWeight: 500,
                 cursor: fotoActivaIdx >= imagenes.length - 1 ? 'not-allowed' : 'pointer',
                 opacity: fotoActivaIdx >= imagenes.length - 1 ? 0.45 : 1 }}

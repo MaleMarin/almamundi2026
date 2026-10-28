@@ -27,7 +27,7 @@ import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client'
 type Kind = 'texto' | 'voz' | 'foto';
 
 const fieldClass =
-  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[15px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]';
+  'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[16px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]';
 
 function pickClass(on: boolean): string {
   return on
@@ -320,11 +320,11 @@ function PreguntaFormInner({
   if (sentAlias) {
     return (
       <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-8 text-[#1C1C2E]">
-        <p className="text-[16px] leading-relaxed">{preguntaThanks(locale, sentAlias)}</p>
+        <p className="text-[length:var(--fs-texto)] leading-relaxed">{preguntaThanks(locale, sentAlias)}</p>
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold"
+            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
             onClick={() => {
               const enlace = `${window.location.origin}${preguntaPageHref(pregunta.id)}`;
               const shareText = preguntaShareText(locale, pregunta[mode][locale], enlace);
@@ -340,7 +340,7 @@ function PreguntaFormInner({
           </button>
           <Link
             href={preguntaPageHref(pregunta.id)}
-            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold"
+            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
           >
             {copy.seeWorld[locale]}
           </Link>
@@ -355,7 +355,7 @@ function PreguntaFormInner({
 
   return (
     <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
-      <p className="m-0 text-sm leading-relaxed text-[#4A5568] md:text-[15px]">{copy.intro[locale]}</p>
+      <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
@@ -364,8 +364,8 @@ function PreguntaFormInner({
           onClick={() => setMode('tu')}
           className={`${pickClass(mode === 'tu')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
-          <span className="text-[15px] font-semibold">{copy.modeYou[locale]}</span>
-          <span className="text-sm font-semibold leading-snug">{copy.modeYouLine[locale]}</span>
+          <span className="text-[length:var(--fs-pequeno)] font-semibold">{copy.modeYou[locale]}</span>
+          <span className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{copy.modeYouLine[locale]}</span>
         </button>
         <button
           type="button"
@@ -373,18 +373,18 @@ function PreguntaFormInner({
           onClick={() => setMode('alguien')}
           className={`${pickClass(mode === 'alguien')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
         >
-          <span className="text-[15px] font-semibold">{copy.modeAsk[locale]}</span>
-          <span className="text-sm font-semibold leading-snug">{copy.modeAskLine[locale]}</span>
+          <span className="text-[length:var(--fs-pequeno)] font-semibold">{copy.modeAsk[locale]}</span>
+          <span className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{copy.modeAskLine[locale]}</span>
         </button>
       </div>
 
       <div>
-        <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
-        <h1 className="m-0 mt-2 text-[22px] font-semibold leading-snug">{question}</h1>
+        <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
+        <h1 className="m-0 mt-2 text-[length:var(--fs-titular)] font-normal leading-snug">{question}</h1>
       </div>
 
       <div className="flex flex-col gap-2">
-        <p className="m-0 text-[15px] font-semibold">{copy.how[locale]}</p>
+        <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{copy.how[locale]}</p>
         <div className="grid grid-cols-3 gap-2">
           {(
             [
@@ -398,7 +398,7 @@ function PreguntaFormInner({
               type="button"
               aria-pressed={kind === id}
               onClick={() => setKind(id)}
-              className={`${pickClass(kind === id)} flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-sm font-semibold`}
+              className={`${pickClass(kind === id)} flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-[length:var(--fs-pequeno)] font-semibold`}
             >
               <Icon size={22} aria-hidden />
               {label}
@@ -417,7 +417,7 @@ function PreguntaFormInner({
             onChange={(event) => setText(event.target.value)}
             className={fieldClass}
           />
-          <p className="m-0 text-right text-xs text-[#4A5568]">
+          <p className="m-0 text-right text-[length:var(--fs-etiqueta)] text-[#4A5568]">
             {text.length}/{RESPUESTA_TEXT_MAX}
           </p>
         </div>
@@ -431,7 +431,7 @@ function PreguntaFormInner({
               <button
                 type="button"
                 onClick={() => void startRecording()}
-                className="text-sm font-semibold text-[#1C1C2E] underline"
+                className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
               >
                 {copy.recordAgain[locale]}
               </button>
@@ -449,19 +449,19 @@ function PreguntaFormInner({
               >
                 <Mic size={28} aria-hidden />
               </button>
-              <p className="m-0 text-sm">{recording ? copy.tapStop[locale] : copy.tapRecord[locale]}</p>
-              <p className="m-0 text-sm font-semibold" aria-live="polite">
+              <p className="m-0 text-[length:var(--fs-pequeno)]">{recording ? copy.tapStop[locale] : copy.tapRecord[locale]}</p>
+              <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold" aria-live="polite">
                 {mmss(elapsed)} / 2:00
               </p>
               {recording && elapsed >= 90 ? (
-                <p className="m-0 text-sm font-semibold text-[#FF4A1C]">{t.modalRecordingSoonEnd}</p>
+                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{t.modalRecordingSoonEnd}</p>
               ) : null}
             </>
           )}
           <button
             type="button"
             onClick={() => audioInputRef.current?.click()}
-            className="text-sm text-[#4A5568] underline"
+            className="text-[length:var(--fs-pequeno)] text-[#4A5568] underline"
           >
             {copy.orUpload[locale]}
           </button>
@@ -483,7 +483,7 @@ function PreguntaFormInner({
           <button
             type="button"
             onClick={() => photoInputRef.current?.click()}
-            className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-sm text-[#1C1C2E]"
+            className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
           >
             {photoUrl ? (
               <img src={photoUrl} alt="" className="max-h-64 w-full object-contain" />
@@ -501,7 +501,7 @@ function PreguntaFormInner({
               event.target.value = '';
             }}
           />
-          <label className="flex flex-col gap-1 text-sm font-semibold">
+          <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
             {copy.caption[locale]}
             <input
               value={caption}
@@ -513,24 +513,24 @@ function PreguntaFormInner({
         </div>
       )}
 
-      <label className="flex flex-col gap-1 text-sm font-semibold">
+      <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
         {t.modalAlias}
         <input value={alias} onChange={(event) => setAlias(event.target.value)} autoComplete="nickname" className={fieldClass} />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-semibold">
+      <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
         {t.modalCountry}
         <input value={country} onChange={(event) => setCountry(event.target.value)} autoComplete="country-name" className={fieldClass} />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-semibold">
+      <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
         {t.modalCity}
         <input value={city} onChange={(event) => setCity(event.target.value)} autoComplete="address-level2" className={fieldClass} />
       </label>
-      <label className="flex flex-col gap-1 text-sm font-semibold">
+      <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
         {t.modalEmail}
         <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" className={fieldClass} />
       </label>
 
-      <div className="flex flex-col gap-2 text-sm">
+      <div className="flex flex-col gap-2 text-[length:var(--fs-pequeno)]">
         <label className="flex items-start gap-2">
           <input type="checkbox" checked={adult} onChange={(event) => setAdult(event.target.checked)} className="mt-1" />
           <span>{t.modalConsentAdult}</span>
@@ -569,11 +569,11 @@ function PreguntaFormInner({
         </div>
       )}
       {error ? (
-        <p className="m-0 text-sm text-red-700" role="alert">
+        <p className="m-0 text-[length:var(--fs-pequeno)] text-red-700" role="alert">
           {error}
         </p>
       ) : null}
-      <button type="submit" disabled={saving} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold disabled:opacity-60">
+      <button type="submit" disabled={saving} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold disabled:opacity-60">
         {copy.submit[locale]}
       </button>
     </form>

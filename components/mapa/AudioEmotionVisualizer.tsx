@@ -233,7 +233,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
               position:      'absolute',
               top:           12,
               right:         14,
-              fontSize: 10,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color:         `${vis.particleColor}0.7)`,
@@ -257,7 +257,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
             background:      `${vis.particleColor}0.12)`,
             border:          `1px solid ${vis.particleColor}0.35)`,
             color:           `${vis.particleColor}1)`,
-            fontSize: 18,
+            fontSize: 'var(--fs-texto)',
             cursor:          'pointer',
             display:         'flex',
             alignItems:      'center',
@@ -318,7 +318,7 @@ export function AudioEmotionVisualizer({ audioUrl, onEmotion, autoPlay = false }
 
         <span
           style={{
-            fontSize: 12,
+            fontSize: 'var(--fs-etiqueta)',
             color:       'rgba(255,255,255,0.40)',
             flexShrink:  0,
             fontFamily:  SITE_FONT_STACK,

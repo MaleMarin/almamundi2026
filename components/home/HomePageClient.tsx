@@ -224,7 +224,7 @@ export function HomePageClient() {
             background: 'rgba(255, 140, 90, 0.22)',
             border: '1px solid rgba(255, 107, 43, 0.35)',
             color: '#7c2d12',
-            fontSize: 13,
+            fontSize: 'var(--fs-etiqueta)',
             maxWidth: 'min(420px, calc(100vw - 32px))',
             textAlign: 'center',
             boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}
@@ -286,22 +286,22 @@ export function HomePageClient() {
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)' }}
           >
             <div className="mx-auto flex w-full max-w-[760px] flex-col items-center">
-            <p className="m-0 text-xs font-semibold uppercase text-[#FF4A1C] tracking-[0.12em]">
+            <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#FF4A1C] tracking-[0.12em]">
               {PREGUNTA_COPY.homeEyebrow[locale]}
             </p>
             <h2
               id="pregunta-semana-titulo"
-              className="mb-0 mt-5 text-[23px] leading-[1.25] md:text-[32px]"
+              className="mb-0 mt-5 text-[length:var(--fs-titular)] leading-[1.25] "
               style={{
                 fontFamily: 'var(--font-interna), sans-serif',
-                fontWeight: 500,
+                fontWeight: 400,
                 color: '#4A5568',
                 textWrap: 'balance' }}
             >
               {preguntaVigente.tu[locale]}
             </h2>
             <p
-              className="mb-0 mt-4 text-[15px] leading-relaxed"
+              className="mb-0 mt-4 text-[length:var(--fs-texto)] font-normal leading-relaxed"
               style={{ color: '#718096', textWrap: 'balance' }}
             >
               {PREGUNTA_COPY.intro[locale]}

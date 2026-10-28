@@ -271,7 +271,7 @@ export function SpatialGlassExpo({
       {/* Top bar */}
       <header className="relative z-20 flex items-center justify-between gap-3 px-4 pt-6 pb-2 sm:px-8">
         <div className="flex min-w-0 flex-1 items-center gap-2">
-          <span className="truncate rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur-md sm:text-sm">
+          <span className="truncate rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-[length:var(--fs-pequeno)] font-medium text-white/90 backdrop-blur-md ">
             {tituloExposicion}
           </span>
         </div>
@@ -439,13 +439,13 @@ export function SpatialGlassExpo({
                       </div>
                     ) : null}
                     <div className="absolute bottom-0 left-0 right-0 p-5 text-left">
-                      <p className="font-semibold text-white drop-shadow-md sm:text-[16px]">
+                      <p className="font-semibold text-white drop-shadow-md text-[length:var(--fs-texto)]">
                         {h.titulo}
                       </p>
-                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-white/90">
+                      <p className="mt-2 line-clamp-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">
                         “{h.cita}”
                       </p>
-                      <p className="mt-3 text-xs text-white/65">
+                      <p className="mt-3 text-[length:var(--fs-etiqueta)] text-white/65">
                         {[h.fecha, h.lugar].filter(Boolean).join(' · ') ||
                           h.detalles ||
                           '—'}
@@ -500,7 +500,7 @@ export function SpatialGlassExpo({
             </div>
             <div className="min-w-0 text-left">
               <p className="truncate font-medium text-white">{active.nombre}</p>
-              <p className="truncate text-xs text-white/70">{metaLine || '—'}</p>
+              <p className="truncate text-[length:var(--fs-etiqueta)] text-white/70">{metaLine || '—'}</p>
             </div>
           </motion.div>
         </div>

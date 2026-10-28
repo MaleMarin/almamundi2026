@@ -81,7 +81,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
     >
       <p
         style={{
-          fontSize: 11,
+          fontSize: 'var(--fs-etiqueta)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: light ? neu.textBody : 'rgba(255,255,255,0.28)',
@@ -148,7 +148,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             )}
             <p
               style={{
-                fontSize: 11,
+                fontSize: 'var(--fs-etiqueta)',
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: 0 }}
             >
@@ -156,7 +156,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             </p>
             <p
               style={{
-                fontSize: 11,
+                fontSize: 'var(--fs-etiqueta)',
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: '4px 0 0' }}
             >
@@ -173,9 +173,9 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
           gap: 14px;
         }
         .am-related-stories-card { padding: 18px 20px; }
-        .am-related-stories-format { font-size: 10px; }
-        .am-related-stories-title { font-size: 13px; }
-        .am-related-stories-desc { font-size: 12px; }
+        .am-related-stories-format { font-size: var(--fs-etiqueta); }
+        .am-related-stories-title { font-size: var(--fs-etiqueta); }
+        .am-related-stories-desc { font-size: var(--fs-etiqueta); }
         @media (min-width: 640px) {
           .am-related-stories[data-related-variant="light"] {
             width: min(1160px, calc(100vw - 2.5rem));
@@ -187,9 +187,9 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             gap: 18px;
           }
           .am-related-stories-card { padding: 24px 26px; }
-          .am-related-stories-format { font-size: 11px; }
-          .am-related-stories-title { font-size: 15px; }
-          .am-related-stories-desc { font-size: 13.5px; }
+          .am-related-stories-format { font-size: var(--fs-etiqueta); }
+          .am-related-stories-title { font-size: var(--fs-pequeno); }
+          .am-related-stories-desc { font-size: var(--fs-pequeno); }
         }
       `}</style>
     </div>

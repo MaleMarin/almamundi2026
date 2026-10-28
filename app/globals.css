@@ -13,6 +13,13 @@
   /* Un solo naranja: botones, enlaces, íconos, puntos y anillos. */
   --almamundi-orange: #FF4A1C;
   --almamundi-orange-rgb: 255, 74, 28;
+  /* Escala única del sitio público. 300 solo en portada. */
+  --fs-portada: clamp(2.25rem, 5.58vw + 0.45rem, 6.188rem);
+  --fs-titular: clamp(1.75rem, 1.15rem + 1.6vw, 2.5rem);
+  --fs-subtitulo: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
+  --fs-texto: clamp(1rem, 0.96rem + 0.15vw, 1.0625rem);
+  --fs-pequeno: clamp(0.9375rem, 0.9375rem, 0.9375rem);
+  --fs-etiqueta: clamp(0.75rem, 0.75rem, 0.75rem);
 }
 
 @theme inline {
@@ -275,8 +282,8 @@ a.btn-am-principal,
 a.btn-am-principal:visited {
   background: #FF4A1C !important;
   color: #fff !important;
-  font-weight: 600 !important;
-  font-size: max(15px, 100%) !important;
+  font-weight: 500 !important;
+  font-size: var(--fs-pequeno) !important;
   border: 1px solid transparent !important;
   border-radius: 9999px !important;
   text-decoration: none;
@@ -299,7 +306,8 @@ a.btn-am-secundario,
 a.btn-am-secundario:visited {
   background: #E9ECF3 !important;
   color: var(--almamundi-orange) !important;
-  font-weight: 600 !important;
+  font-weight: 500 !important;
+  font-size: var(--fs-pequeno) !important;
   border: 1px solid rgba(var(--almamundi-orange-rgb), 0.38) !important;
   border-radius: 9999px !important;
   box-shadow:
@@ -432,8 +440,8 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
     inset 2px 2px 5px rgba(255, 255, 255, 0.9),
     inset -2px -2px 6px rgba(163, 177, 198, 0.28) !important;
   font-family: var(--font-sans);
-  font-size: 0.875rem;
-  font-weight: 600;
+  font-size: var(--fs-pequeno);
+  font-weight: 500;
   line-height: 1;
   letter-spacing: 0;
   font-synthesis: none;
@@ -560,7 +568,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 /* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
 .map-section-hero-title {
   font-weight: 300;
-  font-size: clamp(2.25rem, 5.58vw + 0.45rem, 6.188rem);
+  font-size: var(--fs-portada);
   line-height: 0.95;
 }
 
@@ -597,7 +605,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'],
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
     padding: 0 11px !important;
-    font-size: 0.75rem !important;
+    font-size: var(--fs-pequeno) !important;
   }
 
   #map-dock-slot .map-dock-row {
@@ -613,7 +621,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'],
   #map-dock-slot .home-map-neu-pill.btn-almamundi[data-active='true'] {
     padding: 0 8px !important;
-    font-size: 0.688rem !important;
+    font-size: var(--fs-pequeno) !important;
   }
 
   #map-dock-slot .map-dock-row {
@@ -680,12 +688,12 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   color: #E0E5EC;
   /* Logotipo de texto: no sigue la fuente del sitio. */
   font-family: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
-  font-weight: 900;
+  font-weight: 300;
   /* Tamaño responsive atado al ancho del contenedor (cqi) para que "ALMAMUNDI"
      entre completo en cualquier viewport, incluido 4K.
      Cálculo: con letter-spacing -0.06em la palabra ocupa ~5.6em de ancho;
      16.5cqi × 5.6 ≈ 92.4% del contenedor, con margen seguro de ~7%. */
-  font-size: clamp(3rem, 16.5cqi, 12rem);
+  font-size: var(--fs-portada);
   letter-spacing: -0.06em;
   line-height: 0.9;
   white-space: nowrap;
@@ -761,11 +769,12 @@ a:focus,
 footer a.almamundi-footer-link,
 footer a.almamundi-footer-link:visited {
   color: #718096 !important;
-  font-weight: 400;
+  font-size: var(--fs-pequeno);
+  font-weight: 500;
 }
 footer a.almamundi-footer-link:hover {
   color: var(--almamundi-orange) !important;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 /* Modo alto contraste AlmaMundi */

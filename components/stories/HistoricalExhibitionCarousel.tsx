@@ -229,7 +229,7 @@ export function HistoricalExhibitionCarousel({
   if (n === 0) {
     return (
       <div
-        className={`flex min-h-[40vh] items-center justify-center px-6 text-center text-base ${embedded && isLightHall ? 'text-gray-600' : 'text-white/70'} ${className}`}
+        className={`flex min-h-[40vh] items-center justify-center px-6 text-center text-[length:var(--fs-texto)] ${embedded && isLightHall ? 'text-gray-600' : 'text-white/70'} ${className}`}
         role="status"
       >
         No hay historias para mostrar en este formato.
@@ -514,13 +514,13 @@ export function HistoricalExhibitionCarousel({
                       </div>
 
                       <div className="relative z-10 mt-3 shrink-0 space-y-2 sm:mt-4">
-                        <h3 className="text-[15px] font-semibold leading-snug text-gray-900 sm:text-[17px]">
+                        <h3 className="text-[length:var(--fs-texto)] font-semibold leading-snug text-gray-900 ">
                           {h.titulo}
                         </h3>
-                        <p className="line-clamp-4 text-[14.32px] leading-relaxed text-gray-700 sm:line-clamp-5">
+                        <p className="line-clamp-4 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-700 sm:line-clamp-5">
                           “{h.cita}”
                         </p>
-                        <p className="text-[11px] font-semibold uppercase text-gray-600 tracking-[0.12em]">
+                        <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-600 tracking-[0.12em]">
                           {[h.fecha, h.lugar].filter(Boolean).join(' · ')}
                         </p>
                       </div>
@@ -537,10 +537,10 @@ export function HistoricalExhibitionCarousel({
                           <img src={h.foto_perfil} alt="" className="h-full w-full object-cover" />
                         </div>
                         <div className="min-w-0 text-left leading-tight">
-                          <p className="truncate text-[10.88px] font-semibold uppercase text-gray-500 tracking-[0.12em]">
+                          <p className="truncate text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-500 tracking-[0.12em]">
                             Narrador
                           </p>
-                          <p className="truncate text-sm font-semibold text-gray-900">{h.nombre}</p>
+                          <p className="truncate text-[length:var(--fs-pequeno)] font-semibold text-gray-900">{h.nombre}</p>
                         </div>
                       </div>
 
@@ -553,7 +553,7 @@ export function HistoricalExhibitionCarousel({
                             if (!canOpenThis) return;
                             openHandler(slideIdx);
                           }}
-                          className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-xs font-bold uppercase tracking-[0.17em] transition sm:text-[0.8rem] ${
+                          className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-[length:var(--fs-etiqueta)] font-bold uppercase tracking-[0.17em] transition ${
                             canOpenThis
                               ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#FF4A1C_0%,#FF4A1C_52%,#FF4A1C_100%)] text-white shadow-[0_18px_40px_rgba(255,74,28,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
                               : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-gray-500 opacity-95'
@@ -641,8 +641,8 @@ export function HistoricalExhibitionCarousel({
                       <h3
                         className={
                           isLightHall
-                            ? 'text-[15px] font-semibold leading-snug text-gray-900 sm:text-[18px]'
-                            : 'text-[16px] font-semibold leading-tight sm:text-[18px]'
+                            ? 'text-[length:var(--fs-texto)] font-semibold leading-snug text-gray-900 '
+                            : 'text-[length:var(--fs-texto)] font-semibold leading-tight '
                         }
                       >
                         {h.titulo}
@@ -650,13 +650,13 @@ export function HistoricalExhibitionCarousel({
                       <p
                         className={
                           isLightHall
-                            ? 'line-clamp-3 text-[0.9rem] leading-relaxed text-gray-700 sm:text-sm'
-                            : 'line-clamp-3 text-sm leading-relaxed text-white/90'
+                            ? 'line-clamp-3 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-700 '
+                            : 'line-clamp-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90'
                         }
                       >
                         “{h.cita}”
                       </p>
-                      <p className={isLightHall ? 'text-xs text-gray-600' : 'text-xs text-white/60'}>
+                      <p className={isLightHall ? 'text-[length:var(--fs-etiqueta)] text-gray-600' : 'text-[length:var(--fs-etiqueta)] text-white/60'}>
                         {h.fecha} · {h.lugar}
                       </p>
                     </div>
@@ -708,8 +708,8 @@ export function HistoricalExhibitionCarousel({
                 <p
                   className={
                     isLightHall
-                      ? 'truncate text-xs text-gray-600'
-                      : 'truncate text-xs text-white/70'
+                      ? 'truncate text-[length:var(--fs-etiqueta)] text-gray-600'
+                      : 'truncate text-[length:var(--fs-etiqueta)] text-white/70'
                   }
                 >
                   {metaLine}

@@ -360,8 +360,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           {/* AlmaMundi wordmark */}
           <p style={{
             fontFamily: INTERIOR_FONT_STACK,
-            fontWeight: 200,
-            fontSize: '11.2px',
+            fontWeight: 400,
+            fontSize: 'var(--fs-etiqueta)',
             letterSpacing: '0.12em',
             color: 'var(--sepia)',
             textTransform: 'uppercase',
@@ -382,8 +382,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             className={intertitlePhase === 'out' ? 'title-out' : intertitlePhase === 'hold' ? 'title-in' : ''}
             style={{
               fontFamily: INTERIOR_FONT_STACK,
-              fontSize: 'clamp(2rem, 5.4vw, 4.063rem)',
-              fontWeight: 300,
+              fontSize: 'var(--fs-titular)',
+              fontWeight: 400,
               fontStyle: 'italic',
               color: 'var(--cream)',
               textAlign: 'center',
@@ -426,8 +426,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             />
             <span style={{
               fontFamily: INTERIOR_FONT_STACK,
-              fontWeight: 300,
-              fontSize: '12.8px',
+              fontWeight: 400,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               color: 'rgba(245,240,232,0.5)',
               textTransform: 'uppercase' }}>
@@ -436,8 +436,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             {historia.autor.ubicacion ? (
               <span style={{
                 fontFamily: INTERIOR_FONT_STACK,
-                fontWeight: 300,
-                fontSize: '10.88px',
+                fontWeight: 400,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 color: 'rgba(245,240,232,0.4)',
                 textTransform: 'uppercase' }}>
@@ -515,8 +515,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             <div style={{ pointerEvents: 'none' }}>
               <p style={{
                 fontFamily: INTERIOR_FONT_STACK,
-                fontWeight: 200,
-                fontSize: '10.4px',
+                fontWeight: 400,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
               color: 'var(--sepia)',
               textTransform: 'uppercase',
@@ -532,7 +532,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 400,
               fontStyle: 'italic',
-              fontSize: 'clamp(1rem, 2.25vw, 1.625rem)',
+              fontSize: 'var(--fs-subtitulo)',
               color: 'var(--cream)' }}>
               {historia.titulo}
             </h2>
@@ -650,8 +650,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 {/* Time */}
                 <span style={{
                   fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: '12.48px',
-                  fontWeight: 300,
+                  fontSize: 'var(--fs-etiqueta)',
+                  fontWeight: 400,
                   color: 'rgba(245,240,232,0.6)',
                   whiteSpace: 'nowrap' }}>
                   {formatTime(currentTime)} / {formatTime(duration)}
@@ -672,8 +672,8 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                   />
                   <span style={{
                     fontFamily: INTERIOR_FONT_STACK,
-                    fontSize: '12px',
-                    fontWeight: 300,
+                    fontSize: 'var(--fs-etiqueta)',
+                    fontWeight: 400,
                     color: 'rgba(245,240,232,0.55)' }}>
                     {historia.autor.nombre}
                   </span>

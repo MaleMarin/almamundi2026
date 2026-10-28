@@ -158,7 +158,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
   }
 
   if (!stories.length) return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: SITE_FONT_STACK, fontSize: '15px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: SITE_FONT_STACK, fontSize: 'var(--fs-pequeno)' }}>
       No hay historias por ahora.
     </div>
   )
@@ -191,19 +191,19 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           position:absolute; top:12px; left:12px;
           background:rgba(255,255,255,0.15); border:1px solid rgba(255,255,255,0.3);
           border-radius:20px; padding:3px 10px;
-          font-family:var(--font-interna),sans-serif; font-weight:300; font-size:9px;
+          font-family:var(--font-interna),sans-serif; font-weight:400; font-size: var(--fs-etiqueta);
           letter-spacing:0.22em; text-transform:uppercase; color:#fff;
         }
 
         .sfc-photo-theme {
           position:absolute; top:38px; left:12px; right:12px;
-          font-family:var(--font-interna),sans-serif; font-weight:300; font-size:11px; line-height:1.25;
+          font-family:var(--font-interna),sans-serif; font-weight:400; font-size: var(--fs-etiqueta); line-height:1.25;
           color:rgba(255,255,255,0.95); text-shadow:0 1px 3px rgba(0,0,0,0.55);
           max-height:2.6em; overflow:hidden;
         }
 
         .sfc-bottom { position:absolute; bottom:0; left:0; right:0; padding:14px 13px; }
-        .sfc-title { font-family:var(--font-interna),sans-serif; font-weight:400; font-size:14px; color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
+        .sfc-title { font-family:var(--font-interna),sans-serif; font-weight:400; font-size: var(--fs-pequeno); color:#f5f0e8; line-height:1.3; margin-bottom:8px; }
         .sfc-divider { width:24px; height:1px; background:rgba(255, 74, 28,0.6); margin-bottom:7px; }
         .sfc-author { display:flex; align-items:center; gap:8px; }
         .sfc-avatar-wrap {
@@ -219,8 +219,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
           flex-shrink:0; opacity:0.85;
           filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
         }
-        .sfc-meta { font-family:var(--font-interna),sans-serif; font-weight:300; font-size:10px; color:rgba(245,240,232,0.7); line-height:1.4; }
-        .sfc-meta strong { display:block; font-weight:400; color:#f5f0e8; font-size:11px; }
+        .sfc-meta { font-family:var(--font-interna),sans-serif; font-weight:400; font-size: var(--fs-etiqueta); color:rgba(245,240,232,0.7); line-height:1.4; }
+        .sfc-meta strong { display:block; font-weight:400; color:#f5f0e8; font-size: var(--fs-etiqueta); }
 
         .sfc-play {
           position:absolute; top:50%; left:50%; transform:translate(-50%,-60%);
@@ -238,8 +238,8 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         @keyframes sfcWave { from{transform:scaleY(0.25)} to{transform:scaleY(1)} }
 
         .sfc-text-inner { position:absolute; inset:0; background:#faf7f2; padding:18px 14px 0; overflow:hidden; }
-        .sfc-text-drop { font-family:var(--font-interna),sans-serif; font-size:56px; font-weight:300; color:#FF4A1C; line-height:1; float:left; margin-right:3px; margin-top:2px; }
-        .sfc-text-body { font-family:var(--font-interna),sans-serif; font-size:11px; line-height:1.75; color:#3a3028; }
+        .sfc-text-drop { font-family:var(--font-interna),sans-serif; font-size: var(--fs-titular); font-weight:400; color:#FF4A1C; line-height:1; float:left; margin-right:3px; margin-top:2px; }
+        .sfc-text-body { font-family:var(--font-interna),sans-serif; font-size: var(--fs-etiqueta); line-height:1.75; color:#3a3028; }
         .sfc-text-fade { position:absolute; bottom:0; left:0; right:0; height:120px; background:linear-gradient(to top,#faf7f2 30%,transparent 100%); }
 
         .sfc-photo-inner { position:absolute; inset:0; background:#ede8e0; display:flex; align-items:center; justify-content:center; }
@@ -412,10 +412,10 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
         {/* ── Info ── */}
         {current && (
           <div className="sfc-info" key={active}>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '21px', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-subtitulo)', color: '#1a140e', marginBottom: '5px', lineHeight: 1.2 }}>
               {current.title ?? current.label}
             </p>
-            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 300, fontSize: '11px', color: '#8b7a6a', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+            <p style={{ fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: '#8b7a6a', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
               {authorName}
               <span style={{ display: 'inline-block', width: '1px', height: '10px', background: '#FF4A1C', margin: '0 8px', verticalAlign: 'middle', opacity: 0.5 }} />
               {formatPlace(current)}
@@ -458,7 +458,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 router.push(`/historias/${current.id}`)
               }
             }}
-            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: '11px', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}
+            style={{ padding: '0.6rem 2.2rem', borderRadius: '3px', border: '1px solid rgba(139,105,20,0.4)', background: 'transparent', color: '#6b4f10', fontFamily: SITE_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', cursor: 'pointer' }}
           >
             {mode === 'audio' ? 'Escuchar →' : 'Ver esta historia →'}
           </button>
@@ -475,7 +475,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
                 color: isSavedInCollection?.(current.id) ? '#6b4f10' : '#5a4a3a',
                 fontFamily: SITE_FONT_STACK,
                 fontWeight: 400,
-                fontSize: '11px',
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 cursor: isSavedInCollection?.(current.id) ? 'default' : 'pointer',

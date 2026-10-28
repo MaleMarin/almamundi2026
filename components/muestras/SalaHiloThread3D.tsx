@@ -242,7 +242,7 @@ function KnotStoryLabel({
         >
           <div
             style={{
-              fontSize: 12,
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 700,
               color: TEXT_PRIMARY,
               lineHeight: 1.2,
@@ -256,7 +256,7 @@ function KnotStoryLabel({
           </div>
           <div
             style={{
-              fontSize: 10,
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 500,
               color: ACCENT,
               letterSpacing: '0.12em',

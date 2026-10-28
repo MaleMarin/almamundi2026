@@ -29,7 +29,7 @@ export default function ContactoPage() {
           style={{
             display: 'inline-block',
             marginBottom: '1.5rem',
-            fontSize: '13.6px',
+            fontSize: 'var(--fs-pequeno)',
             padding: '0.45rem 0.9rem' }}
         >
           ← Volver al inicio
@@ -40,12 +40,12 @@ export default function ContactoPage() {
             fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 600,
-            fontSize: '25px',
+            fontSize: 'var(--fs-subtitulo)',
             color: TEXT_1 }}
         >
           Contacto
         </h1>
-        <p style={{ margin: '0 0 2rem', fontSize: '14.4px', color: TEXT_3 }}>
+        <p style={{ margin: '0 0 2rem', fontSize: 'var(--fs-pequeno)', color: TEXT_3 }}>
           AlmaMundi · una iniciativa de Precisar
         </p>
 
@@ -63,7 +63,7 @@ export default function ContactoPage() {
               fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
-              fontSize: '16px',
+              fontSize: 'var(--fs-texto)',
               color: ORANGE }}
           >
             Escríbenos
@@ -72,7 +72,7 @@ export default function ContactoPage() {
             style={{
               margin: '0 0 1rem',
               fontFamily: 'inherit',
-              fontSize: '14.4px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.65,
               color: TEXT_2 }}
           >
@@ -86,7 +86,7 @@ export default function ContactoPage() {
             style={{
               margin: 0,
               fontFamily: 'inherit',
-              fontSize: '14.4px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.65,
               color: TEXT_2 }}
           >

@@ -103,7 +103,7 @@ export default function NewsStrip() {
       >
         <div
           style={{
-            fontSize: '10px',
+            fontSize: 'var(--fs-etiqueta)',
             fontWeight: 600,
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
@@ -147,7 +147,7 @@ export default function NewsStrip() {
                     ? 'inset 0 1px 0 rgba(255, 200, 150, 0.45), 0 0 16px rgba(255, 74, 28, 0.35)'
                     : 'inset 0 1px 0 rgba(255,255,255,0.18)',
                 color: activeTopic === t.id ? '#ffffff' : 'rgba(255,255,255,0.52)',
-                fontSize: '11px',
+                fontSize: 'var(--fs-etiqueta)',
                 cursor: 'pointer',
                 transition: 'all 0.15s' }}
             >
@@ -183,7 +183,7 @@ export default function NewsStrip() {
             style={{
               padding: '24px 16px',
               textAlign: 'center',
-              fontSize: '12px',
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(255,255,255,0.3)' }}
           >
             No hay noticias disponibles
@@ -210,7 +210,7 @@ export default function NewsStrip() {
             >
               <div
                 style={{
-                  fontSize: '11px',
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.35)',
                   marginBottom: '4px',
                   display: 'flex',
@@ -221,7 +221,7 @@ export default function NewsStrip() {
               </div>
               <div
                 style={{
-                  fontSize: '13px',
+                  fontSize: 'var(--fs-etiqueta)',
                   fontWeight: 500,
                   color: 'rgba(255,255,255,0.88)',
                   lineHeight: 1.4,
@@ -235,7 +235,7 @@ export default function NewsStrip() {
               {item.summary && (
                 <div
                   style={{
-                    fontSize: '11px',
+                    fontSize: 'var(--fs-etiqueta)',
                     color: 'rgba(255,255,255,0.35)',
                     marginTop: '4px',
                     lineHeight: 1.5,
@@ -257,7 +257,7 @@ export default function NewsStrip() {
         style={{
           padding: '10px 16px',
           borderTop: '1px solid rgba(255,255,255,0.08)',
-          fontSize: '10px',
+          fontSize: 'var(--fs-etiqueta)',
           color: 'rgba(255,255,255,0.2)',
           textAlign: 'center' }}
       >

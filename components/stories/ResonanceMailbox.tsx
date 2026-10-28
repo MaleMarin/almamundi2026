@@ -309,11 +309,11 @@ export function ResonanceMailbox({
                   <>
                     <h2
                       id={`${dialogId}-title`}
-                      className="pr-10 text-[15px] font-semibold leading-snug text-white sm:text-[16px]"
+                      className="pr-10 text-[length:var(--fs-texto)] font-semibold leading-snug text-white "
                     >
                       Gracias por tomarte el tiempo.
                     </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-white/85">
+                    <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/85">
                       Esto es un poco de lo que dejaste en esta historia.
                     </p>
                     {messageYieldsResonanceGift(sentText, locale) ? (
@@ -323,7 +323,7 @@ export function ResonanceMailbox({
                       <button
                         type="button"
                         onClick={closeDialog}
-                        className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25 sm:w-auto"
+                        className="w-full rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-[length:var(--fs-pequeno)] font-medium text-white transition hover:bg-white/25 sm:w-auto"
                       >
                         Cerrar
                       </button>
@@ -333,11 +333,11 @@ export function ResonanceMailbox({
                   <>
                     <h2
                       id={`${dialogId}-title`}
-                      className="pr-10 text-[15px] font-semibold leading-snug text-white sm:text-[16px]"
+                      className="pr-10 text-[length:var(--fs-texto)] font-semibold leading-snug text-white "
                     >
                       ¿Esta historia resonó contigo?
                     </h2>
-                    <p className="mt-3 text-sm leading-relaxed text-white/85">
+                    <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/85">
                       Escribe un mensaje breve de afecto y respeto pensado para{' '}
                       <span className="font-medium text-white">{recipientName}</span>. AlmaMundi recibe tu mensaje, lo
                       revisa con cuidado (incluye un filtro automático de tono) y, cuando corresponda, puede acercárselo
@@ -353,10 +353,10 @@ export function ResonanceMailbox({
                       onChange={(e) => setText(e.target.value.slice(0, 2000))}
                       rows={5}
                       placeholder="Escribe aquí con cariño…"
-                      className="mt-4 box-border w-full min-h-[120px] resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2.5 text-sm text-white placeholder:text-white/40 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-white/15"
+                      className="mt-4 box-border w-full min-h-[120px] resize-y rounded-xl border border-white/15 bg-black/35 px-3 py-2.5 text-[length:var(--fs-pequeno)] text-white placeholder:text-white/40 focus:border-white/35 focus:outline-none focus:ring-2 focus:ring-white/15"
                     />
                     {reformulateHint ? (
-                      <p className="mt-3 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-sm text-amber-100/95">
+                      <p className="mt-3 rounded-lg border border-amber-400/35 bg-amber-500/10 px-3 py-2 text-[length:var(--fs-pequeno)] text-amber-100/95">
                         {reformulateHint}
                       </p>
                     ) : null}
@@ -364,7 +364,7 @@ export function ResonanceMailbox({
                       <TurnstileWidget onTokenChange={setTurnstileToken} onGateChange={() => {}} />
                     </div>
                     {error ? (
-                      <p className="mt-2 text-sm text-rose-300/95" role="alert">
+                      <p className="mt-2 text-[length:var(--fs-pequeno)] text-rose-300/95" role="alert">
                         {error}
                       </p>
                     ) : null}
@@ -372,7 +372,7 @@ export function ResonanceMailbox({
                       <button
                         type="button"
                         onClick={closeDialog}
-                        className="w-full rounded-full border border-white/20 px-4 py-2.5 text-sm text-white/85 transition hover:bg-white/10 sm:w-auto"
+                        className="w-full rounded-full border border-white/20 px-4 py-2.5 text-[length:var(--fs-pequeno)] text-white/85 transition hover:bg-white/10 sm:w-auto"
                       >
                         Cancelar
                       </button>
@@ -380,7 +380,7 @@ export function ResonanceMailbox({
                         type="button"
                         disabled={sending || text.trim().length < 3}
                         onClick={() => void send()}
-                        className="btn-am-principal w-full px-5 py-2.5 text-sm font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                        className="btn-am-principal w-full px-5 py-2.5 text-[length:var(--fs-pequeno)] font-medium disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
                       >
                         {sending ? 'Enviando…' : 'Enviar'}
                       </button>

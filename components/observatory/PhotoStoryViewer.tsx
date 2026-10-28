@@ -73,7 +73,7 @@ export function PhotoStoryViewer({
       </div>
       <div className="shrink-0 px-4 py-3 text-center border-t border-white/10">
         <p className="text-white/95 font-medium">{title}</p>
-        {dateStr && <p className="text-white/60 text-sm mt-0.5">{dateStr}</p>}
+        {dateStr && <p className="text-white/60 text-[length:var(--fs-pequeno)] mt-0.5">{dateStr}</p>}
       </div>
     </div>
   );

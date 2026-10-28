@@ -191,7 +191,7 @@ export function StoryEndScreen({
           style={{
             fontWeight: 600,
             fontStyle: 'italic',
-            fontSize: 'clamp(1.313rem, 3.78vw, 1.938rem)',
+            fontSize: 'var(--fs-titular)',
             color: TEXT_TITLE,
             lineHeight: 1.2,
             marginBottom: hasTitleExtras ? '0.55rem' : '1.35rem' }}
@@ -211,7 +211,7 @@ export function StoryEndScreen({
             style={{
               margin: '0 auto 1rem',
               maxWidth: '36rem',
-              fontSize: '15px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.55,
               color: TEXT_BODY,
               fontWeight: 500 }}
@@ -224,7 +224,7 @@ export function StoryEndScreen({
           <p
             style={{
               margin: '0 0 1.35rem',
-              fontSize: '11.52px',
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 600,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -239,7 +239,7 @@ export function StoryEndScreen({
             style={{
               fontStyle: 'italic',
               fontWeight: 500,
-              fontSize: '15px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.7,
               color: neu.textMain,
               borderLeft: `3px solid ${ORANGE}`,
@@ -283,16 +283,16 @@ export function StoryEndScreen({
               boxShadow: '8px 8px 14px rgba(163,177,198,0.42), -4px -4px 10px rgba(255,255,255,0.65)' }}
           />
           <div style={{ minWidth: 0 }}>
-            <p style={{ fontWeight: 600, fontSize: '15px', color: TEXT_TITLE, marginBottom: autor.ubicacion ? '0.2rem' : 0 }}>
+            <p style={{ fontWeight: 600, fontSize: 'var(--fs-pequeno)', color: TEXT_TITLE, marginBottom: autor.ubicacion ? '0.2rem' : 0 }}>
               {autor.nombre}
             </p>
             {autor.ubicacion ? (
-              <p style={{ fontWeight: 500, fontSize: '11.52px', letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_BODY }}>
+              <p style={{ fontWeight: 500, fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: TEXT_BODY }}>
                 {autor.ubicacion}
               </p>
             ) : null}
             {autor.bio ? (
-              <p style={{ fontWeight: 400, fontSize: '12.8px', lineHeight: 1.52, color: TEXT_BODY, marginTop: '0.4rem', opacity: 0.94 }}>
+              <p style={{ fontWeight: 400, fontSize: 'var(--fs-etiqueta)', lineHeight: 1.52, color: TEXT_BODY, marginTop: '0.4rem', opacity: 0.94 }}>
                 {autor.bio}
               </p>
             ) : null}
@@ -310,7 +310,7 @@ export function StoryEndScreen({
               borderRadius: 999,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 600,
-              fontSize: '11.84px',
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: neu.textMain,
@@ -328,7 +328,7 @@ export function StoryEndScreen({
                 padding: '0.92rem 1rem',
                 fontFamily: INTERIOR_FONT_STACK,
                 fontWeight: 600,
-                fontSize: '11.84px',
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase' }}
             >
@@ -345,7 +345,7 @@ export function StoryEndScreen({
               border: `1px solid rgba(255, 74, 28,0.32)`,
               fontFamily: INTERIOR_FONT_STACK,
               fontWeight: 700,
-              fontSize: '11.84px',
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: 'pointer',

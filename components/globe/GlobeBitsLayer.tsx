@@ -322,12 +322,12 @@ function BitDot({
                   whiteSpace: 'normal' }}
               >
                 {bit.title ? (
-                  <div style={{ fontSize: 13, fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.95)' }}>
+                  <div style={{ fontSize: 'var(--fs-etiqueta)', fontWeight: 600, lineHeight: 1.25, color: 'rgba(255,255,255,0.95)' }}>
                     {bit.title}
                   </div>
                 ) : null}
                 {bit.place ? (
-                  <div style={{ fontSize: 11, marginTop: 3, color: 'rgba(255, 180, 80, 0.95)', lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 'var(--fs-etiqueta)', marginTop: 3, color: 'rgba(255, 180, 80, 0.95)', lineHeight: 1.3 }}>
                     {bit.place}
                   </div>
                 ) : null}

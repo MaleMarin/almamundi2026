@@ -15,14 +15,14 @@ function HeroSection() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
       >
-        <p className="text-[var(--almamundi-orange)] text-sm md:text-[15px] font-medium uppercase mb-6 tracking-[0.12em]">
+        <p className="text-[var(--almamundi-orange)] text-[length:var(--fs-pequeno)] font-medium uppercase mb-6 tracking-[0.12em]">
           Política Digital
         </p>
-        <h1 className="text-[32px] md:text-[54px] lg:text-[65px] xl:text-[86px] font-light leading-[1.08] text-white/95">
+        <h1 className="text-[length:var(--fs-titular)] font-normal leading-[1.08] text-white/95">
           Tecnología, políticas públicas y gobernanza digital en México.
         </h1>
         <motion.p
-          className="mt-8 text-[16px] md:text-[18px] text-white/60 max-w-2xl"
+          className="mt-8 text-[length:var(--fs-texto)] text-white/60 max-w-2xl"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 0.6 }}
@@ -31,7 +31,7 @@ function HeroSection() {
         </motion.p>
       </motion.div>
       <motion.div
-        className="absolute bottom-8 left-6 md:left-12 text-white/40 text-xs"
+        className="absolute bottom-8 left-6 md:left-12 text-white/40 text-[length:var(--fs-etiqueta)]"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
@@ -55,13 +55,13 @@ function SistemaSection() {
           visible: { transition: { staggerChildren: 0.08 } } }}
       >
         <motion.h2
-          className="text-[27px] md:text-[43px] font-light text-white/90 mb-4"
+          className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-4"
           variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
         >
           El sitio como sistema
         </motion.h2>
         <motion.p
-          className="text-white/50 text-[16px] max-w-2xl mb-16"
+          className="text-white/50 text-[length:var(--fs-texto)] max-w-2xl mb-16"
           variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
         >
           Todo el contenido se organiza por metadatos: tipo, estado, temas, recencia. Sin bloques inventados ni texto fijo.
@@ -73,7 +73,7 @@ function SistemaSection() {
               className="p-4 md:p-6 rounded-xl border border-white/10 bg-white/[0.02]"
               variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
             >
-              <span className="text-[10px] md:text-xs text-[var(--almamundi-orange)] font-medium">
+              <span className="text-[length:var(--fs-etiqueta)] text-[var(--almamundi-orange)] font-medium">
                 {String(i + 1).padStart(2, '0')}
               </span>
               <p className="text-white/80 font-medium mt-2">{label}</p>
@@ -103,10 +103,10 @@ function MexicoPorEstadoSection() {
         viewport={MOTION_VIEW}
         transition={{ duration: 0.7 }}
       >
-        <h2 className="text-[22px] md:text-[32px] font-light text-white/90 mb-12">
+        <h2 className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-12">
           México por estado
         </h2>
-        <p className="text-white/50 text-[15px] md:text-[16px] max-w-xl mb-12">
+        <p className="text-white/50 text-[length:var(--fs-texto)] max-w-xl mb-12">
           Explora el mapa debajo: contenido y señales por entidad federativa.
         </p>
         <div className="flex flex-wrap gap-3">
@@ -114,7 +114,7 @@ function MexicoPorEstadoSection() {
             <a
               key={s.code}
               href="#mapa"
-              className="px-4 py-2 rounded-full border border-white/20 text-white/70 text-sm hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] transition-colors"
+              className="px-4 py-2 rounded-full border border-white/20 text-white/70 text-[length:var(--fs-pequeno)] hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] transition-colors"
             >
               {s.name}
             </a>
@@ -134,14 +134,14 @@ function ContentCard({ item, index }: { item: ContentItem; index: number }) {
       viewport={MOTION_VIEW}
       transition={{ delay: index * 0.05 }}
     >
-      <span className="text-[10px] uppercase text-[var(--almamundi-orange)] tracking-[0.12em]">
+      <span className="text-[length:var(--fs-etiqueta)] uppercase text-[var(--almamundi-orange)] tracking-[0.12em]">
         {item.kind}
       </span>
-      <h3 className="text-[16px] font-medium text-white/95 mt-2 group-hover:text-[var(--almamundi-orange)] transition-colors line-clamp-2">
+      <h3 className="text-[length:var(--fs-texto)] font-medium text-white/95 mt-2 group-hover:text-[var(--almamundi-orange)] transition-colors line-clamp-2">
         {item.title}
       </h3>
-      <p className="text-sm text-white/50 mt-2 line-clamp-2">{item.excerpt}</p>
-      <time className="text-xs text-white/40 mt-3 block">
+      <p className="text-[length:var(--fs-pequeno)] text-white/50 mt-2 line-clamp-2">{item.excerpt}</p>
+      <time className="text-[length:var(--fs-etiqueta)] text-white/40 mt-3 block">
         {new Date(item.publishedAt).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })}
       </time>
     </motion.article>
@@ -154,7 +154,7 @@ function SenalesSection({ seniales }: { seniales: ContentItem[] }) {
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#0d0d12] border-t border-white/5">
       <div className="max-w-6xl mx-auto">
         <motion.h2
-          className="text-[27px] md:text-[43px] font-light text-white/90 mb-4"
+          className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={MOTION_VIEW}
@@ -180,7 +180,7 @@ function ExperienciasSection({ experiencias }: { experiencias: ContentItem[] }) 
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#0a0a0f] border-t border-white/5">
       <div className="max-w-6xl mx-auto">
         <motion.h2
-          className="text-[27px] md:text-[43px] font-light text-white/90 mb-4"
+          className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={MOTION_VIEW}
@@ -209,7 +209,7 @@ function NormasAnalisisSection({ normas, analisis }: { normas: ContentItem[]; an
     <section className="py-24 md:py-32 px-6 md:px-12 bg-[#0d0d12] border-t border-white/5">
       <div className="max-w-6xl mx-auto">
         <motion.h2
-          className="text-[27px] md:text-[43px] font-light text-white/90 mb-4"
+          className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-4"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={MOTION_VIEW}
@@ -238,7 +238,7 @@ function NewsletterSection() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={MOTION_VIEW}
       >
-        <h2 className="text-[22px] md:text-[32px] font-light text-white/90 mb-4">
+        <h2 className="text-[length:var(--fs-titular)] font-normal text-white/90 mb-4">
           Newsletter
         </h2>
         <p className="text-white/50 mb-8">
@@ -256,7 +256,7 @@ function NewsletterSection() {
           />
           <button
             type="submit"
-            className="px-6 py-3 rounded-lg bg-[var(--almamundi-orange)] text-[15px] font-semibold text-white hover:brightness-92"
+            className="px-6 py-3 rounded-lg bg-[var(--almamundi-orange)] text-[length:var(--fs-pequeno)] font-semibold text-white hover:brightness-92"
           >
             Suscribirse
           </button>
@@ -270,10 +270,10 @@ function FooterSection() {
   return (
     <footer className="py-16 px-6 md:px-12 bg-[#0a0a0f] border-t border-white/5">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
-        <p className="text-white/40 text-sm">
+        <p className="text-white/40 text-[length:var(--fs-pequeno)]">
           Política Digital · Contenido tipado y filtrable
         </p>
-        <div className="flex gap-8 text-sm">
+        <div className="flex gap-8 text-[length:var(--fs-pequeno)]">
           <a href="#mapa" className="text-white/50 hover:text-[var(--almamundi-orange)] transition-colors">
             Mapa
           </a>

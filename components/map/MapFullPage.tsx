@@ -99,21 +99,21 @@ class MapErrorBoundary extends React.Component<
           className="min-h-screen flex flex-col items-center justify-center gap-6 text-white p-6"
           style={{ background: MAP_STAGE_GRADIENT }}
         >
-          <h1 className="text-[18px] font-semibold text-white/95">Algo salió mal en el mapa</h1>
-          <p className="text-white/60 text-sm text-center max-w-md">
+          <h1 className="text-[length:var(--fs-texto)] font-normal text-white/95">Algo salió mal en el mapa</h1>
+          <p className="text-white/60 text-[length:var(--fs-pequeno)] text-center max-w-md">
             No se pudo cargar esta vista. Recarga la página o vuelve al inicio.
           </p>
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => this.setState({ hasError: false })}
-              className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded-xl bg-orange-500 hover:bg-orange-600 text-white text-[length:var(--fs-pequeno)] font-medium transition-colors"
             >
               Intentar de nuevo
             </button>
             <Link
               href="/"
-              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-sm font-medium transition-colors"
+              className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-[length:var(--fs-pequeno)] font-medium transition-colors"
             >
               Ir al inicio
             </Link>
@@ -231,7 +231,7 @@ function chipStyle(active: boolean) {
     padding:        '7px 14px',
     borderRadius:    999,
     cursor:         'pointer',
-    fontSize: 13,
+    fontSize: 'var(--fs-etiqueta)',
     whiteSpace:     'nowrap' as const,
     fontFamily:     SITE_FONT_STACK,
     outline:        'none',
@@ -250,7 +250,7 @@ function chipStyle(active: boolean) {
     padding:        '7px 14px',
     borderRadius:    999,
     cursor:         'pointer',
-    fontSize: 13,
+    fontSize: 'var(--fs-etiqueta)',
     whiteSpace:     'nowrap' as const,
     fontFamily:     SITE_FONT_STACK,
     outline:        'none',
@@ -457,7 +457,7 @@ const globalStyles = `
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
+  font-size: var(--fs-subtitulo);
   line-height: 1;
   transition: background 0.2s ease, transform 0.15s ease;
   }
@@ -512,7 +512,7 @@ const globalStyles = `
   }
   .newsCard .newsCardBadge {
   display: inline-block;
-  font-size: 10px;
+  font-size: var(--fs-etiqueta);
   font-weight: 700;
   letter-spacing: 0.12em;
   color: rgba(var(--almamundi-orange-rgb), 0.95);
@@ -521,7 +521,7 @@ const globalStyles = `
   .newsCard .newsTitle {
   color: #fff;
   font-weight: 700;
-  font-size: 16px;
+  font-size: var(--fs-texto);
   line-height: 1.35;
   margin: 0;
   display: -webkit-box;
@@ -531,7 +531,7 @@ const globalStyles = `
   }
   .newsCard .newsMeta {
   margin-top: 8px;
-  font-size: 13px;
+  font-size: var(--fs-etiqueta);
   color: rgba(255,255,255,0.62);
   }
   .newsCard .newsActions {
@@ -546,7 +546,7 @@ const globalStyles = `
   border: 1px solid rgba(var(--almamundi-orange-rgb), 0.25);
   color: #FF4A1C;
   font-weight: 600;
-  font-size: 15px;
+  font-size: var(--fs-pequeno);
   cursor: pointer;
   transition: background 0.2s ease, transform 0.15s ease;
   text-decoration: none;
@@ -565,7 +565,7 @@ const globalStyles = `
   border: 1px solid rgba(255,255,255,0.10);
   color: rgba(255,255,255,0.85);
   font-weight: 600;
-  font-size: 14px;
+  font-size: var(--fs-pequeno);
   cursor: pointer;
   transition: background 0.2s ease;
   }
@@ -1119,18 +1119,18 @@ function NewsListCard({
       }`}
     >
       <button type="button" onClick={() => onSelect(item)} className="w-full text-left p-4 min-w-0">
-        <div className="font-medium text-sm panelCardTitle line-clamp-2 mb-2">
+        <div className="font-medium text-[length:var(--fs-pequeno)] panelCardTitle line-clamp-2 mb-2">
           {item.title.trim() ? item.title : '—'}
         </div>
-        <p className="text-xs text-white/70 mb-1">
+        <p className="text-[length:var(--fs-etiqueta)] text-white/70 mb-1">
           <span className="text-white/50">Medio:</span> {item.source || '—'}
         </p>
-        <p className="text-xs text-white/70 mb-2">
+        <p className="text-[length:var(--fs-etiqueta)] text-white/70 mb-2">
           {item.publishedAt ? formatTimeAgoFromNow(item.publishedAt, now) : '—'}
         </p>
         <div className="flex flex-wrap items-center gap-2">
           {item.topic && item.topic.trim().toLowerCase() !== 'actualidad' && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/25 text-amber-200/90 text-[11px] font-medium">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/15 border border-amber-500/25 text-amber-200/90 text-[length:var(--fs-etiqueta)] font-medium">
               {item.topic}
             </span>
           )}
@@ -1140,7 +1140,7 @@ function NewsListCard({
         <button
           type="button"
           onClick={() => onSelect(item)}
-          className="w-full py-2 rounded-xl bg-white/10 border border-white/15 text-white/90 text-sm font-semibold hover:bg-white/15 transition"
+          className="w-full py-2 rounded-xl bg-white/10 border border-white/15 text-white/90 text-[length:var(--fs-pequeno)] font-semibold hover:bg-white/15 transition"
         >
           Abrir
         </button>
@@ -1314,7 +1314,7 @@ function RightPanel({
     >
       {DEBUG && activeView === 'musica' && (
         <div
-          className="absolute bottom-4 right-4 z-30 px-2.5 py-2 rounded-lg bg-black/60 border border-white/15 backdrop-blur-sm font-mono text-[10px] text-white/80 leading-tight space-y-0.5"
+          className="absolute bottom-4 right-4 z-30 px-2.5 py-2 rounded-lg bg-black/60 border border-white/15 backdrop-blur-sm font-mono text-[length:var(--fs-etiqueta)] text-white/80 leading-tight space-y-0.5"
           aria-hidden
         >
           <div>Mood: {selectedMood ?? '—'}</div>
@@ -1325,7 +1325,7 @@ function RightPanel({
         </div>
       )}
       {DEBUG && (
-        <p className="text-[10px] font-mono text-white/50 px-1 shrink-0" aria-hidden>
+        <p className="text-[length:var(--fs-etiqueta)] font-mono text-white/50 px-1 shrink-0" aria-hidden>
           Vista: {view}
         </p>
       )}
@@ -1362,7 +1362,7 @@ function RightPanel({
             <input
               type="text"
               placeholder="Busca por palabras claves o fechas"
-              className="w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-white placeholder:text-white/35 text-sm font-medium border border-white/10 bg-white/5 focus:bg-white/10 focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
+              className="w-full pl-12 pr-4 py-3 rounded-2xl outline-none text-white placeholder:text-white/35 text-[length:var(--fs-pequeno)] font-medium border border-white/10 bg-white/5 focus:bg-white/10 focus:border-orange-400/50 focus:ring-2 focus:ring-orange-400/20 transition-all duration-200"
             />
           </div>
         </div>
@@ -1421,14 +1421,14 @@ function RightPanel({
                 <div className="space-y-2 mb-4">
                   {selectedTopic && (
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-black uppercase text-white/45 tracking-[0.12em]">Tema</span>
-                      <span className="text-sm text-white/80 truncate flex-1 mx-2">{selectedTopic}</span>
-                      <button type="button" onClick={onClearTopic} className="text-xs font-semibold text-orange-300/90 hover:text-orange-200 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">Limpiar</button>
+                      <span className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/45 tracking-[0.12em]">Tema</span>
+                      <span className="text-[length:var(--fs-pequeno)] text-white/80 truncate flex-1 mx-2">{selectedTopic}</span>
+                      <button type="button" onClick={onClearTopic} className="text-[length:var(--fs-etiqueta)] font-semibold text-orange-300/90 hover:text-orange-200 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">Limpiar</button>
                     </div>
                   )}
                   {selectedStory && (
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-sm font-semibold text-white/90 truncate min-w-0">{selectedStory.label}</span>
+                      <span className="text-[length:var(--fs-pequeno)] font-semibold text-white/90 truncate min-w-0">{selectedStory.label}</span>
                       <button type="button" onClick={onClearStory} className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white shrink-0" aria-label="Cerrar historia"><X size={16} /></button>
                     </div>
                   )}
@@ -1436,13 +1436,13 @@ function RightPanel({
               )}
               {selectedStory ? (
                 <>
-                  <div className="text-[10px] font-black uppercase text-white/50 mb-1 tracking-[0.12em]">Autor / Lugar</div>
-                  <p className="text-sm font-semibold text-white/95 mb-3">{selectedStory.label}</p>
-                  <div className="text-[10px] font-black uppercase text-white/50 mb-1 tracking-[0.12em]">Inicio del relato</div>
-                  <p className="text-sm text-white/80 leading-relaxed">{selectedStory.description || 'Sin descripción.'}</p>
+                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-1 tracking-[0.12em]">Autor / Lugar</div>
+                  <p className="text-[length:var(--fs-pequeno)] font-semibold text-white/95 mb-3">{selectedStory.label}</p>
+                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-1 tracking-[0.12em]">Inicio del relato</div>
+                  <p className="text-[length:var(--fs-pequeno)] text-white/80 leading-relaxed">{selectedStory.description || 'Sin descripción.'}</p>
                 </>
               ) : (
-                <p className="text-white/50 text-sm py-8 text-center">Haz clic en un punto del mapa para leer su historia.</p>
+                <p className="text-white/50 text-[length:var(--fs-pequeno)] py-8 text-center">Haz clic en un punto del mapa para leer su historia.</p>
               )}
             </>
           )}
@@ -1456,7 +1456,7 @@ function RightPanel({
               <p className="panelLead mb-2 max-w-[36ch]">
                 Para ver el mundo mientras ocurre. El mapa marca dónde pasa cada titular. Tú decides qué abrir: siempre fuente y hora.
               </p>
-              <p className="text-[12px] text-white/60 max-w-[36ch] mb-3">
+              <p className="text-[length:var(--fs-etiqueta)] text-white/60 max-w-[36ch] mb-3">
                 No hacemos resúmenes. Te llevamos al enlace oficial.
               </p>
               <div className="flex flex-wrap items-center gap-2 mb-3">
@@ -1493,19 +1493,19 @@ function RightPanel({
               {selectedNews ? (
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
-                    <h4 className="text-sm font-semibold panelCardTitle leading-snug line-clamp-3 flex-1">
+                    <h4 className="text-[length:var(--fs-pequeno)] font-semibold panelCardTitle leading-snug line-clamp-3 flex-1">
                       {selectedNews.title.trim() ? selectedNews.title : '—'}
                     </h4>
                     <button type="button" onClick={onClearSelection} className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white shrink-0" aria-label="Cerrar"><X size={16} /></button>
                   </div>
-                  <p className="text-xs panelCardSubtitle">
+                  <p className="text-[length:var(--fs-etiqueta)] panelCardSubtitle">
                     {selectedNews.source || '—'}
                     {selectedNews.topic && selectedNews.topic.trim().toLowerCase() !== 'actualidad' ? ` · ${selectedNews.topic}` : ''}
                   </p>
-                  <p className="text-[11px] text-white/55">
+                  <p className="text-[length:var(--fs-etiqueta)] text-white/55">
                     {selectedNews.publishedAt ? formatTimeAgoFromNow(selectedNews.publishedAt, now) : '—'}
                   </p>
-                  <p className="text-[11px] text-white/55">
+                  <p className="text-[length:var(--fs-etiqueta)] text-white/55">
                     Por qué aparece: tema y fuente curada del proyecto.
                   </p>
                   {selectedNews.url && (
@@ -1517,20 +1517,20 @@ function RightPanel({
               ) : (
                 <>
                   {newsLoading && newsList.length === 0 && (
-                    <p className="text-white/50 text-sm py-6 text-center">Cargando noticias…</p>
+                    <p className="text-white/50 text-[length:var(--fs-pequeno)] py-6 text-center">Cargando noticias…</p>
                   )}
                   {newsError && (
-                    <p className="text-red-400/80 text-sm py-4 text-center">No se pudo cargar.</p>
+                    <p className="text-red-400/80 text-[length:var(--fs-pequeno)] py-4 text-center">No se pudo cargar.</p>
                   )}
                   {!newsLoading && !newsError && newsList.length === 0 && (
-                    <p className="text-white/40 text-sm py-6 text-center">No hay noticias recientes de los medios autorizados.</p>
+                    <p className="text-white/40 text-[length:var(--fs-pequeno)] py-6 text-center">No hay noticias recientes de los medios autorizados.</p>
                   )}
                   {newsList.length > 0 && (
                     <>
-                      <p className="text-[10px] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">En el mapa</p>
+                      <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">En el mapa</p>
                       <div className="space-y-2 mb-4">
                         {newsOnMap.length === 0 ? (
-                          <p className="text-white/40 text-xs py-2">Ninguna con ubicación.</p>
+                          <p className="text-white/40 text-[length:var(--fs-etiqueta)] py-2">Ninguna con ubicación.</p>
                         ) : (
                           newsOnMap.map((item, idx) => (
                             <NewsListCard
@@ -1546,7 +1546,7 @@ function RightPanel({
                       </div>
                       {newsNoLocation.length > 0 && (
                         <>
-                          <p className="text-[10px] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">Sin ubicación</p>
+                          <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">Sin ubicación</p>
                           <div className="space-y-2">
                             {newsNoLocation.map((item, idx) => (
                               <NewsListCard
@@ -1574,7 +1574,7 @@ function RightPanel({
           {activeView === 'musica' && (
             <div className="space-y-4">
               <h3 className="panelTitle">Sonidos del mundo</h3>
-              <div className="text-white/85 text-[13.5px] md:text-[14px] leading-relaxed max-w-[36ch] space-y-2">
+              <div className="text-white/85 text-[length:var(--fs-pequeno)] leading-relaxed max-w-[36ch] space-y-2">
                 <p>Elige un sonido y el mapa muestra solo las historias que van con ese ambiente.</p>
                 <p>Haz clic en un punto o en «Abrir» para escuchar o leer la historia. El ambiente se baja al abrir.</p>
               </div>
@@ -1642,24 +1642,24 @@ function RightPanel({
               {/* 4) Lista "Historias para este sonido" — máx 6 visibles, botón Abrir */}
               {selectedMood != null && (
                 <div className="space-y-1.5">
-                  <p className="text-[12px] font-semibold text-white/80">
+                  <p className="text-[length:var(--fs-etiqueta)] font-semibold text-white/80">
                     Historias para este sonido
                   </p>
                   <ul className="space-y-1 max-h-[220px] overflow-y-auto hide-scrollbar">
                     {(filteredStoriesForMusic || []).slice(0, 6).map((s) => (
                       <li key={s.id}>
                         <div className="rounded-xl border border-white/10 bg-white/5 p-2.5 flex items-center gap-2 min-w-0">
-                          <span className="text-[14px] shrink-0" aria-hidden>
+                          <span className="text-[length:var(--fs-pequeno)] shrink-0" aria-hidden>
                             {s.hasVideo ? '🎥' : s.hasAudio ? '🎧' : '📝'}
                           </span>
                           <div className="min-w-0 flex-1">
-                            <p className="text-sm font-medium panelCardTitle truncate">{s.title}</p>
-                            <p className="text-[11px] panelCardSubtitle truncate">{s.placeLabel ?? [s.city, s.country].filter(Boolean).join(', ')}</p>
+                            <p className="text-[length:var(--fs-pequeno)] font-medium panelCardTitle truncate">{s.title}</p>
+                            <p className="text-[length:var(--fs-etiqueta)] panelCardSubtitle truncate">{s.placeLabel ?? [s.city, s.country].filter(Boolean).join(', ')}</p>
                           </div>
                           <button
                             type="button"
                             onClick={() => onOpenStoryFromMusic?.(s.id)}
-                            className="shrink-0 py-1.5 px-3 rounded-lg bg-white/15 border border-white/20 text-white text-xs font-semibold hover:bg-white/25 transition"
+                            className="shrink-0 py-1.5 px-3 rounded-lg bg-white/15 border border-white/20 text-white text-[length:var(--fs-etiqueta)] font-semibold hover:bg-white/25 transition"
                           >
                             Abrir
                           </button>
@@ -1668,10 +1668,10 @@ function RightPanel({
                     ))}
                   </ul>
                   {filteredStoriesForMusic?.length === 0 && (
-                    <p className="text-[11px] panel-sec">No hay historias para este sonido.</p>
+                    <p className="text-[length:var(--fs-etiqueta)] panel-sec">No hay historias para este sonido.</p>
                   )}
                   {(filteredStoriesForMusic?.length ?? 0) > 6 && (
-                    <p className="text-[11px] text-white/50">Haz clic en un punto del mapa para ver más.</p>
+                    <p className="text-[length:var(--fs-etiqueta)] text-white/50">Haz clic en un punto del mapa para ver más.</p>
                   )}
                 </div>
               )}
@@ -1679,11 +1679,11 @@ function RightPanel({
               {/* Tarjeta "Activar audio" solo cuando el usuario quiere sonido pero el navegador lo bloqueó */}
               {soundEnabled && audioBlocked && (
                 <div className="rounded-xl border border-amber-500/25 bg-amber-500/10 px-4 py-3 flex flex-col gap-2">
-                  <p className="text-[13px] text-white/90">Activa el audio para escuchar el ambiente.</p>
+                  <p className="text-[length:var(--fs-etiqueta)] text-white/90">Activa el audio para escuchar el ambiente.</p>
                   <button
                     type="button"
                     onClick={() => onActivateAudio?.()}
-                    className="py-2 px-4 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-sm font-semibold hover:bg-amber-500/35 transition w-fit"
+                    className="py-2 px-4 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-[length:var(--fs-pequeno)] font-semibold hover:bg-amber-500/35 transition w-fit"
                   >
                     Activar audio
                   </button>
@@ -1785,7 +1785,7 @@ function PulseIndicator({
       />
       <div>
         <p style={{
-          fontSize: 14,
+          fontSize: 'var(--fs-pequeno)',
           color: 'rgba(255,255,255,0.55)',
           margin: 0,
           fontFamily: SITE_FONT_STACK }}>
@@ -1795,7 +1795,7 @@ function PulseIndicator({
         </p>
         {newbornCount > 0 && (
           <p style={{
-            fontSize: 11,
+            fontSize: 'var(--fs-etiqueta)',
             color: '#FF4A1C',
             margin: '2px 0 0',
             fontFamily: SITE_FONT_STACK }}>
@@ -1851,7 +1851,7 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
         width: '100%' }}
     >
       <p style={{
-        fontSize: 14,
+        fontSize: 'var(--fs-pequeno)',
         fontWeight: isActive ? 600 : 400,
         color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.80)',
         margin: '0 0 4px',
@@ -1862,7 +1862,7 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
         {story.title ?? story.label}
       </p>
       <p style={{
-        fontSize: 12,
+        fontSize: 'var(--fs-etiqueta)',
         color: 'rgba(255,255,255,0.35)',
         margin: 0 }}>
         {[story.city, story.country].filter(Boolean).join(', ')}
@@ -1919,7 +1919,7 @@ function NewsRow({
         opacity: dimmed ? 0.5 : 1 }}
     >
       <p style={{
-        fontSize: 14,
+        fontSize: 'var(--fs-pequeno)',
         color: 'rgba(255,255,255,0.85)',
         margin: '0 0 6px',
         lineHeight: 1.4,
@@ -1930,10 +1930,10 @@ function NewsRow({
         {news.title}
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.30)' }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.30)' }}>
           {news.source ?? news.outletName ?? '—'}
         </span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }} title={news.publishedAt ?? undefined}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)' }} title={news.publishedAt ?? undefined}>
           {timeAgo(news.publishedAt ?? null)}
         </span>
       </div>
@@ -1968,7 +1968,7 @@ function HistoriasPanel({
               border: '1px solid rgba(255,255,255,0.12)',
               background: 'rgba(255,255,255,0.06)',
               color: '#fff',
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               fontFamily: SITE_FONT_STACK,
               outline: 'none' }}
           />
@@ -1993,7 +1993,7 @@ function HistoriasPanel({
           ))
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
+            <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.4)', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               Últimas historias
             </p>
             {ULTIMAS_HISTORIAS_EJEMPLO.map((h, i) => (
@@ -2008,10 +2008,10 @@ function HistoriasPanel({
                   fontFamily: SITE_FONT_STACK,
                   width: '100%' }}
               >
-                <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.80)', margin: '0 0 4px', lineHeight: 1.35 }}>
+                <p style={{ fontSize: 'var(--fs-pequeno)', color: 'rgba(255,255,255,0.80)', margin: '0 0 4px', lineHeight: 1.35 }}>
                   {h.title}
                 </p>
-                <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)', margin: 0 }}>
+                <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
                   {h.city}, {h.country}
                 </p>
               </div>
@@ -2065,7 +2065,7 @@ function NoticiasPanel({
             onClick={() => onTopicIdChange(null)}
             style={{
               ...chipStyle(!selectedTopicId),
-              fontSize: 12,
+              fontSize: 'var(--fs-etiqueta)',
               padding: '8px 12px',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
@@ -2082,7 +2082,7 @@ function NoticiasPanel({
               onClick={() => onTopicIdChange(selectedTopicId === g.id ? null : g.id)}
               style={{
                 ...chipStyle(selectedTopicId === g.id),
-                fontSize: 12,
+                fontSize: 'var(--fs-etiqueta)',
                 padding: '8px 12px',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
@@ -2099,7 +2099,7 @@ function NoticiasPanel({
       <div style={{ flex: 1, overflowY: 'auto', scrollbarWidth: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
         {withLocation.length > 0 && (
           <>
-            <p style={{ fontSize: 10, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(var(--almamundi-orange-rgb), 0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
+            <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: 'rgba(var(--almamundi-orange-rgb), 0.5)', margin: '4px 0 2px 4px', fontFamily: SITE_FONT_STACK }}>◎ En el mapa</p>
             {withLocation.map((n, i) => (
               <NewsRow key={`${n.id ?? 'news'}-${i}`} news={n} isActive={selectedNews?.id === n.id} onClick={() => onNewsFocus(n)} nowMs={nowMs} />
             ))}
@@ -4194,13 +4194,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         >
           <Link href="/" className="flex items-center gap-3 min-w-0">
             <img src="/logo.png" alt="AlmaMundi" className="h-12 md:h-14 w-auto object-contain select-none flex-shrink-0" />
-            <span className="mapa-almamundi-title text-white/95 font-semibold text-[16px] md:text-[18px] truncate">
+            <span className="mapa-almamundi-title text-white/95 font-semibold text-[length:var(--fs-texto)] truncate">
               {t.mapSectionTitle}
             </span>
           </Link>
           <Link
             href="/"
-            className="flex-shrink-0 px-4 py-2 rounded-xl text-sm font-medium text-white/80 hover:text-white hover:bg-white/10 transition"
+            className="flex-shrink-0 px-4 py-2 rounded-xl text-[length:var(--fs-pequeno)] font-medium text-white/80 hover:text-white hover:bg-white/10 transition"
           >
             Inicio
           </Link>
@@ -4368,21 +4368,21 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
 
   .lg-title{
     color: rgba(255,255,255,0.95);
-    font-size: 16px;
-    font-weight: 650;
+    font-size: var(--fs-texto);
+    font-weight: 600;
     line-height: 1.15;
     letter-spacing: 0.2px;
   }
 
   .lg-sub{
     color: rgba(255,255,255,0.70);
-    font-size: 13px;
+    font-size: var(--fs-etiqueta);
     line-height: 1.25;
   }
 
   .lg-sub-dim{
     color: rgba(255,255,255,0.55);
-    font-size: 13px;
+    font-size: var(--fs-etiqueta);
     line-height: 1.25;
   }
 
@@ -4425,7 +4425,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               const picked = pickStoryForMe();
               if (picked) handleStoryClick(picked);
             }}
-            className="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-white/95 font-medium text-sm hover:bg-white/15 hover:border-white/30 transition shadow-lg backdrop-blur-md"
+            className="px-4 py-3 rounded-2xl bg-white/10 border border-white/20 text-white/95 font-medium text-[length:var(--fs-pequeno)] hover:bg-white/15 hover:border-white/30 transition shadow-lg backdrop-blur-md"
           >
             Déjame sorprender
           </button>
@@ -4443,7 +4443,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             right: isMobile ? 20 : 28,
             zIndex: 15,
             padding: '15px 32px',
-            fontSize: 15,
+            fontSize: 'var(--fs-pequeno)',
             fontFamily: SITE_FONT_STACK,
             color: '#fff',
             cursor: 'pointer',
@@ -4626,8 +4626,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           {/* ── LOGO ──────────────────────────────────────────────────── */}
           <div style={{ marginBottom: 20, flexShrink: 0 }}>
             <p style={{
-              fontSize: 25,
-              fontWeight: 300,
+              fontSize: 'var(--fs-subtitulo)',
+              fontWeight: 400,
               color: 'rgba(255,255,255,0.97)',
               margin: '0 0 3px',
               fontFamily: SITE_FONT_STACK,
@@ -4635,7 +4635,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               AlmaMundi
             </p>
             <p style={{
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(255,255,255,0.32)',
               margin: 0,
               fontFamily: SITE_FONT_STACK }}>
@@ -4677,7 +4677,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                     padding:        '11px 6px',
                     borderRadius:    12,
                     cursor:         'pointer',
-                    fontSize: 14,
+                    fontSize: 'var(--fs-pequeno)',
                     fontFamily:     SITE_FONT_STACK,
                     outline:        'none',
                     WebkitTapHighlightColor: 'transparent',
@@ -4694,7 +4694,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                     padding:        '11px 6px',
                     borderRadius:    12,
                     cursor:         'pointer',
-                    fontSize: 14,
+                    fontSize: 'var(--fs-pequeno)',
                     fontFamily:     SITE_FONT_STACK,
                     outline:        'none',
                     WebkitTapHighlightColor: 'transparent',
@@ -4715,8 +4715,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'historias' && (
               <>
                 <p style={{
-                  fontSize: 16,
-                  fontWeight: 300,
+                  fontSize: 'var(--fs-texto)',
+                  fontWeight: 400,
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
@@ -4724,7 +4724,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   Alguien, en algún lugar, vivió esto.
                 </p>
                 <p style={{
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
@@ -4736,8 +4736,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'actualidad' && (
               <>
                 <p style={{
-                  fontSize: 16,
-                  fontWeight: 300,
+                  fontSize: 'var(--fs-texto)',
+                  fontWeight: 400,
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
@@ -4745,7 +4745,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   El mundo no para.
                 </p>
                 <p style={{
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
@@ -4757,8 +4757,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'musica' && (
               <>
                 <p style={{
-                  fontSize: 16,
-                  fontWeight: 300,
+                  fontSize: 'var(--fs-texto)',
+                  fontWeight: 400,
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
@@ -4766,7 +4766,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   Otra forma de encontrar historias.
                 </p>
                 <p style={{
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
@@ -4778,8 +4778,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'bits' && (
               <>
                 <p style={{
-                  fontSize: 16,
-                  fontWeight: 300,
+                  fontSize: 'var(--fs-texto)',
+                  fontWeight: 400,
                   color: 'rgba(255,255,255,0.90)',
                   margin: '0 0 5px',
                   lineHeight: 1.3,
@@ -4787,7 +4787,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   Datos inesperados del mundo.
                 </p>
                 <p style={{
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.38)',
                   margin: 0,
                   lineHeight: 1.55,
@@ -4804,9 +4804,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {activeView === 'actualidad' && <NoticiasPanel {...noticiasProps} nowMs={newsListNowMs} />}
             {activeView === 'musica' && <SoundsPanel {...sonidosProps} />}
             {activeView === 'bits' && (
-              <div className="px-1 py-4 text-white/80 text-sm leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
+              <div className="px-1 py-4 text-white/80 text-[length:var(--fs-pequeno)] leading-relaxed" style={{ fontFamily: SITE_FONT_STACK }}>
                 <p className="mb-4">Los puntos de También cuenta son datos insólitos, paradojas y formas de vivir en el mundo. Pasa el cursor sobre un punto o tócalo para leer la historia.</p>
-                <p className="text-white/50 text-xs">Categorías: Dato insólito, Vivir distinto, Paradoja moderna, Para pensar.</p>
+                <p className="text-white/50 text-[length:var(--fs-etiqueta)]">Categorías: Dato insólito, Vivir distinto, Paradoja moderna, Para pensar.</p>
               </div>
             )}
           </div>
@@ -4873,8 +4873,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           >
             <p
               style={{
-                fontSize: 16,
-                fontWeight: 300,
+                fontSize: 'var(--fs-texto)',
+                fontWeight: 400,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 8px',
                 fontFamily: SITE_FONT_STACK }}
@@ -4883,7 +4883,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             </p>
             <p
               style={{
-                fontSize: 13,
+                fontSize: 'var(--fs-etiqueta)',
                 color: 'rgba(255,255,255,0.40)',
                 margin: '0 0 20px',
                 fontFamily: SITE_FONT_STACK,
@@ -4902,7 +4902,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   border: '1px solid rgba(255,255,255,0.10)',
                   color: 'rgba(255,255,255,0.55)',
                   cursor: 'pointer',
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   outline: 'none',
                   fontFamily: SITE_FONT_STACK }}
               >
@@ -4921,7 +4921,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
                   border: '1px solid rgba(var(--almamundi-orange-rgb), 0.35)',
                   color: '#fdba74',
                   cursor: 'pointer',
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   outline: 'none',
                   fontFamily: SITE_FONT_STACK }}
               >
@@ -5068,13 +5068,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             style={{ top: 'max(5.25rem, 11vh)' }}
             aria-hidden
           >
-            <span className="font-mono text-[9px] md:text-[10px] uppercase text-slate-200/50 tabular-nums tracking-[0.12em]">
+            <span className="font-mono text-[length:var(--fs-etiqueta)] uppercase text-slate-200/50 tabular-nums tracking-[0.12em]">
               Pacífico · vista HD
             </span>
-            <span className="font-mono text-[9px] md:text-[10px] text-orange-100/45 tabular-nums">
+            <span className="font-mono text-[length:var(--fs-etiqueta)] text-orange-100/45 tabular-nums">
               26°C · índice UV 4
             </span>
-            <span className="font-mono text-[9px] md:text-[10px] text-slate-300/45 tabular-nums">
+            <span className="font-mono text-[length:var(--fs-etiqueta)] text-slate-300/45 tabular-nums">
               Pobl. 8.1B · sync
             </span>
           </div>
@@ -5083,13 +5083,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         {activeView === 'musica' && (
           <div className="absolute top-3 right-3 z-[15] px-3 py-2 rounded-xl glassPanel text-right min-w-[160px] max-w-[min(90vw,320px)] pointer-events-none">
             {storyLabel ? (
-              <p className="text-[13px] font-medium text-white/95 truncate" title={`${storyLabel.title} — ${storyLabel.place}`}>
+              <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/95 truncate" title={`${storyLabel.title} — ${storyLabel.place}`}>
                 {storyLabel.title} — {storyLabel.place}
               </p>
             ) : !selectedMood ? (
-              <p className="text-xs font-medium text-white/90">Elige un sonido</p>
+              <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/90">Elige un sonido</p>
             ) : (
-              <p className="text-xs font-medium text-white/80">{filteredStoriesForMusic.length} historias</p>
+              <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/80">{filteredStoriesForMusic.length} historias</p>
             )}
           </div>
         )}
@@ -5101,15 +5101,15 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           const timeStr = cur.publishedAt ? formatTimeAgoFromNow(cur.publishedAt, Date.now()) : '—';
           return (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[15] px-4 py-3 rounded-xl glassPanel text-center min-w-[200px] max-w-[min(90vw,340px)] pointer-events-auto">
-              <p className="text-[11px] text-white/60 mb-1">
+              <p className="text-[length:var(--fs-etiqueta)] text-white/60 mb-1">
                 #{n}/{total} · {cur.source ?? '—'} · {timeStr}
               </p>
-              <p className="text-sm font-semibold text-white/95 truncate mb-2" title={cur.title}>{cur.title?.trim() || '—'}</p>
+              <p className="text-[length:var(--fs-pequeno)] font-semibold text-white/95 truncate mb-2" title={cur.title}>{cur.title?.trim() || '—'}</p>
               <div className="flex items-center justify-center gap-2">
-                <a href={cur.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-xs font-semibold hover:bg-amber-500/35 transition">
+                <a href={cur.url} target="_blank" rel="noopener noreferrer" className="px-3 py-1.5 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-[length:var(--fs-etiqueta)] font-semibold hover:bg-amber-500/35 transition">
                   Abrir
                 </a>
-                <button type="button" onClick={pauseNewsTour} className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white/80 text-xs font-semibold hover:bg-white/15 transition">
+                <button type="button" onClick={pauseNewsTour} className="px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-white/80 text-[length:var(--fs-etiqueta)] font-semibold hover:bg-white/15 transition">
                   Detener
                 </button>
               </div>
@@ -5129,26 +5129,26 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
             {hovered.kind === 'huella' ? (
               <>
                 {hovered.categoria && (
-                  <span className="text-[10px] font-medium text-white/50 uppercase block mb-1 tracking-[0.12em]">{hovered.categoria}</span>
+                  <span className="text-[length:var(--fs-etiqueta)] font-medium text-white/50 uppercase block mb-1 tracking-[0.12em]">{hovered.categoria}</span>
                 )}
-                <p className="text-sm font-semibold text-white/95 leading-snug">{hovered.title}</p>
-                <p className="text-[11px] text-white/60 mt-0.5">{hovered.subtitle}</p>
+                <p className="text-[length:var(--fs-pequeno)] font-semibold text-white/95 leading-snug">{hovered.title}</p>
+                <p className="text-[length:var(--fs-etiqueta)] text-white/60 mt-0.5">{hovered.subtitle}</p>
                 {hovered.historia && (
-                  <p className="text-[12px] text-white/75 mt-2 line-clamp-3 leading-relaxed">
+                  <p className="text-[length:var(--fs-etiqueta)] text-white/75 mt-2 line-clamp-3 leading-relaxed">
                     {hovered.historia.slice(0, 140)}{hovered.historia.length > 140 ? '…' : ''}
                   </p>
                 )}
               </>
             ) : hovered.kind === 'news' ? (
               <>
-                <p className="text-[11px] text-white/70 truncate">{hovered.subtitle}</p>
-                <p className="text-sm font-semibold text-white truncate mt-0.5">{hovered.title}</p>
+                <p className="text-[length:var(--fs-etiqueta)] text-white/70 truncate">{hovered.subtitle}</p>
+                <p className="text-[length:var(--fs-pequeno)] font-semibold text-white truncate mt-0.5">{hovered.title}</p>
                 {hovered.url && (
                   <a
                     href={hovered.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="mt-2 inline-block px-2.5 py-1 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-xs font-semibold hover:bg-amber-500/35 transition"
+                    className="mt-2 inline-block px-2.5 py-1 rounded-lg bg-amber-500/25 border border-amber-500/40 text-amber-200 text-[length:var(--fs-etiqueta)] font-semibold hover:bg-amber-500/35 transition"
                   >
                     Abrir enlace
                   </a>
@@ -5156,9 +5156,9 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               </>
             ) : (
               <>
-                <p className="text-sm font-semibold text-white truncate">{hovered.title} — {hovered.subtitle}</p>
+                <p className="text-[length:var(--fs-pequeno)] font-semibold text-white truncate">{hovered.title} — {hovered.subtitle}</p>
                 {(hovered.hasAudio || hovered.hasVideo || hovered.hasText) && (
-                  <p className="text-[12px] mt-1 flex items-center gap-2 flex-wrap">
+                  <p className="text-[length:var(--fs-etiqueta)] mt-1 flex items-center gap-2 flex-wrap">
                     {hovered.hasText && <span title="Texto">📝</span>}
                     {hovered.hasAudio && <span title="Audio">🎧</span>}
                     {hovered.hasVideo && <span title="Video">🎥</span>}
@@ -5205,7 +5205,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       >
         <TimeBar
           selectedLocation={selectedLocation}
-          className="text-[11px] md:text-[12px] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
+          className="text-[length:var(--fs-etiqueta)] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
         <MapRealtimeSyncLine />
       </div>

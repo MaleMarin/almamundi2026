@@ -29,7 +29,7 @@ function StoryTextBody({
           type="button"
           onClick={onSpeak}
           disabled={isSpeaking}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white/90 hover:bg-white/15 disabled:opacity-60 transition font-medium text-sm"
+          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 border border-white/20 text-white/90 hover:bg-white/15 disabled:opacity-60 transition font-medium text-[length:var(--fs-pequeno)]"
         >
           <span aria-hidden>👁‍🗨</span>
           {isSpeaking ? 'Leyendo…' : 'Cerrar los ojos'}
@@ -108,7 +108,7 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
   const photoImages = story.images?.length ? story.images : (story.imageUrl ? [story.imageUrl] : []);
 
   const tabs: { id: TabId; label: string; icon: React.ReactNode; disabled: boolean }[] = [
-    { id: 'photos', label: 'Fotos', icon: <span className="text-[15px]">📷</span>, disabled: !hasPhotos },
+    { id: 'photos', label: 'Fotos', icon: <span className="text-[length:var(--fs-pequeno)]">📷</span>, disabled: !hasPhotos },
     { id: 'audio', label: 'Escuchar', icon: <Headphones size={18} />, disabled: !hasAudio },
     { id: 'video', label: 'Ver', icon: <Video size={18} />, disabled: !hasVideo },
     { id: 'text', label: 'Leer', icon: <FileText size={18} />, disabled: !hasText },
@@ -117,10 +117,10 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
   return (
     <div className="flex flex-col gap-6">
       {location && (
-        <p className="text-white/60 text-sm">{location}</p>
+        <p className="text-white/60 text-[length:var(--fs-pequeno)]">{location}</p>
       )}
       {story.topic && (
-        <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/80 text-sm font-medium w-fit">
+        <span className="inline-flex items-center px-3 py-1 rounded-full bg-white/10 border border-white/20 text-white/80 text-[length:var(--fs-pequeno)] font-medium w-fit">
           {story.topic}
         </span>
       )}
@@ -132,7 +132,7 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
             type="button"
             disabled={t.disabled}
             onClick={() => setTab(t.id)}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition ${
+            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-[length:var(--fs-pequeno)] font-medium transition ${
               tab === t.id
                 ? 'bg-white/15 text-white border border-white/20'
                 : t.disabled

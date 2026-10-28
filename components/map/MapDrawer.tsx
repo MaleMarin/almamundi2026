@@ -107,7 +107,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
             className="flex flex-shrink-0 items-center justify-between px-5 py-4"
             style={glassHeaderBar}
           >
-            <span className="text-[16px] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+            <span className="text-[length:var(--fs-texto)] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
               {title}
             </span>
             <button
@@ -159,7 +159,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           className="flex flex-shrink-0 items-center justify-between px-5 py-4"
           style={glassHeaderBar}
         >
-          <span className="text-[16px] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
+          <span className="text-[length:var(--fs-texto)] font-medium text-white/95" style={{ fontFamily: SITE_FONT_STACK }}>
             {title}
           </span>
           <button

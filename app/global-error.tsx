@@ -19,15 +19,15 @@ export default function GlobalError({
   return (
     <html lang="es">
       <body style={{ margin: 0, background: '#0F172A', color: '#fff', fontFamily: 'Montserrat, sans-serif', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
-        <h1 style={{ fontSize: '18px', fontWeight: 600 }}>Algo salió mal</h1>
-        <p style={{ opacity: 0.8, fontSize: 14, textAlign: 'center', maxWidth: 400 }}>
+        <h1 style={{ fontSize: 'var(--fs-texto)', fontWeight: 600 }}>Algo salió mal</h1>
+        <p style={{ opacity: 0.8, fontSize: 'var(--fs-pequeno)', textAlign: 'center', maxWidth: 400 }}>
           Ha ocurrido un error. Puedes intentar de nuevo o volver al inicio.
         </p>
         <div style={{ display: 'flex', gap: 12, marginTop: 8 }}>
           <button
             type="button"
             onClick={() => reset()}
-            style={{ padding: '8px 16px', borderRadius: 12, background: '#FF4A1C', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 15 }}
+            style={{ padding: '8px 16px', borderRadius: 12, background: '#FF4A1C', color: '#fff', border: 'none', cursor: 'pointer', fontWeight: 600, fontSize: 'var(--fs-pequeno)' }}
             onMouseEnter={(event) => {
               event.currentTarget.style.filter = 'brightness(0.92)';
             }}

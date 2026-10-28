@@ -133,24 +133,24 @@ function StoryCard({
               alignItems: 'center',
               justifyContent: 'center',
               color: 'rgba(255,255,255,0.2)',
-              fontSize: 43 }}
+              fontSize: 'var(--fs-titular)' }}
           >
             {icon}
           </div>
         )}
-        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 16 }}>
+        <span style={{ position: 'absolute', bottom: 8, right: 8, fontSize: 'var(--fs-texto)' }}>
           {icon}
         </span>
       </div>
       <div style={{ padding: '12px 14px' }}>
-        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.90)', margin: '0 0 4px', fontWeight: 600 }}>
+        <p style={{ fontSize: 'var(--fs-pequeno)', color: 'rgba(255,255,255,0.90)', margin: '0 0 4px', fontWeight: 600 }}>
           {story.title}
         </p>
-        <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.40)', margin: 0 }}>
+        <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.40)', margin: 0 }}>
           {story.alias || '—'} · {story.place || '—'}
         </p>
         {story.topic?.[0] && (
-          <p style={{ fontSize: 11, color: 'rgba(var(--almamundi-orange-rgb), 0.70)', margin: '4px 0 0' }}>
+          <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(var(--almamundi-orange-rgb), 0.70)', margin: '4px 0 0' }}>
             {getThemeLabel(story.topic[0]) || story.topic[0]}
           </p>
         )}
@@ -242,21 +242,21 @@ export default function ArchivoPage() {
         <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 32 }}>
           <HomeHardLink
             href="/"
-            style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: 16, fontWeight: 600 }}
+            style={{ color: 'rgba(255,255,255,0.9)', textDecoration: 'none', fontSize: 'var(--fs-texto)', fontWeight: 600 }}
           >
             ← AlmaMundi
           </HomeHardLink>
           <nav style={{ display: 'flex', gap: 8 }}>
-            <HomeHardLink href="/#mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
+            <HomeHardLink href="/#mapa" style={{ color: 'rgba(255,255,255,0.7)', textDecoration: 'none', fontSize: 'var(--fs-pequeno)' }}>
               Mapa
             </HomeHardLink>
           </nav>
         </header>
 
-        <h1 style={{ fontSize: 'clamp(25px, 3.6vw, 36px)', fontWeight: 300, marginBottom: 8 }}>
+        <h1 style={{ fontSize: 'var(--fs-titular)', fontWeight: 400, marginBottom: 8 }}>
           Archivo
         </h1>
-        <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
+        <p style={{ fontSize: 'var(--fs-pequeno)', color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>
           Historias que ya pasaron por el mapa y permanecen en el archivo.
         </p>
 
@@ -279,7 +279,7 @@ export default function ArchivoPage() {
                 border: `1px solid ${view === tab.id ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
                 background: view === tab.id ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.05)',
                 color: view === tab.id ? '#FF4A1C' : 'rgba(255,255,255,0.85)',
-                fontSize: 15,
+                fontSize: 'var(--fs-pequeno)',
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontFamily: APP_FONT }}
@@ -303,7 +303,7 @@ export default function ArchivoPage() {
             )}
             {byWeek.map(({ key, list, start, weekNum }) => (
               <section key={key}>
-                <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 16, color: 'rgba(255,255,255,0.9)' }}>
+                <h2 style={{ fontSize: 'var(--fs-texto)', fontWeight: 600, marginBottom: 16, color: 'rgba(255,255,255,0.9)' }}>
                   {formatWeekTitle(weekNum, start)}
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style={{ gap: 24 }}>
@@ -330,7 +330,7 @@ export default function ArchivoPage() {
                     border: `1px solid ${temaFilter === null ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
                     background: temaFilter === null ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.06)',
                     color: temaFilter === null ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
-                    fontSize: 14,
+                    fontSize: 'var(--fs-pequeno)',
                     cursor: 'pointer',
                     fontFamily: APP_FONT }}
                 >
@@ -347,7 +347,7 @@ export default function ArchivoPage() {
                       border: `1px solid ${temaFilter === t ? 'rgba(255, 74, 28,0.5)' : 'rgba(255,255,255,0.2)'}`,
                       background: temaFilter === t ? 'rgba(255, 74, 28,0.15)' : 'rgba(255,255,255,0.06)',
                       color: temaFilter === t ? '#FF4A1C' : 'rgba(255,255,255,0.8)',
-                      fontSize: 14,
+                      fontSize: 'var(--fs-pequeno)',
                       cursor: 'pointer',
                       fontFamily: APP_FONT }}
                   >
@@ -382,10 +382,10 @@ export default function ArchivoPage() {
                   border: '1px solid rgba(255,255,255,0.10)',
                   padding: 20 }}
               >
-                <p style={{ fontSize: 16, fontWeight: 600, color: 'rgba(255,255,255,0.95)', margin: '0 0 4px' }}>
+                <p style={{ fontSize: 'var(--fs-texto)', fontWeight: 600, color: 'rgba(255,255,255,0.95)', margin: '0 0 4px' }}>
                   {m.topicLabel}
                 </p>
-                <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.45)', margin: 0 }}>
+                <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)', margin: 0 }}>
                   AlmaMundi · {m.items.length} historias
                 </p>
                 <Link
@@ -398,7 +398,7 @@ export default function ArchivoPage() {
                     background: 'rgba(255, 74, 28,0.2)',
                     border: '1px solid rgba(255, 74, 28,0.4)',
                     color: '#fdba74',
-                    fontSize: 14,
+                    fontSize: 'var(--fs-pequeno)',
                     fontWeight: 600,
                     textDecoration: 'none',
                     fontFamily: APP_FONT }}

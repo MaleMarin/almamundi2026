@@ -61,7 +61,7 @@ function BitsPanelIntro() {
     <div style={{ flexShrink: 0, margin: '0 0 14px' }}>
       <p
         style={{
-          fontSize: 13,
+          fontSize: 'var(--fs-etiqueta)',
           color: 'rgba(248, 250, 255, 0.82)',
           lineHeight: 1.5,
           margin: 0 }}
@@ -106,12 +106,12 @@ function BitIndexRow({
         border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.16)'}`,
         borderLeft: isActive ? '2px solid #FF4A1C' : '2px solid transparent' }}
     >
-      <span style={{ fontSize: 11, color: '#ff5719', fontWeight: 600, lineHeight: 1.2 }}>
+      <span style={{ fontSize: 'var(--fs-etiqueta)', color: '#ff5719', fontWeight: 600, lineHeight: 1.2 }}>
         #{num}
       </span>
       <span
         style={{
-          fontSize: 13,
+          fontSize: 'var(--fs-etiqueta)',
           color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
           lineHeight: 1.35,
           fontWeight: 500 }}
@@ -346,7 +346,7 @@ export function BitsPanel({
           ) : (
             <p
               style={{
-                fontSize: 15,
+                fontSize: 'var(--fs-pequeno)',
                 color: 'rgba(255,255,255,0.58)',
                 lineHeight: 1.65,
                 margin: '8px 4px 0' }}
@@ -386,7 +386,7 @@ export function BitsPanel({
         >
           <p
             style={{
-              fontSize: 9,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: 'rgba(255,255,255,0.45)',

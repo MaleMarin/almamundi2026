@@ -118,7 +118,7 @@ export function TopicsModal({
           {/* Header: Temas + X */}
           <div className="shrink-0 p-5 md:p-6 border-b border-white/10 flex flex-col gap-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 id="temas-modal-title" className="text-white font-semibold text-[16px]">
+              <h3 id="temas-modal-title" className="text-white font-semibold text-[length:var(--fs-texto)]">
                 Temas
               </h3>
               <button
@@ -148,13 +148,13 @@ export function TopicsModal({
 
             {selectedTopic && (
               <div className="flex items-center justify-between gap-3">
-                <div className="text-xs text-white/55">
+                <div className="text-[length:var(--fs-etiqueta)] text-white/55">
                   Filtro activo: <span className="text-white/85 font-semibold">{selectedTopic}</span>
                 </div>
                 <button
                   type="button"
                   onClick={onClearTopic}
-                  className="text-xs font-semibold text-orange-300/90 hover:text-orange-200 px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
+                  className="text-[length:var(--fs-etiqueta)] font-semibold text-orange-300/90 hover:text-orange-200 px-3 py-1.5 rounded-xl bg-orange-500/10 border border-orange-500/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
                 >
                   Limpiar filtro
                 </button>
@@ -166,7 +166,7 @@ export function TopicsModal({
           <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
             {/* Lista de temas filtrados */}
             <section>
-              <div className="text-[11px] font-black uppercase text-white/55 mb-3 tracking-[0.12em]">
+              <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/55 mb-3 tracking-[0.12em]">
                 Temas
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -180,7 +180,7 @@ export function TopicsModal({
                     }}
                     className="text-left px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
                   >
-                    <div className="text-sm font-semibold leading-snug">{t.title}</div>
+                    <div className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{t.title}</div>
                   </button>
                 ))}
               </div>
@@ -190,15 +190,15 @@ export function TopicsModal({
             {q.length > 0 && (
               <section>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-[11px] font-black uppercase text-white/55 tracking-[0.12em]">
+                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/55 tracking-[0.12em]">
                     Historias
                   </div>
-                  <div className="text-xs text-white/40">
+                  <div className="text-[length:var(--fs-etiqueta)] text-white/40">
                     {storyHits.length > 0 ? `Resultados: ${storyHits.length}` : 'Sin coincidencias'}
                   </div>
                 </div>
                 {storyHits.length === 0 && (
-                  <div className="mt-3 text-sm text-white/45">Sin coincidencias en historias.</div>
+                  <div className="mt-3 text-[length:var(--fs-pequeno)] text-white/45">Sin coincidencias en historias.</div>
                 )}
                 {storyHits.length > 0 && (
                   <div className="mt-3 space-y-2">
@@ -212,9 +212,9 @@ export function TopicsModal({
                         }}
                         className="w-full text-left px-4 py-3 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-orange-500/60"
                       >
-                        <div className="text-sm font-semibold leading-snug">{s.label}</div>
+                        <div className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{s.label}</div>
                         {(s.city || s.country || s.topic) && (
-                          <div className="text-xs text-white/55 mt-1">
+                          <div className="text-[length:var(--fs-etiqueta)] text-white/55 mt-1">
                             {[s.topic, s.city, s.country].filter(Boolean).join(' · ')}
                           </div>
                         )}

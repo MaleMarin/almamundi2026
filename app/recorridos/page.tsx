@@ -24,24 +24,24 @@ export default function RecorridosListPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={neu.cardInset}>Recorridos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={neu.cardInset}>Recorridos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-5xl mx-auto">
-        <h1 className="text-[27px] md:text-[32px] font-light mb-2" style={{ color: neu.textMain }}>
+        <h1 className="text-[length:var(--fs-titular)] font-normal mb-2" style={{ color: neu.textMain }}>
           Recorridos
         </h1>
-        <p className="text-[16px] font-light mb-2" style={{ color: neu.textBody }}>
+        <p className="text-[length:var(--fs-texto)] font-normal mb-2" style={{ color: neu.textBody }}>
           Historias que, juntas, trazan un camino.
         </p>
-        <p className="text-[15px] font-light mb-10" style={{ color: neu.textBody }}>
+        <p className="text-[length:var(--fs-pequeno)] font-normal mb-10" style={{ color: neu.textBody }}>
           Cada recorrido conecta voces que no se conocen, pero que comparten una experiencia.
         </p>
 
@@ -64,16 +64,16 @@ export default function RecorridosListPage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h2 className="text-[18px] font-semibold mb-2" style={{ color: neu.textMain }}>
+                  <h2 className="text-[length:var(--fs-texto)] font-semibold mb-2" style={{ color: neu.textMain }}>
                     {r.title}
                   </h2>
-                  <p className="text-sm font-light mb-3" style={{ color: neu.textBody }}>
+                  <p className="text-[length:var(--fs-pequeno)] font-normal mb-3" style={{ color: neu.textBody }}>
                     {r.description}
                   </p>
-                  <p className="text-sm font-medium mb-2" style={{ color: neu.textBody }}>
+                  <p className="text-[length:var(--fs-pequeno)] font-medium mb-2" style={{ color: neu.textBody }}>
                     {r.items.length} pieza{r.items.length !== 1 ? 's' : ''}
                   </p>
-                  <span className="inline-block text-orange-500 font-semibold text-sm">
+                  <span className="inline-block text-orange-500 font-semibold text-[length:var(--fs-pequeno)]">
                     Ver recorrido →
                   </span>
                 </div>

@@ -31,14 +31,14 @@ export function MuestrasInteriorNav() {
       <div className={historiasInterior.navLinksRowClassName}>
         <ActiveInternalNavLink
           href="/#proposito"
-          className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[15px]"
+          className="btn-almamundi rounded-full px-4 py-2.5 text-[length:var(--fs-pequeno)] "
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >
           Nuestro propósito
         </ActiveInternalNavLink>
         <ActiveInternalNavLink
           href="/#como-funciona"
-          className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[15px]"
+          className="btn-almamundi rounded-full px-4 py-2.5 text-[length:var(--fs-pequeno)] "
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >
           ¿Cómo funciona?
@@ -48,14 +48,14 @@ export function MuestrasInteriorNav() {
         </Link>
         <ActiveInternalNavLink
           href="/muestras"
-          className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[15px]"
+          className="btn-almamundi rounded-full px-4 py-2.5 text-[length:var(--fs-pequeno)] "
           style={neu.cardInset}
         >
           Muestras
         </ActiveInternalNavLink>
         <ActiveInternalNavLink
           href="/#mapa"
-          className="btn-almamundi rounded-full px-4 py-2.5 text-sm md:text-[15px]"
+          className="btn-almamundi rounded-full px-4 py-2.5 text-[length:var(--fs-pequeno)] "
           style={{ ...neu.button, color: neu.navLinkIdle }}
         >
           Mapa

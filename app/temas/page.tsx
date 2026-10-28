@@ -44,22 +44,22 @@ export default function TemasPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/temas" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={neu.cardInset}>Temas</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/temas" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={neu.cardInset}>Temas</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <section className="px-6 md:px-12 pt-10 md:pt-14 pb-20 md:pb-28 max-w-5xl mx-auto">
-        <p className="text-xs font-semibold text-amber-700 uppercase mb-3 tracking-[0.12em]">Explorar por tema</p>
-        <h1 className="text-[27px] md:text-[43px] font-semibold leading-[1.1] mb-4" style={{ color: neu.textMain }}>
+        <p className="text-[length:var(--fs-etiqueta)] font-semibold text-amber-700 uppercase mb-3 tracking-[0.12em]">Explorar por tema</p>
+        <h1 className="text-[length:var(--fs-titular)] font-normal leading-[1.1] mb-4" style={{ color: neu.textMain }}>
           ¿Qué quieres <span className="font-medium text-gray-500">encontrar?</span>
         </h1>
-        <p className="text-[15px] md:text-[16px] max-w-xl mb-10" style={{ color: neu.textBody }}>
+        <p className="text-[length:var(--fs-texto)] max-w-xl mb-10" style={{ color: neu.textBody }}>
           Cada experiencia humana tiene su lugar aquí.
         </p>
 
@@ -77,15 +77,15 @@ export default function TemasPage() {
                   className="absolute top-0 left-0 right-0 h-1 rounded-t-2xl opacity-70 transition-opacity group-hover:opacity-100"
                   style={{ backgroundColor: tema.color }}
                 />
-                <div className="text-[16px] md:text-[18px] font-semibold mb-2 line-clamp-2" style={{ color: neu.textMain }}>
+                <div className="text-[length:var(--fs-texto)] font-semibold mb-2 line-clamp-2" style={{ color: neu.textMain }}>
                   {tema.name}
                 </div>
                 {tema.description && (
-                  <p className="text-sm leading-snug line-clamp-3 mb-2" style={{ color: neu.textBody }}>
+                  <p className="text-[length:var(--fs-pequeno)] leading-snug line-clamp-3 mb-2" style={{ color: neu.textBody }}>
                     {tema.description}
                   </p>
                 )}
-                <div className="text-[10px] font-medium uppercase tracking-[0.12em]" style={{ color: neu.textBody }}>
+                <div className="text-[length:var(--fs-etiqueta)] font-medium uppercase tracking-[0.12em]" style={{ color: neu.textBody }}>
                   {count} {count === 1 ? 'historia' : 'historias'}
                 </div>
               </Link>

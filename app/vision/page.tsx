@@ -26,7 +26,7 @@ const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
   disponible: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '10.88px',
+    fontSize: 'var(--fs-etiqueta)',
     fontWeight: 600,
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
@@ -37,7 +37,7 @@ const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
   desarrollo: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '10.88px',
+    fontSize: 'var(--fs-etiqueta)',
     fontWeight: 600,
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
@@ -48,7 +48,7 @@ const STATUS_STYLE: Record<RoadmapStatus, CSSProperties> = {
   futuro: {
     display: 'inline-block',
     padding: '0.15rem 0.55rem',
-    fontSize: '10.88px',
+    fontSize: 'var(--fs-etiqueta)',
     fontWeight: 600,
     letterSpacing: '0.12em',
     textTransform: 'uppercase' as const,
@@ -124,7 +124,7 @@ export default function VisionPage() {
           style={{
             display: 'inline-block',
             marginBottom: '1.5rem',
-            fontSize: '13.6px',
+            fontSize: 'var(--fs-pequeno)',
             padding: '0.45rem 0.9rem' }}
         >
           ← Volver al inicio
@@ -134,7 +134,7 @@ export default function VisionPage() {
           <p
             style={{
               margin: '0 0 0.5rem',
-              fontSize: '12px',
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 600,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -148,7 +148,7 @@ export default function VisionPage() {
               fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
-              fontSize: 'clamp(1.375rem, 2.25vw, 1.813rem)',
+              fontSize: 'var(--fs-titular)',
               lineHeight: 1.2,
               color: TEXT_1 }}
           >
@@ -157,7 +157,7 @@ export default function VisionPage() {
           <p
             style={{
               margin: '0 0 1.25rem',
-              fontSize: '12.8px',
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 600,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
@@ -168,7 +168,7 @@ export default function VisionPage() {
           <div
             style={{
               fontFamily: 'inherit',
-              fontSize: '15px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.72,
               color: TEXT_2 }}
           >
@@ -211,7 +211,7 @@ export default function VisionPage() {
               fontFamily: 'inherit',
               fontStyle: 'italic',
               fontWeight: 600,
-              fontSize: '16px',
+              fontSize: 'var(--fs-texto)',
               color: ORANGE }}
           >
             Lo que estamos construyendo
@@ -235,7 +235,7 @@ export default function VisionPage() {
                   style={{
                     margin: '0 0 0.55rem',
                     fontFamily: 'inherit',
-                    fontSize: '15px',
+                    fontSize: 'var(--fs-pequeno)',
                     fontWeight: 600,
                     color: TEXT_1,
                     lineHeight: 1.45,
@@ -254,7 +254,7 @@ export default function VisionPage() {
                   style={{
                     margin: 0,
                     fontFamily: 'inherit',
-                    fontSize: '14.08px',
+                    fontSize: 'var(--fs-pequeno)',
                     lineHeight: 1.65,
                     color: TEXT_2 }}
                 >
@@ -278,7 +278,7 @@ export default function VisionPage() {
             style={{
               margin: 0,
               fontFamily: 'inherit',
-              fontSize: '15px',
+              fontSize: 'var(--fs-pequeno)',
               lineHeight: 1.72,
               fontStyle: 'italic',
               color: TEXT_2 }}

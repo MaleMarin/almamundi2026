@@ -62,7 +62,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '12.8px',
+              fontSize: 'var(--fs-etiqueta)',
               background:
                 filter === key
                   ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)`
@@ -111,7 +111,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
               <div style={{ padding: '0.5rem 0.6rem' }}>
                 <span
                   style={{
-                    fontSize: '9.28px',
+                    fontSize: 'var(--fs-etiqueta)',
                     textTransform: 'uppercase',
                     color: ORANGE }}
                 >
@@ -122,7 +122,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
                     margin: '2px 0 0',
                     fontFamily: SITE_FONT_STACK,
                     fontStyle: 'italic',
-                    fontSize: '11.52px',
+                    fontSize: 'var(--fs-etiqueta)',
                     color: '#1a2332',
                     lineHeight: 1.3 }}
                 >
@@ -143,7 +143,7 @@ export function GuardadasGrid({ historias, onLoadMore, hasMore, columns = 4 }: P
             borderRadius: 12,
             border: 'none',
             cursor: 'pointer',
-            fontSize: '13.6px',
+            fontSize: 'var(--fs-pequeno)',
             background: '#e8ecf0',
             color: '#4a5568',
             boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}

@@ -15,7 +15,7 @@ export default async function ObservatorioPage({ params }: PageProps) {
 
   const location = [camera.city, camera.country].filter(Boolean).join(', ');
   const badge = (
-    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-semibold">
+    <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[length:var(--fs-etiqueta)] font-semibold">
       EN VIVO
     </span>
   );

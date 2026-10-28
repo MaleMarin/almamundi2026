@@ -27,7 +27,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
         style={{
           fontFamily: INTERIOR_FONT_STACK,
           fontWeight: 500,
-          fontSize: isDark ? '0.88rem' : '0.92rem',
+          fontSize: 'var(--fs-pequeno)',
           letterSpacing: isDark ? '0.06em' : undefined,
           margin: isDark ? '1.1rem 0 0' : '0 0 1rem',
           color }}
@@ -49,7 +49,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
       style={{
         fontFamily: INTERIOR_FONT_STACK,
         fontWeight: 400,
-        fontSize: isDark ? '0.88rem' : '0.95rem',
+        fontSize: 'var(--fs-pequeno)',
         lineHeight: 1.5,
         margin: isDark ? '1.1rem 0 0' : '0 0 1rem',
         color }}

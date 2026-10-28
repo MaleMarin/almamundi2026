@@ -72,7 +72,7 @@ export function EcoRecorder({
     return (
       <p
         style={{
-          fontSize: 13,
+          fontSize: 'var(--fs-etiqueta)',
           color: 'rgba(var(--almamundi-orange-rgb), 0.80)',
           margin: 0,
           fontFamily: SITE_FONT_STACK }}
@@ -86,7 +86,7 @@ export function EcoRecorder({
     return (
       <p
         style={{
-          fontSize: 13,
+          fontSize: 'var(--fs-etiqueta)',
           color: 'rgba(255,255,255,0.40)',
           margin: 0,
           fontFamily: SITE_FONT_STACK }}
@@ -149,7 +149,7 @@ export function EcoRecorder({
           </div>
           <p
             style={{
-              fontSize: 11,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(255,255,255,0.35)',
               margin: '4px 0 0',
               fontFamily: SITE_FONT_STACK }}
@@ -162,7 +162,7 @@ export function EcoRecorder({
       {state === 'idle' && (
         <p
           style={{
-            fontSize: 12,
+            fontSize: 'var(--fs-etiqueta)',
             color: 'rgba(255,255,255,0.35)',
             margin: 0,
             fontFamily: SITE_FONT_STACK }}

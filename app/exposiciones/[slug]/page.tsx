@@ -79,26 +79,26 @@ export default function ExposicionDetailPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Exposiciones</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/exposiciones" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>← Exposiciones</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-4xl mx-auto">
-        <Link href="/exposiciones" className="btn-am-neutro inline-block px-4 py-2 text-sm font-medium mb-6">
+        <Link href="/exposiciones" className="btn-am-neutro inline-block px-4 py-2 text-[length:var(--fs-pequeno)] font-medium mb-6">
           ← Volver al listado
         </Link>
 
-        <h1 className="text-[27px] md:text-[32px] font-light mb-2" style={{ color: neu.textMain }}>
+        <h1 className="text-[length:var(--fs-titular)] font-normal mb-2" style={{ color: neu.textMain }}>
           {exposicion.titulo}
         </h1>
         {exposicion.descripcion && (
-          <p className="text-[16px] font-light mb-8" style={{ color: neu.textBody }}>
+          <p className="text-[length:var(--fs-texto)] font-normal mb-8" style={{ color: neu.textBody }}>
             {exposicion.descripcion}
           </p>
         )}
@@ -125,12 +125,12 @@ export default function ExposicionDetailPage() {
 
         {postalOpen && (
           <div className="mb-10 p-6 rounded-[32px]" style={neu.card}>
-            <p className="text-sm font-semibold mb-4" style={{ color: neu.textMain }}>Postal (OG image)</p>
+            <p className="text-[length:var(--fs-pequeno)] font-semibold mb-4" style={{ color: neu.textMain }}>Postal (OG image)</p>
             {!postalBlob ? (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: neu.textBody }}>Alias</label>
+                    <label className="block text-[length:var(--fs-etiqueta)] font-medium mb-1" style={{ color: neu.textBody }}>Alias</label>
                     <input
                       type="text"
                       value={postalAlias}
@@ -140,7 +140,7 @@ export default function ExposicionDetailPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium mb-1" style={{ color: neu.textBody }}>Fecha</label>
+                    <label className="block text-[length:var(--fs-etiqueta)] font-medium mb-1" style={{ color: neu.textBody }}>Fecha</label>
                     <input
                       type="text"
                       value={postalFecha}
@@ -150,19 +150,19 @@ export default function ExposicionDetailPage() {
                     />
                   </div>
                 </div>
-                <button type="button" onClick={onGenerarPostal} className="px-5 py-2.5 rounded-full font-semibold text-white bg-orange-500 hover:bg-orange-600 transition text-sm">
+                <button type="button" onClick={onGenerarPostal} className="px-5 py-2.5 rounded-full font-semibold text-white bg-orange-500 hover:bg-orange-600 transition text-[length:var(--fs-pequeno)]">
                   Generar PNG
                 </button>
               </>
             ) : (
               <div className="flex flex-wrap gap-3">
-                <button type="button" onClick={onDescargarPostal} className="btn-am-principal px-5 py-2.5 font-semibold text-sm">
+                <button type="button" onClick={onDescargarPostal} className="btn-am-principal px-5 py-2.5 font-semibold text-[length:var(--fs-pequeno)]">
                   Descargar PNG
                 </button>
-                <button type="button" onClick={onCopiarEnlace} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-sm" style={neu.button}>
+                <button type="button" onClick={onCopiarEnlace} className="btn-almamundi px-5 py-2.5 rounded-full font-semibold text-[length:var(--fs-pequeno)]" style={neu.button}>
                   Copiar enlace
                 </button>
-                <button type="button" onClick={() => setPostalBlob(null)} className="text-sm" style={{ color: neu.textBody }}>
+                <button type="button" onClick={() => setPostalBlob(null)} className="text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
                   Otra postal
                 </button>
               </div>
@@ -179,14 +179,14 @@ export default function ExposicionDetailPage() {
           <section className="rounded-[40px] overflow-hidden" style={neu.card}>
             <div className="p-8 md:p-10 min-h-[280px] flex flex-col">
               <div className="flex-1">
-                <p className="text-xs font-bold uppercase mb-2 tracking-[0.12em]" style={{ color: neu.textBody }}>
+                <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase mb-2 tracking-[0.12em]" style={{ color: neu.textBody }}>
                   Pieza {indexPieza + 1} de {total}
                 </p>
-                <h2 className="text-[22px] md:text-[27px] font-semibold mb-4" style={{ color: neu.textMain }}>
+                <h2 className="text-[length:var(--fs-titular)] font-semibold mb-4" style={{ color: neu.textMain }}>
                   {piezaActual?.titulo}
                 </h2>
                 {piezaActual?.descripcion && (
-                  <p className="text-[15px] font-light leading-relaxed" style={{ color: neu.textBody }}>
+                  <p className="text-[length:var(--fs-pequeno)] font-normal leading-relaxed" style={{ color: neu.textBody }}>
                     {piezaActual.descripcion}
                   </p>
                 )}
@@ -197,21 +197,21 @@ export default function ExposicionDetailPage() {
                   type="button"
                   onClick={goPrev}
                   disabled={!hasPrev}
-                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
+                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
                   style={neu.button}
                   aria-label="Pieza anterior"
                 >
                   <ChevronLeft size={20} />
                   Anterior
                 </button>
-                <span className="text-sm font-medium" style={{ color: neu.textBody }}>
+                <span className="text-[length:var(--fs-pequeno)] font-medium" style={{ color: neu.textBody }}>
                   {indexPieza + 1} / {total}
                 </span>
                 <button
                   type="button"
                   onClick={goNext}
                   disabled={!hasNext}
-                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
+                  className="btn-almamundi flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-40 disabled:cursor-not-allowed hover:bg-white/30 active:scale-95 transition"
                   style={neu.button}
                   aria-label="Pieza siguiente"
                 >

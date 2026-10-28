@@ -86,8 +86,8 @@ function AtmosphereLabel({ label }: { label: string }) {
         whiteSpace: 'nowrap' }}
     >
       <p style={{
-        fontSize: 25,
-        fontWeight: 300,
+        fontSize: 'var(--fs-subtitulo)',
+        fontWeight: 400,
         color: 'rgba(255,255,255,0.75)',
         margin: 0,
         fontFamily: 'var(--font-sans)',

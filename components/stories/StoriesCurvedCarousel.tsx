@@ -111,7 +111,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
   if (stories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
-        <p className="text-[16px]">Las historias también se ven. Cuenta la tuya en video.</p>
+        <p className="text-[length:var(--fs-texto)]">Las historias también se ven. Cuenta la tuya en video.</p>
         <Link href="/historias" className="mt-4 text-amber-500 hover:underline">
           Ver todas las historias
         </Link>
@@ -168,7 +168,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                     <img src={story.imageUrl} alt="" className="w-full h-full object-cover pointer-events-none" />
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800 flex items-center justify-center">
-                      <span className="text-[22px] opacity-60">▶</span>
+                      <span className="text-[length:var(--fs-subtitulo)] opacity-60">▶</span>
                     </div>
                   )
                 ) : (
@@ -176,7 +176,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                     {story.imageUrl ? (
                       <img src={story.imageUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-[22px] opacity-60">▶</span>
+                      <span className="text-[length:var(--fs-subtitulo)] opacity-60">▶</span>
                     )}
                   </div>
                 )}
@@ -184,7 +184,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
             );
           })}
         </div>
-        <p className="text-[10px] uppercase text-gray-500 mt-4 text-center tracking-[0.12em]">
+        <p className="text-[length:var(--fs-etiqueta)] uppercase text-gray-500 mt-4 text-center tracking-[0.12em]">
           Gira o arrastra
         </p>
       </div>
@@ -195,17 +195,17 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
           {selected && (
             <>
               {selected.authorName && (
-                <p className="text-[10px] font-semibold text-amber-600 uppercase mb-0.5 tracking-[0.12em]">
+                <p className="text-[length:var(--fs-etiqueta)] font-semibold text-amber-600 uppercase mb-0.5 tracking-[0.12em]">
                   {selected.authorName}
                 </p>
               )}
-              <p className="text-sm text-gray-600 mb-1">
+              <p className="text-[length:var(--fs-pequeno)] text-gray-600 mb-1">
                 {[selected.country, selected.city].filter(Boolean).join(' · ') || formatPlace(selected)}
               </p>
-              <h1 className="text-[22px] md:text-[32px] font-serif font-light leading-tight mb-2 text-gray-800">
+              <h1 className="text-[length:var(--fs-titular)] font-serif font-normal leading-tight mb-2 text-gray-800">
                 {selected.title || 'Sin título'}
               </h1>
-              <p className="text-sm text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
+              <p className="text-[length:var(--fs-pequeno)] text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
 
               {selected.videoUrl ? (
                 <button
@@ -244,8 +244,8 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
 
               <div className="flex items-center gap-4 text-gray-600">
                 <button type="button" className="btn-am-secundario flex items-center gap-1.5 px-3 py-1.5" aria-label="Compartir">
-                  <span className="text-[16px]">↗</span>
-                  <span className="text-xs">Compartir</span>
+                  <span className="text-[length:var(--fs-texto)]">↗</span>
+                  <span className="text-[length:var(--fs-etiqueta)]">Compartir</span>
                 </button>
               </div>
             </>
@@ -266,7 +266,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
             )
           )}
           {selected && !selected.images?.length && !selected.imageUrl && (
-            <div className="col-span-2 aspect-video rounded-lg bg-gray-300/30 flex items-center justify-center text-gray-500 text-sm">
+            <div className="col-span-2 aspect-video rounded-lg bg-gray-300/30 flex items-center justify-center text-gray-500 text-[length:var(--fs-pequeno)]">
               Sin imágenes
             </div>
           )}

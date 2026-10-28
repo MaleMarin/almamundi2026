@@ -147,8 +147,8 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                 style={{
                   margin: 0,
                   fontFamily: 'inherit',
-                  fontWeight: 300,
-                  fontSize: '14.72px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-pequeno)',
                   color: frase ? 'rgba(255,255,255,0.65)' : 'rgba(255,255,255,0.4)',
                   fontStyle: 'italic',
                   flex: 1 }}
@@ -167,7 +167,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                     borderRadius: 10,
                     border: 'none',
                     cursor: 'pointer',
-                    fontSize: '12px',
+                    fontSize: 'var(--fs-etiqueta)',
                     background: 'rgba(255,255,255,0.1)',
                     color: 'rgba(255,255,255,0.8)' }}
                 >
@@ -191,7 +191,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   borderRadius: 10,
                   padding: '0.5rem 0.8rem',
                   color: '#fff',
-                  fontSize: '14.72px' }}
+                  fontSize: 'var(--fs-pequeno)' }}
               />
               <button
                 type="button"
@@ -201,7 +201,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   borderRadius: 10,
                   border: 'none',
                   cursor: 'pointer',
-                  fontSize: '12px',
+                  fontSize: 'var(--fs-etiqueta)',
                   background: ORANGE,
                   color: '#fff' }}
               >
@@ -239,7 +239,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 400,
-            fontSize: '17px',
+            fontSize: 'var(--fs-texto)',
             color: TEXT_1 }}
         >
           {perfil.nombre}
@@ -248,7 +248,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           <p
             style={{
               margin: '4px 0 0',
-              fontSize: '10.4px',
+              fontSize: 'var(--fs-etiqueta)',
               textTransform: 'uppercase',
               letterSpacing: '0.12em',
               color: ORANGE }}
@@ -260,8 +260,8 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           <p
             style={{
               margin: '0.5rem 0 0',
-              fontSize: '12.48px',
-              fontWeight: 300,
+              fontSize: 'var(--fs-etiqueta)',
+              fontWeight: 400,
               color: TEXT_2,
               textAlign: 'center',
               maxWidth: 320 }}
@@ -278,7 +278,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               borderRadius: 12,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '12.8px',
+              fontSize: 'var(--fs-etiqueta)',
               background: BG,
               color: TEXT_2,
               boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
@@ -310,10 +310,10 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               textAlign: 'center',
               boxShadow: `4px 4px 8px ${SH_DARK}, -4px -4px 8px ${SH_LIGHT}` }}
           >
-            <div style={{ fontFamily: 'inherit', fontWeight: 300, fontSize: '20px', color: TEXT_1 }}>
+            <div style={{ fontFamily: 'inherit', fontWeight: 400, fontSize: 'var(--fs-subtitulo)', color: TEXT_1 }}>
               {num}
             </div>
-            <div style={{ fontSize: '9.6px', textTransform: 'uppercase', letterSpacing: '0.12em', color: TEXT_3, marginTop: 2 }}>
+            <div style={{ fontSize: 'var(--fs-etiqueta)', textTransform: 'uppercase', letterSpacing: '0.12em', color: TEXT_3, marginTop: 2 }}>
               {label}
             </div>
           </div>
@@ -347,7 +347,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
               borderRadius: 50,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '13.6px',
+              fontSize: 'var(--fs-pequeno)',
               fontFamily: 'inherit',
               background: activeTab === id ? `linear-gradient(135deg, ${ORANGE}, ${ORANGE_2})` : BG,
               color: activeTab === id ? '#fff' : TEXT_2,
@@ -385,7 +385,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                   alignItems: 'center',
                   justifyContent: 'center',
                   cursor: 'pointer',
-                  fontSize: '14.4px',
+                  fontSize: 'var(--fs-pequeno)',
                   color: TEXT_3 }}
               >
                 + Nueva muestra
@@ -429,10 +429,10 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                     flexShrink: 0 }}
                 />
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <p style={{ margin: 0, fontSize: '14.08px', fontWeight: 500, color: TEXT_1 }}>{h.titulo}</p>
+                  <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', fontWeight: 500, color: TEXT_1 }}>{h.titulo}</p>
                   <span
                     style={{
-                      fontSize: '11.2px',
+                      fontSize: 'var(--fs-etiqueta)',
                       padding: '2px 6px',
                       borderRadius: 6,
                       background: isAudiencePublicStoryStatus(h.status)
@@ -488,7 +488,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
           >
             <p
               style={{
-                fontSize: 11,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: '#C62828',
@@ -499,7 +499,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
             </p>
             <p
               style={{
-                fontSize: 14,
+                fontSize: 'var(--fs-pequeno)',
                 color: '#9299a8',
                 marginBottom: 20,
                 marginTop: 0 }}
@@ -515,7 +515,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                 color: '#C62828',
                 borderRadius: 100,
                 padding: '10px 24px',
-                fontSize: 12,
+                fontSize: 'var(--fs-etiqueta)',
                 fontWeight: 700,
                 cursor: 'pointer' }}
             >

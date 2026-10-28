@@ -57,7 +57,7 @@ export function StoryShareMenu({
   };
 
   const itemClass =
-    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-sm font-medium transition hover:border-[var(--almamundi-orange)]';
+    'inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 py-2.5 text-[length:var(--fs-pequeno)] font-medium transition hover:border-[var(--almamundi-orange)]';
   const buttonClass = `${itemClass.replace('font-medium', 'font-semibold')} text-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]`;
 
   return (
@@ -73,7 +73,7 @@ export function StoryShareMenu({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h4 id="story-share-menu-title" className="text-[15px] font-semibold text-[#141D26]">
+          <h4 id="story-share-menu-title" className="text-[length:var(--fs-pequeno)] font-semibold text-[#141D26]">
             {labels.title}
           </h4>
           <button
@@ -111,7 +111,7 @@ export function StoryShareMenu({
           {showDownload ? (
             <button
               type="button"
-              className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold"
+              className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 py-2.5 text-[length:var(--fs-pequeno)] font-semibold"
               onClick={onDownload}
             >
               <Download size={15} aria-hidden />

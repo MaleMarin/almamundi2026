@@ -25,7 +25,7 @@ export function MapRealtimeSyncLine({ userLat, userLng }: Props) {
   );
 
   return (
-    <div className="pointer-events-none mt-2 max-w-[min(96vw,42rem)] px-2 text-center font-sans text-[10px] leading-relaxed text-slate-400/90 md:text-[11px]">
+    <div className="pointer-events-none mt-2 max-w-[min(96vw,42rem)] px-2 text-center font-sans text-[length:var(--fs-etiqueta)] leading-relaxed text-slate-400/90 ">
       <div className="font-semibold uppercase text-slate-300/95">{headline}</div>
       <div className="mt-1 normal-case tracking-normal text-slate-400/85">{detail}</div>
     </div>

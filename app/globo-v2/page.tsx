@@ -7,7 +7,7 @@ const GlobeV2 = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m
   ssr: false,
   loading: () => (
     <div className="fixed inset-0 z-0 flex h-[100dvh] w-full items-center justify-center bg-black text-white/80">
-      <p className="text-sm">Cargando GlobeV2…</p>
+      <p className="text-[length:var(--fs-pequeno)]">Cargando GlobeV2…</p>
     </div>
   ) });
 
@@ -22,10 +22,10 @@ export default function GloboV2Page() {
         className="fixed inset-0 z-0 h-[100dvh] w-full min-h-0 bg-black [&_canvas]:block [&_canvas]:h-full [&_canvas]:w-full [&_canvas]:touch-none"
       />
       <div className="pointer-events-none absolute left-0 right-0 top-0 z-10 flex justify-between gap-4 p-4 text-white/80">
-        <span className="text-xs font-semibold uppercase tracking-[0.12em]">GlobeV2 · Beta</span>
+        <span className="text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]">GlobeV2 · Beta</span>
         <HomeHardLink
           href="/"
-          className="btn-am-neutro pointer-events-auto px-3 py-1.5 text-sm"
+          className="btn-am-neutro pointer-events-auto px-3 py-1.5 text-[length:var(--fs-pequeno)]"
         >
           Volver al inicio
         </HomeHardLink>

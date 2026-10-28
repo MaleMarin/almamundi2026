@@ -14,7 +14,7 @@ import { GLOBE_V2_CAMERA_PRESETS } from '@/lib/globe/globe-v2-assets';
 const GlobeV2 = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex flex-1 items-center justify-center bg-black text-sm text-white/50">Cargando globo…</div>
+    <div className="flex flex-1 items-center justify-center bg-black text-[length:var(--fs-pequeno)] text-white/50">Cargando globo…</div>
   ) });
 
 const BITS_FOR_VALIDATION: GlobeBitMarker[] = BITS_DATA.map((b) => ({
@@ -93,8 +93,8 @@ export default function GloboValidacionPage() {
         <div className="mx-auto flex max-w-4xl flex-col gap-3">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div>
-              <h1 className="text-sm font-semibold text-white/95">Validación visual del globo</h1>
-              <p className="text-xs text-white/50">
+              <h1 className="text-[length:var(--fs-pequeno)] font-normal text-white/95">Validación visual del globo</h1>
+              <p className="text-[length:var(--fs-etiqueta)] text-white/50">
                 Pipeline visual · {STAGES.find((s) => s.id === stage)?.hint}
               </p>
             </div>
@@ -104,7 +104,7 @@ export default function GloboValidacionPage() {
                   key={s.id}
                   type="button"
                   onClick={() => setStage(s.id)}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors ${
+                  className={`rounded-lg border px-3 py-1.5 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                     stage === s.id
                       ? 'border-orange-500 bg-white/10 text-white'
                       : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -117,10 +117,10 @@ export default function GloboValidacionPage() {
           </div>
 
           <div className="rounded-lg border border-emerald-500/35 bg-emerald-950/30 px-3 py-2.5">
-            <p className="mb-2 text-[11px] font-semibold uppercase text-emerald-200/95 tracking-[0.12em]">
+            <p className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-emerald-200/95 tracking-[0.12em]">
               1 · Oclusión océano / tierra (prioridad)
             </p>
-            <p className="mb-2 text-[11px] leading-relaxed text-white/65">
+            <p className="mb-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-white/65">
               Objetivo: no ver mar bajo continente; sin halo azul en costa; sin z-fighting; sin bordes rotos por
               discard. Si la costa sigue dura, afinar solo{' '}
               <code className="rounded bg-black/50 px-1 text-emerald-100/90">GLOBE_V2_LAND_MASK_DILATE_UV</code> y{' '}
@@ -128,11 +128,11 @@ export default function GloboValidacionPage() {
               <code className="rounded bg-black/50 px-1">globe-v2-assets.ts</code> — sin tocar relieve ni night lights
               hasta que esto quede limpio.
             </p>
-            <ul className="mb-3 list-inside list-disc space-y-0.5 text-[11px] text-white/55">
+            <ul className="mb-3 list-inside list-disc space-y-0.5 text-[length:var(--fs-etiqueta)] text-white/55">
               <li>Modo solo mar / solo tierra / ambos para aislar fallos.</li>
               <li>Usa vistas &quot;Costas difíciles&quot; (Caribe, Indonesia, Japón).</li>
             </ul>
-            <p className="mb-1.5 text-[10px] font-medium uppercase text-white/40 tracking-[0.12em]">
+            <p className="mb-1.5 text-[length:var(--fs-etiqueta)] font-medium uppercase text-white/40 tracking-[0.12em]">
               Los tres modos
             </p>
             <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
@@ -147,15 +147,15 @@ export default function GloboValidacionPage() {
                       : 'border-white/15 bg-white/[0.04] text-white/80 hover:bg-white/[0.08]'
                   }`}
                 >
-                  <span className="text-xs font-semibold">{m.title}</span>
-                  <span className="mt-0.5 text-[10px] leading-snug text-white/55">{m.detail}</span>
+                  <span className="text-[length:var(--fs-etiqueta)] font-semibold">{m.title}</span>
+                  <span className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-snug text-white/55">{m.detail}</span>
                 </button>
               ))}
             </div>
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
+            <p className="mb-1.5 text-[length:var(--fs-etiqueta)] font-medium uppercase text-white/40 tracking-[0.12em]">
               2 · Más capas (después de oclusión)
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -164,7 +164,7 @@ export default function GloboValidacionPage() {
                   key={l.id}
                   type="button"
                   onClick={() => setLayerBuildStage(l.id)}
-                  className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                  className={`rounded-lg border px-2.5 py-1 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                     layerBuildStage === l.id
                       ? 'border-orange-500 bg-white/10 text-white'
                       : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -178,7 +178,7 @@ export default function GloboValidacionPage() {
 
           {layerBuildStage === 'ocean' ? (
             <div>
-              <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
+              <p className="mb-1.5 text-[length:var(--fs-etiqueta)] font-medium uppercase text-white/40 tracking-[0.12em]">
                 Océano · dirección de luz (shader, solo QA)
               </p>
               <div className="flex flex-wrap gap-1.5">
@@ -187,7 +187,7 @@ export default function GloboValidacionPage() {
                     key={o.id}
                     type="button"
                     onClick={() => setOceanSunDebug(o.id)}
-                    className={`rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                    className={`rounded-lg border px-2.5 py-1 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                       oceanSunDebug === o.id
                         ? 'border-amber-500/90 bg-white/10 text-white'
                         : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -200,7 +200,7 @@ export default function GloboValidacionPage() {
             </div>
           ) : null}
 
-          <div className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[11px] leading-relaxed text-white/60">
+          <div className="rounded-md border border-white/10 bg-white/[0.03] px-2.5 py-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-white/60">
             <p className="mb-1 font-medium text-white/75">Lectura del error en consola (WebGL)</p>
             <ul className="list-inside list-disc space-y-0.5">
               <li>
@@ -222,14 +222,14 @@ export default function GloboValidacionPage() {
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
+            <p className="mb-1.5 text-[length:var(--fs-etiqueta)] font-medium uppercase text-white/40 tracking-[0.12em]">
               Vistas fijas · costas difíciles (archipiélagos, bordes finos)
             </p>
             <div className="flex flex-wrap gap-1.5">
               <button
                 type="button"
                 onClick={() => setFixedPreset(null)}
-                className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                className={`rounded-lg border px-2.5 py-1 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                   fixedPreset === null
                     ? 'border-emerald-500/80 bg-white/10 text-white'
                     : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -244,7 +244,7 @@ export default function GloboValidacionPage() {
                     key={key}
                     type="button"
                     onClick={() => setFixedPreset(key)}
-                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                    className={`rounded-lg border px-2.5 py-1 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                       fixedPreset === key
                         ? 'border-emerald-500/80 bg-white/10 text-white'
                         : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -258,7 +258,7 @@ export default function GloboValidacionPage() {
           </div>
 
           <div>
-            <p className="mb-1.5 text-[11px] font-medium uppercase text-white/40 tracking-[0.12em]">
+            <p className="mb-1.5 text-[length:var(--fs-etiqueta)] font-medium uppercase text-white/40 tracking-[0.12em]">
               Otras regiones
             </p>
             <div className="flex flex-wrap gap-1.5">
@@ -269,7 +269,7 @@ export default function GloboValidacionPage() {
                     key={key}
                     type="button"
                     onClick={() => setFixedPreset(key)}
-                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                    className={`rounded-lg border px-2.5 py-1 text-[length:var(--fs-etiqueta)] font-medium transition-colors ${
                       fixedPreset === key
                         ? 'border-emerald-500/80 bg-white/10 text-white'
                         : 'border-white/15 bg-white/5 text-white/75 hover:bg-white/10'
@@ -283,9 +283,9 @@ export default function GloboValidacionPage() {
           </div>
 
           {fixedPreset != null ? (
-            <div className="text-[11px] leading-relaxed text-white/55">
+            <div className="text-[length:var(--fs-etiqueta)] leading-relaxed text-white/55">
               <p className="mb-1 font-medium text-white/70">{GLOBE_V2_CAMERA_PRESETS[fixedPreset].title}</p>
-              <p className="mb-2 rounded-md border border-emerald-500/45 bg-emerald-950/50 px-2.5 py-1.5 text-[11px] font-semibold text-emerald-100/95">
+              <p className="mb-2 rounded-md border border-emerald-500/45 bg-emerald-950/50 px-2.5 py-1.5 text-[length:var(--fs-etiqueta)] font-semibold text-emerald-100/95">
                 {GLOBE_V2_CAMERA_PRESETS[fixedPreset].validationLegend}
               </p>
               <ul className="list-inside list-disc space-y-0.5">
@@ -295,7 +295,7 @@ export default function GloboValidacionPage() {
               </ul>
             </div>
           ) : (
-            <p className="text-[11px] text-white/45">
+            <p className="text-[length:var(--fs-etiqueta)] text-white/45">
               Elegí Caribe, Indonesia o Japón para repetir el mismo encuadre y revisar costas. En &quot;Libre&quot; sigue la
               rotación automática.
             </p>

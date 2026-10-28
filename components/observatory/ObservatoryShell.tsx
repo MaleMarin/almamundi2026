@@ -74,12 +74,12 @@ export function ObservatoryShell({
           )}
           <div className="min-w-0">
             <h1
-              className={`font-bold text-white truncate ${isModal ? 'text-[16px]' : 'text-[18px] md:text-[22px]'}`}
+              className={`font-normal text-white truncate ${isModal ? 'text-[length:var(--fs-texto)]' : 'text-[length:var(--fs-subtitulo)] '}`}
             >
               {title}
             </h1>
             {(subtitleLeft || subtitleRight) && (
-              <p className={`text-white/60 truncate ${isModal ? 'text-xs' : 'text-sm'}`}>
+              <p className={`text-white/60 truncate ${isModal ? 'text-[length:var(--fs-etiqueta)]' : 'text-[length:var(--fs-pequeno)]'}`}>
                 {[subtitleLeft, subtitleRight].filter(Boolean).join(' · ')}
               </p>
             )}

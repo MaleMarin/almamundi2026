@@ -66,12 +66,12 @@ export function HomeFirstPart({
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 lg:mb-10 text-[clamp(1.238rem,1.08vw+0.938rem,2.25rem)]"
+              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-normal leading-[1.15] md:mb-3 lg:mb-10 text-[length:var(--fs-titular)]"
               style={{
                 color: soft.textMain }}
             >
               {t.heroBeforeBold}{' '}
-              <span className="font-extrabold">{t.heroBold}</span>
+              <span className="font-bold">{t.heroBold}</span>
             </h1>
             <svg
               width="360"

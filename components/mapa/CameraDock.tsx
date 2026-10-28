@@ -85,13 +85,13 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
           <div className="flex items-start justify-between gap-4 p-4 border-b border-white/10 shrink-0">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-[18px] font-bold text-white truncate">{camera.title}</h3>
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-semibold shrink-0">
+                <h3 className="text-[length:var(--fs-texto)] font-bold text-white truncate">{camera.title}</h3>
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[length:var(--fs-etiqueta)] font-semibold shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                   LIVE
                 </span>
               </div>
-              <div className="flex items-center gap-2 text-sm text-white/70">
+              <div className="flex items-center gap-2 text-[length:var(--fs-pequeno)] text-white/70">
                 {[camera.city, camera.country].filter(Boolean).join(' • ')}
                 {camera.provider && <><span>•</span><span>{camera.provider}</span></>}
               </div>
@@ -123,8 +123,8 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
               <div className="relative w-full flex-1 min-h-0 rounded-xl overflow-hidden bg-black/40 border border-white/10">
                 <div className="absolute inset-0 flex items-center justify-center text-white/60">
                   <div className="text-center">
-                    <p className="text-sm mb-2">Reproductor HLS</p>
-                    <p className="text-xs text-white/40">Ver en página de observatorio</p>
+                    <p className="text-[length:var(--fs-pequeno)] mb-2">Reproductor HLS</p>
+                    <p className="text-[length:var(--fs-etiqueta)] text-white/40">Ver en página de observatorio</p>
                   </div>
                 </div>
               </div>
@@ -134,8 +134,8 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
                     <ExternalLink size={24} className="text-white/40" />
                   </div>
-                  <h4 className="text-[16px] font-semibold text-white mb-2">Esta cámara se ve en su fuente oficial</h4>
-                  <p className="text-sm text-white/60 mb-6">
+                  <h4 className="text-[length:var(--fs-texto)] font-semibold text-white mb-2">Esta cámara se ve en su fuente oficial</h4>
+                  <p className="text-[length:var(--fs-pequeno)] text-white/60 mb-6">
                     Para ver la transmisión en vivo, abre el enlace en una nueva pestaña.
                   </p>
                 </div>
@@ -146,14 +146,14 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
             <div className="flex items-center gap-3 mt-4 shrink-0">
               <button
                 onClick={handleOpenSource}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30 transition-colors text-sm font-semibold"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-orange-500/20 text-orange-400 border border-orange-500/30 hover:bg-orange-500/30 transition-colors text-[length:var(--fs-pequeno)] font-semibold"
               >
                 <ExternalLink size={16} />
                 Abrir señal oficial
               </button>
               <button
                 onClick={handleCopyLink}
-                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors text-sm font-semibold"
+                className="flex items-center gap-2 px-5 py-3 rounded-xl bg-white/5 text-white/70 border border-white/10 hover:bg-white/10 transition-colors text-[length:var(--fs-pequeno)] font-semibold"
               >
                 {copied ? (
                   <>

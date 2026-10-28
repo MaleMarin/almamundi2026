@@ -3,19 +3,19 @@
  */
 /** `!important` en color: `globals.css` define `a { color: … naranja }`; los botones de la home no son `<a>`, pero Mapa/Historías sí deben verse grises igual que esos botones. */
 export const SITE_NAV_LINK_CLASS =
-  'btn-am-neutro inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-left text-xs font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 md:px-3.5 md:py-2 md:text-sm';
+  'btn-am-neutro inline-flex items-center justify-center whitespace-nowrap px-3 py-1.5 text-left text-[length:var(--fs-pequeno)] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 md:px-3.5 md:py-2';
 
 /** Cuenta tu historia: píldora secundaria. Visible en la barra, también en móvil. */
 export const SITE_NAV_CTA_CLASS =
-  'btn-am-secundario inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1.5 text-[11px] font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 sm:px-3 sm:text-xs md:px-3.5 md:py-2 md:text-sm';
+  'btn-am-secundario inline-flex items-center justify-center whitespace-nowrap px-2.5 py-1.5 text-[length:var(--fs-pequeno)] font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400/45 sm:px-3 md:px-3.5 md:py-2';
 
 /** Enlaces internos del dropdown de Historias: livianos, sin pastillas. */
 export const SITE_NAV_STORIES_ITEM_CLASS =
-  'block whitespace-nowrap rounded-md px-1.5 py-1 text-left text-[0.78rem] font-medium !text-gray-600 visited:!text-gray-600 transition-colors hover:bg-white/50 hover:!text-[var(--almamundi-orange)] hover:font-semibold md:text-[0.82rem]';
+  'block whitespace-nowrap rounded-md px-1.5 py-1 text-left text-[length:var(--fs-pequeno)] font-medium !text-gray-600 visited:!text-gray-600 transition-colors hover:bg-white/50 hover:!text-[var(--almamundi-orange)] hover:font-medium';
 
 /** Píldora en navs secundarios (subir, exposiciones, temas, etc.). */
 export const SITE_NAV_PILL_LINK_CLASS =
-  'btn-am-neutro px-3 py-2 text-sm font-medium transition-colors md:px-4 md:text-[0.9375rem]';
+  'btn-am-neutro px-3 py-2 text-[length:var(--fs-pequeno)] font-medium transition-colors md:px-4 ';
 
 /** Submenú Historias del header (mismo orden en footer). */
 export const SITE_HEADER_STORIES_LINKS = [

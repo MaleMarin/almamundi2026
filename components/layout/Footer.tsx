@@ -14,8 +14,8 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 
 const FOOTER_LINK =
   'almamundi-footer-link font-normal leading-snug tracking-normal transition-colors';
-const FOOTER_GROUP_LINK = `${FOOTER_LINK} text-[15px]`;
-const FOOTER_LEGAL_LINK = `${FOOTER_LINK} text-xs`;
+const FOOTER_GROUP_LINK = `${FOOTER_LINK} text-[length:var(--fs-pequeno)]`;
+const FOOTER_LEGAL_LINK = `${FOOTER_LINK} text-[length:var(--fs-etiqueta)]`;
 
 export type FooterProps = {
   embedded?: boolean;
@@ -96,7 +96,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           {rowLinks.map((item, index) => (
             <li key={item.id} className="inline-flex items-center">
               {index > 0 ? (
-                <span aria-hidden className="text-[15px] text-[#718096]">
+                <span aria-hidden className="text-[length:var(--fs-pequeno)] text-[#718096]">
                   {' · '}
                 </span>
               ) : null}
@@ -111,7 +111,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
           <div className="flex w-full justify-center lg:w-auto lg:justify-start">
             <div className="flex flex-col items-start">
-              <p className="mb-3 text-[11px] font-semibold uppercase text-gray-500 tracking-[0.12em]">
+              <p className="mb-3 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-500 tracking-[0.12em]">
                 {t.footerInitiativeOf}
               </p>
               <img
@@ -159,7 +159,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 {t.footerContact}
               </ActiveInternalNavLink>
             </nav>
-            <p className="text-[11px] font-medium text-gray-500">
+            <p className="text-[length:var(--fs-etiqueta)] font-medium text-gray-500">
               © 2026 AlmaMundi
             </p>
           </div>

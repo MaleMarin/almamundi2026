@@ -108,8 +108,8 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
     className != null
       ? `${base} ${className}`
       : light
-        ? `${base} tracking-[0.2em] text-gray-500 text-xs`
-        : `absolute left-1/2 z-30 tracking-[0.2em] text-white/70 text-xs transition-opacity duration-500 ${base}`;
+        ? `${base} tracking-[0.2em] text-gray-500 text-[length:var(--fs-etiqueta)]`
+        : `absolute left-1/2 z-30 tracking-[0.2em] text-white/70 text-[length:var(--fs-etiqueta)] transition-opacity duration-500 ${base}`;
 
   return (
     <div

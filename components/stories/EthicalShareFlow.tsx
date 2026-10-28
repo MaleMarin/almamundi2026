@@ -185,27 +185,27 @@ export function EthicalShareFlow({
 
           {step === 'notice' ? (
             <div className="pr-8">
-              <h2 id={`${dialogId}-h`} className="text-[16px] font-semibold leading-snug">
+              <h2 id={`${dialogId}-h`} className="text-[length:var(--fs-texto)] font-semibold leading-snug">
                 {NOTICE_TITLE}
               </h2>
-              <p className="mt-4 text-sm leading-relaxed text-white/90">
+              <p className="mt-4 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">
                 {NOTICE_BODY_1}
               </p>
-              <p className="mt-3 text-sm leading-relaxed text-white/90">
+              <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">
                 {NOTICE_BODY_2}
               </p>
               <div className="mt-6 flex flex-wrap justify-end gap-2">
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/85 hover:bg-white/10"
+                  className="rounded-full border border-white/20 px-4 py-2 text-[length:var(--fs-pequeno)] text-white/85 hover:bg-white/10"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
                   onClick={acceptNotice}
-                  className="rounded-full border border-white/35 bg-white/15 px-5 py-2 text-sm font-medium text-white hover:bg-white/25"
+                  className="rounded-full border border-white/35 bg-white/15 px-5 py-2 text-[length:var(--fs-pequeno)] font-medium text-white hover:bg-white/25"
                 >
                   Entiendo y quiero compartir
                 </button>
@@ -213,17 +213,17 @@ export function EthicalShareFlow({
             </div>
           ) : (
             <div className="pr-8">
-              <h2 id={`${dialogId}-h`} className="text-[16px] font-semibold">
+              <h2 id={`${dialogId}-h`} className="text-[length:var(--fs-texto)] font-semibold">
                 Compartir historia
               </h2>
-              <p className="mt-2 text-sm font-light text-white/70">
+              <p className="mt-2 text-[length:var(--fs-pequeno)] font-normal text-white/70">
                 «{storyTitle}» — {authorName}
               </p>
               <div className="mt-5 flex flex-col gap-2">
                 <button
                   type="button"
                   onClick={() => void copyLink()}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-[length:var(--fs-pequeno)] font-medium text-white hover:bg-white/20"
                 >
                   Copiar enlace
                 </button>
@@ -231,20 +231,20 @@ export function EthicalShareFlow({
                   href={whatsAppHref}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-[length:var(--fs-pequeno)] font-medium text-white hover:bg-white/20"
                 >
                   WhatsApp
                 </a>
                 <a
                   href={mailtoHref}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-sm font-medium text-white hover:bg-white/20"
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-2.5 text-left text-[length:var(--fs-pequeno)] font-medium text-white hover:bg-white/20"
                 >
                   Email
                 </a>
                 <button
                   type="button"
                   onClick={() => void nativeShare()}
-                  className="btn-am-secundario px-4 py-2.5 text-left text-sm font-medium"
+                  className="btn-am-secundario px-4 py-2.5 text-left text-[length:var(--fs-pequeno)] font-medium"
                 >
                   Compartir con el sistema
                 </button>
@@ -252,7 +252,7 @@ export function EthicalShareFlow({
                   type="button"
                   disabled={downloading}
                   onClick={() => void downloadCard()}
-                  className="btn-am-principal px-4 py-2.5 text-left text-sm font-medium disabled:opacity-50"
+                  className="btn-am-principal px-4 py-2.5 text-left text-[length:var(--fs-pequeno)] font-medium disabled:opacity-50"
                 >
                   {downloading ? 'Generando tarjeta…' : 'Descargar tarjeta'}
                 </button>
@@ -261,7 +261,7 @@ export function EthicalShareFlow({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="rounded-full border border-white/20 px-4 py-2 text-sm text-white/85 hover:bg-white/10"
+                  className="rounded-full border border-white/20 px-4 py-2 text-[length:var(--fs-pequeno)] text-white/85 hover:bg-white/10"
                 >
                   Cerrar
                 </button>
@@ -273,7 +273,7 @@ export function EthicalShareFlow({
 
       {toast ? (
         <div
-          className="pointer-events-none fixed bottom-8 left-1/2 z-[120] max-w-[min(92vw,360px)] -translate-x-1/2 rounded-full border border-white/25 bg-black/75 px-5 py-3 text-center text-sm text-white shadow-xl backdrop-blur-md"
+          className="pointer-events-none fixed bottom-8 left-1/2 z-[120] max-w-[min(92vw,360px)] -translate-x-1/2 rounded-full border border-white/25 bg-black/75 px-5 py-3 text-center text-[length:var(--fs-pequeno)] text-white shadow-xl backdrop-blur-md"
           role="status"
         >
           {toast}

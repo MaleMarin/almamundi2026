@@ -136,7 +136,7 @@ export function VoiceNav() {
     <div className="fixed bottom-6 right-6 z-[100] flex flex-col items-end gap-2">
       {feedback && (
         <span
-          className="rounded-lg bg-[#0F172A]/95 text-white text-sm px-3 py-2 shadow-lg border border-white/10 max-w-[220px] text-right"
+          className="rounded-lg bg-[#0F172A]/95 text-white text-[length:var(--fs-pequeno)] px-3 py-2 shadow-lg border border-white/10 max-w-[220px] text-right"
           role="status"
           aria-live="polite"
         >

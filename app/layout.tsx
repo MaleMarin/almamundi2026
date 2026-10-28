@@ -84,13 +84,13 @@ export default async function RootLayout({
         <CursorGlobal />
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded focus:text-sm focus:font-bold"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded text-[length:var(--fs-pequeno)] focus:font-bold"
         >
           Saltar al contenido principal
         </a>
         <noscript>
           <div className="p-8 text-center">
-            <h1 className="text-[22px] font-light text-white/95">{ns.title}</h1>
+            <h1 className="text-[length:var(--fs-subtitulo)] font-normal text-white/95">{ns.title}</h1>
             <p className="mt-2 text-white/60">{ns.p}</p>
             <HomeHardLink href="/" className="mt-4 inline-block text-orange-400 hover:underline">
               {ns.link}

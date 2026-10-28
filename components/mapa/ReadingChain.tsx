@@ -55,7 +55,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
     <div style={{ marginTop: 28 }}>
       <p
         style={{
-          fontSize: 10,
+          fontSize: 'var(--fs-etiqueta)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.22)',
@@ -82,7 +82,7 @@ export function ReadingChain({ storyId }: { storyId: string }) {
             position: 'absolute',
             bottom: 6,
             right: 10,
-            fontSize: 10,
+            fontSize: 'var(--fs-etiqueta)',
             color: 'rgba(255,255,255,0.20)',
             margin: 0,
             fontFamily: SITE_FONT_STACK }}

@@ -38,7 +38,7 @@ export function HighContrastToggle() {
           border: '2px solid #FF4A1C',
           borderRadius: '100px',
           padding: '8px 14px',
-          fontSize: '12px',
+          fontSize: 'var(--fs-etiqueta)',
           fontWeight: 700,
           cursor: 'pointer' }}
       >

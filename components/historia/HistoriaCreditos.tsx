@@ -42,7 +42,7 @@ export function HistoriaCreditos({
           style={{
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: isDark ? 300 : 500,
-            fontSize: isDark ? '0.8rem' : '0.95rem',
+            fontSize: 'var(--fs-pequeno)',
             letterSpacing: isDark ? '0.2em' : undefined,
             textTransform: isDark ? 'uppercase' : undefined,
             margin: 0,
@@ -56,7 +56,7 @@ export function HistoriaCreditos({
           style={{
             fontFamily: INTERIOR_FONT_STACK,
             fontWeight: isDark ? 300 : 400,
-            fontSize: isDark ? '0.72rem' : '0.8rem',
+            fontSize: 'var(--fs-etiqueta)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             margin: isDark ? '0.35rem 0 0' : '0.2rem 0 0',

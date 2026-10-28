@@ -29,10 +29,10 @@ function PreguntaCard({
         background: 'rgba(255,255,255,0.08)',
         border: '1px solid rgba(255,255,255,0.16)' }}
     >
-      <p style={{ margin: '0 0 6px', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
+      <p style={{ margin: '0 0 6px', fontSize: 'var(--fs-etiqueta)', fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
         {title}
       </p>
-      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
+      <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
         {pregunta[mode][locale]}
       </p>
       <Link
@@ -43,7 +43,7 @@ function PreguntaCard({
           marginTop: 12,
           padding: '8px 14px',
           fontWeight: 700,
-          fontSize: 13,
+          fontSize: 'var(--fs-etiqueta)',
           fontFamily: SITE_FONT_STACK }}
       >
         {PREGUNTA_UI.responder[locale]}
@@ -61,7 +61,7 @@ function SemanaBlock({
   linkTema?: boolean;
 }) {
   const title = (
-    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
+    <h3 style={{ margin: 0, fontSize: 'var(--fs-texto)', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
       {linkTema ? (
         <Link href={`/pregunta/${pregunta.id}`} style={{ color: 'inherit' }}>
           {pregunta.tema[locale]}
@@ -93,7 +93,7 @@ export function PreguntaPanel() {
         fontFamily: SITE_FONT_STACK,
         paddingBottom: 8 }}
     >
-      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.78)' }}>
+      <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', lineHeight: 1.5, color: 'rgba(255,255,255,0.78)' }}>
         {PREGUNTA_COPY.intro[locale]}
       </p>
       <SemanaBlock pregunta={vigente} locale={locale} />
@@ -102,7 +102,7 @@ export function PreguntaPanel() {
           <h3
             style={{
               margin: 0,
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',

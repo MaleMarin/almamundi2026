@@ -39,14 +39,14 @@ export function StoryInvitation({ onInvite }: Props) {
           marginBottom: 32 }}
       >
         <div style={{ flex: 1, maxWidth: 80, height: 1, background: 'rgba(255,255,255,0.08)' }} />
-        <span style={{ fontSize: 16, opacity: 0.4 }}>✦</span>
+        <span style={{ fontSize: 'var(--fs-texto)', opacity: 0.4 }}>✦</span>
         <div style={{ flex: 1, maxWidth: 80, height: 1, background: 'rgba(255,255,255,0.08)' }} />
       </div>
 
       <p
         style={{
-          fontSize: 'clamp(18px, 2.7vw, 25px)',
-          fontWeight: 300,
+          fontSize: 'var(--fs-subtitulo)',
+          fontWeight: 400,
           color: 'rgba(255,255,255,0.75)',
           margin: '0 0 12px',
           lineHeight: 1.3,
@@ -57,7 +57,7 @@ export function StoryInvitation({ onInvite }: Props) {
 
       <p
         style={{
-          fontSize: 14,
+          fontSize: 'var(--fs-pequeno)',
           color: 'rgba(255,255,255,0.35)',
           margin: '0 0 28px',
           fontFamily: SITE_FONT_STACK }}
@@ -78,7 +78,7 @@ export function StoryInvitation({ onInvite }: Props) {
           border: '1px solid rgba(var(--almamundi-orange-rgb), 0.28)',
           color: '#fdba74',
           cursor: 'pointer',
-          fontSize: 14,
+          fontSize: 'var(--fs-pequeno)',
           fontWeight: 600,
           fontFamily: SITE_FONT_STACK,
           transition: 'all 250ms ease' }}

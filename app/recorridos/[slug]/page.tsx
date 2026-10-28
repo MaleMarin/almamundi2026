@@ -34,21 +34,21 @@ export default function RecorridoDetailPage() {
           <img src={historiasInterior.logoSrc} alt="AlmaMundi" className={historiasInterior.logoClassName} />
         </HomeHardLink>
         <div className={historiasInterior.navLinksRowClassName}>
-          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>← Recorridos</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
-          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/recorridos" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>← Recorridos</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#proposito" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Nuestro propósito</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#como-funciona" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>¿Cómo funciona?</ActiveInternalNavLink>
           <Link href="/historias" className={SITE_NAV_PILL_LINK_CLASS}>
             Historias
           </Link>
-          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-sm md:text-[15px]" style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
+          <ActiveInternalNavLink href="/#mapa" className="btn-almamundi px-4 py-2.5 rounded-full text-[length:var(--fs-pequeno)] " style={{ ...neu.button, color: neu.navLinkIdle }}>Mapa</ActiveInternalNavLink>
         </div>
       </nav>
 
       <div className="pt-10 pb-16 px-6 md:px-12 max-w-3xl mx-auto">
-        <h1 className="text-[27px] md:text-[32px] font-light mb-3" style={{ color: neu.textMain }}>
+        <h1 className="text-[length:var(--fs-titular)] font-normal mb-3" style={{ color: neu.textMain }}>
           {recorrido.title}
         </h1>
-        <p className="text-[16px] font-light mb-8" style={{ color: neu.textBody }}>
+        <p className="text-[length:var(--fs-texto)] font-normal mb-8" style={{ color: neu.textBody }}>
           {recorrido.intro}
         </p>
 
@@ -56,7 +56,7 @@ export default function RecorridoDetailPage() {
           {recorrido.items.map((item, i) => (
             <li key={item.id} className="py-2 px-4 rounded-2xl" style={neu.card}>
               <span className="font-medium">{item.title}</span>
-              <span className="text-sm font-light ml-2" style={{ color: neu.textBody }}>
+              <span className="text-[length:var(--fs-pequeno)] font-normal ml-2" style={{ color: neu.textBody }}>
                 ({item.type})
               </span>
             </li>

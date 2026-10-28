@@ -123,7 +123,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
 
   if (!stories.length) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: 'var(--font-interna), sans-serif', fontSize: '16px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: 'var(--font-interna), sans-serif', fontSize: 'var(--fs-texto)' }}>
         No hay historias en video por ahora.
       </div>
     );
@@ -253,8 +253,8 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
             className="cg-count"
             style={{
               fontFamily: SITE_FONT_STACK,
-              fontWeight: 200,
-              fontSize: '10.4px',
+              fontWeight: 400,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               color: 'rgba(255, 74, 28,0.55)',
               textTransform: 'uppercase',
@@ -285,16 +285,16 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               <div>
                 <p style={{
                   fontFamily: SITE_FONT_STACK,
-                  fontWeight: 300,
-                  fontSize: '13.12px',
+                  fontWeight: 400,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(245,240,232,0.85)' }}>
                   {authorName}
                 </p>
                 {formatPlace(story) && (
                   <p style={{
                     fontFamily: SITE_FONT_STACK,
-                    fontWeight: 200,
-                    fontSize: '10.88px',
+                    fontWeight: 400,
+                    fontSize: 'var(--fs-etiqueta)',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     color: 'rgba(255, 74, 28,0.55)' }}>
@@ -312,9 +312,9 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               className="cg-hero-content"
               style={{
                 fontFamily: SITE_FONT_STACK,
-                fontWeight: 300,
+                fontWeight: 400,
                 fontStyle: 'italic',
-                fontSize: 'clamp(1.813rem, 4.95vw, 3.75rem)',
+                fontSize: 'var(--fs-titular)',
                 color: '#f5f0e8',
                 textAlign: 'center',
                 lineHeight: 1.15,
@@ -333,8 +333,8 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               className="cg-hero-content"
               style={{
                 fontFamily: SITE_FONT_STACK,
-                fontWeight: 200,
-                fontSize: '12px',
+                fontWeight: 400,
+                fontSize: 'var(--fs-etiqueta)',
                 color: 'rgba(245,240,232,0.3)',
                 marginBottom: '3rem',
                 animationDelay: '0.18s' }}
@@ -368,8 +368,8 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               href={`/historias/${story?.id}`}
               style={{
                 fontFamily: SITE_FONT_STACK,
-                fontWeight: 300,
-                fontSize: '12px',
+                fontWeight: 400,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: '#FF4A1C',
@@ -522,8 +522,8 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
           {['←', '→', 'Enter'].map(k => (
             <span key={k} style={{
               fontFamily: SITE_FONT_STACK,
-              fontWeight: 200,
-              fontSize: '9.6px',
+              fontWeight: 400,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(245,240,232,0.2)',
               border: '1px solid rgba(255,255,255,0.08)',
               padding: '0.15rem 0.45rem',

@@ -119,7 +119,7 @@ const HOME_GLOBE_FRAME_LNG = -60;
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
-    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-transparent text-sm text-white/40">
+    <div className="flex min-h-[50vh] w-full flex-1 items-center justify-center bg-transparent text-[length:var(--fs-pequeno)] text-white/40">
       Cargando mapa…
     </div>
   ) });
@@ -849,7 +849,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         className="map-timebar-stage relative z-20 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-4 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
-        <TimeBar className="pointer-events-none text-center text-[11px] md:text-[12px] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
+        <TimeBar className="pointer-events-none text-center text-[length:var(--fs-etiqueta)] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
         <MapRealtimeSyncLine userLat={viewerLat} userLng={viewerLng} />
       </div>
 
@@ -927,7 +927,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {surpriseNotice ? (
         <p
           role="status"
-          className="pointer-events-none absolute bottom-28 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-full px-4 py-2 text-center text-sm text-white/90"
+          className="pointer-events-none absolute bottom-28 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-full px-4 py-2 text-center text-[length:var(--fs-pequeno)] text-white/90"
           style={{
             background: 'rgba(15, 23, 42, 0.82)',
             boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}

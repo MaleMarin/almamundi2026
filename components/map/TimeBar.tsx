@@ -18,7 +18,7 @@ import WorldClock from '@/components/mapa/WorldClock';
 import type { WorldClockLocation } from '@/components/mapa/WorldClock';
 
 const HUD_CLASS =
-  'text-[13px] md:text-[15px] tracking-[0.28em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]';
+  'text-[length:var(--fs-pequeno)] tracking-[0.28em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]';
 
 /** Nota bajo fecha/hora: sonido en el vacío y sonificación (científica). */
 const SPACE_SOUND_NOTE =
@@ -58,7 +58,7 @@ export function TimeBar({ selectedLocation, className }: Props) {
     <div className="pointer-events-none flex w-full max-w-[min(96vw,560px)] flex-col items-center gap-2 px-2 text-center">
       <WorldClock selectedLocation={location} className={className ?? HUD_CLASS} />
       <p
-        className="m-0 max-w-full font-sans font-normal normal-case italic text-[12px] md:text-[14px] leading-[1.48] text-slate-400/80"
+        className="m-0 max-w-full font-sans font-normal normal-case italic text-[length:var(--fs-pequeno)] leading-[1.48] text-slate-400/80"
       >
         {SPACE_SOUND_NOTE}
       </p>

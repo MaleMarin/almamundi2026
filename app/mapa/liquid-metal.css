@@ -43,20 +43,20 @@
    Typography
 ========================= */
 .lm-h1{
-  font-size: 36px;
+  font-size: var(--fs-titular);
   line-height: 1.02;
   
   color: var(--lm-text);
 }
 .lm-p{
   margin-top: 10px;
-  font-size: 15px;
+  font-size: var(--fs-pequeno);
   line-height: 1.55;
   color: var(--lm-muted);
 }
 .lm-tip{
   margin-top: 10px;
-  font-size: 13px;
+  font-size: var(--fs-etiqueta);
   color: var(--lm-dim);
 }
 
@@ -93,7 +93,7 @@
   border: 1px solid rgba(255,255,255,.14);
   background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
   color: rgba(255,255,255,.88);
-  font-size: 14px;
+  font-size: var(--fs-pequeno);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -126,7 +126,7 @@
   border: 1px solid rgba(255,255,255,.14);
   background: rgba(255,255,255,.05);
   color: rgba(255,255,255,.85);
-  font-size: 14px;
+  font-size: var(--fs-pequeno);
   font-weight: 600;
   cursor: pointer;
   transition: transform .12s ease, background .2s ease, border-color .2s ease;
@@ -178,8 +178,8 @@
   transform: translateX(34px);
 }
 .lm-switch-label{
-  font-size: 14px;
-  font-weight: 800;
+  font-size: var(--fs-pequeno);
+  font-weight: 700;
   
   color: rgba(255,255,255,.85);
 }

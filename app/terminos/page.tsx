@@ -42,7 +42,7 @@ function Section({
           fontFamily: 'inherit',
           fontStyle: 'italic',
           fontWeight: 600,
-          fontSize: '16px',
+          fontSize: 'var(--fs-texto)',
           color: ORANGE }}
       >
         {title}
@@ -50,7 +50,7 @@ function Section({
       <div
         style={{
           fontFamily: 'inherit',
-          fontSize: '15px',
+          fontSize: 'var(--fs-pequeno)',
           lineHeight: 1.75,
           color: TEXT_2 }}
       >
@@ -76,7 +76,7 @@ export default function TerminosPage() {
           style={{
             display: 'inline-block',
             marginBottom: '1.5rem',
-            fontSize: '13.6px',
+            fontSize: 'var(--fs-pequeno)',
             padding: '0.45rem 0.9rem' }}
         >
           ← Volver al inicio
@@ -87,12 +87,12 @@ export default function TerminosPage() {
             fontFamily: 'inherit',
             fontStyle: 'italic',
             fontWeight: 600,
-            fontSize: '25px',
+            fontSize: 'var(--fs-subtitulo)',
             color: TEXT_1 }}
         >
           Términos de uso
         </h1>
-        <p style={{ margin: 0, fontSize: '14.4px', color: TEXT_3 }}>
+        <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', color: TEXT_3 }}>
           AlmaMundi · Fecha de vigencia: agosto 2026
         </p>
 
@@ -190,7 +190,7 @@ export default function TerminosPage() {
           <p style={{ margin: 0 }}>Fecha de vigencia: agosto 2026.</p>
         </Section>
 
-        <p style={{ marginTop: '2rem', fontSize: '12.8px', color: TEXT_3 }}>
+        <p style={{ marginTop: '2rem', fontSize: 'var(--fs-etiqueta)', color: TEXT_3 }}>
           AlmaMundi · Términos de uso
         </p>
       </div>

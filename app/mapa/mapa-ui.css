@@ -116,21 +116,21 @@
 
 .miniHint{
   margin-top: 10px;
-  font-size: 13px;
+  font-size: var(--fs-etiqueta);
   color: var(--muted);
   line-height: 1.35;
 }
 
 .heroTitle{
-  font-size: 31px;
-  font-weight: 750;
+  font-size: var(--fs-titular);
+  font-weight: 400;
   
   color: var(--text);
   margin: 4px 0 6px;
 }
 
 .heroSub{
-  font-size: 15px;
+  font-size: var(--fs-pequeno);
   color: var(--muted);
   line-height: 1.45;
 }

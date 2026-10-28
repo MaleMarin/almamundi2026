@@ -179,10 +179,10 @@ function SoftCard({
           }
         >
           <div className="shrink-0 min-w-0">
-            <p className="text-[15px] font-light leading-snug text-gray-600 md:text-[16px] lg:text-[18px]">
+            <p className="text-[length:var(--fs-subtitulo)] font-normal leading-snug text-gray-600">
               {title}
             </p>
-            <h2 className="mt-1 text-[16px] font-bold leading-snug text-gray-800 md:text-[18px] lg:text-[22px]">
+            <h2 className="mt-1 text-[length:var(--fs-subtitulo)] font-bold leading-snug text-gray-800 ">
               {subtitle}
             </h2>
           </div>
@@ -193,7 +193,7 @@ function SoftCard({
                 : 'flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4'
             }
           >
-            <p className="shrink-0 overflow-y-auto pr-0.5 text-sm font-normal leading-[1.6] text-gray-600 md:text-[15px] md:leading-[1.62] lg:text-[15px]">
+            <p className="shrink-0 overflow-y-auto pr-0.5 text-[length:var(--fs-texto)] font-normal leading-[1.6] text-gray-600 md:leading-[1.62]">
               {children}
             </p>
             <Link
@@ -203,7 +203,7 @@ function SoftCard({
                 e.preventDefault();
                 onClick();
               }}
-              className="btn-am-principal flex w-full shrink-0 items-center justify-center px-3 py-2.5 text-center text-[12px] font-semibold normal-case active:scale-[0.98] md:px-4 md:py-3 md:text-sm"
+              className="btn-am-principal flex w-full shrink-0 items-center justify-center px-3 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium normal-case active:scale-[0.98] md:px-4 md:py-3"
               style={{ fontFamily: APP_FONT }}
             >
               {buttonLabel}
@@ -252,10 +252,10 @@ export function HomeFormatCards({
             : 'home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] px-1 text-center leading-snug tracking-normal sm:mb-5 md:mb-6 lg:mb-0 lg:flex lg:w-full lg:max-w-none lg:flex-1 lg:flex-col lg:items-center lg:justify-center'
         }
       >
-        <span className="block text-[17px] font-medium tracking-normal text-[#FF4A1C] md:text-[23px]">
+        <span className="block text-[length:var(--fs-subtitulo)] font-medium tracking-normal text-[#FF4A1C] ">
           {t.historiasLead2}
         </span>
-        <span className="mt-1 block text-[22px] font-bold tracking-normal text-[#FF4A1C] md:text-[31px]">
+        <span className="mt-1 block text-[length:var(--fs-subtitulo)] font-bold tracking-normal text-[#FF4A1C]">
           {t.historiasLead2b}
         </span>
       </p>

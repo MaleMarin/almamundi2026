@@ -86,15 +86,15 @@ export function HistoriasFormatListPageLayout({
           <div className="mx-auto w-full max-w-[52rem]">
             <header className="flex flex-shrink-0 flex-col gap-2 border-b border-gray-400/18 pb-5 text-center sm:gap-2.5 sm:text-left md:pb-6">
               <p
-                className="mb-0 text-[11px] font-semibold uppercase sm:text-xs tracking-[0.12em]"
+                className="mb-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
                 style={{ color: 'var(--almamundi-orange)' }}
               >
                 {orangeKicker}
               </p>
-              <h1 className="text-balance text-[23px] font-semibold leading-[1.12] text-gray-800 sm:text-[27px] md:text-[31px] md:leading-[1.1] lg:text-[43px]">
+              <h1 className="text-balance text-[length:var(--fs-titular)] font-normal leading-[1.12] text-gray-800 md:leading-[1.1] ">
                 {HISTORIAS_LIST_HERO_TITLE}
               </h1>
-              <p className="mx-auto max-w-xl text-pretty text-sm leading-relaxed text-gray-600 sm:mx-0 md:text-[15px] md:leading-snug">
+              <p className="mx-auto max-w-xl text-pretty text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 sm:mx-0 md:leading-snug">
                 {HISTORIAS_LIST_HERO_SUBTITLE}
               </p>
             </header>
@@ -106,12 +106,12 @@ export function HistoriasFormatListPageLayout({
                   ...neu.cardInset,
                   borderRadius: 22 }}
               >
-                <p className="mb-2.5 text-[11px] font-semibold uppercase text-gray-600 sm:text-xs tracking-[0.12em]">
+                <p className="mb-2.5 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-600 tracking-[0.12em]">
                   {HISTORIAS_FILTER_BLOCK_TITLE}
                 </p>
                 <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end lg:gap-x-3 lg:gap-y-3">
                   <label
-                    className="flex min-w-0 flex-1 flex-col gap-1.5 text-xs font-medium text-gray-600 lg:min-w-[min(100%,13rem)] lg:max-w-[16.5rem]"
+                    className="flex min-w-0 flex-1 flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 lg:min-w-[min(100%,13rem)] lg:max-w-[16.5rem]"
                     htmlFor="historias-filter-pais"
                   >
                     País
@@ -121,12 +121,12 @@ export function HistoriasFormatListPageLayout({
                       onChange={setFilterCountry}
                     />
                   </label>
-                  <label className="flex w-full shrink-0 flex-none flex-col gap-1.5 text-xs font-medium text-gray-600 min-w-[15.5rem] sm:min-w-[16rem] lg:w-[16.5rem] lg:max-w-[16.5rem]">
+                  <label className="flex w-full shrink-0 flex-none flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 min-w-[15.5rem] sm:min-w-[16rem] lg:w-[16.5rem] lg:max-w-[16.5rem]">
                     Año
                     <select
                       value={filterYear}
                       onChange={(e) => setFilterYear(e.target.value)}
-                      className="box-border w-full min-h-[2.75rem] min-w-[15.5rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] py-2 pl-3 pr-12 text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+                      className="box-border w-full min-h-[2.75rem] min-w-[15.5rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] py-2 pl-3 pr-12 text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     >
                       <option value="">Todos los años</option>
@@ -137,7 +137,7 @@ export function HistoriasFormatListPageLayout({
                       ))}
                     </select>
                   </label>
-                  <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-xs font-medium text-gray-600 lg:min-w-[12rem] lg:flex-[1.15]">
+                  <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 lg:min-w-[12rem] lg:flex-[1.15]">
                     Palabras clave
                     <input
                       type="search"
@@ -145,7 +145,7 @@ export function HistoriasFormatListPageLayout({
                       onChange={(e) => setFilterKeywords(e.target.value)}
                       placeholder={HISTORIAS_FILTER_KEYWORD_PLACEHOLDER}
                       autoComplete="off"
-                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     />
                   </label>
@@ -173,7 +173,7 @@ export function HistoriasFormatListPageLayout({
                       type="button"
                       onClick={clearFilters}
                       disabled={!hasActiveFilters}
-                      className={`w-full whitespace-nowrap rounded-full px-4 py-2 text-xs font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto md:text-[0.8125rem] ${
+                      className={`w-full whitespace-nowrap rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto ${
                         hasActiveFilters
                           ? 'text-gray-800 ring-1 ring-orange-400/35 ring-offset-2 ring-offset-[#E0E5EC]'
                           : 'text-gray-500'
@@ -187,13 +187,13 @@ export function HistoriasFormatListPageLayout({
                   </div>
                 </div>
                 {showingUnfilteredBecauseNoMatches ? (
-                  <p className="mt-2 text-xs text-amber-900/85" role="status">
+                  <p className="mt-2 text-[length:var(--fs-etiqueta)] text-amber-900/85" role="status">
                     Ninguna historia coincide con los filtros. El carrusel muestra las {allStoryCount}{' '}
                     historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros».
                   </p>
                 ) : null}
                 {hasActiveFilters && !showingUnfilteredBecauseNoMatches ? (
-                  <p className="mt-2 text-xs text-gray-500" role="status">
+                  <p className="mt-2 text-[length:var(--fs-etiqueta)] text-gray-500" role="status">
                     Mostrando {filteredStoryCount} de {allStoryCount} historias.
                   </p>
                 ) : null}

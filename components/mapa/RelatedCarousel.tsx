@@ -57,7 +57,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
     <div style={{ marginTop: 32 }}>
       <p
         style={{
-          fontSize: 10,
+          fontSize: 'var(--fs-etiqueta)',
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: 'rgba(255,255,255,0.25)',
@@ -153,7 +153,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <p
                     style={{
-                      fontSize: 9,
+                      fontSize: 'var(--fs-etiqueta)',
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
                       color: isCurrent
@@ -167,7 +167,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
 
                   <p
                     style={{
-                      fontSize: 13,
+                      fontSize: 'var(--fs-etiqueta)',
                       fontWeight: isCurrent ? 400 : 300,
                       color: isCurrent
                         ? 'rgba(255,255,255,0.95)'
@@ -186,7 +186,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                   {isCurrent && (
                     <p
                       style={{
-                        fontSize: 10,
+                        fontSize: 'var(--fs-etiqueta)',
                         color: 'rgba(var(--almamundi-orange-rgb), 0.60)',
                         margin: '8px 0 0',
                         fontFamily: SITE_FONT_STACK }}

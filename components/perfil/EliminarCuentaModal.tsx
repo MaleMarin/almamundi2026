@@ -58,7 +58,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     color: '#9299a8',
     borderRadius: 100,
     padding: '10px 24px',
-    fontSize: 12,
+    fontSize: 'var(--fs-etiqueta)',
     boxShadow: '3px 3px 6px #c4c7cd, -3px -3px 6px #ffffff',
     cursor: 'pointer' };
 
@@ -68,8 +68,8 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     border: 'none',
     borderRadius: 100,
     padding: '10px 24px',
-    fontSize: 12,
-    fontWeight: 800,
+    fontSize: 'var(--fs-etiqueta)',
+    fontWeight: 700,
     cursor: 'pointer' };
 
   const runDelete = useCallback(async () => {
@@ -164,14 +164,14 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     boxSizing: 'border-box' };
 
   const titleStyle: CSSProperties = {
-    fontSize: 20,
-    fontWeight: 800,
+    fontSize: 'var(--fs-subtitulo)',
+    fontWeight: 700,
     color: '#1a1f2a',
     marginBottom: 16,
     marginTop: 0 };
 
   const paraStyle: CSSProperties = {
-    fontSize: 14,
+    fontSize: 'var(--fs-pequeno)',
     color: '#5a6070',
     lineHeight: 1.75,
     marginBottom: 24,
@@ -249,7 +249,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
                 border: '1.5px solid #e6e9ee',
                 borderRadius: 8,
                 padding: '10px 14px',
-                fontSize: 14,
+                fontSize: 'var(--fs-pequeno)',
                 boxShadow: 'inset 3px 3px 6px #c4c7cd, inset -3px -3px 6px #ffffff',
                 width: '100%',
                 marginBottom: 16,

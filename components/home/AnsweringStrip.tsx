@@ -35,16 +35,16 @@ export function AnsweringStrip({
         className="shrink-0 border-b border-white/50 px-5 py-3 md:px-8"
         style={{ backgroundColor: '#E8EBF2' }}
       >
-        <p className="text-sm leading-snug text-gray-700 md:text-[15px]">
+        <p className="text-[length:var(--fs-pequeno)] leading-snug text-gray-700 ">
           <span className="font-semibold">{t.modalAnsweringPrefix}</span> {text}
         </p>
-        {advice ? <p className="mt-1 text-sm leading-snug text-gray-600">{advice}</p> : null}
+        {advice ? <p className="mt-1 text-[length:var(--fs-pequeno)] leading-snug text-gray-600">{advice}</p> : null}
       </div>
     );
   }
 
   return (
-    <p className="mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-sm leading-snug text-gray-700 md:mb-5 md:text-[15px]">
+    <p className="mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-[length:var(--fs-pequeno)] leading-snug text-gray-700 md:mb-5 ">
       <span className="font-semibold">{t.modalAnsweringPrefix}</span> {text}
     </p>
   );

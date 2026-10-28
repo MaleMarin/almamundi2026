@@ -47,7 +47,7 @@ export function CameraPanel({ camera, onClose }: Props) {
       case "link":
         return (
           <div className="w-full h-full flex flex-col items-center justify-center bg-black/40 p-6">
-            <p className="text-white/80 text-sm mb-4 text-center">
+            <p className="text-white/80 text-[length:var(--fs-pequeno)] mb-4 text-center">
               {camera.title} está disponible en:
             </p>
             <a
@@ -70,8 +70,8 @@ export function CameraPanel({ camera, onClose }: Props) {
       {/* Header */}
       <div className="shrink-0 p-4 border-b border-white/10 flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <h3 className="text-white font-semibold text-[15px] truncate">{camera.title}</h3>
-          <p className="text-white/60 text-xs mt-0.5">{camera.source} · {camera.country}</p>
+          <h3 className="text-white font-semibold text-[length:var(--fs-pequeno)] truncate">{camera.title}</h3>
+          <p className="text-white/60 text-[length:var(--fs-etiqueta)] mt-0.5">{camera.source} · {camera.country}</p>
         </div>
         <button
           type="button"

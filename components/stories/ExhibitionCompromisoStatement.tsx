@@ -30,17 +30,17 @@ export function ExhibitionCompromisoStatement({
 
   const titleCls =
     variant === 'footer' || variant === 'share-intro'
-      ? 'mb-3 text-[11px] font-normal uppercase tracking-[0.22em] text-gray-500'
+      ? 'mb-3 text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-gray-500'
       : variant === 'band'
         ? bandTone === 'light'
-          ? 'text-[10px] font-normal uppercase tracking-[0.22em] text-gray-600'
-          : 'text-[10px] font-normal uppercase tracking-[0.22em] text-white/55'
-        : 'mb-2 text-[10px] font-normal uppercase tracking-[0.22em] text-white/55';
+          ? 'text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-gray-600'
+          : 'text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-white/55'
+        : 'mb-2 text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-white/55';
 
   const bodyCls =
     variant === 'footer' || variant === 'share-intro'
-      ? 'font-serif text-[15px] font-light italic leading-relaxed text-gray-700 md:text-[16px]'
-      : 'font-serif text-sm font-light italic leading-relaxed text-white/88 sm:text-[15px]';
+      ? 'font-serif text-[length:var(--fs-texto)] font-normal italic leading-relaxed text-gray-700 '
+      : 'font-serif text-[length:var(--fs-pequeno)] font-normal italic leading-relaxed text-white/88 ';
 
   return (
     <aside

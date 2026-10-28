@@ -46,17 +46,17 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
             <ExternalLink size={28} className="text-white/40" />
           </div>
-          <h2 className="text-[16px] font-semibold text-white mb-2">Ver en la fuente oficial</h2>
+          <h2 className="text-[length:var(--fs-texto)] font-semibold text-white mb-2">Ver en la fuente oficial</h2>
           <a
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold text-sm"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold text-[length:var(--fs-pequeno)]"
           >
             <ExternalLink size={18} />
             {CTA_LABEL}
           </a>
-          <p className="mt-4 max-w-md mx-auto text-[12px] text-white/55">
+          <p className="mt-4 max-w-md mx-auto text-[length:var(--fs-etiqueta)] text-white/55">
             Esta transmisión se reproduce en la plataforma oficial del proveedor. Para respetar sus políticas de emisión y mantener la estabilidad del servicio, se abre en una nueva pestaña.
           </p>
         </div>
@@ -73,7 +73,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold px-4 py-2.5 text-sm"
+            className="mt-6 inline-flex items-center gap-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold px-4 py-2.5 text-[length:var(--fs-pequeno)]"
           >
             <ExternalLink size={18} />
             {CTA_LABEL}
@@ -112,17 +112,17 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
             </Link>
           )}
           <div className="min-w-0">
-            <h1 className={`font-bold text-white truncate ${isModal ? 'text-[16px]' : 'text-[18px] md:text-[22px]'}`}>
+            <h1 className={`font-normal text-white truncate ${isModal ? 'text-[length:var(--fs-texto)]' : 'text-[length:var(--fs-subtitulo)] '}`}>
               {camera.title}
             </h1>
             {location && (
-              <p className={`text-white/60 truncate ${isModal ? 'text-xs' : 'text-sm'}`}>{location}</p>
+              <p className={`text-white/60 truncate ${isModal ? 'text-[length:var(--fs-etiqueta)]' : 'text-[length:var(--fs-pequeno)]'}`}>{location}</p>
             )}
             {camera.provider && (
-              <p className={`text-white/50 truncate ${isModal ? 'text-[10px]' : 'text-xs'}`}>{camera.provider}</p>
+              <p className={`text-white/50 truncate ${isModal ? 'text-[length:var(--fs-etiqueta)]' : 'text-[length:var(--fs-etiqueta)]'}`}>{camera.provider}</p>
             )}
           </div>
-          <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[10px] font-semibold">
+          <span className="shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[length:var(--fs-etiqueta)] font-semibold">
             EN VIVO
           </span>
         </div>
@@ -131,7 +131,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
             href={sourceUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className={`inline-flex items-center gap-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold ${isModal ? 'px-3 py-2 text-xs' : 'px-4 py-2.5 text-sm'}`}
+            className={`inline-flex items-center gap-1.5 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition font-semibold ${isModal ? 'px-3 py-2 text-[length:var(--fs-etiqueta)]' : 'px-4 py-2.5 text-[length:var(--fs-pequeno)]'}`}
           >
             <ExternalLink size={isModal ? 14 : 18} />
             {CTA_LABEL}
@@ -162,7 +162,7 @@ export function CameraObservatory({ camera, variant = 'page', onClose, contentOn
           <button
             type="button"
             onClick={onClose}
-            className="btn-am-neutro mt-6 inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium"
+            className="btn-am-neutro mt-6 inline-flex items-center gap-2 px-4 py-2.5 text-[length:var(--fs-pequeno)] font-medium"
           >
             <ArrowLeft size={16} />
             Volver al globo

@@ -1879,16 +1879,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1F7A4D] text-white">
               <Check size={16} strokeWidth={2.4} aria-hidden />
             </span>
-            <p className="text-[15px] font-semibold text-gray-800 md:text-[16px]">
+            <p className="text-[length:var(--fs-texto)] font-semibold text-gray-800 ">
               {kind === 'video' ? t.modalReadyTitleVideo : t.modalReadyTitleAudio}
             </p>
           </div>
         ) : null}
-        <p className="text-sm text-gray-700 md:text-[15px]">
+        <p className="text-[length:var(--fs-pequeno)] text-gray-700 ">
           {name} · {durationLabel} · {fileWeightMb({ size: bytes })} MB
         </p>
         {avCardError ? (
-          <p className="text-sm font-medium text-red-600" role="alert">
+          <p className="text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
             {avCardError}
           </p>
         ) : null}
@@ -1920,7 +1920,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           <button
             type="button"
             onClick={changeAvFile}
-            className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700"
+            className="rounded-full px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-700"
             style={soft.button}
           >
             {t.modalChangeFile}
@@ -1928,7 +1928,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           <button
             type="button"
             onClick={mediaBlob ? discardRecording : removePickedFile}
-            className="rounded-full px-4 py-2 text-sm font-semibold text-gray-700"
+            className="rounded-full px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-700"
             style={soft.button}
           >
             {t.modalRemove}
@@ -1968,17 +1968,17 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         ) : null}
         {chosenTopic && mode !== 'texto' && (
           <div
-            className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-[15px]"
+            className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-2xl px-4 py-3 text-[length:var(--fs-pequeno)]"
             style={soft.inset}
           >
             <div className="min-w-0">
               <p className="font-semibold text-gray-700">{t.modalTopicActive}</p>
-              <p className="truncate text-gray-600 md:text-[16px]">{chosenTopic.title}</p>
+              <p className="truncate text-gray-600 text-[length:var(--fs-texto)]">{chosenTopic.title}</p>
             </div>
             <button
               type="button"
               onClick={onClearTopic}
-              className="rounded-full px-4 py-2 text-xs font-bold uppercase text-orange-700 tracking-[0.12em]"
+              className="rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-bold uppercase text-orange-700 tracking-[0.12em]"
               style={soft.button}
               aria-label={t.modalRemove}
             >
@@ -2021,7 +2021,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     >
                       {copy.primaryCta}
                     </button>
-                    <p className="text-center text-sm text-gray-700">{t.modalCameraPermissionHint}</p>
+                    <p className="text-center text-[length:var(--fs-pequeno)] text-gray-700">{t.modalCameraPermissionHint}</p>
                   </div>
                 )}
                 {streamReady && (
@@ -2041,13 +2041,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     </div>
                     {!recording ? (
                       <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                        <span className="text-[18px] font-mono font-semibold text-gray-700 md:text-[22px]" aria-live="polite">
+                        <span className="text-[length:var(--fs-subtitulo)] font-mono font-semibold text-gray-700 " aria-live="polite">
                           {formatMmSs(recordSec)}
                         </span>
                         <button
                           type="button"
                           onClick={startRecordingVideo}
-                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[16px] font-bold text-white md:text-[18px]"
+                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[length:var(--fs-texto)] font-bold text-white "
                           style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                           aria-label="Comenzar a grabar video"
                         >
@@ -2057,18 +2057,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       </div>
                     ) : (
                       <>
-                        <p className="text-[18px] font-semibold text-orange-600 md:text-[22px]" aria-live="polite">
+                        <p className="text-[length:var(--fs-subtitulo)] font-semibold text-orange-600 " aria-live="polite">
                           {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                         </p>
                         {recordSec >= 270 ? (
-                          <p className="text-sm font-semibold text-orange-700" aria-live="assertive">
+                          <p className="text-[length:var(--fs-pequeno)] font-semibold text-orange-700" aria-live="assertive">
                             {t.modalRecordingSoonEnd}
                           </p>
                         ) : null}
                         <button
                           type="button"
                           onClick={stopRecording}
-                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-[16px] font-bold text-white shadow-lg md:text-[18px]"
+                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-[length:var(--fs-texto)] font-bold text-white shadow-lg "
                           aria-label={t.modalStop}
                         >
                           <Square size={22} aria-hidden />
@@ -2089,7 +2089,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {avSource === 'archivo' && (
               <div className="space-y-4">
                 {uploadVideoFile ? null : (
-                  <label htmlFor="story-video-file" className="flex items-center gap-2 text-sm font-semibold text-gray-800">
+                  <label htmlFor="story-video-file" className="flex items-center gap-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
                     <Upload className="h-4 w-4 text-orange-500" aria-hidden />
                     Video desde tu equipo (máx. {SUBIR_VIDEO_UPLOAD_MAX_MB} MB)
                   </label>
@@ -2106,12 +2106,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     if (!f) return;
                     acceptUploadFile('video', f);
                   }}
-                  className={uploadVideoFile ? 'sr-only' : 'w-full text-sm text-gray-600'}
+                  className={uploadVideoFile ? 'sr-only' : 'w-full text-[length:var(--fs-pequeno)] text-gray-600'}
                 />
                 {uploadVideoFile
                   ? renderReadyCard('video', uploadVideoFile.name, uploadVideoFile.size)
                   : null}
-                <label htmlFor="story-video-url" className="block text-sm font-semibold text-gray-800">
+                <label htmlFor="story-video-url" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
                   O pega un enlace (YouTube o Vimeo)
                 </label>
                 <input
@@ -2122,13 +2122,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     setVideoShareUrl(e.target.value);
                     if (e.target.value.trim()) removePickedFile();
                   }}
-                  className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
+                  className="w-full rounded-xl px-3 py-2.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
                   aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
                 />
-                <p className="text-xs text-gray-600">{t.modalVideoLinkHint}</p>
+                <p className="text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalVideoLinkHint}</p>
                 {videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl) ? (
-                  <p className="text-xs text-amber-700" role="alert">
+                  <p className="text-[length:var(--fs-etiqueta)] text-amber-700" role="alert">
                     Usa un enlace de YouTube o Vimeo
                   </p>
                 ) : null}
@@ -2171,7 +2171,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     >
                       {copy.primaryCta}
                     </button>
-                    <p className="text-center text-sm text-gray-700">{t.modalMicPermissionHint}</p>
+                    <p className="text-center text-[length:var(--fs-pequeno)] text-gray-700">{t.modalMicPermissionHint}</p>
                   </div>
                 )}
                 {streamReady && !recording && (
@@ -2179,13 +2179,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div className="flex h-32 w-32 items-center justify-center rounded-full" style={soft.inset} aria-hidden>
                       <Mic className="h-14 w-14 text-orange-500" />
                     </div>
-                    <p className="font-mono text-[22px] text-gray-700 md:text-[27px]" aria-live="polite">
+                    <p className="font-mono text-[length:var(--fs-titular)] text-gray-700 " aria-live="polite">
                       {formatMmSs(recordSec)}
                     </p>
                     <button
                       type="button"
                       onClick={startRecordingAudio}
-                      className="rounded-full px-10 py-4 text-[16px] font-bold text-white md:text-[18px]"
+                      className="rounded-full px-10 py-4 text-[length:var(--fs-texto)] font-bold text-white "
                       style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
                       aria-label={t.modalRecordVoice}
                     >
@@ -2199,18 +2199,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       <span className="absolute inset-3 animate-pulse rounded-full bg-orange-400/25" aria-hidden />
                       <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
                     </div>
-                    <p className="text-[18px] font-semibold text-orange-600 md:text-[22px]" aria-live="polite">
+                    <p className="text-[length:var(--fs-subtitulo)] font-semibold text-orange-600 " aria-live="polite">
                       {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
                     </p>
                     {recordSec >= 270 ? (
-                      <p className="text-sm font-semibold text-orange-700" aria-live="assertive">
+                      <p className="text-[length:var(--fs-pequeno)] font-semibold text-orange-700" aria-live="assertive">
                         {t.modalRecordingSoonEnd}
                       </p>
                     ) : null}
                     <button
                       type="button"
                       onClick={stopRecording}
-                      className="rounded-full bg-red-600 px-10 py-4 text-[16px] font-bold text-white md:text-[18px]"
+                      className="rounded-full bg-red-600 px-10 py-4 text-[length:var(--fs-texto)] font-bold text-white "
                       aria-label={t.modalStop}
                     >
                       {t.modalStop}
@@ -2228,7 +2228,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {avSource === 'archivo' && (
               <div className="space-y-4">
                 {uploadAudioFile ? null : (
-                  <label htmlFor="story-audio-file" className="block text-sm font-semibold text-gray-800">
+                  <label htmlFor="story-audio-file" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
                     Audio desde tu equipo (hasta {SUBIR_AUDIO_UPLOAD_MAX_MB} MB)
                   </label>
                 )}
@@ -2244,12 +2244,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     if (!f) return;
                     acceptUploadFile('audio', f);
                   }}
-                  className={uploadAudioFile ? 'sr-only' : 'w-full text-sm text-gray-600'}
+                  className={uploadAudioFile ? 'sr-only' : 'w-full text-[length:var(--fs-pequeno)] text-gray-600'}
                 />
                 {uploadAudioFile
                   ? renderReadyCard('audio', uploadAudioFile.name, uploadAudioFile.size)
                   : null}
-                <label htmlFor="story-audio-url" className="block text-sm font-semibold text-gray-800">
+                <label htmlFor="story-audio-url" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
                   {t.modalAudioLinkLabel}
                 </label>
                 <input
@@ -2260,7 +2260,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     setAudioShareUrl(e.target.value);
                     if (e.target.value.trim()) removePickedFile();
                   }}
-                  className="w-full rounded-xl px-3 py-2.5 text-sm outline-none text-gray-800"
+                  className="w-full rounded-xl px-3 py-2.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                   style={{ ...soft.flat, borderRadius: '12px' }}
                 />
               </div>
@@ -2273,18 +2273,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {chosenTopic && (
               <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <p className="text-[16px] font-semibold text-gray-800 md:text-[18px]">Inspiración · {chosenTopic.title}</p>
+                  <p className="text-[length:var(--fs-texto)] font-semibold text-gray-800 ">Inspiración · {chosenTopic.title}</p>
                   <button
                     type="button"
                     onClick={onClearTopic}
-                    className="rounded-full px-3 py-1.5 text-xs font-bold text-orange-700"
+                    className="rounded-full px-3 py-1.5 text-[length:var(--fs-etiqueta)] font-bold text-orange-700"
                     style={soft.button}
                     aria-label="Quitar inspiración"
                   >
                     Quitar inspiración
                   </button>
                 </div>
-                <ul className="list-inside list-disc space-y-2 text-[15px] text-gray-600 md:text-[16px]">
+                <ul className="list-inside list-disc space-y-2 text-[length:var(--fs-texto)] text-gray-600 ">
                   {chosenTopic.questions.slice(0, 3).map((q) => (
                     <li key={q}>{q}</li>
                   ))}
@@ -2395,7 +2395,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           style={{ backgroundColor: soft.bg }}
         >
           <div className="min-w-0 space-y-1">
-            <p className="text-xs font-bold uppercase text-orange-600 md:text-sm tracking-[0.12em]">
+            <p className="text-[length:var(--fs-pequeno)] font-bold uppercase text-orange-600 tracking-[0.12em]">
               ALMAMUNDI
             </p>
             {step !== 'details' && (
@@ -2437,23 +2437,23 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 }}
               >
               <div className="space-y-1 px-0.5">
-                <p className="text-xs font-semibold text-gray-700" aria-live="polite">
+                <p className="text-[length:var(--fs-etiqueta)] font-semibold text-gray-700" aria-live="polite">
                   {t.modalStep2}
                 </p>
                 <h3
                   id="story-modal-details-title"
-                  className="text-[16px] font-light leading-tight text-gray-800 md:text-[18px]"
+                  className="text-[length:var(--fs-texto)] font-normal leading-tight text-gray-800 "
                 >
                   {t.modalDetailsTitle}
                 </h3>
-                <p className="text-[12px] leading-snug text-gray-600">{t.modalDetailsSubtitle}</p>
-                <p className="text-[10px] text-gray-500">{t.modalRequiredFieldsNote}</p>
+                <p className="text-[length:var(--fs-etiqueta)] leading-snug text-gray-600">{t.modalDetailsSubtitle}</p>
+                <p className="text-[length:var(--fs-etiqueta)] text-gray-500">{t.modalRequiredFieldsNote}</p>
               </div>
 
               <div className="mt-2 grid grid-cols-1 items-start gap-2 md:grid-cols-2 md:gap-4">
                 {/* Historia + extras — columna izquierda */}
                 <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
+                  <div className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700 ">
                     {mode === 'foto' ? t.modalSectionAbout : t.modalSectionYourStory}
                   </div>
                   <div className="space-y-2">
@@ -2461,7 +2461,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div>
                       <label
                         htmlFor="story-title"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <FileText size={12} className="text-orange-500" aria-hidden />
                         {t.modalStoryName}
@@ -2474,11 +2474,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.title) setFieldErr((p) => ({ ...p, title: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                       {fieldErr.title ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.title}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.title}</p>
                       ) : null}
                     </div>
                     ) : null}
@@ -2486,7 +2486,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div>
                       <label
                         htmlFor="story-alias"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
@@ -2499,12 +2499,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
-                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalAliasHint}</p>
                       {fieldErr.alias ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.alias}</p>
                       ) : null}
                     </div>
                     ) : null}
@@ -2512,12 +2512,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div>
                       <label
                         htmlFor="story-extras"
-                        className="mb-0.5 block text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 block text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         {t.modalExtras}
                       </label>
                       {mode === 'audio' || mode === 'video' ? (
-                        <p className="mb-0.5 text-[10px] leading-snug text-gray-600">
+                        <p className="mb-0.5 text-[length:var(--fs-etiqueta)] leading-snug text-gray-600">
                           {t.modalExtrasColorHint}
                         </p>
                       ) : null}
@@ -2527,7 +2527,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         onChange={(e) => setExtraText(e.target.value.slice(0, ANTECEDENTES_MAX))}
                         maxLength={ANTECEDENTES_MAX}
                         rows={2}
-                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full resize-none rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
@@ -2536,7 +2536,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div>
                       <label
                         htmlFor="story-cancion-relacionada"
-                        className="mb-0.5 block text-[11px] font-semibold normal-case leading-snug text-gray-700"
+                        className="mb-0.5 block text-[length:var(--fs-etiqueta)] font-semibold normal-case leading-snug text-gray-700"
                       >
                         {t.modalCancionRelacionada}
                       </label>
@@ -2545,19 +2545,19 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         value={cancionRelacionada}
                         onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                         maxLength={CANCION_RELACIONADA_MAX}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
                     </div>
                     ) : null}
                     {mode !== 'foto' ? (
                     <div>
-                      <div className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700">
+                      <div className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700">
                         <Upload size={12} className="text-orange-500" aria-hidden />
                         {t.modalFiles}
                       </div>
                       <label
-                        className="flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-xs text-gray-600 md:text-sm"
+                        className="flex cursor-pointer items-center justify-between rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] text-gray-600 "
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <span>{t.modalAttach}</span>
@@ -2569,18 +2569,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           onChange={(e) => addExtraFiles(e.target.files)}
                         />
                       </label>
-                      <p className="mt-0.5 text-[10px] leading-tight text-gray-500">
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-tight text-gray-500">
                         JPG, PNG, WEBP o HEIC.
                       </p>
                       {extraFiles.length > 0 && (
-                        <ul className="mt-1 space-y-0.5 text-[10px] text-gray-700">
+                        <ul className="mt-1 space-y-0.5 text-[length:var(--fs-etiqueta)] text-gray-700">
                           {extraFiles.map((f, idx) => (
                             <li key={f.name + idx} className="flex items-center justify-between gap-1">
                               <span className="truncate">{f.name}</span>
                               <button
                                 type="button"
                                 onClick={() => removeExtraFile(idx)}
-                                className="shrink-0 text-[9px] font-bold uppercase text-gray-500 hover:text-red-500 tracking-[0.12em]"
+                                className="shrink-0 text-[length:var(--fs-etiqueta)] font-bold uppercase text-gray-500 hover:text-red-500 tracking-[0.12em]"
                               >
                                 ×
                               </button>
@@ -2592,12 +2592,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     ) : null}
                     {mode === 'foto' ? (
                     <div>
-                      <p className="mb-2 text-[13px] leading-snug text-gray-700">
+                      <p className="mb-2 text-[length:var(--fs-etiqueta)] leading-snug text-gray-700">
                         {t.modalProfilePhotoNote}
                       </p>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
-                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-xs text-gray-600"
+                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-[length:var(--fs-etiqueta)] text-gray-600"
                           style={{ ...soft.flat, borderRadius: '12px' }}
                         >
                           {profilePhoto ? t.modalChange : t.modalUpload}
@@ -2617,7 +2617,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                             <button
                               type="button"
                               onClick={() => setProfilePhoto(null)}
-                              className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-gray-500 hover:text-red-500"
+                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
@@ -2630,7 +2630,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
 
                 <div className="rounded-2xl p-3 md:p-4" style={soft.inset}>
-                  <div className="mb-2 text-[11px] font-semibold normal-case text-gray-700 md:text-xs">
+                  <div className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700 ">
                     {mode === 'foto' ? t.modalSectionWhere : t.modalSectionAbout}
                   </div>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -2639,7 +2639,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-alias"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <User size={12} className="text-orange-500" aria-hidden />
                         {t.modalAlias}
@@ -2652,21 +2652,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           if (err) setErr('');
                           if (fieldErr.alias) setFieldErr((p) => ({ ...p, alias: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
-                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalAliasHint}</p>
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalAliasHint}</p>
                       {fieldErr.alias ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.alias}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.alias}</p>
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
-                      <p className="mb-2 text-[13px] leading-snug text-gray-700">
+                      <p className="mb-2 text-[length:var(--fs-etiqueta)] leading-snug text-gray-700">
                         {t.modalProfilePhotoNote}
                       </p>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
-                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-xs text-gray-600"
+                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-[length:var(--fs-etiqueta)] text-gray-600"
                           style={{ ...soft.flat, borderRadius: '12px' }}
                         >
                           {profilePhoto ? t.modalChange : t.modalUpload}
@@ -2686,7 +2686,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                             <button
                               type="button"
                               onClick={() => setProfilePhoto(null)}
-                              className="inline-flex min-h-11 items-center px-2 text-[13px] font-semibold text-gray-500 hover:text-red-500"
+                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
@@ -2699,7 +2699,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-country"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <Globe2 size={12} className="text-orange-500" aria-hidden />
                         {t.modalCountry}
@@ -2711,18 +2711,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setCountry(e.target.value);
                           if (fieldErr.country) setFieldErr((p) => ({ ...p, country: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="off"
                       />
                       {fieldErr.country ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.country}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.country}</p>
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-city"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <MapPin size={12} className="text-orange-500" aria-hidden />
                         {t.modalCity}
@@ -2734,19 +2734,19 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setCity(e.target.value);
                           if (fieldErr.city) setFieldErr((p) => ({ ...p, city: undefined }));
                         }}
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                         autoComplete="off"
                       />
-                      <p className="mt-0.5 text-[10px] text-gray-600">{t.modalLocationHint}</p>
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalLocationHint}</p>
                       {fieldErr.city ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.city}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.city}</p>
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-age"
-                        className="mb-0.5 block text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 block text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         {t.modalAge}
                       </label>
@@ -2757,7 +2757,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           setAgeRange(e.target.value as AgeRange);
                           if (fieldErr.age) setFieldErr((p) => ({ ...p, age: undefined }));
                         }}
-                        className="w-full rounded-xl px-2 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalAgeChoose}</option>
@@ -2774,13 +2774,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         ))}
                       </select>
                       {fieldErr.age ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.age}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.age}</p>
                       ) : null}
                     </div>
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-gender"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <Users size={12} className="text-orange-500" aria-hidden />
                         {t.modalGender}
@@ -2789,7 +2789,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         id="story-gender"
                         value={sex}
                         onChange={(e) => setSex(e.target.value as Sex)}
-                        className="w-full rounded-xl px-2 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       >
                         <option value="">{t.modalGenderBlank}</option>
@@ -2803,7 +2803,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <div className="sm:col-span-2">
                       <label
                         htmlFor="story-email"
-                        className="mb-0.5 flex items-center gap-1.5 text-[11px] font-semibold normal-case text-gray-700"
+                        className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
                       >
                         <Mail size={12} className="text-orange-500" aria-hidden />
                         {t.modalEmail}
@@ -2817,14 +2817,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         }}
                         type="email"
                         autoComplete="off"
-                        className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                        className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                         style={{ ...soft.flat, borderRadius: '12px' }}
                       />
-                      <p className="mt-0.5 text-[10px] leading-tight text-gray-600 md:text-[11px]">
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-tight text-gray-600 ">
                         {t.modalEmailHint}
                       </p>
                       {fieldErr.email ? (
-                        <p className="mt-0.5 text-[11px] text-red-600" role="alert">{fieldErr.email}</p>
+                        <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.email}</p>
                       ) : null}
                     </div>
                   </div>
@@ -2835,7 +2835,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 <div className="mt-2 rounded-2xl p-3 md:p-4" style={soft.inset}>
                   <label
                     htmlFor="story-cancion-relacionada"
-                    className="mb-2 block text-[13px] font-semibold leading-snug text-gray-700"
+                    className="mb-2 block text-[length:var(--fs-etiqueta)] font-semibold leading-snug text-gray-700"
                   >
                     {t.modalCancionRelacionada}
                   </label>
@@ -2844,18 +2844,18 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     value={cancionRelacionada}
                     onChange={(e) => setCancionRelacionada(e.target.value.slice(0, CANCION_RELACIONADA_MAX))}
                     maxLength={CANCION_RELACIONADA_MAX}
-                    className="w-full rounded-xl px-2.5 py-1.5 text-[15px] outline-none text-gray-800"
+                    className="w-full rounded-xl px-2.5 py-1.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
                     style={{ ...soft.flat, borderRadius: '12px' }}
                   />
                 </div>
               ) : null}
 
               {mode === 'foto' && fieldErr.title ? (
-                <p className="mt-2 text-[13px] text-red-600" role="alert">{fieldErr.title}</p>
+                <p className="mt-2 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.title}</p>
               ) : null}
 
               {err && (
-                <p className="shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium text-red-600 md:text-xs" role="alert">
+                <p className="shrink-0 rounded-lg px-2 py-1 text-[length:var(--fs-etiqueta)] font-medium text-red-600 " role="alert">
                   {err}
                 </p>
               )}
@@ -2880,7 +2880,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     onChange={(e) => setAcceptedTerminos(e.target.checked)}
                     className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
                   />
-                  <label htmlFor="consent-terminos" className="text-[11px] font-semibold leading-snug text-gray-700 md:text-xs">
+                  <label htmlFor="consent-terminos" className="text-[length:var(--fs-etiqueta)] font-semibold leading-snug text-gray-700 ">
                     Acepto los{' '}
                     <a className="text-orange-600 underline" href="/terminos" target="_blank" rel="noreferrer">
                       {t.modalConsentTermsLink}
@@ -2928,7 +2928,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           style={{ animation: 'story-upload-indeterminate 1.15s ease-in-out infinite' }}
                         />
                       </div>
-                      <p className="mt-1 text-left text-[11px] leading-snug text-gray-700" aria-live="polite">
+                      <p className="mt-1 text-left text-[length:var(--fs-etiqueta)] leading-snug text-gray-700" aria-live="polite">
                         {t.modalUploadColorsWait}
                       </p>
                     </div>
@@ -2947,7 +2947,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           style={{ width: `${uploadProgress}%` }}
                         />
                       </div>
-                      <p className="mt-1 text-right text-[11px] font-semibold text-gray-700">{uploadProgress}%</p>
+                      <p className="mt-1 text-right text-[length:var(--fs-etiqueta)] font-semibold text-gray-700">{uploadProgress}%</p>
                     </div>
                   ) : null}
                   <button
@@ -2956,7 +2956,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       setErr('');
                       setStep('capture');
                     }}
-                    className="btn-am-neutro min-h-11 px-5 py-2 text-xs font-semibold active:scale-95 md:px-6"
+                    className="btn-am-neutro min-h-11 px-5 py-2 text-[length:var(--fs-etiqueta)] font-semibold active:scale-95 md:px-6"
                     style={{ fontFamily: APP_FONT }}
                   >
                     {t.modalBack}
@@ -2968,7 +2968,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       disabled={
                         saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
                       }
-                      className="btn-am-principal min-h-11 px-5 py-2 text-xs font-semibold active:scale-95 disabled:opacity-60 md:px-6"
+                      className="btn-am-principal min-h-11 px-5 py-2 text-[length:var(--fs-etiqueta)] font-semibold active:scale-95 disabled:opacity-60 md:px-6"
                       style={{ fontFamily: APP_FONT }}
                     >
                       {creatingColors
@@ -2992,7 +2992,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                                 : t.modalSendPhoto}
                     </button>
                     {!saving && !(acceptedPrivacy && acceptedPublicacion && acceptedTerminos) ? (
-                      <p className="max-w-[16rem] text-right text-[10px] text-gray-600">
+                      <p className="max-w-[16rem] text-right text-[length:var(--fs-etiqueta)] text-gray-600">
                         {t.modalMarkThreeToSend}
                       </p>
                     ) : null}
@@ -3005,7 +3005,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           {step === 'received' && (
             <div className="font-interna flex flex-col">
               <div className="shrink-0 space-y-2 text-center">
-                <h3 className="text-[clamp(1.35rem,4vw,1.75rem)] font-semibold leading-[1.15] text-[#141D26]">
+                <h3 className="text-[length:var(--fs-titular)] font-semibold leading-[1.15] text-[#141D26]">
                   {alias.trim() ? (
                     <>
                       {aliasForGreeting(alias, locale)}, {t.modalReceivedAfterName}
@@ -3014,10 +3014,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     t.modalReceivedAnonBefore
                   )}
                 </h3>
-                <p className="text-[13px] font-normal leading-snug text-[#5C5C52]">
+                <p className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#5C5C52]">
                   {t.modalImprintExplain}
                 </p>
-                <p className="text-[13px] font-normal leading-snug text-[#5C5C52]">
+                <p className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#5C5C52]">
                   {t.modalReviewInProgress}
                 </p>
               </div>
@@ -3030,7 +3030,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       titulo: (imprintStoryTitle || storyTitle).trim() || 'historia' })}
                   />
               </div>
-              <p className="mx-auto mt-2 w-full text-[13px] leading-snug text-[#5C5C52] md:w-[420px]">
+              <p className="mx-auto mt-2 w-full text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52] md:w-[420px]">
                 {mode === 'texto'
                   ? t.modalImprintHowTexto
                   : mode === 'foto'
@@ -3045,7 +3045,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <button
                     type="button"
                     onClick={() => void downloadImprint()}
-                    className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-semibold md:flex-1"
+                    className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-[length:var(--fs-pequeno)] font-semibold md:flex-1"
                   >
                     <Download size={16} strokeWidth={1.6} aria-hidden />
                     {t.modalDownloadImprint}
@@ -3053,20 +3053,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <button
                     type="button"
                     onClick={() => void shareImprint()}
-                    className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-sm font-medium md:flex-1"
+                    className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-[length:var(--fs-pequeno)] font-medium md:flex-1"
                   >
                     <Share2 size={15} aria-hidden />
                     {t.modalShareImprint}
                   </button>
                 </div>
                 <div className="mt-8">
-                  <p className="mb-2 text-[13px] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
+                  <p className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
                   <button
                     type="button"
                     onClick={() => {
                       router.push('/pregunta');
                     }}
-                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]"
+                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]"
                   >
                     {t.modalAnswerWeekQuestion}
                   </button>
@@ -3074,7 +3074,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={startAnotherStory}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {mode === 'foto'
                         ? t.modalAnotherCtaFoto
@@ -3087,7 +3087,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={onExploreMap}
-                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-sm font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {t.modalBackToMap}
                     </button>
@@ -3099,12 +3099,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                         event.preventDefault();
                         router.push('/contar');
                       }}
-                      className="inline-flex min-h-11 items-center text-[13px] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange)] hover:underline"
+                      className="inline-flex min-h-11 items-center text-[length:var(--fs-etiqueta)] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange)] hover:underline"
                     >
                       {t.modalAnotherFormatLink}
                     </a>
                   </p>
-                  <p className="mt-4 text-center text-[13px] leading-snug text-[#5C5C52]">
+                  <p className="mt-4 text-center text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52]">
                     {t.modalContactLead}{' '}
                     <a
                       href="mailto:hola@almamundi.org"
@@ -3116,7 +3116,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   </p>
                 </div>
                 <p
-                  className={`min-h-[1.1rem] text-center text-[0.78rem] font-semibold text-[var(--almamundi-orange)] ${
+                  className={`min-h-[1.1rem] text-center text-[length:var(--fs-etiqueta)] font-semibold text-[var(--almamundi-orange)] ${
                     shareNotice ? 'opacity-100' : 'opacity-0'
                   }`}
                   aria-live="polite"
@@ -3165,7 +3165,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ) : null}
 
           {err && step !== 'details' && step !== 'received' && (
-            <p className="mt-4 text-[15px] font-medium text-red-600 md:text-[16px]" role="alert">{err}</p>
+            <p className="mt-4 text-[length:var(--fs-texto)] font-medium text-red-600 " role="alert">{err}</p>
           )}
         </div>
         {previewLine ? <p className={`${amStyles.amModalFootnote} px-4 pb-3`}>{previewLine}</p> : null}

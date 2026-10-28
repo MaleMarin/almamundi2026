@@ -62,13 +62,13 @@ export function ComoFuncionaModal({
       >
         <h2
           id="como-funciona-titulo"
-          className="text-[18px] font-semibold md:text-[22px]"
+          className="text-[length:var(--fs-subtitulo)] font-semibold "
           style={{ color: soft.textMain }}
         >
           ¿Cómo funciona?
         </h2>
         <div
-          className="mt-5 space-y-3 text-[13px] leading-relaxed md:space-y-3.5 md:text-sm"
+          className="mt-5 space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5 "
           style={{ color: soft.textBody }}
         >
           <p>AlmaMundi es un mapa vivo de historias humanas.</p>
@@ -101,7 +101,7 @@ export function ComoFuncionaModal({
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
           <Link
             href="/privacidad"
-            className="btn-almamundi inline-flex justify-center rounded-full px-6 py-3 text-center text-sm font-semibold transition active:scale-[0.98]"
+            className="btn-almamundi inline-flex justify-center rounded-full px-6 py-3 text-center text-[length:var(--fs-pequeno)] font-semibold transition active:scale-[0.98]"
             style={{ ...soft.button, color: soft.textMain }}
             onClick={onClose}
           >
@@ -110,7 +110,7 @@ export function ComoFuncionaModal({
           <button
             type="button"
             onClick={onClose}
-            className="btn-almamundi rounded-full px-6 py-3 text-sm font-semibold transition active:scale-[0.98]"
+            className="btn-almamundi rounded-full px-6 py-3 text-[length:var(--fs-pequeno)] font-semibold transition active:scale-[0.98]"
             style={{ ...soft.button, color: soft.textMain }}
           >
             Cerrar

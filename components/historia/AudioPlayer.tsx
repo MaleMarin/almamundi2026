@@ -336,8 +336,8 @@ export default function AudioPlayer({
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontStyle: 'italic',
-                fontWeight: 300,
-                fontSize: 'clamp(1.188rem, 3.24vw, 1.938rem)',
+                fontWeight: 400,
+                fontSize: 'var(--fs-titular)',
                 color: TEXT_MAIN,
                 textAlign: 'center',
                 maxWidth: '100%',
@@ -420,7 +420,7 @@ export default function AudioPlayer({
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
                     fontStyle: 'italic',
-                    fontSize: '15px',
+                    fontSize: 'var(--fs-pequeno)',
                     color: TEXT_BODY,
                     lineHeight: 1.6,
                     margin: 0 }}
@@ -463,7 +463,7 @@ export default function AudioPlayer({
                   onChange={seek}
                 />
               </div>
-              <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: '12.8px', color: TEXT_BODY }}>
+              <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: TEXT_BODY }}>
                 {formatTime(currentTime)} · · · {formatTime(duration)}
               </p>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1rem', flexWrap: 'wrap' }}>
@@ -555,7 +555,7 @@ export default function AudioPlayer({
                   <summary
                     style={{
                       cursor: 'pointer',
-                      fontSize: '13px',
+                      fontSize: 'var(--fs-etiqueta)',
                       fontWeight: 600,
                       letterSpacing: '0.12em',
                       textTransform: 'uppercase',
@@ -573,7 +573,7 @@ export default function AudioPlayer({
                     aria-label="Transcripción del audio"
                     style={{
                       marginTop: '16px',
-                      fontSize: '15px',
+                      fontSize: 'var(--fs-pequeno)',
                       lineHeight: '1.8',
                       color: TEXT_MAIN,
                       borderLeft: '3px solid #FF4A1C',

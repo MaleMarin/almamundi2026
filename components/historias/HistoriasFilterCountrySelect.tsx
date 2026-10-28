@@ -77,7 +77,7 @@ export function HistoriasFilterCountrySelect({
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-[2.75rem] w-full items-center gap-1.5 rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-left text-sm text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+        className="flex min-h-[2.75rem] w-full items-center gap-1.5 rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
         style={{ fontFamily: neu.APP_FONT }}
       >
         <span className="min-w-0 flex-1 truncate">{labelShown}</span>
@@ -100,7 +100,7 @@ export function HistoriasFilterCountrySelect({
               placeholder="Buscar país"
               autoComplete="off"
               aria-label="Buscar en la lista de países"
-              className="w-full rounded-xl border border-gray-300/35 bg-[#E0E5EC] px-3 py-2 text-sm text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.4),inset_-2px_-2px_6px_rgba(255,255,255,0.8)] outline-none focus:ring-2 focus:ring-orange-400/35"
+              className="w-full rounded-xl border border-gray-300/35 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.4),inset_-2px_-2px_6px_rgba(255,255,255,0.8)] outline-none focus:ring-2 focus:ring-orange-400/35"
               style={{ fontFamily: neu.APP_FONT }}
               onKeyDown={(e) => e.stopPropagation()}
             />
@@ -116,7 +116,7 @@ export function HistoriasFilterCountrySelect({
                 type="button"
                 role="option"
                 aria-selected={value === ''}
-                className="w-full px-3 py-2 text-left text-sm text-gray-800 hover:bg-white/60"
+                className="w-full px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 hover:bg-white/60"
                 style={{ fontFamily: neu.APP_FONT }}
                 onClick={() => pick('')}
               >
@@ -129,7 +129,7 @@ export function HistoriasFilterCountrySelect({
                   type="button"
                   role="option"
                   aria-selected={value === c}
-                  className="w-full px-3 py-2 text-left text-sm text-gray-800 hover:bg-white/60"
+                  className="w-full px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 hover:bg-white/60"
                   style={{ fontFamily: neu.APP_FONT }}
                   onClick={() => pick(c)}
                 >
@@ -138,7 +138,7 @@ export function HistoriasFilterCountrySelect({
               </li>
             ))}
             {filtered.length === 0 ? (
-              <li className="px-3 py-4 text-center text-sm text-gray-500">Sin coincidencias</li>
+              <li className="px-3 py-4 text-center text-[length:var(--fs-pequeno)] text-gray-500">Sin coincidencias</li>
             ) : null}
           </ul>
         </div>

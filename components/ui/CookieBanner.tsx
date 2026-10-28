@@ -61,14 +61,15 @@ export function CookieBanner() {
     border: '1px solid rgba(163,177,198,0.35)' };
 
   const textStyle: CSSProperties = {
-    fontSize: 12,
+    fontSize: 'var(--fs-pequeno)',
+    fontWeight: 500,
     color: '#5a6070',
     lineHeight: 1.45,
     margin: 0 };
 
   const linkStyle: CSSProperties = {
     color: '#FF4A1C',
-    fontWeight: 600,
+    fontWeight: 500,
     textDecoration: 'none' };
 
   const buttonStyle: CSSProperties = {
@@ -77,8 +78,8 @@ export function CookieBanner() {
     border: 'none',
     padding: '7px 16px',
     borderRadius: 100,
-    fontSize: 15,
-    fontWeight: 600,
+    fontSize: 'var(--fs-pequeno)',
+    fontWeight: 500,
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,

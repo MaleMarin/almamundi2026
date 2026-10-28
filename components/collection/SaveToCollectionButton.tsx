@@ -31,7 +31,7 @@ export function SaveToCollectionButton({ kind, id, title, subtitle, className }:
   return (
     <div className="flex items-center gap-2">
       {toast && (
-        <span className="text-[11px] text-emerald-400/90">
+        <span className="text-[length:var(--fs-etiqueta)] text-emerald-400/90">
           Guardado en tu colección
         </span>
       )}
@@ -41,7 +41,7 @@ export function SaveToCollectionButton({ kind, id, title, subtitle, className }:
         disabled={saved}
         className={
           className ??
-          'px-3 py-2 rounded-xl text-sm font-medium border transition ' +
+          'px-3 py-2 rounded-xl text-[length:var(--fs-pequeno)] font-medium border transition ' +
             (saved
               ? 'bg-white/10 border-white/20 text-white/60 cursor-default'
               : 'bg-white/5 border-white/15 text-white/80 hover:bg-white/10 hover:border-white/25')

@@ -23,7 +23,7 @@ export function YouTubeEmbed({ videoId, title, className = '' }: YouTubeEmbedPro
           href={`https://www.youtube.com/watch?v=${videoId}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition-colors text-sm font-semibold"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-orange-500/20 text-orange-300 border border-orange-500/40 hover:bg-orange-500/30 transition-colors text-[length:var(--fs-pequeno)] font-semibold"
         >
           <ExternalLink size={18} />
           Abrir señal oficial

@@ -93,7 +93,7 @@ function SoundRow({
           color: 'inherit' }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
-          <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.4 }}>
+          <p style={{ fontSize: 'var(--fs-pequeno)', color: 'rgba(255,255,255,0.85)', margin: 0, lineHeight: 1.4 }}>
             {mood.place}
           </p>
         </div>
@@ -151,7 +151,7 @@ function SoundRow({
           <Plus size={16} strokeWidth={2.5} aria-hidden />
         </button>
         <span
-          className="w-9 shrink-0 text-right text-[11px] tabular-nums text-white/50"
+          className="w-9 shrink-0 text-right text-[length:var(--fs-etiqueta)] tabular-nums text-white/50"
           aria-hidden
         >
           {pct}%
@@ -230,7 +230,7 @@ export function SoundsPanel({
       <div style={{ flexShrink: 0, margin: '0 0 2px' }}>
         <p
           style={{
-            fontSize: 13,
+            fontSize: 'var(--fs-etiqueta)',
             color: 'rgba(248, 250, 255, 0.82)',
             lineHeight: 1.5,
             margin: 0,
@@ -257,7 +257,7 @@ export function SoundsPanel({
             color: soundEnabled ? '#ffffff' : 'rgba(255,255,255,0.55)',
             boxShadow: soundEnabled ? '0 0 16px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255, 200, 160, 0.35)' : 'inset 0 1px 0 rgba(255,255,255,0.2)',
             cursor: 'pointer',
-            fontSize: 13,
+            fontSize: 'var(--fs-etiqueta)',
             fontFamily: SITE_FONT_STACK,
             outline: 'none',
             transition: 'all 200ms ease' }}
@@ -265,11 +265,11 @@ export function SoundsPanel({
           {soundEnabled ? 'ON' : 'OFF'}
         </button>
       </div>
-      <p className="text-[11px] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
+      <p className="text-[length:var(--fs-etiqueta)] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
         Cada ambiente tiene su volumen guardado en este dispositivo. Ajusta con la barra o con − / +.
       </p>
       {publicListError ? (
-        <p className="text-[11px] text-amber-200/80" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
+        <p className="text-[length:var(--fs-etiqueta)] text-amber-200/80" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
           {publicListError}
         </p>
       ) : null}
@@ -289,7 +289,7 @@ export function SoundsPanel({
         {publicPathsDeduped.length > 0 ? (
           <>
             <p
-              className="text-[10px] uppercase text-white/35 tracking-[0.12em]"
+              className="text-[length:var(--fs-etiqueta)] uppercase text-white/35 tracking-[0.12em]"
               style={{ fontFamily: SITE_FONT_STACK, margin: '10px 0 2px', flexShrink: 0 }}
             >
               Más sonidos (tu carpeta public)

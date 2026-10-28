@@ -25,7 +25,7 @@ export function AdultConsentCheckbox({
         onChange={(e) => onChange(e.target.checked)}
         className="mt-0.5 h-4 w-4 shrink-0 accent-orange-500"
       />
-      <label htmlFor={id} className="text-[11px] font-semibold leading-snug text-gray-700 md:text-xs">
+      <label htmlFor={id} className="text-[length:var(--fs-etiqueta)] font-semibold leading-snug text-gray-700 ">
         {label}
       </label>
     </div>

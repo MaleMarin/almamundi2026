@@ -26,7 +26,7 @@ export function HomeLanguageSwitcher({ className = '' }: { className?: string })
             type="button"
             onClick={() => setLocale(code)}
             aria-pressed={active}
-            className={`min-w-[2rem] rounded-full px-2 py-1 text-[11px] font-bold tracking-wide transition-colors ${
+            className={`min-w-[2rem] rounded-full px-2 py-1 text-[length:var(--fs-etiqueta)] font-bold tracking-wide transition-colors ${
               active
                 ? 'bg-gray-600 text-white'
                 : 'text-gray-600 hover:bg-white/50 hover:text-gray-800'

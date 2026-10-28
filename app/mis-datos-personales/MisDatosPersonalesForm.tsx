@@ -49,9 +49,9 @@ const PRIVACY_COUNTRIES = [
 ] as const;
 
 const fieldClass =
-  'mt-1 w-full rounded-xl border border-gray-300/50 bg-[#f0f2f7] px-3 py-2.5 text-sm text-gray-900 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.35),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/35';
+  'mt-1 w-full rounded-xl border border-gray-300/50 bg-[#f0f2f7] px-3 py-2.5 text-[length:var(--fs-pequeno)] text-gray-900 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.35),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/35';
 
-const labelClass = 'block text-sm font-medium text-gray-700';
+const labelClass = 'block text-[length:var(--fs-pequeno)] font-medium text-gray-700';
 
 export function MisDatosPersonalesForm() {
   const [requestType, setRequestType] = useState<string>(REQUEST_OPTIONS[0].value);
@@ -116,11 +116,11 @@ export function MisDatosPersonalesForm() {
   return (
     <div className="mx-auto max-w-2xl space-y-8 px-4 py-10 pb-16" style={{ fontFamily: 'inherit' }}>
       <header className="space-y-3 text-center sm:text-left">
-        <p className="text-xs font-semibold uppercase text-orange-600 tracking-[0.12em]">Privacidad</p>
-        <h1 id="solicitud-datos-personales" className="text-[22px] font-semibold text-gray-900 md:text-[27px]">
+        <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-orange-600 tracking-[0.12em]">Privacidad</p>
+        <h1 id="solicitud-datos-personales" className="text-[length:var(--fs-titular)] font-normal text-gray-900 ">
           Solicitud sobre tus datos personales
         </h1>
-        <div className="space-y-3 text-sm leading-relaxed text-gray-600 md:text-[15px]">
+        <div className="space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 ">
           <p>
             Puedes usar este formulario para solicitar información o ejercer tus derechos sobre los datos personales
             que hayas compartido con AlmaMundi. Es el mismo canal que describe el{' '}
@@ -138,14 +138,14 @@ export function MisDatosPersonalesForm() {
 
       {status === 'ok' ? (
         <div
-          className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 text-center text-sm text-gray-700 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
+          className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 text-center text-[length:var(--fs-pequeno)] text-gray-700 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
           role="status"
         >
           <p className="font-medium text-gray-900">Recibimos tu solicitud.</p>
           <p className="mt-2 leading-relaxed">
             La enviamos al equipo de AlmaMundi. Si necesitamos aclarar algo, te escribiremos al correo que indicaste.
           </p>
-          <p className="mt-3 text-xs text-gray-500">
+          <p className="mt-3 text-[length:var(--fs-etiqueta)] text-gray-500">
             Si el envío automático no estuviera disponible en este momento, puedes escribir a{' '}
             <a href="mailto:hola@almamundi.org" className="font-semibold text-orange-600 underline underline-offset-2">
               hola@almamundi.org
@@ -154,7 +154,7 @@ export function MisDatosPersonalesForm() {
           </p>
           <Link
             href="/"
-            className="btn-am-neutro mt-6 inline-block px-5 py-2.5 text-sm font-semibold"
+            className="btn-am-neutro mt-6 inline-block px-5 py-2.5 text-[length:var(--fs-pequeno)] font-semibold"
           >
             Volver al inicio
           </Link>
@@ -215,7 +215,7 @@ export function MisDatosPersonalesForm() {
                   className={fieldClass}
                   placeholder=""
                 />
-                <p className="mt-2 text-xs leading-relaxed text-gray-500">
+                <p className="mt-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-gray-500">
                   Describe tu solicitud con el mayor detalle posible para poder ayudarte mejor. Puedes indicar qué datos
                   quieres revisar, corregir o eliminar; en qué parte del sitio participaste; si enviaste una historia,
                   fotografía, audio, texto o video; y el correo que usaste al participar.
@@ -228,7 +228,7 @@ export function MisDatosPersonalesForm() {
             className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="identificacion"
           >
-            <h2 id="identificacion" className="text-[15px] font-semibold text-gray-900">
+            <h2 id="identificacion" className="text-[length:var(--fs-pequeno)] font-semibold text-gray-900">
               Identificación de la persona solicitante
             </h2>
             <div className="mt-5 space-y-4">
@@ -300,7 +300,7 @@ export function MisDatosPersonalesForm() {
                 <legend className={`${labelClass} mb-2`}>
                   ¿Haces esta solicitud sobre tus propios datos?
                 </legend>
-                <div className="flex flex-wrap gap-4 text-sm text-gray-800">
+                <div className="flex flex-wrap gap-4 text-[length:var(--fs-pequeno)] text-gray-800">
                   <label className="inline-flex cursor-pointer items-center gap-2">
                     <input type="radio" name="ownData" value="yes" checked={ownData === 'yes'} onChange={() => setOwnData('yes')} required className="h-4 w-4 accent-orange-600" />
                     Sí
@@ -312,7 +312,7 @@ export function MisDatosPersonalesForm() {
                 </div>
               </fieldset>
               {ownData === 'no' ? (
-                <p className="rounded-lg border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-xs leading-relaxed text-amber-950">
+                <p className="rounded-lg border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-amber-950">
                   Si actúas en representación de otra persona, podremos pedir información adicional para verificar que
                   tienes autorización.
                 </p>
@@ -324,10 +324,10 @@ export function MisDatosPersonalesForm() {
             className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="verificacion"
           >
-            <h2 id="verificacion" className="text-[15px] font-semibold text-gray-900">
+            <h2 id="verificacion" className="text-[length:var(--fs-pequeno)] font-semibold text-gray-900">
               Verificación de identidad
             </h2>
-            <p className="mt-3 text-sm leading-relaxed text-gray-600">
+            <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600">
               Para proteger tu privacidad, es posible que solicitemos una verificación mínima de identidad antes de
               responder ciertas solicitudes.
             </p>
@@ -341,7 +341,7 @@ export function MisDatosPersonalesForm() {
             ) : null}
           </section>
 
-          <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#e8ebf2]/90 p-5 text-xs leading-relaxed text-gray-600 md:text-sm">
+          <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#e8ebf2]/90 p-5 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 ">
             <p>
               Al enviar esta solicitud, confirmas que la información entregada es correcta y que AlmaMundi puede
               contactarte para gestionar tu requerimiento.
@@ -352,7 +352,7 @@ export function MisDatosPersonalesForm() {
           </div>
 
           {errMsg ? (
-            <p className="text-sm font-medium text-red-700" role="alert">
+            <p className="text-[length:var(--fs-pequeno)] font-medium text-red-700" role="alert">
               {errMsg}
             </p>
           ) : null}
@@ -361,11 +361,11 @@ export function MisDatosPersonalesForm() {
             <button
               type="submit"
               disabled={status === 'sending' || ownData === '' || !formToken}
-              className="btn-am-principal px-8 py-3 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-60"
+              className="btn-am-principal px-8 py-3 text-[length:var(--fs-pequeno)] font-semibold disabled:cursor-not-allowed disabled:opacity-60"
             >
               {status === 'sending' ? 'Enviando…' : 'Enviar solicitud'}
             </button>
-            <Link href="/privacidad" className="inline-flex justify-center rounded-full border border-gray-400/50 px-6 py-3 text-center text-sm font-semibold text-gray-800 hover:bg-white/50">
+            <Link href="/privacidad" className="inline-flex justify-center rounded-full border border-gray-400/50 px-6 py-3 text-center text-[length:var(--fs-pequeno)] font-semibold text-gray-800 hover:bg-white/50">
               Aviso de privacidad
             </Link>
           </div>

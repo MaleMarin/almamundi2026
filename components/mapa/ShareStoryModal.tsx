@@ -63,8 +63,8 @@ export function ShareStoryModal({
           <div style={{ textAlign: 'center', padding: '12px 0' }}>
             <p
               style={{
-                fontSize: 18,
-                fontWeight: 300,
+                fontSize: 'var(--fs-texto)',
+                fontWeight: 400,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 8px',
                 fontFamily: SITE_FONT_STACK }}
@@ -73,7 +73,7 @@ export function ShareStoryModal({
             </p>
             <p
               style={{
-                fontSize: 13,
+                fontSize: 'var(--fs-etiqueta)',
                 color: 'rgba(255,255,255,0.40)',
                 margin: '0 0 20px',
                 fontFamily: SITE_FONT_STACK }}
@@ -92,7 +92,7 @@ export function ShareStoryModal({
                 border: '1px solid rgba(255,255,255,0.10)',
                 color: 'rgba(255,255,255,0.60)',
                 cursor: 'pointer',
-                fontSize: 13,
+                fontSize: 'var(--fs-etiqueta)',
                 outline: 'none',
                 fontFamily: SITE_FONT_STACK }}
             >
@@ -103,8 +103,8 @@ export function ShareStoryModal({
           <>
             <p
               style={{
-                fontSize: 16,
-                fontWeight: 300,
+                fontSize: 'var(--fs-texto)',
+                fontWeight: 400,
                 color: 'rgba(255,255,255,0.90)',
                 margin: '0 0 6px',
                 fontFamily: SITE_FONT_STACK }}
@@ -115,7 +115,7 @@ export function ShareStoryModal({
             </p>
             <p
               style={{
-                fontSize: 12,
+                fontSize: 'var(--fs-etiqueta)',
                 color: 'rgba(255,255,255,0.35)',
                 margin: '0 0 20px',
                 fontFamily: SITE_FONT_STACK,
@@ -138,7 +138,7 @@ export function ShareStoryModal({
                 background: 'rgba(255,255,255,0.07)',
                 border: '1px solid rgba(255,255,255,0.10)',
                 color: 'rgba(255,255,255,0.85)',
-                fontSize: 13,
+                fontSize: 'var(--fs-etiqueta)',
                 outline: 'none',
                 boxSizing: 'border-box',
                 fontFamily: SITE_FONT_STACK,
@@ -167,7 +167,7 @@ export function ShareStoryModal({
                 style={{ accentColor: '#FF4A1C' }}
               />
               <span
-                style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}
+                style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)' }}
               >
                 Enviar de forma anónima
               </span>
@@ -185,7 +185,7 @@ export function ShareStoryModal({
                   border: '1px solid rgba(255,255,255,0.10)',
                   color: 'rgba(255,255,255,0.35)',
                   cursor: 'pointer',
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   outline: 'none',
                   fontFamily: SITE_FONT_STACK }}
               >
@@ -199,7 +199,7 @@ export function ShareStoryModal({
                 style={{
                   flex: 2,
                   padding: '10px',
-                  fontSize: 13,
+                  fontSize: 'var(--fs-etiqueta)',
                   fontFamily: SITE_FONT_STACK }}
               >
                 {sending ? 'Enviando...' : 'Enviar'}

@@ -49,7 +49,7 @@ const baseBtnStyle: CSSProperties = {
   justifyContent: 'center',
   textAlign: 'center',
   padding: '10px 12px',
-  fontSize: 13,
+  fontSize: 'var(--fs-etiqueta)',
   lineHeight: 1.2,
   fontFamily: 'inherit',
   fontWeight: 600,

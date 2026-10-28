@@ -153,12 +153,12 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           }
         `}</style>
         <form onSubmit={handleSubmit}>
-          <h2 style={{ margin: '0 0 1.2rem', fontSize: '16px', fontWeight: 600, color: TEXT_1 }}>
+          <h2 style={{ margin: '0 0 1.2rem', fontSize: 'var(--fs-texto)', fontWeight: 600, color: TEXT_1 }}>
             Nueva muestra
           </h2>
 
           {/* Título */}
-          <label style={{ display: 'block', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginBottom: 4, fontSize: 'var(--fs-etiqueta)', color: TEXT_2 }}>
             Título de la muestra
           </label>
           <input
@@ -175,7 +175,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               padding: '0.65rem 0.8rem',
               border: 'none',
               outline: 'none',
-              fontSize: '14.4px',
+              fontSize: 'var(--fs-pequeno)',
               color: TEXT_1 }}
             onFocus={(e) => {
               e.currentTarget.style.boxShadow = `inset 3px 3px 6px ${SH_DARK}, inset -3px -3px 6px ${SH_LIGHT}, 0 0 0 2px rgba(255,107,43,0.3)`;
@@ -185,11 +185,11 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
             }}
           />
           {tituloError && (
-            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#c53030' }}>{tituloError}</p>
+            <p style={{ margin: '4px 0 0', fontSize: 'var(--fs-etiqueta)', color: '#c53030' }}>{tituloError}</p>
           )}
 
           {/* Sentido */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: 'var(--fs-etiqueta)', color: TEXT_2 }}>
             ¿Por qué esta muestra? <span style={{ color: ORANGE }}>*</span>
           </label>
           <textarea
@@ -206,7 +206,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               padding: '0.65rem 0.8rem',
               border: 'none',
               outline: 'none',
-              fontSize: '14.4px',
+              fontSize: 'var(--fs-pequeno)',
               color: TEXT_1,
               resize: 'vertical' }}
             onFocus={(e) => {
@@ -216,15 +216,15 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               e.currentTarget.style.boxShadow = `inset 3px 3px 6px ${SH_DARK}, inset -3px -3px 6px ${SH_LIGHT}`;
             }}
           />
-          <p style={{ margin: '4px 0 0', fontSize: '11.2px', fontStyle: 'italic', color: TEXT_3 }}>
+          <p style={{ margin: '4px 0 0', fontSize: 'var(--fs-etiqueta)', fontStyle: 'italic', color: TEXT_3 }}>
             Esta es la parte más importante. Una muestra sin sentido es solo una lista.
           </p>
           {sentidoError && (
-            <p style={{ margin: '4px 0 0', fontSize: '12px', color: '#c53030' }}>{sentidoError}</p>
+            <p style={{ margin: '4px 0 0', fontSize: 'var(--fs-etiqueta)', color: '#c53030' }}>{sentidoError}</p>
           )}
 
           {/* Imagen portada (opcional) */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: '12.8px', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 4, fontSize: 'var(--fs-etiqueta)', color: TEXT_2 }}>
             Imagen de portada (opcional)
           </label>
           <button
@@ -238,14 +238,14 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
               borderRadius: 10,
               border: 'none',
               cursor: 'pointer',
-              fontSize: '12.8px',
+              fontSize: 'var(--fs-etiqueta)',
               color: TEXT_3 }}
           >
             Elegir imagen →
           </button>
 
           {/* Visibilidad */}
-          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 6, fontSize: '12.8px', color: TEXT_2 }}>
+          <label style={{ display: 'block', marginTop: '1rem', marginBottom: 6, fontSize: 'var(--fs-etiqueta)', color: TEXT_2 }}>
             Visibilidad
           </label>
           <div style={{ display: 'flex', gap: 8 }}>
@@ -258,7 +258,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 50,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '12.8px',
+                fontSize: 'var(--fs-etiqueta)',
                 fontFamily: SITE_FONT_STACK,
                 background: isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)` : BG,
                 color: isPublic ? '#fff' : TEXT_2,
@@ -275,7 +275,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 50,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '12.8px',
+                fontSize: 'var(--fs-etiqueta)',
                 fontFamily: SITE_FONT_STACK,
                 background: !isPublic ? `linear-gradient(135deg, ${ORANGE}, #FF4A1C)` : BG,
                 color: !isPublic ? '#fff' : TEXT_2,
@@ -286,7 +286,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
           </div>
 
           {error && (
-            <p style={{ margin: '1rem 0 0', fontSize: '12.8px', color: '#c53030' }}>{error}</p>
+            <p style={{ margin: '1rem 0 0', fontSize: 'var(--fs-etiqueta)', color: '#c53030' }}>{error}</p>
           )}
 
           <div style={{ display: 'flex', gap: 10, marginTop: '1.5rem' }}>
@@ -299,7 +299,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 12,
                 border: 'none',
                 cursor: 'pointer',
-                fontSize: '14.4px',
+                fontSize: 'var(--fs-pequeno)',
                 fontFamily: SITE_FONT_STACK,
                 background: BG,
                 color: TEXT_2,
@@ -316,7 +316,7 @@ export function NuevaMuestraModal({ isOpen, onClose, onCreated, autorId, autorNo
                 borderRadius: 12,
                 border: 'none',
                 cursor: loading ? 'not-allowed' : 'pointer',
-                fontSize: '14.4px',
+                fontSize: 'var(--fs-pequeno)',
                 fontFamily: SITE_FONT_STACK,
                 background: `linear-gradient(135deg, ${ORANGE}, #FF4A1C)`,
                 color: '#fff',

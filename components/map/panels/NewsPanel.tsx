@@ -11,7 +11,7 @@ function chipStyle(active: boolean) {
       padding: '7px 14px',
       borderRadius: 999,
       cursor: 'pointer' as const,
-      fontSize: 13,
+      fontSize: 'var(--fs-etiqueta)',
       whiteSpace: 'nowrap' as const,
       fontFamily: SITE_FONT_STACK,
       outline: 'none',
@@ -28,7 +28,7 @@ function chipStyle(active: boolean) {
     padding: '7px 14px',
     borderRadius: 999,
     cursor: 'pointer' as const,
-    fontSize: 13,
+    fontSize: 'var(--fs-etiqueta)',
     whiteSpace: 'nowrap' as const,
     fontFamily: SITE_FONT_STACK,
     outline: 'none',
@@ -118,7 +118,7 @@ function NewsRow({
     >
       <p
         style={{
-          fontSize: 15,
+          fontSize: 'var(--fs-pequeno)',
           fontWeight: 600,
           color: 'rgba(248, 250, 255, 0.98)',
           margin: '0 0 8px',
@@ -131,12 +131,12 @@ function NewsRow({
         {news.title}
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 6 }}>
-        <span style={{ fontSize: 12, color: 'rgba(230, 236, 248, 0.72)', lineHeight: 1.35 }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(230, 236, 248, 0.72)', lineHeight: 1.35 }}>
           {news.source ?? news.outletName ?? '—'}
         </span>
         {timeLabel ? (
           <span
-            style={{ fontSize: 12, color: 'rgba(200, 210, 228, 0.88)', lineHeight: 1.35 }}
+            style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(200, 210, 228, 0.88)', lineHeight: 1.35 }}
             title={news.publishedAt ?? undefined}
           >
             {timeLabel}
@@ -173,7 +173,7 @@ function NewsListSection({
       {sectionLabel ? (
         <p
           style={{
-            fontSize: 11,
+            fontSize: 'var(--fs-etiqueta)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: sectionLabel === '◎ En el mapa' ? '#FF4A1C' : 'rgba(200, 214, 235, 0.72)',
@@ -187,7 +187,7 @@ function NewsListSection({
       {withLocation.length > 0 && sectionLabel !== '◎ En el mapa' ? (
         <p
           style={{
-            fontSize: 11,
+            fontSize: 'var(--fs-etiqueta)',
             letterSpacing: '0.12em',
             textTransform: 'uppercase',
             color: '#FF4A1C',
@@ -282,7 +282,7 @@ export function NewsPanel({
       <div style={{ flexShrink: 0, margin: '0 0 4px' }}>
         <p
           style={{
-            fontSize: 13,
+            fontSize: 'var(--fs-etiqueta)',
             color: 'rgba(248, 250, 255, 0.82)',
             lineHeight: 1.5,
             margin: 0,
@@ -348,7 +348,7 @@ export function NewsPanel({
         {isRefreshing && totalVisible > 0 ? (
           <p
             style={{
-              fontSize: 11,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(180, 198, 220, 0.65)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.35,
@@ -361,7 +361,7 @@ export function NewsPanel({
         {statusMessage ? (
           <p
             style={{
-              fontSize: 14,
+              fontSize: 'var(--fs-pequeno)',
               color: loading || loadingTimedOut ? 'rgba(212,220,232,0.82)' : 'rgba(255,200,170,0.92)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.5,
@@ -374,7 +374,7 @@ export function NewsPanel({
         {!isAllTopics && displayTopic.length === 0 && displayGeneral.length > 0 && !loading ? (
           <p
             style={{
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(212, 220, 232, 0.88)',
               fontFamily: SITE_FONT_STACK,
               lineHeight: 1.5,
@@ -394,7 +394,7 @@ export function NewsPanel({
           <>
             <p
               style={{
-                fontSize: 11,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: 'rgba(200, 214, 235, 0.72)',

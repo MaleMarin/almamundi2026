@@ -33,13 +33,13 @@ export default function MiColeccionPage() {
     >
       <div className={historiasInterior.contentWrapClassName}>
       <header className={historiasInterior.headerClassName}>
-        <p className="text-xs font-semibold uppercase mb-2 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
+        <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase mb-2 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
           Tu colección
         </p>
-        <h1 className="text-[27px] md:text-[43px] font-semibold leading-[1.1] text-gray-800">
+        <h1 className="text-[length:var(--fs-titular)] font-normal leading-[1.1] text-gray-800">
           Historias que guardaste.
         </h1>
-        <p className="text-gray-600 text-[15px] md:text-[16px] mt-2 max-w-2xl">
+        <p className="text-gray-600 text-[length:var(--fs-texto)] mt-2 max-w-2xl">
           Compartilas o usalas como inspiración para crear la tuya.
         </p>
       </header>
@@ -48,8 +48,8 @@ export default function MiColeccionPage() {
         {saved.length === 0 ? (
           <div className="rounded-2xl p-8 text-center" style={neu.cardInset}>
             <p className="text-gray-600 mb-4">Aún no has guardado ninguna historia.</p>
-            <p className="text-sm text-gray-500 mb-6">En Videos o Audios, elige una historia y haz clic en &quot;Guardar en mi colección&quot;.</p>
-            <Link href="/historias/videos" className="inline-block px-5 py-2.5 rounded-full text-sm font-medium" style={{ ...neu.button, color: neu.textMain }}>Ir a Historias</Link>
+            <p className="text-[length:var(--fs-pequeno)] text-gray-500 mb-6">En Videos o Audios, elige una historia y haz clic en &quot;Guardar en mi colección&quot;.</p>
+            <Link href="/historias/videos" className="inline-block px-5 py-2.5 rounded-full text-[length:var(--fs-pequeno)] font-medium" style={{ ...neu.button, color: neu.textMain }}>Ir a Historias</Link>
           </div>
         ) : (
           <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl">
@@ -59,36 +59,36 @@ export default function MiColeccionPage() {
                   {s.thumbnailUrl || s.imageUrl ? (
                     <img src={s.thumbnailUrl ?? s.imageUrl ?? ''} alt="" className="w-full h-full object-cover" />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-[32px] opacity-50">📖</div>
+                    <div className="w-full h-full flex items-center justify-center text-[length:var(--fs-titular)] opacity-50">📖</div>
                   )}
                 </Link>
                 <div className="p-4">
-                  <p className="text-[10px] font-semibold uppercase mb-1 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
+                  <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase mb-1 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
                     {[s.city, s.country].filter(Boolean).join(', ') || '—'} · {formatLabel(s.format)}
                   </p>
                   <Link href={`/historias/${s.id}`}>
                     <h2 className="font-semibold text-gray-800 line-clamp-2 hover:underline">{s.title ?? 'Sin título'}</h2>
                   </Link>
-                  <p className="text-sm text-gray-600 mt-1">{s.authorName ?? '—'}</p>
+                  <p className="text-[length:var(--fs-pequeno)] text-gray-600 mt-1">{s.authorName ?? '—'}</p>
                   <div className="flex flex-wrap gap-2 mt-4">
                     <button
                       type="button"
                       onClick={() => shareStory(s)}
                       style={{ color: 'var(--almamundi-orange)', borderColor: 'rgba(255, 74, 28, 0.5)' }}
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border hover:bg-orange-50"
+                      className="text-[length:var(--fs-etiqueta)] font-medium px-3 py-1.5 rounded-full border hover:bg-orange-50"
                     >
                       {copiedId === s.id ? 'Copiado' : 'Compartir'}
                     </button>
                     <HomeHardLink
                       href="/#historias"
-                      className="text-xs font-medium px-3 py-1.5 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50"
+                      className="text-[length:var(--fs-etiqueta)] font-medium px-3 py-1.5 rounded-full border border-gray-300 text-gray-600 hover:bg-gray-50"
                     >
                       Crear inspirado en esta
                     </HomeHardLink>
                     <button
                       type="button"
                       onClick={() => remove(s.id)}
-                      className="text-xs text-gray-500 hover:text-red-600"
+                      className="text-[length:var(--fs-etiqueta)] text-gray-500 hover:text-red-600"
                       aria-label="Quitar de mi colección"
                     >
                       Quitar

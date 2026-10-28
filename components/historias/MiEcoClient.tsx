@@ -66,18 +66,18 @@ export function MiEcoClient({
       <div className={`${historiasInterior.contentWrapClassName} px-6 md:px-12 pb-16`}>
         <header className={historiasInterior.headerClassName}>
           <p
-            className="text-xs font-semibold uppercase mb-2 tracking-[0.12em]"
+            className="text-[length:var(--fs-etiqueta)] font-semibold uppercase mb-2 tracking-[0.12em]"
             style={{ color: 'var(--almamundi-orange)' }}
           >
             Tu eco
           </p>
           <h1
-            className="text-[27px] md:text-[43px] font-semibold leading-[1.1]"
+            className="text-[length:var(--fs-titular)] font-normal leading-[1.1]"
             style={{ color: neu.textMain }}
           >
             {title}
           </h1>
-          <p className="mt-3 max-w-2xl text-[15px] md:text-[16px]" style={{ color: neu.textBody }}>
+          <p className="mt-3 max-w-2xl text-[length:var(--fs-texto)] " style={{ color: neu.textBody }}>
             Un rincón solo para ti: cuántas personas resonaron con tu historia, y tu cinta de colores,
             que se va tiñendo con lo que esas voces dejaron.
           </p>
@@ -86,15 +86,15 @@ export function MiEcoClient({
         <section className="mx-auto w-full max-w-2xl space-y-6">
           <div className="rounded-[1.5rem] p-6 md:p-8" style={neu.card}>
             <h2
-              className="text-sm font-semibold uppercase tracking-[0.12em]"
+              className="text-[length:var(--fs-pequeno)] font-semibold uppercase tracking-[0.12em]"
               style={{ color: 'var(--almamundi-orange)' }}
             >
               Resonancia
             </h2>
-            <p className="mt-3 text-[16px] md:text-[18px] font-medium" style={{ color: neu.textMain }}>
+            <p className="mt-3 text-[length:var(--fs-texto)] font-medium" style={{ color: neu.textMain }}>
               {resonanceCopy(resonanceCount)}
             </p>
-            <p className="mt-2 text-sm" style={{ color: neu.textBody }}>
+            <p className="mt-2 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
               El contenido de esos mensajes queda en el buzón; aquí solo ves el número. La cinta de abajo
               sí se mueve, poco a poco, con cada mensaje nuevo.
             </p>
@@ -102,7 +102,7 @@ export function MiEcoClient({
 
           <div className="rounded-[1.5rem] p-6 md:p-8 space-y-4" style={neu.card}>
             <h2
-              className="text-sm font-semibold uppercase tracking-[0.12em]"
+              className="text-[length:var(--fs-pequeno)] font-semibold uppercase tracking-[0.12em]"
               style={{ color: 'var(--almamundi-orange)' }}
             >
               Tu cinta de arte
@@ -119,7 +119,7 @@ export function MiEcoClient({
               />
             </div>
             {err ? (
-              <p className="text-sm text-center text-amber-800" role="alert">
+              <p className="text-[length:var(--fs-pequeno)] text-center text-amber-800" role="alert">
                 {err}
               </p>
             ) : null}
@@ -129,7 +129,7 @@ export function MiEcoClient({
                 setErr('');
                 downloadPng('almamundi-resonancia-visual.png');
               }}
-              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-sm font-bold uppercase text-white tracking-[0.12em]"
+              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-[length:var(--fs-pequeno)] font-bold uppercase text-white tracking-[0.12em]"
               style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255, 74, 28,0.32)' }}
             >
               <Download size={18} aria-hidden />
@@ -140,7 +140,7 @@ export function MiEcoClient({
           <div className="flex justify-center pb-8">
             <HomeHardLink
               href="/"
-              className="inline-flex justify-center items-center rounded-full px-6 py-3.5 text-sm font-semibold"
+              className="inline-flex justify-center items-center rounded-full px-6 py-3.5 text-[length:var(--fs-pequeno)] font-semibold"
               style={{ ...neu.button, color: neu.textMain }}
             >
               Ir al inicio

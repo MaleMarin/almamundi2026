@@ -179,13 +179,13 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
     <div className={status === 'solved' ? 'h-0 overflow-hidden' : 'space-y-1.5'}>
       <div ref={hostRef} />
       {status === 'loading' ? (
-        <p className="text-[10px] leading-tight text-gray-500 md:text-[11px]">
+        <p className="text-[length:var(--fs-etiqueta)] leading-tight text-gray-500 ">
           Cargando verificación de seguridad…
         </p>
       ) : null}
       {status === 'error' || status === 'timeout' ? (
         <div className="flex flex-wrap items-center gap-2">
-          <p className="text-[10px] leading-tight text-red-600 md:text-[11px]" role="status">
+          <p className="text-[length:var(--fs-etiqueta)] leading-tight text-red-600 " role="status">
             {status === 'timeout'
               ? 'La verificación tardó demasiado. Puedes reintentar o enviar; si el servidor la exige, te avisará.'
               : 'No se pudo cargar la verificación. Reintenta; el envío no queda bloqueado.'}
@@ -197,7 +197,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
               onGateRef.current('wait');
               setRetryKey((k) => k + 1);
             }}
-            className="text-[10px] font-bold uppercase text-orange-600 underline md:text-[11px] tracking-[0.12em]"
+            className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-orange-600 underline tracking-[0.12em]"
           >
             Reintentar
           </button>

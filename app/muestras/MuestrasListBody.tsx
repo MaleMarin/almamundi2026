@@ -68,14 +68,14 @@ export function MuestrasListBody() {
         >
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h1
-              className="text-[27px] font-semibold leading-tight md:text-[32px]"
+              className="text-[length:var(--fs-titular)] font-normal leading-tight "
               style={{ color: neu.textMain }}
             >
               Muestras
             </h1>
             <Link
               href="/muestras"
-              className="shrink-0 self-start rounded-full px-5 py-3 text-[14px] font-semibold uppercase text-white hover:brightness-92 sm:self-center tracking-[0.12em]"
+              className="shrink-0 self-start rounded-full px-5 py-3 text-[length:var(--fs-pequeno)] font-semibold uppercase text-white hover:brightness-92 sm:self-center tracking-[0.12em]"
               style={{
                 background: '#FF4A1C',
                 color: '#fff',
@@ -85,14 +85,14 @@ export function MuestrasListBody() {
             </Link>
           </div>
         </header>
-        <p className="mb-2 text-[16px] font-light" style={{ color: neu.textBody }}>
+        <p className="mb-2 text-[length:var(--fs-texto)] font-normal" style={{ color: neu.textBody }}>
           Curadurías que conectan historias del mundo.
         </p>
-        <p className="mb-6 text-[15px] font-light" style={{ color: neu.textBody }}>
+        <p className="mb-6 text-[length:var(--fs-pequeno)] font-normal" style={{ color: neu.textBody }}>
           Solo se muestran piezas ya aprobadas por curaduría.
         </p>
 
-        <p className="mb-8 text-sm leading-relaxed" style={{ color: neu.textBody }}>
+        <p className="mb-8 text-[length:var(--fs-pequeno)] leading-relaxed" style={{ color: neu.textBody }}>
           El recorrido cinematográfico (pantalla completa, GSAP, fondo 3D) es la{' '}
           <Link href="/muestras" className="font-semibold text-blue-600 underline-offset-2 hover:text-blue-800 hover:underline">
             entrada principal en /muestras
@@ -110,19 +110,19 @@ export function MuestrasListBody() {
             style={neu.cardProminent}
           >
             <h2
-              className="text-sm font-semibold uppercase tracking-[0.12em]"
+              className="text-[length:var(--fs-pequeno)] font-semibold uppercase tracking-[0.12em]"
               style={{ color: neu.textMain }}
             >
               Salas curadas (demo)
             </h2>
             <p
-              className="mt-1.5 text-xs font-semibold uppercase tracking-[0.12em]"
+              className="mt-1.5 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
               style={{ color: 'var(--almamundi-orange)' }}
             >
               Curadas por Equipo de AlmaMundi
             </p>
           </div>
-          <p className="mb-5 text-sm leading-relaxed" style={{ color: neu.textBody }}>
+          <p className="mb-5 text-[length:var(--fs-pequeno)] leading-relaxed" style={{ color: neu.textBody }}>
             Toca cada título (relieve neumórfico) para entrar a la sala, recorrer el hilo y abrir las
             historias de ejemplo.{' '}
             <MuestrasSalaEntranceLink
@@ -138,13 +138,13 @@ export function MuestrasListBody() {
               <li key={m.slug} className="space-y-2">
                 <MuestrasSalaEntranceLink
                   href={`/muestras/${m.slug}`}
-                  className="block rounded-[22px] px-5 py-4 text-[15px] font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] md:text-[16px]"
+                  className="block rounded-[22px] px-5 py-4 text-[length:var(--fs-texto)] font-semibold text-blue-600 transition-[box-shadow,transform] duration-200 hover:text-blue-800 active:scale-[0.99] "
                   style={neu.cardProminent}
                 >
                   {m.title}
                 </MuestrasSalaEntranceLink>
                 {m.intro ? (
-                  <p className="pl-1 text-sm font-light leading-snug" style={{ color: neu.textBody }}>
+                  <p className="pl-1 text-[length:var(--fs-pequeno)] font-normal leading-snug" style={{ color: neu.textBody }}>
                     {m.intro}
                   </p>
                 ) : null}
@@ -160,17 +160,17 @@ export function MuestrasListBody() {
         )}
 
         {error && (
-          <div className="mb-6 rounded-2xl p-4 text-sm text-red-600" style={neu.cardProminent}>
+          <div className="mb-6 rounded-2xl p-4 text-[length:var(--fs-pequeno)] text-red-600" style={neu.cardProminent}>
             {error}
           </div>
         )}
 
         {showEmpty && (
           <section className="rounded-[40px] px-8 py-16 text-center" style={neu.cardProminent}>
-            <p className="text-[18px] font-light" style={{ color: neu.textMain }}>
+            <p className="text-[length:var(--fs-texto)] font-normal" style={{ color: neu.textMain }}>
               Aún no hay muestras publicadas.
             </p>
-            <p className="mt-2 text-[15px] font-light" style={{ color: neu.textBody }}>
+            <p className="mt-2 text-[length:var(--fs-pequeno)] font-normal" style={{ color: neu.textBody }}>
               Cuando la curaduría apruebe piezas, aparecerán aquí agrupadas por tema.
             </p>
           </section>
@@ -183,7 +183,7 @@ export function MuestrasListBody() {
                 t.items.length > 0 && (
                   <section key={t.topic}>
                     <h2
-                      className="mb-4 text-[16px] font-semibold uppercase tracking-[0.12em]"
+                      className="mb-4 text-[length:var(--fs-texto)] font-semibold uppercase tracking-[0.12em]"
                       style={{ color: neu.textMain }}
                     >
                       {t.topicLabel}
@@ -210,12 +210,12 @@ export function MuestrasListBody() {
                                 {item.alias}
                               </p>
                               {item.dateTaken && (
-                                <p className="mt-0.5 text-sm" style={{ color: neu.textBody }}>
+                                <p className="mt-0.5 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
                                   {item.dateTaken}
                                 </p>
                               )}
                               {item.context && (
-                                <p className="mt-1 line-clamp-2 text-sm" style={{ color: neu.textBody }}>
+                                <p className="mt-1 line-clamp-2 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
                                   {item.context}
                                 </p>
                               )}

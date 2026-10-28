@@ -311,7 +311,7 @@ export function NASAEpicEarthVideo({
           className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
           aria-hidden
         >
-          <span className="text-white/70 text-sm uppercase px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm tracking-[0.12em]">
+          <span className="text-white/70 text-[length:var(--fs-pequeno)] uppercase px-4 py-2 rounded-full bg-black/40 backdrop-blur-sm tracking-[0.12em]">
             Toca el globo para que gire
           </span>
         </div>

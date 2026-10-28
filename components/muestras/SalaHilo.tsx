@@ -445,7 +445,7 @@ export function SalaHilo({
             >
           <p
             style={{
-              fontSize: 10,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#FF4A1C',
@@ -459,8 +459,8 @@ export function SalaHilo({
 
           <h1
             style={{
-              fontSize: 'clamp(38px, 6.3vw, 72px)',
-              fontWeight: 800,
+              fontSize: 'var(--fs-titular)',
+              fontWeight: 700,
               lineHeight: 1.02,
               color: '#1a1f2a',
               maxWidth: 700,
@@ -474,7 +474,7 @@ export function SalaHilo({
 
           <p
             style={{
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               color: '#9299a8',
               marginTop: 0,
               marginRight: 0,
@@ -486,7 +486,7 @@ export function SalaHilo({
 
           <p
             style={{
-              fontSize: 15,
+              fontSize: 'var(--fs-pequeno)',
               color: '#5a6070',
               lineHeight: 1.75,
               maxWidth: 480,
@@ -501,7 +501,7 @@ export function SalaHilo({
 
           <p
             style={{
-              fontSize: 11,
+              fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               color: '#b0b6c2',
@@ -523,8 +523,8 @@ export function SalaHilo({
               border: 'none',
               padding: '15px 36px',
               borderRadius: 100,
-              fontSize: 13,
-              fontWeight: 800,
+              fontSize: 'var(--fs-etiqueta)',
+              fontWeight: 700,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: 'none',
@@ -554,7 +554,7 @@ export function SalaHilo({
             />
             <span
               style={{
-                fontSize: 10,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: '#b0b6c2' }}
@@ -600,7 +600,7 @@ export function SalaHilo({
           >
             <span
               style={{
-                fontSize: 10,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: TEXT_HINT,
@@ -610,7 +610,7 @@ export function SalaHilo({
             </span>
             <span
               style={{
-                fontSize: 11,
+                fontSize: 'var(--fs-etiqueta)',
                 color: TEXT_MUTED,
                 opacity: discoveredCount > 0 ? 1 : 0,
                 transition: 'opacity 0.3s ease',
@@ -633,7 +633,7 @@ export function SalaHilo({
                 borderRadius: 100,
                 boxShadow: `3px 3px 6px ${SHADOW_DARK}, -3px -3px 6px ${SHADOW_LIGHT}`,
                 cursor: 'pointer',
-                fontSize: 12 }}
+                fontSize: 'var(--fs-etiqueta)' }}
             >
               ✕ Salir
             </button>
@@ -670,7 +670,7 @@ export function SalaHilo({
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 12,
+                  fontSize: 'var(--fs-etiqueta)',
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   color: '#b0b6c2',
@@ -728,7 +728,7 @@ export function SalaHilo({
               style={{
                 position: 'relative',
                 zIndex: 8,
-                fontSize: 10,
+                fontSize: 'var(--fs-etiqueta)',
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase',
                 color: TEXT_HINT,
@@ -803,7 +803,7 @@ export function SalaHilo({
                         />
                         <span
                           style={{
-                            fontSize: 10,
+                            fontSize: 'var(--fs-etiqueta)',
                             textTransform: 'uppercase',
                             letterSpacing: '0.12em',
                             color: ACCENT }}
@@ -813,8 +813,8 @@ export function SalaHilo({
                       </div>
                       <h2
                         style={{
-                          fontSize: 29,
-                          fontWeight: 800,
+                          fontSize: 'var(--fs-titular)',
+                          fontWeight: 700,
                           lineHeight: 1.1,
                           color: TEXT_PRIMARY,
                           maxWidth: 520,
@@ -824,7 +824,7 @@ export function SalaHilo({
                       </h2>
                       <p
                         style={{
-                          fontSize: 14,
+                          fontSize: 'var(--fs-pequeno)',
                           fontStyle: 'italic',
                           color: '#7a8292',
                           lineHeight: 1.75,
@@ -835,7 +835,7 @@ export function SalaHilo({
                       </p>
                       <p
                         style={{
-                          fontSize: 12,
+                          fontSize: 'var(--fs-etiqueta)',
                           color: '#b0b6c2',
                           margin: 0 }}
                       >
@@ -863,8 +863,8 @@ export function SalaHilo({
                           border: 'none',
                           padding: '12px 24px',
                           borderRadius: 100,
-                          fontSize: 12,
-                          fontWeight: 800,
+                          fontSize: 'var(--fs-etiqueta)',
+                          fontWeight: 700,
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
                           cursor: 'pointer' }}
@@ -880,7 +880,7 @@ export function SalaHilo({
                           border: 'none',
                           padding: '12px 20px',
                           borderRadius: 100,
-                          fontSize: 12,
+                          fontSize: 'var(--fs-etiqueta)',
                           boxShadow: `3px 3px 6px ${SHADOW_DARK}, -3px -3px 6px ${SHADOW_LIGHT}`,
                           cursor: 'pointer' }}
                       >

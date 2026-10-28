@@ -56,7 +56,7 @@ export function Breadcrumbs({ items, tone = 'light', className = '' }: Breadcrum
           scrollbarColor:
             tone === 'dark' ? 'rgba(255,255,255,0.25) transparent' : 'rgba(148,163,184,0.45) transparent' }}
       >
-        <ol className="m-0 flex w-max min-w-full list-none flex-nowrap items-center gap-1 px-3 py-2 text-[11px] leading-snug sm:text-[13px]">
+        <ol className="m-0 flex w-max min-w-full list-none flex-nowrap items-center gap-1 px-3 py-2 text-[length:var(--fs-etiqueta)] leading-snug ">
           {items.map((item, index) => {
             const isLast = index === items.length - 1;
             const key = `${item.label}-${index}`;

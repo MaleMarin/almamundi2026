@@ -68,14 +68,14 @@ export function ResonanceGift({
         />
       </div>
       {err ? (
-        <p className="text-center text-xs text-amber-200/90" role="alert">
+        <p className="text-center text-[length:var(--fs-etiqueta)] text-amber-200/90" role="alert">
           {err}
         </p>
       ) : null}
       <button
         type="button"
         onClick={downloadPng}
-        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-white/25"
+        className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/35 bg-white/15 px-5 py-2.5 text-[length:var(--fs-pequeno)] font-medium text-white transition hover:bg-white/25"
       >
         <Download size={16} aria-hidden />
         Descargar

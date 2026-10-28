@@ -35,7 +35,7 @@ export function MapSectionLocked() {
               {t.mapSectionTitle}
             </h2>
             <p
-              className="home-intro-avenir mx-auto max-w-[min(100%,42rem)] text-balance px-6 pb-5 text-center text-[18px] font-normal leading-[1.35] tracking-normal md:pb-7 md:text-[27px] lg:max-w-none lg:whitespace-nowrap"
+              className="home-intro-avenir mx-auto max-w-[min(100%,42rem)] text-balance px-6 pb-5 text-center text-[length:var(--fs-subtitulo)] font-normal leading-[1.35] tracking-normal md:pb-7 lg:max-w-none lg:whitespace-nowrap"
               style={{ color: '#4A5568' }}
             >
               {t.heroSubBefore}{' '}

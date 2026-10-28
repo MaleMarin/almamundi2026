@@ -118,8 +118,8 @@ function KenBurnsViewer({
         >
           <p
             style={{
-              fontSize: 15,
-              fontWeight: 300,
+              fontSize: 'var(--fs-pequeno)',
+              fontWeight: 400,
               color: 'rgba(255,255,255,0.92)',
               margin: '0 0 3px',
               fontFamily: SITE_FONT_STACK,
@@ -129,7 +129,7 @@ function KenBurnsViewer({
           </p>
           <p
             style={{
-              fontSize: 11,
+              fontSize: 'var(--fs-etiqueta)',
               color: 'rgba(255,255,255,0.40)',
               margin: 0,
               fontFamily: SITE_FONT_STACK }}
@@ -142,7 +142,7 @@ function KenBurnsViewer({
             position: 'absolute',
             top: 12,
             right: 14,
-            fontSize: 10,
+            fontSize: 'var(--fs-etiqueta)',
             color: 'rgba(255,255,255,0.35)',
             fontFamily: SITE_FONT_STACK,
             zIndex: 2 }}
@@ -400,7 +400,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               <div style={{ flex: 1, minWidth: 0 }}>
                 <p
                   style={{
-                    fontSize: 11,
+                    fontSize: 'var(--fs-etiqueta)',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
                     color: 'rgba(var(--almamundi-orange-rgb), 0.70)',
@@ -411,8 +411,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </p>
                 <h2
                   style={{
-                    fontSize: 'clamp(18px, 2.7vw, 27px)',
-                    fontWeight: 300,
+                    fontSize: 'var(--fs-titular)',
+                    fontWeight: 400,
                     color: 'rgba(255,255,255,0.96)',
                     margin: '0 0 4px',
                     lineHeight: 1.2,
@@ -422,7 +422,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </h2>
                 <p
                   style={{
-                    fontSize: 13,
+                    fontSize: 'var(--fs-etiqueta)',
                     color: 'rgba(255,255,255,0.35)',
                     margin: 0,
                     fontStyle: 'italic',
@@ -433,7 +433,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 {liveReaders > 1 && (
                   <p
                     style={{
-                      fontSize: 11,
+                      fontSize: 'var(--fs-etiqueta)',
                       color: 'rgba(255,255,255,0.28)',
                       margin: '6px 0 0',
                       fontFamily: SITE_FONT_STACK,
@@ -456,7 +456,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   border: '1px solid rgba(255,255,255,0.12)',
                   color: 'rgba(255,255,255,0.60)',
                   cursor: 'pointer',
-                  fontSize: 16,
+                  fontSize: 'var(--fs-texto)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -514,7 +514,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               {format === 'text' && story.body && (
                 <div
                   style={{
-                    fontSize: 'clamp(15px, 1.8vw, 16px)',
+                    fontSize: 'var(--fs-texto)',
                     lineHeight: 1.85,
                     color: 'rgba(255,255,255,0.78)',
                     fontFamily: SITE_FONT_STACK }}
@@ -543,13 +543,13 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   <p
                     style={{
-                      fontSize: 13,
+                      fontSize: 'var(--fs-etiqueta)',
                       color: 'rgba(255,255,255,0.70)',
                       margin: '0 0 10px',
                       fontFamily: SITE_FONT_STACK }}
                   >
                     ¿Quieres dejar tu reacción?
-                    <span style={{ display: 'block', fontSize: 11, color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
+                    <span style={{ display: 'block', fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.38)', marginTop: 2 }}>
                       10 segundos. Sin edición. Solo tu voz.
                     </span>
                   </p>
@@ -563,7 +563,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       border: 'none',
                       color: 'rgba(255,180,80,0.9)',
                       cursor: 'pointer',
-                      fontSize: 12,
+                      fontSize: 'var(--fs-etiqueta)',
                       fontFamily: SITE_FONT_STACK,
                       padding: 0 }}
                   >
@@ -583,7 +583,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   <p
                     style={{
-                      fontSize: 13,
+                      fontSize: 'var(--fs-etiqueta)',
                       color: 'rgba(255,255,255,0.70)',
                       margin: '0 0 4px',
                       fontFamily: SITE_FONT_STACK }}
@@ -592,7 +592,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   </p>
                   <p
                     style={{
-                      fontSize: 11,
+                      fontSize: 'var(--fs-etiqueta)',
                       color: 'rgba(255,255,255,0.28)',
                       margin: '0 0 10px',
                       fontFamily: SITE_FONT_STACK }}
@@ -613,7 +613,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       background: 'rgba(255,255,255,0.06)',
                       border: '1px solid rgba(255,255,255,0.10)',
                       color: 'rgba(255,255,255,0.82)',
-                      fontSize: 13,
+                      fontSize: 'var(--fs-etiqueta)',
                       fontFamily: SITE_FONT_STACK,
                       resize: 'none',
                       outline: 'none',
@@ -628,7 +628,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                         border: 'none',
                         color: 'rgba(255,180,80,0.9)',
                         cursor: 'pointer',
-                        fontSize: 12,
+                        fontSize: 'var(--fs-etiqueta)',
                         fontFamily: SITE_FONT_STACK,
                         padding: 0 }}
                     >
@@ -645,7 +645,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                           border: '1px solid rgba(255,255,255,0.10)',
                           color: 'rgba(255,255,255,0.55)',
                           cursor: 'pointer',
-                          fontSize: 12,
+                          fontSize: 'var(--fs-etiqueta)',
                           fontFamily: SITE_FONT_STACK }}
                       >
                         Cerrar
@@ -666,7 +666,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                         }}
                         style={{
                           padding: '7px 16px',
-                          fontSize: 12,
+                          fontSize: 'var(--fs-etiqueta)',
                           fontFamily: SITE_FONT_STACK }}
                       >
                         Enviar
@@ -695,10 +695,10 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     borderRadius: 16,
                     textAlign: 'center' }}
                 >
-                  <p style={{ fontSize: 15, color: 'rgba(255,255,255,0.82)', margin: '0 0 6px', fontFamily: SITE_FONT_STACK }}>
+                  <p style={{ fontSize: 'var(--fs-pequeno)', color: 'rgba(255,255,255,0.82)', margin: '0 0 6px', fontFamily: SITE_FONT_STACK }}>
                     Llevas un rato aquí.
                   </p>
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.40)', margin: '0 0 14px', fontFamily: SITE_FONT_STACK }}>
+                  <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.40)', margin: '0 0 14px', fontFamily: SITE_FONT_STACK }}>
                     ¿Hay algo tuyo que podría vivir en este mapa?
                   </p>
                   <button
@@ -717,7 +717,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       border: '1px solid rgba(var(--almamundi-orange-rgb), 0.35)',
                       color: '#fdba74',
                       cursor: 'pointer',
-                      fontSize: 13,
+                      fontSize: 'var(--fs-etiqueta)',
                       fontFamily: SITE_FONT_STACK }}
                   >
                     Sí, quiero contarlo
@@ -748,7 +748,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     border: `1px solid ${listening ? 'rgba(96,165,250,0.35)' : 'rgba(255,255,255,0.10)'}`,
                     color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
-                    fontSize: 12,
+                    fontSize: 'var(--fs-etiqueta)',
                     fontFamily: SITE_FONT_STACK }}
                 >
                   {listening ? 'Detener lectura' : 'Cerrar los ojos'}
@@ -776,7 +776,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     border: '1px solid rgba(255,255,255,0.10)',
                     color: 'rgba(255,255,255,0.55)',
                     cursor: 'pointer',
-                    fontSize: 12,
+                    fontSize: 'var(--fs-etiqueta)',
                     fontFamily: SITE_FONT_STACK }}
                 >
                   Esto me llegó
@@ -793,7 +793,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   marginLeft: 4,
                   padding: '8px 2px',
                   color: 'rgba(255,255,255,0.38)',
-                  fontSize: 12,
+                  fontSize: 'var(--fs-etiqueta)',
                   fontFamily: SITE_FONT_STACK,
                   textDecoration: 'none' }}
               >
@@ -860,7 +860,7 @@ function ActionButton({
         border: `1px solid ${accent ? 'rgba(var(--almamundi-orange-rgb), 0.30)' : 'rgba(255,255,255,0.10)'}`,
         color: accent ? '#fdba74' : 'rgba(255,255,255,0.55)',
         cursor: 'pointer',
-        fontSize: 13,
+        fontSize: 'var(--fs-etiqueta)',
         fontFamily: SITE_FONT_STACK,
         outline: 'none',
         transition: 'all 180ms ease' }}

@@ -104,7 +104,7 @@ function StoryRow({
         width: '100%' }}
     >
       <p style={{
-        fontSize: 14,
+        fontSize: 'var(--fs-pequeno)',
         fontWeight: isActive ? 600 : 400,
         color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.80)',
         margin: '0 0 4px',
@@ -115,10 +115,10 @@ function StoryRow({
         {story.title ?? story.label}
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.35)' }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)' }}>
           {[story.city, story.country].filter(Boolean).join(', ')}
         </span>
-        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           {tipo}
           {ago ? ` · ${ago}` : ''}
         </span>
@@ -176,7 +176,7 @@ export function StoriesPanel({
               WebkitBackdropFilter: 'blur(18px) saturate(1.35)',
               boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.38)',
               color: '#fff',
-              fontSize: 13,
+              fontSize: 'var(--fs-etiqueta)',
               fontFamily: SITE_FONT_STACK,
               outline: 'none' }}
           />
@@ -200,7 +200,7 @@ export function StoriesPanel({
             <div style={hintBoxStyle}>
               <p
                 style={{
-                  fontSize: 14,
+                  fontSize: 'var(--fs-pequeno)',
                   color: 'rgba(255,255,255,0.88)',
                   margin: 0,
                   lineHeight: 1.55,
@@ -210,7 +210,7 @@ export function StoriesPanel({
               </p>
               <p
                 style={{
-                  fontSize: 12,
+                  fontSize: 'var(--fs-etiqueta)',
                   color: 'rgba(255,255,255,0.45)',
                   margin: '12px 0 0',
                   lineHeight: 1.45,
@@ -223,7 +223,7 @@ export function StoriesPanel({
             <div style={hintBoxStyle}>
               <p
                 style={{
-                  fontSize: 14,
+                  fontSize: 'var(--fs-pequeno)',
                   color: 'rgba(255,255,255,0.85)',
                   margin: 0,
                   lineHeight: 1.5,
@@ -234,7 +234,7 @@ export function StoriesPanel({
             </div>
           ) : (
             <>
-              <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
+              <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
                 Resultados
               </p>
               {searchMatches.map((s, i) => (
@@ -258,7 +258,7 @@ export function StoriesPanel({
             border: '1px solid rgba(255,255,255,0.32)',
             boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.35)' }}>
             <p style={{
-              fontSize: 15,
+              fontSize: 'var(--fs-pequeno)',
               color: 'rgba(255,255,255,0.85)',
               margin: '0 0 12px',
               lineHeight: 1.5,
@@ -276,7 +276,7 @@ export function StoriesPanel({
                   border: '1px solid rgba(255, 160, 100, 0.85)',
                   color: '#ffffff',
                   boxShadow: '0 6px 22px rgba(255, 74, 28, 0.5), inset 0 1px 0 rgba(255, 200, 160, 0.35)',
-                  fontSize: 14,
+                  fontSize: 'var(--fs-pequeno)',
                   fontWeight: 600,
                   cursor: 'pointer',
                   fontFamily: SITE_FONT_STACK,
@@ -288,7 +288,7 @@ export function StoriesPanel({
           </div>
         ) : (
           <>
-            <p style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
+            <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               Últimas historias
             </p>
             {stories.map((s, i) => (

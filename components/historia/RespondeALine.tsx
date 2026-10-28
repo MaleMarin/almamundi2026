@@ -21,7 +21,7 @@ export function RespondeALine({
     <p
       style={{
         fontFamily: INTERIOR_FONT_STACK,
-        fontSize: '12.48px',
+        fontSize: 'var(--fs-etiqueta)',
         lineHeight: 1.45,
         fontWeight: 500,
         color,
