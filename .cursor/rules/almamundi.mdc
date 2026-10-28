@@ -15,3 +15,4 @@ alwaysApply: true
 - Sin Playwright ni capturas salvo pedido. Un solo npm run build al final. Ana verifica en el navegador.
 - Informe de máximo 5 líneas: qué cambió, archivos y commit.
 - El formulario de /contar empieza siempre en blanco y el recuadro de Turnstile no se muestra salvo que Cloudflare pida interacción.
+- Si el build falla, no hagas commit ni push: detente e informa.
