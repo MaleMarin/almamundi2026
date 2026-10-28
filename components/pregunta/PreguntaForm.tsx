@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { Image as ImageIcon, Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { PREGUNTA_COPY, preguntaShareText, preguntaThanks } from '@/lib/i18n/pregunta-messages';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
-  PREGUNTA_UI,
   isQuestionMode,
   preguntaPageHref,
   preguntaPorId,
@@ -30,6 +30,12 @@ type Kind = 'texto' | 'voz' | 'foto';
 
 const fieldClass =
   'w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-base text-[#1C1C2E] outline-none focus:border-[#D13D17]';
+
+function pickClass(on: boolean): string {
+  return on
+    ? 'border-2 border-[#D13D17] bg-transparent text-[#D13D17]'
+    : 'border-2 border-black/15 bg-transparent text-[#1C1C2E]';
+}
 
 function mmss(seconds: number): string {
   const s = Math.min(RESPUESTA_VOICE_MAX_SECONDS, Math.max(0, Math.floor(seconds)));
@@ -92,6 +98,7 @@ function PreguntaFormInner({
   const [publish, setPublish] = useState(false);
   const [terms, setTerms] = useState(false);
   const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [recording, setRecording] = useState(false);
@@ -123,14 +130,15 @@ function PreguntaFormInner({
     };
   }, [photoUrl]);
 
-  const advice =
-    mode === 'alguien'
-      ? kind === 'texto'
-        ? t.modalAskAdviceTexto
-        : kind === 'voz'
-          ? t.modalAskAdviceAudio
-          : t.modalAskAdviceFoto
-      : '';
+  useEffect(() => {
+    if (!audioFile) {
+      setAudioUrl(null);
+      return;
+    }
+    const url = URL.createObjectURL(audioFile);
+    setAudioUrl(url);
+    return () => URL.revokeObjectURL(url);
+  }, [audioFile]);
 
   function messageFor(code: string): string {
     if (code === 'text_too_long') return copy.errText[locale];
@@ -178,6 +186,7 @@ function PreguntaFormInner({
         const ext = (rec.mimeType || mime).includes('mp4') ? 'm4a' : 'webm';
         setAudioFile(new File([blob], `voz.${ext}`, { type: blob.type || mime }));
       };
+      setAudioFile(null);
       recRef.current = rec;
       rec.start();
       setRecording(true);
@@ -194,6 +203,15 @@ function PreguntaFormInner({
   }
 
   async function onAudioPicked(file: File | null) {
+    if (recording) {
+      const rec = recRef.current;
+      if (rec && rec.state !== 'inactive') {
+        rec.onstop = () => {
+          rec.stream.getTracks().forEach((track) => track.stop());
+        };
+      }
+      stopRecording();
+    }
     setError('');
     if (!file) return;
     if (file.size > RESPUESTA_VOICE_MAX_BYTES) {
@@ -204,9 +222,11 @@ function PreguntaFormInner({
     const seconds = await probeAudioFileDurationSeconds(file);
     if (seconds != null && seconds > RESPUESTA_VOICE_MAX_SECONDS) {
       setAudioFile(null);
+      setElapsed(0);
       setError(copy.errAudio[locale]);
       return;
     }
+    setElapsed(seconds ?? 0);
     setAudioFile(file);
   }
 
@@ -309,7 +329,7 @@ function PreguntaFormInner({
         <div className="flex flex-col gap-3 sm:flex-row">
           <button
             type="button"
-            className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold"
+            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-sm font-semibold"
             onClick={() => {
               const enlace = `${window.location.origin}${preguntaPageHref(pregunta.id)}`;
               const shareText = preguntaShareText(locale, pregunta[mode][locale], enlace);
@@ -339,78 +359,116 @@ function PreguntaFormInner({
   const question = pregunta[mode][locale];
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
+    <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
       <p className="m-0 text-sm leading-relaxed text-[#4A5568] md:text-base">{copy.intro[locale]}</p>
+
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <button
+          type="button"
+          aria-pressed={mode === 'tu'}
+          onClick={() => setMode('tu')}
+          className={`${pickClass(mode === 'tu')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
+        >
+          <span className="text-base font-semibold">{copy.modeYou[locale]}</span>
+          <span className="text-sm font-normal leading-snug">{copy.modeYouLine[locale]}</span>
+        </button>
+        <button
+          type="button"
+          aria-pressed={mode === 'alguien'}
+          onClick={() => setMode('alguien')}
+          className={`${pickClass(mode === 'alguien')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
+        >
+          <span className="text-base font-semibold">{copy.modeAsk[locale]}</span>
+          <span className="text-sm font-normal leading-snug">{copy.modeAskLine[locale]}</span>
+        </button>
+      </div>
+
       <div>
         <p className="m-0 text-sm font-semibold text-[#D13D17]">{pregunta.tema[locale]}</p>
         <h1 className="m-0 mt-2 text-2xl font-semibold leading-snug">{question}</h1>
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        {(['tu', 'alguien'] as const).map((item) => (
-          <button
-            key={item}
-            type="button"
-            onClick={() => setMode(item)}
-            className={`${mode === item ? 'btn-am-principal' : 'btn-am-neutro'} inline-flex min-h-11 items-center px-4 text-sm font-semibold`}
-          >
-            {PREGUNTA_UI[item][locale]}
-          </button>
-        ))}
-      </div>
-
       <div className="flex flex-col gap-2">
-        {(
-          [
-            ['texto', copy.write[locale]],
-            ['voz', copy.record[locale]],
-            ['foto', copy.photo[locale]],
-          ] as const
-        ).map(([id, label]) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setKind(id)}
-            className={`${kind === id ? 'btn-am-principal' : 'btn-am-neutro'} inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold`}
-          >
-            {label}
-          </button>
-        ))}
+        <p className="m-0 text-base font-semibold">{copy.how[locale]}</p>
+        <div className="grid grid-cols-3 gap-2">
+          {(
+            [
+              ['texto', copy.write[locale], PenLine],
+              ['voz', copy.kindVoice[locale], Mic],
+              ['foto', copy.kindPhoto[locale], ImageIcon],
+            ] as const
+          ).map(([id, label, Icon]) => (
+            <button
+              key={id}
+              type="button"
+              aria-pressed={kind === id}
+              onClick={() => setKind(id)}
+              className={`${pickClass(kind === id)} flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-sm font-semibold`}
+            >
+              <Icon size={22} aria-hidden />
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
-      {advice ? <p className="m-0 text-sm leading-relaxed text-[#4A5568]">{advice}</p> : null}
 
       {kind === 'texto' && (
-        <label className="flex flex-col gap-1 text-sm font-semibold">
-          {copy.write[locale]}
+        <div className="flex flex-col gap-1">
           <textarea
             value={text}
             maxLength={RESPUESTA_TEXT_MAX}
             rows={6}
+            aria-label={copy.write[locale]}
             onChange={(event) => setText(event.target.value)}
             className={fieldClass}
           />
-        </label>
+          <p className="m-0 text-right text-xs text-[#4A5568]">
+            {text.length}/{RESPUESTA_TEXT_MAX}
+          </p>
+        </div>
       )}
 
       {kind === 'voz' && (
-        <div className="flex flex-col gap-3">
-          {recording ? (
+        <div className="flex flex-col items-center gap-3">
+          {audioUrl && !recording ? (
             <>
-              <p className="m-0 text-lg font-semibold text-[#D13D17]" aria-live="polite">
-                {mmss(elapsed)} / 2:00
-              </p>
-              {elapsed >= 90 ? <p className="m-0 text-sm font-semibold text-[#B53514]">{t.modalRecordingSoonEnd}</p> : null}
-              <button type="button" onClick={stopRecording} className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold">
-                {t.modalStop}
+              <audio controls src={audioUrl} className="w-full" />
+              <button
+                type="button"
+                onClick={() => void startRecording()}
+                className="text-sm font-semibold text-[#1C1C2E] underline"
+              >
+                {copy.recordAgain[locale]}
               </button>
             </>
           ) : (
-            <button type="button" onClick={() => void startRecording()} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold">
-              {copy.record[locale]}
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => (recording ? stopRecording() : void startRecording())}
+                aria-pressed={recording}
+                aria-label={recording ? copy.tapStop[locale] : copy.tapRecord[locale]}
+                className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
+                  recording ? 'border-[#D13D17] text-[#D13D17]' : 'border-black/20 text-[#1C1C2E]'
+                }`}
+              >
+                <Mic size={28} aria-hidden />
+              </button>
+              <p className="m-0 text-sm">{recording ? copy.tapStop[locale] : copy.tapRecord[locale]}</p>
+              <p className="m-0 text-sm font-semibold" aria-live="polite">
+                {mmss(elapsed)} / 2:00
+              </p>
+              {recording && elapsed >= 90 ? (
+                <p className="m-0 text-sm font-semibold text-[#B53514]">{t.modalRecordingSoonEnd}</p>
+              ) : null}
+            </>
           )}
-          <button type="button" onClick={() => audioInputRef.current?.click()} className="btn-am-neutro inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold">
-            {copy.uploadAudio[locale]}
+          <button
+            type="button"
+            onClick={() => audioInputRef.current?.click()}
+            className="text-sm text-[#4A5568] underline"
+          >
+            {copy.orUpload[locale]}
           </button>
           <input
             ref={audioInputRef}
@@ -422,14 +480,21 @@ function PreguntaFormInner({
               event.target.value = '';
             }}
           />
-          {audioFile ? <p className="m-0 text-sm text-[#4A5568]">{audioFile.name}</p> : null}
         </div>
       )}
 
       {kind === 'foto' && (
         <div className="flex flex-col gap-3">
-          <button type="button" onClick={() => photoInputRef.current?.click()} className="btn-am-neutro inline-flex min-h-11 items-center justify-center px-4 text-sm font-semibold">
-            {copy.photo[locale]}
+          <button
+            type="button"
+            onClick={() => photoInputRef.current?.click()}
+            className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-sm text-[#1C1C2E]"
+          >
+            {photoUrl ? (
+              <img src={photoUrl} alt="" className="max-h-64 w-full object-contain" />
+            ) : (
+              copy.choosePhoto[locale]
+            )}
           </button>
           <input
             ref={photoInputRef}
@@ -441,7 +506,6 @@ function PreguntaFormInner({
               event.target.value = '';
             }}
           />
-          {photoUrl ? <img src={photoUrl} alt="" className="max-h-64 w-full rounded-2xl object-contain" /> : null}
           <label className="flex flex-col gap-1 text-sm font-semibold">
             {copy.caption[locale]}
             <input
