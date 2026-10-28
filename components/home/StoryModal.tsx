@@ -1300,9 +1300,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     t,
   ]);
 
-  const uploadOnePhoto = useCallback(async (item: StoryPhotoItem): Promise<StoryPhotoItem> => {
+  const uploadOnePhoto = useCallback(async (
+    item: StoryPhotoItem,
+    onProgress?: (ratio: number) => void
+  ): Promise<StoryPhotoItem> => {
     if (item.uploadStatus === 'uploading') return item;
-    if (item.readUrl && item.storagePath) return item;
+    if (item.readUrl && item.storagePath) {
+      onProgress?.(1);
+      return item;
+    }
     if (!item.readyFile) {
       return { ...item, uploadStatus: 'error', error: t.modalPhotoUploadFailed };
     }
@@ -1318,6 +1324,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         'submissions',
         `photo-${item.id}-${prepared.name}`,
         (ratio) => {
+          onProgress?.(ratio);
           setPhotos((prev) =>
             prev.map((p) => (p.id === item.id ? { ...p, progress: ratio } : p))
           );
@@ -1519,7 +1526,23 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           setErr('Faltan las fotos de la historia.');
           return;
         }
-        const uploaded = await Promise.all(ready.map((p) => uploadOnePhoto(p)));
+        setUploadProgress(0);
+        const photoRatios = new Map(ready.map((p) => [p.id, 0]));
+        const reportPhotoProgress = () => {
+          let sum = 0;
+          photoRatios.forEach((ratio) => {
+            sum += ratio;
+          });
+          setUploadProgress(Math.min(100, Math.round((sum / ready.length) * 100)));
+        };
+        const uploaded = await Promise.all(
+          ready.map((p) =>
+            uploadOnePhoto(p, (ratio) => {
+              photoRatios.set(p.id, ratio);
+              reportPhotoProgress();
+            })
+          )
+        );
         const failed = uploaded.filter((p) => p.uploadStatus !== 'done' || !p.readUrl);
         if (failed.length > 0) {
           reportStorySubmitError('photo_partial_failed', 'story-media');
@@ -1548,8 +1571,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
       const storyFileUploaded =
         (mode === 'video' && (mediaBlob != null || uploadVideoFile != null)) ||
-        (mode === 'audio' && (mediaBlob != null || uploadAudioFile != null));
-      if (storyFileUploaded) {
+        (mode === 'audio' && (mediaBlob != null || uploadAudioFile != null)) ||
+        mode === 'foto';
+      if (mode === 'texto') {
+        setCreatingColors(true);
+      } else if (storyFileUploaded) {
         setUploadProgress(100);
         setCreatingColors(true);
       }

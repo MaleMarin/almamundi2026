@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { getAdminDb } from "@/lib/firebase/admin";
 import {
@@ -265,16 +265,22 @@ export async function POST(req: NextRequest) {
       });
       console.warn("[submissions POST] audit log omitido:", auditErr);
     }
-    try {
-      await notifyAuthorStoryReceived({
-        db,
-        collection: "submissions",
-        submissionId: ref.id,
-      });
-    } catch (mailErr) {
-      console.warn("[submissions POST] received mail omitido:", mailErr);
-    }
-    return NextResponse.json({ ok: true, id: ref.id });
+    const submissionId = ref.id;
+    after(async () => {
+      try {
+        const mail = await notifyAuthorStoryReceived({
+          db,
+          collection: "submissions",
+          submissionId,
+        });
+        if (mail.status === "failed") {
+          console.error("[submissions POST] received mail falló:", mail.error);
+        }
+      } catch (mailErr) {
+        console.error("[submissions POST] received mail falló:", mailErr);
+      }
+    });
+    return NextResponse.json({ ok: true, id: submissionId });
   } catch (e) {
     Sentry.captureException(e, {
       tags: { source: 'api.submissions.firestore_add' },
