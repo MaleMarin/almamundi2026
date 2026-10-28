@@ -9,17 +9,15 @@ import {
   SITE_FOOTER_GUIA_CONDUCTA_HREF,
   SITE_FOOTER_LEGAL_LINKS,
   SITE_HEADER_STORIES_LINKS,
-  SITE_NAV_CTA_CLASS,
-  SITE_NAV_LINK_CLASS,
 } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
+import { PREGUNTA_UI } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const FOOTER_LINK =
-  'almamundi-footer-link text-xs font-semibold leading-snug tracking-normal transition-colors';
-
-const FOOTER_PILL =
-  `${SITE_NAV_LINK_CLASS} ${FOOTER_LINK} w-full min-w-0 justify-center px-3 py-2.5 sm:px-4`;
+  'almamundi-footer-link font-normal leading-snug tracking-normal transition-colors';
+const FOOTER_GROUP_LINK = `${FOOTER_LINK} text-[15px]`;
+const FOOTER_LEGAL_LINK = `${FOOTER_LINK} text-xs`;
 
 export type FooterProps = {
   embedded?: boolean;
@@ -33,10 +31,9 @@ type FooterPillItem =
 export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps = {}) {
   const localeCtx = useHomeLocaleOptional();
   const t = localeCtx?.t ?? uiMessages(initialLocale);
+  const locale = localeCtx?.locale ?? initialLocale;
 
-  const footerPills: FooterPillItem[] = [
-    { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
-    { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
+  const exploreLinks: FooterPillItem[] = [
     ...SITE_HEADER_STORIES_LINKS.map(({ href }) => ({
       id: href,
       kind: 'internal' as const,
@@ -50,7 +47,32 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       label: t.navMap,
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
+    { id: 'pregunta', kind: 'internal', href: '/pregunta', label: PREGUNTA_UI.tab[locale] },
   ];
+
+  const aboutLinks: FooterPillItem[] = [
+    { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
+    { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
+  ];
+
+  function renderTextLink(item: FooterPillItem) {
+    if (item.kind === 'hard') {
+      return (
+        <HomeHardLink href={item.href} className={FOOTER_GROUP_LINK} onClick={item.onNavigate}>
+          {item.label}
+        </HomeHardLink>
+      );
+    }
+    return (
+      <ActiveInternalNavLink
+        href={item.href}
+        className={FOOTER_GROUP_LINK}
+        activeClassName="!text-[var(--almamundi-orange)]"
+      >
+        {item.label}
+      </ActiveInternalNavLink>
+    );
+  }
 
   return (
     <footer
@@ -71,48 +93,39 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             </span>
           </HomeHardLink>
         </div>
-        <p className="almamundi-footer-tagline mx-auto max-w-2xl px-3 text-[13px] font-medium leading-relaxed tracking-[0.03em] md:text-sm">
-          AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que despiertan otras historias.
+        <p
+          className="almamundi-footer-tagline mx-auto max-w-[640px] px-3 text-[15px] font-medium leading-relaxed"
+          style={{ textWrap: 'balance' }}
+        >
+          {t.heroBeforeBold} {t.heroBold}
         </p>
-      </div>
-
-      <div className="mt-14 flex w-full max-w-4xl justify-center px-2 md:mt-20">
         <HomeHardLink
           href="/#historias"
-          className={`${SITE_NAV_CTA_CLASS} px-6 py-2.5 text-sm md:px-8 md:py-3 md:text-base`}
+          className="btn-am-principal mt-8 inline-flex min-h-11 items-center justify-center px-6 py-3"
         >
           {t.navTellStory}
         </HomeHardLink>
       </div>
 
-      {/* 2. Pills: grilla 2×4 centrada (Mapa en la última celda, no suelto) */}
       <nav
-        className="mt-8 w-full max-w-4xl px-2 md:mt-10"
+        className="mt-12 flex w-full max-w-3xl flex-col items-center gap-10 md:mt-14 md:flex-row md:items-start md:justify-center md:gap-24"
         aria-label={t.ariaMainNav}
       >
-        <ul className="almamundi-footer-pill-grid m-0 list-none p-0">
-          {footerPills.map((pill) => (
-            <li key={pill.id} className="min-w-0">
-              {pill.kind === 'hard' ? (
-                <HomeHardLink
-                  href={pill.href}
-                  className={FOOTER_PILL}
-                  onClick={pill.onNavigate}
-                >
-                  <span className="block text-center">{pill.label}</span>
-                </HomeHardLink>
-              ) : (
-                <ActiveInternalNavLink
-                  href={pill.href}
-                  className={FOOTER_PILL}
-                  activeClassName="!text-[var(--almamundi-orange)] font-semibold"
-                >
-                  <span className="block text-center">{pill.label}</span>
-                </ActiveInternalNavLink>
-              )}
-            </li>
-          ))}
-        </ul>
+        {[
+          { title: t.footerExplore, links: exploreLinks },
+          { title: t.footerAbout, links: aboutLinks },
+        ].map((group) => (
+          <div key={group.title} className="flex flex-col items-center text-center">
+            <p className="m-0 mb-3 text-xs font-semibold uppercase tracking-[0.12em] text-[#718096]">
+              {group.title}
+            </p>
+            <ul className="m-0 flex list-none flex-col items-center gap-2 p-0">
+              {group.links.map((item) => (
+                <li key={item.id}>{renderTextLink(item)}</li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       {/* 3. Bloque institucional */}
@@ -140,7 +153,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 <ActiveInternalNavLink
                   key={href}
                   href={href}
-                  className={FOOTER_LINK}
+                  className={FOOTER_LEGAL_LINK}
                   activeClassName="!text-gray-900 font-semibold"
                 >
                   {href === '/privacidad'
@@ -152,7 +165,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               ))}
               <a
                 href={SITE_FOOTER_GUIA_CONDUCTA_HREF}
-                className={FOOTER_LINK}
+                className={FOOTER_LEGAL_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
                 type="application/pdf"
@@ -162,7 +175,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               </a>
               <ActiveInternalNavLink
                 href="/contacto"
-                className={FOOTER_LINK}
+                className={FOOTER_LEGAL_LINK}
                 activeClassName="!text-gray-900 font-semibold"
               >
                 {t.footerContact}
