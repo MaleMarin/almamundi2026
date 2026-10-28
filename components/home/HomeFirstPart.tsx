@@ -58,9 +58,10 @@ export function HomeFirstPart({
         onShowComoFunciona={onShowComoFunciona}
       />
 
+      <div className="lg:mt-[13.5rem] lg:flex lg:h-[calc(100svh-13.5rem)] lg:min-h-0 lg:flex-col">
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:pt-[15.25rem] lg:pb-3"
+        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
@@ -104,6 +105,7 @@ export function HomeFirstPart({
         onWriteStory={onWriteStory}
         onRecordPhoto={onRecordPhoto}
       />
+      </div>
     </>
   );
 }
