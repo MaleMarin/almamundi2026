@@ -38,7 +38,9 @@ import {
   peekMapAmbientPending,
 } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
-import { PREGUNTA_UI, preguntaSemanaClave } from '@/lib/pregunta-semana';
+import { PREGUNTA_UI, preguntaSemanaClave, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { RespuestaGlobeCard } from '@/components/map/RespuestaGlobeCard';
+import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
@@ -52,6 +54,7 @@ const PREGUNTA_SEMANA_VISTA_KEY = 'almamundi_pregunta_semana_vista';
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
 const NEWS_GLOBE_ID_BASE = 8_000_000;
+const RESPUESTA_GLOBE_ID_BASE = 7_000_000;
 const GLOBE_NEWS_MAX = 20;
 
 function jitterNewsOffset(id: string): { dLat: number; dLng: number } {
@@ -177,6 +180,28 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     bits: true,
     news: false,
   });
+  const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
+  const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
+
+  useEffect(() => {
+    const questionId = preguntasDeLaSemana().vigente.id;
+    let cancel = false;
+    void fetch(`/api/respuestas/public?questionId=${encodeURIComponent(questionId)}&limit=40`)
+      .then((res) => res.json())
+      .then((data: { items?: RespuestaPublica[] }) => {
+        if (!cancel) setRespuestas(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(() => {
+        if (!cancel) setRespuestas([]);
+      });
+    return () => {
+      cancel = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!globeLayers.news) setOpenRespuesta(null);
+  }, [globeLayers.news]);
   const [newsMarkersMounted, setNewsMarkersMounted] = useState(false);
 
   useEffect(() => {
@@ -606,6 +631,34 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     });
   }, [filteredNewsItems, newsMarkersMounted]);
 
+  const respuestasOnGlobe = useMemo(
+    () =>
+      respuestas
+        .filter(
+          (item) =>
+            typeof item.lat === 'number' &&
+            typeof item.lng === 'number' &&
+            Number.isFinite(item.lat) &&
+            Number.isFinite(item.lng) &&
+            Math.abs(item.lat) <= 90 &&
+            Math.abs(item.lng) <= 180
+        )
+        .slice(0, 40),
+    [respuestas]
+  );
+
+  const globeRespuestaMarkers = useMemo((): GlobeBitMarker[] => {
+    return respuestasOnGlobe.map((item, i) => ({
+      id: RESPUESTA_GLOBE_ID_BASE + i,
+      lat: item.lat as number,
+      lon: item.lng as number,
+      markerKind: 'respuesta' as const,
+      title: item.alias,
+      place: item.city,
+      color: '#D13D17',
+    }));
+  }, [respuestasOnGlobe]);
+
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
     const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
       id: STORY_GLOBE_ID_BASE + i,
@@ -621,8 +674,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         locale,
       }),
     }));
-    return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers];
-  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, locale]);
+    return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {
@@ -717,6 +770,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         }
         return;
       }
+      if (id >= RESPUESTA_GLOBE_ID_BASE) {
+        const item = respuestasOnGlobe[id - RESPUESTA_GLOBE_ID_BASE];
+        if (!item) return;
+        setOpenStory(null);
+        setHighlightedStoryId(null);
+        setOpenRespuesta(item);
+        return;
+      }
       const bit = huellasPuntos.find((h) => h.id === id);
       if (!bit) return;
       setOpenStory(null);
@@ -725,7 +786,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setDrawerMode('bits');
       setDrawerOpen(true);
     },
-    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers]
+    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe]
   );
 
   function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits', key: keyof GlobeLayerVisibility) {
@@ -827,6 +888,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               focusTarget={focusTarget}
               onFocusArrived={finishSurpriseOpen}
             />
+            {openRespuesta ? (
+              <RespuestaGlobeCard item={openRespuesta} onClose={() => setOpenRespuesta(null)} />
+            ) : null}
           </div>
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}

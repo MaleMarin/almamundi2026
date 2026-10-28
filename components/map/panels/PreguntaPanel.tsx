@@ -59,15 +59,26 @@ function PreguntaCard({
 function SemanaBlock({
   pregunta,
   locale,
+  linkTema = false,
 }: {
   pregunta: PreguntaSemana;
   locale: AlmaLocale;
+  linkTema?: boolean;
 }) {
+  const title = (
+    <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
+      {linkTema ? (
+        <Link href={`/pregunta/${pregunta.id}`} style={{ color: 'inherit' }}>
+          {pregunta.tema[locale]}
+        </Link>
+      ) : (
+        pregunta.tema[locale]
+      )}
+    </h3>
+  );
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
-        {pregunta.tema[locale]}
-      </h3>
+      {title}
       <PreguntaCard pregunta={pregunta} mode="tu" locale={locale} />
       <PreguntaCard pregunta={pregunta} mode="alguien" locale={locale} />
     </section>
@@ -107,7 +118,7 @@ export function PreguntaPanel() {
             {PREGUNTA_UI.anteriores[locale]}
           </h3>
           {anteriores.map((pregunta) => (
-            <SemanaBlock key={pregunta.id} pregunta={pregunta} locale={locale} />
+            <SemanaBlock key={pregunta.id} pregunta={pregunta} locale={locale} linkTema />
           ))}
         </section>
       ) : null}

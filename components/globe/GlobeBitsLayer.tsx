@@ -43,8 +43,8 @@ export type GlobeBitMarker = {
   lat: number;
   lon: number;
   color?: string;
-  /** Historias, bits curados o titulares (capa noticias). */
-  markerKind?: 'bit' | 'story' | 'news';
+  /** Historias, bits curados, titulares o respuestas de la pregunta. */
+  markerKind?: 'bit' | 'story' | 'news' | 'respuesta';
   title?: string;
   place?: string;
   url?: string;
@@ -64,7 +64,7 @@ const DEFAULT_LAYER_VISIBILITY: GlobeLayerVisibility = {
 
 function markerLayerKind(bit: GlobeBitMarker): keyof GlobeLayerVisibility {
   if (bit.markerKind === 'story') return 'stories';
-  if (bit.markerKind === 'news') return 'news';
+  if (bit.markerKind === 'news' || bit.markerKind === 'respuesta') return 'news';
   return 'bits';
 }
 
@@ -80,6 +80,8 @@ const STORY_RIPPLE_MUL = 5.6;
 const STORY_HOVER_SCALE = 1.32;
 /** Noticias: anillo más chico y frío que las historias. */
 const NEWS_PLANE_MUL = 2.22;
+/** Respuestas: anillo fino y chico, naranja. */
+const RESPUESTA_PLANE_MUL = 1.55;
 
 function disableMeshRaycast(obj: THREE.Object3D | null) {
   if (obj instanceof THREE.Mesh) obj.raycast = () => {};
@@ -131,6 +133,7 @@ function BitDot({
   storyRippleMat,
   storyRippleMatHover,
   newsMat,
+  respuestaMat,
   layerOpRef,
 }: {
   bit: GlobeBitMarker;
@@ -143,12 +146,13 @@ function BitDot({
   storyRippleMat: THREE.ShaderMaterial;
   storyRippleMatHover: THREE.ShaderMaterial;
   newsMat: THREE.ShaderMaterial;
+  respuestaMat: THREE.ShaderMaterial;
   layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number }>;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
     const p = latLngToCartesianThreeJS(bit.lat, bit.lon, BIT_SURFACE_RADIUS);
     const s = new THREE.Vector3(p.x, p.y, p.z);
-    const lift = bit.markerKind === 'story' ? 0.0064 : bit.markerKind === 'news' ? 0.0052 : 0.0042;
+    const lift = bit.markerKind === 'story' ? 0.0064 : bit.markerKind === 'news' || bit.markerKind === 'respuesta' ? 0.0052 : 0.0042;
     const b = s.clone().normalize().multiplyScalar(lift);
     return { surfacePos: s, flareBump: b };
   }, [bit.lat, bit.lon, bit.markerKind]);
@@ -197,6 +201,7 @@ function BitDot({
 
   const isStory = bit.markerKind === 'story';
   const isNews = bit.markerKind === 'news';
+  const isRespuesta = bit.markerKind === 'respuesta';
   const rippleGeom = useMemo(
     () => (isStory ? makeStoryRippleGeometry(bit.id) : null),
     [bit.id, isStory]
@@ -245,7 +250,9 @@ function BitDot({
     setMatLayerOpacity(mats.rippleHover, op);
   });
 
-  const starMat = isNews
+  const starMat = isRespuesta
+    ? respuestaMat
+    : isNews
     ? newsMat
     : selected || (isStory && magneticActive)
     ? isStory
@@ -257,7 +264,8 @@ function BitDot({
   const sel = selected ? 1.08 : 1.0;
   const mag = magneticActive && !selected ? (isStory ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
   const planeScale =
-    STAR_PLANE_SCALE * (isStory ? STORY_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
+    STAR_PLANE_SCALE *
+    (isStory ? STORY_PLANE_MUL : isRespuesta ? RESPUESTA_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
   const rippleScale = STAR_PLANE_SCALE * STORY_RIPPLE_MUL;
   const coreScale = CORE_SCALE * (isStory ? 1 : 2.4);
   const rippleMat = selected || magneticActive
@@ -290,11 +298,11 @@ function BitDot({
             ref={(m) => disableMeshRaycast(m)}
             material={starMat}
             scale={[planeScale * sel * mag, planeScale * sel * mag, 1]}
-            renderOrder={isStory ? 15 : isNews ? 13 : 10}
+            renderOrder={isStory ? 15 : isNews || isRespuesta ? 13 : 10}
           >
             <planeGeometry args={[1, 1]} />
           </mesh>
-          {(isStory || isNews) && magneticActive && (bit.title || bit.place) ? (
+          {(isStory || isNews || isRespuesta) && magneticActive && (bit.title || bit.place) ? (
             <Html
               center
               sprite
@@ -441,6 +449,13 @@ function GlobeBitsLayerMounted({
   const storyRippleMat = useMemo(() => createStoryRippleMaterial(1.0, 'GlobeStoryRipple'), []);
   const storyRippleMatHover = useMemo(() => createStoryRippleMaterial(1.55, 'GlobeStoryRippleHover'), []);
   const newsMat = useMemo(() => createNewsRingMaterial(0.9, 'GlobeNewsRing'), []);
+  const respuestaMat = useMemo(() => {
+    const mat = createNewsRingMaterial(0.95, 'GlobeRespuestaRing');
+    const color = new THREE.Color('#D13D17').convertSRGBToLinear();
+    mat.uniforms.uCore.value = new THREE.Vector3(color.r, color.g, color.b);
+    mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
+    return mat;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -451,6 +466,7 @@ function GlobeBitsLayerMounted({
       storyRippleMat.dispose();
       storyRippleMatHover.dispose();
       newsMat.dispose();
+      respuestaMat.dispose();
     };
   }, [
     starMatNormal,
@@ -460,6 +476,7 @@ function GlobeBitsLayerMounted({
     storyRippleMat,
     storyRippleMatHover,
     newsMat,
+    respuestaMat,
   ]);
 
   useFrame(({ clock }, dt) => {
@@ -467,6 +484,7 @@ function GlobeBitsLayerMounted({
     storyRippleMat.uniforms.uTime.value = t;
     storyRippleMatHover.uniforms.uTime.value = t;
     newsMat.uniforms.uTime.value = t;
+    respuestaMat.uniforms.uTime.value = t;
     const op = layerOpRef.current;
     op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? 1 : 0, 7, dt);
     op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? 1 : 0, 7, dt);
@@ -478,6 +496,7 @@ function GlobeBitsLayerMounted({
     setMatLayerOpacity(storyRippleMat, op.stories);
     setMatLayerOpacity(storyRippleMatHover, op.stories);
     setMatLayerOpacity(newsMat, op.news);
+    setMatLayerOpacity(respuestaMat, op.news);
   });
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {
@@ -639,6 +658,7 @@ function GlobeBitsLayerMounted({
     storyRippleMat,
     storyRippleMatHover,
     newsMat,
+    respuestaMat,
     layerOpRef,
   };
 
