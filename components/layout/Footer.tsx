@@ -118,15 +118,17 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       {/* 3. Bloque institucional */}
       <div className="mt-16 w-full max-w-6xl border-t border-black/[0.06] pt-10 md:mt-24 md:pt-14">
         <div className="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-          <div className="flex flex-col items-center lg:items-start">
-            <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
-              {t.footerInitiativeOf}
-            </p>
-            <img
-              src="/logo-precisar.png?v=2"
-              alt="Precisar"
-              className="h-11 w-auto object-contain md:h-14"
-            />
+          <div className="flex w-full justify-center lg:w-auto lg:justify-start">
+            <div className="flex flex-col items-start">
+              <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-gray-500">
+                {t.footerInitiativeOf}
+              </p>
+              <img
+                src="/logo-precisar.png?v=3"
+                alt="Precisar"
+                className="h-11 w-auto md:h-14"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col items-center gap-5 lg:items-end">
