@@ -6,6 +6,7 @@
  */
 
 import type { HuellaV2VisualParams, HuellaV2Format } from '@/lib/huella/types';
+import { canvasFontFamily } from '@/lib/typography';
 
 export type { HuellaV2Format };
 
@@ -631,7 +632,7 @@ function drawHuellaSiteFooter(ctx: CanvasRenderingContext2D, at: Date): void {
   const maxW = W * 0.92;
   const metaPx = Math.max(9, Math.round(W * 0.019));
   ctx.fillStyle = '#64748b';
-  ctx.font = `400 ${metaPx}px ui-sans-serif, system-ui, -apple-system, sans-serif`;
+  ctx.font = `400 ${metaPx}px ${canvasFontFamily()}`;
   const lineMeta = truncateCanvasLine(ctx, metaLine, maxW);
   ctx.fillText(lineMeta, W / 2, bandTop + fH * 0.55);
   ctx.restore();

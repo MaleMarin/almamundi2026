@@ -17,7 +17,7 @@ export function RespuestaGlobeCard({
   return (
     <div
       className="absolute bottom-4 left-1/2 z-30 w-[min(92vw,340px)] -translate-x-1/2 rounded-2xl bg-white p-4 text-[#1C1C2E] shadow-[0_12px_40px_rgba(20,29,38,0.18)]"
-      style={{ fontFamily: 'var(--font-interna), system-ui, sans-serif' }}
+      style={{ fontFamily: 'var(--font-interna), sans-serif' }}
     >
       <div className="mb-2 flex items-start justify-between gap-2">
         <div>

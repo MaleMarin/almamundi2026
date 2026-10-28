@@ -14,7 +14,7 @@ function isHomePath(pathname: string): boolean {
   return pathname === '/';
 }
 
-/** Montserrat en todo el sitio; la home conserva la pila actual. */
+/** Montserrat en todo el sitio, home incluida. */
 export function SiteFontScope({ children }: { children: ReactNode }) {
   const pathname = usePathname() ?? '/';
   return (

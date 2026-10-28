@@ -321,7 +321,7 @@ function BitDot({
                   border: `1px solid ${isNews ? 'rgba(126, 200, 255, 0.55)' : 'rgba(255, 122, 0, 0.55)'}`,
                   boxShadow: '0 8px 24px rgba(0,0,0,0.45)',
                   color: '#fff',
-                  fontFamily: 'system-ui, sans-serif',
+                  fontFamily: 'var(--font-interna), sans-serif',
                   pointerEvents: 'none',
                   whiteSpace: 'normal',
                 }}

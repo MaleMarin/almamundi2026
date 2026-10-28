@@ -60,15 +60,14 @@ export function HomeFirstPart({
         onShowComoFunciona={onShowComoFunciona}
       />
 
-      {/* INTRO — Avenir (misma pila que «Mapa de AlmaMundi», globals.css .home-intro-avenir) */}
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex scroll-mt-[9.75rem] flex-col items-center px-6 pb-4 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-5 md:scroll-mt-[12.25rem] md:px-10 md:pb-6 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:pt-[15.25rem] lg:pb-6"
+        className="home-intro-avenir relative z-[20] flex scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:scroll-mt-[13.5rem] lg:pt-[15.25rem] lg:pb-3"
       >
         <div className="mx-auto w-full max-w-[min(100%,42rem)]">
           <div className="home-first-part-float relative">
             <h1
-              className="mx-auto mb-4 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-5 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
+              className="mx-auto mb-2 max-w-[min(100%,42rem)] font-light leading-[1.15] md:mb-3 text-[clamp(1.375rem,1.2vw+1.05rem,2.5rem)]"
               style={{
                 color: soft.textMain,
                 letterSpacing: '-0.02em',

@@ -16,7 +16,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
 const montserrat = Montserrat({
-  weight: ['400', '500', '600', '700'],
+  weight: ['300', '400', '500', '600', '700'],
   subsets: ['latin', 'latin-ext'],
   variable: '--font-interna',
   display: 'swap',

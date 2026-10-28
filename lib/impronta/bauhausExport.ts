@@ -1,4 +1,5 @@
 import type { HuellaVisualParams, VisualBlock } from "@/lib/huella/types";
+import { canvasFontFamily } from "@/lib/typography";
 
 export const IMPRONTA_EXPORT_W = 900;
 export const IMPRONTA_EXPORT_H = 1200;
@@ -86,21 +87,21 @@ export function drawImprontaBauhaus(
   ctx.stroke();
 
   ctx.fillStyle = "#FF4A1C";
-  ctx.font = "600 20px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = `600 20px ${canvasFontFamily()}`;
   ctx.textBaseline = "middle";
   ctx.fillText("AlmaMundi", 28, H - fh / 2 - 26);
 
   ctx.fillStyle = "#334155";
-  ctx.font = "600 22px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = `600 22px ${canvasFontFamily()}`;
   ctx.fillText(opts.footerLine, 28, H - fh / 2 + 2);
 
   const fmt = opts.formatLabel?.trim();
   const sub = fmt ? `${opts.dateLabel} · ${fmt}` : opts.dateLabel;
   ctx.fillStyle = "#64748b";
-  ctx.font = "500 16px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = `500 16px ${canvasFontFamily()}`;
   ctx.fillText(sub, 28, H - fh / 2 + 30);
 
   ctx.fillStyle = "#94a3b8";
-  ctx.font = "400 13px ui-sans-serif, system-ui, sans-serif";
+  ctx.font = `400 13px ${canvasFontFamily()}`;
   ctx.fillText("Interpretación visual", 28, H - fh / 2 + 52);
 }

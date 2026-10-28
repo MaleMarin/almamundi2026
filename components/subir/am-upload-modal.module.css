@@ -11,7 +11,7 @@
   background: rgba(0, 0, 0, 0.25);
   backdrop-filter: blur(4px);
   animation: amModalFadeIn 200ms ease-out;
-  font-family: var(--font-interna), system-ui, sans-serif;
+  font-family: var(--font-interna), sans-serif;
 }
 
 .amModalCard {

@@ -13,7 +13,6 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 const APP_FONT = SITE_FONT_STACK;
 
 const soft = {
-  textBody: '#5A6578',
   flat: {
     backgroundColor: '#E8EBF2',
     borderRadius: '40px',
@@ -255,25 +254,22 @@ export function HomeFormatCards({
       <p
         className={
           fillViewport
-            ? 'home-intro-avenir mx-auto mb-3 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-base font-light leading-snug tracking-wide md:mb-4 md:text-lg lg:mb-5 lg:text-xl'
-            : 'home-intro-avenir mx-auto mb-8 max-w-[min(100%,40rem)] px-1 text-center text-base font-light leading-snug tracking-wide sm:mb-10 md:mb-12 md:text-lg md:leading-relaxed lg:mb-14 lg:text-xl'
+            ? 'home-intro-avenir mx-auto mb-3 max-w-[min(100%,40rem)] shrink-0 px-1 text-center leading-snug tracking-normal md:mb-4 lg:mb-5'
+            : 'home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] px-1 text-center leading-snug tracking-normal sm:mb-5 md:mb-6'
         }
-        style={{ color: soft.textBody }}
       >
-        <span className="font-normal text-orange-500">
-          <span className="block">
-            {t.historiasLead2}
-          </span>
-          <span className="mt-1 block font-bold">
-            {t.historiasLead2b}
-          </span>
+        <span className="block text-[19px] font-medium tracking-normal text-[#FF4A1C] md:text-[26px]">
+          {t.historiasLead2}
+        </span>
+        <span className="mt-1 block text-[24px] font-bold tracking-normal text-[#FF4A1C] md:text-[34px]">
+          {t.historiasLead2b}
         </span>
       </p>
       <div
         className={
           fillViewport
             ? 'mx-auto grid h-full min-h-0 w-full max-w-[min(100%,1600px)] flex-1 grid-cols-2 grid-rows-2 items-stretch gap-4 sm:gap-5 md:gap-6 lg:grid-cols-4 lg:grid-rows-1 lg:gap-7 xl:gap-8'
-            : 'mx-auto mt-12 grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:mt-14 sm:px-0 md:mt-16 lg:grid-cols-4 lg:mt-20 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11'
+            : 'mx-auto mt-6 grid w-full max-w-[min(100%,1560px)] grid-cols-1 gap-y-12 px-1 sm:mt-7 sm:px-0 md:mt-8 lg:grid-cols-4 lg:mt-8 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11'
         }
       >
         <SoftCard

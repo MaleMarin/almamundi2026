@@ -5,6 +5,8 @@
  */
 
 
+import { canvasFontFamily } from '@/lib/typography';
+
 function wrapText(
   ctx: CanvasRenderingContext2D,
   text: string,
@@ -118,7 +120,7 @@ export async function renderExhibitionShareCardPng(
   const q =
     opts.quote.length > 280 ? `${opts.quote.slice(0, 277).trim()}…` : opts.quote;
   ctx.fillStyle = 'rgba(18, 22, 32, 0.92)';
-  ctx.font = 'italic 30px Georgia, "Times New Roman", serif';
+  ctx.font = `400 30px ${canvasFontFamily()}`;
   const quoteBlock = `«${q}»`;
   const textStartY = photoY + photoH + 44;
   const bottomReserve = 260;
@@ -142,11 +144,11 @@ export async function renderExhibitionShareCardPng(
   if (line && lineY <= maxQuoteY) ctx.fillText(line, pad, lineY);
 
   ctx.fillStyle = 'rgba(25, 30, 40, 0.95)';
-  ctx.font = '600 26px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = `600 26px ${canvasFontFamily()}`;
   ctx.fillText(`— ${opts.authorName}`, pad, Math.min(lineY + lh + 8, W - 220));
 
   ctx.fillStyle = 'rgba(45, 50, 62, 0.88)';
-  ctx.font = '600 22px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = `600 22px ${canvasFontFamily()}`;
   const title =
     opts.storyTitle.length > 80
       ? `${opts.storyTitle.slice(0, 77)}…`
@@ -175,7 +177,7 @@ export async function renderExhibitionShareCardPng(
   ctx.translate(W / 2, W / 2);
   ctx.rotate(-Math.PI / 5.5);
   ctx.globalAlpha = 0.06;
-  ctx.font = 'bold 52px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = `700 52px ${canvasFontFamily()}`;
   ctx.fillStyle = '#1a2030';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -185,7 +187,7 @@ export async function renderExhibitionShareCardPng(
 
   ctx.globalAlpha = 1;
   ctx.textAlign = 'left';
-  ctx.font = '13px ui-sans-serif, system-ui, sans-serif';
+  ctx.font = `400 13px ${canvasFontFamily()}`;
   ctx.fillStyle = 'rgba(55, 60, 72, 0.75)';
   ctx.fillText('almamundi.org · Escanea para volver a la historia.', pad, W - pad - 18);
 

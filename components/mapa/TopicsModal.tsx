@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Search, X } from 'lucide-react';
 
-const APP_FONT = 'Avenir, sans-serif';
+const APP_FONT = 'var(--font-interna), sans-serif';
 
 export type TopicsModalStory = {
   id?: string;

@@ -399,7 +399,7 @@ export function SalaHilo({
         minHeight: 'max(32rem, calc(100dvh - 7rem))',
         background: BG,
         color: TEXT_PRIMARY,
-        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontFamily: 'var(--font-interna), sans-serif',
       }}
     >
       {styleTag}

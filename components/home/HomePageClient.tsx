@@ -296,7 +296,7 @@ export function HomePageClient() {
               id="pregunta-semana-titulo"
               className="mb-0 mt-5 text-[26px] leading-[1.25] md:text-[36px]"
               style={{
-                fontFamily: 'var(--font-interna), system-ui, sans-serif',
+                fontFamily: 'var(--font-interna), sans-serif',
                 fontWeight: 500,
                 color: '#4A5568',
                 textWrap: 'balance',

@@ -66,7 +66,7 @@ function MuestraDetailBody() {
           alignItems: 'center',
           justifyContent: 'center',
           gap: 16,
-          fontFamily: 'system-ui, sans-serif',
+          fontFamily: 'var(--font-interna), sans-serif',
         }}
       >
         <p style={{ margin: 0 }}>No se encontró esta muestra.</p>

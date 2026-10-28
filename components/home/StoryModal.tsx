@@ -105,7 +105,7 @@ export type ChosenInspirationTopic = {
   questions: string[];
 };
 
-const APP_FONT = 'var(--font-interna), system-ui, sans-serif';
+const APP_FONT = 'var(--font-interna), sans-serif';
 
 const soft = {
   bg: '#E0E5EC',

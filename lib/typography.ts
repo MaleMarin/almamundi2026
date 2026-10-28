@@ -1,12 +1,16 @@
 /**
- * Solo la home. El resto del sitio hereda Montserrat (`--font-interna`) desde el layout.
- * Tailwind `font-sans` / `globals.css` @theme `--font-sans`.
+ * Montserrat en el sitio público, home incluida (`--font-interna` en el layout).
+ * El logotipo de texto del pie no usa esta pila.
  */
-export const SITE_FONT_STACK =
-  'system-ui, -apple-system, "Segoe UI", Avenir, sans-serif' as const;
+export const SITE_FONT_STACK = 'var(--font-interna), sans-serif' as const;
 
-/**
- * Fuente por defecto del sitio (Montserrat vía next/font).
- */
-export const INTERIOR_FONT_STACK =
-  'var(--font-interna), system-ui, sans-serif' as const;
+export const INTERIOR_FONT_STACK = SITE_FONT_STACK;
+
+/** Familia ya cargada, para canvas (no resuelve var()). */
+export function canvasFontFamily(): string {
+  if (typeof document === 'undefined') return 'sans-serif';
+  const custom = getComputedStyle(document.documentElement)
+    .getPropertyValue('--font-interna')
+    .trim();
+  return custom || 'sans-serif';
+}

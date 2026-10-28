@@ -126,7 +126,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
 
   if (!stories.length) {
     return (
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: 'Georgia, serif', fontSize: '1.1rem' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100%', color: '#FF4A1C', fontFamily: 'var(--font-interna), sans-serif', fontSize: '1.1rem' }}>
         No hay historias en video por ahora.
       </div>
     );

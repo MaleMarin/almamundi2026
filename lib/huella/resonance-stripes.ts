@@ -4,6 +4,7 @@
  */
 
 import type { AlmaLocale } from '@/lib/i18n/locale';
+import { canvasFontFamily } from '@/lib/typography';
 import { formatLongDate } from '@/lib/i18n/locale';
 import { seedFn, seededRnd } from '@/lib/huella/huellaV2';
 import { hitsFromText, type LexiconHit } from '@/lib/huella/almamundi-lexicon';
@@ -110,10 +111,7 @@ function displayInitialCapital(value: string, locale: AlmaLocale): string {
 }
 
 function footerFontStack(): string {
-  const fallback = 'ui-sans-serif, system-ui, -apple-system, sans-serif';
-  if (typeof document === 'undefined') return fallback;
-  const custom = getComputedStyle(document.documentElement).getPropertyValue('--font-interna').trim();
-  return custom ? `${custom}, ${fallback}` : fallback;
+  return canvasFontFamily();
 }
 
 /** Tamaños del pie en el PNG de 1080. En otros anchos se escalan con la misma proporción. */
