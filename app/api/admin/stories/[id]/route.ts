@@ -4,6 +4,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
+import { editorialDeleteStory } from "@/lib/editorial/service";
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 
@@ -91,5 +92,31 @@ export async function PATCH(
   } catch (e) {
     console.error("[admin/stories PATCH]", e);
     return NextResponse.json({ error: "update failed" }, { status: 500 });
+  }
+}
+
+/** DELETE /api/admin/stories/[id] — borra el documento y sus archivos. Solo administradoras. */
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const auth = await requireAdmin(request);
+  if (auth instanceof NextResponse) return auth;
+
+  const { id } = await params;
+  if (!id) {
+    return NextResponse.json({ error: "missing id" }, { status: 400 });
+  }
+
+  try {
+    const db = getAdminDb();
+    const result = await editorialDeleteStory({ db, storyId: id, deletedBy: auth.uid });
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error }, { status: result.httpStatus });
+    }
+    return NextResponse.json({ ok: true });
+  } catch (e) {
+    console.error("[admin/stories DELETE]", e);
+    return NextResponse.json({ error: "delete failed" }, { status: 500 });
   }
 }

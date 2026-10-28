@@ -6,7 +6,8 @@ export type EditorialAuditEventType =
   /** alias explícitos para logs legibles */
   | "approve_from_submission"
   | "reject_moderation"
-  | "publish_spanish_inplace";
+  | "publish_spanish_inplace"
+  | "delete_story";
 
 export type EditorialAuditPayload = {
   storyId?: string;
@@ -19,6 +20,27 @@ export type EditorialAuditPayload = {
 };
 
 const COLLECTION = "editorial_audit_log";
+
+/**
+ * Borrado: solo id, fecha y quién eliminó.
+ * Sin correo, nombre ni texto de la historia.
+ */
+export async function appendDeleteStoryLog(
+  db: Firestore,
+  storyId: string,
+  deletedBy: string
+): Promise<void> {
+  try {
+    await db.collection(COLLECTION).add({
+      event: "delete_story",
+      storyId,
+      deletedBy,
+      createdAt: new Date().toISOString(),
+    });
+  } catch (e) {
+    console.warn("[editorial_audit_log]", "delete_story", e);
+  }
+}
 
 /** Log append-only best-effort; no debe romper la transacción editorial si Firestore falla al auditar. */
 export async function appendEditorialAuditLog(

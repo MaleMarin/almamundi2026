@@ -361,3 +361,89 @@ export async function savePublishedMediaObject(opts: {
   });
   return finalizePublishedObject(opts.destPath);
 }
+
+/** Path de objeto en este bucket, si la URL es de Firebase o GCS. */
+export function storageObjectPathFromUrl(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let objectPath = "";
+    if (u.hostname === "firebasestorage.googleapis.com") {
+      const m = u.pathname.match(/\/v0\/b\/[^/]+\/o\/(.+)$/);
+      if (!m?.[1]) return null;
+      objectPath = decodeURIComponent(m[1]);
+    } else if (u.hostname === "storage.googleapis.com") {
+      const parts = u.pathname.replace(/^\//, "").split("/");
+      if (parts.length < 2) return null;
+      objectPath = decodeURIComponent(parts.slice(1).join("/"));
+    } else if (u.hostname.endsWith(".storage.googleapis.com")) {
+      objectPath = decodeURIComponent(u.pathname.replace(/^\//, ""));
+    } else {
+      return null;
+    }
+    objectPath = objectPath.replace(/^\/+/, "");
+    if (!objectPath || objectPath.includes("\0") || objectPath.includes("..")) return null;
+    return objectPath;
+  } catch {
+    return null;
+  }
+}
+
+/** Solo copias de esta historia, sus ecos, u originales privados citados por ella. */
+export function isStoryOwnedStoragePath(storyId: string, storagePath: string): boolean {
+  let id = "";
+  try {
+    id = assertSafeStoryId(storyId);
+  } catch {
+    return false;
+  }
+  if (!storagePath || storagePath.includes("\0") || storagePath.includes("..")) return false;
+  if (
+    storagePath.startsWith(`published/${id}/`) ||
+    storagePath.startsWith(`published/ecos/${id}/`)
+  ) {
+    try {
+      assertSafePublishedPath(storagePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  if (storagePath.startsWith(`${PRIVATE_PREFIX}/`)) {
+    try {
+      assertSafeSubmissionsPath(storagePath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
+
+/**
+ * Borra archivos de una historia: `published/{id}/**`, `published/ecos/{id}/**`
+ * y paths citados que pasen `isStoryOwnedStoragePath`.
+ */
+export async function deleteStoryStorageFiles(
+  storyId: string,
+  referencedPaths: string[]
+): Promise<void> {
+  const id = assertSafeStoryId(storyId);
+  const bucket = getAdminBucket();
+  const prefixes = [`published/${id}/`, `published/ecos/${id}/`];
+  for (const prefix of prefixes) {
+    const [files] = await bucket.getFiles({ prefix });
+    for (const file of files) {
+      if (!file.name.startsWith(prefix)) continue;
+      await file.delete({ ignoreNotFound: true });
+    }
+  }
+  const seen = new Set<string>();
+  for (const raw of referencedPaths) {
+    const path = raw.trim();
+    if (!path || seen.has(path)) continue;
+    seen.add(path);
+    if (path.startsWith(`published/${id}/`) || path.startsWith(`published/ecos/${id}/`)) continue;
+    if (!isStoryOwnedStoragePath(id, path)) continue;
+    await bucket.file(path).delete({ ignoreNotFound: true });
+  }
+}

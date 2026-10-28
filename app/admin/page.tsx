@@ -30,6 +30,7 @@ import {
   Mic,
   Video,
   FolderOpen,
+  Trash2,
 } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
@@ -138,6 +139,35 @@ function StoryQuestionLine({ story }: { story: Story }) {
     <p style={{ fontSize: 13, margin: '6px 0 0', color: 'rgba(255,255,255,0.72)', lineHeight: 1.4 }}>
       {line}
     </p>
+  );
+}
+
+const DELETE_STORY_CONFIRM = '¿Eliminar esta historia y sus archivos? No se puede deshacer.';
+
+function EliminarHistoriaButton({ disabled, onClick }: { disabled: boolean; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6,
+        padding: '8px 14px',
+        borderRadius: 999,
+        border: '1px solid rgba(239,68,68,0.5)',
+        background: 'rgba(239,68,68,0.2)',
+        color: '#fca5a5',
+        fontWeight: 700,
+        fontSize: 13,
+        cursor: disabled ? 'default' : 'pointer',
+        fontFamily: APP_FONT,
+        opacity: disabled ? 0.6 : 1,
+      }}
+    >
+      <Trash2 size={16} /> Eliminar
+    </button>
   );
 }
 
@@ -325,6 +355,28 @@ export default function AdminPage() {
       }
     })();
   }, [isAdmin, idToken, fetchPending, fetchActive, fetchArchived, fetchCollections, fetchStats]);
+
+  const deleteStory = async (id: string) => {
+    if (!window.confirm(DELETE_STORY_CONFIRM)) return;
+    setActionLoading(id);
+    try {
+      const res = await fetch(`/api/admin/stories/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders(),
+      });
+      const data = (await res.json()) as { ok?: boolean; error?: string };
+      if (data.ok) {
+        showToast('Historia eliminada');
+        await Promise.all([fetchPending(), fetchActive(), fetchArchived(), fetchCollections(), fetchStats()]);
+      } else {
+        showToast(data.error ?? 'Error');
+      }
+    } catch {
+      showToast('Error al eliminar');
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const patchStory = async (id: string, action: 'approve' | 'reject' | 'feature' | 'archive') => {
     setActionLoading(id);
@@ -664,6 +716,7 @@ export default function AdminPage() {
                   >
                     <X size={16} /> Rechazar
                   </button>
+                  <EliminarHistoriaButton disabled={actionLoading === s.id} onClick={() => deleteStory(s.id)} />
                 </div>
               </div>
             </div>
@@ -757,6 +810,7 @@ export default function AdminPage() {
                     >
                       <Archive size={16} /> Mover al archivo
                     </button>
+                    <EliminarHistoriaButton disabled={actionLoading === s.id} onClick={() => deleteStory(s.id)} />
                   </div>
                 </div>
               </div>
@@ -864,6 +918,7 @@ export default function AdminPage() {
                         <option key={c.id} value={c.id}>{c.title}</option>
                       ))}
                     </select>
+                    <EliminarHistoriaButton disabled={actionLoading === s.id} onClick={() => deleteStory(s.id)} />
                   </div>
                 </div>
               </div>

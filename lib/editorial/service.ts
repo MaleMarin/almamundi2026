@@ -3,9 +3,9 @@
  * Las rutas API (`/api/admin/publish`, `/api/curate/publish`, etc.) delegan aquí sin duplicar lógica Firestore.
  */
 import "server-only";
-import type { DocumentReference, Firestore } from "firebase-admin/firestore";
-import { FieldValue } from "firebase-admin/firestore";
-import { appendEditorialAuditLog } from "@/lib/editorial/audit";
+import type { CollectionReference, DocumentReference, Firestore } from "firebase-admin/firestore";
+import { FieldPath, FieldValue } from "firebase-admin/firestore";
+import { appendDeleteStoryLog, appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes } from "@/lib/antecedentes";
 import { imagenesFromSubmissionPhotos, parseStoryImagenes } from "@/lib/historias/story-imagenes";
@@ -20,6 +20,11 @@ import {
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { promotePublicStoryMedia } from "@/lib/published-media";
+import {
+  assertSafeStoryId,
+  deleteStoryStorageFiles,
+  storageObjectPathFromUrl,
+} from "@/lib/server-storage";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import { isQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
 import {
@@ -682,4 +687,163 @@ export async function editorialRejectModerationDocument(args: {
   }
 
   return { ok: true, collection, rejectionMail };
+}
+
+const STORY_URL_FIELDS = [
+  "videoUrl",
+  "audioUrl",
+  "imageUrl",
+  "profilePhotoUrl",
+  "mediaUrl",
+  "coverImageUrl",
+  "storagePath",
+] as const;
+
+function pushStorageRef(out: string[], value: unknown) {
+  if (typeof value !== "string") return;
+  const trimmed = value.trim();
+  if (!trimmed) return;
+  if (trimmed.startsWith("http://") || trimmed.startsWith("https://")) {
+    const path = storageObjectPathFromUrl(trimmed);
+    if (path) out.push(path);
+    return;
+  }
+  out.push(trimmed);
+}
+
+function collectStoryStorageRefs(data: Record<string, unknown>, out: string[]) {
+  for (const key of STORY_URL_FIELDS) pushStorageRef(out, data[key]);
+  for (const key of ["publishedMediaPaths", "privateMediaPaths", "images"] as const) {
+    const arr = data[key];
+    if (!Array.isArray(arr)) continue;
+    for (const item of arr) pushStorageRef(out, item);
+  }
+  const media = data.media;
+  if (media && typeof media === "object" && !Array.isArray(media)) {
+    for (const value of Object.values(media as Record<string, unknown>)) pushStorageRef(out, value);
+  }
+  const imagenes = parseStoryImagenes(data.imagenes);
+  if (imagenes) {
+    for (const img of imagenes) pushStorageRef(out, img.url);
+  }
+}
+
+async function collectTreeStorageRefs(ref: DocumentReference, out: string[]): Promise<void> {
+  const cols = await ref.listCollections();
+  for (const col of cols) {
+    let snap = await col.orderBy(FieldPath.documentId()).limit(100).get();
+    while (!snap.empty) {
+      for (const doc of snap.docs) {
+        collectStoryStorageRefs((doc.data() ?? {}) as Record<string, unknown>, out);
+        await collectTreeStorageRefs(doc.ref, out);
+      }
+      if (snap.size < 100) break;
+      const last = snap.docs[snap.docs.length - 1];
+      snap = await col.orderBy(FieldPath.documentId()).startAfter(last).limit(100).get();
+    }
+  }
+}
+
+async function collectSourceSubmissionStorageRefs(
+  db: Firestore,
+  data: Record<string, unknown>,
+  out: string[]
+): Promise<void> {
+  const id = typeof data.sourceSubmissionId === "string" ? data.sourceSubmissionId.trim() : "";
+  const col = data.sourceSubmissionCollection;
+  if (!id || (col !== "story_submissions" && col !== "submissions")) return;
+  if (id.includes("/") || id.includes("..")) return;
+  const snap = await db.collection(col).doc(id).get();
+  if (!snap.exists) return;
+  collectStoryStorageRefs((snap.data() ?? {}) as Record<string, unknown>, out);
+}
+
+async function deleteCollectionDocs(col: CollectionReference): Promise<void> {
+  const snap = await col.limit(100).get();
+  if (snap.empty) return;
+  for (const doc of snap.docs) {
+    await deleteDocumentTree(doc.ref);
+  }
+  if (snap.size === 100) await deleteCollectionDocs(col);
+}
+
+async function deleteDocumentTree(ref: DocumentReference): Promise<void> {
+  const cols = await ref.listCollections();
+  for (const col of cols) {
+    await deleteCollectionDocs(col);
+  }
+  await ref.delete();
+}
+
+async function detachStoryFromCollections(db: Firestore, storyId: string): Promise<void> {
+  const snap = await db.collection("collections").where("storyIds", "array-contains", storyId).get();
+  for (const doc of snap.docs) {
+    await doc.ref.update({
+      storyIds: FieldValue.arrayRemove(storyId),
+      updatedAt: FieldValue.serverTimestamp(),
+    });
+  }
+}
+
+async function deleteOriginSubmission(
+  db: Firestore,
+  storyId: string,
+  data: Record<string, unknown>
+): Promise<void> {
+  const id = typeof data.sourceSubmissionId === "string" ? data.sourceSubmissionId.trim() : "";
+  if (!id || id.includes("/") || id.includes("..")) return;
+  const named = data.sourceSubmissionCollection;
+  const names: Array<"story_submissions" | "submissions"> =
+    named === "story_submissions" || named === "submissions"
+      ? [named]
+      : ["story_submissions", "submissions"];
+  for (const name of names) {
+    const ref = db.collection(name).doc(id);
+    const snap = await ref.get();
+    if (!snap.exists) continue;
+    if (names.length > 1) {
+      const published = snap.get("publishedStoryId");
+      if (typeof published === "string" && published && published !== storyId) continue;
+    }
+    await deleteDocumentTree(ref);
+    return;
+  }
+}
+
+/**
+ * Borra una historia de `stories`, sus subcolecciones, el envío de origen
+ * (`submissions` o `story_submissions`) y los archivos de Storage citados.
+ */
+export async function editorialDeleteStory(args: {
+  db: Firestore;
+  storyId: string;
+  deletedBy: string;
+}): Promise<{ ok: true } | { ok: false; httpStatus: number; error: string }> {
+  const { db, deletedBy } = args;
+  let storyId = "";
+  try {
+    storyId = assertSafeStoryId(args.storyId);
+  } catch {
+    return { ok: false, httpStatus: 400, error: "Historia no válida" };
+  }
+
+  const ref = db.collection("stories").doc(storyId);
+  const snap = await ref.get();
+  if (!snap.exists) return { ok: false, httpStatus: 404, error: "Historia no encontrada" };
+
+  const data = (snap.data() ?? {}) as Record<string, unknown>;
+  const paths: string[] = [];
+  collectStoryStorageRefs(data, paths);
+  await collectTreeStorageRefs(ref, paths);
+  await collectSourceSubmissionStorageRefs(db, data, paths);
+  await deleteStoryStorageFiles(storyId, paths);
+  await deleteOriginSubmission(db, storyId, data);
+  await deleteDocumentTree(ref);
+  try {
+    await detachStoryFromCollections(db, storyId);
+  } catch (e) {
+    console.error("[editorial] detach story from collections", e);
+  }
+  await appendDeleteStoryLog(db, storyId, deletedBy);
+  return { ok: true };
 }

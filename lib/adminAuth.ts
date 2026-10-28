@@ -30,7 +30,7 @@ export async function getAdminSessionIfPresent(
 
 export async function requireAdmin(
   req: Request
-): Promise<{ email: string } | NextResponse> {
+): Promise<{ email: string; uid: string } | NextResponse> {
   const raw =
     req.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim() ?? "";
   if (!raw) {
@@ -43,7 +43,7 @@ export async function requireAdmin(
     if (!isAdminEmail(email)) {
       return NextResponse.json({ error: "not admin" }, { status: 403 });
     }
-    return { email };
+    return { email, uid: decoded.uid };
   } catch {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
