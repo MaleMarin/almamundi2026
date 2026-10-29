@@ -184,7 +184,7 @@ export interface SubmissionDoc {
   antecedentes?: string;
   /** Id de la pregunta de la semana, p. ej. `musica`. */
   questionId?: (typeof QUESTION_IDS)[number];
-  /** `tu` = Cuéntanos tú. `alguien` = Pregúntale a alguien. */
+  /** `tu` = Responde tú. `alguien` = Pregúntale a alguien. */
   questionMode?: "tu" | "alguien";
   payload: {
     textBody?: string;

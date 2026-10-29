@@ -43,7 +43,7 @@ export const PREGUNTA_UI = {
     pt: 'A pergunta da semana:',
     en: "This week's question:",
   },
-  tu: { es: 'Cuéntanos tú', pt: 'Conte você', en: 'Tell us yourself' },
+  tu: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
   alguien: { es: 'Pregúntale a alguien', pt: 'Pergunte a alguém', en: 'Ask someone' },
   responder: { es: 'Responder', pt: 'Responder', en: 'Answer' },
   anteriores: { es: 'Preguntas anteriores', pt: 'Perguntas anteriores', en: 'Previous questions' },
