@@ -7,8 +7,6 @@ import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
-type Filter = 'all' | 'tu' | 'alguien';
-
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
   if (item.kind === 'voz' && item.previewUrl) {
     return <audio controls preload="none" src={item.previewUrl} className={large ? 'w-full' : 'w-full'} />;
@@ -33,7 +31,6 @@ function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }
 export default function RespuestasMosaic({ questionId }: { questionId: string }) {
   const { locale, t } = useHomeLocale();
   const pregunta = preguntaPorId(questionId);
-  const [filter, setFilter] = useState<Filter>('all');
   const [items, setItems] = useState<RespuestaPublica[]>([]);
   const [total, setTotal] = useState<number | null>(null);
   const [nextOffset, setNextOffset] = useState<number | null>(0);
@@ -49,7 +46,6 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
       setLoading(true);
       try {
         const q = new URLSearchParams({ questionId, offset: String(offset), limit: '24' });
-        if (filter !== 'all') q.set('mode', filter);
         const res = await fetch(`/api/respuestas/public?${q.toString()}`);
         const data = (await res.json()) as { items?: RespuestaPublica[]; nextOffset?: number | null; total?: number };
         if (!res.ok) throw new Error('list');
@@ -65,7 +61,7 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
         setLoading(false);
       }
     },
-    [filter, questionId]
+    [questionId]
   );
 
   useEffect(() => {
@@ -85,53 +81,28 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
   }, [load, nextOffset]);
 
   if (!pregunta) return null;
-  const filters: { id: Filter; label: string }[] = [
-    { id: 'all', label: PREGUNTA_COPY.all[locale] },
-    { id: 'tu', label: PREGUNTA_COPY.you[locale] },
-    { id: 'alguien', label: PREGUNTA_COPY.someone[locale] },
-  ];
   const current = preguntasDeLaSemana().vigente.id === pregunta.id;
   const kicker = current ? PREGUNTA_COPY.weekKicker[locale] : PREGUNTA_COPY.pastKicker[locale];
-  const modes = ['tu', 'alguien'] as const;
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]">
       <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-wide text-[#FF4A1C]">
         {kicker} · {pregunta.tema[locale]}
       </p>
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {modes.map((mode) => (
-          <article key={mode} className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
-            <h2 className="m-0 text-[length:var(--fs-texto)] font-semibold">
-              {mode === 'tu' ? PREGUNTA_COPY.modeYou[locale] : PREGUNTA_COPY.modeAsk[locale]}
-            </h2>
-            <p className="m-0 flex-1 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta[mode][locale]}</p>
-            <Link
-              href={preguntaPageHref(pregunta.id, mode)}
-              className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
-            >
-              {PREGUNTA_UI.responder[locale]}
-            </Link>
-          </article>
-        ))}
-      </div>
+      <article className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
+        <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>
+        <Link
+          href={preguntaPageHref(pregunta.id)}
+          className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
+        >
+          {PREGUNTA_UI.responder[locale]}
+        </Link>
+      </article>
       <section className="flex flex-col gap-4">
         <h2 className="m-0 text-[length:var(--fs-texto)] font-semibold">
           {PREGUNTA_COPY.answers[locale]}
           {total != null ? ` (${total})` : ''}
         </h2>
-        <div className="flex flex-wrap gap-2">
-          {filters.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setFilter(item.id)}
-              className={`${filter === item.id ? 'btn-am-principal' : 'btn-am-neutro'} inline-flex min-h-11 items-center px-4 text-[length:var(--fs-pequeno)] font-semibold`}
-            >
-              {item.label}
-            </button>
-          ))}
-        </div>
         {total === 0 && !loading ? (
           <div className="flex flex-col items-start gap-4">
             <p className="m-0 text-[length:var(--fs-texto)] leading-relaxed">{PREGUNTA_COPY.empty[locale]}</p>

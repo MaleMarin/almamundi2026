@@ -11,12 +11,10 @@ import { PREGUNTA_COPY, preguntaShareText, preguntaThanksTitle } from '@/lib/i18
 import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
-  isQuestionMode,
   preguntaPorId,
   preguntasDeLaSemana,
   resolveQuestionId,
-  type PreguntaSemana,
-  type QuestionMode } from '@/lib/pregunta-semana';
+  type PreguntaSemana } from '@/lib/pregunta-semana';
 import {
   RESPUESTA_CAPTION_MAX,
   RESPUESTA_PHOTO_MAX_BYTES,
@@ -77,14 +75,12 @@ function uploadMedia(
 }
 
 function PreguntaFormInner({
-  pregunta,
-  initialMode }: {
+  pregunta }: {
   pregunta: PreguntaSemana;
-  initialMode: QuestionMode;
 }) {
   const { locale, t } = useHomeLocale();
   const copy = PREGUNTA_COPY;
-  const [mode, setMode] = useState<QuestionMode>(initialMode);
+  const mode = 'tu' as const;
   const [kind, setKind] = useState<Kind>('texto');
   const [text, setText] = useState('');
   const [caption, setCaption] = useState('');
@@ -471,27 +467,6 @@ function PreguntaFormInner({
     <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
       <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <button
-          type="button"
-          aria-pressed={mode === 'tu'}
-          onClick={() => setMode('tu')}
-          className={`${pickClass(mode === 'tu')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
-        >
-          <span className="text-[length:var(--fs-pequeno)] font-semibold">{copy.modeYou[locale]}</span>
-          <span className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{copy.modeYouLine[locale]}</span>
-        </button>
-        <button
-          type="button"
-          aria-pressed={mode === 'alguien'}
-          onClick={() => setMode('alguien')}
-          className={`${pickClass(mode === 'alguien')} flex flex-col items-start gap-1 rounded-2xl px-4 py-3 text-left`}
-        >
-          <span className="text-[length:var(--fs-pequeno)] font-semibold">{copy.modeAsk[locale]}</span>
-          <span className="text-[length:var(--fs-pequeno)] font-semibold leading-snug">{copy.modeAskLine[locale]}</span>
-        </button>
-      </div>
-
       <div>
         <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
         <h1 className="m-0 mt-2 text-[length:var(--fs-titular)] font-normal leading-snug">{question}</h1>
@@ -716,8 +691,6 @@ function PreguntaFormInner({
 export default function PreguntaForm() {
   const params = useSearchParams();
   const id = resolveQuestionId(params.get('pregunta'));
-  const modeParam = params.get('modo');
   const pregunta = (id ? preguntaPorId(id) : null) ?? preguntasDeLaSemana().vigente;
-  const initialMode: QuestionMode = isQuestionMode(modeParam) ? modeParam : 'tu';
-  return <PreguntaFormInner key={`${pregunta.id}:${initialMode}`} pregunta={pregunta} initialMode={initialMode} />;
+  return <PreguntaFormInner key={pregunta.id} pregunta={pregunta} />;
 }

@@ -61,7 +61,7 @@ function BitsPanelIntro() {
     <div style={{ flexShrink: 0, margin: '0 0 14px' }}>
       <p
         style={{
-          fontSize: 'var(--fs-etiqueta)',
+          fontSize: 'var(--fs-texto)',
           color: 'rgba(248, 250, 255, 0.82)',
           lineHeight: 1.5,
           margin: 0 }}
@@ -327,35 +327,15 @@ export function BitsPanel({
   showIndexList = true }: BitsPanelProps) {
   if (!showIndexList) {
     return (
-      <div
-        className="flex h-full min-h-0 flex-col overflow-hidden"
-        style={{ fontFamily: SITE_FONT_STACK }}
-      >
+      <div style={{ fontFamily: SITE_FONT_STACK }}>
         <BitsPanelIntro />
-        <div
-          className="min-h-0 min-w-0 flex-1 overflow-y-auto overflow-x-hidden"
-          onWheel={(event) => event.stopPropagation()}
-          style={{ scrollbarWidth: 'thin', overscrollBehavior: 'contain' }}
-        >
-          {selectedBit ? (
-            <BitDetailCompact
-              bit={selectedBit}
-              onSubirMiHistoria={onSubirMiHistoria}
-              relaxedHeight
-            />
-          ) : (
-            <p
-              style={{
-                fontSize: 'var(--fs-pequeno)',
-                color: 'rgba(255,255,255,0.58)',
-                lineHeight: 1.65,
-                margin: '8px 4px 0' }}
-            >
-              Toca un punto <span style={{ color: '#FF4A1C', fontWeight: 700 }}>brillante</span> en el
-              globo para leer el hecho curioso de ese lugar.
-            </p>
-          )}
-        </div>
+        {selectedBit ? (
+          <BitDetailCompact
+            bit={selectedBit}
+            onSubirMiHistoria={onSubirMiHistoria}
+            relaxedHeight
+          />
+        ) : null}
       </div>
     );
   }

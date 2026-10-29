@@ -639,6 +639,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setStoryViewerClosing(false);
     setHighlightedStoryId(story.id ?? null);
     setDrawerOpen(false);
+    setOpenRespuesta(null);
     setOpenStory(story);
     if (storyHasValidGeo(story)) {
       setSurpriseFlying(true);
@@ -779,6 +780,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       storyCloseTimerRef.current = null;
     }
     setOpenStory(null);
+    setOpenRespuesta(null);
     setStoryViewerClosing(false);
     setHighlightedStoryId(null);
     setDrawerMode(mode);
@@ -850,7 +852,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               selectedBitId={selectedGlobeMarkerId}
               layerVisibility={globeLayers}
               pauseEarthSpinForUi={
-                Boolean(openStory) || surpriseFlying || (drawerOpen && drawerMode === 'bits')
+                Boolean(openStory) || Boolean(openRespuesta) || surpriseFlying || (drawerOpen && drawerMode === 'bits')
               }
               onBitClick={handleGlobeMarkerClick}
               focusTarget={focusTarget}
@@ -865,6 +867,16 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 onClose={closeStoryViewer}
                 isClosing={storyViewerClosing}
                 variant="compact"
+                onTellStory={() => {
+                  if (storyCloseTimerRef.current) {
+                    clearTimeout(storyCloseTimerRef.current);
+                    storyCloseTimerRef.current = null;
+                  }
+                  setOpenStory(null);
+                  setStoryViewerClosing(false);
+                  setHighlightedStoryId(null);
+                  handleSubirMiHistoria();
+                }}
               />
             ) : null}
           </div>
@@ -881,6 +893,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {/* Dock: Historias, También cuenta, Noticias (capas), luego Sonidos (audio), luego buscar. */}
       {dockSlot &&
         createPortal(
+          <div className="map-dock-stack">
           <div className="map-dock-row" role="toolbar" aria-label="Capas y herramientas del mapa">
               <PillNavButton
                 dock
@@ -937,6 +950,29 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 Buscar
               </PillNavButton>
+          </div>
+          <p className="map-dock-legend">
+            <span className="map-dock-legend__item">
+              <span className="map-dock-legend__dot map-dock-legend__dot--story" aria-hidden />
+              {locale === 'pt' ? 'Histórias' : locale === 'en' ? 'Stories' : 'Historias'}
+            </span>
+            <span className="map-dock-legend__item">
+              <span className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
+              {locale === 'pt'
+                ? 'Respostas à pergunta da semana'
+                : locale === 'en'
+                  ? "Answers to this week's question"
+                  : 'Respuestas a la pregunta de la semana'}
+            </span>
+            <span className="map-dock-legend__item">
+              <span className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />
+              {locale === 'pt'
+                ? 'Também conta: curiosidades de lugares'
+                : locale === 'en'
+                  ? 'Also counts: curious facts about places'
+                  : 'También cuenta: datos curiosos de lugares'}
+            </span>
+          </p>
           </div>,
           dockSlot
         )}
@@ -961,7 +997,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </p>
       ) : null}
 
-      <MapDrawer open={drawerOpen} mode={drawerMode} onClose={close} isMobile={isMobile}>
+      <MapDrawer open={drawerOpen} mode={drawerMode} onClose={close} isMobile={isMobile} fitContent={drawerMode === 'bits'}>
           {drawerMode === 'stories' || drawerMode === 'search' ? (
             <StoriesPanel
               {...historiasProps}

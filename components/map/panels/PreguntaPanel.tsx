@@ -7,20 +7,16 @@ import {
   PREGUNTA_UI,
   preguntaPageHref,
   preguntasDeLaSemana,
-  type PreguntaSemana,
-  type QuestionMode } from '@/lib/pregunta-semana';
+  type PreguntaSemana } from '@/lib/pregunta-semana';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 function PreguntaCard({
   pregunta,
-  mode,
   locale }: {
   pregunta: PreguntaSemana;
-  mode: QuestionMode;
   locale: AlmaLocale;
 }) {
-  const title = mode === 'tu' ? PREGUNTA_UI.tu[locale] : PREGUNTA_UI.alguien[locale];
   return (
     <div
       style={{
@@ -29,14 +25,11 @@ function PreguntaCard({
         background: 'rgba(255,255,255,0.08)',
         border: '1px solid rgba(255,255,255,0.16)' }}
     >
-      <p style={{ margin: '0 0 6px', fontSize: 'var(--fs-etiqueta)', fontWeight: 700, color: 'rgba(255,255,255,0.92)' }}>
-        {title}
-      </p>
       <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
-        {pregunta[mode][locale]}
+        {pregunta.tu[locale]}
       </p>
       <Link
-        href={preguntaPageHref(pregunta.id, mode)}
+        href={preguntaPageHref(pregunta.id)}
         className="btn-am-principal"
         style={{
           display: 'inline-flex',
@@ -74,8 +67,7 @@ function SemanaBlock({
   return (
     <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
       {title}
-      <PreguntaCard pregunta={pregunta} mode="tu" locale={locale} />
-      <PreguntaCard pregunta={pregunta} mode="alguien" locale={locale} />
+      <PreguntaCard pregunta={pregunta} locale={locale} />
     </section>
   );
 }

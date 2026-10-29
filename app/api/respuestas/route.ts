@@ -9,7 +9,7 @@ import { getAdminBucket, getAdminDb } from "@/lib/firebase/admin";
 import { stripHtml } from "@/lib/api/input-validation";
 import { LEGAL_TEXTS_VERSION } from "@/lib/legal-consent";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
-import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
+import { resolveQuestionId } from "@/lib/pregunta-semana";
 import {
   clientIpFromRequest,
   enforceRateLimit,
@@ -71,7 +71,6 @@ export async function POST(req: Request) {
   if (!isRespuestaKind(body.kind)) return jsonError("invalid_kind", 400);
   const questionId = resolveQuestionId(body.questionId);
   if (!questionId) return jsonError("invalid_question", 400);
-  if (!isQuestionMode(body.mode)) return jsonError("invalid_mode", 400);
   if (body.kind === "texto") {
     const captcha = await verifyTurnstileStrict(
       typeof body.captchaToken === "string" ? body.captchaToken : null,
@@ -158,7 +157,7 @@ export async function POST(req: Request) {
     const batch = db.batch();
     batch.set(ref, {
       questionId,
-      mode: body.mode,
+      mode: "tu",
       kind: body.kind,
       contenido,
       storagePath: body.kind === "texto" ? null : storagePath,

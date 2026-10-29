@@ -11,7 +11,7 @@ import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat, contarIndexHref } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { preguntaPageHref, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { PREGUNTA_UI, preguntaPageHref, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import {
   navigateToHomeMapa,
@@ -315,16 +315,10 @@ export function HomePageClient() {
             </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Link
-                href={preguntaPageHref(preguntaVigente.id, 'tu')}
+                href={preguntaPageHref(preguntaVigente.id)}
                 className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 py-3"
               >
-                {PREGUNTA_COPY.modeYou[locale]}
-              </Link>
-              <Link
-                href={preguntaPageHref(preguntaVigente.id, 'alguien')}
-                className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3"
-              >
-                {PREGUNTA_COPY.modeAsk[locale]}
+                {PREGUNTA_UI.responder[locale]}
               </Link>
             </div>
             </div>

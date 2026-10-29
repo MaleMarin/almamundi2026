@@ -6,6 +6,7 @@ export type RespuestaPublica = {
   contenido: string;
   alias: string;
   city: string;
+  country: string;
   previewUrl: string | null;
   lat: number | null;
   lng: number | null;

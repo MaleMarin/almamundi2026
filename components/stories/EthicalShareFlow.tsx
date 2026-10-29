@@ -194,20 +194,20 @@ export function EthicalShareFlow({
               <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">
                 {NOTICE_BODY_2}
               </p>
-              <div className="mt-6 flex flex-wrap justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="rounded-full border border-white/20 px-4 py-2 text-[length:var(--fs-pequeno)] text-white/85 hover:bg-white/10"
-                >
-                  Cancelar
-                </button>
+              <div className="mt-6 flex flex-nowrap items-stretch gap-2">
                 <button
                   type="button"
                   onClick={acceptNotice}
-                  className="rounded-full border border-white/35 bg-white/15 px-5 py-2 text-[length:var(--fs-pequeno)] font-medium text-white hover:bg-white/25"
+                  className="btn-am-principal inline-flex min-h-11 flex-1 items-center justify-center px-4 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium leading-tight"
                 >
                   Entiendo y quiero compartir
+                </button>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="btn-am-secundario inline-flex min-h-11 flex-1 items-center justify-center px-4 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium leading-tight"
+                >
+                  Cancelar
                 </button>
               </div>
             </div>

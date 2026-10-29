@@ -21,6 +21,8 @@ type Props = {
   onSelectRelated?: (story: StoryPoint) => void;
   /** Home mapa: un solo panel, máximo media pantalla. */
   variant?: 'full' | 'compact';
+  /** Cierra el panel y abre las cuatro tarjetas del hero. */
+  onTellStory?: () => void;
 };
 
 function KenBurnsViewer({
@@ -206,6 +208,7 @@ const FORMAT_LABEL = {
 } as const;
 
 const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
+const TELL_LABEL = { es: 'Cuenta tu historia', pt: 'Conte sua história', en: 'Tell your story' } as const;
 const MOVED_LABEL = { es: 'Me emocionó', pt: 'Me emocionou', en: 'This moved me' } as const;
 
 function isRepeatedFormatLine(line: string): boolean {
@@ -304,7 +307,7 @@ function PhotoNavigator({ slides }: { slides: PhotoSlide[] }) {
   );
 }
 
-export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full' }: Props) {
+export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full', onTellStory }: Props) {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const compact = variant === 'compact';
   const [mounted, setMounted] = useState(false);
@@ -924,6 +927,48 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
+              {compact ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'stretch',
+                  gap: 8,
+                  marginTop: 8 }}
+              >
+                <button
+                  type="button"
+                  className="btn-am-principal"
+                  onClick={() => setShareOpen(true)}
+                  style={{
+                    flex: '1 1 0',
+                    minHeight: 44,
+                    padding: '8px 12px',
+                    fontFamily: SITE_FONT_STACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center' }}
+                >
+                  {SHARE_LABEL[locale]}
+                </button>
+                <button
+                  type="button"
+                  className="btn-am-secundario"
+                  onClick={() => onTellStory?.()}
+                  style={{
+                    flex: '1 1 0',
+                    minHeight: 44,
+                    padding: '8px 12px',
+                    fontFamily: SITE_FONT_STACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center' }}
+                >
+                  {TELL_LABEL[locale]}
+                </button>
+              </div>
+              ) : (
               <div
                 style={{
                   display: 'flex',
@@ -988,6 +1033,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   />
                 ) : null}
               </div>
+              )}
             </div>
           </div>
 

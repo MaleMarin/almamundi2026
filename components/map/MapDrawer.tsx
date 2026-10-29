@@ -42,12 +42,14 @@ type MapDrawerProps = {
   onClose: () => void;
   children: React.ReactNode;
   isMobile?: boolean;
+  /** El panel llega hasta su contenido, con tope de alto para poder desplazarlo. */
+  fitContent?: boolean;
   /** Obsoletos: el drawer es absolute dentro del Universe, ya no se usan */
   sectionTop?: number;
   sectionHeight?: number;
 };
 
-export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawerProps) {
+export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent = false }: MapDrawerProps) {
   const { locale } = useHomeLocale();
   const [animatingIn, setAnimatingIn] = useState(false);
 
@@ -80,9 +82,11 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
   const innerScrollPanel =
     mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits';
   const dialogAriaLabel = title;
-  const drawerBodyClass = innerScrollPanel
-    ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4'
-    : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4';
+  const drawerBodyClass = fitContent
+    ? 'max-h-[min(70vh,calc(100dvh-8rem))] overflow-y-auto overflow-x-hidden px-5 py-4'
+    : innerScrollPanel
+      ? 'flex min-h-0 flex-1 flex-col overflow-hidden px-5 py-4'
+      : 'min-h-0 flex-1 overflow-y-auto overflow-x-hidden px-5 py-4';
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
   if (isMobile) {
@@ -97,7 +101,9 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
           role="dialog"
           aria-modal="true"
           aria-label={dialogAriaLabel}
-          className={`absolute bottom-0 left-0 right-0 flex max-h-[70vh] flex-col rounded-t-[28px] p-0 ${innerScrollPanel ? 'h-[70vh]' : ''}`}
+          className={`absolute bottom-0 left-0 right-0 flex flex-col rounded-t-[28px] p-0 ${
+            fitContent ? 'h-auto max-h-[70vh]' : innerScrollPanel ? 'h-[70vh] max-h-[70vh]' : 'max-h-[70vh]'
+          }`}
           style={{
             ...glassShell,
             transform: open ? 'translateY(0)' : 'translateY(100%)',
@@ -147,8 +153,10 @@ export function MapDrawer({ open, mode, onClose, children, isMobile }: MapDrawer
         role="dialog"
         aria-modal="true"
         aria-label={dialogAriaLabel}
-        className={`pointer-events-auto absolute right-6 top-6 bottom-6 flex min-h-0 max-h-[calc(100dvh-3rem)] flex-col overflow-hidden rounded-[28px] ${
-          bitsMode ? 'w-[min(calc(100vw-3rem),400px)]' : 'w-[360px]'
+        className={`pointer-events-auto absolute right-6 top-6 flex min-h-0 flex-col overflow-hidden rounded-[28px] ${
+          fitContent
+            ? 'h-auto max-h-[calc(100%-3rem)] w-[min(calc(100vw-3rem),400px)]'
+            : `bottom-6 max-h-[calc(100dvh-3rem)] ${bitsMode ? 'w-[min(calc(100vw-3rem),400px)]' : 'w-[360px]'}`
         }`}
         style={{
           ...glassShell,

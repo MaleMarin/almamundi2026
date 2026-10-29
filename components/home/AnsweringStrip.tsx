@@ -7,8 +7,6 @@ type ContarFormat = 'video' | 'audio' | 'texto' | 'foto';
 
 export function AnsweringStrip({
   questionId,
-  questionMode,
-  format,
   variant = 'page' }: {
   questionId: QuestionId;
   questionMode: QuestionMode;
@@ -16,18 +14,8 @@ export function AnsweringStrip({
   variant?: 'page' | 'modal';
 }) {
   const { t, locale } = useHomeLocale();
-  const text = preguntaTexto(questionId, questionMode, locale);
+  const text = preguntaTexto(questionId, 'tu', locale);
   if (!text) return null;
-  const advice =
-    questionMode === 'alguien' && format
-      ? format === 'texto'
-        ? t.modalAskAdviceTexto
-        : format === 'audio'
-          ? t.modalAskAdviceAudio
-          : format === 'video'
-            ? t.modalAskAdviceVideo
-            : t.modalAskAdviceFoto
-      : null;
 
   if (variant === 'modal') {
     return (
@@ -38,7 +26,6 @@ export function AnsweringStrip({
         <p className="text-[length:var(--fs-pequeno)] leading-snug text-gray-700 ">
           <span className="font-semibold">{t.modalAnsweringPrefix}</span> {text}
         </p>
-        {advice ? <p className="mt-1 text-[length:var(--fs-pequeno)] leading-snug text-gray-600">{advice}</p> : null}
       </div>
     );
   }

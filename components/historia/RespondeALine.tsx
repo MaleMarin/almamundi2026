@@ -6,7 +6,6 @@ import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export function RespondeALine({
   questionId,
-  questionMode,
   color = '#718096',
   align = 'left' }: {
   questionId?: string | null;
@@ -15,7 +14,7 @@ export function RespondeALine({
   align?: 'left' | 'center';
 }) {
   const { locale } = useHomeLocale();
-  const text = preguntaTexto(questionId, questionMode, locale);
+  const text = preguntaTexto(questionId, 'tu', locale);
   if (!text) return null;
   return (
     <p

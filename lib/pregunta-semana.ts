@@ -300,16 +300,15 @@ export function questionPublicFields(source: {
   };
 }
 
-/** Tema, modo y pregunta, en español, para /admin. */
+/** Tema y pregunta, en español, para /admin. Sin la etiqueta del modo. */
 export function preguntaAdminResumen(
   id: string | null | undefined,
   mode: string | null | undefined
 ): string | null {
   const q = preguntaPorId(id);
   if (!q) return null;
-  if (!isQuestionMode(mode)) return q.tema.es;
-  const modo = mode === 'alguien' ? PREGUNTA_UI.alguien.es : PREGUNTA_UI.tu.es;
-  return `${q.tema.es} · ${modo} · ${q[mode].es}`;
+  const text = isQuestionMode(mode) ? q[mode].es : q.tu.es;
+  return `${q.tema.es} · ${text}`;
 }
 
 function civilParts(isoDate: string): { y: number; m: number; d: number } {

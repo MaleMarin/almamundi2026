@@ -56,6 +56,7 @@ export async function GET(request: NextRequest) {
         contenido: typeof data.contenido === "string" ? data.contenido : "",
         alias: typeof data.alias === "string" ? data.alias : "",
         city: typeof data.city === "string" ? data.city : "",
+        country: typeof data.country === "string" ? data.country : "",
         previewUrl: typeof data.publishedUrl === "string" ? data.publishedUrl : null,
         lat,
         lng,
