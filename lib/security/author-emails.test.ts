@@ -108,6 +108,7 @@ describe('correos al autor', () => {
       authorEmail: 'a@b.c',
       storyTitle: 'El río',
       storyId: 'abc123',
+      shortCode: 'abc234',
       placeName: 'Santiago',
     });
     const text = buildPublicationEmailText({
@@ -115,13 +116,14 @@ describe('correos al autor', () => {
       authorEmail: 'a@b.c',
       storyTitle: 'El río',
       storyId: 'abc123',
+      shortCode: 'abc234',
       placeName: 'Santiago',
     });
     assert.equal(
       publicationEmailSubject('El río'),
       'Tu historia «El río» ya está en AlmaMundi'
     );
-    assert.match(html, /https:\/\/www\.almamundi\.org\/\?historia=abc123#mapa/);
+    assert.match(html, /https:\/\/www\.almamundi\.org\/h\/abc234/);
     assert.match(html, /Hola, Male:/);
     assert.match(html, /Tu historia «El río» ya está publicada en el mapa de AlmaMundi, en Santiago/);
     assert.match(html, /Si quieres, compártela con quien tú elijas/);
@@ -135,7 +137,7 @@ describe('correos al autor', () => {
     assert.match(html, /x\.com\/intent\/post/);
     assert.match(html, /linkedin\.com\/sharing\/share-offsite/);
     assert.match(html, /Mi%20historia%20ya%20est%C3%A1%20en%20el%20mapa/);
-    assert.match(html, /historias%2Fabc123/);
+    assert.match(html, /almamundi\.org%2Fh%2Fabc234/);
     assert.match(html, /Gracias por contarla/);
     assert.doesNotMatch(html, /Un abrazo/);
     assert.doesNotMatch(html, /Te invito a leer/);
@@ -151,7 +153,7 @@ describe('correos al autor', () => {
     assert.match(text, /Santiago/);
     assert.match(
       text,
-      /Mi historia ya está en el mapa de AlmaMundi\. Se llama «El río» y la conté desde Santiago: https:\/\/www\.almamundi\.org\/historias\/abc123/
+      /Mi historia ya está en el mapa de AlmaMundi\. Se llama «El río» y la conté desde Santiago: https:\/\/www\.almamundi\.org\/h\/abc234/
     );
     assert.match(text, /WhatsApp: https:\/\/wa\.me\/\?text=/);
     assert.doesNotMatch(text, /Te invito a leer/);
@@ -167,6 +169,7 @@ describe('correos al autor', () => {
       authorEmail: 'a@b.c',
       storyTitle: 'El río',
       storyId: 'abc123',
+      shortCode: 'abc234',
       placeName: 'Santiago',
       ecoUrl: 'https://www.almamundi.org/historias/abc123/mi-eco?t=token',
     });

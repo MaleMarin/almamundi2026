@@ -8,6 +8,14 @@ export function publishedStoryShareUrl(id: string): string {
   return `${ORIGIN}/historias/${id}`;
 }
 
+export function publishedStoryShortUrl(shortCode: string): string {
+  return `${ORIGIN}/h/${shortCode}`;
+}
+
+export function publishedAnswerShortUrl(shortCode: string): string {
+  return `${ORIGIN}/r/${shortCode}`;
+}
+
 export function publishedQuestionShareUrl(id: string): string {
   return `${ORIGIN}/pregunta/${id}`;
 }

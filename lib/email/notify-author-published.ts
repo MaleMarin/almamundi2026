@@ -11,6 +11,7 @@ import {
 } from '@/lib/author-eco-token';
 import { emailPublicOrigin } from '@/lib/email/almamundi-email-layout';
 import { readAuthorContactEmail } from '@/lib/author-contacts';
+import { ensureShortCode } from '@/lib/short-code-store';
 
 export type PublicationMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -122,11 +123,15 @@ export async function notifyAuthorStoryPublished(args: {
 
   const autor = asRecord(data.autor);
   const ubic = asRecord(data.ubicacion);
+  const shortCode = snap.exists
+    ? await ensureShortCode(db, 'stories', storyId, data.shortCode)
+    : '';
   const sent = await sendPublicationEmail({
     authorName: pickText(data.authorName, data.alias, autor?.nombre, 'Autor'),
     authorEmail: to,
     storyTitle: pickText(data.title, data.titulo, 'Tu historia'),
     storyId,
+    shortCode,
     placeName: pickText(
       data.placeLabel,
       data.place,

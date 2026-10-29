@@ -19,6 +19,8 @@ import {
   deleteRespuestaStorageFiles,
 } from "@/lib/server-storage";
 import { geocodePublicPlace } from "@/lib/respuestas/geocode";
+import { isShortCode } from "@/lib/short-code";
+import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
 
 export const runtime = "nodejs";
@@ -167,6 +169,10 @@ export async function PATCH(
           { merge: true }
         );
       }
+      const existingCode = typeof data.shortCode === "string" ? data.shortCode : "";
+      const shortCode = isShortCode(existingCode)
+        ? existingCode
+        : await allocateShortCode(db, RESPUESTAS_COLLECTION);
       try {
         await ref.update({
           status: "approved",
@@ -174,6 +180,7 @@ export async function PATCH(
           publishedUrl,
           publishedAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
+          shortCode,
           temas: temas?.temas ?? [],
           ejes: temas?.ejes ?? [],
           ...(data.ageRange != null ? { ageRange: FieldValue.delete() } : {}),

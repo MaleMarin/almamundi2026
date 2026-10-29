@@ -8,6 +8,8 @@ import { editorialDeleteStory, editorialDeleteSubmission, editorialPublishFromSu
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
+import { isShortCode } from "@/lib/short-code";
+import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
 
 export const runtime = "nodejs";
@@ -204,6 +206,9 @@ export async function PATCH(
       updates.temas = temas.temas;
       updates.ejes = temas.ejes;
       updates.publishedAt = FieldValue.serverTimestamp();
+      if (!isShortCode(typeof data.shortCode === "string" ? data.shortCode : "")) {
+        updates.shortCode = await allocateShortCode(db, "stories");
+      }
       const email = authorEmailOnStory(data);
       if (email) {
         await saveAuthorContact(db, id, email);

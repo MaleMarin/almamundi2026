@@ -14,6 +14,7 @@ import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/ant
 import { publicCityCountry } from "@/lib/historias/story-ubicacion";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
+import { isShortCode } from "@/lib/short-code";
 import { ejesPublicos, idsPublicos } from "@/lib/temas";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
@@ -126,8 +127,10 @@ function firestoreDocToStoryPoint(
   const accessibility = storyAccessibilityFieldsFromRecord(d);
   const questionId = resolveQuestionId(d.questionId);
 
+  const code = typeof d.shortCode === "string" ? d.shortCode : "";
   const base: StoryPoint = {
     id,
+    ...(isShortCode(code) ? { shortCode: code } : {}),
     lat: latOut,
     lng: lngOut,
     label: title,
@@ -301,6 +304,23 @@ export async function getStoryByIdAsync(
     return firestoreDocToStoryPoint(doc.id, d, false);
   } catch (err) {
     console.error("[getStoryByIdAsync]", err);
+    return null;
+  }
+}
+
+/** Historia pública por código corto. Sin código, o no pública, no existe. */
+export async function getStoryByShortCode(code: string): Promise<StoryPoint | null> {
+  if (!isShortCode(code)) return null;
+  try {
+    const { getAdminDb } = await import("@/lib/firebase/admin");
+    const snap = await getAdminDb().collection("stories").where("shortCode", "==", code).limit(1).get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    const data = doc.data() as Record<string, unknown>;
+    if (!isAudiencePublicStoryStatus(data.status)) return null;
+    return firestoreDocToStoryPoint(doc.id, data, false);
+  } catch (err) {
+    console.error("[getStoryByShortCode]", err);
     return null;
   }
 }

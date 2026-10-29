@@ -60,7 +60,7 @@ function jitterNewsOffset(id: string): { dLat: number; dLng: number } {
   return { dLat: Math.sin(a) * r, dLng: Math.cos(a) * r };
 }
 
-function storyHasValidGeo(s: { lat?: number; lng?: number }): boolean {
+function storyHasValidGeo(s: { lat?: number | null; lng?: number | null }): boolean {
   const { lat, lng } = s;
   return (
     typeof lat === 'number' &&
@@ -173,7 +173,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     news: false,
     respuestas: true });
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
+  const [respuestasReady, setRespuestasReady] = useState(false);
   const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
+  const [pinnedStory, setPinnedStory] = useState<StoryPoint | null>(null);
+  const [pinnedRespuesta, setPinnedRespuesta] = useState<RespuestaPublica | null>(null);
 
   useEffect(() => {
     const questionId = preguntasDeLaSemana().vigente.id;
@@ -185,6 +188,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       })
       .catch(() => {
         if (!cancel) setRespuestas([]);
+      })
+      .finally(() => {
+        if (!cancel) setRespuestasReady(true);
       });
     return () => {
       cancel = true;
@@ -227,6 +233,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const searchParams = useSearchParams();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const openedHistoriaRef = useRef<string | null>(null);
+  const openedRespuestaRef = useRef<string | null>(null);
   const openedCapaRef = useRef(false);
 
   const globeBitsMarkers = useMemo(
@@ -241,10 +248,18 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   );
 
   /** Solo historias con lat/lng válidos (misma lista que usa el clic y el resaltado). */
-  const storiesOnGlobe = useMemo(
-    () => stories.filter((s) => storyHasValidGeo(s)),
-    [stories]
-  );
+  const storiesOnGlobe = useMemo(() => {
+    const list = stories.filter((s) => storyHasValidGeo(s));
+    if (
+      pinnedStory &&
+      openStory?.id === pinnedStory.id &&
+      storyHasValidGeo(pinnedStory) &&
+      !list.some((item) => item.id === pinnedStory.id)
+    ) {
+      return [...list, pinnedStory];
+    }
+    return list;
+  }, [stories, pinnedStory, openStory]);
 
   const realPublishedStories = storiesOnGlobe;
 
@@ -592,21 +607,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     });
   }, [filteredNewsItems, newsMarkersMounted]);
 
-  const respuestasOnGlobe = useMemo(
-    () =>
-      respuestas
-        .filter(
-          (item) =>
-            typeof item.lat === 'number' &&
-            typeof item.lng === 'number' &&
-            Number.isFinite(item.lat) &&
-            Number.isFinite(item.lng) &&
-            Math.abs(item.lat) <= 90 &&
-            Math.abs(item.lng) <= 180
-        )
-        .slice(0, 40),
-    [respuestas]
-  );
+  const respuestasOnGlobe = useMemo(() => {
+    const list = respuestas
+      .filter((item) => storyHasValidGeo(item))
+      .slice(0, 40);
+    if (
+      pinnedRespuesta &&
+      openRespuesta?.id === pinnedRespuesta.id &&
+      storyHasValidGeo(pinnedRespuesta) &&
+      !list.some((item) => item.id === pinnedRespuesta.id)
+    ) {
+      return [...list, pinnedRespuesta];
+    }
+    return list;
+  }, [respuestas, pinnedRespuesta, openRespuesta]);
 
   const globeRespuestaMarkers = useMemo((): GlobeBitMarker[] => {
     return respuestasOnGlobe.map((item, i) => ({
@@ -640,6 +654,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setHighlightedStoryId(story.id ?? null);
     setDrawerOpen(false);
     setOpenRespuesta(null);
+    setPinnedRespuesta(null);
+    setPinnedStory((current) => (current?.id === story.id ? current : null));
     setOpenStory(story);
     if (storyHasValidGeo(story)) {
       setSurpriseFlying(true);
@@ -674,13 +690,69 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   useEffect(() => {
     const historiaId = searchParams.get('historia');
     if (!historiaId || openedHistoriaRef.current === historiaId) return;
-    const story = stories.find((item) => item.id === historiaId);
-    if (!story || !storyHasValidGeo(story) || story.lat == null || story.lng == null) return;
-    openedHistoriaRef.current = historiaId;
-    setGlobeLayers((prev) => ({ ...prev, stories: true }));
-    document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    openStoryViewer(story);
+    const known = stories.find((item) => item.id === historiaId);
+    if (known) {
+      openedHistoriaRef.current = historiaId;
+      setPinnedStory(null);
+      setGlobeLayers((prev) => ({ ...prev, stories: true }));
+      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      openStoryViewer(known);
+      return;
+    }
+    let cancel = false;
+    void fetch(`/api/stories/${encodeURIComponent(historiaId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { story?: StoryPoint } | null) => {
+        if (cancel || openedHistoriaRef.current === historiaId) return;
+        const story = data?.story;
+        if (!story || story.id !== historiaId) return;
+        openedHistoriaRef.current = historiaId;
+        setPinnedStory(story);
+        setGlobeLayers((prev) => ({ ...prev, stories: true }));
+        document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        openStoryViewer(story);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancel = true;
+    };
   }, [searchParams, stories, openStoryViewer]);
+
+  useEffect(() => {
+    const respuestaId = searchParams.get('respuesta');
+    if (!respuestaId || openedRespuestaRef.current === respuestaId || !respuestasReady) return;
+    const openRespuestaOnGlobe = (item: RespuestaPublica) => {
+      openedRespuestaRef.current = respuestaId;
+      setPinnedRespuesta(item);
+      setOpenStory(null);
+      setHighlightedStoryId(null);
+      setOpenRespuesta(item);
+      setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
+      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (storyHasValidGeo(item) && item.lat != null && item.lng != null) {
+        setSurpriseFlying(true);
+        setFocusTarget({ lat: item.lat, lng: item.lng, nonce: Date.now() });
+      }
+    };
+    const known = respuestas.find((item) => item.id === respuestaId);
+    if (known) {
+      openRespuestaOnGlobe(known);
+      return;
+    }
+    let cancel = false;
+    void fetch(`/api/respuestas/public/${encodeURIComponent(respuestaId)}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { item?: RespuestaPublica } | null) => {
+        if (cancel || openedRespuestaRef.current === respuestaId) return;
+        const item = data?.item;
+        if (!item || item.id !== respuestaId) return;
+        openRespuestaOnGlobe(item);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancel = true;
+    };
+  }, [searchParams, respuestas, respuestasReady]);
 
   useEffect(() => {
     if (searchParams.get('capa') !== 'pregunta' || openedCapaRef.current) return;
@@ -696,6 +768,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     if (storyCloseTimerRef.current) clearTimeout(storyCloseTimerRef.current);
     storyCloseTimerRef.current = setTimeout(() => {
       setOpenStory(null);
+      setPinnedStory(null);
       setHighlightedStoryId(null);
       setStoryViewerClosing(false);
       storyCloseTimerRef.current = null;
@@ -859,7 +932,13 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               onFocusArrived={finishSurpriseOpen}
             />
             {openRespuesta ? (
-              <RespuestaGlobeCard item={openRespuesta} onClose={() => setOpenRespuesta(null)} />
+              <RespuestaGlobeCard
+                item={openRespuesta}
+                onClose={() => {
+                  setOpenRespuesta(null);
+                  setPinnedRespuesta(null);
+                }}
+              />
             ) : null}
             {openStory ? (
               <StoryViewer

@@ -1,5 +1,7 @@
 export type RespuestaPublica = {
   id: string;
+  /** Código público de /r/[código]. */
+  shortCode?: string;
   questionId: string;
   mode: "tu" | "alguien";
   kind: "texto" | "voz" | "foto";

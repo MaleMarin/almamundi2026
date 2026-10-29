@@ -14,13 +14,14 @@ import {
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
 import { buildStoryShareChannelUrls } from "@/lib/huella/share-story-channels";
-import { publishedAuthorShareText, publishedStoryShareUrl } from "@/lib/share/published-share";
+import { publishedAuthorShareText, publishedStoryShortUrl } from "@/lib/share/published-share";
 
 export type SendPublicationEmailParams = {
   authorName: string;
   authorEmail: string;
   storyTitle: string;
   storyId: string;
+  shortCode: string;
   placeName: string;
   /** Rincón privado del autor (`/historias/[id]/mi-eco?t=`). */
   ecoUrl?: string;
@@ -45,12 +46,12 @@ export function publicationEmailSubject(storyTitle: string): string {
   return `Tu historia «${storyTitleLine(storyTitle)}» ya está en AlmaMundi`;
 }
 
-function storyPublicUrl(storyId: string): string {
-  return absoluteEmailUrl(`/?historia=${encodeURIComponent(storyId)}#mapa`);
+function storyPublicUrl(shortCode: string): string {
+  return publishedStoryShortUrl(shortCode);
 }
 
-function authorShareChannels(title: string, placeName: string, storyId: string) {
-  const link = publishedStoryShareUrl(storyId);
+function authorShareChannels(title: string, placeName: string, shortCode: string) {
+  const link = publishedStoryShortUrl(shortCode);
   const text = publishedAuthorShareText("es", title, placeName, link);
   return {
     text,
@@ -66,8 +67,8 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
   const name = capitalizeAlias(params.authorName);
   const greeting = name ? `Hola, ${name}:` : "Hola:";
   const title = storyTitleLine(params.storyTitle);
-  const storyUrl = storyPublicUrl(params.storyId);
-  const share = authorShareChannels(title, params.placeName, params.storyId);
+  const storyUrl = storyPublicUrl(params.shortCode);
+  const share = authorShareChannels(title, params.placeName, params.shortCode);
   const ecoUrl = params.ecoUrl?.trim() ?? "";
   return [
     greeting,
@@ -103,8 +104,8 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
 export function buildPublicationEmailHtml(params: SendPublicationEmailParams): string {
   const authorName = escapeHtml(capitalizeAlias(params.authorName));
   const place = placeLine(params.placeName);
-  const historiasUrl = storyPublicUrl(params.storyId);
-  const share = authorShareChannels(storyTitleLine(params.storyTitle), place, params.storyId);
+  const historiasUrl = storyPublicUrl(params.shortCode);
+  const share = authorShareChannels(storyTitleLine(params.storyTitle), place, params.shortCode);
   const ecoHref = params.ecoUrl?.trim() ?? "";
   const greeting = authorName ? `Hola, ${authorName}:` : "Hola:";
   const lead = escapeHtml(publishedLead(storyTitleLine(params.storyTitle), place));

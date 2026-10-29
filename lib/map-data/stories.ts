@@ -5,6 +5,8 @@
 
 export type StoryPoint = {
   id: string;
+  /** Código público de /h/[código]. */
+  shortCode?: string;
   lat: number;
   lng: number;
   label: string;

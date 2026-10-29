@@ -18,6 +18,7 @@ import {
   type StoryData,
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
+import { allocateShortCode } from "@/lib/short-code-store";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { promotePublicStoryMedia } from "@/lib/published-media";
 import { getAdminBucket } from "@/lib/firebase/admin";
@@ -281,6 +282,7 @@ export async function editorialPublishFromSubmission(
       story.publishedMediaPaths = promoted.publishedMediaPaths;
     }
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
+    story.shortCode = await allocateShortCode(db, "stories");
 
     await storyRef.set(story);
     await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(sub, authorEmailOnSub));
@@ -391,6 +393,7 @@ export async function editorialPublishFromSubmission(
     story.publishedMediaPaths = promoted.publishedMediaPaths;
   }
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
+  story.shortCode = await allocateShortCode(db, "stories");
 
   await storyRef.set(story);
   const pipelineEmail = typeof sd.email === "string" ? sd.email.trim() : "";
@@ -512,6 +515,7 @@ export async function editorialPublishApprovedStorySubmission(
     storyData.publishedMediaPaths = promoted.publishedMediaPaths;
   }
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
+  storyData.shortCode = await allocateShortCode(db, "stories");
 
   await storyRef.set(storyData);
   await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(data, authorEmailLegacy));

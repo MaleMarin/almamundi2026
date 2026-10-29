@@ -4,6 +4,7 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import { resolveQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
 import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from "@/lib/rate-limit";
 import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
+import { isShortCode } from "@/lib/short-code";
 import type { RespuestaPublica } from "@/lib/respuestas/public";
 
 export const runtime = "nodejs";
@@ -48,8 +49,10 @@ export async function GET(request: NextRequest) {
       if (mode && itemMode !== mode) continue;
       const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
       const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
+      const code = typeof data.shortCode === "string" ? data.shortCode : "";
       items.push({
         id: doc.id,
+        ...(isShortCode(code) ? { shortCode: code } : {}),
         questionId,
         mode: itemMode,
         kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",

@@ -241,8 +241,9 @@ export function RespuestaGlobeCard({
       <ShareAfterNotice
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        kind="question"
-        questionId={item.questionId}
+        kind="answer"
+        answerId={item.id}
+        shortCode={item.shortCode}
         question={question ?? ''}
       />
     </>

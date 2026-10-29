@@ -7,11 +7,14 @@ import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
 import { preguntaInviteShareText, preguntaShareText } from '@/lib/i18n/pregunta-messages';
+import { isShortCode } from '@/lib/short-code';
 import {
+  publishedAnswerShortUrl,
   publishedQuestionShareUrl,
   publishedStoryEmailSubject,
   publishedStoryShareText,
   publishedStoryShareUrl,
+  publishedStoryShortUrl,
   publishedStorySocialText,
   type PublishedStoryFormat } from '@/lib/share/published-share';
 
@@ -42,6 +45,7 @@ type ShareAfterNoticeProps = {
 } & (
   | { kind: 'story'; storyId: string; title: string; city: string; format: PublishedStoryFormat }
   | { kind: 'question'; questionId: string; question: string; afterAnswer?: boolean }
+  | { kind: 'answer'; answerId: string; shortCode?: string; question: string }
 );
 
 export function ShareAfterNotice(props: ShareAfterNoticeProps) {
@@ -50,13 +54,68 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
   const [step, setStep] = useState<'notice' | 'menu'>('notice');
   const [toast, setToast] = useState<string | null>(null);
   const [fallback, setFallback] = useState<string | null>(null);
+  const [resolvedShareUrl, setResolvedShareUrl] = useState<string | null>(null);
+  const [wantMenu, setWantMenu] = useState(false);
+  const shareKey =
+    props.kind === 'story'
+      ? `story:${props.storyId}`
+      : props.kind === 'answer'
+        ? `answer:${props.answerId}:${props.shortCode ?? ''}`
+        : `question:${props.questionId}:${props.afterAnswer ? '1' : '0'}`;
 
   useEffect(() => {
     if (!open) return;
     setStep('notice');
     setToast(null);
     setFallback(null);
+    setWantMenu(false);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) {
+      setResolvedShareUrl(null);
+      return;
+    }
+    if (props.kind === 'question') {
+      setResolvedShareUrl(publishedQuestionShareUrl(props.questionId));
+      return;
+    }
+    if (props.kind === 'answer' && isShortCode(props.shortCode)) {
+      setResolvedShareUrl(publishedAnswerShortUrl(props.shortCode));
+      return;
+    }
+    let cancel = false;
+    const storyId = props.kind === 'story' ? props.storyId : '';
+    const answerId = props.kind === 'answer' ? props.answerId : '';
+    const load = async () => {
+      try {
+        if (answerId) {
+          const res = await fetch(`/api/respuestas/public/${encodeURIComponent(answerId)}`);
+          const data = (res.ok ? await res.json() : null) as { item?: { shortCode?: string } } | null;
+          const code = data?.item?.shortCode;
+          if (!cancel && isShortCode(code)) setResolvedShareUrl(publishedAnswerShortUrl(code));
+          return;
+        }
+        const res = await fetch(`/api/stories/${encodeURIComponent(storyId)}`);
+        const data = (res.ok ? await res.json() : null) as { story?: { shortCode?: string } } | null;
+        const code = data?.story?.shortCode;
+        if (cancel) return;
+        setResolvedShareUrl(
+          isShortCode(code) ? publishedStoryShortUrl(code) : publishedStoryShareUrl(storyId)
+        );
+      } catch {
+        if (!cancel && storyId) setResolvedShareUrl(publishedStoryShareUrl(storyId));
+      }
+    };
+    void load();
+    return () => {
+      cancel = true;
+    };
+  }, [open, shareKey]);
+
+  useEffect(() => {
+    if (wantMenu && resolvedShareUrl) setStep('menu');
+  }, [wantMenu, resolvedShareUrl]);
 
   useEffect(() => {
     if (!toast) return;
@@ -74,14 +133,11 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       : null;
   }
 
-  const shareUrl =
-    props.kind === 'story'
-      ? publishedStoryShareUrl(props.storyId)
-      : publishedQuestionShareUrl(props.questionId);
+  const shareUrl = resolvedShareUrl ?? '';
   const shareText =
     props.kind === 'story'
       ? publishedStoryShareText(locale, props.format, props.title, props.city, shareUrl)
-      : props.afterAnswer
+      : props.kind === 'question' && props.afterAnswer
         ? preguntaShareText(locale, props.question, shareUrl)
         : preguntaInviteShareText(locale, props.question, shareUrl);
   const emailSubject =
@@ -126,7 +182,10 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
               <div className="mt-6 flex flex-nowrap items-stretch gap-2">
                 <button
                   type="button"
-                  onClick={() => setStep('menu')}
+                  onClick={() => {
+                    if (resolvedShareUrl) setStep('menu');
+                    else setWantMenu(true);
+                  }}
                   className="btn-am-principal inline-flex min-h-11 flex-1 items-center justify-center px-4 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium leading-tight"
                 >
                   {notice.share}
