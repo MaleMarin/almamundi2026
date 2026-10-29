@@ -611,6 +611,59 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   }
 }
 
+/* Panel de historia o respuesta: por encima de los fundidos del mapa. */
+.story-map-panel {
+  position: fixed;
+  z-index: 8;
+  top: 24px;
+  right: 24px;
+  width: 420px;
+  height: auto;
+  max-height: calc(100% - 48px);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  pointer-events: none;
+  overscroll-behavior: contain;
+}
+
+.story-map-panel__card {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.story-map-panel__sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+}
+
+.story-map-panel__scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  -webkit-overflow-scrolling: touch;
+}
+
+.story-map-panel__more {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 3;
+  height: 36px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, rgba(6, 10, 22, 0), rgba(6, 10, 22, 0.55));
+}
+
 /* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
 .map-section-hero-title {
   font-weight: 300;

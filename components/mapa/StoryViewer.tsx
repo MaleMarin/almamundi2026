@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState, useRef, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { Heart, Share2 } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
@@ -13,6 +14,7 @@ import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 
 type Props = {
   story: StoryPoint;
@@ -322,6 +324,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const [liveReaders, setLiveReaders] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [moreBelow, setMoreBelow] = useState(false);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const readerIdRef = useRef<string | null>(null);
 
@@ -343,35 +347,18 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
     };
   }, [story.id]);
 
+  const syncMore = useCallback(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    setMoreBelow(globePanelHasMore(el));
+  }, []);
+
   useLayoutEffect(() => {
     if (!compact) return;
     const panel = panelRef.current;
     if (!panel) return;
 
-    const place = () => {
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        panel.style.top = '';
-        panel.style.height = '';
-        panel.style.maxHeight = '';
-        return;
-      }
-      const host = panel.offsetParent as HTMLElement | null;
-      if (!host) return;
-      const hostRect = host.getBoundingClientRect();
-      const siteHeader = [...document.querySelectorAll('header')].find((node) => {
-        const box = node.getBoundingClientRect();
-        return getComputedStyle(node).position === 'fixed' && box.top <= 1 && box.height > 40;
-      });
-      const headerBottom = siteHeader ? siteHeader.getBoundingClientRect().bottom : 0;
-      const visibleTop = Math.max(hostRect.top, headerBottom);
-      const visibleBottom = Math.min(hostRect.bottom, window.innerHeight);
-      const top = Math.max(24, visibleTop - hostRect.top + 24);
-      const height = Math.max(160, visibleBottom - hostRect.top - top - 24);
-      panel.style.top = `${top}px`;
-      panel.style.height = `${height}px`;
-      panel.style.maxHeight = `${height}px`;
-    };
-
+    const place = () => placeGlobeStoryPanel(panel);
     place();
     window.addEventListener('scroll', place, true);
     window.addEventListener('resize', place);
@@ -380,6 +367,24 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
       window.removeEventListener('resize', place);
     };
   }, [compact, story.id]);
+
+  useLayoutEffect(() => {
+    if (!compact) return;
+    const panel = panelRef.current;
+    const el = scrollRef.current;
+    if (!panel || !el) return;
+    syncMore();
+    const unbind = bindGlobePanelScroll(panel, el);
+    el.addEventListener('scroll', syncMore, { passive: true });
+    const observer = new ResizeObserver(syncMore);
+    observer.observe(el);
+    for (const child of el.children) observer.observe(child);
+    return () => {
+      unbind();
+      el.removeEventListener('scroll', syncMore);
+      observer.disconnect();
+    };
+  }, [compact, story.id, syncMore]);
 
   useEffect(() => {
     if (!endRef.current) return;
@@ -489,44 +494,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
           0%, 100% { opacity: 0.6; }
           50%      { opacity: 1; }
         }
-        .story-map-panel {
-          position: absolute;
-          z-index: 40;
-          top: 24px;
-          right: 24px;
-          width: 420px;
-          max-height: calc(100% - 48px);
-          height: auto;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          pointer-events: none;
-        }
-        .story-map-panel__card {
-          width: 100%;
-          height: auto;
-          max-height: 100%;
-          min-height: 0;
-          display: flex;
-          flex-direction: column;
-        }
-        @media (max-width: 767px) {
-          .story-map-panel {
-            position: fixed;
-            top: auto;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: auto;
-            max-height: calc(100svh - 9.75rem - 24px);
-          }
-          .story-map-panel__card {
-            max-height: calc(100svh - 9.75rem - 24px);
-          }
-        }
       `}</style>
 
+      <GlobePanelFrame active={compact}>
       <div
         ref={panelRef}
         className={compact ? 'story-map-panel' : undefined}
@@ -560,6 +530,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             opacity: mounted ? 1 : 0 }}
         >
           <div
+            className={compact ? 'story-map-panel__sheet' : undefined}
             style={{
               background:     'rgba(6, 10, 22, 0.82)',
               backdropFilter: 'blur(48px) saturate(180%)',
@@ -675,14 +646,18 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             </div>
 
             <div
+              ref={compact ? scrollRef : undefined}
+              className={compact ? 'story-map-panel__scroll' : undefined}
               style={{
                 position: 'relative',
                 zIndex: 2,
                 overflowY: 'auto',
                 scrollbarWidth: 'none',
-                padding: '24px 24px 28px',
+                padding: compact ? '24px 24px 24px' : '24px 24px 28px',
                 flex: compact ? '1 1 auto' : 1,
-                minHeight: compact ? 0 : undefined }}
+                minHeight: compact ? 0 : undefined,
+                overscrollBehavior: compact ? 'contain' : undefined,
+                touchAction: compact ? 'pan-y' : undefined }}
             >
               {story.videoUrl ? (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
@@ -724,8 +699,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   {story.body
                     .split('\n')
                     .filter((p) => p.trim() && !isRepeatedFormatLine(p))
-                    .map((p, i) => (
-                      <p key={i} style={{ marginBottom: '1.4em' }}>
+                    .map((p, i, all) => (
+                      <p key={i} style={{ marginBottom: compact && i === all.length - 1 ? 0 : '1.4em' }}>
                         {p}
                       </p>
                     ))}
@@ -927,13 +902,14 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
+              {compact ? <div aria-hidden style={{ height: 32, flexShrink: 0 }} /> : null}
               {compact ? (
               <div
                 style={{
                   display: 'flex',
                   alignItems: 'stretch',
                   gap: 8,
-                  marginTop: 8 }}
+                  marginTop: 0 }}
               >
                 <button
                   type="button"
@@ -1035,6 +1011,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               </div>
               )}
             </div>
+            {compact && moreBelow ? <div className="story-map-panel__more" aria-hidden /> : null}
           </div>
 
           <EthicalShareFlow
@@ -1069,8 +1046,16 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
           />
         </div>
       </div>
+      </GlobePanelFrame>
     </>
   );
+}
+
+function GlobePanelFrame({ active, children }: { active: boolean; children: ReactNode }) {
+  if (!active || typeof document === 'undefined') return children;
+  const target = document.querySelector('.map-section-atmosphere');
+  if (!(target instanceof HTMLElement)) return children;
+  return createPortal(children, target);
 }
 
 function ActionButton({

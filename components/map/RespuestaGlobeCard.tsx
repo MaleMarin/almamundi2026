@@ -1,6 +1,7 @@
 'use client';
 
 import { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
@@ -9,6 +10,7 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 
 const KIND_LABEL = { es: 'Respuesta', pt: 'Resposta', en: 'Answer' } as const;
 const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
@@ -22,7 +24,9 @@ export function RespuestaGlobeCard({
 }) {
   const { locale, t } = useHomeLocale();
   const panelRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [shareOpen, setShareOpen] = useState(false);
+  const [moreBelow, setMoreBelow] = useState(false);
   const pregunta = preguntaPorId(item.questionId);
   const question = preguntaTexto(item.questionId, 'tu', locale);
   const place = formatPublicPlace(item.city, item.country);
@@ -33,31 +37,7 @@ export function RespuestaGlobeCard({
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!panel) return;
-
-    const placePanel = () => {
-      if (window.matchMedia('(max-width: 767px)').matches) {
-        panel.style.top = '';
-        panel.style.height = '';
-        panel.style.maxHeight = '';
-        return;
-      }
-      const host = panel.offsetParent as HTMLElement | null;
-      if (!host) return;
-      const hostRect = host.getBoundingClientRect();
-      const siteHeader = [...document.querySelectorAll('header')].find((node) => {
-        const box = node.getBoundingClientRect();
-        return getComputedStyle(node).position === 'fixed' && box.top <= 1 && box.height > 40;
-      });
-      const headerBottom = siteHeader ? siteHeader.getBoundingClientRect().bottom : 0;
-      const visibleTop = Math.max(hostRect.top, headerBottom);
-      const visibleBottom = Math.min(hostRect.bottom, window.innerHeight);
-      const top = Math.max(24, visibleTop - hostRect.top + 24);
-      const height = Math.max(160, visibleBottom - hostRect.top - top - 24);
-      panel.style.top = `${top}px`;
-      panel.style.height = `${height}px`;
-      panel.style.maxHeight = `${height}px`;
-    };
-
+    const placePanel = () => placeGlobeStoryPanel(panel);
     placePanel();
     window.addEventListener('scroll', placePanel, true);
     window.addEventListener('resize', placePanel);
@@ -67,49 +47,29 @@ export function RespuestaGlobeCard({
     };
   }, [item.id]);
 
-  return (
-    <>
-      <style>{`
-        .story-map-panel {
-          position: absolute;
-          z-index: 40;
-          top: 24px;
-          right: 24px;
-          width: 420px;
-          max-height: calc(100% - 48px);
-          height: auto;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-          pointer-events: none;
-        }
-        .story-map-panel__card {
-          width: 100%;
-          height: auto;
-          max-height: 100%;
-          min-height: 0;
-          display: flex;
-          flex-direction: column;
-        }
-        @media (max-width: 767px) {
-          .story-map-panel {
-            position: fixed;
-            top: auto;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-            height: auto;
-            max-height: calc(100svh - 9.75rem - 24px);
-          }
-          .story-map-panel__card {
-            max-height: calc(100svh - 9.75rem - 24px);
-          }
-        }
-      `}</style>
+  useLayoutEffect(() => {
+    const panel = panelRef.current;
+    const el = scrollRef.current;
+    if (!panel || !el) return;
+    const syncMore = () => setMoreBelow(globePanelHasMore(el));
+    syncMore();
+    const unbind = bindGlobePanelScroll(panel, el);
+    el.addEventListener('scroll', syncMore, { passive: true });
+    const observer = new ResizeObserver(syncMore);
+    observer.observe(el);
+    for (const child of el.children) observer.observe(child);
+    return () => {
+      unbind();
+      el.removeEventListener('scroll', syncMore);
+      observer.disconnect();
+    };
+  }, [item.id]);
+
+  const panel = (
       <div ref={panelRef} className="story-map-panel">
         <div className="story-map-panel__card">
           <div
+            className="story-map-panel__sheet"
             style={{
               background: 'rgba(6, 10, 22, 0.82)',
               backdropFilter: 'blur(48px) saturate(180%)',
@@ -197,14 +157,18 @@ export function RespuestaGlobeCard({
               </button>
             </div>
             <div
+              ref={scrollRef}
+              className="story-map-panel__scroll"
               style={{
                 position: 'relative',
                 zIndex: 2,
                 overflowY: 'auto',
                 scrollbarWidth: 'none',
-                padding: '24px 24px 28px',
+                padding: '24px 24px 24px',
                 flex: '1 1 auto',
-                minHeight: 0 }}
+                minHeight: 0,
+                overscrollBehavior: 'contain',
+                touchAction: 'pan-y' }}
             >
               {item.kind === 'voz' && item.previewUrl ? (
                 <audio controls preload="none" src={item.previewUrl} style={{ width: '100%', marginBottom: 16 }} />
@@ -229,7 +193,8 @@ export function RespuestaGlobeCard({
                   {item.contenido}
                 </p>
               ) : null}
-              <div style={{ display: 'flex', alignItems: 'stretch', gap: 8, marginTop: 16 }}>
+              <div aria-hidden style={{ height: 32, flexShrink: 0 }} />
+              <div style={{ display: 'flex', alignItems: 'stretch', gap: 8, marginTop: 0 }}>
                 <button
                   type="button"
                   className="btn-am-principal"
@@ -264,9 +229,16 @@ export function RespuestaGlobeCard({
                 </Link>
               </div>
             </div>
+            {moreBelow ? <div className="story-map-panel__more" aria-hidden /> : null}
           </div>
         </div>
       </div>
+  );
+  const target = typeof document !== 'undefined' ? document.querySelector('.map-section-atmosphere') : null;
+
+  return (
+    <>
+      {target instanceof HTMLElement ? createPortal(panel, target) : panel}
       <EthicalShareFlow
         open={shareOpen}
         onClose={() => setShareOpen(false)}
