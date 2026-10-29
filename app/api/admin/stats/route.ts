@@ -16,7 +16,7 @@ export async function GET(_request: NextRequest) {
     const storiesRef = db.collection("stories");
 
     const [pendingSnap, visibleSnap, archivedSnap, rejectedSnap] = await Promise.all([
-      storiesRef.where("status", "==", "pending").count().get(),
+      db.collection("submissions").where("status", "==", "pending").count().get(),
       storiesRef.where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]).count().get(),
       storiesRef.where("status", "==", "archived").count().get(),
       storiesRef.where("status", "==", "rejected").count().get(),

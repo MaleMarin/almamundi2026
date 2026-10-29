@@ -88,6 +88,7 @@ type Story = {
   questionId: string | null;
   questionMode: 'tu' | 'alguien' | null;
   imagenes?: AdminImagen[];
+  files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' }[];
 };
 
 type Collection = {
@@ -173,6 +174,40 @@ function EliminarHistoriaButton({ disabled, onClick }: { disabled: boolean; onCl
   );
 }
 
+function PendingFiles({ files }: { files?: Story['files'] }) {
+  if (!files?.length) return null;
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '8px 0' }}>
+      {files.map((file, i) => {
+        if (!file.url) {
+          return (
+            <p key={i} style={{ margin: 0, fontSize: 12, color: '#fbbf24' }}>
+              Archivo adjunto
+            </p>
+          );
+        }
+        if (file.kind === 'image') {
+          return (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={file.url} src={file.url} alt="" style={{ width: 132, height: 96, objectFit: 'cover', borderRadius: 8 }} />
+          );
+        }
+        if (file.kind === 'audio') {
+          return <audio key={file.url} controls src={file.url} style={{ width: 240 }} />;
+        }
+        if (file.kind === 'video') {
+          return <video key={file.url} controls src={file.url} style={{ width: 240, maxHeight: 160, borderRadius: 8 }} />;
+        }
+        return (
+          <a key={file.url} href={file.url} style={{ fontSize: 13, color: '#fdba74' }}>
+            Archivo
+          </a>
+        );
+      })}
+    </div>
+  );
+}
+
 function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
   if (!imagenes?.length) return null;
   return (
@@ -219,6 +254,7 @@ export default function AdminPage() {
 
   const [section, setSection] = useState<'pendientes' | 'mapa' | 'archivo' | 'respuestas' | 'colecciones' | 'stats'>('pendientes');
   const [pendingStories, setPendingStories] = useState<Story[]>([]);
+  const [pendingError, setPendingError] = useState('');
   const [activeStories, setActiveStories] = useState<Story[]>([]);
   const [archivedStories, setArchivedStories] = useState<Story[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
@@ -302,7 +338,13 @@ export default function AdminPage() {
       hardNavigateTo('/#mapa');
       return;
     }
-    const data = (await res.json()) as { stories?: Story[] };
+    const data = (await res.json()) as { stories?: Story[]; error?: string };
+    if (!res.ok) {
+      setPendingStories([]);
+      setPendingError(data.error || 'No se pudieron cargar las historias pendientes.');
+      return;
+    }
+    setPendingError('');
     setPendingStories(data.stories ?? []);
   }, [getAuthHeaders, router]);
 
@@ -656,7 +698,10 @@ export default function AdminPage() {
       {/* 1. Historias pendientes */}
       {section === 'pendientes' && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {pendingStories.length === 0 && (
+          {pendingError && (
+            <p style={{ color: '#fca5a5', textAlign: 'center', padding: 40 }} role="alert">{pendingError}</p>
+          )}
+          {!pendingError && pendingStories.length === 0 && (
             <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 40 }}>No hay historias pendientes.</p>
           )}
           {pendingStories.map((s) => (
@@ -671,6 +716,7 @@ export default function AdminPage() {
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                  <PendingFiles files={s.files} />
                   <StoryQuestionLine story={s} />
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>

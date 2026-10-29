@@ -12,6 +12,7 @@ export type AmUploadModalShellProps = {
   continueEnabled?: boolean;
   onContinue?: () => void;
   continueLabel?: string;
+  continueHint?: string | null;
   closeAriaLabel?: string;
   kicker?: string;
   showContinue?: boolean;
@@ -31,6 +32,7 @@ export function AmUploadModalShell({
   continueEnabled = false,
   onContinue,
   continueLabel = 'Continuar',
+  continueHint = null,
   closeAriaLabel = 'Cerrar',
   kicker,
   showContinue = true,
@@ -60,6 +62,11 @@ export function AmUploadModalShell({
 
       {showContinue || footnote ? (
         <footer className={styles.amModalFooter}>
+          {continueHint ? (
+            <p className={styles.amModalContinueHint} role="status">
+              {continueHint}
+            </p>
+          ) : null}
           {showContinue ? (
             <button
               type="button"

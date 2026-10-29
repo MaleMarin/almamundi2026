@@ -20,8 +20,10 @@ import {
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { promotePublicStoryMedia } from "@/lib/published-media";
+import { getAdminBucket } from "@/lib/firebase/admin";
 import {
   assertSafeStoryId,
+  assertSafeSubmissionsPath,
   deleteStoryStorageFiles,
   storageObjectPathFromUrl,
 } from "@/lib/server-storage";
@@ -854,5 +856,50 @@ export async function editorialDeleteStory(args: {
     console.error("[editorial] detach story from collections", e);
   }
   await appendDeleteStoryLog(db, storyId, deletedBy);
+  return { ok: true };
+}
+
+/**
+ * Borra un envío pendiente de `submissions` y sus archivos privados.
+ * No toca `stories` ni otros documentos.
+ */
+export async function editorialDeleteSubmission(args: {
+  db: Firestore;
+  submissionId: string;
+  deletedBy: string;
+}): Promise<{ ok: true } | { ok: false; httpStatus: number; error: string }> {
+  const id = args.submissionId.trim();
+  if (!/^[A-Za-z0-9]{8,128}$/.test(id)) {
+    return { ok: false, httpStatus: 400, error: "Envío no válido" };
+  }
+  const ref = args.db.collection("submissions").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) return { ok: false, httpStatus: 404, error: "Envío no encontrado" };
+  const data = (snap.data() ?? {}) as Record<string, unknown>;
+  if (String(data.status ?? "") !== "pending") {
+    return { ok: false, httpStatus: 409, error: "Este envío ya no está pendiente" };
+  }
+  const paths: string[] = [];
+  collectStoryStorageRefs(data, paths);
+  const bucket = getAdminBucket();
+  const seen = new Set<string>();
+  for (const raw of paths) {
+    const storagePath = raw.trim();
+    if (!storagePath || seen.has(storagePath)) continue;
+    seen.add(storagePath);
+    try {
+      assertSafeSubmissionsPath(storagePath);
+    } catch {
+      continue;
+    }
+    if (!storagePath.startsWith("submissions/private/")) continue;
+    await bucket.file(storagePath).delete({ ignoreNotFound: true });
+  }
+  await ref.delete();
+  await appendEditorialAuditLog(args.db, args.deletedBy, "delete_story", {
+    submissionId: id,
+    submissionCollection: "submissions",
+    fromStatus: "pending",
+  });
   return { ok: true };
 }

@@ -1,10 +1,10 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
-import { editorialDeleteStory } from "@/lib/editorial/service";
+import { editorialDeleteStory, editorialDeleteSubmission, editorialPublishFromSubmission } from "@/lib/editorial/service";
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
@@ -12,6 +12,42 @@ import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
 export const runtime = "nodejs";
 
 type Action = "approve" | "reject" | "feature" | "archive";
+
+/** Aprobar publica el envío. Rechazar solo cambia el envío, no crea una historia. */
+async function moderatePendingSubmission(
+  db: Firestore,
+  id: string,
+  action: Action,
+  actorEmail: string
+) {
+  if (action !== "approve" && action !== "reject") {
+    return NextResponse.json({ error: "story not found" }, { status: 404 });
+  }
+  const ref = db.collection("submissions").doc(id);
+  const snap = await ref.get();
+  if (!snap.exists) {
+    return NextResponse.json({ error: "story not found" }, { status: 404 });
+  }
+  if (String(snap.get("status") ?? "") !== "pending") {
+    return NextResponse.json({ error: "Este envío ya no está pendiente" }, { status: 409 });
+  }
+  if (action === "reject") {
+    await ref.update({ status: "rejected", reviewedAt: Date.now() });
+    await appendEditorialAuditLog(db, actorEmail, "reject", {
+      submissionId: id,
+      submissionCollection: "submissions",
+      fromStatus: "pending",
+      toStatus: "rejected",
+    });
+    return NextResponse.json({ ok: true, status: "rejected" });
+  }
+  const result = await editorialPublishFromSubmission(db, id, actorEmail);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: result.httpStatus });
+  }
+  const publicationMail = await notifyAuthorStoryPublished({ db, storyId: result.storyId });
+  return NextResponse.json({ ok: true, status: "approved", publicationMail });
+}
 
 /** PATCH /api/admin/stories/[id] — acciones moderación anglo sobre `stories`. Delegadas a transiciones canónicas. */
 export async function PATCH(
@@ -43,7 +79,7 @@ export async function PATCH(
     const ref = db.collection("stories").doc(id);
     const snap = await ref.get();
     if (!snap.exists) {
-      return NextResponse.json({ error: "story not found" }, { status: 404 });
+      return moderatePendingSubmission(db, id, action, auth.email);
     }
 
     const data = snap.data() as Record<string, unknown>;
@@ -117,6 +153,17 @@ export async function DELETE(
   try {
     const db = getAdminDb();
     const result = await editorialDeleteStory({ db, storyId: id, deletedBy: auth.uid });
+    if (!result.ok && result.httpStatus === 404) {
+      const submission = await editorialDeleteSubmission({
+        db,
+        submissionId: id,
+        deletedBy: auth.email,
+      });
+      if (!submission.ok) {
+        return NextResponse.json({ error: submission.error }, { status: submission.httpStatus });
+      }
+      return NextResponse.json({ ok: true });
+    }
     if (!result.ok) {
       return NextResponse.json({ error: result.error }, { status: result.httpStatus });
     }

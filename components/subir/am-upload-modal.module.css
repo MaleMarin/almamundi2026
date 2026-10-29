@@ -146,6 +146,15 @@
   color: #6b6b7b;
 }
 
+.amModalContinueHint {
+  width: 100%;
+  margin: 0;
+  text-align: left;
+  font-size: var(--fs-pequeno);
+  font-weight: 600;
+  color: #1c1c2e;
+}
+
 .amModalFooter {
   display: flex;
   flex-direction: column;

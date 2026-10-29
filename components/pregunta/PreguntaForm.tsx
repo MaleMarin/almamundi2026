@@ -298,9 +298,8 @@ function PreguntaFormInner({
     if (!adult || !publish || !terms) return setError(t.modalMarkThreeToSend);
     if (kind === 'texto' && !text.trim()) return;
     if (kind === 'texto' && text.trim().length > RESPUESTA_TEXT_MAX) return setError(copy.errText[locale]);
-    if (kind === 'voz' && !audioFile) return;
-    if (photoPreparing) return;
-    if (kind === 'foto' && !photoFile) return;
+    if (kind === 'voz' && (recording || !audioFile)) return setError(copy.waitVoice[locale]);
+    if (kind === 'foto' && (photoPreparing || !photoFile)) return setError(copy.waitPhoto[locale]);
     if (kind === 'foto' && !caption.trim()) return setError(copy.errCaption[locale]);
     if (kind === 'foto' && caption.trim().length > RESPUESTA_CAPTION_MAX) return setError(copy.errCaptionLong[locale]);
     if (captchaGate === 'need' || captchaGate === 'wait') return setError(t.modalCaptchaFailed);
@@ -455,6 +454,13 @@ function PreguntaFormInner({
       </div>
     );
   }
+
+  const fileWait =
+    kind === 'voz' && (recording || !audioFile)
+      ? copy.waitVoice[locale]
+      : kind === 'foto' && (photoPreparing || !photoFile)
+        ? copy.waitPhoto[locale]
+        : '';
 
   const termsBits = t.modalConsentTermsAndPrivacy.split('{terminos}');
   const afterTerms = (termsBits[1] ?? '').split('{privacidad}');
@@ -689,12 +695,17 @@ function PreguntaFormInner({
           <div className="h-full bg-[#FF4A1C]" style={{ width: `${progress}%` }} />
         </div>
       )}
+      {fileWait ? (
+        <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E]" role="status">
+          {fileWait}
+        </p>
+      ) : null}
       {error ? (
         <p className="m-0 text-[length:var(--fs-pequeno)] text-red-700" role="alert">
           {error}
         </p>
       ) : null}
-      <button type="submit" disabled={saving} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold disabled:opacity-60">
+      <button type="submit" disabled={saving || Boolean(fileWait)} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold disabled:opacity-60">
         {copy.submit[locale]}
       </button>
     </form>

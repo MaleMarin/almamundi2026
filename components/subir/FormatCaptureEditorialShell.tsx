@@ -10,6 +10,7 @@ type Props = {
   continueEnabled: boolean;
   onContinue: () => void;
   continueLabel?: string;
+  continueHint?: string | null;
   closeAriaLabel?: string;
   kicker?: string;
   children: ReactNode;
@@ -25,6 +26,7 @@ export function FormatCaptureEditorialShell({
   continueEnabled,
   onContinue,
   continueLabel = 'Continuar',
+  continueHint = null,
   closeAriaLabel = 'Cerrar',
   kicker,
   children,
@@ -42,6 +44,7 @@ export function FormatCaptureEditorialShell({
       continueEnabled={continueEnabled}
       onContinue={onContinue}
       continueLabel={continueLabel}
+      continueHint={continueHint}
       closeAriaLabel={closeAriaLabel}
       kicker={kicker}
       footnote={footnote}

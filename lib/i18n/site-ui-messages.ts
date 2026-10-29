@@ -69,6 +69,9 @@ export type SiteUiMessages = {
   subirBackHome: string;
   modalClose: string;
   modalContinue: string;
+  modalWaitVoice: string;
+  modalWaitPhoto: string;
+  modalWaitVideo: string;
   modalCapture: string;
   modalConfirmSend: string;
   modalDetailsTitle: string;
@@ -222,6 +225,9 @@ const es: SiteUiMessages = {
   subirBackHome: '← Volver al inicio',
   modalClose: 'Cerrar',
   modalContinue: 'Continuar',
+  modalWaitVoice: 'Termina de grabar tu voz',
+  modalWaitPhoto: 'Espera a que tu foto esté lista',
+  modalWaitVideo: 'Termina de grabar tu video',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmación de envío',
   modalDetailsTitle: 'Por favor, déjanos tus datos',
@@ -407,6 +413,9 @@ const pt: SiteUiMessages = {
   subirBackHome: '← Voltar ao início',
   modalClose: 'Fechar',
   modalContinue: 'Continuar',
+  modalWaitVoice: 'Termine de gravar sua voz',
+  modalWaitPhoto: 'Aguarde sua foto ficar pronta',
+  modalWaitVideo: 'Termine de gravar seu vídeo',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmação de envio',
   modalDetailsTitle: 'Por favor, deixe-nos os seus dados',
@@ -592,6 +601,9 @@ const en: SiteUiMessages = {
   subirBackHome: '← Back to home',
   modalClose: 'Close',
   modalContinue: 'Continue',
+  modalWaitVoice: 'Finish recording your voice',
+  modalWaitPhoto: 'Wait until your photo is ready',
+  modalWaitVideo: 'Finish recording your video',
   modalCapture: 'Capture',
   modalConfirmSend: 'Submission confirmation',
   modalDetailsTitle: 'Please leave us your details',

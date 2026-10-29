@@ -5,6 +5,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { AUTHOR_CONTACTS_COLLECTION, authorEmailOnStory } from "@/lib/author-contacts";
+import { signReadUrlForPath } from "@/lib/server-storage";
 
 export const runtime = "nodejs";
 
@@ -19,6 +20,79 @@ function toMillis(ts: unknown): number | null {
   return null;
 }
 
+type PendingFile = { url: string; kind: "image" | "audio" | "video" | "file" };
+
+function submissionFormat(type: unknown): "video" | "audio" | "text" | "photos" {
+  if (type === "video") return "video";
+  if (type === "audio") return "audio";
+  if (type === "foto" || type === "photo" || type === "fotos") return "photos";
+  return "text";
+}
+
+function fileKind(path: string, type: string): PendingFile["kind"] {
+  const lower = path.toLowerCase();
+  if (/\.(png|jpe?g|webp|gif|heic|heif)$/.test(lower)) return "image";
+  if (/\.(mp3|m4a|wav|ogg|aac)$/.test(lower)) return "audio";
+  if (/\.(mp4|mov|webm)$/.test(lower)) {
+    if (type === "audio") return "audio";
+    if (type === "video") return "video";
+    return lower.endsWith(".webm") ? "audio" : "video";
+  }
+  return "file";
+}
+
+/** Envíos de /api/submissions que aún no son historias publicadas. */
+async function listPendingSubmissions() {
+  const db = getAdminDb();
+  const snap = await db.collection("submissions").where("status", "==", "pending").limit(200).get();
+  const rows = await Promise.all(
+    snap.docs.map(async (doc) => {
+      const d = doc.data() as Record<string, unknown>;
+      const type = typeof d.type === "string" ? d.type : "texto";
+      const paths = Array.isArray(d.privateMediaPaths)
+        ? d.privateMediaPaths.filter((p): p is string => typeof p === "string" && p.startsWith("submissions/private/"))
+        : [];
+      const files: PendingFile[] = [];
+      for (const storagePath of paths.slice(0, 8)) {
+        try {
+          files.push({ url: await signReadUrlForPath(storagePath), kind: fileKind(storagePath, type) });
+        } catch {
+          files.push({ url: "", kind: fileKind(storagePath, type) });
+        }
+      }
+      const createdAt = toMillis(d.createdAt);
+      const place = typeof d.placeLabel === "string" ? d.placeLabel : "";
+      const email = typeof d.email === "string" ? d.email.trim() : "";
+      return {
+        id: doc.id,
+        title: typeof d.storyTitle === "string" ? d.storyTitle : "",
+        alias: typeof d.alias === "string" ? d.alias : "",
+        place,
+        lat: null,
+        lng: null,
+        format: submissionFormat(type),
+        mediaUrl: files.find((f) => f.url)?.url ?? "",
+        topic: [],
+        status: "pending" as const,
+        activeSince: null,
+        isFeatured: false,
+        resonances: 0,
+        createdAt,
+        authorEmail: email || null,
+        rightsAccepted: Boolean(d.consentPublicacion),
+        publicationMail: null,
+        questionId: typeof d.questionId === "string" ? d.questionId : null,
+        questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
+        imagenes: [],
+        files,
+        source: "submissions" as const,
+      };
+    })
+  );
+  rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
+  return rows;
+}
+
 /** GET /api/admin/stories?status=pending|active|archived|rejected */
 export async function GET(request: NextRequest) {
   const auth = await requireAdmin(request);
@@ -30,6 +104,11 @@ export async function GET(request: NextRequest) {
   }
 
   try {
+    if (status === "pending") {
+      const stories = await listPendingSubmissions();
+      return NextResponse.json({ stories });
+    }
+
     const db = getAdminDb();
     const col = db.collection("stories");
     const snap =

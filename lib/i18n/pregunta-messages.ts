@@ -18,6 +18,16 @@ export const PREGUNTA_COPY = {
     pt: 'Enviar minha resposta',
     en: 'Send my answer',
   },
+  waitVoice: {
+    es: 'Termina de grabar tu voz',
+    pt: 'Termine de gravar sua voz',
+    en: 'Finish recording your voice',
+  },
+  waitPhoto: {
+    es: 'Espera a que tu foto esté lista',
+    pt: 'Aguarde sua foto ficar pronta',
+    en: 'Wait until your photo is ready',
+  },
   thanksTitle: {
     es: 'Gracias, [alias]',
     pt: 'Obrigado, [alias]',

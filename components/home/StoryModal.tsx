@@ -1220,7 +1220,40 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     profileUploadRef.current = null;
   }, [t.modalPhotoReadError]);
 
+  const captureFileWait = useCallback((): string | null => {
+    if (mode === 'audio' || mode === 'video') {
+      const ready =
+        mode === 'video'
+          ? (mediaBlob != null && mediaBlob.size > 0) ||
+            uploadVideoFile != null ||
+            isVideoShareUrl(videoShareUrl)
+          : (mediaBlob != null && mediaBlob.size > 0) ||
+            uploadAudioFile != null ||
+            isHttpUrl(audioShareUrl);
+      if (recording || !ready) return mode === 'audio' ? t.modalWaitVoice : t.modalWaitVideo;
+      return null;
+    }
+    if (mode === 'foto') {
+      const ready = photos.some((p) => p.readyFile && !p.converting);
+      if (!ready || photos.some((p) => p.converting)) return t.modalWaitPhoto;
+    }
+    return null;
+  }, [
+    mode,
+    recording,
+    mediaBlob,
+    uploadVideoFile,
+    uploadAudioFile,
+    videoShareUrl,
+    audioShareUrl,
+    photos,
+    t.modalWaitVoice,
+    t.modalWaitVideo,
+    t.modalWaitPhoto,
+  ]);
+
   const canContinueCapture = useCallback((): boolean => {
+    if (captureFileWait()) return false;
     if (mode === 'video' || mode === 'audio') {
       if (avProbePending || avCardError) return false;
       if (mode === 'video') {
@@ -1258,15 +1291,21 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     photos,
     avProbePending,
     avCardError,
+    captureFileWait,
   ]);
 
   const goDetails = useCallback(() => {
+    const wait = captureFileWait();
+    if (wait) {
+      setErr(wait);
+      return;
+    }
     if (!canContinueCapture()) return;
     stopStream();
     setErr('');
     setMediaErrKind(null);
     setStep('details');
-  }, [canContinueCapture, stopStream]);
+  }, [canContinueCapture, captureFileWait, stopStream]);
 
   const validateDetails = useCallback(() => {
     const title =
@@ -1946,6 +1985,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         onClose={requestLeave}
         footnote={previewLine}
         continueEnabled={canContinueCapture()}
+        continueHint={captureFileWait()}
         onContinue={goDetails}
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
