@@ -79,6 +79,42 @@ export function publishedStoryShareText(
   return `${lead} Lee ${name}, una historia escrita${from}, en AlmaMundi: ${link}`;
 }
 
+export type PublishedAnswerKind = 'texto' | 'voz' | 'foto';
+
+const ANSWER_SHARE: Record<PublishedAnswerKind, Record<AlmaLocale, string>> = {
+  texto: {
+    es: 'En AlmaMundi alguien respondió: [pregunta] Lee su respuesta y piensa la tuya: [enlace]',
+    pt: 'No AlmaMundi alguém respondeu: [pergunta] Leia a resposta e pense na sua: [link]',
+    en: 'Someone on AlmaMundi answered: [question] Read their answer and think of yours: [link]',
+  },
+  voz: {
+    es: 'En AlmaMundi alguien respondió con su voz: [pregunta] Escucha su respuesta y piensa la tuya: [enlace]',
+    pt: 'No AlmaMundi alguém respondeu com a própria voz: [pergunta] Ouça a resposta e pense na sua: [link]',
+    en: 'Someone on AlmaMundi answered in their own voice: [question] Listen to their answer and think of yours: [link]',
+  },
+  foto: {
+    es: 'En AlmaMundi alguien respondió con una foto: [pregunta] Mira su respuesta y piensa la tuya: [enlace]',
+    pt: 'No AlmaMundi alguém respondeu com uma foto: [pergunta] Veja a resposta e pense na sua: [link]',
+    en: 'Someone on AlmaMundi answered with a photo: [question] See their answer and think of yours: [link]',
+  },
+};
+
+/** Texto de una respuesta publicada. Instagram y TikTok usan el mismo. */
+export function publishedAnswerShareText(
+  locale: AlmaLocale,
+  kind: PublishedAnswerKind,
+  question: string,
+  link: string
+): string {
+  const pregunta = question.replace(/\s+/g, ' ').trim();
+  return ANSWER_SHARE[kind][locale]
+    .replace('[pregunta]', pregunta)
+    .replace('[pergunta]', pregunta)
+    .replace('[question]', pregunta)
+    .replace('[enlace]', link)
+    .replace('[link]', link);
+}
+
 /** Instagram y TikTok, solo para una historia ya publicada. */
 export function publishedStorySocialText(
   locale: AlmaLocale,

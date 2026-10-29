@@ -10,12 +10,14 @@ import { preguntaInviteShareText, preguntaShareText } from '@/lib/i18n/pregunta-
 import { isShortCode } from '@/lib/short-code';
 import {
   publishedAnswerShortUrl,
+  publishedAnswerShareText,
   publishedQuestionShareUrl,
   publishedStoryEmailSubject,
   publishedStoryShareText,
   publishedStoryShareUrl,
   publishedStoryShortUrl,
   publishedStorySocialText,
+  type PublishedAnswerKind,
   type PublishedStoryFormat } from '@/lib/share/published-share';
 
 const NOTICE = {
@@ -39,13 +41,26 @@ const NOTICE = {
   },
 } as const;
 
+const ANSWER_NOTICE_BODY = {
+  es: 'Alguien respondió esta pregunta desde su propia vida. Si compartes su respuesta, que viaje con el mismo cuidado con que la compartió.',
+  pt: 'Alguém respondeu a esta pergunta a partir da própria vida. Se você compartilhar a resposta, que ela viaje com o mesmo cuidado com que foi compartilhada.',
+  en: 'Someone answered this question from their own life. If you share their answer, let it travel with the same care they shared it with.',
+} as const;
+
 type ShareAfterNoticeProps = {
   open: boolean;
   onClose: () => void;
 } & (
   | { kind: 'story'; storyId: string; title: string; city: string; format: PublishedStoryFormat }
   | { kind: 'question'; questionId: string; question: string; afterAnswer?: boolean }
-  | { kind: 'answer'; answerId: string; questionId: string; shortCode?: string; question: string }
+  | {
+      kind: 'answer';
+      answerId: string;
+      questionId: string;
+      shortCode?: string;
+      question: string;
+      answerKind: PublishedAnswerKind;
+    }
 );
 
 type SharePacket = { url: string; text: string; social: string };
@@ -57,6 +72,10 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
       text: publishedStoryShareText(locale, props.format, props.title, props.city, url),
       social: publishedStorySocialText(locale, props.title, props.city, url),
     };
+  }
+  if (props.kind === 'answer') {
+    const text = publishedAnswerShareText(locale, props.answerKind, props.question, url);
+    return { url, text, social: text };
   }
   const text =
     props.kind === 'question' && props.afterAnswer
@@ -77,7 +96,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
     props.kind === 'story'
       ? `story:${props.storyId}`
       : props.kind === 'answer'
-        ? `answer:${props.answerId}:${props.questionId}:${props.shortCode ?? ''}`
+        ? `answer:${props.answerId}:${props.questionId}:${props.answerKind}:${props.shortCode ?? ''}`
         : `question:${props.questionId}:${props.afterAnswer ? '1' : '0'}`;
 
   useEffect(() => {
@@ -162,7 +181,9 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       ? publishedStoryEmailSubject(locale)
       : props.question.slice(0, 120);
   const shareTitle = props.kind === 'story' ? props.title : props.question;
-  const notice = NOTICE[locale];
+  const storyNotice = NOTICE[locale];
+  const notice =
+    props.kind === 'answer' ? { ...storyNotice, body: ANSWER_NOTICE_BODY[locale] } : storyNotice;
 
   return createPortal(
     <>

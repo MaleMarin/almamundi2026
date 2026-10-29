@@ -236,6 +236,7 @@ export function RespuestaGlobeCard({
         questionId={item.questionId}
         shortCode={item.shortCode}
         question={question ?? ''}
+        answerKind={item.kind}
       />
     </>
   );
