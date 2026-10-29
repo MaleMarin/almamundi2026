@@ -15,6 +15,7 @@ import { publicCityCountry } from "@/lib/historias/story-ubicacion";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { isShortCode } from "@/lib/short-code";
+import { ensureShortCode } from "@/lib/short-code-store";
 import { ejesPublicos, idsPublicos } from "@/lib/temas";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
@@ -300,6 +301,16 @@ export async function getStoryByIdAsync(
     const d = doc.data() as Record<string, unknown>;
     if (!privilegedReader && !isAudiencePublicStoryStatus(d.status)) {
       return null;
+    }
+    if (isAudiencePublicStoryStatus(d.status)) {
+      const code = typeof d.shortCode === "string" ? d.shortCode : "";
+      if (!isShortCode(code)) {
+        try {
+          d.shortCode = await ensureShortCode(db, "stories", doc.id, code);
+        } catch (err) {
+          console.error("[getStoryByIdAsync] shortCode", err);
+        }
+      }
     }
     return firestoreDocToStoryPoint(doc.id, d, false);
   } catch (err) {

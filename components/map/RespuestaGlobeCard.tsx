@@ -1,6 +1,6 @@
 'use client';
 
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -9,6 +9,7 @@ import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
+import { isShortCode } from '@/lib/short-code';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 
@@ -32,6 +33,13 @@ export function RespuestaGlobeCard({
   const place = formatPublicPlace(item.city, item.country);
   const kicker = [KIND_LABEL[locale], pregunta?.tema[locale], place].filter(Boolean).join(' · ');
   const alias = preguntaAlias(item.alias);
+
+  useEffect(() => {
+    if (!item.id || isShortCode(item.shortCode)) return;
+    void fetch(`/api/respuestas/public/${encodeURIComponent(item.id)}`, { cache: 'no-store' }).catch(
+      () => undefined
+    );
+  }, [item.id, item.shortCode]);
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -243,6 +251,7 @@ export function RespuestaGlobeCard({
         onClose={() => setShareOpen(false)}
         kind="answer"
         answerId={item.id}
+        questionId={item.questionId}
         shortCode={item.shortCode}
         question={question ?? ''}
       />

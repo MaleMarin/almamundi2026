@@ -3,6 +3,7 @@ import { getAdminDb } from "@/lib/firebase/admin";
 import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
 import type { RespuestaPublica } from "@/lib/respuestas/public";
 import { isShortCode } from "@/lib/short-code";
+import { ensureShortCode } from "@/lib/short-code-store";
 
 export type RespuestaCorta = {
   id: string;
@@ -54,13 +55,21 @@ export async function getRespuestaByShortCode(code: string): Promise<RespuestaCo
 export async function getRespuestaPublicById(id: string): Promise<RespuestaPublica | null> {
   if (!id || id.length > 128) return null;
   try {
-    const doc = await getAdminDb().collection(RESPUESTAS_COLLECTION).doc(id).get();
+    const db = getAdminDb();
+    const doc = await db.collection(RESPUESTAS_COLLECTION).doc(id).get();
     if (!doc.exists) return null;
     const data = doc.data() as Record<string, unknown>;
     if (!approvedPublic(data)) return null;
     const questionId = typeof data.questionId === "string" ? data.questionId.trim() : "";
     if (!questionId) return null;
-    const code = typeof data.shortCode === "string" ? data.shortCode : "";
+    let code = typeof data.shortCode === "string" ? data.shortCode : "";
+    if (!isShortCode(code)) {
+      try {
+        code = await ensureShortCode(db, RESPUESTAS_COLLECTION, doc.id, code);
+      } catch (err) {
+        console.error("[getRespuestaPublicById] shortCode", err);
+      }
+    }
     const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
     const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
     return {

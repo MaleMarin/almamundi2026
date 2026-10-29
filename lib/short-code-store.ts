@@ -12,7 +12,10 @@ export async function allocateShortCode(db: Firestore, collectionName: string): 
   throw new Error("No se pudo crear un código corto");
 }
 
-/** Si ya hay un código válido, lo deja. Si no, escribe solo shortCode. */
+/**
+ * Si ya hay un código válido, lo deja. Si no, escribe solo shortCode.
+ * Dos pedidos a la vez: el primero que guarda se queda; el otro usa ese mismo código.
+ */
 export async function ensureShortCode(
   db: Firestore,
   collectionName: string,
@@ -20,7 +23,14 @@ export async function ensureShortCode(
   current: unknown
 ): Promise<string> {
   if (isShortCode(typeof current === "string" ? current : "")) return current as string;
-  const code = await allocateShortCode(db, collectionName);
-  await db.collection(collectionName).doc(id).update({ shortCode: code });
-  return code;
+  const ref = db.collection(collectionName).doc(id);
+  const candidate = await allocateShortCode(db, collectionName);
+  return db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    if (!snap.exists) throw new Error("No se pudo crear un código corto");
+    const existing = snap.get("shortCode");
+    if (isShortCode(typeof existing === "string" ? existing : "")) return existing as string;
+    tx.update(ref, { shortCode: candidate });
+    return candidate;
+  });
 }

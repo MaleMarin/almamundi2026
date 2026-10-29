@@ -16,6 +16,7 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { TemaTags } from '@/components/historias/TemaTags';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
+import { isShortCode } from '@/lib/short-code';
 
 type Props = {
   story: StoryPoint;
@@ -333,6 +334,11 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const alreadySentKey = `resonance_${story.id}`;
   const alreadySent =
     typeof window !== 'undefined' && sessionStorage.getItem(alreadySentKey) === '1';
+
+  useEffect(() => {
+    if (!story.id || isShortCode(story.shortCode)) return;
+    void fetch(`/api/stories/${encodeURIComponent(story.id)}`, { cache: 'no-store' }).catch(() => undefined);
+  }, [story.id, story.shortCode]);
 
   useEffect(() => {
     requestAnimationFrame(() => setMounted(true));

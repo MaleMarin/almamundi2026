@@ -45,7 +45,7 @@ type ShareAfterNoticeProps = {
 } & (
   | { kind: 'story'; storyId: string; title: string; city: string; format: PublishedStoryFormat }
   | { kind: 'question'; questionId: string; question: string; afterAnswer?: boolean }
-  | { kind: 'answer'; answerId: string; shortCode?: string; question: string }
+  | { kind: 'answer'; answerId: string; questionId: string; shortCode?: string; question: string }
 );
 
 export function ShareAfterNotice(props: ShareAfterNoticeProps) {
@@ -60,7 +60,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
     props.kind === 'story'
       ? `story:${props.storyId}`
       : props.kind === 'answer'
-        ? `answer:${props.answerId}:${props.shortCode ?? ''}`
+        ? `answer:${props.answerId}:${props.questionId}:${props.shortCode ?? ''}`
         : `question:${props.questionId}:${props.afterAnswer ? '1' : '0'}`;
 
   useEffect(() => {
@@ -87,16 +87,22 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
     let cancel = false;
     const storyId = props.kind === 'story' ? props.storyId : '';
     const answerId = props.kind === 'answer' ? props.answerId : '';
+    const questionId = props.kind === 'answer' ? props.questionId : '';
     const load = async () => {
       try {
         if (answerId) {
-          const res = await fetch(`/api/respuestas/public/${encodeURIComponent(answerId)}`);
+          const res = await fetch(`/api/respuestas/public/${encodeURIComponent(answerId)}`, {
+            cache: 'no-store',
+          });
           const data = (res.ok ? await res.json() : null) as { item?: { shortCode?: string } } | null;
           const code = data?.item?.shortCode;
-          if (!cancel && isShortCode(code)) setResolvedShareUrl(publishedAnswerShortUrl(code));
+          if (cancel) return;
+          setResolvedShareUrl(
+            isShortCode(code) ? publishedAnswerShortUrl(code) : publishedQuestionShareUrl(questionId)
+          );
           return;
         }
-        const res = await fetch(`/api/stories/${encodeURIComponent(storyId)}`);
+        const res = await fetch(`/api/stories/${encodeURIComponent(storyId)}`, { cache: 'no-store' });
         const data = (res.ok ? await res.json() : null) as { story?: { shortCode?: string } } | null;
         const code = data?.story?.shortCode;
         if (cancel) return;
@@ -104,7 +110,9 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
           isShortCode(code) ? publishedStoryShortUrl(code) : publishedStoryShareUrl(storyId)
         );
       } catch {
-        if (!cancel && storyId) setResolvedShareUrl(publishedStoryShareUrl(storyId));
+        if (cancel) return;
+        if (answerId && questionId) setResolvedShareUrl(publishedQuestionShareUrl(questionId));
+        else if (storyId) setResolvedShareUrl(publishedStoryShareUrl(storyId));
       }
     };
     void load();
