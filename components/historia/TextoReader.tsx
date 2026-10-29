@@ -9,6 +9,8 @@ import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 import { RespondeALine } from '@/components/historia/RespondeALine';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 
 const PAPEL = '#faf8f4';
 const TINTA = '#2a2218';
@@ -66,6 +68,8 @@ function splitParrafos(contenido: string): string[] {
 }
 
 export default function TextoReader({ historia, onClose, siteLayout = false }: TextoReaderProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const [readProgress, setReadProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
@@ -134,14 +138,14 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <polyline points="15,18 9,12 15,6" />
           </svg>
-          {isMobile ? '←' : '← Volver'}
+          {isMobile ? '←' : copy.back}
         </button>
       )}
 
       {/* Contenedor principal */}
       <div
         role="article"
-        aria-label={`Historia: ${historia.titulo}`}
+        aria-label={copy.storyAria(historia.titulo)}
         style={{
           background: PAPEL,
           minHeight: siteLayout ? 'min(88dvh, 48rem)' : '100vh',
@@ -217,7 +221,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         >
           <img
             src={historia.autor.avatar}
-            alt={`Retrato de ${historia.autor.nombre}`}
+            alt={copy.portrait(historia.autor.nombre)}
             style={{
               width: 36,
               height: 36,
@@ -253,7 +257,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                   fontSize: 'var(--fs-etiqueta)',
                   color: SEPIA }}
               >
-                {historia.tiempoLectura} min de lectura
+                {copy.readingMinutes(historia.tiempoLectura)}
               </span>
             </>
           )}
@@ -327,7 +331,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             <img
               src={historia.autor.avatar}
-              alt={`Retrato de ${historia.autor.nombre}`}
+              alt={copy.portrait(historia.autor.nombre)}
               style={{
                 width: avatarSize,
                 height: avatarSize,
@@ -404,7 +408,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
                 textTransform: 'uppercase',
                 padding: '0.85rem 1.35rem' }}
             >
-              ← Volver a las historias
+              {copy.backStories}
             </button>
           )}
           <button
@@ -419,7 +423,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               textTransform: 'uppercase',
               padding: '0.85rem 1.35rem' }}
           >
-            Compartir esta historia
+            {copy.shareThisStory}
           </button>
         </div>
         </StoryScrollBlock>

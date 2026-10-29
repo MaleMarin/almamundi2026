@@ -2,11 +2,11 @@
 
 Inventario leído del código el 29 de octubre de 2026, rama preview/adenda-revision. Cada fila sale del código de esa fecha, no de una versión anterior de este documento.
 
-Alcance: home, mapa, panel También cuenta, panel La pregunta, ficha /historias/[id], visor, panel de respuestas del globo, las 12 preguntas, /contar, /pregunta, /historias, compartir, los 6 correos, Propósito, Cómo funciona, 404, cookies, legales, metaetiquetas, migas, /h/ y /r/. Quedan fuera el admin, la curaduría y las páginas de laboratorio.
+Alcance: home, mapa, panel También cuenta, panel La pregunta, ficha /historias/[id], visor, panel de respuestas del globo, las 12 preguntas, /contar, /pregunta, /historias, las páginas por formato (/historias/videos, /audios, /escrito, /fotos) y su filtro, compartir, los 6 correos, Propósito, Cómo funciona, 404, cookies, legales, metaetiquetas, migas, /h/ y /r/. Quedan fuera el admin, la curaduría y las páginas de laboratorio.
 
 La columna «dónde aparece» es la clave del código. En Propósito, Cómo funciona, correos y metaetiquetas va el texto completo. El cuerpo de /privacidad, /terminos, /contacto y /mis-datos-personales sigue en español, con un aviso arriba en PT y EN.
 
-Textos en las tablas: 531.
+Textos en las tablas: 604.
 
 ## Home
 
@@ -380,6 +380,8 @@ Textos en las tablas: 531.
 
 ## /historias
 
+Estas 14 claves están en el diccionario y no las leen las cuatro páginas. El texto visible está en «Páginas por formato».
+
 14 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
@@ -600,8 +602,6 @@ Textos en las tablas: 531.
 | Migas | contar | Cuenta tu historia | Conte sua história | Tell your story | lib/layout/site-breadcrumbs.ts |
 | Migas | pregunta | Pregunta | Pergunta | Question | lib/layout/site-breadcrumbs.ts |
 
-Las claves listFilterAria, listFilterCountry, listFilterClear y listFilterShowing siguen en el diccionario y no se muestran. El filtro de /historias/videos, audios, escrito y fotos está fijo en español en `components/historias/HistoriasFormatListPageLayout.tsx`.
-
 ## Panel También cuenta
 
 El botón del mapa ya está en Home, mapa (`bits`). Estos textos son el panel.
@@ -695,6 +695,90 @@ El panel muestra la introducción, el tema, la pregunta en «tú», Responder, P
 | 11 valentía | Valentía / Coragem / Courage | ¿Cuándo tuviste más miedo y qué hiciste con él? | Quando você sentiu mais medo e o que fez com ele? | When were you most afraid, and what did you do with that fear? |
 | 12 legado | Legado / Legado / Legacy | ¿Qué te gustaría que recordaran de ti? | Pelo que você gostaria de ser lembrado? | What would you like to be remembered for? |
 
+## Páginas por formato
+
+/historias/videos, /audios, /escrito y /fotos. El filtro, el carrusel y el reproductor que se abre desde ahí leen `lib/historias/format-pages-copy.ts`. Los nombres de país del filtro siguen en español, porque así están guardadas las historias. La fecha de publicación sigue con el mes en español.
+
+73 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| Formato | heroTitle | El mundo tiene millones de historias que nadie conoce. | O mundo tem milhões de histórias que ninguém conhece. | The world holds millions of stories no one knows. | lib/historias/format-pages-copy.ts |
+| Formato | heroSubtitle | Estas son algunas. | Estas são algumas. | These are a few of them. | lib/historias/format-pages-copy.ts |
+| Formato | filterAria | Filtros de historias | Filtros de histórias | Story filters | lib/historias/format-pages-copy.ts |
+| Formato | filterTitle | Buscar por país, año o palabras clave | Procurar por país, ano ou palavras-chave | Search by country, year, or keywords | lib/historias/format-pages-copy.ts |
+| Formato | country | País | País | Country | lib/historias/format-pages-copy.ts |
+| Formato | year | Año | Ano | Year | lib/historias/format-pages-copy.ts |
+| Formato | allYears | Todos los años | Todos os anos | All years | lib/historias/format-pages-copy.ts |
+| Formato | keywords | Palabras clave | Palavras-chave | Keywords | lib/historias/format-pages-copy.ts |
+| Formato | keywordPlaceholder | Buscar por título, ciudad o tema | Buscar por título, cidade ou tema | Search by title, city, or theme | lib/historias/format-pages-copy.ts |
+| Formato | clear | Limpiar filtros | Limpar filtros | Clear filters | lib/historias/format-pages-copy.ts |
+| Formato | noMatch | Ninguna historia coincide con los filtros. El carrusel muestra las {count} historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros». | Nenhuma história coincide com os filtros. O carrossel mostra as {count} histórias disponíveis. Ajuste os filtros ou toque em «Limpar filtros». | No stories match the filters. The carousel shows the {count} stories available. Adjust the filters or tap “Clear filters”. | lib/historias/format-pages-copy.ts |
+| Formato | showing | Mostrando {shown} de {total} historias. | Mostrando {shown} de {total} histórias. | Showing {shown} of {total} stories. | lib/historias/format-pages-copy.ts |
+| Formato | carouselAria | Carrusel de historias | Carrossel de histórias | Stories carousel | lib/historias/format-pages-copy.ts |
+| Formato | kicker videos | Historias en video | Histórias em vídeo | Stories in video | lib/historias/format-pages-copy.ts |
+| Formato | kicker audios | Historias en audio | Histórias em áudio | Stories in audio | lib/historias/format-pages-copy.ts |
+| Formato | kicker escrito | Historias en texto | Histórias em texto | Stories in writing | lib/historias/format-pages-copy.ts |
+| Formato | kicker fotos | Historias en foto | Histórias em foto | Stories in photos | lib/historias/format-pages-copy.ts |
+| Formato | shareLabel | Compartir | Compartilhar | Share | lib/historias/format-pages-copy.ts |
+| Formato | shareText | Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable. | Compartilhar a história com respeito: crédito a quem conta, link e cartão para baixar. | Share the story with care: credit the teller, a link, and a downloadable card. | lib/historias/format-pages-copy.ts |
+| Formato | countryAll | Todos los países | Todos os países | All countries | lib/historias/format-pages-copy.ts |
+| Formato | countrySearch | Buscar país | Buscar país | Search country | lib/historias/format-pages-copy.ts |
+| Formato | countrySearchAria | Buscar en la lista de países | Buscar na lista de países | Search the country list | lib/historias/format-pages-copy.ts |
+| Formato | countryEmpty | Sin coincidencias | Sem coincidências | No matches | lib/historias/format-pages-copy.ts |
+| Formato | narrator | Narrador | Narrador | Narrator | lib/historias/format-pages-copy.ts |
+| Formato | open video | Ver historia | Ver história | See the story | lib/historias/format-pages-copy.ts |
+| Formato | open audio | Escuchar historia | Ouvir história | Listen to the story | lib/historias/format-pages-copy.ts |
+| Formato | open texto | Leer historia | Ler história | Read the story | lib/historias/format-pages-copy.ts |
+| Formato | open foto | Ver fotografías | Ver fotografias | See the photos | lib/historias/format-pages-copy.ts |
+| Formato | unavailable | Contenido no disponible en este formato | Conteúdo indisponível neste formato | Content isn't available in this format | lib/historias/format-pages-copy.ts |
+| Formato | prevStory | Historia anterior | História anterior | Previous story | lib/historias/format-pages-copy.ts |
+| Formato | nextStory | Próxima historia | Próxima história | Next story | lib/historias/format-pages-copy.ts |
+| Formato | play video | Ver video | Ver vídeo | Watch the video | lib/historias/format-pages-copy.ts |
+| Formato | play audio | Escuchar audio | Ouvir áudio | Listen to the audio | lib/historias/format-pages-copy.ts |
+| Formato | play texto | Leer historia | Ler história | Read the story | lib/historias/format-pages-copy.ts |
+| Formato | play foto | Ver álbum de fotos | Ver álbum de fotos | See the photo album | lib/historias/format-pages-copy.ts |
+| Formato | back | ← Volver | ← Voltar | ← Back | lib/historias/format-pages-copy.ts |
+| Formato | backStories | ← Volver a las historias | ← Voltar às histórias | ← Back to the stories | lib/historias/format-pages-copy.ts |
+| Formato | seeMoreStories | ← Ver más historias | ← Ver mais histórias | ← See more stories | lib/historias/format-pages-copy.ts |
+| Formato | shareThisStory | Compartir esta historia | Compartilhar esta história | Share this story | lib/historias/format-pages-copy.ts |
+| Formato | moreStories | Más historias | Mais histórias | More stories | lib/historias/format-pages-copy.ts |
+| Formato | related | Otras historias con un tono cercano | Outras histórias com um tom parecido | Other stories with a similar tone | lib/historias/format-pages-copy.ts |
+| Formato | listen | Escuchar | Ouvir | Listen | lib/historias/format-pages-copy.ts |
+| Formato | photoPrev | Foto anterior | Foto anterior | Previous photo | lib/historias/format-pages-copy.ts |
+| Formato | photoNext | Foto siguiente | Próxima foto | Next photo | lib/historias/format-pages-copy.ts |
+| Formato | close | Cerrar | Fechar | Close | lib/historias/format-pages-copy.ts |
+| Formato | pause | Pausar | Pausar | Pause | lib/historias/format-pages-copy.ts |
+| Formato | playControl | Reproducir | Reproduzir | Play | lib/historias/format-pages-copy.ts |
+| Formato | back10 | Atrás 10 s | Voltar 10 s | Back 10 s | lib/historias/format-pages-copy.ts |
+| Formato | forward10 | Adelante 10 s | Avançar 10 s | Forward 10 s | lib/historias/format-pages-copy.ts |
+| Formato | soundOn | Activar sonido | Ativar som | Turn sound on | lib/historias/format-pages-copy.ts |
+| Formato | mute | Silenciar | Silenciar | Mute | lib/historias/format-pages-copy.ts |
+| Formato | transcript | Transcripción del audio | Transcrição do áudio | Audio transcript | lib/historias/format-pages-copy.ts |
+| Formato | listenAgain | Escuchar de nuevo | Ouvir de novo | Listen again | lib/historias/format-pages-copy.ts |
+| Formato | watchAgain | Ver de nuevo | Ver de novo | Watch again | lib/historias/format-pages-copy.ts |
+| Formato | videoPlayer | Reproductor de video | Reprodutor de vídeo | Video player | lib/historias/format-pages-copy.ts |
+| Formato | captionEs | Español | Espanhol | Spanish | lib/historias/format-pages-copy.ts |
+| Formato | fullscreen | Pantalla completa | Tela cheia | Full screen | lib/historias/format-pages-copy.ts |
+| Formato | exitFullscreen | Salir de pantalla completa | Sair da tela cheia | Exit full screen | lib/historias/format-pages-copy.ts |
+| Formato | formatAudio | Audio | Áudio | Audio | lib/historias/format-pages-copy.ts |
+| Formato | formatVideo | Video | Vídeo | Video | lib/historias/format-pages-copy.ts |
+| Formato | formatText | Texto | Texto | Text | lib/historias/format-pages-copy.ts |
+| Formato | formatPhoto | Foto | Foto | Photo | lib/historias/format-pages-copy.ts |
+| Formato | formatStory | Historia | História | Story | lib/historias/format-pages-copy.ts |
+| Formato | anonymous | Anónimo | Anônimo | Anonymous | lib/historias/format-pages-copy.ts |
+| Formato | photoCount | 1 fotografía / {n} fotografías | 1 fotografia / {n} fotografias | 1 photo / {n} photos | lib/historias/format-pages-copy.ts |
+| Formato | photoOf | Fotografía de {título} | Fotografia de {título} | Photo of {title} | lib/historias/format-pages-copy.ts |
+| Formato | albumPhoto | Foto del álbum: {título} | Foto do álbum: {título} | Album photo: {title} | lib/historias/format-pages-copy.ts |
+| Formato | portrait | Retrato de {nombre} | Retrato de {nombre} | Portrait of {name} | lib/historias/format-pages-copy.ts |
+| Formato | goToPhoto | Ir a foto {n} | Ir para a foto {n} | Go to photo {n} | lib/historias/format-pages-copy.ts |
+| Formato | playAudioTitle | Reproducir audio: {título} | Reproduzir áudio: {título} | Play audio: {title} | lib/historias/format-pages-copy.ts |
+| Formato | playVideoTitle | Reproducir video: {título} | Reproduzir vídeo: {título} | Play video: {title} | lib/historias/format-pages-copy.ts |
+| Formato | readingMinutes | {n} min de lectura | {n} min de leitura | {n} min read | lib/historias/format-pages-copy.ts |
+| Formato | storyAria | Historia: {título} | História: {título} | Story: {title} | lib/historias/format-pages-copy.ts |
+
+La etiqueta de exposición (`alma.mundi / historias en …`) se pasa al carrusel y no se pinta.
+
 ## Problemas detectados
 
 Lectura del código al 29 de octubre de 2026. Los textos que seguían en español dentro de PT o EN se tradujeron en esta pasada. El detalle está en «Cambios».
@@ -713,7 +797,7 @@ Sin pendientes. Las páginas legales siguen en español a propósito, con el avi
 
 ### Términos retirados que siguen
 
-Sin pendientes en la interfaz. «Mi colección» responde 404. Las claves de archivo, colección, carta al autor y el filtro viejo de /historias no se usaban y se borraron. Quedan en el diccionario, sin mostrarse, listFilterAria, listFilterCountry, listFilterClear y listFilterShowing. «Pregúntale a alguien» sigue en lib/pregunta-semana.ts y no se muestra. «Noticias» no está en las migas ni en el mapa de la home. El filtro visible de /historias/videos, audios, escrito y fotos sigue fijo en español en components/historias/HistoriasFormatListPageLayout.tsx: «Buscar por país, año o palabras clave», con el campo «Buscar por título, ciudad o tema».
+Sin pendientes en la interfaz de las páginas por formato. «Mi colección» responde 404. Las claves de archivo, colección, carta al autor y el filtro viejo de /historias no se usaban y se borraron. Quedan en el diccionario, sin mostrarse, listHeroTitle, listHeroSubtitle, listFilterAria, listFilterCountry, listFilterClear, listFilterShowing, listKicker* y listExpo*. «Pregúntale a alguien» sigue en lib/pregunta-semana.ts y no se muestra. «Noticias» no está en las migas ni en el mapa de la home. Los nombres de país del filtro y el mes de la fecha de publicación siguen en español.
 
 ### El mismo concepto, dicho de formas distintas
 

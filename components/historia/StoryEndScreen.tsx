@@ -8,6 +8,8 @@ import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { RespondeALine } from '@/components/historia/RespondeALine';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 
 export type StoryEndAutor = {
   nombre: string;
@@ -78,6 +80,8 @@ export function StoryEndScreen({
   embedInSite = false,
   share,
   storyId }: StoryEndScreenProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const fechaStr = formatEndFecha(fecha);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -316,7 +320,7 @@ export function StoryEndScreen({
                 letterSpacing: '0.12em',
                 textTransform: 'uppercase' }}
             >
-              Compartir
+              {copy.share}
             </button>
           ) : null}
           <button
@@ -337,7 +341,7 @@ export function StoryEndScreen({
               background: `linear-gradient(165deg, #FF4A1C 0%, ${neu.orange} 52%, ${neu.orange} 100%)`,
               boxShadow: SOFT_ORANGE_SHADOW }}
           >
-            Más historias
+            {copy.moreStories}
           </button>
         </div>
       </div>

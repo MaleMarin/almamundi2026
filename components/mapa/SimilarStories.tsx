@@ -7,6 +7,8 @@ import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubica
 import { storyReaderPath } from '@/lib/historias/story-json-ld';
 import { neu } from '@/lib/historias-neumorph';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy, type FormatPagesCopy } from '@/lib/historias/format-pages-copy';
 
 type SimilarStory = {
   id: string;
@@ -19,22 +21,17 @@ type SimilarStory = {
   publishedAt: string | null;
 };
 
-const FORMAT_LABEL: Record<string, string> = {
-  audio: 'Audio',
-  video: 'Video',
-  text: 'Escrito',
-  texto: 'Escrito',
-  escrito: 'Texto',
-  image: 'Foto',
-  foto: 'Foto',
-  photo: 'Foto' };
-
-function formatLabel(format: string): string {
-  return FORMAT_LABEL[format.toLowerCase()] ?? 'Historia';
+function formatLabel(format: string, copy: FormatPagesCopy): string {
+  const key = format.toLowerCase();
+  if (key === 'audio') return copy.formatAudio;
+  if (key === 'video') return copy.formatVideo;
+  if (key === 'text' || key === 'texto' || key === 'escrito') return copy.formatText;
+  if (key === 'image' || key === 'foto' || key === 'photo') return copy.formatPhoto;
+  return copy.formatStory;
 }
 
-function authorAndDateLine(label: string, publishedAt: string | null): string {
-  const name = formatPublicName(label) || 'Anónimo';
+function authorAndDateLine(label: string, publishedAt: string | null, anonymous: string): string {
+  const name = formatPublicName(label) || anonymous;
   if (!publishedAt) return name;
   const date = formatPublishedAtEsStable(publishedAt);
   if (!date || date === '—') return name;
@@ -57,6 +54,8 @@ type SimilarStoriesProps = {
 };
 
 export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const [stories, setStories] = useState<SimilarStory[]>([]);
   const light = variant === 'light';
 
@@ -90,7 +89,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
           fontFamily: SITE_FONT_STACK,
           fontWeight: 600 }}
       >
-        Otras historias con un tono cercano
+        {copy.related}
       </p>
 
       <div className="am-related-stories-grid">
@@ -124,7 +123,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                   textTransform: 'uppercase',
                   color: light ? 'var(--almamundi-orange)' : 'rgba(var(--almamundi-orange-rgb), 0.85)' }}
               >
-                {formatLabel(s.format)}
+                {formatLabel(s.format, copy)}
               </span>
               <span
                 className="am-related-stories-title"
@@ -163,7 +162,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: '4px 0 0' }}
             >
-              {authorAndDateLine(s.label, s.publishedAt ?? null)}
+              {authorAndDateLine(s.label, s.publishedAt ?? null, copy.anonymous)}
             </p>
           </Link>
         ))}

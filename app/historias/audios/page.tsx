@@ -11,9 +11,6 @@ import AudioPlayer from '@/components/historia/AudioPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
 import { storyToHistoriaAudio } from '@/lib/historias/audio-adapter';
-import {
-  historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionAudio } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
@@ -129,7 +126,6 @@ export default function HistoriasAudiosPage() {
     <>
       <HistoriasFormatListPageLayout
         activeTab="audios"
-        orangeKicker={historiasListFormatOrangeKicker.audio}
         filterCountry={filterCountry}
         setFilterCountry={setFilterCountry}
         filterYear={filterYear}
@@ -144,7 +140,6 @@ export default function HistoriasAudiosPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        expoLabel={historiasListFormatExpoLabel.audio}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="audio"

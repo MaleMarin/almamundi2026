@@ -27,6 +27,8 @@ import 'swiper/css';
 import 'swiper/css/effect-coverflow';
 
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
+import { formatPagesCopy, type FormatPagesCopy } from '@/lib/historias/format-pages-copy';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 
 import { EthicalShareTriggerButton } from './EthicalShareTrigger';
 import { ShareAfterNotice } from './ShareAfterNotice';
@@ -89,11 +91,8 @@ function canOpenPrimary(
   return true;
 }
 
-function primaryOpenLabel(mode: ExhibitionContentMode): string {
-  if (mode === 'video') return 'Ver historia';
-  if (mode === 'audio') return 'Escuchar historia';
-  if (mode === 'texto') return 'Leer historia';
-  return 'Ver fotografías';
+function primaryOpenLabel(mode: ExhibitionContentMode, copy: FormatPagesCopy): string {
+  return copy.open[mode];
 }
 
 /** Máx. inclinación por tarjeta (solo rotación local; sin mover el carrusel entero). */
@@ -148,7 +147,6 @@ function ExpoCardTiltShell({
 
 export function HistoricalExhibitionCarousel({
   historias,
-  tituloExposicion = 'Exposición histórica',
   backgroundImageUrl,
   className = '',
   embedded = false,
@@ -162,6 +160,8 @@ export function HistoricalExhibitionCarousel({
   expoMaxWidthClassName,
   shareInGalleryChrome = true,
   showMailboxInGalleryChrome = false }: HistoricalExhibitionCarouselProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
   /** Listados /historias/* (layout comparte filtros y carrusel sin chrome de compartir en la expo). */
@@ -377,7 +377,7 @@ export function HistoricalExhibitionCarousel({
                         : 'pointer-events-auto absolute left-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:left-2.5 md:left-4'
                       : 'pointer-events-auto absolute left-0 top-1/2 z-[60] flex min-h-[52px] min-w-[52px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/55 bg-black/45 p-3 text-white shadow-[0_4px_28px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-white/80 hover:bg-black/60 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/45 sm:left-1 md:left-2'
                   }
-                  aria-label="Historia anterior"
+                  aria-label={copy.prevStory}
                 >
                   <ChevronLeft
                     className={
@@ -401,7 +401,7 @@ export function HistoricalExhibitionCarousel({
                         : 'pointer-events-auto absolute right-1.5 top-1/2 z-[60] flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-full border border-gray-400/42 bg-white/92 p-2 text-gray-800 shadow-[0_6px_22px_rgba(15,23,42,0.08)] backdrop-blur-md transition hover:bg-white active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-white/92 disabled:active:scale-100 sm:right-2.5 md:right-4'
                       : 'pointer-events-auto absolute right-0 top-1/2 z-[60] flex min-h-[56px] min-w-[56px] -translate-y-1/2 items-center justify-center rounded-full border-2 border-white/70 bg-black/50 p-3 text-white shadow-[0_6px_32px_rgba(0,0,0,0.55)] backdrop-blur-md ring-2 ring-white/15 transition hover:border-white hover:bg-black/65 hover:ring-white/25 active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-black/50 sm:right-1 md:right-2'
                   }
-                  aria-label="Próxima historia"
+                  aria-label={copy.nextStory}
                 >
                   <ChevronRight
                     className={
@@ -484,7 +484,7 @@ export function HistoricalExhibitionCarousel({
                               openHandler(slideIdx);
                             }}
                             className="pointer-events-auto absolute bottom-2.5 right-2.5 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/52 bg-black/43 text-white shadow-lg backdrop-blur-md transition hover:bg-black/54"
-                            aria-label={primaryOpenLabel(contentMode)}
+                            aria-label={primaryOpenLabel(contentMode, copy)}
                           >
                             {contentMode === 'video' ? (
                               <Play className="ml-0.5 h-5 w-5" fill="currentColor" strokeWidth={0} />
@@ -524,7 +524,7 @@ export function HistoricalExhibitionCarousel({
                         </div>
                         <div className="min-w-0 text-left leading-tight">
                           <p className="truncate text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-500 tracking-[0.12em]">
-                            Narrador
+                            {copy.narrator}
                           </p>
                           <p className="truncate text-[length:var(--fs-pequeno)] font-semibold text-gray-900">{h.nombre}</p>
                         </div>
@@ -545,7 +545,7 @@ export function HistoricalExhibitionCarousel({
                               : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-gray-500 opacity-95'
                           }`}
                         >
-                          {canOpenThis ? primaryOpenLabel(contentMode) : 'Contenido no disponible en este formato'}
+                          {canOpenThis ? primaryOpenLabel(contentMode, copy) : copy.unavailable}
                         </button>
                       ) : null}
                     </div>
@@ -600,15 +600,7 @@ export function HistoricalExhibitionCarousel({
                               openHandler(slideIdx);
                             }}
                             className="flex h-14 w-14 items-center justify-center rounded-full border border-white/45 bg-black/45 text-white shadow-lg backdrop-blur-md transition hover:bg-black/60"
-                            aria-label={
-                              contentMode === 'video'
-                                ? 'Ver video'
-                                : contentMode === 'audio'
-                                  ? 'Escuchar audio'
-                                  : contentMode === 'texto'
-                                    ? 'Leer historia'
-                                    : 'Ver álbum de fotos'
-                            }
+                            aria-label={copy.play[contentMode]}
                           >
                             {contentMode === 'video' ? (
                               <Play className="ml-0.5 h-7 w-7" fill="currentColor" strokeWidth={0} />

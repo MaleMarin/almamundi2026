@@ -6,6 +6,8 @@ import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock'
 import { RespondeALine } from '@/components/historia/RespondeALine'
 import { INTERIOR_FONT_STACK } from '@/lib/typography'
 import { useState, useRef, useEffect, useCallback } from 'react'
+import { useHomeLocale } from '@/components/i18n/LocaleProvider'
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 export interface Historia {
@@ -97,6 +99,8 @@ const MinimizeIcon = () => (
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function VideoPlayer({ historia, onClose, skipIntertitle = false, siteLayout = false }: VideoPlayerProps) {
+  const { locale } = useHomeLocale()
+  const copy = formatPagesCopy(locale)
   // Stages: 'intertitle' → 'playing' → 'ended' (skipIntertitle: entra en 'playing' al instante)
   const [stage, setStage] = useState<'intertitle' | 'playing' | 'ended'>(() =>
     skipIntertitle ? 'playing' : 'intertitle'
@@ -342,7 +346,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 zIndex: 200, transition: 'background 0.2s, color 0.2s' }}
               onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 74, 28,0.12)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.6)'; }}
-              aria-label="Cerrar"
+              aria-label={copy.close}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -455,7 +459,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
         <div
           ref={containerRef}
           role="region"
-          aria-label="Reproductor de video"
+          aria-label={copy.videoPlayer}
           onMouseMove={resetControlsTimer}
           onClick={togglePlay}
           style={{
@@ -490,7 +494,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             onTimeUpdate={handleTimeUpdate}
             onLoadedMetadata={handleLoadedMetadata}
             onEnded={handleEnded}
-            aria-label={`Reproducir video: ${historia.titulo}`}
+            aria-label={copy.playVideoTitle(historia.titulo)}
             style={{
               position: 'relative', zIndex: 2,
               width: '100%', height: '100%',
@@ -499,7 +503,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
             playsInline
           >
             {historia.subtitulos ? (
-              <track kind="captions" src={historia.subtitulos} label="Español" srcLang="es" default />
+              <track kind="captions" src={historia.subtitulos} label={copy.captionEs} srcLang="es" default />
             ) : null}
           </video>
 
@@ -552,7 +556,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                   transition: 'background 0.2s, color 0.2s' }}
                 onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255, 74, 28,0.15)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--almamundi-orange, #FF4A1C)'; }}
                 onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLButtonElement).style.color = 'rgba(245,240,232,0.7)'; }}
-                aria-label="Cerrar"
+                aria-label={copy.close}
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
@@ -625,7 +629,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                   onClick={togglePlay}
                   style={btnStyle}
                   aria-pressed={isPlaying}
-                  aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+                  aria-label={isPlaying ? copy.pause : copy.playControl}
                 >
                   {isPlaying
                     ? <PauseIcon />
@@ -634,7 +638,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                 </button>
 
                 {/* Mute */}
-                <button type="button" onClick={toggleMute} style={btnStyle} aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}>
+                <button type="button" onClick={toggleMute} style={btnStyle} aria-label={isMuted ? copy.soundOn : copy.mute}>
                   {isMuted ? <MutedIcon /> : <VolumeIcon />}
                 </button>
 
@@ -682,7 +686,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
                   type="button"
                   onClick={toggleFullscreen}
                   style={btnStyle}
-                  aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+                  aria-label={isFullscreen ? copy.exitFullscreen : copy.fullscreen}
                 >
                   {isFullscreen ? <MinimizeIcon /> : <FullscreenIcon />}
                 </button>
@@ -705,7 +709,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           questionId={historia.questionId}
           questionMode={historia.questionMode}
           embedInSite={siteLayout}
-          replayLabel="Ver de nuevo"
+          replayLabel={copy.watchAgain}
           onReplay={() => {
             setIntertitlePhase('in')
             setIrisOpen(false)

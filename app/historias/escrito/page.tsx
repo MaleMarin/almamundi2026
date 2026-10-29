@@ -10,9 +10,6 @@ import ReactDOM from 'react-dom';
 import TextoReader, { type HistoriaTexto } from '@/components/historia/TextoReader';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
-import {
-  historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaTextoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
@@ -128,7 +125,6 @@ export default function HistoriasEscritoPage() {
     <>
       <HistoriasFormatListPageLayout
         activeTab="escrito"
-        orangeKicker={historiasListFormatOrangeKicker.texto}
         filterCountry={filterCountry}
         setFilterCountry={setFilterCountry}
         filterYear={filterYear}
@@ -143,7 +139,6 @@ export default function HistoriasEscritoPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        expoLabel={historiasListFormatExpoLabel.texto}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="texto"

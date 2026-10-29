@@ -10,9 +10,6 @@ import ReactDOM from 'react-dom';
 import FotoAlbum, { type HistoriaFoto } from '@/components/historia/FotoAlbum';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
-import {
-  historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionReader } from '@/lib/historias/historical-exhibition-from-story';
 import { storyPointToHistoriaFotoModal } from '@/lib/historias/historia-modal-adapters';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
@@ -129,7 +126,6 @@ export default function HistoriasFotosPage() {
     <>
       <HistoriasFormatListPageLayout
         activeTab="fotos"
-        orangeKicker={historiasListFormatOrangeKicker.foto}
         filterCountry={filterCountry}
         setFilterCountry={setFilterCountry}
         filterYear={filterYear}
@@ -144,7 +140,6 @@ export default function HistoriasFotosPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        expoLabel={historiasListFormatExpoLabel.foto}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="foto"

@@ -12,21 +12,16 @@ import {
   HistoricalExhibitionCarousel,
   type ExhibitionContentMode } from '@/components/stories/HistoricalExhibitionCarousel';
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
-import {
-  HISTORIAS_CAROUSEL_ARIA_LABEL,
-  HISTORIAS_FILTER_BLOCK_TITLE,
-  HISTORIAS_FILTER_KEYWORD_PLACEHOLDER,
-  HISTORIAS_LIST_HERO_SUBTITLE,
-  HISTORIAS_LIST_HERO_TITLE,
-  HISTORIAS_SHARE_ICONS_LEGEND } from '@/lib/historias/historias-format-list-ui';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { interpolate } from '@/lib/i18n/locale';
 import { HistoriasFilterCountrySelect } from '@/components/historias/HistoriasFilterCountrySelect';
-import { neu, historiasInterior } from '@/lib/historias-neumorph';
+import { neu } from '@/lib/historias-neumorph';
 
 export type HistoriasFormatListActiveTab = 'videos' | 'audios' | 'escrito' | 'fotos';
 
 export type HistoriasFormatListPageLayoutProps = {
   activeTab: HistoriasFormatListActiveTab;
-  orangeKicker: string;
   filterCountry: string;
   setFilterCountry: (v: string) => void;
   filterYear: string;
@@ -41,7 +36,6 @@ export type HistoriasFormatListPageLayoutProps = {
   shareTarget: HistoricalExhibitionStory | null;
   ethicalShareOpen: boolean;
   setEthicalShareOpen: (open: boolean) => void;
-  expoLabel: string;
   clearFilters: () => void;
   exhibitionHistorias: HistoricalExhibitionStory[];
   contentMode: ExhibitionContentMode;
@@ -52,7 +46,6 @@ export type HistoriasFormatListPageLayoutProps = {
 
 export function HistoriasFormatListPageLayout({
   activeTab,
-  orangeKicker,
   filterCountry,
   setFilterCountry,
   filterYear,
@@ -67,13 +60,15 @@ export function HistoriasFormatListPageLayout({
   shareTarget,
   ethicalShareOpen,
   setEthicalShareOpen,
-  expoLabel,
   clearFilters,
   exhibitionHistorias,
   contentMode,
   onOpenContent,
   onSlideChange,
   disableKeyboardNav }: HistoriasFormatListPageLayoutProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
+  const shareLegend = `${copy.shareLabel}: ${copy.shareText}`;
   return (
     <>
       <main
@@ -88,17 +83,17 @@ export function HistoriasFormatListPageLayout({
                 className="mb-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
                 style={{ color: 'var(--almamundi-orange)' }}
               >
-                {orangeKicker}
+                {copy.kicker[activeTab]}
               </p>
               <h1 className="text-balance text-[length:var(--fs-titular)] font-normal leading-[1.12] text-gray-800 md:leading-[1.1] ">
-                {HISTORIAS_LIST_HERO_TITLE}
+                {copy.heroTitle}
               </h1>
               <p className="mx-auto max-w-xl text-pretty text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 sm:mx-0 md:leading-snug">
-                {HISTORIAS_LIST_HERO_SUBTITLE}
+                {copy.heroSubtitle}
               </p>
             </header>
 
-            <div className="mt-5 flex-shrink-0 md:mt-6" aria-label="Filtros de historias">
+            <div className="mt-5 flex-shrink-0 md:mt-6" aria-label={copy.filterAria}>
               <div
                 className="w-full overflow-visible rounded-[22px] px-3 py-3.5 shadow-[inset_6px_6px_12px_rgba(163,177,198,0.35),inset_-5px_-5px_12px_rgba(255,255,255,0.88)] sm:px-4 sm:py-4 md:rounded-3xl"
                 style={{
@@ -106,14 +101,14 @@ export function HistoriasFormatListPageLayout({
                   borderRadius: 22 }}
               >
                 <p className="mb-2.5 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-600 tracking-[0.12em]">
-                  {HISTORIAS_FILTER_BLOCK_TITLE}
+                  {copy.filterTitle}
                 </p>
                 <div className="flex flex-col gap-3 lg:flex-row lg:flex-wrap lg:items-end lg:gap-x-3 lg:gap-y-3">
                   <label
                     className="flex min-w-0 flex-1 flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 lg:min-w-[min(100%,13rem)] lg:max-w-[16.5rem]"
                     htmlFor="historias-filter-pais"
                   >
-                    País
+                    {copy.country}
                     <HistoriasFilterCountrySelect
                       id="historias-filter-pais"
                       value={filterCountry}
@@ -121,14 +116,14 @@ export function HistoriasFormatListPageLayout({
                     />
                   </label>
                   <label className="flex w-full shrink-0 flex-none flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 min-w-[15.5rem] sm:min-w-[16rem] lg:w-[16.5rem] lg:max-w-[16.5rem]">
-                    Año
+                    {copy.year}
                     <select
                       value={filterYear}
                       onChange={(e) => setFilterYear(e.target.value)}
                       className="box-border w-full min-h-[2.75rem] min-w-[15.5rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] py-2 pl-3 pr-12 text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     >
-                      <option value="">Todos los años</option>
+                      <option value="">{copy.allYears}</option>
                       {yearOptions.map((y) => (
                         <option key={y} value={String(y)}>
                           {y}
@@ -137,12 +132,12 @@ export function HistoriasFormatListPageLayout({
                     </select>
                   </label>
                   <label className="flex min-w-0 flex-1 flex-col gap-1.5 text-[length:var(--fs-etiqueta)] font-medium text-gray-600 lg:min-w-[12rem] lg:flex-[1.15]">
-                    Palabras clave
+                    {copy.keywords}
                     <input
                       type="search"
                       value={filterKeywords}
                       onChange={(e) => setFilterKeywords(e.target.value)}
-                      placeholder={HISTORIAS_FILTER_KEYWORD_PLACEHOLDER}
+                      placeholder={copy.keywordPlaceholder}
                       autoComplete="off"
                       className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
@@ -154,8 +149,8 @@ export function HistoriasFormatListPageLayout({
                         <EthicalShareTriggerButton
                           onClick={() => setEthicalShareOpen(true)}
                           className="flex min-h-11 min-w-11 shrink-0 cursor-help items-center justify-center rounded-full border-2 border-[color:var(--almamundi-orange)] bg-[#E9ECF3] text-[color:var(--almamundi-orange)] shadow-[3px_3px_10px_rgba(163,177,198,0.5),-2px_-2px_8px_rgba(255,255,255,0.92)] transition hover:bg-[#e2e7f0]"
-                          title={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
-                          ariaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
+                          title={shareLegend}
+                          ariaLabel={`${copy.shareLabel}. ${copy.shareText}`}
                         />
                         {false && shareTarget ? (
                         <ResonanceMailbox
@@ -163,8 +158,8 @@ export function HistoriasFormatListPageLayout({
                           recipientName={shareTarget?.nombre ?? ''}
                           triggerLayout="inline"
                           triggerTone="orange"
-                          triggerTitle={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
-                          triggerAriaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
+                          triggerTitle={shareLegend}
+                          triggerAriaLabel={`${copy.shareLabel}. ${copy.shareText}`}
                           className="cursor-help"
                         />
                         ) : null}
@@ -183,19 +178,18 @@ export function HistoriasFormatListPageLayout({
                         ...neu.button,
                         opacity: hasActiveFilters ? 1 : 0.88 }}
                     >
-                      Limpiar filtros
+                      {copy.clear}
                     </button>
                   </div>
                 </div>
                 {showingUnfilteredBecauseNoMatches ? (
                   <p className="mt-2 text-[length:var(--fs-etiqueta)] text-amber-900/85" role="status">
-                    Ninguna historia coincide con los filtros. El carrusel muestra las {allStoryCount}{' '}
-                    historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros».
+                    {interpolate(copy.noMatch, { count: allStoryCount })}
                   </p>
                 ) : null}
                 {hasActiveFilters && !showingUnfilteredBecauseNoMatches ? (
                   <p className="mt-2 text-[length:var(--fs-etiqueta)] text-gray-500" role="status">
-                    Mostrando {filteredStoryCount} de {allStoryCount} historias.
+                    {interpolate(copy.showing, { shown: filteredStoryCount, total: allStoryCount })}
                   </p>
                 ) : null}
               </div>
@@ -205,7 +199,7 @@ export function HistoriasFormatListPageLayout({
 
         <section
           id="historias-carrusel"
-          aria-label={HISTORIAS_CAROUSEL_ARIA_LABEL}
+          aria-label={copy.carouselAria}
           className="mt-4 flex min-h-[min(480px,calc(100dvh-11rem))] flex-1 flex-col overflow-visible border-t border-gray-400/25 bg-[linear-gradient(180deg,rgba(224,229,236,0.42)_0%,#E0E5EC_16%,#e2e7ee_100%)] scroll-mt-24 px-2 pb-4 pt-5 sm:mt-5 sm:px-3 sm:pb-6 md:px-6 lg:min-h-[min(520px,calc(100dvh-10.5rem))] lg:px-10 lg:pb-8"
         >
           <div className="flex min-h-0 w-full flex-1 flex-col items-stretch justify-center">
@@ -217,7 +211,7 @@ export function HistoriasFormatListPageLayout({
               spatialVariant="light-gallery"
               expoPaddingTopClassName="pt-0"
               expoMaxWidthClassName="max-w-full"
-              tituloExposicion={expoLabel}
+              tituloExposicion={copy.expo[activeTab]}
               onOpenContent={onOpenContent}
               onSlideChange={onSlideChange}
               shareInGalleryChrome={false}

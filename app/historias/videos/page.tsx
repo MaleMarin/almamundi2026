@@ -10,9 +10,6 @@ import ReactDOM from 'react-dom';
 import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
 import { useStories } from '@/hooks/useStories';
-import {
-  historiasListFormatExpoLabel,
-  historiasListFormatOrangeKicker } from '@/lib/historias/historias-format-list-ui';
 import { storyPointToHistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-from-story';
 import { pickStoriesForEmbeddedCarousel } from '@/lib/historias/historias-embedded-carousel-source';
 import { foldText, haystackForStory, yearFromPublished } from '@/lib/historias/story-filter-helpers';
@@ -127,7 +124,6 @@ export default function HistoriasVideosPage() {
     <>
       <HistoriasFormatListPageLayout
         activeTab="videos"
-        orangeKicker={historiasListFormatOrangeKicker.video}
         filterCountry={filterCountry}
         setFilterCountry={setFilterCountry}
         filterYear={filterYear}
@@ -142,7 +138,6 @@ export default function HistoriasVideosPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        expoLabel={historiasListFormatExpoLabel.video}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}
         contentMode="video"

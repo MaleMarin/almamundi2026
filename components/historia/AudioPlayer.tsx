@@ -7,6 +7,8 @@ import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu } from '@/lib/historias-neumorph';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 import ReactDOM from 'react-dom';
 
 /** Fondo y tipografía coherentes con interiores AlmaMundi (neumorfismo claro). */
@@ -101,6 +103,8 @@ export default function AudioPlayer({
   historia,
   onClose,
   presentation = 'portal' }: AudioPlayerProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(historia.duracion || 0);
@@ -292,7 +296,7 @@ export default function AudioPlayer({
             <button
               type="button"
               onClick={onClose}
-              aria-label="Cerrar"
+              aria-label={copy.close}
               style={{
                 position: 'absolute',
                 top: '1.5rem',
@@ -470,7 +474,7 @@ export default function AudioPlayer({
                 <button
                   type="button"
                   onClick={() => skip(-10)}
-                  aria-label="Atrás 10 s"
+                  aria-label={copy.back10}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -488,7 +492,7 @@ export default function AudioPlayer({
                   type="button"
                   onClick={togglePlay}
                   aria-pressed={isPlaying}
-                  aria-label={isPlaying ? 'Pausar' : 'Reproducir'}
+                  aria-label={isPlaying ? copy.pause : copy.playControl}
                   style={{
                     width: '64px',
                     height: '64px',
@@ -507,7 +511,7 @@ export default function AudioPlayer({
                 <button
                   type="button"
                   onClick={() => skip(10)}
-                  aria-label="Adelante 10 s"
+                  aria-label={copy.forward10}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -524,7 +528,7 @@ export default function AudioPlayer({
                 <button
                   type="button"
                   onClick={toggleMute}
-                  aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
+                  aria-label={isMuted ? copy.soundOn : copy.mute}
                   style={{
                     width: '40px',
                     height: '40px',
@@ -544,7 +548,7 @@ export default function AudioPlayer({
                 src={historia.audioUrl}
                 controls
                 preload="metadata"
-                aria-label={`Reproducir audio: ${historia.titulo}`}
+                aria-label={copy.playAudioTitle(historia.titulo)}
                 style={{
                   width: '100%',
                   maxWidth: '480px',
@@ -570,7 +574,7 @@ export default function AudioPlayer({
                   </summary>
                   <div
                     role="region"
-                    aria-label="Transcripción del audio"
+                    aria-label={copy.transcript}
                     style={{
                       marginTop: '16px',
                       fontSize: 'var(--fs-pequeno)',
@@ -606,7 +610,7 @@ export default function AudioPlayer({
           questionId={historia.questionId}
           questionMode={historia.questionMode}
           embedInSite={presentation === 'embed'}
-          replayLabel="Escuchar de nuevo"
+          replayLabel={copy.listenAgain}
           onReplay={restart}
           onMoreStories={() => {
             void onClose?.();

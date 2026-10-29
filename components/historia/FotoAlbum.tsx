@@ -8,6 +8,7 @@ import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 import { interpolate } from '@/lib/i18n/locale';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 
@@ -64,7 +65,8 @@ function extractColor(imgUrl: string): Promise<string> {
 
 export default function FotoAlbum({ historia, onClose, siteLayout = false }: FotoAlbumProps) {
   const { imagenes } = historia;
-  const { t } = useHomeLocale();
+  const { locale, t } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const fichaCaption = useCallback(
     (img: HistoriaFoto['imagenes'][number]) => {
       const when = img.anio?.trim()
@@ -113,14 +115,14 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
     (img: HistoriaFoto['imagenes'][number]) =>
       img.descripcion?.trim() ||
       fichaCaption(img) ||
-      `Fotografía de ${historia.titulo}`,
-    [fichaCaption, historia.titulo]
+      copy.photoOf(historia.titulo),
+    [copy, fichaCaption, historia.titulo]
   );
 
   const photoAriaLabel = useCallback(
     (img: HistoriaFoto['imagenes'][number]) =>
-      img.descripcion?.trim() || fichaCaption(img) || `Foto del álbum: ${historia.titulo}`,
-    [fichaCaption, historia.titulo]
+      img.descripcion?.trim() || fichaCaption(img) || copy.albumPhoto(historia.titulo),
+    [copy, fichaCaption, historia.titulo]
   );
 
   useEffect(() => {
@@ -187,7 +189,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                   <polyline points="15,18 9,12 15,6" />
                 </svg>
-                ← Volver
+                {copy.back}
               </button>
             )}
           </div>
@@ -395,7 +397,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     color: neu.textBody,
                     marginBottom: '0.85rem' }}
                 >
-                  {imagenes.length} fotografías
+                  {copy.photoCount(imagenes.length)}
                 </p>
               ) : null}
               <RespondeALine
@@ -418,7 +420,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               <div style={{ width: 48, height: 2, background: `${SEPIA}45`, margin: '0 auto 1.35rem', borderRadius: 999 }} />
               <img
                 src={historia.autor.avatar}
-                alt={`Retrato de ${historia.autor.nombre}`}
+                alt={copy.portrait(historia.autor.nombre)}
                 style={{
                   width: 72,
                   height: 72,
@@ -449,7 +451,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                       borderRadius: 999,
                       boxShadow: `${String(neu.button.boxShadow)}, inset 0 1px 0 rgba(255,255,255,0.75)` }}
                   >
-                    ← Ver más historias
+                    {copy.seeMoreStories}
                   </button>
                 ) : null}
                 <button
@@ -464,7 +466,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     textTransform: 'uppercase',
                     padding: '0.85rem 1.35rem' }}
                 >
-                  Compartir
+                  {copy.share}
                 </button>
               </div>
             </div>
@@ -493,7 +495,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               type="button"
               onClick={() => scrollToPhoto(fotoActivaIdx - 1)}
               disabled={fotoActivaIdx <= 0}
-              aria-label="Foto anterior"
+              aria-label={copy.photoPrev}
               style={{
                 minHeight: 48,
                 minWidth: 48,
@@ -515,7 +517,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 key={i}
                 type="button"
                 onClick={() => scrollToPhoto(i)}
-                aria-label={`Ir a foto ${i + 1}`}
+                aria-label={copy.goToPhoto(i + 1)}
                 style={{
                   width: 12,
                   height: fotoActivaIdx === i ? 44 : 12,
@@ -531,7 +533,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               type="button"
               onClick={() => scrollToPhoto(fotoActivaIdx + 1)}
               disabled={fotoActivaIdx >= imagenes.length - 1}
-              aria-label="Foto siguiente"
+              aria-label={copy.photoNext}
               style={{
                 minHeight: 48,
                 minWidth: 48,

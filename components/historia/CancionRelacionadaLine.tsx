@@ -2,6 +2,8 @@
 
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 
 type CancionRelacionadaLineProps = {
   value?: string;
@@ -14,6 +16,8 @@ type CancionRelacionadaLineProps = {
  * No usa HTML crudo.
  */
 export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacionadaLineProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const text = value?.trim();
   if (!text) return null;
 
@@ -38,7 +42,7 @@ export function CancionRelacionadaLine({ value, tone = 'light' }: CancionRelacio
           rel="noopener noreferrer nofollow ugc"
           style={{ color: isDark ? 'rgba(255, 180, 140, 0.95)' : '#FF4A1C', textDecoration: 'underline' }}
         >
-          Escuchar
+          {copy.listen}
         </a>
       </p>
     );

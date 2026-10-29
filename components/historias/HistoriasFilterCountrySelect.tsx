@@ -7,7 +7,9 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { getHistoriasFilterCountryNamesEs } from '@/lib/historias/historias-filter-countries';
+import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 import { foldText } from '@/lib/historias/story-filter-helpers';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { neu } from '@/lib/historias-neumorph';
 
 type HistoriasFilterCountrySelectProps = {
@@ -20,6 +22,8 @@ export function HistoriasFilterCountrySelect({
   id: idProp,
   value,
   onChange }: HistoriasFilterCountrySelectProps) {
+  const { locale } = useHomeLocale();
+  const copy = formatPagesCopy(locale);
   const reactId = useId();
   const buttonId = idProp ?? `historias-pais-${reactId.replace(/:/g, '')}`;
   const listboxId = `${buttonId}-listbox`;
@@ -66,7 +70,7 @@ export function HistoriasFilterCountrySelect({
     [onChange, close]
   );
 
-  const labelShown = value.trim() ? value : 'Todos los países';
+  const labelShown = value.trim() ? value : copy.countryAll;
 
   return (
     <div ref={rootRef} className="relative min-w-0">
@@ -97,9 +101,9 @@ export function HistoriasFilterCountrySelect({
               type="search"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Buscar país"
+              placeholder={copy.countrySearch}
               autoComplete="off"
-              aria-label="Buscar en la lista de países"
+              aria-label={copy.countrySearchAria}
               className="w-full rounded-xl border border-gray-300/35 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.4),inset_-2px_-2px_6px_rgba(255,255,255,0.8)] outline-none focus:ring-2 focus:ring-orange-400/35"
               style={{ fontFamily: neu.APP_FONT }}
               onKeyDown={(e) => e.stopPropagation()}
@@ -120,7 +124,7 @@ export function HistoriasFilterCountrySelect({
                 style={{ fontFamily: neu.APP_FONT }}
                 onClick={() => pick('')}
               >
-                Todos los países
+                {copy.countryAll}
               </button>
             </li>
             {filtered.map((c) => (
@@ -138,7 +142,7 @@ export function HistoriasFilterCountrySelect({
               </li>
             ))}
             {filtered.length === 0 ? (
-              <li className="px-3 py-4 text-center text-[length:var(--fs-pequeno)] text-gray-500">Sin coincidencias</li>
+              <li className="px-3 py-4 text-center text-[length:var(--fs-pequeno)] text-gray-500">{copy.countryEmpty}</li>
             ) : null}
           </ul>
         </div>
