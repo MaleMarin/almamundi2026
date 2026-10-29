@@ -588,7 +588,6 @@ export default function AudioPlayer({
 
             <StoryScrollBlock scene>
             <HistoriaCreditos
-              antecedentes={historia.antecedentes}
               cancionRelacionada={historia.cancionRelacionada}
             />
             </StoryScrollBlock>
@@ -604,7 +603,6 @@ export default function AudioPlayer({
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           cancionRelacionada={historia.cancionRelacionada}
-          antecedentes={historia.antecedentes}
           questionId={historia.questionId}
           questionMode={historia.questionMode}
           embedInSite={presentation === 'embed'}

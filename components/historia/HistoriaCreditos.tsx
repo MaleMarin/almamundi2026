@@ -1,25 +1,22 @@
 'use client';
 
-import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export type HistoriaCreditosProps = {
   nombre?: string;
   ubicacion?: string;
-  antecedentes?: string;
   cancionRelacionada?: string;
   tone?: 'light' | 'dark';
 };
 
 /**
- * Orden fijo: nombre → ubicación → antecedentes → canción.
- * El título queda fuera, en cada página.
+ * Orden fijo: nombre → ubicación → canción.
+ * El título queda fuera, en cada página. El mensaje para el equipo no se muestra.
  */
 export function HistoriaCreditos({
   nombre,
   ubicacion,
-  antecedentes,
   cancionRelacionada,
   tone = 'light' }: HistoriaCreditosProps) {
   const isDark = tone === 'dark';
@@ -65,7 +62,6 @@ export function HistoriaCreditos({
           {ubicacion}
         </p>
       ) : null}
-      <AntecedentesText value={antecedentes} tone={tone} />
       <CancionRelacionadaLine value={cancionRelacionada} tone={tone} />
     </div>
   );

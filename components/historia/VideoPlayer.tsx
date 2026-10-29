@@ -702,7 +702,6 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
           tags={historia.tags}
           thumbnailUrl={historia.thumbnailUrl}
           cancionRelacionada={historia.cancionRelacionada}
-          antecedentes={historia.antecedentes}
           questionId={historia.questionId}
           questionMode={historia.questionMode}
           embedInSite={siteLayout}

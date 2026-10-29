@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
 export type StoriesPanelProps = {
   stories: StoryPoint[];
@@ -116,7 +117,7 @@ function StoryRow({
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
         <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)' }}>
-          {[story.city, story.country].filter(Boolean).join(', ')}
+          {formatPublicPlace(story.city, story.country)}
         </span>
         <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           {tipo}

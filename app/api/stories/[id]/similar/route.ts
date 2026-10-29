@@ -16,6 +16,8 @@ import {
   toneSeedFromFirestoreDoc,
   type StoryToneSeed,
 } from '@/lib/huella/related-by-tone';
+import { normalizeAntecedentes, omitAntecedentesFromPublicText } from '@/lib/antecedentes';
+import { publicCityCountry } from '@/lib/historias/story-ubicacion';
 
 export const runtime = 'nodejs';
 
@@ -43,10 +45,15 @@ function publishedAtIso(raw: unknown): string | null {
 }
 
 function similarFromFirestore(id: string, d: Record<string, unknown>): Rankable {
-  const text = typeof d.text === 'string' ? d.text : '';
-  const body = typeof d.body === 'string' ? d.body : '';
+  const note = normalizeAntecedentes(d.antecedentes);
+  const text = omitAntecedentesFromPublicText(typeof d.text === 'string' ? d.text : '', note);
+  const body = omitAntecedentesFromPublicText(typeof d.body === 'string' ? d.body : '', note);
   const excerpt = typeof d.excerpt === 'string' ? d.excerpt : '';
   const formatRaw = (d.format as string | undefined) ?? (d.formato as string | undefined);
+  const place = publicCityCountry(
+    typeof d.city === 'string' ? d.city : typeof d.placeLabel === 'string' ? d.placeLabel : '',
+    typeof d.country === 'string' ? d.country : ''
+  );
   return {
     id,
     lat: Number(d.lat) || 0,
@@ -54,8 +61,8 @@ function similarFromFirestore(id: string, d: Record<string, unknown>): Rankable 
     title: (d.title as string) ?? '',
     label: (d.authorName as string) ?? 'Anónimo',
     description: (excerpt || text || body).slice(0, 120),
-    city: (d.city as string) ?? null,
-    country: (d.country as string) ?? null,
+    city: place.city ?? null,
+    country: place.country ?? null,
     format: formatRaw || 'text',
     publishedAt: publishedAtIso(d.publishedAt),
     seed: toneSeedFromFirestoreDoc(d),

@@ -5,7 +5,6 @@ import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-s
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
-import { AntecedentesText } from '@/components/historia/AntecedentesText';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
@@ -313,7 +312,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
 
         <StoryScrollBlock scene>
         <div style={{ textAlign: 'left', marginTop: '1rem' }}>
-          <AntecedentesText value={historia.antecedentes} />
           <CancionRelacionadaLine value={historia.cancionRelacionada} />
         </div>
 

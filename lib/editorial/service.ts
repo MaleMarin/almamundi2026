@@ -7,7 +7,9 @@ import type { CollectionReference, DocumentReference, Firestore } from "firebase
 import { FieldPath, FieldValue } from "firebase-admin/firestore";
 import { appendDeleteStoryLog, appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
-import { normalizeAntecedentes } from "@/lib/antecedentes";
+import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/antecedentes";
+import { geocodeCityCountry } from "@/lib/respuestas/geocode";
+import { formatPublicPlace } from "@/lib/historias/story-ubicacion";
 import { imagenesFromSubmissionPhotos, parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
@@ -135,6 +137,29 @@ function coerceFiniteNumber(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
+function scrubPublicNote(story: Record<string, unknown>) {
+  if (typeof story.text !== "string") return;
+  const note = typeof story.antecedentes === "string" ? story.antecedentes : undefined;
+  const cleaned = omitAntecedentesFromPublicText(story.text, note);
+  story.text = cleaned || null;
+}
+
+async function coordsForPlace(
+  city: unknown,
+  country: unknown,
+  lat: unknown,
+  lng: unknown
+): Promise<{ lat: number | null; lng: number | null }> {
+  const knownLat = coerceFiniteNumber(lat);
+  const knownLng = coerceFiniteNumber(lng);
+  if (knownLat != null && knownLng != null) return { lat: knownLat, lng: knownLng };
+  const geo = await geocodeCityCountry(
+    formatPublicPlace(typeof city === "string" ? city : "", typeof country === "string" ? country : ""),
+    ""
+  );
+  return { lat: geo?.lat ?? null, lng: geo?.lng ?? null };
+}
+
 async function resolveSubmission(
   db: Firestore,
   submissionId: string
@@ -192,8 +217,14 @@ export async function editorialPublishFromSubmission(
     ) {
       return { ok: false, httpStatus: 400, error: "bad submission status" };
     }
-    const lat = coerceFiniteNumber(sub.lat);
-    const lng = coerceFiniteNumber(sub.lng);
+    const coords = await coordsForPlace(
+      typeof sub.city === "string" && sub.city.trim() ? sub.city : sub.placeLabel,
+      sub.country,
+      sub.lat,
+      sub.lng
+    );
+    const lat = coords.lat;
+    const lng = coords.lng;
     const now = FieldValue.serverTimestamp();
     const storyRef = db.collection("stories").doc();
     const rawMedia: Record<string, string> = {};
@@ -243,6 +274,7 @@ export async function editorialPublishFromSubmission(
     if (cityKnown) story.city = cityKnown;
     if (countryKnown) story.country = countryKnown;
     copyOptionalPublicFields(story, sub);
+    scrubPublicNote(story);
     if (promoted.imagenes?.length) story.imagenes = promoted.imagenes;
     if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
     if (promoted.publishedMediaPaths.length) {
@@ -296,7 +328,11 @@ export async function editorialPublishFromSubmission(
     sd.themeId && sd.themeId.trim().length > 0
       ? ([sd.themeId.trim()] as string[])
       : ([] as string[]);
-  const textParts = [sd.context ?? "", sd.payload?.textBody ?? ""].filter((t) => t && t.trim()).join("\n\n");
+  const textParts = omitAntecedentesFromPublicText(
+    [sd.context ?? "", sd.payload?.textBody ?? ""].filter((t) => t && t.trim()).join("\n\n"),
+    normalizeAntecedentes(sd.antecedentes)
+  );
+  const coords = await coordsForPlace(sd.placeLabel, sd.countryLabel, null, null);
   const rawMedia: Record<string, string> = {};
   if (sd.payload?.videoUrl) rawMedia.videoUrl = sd.payload.videoUrl;
   if (sd.payload?.audioUrl) rawMedia.audioUrl = sd.payload.audioUrl;
@@ -330,9 +366,8 @@ export async function editorialPublishFromSubmission(
     publishedAt: now,
     title: sd.storyTitle,
     excerpt: sd.storyTitle ? String(sd.storyTitle).slice(0, 160) : undefined,
-    /** Sin geocoding en servidor: público sí, globo sólo cuando existan coords en revisión posterior. */
-    lat: null,
-    lng: null,
+    lat: coords.lat,
+    lng: coords.lng,
     format: formato,
     text: textParts.trim().length ? textParts : null,
     media,
@@ -344,6 +379,7 @@ export async function editorialPublishFromSubmission(
     ...(imagenes?.length ? { imagenes } : {}),
   };
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
+  scrubPublicNote(story);
   if (imagenes?.length) story.imagenes = imagenes;
   if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
   if (promoted.publishedMediaPaths.length) {
@@ -438,8 +474,7 @@ export async function editorialPublishApprovedStorySubmission(
     sourceSubmissionCollection: "story_submissions",
     title: data.title,
     placeLabel: data.placeLabel,
-    lat: data.lat ?? null,
-    lng: data.lng ?? null,
+    ...(await coordsForPlace(data.placeLabel, data.country, data.lat, data.lng)),
     format: data.format,
     tags: data.tags ?? { themes: [], moods: [], keywords: [] },
     excerpt:
@@ -455,6 +490,7 @@ export async function editorialPublishApprovedStorySubmission(
         ? data.email.trim()
         : "";
   copyOptionalPublicFields(storyData, data);
+  scrubPublicNote(storyData);
   if (promoted.imagenes?.length) storyData.imagenes = promoted.imagenes;
   if (promoted.profilePhotoUrl) storyData.profilePhotoUrl = promoted.profilePhotoUrl;
   if (promoted.publishedMediaPaths.length) {

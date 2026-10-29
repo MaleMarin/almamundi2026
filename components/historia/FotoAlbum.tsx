@@ -442,7 +442,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)' }}
               />
               <HistoriaCreditos
-                antecedentes={historia.antecedentes}
                 cancionRelacionada={historia.cancionRelacionada}
               />
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.85rem', justifyContent: 'center' }}>

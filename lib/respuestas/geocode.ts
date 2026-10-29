@@ -1,15 +1,23 @@
 import "server-only";
 
+const geocodeCache = new Map<string, { lat: number; lng: number }>();
+
 /**
- * Coordenadas de ciudad y país. Si Nominatim no responde, la respuesta se guarda igual
- * y no sale en el globo hasta tener latitud y longitud.
+ * Coordenadas de ciudad y país. Si Nominatim no responde, se reintenta en la siguiente lectura.
  */
 export async function geocodeCityCountry(
   city: string,
   country: string
 ): Promise<{ lat: number; lng: number } | null> {
-  const q = `${city}, ${country}`.replace(/\s+/g, " ").trim().slice(0, 160);
+  const q = [city, country]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(", ")
+    .replace(/\s+/g, " ")
+    .slice(0, 160);
   if (q.length < 3) return null;
+  const cached = geocodeCache.get(q.toLocaleLowerCase("es-CL"));
+  if (cached) return cached;
   const url = new URL("https://nominatim.openstreetmap.org/search");
   url.searchParams.set("format", "jsonv2");
   url.searchParams.set("limit", "1");
@@ -30,7 +38,9 @@ export async function geocodeCityCountry(
     const lng = Number(hit.lon);
     if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
     if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return null;
-    return { lat, lng };
+    const point = { lat, lng };
+    geocodeCache.set(q.toLocaleLowerCase("es-CL"), point);
+    return point;
   } catch {
     return null;
   }

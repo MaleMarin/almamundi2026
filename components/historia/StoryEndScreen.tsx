@@ -37,7 +37,6 @@ export type StoryEndScreenProps = {
   onMoreStories: () => void;
   thumbnailUrl?: string;
   cancionRelacionada?: string;
-  antecedentes?: string;
   questionId?: string;
   questionMode?: 'tu' | 'alguien';
   /** Incrustado bajo el layout global: no usa overlay `fixed` a pantalla completa. */
@@ -86,7 +85,6 @@ export function StoryEndScreen({
   onMoreStories,
   thumbnailUrl,
   cancionRelacionada,
-  antecedentes,
   questionId,
   questionMode,
   embedInSite = false,
@@ -99,7 +97,6 @@ export function StoryEndScreen({
     Boolean(subtitulo?.trim()) ||
     Boolean(fechaStr) ||
     Boolean(cancionRelacionada?.trim()) ||
-    Boolean(antecedentes?.trim()) ||
     Boolean(autor.nombre?.trim()) ||
     Boolean(autor.ubicacion?.trim());
 
@@ -202,7 +199,6 @@ export function StoryEndScreen({
         <HistoriaCreditos
           nombre={autor.nombre}
           ubicacion={autor.ubicacion}
-          antecedentes={antecedentes}
           cancionRelacionada={cancionRelacionada}
         />
 

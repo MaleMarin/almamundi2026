@@ -121,7 +121,7 @@ describe('correos al autor', () => {
       publicationEmailSubject('El río'),
       'Tu historia «El río» ya está en AlmaMundi'
     );
-    assert.match(html, /https:\/\/www\.almamundi\.org\/historias\/abc123/);
+    assert.match(html, /https:\/\/www\.almamundi\.org\/\?historia=abc123#mapa/);
     assert.match(html, /Hola, Male:/);
     assert.match(html, /Tu historia «El río» ya está publicada en el mapa de AlmaMundi, en Santiago/);
     assert.match(html, /Si quieres, compártela con quien tú elijas/);

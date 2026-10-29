@@ -46,7 +46,7 @@ export function publicationEmailSubject(storyTitle: string): string {
 }
 
 function storyPublicUrl(storyId: string): string {
-  return absoluteEmailUrl(`/historias/${encodeURIComponent(storyId)}`);
+  return absoluteEmailUrl(`/?historia=${encodeURIComponent(storyId)}#mapa`);
 }
 
 export function buildPublicationEmailText(params: SendPublicationEmailParams): string {

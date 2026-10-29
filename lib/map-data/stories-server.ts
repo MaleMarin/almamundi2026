@@ -10,7 +10,9 @@ import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
-import { normalizeAntecedentes } from "@/lib/antecedentes";
+import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/antecedentes";
+import { formatPublicPlace, publicCityCountry } from "@/lib/historias/story-ubicacion";
+import { geocodeCityCountry } from "@/lib/respuestas/geocode";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import {
@@ -73,7 +75,9 @@ function firestoreDocToStoryPoint(
     ((d.title as string) ?? "").trim() ||
     ((d.titulo as string) ?? "").trim() ||
     "Historia";
-  const text = ((d.text as string) ?? (d.texto as string) ?? "") || "";
+  const note = normalizeAntecedentes(d.antecedentes);
+  const rawText = ((d.text as string) ?? (d.texto as string) ?? "") || "";
+  const text = omitAntecedentesFromPublicText(rawText, note);
   const media = mediaFromDoc(d);
   const { lat, lng } = resolveLatLng(d);
   if (globeOnly) {
@@ -91,15 +95,19 @@ function firestoreDocToStoryPoint(
     (((d.autor as { nombre?: string } | undefined)?.nombre ?? "") ||
       "");
 
-  const city =
+  const cityRaw =
     ((d.city as string) ?? "").trim() ||
+    ((d.placeLabel as string) ?? "").trim() ||
     (((d.ubicacion as { ciudad?: string } | undefined)?.ciudad ?? "") ||
       "");
 
-  const country =
+  const countryRaw =
     ((d.country as string) ?? "").trim() ||
     (((d.ubicacion as { pais?: string } | undefined)?.pais ?? "") ||
       "");
+  const place = publicCityCountry(cityRaw, countryRaw);
+  const city = place.city ?? "";
+  const country = place.country ?? "";
 
   const formato = (d.format as string | undefined) ?? (d.formato as string | undefined);
   const topic =
@@ -154,6 +162,15 @@ function firestoreDocToStoryPoint(
   return base;
 }
 
+function placeQuery(d: Record<string, unknown>): { city: string; country: string } {
+  const city =
+    (typeof d.city === "string" && d.city.trim()) ||
+    (typeof d.placeLabel === "string" && d.placeLabel.trim()) ||
+    "";
+  const country = typeof d.country === "string" ? d.country.trim() : "";
+  return { city, country };
+}
+
 export async function getStoriesAsync(): Promise<StoryPoint[]> {
   try {
     const { getAdminDb } = await import("@/lib/firebase/admin");
@@ -166,9 +183,20 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       .limit(GLOBE_PUBLIC_STORY_CAP)
       .get();
 
-    return snap.docs
-      .map((doc) => firestoreDocToStoryPoint(doc.id, doc.data(), true))
-      .filter((s): s is StoryPoint => s !== null);
+    const stories: StoryPoint[] = [];
+    for (const doc of snap.docs) {
+      const data = doc.data() as Record<string, unknown>;
+      let point = firestoreDocToStoryPoint(doc.id, data, true);
+      if (!point && isAudiencePublicStoryStatus(data.status)) {
+        const { city, country } = placeQuery(data);
+        const geo = await geocodeCityCountry(formatPublicPlace(city, country), "");
+        if (geo) {
+          point = firestoreDocToStoryPoint(doc.id, { ...data, lat: geo.lat, lng: geo.lng }, true);
+        }
+      }
+      if (point) stories.push(point);
+    }
+    return stories;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     const isDecoder = /DECODER routines::\s*unsupported|1E08010C/i.test(msg);

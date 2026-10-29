@@ -13,11 +13,13 @@ import {
   useRef,
   useState,
   type RefObject } from 'react';
+import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyGlobeMarkerColor } from '@/lib/huella/story-globe-color';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import {
@@ -222,7 +224,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [globeLayers.news]);
 
   const stories = useStories();
+  const searchParams = useSearchParams();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
+  const openedHistoriaRef = useRef<string | null>(null);
 
   const globeBitsMarkers = useMemo(
     () =>
@@ -615,18 +619,26 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [respuestasOnGlobe]);
 
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
-    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
+    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => {
+      const pile = storiesOnGlobe
+        .slice(0, i)
+        .filter((other) => Math.abs(other.lat - s.lat) < 0.05 && Math.abs(other.lng - s.lng) < 0.05).length;
+      const radius = pile === 0 ? 0 : 0.12 + pile * 0.05;
+      const angle = pile * 1.15;
+      return {
       id: STORY_GLOBE_ID_BASE + i,
-      lat: s.lat,
-      lon: s.lng,
+      lat: s.lat + Math.sin(angle) * radius,
+      lon: s.lng + Math.cos(angle) * radius,
       markerKind: 'story' as const,
       title: s.title ?? s.label,
-      place: [s.city, s.country].filter(Boolean).join(', ') || undefined,
+      place: formatPublicPlace(s.city, s.country) || undefined,
       color: storyGlobeMarkerColor({
         antecedentes: s.antecedentes,
         body: s.body,
         transcription: s.transcription,
-        locale }) }));
+        locale }),
+    };
+    });
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
   }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 
@@ -672,6 +684,25 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       finishSurpriseOpen();
     }, 1400);
   }, [realPublishedStories, finishSurpriseOpen]);
+
+  useEffect(() => {
+    const historiaId = searchParams.get('historia');
+    if (!historiaId || openedHistoriaRef.current === historiaId) return;
+    const story = stories.find((item) => item.id === historiaId);
+    if (!story || !storyHasValidGeo(story) || story.lat == null || story.lng == null) return;
+    openedHistoriaRef.current = historiaId;
+    setGlobeLayers((prev) => ({ ...prev, stories: true }));
+    document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    pendingSurpriseRef.current = story;
+    setHighlightedStoryId(story.id ?? null);
+    setDrawerOpen(false);
+    setSurpriseFlying(true);
+    setFocusTarget({ lat: story.lat, lng: story.lng, nonce: Date.now() });
+    if (surpriseSafetyTimerRef.current) clearTimeout(surpriseSafetyTimerRef.current);
+    surpriseSafetyTimerRef.current = setTimeout(() => {
+      finishSurpriseOpen();
+    }, 1400);
+  }, [searchParams, stories, finishSurpriseOpen]);
 
   const closeStoryViewer = useCallback(() => {
     setStoryViewerClosing(true);

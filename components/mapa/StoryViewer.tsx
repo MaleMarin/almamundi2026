@@ -10,6 +10,8 @@ import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Props = {
@@ -185,7 +187,14 @@ function KenBurnsViewer({
   );
 }
 
+const FULL_STORY_LABEL = {
+  es: 'Ver historia completa',
+  pt: 'Ver história completa',
+  en: 'See full story',
+} as const;
+
 export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full' }: Props) {
+  const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const compact = variant === 'compact';
   const [mounted, setMounted] = useState(false);
   const [ecoPanel, setEcoPanel] = useState<null | 'voice' | 'text'>(null);
@@ -407,7 +416,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     margin: '0 0 6px',
                     fontFamily: SITE_FONT_STACK }}
                 >
-                  {[story.city, story.country].filter(Boolean).join(', ')}
+                  {formatPublicPlace(story.city, story.country)}
                 </p>
                 <h2
                   style={{
@@ -753,6 +762,20 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {listening ? 'Detener lectura' : 'Cerrar los ojos'}
                 </button>
+              ) : null}
+              {story.id ? (
+                <a
+                  href={`/historias/${story.id}`}
+                  className="btn-am-principal"
+                  style={{
+                    padding: '8px 14px',
+                    fontSize: 'var(--fs-etiqueta)',
+                    fontFamily: SITE_FONT_STACK,
+                    textDecoration: 'none',
+                  }}
+                >
+                  {FULL_STORY_LABEL[locale]}
+                </a>
               ) : null}
               <ActionButton className="btn-am-secundario" label="Compartir" onClick={() => setShareOpen(true)} />
               {!alreadySent && !resonanceSent ? (
