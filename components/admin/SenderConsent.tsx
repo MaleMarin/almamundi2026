@@ -19,6 +19,8 @@ export type ConsentInfo = {
   label: string;
   accepted: boolean;
   at: number | null;
+  missing?: boolean;
+  legacy?: boolean;
 };
 
 const labelStyle = {
@@ -146,21 +148,28 @@ export function SenderConsentBlocks({
       {rows.map((row) => (
         <p key={row.label} style={{ ...valueStyle, marginTop: 2 }}>
           <span style={{ color: 'rgba(255,255,255,0.55)' }}>{row.label}: </span>
-          {row.accepted ? (
-            `Aceptado${row.at ? `, ${formatWhen(row.at)}` : ''}`
-          ) : (
+          {row.missing ? (
             <span style={{ color: '#fbbf24' }}>No registrado</span>
+          ) : row.accepted ? (
+            <>
+              {`Aceptado${row.at ? `, ${formatWhen(row.at)}` : ''}`}
+              {row.legacy ? (
+                <span style={{ marginLeft: 8, fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.45)' }}>
+                  formato anterior
+                </span>
+              ) : null}
+            </>
+          ) : (
+            'No aceptado'
           )}
         </p>
       ))}
-      <p style={{ ...valueStyle, marginTop: 2 }}>
-        <span style={{ color: 'rgba(255,255,255,0.55)' }}>Versión de los textos: </span>
-        {consentTextsVersion?.trim() ? (
-          consentTextsVersion
-        ) : (
-          <span style={{ color: '#fbbf24' }}>No registrado</span>
-        )}
-      </p>
+      {consentTextsVersion?.trim() ? (
+        <p style={{ ...valueStyle, marginTop: 2 }}>
+          <span style={{ color: 'rgba(255,255,255,0.55)' }}>Versión de los textos: </span>
+          {consentTextsVersion}
+        </p>
+      ) : null}
     </div>
   );
 }
