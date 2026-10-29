@@ -2,12 +2,11 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
-import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { isShortCode } from '@/lib/short-code';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -207,9 +206,8 @@ export function RespuestaGlobeCard({
                   className="btn-am-principal"
                   onClick={() => setShareOpen(true)}
                   style={{
-                    flex: '1 1 0',
                     minHeight: 44,
-                    padding: '8px 12px',
+                    padding: '8px 16px',
                     fontFamily: SITE_FONT_STACK,
                     display: 'inline-flex',
                     alignItems: 'center',
@@ -218,22 +216,6 @@ export function RespuestaGlobeCard({
                 >
                   {SHARE_LABEL[locale]}
                 </button>
-                <Link
-                  href={preguntaPageHref(item.questionId)}
-                  className="btn-am-secundario"
-                  onClick={onClose}
-                  style={{
-                    flex: '1 1 0',
-                    minHeight: 44,
-                    padding: '8px 12px',
-                    fontFamily: SITE_FONT_STACK,
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    textAlign: 'center' }}
-                >
-                  {PREGUNTA_UI.responder[locale]}
-                </Link>
               </div>
             </div>
             {moreBelow ? <div className="story-map-panel__more" aria-hidden /> : null}

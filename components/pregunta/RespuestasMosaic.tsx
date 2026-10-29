@@ -1,10 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
-import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
@@ -91,12 +90,6 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
       </p>
       <article className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
         <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>
-        <Link
-          href={preguntaPageHref(pregunta.id)}
-          className="btn-am-principal inline-flex min-h-11 w-fit items-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
-        >
-          {PREGUNTA_UI.responder[locale]}
-        </Link>
       </article>
       <section className="flex flex-col gap-4">
         <h2 className="m-0 text-[length:var(--fs-texto)] font-semibold">
@@ -104,15 +97,7 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
           {total != null ? ` (${total})` : ''}
         </h2>
         {total === 0 && !loading ? (
-          <div className="flex flex-col items-start gap-4">
-            <p className="m-0 text-[length:var(--fs-texto)] leading-relaxed">{PREGUNTA_COPY.empty[locale]}</p>
-            <Link
-              href={preguntaPageHref(pregunta.id)}
-              className="btn-am-principal inline-flex min-h-11 items-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
-            >
-              {PREGUNTA_UI.responder[locale]}
-            </Link>
-          </div>
+          <p className="m-0 text-[length:var(--fs-texto)] leading-relaxed">{PREGUNTA_COPY.empty[locale]}</p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {items.map((item) => (
