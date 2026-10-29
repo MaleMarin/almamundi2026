@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
+import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Kind = 'texto' | 'voz' | 'foto';
@@ -17,6 +18,9 @@ type RespuestaItem = {
   alias: string;
   city: string;
   country: string;
+  sender?: SenderInfo;
+  consents?: ConsentInfo[];
+  consentTextsVersion?: string | null;
   status: Status;
   createdAt: number | null;
   previewUrl: string | null;
@@ -230,7 +234,12 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                     <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>
                       {preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
                     </p>
-                    <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.55)' }}>Alias: {item.alias || '—'}</p>
+                    <SenderConsentBlocks
+                      sender={item.sender}
+                      consents={item.consents}
+                      consentTextsVersion={item.consentTextsVersion}
+                      token={token}
+                    />
                     {item.kind === 'texto' && (
                       <p style={{ margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{item.contenido}</p>
                     )}

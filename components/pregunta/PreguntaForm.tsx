@@ -327,9 +327,10 @@ function PreguntaFormInner({
           city,
           country,
           email,
-          consentPrivacyPolicy: adult,
+          consentAdult: adult,
           consentPublicacion: publish,
-          consentTerminos: terms }) });
+          consentTerminos: terms,
+          consentPrivacyPolicy: terms }) });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error || 'send_failed');
       setSentAlias(alias.trim());

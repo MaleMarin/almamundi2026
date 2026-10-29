@@ -7,6 +7,8 @@ import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { AUTHOR_CONTACTS_COLLECTION, authorEmailOnStory } from "@/lib/author-contacts";
 import { extractPrivateStoragePathFromUrl } from "@/lib/published-media";
 import { isDeclaredHeic } from "@/lib/heic-jpeg";
+import { consentRowsFromRecord } from "@/lib/legal-consent";
+import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 import { privateObjectContentType, signReadUrlForPath } from "@/lib/server-storage";
 
 export const runtime = "nodejs";
@@ -51,6 +53,15 @@ function fileKind(path: string, type: string): PendingFile["kind"] {
 }
 
 type PendingSource = "submissions" | "story_submissions";
+
+const AGE_LABEL = new Map(AGE_RANGE_OPTIONS.map((option) => [option.id, option.label]));
+const SEX_LABEL: Record<string, string> = {
+  femenino: "Femenino",
+  masculino: "Masculino",
+  "no-binario": "No binario",
+  "prefiero-no-decir": "Prefiero no decirlo",
+  otro: "Otro",
+};
 
 function textField(data: Record<string, unknown>, ...keys: string[]): string {
   for (const key of keys) {
@@ -185,6 +196,45 @@ async function filesForSubmission(data: Record<string, unknown>, type: string): 
   return files.slice(0, 8);
 }
 
+function personFields(data: Record<string, unknown>, email: string) {
+  const ageId = textField(data, "ageRange");
+  const sexId = textField(data, "sex");
+  return {
+    alias: textField(data, "alias", "authorName"),
+    country: textField(data, "country", "countryLabel"),
+    city: textField(data, "city", "cityLabel", "placeLabel", "place"),
+    age: AGE_LABEL.get(ageId as (typeof AGE_RANGE_OPTIONS)[number]["id"]) ?? "",
+    gender: SEX_LABEL[sexId] ?? "",
+    email,
+  };
+}
+
+async function profilePhotoForAdmin(data: Record<string, unknown>) {
+  const raw = textField(data, "profilePhotoUrl");
+  const storedPath = textField(data, "profilePhotoPath");
+  const path = storedPath.startsWith("submissions/private/")
+    ? storedPath
+    : raw.startsWith("submissions/private/")
+      ? raw
+      : extractPrivateStoragePathFromUrl(raw) || "";
+  if (path.startsWith("submissions/private/")) {
+    const heic = isDeclaredHeic(path);
+    try {
+      return {
+        profilePhotoUrl: heic ? "" : await signReadUrlForPath(path),
+        profilePhotoPath: path,
+        profilePhotoHeic: heic,
+      };
+    } catch {
+      return { profilePhotoUrl: "", profilePhotoPath: path, profilePhotoHeic: heic };
+    }
+  }
+  if (raw.startsWith("https://") || raw.startsWith("http://")) {
+    return { profilePhotoUrl: raw, profilePhotoPath: "", profilePhotoHeic: isDeclaredHeic(raw) };
+  }
+  return { profilePhotoUrl: "", profilePhotoPath: "", profilePhotoHeic: false };
+}
+
 function pendingRow(
   id: string,
   data: Record<string, unknown>,
@@ -195,6 +245,7 @@ function pendingRow(
   const email = textField(data, "email", "authorEmail");
   const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
   const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
+  const consent = consentRowsFromRecord(data);
   return {
     id,
     title: textField(data, "storyTitle", "title"),
@@ -211,6 +262,14 @@ function pendingRow(
     resonances: 0,
     createdAt: toMillis(data.createdAt),
     authorEmail: email || null,
+    sender: {
+      ...personFields(data, email),
+      profilePhotoUrl: "",
+      profilePhotoPath: "",
+      profilePhotoHeic: false,
+    },
+    consents: consent.rows,
+    consentTextsVersion: consent.version,
     rightsAccepted: data.consentPublicacion === true || Boolean(data.consent),
     publicationMail: null,
     questionId: typeof data.questionId === "string" ? data.questionId : null,
@@ -235,12 +294,14 @@ async function listPendingSubmissions() {
     ...current.docs.map(async (doc) => {
       const data = doc.data() as Record<string, unknown>;
       const type = textField(data, "type", "format") || "texto";
-      return pendingRow(doc.id, data, "submissions", await filesForSubmission(data, type));
+      const row = pendingRow(doc.id, data, "submissions", await filesForSubmission(data, type));
+      return { ...row, sender: { ...row.sender, ...(await profilePhotoForAdmin(data)) } };
     }),
     ...legacy.docs.map(async (doc) => {
       const data = doc.data() as Record<string, unknown>;
       const type = textField(data, "format", "type") || "text";
-      return pendingRow(doc.id, data, "story_submissions", await filesForSubmission(data, type));
+      const row = pendingRow(doc.id, data, "story_submissions", await filesForSubmission(data, type));
+      return { ...row, sender: { ...row.sender, ...(await profilePhotoForAdmin(data)) } };
     }),
   ]);
   rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
@@ -291,14 +352,49 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const list = snap.docs.map((doc) => {
+    const sourceRefs = [];
+    const sourceStoryIds: string[] = [];
+    for (const doc of snap.docs) {
+      const submissionId = doc.get("sourceSubmissionId");
+      const collection = doc.get("sourceSubmissionCollection");
+      if (
+        typeof submissionId === "string" &&
+        (collection === "submissions" || collection === "story_submissions")
+      ) {
+        sourceRefs.push(db.collection(collection).doc(submissionId));
+        sourceStoryIds.push(doc.id);
+      }
+    }
+    const sourceSnaps = sourceRefs.length ? await db.getAll(...sourceRefs) : [];
+    const sourceByStory = new Map<string, Record<string, unknown>>();
+    sourceSnaps.forEach((sourceDoc, index) => {
+      if (sourceDoc.exists) sourceByStory.set(sourceStoryIds[index], sourceDoc.data() as Record<string, unknown>);
+    });
+
+    const list = await Promise.all(snap.docs.map(async (doc) => {
       const d = doc.data();
       const createdAt = toMillis(d.createdAt);
       const activeSince = toMillis(d.activeSince);
+      const source = sourceByStory.get(doc.id);
+      const email =
+        emailByStory.get(doc.id) ??
+        authorEmailOnStory(d) ??
+        (source ? textField(source, "email", "authorEmail") : "") ??
+        "";
+      const personSource: Record<string, unknown> = source ?? {
+        alias: typeof d.authorName === "string" ? d.authorName : d.alias,
+        authorName: d.authorName,
+        country: d.country,
+        city: d.city,
+        placeLabel: d.placeLabel ?? d.place,
+        profilePhotoUrl: d.profilePhotoUrl,
+      };
+      const consent = consentRowsFromRecord(source ?? {});
+      const profile = await profilePhotoForAdmin(personSource);
       return {
         id: doc.id,
         title: (d.title as string | undefined) ?? (d.titulo as string | undefined) ?? "",
-        alias: d.alias ?? "",
+        alias: textField(personSource, "alias", "authorName") || (typeof d.alias === "string" ? d.alias : ""),
         place: d.place ?? d.placeLabel ?? "",
         lat: d.lat ?? null,
         lng: d.lng ?? null,
@@ -310,7 +406,10 @@ export async function GET(request: NextRequest) {
         isFeatured: Boolean(d.isFeatured),
         resonances: typeof d.resonances === "number" ? d.resonances : 0,
         createdAt,
-        authorEmail: emailByStory.get(doc.id) ?? authorEmailOnStory(d),
+        authorEmail: email || null,
+        sender: { ...personFields(personSource, email), ...profile },
+        consents: consent.rows,
+        consentTextsVersion: consent.version,
         rightsAccepted: Boolean(d.rightsAccepted),
         publicationMail: d.publicationMail ?? null,
         questionId: typeof d.questionId === "string" ? d.questionId : null,
@@ -320,7 +419,7 @@ export async function GET(request: NextRequest) {
         cancionRelacionada: typeof d.cancionRelacionada === "string" ? d.cancionRelacionada : "",
         imagenes: (parseStoryImagenes(d.imagenes) ?? []).map(imagenFromParsed),
       };
-    });
+    }));
 
     return NextResponse.json({ stories: list });
   } catch (e) {

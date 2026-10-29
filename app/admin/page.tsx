@@ -36,6 +36,7 @@ import {
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
+import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
 
 const BG = '#0a0f24';
 
@@ -79,6 +80,9 @@ type Story = {
   resonances: number;
   createdAt: number | null;
   authorEmail: string | null;
+  sender?: SenderInfo;
+  consents?: ConsentInfo[];
+  consentTextsVersion?: string | null;
   rightsAccepted: boolean;
   publicationMail: {
     status: 'sent' | 'skipped_no_email' | 'failed';
@@ -860,7 +864,12 @@ export default function AdminPage() {
                   <StoryReview story={s} />
                   <PendingFiles files={s.files} token={idToken} />
                   <StoryQuestionLine story={s} />
-                  <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
+                  <SenderConsentBlocks
+                    sender={s.sender}
+                    consents={s.consents}
+                    consentTextsVersion={s.consentTextsVersion}
+                    token={idToken}
+                  />
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
                     {s.authorEmail ? `Se avisará a ${s.authorEmail}` : 'Sin correo del autor: no se podrá avisar al publicar'}
                   </p>
@@ -944,6 +953,12 @@ export default function AdminPage() {
                     <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
+                    <SenderConsentBlocks
+                      sender={s.sender}
+                      consents={s.consents}
+                      consentTextsVersion={s.consentTextsVersion}
+                      token={idToken}
+                    />
                     <StoryPhotoFichas imagenes={s.imagenes} />
                     {s.publicationMail?.status === 'sent' ? (
                       <p style={{ fontSize: 12, margin: '6px 0 0', color: '#86efac' }}>
@@ -1086,6 +1101,12 @@ export default function AdminPage() {
                     <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
+                    <SenderConsentBlocks
+                      sender={s.sender}
+                      consents={s.consents}
+                      consentTextsVersion={s.consentTextsVersion}
+                      token={idToken}
+                    />
                     <StoryPhotoFichas imagenes={s.imagenes} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>

@@ -1669,9 +1669,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             mode === 'foto' ? '' : extraText
           ),
           payload,
-          consentPrivacyPolicy: acceptedPrivacy,
+          consentAdult: acceptedPrivacy,
           consentPublicacion: acceptedPublicacion,
           consentTerminos: acceptedTerminos,
+          consentPrivacyPolicy: acceptedTerminos,
           ...(captchaTokenRef.current ? { captchaToken: captchaTokenRef.current } : {}),
           ...(profilePhotoUploaded ? { profilePhotoUrl: profilePhotoUploaded } : {}),
           ...(sex ? { sex } : {}),

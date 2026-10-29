@@ -94,6 +94,8 @@ export const CreateSubmissionBody = z.object({
   consentPublicacion: z.literal(true),
   /** Aceptación explícita de los Términos de Uso. */
   consentTerminos: z.literal(true),
+  /** Mayor de 18, o adulto responsable o representante de una institución. */
+  consentAdult: z.literal(true).optional(),
   /** Token de Turnstile. POST /api/submissions lo verifica en siteverify. */
   captchaToken: z.string().max(4000).optional(),
   /** Foto personal opcional (avatar) para mostrar junto al nombre público si se aprueba. */
@@ -169,8 +171,11 @@ export interface SubmissionDoc {
   consentPrivacyPolicy?: true;
   consentPublicacion?: true;
   consentTerminos?: true;
+  consentAdult?: true;
   /** Momento en que se registraron los consentimientos (ms epoch). */
   consentedAt?: number;
+  /** Textos de Términos y Política de privacidad que la persona aceptó. */
+  consentTextsVersion?: string;
   extraAttachmentUrls?: string[];
   privateMediaPaths?: string[];
   /** Nombre de canción o enlace; opcional. */

@@ -7,6 +7,7 @@ import {
   MAX_TITULO,
   stripHtml,
 } from "@/lib/api/input-validation";
+import { LEGAL_TEXTS_VERSION } from "@/lib/legal-consent";
 import { CreateSubmissionBody, type SubmissionDoc } from "@/lib/submissionSchema";
 import { CANCION_RELACIONADA_MAX, normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { ANTECEDENTES_MAX, normalizeAntecedentes } from "@/lib/antecedentes";
@@ -212,14 +213,16 @@ export async function POST(req: NextRequest) {
   if (data.ageRange) {
     (doc as SubmissionDoc).ageRange = data.ageRange;
   }
-  if (data.consentPrivacyPolicy) {
-    (doc as SubmissionDoc).consentPrivacyPolicy = true;
-  }
-  if (data.consentPublicacion) {
+  if (data.consentAdult === true) {
+    (doc as SubmissionDoc).consentAdult = true;
     (doc as SubmissionDoc).consentPublicacion = true;
-  }
-  if (data.consentTerminos) {
     (doc as SubmissionDoc).consentTerminos = true;
+    (doc as SubmissionDoc).consentPrivacyPolicy = true;
+    (doc as SubmissionDoc).consentTextsVersion = LEGAL_TEXTS_VERSION;
+  } else {
+    if (data.consentPrivacyPolicy) (doc as SubmissionDoc).consentPrivacyPolicy = true;
+    if (data.consentPublicacion) (doc as SubmissionDoc).consentPublicacion = true;
+    if (data.consentTerminos) (doc as SubmissionDoc).consentTerminos = true;
   }
   (doc as SubmissionDoc).consentedAt = now;
   if (data.extraAttachmentUrls?.length) {

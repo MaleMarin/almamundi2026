@@ -7,6 +7,7 @@ import {
 } from "@/lib/email/respuesta-mail";
 import { getAdminBucket, getAdminDb } from "@/lib/firebase/admin";
 import { stripHtml } from "@/lib/api/input-validation";
+import { LEGAL_TEXTS_VERSION } from "@/lib/legal-consent";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import {
@@ -92,6 +93,7 @@ export async function POST(req: Request) {
   if (city.length < 1) return jsonError("city_required", 400);
   if (country.length < 2) return jsonError("country_required", 400);
   if (!isValidRecipientEmail(email)) return jsonError("email_required", 400);
+  const versionedConsent = body.consentAdult === true;
   if (
     body.consentPrivacyPolicy !== true ||
     body.consentPublicacion !== true ||
@@ -175,6 +177,16 @@ export async function POST(req: Request) {
       alias,
       city,
       country,
+      consentPublicacion: true,
+      consentTerminos: true,
+      consentedAt: Date.now(),
+      ...(versionedConsent
+        ? {
+            consentAdult: true,
+            consentPrivacyPolicy: true,
+            consentTextsVersion: LEGAL_TEXTS_VERSION,
+          }
+        : { consentPrivacyPolicy: true }),
       lat,
       lng,
       status: "pending",

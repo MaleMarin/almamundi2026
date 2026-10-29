@@ -2,7 +2,8 @@ import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
-import { RESPUESTAS_COLLECTION, isRespuestaStatus } from "@/lib/respuestas/constants";
+import { consentRowsFromRecord } from "@/lib/legal-consent";
+import { RESPUESTA_CONTACTS_COLLECTION, RESPUESTAS_COLLECTION, isRespuestaStatus } from "@/lib/respuestas/constants";
 import { signReadUrlForPath } from "@/lib/server-storage";
 
 export const runtime = "nodejs";
@@ -29,9 +30,20 @@ export async function GET(request: NextRequest) {
   try {
     const db = getAdminDb();
     const snap = await db.collection(RESPUESTAS_COLLECTION).where("status", "==", status).get();
+    const contactSnaps = snap.docs.length
+      ? await db.getAll(...snap.docs.map((doc) => db.collection(RESPUESTA_CONTACTS_COLLECTION).doc(doc.id)))
+      : [];
+    const emailById = new Map<string, string>();
+    for (const contact of contactSnaps) {
+      const email = contact.get("email");
+      if (contact.exists && typeof email === "string" && email.trim()) {
+        emailById.set(contact.id, email.trim());
+      }
+    }
     const items = await Promise.all(
       snap.docs.map(async (doc) => {
         const data = doc.data() as Record<string, unknown>;
+        const consent = consentRowsFromRecord(data);
         const publishedUrl = typeof data.publishedUrl === "string" ? data.publishedUrl : "";
         const storagePath = typeof data.storagePath === "string" ? data.storagePath : "";
         let previewUrl = publishedUrl || null;
@@ -53,6 +65,16 @@ export async function GET(request: NextRequest) {
           alias: typeof data.alias === "string" ? data.alias : "",
           city: typeof data.city === "string" ? data.city : "",
           country: typeof data.country === "string" ? data.country : "",
+          sender: {
+            alias: typeof data.alias === "string" ? data.alias : "",
+            country: typeof data.country === "string" ? data.country : "",
+            city: typeof data.city === "string" ? data.city : "",
+            age: "",
+            gender: "",
+            email: emailById.get(doc.id) ?? "",
+          },
+          consents: consent.rows,
+          consentTextsVersion: consent.version,
           status,
           createdAt: toMillis(data.createdAt),
           previewUrl,
