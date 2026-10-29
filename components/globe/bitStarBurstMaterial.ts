@@ -78,6 +78,47 @@ export function createBitStarBurstMaterial(
   );
 }
 
+/** Huellas: disco blanco fijo, sin halo ni pulso. */
+export function createHuellaDotMaterial(materialName = 'GlobeHuellaDot'): THREE.ShaderMaterial {
+  const mat = new THREE.ShaderMaterial({
+    name: materialName,
+    uniforms: {
+      uLayerOpacity: { value: 1 },
+    },
+    glslVersion: THREE.GLSL3,
+    vertexShader: /* glsl */ `
+      varying vec2 vUv;
+      void main() {
+        vUv = uv;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: /* glsl */ `
+      precision highp float;
+      uniform float uLayerOpacity;
+      varying vec2 vUv;
+
+      layout(location = 0) out highp vec4 fragColor;
+
+      void main() {
+        vec2 c = vUv - 0.5;
+        float d = length(c) * 2.0;
+        if (d > 1.0) discard;
+        float edge = 1.0 - smoothstep(0.86, 1.0, d);
+        fragColor = vec4(1.0, 1.0, 1.0, 0.75 * edge * uLayerOpacity);
+      }
+    `,
+    transparent: true,
+    blending: THREE.NormalBlending,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+    side: THREE.DoubleSide,
+  });
+  mat.name = materialName;
+  return mat;
+}
+
 /** Naranja fuerte de historias (`#ff7a00`), en lineal para ShaderMaterial. */
 function almaMundiCoralLinear(): THREE.Vector3 {
   const c = new THREE.Color('#ff7a00').convertSRGBToLinear();

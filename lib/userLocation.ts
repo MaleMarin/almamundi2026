@@ -2,7 +2,7 @@
  * lib/userLocation.ts
  *
  * Obtiene la ubicación aproximada del usuario.
- * Solo se pide al tocar Resonar («Esto me llegó»).
+ * Solo se pide al tocar «Me emocionó».
  * No se pide al terminar de leer, oír o ver una historia.
  */
 

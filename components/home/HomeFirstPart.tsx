@@ -72,7 +72,7 @@ export function HomeFirstPart({
                 color: soft.textMain }}
             >
               {t.heroBeforeBold}{' '}
-              <span className="font-bold">{t.heroBold}</span>
+              <span style={{ fontWeight: 500 }}>{t.heroBold}</span>
             </h1>
             <svg
               width="360"

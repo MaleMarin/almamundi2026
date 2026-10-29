@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useLayoutEffect, useState, useRef } from 'react';
+import { Heart, Share2 } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
 import { getApproxLocation } from '@/lib/userLocation';
@@ -202,6 +203,11 @@ const FORMAT_LABEL = {
 } as const;
 
 const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
+const MOVED_LABEL = { es: 'Me emocionó', pt: 'Me emocionou', en: 'This moved me' } as const;
+
+function isRepeatedFormatLine(line: string): boolean {
+  return /^.+·.+·\s*Formato:\s*.+$/i.test(line.trim());
+}
 const BY_LABEL = { es: 'Por', pt: 'Por', en: 'By' } as const;
 
 function initialCapital(raw: string | undefined): string {
@@ -304,10 +310,12 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const [lastSecondText, setLastSecondText] = useState('');
   const [lastSecondSent, setLastSecondSent] = useState(false);
   const [resonanceSent, setResonanceSent] = useState(false);
+  const [resonanceExtra, setResonanceExtra] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
   const [showMomentoJusto, setShowMomentoJusto] = useState(false);
   const [liveReaders, setLiveReaders] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
   const readerIdRef = useRef<string | null>(null);
 
@@ -322,10 +330,50 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
     setEcoPanel(null);
     setLastSecondText('');
     setLastSecondSent(false);
+    setResonanceSent(false);
+    setResonanceExtra(0);
     return () => {
       duckAmbient(false);
     };
   }, [story.id]);
+
+  useLayoutEffect(() => {
+    if (!compact) return;
+    const panel = panelRef.current;
+    if (!panel) return;
+
+    const place = () => {
+      if (window.matchMedia('(max-width: 767px)').matches) {
+        panel.style.top = '';
+        panel.style.height = '';
+        panel.style.maxHeight = '';
+        return;
+      }
+      const host = panel.offsetParent as HTMLElement | null;
+      if (!host) return;
+      const hostRect = host.getBoundingClientRect();
+      const siteHeader = [...document.querySelectorAll('header')].find((node) => {
+        const box = node.getBoundingClientRect();
+        return getComputedStyle(node).position === 'fixed' && box.top <= 1 && box.height > 40;
+      });
+      const headerBottom = siteHeader ? siteHeader.getBoundingClientRect().bottom : 0;
+      const visibleTop = Math.max(hostRect.top, headerBottom);
+      const visibleBottom = Math.min(hostRect.bottom, window.innerHeight);
+      const top = Math.max(24, visibleTop - hostRect.top + 24);
+      const height = Math.max(160, visibleBottom - hostRect.top - top - 24);
+      panel.style.top = `${top}px`;
+      panel.style.height = `${height}px`;
+      panel.style.maxHeight = `${height}px`;
+    };
+
+    place();
+    window.addEventListener('scroll', place, true);
+    window.addEventListener('resize', place);
+    return () => {
+      window.removeEventListener('scroll', place, true);
+      window.removeEventListener('resize', place);
+    };
+  }, [compact, story.id]);
 
   useEffect(() => {
     if (!endRef.current) return;
@@ -440,16 +488,21 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
           z-index: 40;
           top: 24px;
           right: 24px;
-          bottom: 24px;
           width: 420px;
           max-height: calc(100% - 48px);
+          height: auto;
           display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
           pointer-events: none;
         }
         .story-map-panel__card {
           width: 100%;
-          height: 100%;
+          height: auto;
           max-height: 100%;
+          min-height: 0;
+          display: flex;
+          flex-direction: column;
         }
         @media (max-width: 767px) {
           .story-map-panel {
@@ -459,13 +512,17 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             right: 0;
             bottom: 0;
             width: 100%;
-            height: 85vh;
-            max-height: 85vh;
+            height: auto;
+            max-height: calc(100svh - 9.75rem - 24px);
+          }
+          .story-map-panel__card {
+            max-height: calc(100svh - 9.75rem - 24px);
           }
         }
       `}</style>
 
       <div
+        ref={panelRef}
         className={compact ? 'story-map-panel' : undefined}
         style={compact ? undefined : {
           position: 'fixed',
@@ -485,7 +542,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             width: '100%',
             maxWidth: compact ? '100%' : 720,
             maxHeight: compact ? '100%' : '85vh',
-            height: compact ? '100%' : undefined,
+            height: compact ? 'auto' : undefined,
             margin: compact ? 0 : '0 auto',
             padding: compact ? 0 : '0 24px 24px',
             pointerEvents: 'auto',
@@ -511,7 +568,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               `,
               overflow:       'hidden',
               maxHeight:      compact ? '100%' : '85vh',
-              height:         compact ? '100%' : undefined,
+              height:         compact ? 'auto' : undefined,
+              minHeight:      compact ? 0 : undefined,
               display:        'flex',
               flexDirection:  'column',
               position:       'relative' }}
@@ -617,7 +675,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 overflowY: 'auto',
                 scrollbarWidth: 'none',
                 padding: '24px 24px 28px',
-                flex: 1 }}
+                flex: compact ? '1 1 auto' : 1,
+                minHeight: compact ? 0 : undefined }}
             >
               {story.videoUrl ? (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
@@ -658,7 +717,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {story.body
                     .split('\n')
-                    .filter((p) => p.trim())
+                    .filter((p) => p.trim() && !isRepeatedFormatLine(p))
                     .map((p, i) => (
                       <p key={i} style={{ marginBottom: '1.4em' }}>
                         {p}
@@ -861,54 +920,69 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   </button>
                 </div>
               ) : null}
-            </div>
 
-            <div
-              style={{
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 8,
-                flexWrap: 'wrap',
-                padding: '12px 16px 14px',
-                borderTop: '1px solid rgba(255,255,255,0.07)',
-                zIndex: 2 }}
-            >
-              <button
-                type="button"
-                className="btn-am-secundario"
-                disabled={alreadySent || resonanceSent}
-                onClick={async () => {
-                  if (alreadySent || resonanceSent) return;
-                  try {
-                    const loc = await getApproxLocation();
-                    await fetch(`/api/stories/${story.id}/resonance`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }) });
-                  } catch {}
-                  if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
-                  setResonanceSent(true);
-                }}
-                style={{ minHeight: 44, padding: '8px 16px', fontFamily: SITE_FONT_STACK }}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  flexWrap: 'wrap',
+                  marginTop: 8 }}
               >
-                Esto me llegó
-              </button>
-              <button
-                type="button"
-                className="btn-am-principal"
-                onClick={() => setShareOpen(true)}
-                style={{ minHeight: 44, padding: '8px 16px', fontFamily: SITE_FONT_STACK }}
-              >
-                {SHARE_LABEL[locale]}
-              </button>
-              {SHOW_PUBLIC_ECO ? (
-                <ActionButton
-                  label="¿Dejar un eco?"
-                  onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
-                  accent
-                />
-              ) : null}
+                <button
+                  type="button"
+                  className="btn-am-secundario"
+                  disabled={alreadySent || resonanceSent}
+                  onClick={async () => {
+                    if (alreadySent || resonanceSent) return;
+                    try {
+                      const loc = await getApproxLocation();
+                      await fetch(`/api/stories/${story.id}/resonance`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }) });
+                    } catch {}
+                    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
+                    setResonanceExtra(1);
+                    setResonanceSent(true);
+                  }}
+                  style={{
+                    minHeight: 44,
+                    padding: '8px 16px',
+                    fontFamily: SITE_FONT_STACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8 }}
+                >
+                  {MOVED_LABEL[locale]}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                    <Heart size={16} fill="currentColor" aria-hidden />
+                    {(story.resonancesCount ?? 0) + resonanceExtra}
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="btn-am-principal"
+                  onClick={() => setShareOpen(true)}
+                  style={{
+                    minHeight: 44,
+                    padding: '8px 16px',
+                    fontFamily: SITE_FONT_STACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: 8 }}
+                >
+                  <Share2 size={16} aria-hidden />
+                  {SHARE_LABEL[locale]}
+                </button>
+                {SHOW_PUBLIC_ECO ? (
+                  <ActionButton
+                    label="¿Dejar un eco?"
+                    onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
+                    accent
+                  />
+                ) : null}
+              </div>
             </div>
           </div>
 

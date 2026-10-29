@@ -51,6 +51,8 @@ export type StoryPoint = {
   isRealStory?: boolean;
   demoNotice?: string;
   editorialStatus?: string;
+  /** Personas que marcaron «Me emocionó». Conteo público. */
+  resonancesCount?: number;
 };
 
 export function getStories(): StoryPoint[] {

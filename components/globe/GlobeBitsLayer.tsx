@@ -28,7 +28,7 @@ import {
   PICKING_SPHERE_RADIUS,
   type GlobeBitInteractionStore } from '@/lib/globe/globe-bits-magnetic-config';
 import {
-  createBitStarBurstMaterial,
+  createHuellaDotMaterial,
   createNewsRingMaterial,
   createStoryRippleMaterial,
   createStoryStarBurstMaterial,
@@ -69,8 +69,8 @@ const BIT_SURFACE_RADIUS = GLOBE_V2_BIT_SURFACE_RADIUS;
 
 const STAR_PLANE_SCALE = 0.0127;
 const CORE_SCALE = 0.00043;
-/** Bits: visibles junto a las historias, más chicos. */
-const BIT_PLANE_MUL = 1.9;
+/** Huellas: disco blanco más chico que el punto sólido de una historia. */
+const BIT_PLANE_MUL = 1.15;
 /** Historias: disco mayor que el bit, sin tapar el planeta. */
 const STORY_PLANE_MUL = 3.05;
 const STORY_RIPPLE_MUL = 5.6;
@@ -336,7 +336,7 @@ function BitDot({
           ) : null}
         </Billboard>
 
-        {isStory || isNews ? null : (
+        {isRespuesta ? (
         <mesh
           ref={(m) => disableMeshRaycast(m)}
           scale={coreScale * sel * mag}
@@ -353,7 +353,7 @@ function BitDot({
             toneMapped={false}
           />
         </mesh>
-        )}
+        ) : null}
       </group>
     </group>
   );
@@ -434,8 +434,8 @@ function GlobeBitsLayerMounted({
     []
   );
 
-  const starMatNormal = useMemo(() => createBitStarBurstMaterial(1.32, 'GlobeBitStarBurst'), []);
-  const starMatSelected = useMemo(() => createBitStarBurstMaterial(1.55, 'GlobeBitStarBurstSelected'), []);
+  const starMatNormal = useMemo(() => createHuellaDotMaterial('GlobeHuellaDot'), []);
+  const starMatSelected = useMemo(() => createHuellaDotMaterial('GlobeHuellaDotSelected'), []);
   const storyMatNormal = useMemo(() => createStoryStarBurstMaterial(0.96, 'GlobeStoryStarBurst'), []);
   const storyMatSelected = useMemo(() => createStoryStarBurstMaterial(1.0, 'GlobeStoryStarBurstSelected'), []);
   const storyRippleMat = useMemo(() => createStoryRippleMaterial(1.0, 'GlobeStoryRipple'), []);
