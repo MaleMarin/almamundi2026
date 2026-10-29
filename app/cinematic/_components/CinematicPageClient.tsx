@@ -106,7 +106,7 @@ export function CinematicPageClient({
     <div className={styles.muestrasCinematicPage}>
       <section
         className={styles.heroRoot}
-        aria-label="Muestras — recorrido"
+        aria-label="Muestras, recorrido"
         aria-live="polite"
       >
         <div className={styles.lightWave} aria-hidden />

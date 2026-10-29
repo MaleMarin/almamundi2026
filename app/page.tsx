@@ -6,7 +6,7 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 const HOME_CANONICAL = `${PUBLIC_SITE_ORIGIN}/`;
-const HOME_TITLE = 'AlmaMundi — Entra y cuenta tu historia';
+const HOME_TITLE = 'AlmaMundi, Entra y cuenta tu historia';
 const HOME_DESCRIPTION =
   'Descubre historias de vida reales en video, audio o texto, y entra a contar la tuya. Cada historia despierta otra.';
 
@@ -28,7 +28,7 @@ export const metadata: Metadata = {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
+        alt: 'AlmaMundi, historias de vida en video, audio, escrito y foto',
       },
     ],
   },

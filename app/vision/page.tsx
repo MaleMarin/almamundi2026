@@ -163,7 +163,7 @@ export default function VisionPage() {
               textTransform: 'uppercase',
               color: '#9a3412' }}
           >
-            Beta pública — esta hoja de ruta puede actualizarse mientras el proyecto avanza.
+            Beta pública, esta hoja de ruta puede actualizarse mientras el proyecto avanza.
           </p>
           <div
             style={{

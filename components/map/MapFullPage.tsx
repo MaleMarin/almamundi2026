@@ -5083,8 +5083,8 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         {activeView === 'musica' && (
           <div className="absolute top-3 right-3 z-[15] px-3 py-2 rounded-xl glassPanel text-right min-w-[160px] max-w-[min(90vw,320px)] pointer-events-none">
             {storyLabel ? (
-              <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/95 truncate" title={`${storyLabel.title} — ${storyLabel.place}`}>
-                {storyLabel.title} — {storyLabel.place}
+              <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/95 truncate" title={`${storyLabel.title}, ${storyLabel.place}`}>
+                {storyLabel.title}, {storyLabel.place}
               </p>
             ) : !selectedMood ? (
               <p className="text-[length:var(--fs-etiqueta)] font-medium text-white/90">Elige un sonido</p>
@@ -5156,7 +5156,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
               </>
             ) : (
               <>
-                <p className="text-[length:var(--fs-pequeno)] font-semibold text-white truncate">{hovered.title} — {hovered.subtitle}</p>
+                <p className="text-[length:var(--fs-pequeno)] font-semibold text-white truncate">{hovered.title}, {hovered.subtitle}</p>
                 {(hovered.hasAudio || hovered.hasVideo || hovered.hasText) && (
                   <p className="text-[length:var(--fs-etiqueta)] mt-1 flex items-center gap-2 flex-wrap">
                     {hovered.hasText && <span title="Texto">📝</span>}

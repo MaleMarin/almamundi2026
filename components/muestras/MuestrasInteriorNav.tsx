@@ -20,7 +20,7 @@ export function MuestrasInteriorNav() {
       <HomeHardLink
         href="/"
         className="flex min-w-0 flex-shrink-0 items-center pr-2"
-        aria-label="AlmaMundi — inicio"
+        aria-label="AlmaMundi, inicio"
       >
         <img
           src={historiasInterior.logoSrc}

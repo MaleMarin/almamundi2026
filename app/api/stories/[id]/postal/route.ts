@@ -93,7 +93,7 @@ export async function POST(
       from:
         process.env.RESEND_FROM_EMAIL ?? 'AlmaMundi <hola@almamundi.org>',
       to: email,
-      subject: 'Una postal para ti — AlmaMundi',
+      subject: 'Una postal para ti, AlmaMundi',
       html: `
         <div style="font-family:system-ui,-apple-system,'Segoe UI',Avenir,sans-serif;background:#0f172a;color:#e2e8f0;padding:0;max-width:520px;margin:0 auto;border-radius:16px;overflow:hidden">
           ${bgUrl ? `<div style="${bgStyle}"></div>` : ''}

@@ -428,7 +428,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     fontStyle: 'italic',
                     fontFamily: SITE_FONT_STACK }}
                 >
-                  — {story.authorName || story.label}
+                  , {story.authorName || story.label}
                 </p>
                 {liveReaders > 1 && (
                   <p

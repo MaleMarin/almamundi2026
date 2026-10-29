@@ -243,7 +243,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         <HomeHardLink
           href="/"
           className="inline-flex min-w-0 shrink-0 !text-transparent outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
-          aria-label="AlmaMundi — inicio"
+          aria-label="AlmaMundi, inicio"
         >
           <img
             src="/logo.png"

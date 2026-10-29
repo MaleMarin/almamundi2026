@@ -122,7 +122,7 @@ function contactHtml(): string {
 
 export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
   const title = escapeHtml(storyTitleOrFallback(params.storyTitle));
-  const mapUrl = absoluteEmailUrl("/");
+  const mapUrl = absoluteEmailUrl("/#mapa");
   const tellUrl = absoluteEmailUrl("/contar");
   const bodyHtml = `
       ${greetingHtml(escapeHtml(greetingLine(params.authorName)))}
@@ -145,7 +145,7 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
 
 export function buildReceivedEmailText(params: ReceivedEmailContent): string {
   const title = storyTitleOrFallback(params.storyTitle);
-  const originHome = absoluteEmailUrl("/");
+  const originHome = absoluteEmailUrl("/#mapa");
   return [
     greetingLine(params.authorName),
     "",

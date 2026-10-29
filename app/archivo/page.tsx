@@ -50,7 +50,7 @@ function formatWeekTitle(weekNum: number, startDate: Date): string {
   const d = startDate.getDate();
   const m = startDate.toLocaleString('es-CL', { month: 'long' });
   const y = startDate.getFullYear();
-  return `${weekNum} — ${d} ${m} ${y}`;
+  return `${weekNum}, ${d} ${m} ${y}`;
 }
 
 function getWeekKey(ts: number | null): { year: number; week: number; start: Date } | null {

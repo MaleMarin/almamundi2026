@@ -169,7 +169,7 @@ function buildModalSubmissionContext(
   const tbRaw = textBody.trim();
   const tb =
     ex && tbRaw
-      ? `${tbRaw}\n\n— Extras / contexto —\n${ex}`
+      ? `${tbRaw}\n\nExtras / contexto\n${ex}`
       : ex && !tbRaw
         ? ex
         : tbRaw;
@@ -179,7 +179,7 @@ function buildModalSubmissionContext(
   let out = pieces.join(' · ');
   if (tb.length > 0) out = `${tb}\n\n${out}`;
   if (out.trim().length >= 30) return out.slice(0, 2000);
-  return `${out}\n(Envío AlmaMundi — sin descripción ampliada.)`.slice(0, 2000);
+  return `${out}\n(Envío AlmaMundi, sin descripción ampliada.)`.slice(0, 2000);
 }
 
 type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';

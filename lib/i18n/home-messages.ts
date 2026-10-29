@@ -172,7 +172,7 @@ const en: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi is the place where your stories don’t get lost in the scroll—instead,',
+    'AlmaMundi is the place where your stories don’t get lost in the scroll, instead,',
   heroBold: 'they awaken other stories.',
   heroSubBefore: 'Here, every story matters.',
   heroSubBold: 'Every story is extraordinary.',
@@ -194,7 +194,7 @@ const en: HomeMessages = {
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
-    'Write a scene, a letter, a farewell—or something that still comes back. Up to 5000 characters.',
+    'Write a scene, a letter, a farewell, or something that still comes back. Up to 5000 characters.',
   cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',

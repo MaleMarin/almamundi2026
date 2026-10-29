@@ -260,7 +260,7 @@ export function CinemaGallery({ stories, onSelectStory }: CinemaGalleryProps) {
               textTransform: 'uppercase',
               marginBottom: '2rem' }}
           >
-            {String(activeIdx + 1).padStart(2,'0')} — {String(stories.length).padStart(2,'0')}
+            {String(activeIdx + 1).padStart(2,'0')}, {String(stories.length).padStart(2,'0')}
           </p>
 
           {/* Author */}

@@ -18,7 +18,7 @@ export function YouTubeEmbed({ videoId, title, className = '' }: YouTubeEmbedPro
       <div
         className={`rounded-2xl border border-white/10 bg-black/40 flex flex-col items-center justify-center p-8 text-center ${className}`}
       >
-        <p className="text-white/90 font-medium mb-2">No se puede cargar el vídeo — abrir origen</p>
+        <p className="text-white/90 font-medium mb-2">No se puede cargar el vídeo, abrir origen</p>
         <a
           href={`https://www.youtube.com/watch?v=${videoId}`}
           target="_blank"

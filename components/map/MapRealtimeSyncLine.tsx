@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { formatMapRealtimeSyncCaption } from '@/lib/sunPosition';
 
 type Props = {
@@ -12,6 +13,7 @@ type Props = {
  * Leyenda bajo el HUD del mapa: terminador / tiempo real (Chile u otra zona).
  */
 export function MapRealtimeSyncLine({ userLat, userLng }: Props) {
+  const { locale } = useHomeLocale();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
@@ -20,8 +22,8 @@ export function MapRealtimeSyncLine({ userLat, userLng }: Props) {
   }, []);
 
   const { headline, detail } = useMemo(
-    () => formatMapRealtimeSyncCaption(now, { userLat, userLng }),
-    [now, userLat, userLng]
+    () => formatMapRealtimeSyncCaption(now, { userLat, userLng, locale }),
+    [now, userLat, userLng, locale]
   );
 
   return (

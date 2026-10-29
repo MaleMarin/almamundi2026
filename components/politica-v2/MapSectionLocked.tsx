@@ -50,6 +50,7 @@ export function MapSectionLocked() {
           >
             <HomeMap universeSectionRef={globeUniverseRef} />
           </div>
+          <div aria-hidden className="map-universe-fade-after" />
         </div>
       </section>
     </>

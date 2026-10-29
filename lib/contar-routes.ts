@@ -8,7 +8,7 @@ const OG_IMAGE = {
   url: '/og-image.png',
   width: 1200,
   height: 630,
-  alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
+  alt: 'AlmaMundi, historias de vida en video, audio, escrito y foto',
 } as const;
 
 /** Tarjeta que arman Facebook y LinkedIn al recibir solo el enlace de /contar. */

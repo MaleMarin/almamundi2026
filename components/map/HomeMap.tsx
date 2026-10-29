@@ -846,7 +846,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
-        className="map-timebar-stage relative z-20 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-4 pt-2 shadow-none outline-none"
+        className="map-timebar-stage relative z-20 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-8 pt-2 shadow-none outline-none"
         style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
         <TimeBar className="pointer-events-none text-center text-[length:var(--fs-etiqueta)] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
@@ -957,11 +957,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <SoundsPanel {...sonidosProps} />
           )}
       </MapDrawer>
-      <div
-        aria-hidden
-        className="map-universe-fade map-universe-fade-bottom"
-        style={{ bottom: TIME_STRIP_HEIGHT }}
-      />
       {openStory
         ? createPortal(
             <StoryViewer

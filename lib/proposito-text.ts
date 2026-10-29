@@ -36,7 +36,7 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       },
       {
         type: 'p',
-        text: 'Cada persona que vive algo lo vive de una manera que nadie más va a vivir exactamente igual. Ese momento, esa experiencia, ese fragmento de vida — tiene un valor que solo existe si alguien lo cuenta.',
+        text: 'Cada persona que vive algo lo vive de una manera que nadie más va a vivir exactamente igual. Ese momento, esa experiencia, ese fragmento de vida, tiene un valor que solo existe si alguien lo cuenta.',
       },
       {
         type: 'quote',

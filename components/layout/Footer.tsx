@@ -76,7 +76,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           <HomeHardLink
             href="/"
             className="inline-block max-w-full select-none leading-none outline-offset-[6px] focus-visible:rounded-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-orange-400/55"
-            aria-label="AlmaMundi — inicio"
+            aria-label="AlmaMundi, inicio"
           >
             <span className="almamundi-footer-title" aria-hidden>
               ALMAMUNDI

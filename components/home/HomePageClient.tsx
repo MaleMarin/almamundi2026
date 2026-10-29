@@ -84,8 +84,15 @@ export function HomePageClient() {
   const exploreMapFromStory = useCallback(() => {
     setStoryOpen(false);
     primeMapAmbientFromNavGesture();
-    hardNavigateTo('/?section=mapa');
-  }, []);
+    const path = window.location.pathname.replace(/\/$/, '') || '/';
+    if (path === '/' || path.startsWith('/contar')) {
+      router.replace('/#mapa', { scroll: false });
+      window.setTimeout(() => scrollToHomeMapaSection('smooth'), 80);
+      window.setTimeout(() => scrollToHomeMapaSection('smooth'), 280);
+      return;
+    }
+    hardNavigateTo('/#mapa');
+  }, [router]);
 
   useLayoutEffect(() => {
     const format = parseContarFormat(pathname);

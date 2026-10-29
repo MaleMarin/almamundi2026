@@ -35,7 +35,7 @@ function ogImageForStory(story: {
     url: SITE_OG_IMAGE,
     width: 1200,
     height: 630,
-    alt: 'AlmaMundi — historias de vida en video, audio, escrito y foto',
+    alt: 'AlmaMundi, historias de vida en video, audio, escrito y foto',
   };
 }
 

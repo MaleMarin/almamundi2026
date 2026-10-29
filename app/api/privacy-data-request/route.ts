@@ -74,7 +74,7 @@ function buildPrivacyDataRequestEmail(input: {
   const phoneLine = input.phone ? input.phone : '(no indicado)';
   const own = input.ownData === 'yes' ? 'Sí' : 'No';
   const text = [
-    'Solicitud sobre datos personales — AlmaMundi',
+    'Solicitud sobre datos personales, AlmaMundi',
     '',
     `Tipo: ${label}`,
     `Código interno: ${input.requestType}`,

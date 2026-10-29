@@ -145,7 +145,7 @@ export async function renderExhibitionShareCardPng(
 
   ctx.fillStyle = 'rgba(25, 30, 40, 0.95)';
   ctx.font = `600 26px ${canvasFontFamily()}`;
-  ctx.fillText(`— ${opts.authorName}`, pad, Math.min(lineY + lh + 8, W - 220));
+  ctx.fillText(`, ${opts.authorName}`, pad, Math.min(lineY + lh + 8, W - 220));
 
   ctx.fillStyle = 'rgba(45, 50, 62, 0.88)';
   ctx.font = `600 22px ${canvasFontFamily()}`;

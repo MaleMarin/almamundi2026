@@ -40,7 +40,7 @@ const NOTICE_BODY_2 =
   'Al compartirla, cuida su nombre, su voz y su dignidad. Este es un espacio de encuentro, no de viralización.';
 
 function buildShareText(authorName: string, storyTitle: string, label: string): string {
-  return `«${storyTitle}» — ${authorName}\n${label} · AlmaMundi`;
+  return `«${storyTitle}», ${authorName}\n${label} · AlmaMundi`;
 }
 
 export function EthicalShareFlow({
@@ -95,7 +95,7 @@ export function EthicalShareFlow({
   // Mailto: usar un <a href> real (más fiable que window.location en navegadores
   // que abren el cliente en otra app/ventana).
   const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent(`${storyTitle} — AlmaMundi`);
+    const subject = encodeURIComponent(`${storyTitle}, AlmaMundi`);
     const body = encodeURIComponent(`${shareText}\n\n${shareUrl}`);
     return `mailto:?subject=${subject}&body=${body}`;
   }, [shareText, shareUrl, storyTitle]);
@@ -217,7 +217,7 @@ export function EthicalShareFlow({
                 Compartir historia
               </h2>
               <p className="mt-2 text-[length:var(--fs-pequeno)] font-normal text-white/70">
-                «{storyTitle}» — {authorName}
+                «{storyTitle}», {authorName}
               </p>
               <div className="mt-5 flex flex-col gap-2">
                 <button

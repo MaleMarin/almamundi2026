@@ -4,6 +4,7 @@
  */
 
 import { latLngToCartesianThreeJS } from '@/lib/globe-coords';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 
 export type SunVector3 = { x: number; y: number; z: number };
 
@@ -192,9 +193,56 @@ export function approximateCoordinatesForIANATimeZone(timeZone: string): { lat: 
 /**
  * Texto bajo el HUD del mapa: sincronización con tiempo real y penumbra (Chile u otra zona).
  */
+const MAP_SYNC_COPY: Record<
+  AlmaLocale,
+  {
+    headline: string;
+    chileNight: (time: string) => string;
+    chileDay: (time: string) => string;
+    chilePlain: (time: string) => string;
+    zoneNight: (place: string, time: string) => string;
+    zoneDay: (place: string, time: string) => string;
+    zoneUtc: (place: string, time: string) => string;
+  }
+> = {
+  es: {
+    headline: 'Sincronizado con tu tiempo real',
+    chileNight: (time) => `Actualmente en Chile: ${time}, Hemisferio Sur en penumbra nocturna`,
+    chileDay: (time) => `Actualmente en Chile: ${time}, día en tu meridiano`,
+    chilePlain: (time) => `Actualmente en Chile: ${time}`,
+    zoneNight: (place, time) => `Tu zona (${place}): ${time}, noche en tu ubicación`,
+    zoneDay: (place, time) => `Tu zona (${place}): ${time}, día en tu ubicación`,
+    zoneUtc: (place, time) => `Tu zona (${place}): ${time}, terminador solar según hora UTC`,
+  },
+  pt: {
+    headline: 'Sincronizado com o seu tempo real',
+    chileNight: (time) => `Atualmente no Chile: ${time}, Hemisfério Sul em penumbra noturna`,
+    chileDay: (time) => `Atualmente no Chile: ${time}, dia no seu meridiano`,
+    chilePlain: (time) => `Atualmente no Chile: ${time}`,
+    zoneNight: (place, time) => `Sua zona (${place}): ${time}, noite na sua localização`,
+    zoneDay: (place, time) => `Sua zona (${place}): ${time}, dia na sua localização`,
+    zoneUtc: (place, time) => `Sua zona (${place}): ${time}, terminador solar segundo a hora UTC`,
+  },
+  en: {
+    headline: 'Synced with your real time',
+    chileNight: (time) => `Currently in Chile: ${time}, Southern Hemisphere in night shadow`,
+    chileDay: (time) => `Currently in Chile: ${time}, day on your meridian`,
+    chilePlain: (time) => `Currently in Chile: ${time}`,
+    zoneNight: (place, time) => `Your zone (${place}): ${time}, night at your location`,
+    zoneDay: (place, time) => `Your zone (${place}): ${time}, day at your location`,
+    zoneUtc: (place, time) => `Your zone (${place}): ${time}, solar terminator by UTC time`,
+  },
+};
+
+const MAP_SYNC_TIME_LOCALE: Record<AlmaLocale, string> = {
+  es: 'es-CL',
+  pt: 'pt-BR',
+  en: 'en-GB',
+};
+
 export function formatMapRealtimeSyncCaption(
   now: Date,
-  options?: { userLat?: number | null; userLng?: number | null }
+  options?: { userLat?: number | null; userLng?: number | null; locale?: AlmaLocale }
 ): MapSyncCaption {
   let timeZone: string;
   try {
@@ -205,8 +253,9 @@ export function formatMapRealtimeSyncCaption(
   const inChile = timeZone === 'America/Santiago';
   const lat = options?.userLat ?? (inChile ? -33.4489 : null);
   const lng = options?.userLng ?? (inChile ? -70.6693 : null);
+  const copy = MAP_SYNC_COPY[options?.locale ?? 'es'];
 
-  const timeFmt = new Intl.DateTimeFormat('es-CL', {
+  const timeFmt = new Intl.DateTimeFormat(MAP_SYNC_TIME_LOCALE[options?.locale ?? 'es'], {
     timeZone: inChile ? 'America/Santiago' : timeZone,
     hour: '2-digit',
     minute: '2-digit',
@@ -217,22 +266,22 @@ export function formatMapRealtimeSyncCaption(
   const night =
     lat != null && lng != null ? isNightAtLocation(lat, lng, now) : null;
 
-  const headline = 'Sincronizado con tu tiempo real';
+  const headline = copy.headline;
 
   let detail: string;
   if (inChile) {
     detail =
       night === true
-        ? `Actualmente en Chile: ${timeStr} — Hemisferio Sur en penumbra nocturna`
+        ? copy.chileNight(timeStr)
         : night === false
-          ? `Actualmente en Chile: ${timeStr} — día en tu meridiano`
-          : `Actualmente en Chile: ${timeStr}`;
+          ? copy.chileDay(timeStr)
+          : copy.chilePlain(timeStr);
   } else if (lat != null && lng != null && night != null) {
     const place = timeZone.split('/').pop()?.replace(/_/g, ' ') ?? timeZone;
-    detail = `Tu zona (${place}): ${timeStr} — ${night ? 'noche en tu ubicación' : 'día en tu ubicación'}`;
+    detail = night ? copy.zoneNight(place, timeStr) : copy.zoneDay(place, timeStr);
   } else {
     const place = timeZone.split('/').pop()?.replace(/_/g, ' ') ?? timeZone;
-    detail = `Tu zona (${place}): ${timeStr} — terminador solar según hora UTC`;
+    detail = copy.zoneUtc(place, timeStr);
   }
 
   return { headline, detail };

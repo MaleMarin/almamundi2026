@@ -217,7 +217,7 @@ const es: SiteUiMessages = {
   archivoMuestrasCount: 'AlmaMundi · {n} historias',
   archivoViewMuestra: 'Ver muestra',
   archivoEmptyMuestras: 'No hay muestras publicadas.',
-  archivoWeekTitle: '{week} — {day} {month} {year}',
+  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Elegir formato de participación',
   subirBackHome: '← Volver al inicio',
   modalClose: 'Cerrar',
@@ -402,7 +402,7 @@ const pt: SiteUiMessages = {
   archivoMuestrasCount: 'AlmaMundi · {n} histórias',
   archivoViewMuestra: 'Ver amostra',
   archivoEmptyMuestras: 'Não há amostras publicadas.',
-  archivoWeekTitle: '{week} — {day} {month} {year}',
+  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Escolher formato de participação',
   subirBackHome: '← Voltar ao início',
   modalClose: 'Fechar',
@@ -520,7 +520,7 @@ const pt: SiteUiMessages = {
 };
 
 const en: SiteUiMessages = {
-  footerClosingLine: 'Stories that are not lost—they awaken other stories.',
+  footerClosingLine: 'Stories that are not lost, they awaken other stories.',
   footerInitiativeOf: 'An initiative of',
   footerLegalAria: 'Legal information and personal data',
   footerPrivacy: 'Privacy notice',
@@ -587,7 +587,7 @@ const en: SiteUiMessages = {
   archivoMuestrasCount: 'AlmaMundi · {n} stories',
   archivoViewMuestra: 'View sample',
   archivoEmptyMuestras: 'No samples published.',
-  archivoWeekTitle: '{week} — {day} {month} {year}',
+  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Choose how to take part',
   subirBackHome: '← Back to home',
   modalClose: 'Close',
