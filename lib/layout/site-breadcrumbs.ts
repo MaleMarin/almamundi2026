@@ -20,7 +20,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     texto: 'Texto',
     foto: 'Foto',
     mapa: 'Mapa',
-    contar: 'Contar',
+    contar: 'Cuenta tu historia',
     pregunta: 'Pregunta',
   },
   pt: {
@@ -36,7 +36,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     texto: 'Texto',
     foto: 'Foto',
     mapa: 'Mapa',
-    contar: 'Contar',
+    contar: 'Conte sua história',
     pregunta: 'Pergunta',
   },
   en: {
@@ -44,7 +44,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     _historia: 'Story',
     historias: 'Stories',
     videos: 'Videos',
-    audios: 'Audios',
+    audios: 'Audio',
     escrito: 'Texts',
     fotos: 'Photos',
     audio: 'Audio',
@@ -52,7 +52,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     texto: 'Text',
     foto: 'Photo',
     mapa: 'Map',
-    contar: 'Tell',
+    contar: 'Tell your story',
     pregunta: 'Question',
   },
 };

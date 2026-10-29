@@ -25,11 +25,15 @@ function normalizeTema(t: string | undefined): string {
 }
 
 function formatPlace(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '—';
+  const joined = [s.city, s.country].filter(Boolean).join(', ');
+  if (joined) return joined;
+  const label = (s.label ?? '').trim();
+  if (!label || label === '—' || label === '-') return '';
+  return label;
 }
 
 function timeAgo(publishedAt: string | undefined): string {
-  if (!publishedAt) return '—';
+  if (!publishedAt) return '';
   const d = new Date(publishedAt);
   const now = new Date();
   const diff = now.getTime() - d.getTime();
@@ -119,13 +123,17 @@ export default function TemaPage() {
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-amber-700 mb-1 tracking-[0.12em]">{formatPlace(s)}</div>
+                    {formatPlace(s) ? (
+                      <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-amber-700 mb-1 tracking-[0.12em]">{formatPlace(s)}</div>
+                    ) : null}
                     <h2 className="text-[length:var(--fs-texto)] font-semibold text-gray-800 line-clamp-2">{s.title || 'Sin título'}</h2>
                     {s.description && <p className="text-[length:var(--fs-pequeno)] text-gray-600 line-clamp-1 mt-1">{s.description}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-[length:var(--fs-etiqueta)] text-gray-500 capitalize">{getFormat(s)}</span>
-                    <span className="text-[length:var(--fs-etiqueta)] text-gray-400">{timeAgo(s.publishedAt)}</span>
+                    {timeAgo(s.publishedAt) ? (
+                      <span className="text-[length:var(--fs-etiqueta)] text-gray-400">{timeAgo(s.publishedAt)}</span>
+                    ) : null}
                   </div>
                 </div>
               </Link>

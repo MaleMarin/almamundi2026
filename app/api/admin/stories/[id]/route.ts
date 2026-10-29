@@ -11,6 +11,9 @@ import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
 import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
+import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { notifyAuthorStoryRejected } from "@/lib/email/notify-author-rejected";
 
 export const runtime = "nodejs";
 
@@ -30,7 +33,8 @@ async function moderatePendingSubmission(
   action: Action,
   actorEmail: string,
   place?: { city: string; country: string },
-  temas?: { temas: string[]; ejes: string[] }
+  temas?: { temas: string[]; ejes: string[] },
+  reasonInput?: { reasonId?: unknown; reasonDetail?: unknown }
 ) {
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "story not found" }, { status: 404 });
@@ -70,14 +74,35 @@ async function moderatePendingSubmission(
     );
   }
   if (action === "reject") {
-    await ref.update({ status: "rejected", reviewedAt: Date.now() });
+    const current = await ref.get();
+    const data = (current.data() ?? {}) as Record<string, unknown>;
+    const reason = resolvePublicRejectionText(
+      reasonInput?.reasonId,
+      reasonInput?.reasonDetail,
+      parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined)
+    );
+    if (!reason.ok) return NextResponse.json({ error: reason.error }, { status: 400 });
+    await ref.update({
+      status: "rejected",
+      reviewedAt: Date.now(),
+      rejectionReasonId: reason.reasonId,
+      rejectionReason: reason.publicText,
+      rejectionReasonDetail: reason.detail || null,
+    });
     await appendEditorialAuditLog(db, actorEmail, "reject", {
       submissionId: id,
       submissionCollection: collection,
       fromStatus: "pending",
       toStatus: "rejected",
+      extras: { reasonId: reason.reasonId, rejectionReason: reason.publicText },
     });
-    return NextResponse.json({ ok: true, status: "rejected" });
+    const rejectionMail = await notifyAuthorStoryRejected({
+      db,
+      collection,
+      docId: id,
+      publicReason: reason.publicText,
+    });
+    return NextResponse.json({ ok: true, status: "rejected", rejectionMail });
   }
   const result = await editorialPublishFromSubmission(db, id, actorEmail, temas);
   if (!result.ok) {
@@ -107,7 +132,14 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string; city?: string; country?: string; temas?: unknown };
+  let body: {
+    action?: string;
+    city?: string;
+    country?: string;
+    temas?: unknown;
+    reasonId?: unknown;
+    reasonDetail?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
@@ -137,7 +169,8 @@ export async function PATCH(
           city: cleanPlace(body.city),
           country: cleanPlace(body.country),
         },
-        temas ?? undefined
+        temas ?? undefined,
+        { reasonId: body.reasonId, reasonDetail: body.reasonDetail }
       );
     }
 
@@ -198,10 +231,23 @@ export async function PATCH(
       );
     }
 
+    let rejectionText = "";
     const updates: Record<string, unknown> = {
       status: nextStatus,
       updatedAt: FieldValue.serverTimestamp(),
     };
+    if (action === "reject") {
+      const reason = resolvePublicRejectionText(
+        body.reasonId,
+        body.reasonDetail,
+        parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined)
+      );
+      if (!reason.ok) return NextResponse.json({ error: reason.error }, { status: 400 });
+      updates.rejectionReasonId = reason.reasonId;
+      updates.rejectionReason = reason.publicText;
+      updates.rejectionReasonDetail = reason.detail || null;
+      rejectionText = reason.publicText;
+    }
     if (action === "approve" && temas) {
       updates.temas = temas.temas;
       updates.ejes = temas.ejes;
@@ -233,14 +279,24 @@ export async function PATCH(
       storyId: id,
       fromStatus: currentStatus,
       toStatus: nextStatus,
+      ...(action === "reject" ? { extras: { rejectionReason: rejectionText } } : {}),
     });
 
     let publicationMail = null;
     if (action === "approve") {
       publicationMail = await notifyAuthorStoryPublished({ db, storyId: id });
     }
+    const rejectionMail =
+      action === "reject"
+        ? await notifyAuthorStoryRejected({
+            db,
+            collection: "stories",
+            docId: id,
+            publicReason: rejectionText,
+          })
+        : null;
 
-    return NextResponse.json({ ok: true, status: nextStatus, publicationMail });
+    return NextResponse.json({ ok: true, status: nextStatus, publicationMail, rejectionMail });
   } catch (e) {
     console.error("[admin/stories PATCH]", e);
     return NextResponse.json({ error: "update failed" }, { status: 500 });

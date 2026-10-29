@@ -39,6 +39,9 @@ import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
 import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
+import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
+import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const BG = '#0a0f24';
 
@@ -101,6 +104,7 @@ type Story = {
   cancionRelacionada?: string;
   files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' | 'heic'; storagePath?: string }[];
   source?: 'submissions' | 'story_submissions';
+  locale?: AlmaLocale;
 };
 
 type Collection = {
@@ -407,6 +411,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
+  const [rejectDraft, setRejectDraft] = useState<Record<string, { reasonId: string; detail: string }>>({});
   const [themePick, setThemePick] = useState<Record<string, string[]>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [archivedFilter, setArchivedFilter] = useState<{ topic?: string; place?: string; format?: StoryFormat }>({});
@@ -576,7 +581,8 @@ export default function AdminPage() {
     id: string,
     action: 'approve' | 'reject' | 'feature' | 'unfeature' | 'archive' | 'themes',
     place?: { city: string; country: string },
-    temas?: string[]
+    temas?: string[],
+    reason?: { reasonId: string; detail: string }
   ) => {
     setActionLoading(id);
     try {
@@ -587,12 +593,18 @@ export default function AdminPage() {
           action,
           ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
           ...(temas ? { temas } : {}),
+          ...(reason ? { reasonId: reason.reasonId, reasonDetail: reason.detail || undefined } : {}),
         }),
       });
       const data = (await res.json()) as {
         ok?: boolean;
         error?: string;
         code?: string;
+        rejectionMail?: {
+          status: 'sent' | 'skipped_no_email' | 'failed';
+          to: string | null;
+          error: string | null;
+        };
         publicationMail?: {
           status: 'sent' | 'skipped_no_email' | 'failed';
           to: string | null;
@@ -611,11 +623,15 @@ export default function AdminPage() {
           } else {
             showToast('Aprobada al mapa');
           }
+        } else if (action === 'reject') {
+          const mail = data.rejectionMail;
+          if (mail?.status === 'sent') showToast(`Rechazada. Correo enviado a ${mail.to ?? 'quien envió'}`);
+          else if (mail?.status === 'skipped_no_email') showToast('Rechazada. No se avisó: no hay correo');
+          else if (mail?.status === 'failed') showToast(`Rechazada, pero el correo NO salió: ${mail.error ?? 'error de envío'}`);
+          else showToast('Rechazada');
         } else {
           showToast(
-            action === 'reject'
-              ? 'Rechazada'
-              : action === 'feature'
+            action === 'feature'
                 ? 'Destacada'
                 : action === 'unfeature'
                   ? 'Ya no está destacada'
@@ -976,6 +992,24 @@ export default function AdminPage() {
                     value={chosenTemas(s)}
                     onChange={(ids) => setThemePick((prev) => ({ ...prev, [s.id]: ids }))}
                   />
+                  <RejectionReasonFields
+                    locale={s.locale ?? 'es'}
+                    reasonId={rejectDraft[s.id]?.reasonId ?? ''}
+                    detail={rejectDraft[s.id]?.detail ?? ''}
+                    disabled={actionLoading === s.id}
+                    onReasonId={(reasonId) =>
+                      setRejectDraft((prev) => ({
+                        ...prev,
+                        [s.id]: { reasonId, detail: prev[s.id]?.detail ?? '' },
+                      }))
+                    }
+                    onDetail={(detail) =>
+                      setRejectDraft((prev) => ({
+                        ...prev,
+                        [s.id]: { reasonId: prev[s.id]?.reasonId ?? '', detail },
+                      }))
+                    }
+                  />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
@@ -1009,7 +1043,18 @@ export default function AdminPage() {
                   <button
                     type="button"
                     disabled={actionLoading === s.id}
-                    onClick={() => patchStory(s.id, 'reject')}
+                    onClick={() => {
+                      const draft = rejectDraft[s.id] ?? { reasonId: '', detail: '' };
+                      const resolved = resolvePublicRejectionText(draft.reasonId, draft.detail, s.locale ?? 'es');
+                      if (!resolved.ok) {
+                        showToast(resolved.error);
+                        return;
+                      }
+                      void patchStory(s.id, 'reject', undefined, undefined, {
+                        reasonId: resolved.reasonId,
+                        detail: resolved.detail,
+                      });
+                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

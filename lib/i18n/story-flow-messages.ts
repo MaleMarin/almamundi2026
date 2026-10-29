@@ -432,7 +432,7 @@ const pt: StoryFlowMessages = {
   modalFieldCityMissing: 'Falta a cidade ou localidade.',
   modalFieldAgeMissing: 'Falta a idade.',
   modalFieldEmailMissing: 'Falta um e-mail válido.',
-  modalImprintAlt: 'Fitas de cores criadas a partir da sua história «{titulo}»',
+  modalImprintAlt: 'Fitas de cores criadas a partir da sua história “{titulo}”',
   modalCameraDenied:
     'Não temos permissão para usar sua câmera. Ative-a no navegador ou envie um vídeo que você já tenha.',
   modalCameraUnsupported:
@@ -588,7 +588,7 @@ const en: StoryFlowMessages = {
   modalFieldCityMissing: 'The city or town is missing.',
   modalFieldAgeMissing: 'Age is missing.',
   modalFieldEmailMissing: 'A valid email is missing.',
-  modalImprintAlt: 'Color ribbons created from your story «{titulo}»',
+  modalImprintAlt: 'Color ribbons created from your story “{titulo}”',
   modalCameraDenied:
     "We don't have permission to use your camera. Turn it on in your browser, or upload a video you already have.",
   modalCameraUnsupported:

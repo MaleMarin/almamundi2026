@@ -6,6 +6,7 @@ import { consentRowsFromRecord } from "@/lib/legal-consent";
 import { RESPUESTA_CONTACTS_COLLECTION, RESPUESTAS_COLLECTION, isRespuestaStatus } from "@/lib/respuestas/constants";
 import { signReadUrlForPath } from "@/lib/server-storage";
 import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 const AGE_LABEL = new Map(AGE_RANGE_OPTIONS.map((option) => [option.id, option.label]));
 const SEX_LABEL: Record<string, string> = {
@@ -115,6 +116,7 @@ export async function GET(request: NextRequest) {
           temas: Array.isArray(data.temas)
             ? data.temas.filter((item): item is string => typeof item === "string")
             : [],
+          locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
         };
       })
     );

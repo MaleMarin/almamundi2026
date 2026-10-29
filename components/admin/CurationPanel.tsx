@@ -18,11 +18,9 @@
 import { useState } from 'react';
 import { TEMAS, detectarTemas } from '@/lib/temas';
 import type { StoryData } from '@/lib/story-schema';
-import {
-  REJECTION_REASON_DETAIL_MAX,
-  REJECTION_REASON_OPTIONS,
-  resolvePublicRejectionText,
-} from '@/lib/editorial/rejection-reasons';
+import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
+import { parseAlmaLocale } from '@/lib/i18n/locale';
 
 // ─── Tipos UI ────────────────────────────────────────────────────────────────
 type CurationState = 'idle' | 'publishing' | 'rejecting' | 'done' | 'error';
@@ -114,7 +112,10 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
 
   // ── Rechazar ─────────────────────────────────────────────────────────────
   const rechazar = async () => {
-    const resolved = resolvePublicRejectionText(reasonId, reasonDetail);
+    const locale = parseAlmaLocale(
+      typeof (story as { locale?: string }).locale === 'string' ? (story as { locale?: string }).locale : undefined
+    );
+    const resolved = resolvePublicRejectionText(reasonId, reasonDetail, locale);
     if (!resolved.ok) {
       setErrorMsg(resolved.error);
       return;
@@ -322,34 +323,14 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
         titulo="Motivo si rechazas"
         subtitulo="La persona lo recibe por correo, en tono claro. Si hay duda (menores, terceros), pide más información y deja pendiente; no apruebes ni rechaces de inmediato."
       >
-        <select
-          value={reasonId}
-          onChange={(e) => setReasonId(e.target.value)}
-          style={{ ...inputStyle, width: '100%', marginBottom: '0.5rem' }}
-        >
-          <option value="">Elegir motivo…</option>
-          {REJECTION_REASON_OPTIONS.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
-        {reasonId === 'minors' && (
-          <p style={{ fontSize: '0.75rem', color: '#b45309', margin: '0 0 0.5rem' }}>
-            Si hay duda, no rechaces aún: pide más información y deja la historia pendiente.
-          </p>
-        )}
-        <textarea
-          value={reasonDetail}
-          onChange={(e) => setReasonDetail(e.target.value)}
-          maxLength={REJECTION_REASON_DETAIL_MAX}
-          placeholder={
-            reasonId === 'other'
-              ? 'Escribe el motivo que verá la persona…'
-              : 'Detalle opcional (también lo verá la persona)'
-          }
-          rows={2}
-          style={{ ...inputStyle, width: '100%', resize: 'vertical' }}
+        <RejectionReasonFields
+          tone="light"
+          locale={parseAlmaLocale(typeof (story as { locale?: string }).locale === 'string' ? (story as { locale?: string }).locale : undefined)}
+          reasonId={reasonId}
+          detail={reasonDetail}
+          disabled={state !== 'idle'}
+          onReasonId={setReasonId}
+          onDetail={setReasonDetail}
         />
       </Section>
 

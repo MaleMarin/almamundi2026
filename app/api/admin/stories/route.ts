@@ -10,6 +10,7 @@ import { isDeclaredHeic } from "@/lib/heic-jpeg";
 import { consentRowsFromRecord } from "@/lib/legal-consent";
 import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
 import { privateObjectContentType, signReadUrlForPath } from "@/lib/server-storage";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
 
@@ -280,6 +281,7 @@ function pendingRow(
     imagenes: imagenesOf(data, source),
     files,
     source,
+    locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
   };
 }
 

@@ -7,6 +7,9 @@ import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/compon
 import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema } from '@/lib/temas';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
+import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 
 type Kind = 'texto' | 'voz' | 'foto';
 type Status = 'pending' | 'approved' | 'rejected' | 'archived';
@@ -29,6 +32,7 @@ type RespuestaItem = {
   hasLocation: boolean;
   antecedentes?: string;
   temas?: string[];
+  locale?: AlmaLocale;
 };
 
 const CONFIRM_DELETE = '¿Eliminar esta respuesta y sus archivos? No se puede deshacer.';
@@ -112,6 +116,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
   const [loading, setLoading] = useState(false);
   const [actionId, setActionId] = useState<string | null>(null);
   const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
+  const [rejectDraft, setRejectDraft] = useState<Record<string, { reasonId: string; detail: string }>>({});
   const [notice, setNotice] = useState<string | null>(null);
 
   const headers = useCallback((): HeadersInit => ({ Authorization: `Bearer ${token}` }), [token]);
@@ -153,7 +158,8 @@ export default function RespuestasAdmin({ token }: { token: string }) {
     id: string,
     action: 'approve' | 'reject' | 'archive' | 'themes',
     place?: { city: string; country: string },
-    temas?: string[]
+    temas?: string[],
+    reason?: { reasonId: string; detail: string }
   ) => {
     setActionId(id);
     try {
@@ -164,6 +170,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
           action,
           ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
           ...(temas ? { temas } : {}),
+          ...(reason ? { reasonId: reason.reasonId, reasonDetail: reason.detail || undefined } : {}),
         }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string; code?: string };
@@ -381,6 +388,26 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                         Guardar temas
                       </button>
                     ) : null}
+                    {item.status === 'pending' ? (
+                      <RejectionReasonFields
+                        locale={item.locale ?? 'es'}
+                        reasonId={rejectDraft[item.id]?.reasonId ?? ''}
+                        detail={rejectDraft[item.id]?.detail ?? ''}
+                        disabled={busy}
+                        onReasonId={(reasonId) =>
+                          setRejectDraft((prev) => ({
+                            ...prev,
+                            [item.id]: { reasonId, detail: prev[item.id]?.detail ?? '' },
+                          }))
+                        }
+                        onDetail={(detail) =>
+                          setRejectDraft((prev) => ({
+                            ...prev,
+                            [item.id]: { reasonId: prev[item.id]?.reasonId ?? '', detail },
+                          }))
+                        }
+                      />
+                    ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     {item.status === 'pending' && (
@@ -401,7 +428,23 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       </button>
                     )}
                     {item.status === 'pending' && (
-                      <button type="button" disabled={busy} onClick={() => patch(item.id, 'reject')} style={dangerBtn}>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => {
+                          const draft = rejectDraft[item.id] ?? { reasonId: '', detail: '' };
+                          const resolved = resolvePublicRejectionText(draft.reasonId, draft.detail, item.locale ?? 'es');
+                          if (!resolved.ok) {
+                            setNotice(resolved.error);
+                            return;
+                          }
+                          void patch(item.id, 'reject', undefined, undefined, {
+                            reasonId: resolved.reasonId,
+                            detail: resolved.detail,
+                          });
+                        }}
+                        style={dangerBtn}
+                      >
                         <X size={16} /> Rechazar
                       </button>
                     )}

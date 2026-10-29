@@ -99,7 +99,7 @@ const CONTAR_META: Record<
     },
     texto: {
       title: 'Write what you never told anyone',
-      description: 'Here it is not lost in the scroll. It stays. Up to 5,000 characters.',
+      description: "Here, it doesn't get lost in the scroll. It stays. Up to 5,000 characters.",
     },
   },
 };

@@ -139,14 +139,22 @@ export function invitationHtml(): string {
   return primaryButtonHtml("Contar otra historia", absoluteEmailUrl("/contar"));
 }
 
+export function authorEmailFooterNote(locale: AlmaLocale, kind: "historia" | "respuesta"): string {
+  if (locale === "pt") {
+    const what = kind === "respuesta" ? "uma resposta" : "uma história";
+    return `Você está recebendo este e-mail porque enviou ${what} ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar.`;
+  }
+  if (locale === "en") {
+    const what = kind === "respuesta" ? "an answer" : "a story";
+    return `You're receiving this email because you sent ${what} to AlmaMundi. AlmaMundi is an initiative of Precisar.`;
+  }
+  const what = kind === "respuesta" ? "una respuesta" : "una historia";
+  return `Recibes este correo porque enviaste ${what} a AlmaMundi. AlmaMundi es una iniciativa de Precisar.`;
+}
+
 function receivedFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
-  const note =
-    locale === "pt"
-      ? "Você recebe este e-mail porque enviou uma história ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar."
-      : locale === "en"
-        ? "You receive this email because you sent a story to AlmaMundi. AlmaMundi is an initiative of Precisar."
-        : "Recibes este correo porque enviaste una historia a AlmaMundi. AlmaMundi es una iniciativa de Precisar.";
+  const note = authorEmailFooterNote(locale, "historia");
   const policy = locale === "en" ? "Privacy policy" : "Política de privacidad";
   const policyPt = locale === "pt" ? "Política de privacidade" : policy;
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
@@ -158,12 +166,7 @@ function receivedFooterHtml(locale: AlmaLocale = "es"): string {
 
 function respuestaFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
-  const note =
-    locale === "pt"
-      ? "Você recebe este e-mail porque enviou uma resposta ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar."
-      : locale === "en"
-        ? "You receive this email because you sent an answer to AlmaMundi. AlmaMundi is an initiative of Precisar."
-        : "Recibes este correo porque enviaste una respuesta a AlmaMundi. AlmaMundi es una iniciativa de Precisar.";
+  const note = authorEmailFooterNote(locale, "respuesta");
   const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         ${note}

@@ -9,24 +9,24 @@ export const PUBLIC_OG_LOCALE: Record<AlmaLocale, string> = {
 export function publicSiteMeta(locale: AlmaLocale): { title: string; description: string; ogAlt: string } {
   if (locale === 'pt') {
     return {
-      title: 'AlmaMundi, Entre e conte sua história',
+      title: 'AlmaMundi · Conte sua história',
       description:
-        'Descubra histórias de vida reais em vídeo, áudio ou texto, e entre para contar a sua. Cada história desperta outra.',
+        'Descubra histórias reais em vídeo, áudio, texto e foto, e conte a sua. Cada história desperta outra.',
       ogAlt: 'AlmaMundi, histórias de vida em vídeo, áudio, texto e foto',
     };
   }
   if (locale === 'en') {
     return {
-      title: 'AlmaMundi, Come in and tell your story',
+      title: 'AlmaMundi · Tell your story',
       description:
-        'Discover real life stories in video, audio, or text, and come in to tell yours. Each story awakens another.',
+        'Discover real stories in video, audio, text, and photos, and tell yours. Every story awakens another.',
       ogAlt: 'AlmaMundi, life stories in video, audio, text, and photo',
     };
   }
   return {
-    title: 'AlmaMundi, Entra y cuenta tu historia',
+    title: 'AlmaMundi · Cuenta tu historia',
     description:
-      'Descubre historias de vida reales en video, audio o texto, y entra a contar la tuya. Cada historia despierta otra.',
+      'Descubre historias reales en video, audio, texto y foto, y cuenta la tuya. Cada historia despierta otra.',
     ogAlt: 'AlmaMundi, historias de vida en video, audio, texto y foto',
   };
 }

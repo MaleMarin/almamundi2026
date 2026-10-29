@@ -666,7 +666,7 @@ const en: SiteUiMessages = {
     },
     texto: {
       title: 'Write what you never told anyone,\nor what you told everyone',
-      subtitle: 'Here it is not lost in the scroll. It stays.',
+      subtitle: "Here, it doesn't get lost in the scroll. It stays. Up to 5,000 characters.",
       limit: '',
       uploadLabel: '',
     },

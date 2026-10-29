@@ -23,6 +23,7 @@ import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -60,7 +61,14 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string; city?: string; country?: string; temas?: unknown };
+  let body: {
+    action?: string;
+    city?: string;
+    country?: string;
+    temas?: unknown;
+    reasonId?: unknown;
+    reasonDetail?: unknown;
+  };
   try {
     body = await request.json();
   } catch {
@@ -218,8 +226,14 @@ export async function PATCH(
         })
         .catch(() => undefined);
     } else if (action === "reject") {
+      const locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
+      const reason = resolvePublicRejectionText(body.reasonId, body.reasonDetail, locale);
+      if (!reason.ok) return NextResponse.json({ error: reason.error }, { status: 400 });
       await ref.update({
         status: "rejected",
+        rejectionReasonId: reason.reasonId,
+        rejectionReason: reason.publicText,
+        rejectionReasonDetail: reason.detail || null,
         updatedAt: FieldValue.serverTimestamp(),
       });
       const email = await contactEmail(id);
@@ -228,7 +242,8 @@ export async function PATCH(
         ? await sendRespuestaRejectedEmail({
             to: email,
             alias,
-            locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
+            locale,
+            publicReason: reason.publicText,
           })
         : { ok: false as const };
       await ref

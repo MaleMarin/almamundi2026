@@ -6,6 +6,7 @@
 import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
+  authorEmailFooterNote,
   AUTHOR_REPLY_TO,
   EMAIL_BOX,
   EMAIL_FONT,
@@ -44,9 +45,9 @@ function rejectionCopy(locale: AlmaLocale) {
     return {
       fallback: "sua história",
       hello: (name: string) => (name ? `Olá, ${name}:` : "Olá:"),
-      subject: (title: string) => `Sobre sua história «${title}» no AlmaMundi`,
+      subject: (title: string) => `Sobre sua história “${title}” no AlmaMundi`,
       reviewed: (title: string) =>
-        `Revisamos sua história «${title}» e, desta vez, não poderemos publicá-la no AlmaMundi.`,
+        `Revisamos sua história “${title}” e, desta vez, não poderemos publicá-la no AlmaMundi.`,
       reason: "Motivo",
       retry: (contact: string) =>
         `Se você acha que houve um erro, responda este e-mail ou escreva para ${contact} e vamos revisá-la de novo.`,
@@ -54,16 +55,15 @@ function rejectionCopy(locale: AlmaLocale) {
       thanksText: "Agradecemos por confiar sua história a nós.",
       team: "Equipe AlmaMundi",
       privacy: "Política de privacidade",
-      because: "Você recebeu este e-mail porque enviou uma história no AlmaMundi.",
     };
   }
   if (locale === "en") {
     return {
       fallback: "your story",
       hello: (name: string) => (name ? `Hello, ${name}:` : "Hello:"),
-      subject: (title: string) => `About your story «${title}» on AlmaMundi`,
+      subject: (title: string) => `About your story “${title}” on AlmaMundi`,
       reviewed: (title: string) =>
-        `We reviewed your story «${title}» and this time we will not be able to publish it on AlmaMundi.`,
+        `We reviewed your story “${title}” and this time we will not be able to publish it on AlmaMundi.`,
       reason: "Reason",
       retry: (contact: string) =>
         `If you think there was a mistake, reply to this email or write to ${contact} and we will review it again.`,
@@ -71,7 +71,6 @@ function rejectionCopy(locale: AlmaLocale) {
       thanksText: "Thank you for trusting us with your story.",
       team: "The AlmaMundi team",
       privacy: "Privacy policy",
-      because: "You received this email because you sent a story on AlmaMundi.",
     };
   }
   return {
@@ -87,7 +86,6 @@ function rejectionCopy(locale: AlmaLocale) {
     thanksText: "Gracias por confiarnos tu historia.",
     team: "Equipo AlmaMundi",
     privacy: "Política de privacidad",
-    because: "Recibiste este correo porque enviaste una historia en AlmaMundi.",
   };
 }
 
@@ -115,7 +113,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
       ${paragraphHtml(retry)}
       ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml, locale });
+  return emailShell({ bodyHtml, footer: "received", locale });
 }
 
 export function buildRejectionEmailText(params: SendRejectionEmailParams): string {
@@ -134,8 +132,8 @@ export function buildRejectionEmailText(params: SendRejectionEmailParams): strin
     copy.thanksText,
     copy.team,
     "",
+    authorEmailFooterNote(locale, "historia"),
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
-    copy.because,
   ].join("\n");
 }
 

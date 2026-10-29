@@ -7,6 +7,7 @@ import { formatPublicName } from "@/lib/historias/story-ubicacion";
 import type { AlmaLocale } from "@/lib/i18n/locale";
 import {
   absoluteEmailUrl,
+  authorEmailFooterNote,
   EMAIL_BOX,
   EMAIL_CONTACT_ADDRESS,
   EMAIL_FONT,
@@ -87,9 +88,9 @@ function receivedCopy(locale: AlmaLocale) {
     return {
       fallback: "sua história",
       hello: (alias: string) => (alias ? `Olá, ${alias}:` : "Olá:"),
-      subject: (title: string) => `Recebemos sua história «${title}»`,
+      subject: (title: string) => `Recebemos sua história “${title}”`,
       preview: "Agora ela passa por uma revisão. Avisaremos quando estiver no mapa.",
-      thanks: (title: string) => `Recebemos sua história «${title}». Agradecemos por contá-la no AlmaMundi.`,
+      thanks: (title: string) => `Recebemos sua história “${title}”. Agradecemos por contá-la no AlmaMundi.`,
       before: "Antes de publicá-la, uma pessoa da nossa equipe vai lê-la. Escreveremos para este e-mail quando ela aparecer no mapa.",
       titleLabel: "Título",
       formatLabel: "Formato",
@@ -103,7 +104,7 @@ function receivedCopy(locale: AlmaLocale) {
       another: "Conte outra história",
       map: "Explorar o mapa",
       doubts: "Tem dúvidas? Escreva para",
-      footerNote: "Você recebe este e-mail porque enviou uma história ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar.",
+      footerNote: authorEmailFooterNote("pt", "historia"),
       privacy: "Política de privacidade",
     };
   }
@@ -111,10 +112,10 @@ function receivedCopy(locale: AlmaLocale) {
     return {
       fallback: "your story",
       hello: (alias: string) => (alias ? `Hello, ${alias}:` : "Hello:"),
-      subject: (title: string) => `We received your story «${title}»`,
-      preview: "It now goes through a review. We will let you know when it is on the map.",
-      thanks: (title: string) => `We received your story «${title}». Thank you for telling it on AlmaMundi.`,
-      before: "Before we publish it, someone on our team will read it. We will write to this email when it appears on the map.",
+      subject: (title: string) => `We received your story “${title}”`,
+      preview: "It's now being reviewed. We'll let you know when it's on the map.",
+      thanks: (title: string) => `We received your story “${title}”. Thank you for telling it on AlmaMundi.`,
+      before: "Before we publish it, someone on our team will read it. We'll write to you at this address when it appears on the map.",
       titleLabel: "Title",
       formatLabel: "Format",
       dateLabel: "Date sent",
@@ -127,7 +128,7 @@ function receivedCopy(locale: AlmaLocale) {
       another: "Tell another story",
       map: "Explore the map",
       doubts: "Questions? Write to",
-      footerNote: "You receive this email because you sent a story to AlmaMundi. AlmaMundi is an initiative of Precisar.",
+      footerNote: authorEmailFooterNote("en", "historia"),
       privacy: "Privacy policy",
     };
   }
@@ -150,7 +151,7 @@ function receivedCopy(locale: AlmaLocale) {
     another: "Contar otra historia",
     map: "Explorar el mapa",
     doubts: "¿Tienes dudas? Escríbenos a",
-    footerNote: "Recibes este correo porque enviaste una historia a AlmaMundi. AlmaMundi es una iniciativa de Precisar.",
+    footerNote: authorEmailFooterNote("es", "historia"),
     privacy: "Política de privacidad",
   };
 }

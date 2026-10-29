@@ -29,7 +29,7 @@ const en: NotFoundMessages = {
   mapTitle: 'Back to the map',
   mapBody: 'Keep exploring the world',
   storiesTitle: 'See stories',
-  storiesBody: 'Stories in video, audio, photo and text',
+  storiesBody: 'Stories in video, audio, photos, and text',
 };
 
 export const NOT_FOUND_MESSAGES: Record<AlmaLocale, NotFoundMessages> = { es, pt, en };

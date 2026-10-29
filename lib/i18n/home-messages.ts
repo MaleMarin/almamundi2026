@@ -150,7 +150,7 @@ const pt: HomeMessages = {
 
 const en: HomeMessages = {
   navPurpose: 'Purpose',
-  navHow: 'How it works?',
+  navHow: 'How does it work?',
   navStories: 'Stories',
   navHistoriasColeccion: 'My collection',
   navHistoriasVideos: 'Videos',

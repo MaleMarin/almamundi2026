@@ -48,11 +48,11 @@ export const COMO_FUNCIONA: Record<
     close: 'Fechar',
   },
   en: {
-    title: 'How it works?',
+    title: 'How does it work?',
     p1: 'AlmaMundi is a living map of human stories.',
     formats: 'video, audio, text, or photo',
     p2: 'You can share your story in',
-    p2b: '. Sending in any of these formats is for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Each story goes through editorial review:',
+    p2b: '. Submissions in any of these formats are for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Every story goes through editorial review:',
     auto: 'nothing is published automatically',
     p3: 'We only publish stories that respect human dignity, privacy, copyright, and human rights. We do not accept content with',
     banned:

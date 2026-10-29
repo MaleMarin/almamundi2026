@@ -12,10 +12,9 @@ import {
   type User } from 'firebase/auth';
 import { isAdminEmail } from '@/lib/adminEmails';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import {
-  REJECTION_REASON_DETAIL_MAX,
-  REJECTION_REASON_OPTIONS,
-  resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
+import { parseAlmaLocale, type AlmaLocale } from '@/lib/i18n/locale';
 import { CONDUCT_GUIDE_HREF, moreInfoMailto } from '@/lib/editorial/edge-case-protocol';
 
 type Submission = {
@@ -33,6 +32,7 @@ type Submission = {
   lng?: number;
   malwareScanStatus?: string;
   malwareFlag?: boolean;
+  locale?: AlmaLocale | string;
 };
 
 type PendingReaderMessage = {
@@ -561,6 +561,7 @@ export default function CuraduriaPage() {
                     <p className="text-[length:var(--fs-etiqueta)] text-white/50">Sin correo: no se puede pedir más información por aquí.</p>
                   )}
                   <RejectionControls
+                    locale={parseAlmaLocale(typeof s.locale === 'string' ? s.locale : undefined)}
                     disabled={publishingId === s.id || (rejectingId !== null && rejectingId !== s.id)}
                     busy={rejectingId === s.id}
                     onReject={(reasonId, reasonDetail, nota) =>
@@ -622,9 +623,11 @@ function EdgeCaseProtocol() {
 }
 
 function RejectionControls({
+  locale,
   disabled,
   busy,
   onReject }: {
+  locale: AlmaLocale;
   disabled: boolean;
   busy: boolean;
   onReject: (reasonId: string, reasonDetail: string, nota: string) => void;
@@ -632,44 +635,18 @@ function RejectionControls({
   const [reasonId, setReasonId] = useState('');
   const [detail, setDetail] = useState('');
   const [nota, setNota] = useState('');
-  const preview = reasonId ? resolvePublicRejectionText(reasonId, detail) : null;
+  const preview = reasonId ? resolvePublicRejectionText(reasonId, detail, locale) : null;
   const canSubmit = Boolean(preview && preview.ok) && !disabled && !busy;
 
   return (
     <div className="flex flex-col gap-2">
-      {reasonId === 'minors' && (
-        <p className="text-amber-200 text-[length:var(--fs-etiqueta)] leading-relaxed">
-          Si hay duda, no rechaces aún: pide más información y deja la historia pendiente.
-        </p>
-      )}
-      <label className="text-[length:var(--fs-etiqueta)] text-white/60">
-        Motivo del rechazo (lo recibe la persona por correo)
-        <select
-          value={reasonId}
-          onChange={(e) => setReasonId(e.target.value)}
-          disabled={disabled || busy}
-          className="mt-1 w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-[length:var(--fs-pequeno)]"
-        >
-          <option value="">Elegir motivo…</option>
-          {REJECTION_REASON_OPTIONS.map((opt) => (
-            <option key={opt.id} value={opt.id} className="text-black">
-              {opt.label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <textarea
-        value={detail}
-        onChange={(e) => setDetail(e.target.value)}
+      <RejectionReasonFields
+        locale={locale}
+        reasonId={reasonId}
+        detail={detail}
         disabled={disabled || busy}
-        maxLength={REJECTION_REASON_DETAIL_MAX}
-        rows={2}
-        placeholder={
-          reasonId === 'other'
-            ? 'Escribe el motivo que verá la persona…'
-            : 'Detalle opcional (también lo verá la persona)'
-        }
-        className="w-full px-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white text-[length:var(--fs-pequeno)] placeholder-white/40"
+        onReasonId={setReasonId}
+        onDetail={setDetail}
       />
       <textarea
         value={nota}

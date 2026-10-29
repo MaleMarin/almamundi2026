@@ -6,8 +6,12 @@
 import { escapeHtml, isValidRecipientEmail } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
+  authorEmailFooterNote,
   AUTHOR_REPLY_TO,
+  EMAIL_BOX,
   EMAIL_CONTACT_ADDRESS,
+  EMAIL_FONT,
+  EMAIL_INK,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -57,6 +61,7 @@ function respuestaCopy(locale: AlmaLocale) {
       see: "Ver a pergunta",
       rejectedSubject: "Sobre sua resposta no AlmaMundi",
       rejectedBody: "Revisamos sua resposta e, desta vez, não vamos publicá-la. Se quiser, você pode enviar outra.",
+      reason: "Motivo",
       again: "Responder de novo",
     };
   }
@@ -79,6 +84,7 @@ function respuestaCopy(locale: AlmaLocale) {
       see: "See the question",
       rejectedSubject: "About your answer on AlmaMundi",
       rejectedBody: "We reviewed your answer and this time we will not publish it. If you want, you can send another.",
+      reason: "Reason",
       again: "Answer again",
     };
   }
@@ -100,6 +106,7 @@ function respuestaCopy(locale: AlmaLocale) {
     see: "Ver la pregunta",
     rejectedSubject: "Sobre tu respuesta en AlmaMundi",
     rejectedBody: "Revisamos tu respuesta y esta vez no la publicaremos. Si quieres, puedes enviar otra.",
+    reason: "Motivo",
     again: "Responder de nuevo",
   };
 }
@@ -183,6 +190,8 @@ export async function sendRespuestaReceivedEmail(opts: {
     "",
     copy.thanksText,
     copy.team,
+    "",
+    authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");
   return deliver({
     to: opts.to,
@@ -222,6 +231,8 @@ export async function sendRespuestaPublishedEmail(opts: {
     "",
     copy.thanksText,
     copy.team,
+    "",
+    authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");
   return deliver({
     to: opts.to,
@@ -235,11 +246,13 @@ export async function sendRespuestaRejectedEmail(opts: {
   to: string;
   alias: string;
   locale?: AlmaLocale;
+  publicReason: string;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
   const url = absoluteEmailUrl("/pregunta");
+  const reason = escapeHtml(opts.publicReason.trim());
   const html = emailShell({
     preheader: copy.rejectedSubject,
     footer: "respuesta",
@@ -247,6 +260,7 @@ export async function sendRespuestaRejectedEmail(opts: {
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(copy.rejectedBody),
+      `<p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${copy.reason}: ${reason}</p>`,
       primaryButtonHtml(copy.again, url),
       contactLine(locale),
       paragraphHtml(copy.team, "0"),
@@ -257,11 +271,15 @@ export async function sendRespuestaRejectedEmail(opts: {
     "",
     copy.rejectedBody,
     "",
+    `${copy.reason}: ${opts.publicReason.trim()}`,
+    "",
     `${copy.again}: ${url}`,
     "",
     `${copy.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
     "",
     copy.team,
+    "",
+    authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");
   return deliver({
     to: opts.to,

@@ -20,6 +20,7 @@ import {
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 import { promotePublicStoryMedia } from "@/lib/published-media";
 import { getAdminBucket } from "@/lib/firebase/admin";
 import {
@@ -30,7 +31,6 @@ import {
 } from "@/lib/server-storage";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
-import { parseAlmaLocale } from "@/lib/i18n/locale";
 import { deleteAuthorContact, saveAuthorPrivate } from "@/lib/author-contacts";
 import {
   notifyAuthorStoryRejected,
@@ -695,8 +695,6 @@ export async function editorialRejectModerationDocument(args: {
   | { ok: false; httpStatus: number; error: string }
 > {
   const { db, docId, actorEmail, nota } = args;
-  const reason = resolvePublicRejectionText(args.reasonId, args.reasonDetail);
-  if (!reason.ok) return { ok: false, httpStatus: 400, error: reason.error };
 
   let ref: DocumentReference | null = null;
   let prev: Record<string, unknown> = {};
@@ -711,6 +709,13 @@ export async function editorialRejectModerationDocument(args: {
     break;
   }
   if (!ref || !collection) return { ok: false, httpStatus: 404, error: "Historia no encontrada" };
+
+  const reason = resolvePublicRejectionText(
+    args.reasonId,
+    args.reasonDetail,
+    parseAlmaLocale(typeof prev.locale === "string" ? prev.locale : undefined)
+  );
+  if (!reason.ok) return { ok: false, httpStatus: 400, error: reason.error };
 
   const rejectedAt = new Date().toISOString();
   const updatedAt = new Date().toISOString();

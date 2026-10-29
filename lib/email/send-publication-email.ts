@@ -5,6 +5,7 @@
 import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
+  authorEmailFooterNote,
   AUTHOR_REPLY_TO,
   emailShell,
   greetingHtml,
@@ -38,9 +39,9 @@ function publicationCopy(locale: AlmaLocale) {
     return {
       fallback: "sua história",
       hello: (name: string) => (name ? `Olá, ${name}:` : "Olá:"),
-      subject: (title: string) => `Sua história «${title}» já está no AlmaMundi`,
+      subject: (title: string) => `Sua história “${title}” já está no AlmaMundi`,
       lead: (title: string, where: string) => {
-        const base = `Sua história «${title}» já está publicada no mapa do AlmaMundi`;
+        const base = `Sua história “${title}” já está publicada no mapa do AlmaMundi`;
         const located = where ? `${base}, em ${where}` : base;
         return `${located}. A partir de hoje, qualquer pessoa que visite o site pode vê-la.`;
       },
@@ -51,27 +52,25 @@ function publicationCopy(locale: AlmaLocale) {
       thanksText: "Agradecemos por contá-la.",
       team: "Equipe AlmaMundi",
       privacy: "Política de privacidade",
-      because: "Você recebeu este e-mail porque enviou uma história no AlmaMundi.",
     };
   }
   if (locale === "en") {
     return {
       fallback: "your story",
       hello: (name: string) => (name ? `Hello, ${name}:` : "Hello:"),
-      subject: (title: string) => `Your story «${title}» is now on AlmaMundi`,
+      subject: (title: string) => `Your story “${title}” is now on AlmaMundi`,
       lead: (title: string, where: string) => {
-        const base = `Your story «${title}» is now published on the AlmaMundi map`;
+        const base = `Your story “${title}” is now published on the AlmaMundi map`;
         const located = where ? `${base}, in ${where}` : base;
-        return `${located}. From today, anyone who visits the site can see it.`;
+        return `${located}. Starting today, anyone who visits the site can see it.`;
       },
-      share: "If you want, share it with whomever you choose.",
+      share: "If you'd like, share it with anyone you choose.",
       see: "See my story",
       another: "Tell another story",
       thanks: "Thank you for telling it.<br>The AlmaMundi team",
       thanksText: "Thank you for telling it.",
       team: "The AlmaMundi team",
       privacy: "Privacy policy",
-      because: "You received this email because you sent a story on AlmaMundi.",
     };
   }
   return {
@@ -90,7 +89,6 @@ function publicationCopy(locale: AlmaLocale) {
     thanksText: "Gracias por contarla.",
     team: "Equipo AlmaMundi",
     privacy: "Política de privacidad",
-    because: "Recibiste este correo porque enviaste una historia en AlmaMundi.",
   };
 }
 
@@ -157,8 +155,8 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     copy.thanksText,
     copy.team,
     "",
-    `${absoluteEmailUrl("/")} · ${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
-    copy.because,
+    authorEmailFooterNote(locale, "historia"),
+    `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
   ].join("\n");
 }
 
@@ -184,7 +182,7 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
       ${primaryButtonHtml(copy.another, absoluteEmailUrl("/contar"))}
       ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml, locale });
+  return emailShell({ bodyHtml, footer: "received", locale });
 }
 
 export type SendPublicationEmailResult =
