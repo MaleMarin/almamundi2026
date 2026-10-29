@@ -2,7 +2,6 @@ import type { UploadModalCopy } from '@/lib/subir-upload-modal-copy';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 export type SiteUiMessages = {
-  footerClosingLine: string;
   footerInitiativeOf: string;
   footerLegalAria: string;
   footerPrivacy: string;
@@ -18,15 +17,9 @@ export type SiteUiMessages = {
   listHeroTitle: string;
   listHeroSubtitle: string;
   listFilterAria: string;
-  listFilterBlockTitle: string;
   listFilterCountry: string;
-  listFilterYear: string;
-  listFilterAllYears: string;
-  listFilterKeywords: string;
   listFilterClear: string;
-  listFilterNoMatch: string;
   listFilterShowing: string;
-  listCarouselAria: string;
   listKickerVideos: string;
   listKickerAudios: string;
   listKickerEscrito: string;
@@ -37,34 +30,6 @@ export type SiteUiMessages = {
   listExpoFotos: string;
   listShareLabel: string;
   listShareText: string;
-  listLetterLabel: string;
-  listLetterText: string;
-  coleccionKicker: string;
-  coleccionTitle: string;
-  coleccionSubtitle: string;
-  coleccionEmpty: string;
-  coleccionEmptyHint: string;
-  coleccionGoStories: string;
-  coleccionShare: string;
-  coleccionCopied: string;
-  coleccionCreateInspired: string;
-  coleccionRemove: string;
-  coleccionRemoveAria: string;
-  coleccionUntitled: string;
-  archivoBack: string;
-  archivoTitle: string;
-  archivoLead: string;
-  archivoTabWeek: string;
-  archivoTabTheme: string;
-  archivoTabMuestras: string;
-  archivoLoading: string;
-  archivoEmpty: string;
-  archivoAll: string;
-  archivoEmptyTheme: string;
-  archivoMuestrasCount: string;
-  archivoViewMuestra: string;
-  archivoEmptyMuestras: string;
-  archivoWeekTitle: string;
   subirH1: string;
   subirBackHome: string;
   modalClose: string;
@@ -147,8 +112,6 @@ export type SiteUiMessages = {
 };
 
 const es: SiteUiMessages = {
-  footerClosingLine:
-    'Historias que no se pierden, sino que despiertan otras historias.',
   footerInitiativeOf: 'Una iniciativa de',
   footerLegalAria: 'Información legal y datos personales',
   footerPrivacy: 'Aviso de privacidad',
@@ -165,16 +128,9 @@ const es: SiteUiMessages = {
   listHeroTitle: 'El mundo tiene millones de historias que nadie conoce.',
   listHeroSubtitle: 'Estas son algunas.',
   listFilterAria: 'Filtros de historias',
-  listFilterBlockTitle: 'Buscar por país, año o palabras clave',
   listFilterCountry: 'País',
-  listFilterYear: 'Año',
-  listFilterAllYears: 'Todos los años',
-  listFilterKeywords: 'Palabras clave',
   listFilterClear: 'Limpiar filtros',
-  listFilterNoMatch:
-    'Ninguna historia coincide con los filtros. El carrusel muestra las {count} historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros».',
   listFilterShowing: 'Mostrando {shown} de {total} historias.',
-  listCarouselAria: 'Carrusel de historias',
   listKickerVideos: 'Historias en video',
   listKickerAudios: 'Historias en audio',
   listKickerEscrito: 'Historias en texto',
@@ -186,36 +142,6 @@ const es: SiteUiMessages = {
   listShareLabel: 'Compartir',
   listShareText:
     'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
-  listLetterLabel: 'Mensaje a quien cuenta',
-  listLetterText:
-    'Escribir un mensaje breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
-  coleccionKicker: 'Tu colección',
-  coleccionTitle: 'Historias que guardaste',
-  coleccionSubtitle: 'Compártelas o úsalas como inspiración para crear la tuya.',
-  coleccionEmpty: 'Aún no has guardado ninguna historia.',
-  coleccionEmptyHint:
-    'En Videos o Audios, elige una historia y haz clic en "Guardar en mi colección".',
-  coleccionGoStories: 'Ir a Historias',
-  coleccionShare: 'Compartir',
-  coleccionCopied: 'Copiado',
-  coleccionCreateInspired: 'Crear inspirado en esta',
-  coleccionRemove: 'Quitar',
-  coleccionRemoveAria: 'Quitar de mi colección',
-  coleccionUntitled: 'Sin título',
-  archivoBack: '← AlmaMundi',
-  archivoTitle: 'Archivo',
-  archivoLead: 'Historias que ya pasaron por el mapa y permanecen en el archivo.',
-  archivoTabWeek: 'Por semana',
-  archivoTabTheme: 'Por tema',
-  archivoTabMuestras: 'Muestras',
-  archivoLoading: 'Cargando…',
-  archivoEmpty: 'El archivo se construye con las historias que ya recorrieron el mapa. La tuya también puede llegar.',
-  archivoAll: 'Todos',
-  archivoEmptyTheme: 'Este tema, en el archivo, se escribe con historias como la tuya.',
-  archivoMuestrasCount: 'AlmaMundi · {n} historias',
-  archivoViewMuestra: 'Ver muestra',
-  archivoEmptyMuestras: 'No hay muestras publicadas.',
-  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Elegir formato de participación',
   subirBackHome: '← Volver al inicio',
   modalClose: 'Cerrar',
@@ -325,8 +251,6 @@ const es: SiteUiMessages = {
 };
 
 const pt: SiteUiMessages = {
-  footerClosingLine:
-    'Histórias que não se perdem, mas despertam outras histórias.',
   footerInitiativeOf: 'Uma iniciativa de',
   footerLegalAria: 'Informação legal e dados pessoais',
   footerPrivacy: 'Aviso de privacidade',
@@ -343,16 +267,9 @@ const pt: SiteUiMessages = {
   listHeroTitle: 'O mundo tem milhões de histórias que ninguém conhece.',
   listHeroSubtitle: 'Estas são algumas.',
   listFilterAria: 'Filtros de histórias',
-  listFilterBlockTitle: 'Procurar por país, ano ou palavras-chave',
   listFilterCountry: 'País',
-  listFilterYear: 'Ano',
-  listFilterAllYears: 'Todos os anos',
-  listFilterKeywords: 'Palavras-chave',
   listFilterClear: 'Limpar filtros',
-  listFilterNoMatch:
-    'Nenhuma história coincide com os filtros. O carrossel mostra as {count} histórias disponíveis. Ajuste os filtros ou toque em «Limpar filtros».',
   listFilterShowing: 'Mostrando {shown} de {total} histórias.',
-  listCarouselAria: 'Carrossel de histórias',
   listKickerVideos: 'Histórias em vídeo',
   listKickerAudios: 'Histórias em áudio',
   listKickerEscrito: 'Histórias em texto',
@@ -364,36 +281,6 @@ const pt: SiteUiMessages = {
   listShareLabel: 'Compartilhar',
   listShareText:
     'Compartilhar a história com respeito: crédito a quem conta, link e cartão para baixar.',
-  listLetterLabel: 'Mensagem a quem conta',
-  listLetterText:
-    'Escreva uma mensagem breve de ressonância para quem narra este relato. O AlmaMundi recebe sua mensagem, revisa com cuidado (inclui um filtro automático de respeito) e, quando corresponder, pode aproximá-la de quem contou. É um processo com pausa: não há envio direto sem esse cuidado.',
-  coleccionKicker: 'Sua coleção',
-  coleccionTitle: 'Histórias que você guardou',
-  coleccionSubtitle: 'Compartilhe ou use como inspiração para criar a sua.',
-  coleccionEmpty: 'Você ainda não guardou nenhuma história.',
-  coleccionEmptyHint:
-    'Em Vídeos ou Áudios, escolha uma história e toque em "Guardar na minha coleção".',
-  coleccionGoStories: 'Ir a Histórias',
-  coleccionShare: 'Compartilhar',
-  coleccionCopied: 'Copiado',
-  coleccionCreateInspired: 'Criar inspirado nesta',
-  coleccionRemove: 'Remover',
-  coleccionRemoveAria: 'Remover da minha coleção',
-  coleccionUntitled: 'Sem título',
-  archivoBack: '← AlmaMundi',
-  archivoTitle: 'Arquivo',
-  archivoLead: 'Histórias que já passaram pelo mapa e permanecem no arquivo.',
-  archivoTabWeek: 'Por semana',
-  archivoTabTheme: 'Por tema',
-  archivoTabMuestras: 'Amostras',
-  archivoLoading: 'Carregando…',
-  archivoEmpty: 'O arquivo se constrói com as histórias que já percorreram o mapa. A sua também pode chegar.',
-  archivoAll: 'Todos',
-  archivoEmptyTheme: 'Este tema, no arquivo, se escreve com histórias como a sua.',
-  archivoMuestrasCount: 'AlmaMundi · {n} histórias',
-  archivoViewMuestra: 'Ver amostra',
-  archivoEmptyMuestras: 'Não há amostras publicadas.',
-  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Escolher formato de participação',
   subirBackHome: '← Voltar ao início',
   modalClose: 'Fechar',
@@ -417,7 +304,7 @@ const pt: SiteUiMessages = {
   modalSendingPhotos: 'Enviando suas fotos…',
   modalSectionStory: 'História',
   modalStoryName: 'Título da sua história *',
-  modalAlias: 'Nome ou alias *',
+  modalAlias: 'Nome ou apelido *',
   modalExtras: 'Quer contar mais alguma coisa? (opcional)',
   modalCancionRelacionada: 'Uma música para esta história (opcional)',
   modalFiles: 'Fotos extras (opcional, até 10 MB cada)',
@@ -443,18 +330,18 @@ const pt: SiteUiMessages = {
   modalEmail: 'E-mail',
   modalEmailHint:
     'Avisamos por e-mail quando sua história estiver no mapa (depois da revisão). Não aparece em público.',
-  modalLegalNote: 'A sua história ficará em revisão antes de fazer parte de AlmaMundi.',
+  modalLegalNote: 'Sua história ficará em revisão antes de fazer parte do AlmaMundi.',
   modalBack: 'Voltar',
   modalSending: 'Enviando…',
   modalSend: 'Enviar minha história',
   modalRecord: 'Gravar',
-  modalRecording: 'A gravar…',
+  modalRecording: 'Gravando…',
   modalReviewVideo: 'Revise seu vídeo',
   modalReviewAudio: 'Revise seu áudio',
   modalRecordVoice: 'Gravar voz',
   modalRerecord: 'Voltar a gravar',
   modalStop: 'Parar',
-  modalListenClip: 'Escute o clip completo antes de continuar.',
+  modalListenClip: 'Escute antes de continuar. Se não gostar, grave de novo.',
   modalChars: '{n} / {max} caracteres',
   modalReceivedNamed: '{name},\nseu relato em cores.',
   modalReceivedAnon: 'Seu relato em cores.',
@@ -503,7 +390,6 @@ const pt: SiteUiMessages = {
 };
 
 const en: SiteUiMessages = {
-  footerClosingLine: 'Stories that are not lost, they awaken other stories.',
   footerInitiativeOf: 'An initiative of',
   footerLegalAria: 'Legal information and personal data',
   footerPrivacy: 'Privacy notice',
@@ -520,57 +406,20 @@ const en: SiteUiMessages = {
   listHeroTitle: 'The world holds millions of stories no one knows.',
   listHeroSubtitle: 'These are a few of them.',
   listFilterAria: 'Story filters',
-  listFilterBlockTitle: 'Search by country, year, or keywords',
   listFilterCountry: 'Country',
-  listFilterYear: 'Year',
-  listFilterAllYears: 'All years',
-  listFilterKeywords: 'Keywords',
   listFilterClear: 'Clear filters',
-  listFilterNoMatch:
-    'No stories match the filters. The carousel shows the {count} stories available. Adjust the filters or tap “Clear filters”.',
   listFilterShowing: 'Showing {shown} of {total} stories.',
-  listCarouselAria: 'Stories carousel',
   listKickerVideos: 'Stories in video',
   listKickerAudios: 'Stories in audio',
   listKickerEscrito: 'Stories in writing',
-  listKickerFotos: 'Stories in photo',
+  listKickerFotos: 'Stories in photos',
   listExpoVideos: 'alma.mundi / stories in video',
   listExpoAudios: 'alma.mundi / stories in audio',
   listExpoEscrito: 'alma.mundi / stories in writing',
-  listExpoFotos: 'alma.mundi / stories in photo',
+  listExpoFotos: 'alma.mundi / stories in photos',
   listShareLabel: 'Share',
   listShareText:
     'Share the story with care: credit the teller, a link, and a downloadable card.',
-  listLetterLabel: 'Message to the teller',
-  listLetterText:
-    'Write a short resonance message to the person who told this story. AlmaMundi receives your message, reviews it with care (including an automatic respect filter) and, when it is right, may pass it on. There is a pause: nothing is sent through without this safeguard.',
-  coleccionKicker: 'Your collection',
-  coleccionTitle: 'Stories you saved',
-  coleccionSubtitle: 'Share them, or use them as a spark to create yours.',
-  coleccionEmpty: 'You have not saved any stories yet.',
-  coleccionEmptyHint:
-    'In Videos or Audio, choose a story and click “Save to my collection”.',
-  coleccionGoStories: 'Go to Stories',
-  coleccionShare: 'Share',
-  coleccionCopied: 'Copied',
-  coleccionCreateInspired: 'Create inspired by this',
-  coleccionRemove: 'Remove',
-  coleccionRemoveAria: 'Remove from my collection',
-  coleccionUntitled: 'Untitled',
-  archivoBack: '← AlmaMundi',
-  archivoTitle: 'Archive',
-  archivoLead: 'Stories that have left the map and remain in the archive.',
-  archivoTabWeek: 'By week',
-  archivoTabTheme: 'By theme',
-  archivoTabMuestras: 'Samples',
-  archivoLoading: 'Loading…',
-  archivoEmpty: 'The archive is built from stories that have already traveled the map. Yours can arrive too.',
-  archivoAll: 'All',
-  archivoEmptyTheme: 'This theme in the archive is written with stories like yours.',
-  archivoMuestrasCount: 'AlmaMundi · {n} stories',
-  archivoViewMuestra: 'View sample',
-  archivoEmptyMuestras: 'No samples published.',
-  archivoWeekTitle: '{week}, {day} {month} {year}',
   subirH1: 'Choose how to take part',
   subirBackHome: '← Back to home',
   modalClose: 'Close',
@@ -582,7 +431,7 @@ const en: SiteUiMessages = {
   modalConfirmSend: 'Submission confirmation',
   modalDetailsTitle: 'Please leave us your details',
   modalDetailsSubtitle:
-    'This is how we can place your story on the map and let you know when it is published.',
+    "This is how we can place your story on the map and let you know when it's published.",
   modalSendVideo: 'Send my video',
   modalSendAudio: 'Send my audio',
   modalSendText: 'Send my text',
@@ -619,7 +468,7 @@ const en: SiteUiMessages = {
   modalGenderOther: 'Other',
   modalEmail: 'Email',
   modalEmailHint:
-    'We will email you when your story is on the map (after review). It is not shown publicly.',
+    "We'll email you when your story is on the map (after review). It's not shown publicly.",
   modalLegalNote: 'Your story will be reviewed before it becomes part of AlmaMundi.',
   modalBack: 'Back',
   modalSending: 'Sending…',
@@ -631,7 +480,7 @@ const en: SiteUiMessages = {
   modalRecordVoice: 'Record voice',
   modalRerecord: 'Record again',
   modalStop: 'Stop',
-  modalListenClip: 'Listen to the full clip before continuing.',
+  modalListenClip: "Listen to it before continuing. If you're not happy with it, record again.",
   modalChars: '{n} / {max} characters',
   modalReceivedNamed: '{name},\nyour story in colors.',
   modalReceivedAnon: 'Your story in colors.',
@@ -642,8 +491,8 @@ const en: SiteUiMessages = {
   modalDownloadImprint: 'Download',
   modalShareImprint: 'Share',
   modalShareCopied: 'Image copied. You can paste it wherever you like.',
-  modalShareDownloaded: 'Your browser could not copy the image; the PNG was downloaded instead.',
-  modalShareFailed: 'Could not share the image.',
+  modalShareDownloaded: "Your browser couldn't copy the image; the PNG was downloaded instead.",
+  modalShareFailed: "We couldn't share the image. Save it and share it from your gallery.",
   modalCopyLink: 'Copy link',
   modalAnotherStory: 'Another story',
   modalLinkCopied: 'Link copied',
@@ -660,7 +509,7 @@ const en: SiteUiMessages = {
     },
     audio: {
       title: 'Some stories are best told out loud',
-      subtitle: 'Your voice holds what written words cannot always carry.',
+      subtitle: "Your voice holds what written words can't always carry.",
       limit: 'Up to 5 minutes of audio.',
       uploadLabel: 'or upload audio from your device',
     },
@@ -671,7 +520,7 @@ const en: SiteUiMessages = {
       uploadLabel: '',
     },
     foto: {
-      title: 'An image can hold\nwhat words cannot reach',
+      title: "An image can hold\nwhat words can't reach",
       subtitle: 'Upload up to 8 photos. Each one includes its name, the year, and the place where it was taken.',
       limit: 'Up to 10 MB per photo.',
       uploadLabel: '',

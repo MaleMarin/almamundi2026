@@ -154,7 +154,7 @@ const en: HomeMessages = {
   navStories: 'Stories',
   navHistoriasColeccion: 'My collection',
   navHistoriasVideos: 'Videos',
-  navHistoriasAudios: 'Audios',
+  navHistoriasAudios: 'Audio',
   navHistoriasEscrito: 'Texts',
   navHistoriasFotos: 'Photos',
   navMap: 'Map',
@@ -185,7 +185,7 @@ const en: HomeMessages = {
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
     "Some stories don't need to be seen, only heard. Up to 5 minutes.",
-  cardAudioCta: 'Record an audio',
+  cardAudioCta: 'Record audio',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
@@ -209,7 +209,7 @@ export const NOSCRIPT_BY_LOCALE: Record<AlmaLocale, NoscriptCopy> = {
   },
   pt: {
     title: 'AlmaMundi',
-    p: 'Precisa de JavaScript para ver o site.',
+    p: 'Você precisa de JavaScript para ver o site.',
     link: 'Ir ao início',
   },
   en: {

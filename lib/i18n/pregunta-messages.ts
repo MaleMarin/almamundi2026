@@ -74,12 +74,6 @@ export const PREGUNTA_COPY = {
     pt: 'Ainda não há respostas. Seja a primeira pessoa a responder.',
     en: 'No answers yet. Be the first to answer.',
   },
-  modeYou: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
-  modeYouLine: {
-    es: 'Responde desde tu propia vida.',
-    pt: 'Responda a partir da sua própria vida.',
-    en: 'Answer from your own life.',
-  },
   how: {
     es: '¿Cómo quieres responder?',
     pt: 'Como você quer responder?',
@@ -97,8 +91,6 @@ export const PREGUNTA_COPY = {
   uploadAudio: { es: 'Subir un audio', pt: 'Enviar um áudio', en: 'Upload audio' },
   photo: { es: 'Una foto con una frase', pt: 'Uma foto com uma frase', en: 'A photo with a sentence' },
   caption: { es: 'Frase de la foto', pt: 'Frase da foto', en: 'Photo caption' },
-  all: { es: 'Todas', pt: 'Todas', en: 'All' },
-  you: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
   errText: {
     es: 'El texto puede tener hasta 1000 caracteres.',
     pt: 'O texto pode ter até 1000 caracteres.',

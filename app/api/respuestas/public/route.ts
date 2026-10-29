@@ -1,7 +1,7 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
-import { resolveQuestionId, isQuestionMode } from "@/lib/pregunta-semana";
+import { resolveQuestionId } from "@/lib/pregunta-semana";
 import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from "@/lib/rate-limit";
 import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
 import { isShortCode } from "@/lib/short-code";
@@ -17,7 +17,7 @@ function toMillis(ts: unknown): number {
   return 0;
 }
 
-/** GET /api/respuestas/public?questionId=&mode=&offset=&limit= — solo aprobadas, sin correo. */
+/** GET /api/respuestas/public?questionId=&offset=&limit= — solo aprobadas, sin correo. */
 export async function GET(request: NextRequest) {
   const ip = clientIpFromRequest(request);
   const blocked = await enforceRateLimit(
@@ -29,8 +29,6 @@ export async function GET(request: NextRequest) {
 
   const questionId = resolveQuestionId(request.nextUrl.searchParams.get("questionId"));
   if (!questionId) return NextResponse.json({ error: "invalid_question" }, { status: 400 });
-  const modeRaw = request.nextUrl.searchParams.get("mode");
-  const mode = modeRaw && isQuestionMode(modeRaw) ? modeRaw : null;
   const limitRaw = Number(request.nextUrl.searchParams.get("limit") ?? 24);
   const offsetRaw = Number(request.nextUrl.searchParams.get("offset") ?? 0);
   const limit = Number.isFinite(limitRaw) ? Math.min(40, Math.max(1, Math.floor(limitRaw))) : 24;
@@ -46,7 +44,6 @@ export async function GET(request: NextRequest) {
       if (data.malwareScanStatus === "infected") continue;
       total += 1;
       const itemMode = data.mode === "alguien" ? "alguien" : "tu";
-      if (mode && itemMode !== mode) continue;
       const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
       const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
       const code = typeof data.shortCode === "string" ? data.shortCode : "";

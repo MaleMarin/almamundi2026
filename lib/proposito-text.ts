@@ -53,7 +53,6 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
       {
         type: 'beliefs',
         items: [
-          'Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única.',
           'Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego.',
           'El único requisito es querer compartirlo.',
           'Video, audio, texto, foto. Cuatro maneras de contar. Cuatro maneras de conocer.',
@@ -118,7 +117,7 @@ const PT_SECTIONS: ManifiestoSection[] = [
       },
       {
         type: 'p',
-        text: 'Estamos construindo o lugar onde a humanidade se conta. Uma história real de cada vez.',
+        text: 'Estamos construindo o lugar onde a humanidade conta a própria história. Uma história real de cada vez.',
       },
       {
         type: 'p',
@@ -137,7 +136,6 @@ const PT_SECTIONS: ManifiestoSection[] = [
       {
         type: 'beliefs',
         items: [
-          'Cada pessoa que viveu algo viveu de um jeito que ninguém mais vai viver exatamente igual. Isso, por definição, é uma história única.',
           'Uma história real pode mudar a vida de alguém que você ainda não conhece. É o que as histórias fazem desde que os humanos se sentam ao redor do fogo.',
           'O único requisito é querer compartilhar.',
           'Vídeo, áudio, texto, foto. Quatro maneiras de contar. Quatro maneiras de conhecer.',
@@ -167,7 +165,7 @@ const PT_SECTIONS: ManifiestoSection[] = [
   },
   {
     id: 'cierre',
-    title: 'Conte',
+    title: 'Conte a sua',
     blocks: [
       {
         type: 'closing',
@@ -193,7 +191,7 @@ const EN_SECTIONS: ManifiestoSection[] = [
       },
       {
         type: 'p',
-        text: 'We are building the place where humanity tells itself. One real story at a time.',
+        text: 'We are building the place where humanity tells its own story. One real story at a time.',
       },
       {
         type: 'p',
@@ -212,8 +210,7 @@ const EN_SECTIONS: ManifiestoSection[] = [
       {
         type: 'beliefs',
         items: [
-          'Each person who has lived something has lived it in a way no one else will live exactly the same. That, by definition, is a unique story.',
-          'A real story can change the life of someone you do not know yet. That is what stories have done since humans sat around a fire.',
+          "A real story can change the life of someone you don't know yet. That's what stories have done since humans sat around a fire.",
           'The only requirement is wanting to share it.',
           'Video, audio, text, photo. Four ways to tell. Four ways to know.',
           'The stories that awaken other stories come from lived experience.',
@@ -228,7 +225,7 @@ const EN_SECTIONS: ManifiestoSection[] = [
       { type: 'p', text: 'AlmaMundi was designed so that stories last.' },
       {
         type: 'p',
-        text: 'On AlmaMundi, each story has its own time. A story published today can find the person who needs it tomorrow. Or in three years. The meeting between a story and the person who needs it is not in a hurry.',
+        text: 'On AlmaMundi, each story has its own time. A story published today can find the person who needs it tomorrow. Or in three years. The meeting between a story and the person who needs it is never in a hurry.',
       },
       {
         type: 'p',
@@ -236,7 +233,7 @@ const EN_SECTIONS: ManifiestoSection[] = [
       },
       {
         type: 'p',
-        text: 'We build AlmaMundi so that each story that is read awakens one that has not been told yet.',
+        text: "We built AlmaMundi so that every story someone reads awakens one that hasn't been told yet.",
       },
     ],
   },
@@ -247,7 +244,7 @@ const EN_SECTIONS: ManifiestoSection[] = [
       {
         type: 'closing',
         lines: [
-          'The format is yours. The story is too. AlmaMundi is the place where what you lived does not disappear.',
+          "The format is yours. The story is too. AlmaMundi is the place where what you lived doesn't disappear.",
         ],
       },
     ],

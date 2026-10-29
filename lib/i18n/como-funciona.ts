@@ -20,7 +20,7 @@ export const COMO_FUNCIONA: Record<
   es: {
     title: '¿Cómo funciona?',
     p1: 'AlmaMundi es un mapa vivo de historias humanas.',
-    formats: 'video, audio, texto o fotografía',
+    formats: 'video, audio, texto o foto',
     p2: 'Puedes compartir tu relato en',
     p2b: '. El envío en cualquiera de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial:',
     auto: 'nada se publica automáticamente',
@@ -54,11 +54,11 @@ export const COMO_FUNCIONA: Record<
     p2: 'You can share your story in',
     p2b: '. Submissions in any of these formats are for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Every story goes through editorial review:',
     auto: 'nothing is published automatically',
-    p3: 'We only publish stories that respect human dignity, privacy, copyright, and human rights. We do not accept content with',
+    p3: "We only publish stories that respect human dignity, privacy, copyright, and human rights. We don't accept content with",
     banned:
       'insults, defamation, slander, discrimination, racism, xenophobia, homophobia, threats, violence, abuse, exploitation, improper exposure of others, violations of the rights of children and adolescents, plagiarism, or unauthorized use of material that belongs to someone else',
     p4: 'To take care of each story, we review its content, authorship, consent, and possible risks to other people. We may ask for changes, decline to publish, or remove stories when needed.',
-    p5: 'We do not ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part.',
+    p5: "We don't ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part.",
     privacy: 'See the privacy policy',
     close: 'Close',
   },

@@ -91,10 +91,10 @@ const CONTAR_META: Record<
     },
     audio: {
       title: 'Some stories are best told out loud',
-      description: 'Your voice holds what written words cannot always carry. Up to 5 minutes of audio.',
+      description: "Your voice holds what written words can't always carry. Up to 5 minutes of audio.",
     },
     foto: {
-      title: 'An image can hold what words cannot reach',
+      title: "An image can hold what words can't reach",
       description: 'Up to 10 MB per photo.',
     },
     texto: {

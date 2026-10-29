@@ -2,11 +2,11 @@
 
 Inventario leído del código el 29 de octubre de 2026, rama preview/adenda-revision. Cada fila sale del código de esa fecha, no de una versión anterior de este documento.
 
-Alcance: home, mapa, /contar, /pregunta, /historias, compartir, los 6 correos, Propósito, Cómo funciona, 404, cookies, legales, metaetiquetas, migas, /h/ y /r/. Quedan fuera el admin, la curaduría y las páginas de laboratorio.
+Alcance: home, mapa, panel También cuenta, panel La pregunta, ficha /historias/[id], visor, panel de respuestas del globo, las 12 preguntas, /contar, /pregunta, /historias, compartir, los 6 correos, Propósito, Cómo funciona, 404, cookies, legales, metaetiquetas, migas, /h/ y /r/. Quedan fuera el admin, la curaduría y las páginas de laboratorio.
 
 La columna «dónde aparece» es la clave del código. En Propósito, Cómo funciona, correos y metaetiquetas va el texto completo. El cuerpo de /privacidad, /terminos, /contacto y /mis-datos-personales sigue en español, con un aviso arriba en PT y EN.
 
-Textos en las tablas: 527.
+Textos en las tablas: 531.
 
 ## Home
 
@@ -15,11 +15,11 @@ Textos en las tablas: 527.
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
 | Home | navPurpose | Propósito | Propósito | Purpose | lib/i18n/home-messages.ts |
-| Home | navHow | ¿Cómo funciona? | Como funciona? | How it works? | lib/i18n/home-messages.ts |
+| Home | navHow | ¿Cómo funciona? | Como funciona? | How does it work? | lib/i18n/home-messages.ts |
 | Home | navStories | Historias | Histórias | Stories | lib/i18n/home-messages.ts |
 | Home | navHistoriasColeccion | Mi colección | Minha coleção | My collection | lib/i18n/home-messages.ts |
 | Home | navHistoriasVideos | Videos | Vídeos | Videos | lib/i18n/home-messages.ts |
-| Home | navHistoriasAudios | Audios | Áudios | Audios | lib/i18n/home-messages.ts |
+| Home | navHistoriasAudios | Audios | Áudios | Audio | lib/i18n/home-messages.ts |
 | Home | navHistoriasEscrito | Textos | Textos | Texts | lib/i18n/home-messages.ts |
 | Home | navHistoriasFotos | Fotos | Fotos | Photos | lib/i18n/home-messages.ts |
 | Home | navMap | Mapa | Mapa | Map | lib/i18n/home-messages.ts |
@@ -47,7 +47,7 @@ Textos en las tablas: 527.
 | Home | cardAudioTitle | Dale voz | Dê voz | Give voice | lib/i18n/home-messages.ts |
 | Home | cardAudioSubtitle | a lo que recuerdas | ao que você lembra | to what you remember | lib/i18n/home-messages.ts |
 | Home | cardAudioBody | Hay historias que no necesitan verse, solo ser escuchadas. Hasta 5 minutos. | Há histórias que não precisam ser vistas, só ouvidas. Até 5 minutos. | Some stories don't need to be seen, only heard. Up to 5 minutes. | lib/i18n/home-messages.ts |
-| Home | cardAudioCta | Graba un audio | Grave um áudio | Record an audio | lib/i18n/home-messages.ts |
+| Home | cardAudioCta | Graba un audio | Grave um áudio | Record audio | lib/i18n/home-messages.ts |
 | Home | cardWriteTitle | Ponle palabras | Dê palavras | Put words | lib/i18n/home-messages.ts |
 | Home | cardWriteSubtitle | a tu memoria | à sua memória | to your memory | lib/i18n/home-messages.ts |
 | Home | cardWriteBody | Hay historias que no necesitan sonido ni imagen, solo palabras. Hasta 5000 caracteres. | Há histórias que não precisam de som nem imagem, só de palavras. Até 5000 caracteres. | Some stories need no sound or image, only words. Up to 5,000 characters. | lib/i18n/home-messages.ts |
@@ -56,7 +56,7 @@ Textos en las tablas: 527.
 | Home | cardPhotoSubtitle | una vida | uma vida | one life | lib/i18n/home-messages.ts |
 | Home | cardPhotoBody | Una foto guarda más de lo que se ve a simple vista. Hasta 8 fotos. | Uma foto guarda mais do que se vê à primeira vista. Até 8 fotos. | A photo holds more than meets the eye. Up to 8 photos. | lib/i18n/home-messages.ts |
 | Home | cardPhotoCta | Sube una foto | Envie uma foto | Upload a photo | lib/i18n/home-messages.ts |
-| Home | noscript | Necesitas JavaScript para ver el sitio. | Precisa de JavaScript para ver o site. | You need JavaScript to view this site. | lib/i18n/home-messages.ts |
+| Home | noscript | Necesitas JavaScript para ver el sitio. | Você precisa de JavaScript para ver o site. | You need JavaScript to view this site. | lib/i18n/home-messages.ts |
 
 ## Home, mapa
 
@@ -103,11 +103,10 @@ Textos en las tablas: 527.
 
 ## Home, pie y cookies
 
-13 textos.
+12 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
-| Home, pie y cookies | footerClosingLine | Historias que no se pierden, sino que despiertan otras historias. | Histórias que não se perdem, mas despertam outras histórias. | Stories that are not lost, they awaken other stories. | lib/i18n/site-ui-messages.ts |
 | Home, pie y cookies | footerInitiativeOf | Una iniciativa de | Uma iniciativa de | An initiative of | lib/i18n/site-ui-messages.ts |
 | Home, pie y cookies | footerLegalAria | Información legal y datos personales | Informação legal e dados pessoais | Legal information and personal data | lib/i18n/site-ui-messages.ts |
 | Home, pie y cookies | footerPrivacy | Aviso de privacidad | Aviso de privacidade | Privacy notice | lib/i18n/site-ui-messages.ts |
@@ -137,7 +136,7 @@ Textos en las tablas: 527.
 | /contar | modalCapture | Captura | Captura | Capture | lib/i18n/site-ui-messages.ts |
 | /contar | modalConfirmSend | Confirmación de envío | Confirmação de envio | Submission confirmation | lib/i18n/site-ui-messages.ts |
 | /contar | modalDetailsTitle | Por favor, déjanos tus datos | Por favor, deixe seus dados | Please leave us your details | lib/i18n/site-ui-messages.ts |
-| /contar | modalDetailsSubtitle | Así podremos ubicar tu historia en el mapa y avisarte cuando esté publicada. | Assim podemos colocar sua história no mapa e avisar você quando estiver publicada. | This is how we can place your story on the map and let you know when it is published. | lib/i18n/site-ui-messages.ts |
+| /contar | modalDetailsSubtitle | Así podremos ubicar tu historia en el mapa y avisarte cuando esté publicada. | Assim podemos colocar sua história no mapa e avisar você quando estiver publicada. | This is how we can place your story on the map and let you know when it's published. | lib/i18n/site-ui-messages.ts |
 | /contar | modalSendVideo | Enviar mi video | Enviar meu vídeo | Send my video | lib/i18n/site-ui-messages.ts |
 | /contar | modalSendAudio | Enviar mi audio | Enviar meu áudio | Send my audio | lib/i18n/site-ui-messages.ts |
 | /contar | modalSendText | Enviar mi texto | Enviar meu texto | Send my text | lib/i18n/site-ui-messages.ts |
@@ -149,7 +148,7 @@ Textos en las tablas: 527.
 | /contar | modalSendingPhotos | Enviando tus fotos… | Enviando suas fotos… | Sending your photos… | lib/i18n/site-ui-messages.ts |
 | /contar | modalSectionStory | Historia | História | Story | lib/i18n/site-ui-messages.ts |
 | /contar | modalStoryName | Título de tu historia * | Título da sua história * | Title of your story * | lib/i18n/site-ui-messages.ts |
-| /contar | modalAlias | Nombre o alias * | Nome ou alias * | Name or alias * | lib/i18n/site-ui-messages.ts |
+| /contar | modalAlias | Nombre o alias * | Nome ou apelido * | Name or alias * | lib/i18n/site-ui-messages.ts |
 | /contar | modalExtras | ¿Algo más que quieras contarnos? (opcional) | Quer contar mais alguma coisa? (opcional) | Anything else you want to tell us? (optional) | lib/i18n/site-ui-messages.ts |
 | /contar | modalCancionRelacionada | Una canción para esta historia (opcional) | Uma música para esta história (opcional) | A song for this story (optional) | lib/i18n/site-ui-messages.ts |
 | /contar | modalFiles | Fotos extra (opcional, hasta 10 MB cada una) | Fotos extras (opcional, até 10 MB cada) | Extra photos (optional, up to 10 MB each) | lib/i18n/site-ui-messages.ts |
@@ -173,19 +172,19 @@ Textos en las tablas: 527.
 | /contar | modalGenderPreferNot | Prefiero no decirlo | Prefiro não dizer | Prefer not to say | lib/i18n/site-ui-messages.ts |
 | /contar | modalGenderOther | Otro | Outro | Other | lib/i18n/site-ui-messages.ts |
 | /contar | modalEmail | Correo electrónico | E-mail | Email | lib/i18n/site-ui-messages.ts |
-| /contar | modalEmailHint | Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No se muestra en público. | Avisamos por e-mail quando sua história estiver no mapa (depois da revisão). Não aparece em público. | We will email you when your story is on the map (after review). It is not shown publicly. | lib/i18n/site-ui-messages.ts |
-| /contar | modalLegalNote | Tu historia quedará en revisión antes de formar parte de AlmaMundi. | A sua história ficará em revisão antes de fazer parte de AlmaMundi. | Your story will be reviewed before it becomes part of AlmaMundi. | lib/i18n/site-ui-messages.ts |
+| /contar | modalEmailHint | Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No se muestra en público. | Avisamos por e-mail quando sua história estiver no mapa (depois da revisão). Não aparece em público. | We'll email you when your story is on the map (after review). It's not shown publicly. | lib/i18n/site-ui-messages.ts |
+| /contar | modalLegalNote | Tu historia quedará en revisión antes de formar parte de AlmaMundi. | Sua história ficará em revisão antes de fazer parte do AlmaMundi. | Your story will be reviewed before it becomes part of AlmaMundi. | lib/i18n/site-ui-messages.ts |
 | /contar | modalBack | Volver | Voltar | Back | lib/i18n/site-ui-messages.ts |
 | /contar | modalSending | Enviando… | Enviando… | Sending… | lib/i18n/site-ui-messages.ts |
 | /contar | modalSend | Enviar mi historia | Enviar minha história | Send my story | lib/i18n/site-ui-messages.ts |
 | /contar | modalRecord | Grabar | Gravar | Record | lib/i18n/site-ui-messages.ts |
-| /contar | modalRecording | Grabando… | A gravar… | Recording… | lib/i18n/site-ui-messages.ts |
+| /contar | modalRecording | Grabando… | Gravando… | Recording… | lib/i18n/site-ui-messages.ts |
 | /contar | modalReviewVideo | Revisa tu video | Revise seu vídeo | Review your video | lib/i18n/site-ui-messages.ts |
 | /contar | modalReviewAudio | Revisa tu audio | Revise seu áudio | Review your audio | lib/i18n/site-ui-messages.ts |
 | /contar | modalRecordVoice | Grabar voz | Gravar voz | Record voice | lib/i18n/site-ui-messages.ts |
 | /contar | modalRerecord | Volver a grabar | Voltar a gravar | Record again | lib/i18n/site-ui-messages.ts |
 | /contar | modalStop | Detener | Parar | Stop | lib/i18n/site-ui-messages.ts |
-| /contar | modalListenClip | Escúchalo antes de continuar. Si no te convence, vuelve a grabar. | Escute o clip completo antes de continuar. | Listen to the full clip before continuing. | lib/i18n/site-ui-messages.ts |
+| /contar | modalListenClip | Escúchalo antes de continuar. Si no te convence, vuelve a grabar. | Escute antes de continuar. Se não gostar, grave de novo. | Listen to it before continuing. If you're not happy with it, record again. | lib/i18n/site-ui-messages.ts |
 | /contar | modalChars | {n} / {max} caracteres | {n} / {max} caracteres | {n} / {max} characters | lib/i18n/site-ui-messages.ts |
 | /contar | modalReceivedNamed | {name}, / tu relato en colores. | {name}, / seu relato em cores. | {name}, / your story in colors. | lib/i18n/site-ui-messages.ts |
 | /contar | modalReceivedAnon | Tu relato en colores. | Seu relato em cores. | Your story in colors. | lib/i18n/site-ui-messages.ts |
@@ -206,14 +205,14 @@ Textos en las tablas: 527.
 | /contar | upload.video.limit | Hasta 5 minutos de video. | Até 5 minutos de vídeo. | Up to 5 minutes of video. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.video.uploadLabel | o subir un video desde tu dispositivo | ou enviar um vídeo do seu dispositivo | or upload a video from your device | lib/i18n/site-ui-messages.ts |
 | /contar | upload.audio.title | Hay historias que se cuentan mejor en voz alta | Há histórias que se contam melhor em voz alta | Some stories are best told out loud | lib/i18n/site-ui-messages.ts |
-| /contar | upload.audio.subtitle | Tu voz guarda lo que las palabras escritas no siempre pueden. | Sua voz guarda o que as palavras escritas nem sempre podem. | Your voice holds what written words cannot always carry. | lib/i18n/site-ui-messages.ts |
+| /contar | upload.audio.subtitle | Tu voz guarda lo que las palabras escritas no siempre pueden. | Sua voz guarda o que as palavras escritas nem sempre podem. | Your voice holds what written words can't always carry. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.audio.limit | Hasta 5 minutos de audio. | Até 5 minutos de áudio. | Up to 5 minutes of audio. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.audio.uploadLabel | o subir un audio desde tu dispositivo | ou enviar um áudio do seu dispositivo | or upload audio from your device | lib/i18n/site-ui-messages.ts |
 | /contar | upload.texto.title | Escribe lo que no le contaste a nadie, / o lo que le contaste a todos | Escreva o que você não contou a ninguém, / ou o que contou a todos | Write what you never told anyone, / or what you told everyone | lib/i18n/site-ui-messages.ts |
-| /contar | upload.texto.subtitle | Aquí no se pierde en el scroll. Queda. | Aqui não se perde no scroll. Fica. | Here it is not lost in the scroll. It stays. | lib/i18n/site-ui-messages.ts |
+| /contar | upload.texto.subtitle | Aquí no se pierde en el scroll. Queda. | Aqui não se perde no scroll. Fica. | Here, it doesn't get lost in the scroll. It stays. Up to 5,000 characters. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.texto.limit |  |  |  | lib/i18n/site-ui-messages.ts |
 | /contar | upload.texto.uploadLabel |  |  |  | lib/i18n/site-ui-messages.ts |
-| /contar | upload.foto.title | Una imagen puede guardar / lo que las palabras no alcanzan | Uma imagem pode guardar / o que as palavras não alcançam | An image can hold / what words cannot reach | lib/i18n/site-ui-messages.ts |
+| /contar | upload.foto.title | Una imagen puede guardar / lo que las palabras no alcanzan | Uma imagem pode guardar / o que as palavras não alcançam | An image can hold / what words can't reach | lib/i18n/site-ui-messages.ts |
 | /contar | upload.foto.subtitle | Sube hasta 8 fotos. Cada una lleva su nombre, el año y el lugar donde fue tomada. | Envie até 8 fotos. Cada uma leva seu nome, o ano e o lugar onde foi tirada. | Upload up to 8 photos. Each one includes its name, the year, and the place where it was taken. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.foto.limit | Hasta 10 MB por foto. | Até 10 MB por foto. | Up to 10 MB per photo. | lib/i18n/site-ui-messages.ts |
 | /contar | upload.foto.uploadLabel |  |  |  | lib/i18n/site-ui-messages.ts |
@@ -244,11 +243,11 @@ Textos en las tablas: 527.
 | /contar | modalCameraDenied | No tenemos permiso para usar tu cámara. Actívalo en tu navegador o sube un video que ya tengas. | Não temos permissão para usar sua câmera. Ative-a no navegador ou envie um vídeo que você já tenha. | We don't have permission to use your camera. Turn it on in your browser, or upload a video you already have. | lib/i18n/story-flow-messages.ts |
 | /contar | modalCameraUnsupported | Tu navegador no permite grabar aquí. Prueba con Chrome o Safari actualizado, o sube un video. | Seu navegador não permite gravar aqui. Tente o Chrome ou o Safari atualizado, ou envie um vídeo. | Your browser can't record here. Try an updated Chrome or Safari, or upload a video. | lib/i18n/story-flow-messages.ts |
 | /contar | modalCameraBusy | La cámara está ocupada o no responde. Cierra otras apps que la usen e intenta de nuevo. | A câmera está ocupada ou não responde. Feche outros aplicativos que a usem e tente de novo. | The camera is busy or not responding. Close other apps using it and try again. | lib/i18n/story-flow-messages.ts |
-| /contar | modalMicDenied | No tenemos permiso para usar tu micrófono. Actívalo en tu navegador o sube un audio que ya tengas. | Não temos permissão para usar seu microfone. Ative-o no navegador ou envie um áudio que você já tenha. | We don't have permission to use your microphone. Turn it on in your browser, or upload an audio you already have. | lib/i18n/story-flow-messages.ts |
-| /contar | modalMicUnsupported | Tu navegador no permite grabar aquí. Prueba con Chrome o Safari actualizado, o sube un audio. | Seu navegador não permite gravar aqui. Tente o Chrome ou o Safari atualizado, ou envie um áudio. | Your browser can't record here. Try an updated Chrome or Safari, or upload an audio. | lib/i18n/story-flow-messages.ts |
+| /contar | modalMicDenied | No tenemos permiso para usar tu micrófono. Actívalo en tu navegador o sube un audio que ya tengas. | Não temos permissão para usar seu microfone. Ative-o no navegador ou envie um áudio que você já tenha. | We don't have permission to use your microphone. Turn it on in your browser, or upload a recording you already have. | lib/i18n/story-flow-messages.ts |
+| /contar | modalMicUnsupported | Tu navegador no permite grabar aquí. Prueba con Chrome o Safari actualizado, o sube un audio. | Seu navegador não permite gravar aqui. Tente o Chrome ou o Safari atualizado, ou envie um áudio. | Your browser can't record here. Try an updated Chrome or Safari, or upload a recording. | lib/i18n/story-flow-messages.ts |
 | /contar | modalMicBusy | El micrófono está ocupado o no responde. Cierra otras apps que lo usen e intenta de nuevo. | O microfone está ocupado ou não responde. Feche outros aplicativos que o usem e tente de novo. | The microphone is busy or not responding. Close other apps using it and try again. | lib/i18n/story-flow-messages.ts |
 | /contar | modalSwitchToUploadVideo | Subir un video | Enviar um vídeo | Upload a video | lib/i18n/story-flow-messages.ts |
-| /contar | modalSwitchToUploadAudio | Subir un audio | Enviar um áudio | Upload an audio | lib/i18n/story-flow-messages.ts |
+| /contar | modalSwitchToUploadAudio | Subir un audio | Enviar um áudio | Upload audio | lib/i18n/story-flow-messages.ts |
 | /contar | modalRecordingProgress | Grabando {time} de 5:00 | Gravando {time} de 5:00 | Recording {time} of 5:00 | lib/i18n/story-flow-messages.ts |
 | /contar | modalRecordingSoonEnd | Quedan 30 segundos | Faltam 30 segundos | 30 seconds left | lib/i18n/story-flow-messages.ts |
 | /contar | modalFileReadyVideo | Video listo: {nombre} ({peso} MB) | Vídeo pronto: {nombre} ({peso} MB) | Video ready: {nombre} ({peso} MB) | lib/i18n/story-flow-messages.ts |
@@ -257,11 +256,11 @@ Textos en las tablas: 527.
 | /contar | modalReadyTitleAudio | Audio listo | Áudio pronto | Audio ready | lib/i18n/story-flow-messages.ts |
 | /contar | modalChangeFile | Cambiar archivo | Trocar arquivo | Change file | lib/i18n/story-flow-messages.ts |
 | /contar | modalRecordingName | Grabación | Gravação | Recording | lib/i18n/story-flow-messages.ts |
-| /contar | modalFileTypeVideo | Este formato de video no es compatible. Prueba con .mp4, .webm o .mov. | Este formato de vídeo não é compatível. Tente .mp4, .webm ou .mov. | This video format is not supported. Try .mp4, .webm, or .mov. | lib/i18n/story-flow-messages.ts |
-| /contar | modalFileTypeAudio | Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav. | Este formato de áudio não é compatível. Tente .mp3, .m4a ou .wav. | This audio format is not supported. Try .mp3, .m4a, or .wav. | lib/i18n/story-flow-messages.ts |
+| /contar | modalFileTypeVideo | Este formato de video no es compatible. Prueba con .mp4, .webm o .mov. | Este formato de vídeo não é compatível. Tente .mp4, .webm ou .mov. | This video format isn't supported. Try .mp4, .webm, or .mov. | lib/i18n/story-flow-messages.ts |
+| /contar | modalFileTypeAudio | Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav. | Este formato de áudio não é compatível. Tente .mp3, .m4a ou .wav. | This audio format isn't supported. Try .mp3, .m4a, or .wav. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFileTooHeavy | Este archivo supera los {max} MB. Prueba con uno más liviano. | Este arquivo passa de {max} MB. Tente um mais leve. | This file is over {max} MB. Try a smaller one. | lib/i18n/story-flow-messages.ts |
-| /contar | modalFileTooLongVideo | Este video dura más de 5 minutos. Puedes recortarlo o subir otro. | Este vídeo dura mais de 5 minutos. Pode cortá-lo ou enviar outro. | This video is longer than 5 minutes. You can trim it or upload another. | lib/i18n/story-flow-messages.ts |
-| /contar | modalFileTooLongAudio | Este audio dura más de 5 minutos. Puedes recortarlo o subir otro. | Este áudio dura mais de 5 minutos. Pode cortá-lo ou enviar outro. | This audio is longer than 5 minutes. You can trim it or upload another. | lib/i18n/story-flow-messages.ts |
+| /contar | modalFileTooLongVideo | Este video dura más de 5 minutos. Puedes recortarlo o subir otro. | Este vídeo dura mais de 5 minutos. Você pode cortá-lo ou enviar outro. | This video is longer than 5 minutes. You can trim it or upload another. | lib/i18n/story-flow-messages.ts |
+| /contar | modalFileTooLongAudio | Este audio dura más de 5 minutos. Puedes recortarlo o subir otro. | Este áudio dura mais de 5 minutos. Você pode cortá-lo ou enviar outro. | This audio is longer than 5 minutes. You can trim it or upload another. | lib/i18n/story-flow-messages.ts |
 | /contar | modalUploadProgress | Progreso de la subida | Progresso do envio | Upload progress | lib/i18n/story-flow-messages.ts |
 | /contar | modalUploadColorsWait | Tu archivo ya subió. Ahora creamos tus colores, puede tardar unos segundos. | Seu arquivo já foi enviado. Agora criamos suas cores, pode levar alguns segundos. | Your file is uploaded. We're creating your colors now, it may take a few seconds. | lib/i18n/story-flow-messages.ts |
 | /contar | modalCreatingColors | Creando tus colores… | Criando suas cores… | Creating your colors… | lib/i18n/story-flow-messages.ts |
@@ -271,7 +270,7 @@ Textos en las tablas: 527.
 | /contar | modalPhotoAltLabel | Describe esta foto en una frase. Así personas ciegas o con baja visión también podrán conocerla. (opcional) | Descreva esta foto numa frase. Assim, pessoas cegas ou com baixa visão também poderão conhecê-la. (opcional) | Describe this photo in one sentence so people who are blind or have low vision can know it too. (optional) | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoName | Nombre de la foto * | Nome da foto * | Photo name * | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoYear | Año * | Ano * | Year * | lib/i18n/story-flow-messages.ts |
-| /contar | modalPhotoYearUnknown | No sé el año exacto | Não sei o ano exato | I do not know the exact year | lib/i18n/story-flow-messages.ts |
+| /contar | modalPhotoYearUnknown | No sé el año exacto | Não sei o ano exato | I don't know the exact year | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoDecade | Década * | Década * | Decade * | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoDecadeChoose | Elige una década | Escolha uma década | Choose a decade | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoPlace | Lugar * | Lugar * | Place * | lib/i18n/story-flow-messages.ts |
@@ -287,14 +286,14 @@ Textos en las tablas: 527.
 | /contar | modalPhotoInvalidYear | El año de la foto {foto} debe tener 4 dígitos, entre 1850 y {max}. | O ano da foto {foto} deve ter 4 dígitos, entre 1850 e {max}. | The year of photo {foto} must be 4 digits, from 1850 to {max}. | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoMissingDecade | Falta la década de la foto {foto}. | Falta a década da foto {foto}. | Photo {foto} is missing a decade. | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoMissingPlace | Falta el lugar de la foto {foto}. | Falta o lugar da foto {foto}. | Photo {foto} is missing the place. | lib/i18n/story-flow-messages.ts |
-| /contar | modalPhotoTypeError | Ese archivo no es una foto. Usa JPG, PNG, WEBP o HEIC. | Esse arquivo não é uma foto. Use JPG, PNG, WEBP ou HEIC. | That file is not a photo. Use JPG, PNG, WEBP, or HEIC. | lib/i18n/story-flow-messages.ts |
+| /contar | modalPhotoTypeError | Ese archivo no es una foto. Usa JPG, PNG, WEBP o HEIC. | Esse arquivo não é uma foto. Use JPG, PNG, WEBP ou HEIC. | That file isn't a photo. Use JPG, PNG, WEBP, or HEIC. | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoSizeError | Esa foto pesa más de 10 MB. Prueba con una más liviana. | Essa foto pesa mais de 10 MB. Tente uma mais leve. | That photo is over 10 MB. Try a smaller one. | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoConverting | Preparando tu foto… | Preparando sua foto… | Preparing your photo… | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoReadError | No pudimos leer esta foto. Prueba con una en JPG o PNG. | Não conseguimos ler esta foto. Tente uma em JPG ou PNG. | We couldn't read this photo. Try one in JPG or PNG. | lib/i18n/story-flow-messages.ts |
-| /contar | modalPhotoUploadFailed | No pudimos subir esta foto. | Não foi possível enviar esta foto. | We could not upload this photo. | lib/i18n/story-flow-messages.ts |
+| /contar | modalPhotoUploadFailed | No pudimos subir esta foto. | Não foi possível enviar esta foto. | We couldn't upload this photo. | lib/i18n/story-flow-messages.ts |
 | /contar | modalPhotoRetry | Reintentar | Tentar de novo | Try again | lib/i18n/story-flow-messages.ts |
 | /contar | modalRequiredFieldsNote | Los campos con * son obligatorios. | Os campos com * são obrigatórios. | Fields marked with * are required. | lib/i18n/story-flow-messages.ts |
-| /contar | modalAliasHint | Así aparecerás en el mapa. | É assim que você aparece no mapa. | This is how you will appear on the map. | lib/i18n/story-flow-messages.ts |
+| /contar | modalAliasHint | Así aparecerás en el mapa. | É assim que você aparece no mapa. | This is how you'll appear on the map. | lib/i18n/story-flow-messages.ts |
 | /contar | modalLocationHint | Así ubicamos tu historia en el mapa. | É assim que localizamos sua história no mapa. | This is how we place your story on the map. | lib/i18n/story-flow-messages.ts |
 | /contar | modalConsentAdult | Soy mayor de 18 años, o adulto responsable o representante de una institución, y tengo autorización de quienes aparecen en esta historia. | Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição, e tenho autorização de quem aparece nesta história. | I am 18 or older, or a responsible adult or institutional representative, and I have permission from the people who appear in this story. | lib/i18n/story-flow-messages.ts |
 | /contar | modalConsentPublish | Autorizo que mi imagen, voz y nombre o alias se publiquen en AlmaMundi. | Autorizo que minha imagem, voz e nome ou apelido sejam publicados no AlmaMundi. | I authorize my image, voice, and name or alias to be published on AlmaMundi. | lib/i18n/story-flow-messages.ts |
@@ -302,18 +301,18 @@ Textos en las tablas: 527.
 | /contar | modalConsentTermsLink | Términos de uso | Termos de uso | Terms of use | lib/i18n/story-flow-messages.ts |
 | /contar | modalConsentPrivacyLink | Política de privacidad | Política de privacidade | Privacy policy | lib/i18n/story-flow-messages.ts |
 | /contar | modalMarkThreeToSend | Marca las tres casillas para enviar. | Marque as três caixas para enviar. | Check the three boxes to send. | lib/i18n/story-flow-messages.ts |
-| /contar | modalSubmitFailedKeep | No pudimos enviar tu historia. Lo que grabaste y escribiste sigue aquí. Revisa tu conexión e intenta de nuevo. | Não conseguimos enviar sua história. O que você gravou e escreveu continua aqui. Verifique sua conexão e tente de novo. | We could not send your story. What you recorded and wrote is still here. Check your connection and try again. | lib/i18n/story-flow-messages.ts |
-| /contar | modalCaptchaFailed | No pudimos confirmar el envío. Espera unos segundos e inténtalo de nuevo. | Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo. | We could not confirm the submission. Wait a few seconds and try again. | lib/i18n/story-flow-messages.ts |
+| /contar | modalSubmitFailedKeep | No pudimos enviar tu historia. Lo que grabaste y escribiste sigue aquí. Revisa tu conexión e intenta de nuevo. | Não conseguimos enviar sua história. O que você gravou e escreveu continua aqui. Verifique sua conexão e tente de novo. | We couldn't send your story. What you recorded and wrote is still here. Check your connection and try again. | lib/i18n/story-flow-messages.ts |
+| /contar | modalCaptchaFailed | No pudimos confirmar el envío. Espera unos segundos e inténtalo de nuevo. | Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo. | We couldn't confirm the submission. Wait a few seconds and try again. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldTitleMissing | Falta el título de tu historia. | Falta o título da sua história. | Your story is missing a title. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldAliasMissing | Falta tu nombre o alias. | Falta seu nome ou apelido. | Your name or alias is missing. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldCountryMissing | Falta el país. | Falta o país. | The country is missing. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldCityMissing | Falta la ciudad o localidad. | Falta a cidade ou localidade. | The city or town is missing. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldAgeMissing | Falta la edad. | Falta a idade. | Age is missing. | lib/i18n/story-flow-messages.ts |
 | /contar | modalFieldEmailMissing | Falta un correo válido. | Falta um e-mail válido. | A valid email is missing. | lib/i18n/story-flow-messages.ts |
-| /contar | modalReviewInProgress | Tu historia está en revisión. Te escribiremos cuando aparezca en el mapa. | Sua história está em revisão. Vamos escrever quando ela aparecer no mapa. | Your story is in review. We will write to you when it appears on the map. | lib/i18n/story-flow-messages.ts |
+| /contar | modalReviewInProgress | Tu historia está en revisión. Te escribiremos cuando aparezca en el mapa. | Sua história está em revisão. Vamos escrever quando ela aparecer no mapa. | Your story is under review. We'll write to you when it appears on the map. | lib/i18n/story-flow-messages.ts |
 | /contar | modalSaveImage | Guardar imagen | Salvar imagem | Save image | lib/i18n/story-flow-messages.ts |
-| /contar | modalCopyImageFailed | No pudimos copiar la imagen. Prueba con Descargar. | Não conseguimos copiar a imagem. Tente Baixar. | We could not copy the image. Try Download. | lib/i18n/story-flow-messages.ts |
-| /contar | modalImprintAlt | Cintas de colores creadas a partir de tu historia «{titulo}» | Fitas de cores criadas a partir da sua história «{titulo}» | Color ribbons created from your story «{titulo}» | lib/i18n/story-flow-messages.ts |
+| /contar | modalCopyImageFailed | No pudimos copiar la imagen. Prueba con Descargar. | Não conseguimos copiar a imagem. Tente Baixar. | We couldn't copy the image. Try Download. | lib/i18n/story-flow-messages.ts |
+| /contar | modalImprintAlt | Cintas de colores creadas a partir de tu historia «{titulo}» | Fitas de cores criadas a partir da sua história “{titulo}” | Color ribbons created from your story “{titulo}” | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherPromptFoto | ¿Quieres subir más fotos? | Quer enviar mais fotos? | Want to upload more photos? | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherCtaFoto | Subir más fotos | Enviar mais fotos | Upload more photos | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherPromptVideo | ¿Quieres grabar otro momento? | Quer gravar outro momento? | Want to record another moment? | lib/i18n/story-flow-messages.ts |
@@ -321,24 +320,24 @@ Textos en las tablas: 527.
 | /contar | modalAnotherPromptAudio | ¿Quieres grabar otro momento? | Quer gravar outro momento? | Want to record another moment? | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherCtaAudio | Grabar otro audio | Gravar outro áudio | Record another audio | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherPromptTexto | ¿Quieres escribir otra historia? | Quer escrever outra história? | Want to write another story? | lib/i18n/story-flow-messages.ts |
-| /contar | modalAnotherCtaTexto | Escribir otra historia | Escreva outra história | Write another story | lib/i18n/story-flow-messages.ts |
+| /contar | modalAnotherCtaTexto | Escribir otra historia | Escrever outra história | Write another story | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnotherFormatLink | o cuéntala en otro formato | ou conte em outro formato | or tell it in another format | lib/i18n/story-flow-messages.ts |
 | /contar | modalSectionYourStory | Tu historia | Sua história | Your story | lib/i18n/story-flow-messages.ts |
 | /contar | modalSectionAbout | Sobre ti | Sobre você | About you | lib/i18n/story-flow-messages.ts |
 | /contar | modalSectionWhere | Dónde estás y cómo avisarte | Onde você está e como avisar você | Where you are and how to reach you | lib/i18n/story-flow-messages.ts |
-| /contar | modalProfilePhotoNote | Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla. | Sua foto (opcional, até 10 MB). Ela aparecerá junto da sua história quando for publicada. Você pode não enviá-la. | Your photo (optional, up to 10 MB). It will appear next to your story when it is published. You can skip it. | lib/i18n/story-flow-messages.ts |
+| /contar | modalProfilePhotoNote | Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla. | Sua foto (opcional, até 10 MB). Ela aparecerá junto da sua história quando for publicada. Você pode não enviá-la. | Your photo (optional, up to 10 MB). It'll appear next to your story when it's published. You can skip it. | lib/i18n/story-flow-messages.ts |
 | /contar | modalImprintHowTexto | Los colores salen de las palabras de tu relato. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece. | As cores saem das palavras do seu relato. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece. | The colors come from the words of your story. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears. | lib/i18n/story-flow-messages.ts |
 | /contar | modalImprintHowFoto | Los colores salen de los nombres, los lugares y las descripciones que diste a tus fotos. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece. | As cores saem dos nomes, dos lugares e das descrições que você deu às suas fotos. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece. | The colors come from the names, the places and the descriptions you gave your photos. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears. | lib/i18n/story-flow-messages.ts |
 | /contar | modalImprintHowAudio | Los colores salen de las palabras con que presentaste tu audio. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece. | As cores saem das palavras com que você apresentou seu áudio. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece. | The colors come from the words you used to present your audio. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears. | lib/i18n/story-flow-messages.ts |
 | /contar | modalImprintHowVideo | Los colores salen de las palabras con que presentaste tu video. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece. | As cores saem das palavras com que você apresentou seu vídeo. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece. | The colors come from the words you used to present your video. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears. | lib/i18n/story-flow-messages.ts |
-| /contar | modalExtrasColorHint | Lo que escribas aquí también da color a tu imagen. | O que escrever aqui também dá cor à sua imagem. | What you write here also gives color to your image. | lib/i18n/story-flow-messages.ts |
+| /contar | modalExtrasColorHint | Lo que escribas aquí también da color a tu imagen. | O que você escrever aqui também dá cor à sua imagem. | What you write here also gives color to your image. | lib/i18n/story-flow-messages.ts |
 | /contar | modalNowWhat | ¿Y ahora? | E agora? | What now? | lib/i18n/story-flow-messages.ts |
 | /contar | modalAnswerWeekQuestion | Responde la pregunta de la semana | Responda à pergunta da semana | Answer this week's question | lib/i18n/story-flow-messages.ts |
 | /contar | modalContactLead | ¿Tienes dudas? Escríbenos a | Tem dúvidas? Escreva para | Questions? Write to us at | lib/i18n/story-flow-messages.ts |
 
 ## /pregunta
 
-40 textos.
+36 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
@@ -355,8 +354,6 @@ Textos en las tablas: 527.
 | /pregunta | pastKicker | Pregunta anterior | Pergunta anterior | Previous question | lib/i18n/pregunta-messages.ts |
 | /pregunta | answers | Respuestas | Respostas | Answers | lib/i18n/pregunta-messages.ts |
 | /pregunta | empty | Todavía no hay respuestas. Sé la primera persona en responder. | Ainda não há respostas. Seja a primeira pessoa a responder. | No answers yet. Be the first to answer. | lib/i18n/pregunta-messages.ts |
-| /pregunta | modeYou | Responde tú | Responda você | You answer | lib/i18n/pregunta-messages.ts |
-| /pregunta | modeYouLine | Responde desde tu propia vida. | Responda a partir da sua própria vida. | Answer from your own life. | lib/i18n/pregunta-messages.ts |
 | /pregunta | how | ¿Cómo quieres responder? | Como você quer responder? | How do you want to answer? | lib/i18n/pregunta-messages.ts |
 | /pregunta | write | Escribir | Escrever | Write | lib/i18n/pregunta-messages.ts |
 | /pregunta | kindVoice | Tu voz | Sua voz | Your voice | lib/i18n/pregunta-messages.ts |
@@ -370,8 +367,6 @@ Textos en las tablas: 527.
 | /pregunta | uploadAudio | Subir un audio | Enviar um áudio | Upload audio | lib/i18n/pregunta-messages.ts |
 | /pregunta | photo | Una foto con una frase | Uma foto com uma frase | A photo with a sentence | lib/i18n/pregunta-messages.ts |
 | /pregunta | caption | Frase de la foto | Frase da foto | Photo caption | lib/i18n/pregunta-messages.ts |
-| /pregunta | all | Todas | Todas | All | lib/i18n/pregunta-messages.ts |
-| /pregunta | you | Responde tú | Responda você | You answer | lib/i18n/pregunta-messages.ts |
 | /pregunta | errText | El texto puede tener hasta 1000 caracteres. | O texto pode ter até 1000 caracteres. | Your text can be up to 1000 characters. | lib/i18n/pregunta-messages.ts |
 | /pregunta | errAudio | Este audio dura más de 2 minutos. | Este áudio dura mais de 2 minutos. | This audio is longer than 2 minutes. | lib/i18n/pregunta-messages.ts |
 | /pregunta | errAudioSize | Este audio pesa más de 5 MB. | Este áudio tem mais de 5 MB. | This audio is larger than 5 MB. | lib/i18n/pregunta-messages.ts |
@@ -385,75 +380,41 @@ Textos en las tablas: 527.
 
 ## /historias
 
-45 textos.
+14 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
 | /historias | listHeroTitle | El mundo tiene millones de historias que nadie conoce. | O mundo tem milhões de histórias que ninguém conhece. | The world holds millions of stories no one knows. | lib/i18n/site-ui-messages.ts |
 | /historias | listHeroSubtitle | Estas son algunas. | Estas são algumas. | These are a few of them. | lib/i18n/site-ui-messages.ts |
 | /historias | listFilterAria | Filtros de historias | Filtros de histórias | Story filters | lib/i18n/site-ui-messages.ts |
-| /historias | listFilterBlockTitle | Buscar por país, año o palabras clave | Procurar por país, ano ou palavras-chave | Search by country, year, or keywords | lib/i18n/site-ui-messages.ts |
 | /historias | listFilterCountry | País | País | Country | lib/i18n/site-ui-messages.ts |
-| /historias | listFilterYear | Año | Ano | Year | lib/i18n/site-ui-messages.ts |
-| /historias | listFilterAllYears | Todos los años | Todos os anos | All years | lib/i18n/site-ui-messages.ts |
-| /historias | listFilterKeywords | Palabras clave | Palavras-chave | Keywords | lib/i18n/site-ui-messages.ts |
 | /historias | listFilterClear | Limpiar filtros | Limpar filtros | Clear filters | lib/i18n/site-ui-messages.ts |
-| /historias | listFilterNoMatch | Ninguna historia coincide con los filtros. El carrusel muestra las {count} historias disponibles. Ajusta los filtros o pulsa «Limpiar filtros». | Nenhuma história coincide com os filtros. O carrossel mostra as {count} histórias disponíveis. Ajuste os filtros ou toque em «Limpar filtros». | No stories match the filters. The carousel shows the {count} stories available. Adjust the filters or tap “Clear filters”. | lib/i18n/site-ui-messages.ts |
 | /historias | listFilterShowing | Mostrando {shown} de {total} historias. | Mostrando {shown} de {total} histórias. | Showing {shown} of {total} stories. | lib/i18n/site-ui-messages.ts |
-| /historias | listCarouselAria | Carrusel de historias | Carrossel de histórias | Stories carousel | lib/i18n/site-ui-messages.ts |
 | /historias | listKickerVideos | Historias en video | Histórias em vídeo | Stories in video | lib/i18n/site-ui-messages.ts |
 | /historias | listKickerAudios | Historias en audio | Histórias em áudio | Stories in audio | lib/i18n/site-ui-messages.ts |
 | /historias | listKickerEscrito | Historias en texto | Histórias em texto | Stories in writing | lib/i18n/site-ui-messages.ts |
-| /historias | listKickerFotos | Historias en foto | Histórias em foto | Stories in photo | lib/i18n/site-ui-messages.ts |
+| /historias | listKickerFotos | Historias en foto | Histórias em foto | Stories in photos | lib/i18n/site-ui-messages.ts |
 | /historias | listExpoVideos | alma.mundi / historias en video | alma.mundi / histórias em vídeo | alma.mundi / stories in video | lib/i18n/site-ui-messages.ts |
 | /historias | listExpoAudios | alma.mundi / historias en audio | alma.mundi / histórias em áudio | alma.mundi / stories in audio | lib/i18n/site-ui-messages.ts |
 | /historias | listExpoEscrito | alma.mundi / historias en texto | alma.mundi / histórias em texto | alma.mundi / stories in writing | lib/i18n/site-ui-messages.ts |
-| /historias | listExpoFotos | alma.mundi / historias en foto | alma.mundi / histórias em foto | alma.mundi / stories in photo | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionKicker | Tu colección | Sua coleção | Your collection | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionTitle | Historias que guardaste | Histórias que você guardou | Stories you saved | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionSubtitle | Compártelas o úsalas como inspiración para crear la tuya. | Compartilhe ou use como inspiração para criar a sua. | Share them, or use them as a spark to create yours. | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionEmpty | Aún no has guardado ninguna historia. | Você ainda não guardou nenhuma história. | You have not saved any stories yet. | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionEmptyHint | En Videos o Audios, elige una historia y haz clic en "Guardar en mi colección". | Em Vídeos ou Áudios, escolha uma história e toque em "Guardar na minha coleção". | In Videos or Audio, choose a story and click “Save to my collection”. | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionGoStories | Ir a Historias | Ir a Histórias | Go to Stories | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionCopied | Copiado | Copiado | Copied | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionCreateInspired | Crear inspirado en esta | Criar inspirado nesta | Create inspired by this | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionRemove | Quitar | Remover | Remove | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionRemoveAria | Quitar de mi colección | Remover da minha coleção | Remove from my collection | lib/i18n/site-ui-messages.ts |
-| /historias | coleccionUntitled | Sin título | Sem título | Untitled | lib/i18n/site-ui-messages.ts |
-| /historias | archivoBack | ← AlmaMundi | ← AlmaMundi | ← AlmaMundi | lib/i18n/site-ui-messages.ts |
-| /historias | archivoTitle | Archivo | Arquivo | Archive | lib/i18n/site-ui-messages.ts |
-| /historias | archivoLead | Historias que ya pasaron por el mapa y permanecen en el archivo. | Histórias que já passaram pelo mapa e permanecem no arquivo. | Stories that have left the map and remain in the archive. | lib/i18n/site-ui-messages.ts |
-| /historias | archivoTabWeek | Por semana | Por semana | By week | lib/i18n/site-ui-messages.ts |
-| /historias | archivoTabTheme | Por tema | Por tema | By theme | lib/i18n/site-ui-messages.ts |
-| /historias | archivoTabMuestras | Muestras | Amostras | Samples | lib/i18n/site-ui-messages.ts |
-| /historias | archivoLoading | Cargando… | Carregando… | Loading… | lib/i18n/site-ui-messages.ts |
-| /historias | archivoEmpty | El archivo se construye con las historias que ya recorrieron el mapa. La tuya también puede llegar. | O arquivo se constrói com as histórias que já percorreram o mapa. A sua também pode chegar. | The archive is built from stories that have already traveled the map. Yours can arrive too. | lib/i18n/site-ui-messages.ts |
-| /historias | archivoAll | Todos | Todos | All | lib/i18n/site-ui-messages.ts |
-| /historias | archivoEmptyTheme | Este tema, en el archivo, se escribe con historias como la tuya. | Este tema, no arquivo, se escreve com histórias como a sua. | This theme in the archive is written with stories like yours. | lib/i18n/site-ui-messages.ts |
-| /historias | archivoMuestrasCount | AlmaMundi · {n} historias | AlmaMundi · {n} histórias | AlmaMundi · {n} stories | lib/i18n/site-ui-messages.ts |
-| /historias | archivoViewMuestra | Ver muestra | Ver amostra | View sample | lib/i18n/site-ui-messages.ts |
-| /historias | archivoEmptyMuestras | No hay muestras publicadas. | Não há amostras publicadas. | No samples published. | lib/i18n/site-ui-messages.ts |
-| /historias | archivoWeekTitle | {week}, {day} {month} {year} | {week}, {day} {month} {year} | {week}, {day} {month} {year} | lib/i18n/site-ui-messages.ts |
+| /historias | listExpoFotos | alma.mundi / historias en foto | alma.mundi / histórias em foto | alma.mundi / stories in photos | lib/i18n/site-ui-messages.ts |
 
 ## Compartir
 
-43 textos.
+40 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
 | Compartir | listShareLabel | Compartir | Compartilhar | Share | lib/i18n/site-ui-messages.ts |
 | Compartir | listShareText | Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable. | Compartilhar a história com respeito: crédito a quem conta, link e cartão para baixar. | Share the story with care: credit the teller, a link, and a downloadable card. | lib/i18n/site-ui-messages.ts |
-| Compartir | listLetterLabel | Mensaje a quien cuenta | Mensagem a quem conta | Message to the teller | lib/i18n/site-ui-messages.ts |
-| Compartir | listLetterText | Escribir un mensaje breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo. | Escreva uma mensagem breve de ressonância para quem narra este relato. O AlmaMundi recebe sua mensagem, revisa com cuidado (inclui um filtro automático de respeito) e, quando corresponder, pode aproximá-la de quem contou. É um processo com pausa: não há envio direto sem esse cuidado. | Write a short resonance message to the person who told this story. AlmaMundi receives your message, reviews it with care (including an automatic respect filter) and, when it is right, may pass it on. There is a pause: nothing is sent through without this safeguard. | lib/i18n/site-ui-messages.ts |
-| Compartir | coleccionShare | Compartir | Compartilhar | Share | lib/i18n/site-ui-messages.ts |
 | Compartir | modalShareImprint | Compartir | Compartilhar | Share | lib/i18n/site-ui-messages.ts |
 | Compartir | modalShareCopied | Imagen copiada. Puedes pegarla donde quieras. | Imagem copiada. Você pode colar onde quiser. | Image copied. You can paste it wherever you like. | lib/i18n/site-ui-messages.ts |
-| Compartir | modalShareDownloaded | Tu navegador no pudo copiar la imagen; se descargó el PNG. | Seu navegador não pôde copiar a imagem; o PNG foi baixado. | Your browser could not copy the image; the PNG was downloaded instead. | lib/i18n/site-ui-messages.ts |
-| Compartir | modalShareFailed | No pudimos compartir la imagen. Guárdala y compártela desde tu galería. | Não foi possível compartilhar a imagem. Salve e compartilhe a partir da sua galeria. | Could not share the image. | lib/i18n/site-ui-messages.ts |
+| Compartir | modalShareDownloaded | Tu navegador no pudo copiar la imagen; se descargó el PNG. | Seu navegador não pôde copiar a imagem; o PNG foi baixado. | Your browser couldn't copy the image; the PNG was downloaded instead. | lib/i18n/site-ui-messages.ts |
+| Compartir | modalShareFailed | No pudimos compartir la imagen. Guárdala y compártela desde tu galería. | Não foi possível compartilhar a imagem. Salve e compartilhe a partir da sua galeria. | We couldn't share the image. Save it and share it from your gallery. | lib/i18n/site-ui-messages.ts |
 | Compartir | modalShareTextShort | Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar | Contei uma história e ela me devolveu suas cores. Você também tem uma. https://www.almamundi.org/contar | I told a story and it gave me back its colors. You have one too. https://www.almamundi.org/contar | lib/i18n/story-flow-messages.ts |
 | Compartir | modalShareTextLong | Todos guardamos una historia que vale la pena contar. Yo conté la mía en AlmaMundi y estos son sus colores. Te toca. https://www.almamundi.org/contar | Todos guardamos uma história que vale a pena contar. Eu contei a minha no AlmaMundi e estas são as cores dela. Agora é sua vez. https://www.almamundi.org/contar | We all carry a story worth telling. I told mine on AlmaMundi and these are its colors. Your turn. https://www.almamundi.org/contar | lib/i18n/story-flow-messages.ts |
 | Compartir | modalShareEmailSubject | Conté una historia en AlmaMundi | Contei uma história no AlmaMundi | I told a story on AlmaMundi | lib/i18n/story-flow-messages.ts |
-| Compartir | modalShareImageFailed | No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo. | Não foi possível compartilhar. Baixe a imagem e compartilhe a partir do seu dispositivo. | We could not share this. Download the image and share it from your device. | lib/i18n/story-flow-messages.ts |
+| Compartir | modalShareImageFailed | No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo. | Não foi possível compartilhar. Baixe a imagem e compartilhe a partir do seu dispositivo. | We couldn't share this. Download the image and share it from your device. | lib/i18n/story-flow-messages.ts |
 | Compartir | modalShareMenuTitle | Compartir | Compartilhar | Share | lib/i18n/story-flow-messages.ts |
 | Compartir | modalShareFacebook | Facebook | Facebook | Facebook | lib/i18n/story-flow-messages.ts |
 | Compartir | modalShareX | X | X | X | lib/i18n/story-flow-messages.ts |
@@ -487,7 +448,7 @@ Textos en las tablas: 527.
 
 ## Propósito
 
-20 textos.
+19 textos.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
@@ -495,22 +456,21 @@ Textos en las tablas: 527.
 | Propósito | por-que · título | Por qué existimos | Por que existimos | Why we exist | lib/proposito-text.ts |
 | Propósito | por-que · lead 1.1 | El mundo está lleno de historias que merecen ser contadas. | O mundo está cheio de histórias que merecem ser contadas. | The world is full of stories that deserve to be told. | lib/proposito-text.ts |
 | Propósito | por-que · lead 1.2 | AlmaMundi es el lugar donde eso ocurre. | O AlmaMundi é o lugar onde isso acontece. | AlmaMundi is the place where that happens. | lib/proposito-text.ts |
-| Propósito | por-que · p 2.1 | Estamos construyendo el lugar donde la humanidad se cuenta a sí misma. Una historia real a la vez. | Estamos construindo o lugar onde a humanidade se conta. Uma história real de cada vez. | We are building the place where humanity tells itself. One real story at a time. | lib/proposito-text.ts |
+| Propósito | por-que · p 2.1 | Estamos construyendo el lugar donde la humanidad se cuenta a sí misma. Una historia real a la vez. | Estamos construindo o lugar onde a humanidade conta a própria história. Uma história real de cada vez. | We are building the place where humanity tells its own story. One real story at a time. | lib/proposito-text.ts |
 | Propósito | por-que · p 3.1 | Cada persona que vive algo lo vive de una manera que nadie más va a vivir exactamente igual. Ese momento, esa experiencia, ese fragmento de vida, tiene un valor que solo existe si alguien lo cuenta. | Cada pessoa que vive algo vive de um jeito que ninguém mais vai viver exatamente igual. Esse momento, essa experiência, esse fragmento de vida, tem um valor que só existe se alguém contar. | Each person who lives something lives it in a way no one else will live exactly the same. That moment, that experience, that fragment of a life, has a value that exists only if someone tells it. | lib/proposito-text.ts |
 | Propósito | por-que · quote 4.1 | Vivimos en la era más documentada de la historia. Y hay millones de historias reales esperando el lugar correcto para existir. | Vivemos na era mais documentada da história. E há milhões de histórias reais esperando o lugar certo para existir. | We live in the most documented era in history. And there are millions of real stories waiting for the right place to exist. | lib/proposito-text.ts |
 | Propósito | creemos · título | Lo que creemos | O que acreditamos | What we believe | lib/proposito-text.ts |
-| Propósito | creemos · beliefs 1.1 | Cada persona que ha vivido algo lo ha vivido de una manera que nadie más va a vivir exactamente igual. Eso, por definición, es una historia única. | Cada pessoa que viveu algo viveu de um jeito que ninguém mais vai viver exatamente igual. Isso, por definição, é uma história única. | Each person who has lived something has lived it in a way no one else will live exactly the same. That, by definition, is a unique story. | lib/proposito-text.ts |
-| Propósito | creemos · beliefs 1.2 | Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego. | Uma história real pode mudar a vida de alguém que você ainda não conhece. É o que as histórias fazem desde que os humanos se sentam ao redor do fogo. | A real story can change the life of someone you do not know yet. That is what stories have done since humans sat around a fire. | lib/proposito-text.ts |
-| Propósito | creemos · beliefs 1.3 | El único requisito es querer compartirlo. | O único requisito é querer compartilhar. | The only requirement is wanting to share it. | lib/proposito-text.ts |
-| Propósito | creemos · beliefs 1.4 | Video, audio, texto, foto. Cuatro maneras de contar. Cuatro maneras de conocer. | Vídeo, áudio, texto, foto. Quatro maneiras de contar. Quatro maneiras de conhecer. | Video, audio, text, photo. Four ways to tell. Four ways to know. | lib/proposito-text.ts |
-| Propósito | creemos · beliefs 1.5 | Las historias que despiertan otras historias vienen de la experiencia vivida. | As histórias que despertam outras histórias vêm da experiência vivida. | The stories that awaken other stories come from lived experience. | lib/proposito-text.ts |
+| Propósito | creemos · beliefs 1.1 | Una historia real puede cambiar la vida de alguien que aún no conoces. Eso es lo que hacen las historias desde que los humanos se sientan alrededor del fuego. | Uma história real pode mudar a vida de alguém que você ainda não conhece. É o que as histórias fazem desde que os humanos se sentam ao redor do fogo. | A real story can change the life of someone you don't know yet. That's what stories have done since humans sat around a fire. | lib/proposito-text.ts |
+| Propósito | creemos · beliefs 1.2 | El único requisito es querer compartirlo. | O único requisito é querer compartilhar. | The only requirement is wanting to share it. | lib/proposito-text.ts |
+| Propósito | creemos · beliefs 1.3 | Video, audio, texto, foto. Cuatro maneras de contar. Cuatro maneras de conocer. | Vídeo, áudio, texto, foto. Quatro maneiras de contar. Quatro maneiras de conhecer. | Video, audio, text, photo. Four ways to tell. Four ways to know. | lib/proposito-text.ts |
+| Propósito | creemos · beliefs 1.4 | Las historias que despiertan otras historias vienen de la experiencia vivida. | As histórias que despertam outras histórias vêm da experiência vivida. | The stories that awaken other stories come from lived experience. | lib/proposito-text.ts |
 | Propósito | diferente · título | Lo que hacemos diferente | O que fazemos diferente | What we do differently | lib/proposito-text.ts |
 | Propósito | diferente · p 1.1 | AlmaMundi fue diseñado para que las historias duren. | O AlmaMundi foi pensado para que as histórias durem. | AlmaMundi was designed so that stories last. | lib/proposito-text.ts |
-| Propósito | diferente · p 2.1 | En AlmaMundi, cada historia tiene su propio tiempo. Una historia publicada hoy puede encontrar a quien la necesita mañana. O en tres años. El encuentro entre una historia y la persona que la necesita no tiene prisa. | No AlmaMundi, cada história tem seu próprio tempo. Uma história publicada hoje pode encontrar quem precisa dela amanhã. Ou em três anos. O encontro entre uma história e a pessoa que precisa dela não tem pressa. | On AlmaMundi, each story has its own time. A story published today can find the person who needs it tomorrow. Or in three years. The meeting between a story and the person who needs it is not in a hurry. | lib/proposito-text.ts |
+| Propósito | diferente · p 2.1 | En AlmaMundi, cada historia tiene su propio tiempo. Una historia publicada hoy puede encontrar a quien la necesita mañana. O en tres años. El encuentro entre una historia y la persona que la necesita no tiene prisa. | No AlmaMundi, cada história tem seu próprio tempo. Uma história publicada hoje pode encontrar quem precisa dela amanhã. Ou em três anos. O encontro entre uma história e a pessoa que precisa dela não tem pressa. | On AlmaMundi, each story has its own time. A story published today can find the person who needs it tomorrow. Or in three years. The meeting between a story and the person who needs it is never in a hurry. | lib/proposito-text.ts |
 | Propósito | diferente · p 3.1 | Aquí las historias existen porque existen. No hay sistema que decida cuánto valen ni cuándo aparecen. Una historia publicada hace tres años puede despertar a alguien hoy con la misma fuerza que el día en que se publicó. | Aqui as histórias existem porque existem. Não há um sistema que decida quanto valem nem quando aparecem. Uma história publicada há três anos pode despertar alguém hoje com a mesma força do dia em que foi publicada. | Here stories exist because they exist. There is no system that decides how much they are worth or when they appear. A story published three years ago can awaken someone today with the same force as the day it was published. | lib/proposito-text.ts |
-| Propósito | diferente · p 4.1 | Construimos AlmaMundi para que cada historia que se lee despierte una que aún no se ha contado. | Construímos o AlmaMundi para que cada história lida desperte uma que ainda não foi contada. | We build AlmaMundi so that each story that is read awakens one that has not been told yet. | lib/proposito-text.ts |
-| Propósito | cierre · título | Cuéntalo | Conte | Tell it | lib/proposito-text.ts |
-| Propósito | cierre · closing 1.1 | El formato es tuyo. La historia también. AlmaMundi es el lugar donde lo que viviste no desaparece. | O formato é seu. A história também. O AlmaMundi é o lugar onde o que você viveu não desaparece. | The format is yours. The story is too. AlmaMundi is the place where what you lived does not disappear. | lib/proposito-text.ts |
+| Propósito | diferente · p 4.1 | Construimos AlmaMundi para que cada historia que se lee despierte una que aún no se ha contado. | Construímos o AlmaMundi para que cada história lida desperte uma que ainda não foi contada. | We built AlmaMundi so that every story someone reads awakens one that hasn't been told yet. | lib/proposito-text.ts |
+| Propósito | cierre · título | Cuéntalo | Conte a sua | Tell it | lib/proposito-text.ts |
+| Propósito | cierre · closing 1.1 | El formato es tuyo. La historia también. AlmaMundi es el lugar donde lo que viviste no desaparece. | O formato é seu. A história também. O AlmaMundi é o lugar onde o que você viveu não desaparece. | The format is yours. The story is too. AlmaMundi is the place where what you lived doesn't disappear. | lib/proposito-text.ts |
 
 ## Cómo funciona
 
@@ -518,16 +478,16 @@ Textos en las tablas: 527.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
-| Cómo funciona | title | ¿Cómo funciona? | Como funciona? | How it works? | lib/i18n/como-funciona.ts |
+| Cómo funciona | title | ¿Cómo funciona? | Como funciona? | How does it work? | lib/i18n/como-funciona.ts |
 | Cómo funciona | p1 | AlmaMundi es un mapa vivo de historias humanas. | O AlmaMundi é um mapa vivo de histórias humanas. | AlmaMundi is a living map of human stories. | lib/i18n/como-funciona.ts |
-| Cómo funciona | formats | video, audio, texto o fotografía | vídeo, áudio, texto ou foto | video, audio, text, or photo | lib/i18n/como-funciona.ts |
+| Cómo funciona | formats | video, audio, texto o foto | vídeo, áudio, texto ou foto | video, audio, text, or photo | lib/i18n/como-funciona.ts |
 | Cómo funciona | p2 | Puedes compartir tu relato en | Você pode compartilhar seu relato em | You can share your story in | lib/i18n/como-funciona.ts |
-| Cómo funciona | p2b | . El envío en cualquiera de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial: | . O envio em qualquer um desses formatos é para pessoas maiores de 18 anos, ou para um adulto responsável ou representante de uma instituição com autorização expressa de quem aparece. Cada história passa por revisão editorial: | . Sending in any of these formats is for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Each story goes through editorial review: | lib/i18n/como-funciona.ts |
+| Cómo funciona | p2b | . El envío en cualquiera de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial: | . O envio em qualquer um desses formatos é para pessoas maiores de 18 anos, ou para um adulto responsável ou representante de uma instituição com autorização expressa de quem aparece. Cada história passa por revisão editorial: | . Submissions in any of these formats are for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Every story goes through editorial review: | lib/i18n/como-funciona.ts |
 | Cómo funciona | auto | nada se publica automáticamente | nada é publicado automaticamente | nothing is published automatically | lib/i18n/como-funciona.ts |
-| Cómo funciona | p3 | Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los derechos humanos. No se aceptan contenidos con | Só publicamos relatos que respeitem a dignidade humana, a privacidade, os direitos autorais e os direitos humanos. Não aceitamos conteúdos com | We only publish stories that respect human dignity, privacy, copyright, and human rights. We do not accept content with | lib/i18n/como-funciona.ts |
+| Cómo funciona | p3 | Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los derechos humanos. No se aceptan contenidos con | Só publicamos relatos que respeitem a dignidade humana, a privacidade, os direitos autorais e os direitos humanos. Não aceitamos conteúdos com | We only publish stories that respect human dignity, privacy, copyright, and human rights. We don't accept content with | lib/i18n/como-funciona.ts |
 | Cómo funciona | banned | insultos, injurias, calumnias, discriminación, racismo, xenofobia, homofobia, amenazas, violencia, abuso, explotación, exposición indebida de terceros, vulneración de derechos de niños, niñas y adolescentes, plagio o uso no autorizado de material ajeno | insultos, injúrias, calúnias, discriminação, racismo, xenofobia, homofobia, ameaças, violência, abuso, exploração, exposição indevida de terceiros, violação de direitos de crianças e adolescentes, plágio ou uso não autorizado de material de outra pessoa | insults, defamation, slander, discrimination, racism, xenophobia, homophobia, threats, violence, abuse, exploitation, improper exposure of others, violations of the rights of children and adolescents, plagiarism, or unauthorized use of material that belongs to someone else | lib/i18n/como-funciona.ts |
 | Cómo funciona | p4 | Para cuidar cada historia, revisamos su contenido, autoría, consentimiento y posibles riesgos para otras personas. Podemos pedir ajustes, no publicar o retirar relatos cuando sea necesario. | Para cuidar de cada história, revisamos o conteúdo, a autoria, o consentimento e os possíveis riscos para outras pessoas. Podemos pedir ajustes, não publicar ou retirar relatos quando for necessário. | To take care of each story, we review its content, authorship, consent, and possible risks to other people. We may ask for changes, decline to publish, or remove stories when needed. | lib/i18n/como-funciona.ts |
-| Cómo funciona | p5 | No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar el envío y proteger a quienes participan. | Não pedimos dados sensíveis para identificar a autoria. Usamos só a informação necessária para revisar o envio e proteger quem participa. | We do not ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part. | lib/i18n/como-funciona.ts |
+| Cómo funciona | p5 | No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar el envío y proteger a quienes participan. | Não pedimos dados sensíveis para identificar a autoria. Usamos só a informação necessária para revisar o envio e proteger quem participa. | We don't ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part. | lib/i18n/como-funciona.ts |
 | Cómo funciona | privacy | Ver política de privacidad | Ver política de privacidade | See the privacy policy | lib/i18n/como-funciona.ts |
 | Cómo funciona | close | Cerrar | Fechar | Close | lib/i18n/como-funciona.ts |
 
@@ -571,11 +531,11 @@ Textos en las tablas: 527.
 | Meta | /contar video · title | Graba el momento que todavía vive en ti | Grave o momento que ainda vive em você | Record the moment that still lives in you | lib/contar-routes.ts |
 | Meta | /contar video · description | Tu historia merece verse. Hasta 5 minutos de video. | Sua história merece ser vista. Até 5 minutos de vídeo. | Your story deserves to be seen. Up to 5 minutes of video. | lib/contar-routes.ts |
 | Meta | /contar audio · title | Hay historias que se cuentan mejor en voz alta | Há histórias que se contam melhor em voz alta | Some stories are best told out loud | lib/contar-routes.ts |
-| Meta | /contar audio · description | Tu voz guarda lo que las palabras escritas no siempre pueden. Hasta 5 minutos de audio. | Sua voz guarda o que as palavras escritas nem sempre podem. Até 5 minutos de áudio. | Your voice holds what written words cannot always carry. Up to 5 minutes of audio. | lib/contar-routes.ts |
-| Meta | /contar foto · title | Una imagen puede guardar lo que las palabras no alcanzan | Uma imagem pode guardar o que as palavras não alcançam | An image can hold what words cannot reach | lib/contar-routes.ts |
+| Meta | /contar audio · description | Tu voz guarda lo que las palabras escritas no siempre pueden. Hasta 5 minutos de audio. | Sua voz guarda o que as palavras escritas nem sempre podem. Até 5 minutos de áudio. | Your voice holds what written words can't always carry. Up to 5 minutes of audio. | lib/contar-routes.ts |
+| Meta | /contar foto · title | Una imagen puede guardar lo que las palabras no alcanzan | Uma imagem pode guardar o que as palavras não alcançam | An image can hold what words can't reach | lib/contar-routes.ts |
 | Meta | /contar foto · description | Hasta 10 MB por foto. | Até 10 MB por foto. | Up to 10 MB per photo. | lib/contar-routes.ts |
 | Meta | /contar texto · title | Escribe lo que no le contaste a nadie | Escreva o que você não contou a ninguém | Write what you never told anyone | lib/contar-routes.ts |
-| Meta | /contar texto · description | Aquí no se pierde en el scroll. Queda. Hasta 5000 caracteres. | Aqui não se perde no scroll. Fica. Até 5000 caracteres. | Here it is not lost in the scroll. It stays. Up to 5,000 characters. | lib/contar-routes.ts |
+| Meta | /contar texto · description | Aquí no se pierde en el scroll. Queda. Hasta 5000 caracteres. | Aqui não se perde no scroll. Fica. Até 5000 caracteres. | Here, it doesn't get lost in the scroll. It stays. Up to 5,000 characters. | lib/contar-routes.ts |
 | Meta | /historias/[id] · description | Un video / Un audio / Una historia en fotos / Una historia escrita, con «desde [lugar]» si hay lugar. | Um vídeo / Um áudio / Uma história em fotos / Uma história escrita, con «de [lugar]» o «em [lugar]» si hay lugar. | A video / An audio story / A story in photos / A written story, with «from [place]» if there is a place. | lib/share/published-share.ts |
 | Meta | /historias/[id] sin título | Historia | História | Story | lib/historias/story-page-metadata.ts |
 | Meta | /historias/[id] inexistente · description | Una historia en AlmaMundi, el mapa de historias humanas. | Uma história no AlmaMundi, o mapa de histórias humanas. | A story on AlmaMundi, the map of human stories. | lib/historias/story-page-metadata.ts |
@@ -609,11 +569,11 @@ Textos en las tablas: 527.
 | 404 | mapTitle | Volver al mapa | Voltar ao mapa | Back to the map | lib/i18n/not-found-messages.ts |
 | 404 | mapBody | Sigue explorando el mundo | Continue explorando o mundo | Keep exploring the world | lib/i18n/not-found-messages.ts |
 | 404 | storiesTitle | Ver historias | Ver histórias | See stories | lib/i18n/not-found-messages.ts |
-| 404 | storiesBody | Relatos en video, audio, foto y texto | Relatos em vídeo, áudio, foto e texto | Stories in video, audio, photo and text | lib/i18n/not-found-messages.ts |
+| 404 | storiesBody | Relatos en video, audio, foto y texto | Relatos em vídeo, áudio, foto e texto | Stories in video, audio, photos, and text | lib/i18n/not-found-messages.ts |
 
 ## Legales
 
-1 textos.
+1 texto.
 
 | pantalla | dónde aparece | ES | PT | EN | archivo |
 | --- | --- | --- | --- | --- | --- |
@@ -629,7 +589,7 @@ Textos en las tablas: 527.
 | Migas | _historia | Historia | História | Story | lib/layout/site-breadcrumbs.ts |
 | Migas | historias | Historias | Histórias | Stories | lib/layout/site-breadcrumbs.ts |
 | Migas | videos | Videos | Vídeos | Videos | lib/layout/site-breadcrumbs.ts |
-| Migas | audios | Audios | Áudios | Audios | lib/layout/site-breadcrumbs.ts |
+| Migas | audios | Audios | Áudios | Audio | lib/layout/site-breadcrumbs.ts |
 | Migas | escrito | Textos | Textos | Texts | lib/layout/site-breadcrumbs.ts |
 | Migas | fotos | Fotos | Fotos | Photos | lib/layout/site-breadcrumbs.ts |
 | Migas | audio | Audio | Áudio | Audio | lib/layout/site-breadcrumbs.ts |
@@ -637,8 +597,103 @@ Textos en las tablas: 527.
 | Migas | texto | Texto | Texto | Text | lib/layout/site-breadcrumbs.ts |
 | Migas | foto | Foto | Foto | Photo | lib/layout/site-breadcrumbs.ts |
 | Migas | mapa | Mapa | Mapa | Map | lib/layout/site-breadcrumbs.ts |
-| Migas | contar | Contar | Contar | Tell | lib/layout/site-breadcrumbs.ts |
+| Migas | contar | Cuenta tu historia | Conte sua história | Tell your story | lib/layout/site-breadcrumbs.ts |
 | Migas | pregunta | Pregunta | Pergunta | Question | lib/layout/site-breadcrumbs.ts |
+
+Las claves listFilterAria, listFilterCountry, listFilterClear y listFilterShowing siguen en el diccionario y no se muestran. El filtro de /historias/videos, audios, escrito y fotos está fijo en español en `components/historias/HistoriasFormatListPageLayout.tsx`.
+
+## Panel También cuenta
+
+El botón del mapa ya está en Home, mapa (`bits`). Estos textos son el panel.
+
+6 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| Panel También cuenta | happened | Qué pasó aquí | O que aconteceu aqui | What happened here | components/map/panels/BitsPanel.tsx |
+| Panel También cuenta | maps | Ver ubicación en Google Maps | Ver localização no Google Maps | See location on Google Maps | components/map/panels/BitsPanel.tsx |
+| Panel También cuenta | phrase | El mundo está lleno de historias sorprendentes. La tuya también merece contarse. | O mundo está cheio de histórias surpreendentes. A sua também merece ser contada. | The world is full of surprising stories. Yours deserves to be told too. | components/map/panels/BitsPanel.tsx |
+| Panel También cuenta | tell | Cuenta tu historia | Conte sua história | Tell your story | components/map/panels/BitsPanel.tsx |
+| Panel También cuenta | empty | Este mapa se construye con historias como la tuya. | Este mapa é feito de histórias como a sua. | This map is made of stories like yours. | components/map/panels/BitsPanel.tsx |
+| Panel También cuenta | places | {n} lugares | {n} lugares | 1 place / {n} places | components/map/panels/BitsPanel.tsx |
+
+## Ficha /historias/[id]
+
+13 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| Ficha | by | Por {nombre} | Por {nombre} | By {nombre} | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | today | Hoy | Hoje | Today | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | yesterday | Ayer | Ontem | Yesterday | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | days | hace {n} días | há {n} dias | {n} days ago | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | read | Leer en modo lectura | Ler em modo leitura | Read in reading mode | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | map | Ver en el mapa | Ver no mapa | See on the map | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | share | Compartir | Compartilhar | Share | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | songLead | Una canción para esta historia: | Uma música para esta história: | A song for this story: | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | ask | ¿Tienes una historia que contar? | Tem uma história para contar? | Do you have a story to tell? | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | tell | Cuenta tu historia | Conte sua história | Tell your story | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | all | Ver todas las historias | Ver todas as histórias | See all stories | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | back | Historias | Histórias | Stories | app/historias/[id]/HistoriasIdPageClient.tsx |
+| Ficha | format video / audio / foto / texto | Video / Audio / Foto / Texto | Vídeo / Áudio / Foto / Texto | Video / Audio / Photo / Text | app/historias/[id]/HistoriasIdPageClient.tsx |
+
+## Visor
+
+El visor del globo. «Me emocionó» está en el código y no se muestra.
+
+5 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| Visor | full | Ver historia completa | Ver história completa | See full story | components/mapa/StoryViewer.tsx |
+| Visor | format video / audio / foto / texto | Video / Audio / Foto / Texto | Vídeo / Áudio / Foto / Texto | Video / Audio / Photo / Text | components/mapa/StoryViewer.tsx |
+| Visor | share | Compartir | Compartilhar | Share | components/mapa/StoryViewer.tsx |
+| Visor | tell | Cuenta tu historia | Conte sua história | Tell your story | components/mapa/StoryViewer.tsx |
+| Visor | by | Por | Por | By | components/mapa/StoryViewer.tsx |
+
+## Panel de respuestas del globo
+
+4 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| Respuesta en el globo | kind | Respuesta | Resposta | Answer | components/map/RespuestaGlobeCard.tsx |
+| Respuesta en el globo | share | Compartir | Compartilhar | Share | components/map/RespuestaGlobeCard.tsx |
+| Respuesta en el globo | by | Por | Por | By | components/map/RespuestaGlobeCard.tsx |
+| Respuesta en el globo | responde | Responde tú esta pregunta | Responda você esta pregunta | Answer this question yourself | lib/pregunta-semana.ts |
+
+Al compartir, la pregunta del texto sale de `preguntaTexto(id, 'tu', idioma)` en `components/stories/ShareAfterNotice.tsx`.
+
+## Panel La pregunta del mapa
+
+El panel muestra la introducción, el tema, la pregunta en «tú», Responder, Preguntas anteriores y Ver todas las respuestas. Esos textos ya están en /pregunta y en `PREGUNTA_UI`.
+
+3 textos.
+
+| pantalla | dónde aparece | ES | PT | EN | archivo |
+| --- | --- | --- | --- | --- | --- |
+| La pregunta | tab | La pregunta | A pergunta | The question | lib/pregunta-semana.ts |
+| La pregunta | responder | Responder | Responder | Answer | lib/pregunta-semana.ts |
+| La pregunta | anteriores | Preguntas anteriores | Perguntas anteriores | Previous questions | lib/pregunta-semana.ts |
+
+## Las 12 preguntas
+
+12 textos. Solo se muestra la pregunta en «tú». La variante «Pregúntale a alguien» sigue en el código y no se muestra.
+
+| semana | tema ES / PT / EN | ES | PT | EN |
+| --- | --- | --- | --- | --- |
+| 1 música | Música / Música / Music | ¿Qué canción no puedes escuchar sin pensar en alguien? | Que música você não consegue ouvir sem pensar em alguém? | What song can you never hear without thinking of someone? |
+| 2 amabilidad | Amabilidad / Gentileza / Kindness | ¿Quién fue amable contigo cuando nadie más lo fue? | Quem foi gentil com você quando ninguém mais foi? | Who was kind to you when no one else was? |
+| 3 risa | Risa / Riso / Laughter | ¿Qué historia cuenta tu familia una y otra vez, y siempre da risa? | Que história sua família conta sem parar, e sempre faz rir? | What story does your family tell again and again, and it always gets a laugh? |
+| 4 amor | Amor / Amor / Love | ¿Cómo supiste que estabas enamorado o enamorada? | Como você soube que estava apaixonado ou apaixonada? | How did you know you were in love? |
+| 5 lugares | Lugares / Lugares / Places | ¿Qué lugar ya no existe, pero sigue vivo en tu memoria? | Que lugar já não existe, mas continua vivo na sua memória? | What place no longer exists but is still alive in your memory? |
+| 6 giros | Giros / Viradas / Turning points | ¿Cuál fue el día en que tu vida cambió de rumbo? | Qual foi o dia em que sua vida mudou de rumo? | What was the day your life changed course? |
+| 7 olores | Olores / Cheiros / Smells | ¿Qué olor te devuelve de golpe a tu infancia? | Que cheiro te leva de volta à infância de repente? | What smell takes you straight back to your childhood? |
+| 8 objetos | Objetos / Objetos / Objects | ¿Qué objeto guardas aunque ya no sirva para nada? | Que objeto você guarda mesmo que já não sirva para nada? | What object do you keep even though it no longer serves any purpose? |
+| 9 ausencias | Ausencias / Ausências / Absences | ¿Qué le dirías hoy a alguien que ya no está? | O que você diria hoje a alguém que já não está? | What would you say today to someone who is gone? |
+| 10 raíces | Raíces / Raízes / Roots | ¿Qué te llevaste contigo cuando te fuiste de un lugar? | O que você levou consigo quando foi embora de um lugar? | What did you take with you when you left a place? |
+| 11 valentía | Valentía / Coragem / Courage | ¿Cuándo tuviste más miedo y qué hiciste con él? | Quando você sentiu mais medo e o que fez com ele? | When were you most afraid, and what did you do with that fear? |
+| 12 legado | Legado / Legado / Legacy | ¿Qué te gustaría que recordaran de ti? | Pelo que você gostaria de ser lembrado? | What would you like to be remembered for? |
 
 ## Problemas detectados
 
@@ -650,11 +705,7 @@ Sin pendientes.
 
 ### Guiones largos
 
-No hay raya (—) como puntuación en la interfaz, compartir ni correos. En las pantallas de esta auditoría, un dato vacío se oculta.
-
-| pantalla | texto | archivo |
-| --- | --- | --- |
-| /temas/[tema], fuera del alcance principal | Si falta el lugar o la fecha, la ficha todavía muestra «—». | app/temas/[tema]/page.tsx |
+No hay raya (—) como puntuación en la interfaz, compartir ni correos. En las pantallas de esta auditoría, un dato vacío se oculta. En /temas/[tema], si falta el lugar o la fecha, esa línea no se muestra.
 
 ### Textos en español dentro de PT o EN
 
@@ -662,7 +713,7 @@ Sin pendientes. Las páginas legales siguen en español a propósito, con el avi
 
 ### Términos retirados que siguen
 
-Sin pendientes. «Mi colección» responde 404. «Mensaje a quien cuenta», «Pregúntale a alguien» y el modo oculto de la pregunta siguen en el código y no se muestran. «Noticias» no está en las migas ni en el mapa de la home.
+Sin pendientes en la interfaz. «Mi colección» responde 404. Las claves de archivo, colección, carta al autor y el filtro viejo de /historias no se usaban y se borraron. Quedan en el diccionario, sin mostrarse, listFilterAria, listFilterCountry, listFilterClear y listFilterShowing. «Pregúntale a alguien» sigue en lib/pregunta-semana.ts y no se muestra. «Noticias» no está en las migas ni en el mapa de la home. El filtro visible de /historias/videos, audios, escrito y fotos sigue fijo en español en components/historias/HistoriasFormatListPageLayout.tsx: «Buscar por país, año o palabras clave», con el campo «Buscar por título, ciudad o tema».
 
 ### El mismo concepto, dicho de formas distintas
 
@@ -688,6 +739,6 @@ Glosario de portugués de Brasil que ya está en el sitio: compartilhar, baixar,
 
 ### Textos que el código no había traducido
 
-- /contar, errores de cámara y micrófono, «Enviar um vídeo» / «Upload a video», «Enviar um áudio» / «Upload an audio», y las dos ayudas de alias y lugar. `lib/i18n/story-flow-messages.ts`.
+- /contar, errores de cámara y micrófono, «Enviar um vídeo» / «Upload a video», «Enviar um áudio» / «Upload audio», y las dos ayudas de alias y lugar. `lib/i18n/story-flow-messages.ts`.
 - Migas públicas: Início / Home, Histórias / Stories, Vídeos / Videos, Áudios / Audios, Textos / Texts, Fotos / Photos, História / Story, Pergunta / Question. `lib/layout/site-breadcrumbs.ts`.
 - Meta sin título: História / Story, Resposta / Answer. La description de una historia que no existe también quedó en PT y EN. `lib/historias/story-page-metadata.ts`, `app/r/[code]/page.tsx`.

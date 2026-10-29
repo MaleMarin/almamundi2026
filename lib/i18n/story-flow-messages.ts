@@ -323,8 +323,8 @@ const pt: StoryFlowMessages = {
   modalFileTypeVideo: 'Este formato de vídeo não é compatível. Tente .mp4, .webm ou .mov.',
   modalFileTypeAudio: 'Este formato de áudio não é compatível. Tente .mp3, .m4a ou .wav.',
   modalFileTooHeavy: 'Este arquivo passa de {max} MB. Tente um mais leve.',
-  modalFileTooLongVideo: 'Este vídeo dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
-  modalFileTooLongAudio: 'Este áudio dura mais de 5 minutos. Pode cortá-lo ou enviar outro.',
+  modalFileTooLongVideo: 'Este vídeo dura mais de 5 minutos. Você pode cortá-lo ou enviar outro.',
+  modalFileTooLongAudio: 'Este áudio dura mais de 5 minutos. Você pode cortá-lo ou enviar outro.',
   modalUploadProgress: 'Progresso do envio',
   modalUploadColorsWait:
     'Seu arquivo já foi enviado. Agora criamos suas cores, pode levar alguns segundos.',
@@ -381,7 +381,7 @@ const pt: StoryFlowMessages = {
   modalAnotherPromptAudio: 'Quer gravar outro momento?',
   modalAnotherCtaAudio: 'Gravar outro áudio',
   modalAnotherPromptTexto: 'Quer escrever outra história?',
-  modalAnotherCtaTexto: 'Escreva outra história',
+  modalAnotherCtaTexto: 'Escrever outra história',
   modalAnotherFormatLink: 'ou conte em outro formato',
   modalReviewInProgress:
     'Sua história está em revisão. Vamos escrever quando ela aparecer no mapa.',
@@ -398,7 +398,7 @@ const pt: StoryFlowMessages = {
     'As cores saem das palavras com que você apresentou seu áudio. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
   modalImprintHowVideo:
     'As cores saem das palavras com que você apresentou seu vídeo. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
-  modalExtrasColorHint: 'O que escrever aqui também dá cor à sua imagem.',
+  modalExtrasColorHint: 'O que você escrever aqui também dá cor à sua imagem.',
   modalNowWhat: 'E agora?',
   modalAnswerWeekQuestion: 'Responda à pergunta da semana',
   modalContactLead: 'Tem dúvidas? Escreva para',
@@ -476,8 +476,8 @@ const en: StoryFlowMessages = {
   modalReadyTitleAudio: 'Audio ready',
   modalChangeFile: 'Change file',
   modalRecordingName: 'Recording',
-  modalFileTypeVideo: 'This video format is not supported. Try .mp4, .webm, or .mov.',
-  modalFileTypeAudio: 'This audio format is not supported. Try .mp3, .m4a, or .wav.',
+  modalFileTypeVideo: "This video format isn't supported. Try .mp4, .webm, or .mov.",
+  modalFileTypeAudio: "This audio format isn't supported. Try .mp3, .m4a, or .wav.",
   modalFileTooHeavy: 'This file is over {max} MB. Try a smaller one.',
   modalFileTooLongVideo: 'This video is longer than 5 minutes. You can trim it or upload another.',
   modalFileTooLongAudio: 'This audio is longer than 5 minutes. You can trim it or upload another.',
@@ -486,17 +486,17 @@ const en: StoryFlowMessages = {
     'Your file is uploaded. We\'re creating your colors now, it may take a few seconds.',
   modalCreatingColors: 'Creating your colors…',
   modalPreviewVersion: 'Test version · {sha}',
-  modalPhotoTypeError: 'That file is not a photo. Use JPG, PNG, WEBP, or HEIC.',
+  modalPhotoTypeError: "That file isn't a photo. Use JPG, PNG, WEBP, or HEIC.",
   modalPhotoSizeError: 'That photo is over 10 MB. Try a smaller one.',
   modalPhotoConverting: 'Preparing your photo…',
   modalPhotoReadError: 'We couldn\'t read this photo. Try one in JPG or PNG.',
-  modalPhotoUploadFailed: 'We could not upload this photo.',
+  modalPhotoUploadFailed: "We couldn't upload this photo.",
   modalPhotoRetry: 'Try again',
   modalPhotoAltLabel:
     'Describe this photo in one sentence so people who are blind or have low vision can know it too. (optional)',
   modalPhotoName: 'Photo name *',
   modalPhotoYear: 'Year *',
-  modalPhotoYearUnknown: 'I do not know the exact year',
+  modalPhotoYearUnknown: "I don't know the exact year",
   modalPhotoDecade: 'Decade *',
   modalPhotoDecadeChoose: 'Choose a decade',
   modalPhotoPlace: 'Place *',
@@ -519,7 +519,7 @@ const en: StoryFlowMessages = {
     'We all carry a story worth telling. I told mine on AlmaMundi and these are its colors. Your turn. https://www.almamundi.org/contar',
   modalShareEmailSubject: 'I told a story on AlmaMundi',
   modalShareImageFailed:
-    'We could not share this. Download the image and share it from your device.',
+    "We couldn't share this. Download the image and share it from your device.",
   modalShareMenuTitle: 'Share',
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
@@ -541,12 +541,12 @@ const en: StoryFlowMessages = {
   modalAnotherCtaTexto: 'Write another story',
   modalAnotherFormatLink: 'or tell it in another format',
   modalReviewInProgress:
-    'Your story is in review. We will write to you when it appears on the map.',
+    "Your story is under review. We'll write to you when it appears on the map.",
   modalSectionYourStory: 'Your story',
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',
   modalProfilePhotoNote:
-    'Your photo (optional, up to 10 MB). It will appear next to your story when it is published. You can skip it.',
+    "Your photo (optional, up to 10 MB). It'll appear next to your story when it's published. You can skip it.",
   modalImprintHowTexto:
     'The colors come from the words of your story. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
   modalImprintHowFoto:
@@ -559,7 +559,7 @@ const en: StoryFlowMessages = {
   modalNowWhat: 'What now?',
   modalAnswerWeekQuestion: "Answer this week's question",
   modalContactLead: 'Questions? Write to us at',
-  modalCaptchaFailed: 'We could not confirm the submission. Wait a few seconds and try again.',
+  modalCaptchaFailed: "We couldn't confirm the submission. Wait a few seconds and try again.",
   modalStep1: 'Step 1 of 2',
   modalStep2: 'Step 2 of 2',
   modalLeaveConfirm: 'Leave without sending?',
@@ -571,7 +571,7 @@ const en: StoryFlowMessages = {
   modalFileReadyAudio: 'Audio ready: {nombre} ({peso} MB)',
   modalVideoLinkHint: 'The video must be public or unlisted.',
   modalAudioLinkLabel: 'Or paste a public link (SoundCloud, Google Drive, YouTube…)',
-  modalCopyImageFailed: 'We could not copy the image. Try Download.',
+  modalCopyImageFailed: "We couldn't copy the image. Try Download.",
   modalSaveImage: 'Save image',
   modalConsentAdult:
     'I am 18 or older, or a responsible adult or institutional representative, and I have permission from the people who appear in this story.',
@@ -581,7 +581,7 @@ const en: StoryFlowMessages = {
   modalConsentPrivacyLink: 'Privacy policy',
   modalMarkThreeToSend: 'Check the three boxes to send.',
   modalSubmitFailedKeep:
-    'We could not send your story. What you recorded and wrote is still here. Check your connection and try again.',
+    "We couldn't send your story. What you recorded and wrote is still here. Check your connection and try again.",
   modalFieldTitleMissing: 'Your story is missing a title.',
   modalFieldAliasMissing: 'Your name or alias is missing.',
   modalFieldCountryMissing: 'The country is missing.',
@@ -596,14 +596,14 @@ const en: StoryFlowMessages = {
   modalCameraBusy:
     'The camera is busy or not responding. Close other apps using it and try again.',
   modalMicDenied:
-    "We don't have permission to use your microphone. Turn it on in your browser, or upload an audio you already have.",
+    "We don't have permission to use your microphone. Turn it on in your browser, or upload a recording you already have.",
   modalMicUnsupported:
-    "Your browser can't record here. Try an updated Chrome or Safari, or upload an audio.",
+    "Your browser can't record here. Try an updated Chrome or Safari, or upload a recording.",
   modalMicBusy:
     'The microphone is busy or not responding. Close other apps using it and try again.',
   modalSwitchToUploadVideo: 'Upload a video',
-  modalSwitchToUploadAudio: 'Upload an audio',
-  modalAliasHint: 'This is how you will appear on the map.',
+  modalSwitchToUploadAudio: 'Upload audio',
+  modalAliasHint: "This is how you'll appear on the map.",
   modalLocationHint: 'This is how we place your story on the map.',
 };
 

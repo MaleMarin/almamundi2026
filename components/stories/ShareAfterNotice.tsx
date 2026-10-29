@@ -7,6 +7,7 @@ import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
 import { preguntaInviteShareText, preguntaShareText } from '@/lib/i18n/pregunta-messages';
+import { preguntaTexto } from '@/lib/pregunta-semana';
 import { isShortCode } from '@/lib/short-code';
 import {
   publishedAnswerShortUrl,
@@ -74,7 +75,8 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
     };
   }
   if (props.kind === 'answer') {
-    const text = publishedAnswerShareText(locale, props.answerKind, props.question, url);
+    const question = preguntaTexto(props.questionId, 'tu', locale) ?? props.question;
+    const text = publishedAnswerShareText(locale, props.answerKind, question, url);
     return { url, text, social: text };
   }
   const text =

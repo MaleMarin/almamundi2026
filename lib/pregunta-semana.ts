@@ -43,7 +43,6 @@ export const PREGUNTA_UI = {
     pt: 'A pergunta da semana:',
     en: "This week's question:",
   },
-  tu: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
   responder: { es: 'Responder', pt: 'Responder', en: 'Answer' },
   anteriores: { es: 'Preguntas anteriores', pt: 'Perguntas anteriores', en: 'Previous questions' },
 } as const satisfies Record<string, L3>;
