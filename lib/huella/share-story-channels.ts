@@ -48,8 +48,19 @@ function messageWithCanonicalUrl(text: string): string {
 
 export function buildStoryShareChannelUrls(
   url: string,
-  copy: StoryShareCopy
+  copy: StoryShareCopy,
+  options?: { exact?: boolean }
 ): StoryShareChannelUrls {
+  if (options?.exact && url) {
+    const subject = copy.emailSubject.trim() || PENDING_STORY_SHARE_EMAIL_SUBJECT;
+    return {
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(copy.long)}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
+      x: `https://x.com/intent/post?text=${encodeURIComponent(copy.short)}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
+      email: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(copy.long)}`,
+    };
+  }
   const shareUrl = canonicalStoryShareUrl(url);
   const shortMessage = messageWithCanonicalUrl(copy.short);
   const longMessage = messageWithCanonicalUrl(copy.long);

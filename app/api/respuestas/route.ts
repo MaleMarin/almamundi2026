@@ -1,5 +1,5 @@
 import "server-only";
-import { NextResponse } from "next/server";
+import { after, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
 import { isValidRecipientEmail } from "@/lib/email-html";
 import {
@@ -119,13 +119,9 @@ export async function POST(req: Request) {
     }
   }
 
-  let lat = coord(body.lat, 90);
-  let lng = coord(body.lng, 180);
-  if (lat == null || lng == null) {
-    const geo = await geocodeCityCountry(city, country);
-    lat = geo?.lat ?? null;
-    lng = geo?.lng ?? null;
-  }
+  const lat = coord(body.lat, 90);
+  const lng = coord(body.lng, 180);
+  const needsGeo = lat == null || lng == null;
 
   try {
     const db = getAdminDb();
@@ -213,17 +209,31 @@ export async function POST(req: Request) {
       });
     }
 
-    const mailed = await sendRespuestaReceivedEmail({ to: email, alias });
-    await ref
-      .update({
-        receivedMail: {
-          status: mailed.ok ? "sent" : "failed",
-          at: new Date().toISOString(),
-        },
-      })
-      .catch(() => undefined);
+    const respuestaId = ref.id;
+    after(async () => {
+      if (needsGeo) {
+        try {
+          const geo = await geocodeCityCountry(city, country);
+          if (geo) await ref.update({ lat: geo.lat, lng: geo.lng });
+          else console.error("[respuestas POST] geocode sin resultado");
+        } catch (err) {
+          console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
+        }
+      }
+      try {
+        const mailed = await sendRespuestaReceivedEmail({ to: email, alias });
+        await ref.update({
+          receivedMail: {
+            status: mailed.ok ? "sent" : "failed",
+            at: new Date().toISOString(),
+          },
+        });
+      } catch (err) {
+        console.error("[respuestas POST] correo", err instanceof Error ? err.message : "mail");
+      }
+    });
 
-    return NextResponse.json({ ok: true, id: ref.id });
+    return NextResponse.json({ ok: true, id: respuestaId });
   } catch (e) {
     console.error("[respuestas POST]", e instanceof Error ? e.message : "save");
     return jsonError("send_failed", 500);

@@ -87,6 +87,8 @@ type StoryShareMenuProps = {
   onDownload: () => void;
   onEmail: () => void;
   onClose: () => void;
+  /** Conserva el enlace recibido. Sin esto, el menú lo cambia por /contar. */
+  keepShareUrl?: boolean;
 };
 
 export function StoryShareMenu({
@@ -105,14 +107,19 @@ export function StoryShareMenu({
   onCopyFailed,
   onDownload,
   onEmail,
-  onClose }: StoryShareMenuProps) {
-  const channels = buildStoryShareChannelUrls(shareUrl, {
-    short: shareTextShort,
-    long: shareTextLong,
-    emailSubject });
+  onClose,
+  keepShareUrl = false }: StoryShareMenuProps) {
+  const channels = buildStoryShareChannelUrls(
+    shareUrl,
+    {
+      short: shareTextShort,
+      long: shareTextLong,
+      emailSubject },
+    { exact: keepShareUrl }
+  );
 
   const copyLink = () => {
-    const link = canonicalStoryShareUrl(shareUrl);
+    const link = keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl);
     copyTextInClick(link, (ok) => {
       if (ok) onCopied();
       else onCopyFailed(link);
@@ -124,7 +131,7 @@ export function StoryShareMenu({
     const native = Boolean(
       showImageApps && imageFile && typeof navigator !== 'undefined' && typeof navigator.share === 'function'
     );
-    if (!native) {
+    if (!native && imageFile) {
       window.open(
         app === 'Instagram' ? 'https://www.instagram.com/' : 'https://www.tiktok.com/upload',
         '_blank',

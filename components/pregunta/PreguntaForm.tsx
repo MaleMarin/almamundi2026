@@ -5,13 +5,13 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Image as ImageIcon, Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
-import { PREGUNTA_COPY, preguntaShareText, preguntaThanks } from '@/lib/i18n/pregunta-messages';
+import { PREGUNTA_COPY, preguntaShareText, preguntaThanksTitle } from '@/lib/i18n/pregunta-messages';
 import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
   isQuestionMode,
-  preguntaPageHref,
   preguntaPorId,
   preguntasDeLaSemana,
   resolveQuestionId,
@@ -106,6 +106,10 @@ function PreguntaFormInner({
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [sentAlias, setSentAlias] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareUrl, setShareUrl] = useState('');
+  const [shareNotice, setShareNotice] = useState('');
+  const [shareFallback, setShareFallback] = useState<string | null>(null);
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(getTurnstileSiteKey() ? 'wait' : 'skip');
   const captchaTokenRef = useRef('');
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -342,33 +346,112 @@ function PreguntaFormInner({
   }
 
   if (sentAlias) {
+    const shareText = preguntaShareText(locale, pregunta[mode][locale], shareUrl);
     return (
-      <div className="mx-auto flex w-full max-w-xl flex-col gap-6 px-4 py-8 text-[#1C1C2E]">
-        <p className="text-[length:var(--fs-texto)] leading-relaxed">{preguntaThanks(locale, sentAlias)}</p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
-            onClick={() => {
-              const enlace = `${window.location.origin}${preguntaPageHref(pregunta.id)}`;
-              const shareText = preguntaShareText(locale, pregunta[mode][locale], enlace);
-              const nav = navigator as Navigator & { share?: (data: { text: string }) => Promise<void> };
-              if (nav.share) {
-                void nav.share({ text: shareText }).catch(() => undefined);
-                return;
-              }
-              void navigator.clipboard?.writeText(shareText);
+      <div className="mx-auto flex w-full max-w-xl items-center px-4 py-10 text-[#1C1C2E]">
+        <article className="w-full rounded-3xl bg-white px-6 py-8 text-center shadow-[0_12px_40px_rgba(20,29,38,0.08)]">
+          <h1 className="m-0 text-[length:var(--fs-titular)] font-semibold leading-tight">
+            {preguntaThanksTitle(locale, sentAlias)}
+          </h1>
+          <p className="m-0 mt-3 text-[length:var(--fs-texto)] leading-relaxed">{copy.thanksBody[locale]}</p>
+          <div className="mt-6 text-left">
+            <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-[#4A5568]">{pregunta[mode][locale]}</p>
+            {kind === 'texto' ? (
+              <p className="m-0 mt-3 whitespace-pre-wrap text-[length:var(--fs-texto)] leading-relaxed">{text.trim()}</p>
+            ) : null}
+            {kind === 'voz' && audioUrl ? (
+              <audio controls src={audioUrl} className="mt-3 w-full" />
+            ) : null}
+            {kind === 'foto' && photoUrl ? (
+              <figure className="m-0 mt-3">
+                <img src={photoUrl} alt="" className="max-h-64 w-full rounded-2xl object-contain" />
+                {caption.trim() ? (
+                  <figcaption className="mt-2 text-[length:var(--fs-texto)] leading-relaxed">{caption.trim()}</figcaption>
+                ) : null}
+              </figure>
+            ) : null}
+          </div>
+          <div className="mt-8 flex flex-col gap-3 md:flex-row md:justify-center">
+            <button
+              type="button"
+              className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+              onClick={() => {
+                setShareNotice('');
+                setShareFallback(null);
+                setShareUrl(`${window.location.origin}/pregunta/${pregunta.id}`);
+                setShareOpen(true);
+              }}
+            >
+              {copy.share[locale]}
+            </button>
+            <Link
+              href={`/pregunta/${pregunta.id}`}
+              className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+            >
+              {copy.seeWorld[locale]}
+            </Link>
+          </div>
+          {shareNotice ? (
+            <p className="m-0 mt-4 text-[length:var(--fs-pequeno)]" role="status">
+              {shareNotice}
+            </p>
+          ) : null}
+          {shareFallback ? (
+            <label className="mt-3 block text-left text-[length:var(--fs-etiqueta)]">
+              {t.modalShareCopyFailed}
+              <textarea readOnly value={shareFallback} className={`${fieldClass} mt-1`} onFocus={(event) => event.currentTarget.select()} />
+            </label>
+          ) : null}
+        </article>
+        {shareOpen ? (
+          <StoryShareMenu
+            shareUrl={shareUrl}
+            shareTextShort={shareText}
+            shareTextLong={shareText}
+            emailSubject={pregunta[mode][locale].slice(0, 120)}
+            keepShareUrl
+            labels={{
+              title: t.modalShareMenuTitle,
+              facebook: t.modalShareFacebook,
+              x: t.modalShareX,
+              linkedin: t.modalShareLinkedIn,
+              instagram: t.modalShareInstagram,
+              tiktok: t.modalShareTikTok,
+              email: t.modalShareEmail,
+              copyLink: t.modalCopyLink,
+              download: t.modalDownloadImprint,
+              close: t.modalClose }}
+            showDownload={false}
+            showImageApps={false}
+            imageFile={null}
+            shareTitle={pregunta[mode][locale]}
+            onCopied={() => {
+              setShareFallback(null);
+              setShareNotice(t.modalShareLinkCopied);
+              setShareOpen(false);
             }}
-          >
-            {copy.share[locale]}
-          </button>
-          <Link
-            href={preguntaPageHref(pregunta.id)}
-            className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold"
-          >
-            {copy.seeWorld[locale]}
-          </Link>
-        </div>
+            onTextCopied={() => {
+              setShareFallback(null);
+              setShareNotice(t.modalShareTextCopied);
+              setShareOpen(false);
+            }}
+            onAppHandoff={() => {
+              setShareOpen(false);
+            }}
+            onCopyFailed={(value) => {
+              setShareNotice(t.modalShareCopyFailed);
+              setShareFallback(value);
+              window.setTimeout(() => setShareOpen(false), 0);
+            }}
+            onDownload={() => undefined}
+            onEmail={() => {
+              setShareFallback(null);
+              setShareNotice(t.modalShareEmailCopied);
+              window.setTimeout(() => setShareOpen(false), 0);
+            }}
+            onClose={() => setShareOpen(false)}
+          />
+        ) : null}
       </div>
     );
   }

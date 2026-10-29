@@ -18,10 +18,15 @@ export const PREGUNTA_COPY = {
     pt: 'Enviar minha resposta',
     en: 'Send my answer',
   },
-  thanks: {
-    es: 'Gracias, [alias]. Tu respuesta está en revisión. Te escribiremos cuando aparezca en el mapa.',
-    pt: 'Obrigado, [alias]. Sua resposta está em revisão. Vamos te avisar quando aparecer no mapa.',
-    en: "Thank you, [alias]. Your answer is under review. We'll write to you when it appears on the map.",
+  thanksTitle: {
+    es: 'Gracias, [alias]',
+    pt: 'Obrigado, [alias]',
+    en: 'Thank you, [alias]',
+  },
+  thanksBody: {
+    es: 'Tu respuesta está en revisión. Te escribiremos cuando aparezca en el mapa',
+    pt: 'Sua resposta está em revisão. Vamos te avisar quando aparecer no mapa',
+    en: "Your answer is under review. We'll write to you when it appears on the map",
   },
   share: {
     es: 'Comparte la pregunta',
@@ -127,8 +132,14 @@ export const PREGUNTA_COPY = {
   },
 } as const satisfies Record<string, L3>;
 
-export function preguntaThanks(locale: AlmaLocale, alias: string): string {
-  return PREGUNTA_COPY.thanks[locale].replace('[alias]', alias.trim());
+export function preguntaAlias(alias: string): string {
+  const name = alias.trim();
+  if (!name) return name;
+  return name.charAt(0).toLocaleUpperCase() + name.slice(1);
+}
+
+export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {
+  return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', preguntaAlias(alias));
 }
 
 export function preguntaShareText(locale: AlmaLocale, pregunta: string, enlace: string): string {
