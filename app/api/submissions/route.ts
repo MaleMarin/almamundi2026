@@ -23,6 +23,7 @@ import { TURNSTILE_REJECT_MESSAGE } from "@/lib/subir-upload-modal-copy";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
+import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 
 export const runtime = "nodejs";
 
@@ -274,6 +275,11 @@ export async function POST(req: NextRequest) {
     }
     const submissionId = ref.id;
     after(async () => {
+      try {
+        await writeCoordsIfMissing(ref, placeLabel, countryLabel ?? "");
+      } catch (geoErr) {
+        console.error("[submissions POST] geocode", geoErr instanceof Error ? geoErr.message : "geo");
+      }
       try {
         const mail = await notifyAuthorStoryReceived({
           db,

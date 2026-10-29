@@ -18,11 +18,23 @@ import {
   copyPrivateSubmissionToPublishedRespuesta,
   deleteRespuestaStorageFiles,
 } from "@/lib/server-storage";
+import { geocodePublicPlace } from "@/lib/respuestas/geocode";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
 type Action = "approve" | "reject" | "archive";
+
+function cleanPlace(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.replace(/[\r\n\t]+/g, " ").trim().slice(0, 120);
+}
+
+function storedPoint(lat: unknown, lng: unknown): { lat: number; lng: number } | null {
+  if (typeof lat !== "number" || typeof lng !== "number") return null;
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+  return { lat, lng };
+}
 
 async function contactEmail(id: string): Promise<string | null> {
   const snap = await getAdminDb().collection(RESPUESTA_CONTACTS_COLLECTION).doc(id).get();
@@ -44,7 +56,7 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string };
+  let body: { action?: string; city?: string; country?: string };
   try {
     body = await request.json();
   } catch {
@@ -73,6 +85,33 @@ export async function PATCH(
     }
 
     if (action === "approve") {
+      const cityFix = cleanPlace(body.city);
+      const countryFix = cleanPlace(body.country);
+      let city = typeof data.city === "string" ? data.city : "";
+      let country = typeof data.country === "string" ? data.country : "";
+      let point = storedPoint(data.lat, data.lng);
+      if (cityFix && countryFix) {
+        city = cityFix;
+        country = countryFix;
+        point = null;
+        await ref.update({
+          city,
+          country,
+          lat: FieldValue.delete(),
+          lng: FieldValue.delete(),
+          updatedAt: FieldValue.serverTimestamp(),
+        });
+      }
+      if (!point) {
+        point = await geocodePublicPlace(city, country);
+        if (!point) {
+          return NextResponse.json(
+            { error: "No encontramos esta ubicación", code: "location_not_found" },
+            { status: 422 }
+          );
+        }
+        await ref.update({ lat: point.lat, lng: point.lng });
+      }
       const malware = publishBlockedByMalware(data);
       if (malware.blocked) {
         return NextResponse.json({ error: malware.error }, { status: 400 });

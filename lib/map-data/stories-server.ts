@@ -11,8 +11,7 @@ import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/antecedentes";
-import { formatPublicPlace, publicCityCountry } from "@/lib/historias/story-ubicacion";
-import { geocodeCityCountry } from "@/lib/respuestas/geocode";
+import { publicCityCountry } from "@/lib/historias/story-ubicacion";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import {
@@ -162,15 +161,6 @@ function firestoreDocToStoryPoint(
   return base;
 }
 
-function placeQuery(d: Record<string, unknown>): { city: string; country: string } {
-  const city =
-    (typeof d.city === "string" && d.city.trim()) ||
-    (typeof d.placeLabel === "string" && d.placeLabel.trim()) ||
-    "";
-  const country = typeof d.country === "string" ? d.country.trim() : "";
-  return { city, country };
-}
-
 export async function getStoriesAsync(): Promise<StoryPoint[]> {
   try {
     const { getAdminDb } = await import("@/lib/firebase/admin");
@@ -183,20 +173,9 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       .limit(GLOBE_PUBLIC_STORY_CAP)
       .get();
 
-    const stories: StoryPoint[] = [];
-    for (const doc of snap.docs) {
-      const data = doc.data() as Record<string, unknown>;
-      let point = firestoreDocToStoryPoint(doc.id, data, true);
-      if (!point && isAudiencePublicStoryStatus(data.status)) {
-        const { city, country } = placeQuery(data);
-        const geo = await geocodeCityCountry(formatPublicPlace(city, country), "");
-        if (geo) {
-          point = firestoreDocToStoryPoint(doc.id, { ...data, lat: geo.lat, lng: geo.lng }, true);
-        }
-      }
-      if (point) stories.push(point);
-    }
-    return stories;
+    return snap.docs
+      .map((doc) => firestoreDocToStoryPoint(doc.id, doc.data(), true))
+      .filter((s): s is StoryPoint => s !== null);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     const isDecoder = /DECODER routines::\s*unsupported|1E08010C/i.test(msg);

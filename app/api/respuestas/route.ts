@@ -26,7 +26,7 @@ import {
   RESPUESTAS_COLLECTION,
   isRespuestaKind,
 } from "@/lib/respuestas/constants";
-import { geocodeCityCountry } from "@/lib/respuestas/geocode";
+import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { verifyTurnstileStrict } from "@/lib/security/turnstile-strict";
 
 export const runtime = "nodejs";
@@ -39,11 +39,6 @@ function jsonError(error: string, status: number) {
 function cleanLine(value: unknown, max: number): string {
   if (typeof value !== "string") return "";
   return stripHtml(value).replace(/[\r\n]+/g, " ").trim().slice(0, max);
-}
-
-function coord(value: unknown, maxAbs: number): number | null {
-  if (typeof value !== "number" || !Number.isFinite(value) || Math.abs(value) > maxAbs) return null;
-  return value;
 }
 
 const PHOTO_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/heic", "image/heif"]);
@@ -121,10 +116,6 @@ export async function POST(req: Request) {
     }
   }
 
-  const lat = coord(body.lat, 90);
-  const lng = coord(body.lng, 180);
-  const needsGeo = lat == null || lng == null;
-
   try {
     const db = getAdminDb();
     const ref = db.collection(RESPUESTAS_COLLECTION).doc();
@@ -187,8 +178,6 @@ export async function POST(req: Request) {
             consentTextsVersion: LEGAL_TEXTS_VERSION,
           }
         : { consentPrivacyPolicy: true }),
-      lat,
-      lng,
       status: "pending",
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
@@ -223,14 +212,10 @@ export async function POST(req: Request) {
 
     const respuestaId = ref.id;
     after(async () => {
-      if (needsGeo) {
-        try {
-          const geo = await geocodeCityCountry(city, country);
-          if (geo) await ref.update({ lat: geo.lat, lng: geo.lng });
-          else console.error("[respuestas POST] geocode sin resultado");
-        } catch (err) {
-          console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
-        }
+      try {
+        await writeCoordsIfMissing(ref, city, country);
+      } catch (err) {
+        console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
       }
       try {
         const mailed = await sendRespuestaReceivedEmail({ to: email, alias });

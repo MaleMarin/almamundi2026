@@ -619,16 +619,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [respuestasOnGlobe]);
 
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
-    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => {
-      const pile = storiesOnGlobe
-        .slice(0, i)
-        .filter((other) => Math.abs(other.lat - s.lat) < 0.05 && Math.abs(other.lng - s.lng) < 0.05).length;
-      const radius = pile === 0 ? 0 : 0.12 + pile * 0.05;
-      const angle = pile * 1.15;
-      return {
+    const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
       id: STORY_GLOBE_ID_BASE + i,
-      lat: s.lat + Math.sin(angle) * radius,
-      lon: s.lng + Math.cos(angle) * radius,
+      lat: s.lat,
+      lon: s.lng,
       markerKind: 'story' as const,
       title: s.title ?? s.label,
       place: formatPublicPlace(s.city, s.country) || undefined,
@@ -636,9 +630,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         antecedentes: s.antecedentes,
         body: s.body,
         transcription: s.transcription,
-        locale }),
-    };
-    });
+        locale }) }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
   }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 

@@ -16,11 +16,17 @@ type Action = "approve" | "reject" | "feature" | "archive";
 const PENDING_COLLECTIONS = ["submissions", "story_submissions"] as const;
 
 /** Aprobar publica el envío. Rechazar solo cambia el envío, no crea una historia. */
+function cleanPlace(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value.replace(/[\r\n\t]+/g, " ").trim().slice(0, 120);
+}
+
 async function moderatePendingSubmission(
   db: Firestore,
   id: string,
   action: Action,
-  actorEmail: string
+  actorEmail: string,
+  place?: { city: string; country: string }
 ) {
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "story not found" }, { status: 404 });
@@ -41,6 +47,24 @@ async function moderatePendingSubmission(
   if (!ref || !collection) {
     return NextResponse.json({ error: "story not found" }, { status: 404 });
   }
+  if (action === "approve" && place?.city && place.country) {
+    await ref.update(
+      collection === "submissions"
+        ? {
+            placeLabel: place.city,
+            countryLabel: place.country,
+            lat: FieldValue.delete(),
+            lng: FieldValue.delete(),
+          }
+        : {
+            city: place.city,
+            placeLabel: place.city,
+            country: place.country,
+            lat: FieldValue.delete(),
+            lng: FieldValue.delete(),
+          }
+    );
+  }
   if (action === "reject") {
     await ref.update({ status: "rejected", reviewedAt: Date.now() });
     await appendEditorialAuditLog(db, actorEmail, "reject", {
@@ -53,7 +77,14 @@ async function moderatePendingSubmission(
   }
   const result = await editorialPublishFromSubmission(db, id, actorEmail);
   if (!result.ok) {
-    return NextResponse.json({ error: result.error }, { status: result.httpStatus });
+    const missingPlace = result.error === "location_not_found";
+    return NextResponse.json(
+      {
+        error: missingPlace ? "No encontramos esta ubicación" : result.error,
+        code: result.error,
+      },
+      { status: result.httpStatus }
+    );
   }
   const publicationMail = await notifyAuthorStoryPublished({ db, storyId: result.storyId });
   return NextResponse.json({ ok: true, status: "approved", publicationMail });
@@ -72,7 +103,7 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string };
+  let body: { action?: string; city?: string; country?: string };
   try {
     body = await request.json();
   } catch {
@@ -89,7 +120,10 @@ export async function PATCH(
     const ref = db.collection("stories").doc(id);
     const snap = await ref.get();
     if (!snap.exists) {
-      return moderatePendingSubmission(db, id, action, auth.email);
+      return moderatePendingSubmission(db, id, action, auth.email, {
+        city: cleanPlace(body.city),
+        country: cleanPlace(body.country),
+      });
     }
 
     const data = snap.data() as Record<string, unknown>;

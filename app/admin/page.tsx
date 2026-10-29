@@ -403,6 +403,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [archivedFilter, setArchivedFilter] = useState<{ topic?: string; place?: string; format?: StoryFormat }>({});
   const [newCollectionTitle, setNewCollectionTitle] = useState('');
@@ -564,17 +565,25 @@ export default function AdminPage() {
     }
   };
 
-  const patchStory = async (id: string, action: 'approve' | 'reject' | 'feature' | 'archive') => {
+  const patchStory = async (
+    id: string,
+    action: 'approve' | 'reject' | 'feature' | 'archive',
+    place?: { city: string; country: string }
+  ) => {
     setActionLoading(id);
     try {
       const res = await fetch(`/api/admin/stories/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', ...getAuthHeaders() },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({
+          action,
+          ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
+        }),
       });
       const data = (await res.json()) as {
         ok?: boolean;
         error?: string;
+        code?: string;
         publicationMail?: {
           status: 'sent' | 'skipped_no_email' | 'failed';
           to: string | null;
@@ -596,7 +605,22 @@ export default function AdminPage() {
         } else {
           showToast(action === 'reject' ? 'Rechazada' : action === 'feature' ? 'Destacada' : 'Archivada');
         }
+        setPlacePrompt((prev) => {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        });
         await Promise.all([fetchPending(), fetchActive(), fetchArchived(), fetchStats()]);
+      } else if (data.code === 'location_not_found') {
+        const story = pendingStories.find((item) => item.id === id);
+        setPlacePrompt((prev) => ({
+          ...prev,
+          [id]: prev[id] ?? {
+            city: story?.sender?.city ?? '',
+            country: story?.sender?.country ?? '',
+          },
+        }));
+        showToast('No encontramos esta ubicación');
       } else {
         showToast(data.error ?? 'Error');
       }
@@ -873,13 +897,68 @@ export default function AdminPage() {
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
                     {s.authorEmail ? `Se avisará a ${s.authorEmail}` : 'Sin correo del autor: no se podrá avisar al publicar'}
                   </p>
+                  <p
+                    style={{
+                      fontSize: 12,
+                      margin: '6px 0 0',
+                      color:
+                        typeof s.lat === 'number' && typeof s.lng === 'number' ? 'rgba(255,255,255,0.55)' : '#fbbf24',
+                    }}
+                  >
+                    {typeof s.lat === 'number' && typeof s.lng === 'number' ? 'Ya tiene ubicación' : 'Sin ubicación'}
+                  </p>
+                  {placePrompt[s.id] ? (
+                    <div style={{ marginTop: 10 }}>
+                      <p style={{ fontSize: 13, margin: '0 0 8px', color: '#fbbf24' }}>No encontramos esta ubicación</p>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <input
+                          value={placePrompt[s.id]?.city ?? ''}
+                          onChange={(event) =>
+                            setPlacePrompt((prev) => ({
+                              ...prev,
+                              [s.id]: { city: event.target.value, country: prev[s.id]?.country ?? '' },
+                            }))
+                          }
+                          placeholder="Ciudad"
+                          aria-label="Ciudad"
+                          style={{
+                            padding: '8px 12px',
+                            borderRadius: 10,
+                            border: '1px solid rgba(251,191,36,0.45)',
+                            background: 'rgba(0,0,0,0.25)',
+                            color: 'white',
+                            fontFamily: APP_FONT,
+                          }}
+                        />
+                        <input
+                          value={placePrompt[s.id]?.country ?? ''}
+                          onChange={(event) =>
+                            setPlacePrompt((prev) => ({
+                              ...prev,
+                              [s.id]: { city: prev[s.id]?.city ?? '', country: event.target.value },
+                            }))
+                          }
+                          placeholder="País"
+                          aria-label="País"
+                          style={{
+                            padding: '8px 12px',
+                            borderRadius: 10,
+                            border: '1px solid rgba(251,191,36,0.45)',
+                            background: 'rgba(0,0,0,0.25)',
+                            color: 'white',
+                            fontFamily: APP_FONT,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ) : null}
                   <StoryPhotoFichas imagenes={s.imagenes} />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     type="button"
                     disabled={actionLoading === s.id}
-                    onClick={() => patchStory(s.id, 'approve')}
+                    onClick={() => patchStory(s.id, 'approve', placePrompt[s.id])}
                     style={{
                       display: 'flex',
                       alignItems: 'center',

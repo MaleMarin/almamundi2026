@@ -106,6 +106,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
   const [items, setItems] = useState<RespuestaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionId, setActionId] = useState<string | null>(null);
+  const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
   const [notice, setNotice] = useState<string | null>(null);
 
   const headers = useCallback((): HeadersInit => ({ Authorization: `Bearer ${token}` }), [token]);
@@ -140,17 +141,40 @@ export default function RespuestasAdmin({ token }: { token: string }) {
     void load();
   }, [load]);
 
-  const patch = async (id: string, action: 'approve' | 'reject' | 'archive') => {
+  const patch = async (
+    id: string,
+    action: 'approve' | 'reject' | 'archive',
+    place?: { city: string; country: string }
+  ) => {
     setActionId(id);
     try {
       const res = await fetch(`/api/admin/respuestas/${id}`, {
         method: 'PATCH',
         headers: { ...headers(), 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action }),
+        body: JSON.stringify({
+          action,
+          ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
+        }),
       });
-      const data = (await res.json()) as { ok?: boolean; error?: string };
-      setNotice(data.ok ? 'Listo.' : (data.error ?? 'No se pudo actualizar.'));
-      if (data.ok) await load();
+      const data = (await res.json()) as { ok?: boolean; error?: string; code?: string };
+      if (data.code === 'location_not_found') {
+        const item = items.find((row) => row.id === id);
+        setPlacePrompt((prev) => ({
+          ...prev,
+          [id]: prev[id] ?? { city: item?.city ?? '', country: item?.country ?? '' },
+        }));
+        setNotice('No encontramos esta ubicación');
+      } else {
+        setNotice(data.ok ? 'Listo.' : (data.error ?? 'No se pudo actualizar.'));
+        if (data.ok) {
+          setPlacePrompt((prev) => {
+            const next = { ...prev };
+            delete next[id];
+            return next;
+          });
+          await load();
+        }
+      }
     } catch {
       setNotice('No se pudo actualizar.');
     } finally {
@@ -262,15 +286,71 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                         )}
                       </div>
                     )}
-                    {!item.hasLocation && (
-                      <p style={{ margin: '8px 0 0', fontSize: 12, color: '#fbbf24' }}>
-                        Sin coordenadas: no aparece en el globo.
+                    {item.status === 'pending' && (
+                      <p
+                        style={{
+                          margin: '8px 0 0',
+                          fontSize: 12,
+                          color: item.hasLocation ? 'rgba(255,255,255,0.55)' : '#fbbf24',
+                        }}
+                      >
+                        {item.hasLocation ? 'Ya tiene ubicación' : 'Sin ubicación'}
                       </p>
                     )}
+                    {placePrompt[item.id] ? (
+                      <div style={{ marginTop: 10 }}>
+                        <p style={{ margin: '0 0 8px', fontSize: 13, color: '#fbbf24' }}>No encontramos esta ubicación</p>
+                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                          <input
+                            value={placePrompt[item.id]?.city ?? ''}
+                            onChange={(event) =>
+                              setPlacePrompt((prev) => ({
+                                ...prev,
+                                [item.id]: { city: event.target.value, country: prev[item.id]?.country ?? '' },
+                              }))
+                            }
+                            placeholder="Ciudad"
+                            aria-label="Ciudad"
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: 10,
+                              border: '1px solid rgba(251,191,36,0.45)',
+                              background: 'rgba(0,0,0,0.25)',
+                              color: 'white',
+                              fontFamily: SITE_FONT_STACK,
+                            }}
+                          />
+                          <input
+                            value={placePrompt[item.id]?.country ?? ''}
+                            onChange={(event) =>
+                              setPlacePrompt((prev) => ({
+                                ...prev,
+                                [item.id]: { city: prev[item.id]?.city ?? '', country: event.target.value },
+                              }))
+                            }
+                            placeholder="País"
+                            aria-label="País"
+                            style={{
+                              padding: '8px 12px',
+                              borderRadius: 10,
+                              border: '1px solid rgba(251,191,36,0.45)',
+                              background: 'rgba(0,0,0,0.25)',
+                              color: 'white',
+                              fontFamily: SITE_FONT_STACK,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     {item.status === 'pending' && (
-                      <button type="button" disabled={busy} onClick={() => patch(item.id, 'approve')} style={okBtn}>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => patch(item.id, 'approve', placePrompt[item.id])}
+                        style={okBtn}
+                      >
                         <Check size={16} /> Aprobar
                       </button>
                     )}

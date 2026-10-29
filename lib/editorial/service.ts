@@ -8,8 +8,7 @@ import { FieldPath, FieldValue } from "firebase-admin/firestore";
 import { appendDeleteStoryLog, appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/antecedentes";
-import { geocodeCityCountry } from "@/lib/respuestas/geocode";
-import { formatPublicPlace } from "@/lib/historias/story-ubicacion";
+import { geocodePublicPlace } from "@/lib/respuestas/geocode";
 import { imagenesFromSubmissionPhotos, parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES, GLOBE_PUBLIC_STORY_CAP, isFeaturedStoryStatus } from "@/lib/editorial/status";
 import { canApproveSpanishDraft } from "@/lib/editorial/transitions";
@@ -110,6 +109,8 @@ type SubmissionsPipelineDoc = {
   publishedStoryId?: string;
   privateMediaPaths?: string[];
   profilePhotoUrl?: string;
+  lat?: number | null;
+  lng?: number | null;
 };
 
 function mapSubmissionsTipoToStoryFormat(type: string | undefined): "text" | "audio" | "video" | "image" {
@@ -149,15 +150,11 @@ async function coordsForPlace(
   country: unknown,
   lat: unknown,
   lng: unknown
-): Promise<{ lat: number | null; lng: number | null }> {
+): Promise<{ lat: number; lng: number } | null> {
   const knownLat = coerceFiniteNumber(lat);
   const knownLng = coerceFiniteNumber(lng);
   if (knownLat != null && knownLng != null) return { lat: knownLat, lng: knownLng };
-  const geo = await geocodeCityCountry(
-    formatPublicPlace(typeof city === "string" ? city : "", typeof country === "string" ? country : ""),
-    ""
-  );
-  return { lat: geo?.lat ?? null, lng: geo?.lng ?? null };
+  return geocodePublicPlace(typeof city === "string" ? city : "", typeof country === "string" ? country : "");
 }
 
 async function resolveSubmission(
@@ -223,6 +220,7 @@ export async function editorialPublishFromSubmission(
       sub.lat,
       sub.lng
     );
+    if (!coords) return { ok: false, httpStatus: 422, error: "location_not_found" };
     const lat = coords.lat;
     const lng = coords.lng;
     const now = FieldValue.serverTimestamp();
@@ -289,6 +287,8 @@ export async function editorialPublishFromSubmission(
       status: "approved",
       updatedAt: now,
       publishedStoryId: storyRef.id,
+      lat,
+      lng,
     });
     await appendEditorialAuditLog(db, actorEmail, "approve_from_submission", {
       submissionId,
@@ -332,7 +332,8 @@ export async function editorialPublishFromSubmission(
     [sd.context ?? "", sd.payload?.textBody ?? ""].filter((t) => t && t.trim()).join("\n\n"),
     normalizeAntecedentes(sd.antecedentes)
   );
-  const coords = await coordsForPlace(sd.placeLabel, sd.countryLabel, null, null);
+  const coords = await coordsForPlace(sd.placeLabel, sd.countryLabel, sd.lat, sd.lng);
+  if (!coords) return { ok: false, httpStatus: 422, error: "location_not_found" };
   const rawMedia: Record<string, string> = {};
   if (sd.payload?.videoUrl) rawMedia.videoUrl = sd.payload.videoUrl;
   if (sd.payload?.audioUrl) rawMedia.audioUrl = sd.payload.audioUrl;
@@ -396,6 +397,8 @@ export async function editorialPublishFromSubmission(
     reviewedAt: Date.now(),
     publicId: storyRef.id,
     publishedStoryId: storyRef.id,
+    lat: coords.lat,
+    lng: coords.lng,
   });
   await appendEditorialAuditLog(db, actorEmail, "approve_from_submission", {
     submissionId,
@@ -446,6 +449,8 @@ export async function editorialPublishApprovedStorySubmission(
     return { ok: false, httpStatus: 400, error: "already published" };
   }
 
+  const legacyCoords = await coordsForPlace(data.placeLabel, data.country, data.lat, data.lng);
+  if (!legacyCoords) return { ok: false, httpStatus: 422, error: "location_not_found" };
   const now = FieldValue.serverTimestamp();
   const storyRef = db.collection("stories").doc();
   const rawMedia: Record<string, string> = {};
@@ -474,7 +479,8 @@ export async function editorialPublishApprovedStorySubmission(
     sourceSubmissionCollection: "story_submissions",
     title: data.title,
     placeLabel: data.placeLabel,
-    ...(await coordsForPlace(data.placeLabel, data.country, data.lat, data.lng)),
+    lat: legacyCoords.lat,
+    lng: legacyCoords.lng,
     format: data.format,
     tags: data.tags ?? { themes: [], moods: [], keywords: [] },
     excerpt:
@@ -504,6 +510,8 @@ export async function editorialPublishApprovedStorySubmission(
     status: "approved",
     updatedAt: FieldValue.serverTimestamp(),
     publishedStoryId: storyRef.id,
+    lat: legacyCoords.lat,
+    lng: legacyCoords.lng,
   });
   await maybeArchiveOldestPublicIfOverCap(db);
   await appendEditorialAuditLog(db, actorEmail, "approve_from_submission", {
