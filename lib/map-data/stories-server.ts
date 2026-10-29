@@ -175,9 +175,20 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
       .limit(GLOBE_PUBLIC_STORY_CAP)
       .get();
 
-    return snap.docs
-      .map((doc) => firestoreDocToStoryPoint(doc.id, doc.data(), true))
-      .filter((s): s is StoryPoint => s !== null);
+    const stories: StoryPoint[] = [];
+    for (const doc of snap.docs) {
+      const data = doc.data() as Record<string, unknown>;
+      const point = firestoreDocToStoryPoint(doc.id, data, true);
+      if (point) {
+        stories.push(point);
+        continue;
+      }
+      const { lat, lng } = resolveLatLng(data);
+      if (lat == null || lng == null) {
+        console.warn(`[getStoriesAsync] Historia aprobada sin coordenadas, omitida del globo: ${doc.id}`);
+      }
+    }
+    return stories;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     const isDecoder = /DECODER routines::\s*unsupported|1E08010C/i.test(msg);

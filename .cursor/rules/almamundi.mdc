@@ -16,4 +16,5 @@ alwaysApply: true
 - Informe de máximo 5 líneas: qué cambió, archivos y commit.
 - El formulario de /contar empieza siempre en blanco y el recuadro de Turnstile no se muestra salvo que Cloudflare pida interacción.
 - Si el build falla, no hagas commit ni push: detente e informa.
-- Edad, género, correo y "¿Algo más…?" son internos: nunca en documentos públicos, APIs públicas ni páginas.
+- Edad, género, correo y «¿Algo más…?» son internos: nunca en documentos públicos, APIs públicas ni páginas.
+- Nunca modificar el texto, título ni contenido de una historia o respuesta de una persona sin aprobación explícita de Ana.
