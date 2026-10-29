@@ -860,7 +860,7 @@ export async function editorialDeleteStory(args: {
 }
 
 /**
- * Borra un envío pendiente de `submissions` y sus archivos privados.
+ * Borra un envío pendiente de `submissions` o `story_submissions` y sus archivos privados.
  * No toca `stories` ni otros documentos.
  */
 export async function editorialDeleteSubmission(args: {
@@ -872,9 +872,18 @@ export async function editorialDeleteSubmission(args: {
   if (!/^[A-Za-z0-9]{8,128}$/.test(id)) {
     return { ok: false, httpStatus: 400, error: "Envío no válido" };
   }
-  const ref = args.db.collection("submissions").doc(id);
+  let ref: DocumentReference | null = null;
+  let collection: "submissions" | "story_submissions" | null = null;
+  for (const name of ["submissions", "story_submissions"] as const) {
+    const candidate = args.db.collection(name).doc(id);
+    const found = await candidate.get();
+    if (!found.exists) continue;
+    ref = candidate;
+    collection = name;
+    break;
+  }
+  if (!ref || !collection) return { ok: false, httpStatus: 404, error: "Envío no encontrado" };
   const snap = await ref.get();
-  if (!snap.exists) return { ok: false, httpStatus: 404, error: "Envío no encontrado" };
   const data = (snap.data() ?? {}) as Record<string, unknown>;
   if (String(data.status ?? "") !== "pending") {
     return { ok: false, httpStatus: 409, error: "Este envío ya no está pendiente" };
@@ -898,7 +907,7 @@ export async function editorialDeleteSubmission(args: {
   await ref.delete();
   await appendEditorialAuditLog(args.db, args.deletedBy, "delete_story", {
     submissionId: id,
-    submissionCollection: "submissions",
+    submissionCollection: collection,
     fromStatus: "pending",
   });
   return { ok: true };

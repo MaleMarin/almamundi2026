@@ -89,6 +89,7 @@ type Story = {
   questionMode: 'tu' | 'alguien' | null;
   imagenes?: AdminImagen[];
   files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' }[];
+  source?: 'submissions' | 'story_submissions';
 };
 
 type Collection = {
@@ -713,6 +714,9 @@ export default function AdminPage() {
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{s.place}</span>
+                    {s.source ? (
+                      <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Origen: {s.source}</span>
+                    ) : null}
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>

@@ -1,6 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue, type Firestore } from "firebase-admin/firestore";
+import { FieldValue, type DocumentReference, type Firestore } from "firebase-admin/firestore";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
@@ -13,6 +13,8 @@ export const runtime = "nodejs";
 
 type Action = "approve" | "reject" | "feature" | "archive";
 
+const PENDING_COLLECTIONS = ["submissions", "story_submissions"] as const;
+
 /** Aprobar publica el envío. Rechazar solo cambia el envío, no crea una historia. */
 async function moderatePendingSubmission(
   db: Firestore,
@@ -23,19 +25,27 @@ async function moderatePendingSubmission(
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "story not found" }, { status: 404 });
   }
-  const ref = db.collection("submissions").doc(id);
-  const snap = await ref.get();
-  if (!snap.exists) {
-    return NextResponse.json({ error: "story not found" }, { status: 404 });
+  let ref: DocumentReference | null = null;
+  let collection: (typeof PENDING_COLLECTIONS)[number] | null = null;
+  for (const name of PENDING_COLLECTIONS) {
+    const candidate = db.collection(name).doc(id);
+    const found = await candidate.get();
+    if (!found.exists) continue;
+    ref = candidate;
+    collection = name;
+    if (String(found.get("status") ?? "") !== "pending") {
+      return NextResponse.json({ error: "Este envío ya no está pendiente" }, { status: 409 });
+    }
+    break;
   }
-  if (String(snap.get("status") ?? "") !== "pending") {
-    return NextResponse.json({ error: "Este envío ya no está pendiente" }, { status: 409 });
+  if (!ref || !collection) {
+    return NextResponse.json({ error: "story not found" }, { status: 404 });
   }
   if (action === "reject") {
     await ref.update({ status: "rejected", reviewedAt: Date.now() });
     await appendEditorialAuditLog(db, actorEmail, "reject", {
       submissionId: id,
-      submissionCollection: "submissions",
+      submissionCollection: collection,
       fromStatus: "pending",
       toStatus: "rejected",
     });

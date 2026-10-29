@@ -25,7 +25,9 @@ type PendingFile = { url: string; kind: "image" | "audio" | "video" | "file" };
 function submissionFormat(type: unknown): "video" | "audio" | "text" | "photos" {
   if (type === "video") return "video";
   if (type === "audio") return "audio";
-  if (type === "foto" || type === "photo" || type === "fotos") return "photos";
+  if (type === "foto" || type === "photo" || type === "fotos" || type === "image" || type === "photos") {
+    return "photos";
+  }
   return "text";
 }
 
@@ -41,56 +43,104 @@ function fileKind(path: string, type: string): PendingFile["kind"] {
   return "file";
 }
 
-/** Envíos de /api/submissions que aún no son historias publicadas. */
+type PendingSource = "submissions" | "story_submissions";
+
+function textField(data: Record<string, unknown>, ...keys: string[]): string {
+  for (const key of keys) {
+    const value = data[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
+
+async function filesForSubmission(data: Record<string, unknown>, type: string): Promise<PendingFile[]> {
+  const paths = Array.isArray(data.privateMediaPaths)
+    ? data.privateMediaPaths.filter((p): p is string => typeof p === "string" && p.startsWith("submissions/private/"))
+    : [];
+  const media = data.media;
+  if (media && typeof media === "object" && !Array.isArray(media)) {
+    for (const value of Object.values(media as Record<string, unknown>)) {
+      if (typeof value === "string" && value.startsWith("submissions/private/") && !paths.includes(value)) {
+        paths.push(value);
+      }
+    }
+  }
+  const files: PendingFile[] = [];
+  for (const storagePath of paths.slice(0, 8)) {
+    try {
+      files.push({ url: await signReadUrlForPath(storagePath), kind: fileKind(storagePath, type) });
+    } catch {
+      files.push({ url: "", kind: fileKind(storagePath, type) });
+    }
+  }
+  if (media && typeof media === "object" && !Array.isArray(media)) {
+    for (const value of Object.values(media as Record<string, unknown>)) {
+      if (typeof value !== "string") continue;
+      const url = value.trim();
+      if (!url.startsWith("https://") && !url.startsWith("http://")) continue;
+      files.push({ url, kind: fileKind(url, type) });
+    }
+  }
+  return files.slice(0, 8);
+}
+
+function pendingRow(
+  id: string,
+  data: Record<string, unknown>,
+  source: PendingSource,
+  files: PendingFile[]
+) {
+  const type = textField(data, "type", "format") || "texto";
+  const email = textField(data, "email", "authorEmail");
+  const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
+  const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
+  return {
+    id,
+    title: textField(data, "storyTitle", "title"),
+    alias: textField(data, "alias", "authorName"),
+    place: textField(data, "placeLabel", "place", "city"),
+    lat,
+    lng,
+    format: submissionFormat(type),
+    mediaUrl: files.find((f) => f.url)?.url ?? "",
+    topic: [],
+    status: "pending" as const,
+    activeSince: null,
+    isFeatured: false,
+    resonances: 0,
+    createdAt: toMillis(data.createdAt),
+    authorEmail: email || null,
+    rightsAccepted: data.consentPublicacion === true || Boolean(data.consent),
+    publicationMail: null,
+    questionId: typeof data.questionId === "string" ? data.questionId : null,
+    questionMode: data.questionMode === "tu" || data.questionMode === "alguien" ? data.questionMode : null,
+    imagenes: [],
+    files,
+    source,
+  };
+}
+
+/** Envíos pendientes de submissions y de la colección antigua story_submissions. */
 async function listPendingSubmissions() {
   const db = getAdminDb();
-  const snap = await db.collection("submissions").where("status", "==", "pending").limit(200).get();
-  const rows = await Promise.all(
-    snap.docs.map(async (doc) => {
-      const d = doc.data() as Record<string, unknown>;
-      const type = typeof d.type === "string" ? d.type : "texto";
-      const paths = Array.isArray(d.privateMediaPaths)
-        ? d.privateMediaPaths.filter((p): p is string => typeof p === "string" && p.startsWith("submissions/private/"))
-        : [];
-      const files: PendingFile[] = [];
-      for (const storagePath of paths.slice(0, 8)) {
-        try {
-          files.push({ url: await signReadUrlForPath(storagePath), kind: fileKind(storagePath, type) });
-        } catch {
-          files.push({ url: "", kind: fileKind(storagePath, type) });
-        }
-      }
-      const createdAt = toMillis(d.createdAt);
-      const place = typeof d.placeLabel === "string" ? d.placeLabel : "";
-      const email = typeof d.email === "string" ? d.email.trim() : "";
-      return {
-        id: doc.id,
-        title: typeof d.storyTitle === "string" ? d.storyTitle : "",
-        alias: typeof d.alias === "string" ? d.alias : "",
-        place,
-        lat: null,
-        lng: null,
-        format: submissionFormat(type),
-        mediaUrl: files.find((f) => f.url)?.url ?? "",
-        topic: [],
-        status: "pending" as const,
-        activeSince: null,
-        isFeatured: false,
-        resonances: 0,
-        createdAt,
-        authorEmail: email || null,
-        rightsAccepted: Boolean(d.consentPublicacion),
-        publicationMail: null,
-        questionId: typeof d.questionId === "string" ? d.questionId : null,
-        questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
-        imagenes: [],
-        files,
-        source: "submissions" as const,
-      };
-    })
-  );
+  const [current, legacy] = await Promise.all([
+    db.collection("submissions").where("status", "==", "pending").limit(200).get(),
+    db.collection("story_submissions").where("status", "==", "pending").limit(200).get(),
+  ]);
+  const rows = await Promise.all([
+    ...current.docs.map(async (doc) => {
+      const data = doc.data() as Record<string, unknown>;
+      const type = textField(data, "type", "format") || "texto";
+      return pendingRow(doc.id, data, "submissions", await filesForSubmission(data, type));
+    }),
+    ...legacy.docs.map(async (doc) => {
+      const data = doc.data() as Record<string, unknown>;
+      const type = textField(data, "format", "type") || "text";
+      return pendingRow(doc.id, data, "story_submissions", await filesForSubmission(data, type));
+    }),
+  ]);
   rows.sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));
-  return rows;
+  return rows.slice(0, 200);
 }
 
 /** GET /api/admin/stories?status=pending|active|archived|rejected */

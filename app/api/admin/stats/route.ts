@@ -15,8 +15,9 @@ export async function GET(_request: NextRequest) {
     const db = getAdminDb();
     const storiesRef = db.collection("stories");
 
-    const [pendingSnap, visibleSnap, archivedSnap, rejectedSnap] = await Promise.all([
+    const [pendingSnap, legacyPendingSnap, visibleSnap, archivedSnap, rejectedSnap] = await Promise.all([
       db.collection("submissions").where("status", "==", "pending").count().get(),
+      db.collection("story_submissions").where("status", "==", "pending").count().get(),
       storiesRef.where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES]).count().get(),
       storiesRef.where("status", "==", "archived").count().get(),
       storiesRef.where("status", "==", "rejected").count().get(),
@@ -46,7 +47,7 @@ export async function GET(_request: NextRequest) {
     });
 
     return NextResponse.json({
-      pending: pendingSnap.data().count,
+      pending: pendingSnap.data().count + legacyPendingSnap.data().count,
       /** Audiencia pública (+ legacy alias en `editorial/status`). */
       active: visibleSnap.data().count,
       archived: archivedSnap.data().count,
