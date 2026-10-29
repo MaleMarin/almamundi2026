@@ -265,7 +265,7 @@ const es: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Descargamos tu imagen y copiamos el texto. Súbelos desde la app de {app}.',
+    'Te abrimos {app}. Tu imagen ya se descargó y el texto está copiado.',
   modalShareEmail: 'Correo',
   modalShareEmailCopied:
     'Si tu correo no se abrió, el mensaje ya está copiado: pégalo donde quieras.',
@@ -377,7 +377,7 @@ const pt: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Baixamos sua imagem e copiamos o texto. Publique pelo app do {app}.',
+    'Abrimos o {app}. Sua imagem já foi baixada e o texto está copiado.',
   modalShareEmail: 'E-mail',
   modalShareEmailCopied:
     'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
@@ -493,7 +493,7 @@ const en: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'We downloaded your image and copied the text. Post them from the {app} app.',
+    'We opened {app}. Your image is downloaded and the text is copied.',
   modalShareEmail: 'Email',
   modalShareEmailCopied:
     'If your email didn\'t open, the message is already copied: paste it wherever you like.',

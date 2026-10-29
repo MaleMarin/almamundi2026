@@ -242,7 +242,7 @@ export function HomeFormatCards({
       className={
         fillViewport
           ? 'relative z-[18] flex min-h-0 flex-1 flex-col px-4 py-2 sm:px-6 md:px-10 md:py-3 lg:px-12'
-          : 'relative z-[18] mb-8 px-6 pb-10 pt-0 sm:pt-1 md:mb-12 md:px-10 md:pb-12 md:pt-2 lg:mb-0 lg:flex lg:min-h-0 lg:grow lg:shrink-0 lg:flex-col lg:px-10 lg:pb-8 lg:pt-0'
+          : 'relative z-[18] mb-8 px-6 pb-10 pt-0 sm:pt-1 md:mb-12 md:px-10 md:pb-12 md:pt-2 lg:mb-0 lg:flex lg:min-h-0 lg:grow lg:shrink lg:flex-col lg:px-10 lg:pb-8 lg:pt-0'
       }
     >
       {!fillViewport ? <div aria-hidden className="home-hero-lead-gap" /> : null}

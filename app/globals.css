@@ -368,7 +368,7 @@ a.btn-am-neutro:focus-visible,
   mask-image: none;
 }
 
-/* Desde 1024 px el hero cabe en la pantalla: primero cede el aire bajo la línea naranja (mín. 24 px); si falta, el del encabezado. */
+/* Desde 1024 px el titular queda al menos a 48 px del encabezado. Si falta alto, cede el aire bajo la línea naranja, nunca por debajo de 24 px. */
 .home-hero-head-gap,
 .home-hero-lead-gap {
   display: none;
@@ -377,13 +377,13 @@ a.btn-am-neutro:focus-visible,
 @media (min-width: 1024px) {
   .home-hero-head-gap {
     display: block;
-    flex: 0 1 4rem;
-    min-height: 0;
+    flex: 0 0 48px;
+    min-height: 48px;
   }
 
   .home-hero-lead-gap {
     display: block;
-    flex: 1 0 24px;
+    flex: 1 1 24px;
     min-height: 24px;
   }
 }

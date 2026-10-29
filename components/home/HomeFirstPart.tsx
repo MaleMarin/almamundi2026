@@ -61,7 +61,7 @@ export function HomeFirstPart({
       <div className="lg:mt-[13.5rem] lg:flex lg:h-[calc(100svh-13.5rem)] lg:min-h-0 lg:flex-col">
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[11.25rem] text-center sm:pt-[11.5rem] sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[13.75rem] lg:min-h-0 lg:shrink lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
+        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[12.75rem] text-center sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[15.25rem] lg:min-h-0 lg:shrink-0 lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
       >
         <div aria-hidden className="home-hero-head-gap" />
         <div className="mx-auto w-full max-w-[min(100%,42rem)] shrink-0 lg:max-w-[1000px]">

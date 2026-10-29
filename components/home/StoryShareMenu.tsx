@@ -124,6 +124,13 @@ export function StoryShareMenu({
     const native = Boolean(
       showImageApps && imageFile && typeof navigator !== 'undefined' && typeof navigator.share === 'function'
     );
+    if (!native) {
+      window.open(
+        app === 'Instagram' ? 'https://www.instagram.com/' : 'https://www.tiktok.com/upload',
+        '_blank',
+        'noopener,noreferrer'
+      );
+    }
     copyTextInClick(text, (ok) => {
       if (!ok) onCopyFailed(text);
       else if (native) onTextCopied();
