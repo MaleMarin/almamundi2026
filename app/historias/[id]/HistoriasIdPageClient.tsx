@@ -3,7 +3,7 @@
 /**
  * /historias/[id] — ficha pública. El mensaje para el equipo no se muestra.
  */
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -14,17 +14,6 @@ import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
-
-type SimilarStory = {
-  id: string;
-  title: string;
-  label?: string;
-  description?: string;
-  city?: string | null;
-  country?: string | null;
-  format?: string;
-  publishedAt?: string | null;
-};
 
 const FORMAT_LABEL: Record<AlmaLocale, Record<string, string>> = {
   es: { video: 'Video', audio: 'Audio', image: 'Foto', foto: 'Foto', photos: 'Foto', text: 'Texto', texto: 'Texto' },
@@ -45,8 +34,7 @@ const COPY = {
     song: (song: string) => `Una canción para esta historia: ${song}`,
     ask: '¿Tienes una historia que contar?',
     tell: 'Cuenta la tuya',
-    more: (place: string) => `Más historias de ${place}`,
-    morePlain: 'Más historias',
+    all: 'Ver todas las historias',
     back: 'Historias',
   },
   pt: {
@@ -61,8 +49,7 @@ const COPY = {
     song: (song: string) => `Uma música para esta história: ${song}`,
     ask: 'Tem uma história para contar?',
     tell: 'Conte a sua',
-    more: (place: string) => `Mais histórias de ${place}`,
-    morePlain: 'Mais histórias',
+    all: 'Ver todas as histórias',
     back: 'Histórias',
   },
   en: {
@@ -77,8 +64,7 @@ const COPY = {
     song: (song: string) => `A song for this story: ${song}`,
     ask: 'Do you have a story to tell?',
     tell: 'Tell yours',
-    more: (place: string) => `More stories from ${place}`,
-    morePlain: 'More stories',
+    all: 'See all stories',
     back: 'Stories',
   },
 } as const;
@@ -119,22 +105,7 @@ function storyKind(story: StoryPoint): 'video' | 'audio' | 'image' | 'text' {
 export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) {
   const { locale } = useHomeLocale();
   const copy = COPY[locale];
-  const [similar, setSimilar] = useState<SimilarStory[]>([]);
   const [shareOpen, setShareOpen] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch(`/api/stories/${story.id}/similar`)
-      .then((r) => (r.ok ? r.json() : { similar: [] }))
-      .then((data: { similar?: SimilarStory[] }) => {
-        if (!cancelled && Array.isArray(data.similar)) {
-          setSimilar(data.similar.filter((item) => item.id !== story.id));
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [story.id]);
 
   const kind = storyKind(story);
   const place = formatPublicPlace(story.city, story.country);
@@ -147,7 +118,6 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
   const songHref = song ? parseCancionRelacionadaHref(song) : null;
   const photos = (story.imagenes ?? []).map((item) => item.url).filter(Boolean);
   const image = story.imageUrl || photos[0] || '';
-  const morePlace = formatPublicPlace(undefined, story.country) || place;
 
   return (
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -241,30 +211,14 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
             </button>
           </div>
 
-          <div className="border-t border-gray-300/40 pt-8">
-            <p className="mb-4 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em] text-gray-500">
-              {morePlace ? copy.more(morePlace) : copy.morePlain}
-            </p>
-            <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {similar.slice(0, 3).map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/historias/${item.id}`}
-                  className="block rounded-2xl p-4 transition-all hover:scale-[1.02] active:scale-[0.99]"
-                  style={neu.card}
-                >
-                  <div
-                    className="mb-1 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
-                    style={{ color: 'var(--almamundi-orange)' }}
-                  >
-                    {formatPublicPlace(item.city, item.country) || '—'}
-                  </div>
-                  <h3 className="line-clamp-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
-                    {item.title || 'Sin título'}
-                  </h3>
-                </Link>
-              ))}
-            </div>
+          <div className="mb-10 border-t border-gray-300/40 pt-8">
+            <HomeHardLink
+              href="/#mapa"
+              className="text-[length:var(--fs-pequeno)] font-semibold"
+              style={{ color: 'var(--almamundi-orange)' }}
+            >
+              {copy.all}
+            </HomeHardLink>
           </div>
 
           <div className="flex flex-col items-center px-2 pb-6 text-center">
@@ -284,6 +238,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
         storyId={story.id}
         title={story.title || ''}
         city={story.city ?? ''}
+        format={kind === 'image' ? 'photo' : kind}
       />
     </main>
   );

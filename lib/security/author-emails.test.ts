@@ -126,19 +126,35 @@ describe('correos al autor', () => {
     assert.match(html, /Tu historia «El río» ya está publicada en el mapa de AlmaMundi, en Santiago/);
     assert.match(html, /Si quieres, compártela con quien tú elijas/);
     assert.match(html, /Ver mi historia/);
+    assert.match(html, /WhatsApp/);
+    assert.match(html, /Facebook/);
+    assert.match(html, /LinkedIn/);
     assert.match(html, /Contar otra historia/);
-    assert.match(html, /Compartir por WhatsApp/);
     assert.match(html, /wa\.me\/\?text=/);
+    assert.match(html, /facebook\.com\/sharer\/sharer\.php/);
+    assert.match(html, /x\.com\/intent\/post/);
+    assert.match(html, /linkedin\.com\/sharing\/share-offsite/);
+    assert.match(html, /Mi%20historia%20ya%20est%C3%A1%20en%20el%20mapa/);
+    assert.match(html, /historias%2Fabc123/);
     assert.match(html, /Gracias por contarla/);
     assert.doesNotMatch(html, /Un abrazo/);
+    assert.doesNotMatch(html, /Te invito a leer/);
     assert.match(html, /ALMAMUNDI/);
     const ver = html.indexOf('Ver mi historia');
+    const whatsapp = html.indexOf('wa.me/?text=');
+    const facebook = html.indexOf('facebook.com/sharer');
+    const x = html.indexOf('x.com/intent/post');
+    const linkedin = html.indexOf('linkedin.com/sharing');
     const contar = html.indexOf('Contar otra historia');
-    const compartir = html.indexOf('Compartir por WhatsApp');
-    assert.ok(ver < contar && contar < compartir);
+    assert.ok(ver < whatsapp && whatsapp < facebook && facebook < x && x < linkedin && linkedin < contar);
     assert.match(text, /El río/);
     assert.match(text, /Santiago/);
-    assert.match(text, /Compartir por WhatsApp: https:\/\/wa\.me\/\?text=/);
+    assert.match(
+      text,
+      /Mi historia ya está en el mapa de AlmaMundi\. Se llama «El río» y la conté desde Santiago: https:\/\/www\.almamundi\.org\/historias\/abc123/
+    );
+    assert.match(text, /WhatsApp: https:\/\/wa\.me\/\?text=/);
+    assert.doesNotMatch(text, /Te invito a leer/);
   });
 
   it('publicación con eco ofrece el espacio personal', () => {

@@ -571,6 +571,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
         storyId={historia.id}
         title={historia.titulo}
         city={historia.autor.ubicacion ?? ''}
+        format="photo"
       />
     </>
   );

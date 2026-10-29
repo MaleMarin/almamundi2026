@@ -431,6 +431,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         storyId={historia.id}
         title={historia.titulo}
         city={historia.autor.ubicacion ?? ''}
+        format="text"
       />
     </>
   );

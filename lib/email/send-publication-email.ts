@@ -11,10 +11,10 @@ import {
   invitationHtml,
   paragraphHtml,
   primaryButtonHtml,
-  secondaryLinkHtml,
-  whatsappShareHref,
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
+import { buildStoryShareChannelUrls } from "@/lib/huella/share-story-channels";
+import { publishedAuthorShareText, publishedStoryShareUrl } from "@/lib/share/published-share";
 
 export type SendPublicationEmailParams = {
   authorName: string;
@@ -49,12 +49,25 @@ function storyPublicUrl(storyId: string): string {
   return absoluteEmailUrl(`/?historia=${encodeURIComponent(storyId)}#mapa`);
 }
 
+function authorShareChannels(title: string, placeName: string, storyId: string) {
+  const link = publishedStoryShareUrl(storyId);
+  const text = publishedAuthorShareText("es", title, placeName, link);
+  return {
+    text,
+    ...buildStoryShareChannelUrls(
+      link,
+      { short: text, long: text, emailSubject: publicationEmailSubject(title) },
+      { exact: true }
+    ),
+  };
+}
+
 export function buildPublicationEmailText(params: SendPublicationEmailParams): string {
   const name = capitalizeAlias(params.authorName);
   const greeting = name ? `Hola, ${name}:` : "Hola:";
   const title = storyTitleLine(params.storyTitle);
   const storyUrl = storyPublicUrl(params.storyId);
-  const shareText = `Te invito a leer esta historia en AlmaMundi: ${storyUrl}`;
+  const share = authorShareChannels(title, params.placeName, params.storyId);
   const ecoUrl = params.ecoUrl?.trim() ?? "";
   return [
     greeting,
@@ -63,9 +76,14 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     "",
     "Si quieres, compártela con quien tú elijas.",
     "",
+    share.text,
+    "",
     `Ver mi historia: ${storyUrl}`,
+    `WhatsApp: ${share.whatsapp}`,
+    `Facebook: ${share.facebook}`,
+    `X: ${share.x}`,
+    `LinkedIn: ${share.linkedin}`,
     `Contar otra historia: ${absoluteEmailUrl("/contar")}`,
-    `Compartir por WhatsApp: ${whatsappShareHref(shareText)}`,
     ...(ecoUrl
       ? [
           "",
@@ -86,7 +104,7 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const authorName = escapeHtml(capitalizeAlias(params.authorName));
   const place = placeLine(params.placeName);
   const historiasUrl = storyPublicUrl(params.storyId);
-  const shareText = `Te invito a leer esta historia en AlmaMundi: ${historiasUrl}`;
+  const share = authorShareChannels(storyTitleLine(params.storyTitle), place, params.storyId);
   const ecoHref = params.ecoUrl?.trim() ?? "";
   const greeting = authorName ? `Hola, ${authorName}:` : "Hola:";
   const lead = escapeHtml(publishedLead(storyTitleLine(params.storyTitle), place));
@@ -101,8 +119,11 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
       ${paragraphHtml(lead)}
       ${paragraphHtml("Si quieres, compártela con quien tú elijas.", "0 0 28px")}
       ${primaryButtonHtml("Ver mi historia", historiasUrl)}
+      ${primaryButtonHtml("WhatsApp", share.whatsapp)}
+      ${primaryButtonHtml("Facebook", share.facebook)}
+      ${primaryButtonHtml("X", share.x)}
+      ${primaryButtonHtml("LinkedIn", share.linkedin)}
       ${invitationHtml()}
-      ${secondaryLinkHtml("Compartir por WhatsApp", whatsappShareHref(shareText))}
       ${ecoBlock}
       ${paragraphHtml("Gracias por contarla.<br>Equipo AlmaMundi", "0")}`;
 

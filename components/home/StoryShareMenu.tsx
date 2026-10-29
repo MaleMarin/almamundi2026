@@ -72,6 +72,8 @@ type StoryShareMenuProps = {
   shareUrl: string;
   shareTextShort: string;
   shareTextLong: string;
+  /** Instagram y TikTok. Si falta, usan el mismo texto que el resto del menú. */
+  shareTextSocial?: string;
   emailSubject: string;
   labels: StoryShareMenuLabels;
   showDownload: boolean;
@@ -94,6 +96,7 @@ export function StoryShareMenu({
   shareUrl,
   shareTextShort,
   shareTextLong,
+  shareTextSocial,
   emailSubject,
   labels,
   showDownload,
@@ -124,7 +127,7 @@ export function StoryShareMenu({
   };
 
   const shareApp = (app: 'Instagram' | 'TikTok') => {
-    const text = shareTextLong;
+    const text = shareTextSocial?.trim() || shareTextLong;
     const link = keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl);
     const phone =
       typeof navigator !== 'undefined' &&

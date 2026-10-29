@@ -1021,6 +1021,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             storyId={story.id ?? ''}
             title={story.title ?? story.label}
             city={story.city ?? ''}
+            format={format === 'photos' ? 'photo' : format}
           />
         </div>
       </div>

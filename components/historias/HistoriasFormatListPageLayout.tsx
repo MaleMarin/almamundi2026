@@ -235,6 +235,7 @@ export function HistoriasFormatListPageLayout({
           storyId={shareTarget.id}
           title={shareTarget.titulo}
           city={shareTarget.lugar}
+          format={contentMode === 'foto' ? 'photo' : contentMode === 'texto' ? 'text' : contentMode}
         />
       ) : null}
       </main>

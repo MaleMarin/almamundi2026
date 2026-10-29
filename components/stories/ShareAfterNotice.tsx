@@ -11,7 +11,9 @@ import {
   publishedQuestionShareUrl,
   publishedStoryEmailSubject,
   publishedStoryShareText,
-  publishedStoryShareUrl } from '@/lib/share/published-share';
+  publishedStoryShareUrl,
+  publishedStorySocialText,
+  type PublishedStoryFormat } from '@/lib/share/published-share';
 
 const NOTICE_TITLE = 'Antes de compartir';
 const NOTICE_BODY_1 =
@@ -23,7 +25,7 @@ type ShareAfterNoticeProps = {
   open: boolean;
   onClose: () => void;
 } & (
-  | { kind: 'story'; storyId: string; title: string; city: string }
+  | { kind: 'story'; storyId: string; title: string; city: string; format: PublishedStoryFormat }
   | { kind: 'question'; questionId: string; question: string }
 );
 
@@ -63,13 +65,17 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       : publishedQuestionShareUrl(props.questionId);
   const shareText =
     props.kind === 'story'
-      ? publishedStoryShareText(locale, props.title, props.city, shareUrl)
+      ? publishedStoryShareText(locale, props.format, props.title, props.city, shareUrl)
       : preguntaShareText(locale, props.question, shareUrl);
   const emailSubject =
     props.kind === 'story'
       ? publishedStoryEmailSubject(locale)
       : props.question.slice(0, 120);
   const shareTitle = props.kind === 'story' ? props.title : props.question;
+  const shareTextSocial =
+    props.kind === 'story'
+      ? publishedStorySocialText(locale, props.title, props.city, shareUrl)
+      : undefined;
 
   return createPortal(
     <>
@@ -124,6 +130,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
           shareUrl={shareUrl}
           shareTextShort={shareText}
           shareTextLong={shareText}
+          shareTextSocial={shareTextSocial}
           emailSubject={emailSubject}
           keepShareUrl
           labels={{

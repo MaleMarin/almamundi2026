@@ -353,6 +353,7 @@ export function StoryEndScreen({
           storyId={share.storyId}
           title={titulo}
           city={autor.ubicacion ?? ''}
+          format={share.formato === 'foto' ? 'photo' : share.formato === 'escrito' ? 'text' : share.formato}
         />
       ) : null}
 

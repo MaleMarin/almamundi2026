@@ -751,6 +751,7 @@ export function HistoricalExhibitionCarousel({
           storyId={active.id}
           title={active.titulo}
           city={active.lugar}
+          format={contentMode === 'foto' ? 'photo' : contentMode === 'texto' ? 'text' : contentMode}
         />
       ) : null}
     </div>

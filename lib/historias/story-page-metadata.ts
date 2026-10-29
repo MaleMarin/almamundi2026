@@ -1,47 +1,85 @@
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { ALMA_LOCALE_COOKIE, parseAlmaLocale, type AlmaLocale } from '@/lib/i18n/locale';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
+import type { StoryPoint } from '@/lib/map-data/stories';
+import {
+  publishedStoryFormat,
+  publishedStoryPreviewDescription,
+  type PublishedStoryFormat,
+} from '@/lib/share/published-share';
 import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 
 const SITE_OG_IMAGE = '/og-image.png';
 const FALLBACK_DESCRIPTION = 'Una historia en AlmaMundi, el mapa de historias humanas.';
+const OG_LOCALE: Record<AlmaLocale, string> = {
+  es: 'es_CL',
+  pt: 'pt_BR',
+  en: 'en_US',
+};
 
-function descriptionFromStory(story: {
-  quote?: string;
-  excerpt?: string;
-  description?: string;
-  body?: string;
-}): string {
-  const raw =
-    story.quote ||
-    story.excerpt ||
-    story.description ||
-    (typeof story.body === 'string' ? story.body : '');
-  const text = String(raw).replace(/\s+/g, ' ').trim();
-  if (!text) return FALLBACK_DESCRIPTION;
-  return text.slice(0, 160);
+function publicImage(url: string | null | undefined): string {
+  const value = (url ?? '').trim();
+  if (!value || value.startsWith('data:') || value.startsWith('blob:')) return '';
+  if (/^https?:\/\//i.test(value) || value.startsWith('/')) return value;
+  return '';
 }
 
-function ogImageForStory(story: {
-  title?: string;
-  thumbnailUrl?: string;
-  imageUrl?: string;
-}): { url: string; width: number; height: number; alt: string } {
-  const alt = story.title?.trim() || 'AlmaMundi';
-  const img = (story.thumbnailUrl || story.imageUrl || '').trim();
-  if (img && (/^https?:\/\//i.test(img) || img.startsWith('/'))) {
-    return { url: img, width: 1200, height: 630, alt };
+function previewFormat(story: StoryPoint): PublishedStoryFormat {
+  const named = (story.format ?? '').trim().toLowerCase();
+  if (
+    named === 'video' ||
+    named === 'audio' ||
+    named === 'image' ||
+    named === 'foto' ||
+    named === 'photos' ||
+    named === 'text' ||
+    named === 'texto' ||
+    named === 'escrito'
+  ) {
+    return publishedStoryFormat(named);
   }
+  if (story.videoUrl || story.hasVideo) return 'video';
+  if (story.audioUrl || story.hasAudio) return 'audio';
+  if ((story.imagenes?.length ?? 0) > 0) return 'photo';
+  return 'text';
+}
+
+function ogImageForStory(
+  story: StoryPoint,
+  title: string,
+  format: PublishedStoryFormat
+): { url: string; width: number; height: number; alt: string } {
+  const firstPhoto =
+    publicImage(story.imagenes?.[0]?.url) || (format === 'photo' ? publicImage(story.imageUrl) : '');
+  const videoFrame =
+    format === 'video' ? publicImage(story.thumbnailUrl) || publicImage(story.imageUrl) : '';
+  const profile = publicImage(story.authorAvatar) || publicImage(story.author?.avatar);
+  const url = firstPhoto || videoFrame || profile || SITE_OG_IMAGE;
   return {
-    url: SITE_OG_IMAGE,
+    url,
     width: 1200,
     height: 630,
-    alt: 'AlmaMundi, historias de vida en video, audio, escrito y foto',
+    alt:
+      url === SITE_OG_IMAGE
+        ? 'AlmaMundi, historias de vida en video, audio, escrito y foto'
+        : title,
   };
 }
 
+async function requestLocale(): Promise<AlmaLocale> {
+  try {
+    const jar = await cookies();
+    return parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
+  } catch {
+    return 'es';
+  }
+}
+
 /**
- * Metadata OG/Twitter para rutas `/historias/[id]/*` (Server Components).
- * Si no hay portada, usa `/og-image.png`.
+ * Metadata OG/Twitter para `/historias/[id]`.
+ * Título, formato y lugar públicos. La imagen es la primera foto, el cuadro del video o la foto de perfil.
  */
 export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> {
   const story = await getStoryByIdAsync(id).catch(() => null);
@@ -56,8 +94,14 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
   }
 
   const titulo = (story.title ?? story.label ?? 'Historia').trim() || 'Historia';
-  const description = descriptionFromStory(story);
-  const image = ogImageForStory({ title: titulo, thumbnailUrl: story.thumbnailUrl, imageUrl: story.imageUrl });
+  const locale = await requestLocale();
+  const format = previewFormat(story);
+  const description = publishedStoryPreviewDescription(
+    locale,
+    format,
+    formatPublicPlace(story.city, story.country)
+  );
+  const image = ogImageForStory(story, titulo, format);
 
   return {
     metadataBase,
@@ -70,7 +114,7 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
       url: './',
       images: [image],
       type: 'article',
-      locale: 'es_CL',
+      locale: OG_LOCALE[locale],
       siteName: 'AlmaMundi',
       publishedTime: story.publishedAt ?? undefined,
     },
