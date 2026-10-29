@@ -12,7 +12,7 @@ import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
-import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { TemaTags } from '@/components/historias/TemaTags';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
@@ -206,12 +206,6 @@ function isRepeatedFormatLine(line: string): boolean {
   return /^.+·.+·\s*Formato:\s*.+$/i.test(line.trim());
 }
 const BY_LABEL = { es: 'Por', pt: 'Por', en: 'By' } as const;
-
-function initialCapital(raw: string | undefined): string {
-  const name = (raw ?? '').trim();
-  if (!name) return '';
-  return name.charAt(0).toLocaleUpperCase('es-CL') + name.slice(1);
-}
 
 type PhotoSlide = {
   url: string;
@@ -412,7 +406,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const place = formatPublicPlace(story.city, story.country);
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
-  const alias = initialCapital(story.authorName || story.author?.name);
+  const alias = formatPublicName(story.authorName || story.author?.name);
 
   const startListening = () => {
     if (!story.body || typeof window === 'undefined') return;

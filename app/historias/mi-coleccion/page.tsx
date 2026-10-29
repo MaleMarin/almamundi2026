@@ -1,4 +1,5 @@
 'use client';
+import { notFound } from 'next/navigation';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 
 /**
@@ -11,12 +12,15 @@ import { useMiColeccion, type SavedStory } from '@/hooks/useMiColeccion';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 function formatLabel(format?: string): string {
-  return { video: 'Videos', audio: 'Audios', texto: 'Escritos', foto: 'Fotografías' }[format ?? ''] ?? format ?? '—';
+  return { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' }[format ?? ''] ?? format ?? '';
 }
+
+const SHOW_PUBLIC_MI_COLECCION = false;
 
 export default function MiColeccionPage() {
   const { saved, remove } = useMiColeccion();
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  if (!SHOW_PUBLIC_MI_COLECCION) notFound();
 
   const shareStory = (s: SavedStory) => {
     const url = typeof window !== 'undefined' ? `${window.location.origin}/historias/${s.id}` : '';
@@ -37,7 +41,7 @@ export default function MiColeccionPage() {
           Tu colección
         </p>
         <h1 className="text-[length:var(--fs-titular)] font-normal leading-[1.1] text-gray-800">
-          Historias que guardaste.
+          Historias que guardaste
         </h1>
         <p className="text-gray-600 text-[length:var(--fs-texto)] mt-2 max-w-2xl">
           Compartilas o usalas como inspiración para crear la tuya.
@@ -64,12 +68,15 @@ export default function MiColeccionPage() {
                 </Link>
                 <div className="p-4">
                   <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase mb-1 tracking-[0.12em]" style={{ color: 'var(--almamundi-orange)' }}>
-                    {[s.city, s.country].filter(Boolean).join(', ') || '—'} · {formatLabel(s.format)}
+                    {[s.city, s.country].filter(Boolean).join(', ')}
+                    {formatLabel(s.format) ? ` · ${formatLabel(s.format)}` : ''}
                   </p>
                   <Link href={`/historias/${s.id}`}>
                     <h2 className="font-semibold text-gray-800 line-clamp-2 hover:underline">{s.title ?? 'Sin título'}</h2>
                   </Link>
-                  <p className="text-[length:var(--fs-pequeno)] text-gray-600 mt-1">{s.authorName ?? '—'}</p>
+                  {s.authorName ? (
+                  <p className="text-[length:var(--fs-pequeno)] text-gray-600 mt-1">{s.authorName}</p>
+                  ) : null}
                   <div className="flex flex-wrap gap-2 mt-4">
                     <button
                       type="button"

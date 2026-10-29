@@ -4,9 +4,16 @@ import { useEffect } from 'react';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const NOTICE = {
-  es: 'Abriendo la historia en el mapa…',
-  pt: 'Abrindo a história no mapa…',
-  en: 'Opening the story on the map…',
+  story: {
+    es: 'Abriendo la historia en el mapa…',
+    pt: 'Abrindo a história no mapa…',
+    en: 'Opening the story on the map…',
+  },
+  answer: {
+    es: 'Abriendo la respuesta en el mapa…',
+    pt: 'Abrindo a resposta no mapa…',
+    en: 'Opening the answer on the map…',
+  },
 } as const;
 
 function canShowGlobe(): boolean {
@@ -24,10 +31,12 @@ export function ShortLinkRedirect({
   locale,
   globeHref,
   lightHref,
+  kind = 'story',
 }: {
   locale: AlmaLocale;
   globeHref: string;
   lightHref: string;
+  kind?: 'story' | 'answer';
 }) {
   useEffect(() => {
     window.location.replace(canShowGlobe() ? globeHref : lightHref);
@@ -35,7 +44,7 @@ export function ShortLinkRedirect({
 
   return (
     <main className="flex min-h-[50vh] items-center justify-center px-6">
-      <p className="text-center text-[length:var(--fs-texto)] text-[#141D26]">{NOTICE[locale]}</p>
+      <p className="text-center text-[length:var(--fs-texto)] text-[#141D26]">{NOTICE[kind][locale]}</p>
     </main>
   );
 }

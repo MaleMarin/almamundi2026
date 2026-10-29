@@ -30,8 +30,6 @@ export type HomeMessages = {
   historiasLead2: string;
   /** Segunda línea de la frase naranja (misma familia y color que `historiasLead2`). */
   historiasLead2b: string;
-  /** Segunda línea cuando /contar llega con una pregunta. */
-  historiasLeadChoose: string;
   /** Título grande sobre la sección del mapa (home #mapa y cabecera /mapa). */
   mapSectionTitle: string;
   cardVideoTitle: string;
@@ -59,8 +57,8 @@ const es: HomeMessages = {
   navHistoriasColeccion: 'Mi colección',
   navHistoriasVideos: 'Videos',
   navHistoriasAudios: 'Audios',
-  navHistoriasEscrito: 'Escritos',
-  navHistoriasFotos: 'Fotografías',
+  navHistoriasEscrito: 'Textos',
+  navHistoriasFotos: 'Fotos',
   navMap: 'Mapa',
   navTellStory: 'Cuenta tu historia',
   ariaOpenMenu: 'Abrir menú',
@@ -79,7 +77,6 @@ const es: HomeMessages = {
   historiasLead1: 'Hay historias que solo tú puedes contar.',
   historiasLead2: 'Hay muchas formas de contar',
   historiasLead2b: 'Elige la tuya',
-  historiasLeadChoose: 'Elige cómo contarla.',
   mapSectionTitle: 'El Alma del Mundo',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
@@ -109,10 +106,10 @@ const pt: HomeMessages = {
   navHistoriasColeccion: 'A minha coleção',
   navHistoriasVideos: 'Vídeos',
   navHistoriasAudios: 'Áudios',
-  navHistoriasEscrito: 'Escritos',
-  navHistoriasFotos: 'Fotografias',
+  navHistoriasEscrito: 'Textos',
+  navHistoriasFotos: 'Fotos',
   navMap: 'Mapa',
-  navTellStory: 'Conta a sua história',
+  navTellStory: 'Conte sua história',
   ariaOpenMenu: 'Abrir menu',
   ariaCloseMenu: 'Fechar menu',
   ariaCloseMenuBackdrop: 'Fechar menu',
@@ -129,7 +126,6 @@ const pt: HomeMessages = {
   historiasLead1: 'Há histórias que só você pode contar.',
   historiasLead2: 'Há muitas formas de contar',
   historiasLead2b: 'Escolha a sua',
-  historiasLeadChoose: 'Escolha como contar.',
   mapSectionTitle: 'A Alma do Mundo',
   cardVideoTitle: 'A sua história,',
   cardVideoSubtitle: 'em primeiro plano',
@@ -154,12 +150,12 @@ const pt: HomeMessages = {
 
 const en: HomeMessages = {
   navPurpose: 'Purpose',
-  navHow: 'How it works',
+  navHow: 'How it works?',
   navStories: 'Stories',
   navHistoriasColeccion: 'My collection',
   navHistoriasVideos: 'Videos',
-  navHistoriasAudios: 'Audio',
-  navHistoriasEscrito: 'Written',
+  navHistoriasAudios: 'Audios',
+  navHistoriasEscrito: 'Texts',
   navHistoriasFotos: 'Photos',
   navMap: 'Map',
   navTellStory: 'Tell your story',
@@ -179,7 +175,6 @@ const en: HomeMessages = {
   historiasLead1: 'There are stories only you can tell.',
   historiasLead2: 'There are many ways to tell it',
   historiasLead2b: 'Choose yours',
-  historiasLeadChoose: 'Choose how to tell it.',
   mapSectionTitle: 'The Soul of the World',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',

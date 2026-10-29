@@ -1,13 +1,25 @@
 import { foldText } from '@/lib/historias/story-filter-helpers';
 
+const SMALL_WORDS = new Set(['de', 'del', 'la', 'las', 'los', 'y', 'e', 'da', 'do', 'das', 'dos']);
+
+/** Alias, ciudad o país: mayúscula inicial en cada palabra, salvo las partículas si no van al inicio. */
+export function formatPublicName(value: string | null | undefined): string {
+  const raw = (value ?? '').replace(/\s+/g, ' ').trim();
+  if (!raw || raw === '—' || raw === '-' || raw === '–') return '';
+  return raw
+    .split(' ')
+    .map((word, index) => {
+      const lower = word.toLocaleLowerCase('es-CL');
+      if (index > 0 && SMALL_WORDS.has(lower)) return lower;
+      return lower.charAt(0).toLocaleUpperCase('es-CL') + lower.slice(1);
+    })
+    .join(' ');
+}
+
 function capSegments(value: string): string {
   return value
     .split(',')
-    .map((part) => {
-      const text = part.trim();
-      if (!text) return '';
-      return text.charAt(0).toLocaleUpperCase('es-CL') + text.slice(1);
-    })
+    .map((part) => formatPublicName(part))
     .filter(Boolean)
     .join(', ');
 }
@@ -49,7 +61,7 @@ export function publicCityCountry(
   if (!cityRaw) return { country: countryOut };
   if (countryRaw && cityNamesCountry(cityRaw, countryRaw)) {
     const stripped = cityWithoutTrailingCountry(cityRaw, countryRaw);
-    if (stripped && foldText(stripped) !== foldText(countryRaw)) {
+    if (stripped && !cityNamesCountry(stripped, countryRaw)) {
       return { city: capSegments(stripped), country: countryOut };
     }
     return { city: capSegments(cityRaw), country: undefined };

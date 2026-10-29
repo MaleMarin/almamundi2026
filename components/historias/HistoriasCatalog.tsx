@@ -7,7 +7,7 @@ import { AlignLeft, Headphones, Image as ImageIcon, Video } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
 import { EJES, ejeDeTema, getEje } from '@/lib/temas';
-import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -26,7 +26,7 @@ const COPY = {
     order: 'Orden',
     newest: 'Más recientes',
     oldest: 'Más antiguas',
-    search: 'Buscar por título o ciudad',
+    search: 'Buscar por título, ciudad o tema',
     by: 'Por',
     onGlobe: 'En el globo',
     more: 'Ver más',
@@ -40,7 +40,7 @@ const COPY = {
     order: 'Ordem',
     newest: 'Mais recentes',
     oldest: 'Mais antigas',
-    search: 'Buscar por título ou cidade',
+    search: 'Buscar por título, cidade ou tema',
     by: 'Por',
     onGlobe: 'No globo',
     more: 'Ver mais',
@@ -54,7 +54,7 @@ const COPY = {
     order: 'Order',
     newest: 'Newest',
     oldest: 'Oldest',
-    search: 'Search by title or city',
+    search: 'Search by title, city, or theme',
     by: 'By',
     onGlobe: 'On the globe',
     more: 'See more',
@@ -92,12 +92,6 @@ function cardImage(story: StoryPoint): string {
   return story.imageUrl || story.thumbnailUrl || story.authorAvatar || story.author?.avatar || '';
 }
 
-function initialCapital(raw: string | undefined): string {
-  const name = (raw ?? '').trim();
-  if (!name) return '';
-  return name.charAt(0).toLocaleUpperCase('es-CL') + name.slice(1);
-}
-
 function publishedTime(iso: string | undefined): number {
   if (!iso) return 0;
   const time = Date.parse(iso);
@@ -128,7 +122,7 @@ function StoryCard({
   copy: (typeof COPY)[keyof typeof COPY];
 }) {
   const image = cardImage(story);
-  const alias = initialCapital(story.authorName || story.author?.name);
+  const alias = formatPublicName(story.authorName || story.author?.name);
   const place = formatPublicPlace(story.city, story.country);
   const who = alias ? `${copy.by} ${alias}` : '';
   const byline = [who, place].filter(Boolean).join(' · ');

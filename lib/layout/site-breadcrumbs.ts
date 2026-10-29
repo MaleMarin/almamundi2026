@@ -8,13 +8,13 @@ const STATIC_LABELS: Record<string, string> = {
   historias: 'Historias',
   videos: 'Videos',
   audios: 'Audios',
-  escrito: 'Escritos',
-  fotos: 'Fotografías',
+  escrito: 'Textos',
+  fotos: 'Fotos',
   /** Segmentos en URL dedicada /historias/[id]/… */
   audio: 'Audio',
   video: 'Video',
-  texto: 'Escrito',
-  foto: 'Fotografías',
+  texto: 'Texto',
+  foto: 'Foto',
   'mi-coleccion': 'Mi colección',
   mapa: 'Mapa',
   temas: 'Temas',
@@ -33,7 +33,6 @@ const STATIC_LABELS: Record<string, string> = {
   'mis-datos-personales': 'Mis datos personales',
   contacto: 'Contacto',
   camaras: 'Cámaras',
-  noticias: 'Noticias',
   u: 'Perfil público',
   /** Rutas de laboratorio / preview */
   'vista-previa': 'Vista previa',
@@ -79,8 +78,8 @@ export function siteBreadcrumbTone(pathname: string): 'light' | 'dark' {
 const HISTORIA_MEDIA_FORMAT_CRUMB: Record<string, [string, string]> = {
   audio: ['/historias/audios', 'Audios'],
   video: ['/historias/videos', 'Videos'],
-  foto: ['/historias/fotos', 'Fotografías'],
-  texto: ['/historias/escrito', 'Escritos'],
+  foto: ['/historias/fotos', 'Fotos'],
+  texto: ['/historias/escrito', 'Textos'],
 };
 
 /**
@@ -120,6 +119,8 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
       break;
     }
 
+    if (seg === 'noticias' || prev === 'noticias') continue;
+
     let href: string | null = isLast ? null : pathUpTo;
     if (pathUpTo === '/mapa' || pathUpTo === '/mapa/historias' || pathUpTo === '/mapa/camaras') {
       href = isLast ? null : '/#mapa';
@@ -139,8 +140,6 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
         label = humanizeSegment(seg);
       } else if (prev === 'camaras') {
         label = humanizeSegment(seg);
-      } else if (prev === 'noticias') {
-        label = 'Noticia';
       } else {
         label = humanizeSegment(seg);
       }

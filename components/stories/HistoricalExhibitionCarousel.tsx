@@ -161,7 +161,7 @@ export function HistoricalExhibitionCarousel({
   expoPaddingTopClassName,
   expoMaxWidthClassName,
   shareInGalleryChrome = true,
-  showMailboxInGalleryChrome = true }: HistoricalExhibitionCarouselProps) {
+  showMailboxInGalleryChrome = false }: HistoricalExhibitionCarouselProps) {
   const openHandler = onOpenContent ?? onOpenVideo;
   const isLightHall = spatialVariant === 'light-gallery';
   /** Listados /historias/* (layout comparte filtros y carrusel sin chrome de compartir en la expo). */

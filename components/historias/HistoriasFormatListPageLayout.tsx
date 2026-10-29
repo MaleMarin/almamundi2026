@@ -157,15 +157,17 @@ export function HistoriasFormatListPageLayout({
                           title={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
                           ariaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[0].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[0].text}`}
                         />
+                        {false && shareTarget ? (
                         <ResonanceMailbox
-                          storyId={shareTarget.id}
-                          recipientName={shareTarget.nombre}
+                          storyId={shareTarget?.id ?? ''}
+                          recipientName={shareTarget?.nombre ?? ''}
                           triggerLayout="inline"
                           triggerTone="orange"
                           triggerTitle={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}: ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
                           triggerAriaLabel={`${HISTORIAS_SHARE_ICONS_LEGEND[1].label}. ${HISTORIAS_SHARE_ICONS_LEGEND[1].text}`}
                           className="cursor-help"
                         />
+                        ) : null}
                       </div>
                     ) : null}
                     <button

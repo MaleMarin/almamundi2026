@@ -101,11 +101,16 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
 
   useEffect(() => {
     if (!open) return;
-    setStep('notice');
     setToast(null);
     setFallback(null);
+    if (props.kind === 'question') {
+      setWantMenu(true);
+      setStep('menu');
+      return;
+    }
+    setStep('notice');
     setWantMenu(false);
-  }, [open]);
+  }, [open, props.kind]);
 
   useEffect(() => {
     if (!open) {
@@ -187,7 +192,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
 
   return createPortal(
     <>
-      {step !== 'menu' || !packet ? (
+      {props.kind !== 'question' && (step !== 'menu' || !packet) ? (
         <div
           className="fixed inset-0 z-[110] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
           role="presentation"
@@ -235,7 +240,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
             </div>
           </div>
         </div>
-      ) : (
+      ) : packet ? (
         <StoryShareMenu
           shareUrl={packet.url}
           shareTextShort={packet.text}
@@ -286,7 +291,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
           }}
           onClose={onClose}
         />
-      )}
+      ) : null}
       <ShareStatus toast={toast} fallback={fallback} failedLabel={t.modalShareCopyFailed} />
     </>,
     document.body

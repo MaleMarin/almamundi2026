@@ -1,4 +1,5 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
+import { formatPublicName } from '@/lib/historias/story-ubicacion';
 
 type L3 = Record<AlmaLocale, string>;
 
@@ -34,9 +35,9 @@ export const PREGUNTA_COPY = {
     en: 'Thank you, [alias]',
   },
   thanksBody: {
-    es: 'Tu respuesta está en revisión. Te escribiremos cuando aparezca en el mapa',
-    pt: 'Sua resposta está em revisão. Vamos te avisar quando aparecer no mapa',
-    en: "Your answer is under review. We'll write to you when it appears on the map",
+    es: 'Tu respuesta está en revisión. Te escribiremos cuando aparezca en el mapa.',
+    pt: 'Sua resposta está em revisão. Vamos te avisar quando aparecer no mapa.',
+    en: "Your answer is under review. We'll write to you when it appears on the map.",
   },
   share: {
     es: 'Comparte la pregunta',
@@ -69,21 +70,15 @@ export const PREGUNTA_COPY = {
     en: 'Answers',
   },
   empty: {
-    es: 'Todavía no hay respuestas. Sé la primera persona en responder',
-    pt: 'Ainda não há respostas. Seja a primeira pessoa a responder',
-    en: 'No answers yet. Be the first to answer',
+    es: 'Todavía no hay respuestas. Sé la primera persona en responder.',
+    pt: 'Ainda não há respostas. Seja a primeira pessoa a responder.',
+    en: 'No answers yet. Be the first to answer.',
   },
   modeYou: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
   modeYouLine: {
     es: 'Responde desde tu propia vida.',
     pt: 'Responda a partir da sua própria vida.',
     en: 'Answer from your own life.',
-  },
-  modeAsk: { es: 'Pregúntale a alguien', pt: 'Pergunte a alguém', en: 'Ask someone' },
-  modeAskLine: {
-    es: 'Hazle la pregunta a alguien que quieres y comparte su respuesta.',
-    pt: 'Faça a pergunta a alguém que você ama e compartilhe a resposta.',
-    en: 'Ask someone you love and share their answer.',
   },
   how: {
     es: '¿Cómo quieres responder?',
@@ -104,7 +99,6 @@ export const PREGUNTA_COPY = {
   caption: { es: 'Frase de la foto', pt: 'Frase da foto', en: 'Photo caption' },
   all: { es: 'Todas', pt: 'Todas', en: 'All' },
   you: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
-  someone: { es: 'Pregúntale a alguien', pt: 'Pergunte a alguém', en: 'Ask someone' },
   errText: {
     es: 'El texto puede tener hasta 1000 caracteres.',
     pt: 'O texto pode ter até 1000 caracteres.',
@@ -168,9 +162,7 @@ export const PREGUNTA_COPY = {
 } as const satisfies Record<string, L3>;
 
 export function preguntaAlias(alias: string): string {
-  const name = alias.trim();
-  if (!name) return name;
-  return name.charAt(0).toLocaleUpperCase() + name.slice(1);
+  return formatPublicName(alias);
 }
 
 export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {

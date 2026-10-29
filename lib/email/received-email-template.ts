@@ -3,6 +3,7 @@
  */
 
 import { escapeHtml } from "@/lib/email-html";
+import { formatPublicName } from "@/lib/historias/story-ubicacion";
 import {
   absoluteEmailUrl,
   EMAIL_BOX,
@@ -33,9 +34,7 @@ function cleanLine(value: string, max = 200): string {
 }
 
 export function capitalizeAlias(authorName: string): string {
-  const name = cleanLine(authorName, 80);
-  if (!name) return "";
-  return name.charAt(0).toLocaleUpperCase("es-CL") + name.slice(1);
+  return formatPublicName(cleanLine(authorName, 80));
 }
 
 export function storyFormatLabel(raw: string): ReceivedFormatLabel {

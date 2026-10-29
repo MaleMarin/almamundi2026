@@ -116,7 +116,7 @@ export function useSubirHuella({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          text: `Mi resonancia visual en https://${SUBIR_HUELLA_FOOTER_SITE}`,
+          text: `Tu relato en colores en https://${SUBIR_HUELLA_FOOTER_SITE}`,
         });
         return;
       }

@@ -13,10 +13,11 @@ import VideoPlayer from '@/components/historia/VideoPlayer'
 import AudioPlayer, { type HistoriaAudio } from '@/components/historia/AudioPlayer'
 import type { StoryPoint } from '@/lib/map-data/stories'
 import { SITE_FONT_STACK } from '@/lib/typography'
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 function formatPlace(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(' · ') || s.label || ''
+  return formatPublicPlace(s.city, s.country) || formatPublicName(s.label)
 }
 function defaultAvatar(name: string): string {
   const initial = (name || '?').trim().charAt(0).toUpperCase()
@@ -30,7 +31,7 @@ const PLACEHOLDER_THUMB =
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300"><rect fill="#e8e4dc" width="400" height="300"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#8b7a6a">Sin imagen</text></svg>'
   )
 function formatLabel(fmt: string): string {
-  return { video: 'Videos', audio: 'Audios', texto: 'Escritos', foto: 'Fotografías' }[fmt] ?? fmt
+  return { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' }[fmt] ?? fmt
 }
 
 /**
@@ -125,7 +126,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
       duracion: 0,
       fecha: s.publishedAt ?? '',
       autor: {
-        nombre: s.authorName ?? s.author?.name ?? '',
+        nombre: formatPublicName(s.authorName ?? s.author?.name),
         avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(s.authorName ?? ''),
         ubicacion: formatPlace(s) || undefined,
         bio: s.author?.bio },
@@ -150,7 +151,7 @@ export function StoriesFanCarousel({ stories, mode = 'video', onSelectStory, onS
       frases: Array.isArray(frases) ? frases : undefined,
       citaDestacada: s.quote ?? (s as Record<string, unknown>).citaDestacada as string | undefined,
       autor: {
-        nombre: s.authorName ?? s.author?.name ?? '',
+        nombre: formatPublicName(s.authorName ?? s.author?.name),
         avatar: s.author?.avatar ?? s.authorAvatar ?? defaultAvatar(s.authorName ?? ''),
         ubicacion: formatPlace(s) || undefined,
         bio: s.author?.bio },

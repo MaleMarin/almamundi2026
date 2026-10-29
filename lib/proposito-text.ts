@@ -66,7 +66,7 @@ export const MANIFIESTO_SECTIONS: ManifiestoSection[] = [
     blocks: [
       {
         type: 'p',
-        text: 'AlmaMundi fue diseñado para la resonancia larga.',
+        text: 'AlmaMundi fue diseñado para que las historias duren.',
       },
       {
         type: 'p',

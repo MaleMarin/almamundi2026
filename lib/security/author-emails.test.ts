@@ -56,6 +56,7 @@ describe('correos al autor', () => {
     const text = buildReceivedEmailText(sampleReceived);
     assert.equal(receivedEmailSubject('El río'), 'Recibimos tu historia «El río»');
     assert.equal(capitalizeAlias('ana'), 'Ana');
+    assert.equal(capitalizeAlias('ana maría'), 'Ana María');
     assert.equal(storyFormatLabel('foto'), 'fotos');
     assert.match(html, /Hola, Ana:/);
     assert.match(html, /Recibimos tu historia «El río»/);
@@ -159,7 +160,7 @@ describe('correos al autor', () => {
     assert.doesNotMatch(text, /Te invito a leer/);
   });
 
-  it('publicación con eco ofrece el espacio personal', () => {
+  it('publicación no ofrece el espacio personal', () => {
     rememberEnv();
     delete process.env.VERCEL_ENV;
     delete process.env.VERCEL_URL;
@@ -173,12 +174,10 @@ describe('correos al autor', () => {
       placeName: 'Santiago',
       ecoUrl: 'https://www.almamundi.org/historias/abc123/mi-eco?t=token',
     });
-    assert.match(
-      html,
-      /En tu espacio personal puedes ver cuántas personas respondieron a tu historia/
-    );
-    assert.match(html, /Ir a mi espacio/);
-    assert.match(html, /mi-eco\?t=token/);
+    assert.doesNotMatch(html, /En tu espacio personal puedes ver cuántas personas respondieron a tu historia/);
+    assert.doesNotMatch(html, /Ir a mi espacio/);
+    assert.doesNotMatch(html, /mi-eco/);
+    assert.match(html, /Contar otra historia/);
   });
 
   it('rechazo usa los textos pedidos y no ofrece WhatsApp', () => {

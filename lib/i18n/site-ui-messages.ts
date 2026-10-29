@@ -96,7 +96,6 @@ export type SiteUiMessages = {
   modalUpload: string;
   modalChange: string;
   modalRemove: string;
-  modalSectionPerson: string;
   modalCountry: string;
   modalCity: string;
   modalAge: string;
@@ -117,10 +116,6 @@ export type SiteUiMessages = {
   modalBack: string;
   modalSending: string;
   modalSend: string;
-  modalConsentBefore: string;
-  modalConsentPrivacy: string;
-  modalRecordVideo: string;
-  modalUploadOrLink: string;
   modalRecord: string;
   modalRecording: string;
   modalReviewVideo: string;
@@ -183,11 +178,11 @@ const es: SiteUiMessages = {
   listKickerVideos: 'Historias en video',
   listKickerAudios: 'Historias en audio',
   listKickerEscrito: 'Historias en texto',
-  listKickerFotos: 'Historias en fotografía',
+  listKickerFotos: 'Historias en foto',
   listExpoVideos: 'alma.mundi / historias en video',
   listExpoAudios: 'alma.mundi / historias en audio',
   listExpoEscrito: 'alma.mundi / historias en texto',
-  listExpoFotos: 'alma.mundi / historias en fotografía',
+  listExpoFotos: 'alma.mundi / historias en foto',
   listShareLabel: 'Compartir',
   listShareText:
     'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
@@ -195,7 +190,7 @@ const es: SiteUiMessages = {
   listLetterText:
     'Escribir un mensaje breve de resonancia para quien narra este relato. AlmaMundi recibe tu mensaje, lo revisa con cuidado (incluye un filtro automático de respeto) y, cuando corresponda, puede acercárselo a quien lo contó. Es un proceso con pausa: no hay envío directo sin este resguardo.',
   coleccionKicker: 'Tu colección',
-  coleccionTitle: 'Historias que guardaste.',
+  coleccionTitle: 'Historias que guardaste',
   coleccionSubtitle: 'Compártelas o úsalas como inspiración para crear la tuya.',
   coleccionEmpty: 'Aún no has guardado ninguna historia.',
   coleccionEmptyHint:
@@ -253,7 +248,6 @@ const es: SiteUiMessages = {
   modalUpload: 'Subir',
   modalChange: 'Cambiar',
   modalRemove: 'Quitar',
-  modalSectionPerson: 'Datos y avisos',
   modalCountry: 'País *',
   modalCity: 'Ciudad o localidad *',
   modalAge: 'Edad *',
@@ -268,18 +262,13 @@ const es: SiteUiMessages = {
   modalGenderNb: 'No binario',
   modalGenderPreferNot: 'Prefiero no decirlo',
   modalGenderOther: 'Otro',
-  modalEmail: 'Correo electrónico *',
+  modalEmail: 'Correo electrónico',
   modalEmailHint:
     'Te avisaremos por correo cuando tu historia esté en el mapa (tras la revisión). No se muestra en público.',
   modalLegalNote: 'Tu historia quedará en revisión antes de formar parte de AlmaMundi.',
   modalBack: 'Volver',
   modalSending: 'Enviando…',
   modalSend: 'Enviar mi historia',
-  modalConsentBefore:
-    'Declaro que soy mayor de 18 años, o que actúo como adulto responsable o representante de una institución y cuento con la autorización expresa de quien aparece en esta historia. Leí y acepto la',
-  modalConsentPrivacy: 'política de privacidad',
-  modalRecordVideo: 'Grabar video',
-  modalUploadOrLink: 'Subir o enlace',
   modalRecord: 'Grabar',
   modalRecording: 'Grabando…',
   modalReviewVideo: 'Revisa tu video',
@@ -294,7 +283,7 @@ const es: SiteUiMessages = {
   modalReceivedAfterName: 'tu relato en colores.',
   modalReceivedAnonBefore: 'Tu relato en colores.',
   modalReceivedEmph: 'colores.',
-  modalImprintAria: 'Resonancia visual generada',
+  modalImprintAria: 'Tu relato en colores',
   modalDownloadImprint: 'Descargar',
   modalShareImprint: 'Compartir',
   modalShareCopied: 'Imagen copiada. Puedes pegarla donde quieras.',
@@ -303,7 +292,7 @@ const es: SiteUiMessages = {
   modalCopyLink: 'Copiar enlace',
   modalAnotherStory: 'Otra historia',
   modalLinkCopied: 'Enlace copiado',
-  modalImprintWhat: '¿Qué es esta resonancia visual?',
+  modalImprintWhat: '¿De dónde salen estos colores?',
   modalImprintExplain: 'Esta imagen nace de tu historia y es solo tuya.',
   modalBackToMap: 'Explorar el mapa',
   modalTopicActive: 'Tema guía activo',
@@ -312,28 +301,24 @@ const es: SiteUiMessages = {
       title: 'Graba el momento que todavía vive en ti',
       subtitle: 'Tu historia merece verse.',
       limit: 'Hasta 5 minutos de video.',
-      primaryCta: 'Activar cámara',
       uploadLabel: 'o subir un video desde tu dispositivo',
     },
     audio: {
       title: 'Hay historias que se cuentan mejor en voz alta',
       subtitle: 'Tu voz guarda lo que las palabras escritas no siempre pueden.',
       limit: 'Hasta 5 minutos de audio.',
-      primaryCta: 'Activar micrófono',
       uploadLabel: 'o subir un audio desde tu dispositivo',
     },
     texto: {
       title: 'Escribe lo que no le contaste a nadie,\no lo que le contaste a todos',
       subtitle: 'Aquí no se pierde en el scroll. Queda.',
       limit: '',
-      primaryCta: '',
       uploadLabel: '',
     },
     foto: {
       title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
       subtitle: 'Sube hasta 8 fotos. Cada una lleva su nombre, el año y el lugar donde fue tomada.',
       limit: 'Hasta 10 MB por foto.',
-      primaryCta: 'Elegir fotos',
       uploadLabel: '',
     },
   },
@@ -371,11 +356,11 @@ const pt: SiteUiMessages = {
   listKickerVideos: 'Histórias em vídeo',
   listKickerAudios: 'Histórias em áudio',
   listKickerEscrito: 'Histórias em texto',
-  listKickerFotos: 'Histórias em fotografia',
+  listKickerFotos: 'Histórias em foto',
   listExpoVideos: 'alma.mundi / histórias em vídeo',
   listExpoAudios: 'alma.mundi / histórias em áudio',
   listExpoEscrito: 'alma.mundi / histórias em texto',
-  listExpoFotos: 'alma.mundi / histórias em fotografia',
+  listExpoFotos: 'alma.mundi / histórias em foto',
   listShareLabel: 'Partilhar',
   listShareText:
     'Partilhar a história com respeito: crédito a quem a conta, ligação e cartão para descarregar.',
@@ -383,7 +368,7 @@ const pt: SiteUiMessages = {
   listLetterText:
     'Escrever uma mensagem breve de ressonância para quem narra este relato. AlmaMundi recebe a sua mensagem, revê-a com cuidado (inclui um filtro automático de respeito) e, quando corresponder, pode aproximá-la de quem a contou. É um processo com pausa: não há envio direto sem este resguardo.',
   coleccionKicker: 'A sua coleção',
-  coleccionTitle: 'Histórias que guardou.',
+  coleccionTitle: 'Histórias que guardou',
   coleccionSubtitle: 'Partilhe-as ou use-as como inspiração para criar a sua.',
   coleccionEmpty: 'Ainda não guardou nenhuma história.',
   coleccionEmptyHint:
@@ -442,7 +427,6 @@ const pt: SiteUiMessages = {
   modalUpload: 'Enviar',
   modalChange: 'Mudar',
   modalRemove: 'Remover',
-  modalSectionPerson: 'Dados e avisos',
   modalCountry: 'País *',
   modalCity: 'Cidade ou localidade *',
   modalAge: 'Faixa etária *',
@@ -457,18 +441,13 @@ const pt: SiteUiMessages = {
   modalGenderNb: 'Não binário',
   modalGenderPreferNot: 'Prefiro não dizer',
   modalGenderOther: 'Outro',
-  modalEmail: 'Correio eletrónico *',
+  modalEmail: 'Correio eletrónico',
   modalEmailHint:
     'Avisamo-lo por correio quando a sua história estiver no mapa (após a revisão). Não se mostra em público.',
   modalLegalNote: 'A sua história ficará em revisão antes de fazer parte de AlmaMundi.',
   modalBack: 'Voltar',
   modalSending: 'A enviar…',
   modalSend: 'Enviar',
-  modalConsentBefore:
-    'Declaro que tenho 18 anos ou mais, ou que atuo como adulto responsável ou representante de uma instituição e conto com a autorização expressa de quem aparece nesta história. Li e aceito a',
-  modalConsentPrivacy: 'política de privacidade',
-  modalRecordVideo: 'Gravar vídeo',
-  modalUploadOrLink: 'Enviar ou ligação',
   modalRecord: 'Gravar',
   modalRecording: 'A gravar…',
   modalReviewVideo: 'Reveja o seu vídeo',
@@ -483,7 +462,7 @@ const pt: SiteUiMessages = {
   modalReceivedAfterName: 'o seu relato em cores.',
   modalReceivedAnonBefore: 'Seu relato em cores.',
   modalReceivedEmph: 'cores.',
-  modalImprintAria: 'Ressonância visual gerada',
+  modalImprintAria: 'Seu relato em cores',
   modalDownloadImprint: 'Descarregar',
   modalShareImprint: 'Partilhar',
   modalShareCopied: 'Imagem copiada. Pode colá-la onde quiser.',
@@ -492,7 +471,7 @@ const pt: SiteUiMessages = {
   modalCopyLink: 'Copiar ligação',
   modalAnotherStory: 'Outra história',
   modalLinkCopied: 'Ligação copiada',
-  modalImprintWhat: 'O que é esta ressonância visual?',
+  modalImprintWhat: 'De onde vêm estas cores?',
   modalImprintExplain: 'Esta imagem nasce da sua história e é só sua.',
   modalBackToMap: 'Explorar o mapa',
   modalTopicActive: 'Tema guia ativo',
@@ -501,28 +480,24 @@ const pt: SiteUiMessages = {
       title: 'Grave o momento que ainda vive em si',
       subtitle: 'A sua história merece ser vista.',
       limit: 'Até 5 minutos de vídeo.',
-      primaryCta: 'Ativar câmara',
       uploadLabel: 'ou enviar um vídeo do seu dispositivo',
     },
     audio: {
       title: 'Há histórias que se entendem melhor quando se escutam',
       subtitle: 'A sua voz guarda o que as palavras escritas nem sempre podem.',
       limit: 'Até 5 minutos de áudio.',
-      primaryCta: 'Ativar microfone',
       uploadLabel: 'ou enviar um áudio do seu dispositivo',
     },
     texto: {
       title: 'Escreva o que não contou a ninguém,\nou o que contou a todos',
       subtitle: 'Aqui não se perde no scroll. Fica.',
       limit: '',
-      primaryCta: '',
       uploadLabel: '',
     },
     foto: {
       title: 'Uma imagem pode guardar\no que as palavras não alcançam',
       subtitle: 'Envie até 8 fotos. Cada uma leva o seu nome, o ano e o lugar onde foi tirada.',
       limit: 'Até 10 MB por foto.',
-      primaryCta: 'Selecionar fotos',
       uploadLabel: '',
     },
   },
@@ -559,11 +534,11 @@ const en: SiteUiMessages = {
   listKickerVideos: 'Stories in video',
   listKickerAudios: 'Stories in audio',
   listKickerEscrito: 'Stories in writing',
-  listKickerFotos: 'Stories in photography',
+  listKickerFotos: 'Stories in photo',
   listExpoVideos: 'alma.mundi / stories in video',
   listExpoAudios: 'alma.mundi / stories in audio',
   listExpoEscrito: 'alma.mundi / stories in writing',
-  listExpoFotos: 'alma.mundi / stories in photography',
+  listExpoFotos: 'alma.mundi / stories in photo',
   listShareLabel: 'Share',
   listShareText:
     'Share the story with care: credit the teller, a link, and a downloadable card.',
@@ -571,7 +546,7 @@ const en: SiteUiMessages = {
   listLetterText:
     'Write a short resonance message to the person who told this story. AlmaMundi receives your message, reviews it with care (including an automatic respect filter) and, when it is right, may pass it on. There is a pause: nothing is sent through without this safeguard.',
   coleccionKicker: 'Your collection',
-  coleccionTitle: 'Stories you saved.',
+  coleccionTitle: 'Stories you saved',
   coleccionSubtitle: 'Share them, or use them as a spark to create yours.',
   coleccionEmpty: 'You have not saved any stories yet.',
   coleccionEmptyHint:
@@ -630,7 +605,6 @@ const en: SiteUiMessages = {
   modalUpload: 'Upload',
   modalChange: 'Change',
   modalRemove: 'Remove',
-  modalSectionPerson: 'Details and notices',
   modalCountry: 'Country *',
   modalCity: 'City or town *',
   modalAge: 'Age range *',
@@ -645,18 +619,13 @@ const en: SiteUiMessages = {
   modalGenderNb: 'Non-binary',
   modalGenderPreferNot: 'Prefer not to say',
   modalGenderOther: 'Other',
-  modalEmail: 'Email *',
+  modalEmail: 'Email',
   modalEmailHint:
     'We will email you when your story is on the map (after review). It is not shown publicly.',
   modalLegalNote: 'Your story will be reviewed before it becomes part of AlmaMundi.',
   modalBack: 'Back',
   modalSending: 'Sending…',
   modalSend: 'Send',
-  modalConsentBefore:
-    'I declare that I am 18 or older, or that I am acting as a responsible adult or institutional representative and have the express authorization of the person who appears in this story. I have read and accept the',
-  modalConsentPrivacy: 'privacy policy',
-  modalRecordVideo: 'Record video',
-  modalUploadOrLink: 'Upload or link',
   modalRecord: 'Record',
   modalRecording: 'Recording…',
   modalReviewVideo: 'Review your video',
@@ -671,7 +640,7 @@ const en: SiteUiMessages = {
   modalReceivedAfterName: 'your story in colors.',
   modalReceivedAnonBefore: 'Your story in colors.',
   modalReceivedEmph: 'colors.',
-  modalImprintAria: 'Generated visual resonance',
+  modalImprintAria: 'Your story in colors',
   modalDownloadImprint: 'Download',
   modalShareImprint: 'Share',
   modalShareCopied: 'Image copied. You can paste it wherever you like.',
@@ -680,7 +649,7 @@ const en: SiteUiMessages = {
   modalCopyLink: 'Copy link',
   modalAnotherStory: 'Another story',
   modalLinkCopied: 'Link copied',
-  modalImprintWhat: 'What is this visual resonance?',
+  modalImprintWhat: 'Where do these colors come from?',
   modalImprintExplain: 'This image comes from your story and is yours alone.',
   modalBackToMap: 'Explore the map',
   modalTopicActive: 'Active guide theme',
@@ -689,28 +658,24 @@ const en: SiteUiMessages = {
       title: 'Record the moment that still lives in you',
       subtitle: 'Your story deserves to be seen.',
       limit: 'Up to 5 minutes of video.',
-      primaryCta: 'Turn on camera',
       uploadLabel: 'or upload a video from your device',
     },
     audio: {
       title: 'Some stories are better understood when they are heard',
       subtitle: 'Your voice holds what written words cannot always carry.',
       limit: 'Up to 5 minutes of audio.',
-      primaryCta: 'Turn on microphone',
       uploadLabel: 'or upload audio from your device',
     },
     texto: {
       title: 'Write what you never told anyone,\nor what you told everyone',
       subtitle: 'Here it is not lost in the scroll. It stays.',
       limit: '',
-      primaryCta: '',
       uploadLabel: '',
     },
     foto: {
       title: 'An image can hold\nwhat words cannot reach',
       subtitle: 'Upload up to 8 photos. Each one includes its name, the year, and the place where it was taken.',
       limit: 'Up to 10 MB per photo.',
-      primaryCta: 'Select photos',
       uploadLabel: '',
     },
   },

@@ -11,7 +11,7 @@ import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
-import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { TemaTags } from '@/components/historias/TemaTags';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -34,7 +34,7 @@ const COPY = {
     songLead: 'Una canción para esta historia:',
     song: (song: string) => `Una canción para esta historia: ${song}`,
     ask: '¿Tienes una historia que contar?',
-    tell: 'Cuenta la tuya',
+    tell: 'Cuenta tu historia',
     all: 'Ver todas las historias',
     back: 'Historias',
   },
@@ -49,7 +49,7 @@ const COPY = {
     songLead: 'Uma música para esta história:',
     song: (song: string) => `Uma música para esta história: ${song}`,
     ask: 'Tem uma história para contar?',
-    tell: 'Conte a sua',
+    tell: 'Conte sua história',
     all: 'Ver todas as histórias',
     back: 'Histórias',
   },
@@ -64,16 +64,14 @@ const COPY = {
     songLead: 'A song for this story:',
     song: (song: string) => `A song for this story: ${song}`,
     ask: 'Do you have a story to tell?',
-    tell: 'Tell yours',
+    tell: 'Tell your story',
     all: 'See all stories',
     back: 'Stories',
   },
 } as const;
 
 function aliasName(raw: string | undefined): string {
-  const name = (raw ?? '').replace(/\s+/g, ' ').trim();
-  if (!name) return '';
-  return name.charAt(0).toLocaleUpperCase('es-CL') + name.slice(1);
+  return formatPublicName(raw);
 }
 
 function whenLabel(publishedAt: string | undefined, locale: AlmaLocale): string {

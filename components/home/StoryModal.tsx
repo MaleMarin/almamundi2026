@@ -16,6 +16,7 @@ import {
   MapPin,
   Globe2,
   Mail } from 'lucide-react';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
   probeAudioFileDurationSeconds,
@@ -148,15 +149,7 @@ declare global {
   }
 }
 
-const MODE_CONTEXT_LABEL: Record<StoryModalMode, string> = {
-  video: 'Video',
-  audio: 'Audio',
-  texto: 'Escrito',
-  foto: 'Fotografía' };
-
-/** Contexto ≥30 chars exigido por /api/submissions. */
 function buildModalSubmissionContext(
-  mode: StoryModalMode,
   textBody: string,
   storyTitle: string,
   city: string,
@@ -172,8 +165,8 @@ function buildModalSubmissionContext(
         ? ex
         : tbRaw;
   if (tb.length >= 30) return tb.slice(0, 2000);
-  const geo = [city.trim(), country.trim()].filter(Boolean).join(', ');
-  const pieces = [storyTitle.trim(), geo, `Formato: ${MODE_CONTEXT_LABEL[mode]}`].filter(Boolean);
+  const geo = formatPublicPlace(city, country);
+  const pieces = [storyTitle.trim(), geo].filter(Boolean);
   let out = pieces.join(' · ');
   if (tb.length > 0) out = `${tb}\n\n${out}`;
   if (out.trim().length >= 30) return out.slice(0, 2000);
@@ -285,11 +278,8 @@ type ImprintDrawArgs = {
   country: string;
 };
 
-function aliasForGreeting(alias: string, locale: string): string {
-  const trimmed = alias.trim();
-  const first = trimmed.charAt(0);
-  if (!first) return trimmed;
-  return first.toLocaleUpperCase(locale) + trimmed.slice(1);
+function aliasForGreeting(alias: string, _locale: string): string {
+  return formatPublicName(alias);
 }
 
 function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): void {
@@ -1662,7 +1652,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           placeLabel: placeCombined,
           countryLabel: country.trim(),
           context: buildModalSubmissionContext(
-            mode,
             textBody,
             title,
             city,
@@ -3077,11 +3066,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   <canvas
                     ref={imprintCanvasRef}
                     className="block h-full w-full object-contain"
-                    aria-label={interpolate(t.modalImprintAlt, {
-                      titulo: (imprintStoryTitle || storyTitle).trim() || 'historia' })}
+                    aria-label={t.modalImprintAria}
                   />
               </div>
-              <p className="mx-auto mt-2 w-full text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52] md:w-[420px]">
+              <p className="mx-auto mt-2 w-full text-[length:var(--fs-etiqueta)] font-semibold leading-snug text-[#141D26] md:w-[420px]">
+                {t.modalImprintWhat}
+              </p>
+              <p className="mx-auto mt-1 w-full text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52] md:w-[420px]">
                 {mode === 'texto'
                   ? t.modalImprintHowTexto
                   : mode === 'foto'

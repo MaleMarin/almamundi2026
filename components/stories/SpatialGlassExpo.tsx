@@ -18,6 +18,7 @@ import {
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 export type HistoriaSpatial = {
@@ -48,13 +49,13 @@ function defaultAvatar(name: string): string {
 }
 
 function formatPlaceStory(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '';
+  return formatPublicPlace(s.city, s.country) || formatPublicName(s.label);
 }
 
 function formatPublishedAt(iso: string | undefined): string | undefined {
   if (!iso) return undefined;
   const s = formatPublishedAtEsStable(iso);
-  return s === '—' ? undefined : s;
+  return s && s !== '—' ? s : undefined;
 }
 
 /** Convierte un punto del mapa / API al formato de tarjeta espacial (listados de video). */
@@ -68,15 +69,14 @@ export function storyPointToHistoriaSpatial(s: StoryPoint): HistoriaSpatial {
     (s as Record<string, unknown>).videoThumbnail;
   const imagen =
     typeof raw === 'string' && raw.trim() ? raw.trim() : PLACEHOLDER_THUMB;
-  const name = s.authorName ?? s.author?.name ?? '—';
+  const name = formatPublicName(s.authorName ?? s.author?.name);
   const rawAvatar = s.author?.avatar ?? s.authorAvatar ?? '';
   const foto =
     typeof rawAvatar === 'string' && rawAvatar.trim()
       ? rawAvatar.trim()
       : defaultAvatar(name);
   const lugar = formatPlaceStory(s);
-  const cita =
-    (s.quote ?? s.excerpt ?? s.description ?? '').trim() || '—';
+  const cita = (s.quote ?? s.excerpt ?? s.description ?? '').trim();
   return {
     storyId: s.id,
     nombre: name,
@@ -147,7 +147,7 @@ export function SpatialGlassExpo({
 
   const metaLine = useMemo(() => {
     if (!active) return '';
-    const parts = [active.fecha, active.lugar, active.detalles].filter(Boolean);
+    const parts = [active.fecha, active.lugar, active.detalles].filter((part) => part && part !== '—');
     return parts.join(' · ');
   }, [active]);
 
@@ -441,14 +441,16 @@ export function SpatialGlassExpo({
                       <p className="font-semibold text-white drop-shadow-md text-[length:var(--fs-texto)]">
                         {h.titulo}
                       </p>
+                      {h.cita ? (
                       <p className="mt-2 line-clamp-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">
                         “{h.cita}”
                       </p>
+                      ) : null}
+                      {[h.fecha, h.lugar].filter((part) => part && part !== '—').length || h.detalles ? (
                       <p className="mt-3 text-[length:var(--fs-etiqueta)] text-white/65">
-                        {[h.fecha, h.lugar].filter(Boolean).join(' · ') ||
-                          h.detalles ||
-                          '—'}
+                        {[h.fecha, h.lugar].filter((part) => part && part !== '—').join(' · ') || h.detalles}
                       </p>
+                      ) : null}
                     </div>
                   </div>
                 </div>
@@ -499,7 +501,9 @@ export function SpatialGlassExpo({
             </div>
             <div className="min-w-0 text-left">
               <p className="truncate font-medium text-white">{active.nombre}</p>
-              <p className="truncate text-[length:var(--fs-etiqueta)] text-white/70">{metaLine || '—'}</p>
+              {metaLine ? (
+              <p className="truncate text-[length:var(--fs-etiqueta)] text-white/70">{metaLine}</p>
+              ) : null}
             </div>
           </motion.div>
         </div>

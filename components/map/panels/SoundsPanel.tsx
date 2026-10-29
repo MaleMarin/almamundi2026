@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Play, Square, Minus, Plus } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import {
   dedupePublicAudioPaths,
   folderHintFromPublicPath,
@@ -166,6 +167,12 @@ export function SoundsPanel({
   onMoodChange,
   soundEnabled,
   onToggleSound }: SoundsPanelProps) {
+  const { locale } = useHomeLocale();
+  const soundCopy = {
+    es: { on: 'Encendido', off: 'Apagado', error: 'No pudimos cargar los sonidos.' },
+    pt: { on: 'Ligado', off: 'Desligado', error: 'Não conseguimos carregar os sons.' },
+    en: { on: 'On', off: 'Off', error: "We couldn't load the sounds." },
+  }[locale];
   const [publicPaths, setPublicPaths] = useState<string[]>([]);
   const [publicListError, setPublicListError] = useState<string | null>(null);
   const [volTick, setVolTick] = useState(0);
@@ -185,12 +192,12 @@ export function SoundsPanel({
       .catch(() => {
         if (cancelled) return;
         setPublicPaths([]);
-        setPublicListError('No se pudo listar archivos en public.');
+        setPublicListError(soundCopy.error);
       });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [locale]);
 
   const volumes = useMemo(() => {
     void volTick;
@@ -262,7 +269,7 @@ export function SoundsPanel({
             outline: 'none',
             transition: 'all 200ms ease' }}
         >
-          {soundEnabled ? 'ON' : 'OFF'}
+          {soundEnabled ? soundCopy.on : soundCopy.off}
         </button>
       </div>
       <p className="text-[length:var(--fs-etiqueta)] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>

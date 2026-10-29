@@ -7,6 +7,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import VideoPlayer from '@/components/historia/VideoPlayer';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 function defaultAvatar(name: string): string {
@@ -21,13 +22,14 @@ const THUMB_WIDTH = 120;
 const THUMB_HEIGHT = 68;
 
 function formatDate(publishedAt: string | undefined): string {
-  if (!publishedAt) return '—';
+  if (!publishedAt) return '';
   const d = new Date(publishedAt);
+  if (Number.isNaN(d.getTime())) return '';
   return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function formatPlace(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '—';
+  return formatPublicPlace(s.city, s.country) || formatPublicName(s.label);
 }
 
 export type StoriesCurvedCarouselProps = {
@@ -111,7 +113,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
   if (stories.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
-        <p className="text-[length:var(--fs-texto)]">Las historias también se ven. Cuenta la tuya en video.</p>
+        <p className="text-[length:var(--fs-texto)]">Las historias también se ven. Cuenta tu historia en video.</p>
         <Link href="/historias" className="mt-4 text-amber-500 hover:underline">
           Ver todas las historias
         </Link>
@@ -194,18 +196,22 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
         <div className="flex flex-col flex-1 min-w-0">
           {selected && (
             <>
-              {selected.authorName && (
+              {formatPublicName(selected.authorName) ? (
                 <p className="text-[length:var(--fs-etiqueta)] font-semibold text-amber-600 uppercase mb-0.5 tracking-[0.12em]">
-                  {selected.authorName}
+                  {formatPublicName(selected.authorName)}
                 </p>
-              )}
+              ) : null}
+              {([selected.country, selected.city].filter(Boolean).join(' · ') || formatPlace(selected)) ? (
               <p className="text-[length:var(--fs-pequeno)] text-gray-600 mb-1">
-                {[selected.country, selected.city].filter(Boolean).join(' · ') || formatPlace(selected)}
+                {formatPublicPlace(selected.city, selected.country) || formatPlace(selected)}
               </p>
+              ) : null}
               <h1 className="text-[length:var(--fs-titular)] font-serif font-normal leading-tight mb-2 text-gray-800">
                 {selected.title || 'Sin título'}
               </h1>
+              {formatDate(selected.publishedAt) ? (
               <p className="text-[length:var(--fs-pequeno)] text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
+              ) : null}
 
               {selected.videoUrl ? (
                 <button

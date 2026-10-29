@@ -13,7 +13,7 @@ export function AnsweringStrip({
   format?: ContarFormat | null;
   variant?: 'page' | 'modal';
 }) {
-  const { t, locale } = useHomeLocale();
+  const { locale } = useHomeLocale();
   const text = preguntaTexto(questionId, 'tu', locale);
   if (!text) return null;
 
@@ -23,16 +23,14 @@ export function AnsweringStrip({
         className="shrink-0 border-b border-white/50 px-5 py-3 md:px-8"
         style={{ backgroundColor: '#E8EBF2' }}
       >
-        <p className="text-[length:var(--fs-pequeno)] leading-snug text-gray-700 ">
-          <span className="font-semibold">{t.modalAnsweringPrefix}</span> {text}
-        </p>
+        <p className="text-[length:var(--fs-pequeno)] leading-snug text-gray-700 ">{text}</p>
       </div>
     );
   }
 
   return (
     <p className="mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-[length:var(--fs-pequeno)] leading-snug text-gray-700 md:mb-5 ">
-      <span className="font-semibold">{t.modalAnsweringPrefix}</span> {text}
+      {text}
     </p>
   );
 }

@@ -96,7 +96,7 @@ function WorldClockInner({ selectedLocation, light, className }: Props) {
       const hms = `${get('hour')}:${get('minute')}:${get('second')}`;
       return tzShort ? `${cityLabel} · ${hms} ${tzShort}` : `${cityLabel} · ${hms}`;
     } catch {
-      return `${cityLabel} · —`;
+      return cityLabel || '';
     }
   }, [now, timeZone, cityLabel]);
 

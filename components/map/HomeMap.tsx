@@ -1025,7 +1025,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 dock
                 active={drawerOpen && drawerMode === 'search'}
                 onClick={() => open('search')}
-                title="Buscar por palabras clave"
+                title="Buscar por título, ciudad o tema"
               >
                 Buscar
               </PillNavButton>

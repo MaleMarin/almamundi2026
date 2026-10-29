@@ -70,7 +70,7 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
     { mode: 'bits', label: 'También cuenta' },
     { mode: 'news', label: PREGUNTA_UI.tab[locale] },
     { mode: 'sounds', label: 'Sonidos' },
-    { mode: 'search', label: 'Buscar por palabras clave' },
+    { mode: 'search', label: 'Buscar por título, ciudad o tema' },
   ];
 
   return (

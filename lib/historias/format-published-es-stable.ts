@@ -19,10 +19,10 @@ const MONTHS_ES = [
 ] as const;
 
 /**
- * @returns Texto tipo «15 de marzo de 2024», o «—» si no es parseable.
+ * @returns Texto tipo «15 de marzo de 2024», o cadena vacía si no es parseable.
  */
 export function formatPublishedAtEsStable(iso: string | undefined): string {
-  if (!iso) return '—';
+  if (!iso || iso.trim() === '—' || iso.trim() === '-') return '';
   const trimmed = iso.trim();
   const cal = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
   if (cal) {
@@ -34,6 +34,6 @@ export function formatPublishedAtEsStable(iso: string | undefined): string {
     }
   }
   const d = new Date(trimmed);
-  if (Number.isNaN(d.getTime())) return '—';
+  if (Number.isNaN(d.getTime())) return '';
   return `${d.getUTCDate()} de ${MONTHS_ES[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
 }

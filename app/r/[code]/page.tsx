@@ -6,10 +6,6 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale, type AlmaLocale } from '@/lib/i18n/locale';
 import { preguntaTexto } from '@/lib/pregunta-semana';
 import { getRespuestaByShortCode } from '@/lib/respuestas/by-code';
-import {
-  publishedStoryPreviewDescription,
-  type PublishedStoryFormat,
-} from '@/lib/share/published-share';
 import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 
 type PageProps = { params: Promise<{ code: string }> };
@@ -37,10 +33,28 @@ function publicImage(url: string | null | undefined): string {
   return '';
 }
 
-function answerFormat(kind: 'texto' | 'voz' | 'foto'): PublishedStoryFormat {
-  if (kind === 'voz') return 'audio';
-  if (kind === 'foto') return 'photo';
-  return 'text';
+function answerPreviewDescription(
+  locale: AlmaLocale,
+  kind: 'texto' | 'voz' | 'foto',
+  place: string
+): string {
+  const where = place.trim();
+  if (locale === 'pt') {
+    const what = kind === 'voz' ? 'com voz' : kind === 'foto' ? 'com uma foto' : 'escrita';
+    return where
+      ? `Uma resposta ${what} à pergunta da semana do AlmaMundi, de ${where}.`
+      : `Uma resposta ${what} à pergunta da semana do AlmaMundi.`;
+  }
+  if (locale === 'en') {
+    const what = kind === 'voz' ? 'voice' : kind === 'foto' ? 'photo' : 'written';
+    return where
+      ? `A ${what} answer to AlmaMundi's question of the week, from ${where}.`
+      : `A ${what} answer to AlmaMundi's question of the week.`;
+  }
+  const what = kind === 'voz' ? 'con voz' : kind === 'foto' ? 'con una foto' : 'escrita';
+  return where
+    ? `Una respuesta ${what} a la pregunta de la semana de AlmaMundi, desde ${where}.`
+    : `Una respuesta ${what} a la pregunta de la semana de AlmaMundi.`;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -55,14 +69,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
   const locale = await requestLocale();
-  const format = answerFormat(item.kind);
-  const titulo = preguntaTexto(item.questionId, item.mode, locale)?.trim() || 'Respuesta';
-  const description = publishedStoryPreviewDescription(
-    locale,
-    format,
-    formatPublicPlace(item.city, item.country)
-  );
-  const photo = format === 'photo' ? publicImage(item.previewUrl) : '';
+  const titulo = preguntaTexto(item.questionId, 'tu', locale)?.trim() || 'Respuesta';
+  const place = formatPublicPlace(item.city, item.country);
+  const description = answerPreviewDescription(locale, item.kind, place);
+  const photo = item.kind === 'foto' ? publicImage(item.previewUrl) : '';
   const image = photo || SITE_OG_IMAGE;
   const canonical = `${PUBLIC_SITE_ORIGIN}/pregunta/${item.questionId}`;
   return {
@@ -97,6 +107,7 @@ export default async function ShortAnswerPage({ params }: PageProps) {
   return (
     <ShortLinkRedirect
       locale={locale}
+      kind="answer"
       globeHref={`/?respuesta=${encodeURIComponent(item.id)}#mapa`}
       lightHref={`/pregunta/${encodeURIComponent(item.questionId)}`}
     />

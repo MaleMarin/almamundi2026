@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { storyReaderPath } from '@/lib/historias/story-json-ld';
 import { neu } from '@/lib/historias-neumorph';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -23,7 +24,7 @@ const FORMAT_LABEL: Record<string, string> = {
   video: 'Video',
   text: 'Escrito',
   texto: 'Escrito',
-  escrito: 'Escrito',
+  escrito: 'Texto',
   image: 'Foto',
   foto: 'Foto',
   photo: 'Foto' };
@@ -33,7 +34,7 @@ function formatLabel(format: string): string {
 }
 
 function authorAndDateLine(label: string, publishedAt: string | null): string {
-  const name = (label || '').trim() || 'Anónimo';
+  const name = formatPublicName(label) || 'Anónimo';
   if (!publishedAt) return name;
   const date = formatPublishedAtEsStable(publishedAt);
   if (!date || date === '—') return name;
@@ -146,14 +147,16 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 {truncateAtWord(s.description, 80)}
               </p>
             )}
+            {formatPublicPlace(s.city, s.country) ? (
             <p
               style={{
                 fontSize: 'var(--fs-etiqueta)',
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: 0 }}
             >
-              {[s.city, s.country].filter(Boolean).join(', ') || '—'}
+              {formatPublicPlace(s.city, s.country)}
             </p>
+            ) : null}
             <p
               style={{
                 fontSize: 'var(--fs-etiqueta)',

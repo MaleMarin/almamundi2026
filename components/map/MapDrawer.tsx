@@ -76,7 +76,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   if (!open) return null;
 
   const title =
-    mode === 'stories' ? 'Historias' : mode === 'news' ? PREGUNTA_UI.tab[locale] : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por palabras clave';
+    mode === 'stories' ? 'Historias' : mode === 'news' ? PREGUNTA_UI.tab[locale] : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por título, ciudad o tema';
   const bitsMode = mode === 'bits';
   /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
   const innerScrollPanel =

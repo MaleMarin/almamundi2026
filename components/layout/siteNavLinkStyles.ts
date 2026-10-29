@@ -21,8 +21,8 @@ export const SITE_NAV_PILL_LINK_CLASS =
 export const SITE_HEADER_STORIES_LINKS = [
   { href: '/historias/videos', label: 'Videos' },
   { href: '/historias/audios', label: 'Audios' },
-  { href: '/historias/escrito', label: 'Escritos' },
-  { href: '/historias/fotos', label: 'Fotografías' },
+  { href: '/historias/escrito', label: 'Textos' },
+  { href: '/historias/fotos', label: 'Fotos' },
 ] as const;
 
 /** Anclas en la home (Propósito, Cómo funciona) — `HomeHardLink` + modales. */

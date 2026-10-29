@@ -146,8 +146,8 @@ export function StoriesPanel({
             type="search"
             value={exploreQuery}
             onChange={(e) => onExploreQueryChange(e.target.value)}
-            placeholder="Buscar por palabra clave"
-            aria-label="Buscar historias por palabra clave"
+            placeholder="Buscar por título, ciudad o tema"
+            aria-label="Buscar por título, ciudad o tema"
             style={{
               width: '100%',
               padding: '10px 12px 10px 36px',

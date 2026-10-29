@@ -17,7 +17,7 @@ export type ConsentRow = {
 const LABELS = {
   adult: "Mayor de 18 o adulto responsable",
   publish: "Autoriza publicar imagen, voz y nombre",
-  terms: "Términos de Uso",
+  terms: "Términos de uso",
   privacy: "Política de privacidad",
 } as const;
 

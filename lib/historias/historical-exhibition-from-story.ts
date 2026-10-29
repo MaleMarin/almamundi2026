@@ -1,5 +1,6 @@
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 const PLACEHOLDER_THUMB =
@@ -15,7 +16,7 @@ function defaultAvatar(name: string): string {
 }
 
 function formatPlace(s: StoryPoint): string {
-  return [s.city, s.country].filter(Boolean).join(', ') || s.label || '';
+  return formatPublicPlace(s.city, s.country) || formatPublicName(s.label);
 }
 
 function tagsFromStory(s: StoryPoint): string[] {
@@ -40,15 +41,14 @@ export function storyPointToHistoricalExhibitionStory(
     (s as Record<string, unknown>).videoThumbnail;
   const imagen =
     typeof raw === 'string' && raw.trim() ? raw.trim() : PLACEHOLDER_THUMB;
-  const name = s.authorName ?? s.author?.name ?? '—';
+  const name = formatPublicName(s.authorName ?? s.author?.name);
   const rawAvatar = s.author?.avatar ?? s.authorAvatar ?? '';
   const foto =
     typeof rawAvatar === 'string' && rawAvatar.trim()
       ? rawAvatar.trim()
       : defaultAvatar(name);
   const lugar = formatPlace(s);
-  const cita =
-    (s.quote ?? s.excerpt ?? s.description ?? '').trim() || '—';
+  const cita = (s.quote ?? s.excerpt ?? s.description ?? '').trim();
   const v = (s.videoUrl ?? '').trim();
   return {
     id: s.id,
@@ -56,7 +56,7 @@ export function storyPointToHistoricalExhibitionStory(
     titulo: s.title ?? s.label ?? 'Historia',
     cita,
     fecha: formatPublishedAtEsStable(s.publishedAt),
-    lugar: lugar || '—',
+    lugar: lugar || '',
     foto_perfil: foto,
     imagen_principal: imagen,
     tags: tagsFromStory(s),

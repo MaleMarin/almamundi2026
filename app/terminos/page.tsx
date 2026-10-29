@@ -149,7 +149,7 @@ export default function TerminosPage() {
           </p>
         </Section>
 
-        <Section id="s5" title="5. Moderación y curaduria">
+        <Section id="s5" title="5. Moderación y curaduría">
           <p>
             Todo el contenido pasa por un proceso de revisión editorial antes de publicarse. Precisar puede
             aprobar, rechazar o retirar historias sin necesidad de justificación, respetando siempre la dignidad

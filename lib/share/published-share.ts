@@ -1,3 +1,4 @@
+import { publicCityCountry } from '@/lib/historias/story-ubicacion';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const ORIGIN = 'https://www.almamundi.org';
@@ -20,12 +21,13 @@ export function publishedQuestionShareUrl(id: string): string {
   return `${ORIGIN}/pregunta/${id}`;
 }
 
-/** Ciudad sola: «Santiago, Chile» o un lugar compuesto queda en «Santiago». */
+/** Ciudad pública, sin repetir el país si el nombre ya lo trae. */
 export function publishedStoryCity(value: string | null | undefined): string {
   const raw = (value ?? '').replace(/\s+/g, ' ').trim();
-  if (!raw || raw === '—') return '';
-  const city = raw.split(',')[0]?.trim() ?? '';
-  return city === '—' ? '' : city;
+  if (!raw || raw === '—' || raw === '-') return '';
+  const comma = raw.indexOf(',');
+  if (comma === -1) return publicCityCountry(raw, '').city ?? '';
+  return publicCityCountry(raw.slice(0, comma), raw.slice(comma + 1)).city ?? '';
 }
 
 export function publishedStoryFormat(raw: string | null | undefined): PublishedStoryFormat {

@@ -135,11 +135,6 @@ export type StoryFlowMessages = {
   modalNowWhat: string;
   modalAnswerWeekQuestion: string;
   modalContactLead: string;
-  modalAnsweringPrefix: string;
-  modalAskAdviceTexto: string;
-  modalAskAdviceAudio: string;
-  modalAskAdviceVideo: string;
-  modalAskAdviceFoto: string;
 };
 
 const es: StoryFlowMessages = {
@@ -234,7 +229,7 @@ const es: StoryFlowMessages = {
     'Soy mayor de 18 años, o adulto responsable o representante de una institución, y tengo autorización de quienes aparecen en esta historia.',
   modalConsentPublish: 'Autorizo que mi imagen, voz y nombre o alias se publiquen en AlmaMundi.',
   modalConsentTermsAndPrivacy: 'Acepto los {terminos} y la {privacidad}.',
-  modalConsentTermsLink: 'Términos de Uso',
+  modalConsentTermsLink: 'Términos de uso',
   modalConsentPrivacyLink: 'Política de privacidad',
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
@@ -298,11 +293,6 @@ const es: StoryFlowMessages = {
   modalNowWhat: '¿Y ahora?',
   modalAnswerWeekQuestion: 'Responde la pregunta de la semana',
   modalContactLead: '¿Tienes dudas? Escríbenos a',
-  modalAnsweringPrefix: 'Respondes a:',
-  modalAskAdviceTexto: 'Escribe lo que te contó, con sus palabras si puedes.',
-  modalAskAdviceAudio: 'Graba la conversación: tú preguntas y la otra persona responde.',
-  modalAskAdviceVideo: 'Pon el celular horizontal y que se vean ambos.',
-  modalAskAdviceFoto: 'Pídele una foto de esa época y cuéntanos qué hay en ella.',
 };
 
 const pt: StoryFlowMessages = {
@@ -378,7 +368,7 @@ const pt: StoryFlowMessages = {
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
     'Abrimos o {app}. Sua imagem já foi baixada e o texto está copiado.',
-  modalShareEmail: 'E-mail',
+  modalShareEmail: 'Correio',
   modalShareEmailCopied:
     'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
   modalShareLinkCopied: 'Link copiado',
@@ -413,11 +403,6 @@ const pt: StoryFlowMessages = {
   modalAnswerWeekQuestion: 'Responda à pergunta da semana',
   modalContactLead: 'Tem dúvidas? Escreva para',
   modalCaptchaFailed: 'Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo.',
-  modalAnsweringPrefix: 'Você está respondendo:',
-  modalAskAdviceTexto: 'Escreva o que a pessoa contou, com as palavras dela se puder.',
-  modalAskAdviceAudio: 'Grave a conversa: você pergunta e a outra pessoa responde.',
-  modalAskAdviceVideo: 'Deixe o celular na horizontal e que os dois apareçam.',
-  modalAskAdviceFoto: 'Peça uma foto daquela época e conte o que há nela.',
 };
 
 const en: StoryFlowMessages = {
@@ -529,11 +514,6 @@ const en: StoryFlowMessages = {
   modalAnswerWeekQuestion: "Answer this week's question",
   modalContactLead: 'Questions? Write to us at',
   modalCaptchaFailed: 'We could not confirm the submission. Wait a few seconds and try again.',
-  modalAnsweringPrefix: "You're answering:",
-  modalAskAdviceTexto: 'Write what they told you, in their own words if you can.',
-  modalAskAdviceAudio: 'Record the conversation: you ask, the other person answers.',
-  modalAskAdviceVideo: 'Hold your phone horizontally so you both appear.',
-  modalAskAdviceFoto: "Ask them for a photo from that time and tell us what's in it.",
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

@@ -13,6 +13,7 @@ import {
   primaryButtonHtml,
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
+import { formatPublicPlace, formatPublicName } from "@/lib/historias/story-ubicacion";
 import { buildStoryShareChannelUrls } from "@/lib/huella/share-story-channels";
 import { publishedAuthorShareText, publishedStoryShortUrl } from "@/lib/share/published-share";
 
@@ -32,7 +33,11 @@ function storyTitleLine(storyTitle: string): string {
 }
 
 function placeLine(placeName: string): string {
-  return placeName.replace(/[\r\n]+/g, " ").trim();
+  const raw = placeName.replace(/[\r\n]+/g, " ").trim();
+  if (!raw || raw === "—" || raw === "-") return "";
+  const comma = raw.indexOf(",");
+  if (comma === -1) return formatPublicName(raw);
+  return formatPublicPlace(raw.slice(0, comma), raw.slice(comma + 1));
 }
 
 function publishedLead(title: string, place: string): string {
@@ -69,7 +74,6 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
   const title = storyTitleLine(params.storyTitle);
   const storyUrl = storyPublicUrl(params.shortCode);
   const share = authorShareChannels(title, params.placeName, params.shortCode);
-  const ecoUrl = params.ecoUrl?.trim() ?? "";
   return [
     greeting,
     "",
@@ -85,13 +89,6 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     `X: ${share.x}`,
     `LinkedIn: ${share.linkedin}`,
     `Contar otra historia: ${absoluteEmailUrl("/contar")}`,
-    ...(ecoUrl
-      ? [
-          "",
-          "En tu espacio personal puedes ver cuántas personas respondieron a tu historia y volver a descargar tu relato en colores.",
-          `Ir a mi espacio: ${ecoUrl}`,
-        ]
-      : []),
     "",
     "Gracias por contarla.",
     "Equipo AlmaMundi",
@@ -106,14 +103,8 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const place = placeLine(params.placeName);
   const historiasUrl = storyPublicUrl(params.shortCode);
   const share = authorShareChannels(storyTitleLine(params.storyTitle), place, params.shortCode);
-  const ecoHref = params.ecoUrl?.trim() ?? "";
   const greeting = authorName ? `Hola, ${authorName}:` : "Hola:";
   const lead = escapeHtml(publishedLead(storyTitleLine(params.storyTitle), place));
-  const ecoBlock = ecoHref
-    ? `
-      ${paragraphHtml("En tu espacio personal puedes ver cuántas personas respondieron a tu historia y volver a descargar tu relato en colores.")}
-      ${primaryButtonHtml("Ir a mi espacio", ecoHref)}`
-    : "";
 
   const bodyHtml = `
       ${greetingHtml(greeting)}
@@ -125,7 +116,6 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
       ${primaryButtonHtml("X", share.x)}
       ${primaryButtonHtml("LinkedIn", share.linkedin)}
       ${invitationHtml()}
-      ${ecoBlock}
       ${paragraphHtml("Gracias por contarla.<br>Equipo AlmaMundi", "0")}`;
 
   return emailShell({ bodyHtml });

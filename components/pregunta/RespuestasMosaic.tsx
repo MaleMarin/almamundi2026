@@ -5,6 +5,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import Link from 'next/link';
 import { preguntaPageHref, preguntaPorId, preguntasDeLaSemana, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
+import { formatPublicName } from '@/lib/historias/story-ubicacion';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
@@ -108,8 +109,10 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
                 onClick={() => setOpen(item)}
                 className="rounded-2xl border border-black/10 bg-white p-4 text-left"
               >
-                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{item.alias}</p>
-                <p className="mb-2 mt-0.5 text-[length:var(--fs-etiqueta)] text-[#4A5568]">{item.city}</p>
+                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{formatPublicName(item.alias)}</p>
+                {formatPublicName(item.city) ? (
+                  <p className="mb-2 mt-0.5 text-[length:var(--fs-etiqueta)] text-[#4A5568]">{formatPublicName(item.city)}</p>
+                ) : null}
                 <AnswerBody item={item} />
               </button>
             ))}
@@ -127,8 +130,10 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
           >
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
-                <p className="m-0 text-[length:var(--fs-texto)] font-semibold">{open.alias}</p>
-                <p className="m-0 text-[length:var(--fs-pequeno)] text-[#4A5568]">{open.city}</p>
+                <p className="m-0 text-[length:var(--fs-texto)] font-semibold">{formatPublicName(open.alias)}</p>
+                {formatPublicName(open.city) ? (
+                  <p className="m-0 text-[length:var(--fs-pequeno)] text-[#4A5568]">{formatPublicName(open.city)}</p>
+                ) : null}
               </div>
               <button type="button" onClick={() => setOpen(null)} className="btn-am-neutro inline-flex min-h-11 items-center px-4 text-[length:var(--fs-pequeno)] font-semibold">
                 {t.modalClose}

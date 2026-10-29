@@ -8,7 +8,7 @@ export const HISTORIAS_LIST_HERO_TITLE = historiasFormatListHero.video.title;
 export const HISTORIAS_LIST_HERO_SUBTITLE = historiasFormatListHero.video.subtitle;
 
 /** Placeholder vacío: la etiqueta «Palabras clave» ya orienta al usuario. */
-export const HISTORIAS_FILTER_KEYWORD_PLACEHOLDER = '';
+export const HISTORIAS_FILTER_KEYWORD_PLACEHOLDER = 'Buscar por título, ciudad o tema';
 
 /** Misma etiqueta accesible del bloque carrusel en los cuatro formatos (como referencia única). */
 export const HISTORIAS_CAROUSEL_ARIA_LABEL = 'Carrusel de historias';
@@ -35,7 +35,7 @@ export const historiasListFormatOrangeKicker: Record<HistoriasListFormatKey, str
   video: 'Historias en video',
   audio: 'Historias en audio',
   texto: 'Historias en texto',
-  foto: 'Historias en fotografía',
+  foto: 'Historias en foto',
 };
 
 /** Título de exposición del carrusel (misma composición; texto según pestaña de formato). */
@@ -43,5 +43,5 @@ export const historiasListFormatExpoLabel: Record<HistoriasListFormatKey, string
   video: 'alma.mundi / historias en video',
   audio: 'alma.mundi / historias en audio',
   texto: 'alma.mundi / historias en texto',
-  foto: 'alma.mundi / historias en fotografía',
+  foto: 'alma.mundi / historias en foto',
 };
