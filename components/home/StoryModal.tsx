@@ -53,8 +53,7 @@ import {
   RESONANCE_EXPORT_PX } from '@/lib/huella/resonance-stripes';
 import {
   canvasToPngBlob,
-  downloadPngBlob,
-  shareNativeStoryWithImage } from '@/lib/huella/share-resonance-png';
+  downloadPngBlob } from '@/lib/huella/share-resonance-png';
 import {
   PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
@@ -470,8 +469,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [shareMenuShowDownload, setShareMenuShowDownload] = useState(false);
   const [shareImageApps, setShareImageApps] = useState(false);
+  const [shareImageFile, setShareImageFile] = useState<File | null>(null);
+  const [shareCopyFallback, setShareCopyFallback] = useState<string | null>(null);
   const shareNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const shareRequestTokenRef = useRef(0);
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
@@ -574,9 +574,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setImprintReceivedAt(null);
       setImprintStoryTitle('');
       setShareNotice('');
+      setShareCopyFallback(null);
+      setShareImageFile(null);
       setShareMenuOpen(false);
       setShareMenuShowDownload(false);
-      shareRequestTokenRef.current += 1;
       if (shareNoticeTimerRef.current) {
         clearTimeout(shareNoticeTimerRef.current);
         shareNoticeTimerRef.current = null;
@@ -1757,71 +1758,58 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   const shareImprint = useCallback(async () => {
     setShareMenuShowDownload(false);
+    setShareCopyFallback(null);
     const canvas = imprintCanvasRef.current;
     const phone =
       typeof navigator !== 'undefined' &&
       (window.matchMedia('(pointer: coarse)').matches ||
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    let file: File | null = null;
+    if (canvas) {
+      try {
+        const blob = await canvasToPngBlob(canvas);
+        file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
+          type: 'image/png' });
+      } catch (error) {
+        console.error('[StoryModal] canvasToPngBlob', error);
+        file = null;
+      }
+    }
     let canShare = false;
     if (
       phone &&
-      canvas &&
+      file &&
       typeof navigator.share === 'function' &&
       typeof navigator.canShare === 'function'
     ) {
       try {
-        const blob = await canvasToPngBlob(canvas);
-        const file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
-          type: 'image/png' });
         canShare = navigator.canShare({ files: [file] });
-      } catch {
+      } catch (error) {
+        console.error('[StoryModal] canShare', error);
         canShare = false;
       }
     }
+    setShareImageFile(file);
     setShareImageApps(canShare);
     setShareMenuOpen(true);
   }, [imprintId, imprintStoryTitle, storyTitle]);
 
-  const shareImageToApp = useCallback(async () => {
-    const c = imprintCanvasRef.current;
-    if (!c) return;
-    const requestToken = ++shareRequestTokenRef.current;
-    const shareText = t.modalShareTextLong || PENDING_STORY_SHARE_TEXT;
-    const filename = huellaPngFilename(imprintStoryTitle || storyTitle, imprintId);
-    try {
-      const blob = await canvasToPngBlob(c);
-      const file = new File([blob], filename, { type: 'image/png' });
-      const native = await shareNativeStoryWithImage({
-        file,
-        title: (imprintStoryTitle || storyTitle).trim() || 'AlmaMundi',
-        text: shareText,
-        url: PENDING_STORY_SHARE_URL });
-      if (requestToken !== shareRequestTokenRef.current) return;
-      if (native === 'aborted') return;
-      if (native === 'shared') {
-        setShareMenuOpen(false);
-        return;
-      }
-      flashShareNotice(t.modalShareImageFailed);
-    } catch (error) {
-      if (requestToken !== shareRequestTokenRef.current) return;
-      const name = error instanceof Error ? error.name : '';
-      if (name === 'AbortError') return;
-      flashShareNotice(t.modalShareImageFailed);
+  const showCopyFallback = useCallback((text: string) => {
+    if (shareNoticeTimerRef.current) {
+      clearTimeout(shareNoticeTimerRef.current);
+      shareNoticeTimerRef.current = null;
     }
-  }, [
-    flashShareNotice,
-    imprintId,
-    imprintStoryTitle,
-    storyTitle,
-    t.modalShareImageFailed,
-    t.modalShareTextLong,
-  ]);
+    setShareNotice(t.modalShareCopyFailed);
+    setShareCopyFallback(text);
+    window.setTimeout(() => setShareMenuOpen(false), 0);
+  }, [t.modalShareCopyFailed]);
 
   const startAnotherStory = useCallback(() => {
     setShareMenuOpen(false);
     setShareMenuShowDownload(false);
     setShareNotice('');
+    setShareCopyFallback(null);
+    setShareImageFile(null);
     setErr('');
     setMediaErrKind(null);
     setFieldErr({});
@@ -3044,6 +3032,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 >
                   {shareNotice || '\u00a0'}
                 </p>
+                {shareCopyFallback ? (
+                  <textarea
+                    readOnly
+                    value={shareCopyFallback}
+                    aria-label={t.modalShareCopyFailed}
+                    className="mt-2 w-full resize-y rounded-xl border border-[#D4D4C4] bg-white px-3 py-2 text-[length:var(--fs-pequeno)] text-[#141D26]"
+                    rows={4}
+                    onFocus={(event) => event.currentTarget.select()}
+                  />
+                ) : null}
               </div>
             </div>
           )}
@@ -3067,24 +3065,32 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 close: t.modalClose }}
               showDownload={shareMenuShowDownload}
               showImageApps={shareImageApps}
+              imageFile={shareImageFile}
+              shareTitle={(imprintStoryTitle || storyTitle).trim() || 'AlmaMundi'}
               onCopied={() => {
+                setShareCopyFallback(null);
                 flashShareNotice(t.modalShareLinkCopied);
                 setShareMenuOpen(false);
               }}
-              onCopyFailed={() => {
-                setShareMenuShowDownload(true);
-                flashShareNotice(t.modalShareImageFailed);
+              onTextCopied={() => {
+                setShareCopyFallback(null);
+                flashShareNotice(t.modalShareTextCopied);
+                setShareMenuOpen(false);
               }}
+              onAppHandoff={(app) => {
+                setShareCopyFallback(null);
+                flashShareNotice(interpolate(t.modalShareAppHandoff, { app }), 7000);
+                setShareMenuOpen(false);
+              }}
+              onCopyFailed={showCopyFallback}
               onDownload={() => {
                 setShareMenuOpen(false);
                 void downloadImprint();
               }}
-              onShareImage={() => {
-                void shareImageToApp();
-              }}
               onEmail={() => {
+                setShareCopyFallback(null);
                 flashShareNotice(t.modalShareEmailCopied, 7000);
-                setShareMenuOpen(false);
+                window.setTimeout(() => setShareMenuOpen(false), 0);
               }}
               onClose={() => setShareMenuOpen(false)}
             />

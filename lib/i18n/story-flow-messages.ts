@@ -111,6 +111,8 @@ export type StoryFlowMessages = {
   modalShareEmail: string;
   modalShareEmailCopied: string;
   modalShareLinkCopied: string;
+  modalShareTextCopied: string;
+  modalShareCopyFailed: string;
   modalAnotherPromptFoto: string;
   modalAnotherCtaFoto: string;
   modalAnotherPromptVideo: string;
@@ -261,11 +263,13 @@ const es: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Descargamos tu imagen y copiamos el texto. Te abrimos la app en otra pestaña para que los subas.',
+    'Descargamos tu imagen y copiamos el texto. Súbelos desde la app de {app}.',
   modalShareEmail: 'Correo',
   modalShareEmailCopied:
     'Si tu correo no se abrió, el mensaje ya está copiado: pégalo donde quieras.',
   modalShareLinkCopied: 'Enlace copiado',
+  modalShareTextCopied: 'Texto copiado',
+  modalShareCopyFailed: 'No pudimos copiar. Selecciona y copia este texto:',
   modalAnotherPromptFoto: '¿Quieres subir más fotos?',
   modalAnotherCtaFoto: 'Subir más fotos',
   modalAnotherPromptVideo: '¿Quieres grabar otro momento?',
@@ -370,11 +374,13 @@ const pt: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Baixamos sua imagem e copiamos o texto. Abrimos o app em outra aba para você publicar.',
+    'Baixamos sua imagem e copiamos o texto. Publique pelo app do {app}.',
   modalShareEmail: 'E-mail',
   modalShareEmailCopied:
     'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
   modalShareLinkCopied: 'Link copiado',
+  modalShareTextCopied: 'Texto copiado',
+  modalShareCopyFailed: 'Não conseguimos copiar. Selecione e copie este texto:',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
   modalAnotherCtaFoto: 'Enviar mais fotos',
   modalAnotherPromptVideo: 'Quer gravar outro momento?',
@@ -483,11 +489,13 @@ const en: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'We downloaded your image and copied the text. We opened the app in another tab so you can post them.',
+    'We downloaded your image and copied the text. Post them from the {app} app.',
   modalShareEmail: 'Email',
   modalShareEmailCopied:
     'If your email didn\'t open, the message is already copied: paste it wherever you like.',
   modalShareLinkCopied: 'Link copied',
+  modalShareTextCopied: 'Text copied',
+  modalShareCopyFailed: 'We couldn\'t copy it. Select and copy this text:',
   modalAnotherPromptFoto: 'Want to upload more photos?',
   modalAnotherCtaFoto: 'Upload more photos',
   modalAnotherPromptVideo: 'Want to record another moment?',

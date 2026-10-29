@@ -1,10 +1,60 @@
 'use client';
 
 import { Download, Mail, X } from 'lucide-react';
+import { downloadPngBlob } from '@/lib/huella/share-resonance-png';
 import {
   canonicalStoryShareUrl,
-  buildStoryShareChannelUrls,
-  copyTextToClipboard } from '@/lib/huella/share-story-channels';
+  buildStoryShareChannelUrls } from '@/lib/huella/share-story-channels';
+
+/** writeText en el mismo clic, sin await previos. Si no queda copiado, textarea oculto. */
+function copyTextInClick(text: string, onSettled: (ok: boolean) => void): void {
+  let pending: Promise<void> | null = null;
+  try {
+    if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+      pending = navigator.clipboard.writeText(text);
+    }
+  } catch (error) {
+    console.error('[StoryShareMenu] clipboard.writeText', error);
+    pending = null;
+  }
+  const synced = copyWithHiddenTextarea(text);
+  if (synced) {
+    if (pending) void pending.catch(() => {});
+    onSettled(true);
+    return;
+  }
+  if (!pending) {
+    onSettled(false);
+    return;
+  }
+  pending.then(() => onSettled(true)).catch((error: unknown) => {
+    console.error('[StoryShareMenu] clipboard.writeText rejected', error);
+    onSettled(false);
+  });
+}
+
+function copyWithHiddenTextarea(text: string): boolean {
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.setAttribute('aria-hidden', 'true');
+    ta.style.position = 'fixed';
+    ta.style.top = '0';
+    ta.style.left = '-9999px';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch (error) {
+    console.error('[StoryShareMenu] execCommand copy', error);
+    return false;
+  }
+}
 
 export type StoryShareMenuLabels = {
   title: string;
@@ -26,11 +76,15 @@ type StoryShareMenuProps = {
   emailSubject: string;
   labels: StoryShareMenuLabels;
   showDownload: boolean;
+  /** Celular que acepta archivos en la hoja del sistema. */
   showImageApps: boolean;
+  imageFile: File | null;
+  shareTitle: string;
   onCopied: () => void;
-  onCopyFailed: () => void;
+  onTextCopied: () => void;
+  onAppHandoff: (app: 'Instagram' | 'TikTok') => void;
+  onCopyFailed: (text: string) => void;
   onDownload: () => void;
-  onShareImage: () => void;
   onEmail: () => void;
   onClose: () => void;
 };
@@ -43,10 +97,13 @@ export function StoryShareMenu({
   labels,
   showDownload,
   showImageApps,
+  imageFile,
+  shareTitle,
   onCopied,
+  onTextCopied,
+  onAppHandoff,
   onCopyFailed,
   onDownload,
-  onShareImage,
   onEmail,
   onClose }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(shareUrl, {
@@ -54,10 +111,44 @@ export function StoryShareMenu({
     long: shareTextLong,
     emailSubject });
 
-  const copyLink = async () => {
-    const ok = await copyTextToClipboard(canonicalStoryShareUrl(shareUrl));
-    if (ok) onCopied();
-    else onCopyFailed();
+  const copyLink = () => {
+    const link = canonicalStoryShareUrl(shareUrl);
+    copyTextInClick(link, (ok) => {
+      if (ok) onCopied();
+      else onCopyFailed(link);
+    });
+  };
+
+  const shareImage = (app: 'Instagram' | 'TikTok') => {
+    const text = shareTextLong;
+    const native = Boolean(
+      showImageApps && imageFile && typeof navigator !== 'undefined' && typeof navigator.share === 'function'
+    );
+    copyTextInClick(text, (ok) => {
+      if (!ok) onCopyFailed(text);
+      else if (native) onTextCopied();
+      else if (imageFile) onAppHandoff(app);
+      else onTextCopied();
+    });
+    if (native && imageFile) {
+      try {
+        const pendingShare = navigator.share({
+          files: [imageFile],
+          title: shareTitle,
+          text });
+        void pendingShare.catch((error: unknown) => {
+          const name = error instanceof Error ? error.name : '';
+          if (name === 'AbortError') return;
+          console.error('[StoryShareMenu] navigator.share', error);
+          downloadPngBlob(imageFile, imageFile.name);
+        });
+      } catch (error) {
+        console.error('[StoryShareMenu] navigator.share', error);
+        downloadPngBlob(imageFile, imageFile.name);
+      }
+      return;
+    }
+    if (imageFile) downloadPngBlob(imageFile, imageFile.name);
   };
 
   const itemClass =
@@ -99,32 +190,26 @@ export function StoryShareMenu({
           <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
             {labels.linkedin}
           </a>
-          {showImageApps ? (
-            <>
-              <button type="button" className={buttonClass} onClick={onShareImage}>
-                {labels.instagram}
-              </button>
-              <button type="button" className={buttonClass} onClick={onShareImage}>
-                {labels.tiktok}
-              </button>
-            </>
-          ) : null}
+          <button type="button" className={buttonClass} onClick={() => shareImage('Instagram')}>
+            {labels.instagram}
+          </button>
+          <button type="button" className={buttonClass} onClick={() => shareImage('TikTok')}>
+            {labels.tiktok}
+          </button>
           <a
             className={itemClass}
             href={channels.email}
-            onClick={(event) => {
-              event.preventDefault();
-              const pending = copyTextToClipboard(shareTextLong);
-              window.location.href = channels.email;
-              void pending.then((ok) => {
+            onClick={() => {
+              copyTextInClick(shareTextLong, (ok) => {
                 if (ok) onEmail();
+                else onCopyFailed(shareTextLong);
               });
             }}
           >
             <Mail size={15} className="mr-2" aria-hidden />
             {labels.email}
           </a>
-          <button type="button" className={buttonClass} onClick={() => void copyLink()}>
+          <button type="button" className={buttonClass} onClick={copyLink}>
             {labels.copyLink}
           </button>
           {showDownload ? (
