@@ -25,6 +25,7 @@ type RespuestaItem = {
   createdAt: number | null;
   previewUrl: string | null;
   hasLocation: boolean;
+  antecedentes?: string;
 };
 
 const CONFIRM_DELETE = '¿Eliminar esta respuesta y sus archivos? No se puede deshacer.';
@@ -264,6 +265,12 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       consentTextsVersion={item.consentTextsVersion}
                       token={token}
                     />
+                    {item.antecedentes?.trim() ? (
+                      <p style={{ margin: '8px 0 0', fontSize: 13, lineHeight: 1.45, whiteSpace: 'pre-wrap' }}>
+                        <span style={{ color: 'rgba(255,255,255,0.55)' }}>¿Algo más que quieras contarnos?: </span>
+                        {item.antecedentes.trim()}
+                      </p>
+                    ) : null}
                     {item.kind === 'texto' && (
                       <p style={{ margin: '10px 0 0', fontSize: 14, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>{item.contenido}</p>
                     )}

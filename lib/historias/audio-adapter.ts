@@ -42,7 +42,6 @@ export function storyToHistoriaAudio(s: StoryPoint): HistoriaAudio {
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s),
   };
 }

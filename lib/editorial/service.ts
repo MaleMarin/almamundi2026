@@ -30,7 +30,7 @@ import {
 } from "@/lib/server-storage";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
-import { deleteAuthorContact, saveAuthorContact } from "@/lib/author-contacts";
+import { deleteAuthorContact, saveAuthorPrivate } from "@/lib/author-contacts";
 import {
   notifyAuthorStoryRejected,
   type RejectionMailCollection,
@@ -123,8 +123,6 @@ function mapSubmissionsTipoToStoryFormat(type: string | undefined): "text" | "au
 function copyOptionalPublicFields(story: Record<string, unknown>, source: Record<string, unknown>) {
   const cancion = normalizeCancionRelacionada(source.cancionRelacionada);
   if (cancion) story.cancionRelacionada = cancion;
-  const antecedentes = normalizeAntecedentes(source.antecedentes);
-  if (antecedentes) story.antecedentes = antecedentes;
   const imagenes = parseStoryImagenes(source.imagenes);
   if (imagenes) story.imagenes = imagenes;
   const questionId = resolveQuestionId(source.questionId);
@@ -138,11 +136,25 @@ function coerceFiniteNumber(v: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-function scrubPublicNote(story: Record<string, unknown>) {
-  if (typeof story.text !== "string") return;
-  const note = typeof story.antecedentes === "string" ? story.antecedentes : undefined;
-  const cleaned = omitAntecedentesFromPublicText(story.text, note);
-  story.text = cleaned || null;
+function scrubPublicNote(story: Record<string, unknown>, note?: string) {
+  if (typeof story.text === "string") {
+    const cleaned = omitAntecedentesFromPublicText(story.text, note);
+    story.text = cleaned || null;
+  }
+  delete story.antecedentes;
+  delete story.ageRange;
+  delete story.sex;
+  delete story.age;
+  delete story.gender;
+}
+
+function privateFieldsFromSource(source: Record<string, unknown>, email: string) {
+  return {
+    email,
+    ageRange: typeof source.ageRange === "string" ? source.ageRange : null,
+    sex: typeof source.sex === "string" ? source.sex : null,
+    antecedentes: normalizeAntecedentes(source.antecedentes) ?? null,
+  };
 }
 
 async function coordsForPlace(
@@ -271,8 +283,9 @@ export async function editorialPublishFromSubmission(
     const countryKnown = typeof sub.country === "string" ? sub.country : undefined;
     if (cityKnown) story.city = cityKnown;
     if (countryKnown) story.country = countryKnown;
+    const privateNote = normalizeAntecedentes(sub.antecedentes);
     copyOptionalPublicFields(story, sub);
-    scrubPublicNote(story);
+    scrubPublicNote(story, privateNote);
     if (promoted.imagenes?.length) story.imagenes = promoted.imagenes;
     if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
     if (promoted.publishedMediaPaths.length) {
@@ -281,7 +294,7 @@ export async function editorialPublishFromSubmission(
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
 
     await storyRef.set(story);
-    if (authorEmailOnSub) await saveAuthorContact(db, storyRef.id, authorEmailOnSub);
+    await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(sub, authorEmailOnSub));
     const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
     await resolved.ref.update({
       status: "approved",
@@ -379,8 +392,9 @@ export async function editorialPublishFromSubmission(
     city: sd.placeLabel ?? undefined,
     ...(imagenes?.length ? { imagenes } : {}),
   };
+  const pipelineNote = normalizeAntecedentes(sd.antecedentes);
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
-  scrubPublicNote(story);
+  scrubPublicNote(story, pipelineNote);
   if (imagenes?.length) story.imagenes = imagenes;
   if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
   if (promoted.publishedMediaPaths.length) {
@@ -390,7 +404,11 @@ export async function editorialPublishFromSubmission(
 
   await storyRef.set(story);
   const pipelineEmail = typeof sd.email === "string" ? sd.email.trim() : "";
-  if (pipelineEmail) await saveAuthorContact(db, storyRef.id, pipelineEmail);
+  await saveAuthorPrivate(
+    db,
+    storyRef.id,
+    privateFieldsFromSource(sd as unknown as Record<string, unknown>, pipelineEmail)
+  );
   const archivedOldestStoryId = await maybeArchiveOldestPublicIfOverCap(db);
   await resolved.ref.update({
     status: "approved" as SubmissionsPipelineDoc["status"],
@@ -495,8 +513,9 @@ export async function editorialPublishApprovedStorySubmission(
       : typeof data.email === "string"
         ? data.email.trim()
         : "";
+  const legacyNote = normalizeAntecedentes(data.antecedentes);
   copyOptionalPublicFields(storyData, data);
-  scrubPublicNote(storyData);
+  scrubPublicNote(storyData, legacyNote);
   if (promoted.imagenes?.length) storyData.imagenes = promoted.imagenes;
   if (promoted.profilePhotoUrl) storyData.profilePhotoUrl = promoted.profilePhotoUrl;
   if (promoted.publishedMediaPaths.length) {
@@ -505,7 +524,7 @@ export async function editorialPublishApprovedStorySubmission(
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
 
   await storyRef.set(storyData);
-  if (authorEmailLegacy) await saveAuthorContact(db, storyRef.id, authorEmailLegacy);
+  await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(data, authorEmailLegacy));
   await subRef.update({
     status: "approved",
     updatedAt: FieldValue.serverTimestamp(),
@@ -603,9 +622,18 @@ export async function editorialPublishSpanishDraftInPlace(args: {
     update.publishedMediaPaths = promoted.publishedMediaPaths;
   }
   const draftEmail = typeof raw.authorEmail === "string" ? raw.authorEmail.trim() : "";
-  if (draftEmail) {
-    await saveAuthorContact(db, storyId, draftEmail);
-    update.authorEmail = FieldValue.delete();
+  const draftNote = normalizeAntecedentes(raw.antecedentes);
+  await saveAuthorPrivate(db, storyId, privateFieldsFromSource(raw, draftEmail));
+  if (draftEmail) update.authorEmail = FieldValue.delete();
+  if (typeof raw.ageRange === "string" && raw.ageRange.trim()) update.ageRange = FieldValue.delete();
+  if (typeof raw.sex === "string" && raw.sex.trim()) update.sex = FieldValue.delete();
+  if (raw.age != null && raw.age !== "") update.age = FieldValue.delete();
+  if (raw.gender != null && raw.gender !== "") update.gender = FieldValue.delete();
+  if (draftNote) {
+    update.antecedentes = FieldValue.delete();
+    if (typeof raw.text === "string") {
+      update.text = omitAntecedentesFromPublicText(raw.text, draftNote) || null;
+    }
   }
 
   await ref.update(update);

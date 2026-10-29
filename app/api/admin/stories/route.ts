@@ -344,12 +344,16 @@ export async function GET(request: NextRequest) {
           ...snap.docs.map((doc) => db.collection(AUTHOR_CONTACTS_COLLECTION).doc(doc.id))
         )
       : [];
-    const emailByStory = new Map<string, string>();
+    const privateByStory = new Map<string, { email: string; ageRange: string; sex: string; antecedentes: string }>();
     for (const contact of contactSnaps) {
-      const email = contact.get("email");
-      if (contact.exists && typeof email === "string" && email.trim()) {
-        emailByStory.set(contact.id, email.trim());
-      }
+      if (!contact.exists) continue;
+      const data = (contact.data() ?? {}) as Record<string, unknown>;
+      privateByStory.set(contact.id, {
+        email: textField(data, "email"),
+        ageRange: textField(data, "ageRange", "age"),
+        sex: textField(data, "sex", "gender"),
+        antecedentes: textField(data, "antecedentes"),
+      });
     }
 
     const sourceRefs = [];
@@ -376,19 +380,24 @@ export async function GET(request: NextRequest) {
       const createdAt = toMillis(d.createdAt);
       const activeSince = toMillis(d.activeSince);
       const source = sourceByStory.get(doc.id);
+      const priv = privateByStory.get(doc.id);
       const email =
-        emailByStory.get(doc.id) ??
-        authorEmailOnStory(d) ??
-        (source ? textField(source, "email", "authorEmail") : "") ??
+        priv?.email ||
+        authorEmailOnStory(d) ||
+        (source ? textField(source, "email", "authorEmail") : "") ||
         "";
-      const personSource: Record<string, unknown> = source ?? {
-        alias: typeof d.authorName === "string" ? d.authorName : d.alias,
-        authorName: d.authorName,
-        country: d.country,
-        city: d.city,
-        placeLabel: d.placeLabel ?? d.place,
-        profilePhotoUrl: d.profilePhotoUrl,
+      const personSource: Record<string, unknown> = {
+        ...(source ?? {
+          alias: typeof d.authorName === "string" ? d.authorName : d.alias,
+          authorName: d.authorName,
+          country: d.country,
+          city: d.city,
+          placeLabel: d.placeLabel ?? d.place,
+          profilePhotoUrl: d.profilePhotoUrl,
+        }),
       };
+      if (priv?.ageRange) personSource.ageRange = priv.ageRange;
+      if (priv?.sex) personSource.sex = priv.sex;
       const consent = consentRowsFromRecord(source ?? {});
       const profile = await profilePhotoForAdmin(personSource);
       return {
@@ -415,7 +424,10 @@ export async function GET(request: NextRequest) {
         questionId: typeof d.questionId === "string" ? d.questionId : null,
         questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
         text: typeof d.text === "string" ? d.text : "",
-        antecedentes: typeof d.antecedentes === "string" ? d.antecedentes : "",
+        antecedentes:
+          priv?.antecedentes ||
+          (source ? textField(source, "antecedentes") : "") ||
+          (typeof d.antecedentes === "string" ? d.antecedentes : ""),
         cancionRelacionada: typeof d.cancionRelacionada === "string" ? d.cancionRelacionada : "",
         imagenes: (parseStoryImagenes(d.imagenes) ?? []).map(imagenFromParsed),
       };

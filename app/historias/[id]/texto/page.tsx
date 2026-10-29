@@ -38,7 +38,6 @@ function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
       bio: s.author?.bio },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s) };
 }
 

@@ -57,7 +57,6 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s),
   };
 }
@@ -83,7 +82,6 @@ export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | nul
     },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s),
   };
 }

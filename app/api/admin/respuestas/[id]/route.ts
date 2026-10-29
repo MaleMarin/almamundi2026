@@ -137,6 +137,20 @@ export async function PATCH(
         }
       }
 
+      const ageRange = typeof data.ageRange === "string" ? data.ageRange.trim() : "";
+      const sex = typeof data.sex === "string" ? data.sex.trim() : "";
+      const antecedentes = typeof data.antecedentes === "string" ? data.antecedentes.trim().slice(0, 2000) : "";
+      if (ageRange || sex || antecedentes) {
+        await db.collection(RESPUESTA_CONTACTS_COLLECTION).doc(id).set(
+          {
+            ...(ageRange ? { ageRange } : {}),
+            ...(sex ? { sex } : {}),
+            ...(antecedentes ? { antecedentes } : {}),
+            updatedAt: FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      }
       try {
         await ref.update({
           status: "approved",
@@ -144,6 +158,11 @@ export async function PATCH(
           publishedUrl,
           publishedAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
+          ...(data.ageRange != null ? { ageRange: FieldValue.delete() } : {}),
+          ...(data.sex != null ? { sex: FieldValue.delete() } : {}),
+          ...(data.age != null ? { age: FieldValue.delete() } : {}),
+          ...(data.gender != null ? { gender: FieldValue.delete() } : {}),
+          ...(data.antecedentes != null ? { antecedentes: FieldValue.delete() } : {}),
         });
       } catch (err) {
         if (publishedPath) {

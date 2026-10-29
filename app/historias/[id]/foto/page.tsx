@@ -47,7 +47,6 @@ function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: s
       ubicacion },
     tags: s.tags ?? (s.topic ? [s.topic] : undefined),
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s) };
 }
 

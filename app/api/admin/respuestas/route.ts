@@ -5,6 +5,25 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { consentRowsFromRecord } from "@/lib/legal-consent";
 import { RESPUESTA_CONTACTS_COLLECTION, RESPUESTAS_COLLECTION, isRespuestaStatus } from "@/lib/respuestas/constants";
 import { signReadUrlForPath } from "@/lib/server-storage";
+import { AGE_RANGE_OPTIONS } from "@/lib/subir-author-fields";
+
+const AGE_LABEL = new Map(AGE_RANGE_OPTIONS.map((option) => [option.id, option.label]));
+const SEX_LABEL: Record<string, string> = {
+  femenino: "Femenino",
+  masculino: "Masculino",
+  "no-binario": "No binario",
+  "prefiero-no-decir": "Prefiero no decirlo",
+  otro: "Otro",
+};
+
+function contactText(data: Record<string, unknown> | undefined, ...keys: string[]): string {
+  if (!data) return "";
+  for (const key of keys) {
+    const value = data[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+  }
+  return "";
+}
 
 export const runtime = "nodejs";
 
@@ -33,12 +52,18 @@ export async function GET(request: NextRequest) {
     const contactSnaps = snap.docs.length
       ? await db.getAll(...snap.docs.map((doc) => db.collection(RESPUESTA_CONTACTS_COLLECTION).doc(doc.id)))
       : [];
-    const emailById = new Map<string, string>();
+    const privateById = new Map<string, { email: string; age: string; gender: string; antecedentes: string }>();
     for (const contact of contactSnaps) {
-      const email = contact.get("email");
-      if (contact.exists && typeof email === "string" && email.trim()) {
-        emailById.set(contact.id, email.trim());
-      }
+      if (!contact.exists) continue;
+      const data = (contact.data() ?? {}) as Record<string, unknown>;
+      const ageRaw = contactText(data, "ageRange", "age");
+      const sexRaw = contactText(data, "sex", "gender");
+      privateById.set(contact.id, {
+        email: contactText(data, "email"),
+        age: AGE_LABEL.get(ageRaw as (typeof AGE_RANGE_OPTIONS)[number]["id"]) || ageRaw,
+        gender: SEX_LABEL[sexRaw] || sexRaw,
+        antecedentes: contactText(data, "antecedentes"),
+      });
     }
     const items = await Promise.all(
       snap.docs.map(async (doc) => {
@@ -69,10 +94,18 @@ export async function GET(request: NextRequest) {
             alias: typeof data.alias === "string" ? data.alias : "",
             country: typeof data.country === "string" ? data.country : "",
             city: typeof data.city === "string" ? data.city : "",
-            age: "",
-            gender: "",
-            email: emailById.get(doc.id) ?? "",
+            age:
+              privateById.get(doc.id)?.age ||
+              AGE_LABEL.get(contactText(data, "ageRange", "age") as (typeof AGE_RANGE_OPTIONS)[number]["id"]) ||
+              contactText(data, "ageRange", "age"),
+            gender:
+              privateById.get(doc.id)?.gender ||
+              SEX_LABEL[contactText(data, "sex", "gender")] ||
+              contactText(data, "sex", "gender"),
+            email: privateById.get(doc.id)?.email ?? "",
           },
+          antecedentes:
+            privateById.get(doc.id)?.antecedentes || contactText(data, "antecedentes"),
           consents: consent.rows,
           consentTextsVersion: consent.version,
           status,

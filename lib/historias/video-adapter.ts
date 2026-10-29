@@ -49,7 +49,6 @@ export function storyToVideoHistoria(s: StoryPoint): Historia {
     citaDestacada: s.quote,
     subtitulos: s.captionsUrl,
     ...(s.cancionRelacionada ? { cancionRelacionada: s.cancionRelacionada } : {}),
-    ...(s.antecedentes ? { antecedentes: s.antecedentes } : {}),
     ...questionPublicFields(s),
   };
 }

@@ -77,6 +77,9 @@ function firestoreDocToStoryPoint(
   const note = normalizeAntecedentes(d.antecedentes);
   const rawText = ((d.text as string) ?? (d.texto as string) ?? "") || "";
   const text = omitAntecedentesFromPublicText(rawText, note);
+  const excerpt = omitAntecedentesFromPublicText((d.excerpt as string) ?? "", note) || undefined;
+  const quote = omitAntecedentesFromPublicText((d.quote as string) ?? "", note) || undefined;
+  const descripcion = omitAntecedentesFromPublicText((d.descripcion as string) ?? "", note) || undefined;
   const media = mediaFromDoc(d);
   const { lat, lng } = resolveLatLng(d);
   if (globeOnly) {
@@ -130,11 +133,10 @@ function firestoreDocToStoryPoint(
     authorName: authorNameRaw || undefined,
     authorAvatar: (d.authorAvatar as string) ?? undefined,
     title,
-    description: (d.excerpt as string) ?? (d.descripcion as string) ?? (text ? String(text).slice(0, 200) : undefined),
-    excerpt: (d.excerpt as string) ?? undefined,
-    quote: (d.quote as string) ?? undefined,
+    description: excerpt ?? descripcion ?? (text ? String(text).slice(0, 200) : undefined),
+    excerpt,
+    quote,
     cancionRelacionada: normalizeCancionRelacionada(d.cancionRelacionada),
-    antecedentes: normalizeAntecedentes(d.antecedentes),
     ...(questionId ? { questionId } : {}),
     ...(isQuestionMode(d.questionMode) ? { questionMode: d.questionMode } : {}),
     imagenes: parseStoryImagenes(d.imagenes),

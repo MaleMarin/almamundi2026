@@ -48,7 +48,7 @@ function similarFromFirestore(id: string, d: Record<string, unknown>): Rankable 
   const note = normalizeAntecedentes(d.antecedentes);
   const text = omitAntecedentesFromPublicText(typeof d.text === 'string' ? d.text : '', note);
   const body = omitAntecedentesFromPublicText(typeof d.body === 'string' ? d.body : '', note);
-  const excerpt = typeof d.excerpt === 'string' ? d.excerpt : '';
+  const excerpt = omitAntecedentesFromPublicText(typeof d.excerpt === 'string' ? d.excerpt : '', note);
   const formatRaw = (d.format as string | undefined) ?? (d.formato as string | undefined);
   const place = publicCityCountry(
     typeof d.city === 'string' ? d.city : typeof d.placeLabel === 'string' ? d.placeLabel : '',
