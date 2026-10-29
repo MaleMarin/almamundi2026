@@ -3,7 +3,9 @@
  * Server component: historia inexistente → HTTP 404; sin texto → redirige al detalle.
  */
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { ALMA_LOCALE_COOKIE, parseAlmaLocale, type AlmaLocale } from '@/lib/i18n/locale';
 import { requirePublicStory } from '@/lib/historias/require-public-story';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
@@ -19,9 +21,9 @@ function defaultAvatar(name: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-function storyToHistoriaTexto(s: StoryPoint, contenido: string): HistoriaTexto {
+function storyToHistoriaTexto(s: StoryPoint, contenido: string, locale: AlmaLocale): HistoriaTexto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = storyUbicacionLabel(s);
+  const ubicacion = storyUbicacionLabel(s, locale);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
   return {
@@ -53,7 +55,8 @@ export default async function HistoriasIdTextoPage({ params }: PageProps) {
   const story = await requirePublicStory(id);
   const contenido = (story.body ?? (story as { content?: string }).content ?? '').trim();
   if (!contenido) redirect(`/historias/${id}`);
-  const historia = storyToHistoriaTexto(story, contenido);
+  const locale = parseAlmaLocale((await cookies()).get(ALMA_LOCALE_COOKIE)?.value);
+  const historia = storyToHistoriaTexto(story, contenido, locale);
   return (
     <>
       <StoryJsonLd id={id} />

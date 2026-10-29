@@ -642,10 +642,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       lon: s.lng,
       markerKind: 'story' as const,
       title: s.title ?? s.label,
-      place: formatPublicPlace(s.city, s.country) || undefined,
+      place: formatPublicPlace(s.city, s.country, locale) || undefined,
       color: '#FF4A1C' }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
-  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers]);
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {

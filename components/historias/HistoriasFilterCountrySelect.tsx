@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { getHistoriasFilterCountryNamesEs } from '@/lib/historias/historias-filter-countries';
+import { countryOptions, displayCountryName } from '@/lib/i18n/country-name';
 import { formatPagesCopy } from '@/lib/historias/format-pages-copy';
 import { foldText } from '@/lib/historias/story-filter-helpers';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -32,12 +32,12 @@ export function HistoriasFilterCountrySelect({
   const [query, setQuery] = useState('');
   const rootRef = useRef<HTMLDivElement>(null);
 
-  const allCountries = useMemo(() => getHistoriasFilterCountryNamesEs(), []);
+  const allCountries = useMemo(() => countryOptions(locale), [locale]);
 
   const filtered = useMemo(() => {
     const q = foldText(query.trim());
     if (!q) return allCountries;
-    return allCountries.filter((c) => foldText(c).includes(q));
+    return allCountries.filter((c) => foldText(c.name).includes(q) || foldText(c.code).includes(q));
   }, [allCountries, query]);
 
   const close = useCallback(() => {
@@ -70,7 +70,7 @@ export function HistoriasFilterCountrySelect({
     [onChange, close]
   );
 
-  const labelShown = value.trim() ? value : copy.countryAll;
+  const labelShown = value.trim() ? displayCountryName(value, locale) : copy.countryAll;
 
   return (
     <div ref={rootRef} className="relative min-w-0">
@@ -128,16 +128,16 @@ export function HistoriasFilterCountrySelect({
               </button>
             </li>
             {filtered.map((c) => (
-              <li key={c} role="presentation">
+              <li key={c.code} role="presentation">
                 <button
                   type="button"
                   role="option"
-                  aria-selected={value === c}
+                  aria-selected={value === c.code}
                   className="w-full px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 hover:bg-white/60"
                   style={{ fontFamily: neu.APP_FONT }}
-                  onClick={() => pick(c)}
+                  onClick={() => pick(c.code)}
                 >
-                  {c}
+                  {c.name}
                 </button>
               </li>
             ))}

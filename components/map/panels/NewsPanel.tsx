@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatRelativeTime } from '@/lib/i18n/site-intl';
 import type { NewsItem } from '@/components/NewsLayer';
 import { NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -63,6 +65,7 @@ function NewsRow({
   onClick: () => void;
   dimmed?: boolean;
 }) {
+  const { locale } = useHomeLocale();
   const [now, setNow] = useState(0);
   useEffect(() => {
     const raf = requestAnimationFrame(() => setNow(Date.now()));
@@ -74,15 +77,8 @@ function NewsRow({
   }, []);
 
   const timeAgo = (date: string | null, currentTime: number) => {
-    if (!date) return '';
-    const diff = currentTime - new Date(date).getTime();
-    if (!Number.isFinite(diff) || diff < 0) return '';
-    const mins = Math.floor(diff / 60000);
-    if (mins < 1) return 'ahora';
-    if (mins < 60) return `hace ${mins}m`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `hace ${hrs}h`;
-    return `hace ${Math.floor(hrs / 24)}d`;
+    if (!date || !currentTime) return '';
+    return formatRelativeTime(date, currentTime, locale);
   };
 
   const handleClick = () => {

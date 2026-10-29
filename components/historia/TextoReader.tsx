@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
@@ -45,9 +46,9 @@ interface TextoReaderProps {
   siteLayout?: boolean;
 }
 
-function formatFecha(fecha: string): string {
+function formatFecha(fecha: string, locale: AlmaLocale): string {
   if (!fecha) return '';
-  const s = formatPublishedAtEsStable(fecha);
+  const s = formatPublishedAtEsStable(fecha, locale);
   return s === '—' ? fecha : s;
 }
 
@@ -169,7 +170,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             color: SEPIA,
             marginBottom: '1.5rem' }}
         >
-          {formatFecha(historia.fecha)}
+          {formatFecha(historia.fecha, locale)}
         </p>
 
         {/* Título */}

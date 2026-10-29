@@ -41,6 +41,10 @@ import { getUserCalendarDayForNewsApi } from '@/lib/news-calendar-day';
 import { BITS_DATA, type BitEntry } from '@/lib/bits-data';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatRelativeTime } from '@/lib/i18n/site-intl';
+import type { AlmaLocale } from '@/lib/i18n/locale';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { displayCountryName } from '@/lib/i18n/country-name';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { latLngToCartesianThreeGlobe } from '@/lib/globe-coords';
 import { getMediaByDomain, normalizeDomain } from '@/lib/media-sources';
@@ -1046,26 +1050,19 @@ function isColeccionStoredItem(v: unknown): v is { kind: string; id: string; tit
 
 /* ----- Panel derecho: título + búsqueda + acciones (Temas, Explorar, Colecciones, Sonido) + vistas ----- */
 /** Tiempo relativo desde publishedAt usando `now` (se actualiza cada minuto en Pulso Global, sin refetch). */
-function formatTimeAgoFromNow(publishedAt: string | null, now: number): string {
+function formatTimeAgoFromNow(publishedAt: string | null, now: number, locale: AlmaLocale): string {
   if (!publishedAt) return '—';
-  try {
-    const ts = new Date(publishedAt).getTime();
-    if (Number.isNaN(ts)) return '—';
-    const diffMs = now - ts;
-    if (diffMs < 0) return '—';
-    const minutesAgo = Math.floor(diffMs / 60000);
-    if (minutesAgo < 1) return 'hace unos segundos';
-    if (minutesAgo === 1) return 'hace 1 minuto';
-    if (minutesAgo < 60) return `hace ${minutesAgo} minutos`;
-    const hoursAgo = Math.floor(minutesAgo / 60);
-    if (hoursAgo === 1) return 'hace 1 hora';
-    if (minutesAgo < 1440) return `hace ${hoursAgo} horas`;
-    const daysAgo = Math.floor(minutesAgo / 1440);
-    if (daysAgo === 1) return 'hace 1 día';
-    return `hace ${daysAgo} días`;
-  } catch {
-    return '—';
-  }
+  const label = formatRelativeTime(publishedAt, now, locale);
+  return label || '—';
+}
+
+function storyPlace(
+  city: string | null | undefined,
+  country: string | null | undefined,
+  locale: AlmaLocale,
+  placeLabel?: string | null
+): string {
+  return formatPublicPlace(city, country, locale) || (placeLabel ?? '').trim();
 }
 
 const MOOD_LABELS: Record<SoundMood, string> = {
@@ -1108,6 +1105,7 @@ function NewsListCard({
   onSelect: (item: NewsItem) => void;
   now: number;
 }) {
+  const { locale } = useHomeLocale();
   const item = items[index];
   if (!item) return null;
   const isSelected = selectedId !== null && selectedId !== '' && selectedId === item.id;
@@ -1125,7 +1123,7 @@ function NewsListCard({
           <span className="text-white/50">Medio:</span> {item.source || '—'}
         </p>
         <p className="text-[length:var(--fs-etiqueta)] text-white/70 mb-2">
-          {item.publishedAt ? formatTimeAgoFromNow(item.publishedAt, now) : '—'}
+          {item.publishedAt ? formatTimeAgoFromNow(item.publishedAt, now, locale) : '—'}
         </p>
         <div className="flex flex-wrap items-center gap-2">
           {item.topic && item.topic.trim().toLowerCase() !== 'actualidad' && (
@@ -1242,6 +1240,7 @@ function RightPanel({
   onPauseNewsTour?: () => void;
   newsTourRunning?: boolean;
 }) {
+  const { locale } = useHomeLocale();
   const DEBUG = false;
   const newsList = (Array.isArray(newsItems) ? newsItems : []) as NewsItem[];
   const hasLocation = (n: NewsItem) => (n.geo?.lat != null && n.geo?.lng != null) || (n.lat != null && n.lng != null);
@@ -1502,7 +1501,7 @@ function RightPanel({
                     {selectedNews.topic && selectedNews.topic.trim().toLowerCase() !== 'actualidad' ? ` · ${selectedNews.topic}` : ''}
                   </p>
                   <p className="text-[length:var(--fs-etiqueta)] text-white/55">
-                    {selectedNews.publishedAt ? formatTimeAgoFromNow(selectedNews.publishedAt, now) : '—'}
+                    {selectedNews.publishedAt ? formatTimeAgoFromNow(selectedNews.publishedAt, now, locale) : '—'}
                   </p>
                   <p className="text-[length:var(--fs-etiqueta)] text-white/55">
                     Por qué aparece: tema y fuente curada del proyecto.
@@ -1653,7 +1652,7 @@ function RightPanel({
                           </span>
                           <div className="min-w-0 flex-1">
                             <p className="text-[length:var(--fs-pequeno)] font-medium panelCardTitle truncate">{s.title}</p>
-                            <p className="text-[length:var(--fs-etiqueta)] panelCardSubtitle truncate">{s.placeLabel ?? [s.city, s.country].filter(Boolean).join(', ')}</p>
+                            <p className="text-[length:var(--fs-etiqueta)] panelCardSubtitle truncate">{storyPlace(s.city, s.country, locale, s.placeLabel) || '—'}</p>
                           </div>
                           <button
                             type="button"
@@ -1833,6 +1832,7 @@ const ULTIMAS_HISTORIAS_EJEMPLO: { title: string; city: string; country: string 
 ];
 
 function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: boolean; onClick: () => void }) {
+  const { locale } = useHomeLocale();
   return (
     <button
       type="button"
@@ -1864,7 +1864,7 @@ function StoryRow({ story, isActive, onClick }: { story: StoryPoint; isActive: b
         fontSize: 'var(--fs-etiqueta)',
         color: 'rgba(255,255,255,0.35)',
         margin: 0 }}>
-        {[story.city, story.country].filter(Boolean).join(', ')}
+        {storyPlace(story.city, story.country, locale)}
       </p>
     </button>
   );
@@ -1883,15 +1883,8 @@ function NewsRow({
   /** Tiempo de referencia (actualizado cada minuto en el padre) para evitar Date.now() en render. */
   nowMs: number;
 }) {
-  const timeAgo = (date: string | null) => {
-    if (!date) return '';
-    const diff = nowMs - new Date(date).getTime();
-    const mins = Math.floor(diff / 60000);
-    if (mins < 60) return `hace ${mins}m`;
-    const hrs = Math.floor(mins / 60);
-    if (hrs < 24) return `hace ${hrs}h`;
-    return `hace ${Math.floor(hrs / 24)}d`;
-  };
+  const { locale } = useHomeLocale();
+  const timeAgo = (date: string | null) => formatRelativeTime(date, nowMs, locale);
 
   const handleClick = () => {
     onClick();
@@ -1948,6 +1941,7 @@ function HistoriasPanel({
   onStoryFocus: (s: StoryPoint) => void;
   highlightedStoryId: string | null;
 }) {
+  const { locale } = useHomeLocale();
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, height: '100%' }}>
       {/* Solo búsqueda por palabras clave */}
@@ -2011,7 +2005,7 @@ function HistoriasPanel({
                   {h.title}
                 </p>
                 <p style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)', margin: 0 }}>
-                  {h.city}, {h.country}
+                  {h.city}, {displayCountryName(h.country, locale)}
                 </p>
               </div>
             ))}
@@ -2142,7 +2136,7 @@ type MapaPageContentProps = {
 };
 
 function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight = 0, universeVisible = true }: MapaPageContentProps) {
-  const { t } = useHomeLocale();
+  const { t, locale } = useHomeLocale();
   const audioRef = useRef<HTMLAudioElement>(null);
   /** Audio del universo: por defecto ON; la persona puede apagarlo con el botón Universo. */
   const [isMuted, setIsMuted] = useState(false);
@@ -3230,11 +3224,11 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         lat: s.lat,
         lng: s.lng,
         label: s.title,
-        placeLabel: s.placeLabel ?? [s.city, s.country].filter(Boolean).join(', '),
+        placeLabel: storyPlace(s.city, s.country, locale, s.placeLabel),
         hasText: s.hasText ?? true,
         hasAudio: s.hasAudio ?? false,
         hasVideo: s.hasVideo ?? false })),
-    [filteredStoriesForMusic]
+    [filteredStoriesForMusic, locale]
   );
   const pointsData: (StoryPoint | RegionPoint | { id: string; lat: number; lng: number; kind: 'news'; title: string; source: string | null; publishedAt: string | null; url: string; weight: number; altitude: number; radius?: number })[] =
     view === 'news' || activeView === 'actualidad'
@@ -3436,10 +3430,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
     try {
       globeEl.current.pointOfView({ lat: s.lat, lng: s.lng, altitude: 1.55 }, 900);
     } catch {}
-    const place = (s.placeLabel ?? [s.city, s.country].filter(Boolean).join(', ')) || '—';
+    const place = storyPlace(s.city, s.country, locale, s.placeLabel) || '—';
     setStoryLabelTemporary(s.title ?? '—', place, s.id);
     setCurrentChapterIndex(index);
-  }, [journey, setStoryLabelTemporary]);
+  }, [journey, setStoryLabelTemporary, locale]);
 
   const nextChapter = useCallback(() => {
     if (journey.length === 0) return;
@@ -3494,10 +3488,10 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       try {
         globeEl.current.pointOfView({ lat: first.lat, lng: first.lng, altitude: 1.55 }, 900);
       } catch {}
-      const place = (first.placeLabel ?? [first.city, first.country].filter(Boolean).join(', ')) || '—';
+      const place = storyPlace(first.city, first.country, locale, first.placeLabel) || '—';
       setStoryLabelTemporary(first.title ?? '—', place, first.id);
     }
-  }, [selectedMood, soundEnabled, playAmbient, clearTourTimer, setStoryLabelTemporary, publicStoriesMock]);
+  }, [selectedMood, soundEnabled, playAmbient, clearTourTimer, setStoryLabelTemporary, publicStoriesMock, locale]);
 
   const activateAudio = useCallback(() => {
     void playAmbient();
@@ -3672,7 +3666,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           kind: 'huella',
           id: (p as { id?: string }).id ?? '',
           title: (p as { titulo?: string }).titulo ?? 'Relato breve',
-          subtitle: [(p as { lugar?: string }).lugar, (p as { pais?: string }).pais].filter(Boolean).join(', ') || '—',
+          subtitle: [(p as { lugar?: string }).lugar, displayCountryName((p as { pais?: string }).pais, locale)].filter(Boolean).join(', ') || '—',
           lat,
           lng,
           historia: (p as { historia?: string }).historia,
@@ -3685,7 +3679,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           kind: 'music',
           id: p.id,
           title: p.label ?? 'Historia',
-          subtitle: p.placeLabel ?? ([p.city, p.country].filter(Boolean).join(', ') || '—'),
+          subtitle: storyPlace(p.city, p.country, locale, p.placeLabel) || '—',
           hasAudio: p.hasAudio,
           hasVideo: p.hasVideo,
           hasText: p.hasText,
@@ -3698,7 +3692,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           kind: 'news',
           id: item?.id ?? newsId ?? '',
           title: item?.title?.trim()?.slice(0, 60) ?? (p as { title?: string }).title?.slice(0, 60) ?? 'Noticia',
-          subtitle: item ? `${item.source ?? '—'} · ${formatTimeAgoFromNow(item.publishedAt ?? null, Date.now())}` : '—',
+          subtitle: item ? `${item.source ?? '—'} · ${formatTimeAgoFromNow(item.publishedAt ?? null, Date.now(), locale)}` : '—',
           lat,
           lng,
           url: item?.url ?? undefined });
@@ -3708,7 +3702,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           kind: 'stories',
           id: sp.id ?? '',
           title: sp.label ?? 'Historia',
-          subtitle: [sp.city, sp.country].filter(Boolean).join(', ') || '—',
+          subtitle: storyPlace(sp.city, sp.country, locale) || '—',
           hasAudio: Boolean(sp.audioUrl),
           hasVideo: Boolean(sp.videoUrl),
           hasText: Boolean(sp.body || sp.description),
@@ -3717,7 +3711,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
       }
       setHoverPos(hoverPosRef.current);
     },
-    [activeView, view, newsItems]
+    [activeView, view, newsItems, locale]
   );
 
   /** Click en objeto 3D de noticia: abre link oficial. */
@@ -3745,13 +3739,13 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         kind: 'news',
         id: item.id ?? '',
         title: (item.title ?? '').trim().slice(0, 60) || 'Noticia',
-        subtitle: `${item.source ?? '—'} · ${formatTimeAgoFromNow(item.publishedAt ?? null, Date.now())}`,
+        subtitle: `${item.source ?? '—'} · ${formatTimeAgoFromNow(item.publishedAt ?? null, Date.now(), locale)}`,
         lat,
         lng,
         url: item.url ?? undefined });
       setHoverPos(hoverPosRef.current);
     },
-    []
+    [locale]
   );
 
   /** Arcos constelación: activo (currentChapterIndex) naranja brillante, resto blanco tenue. Alpha con beatPhase. */
@@ -5097,7 +5091,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           if (!cur) return null;
           const n = newsTour.idx + 1;
           const total = newsTour.items.length;
-          const timeStr = cur.publishedAt ? formatTimeAgoFromNow(cur.publishedAt, Date.now()) : '—';
+          const timeStr = cur.publishedAt ? formatTimeAgoFromNow(cur.publishedAt, Date.now(), locale) : '—';
           return (
             <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[15] px-4 py-3 rounded-xl glassPanel text-center min-w-[200px] max-w-[min(90vw,340px)] pointer-events-auto">
               <p className="text-[length:var(--fs-etiqueta)] text-white/60 mb-1">

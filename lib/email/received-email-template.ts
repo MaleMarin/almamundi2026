@@ -5,6 +5,7 @@
 import { escapeHtml } from "@/lib/email-html";
 import { formatPublicName } from "@/lib/historias/story-ubicacion";
 import type { AlmaLocale } from "@/lib/i18n/locale";
+import { formatZonedDate } from "@/lib/i18n/site-intl";
 import {
   absoluteEmailUrl,
   authorEmailFooterNote,
@@ -64,19 +65,7 @@ export function storyFormatLabel(raw: string, locale: AlmaLocale = "es"): string
 }
 
 export function formatSubmissionDate(at: Date, locale: AlmaLocale = "es"): string {
-  const when = Number.isNaN(at.getTime()) ? new Date() : at;
-  const intl = locale === "pt" ? "pt-BR" : locale === "en" ? "en-US" : "es-CL";
-  const parts = new Intl.DateTimeFormat(intl, {
-    timeZone: "America/Santiago",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).formatToParts(when);
-  const day = parts.find((part) => part.type === "day")?.value ?? "";
-  const month = parts.find((part) => part.type === "month")?.value ?? "";
-  const year = parts.find((part) => part.type === "year")?.value ?? "";
-  if (locale === "en") return `${month} ${day}, ${year}`;
-  return `${day} de ${month} de ${year}`;
+  return formatZonedDate(at, locale, "America/Santiago");
 }
 
 function mailLocale(params: { locale?: AlmaLocale }): AlmaLocale {

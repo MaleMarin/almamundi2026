@@ -1,20 +1,15 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatSiteDate } from '@/lib/i18n/site-intl';
 
 /** Una foto por vez, Ken Burns lento, silencio entre cada una. Nombre + fecha como subtítulo (roadmap 1B). */
 const DURATION_MS = 8000;
 const KEN_BURNS_DURATION_MS = 7500;
 
-function formatDate(iso?: string): string {
-  if (!iso) return '';
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return '';
-    return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
-  } catch {
-    return '';
-  }
+function formatDate(iso: string | undefined, locale: 'es' | 'pt' | 'en'): string {
+  return formatSiteDate(iso, locale);
 }
 
 export interface PhotoStoryViewerProps {
@@ -30,6 +25,7 @@ export function PhotoStoryViewer({
   title,
   date,
   durationMs = DURATION_MS }: PhotoStoryViewerProps) {
+  const { locale } = useHomeLocale();
   const [index, setIndex] = useState(0);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -52,7 +48,7 @@ export function PhotoStoryViewer({
   }
 
   const src = images[index] ?? images[0]!;
-  const dateStr = formatDate(date);
+  const dateStr = formatDate(date, locale);
 
   return (
     <div className="rounded-2xl border border-white/10 bg-black/30 overflow-hidden min-h-[280px] flex flex-col">

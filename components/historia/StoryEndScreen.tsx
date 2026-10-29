@@ -6,6 +6,7 @@ import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -54,9 +55,9 @@ const TEXT_BODY = neu.textBody;
 const ORANGE = 'var(--almamundi-orange, #FF4A1C)';
 const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(255, 74, 28,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
 
-function formatEndFecha(raw: string | undefined): string | null {
+function formatEndFecha(raw: string | undefined, locale: AlmaLocale): string | null {
   if (!raw || !String(raw).trim()) return null;
-  const s = formatPublishedAtEsStable(String(raw));
+  const s = formatPublishedAtEsStable(String(raw), locale);
   return s === '—' ? String(raw).trim() : s;
 }
 
@@ -82,7 +83,7 @@ export function StoryEndScreen({
   storyId }: StoryEndScreenProps) {
   const { locale } = useHomeLocale();
   const copy = formatPagesCopy(locale);
-  const fechaStr = formatEndFecha(fecha);
+  const fechaStr = formatEndFecha(fecha, locale);
   const [shareOpen, setShareOpen] = useState(false);
 
   const hasTitleExtras =

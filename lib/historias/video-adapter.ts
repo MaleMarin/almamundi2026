@@ -5,6 +5,7 @@ import type { Historia } from '@/components/historia/VideoPlayer';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { defaultAvatar } from '@/lib/historias/audio-adapter';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { questionPublicFields } from '@/lib/pregunta-semana';
 
 function resolveThumbnail(s: StoryPoint): string {
@@ -26,9 +27,9 @@ function resolveThumbnail(s: StoryPoint): string {
   return placeholder;
 }
 
-export function storyToVideoHistoria(s: StoryPoint): Historia {
+export function storyToVideoHistoria(s: StoryPoint, locale: AlmaLocale = 'es'): Historia {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = storyUbicacionLabel(s);
+  const ubicacion = storyUbicacionLabel(s, locale);
   const videoUrl = (s.videoUrl ?? '').trim();
 
   return {

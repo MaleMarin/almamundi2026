@@ -1,6 +1,7 @@
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
 const PLACEHOLDER_THUMB =
@@ -15,8 +16,8 @@ function defaultAvatar(name: string): string {
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 
-function formatPlace(s: StoryPoint): string {
-  return formatPublicPlace(s.city, s.country) || formatPublicName(s.label);
+function formatPlace(s: StoryPoint, locale: AlmaLocale): string {
+  return formatPublicPlace(s.city, s.country, locale) || formatPublicName(s.label);
 }
 
 function tagsFromStory(s: StoryPoint): string[] {
@@ -30,7 +31,8 @@ function tagsFromStory(s: StoryPoint): string[] {
 
 /** Historias del mapa / API → tarjetas del carrusel exposición (Swiper). */
 export function storyPointToHistoricalExhibitionStory(
-  s: StoryPoint
+  s: StoryPoint,
+  locale: AlmaLocale = 'es'
 ): HistoricalExhibitionStory {
   const raw =
     s.imageUrl ??
@@ -47,7 +49,7 @@ export function storyPointToHistoricalExhibitionStory(
     typeof rawAvatar === 'string' && rawAvatar.trim()
       ? rawAvatar.trim()
       : defaultAvatar(name);
-  const lugar = formatPlace(s);
+  const lugar = formatPlace(s, locale);
   const cita = (s.quote ?? s.excerpt ?? s.description ?? '').trim();
   const v = (s.videoUrl ?? '').trim();
   return {
@@ -55,7 +57,7 @@ export function storyPointToHistoricalExhibitionStory(
     nombre: name,
     titulo: s.title ?? s.label ?? 'Historia',
     cita,
-    fecha: formatPublishedAtEsStable(s.publishedAt),
+    fecha: formatPublishedAtEsStable(s.publishedAt, locale),
     lugar: lugar || '',
     foto_perfil: foto,
     imagen_principal: imagen,
@@ -66,9 +68,10 @@ export function storyPointToHistoricalExhibitionStory(
 
 /** Carrusel audios: portada + enlace de audio, sin video. */
 export function storyPointToHistoricalExhibitionAudio(
-  s: StoryPoint
+  s: StoryPoint,
+  locale: AlmaLocale = 'es'
 ): HistoricalExhibitionStory {
-  const base = storyPointToHistoricalExhibitionStory(s);
+  const base = storyPointToHistoricalExhibitionStory(s, locale);
   const a = (s.audioUrl ?? '').trim();
   const tags = base.tags.filter((t) => t !== 'video');
   if (!tags.includes('audio')) tags.unshift('audio');
@@ -83,9 +86,10 @@ export function storyPointToHistoricalExhibitionAudio(
 /** Texto o foto: tarjeta sin reproductor A/V en URL (se abre lector/álbum en modal). */
 export function storyPointToHistoricalExhibitionReader(
   s: StoryPoint,
-  kind: 'texto' | 'foto'
+  kind: 'texto' | 'foto',
+  locale: AlmaLocale = 'es'
 ): HistoricalExhibitionStory {
-  const base = storyPointToHistoricalExhibitionStory(s);
+  const base = storyPointToHistoricalExhibitionStory(s, locale);
   const tag = kind === 'foto' ? 'foto' : 'texto';
   const tags = base.tags.filter((t) => t !== 'video');
   if (!tags.includes(tag)) tags.unshift(tag);

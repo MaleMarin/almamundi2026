@@ -14,6 +14,7 @@ import {
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
 import type { AlmaLocale } from "@/lib/i18n/locale";
+import { displayCountryName } from "@/lib/i18n/country-name";
 import { formatPublicPlace, formatPublicName } from "@/lib/historias/story-ubicacion";
 import { buildStoryShareChannelUrls } from "@/lib/huella/share-story-channels";
 import { publishedAuthorShareText, publishedStoryShortUrl } from "@/lib/share/published-share";
@@ -96,16 +97,16 @@ function storyTitleLine(storyTitle: string, locale: AlmaLocale): string {
   return storyTitle.replace(/[\r\n]+/g, " ").trim().slice(0, 200) || publicationCopy(locale).fallback;
 }
 
-function placeLine(placeName: string): string {
+function placeLine(placeName: string, locale: AlmaLocale): string {
   const raw = placeName.replace(/[\r\n]+/g, " ").trim();
   if (!raw || raw === "—" || raw === "-") return "";
   const comma = raw.indexOf(",");
-  if (comma === -1) return formatPublicName(raw);
-  return formatPublicPlace(raw.slice(0, comma), raw.slice(comma + 1));
+  if (comma === -1) return displayCountryName(raw, locale) || formatPublicName(raw);
+  return formatPublicPlace(raw.slice(0, comma), raw.slice(comma + 1), locale);
 }
 
 function publishedLead(title: string, place: string, locale: AlmaLocale): string {
-  return publicationCopy(locale).lead(title, placeLine(place));
+  return publicationCopy(locale).lead(title, placeLine(place, locale));
 }
 
 export function publicationEmailSubject(storyTitle: string, locale: AlmaLocale = "es"): string {
@@ -164,7 +165,7 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const locale = mailLang(params.locale);
   const copy = publicationCopy(locale);
   const authorName = escapeHtml(capitalizeAlias(params.authorName));
-  const place = placeLine(params.placeName);
+  const place = placeLine(params.placeName, locale);
   const historiasUrl = storyPublicUrl(params.shortCode);
   const title = storyTitleLine(params.storyTitle, locale);
   const share = authorShareChannels(title, place, params.shortCode, locale);

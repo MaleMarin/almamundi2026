@@ -6,6 +6,8 @@
  * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { countryMatches } from '@/lib/i18n/country-name';
 import ReactDOM from 'react-dom';
 import AudioPlayer from '@/components/historia/AudioPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
@@ -21,6 +23,7 @@ function isAudioStory(s: StoryPoint): boolean {
 }
 
 export default function HistoriasAudiosPage() {
+  const { locale } = useHomeLocale();
   const allStories = useStories();
   const [selectedForAudio, setSelectedForAudio] = useState<StoryPoint | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -50,7 +53,7 @@ export default function HistoriasAudiosPage() {
 
   const audioStories = useMemo(() => {
     return audioStoriesAll.filter((s) => {
-      if (filterCountry && (s.country || '').trim() !== filterCountry) return false;
+      if (filterCountry && !countryMatches(s.country, filterCountry)) return false;
       if (filterYear) {
         const y = yearFromPublished(s.publishedAt);
         if (String(y ?? '') !== filterYear) return false;
@@ -80,8 +83,8 @@ export default function HistoriasAudiosPage() {
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
-    () => audioStoriesForCarousel.map(storyPointToHistoricalExhibitionAudio),
-    [audioStoriesForCarousel]
+    () => audioStoriesForCarousel.map((story) => storyPointToHistoricalExhibitionAudio(story, locale)),
+    [audioStoriesForCarousel, locale]
   );
 
   const shareListResetKey = useMemo(
@@ -120,7 +123,7 @@ export default function HistoriasAudiosPage() {
     setFilterKeywords('');
   }, []);
 
-  const historiaParaPlayer = selectedForAudio ? storyToHistoriaAudio(selectedForAudio) : null;
+  const historiaParaPlayer = selectedForAudio ? storyToHistoriaAudio(selectedForAudio, locale) : null;
 
   return (
     <>

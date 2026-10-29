@@ -11,6 +11,7 @@ import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
+import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { TemaTags } from '@/components/historias/TemaTags';
 import type { AlmaLocale } from '@/lib/i18n/locale';
@@ -75,18 +76,7 @@ function aliasName(raw: string | undefined): string {
 }
 
 function whenLabel(publishedAt: string | undefined, locale: AlmaLocale): string {
-  const copy = COPY[locale];
-  if (!publishedAt) return '';
-  const date = new Date(publishedAt);
-  if (Number.isNaN(date.getTime())) return '';
-  const days = Math.floor((Date.now() - date.getTime()) / 86400000);
-  if (days <= 0) return copy.today;
-  if (days === 1) return copy.yesterday;
-  if (days < 7) return copy.days(days);
-  return date.toLocaleDateString(locale === 'en' ? 'en-US' : locale === 'pt' ? 'pt-BR' : 'es-CL', {
-    day: 'numeric',
-    month: 'long',
-  });
+  return formatStoryWhen(publishedAt, locale);
 }
 
 function storyKind(story: StoryPoint): 'video' | 'audio' | 'image' | 'text' {
@@ -107,7 +97,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
   const [shareOpen, setShareOpen] = useState(false);
 
   const kind = storyKind(story);
-  const place = formatPublicPlace(story.city, story.country);
+  const place = formatPublicPlace(story.city, story.country, locale);
   const when = whenLabel(story.publishedAt, locale);
   const kicker = [FORMAT_LABEL[locale][kind] ?? FORMAT_LABEL[locale].text, place, when]
     .filter(Boolean)

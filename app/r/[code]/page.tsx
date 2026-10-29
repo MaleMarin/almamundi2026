@@ -71,7 +71,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const locale = await requestLocale();
   const missing = locale === 'pt' ? 'Resposta' : locale === 'en' ? 'Answer' : 'Respuesta';
   const titulo = preguntaTexto(item.questionId, 'tu', locale)?.trim() || missing;
-  const place = formatPublicPlace(item.city, item.country);
+  const place = formatPublicPlace(item.city, item.country, locale);
   const description = answerPreviewDescription(locale, item.kind, place);
   const photo = item.kind === 'foto' ? publicImage(item.previewUrl) : '';
   const image = photo || SITE_OG_IMAGE;

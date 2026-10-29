@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
@@ -10,6 +12,7 @@ type Props = {
 };
 
 export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
+  const { locale } = useHomeLocale();
   const [stories, setStories] = useState<StoryPoint[]>([]);
   const [active, setActive] = useState(1);
   const [dragging, setDragging] = useState(false);
@@ -162,7 +165,7 @@ export function RelatedCarousel({ currentStoryId, onSelect }: Props) {
                       margin: '0 0 4px',
                       fontFamily: SITE_FONT_STACK }}
                   >
-                    {[s.city, s.country].filter(Boolean).join(', ')}
+                    {formatPublicPlace(s.city, s.country, locale)}
                   </p>
 
                   <p

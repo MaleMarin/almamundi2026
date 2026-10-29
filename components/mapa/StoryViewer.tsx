@@ -403,7 +403,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
         ? 'photos'
         : 'text';
   const formatKey = format === 'photos' ? 'image' : format;
-  const place = formatPublicPlace(story.city, story.country);
+  const place = formatPublicPlace(story.city, story.country, locale);
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
   const alias = formatPublicName(story.authorName || story.author?.name);

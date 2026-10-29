@@ -1,39 +1,17 @@
 /**
- * Fecha en español idéntica en SSR (Node) y en el cliente.
- * `toLocaleDateString` difiere entre entornos y rompe la hidratación de React.
+ * Fecha de publicación idéntica en SSR y en el cliente.
+ * El día sale del calendario ISO, con `timeZone: 'UTC'`, para no depender del huso.
  */
 
-const MONTHS_ES = [
-  'enero',
-  'febrero',
-  'marzo',
-  'abril',
-  'mayo',
-  'junio',
-  'julio',
-  'agosto',
-  'septiembre',
-  'octubre',
-  'noviembre',
-  'diciembre',
-] as const;
+import type { AlmaLocale } from '@/lib/i18n/locale';
+import { formatSiteDate } from '@/lib/i18n/site-intl';
 
 /**
  * @returns Texto tipo «15 de marzo de 2024», o cadena vacía si no es parseable.
  */
-export function formatPublishedAtEsStable(iso: string | undefined): string {
-  if (!iso || iso.trim() === '—' || iso.trim() === '-') return '';
-  const trimmed = iso.trim();
-  const cal = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})/);
-  if (cal) {
-    const year = Number(cal[1]);
-    const monthIdx = parseInt(cal[2], 10) - 1;
-    const day = parseInt(cal[3], 10);
-    if (monthIdx >= 0 && monthIdx < 12 && day >= 1 && day <= 31) {
-      return `${day} de ${MONTHS_ES[monthIdx]} de ${year}`;
-    }
-  }
-  const d = new Date(trimmed);
-  if (Number.isNaN(d.getTime())) return '';
-  return `${d.getUTCDate()} de ${MONTHS_ES[d.getUTCMonth()]} de ${d.getUTCFullYear()}`;
+export function formatPublishedAtEsStable(
+  iso: string | undefined,
+  locale: AlmaLocale = 'es'
+): string {
+  return formatSiteDate(iso, locale);
 }

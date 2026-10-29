@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useMemo, useEffect, useCallback } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { Headphones, Video, FileText } from 'lucide-react';
 import { AudioEmotionVisualizer } from '@/components/mapa/AudioEmotionVisualizer';
@@ -89,6 +91,7 @@ function useSpeakText(text: string, onEmotionChange?: (v: EmotionVisual) => void
 }
 
 export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryProps) {
+  const { locale } = useHomeLocale();
   const defaultTab = useMemo(() => defaultTabId(story), [story]);
   const [tab, setTab] = useState<TabId>(defaultTab);
   const textBody = story.body || story.description || '';
@@ -100,7 +103,7 @@ export function StoryObservatory({ story, onEmotionChange }: StoryObservatoryPro
     }
   }, [tab, onEmotionChange]);
 
-  const location = [story.city, story.country].filter(Boolean).join(', ');
+  const location = formatPublicPlace(story.city, story.country, locale);
   const hasPhotos = (story.images?.length ?? 0) > 0 || Boolean(story.imageUrl);
   const hasAudio = story.hasAudio ?? Boolean(story.audioUrl);
   const hasVideo = story.hasVideo ?? Boolean(story.videoUrl);

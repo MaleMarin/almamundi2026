@@ -6,6 +6,8 @@
  * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { countryMatches } from '@/lib/i18n/country-name';
 import ReactDOM from 'react-dom';
 import VideoPlayer, { type Historia } from '@/components/historia/VideoPlayer';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
@@ -21,6 +23,7 @@ function isVideoStory(s: StoryPoint): boolean {
 }
 
 export default function HistoriasVideosPage() {
+  const { locale } = useHomeLocale();
   const allStories = useStories();
   const [activeVideo, setActiveVideo] = useState<Historia | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -50,7 +53,7 @@ export default function HistoriasVideosPage() {
 
   const videoStories = useMemo(() => {
     return videoStoriesAll.filter((s) => {
-      if (filterCountry && (s.country || '').trim() !== filterCountry) return false;
+      if (filterCountry && !countryMatches(s.country, filterCountry)) return false;
       if (filterYear) {
         const y = yearFromPublished(s.publishedAt);
         if (String(y ?? '') !== filterYear) return false;
@@ -80,8 +83,8 @@ export default function HistoriasVideosPage() {
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
-    () => videoStoriesForCarousel.map(storyPointToHistoricalExhibitionStory),
-    [videoStoriesForCarousel]
+    () => videoStoriesForCarousel.map((story) => storyPointToHistoricalExhibitionStory(story, locale)),
+    [videoStoriesForCarousel, locale]
   );
 
   const shareListResetKey = useMemo(
@@ -109,9 +112,9 @@ export default function HistoriasVideosPage() {
     (index: number) => {
       const s = videoStoriesForCarousel[index];
       if (!s?.videoUrl?.trim()) return;
-      setActiveVideo(storyToVideoHistoria(s));
+      setActiveVideo(storyToVideoHistoria(s, locale));
     },
-    [videoStoriesForCarousel]
+    [videoStoriesForCarousel, locale]
   );
 
   const clearFilters = useCallback(() => {

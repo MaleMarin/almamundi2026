@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { storyReaderPath } from '@/lib/historias/story-json-ld';
 import { neu } from '@/lib/historias-neumorph';
@@ -30,10 +31,10 @@ function formatLabel(format: string, copy: FormatPagesCopy): string {
   return copy.formatStory;
 }
 
-function authorAndDateLine(label: string, publishedAt: string | null, anonymous: string): string {
+function authorAndDateLine(label: string, publishedAt: string | null, anonymous: string, locale: AlmaLocale): string {
   const name = formatPublicName(label) || anonymous;
   if (!publishedAt) return name;
-  const date = formatPublishedAtEsStable(publishedAt);
+  const date = formatPublishedAtEsStable(publishedAt, locale);
   if (!date || date === '—') return name;
   return `${name} · ${date}`;
 }
@@ -146,14 +147,14 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 {truncateAtWord(s.description, 80)}
               </p>
             )}
-            {formatPublicPlace(s.city, s.country) ? (
+            {formatPublicPlace(s.city, s.country, locale) ? (
             <p
               style={{
                 fontSize: 'var(--fs-etiqueta)',
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: 0 }}
             >
-              {formatPublicPlace(s.city, s.country)}
+              {formatPublicPlace(s.city, s.country, locale)}
             </p>
             ) : null}
             <p
@@ -162,7 +163,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 color: light ? neu.textBody : 'rgba(255,255,255,0.25)',
                 margin: '4px 0 0' }}
             >
-              {authorAndDateLine(s.label, s.publishedAt ?? null, copy.anonymous)}
+              {authorAndDateLine(s.label, s.publishedAt ?? null, copy.anonymous, locale)}
             </p>
           </Link>
         ))}

@@ -6,6 +6,8 @@
  * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { countryMatches } from '@/lib/i18n/country-name';
 import ReactDOM from 'react-dom';
 import TextoReader, { type HistoriaTexto } from '@/components/historia/TextoReader';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
@@ -21,6 +23,7 @@ function isTextStory(s: StoryPoint): boolean {
 }
 
 export default function HistoriasEscritoPage() {
+  const { locale } = useHomeLocale();
   const allStories = useStories();
   const [textoOpen, setTextoOpen] = useState<HistoriaTexto | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -50,7 +53,7 @@ export default function HistoriasEscritoPage() {
 
   const textStories = useMemo(() => {
     return textStoriesAll.filter((s) => {
-      if (filterCountry && (s.country || '').trim() !== filterCountry) return false;
+      if (filterCountry && !countryMatches(s.country, filterCountry)) return false;
       if (filterYear) {
         const y = yearFromPublished(s.publishedAt);
         if (String(y ?? '') !== filterYear) return false;
@@ -80,8 +83,8 @@ export default function HistoriasEscritoPage() {
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
-    () => textStoriesForCarousel.map((s) => storyPointToHistoricalExhibitionReader(s, 'texto')),
-    [textStoriesForCarousel]
+    () => textStoriesForCarousel.map((s) => storyPointToHistoricalExhibitionReader(s, 'texto', locale)),
+    [textStoriesForCarousel, locale]
   );
 
   const shareListResetKey = useMemo(
@@ -109,10 +112,10 @@ export default function HistoriasEscritoPage() {
     (index: number) => {
       const s = textStoriesForCarousel[index];
       if (!s) return;
-      const h = storyPointToHistoriaTextoModal(s);
+      const h = storyPointToHistoriaTextoModal(s, locale);
       if (h) setTextoOpen(h);
     },
-    [textStoriesForCarousel]
+    [textStoriesForCarousel, locale]
   );
 
   const clearFilters = useCallback(() => {

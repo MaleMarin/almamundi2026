@@ -7,6 +7,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { mapChrome } from '@/lib/i18n/map-chrome';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
+import { formatRelativeTime } from '@/lib/i18n/site-intl';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
 export type StoriesPanelProps = {
@@ -37,16 +38,6 @@ function formatStoryType(s: StoryPoint): string {
   return 'texto';
 }
 
-function timeAgo(publishedAt: string | undefined): string {
-  if (!publishedAt) return '';
-  const diff = Date.now() - new Date(publishedAt).getTime();
-  const mins = Math.floor(diff / 60000);
-  if (mins < 60) return `hace ${mins}m`;
-  const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `hace ${hrs}h`;
-  return `hace ${Math.floor(hrs / 24)}d`;
-}
-
 function StoryRow({
   story,
   isActive,
@@ -55,8 +46,9 @@ function StoryRow({
   isActive: boolean;
   onClick: () => void;
 }) {
+  const { locale } = useHomeLocale();
   const tipo = formatStoryType(story);
-  const ago = timeAgo(story.publishedAt);
+  const ago = formatRelativeTime(story.publishedAt, Date.now(), locale);
   const cardShell = {
     borderRadius: 16,
     background: isActive
@@ -100,7 +92,7 @@ function StoryRow({
       </p>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
         <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)' }}>
-          {formatPublicPlace(story.city, story.country)}
+          {formatPublicPlace(story.city, story.country, locale)}
         </span>
         <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           {tipo}

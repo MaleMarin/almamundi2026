@@ -6,6 +6,8 @@
  * Hero y filtros centrados (max-w-5xl); carrusel a ancho completo. Espaciado y alto del carrusel viven en ese layout.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { countryMatches } from '@/lib/i18n/country-name';
 import ReactDOM from 'react-dom';
 import FotoAlbum, { type HistoriaFoto } from '@/components/historia/FotoAlbum';
 import { HistoriasFormatListPageLayout } from '@/components/historias/HistoriasFormatListPageLayout';
@@ -22,6 +24,7 @@ function isPhotoStory(s: StoryPoint): boolean {
 }
 
 export default function HistoriasFotosPage() {
+  const { locale } = useHomeLocale();
   const allStories = useStories();
   const [fotoOpen, setFotoOpen] = useState<HistoriaFoto | null>(null);
   const [mounted, setMounted] = useState(false);
@@ -51,7 +54,7 @@ export default function HistoriasFotosPage() {
 
   const photoStories = useMemo(() => {
     return photoStoriesAll.filter((s) => {
-      if (filterCountry && (s.country || '').trim() !== filterCountry) return false;
+      if (filterCountry && !countryMatches(s.country, filterCountry)) return false;
       if (filterYear) {
         const y = yearFromPublished(s.publishedAt);
         if (String(y ?? '') !== filterYear) return false;
@@ -81,8 +84,8 @@ export default function HistoriasFotosPage() {
   }, [filterCountry, filterYear, filterKeywords]);
 
   const exhibitionHistorias = useMemo(
-    () => photoStoriesForCarousel.map((s) => storyPointToHistoricalExhibitionReader(s, 'foto')),
-    [photoStoriesForCarousel]
+    () => photoStoriesForCarousel.map((s) => storyPointToHistoricalExhibitionReader(s, 'foto', locale)),
+    [photoStoriesForCarousel, locale]
   );
 
   const shareListResetKey = useMemo(
@@ -110,10 +113,10 @@ export default function HistoriasFotosPage() {
     (index: number) => {
       const s = photoStoriesForCarousel[index];
       if (!s) return;
-      const h = storyPointToHistoriaFotoModal(s);
+      const h = storyPointToHistoriaFotoModal(s, locale);
       if (h) setFotoOpen(h);
     },
-    [photoStoriesForCarousel]
+    [photoStoriesForCarousel, locale]
   );
 
   const clearFilters = useCallback(() => {

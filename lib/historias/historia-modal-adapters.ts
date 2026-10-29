@@ -6,6 +6,7 @@ import type { HistoriaFoto } from '@/components/historia/FotoAlbum';
 import type { HistoriaTexto } from '@/components/historia/TextoReader';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { storyUbicacionLabel } from '@/lib/historias/story-ubicacion';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { questionPublicFields } from '@/lib/pregunta-semana';
 
 function defaultAvatar(name: string): string {
@@ -28,7 +29,7 @@ export function buildImagenesFromStory(s: StoryPoint): { url: string; caption?: 
   return [];
 }
 
-export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | null {
+export function storyPointToHistoriaTextoModal(s: StoryPoint, locale: AlmaLocale = 'es'): HistoriaTexto | null {
   const contenido = (
     s.body ??
     (s as StoryPoint & { content?: string }).content ??
@@ -36,7 +37,7 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
   ).trim();
   if (!contenido) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = storyUbicacionLabel(s);
+  const ubicacion = storyUbicacionLabel(s, locale);
   const wordCount = contenido.split(/\s+/).filter(Boolean).length;
   const tiempoLectura = Math.ceil(wordCount / 200);
   return {
@@ -61,11 +62,11 @@ export function storyPointToHistoriaTextoModal(s: StoryPoint): HistoriaTexto | n
   };
 }
 
-export function storyPointToHistoriaFotoModal(s: StoryPoint): HistoriaFoto | null {
+export function storyPointToHistoriaFotoModal(s: StoryPoint, locale: AlmaLocale = 'es'): HistoriaFoto | null {
   const imagenes = buildImagenesFromStory(s);
   if (imagenes.length === 0) return null;
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = storyUbicacionLabel(s);
+  const ubicacion = storyUbicacionLabel(s, locale);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',

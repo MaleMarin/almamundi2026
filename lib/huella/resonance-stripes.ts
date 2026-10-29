@@ -5,6 +5,7 @@
 
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { canvasFontFamily } from '@/lib/typography';
+import { displayCountryName } from '@/lib/i18n/country-name';
 import { formatLongDate } from '@/lib/i18n/locale';
 import { seedFn, seededRnd } from '@/lib/huella/huellaV2';
 import { hitsFromText, type LexiconHit } from '@/lib/huella/almamundi-lexicon';
@@ -140,7 +141,8 @@ function drawResonancePieceFooter(
   const m = footerMetrics(W, Boolean(title));
   const maxW = W - m.padX * 2;
   const city = displayInitialCapital(footer.city ?? '', footer.locale);
-  const place = [city, footer.country?.trim()].filter(Boolean).join(', ');
+  const country = displayCountryName(footer.country, footer.locale);
+  const place = [city, country].filter(Boolean).join(', ');
   const date = formatLongDate(footer.at, footer.locale);
   const meta = place ? `${place} · ${date}` : date;
 

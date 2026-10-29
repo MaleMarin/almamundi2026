@@ -8,6 +8,9 @@ import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink
 import { useMemo } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { formatStoryWhen } from '@/lib/i18n/site-intl';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { useStories } from '@/hooks/useStories';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { SITE_NAV_PILL_LINK_CLASS } from '@/components/layout/siteNavLinkStyles';
@@ -24,25 +27,12 @@ function normalizeTema(t: string | undefined): string {
     .replace(/[^a-z0-9-]/g, '');
 }
 
-function formatPlace(s: StoryPoint): string {
-  const joined = [s.city, s.country].filter(Boolean).join(', ');
+function formatPlace(s: StoryPoint, locale: 'es' | 'pt' | 'en'): string {
+  const joined = formatPublicPlace(s.city, s.country, locale);
   if (joined) return joined;
   const label = (s.label ?? '').trim();
   if (!label || label === '—' || label === '-') return '';
   return label;
-}
-
-function timeAgo(publishedAt: string | undefined): string {
-  if (!publishedAt) return '';
-  const d = new Date(publishedAt);
-  const now = new Date();
-  const diff = now.getTime() - d.getTime();
-  const days = Math.floor(diff / 86400000);
-  if (days === 0) return 'hoy';
-  if (days === 1) return 'ayer';
-  if (days < 7) return `hace ${days} días`;
-  if (days < 14) return 'hace 1 semana';
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
 }
 
 function getFormat(s: StoryPoint): 'video' | 'audio' | 'text' | 'photo' {
@@ -53,6 +43,7 @@ function getFormat(s: StoryPoint): 'video' | 'audio' | 'text' | 'photo' {
 }
 
 export default function TemaPage() {
+  const { locale } = useHomeLocale();
   const params = useParams();
   const slug = (params?.tema as string) ?? '';
   const tema = getTemaBySlug(slug);
@@ -123,16 +114,16 @@ export default function TemaPage() {
               >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    {formatPlace(s) ? (
-                      <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-amber-700 mb-1 tracking-[0.12em]">{formatPlace(s)}</div>
+                    {formatPlace(s, locale) ? (
+                      <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-amber-700 mb-1 tracking-[0.12em]">{formatPlace(s, locale)}</div>
                     ) : null}
                     <h2 className="text-[length:var(--fs-texto)] font-semibold text-gray-800 line-clamp-2">{s.title || 'Sin título'}</h2>
                     {s.description && <p className="text-[length:var(--fs-pequeno)] text-gray-600 line-clamp-1 mt-1">{s.description}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <span className="text-[length:var(--fs-etiqueta)] text-gray-500 capitalize">{getFormat(s)}</span>
-                    {timeAgo(s.publishedAt) ? (
-                      <span className="text-[length:var(--fs-etiqueta)] text-gray-400">{timeAgo(s.publishedAt)}</span>
+                    {formatStoryWhen(s.publishedAt, locale) ? (
+                      <span className="text-[length:var(--fs-etiqueta)] text-gray-400">{formatStoryWhen(s.publishedAt, locale)}</span>
                     ) : null}
                   </div>
                 </div>

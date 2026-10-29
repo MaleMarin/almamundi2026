@@ -1,3 +1,4 @@
+import { displayCountryName } from '@/lib/i18n/country-name';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { temasSearchText } from '@/lib/temas';
 
@@ -36,6 +37,9 @@ export function haystackForStory(s: StoryPoint): string {
     s.label,
     s.city,
     s.country,
+    displayCountryName(s.country, 'es'),
+    displayCountryName(s.country, 'pt'),
+    displayCountryName(s.country, 'en'),
     s.authorName,
     s.author?.name,
     temasSearchText(s.temas),

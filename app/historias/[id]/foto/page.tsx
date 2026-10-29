@@ -3,7 +3,9 @@
  * Server component: historia inexistente → HTTP 404; sin imágenes → redirige al detalle.
  */
 import type { Metadata } from 'next';
+import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { ALMA_LOCALE_COOKIE, parseAlmaLocale, type AlmaLocale } from '@/lib/i18n/locale';
 import { requirePublicStory } from '@/lib/historias/require-public-story';
 import { buildHistoriaStoryMetadata } from '@/lib/historias/story-page-metadata';
 import { StoryJsonLd } from '@/components/historia/StoryJsonLd';
@@ -32,9 +34,9 @@ function buildImagenes(s: StoryPoint): { url: string; caption?: string; descripc
   return [];
 }
 
-function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string; descripcion?: string }[]): HistoriaFoto {
+function storyToHistoriaFoto(s: StoryPoint, imagenes: { url: string; caption?: string; descripcion?: string }[], locale: AlmaLocale): HistoriaFoto {
   const nombre = s.authorName ?? s.author?.name ?? 'Anónimo';
-  const ubicacion = storyUbicacionLabel(s);
+  const ubicacion = storyUbicacionLabel(s, locale);
   return {
     id: s.id,
     titulo: s.title ?? s.label ?? 'Sin título',
@@ -62,7 +64,8 @@ export default async function HistoriasIdFotoPage({ params }: PageProps) {
   const story = await requirePublicStory(id);
   const imagenes = buildImagenes(story);
   if (imagenes.length === 0) redirect(`/historias/${id}`);
-  const historia = storyToHistoriaFoto(story, imagenes);
+  const locale = parseAlmaLocale((await cookies()).get(ALMA_LOCALE_COOKIE)?.value);
+  const historia = storyToHistoriaFoto(story, imagenes, locale);
   return (
     <>
       <StoryJsonLd id={id} />

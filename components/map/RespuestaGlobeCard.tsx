@@ -30,7 +30,7 @@ export function RespuestaGlobeCard({
   const [moreBelow, setMoreBelow] = useState(false);
   const pregunta = preguntaPorId(item.questionId);
   const question = preguntaTexto(item.questionId, 'tu', locale);
-  const place = formatPublicPlace(item.city, item.country);
+  const place = formatPublicPlace(item.city, item.country, locale);
   const kicker = [KIND_LABEL[locale], pregunta?.tema[locale], place].filter(Boolean).join(' · ');
   const alias = preguntaAlias(item.alias);
 

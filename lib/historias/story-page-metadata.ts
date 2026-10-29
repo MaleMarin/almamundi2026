@@ -110,7 +110,7 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
   const description = publishedStoryPreviewDescription(
     locale,
     format,
-    formatPublicPlace(story.city, story.country)
+    formatPublicPlace(story.city, story.country, locale)
   );
   const image = ogImageForStory(story, titulo, format);
 

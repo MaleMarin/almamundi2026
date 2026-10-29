@@ -1,3 +1,5 @@
+import { displayCountryName } from '@/lib/i18n/country-name';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { foldText } from '@/lib/historias/story-filter-helpers';
 
 const SMALL_WORDS = new Set(['de', 'del', 'la', 'las', 'los', 'y', 'e', 'da', 'do', 'das', 'dos']);
@@ -46,9 +48,17 @@ function cityWithoutTrailingCountry(city: string, country: string): string {
 }
 
 /** Ciudad y país con mayúscula inicial, sin repetir el país si la ciudad ya lo incluye. */
-export function formatPublicPlace(city?: string | null, country?: string | null): string {
+export function formatPublicPlace(
+  city?: string | null,
+  country?: string | null,
+  locale?: AlmaLocale
+): string {
   const parts = publicCityCountry(city, country);
-  return [parts.city, parts.country].filter(Boolean).join(', ');
+  const countryLabel =
+    locale && (country ?? '').trim() && parts.country
+      ? displayCountryName(country, locale)
+      : parts.country;
+  return [parts.city, countryLabel].filter(Boolean).join(', ');
 }
 
 export function publicCityCountry(
@@ -70,7 +80,10 @@ export function publicCityCountry(
 }
 
 /** Lugar público: ciudad y país, sin repetir el país. */
-export function storyUbicacionLabel(s: { city?: string; country?: string }): string | undefined {
-  const label = formatPublicPlace(s.city, s.country);
+export function storyUbicacionLabel(
+  s: { city?: string; country?: string },
+  locale?: AlmaLocale
+): string | undefined {
+  const label = formatPublicPlace(s.city, s.country, locale);
   return label || undefined;
 }

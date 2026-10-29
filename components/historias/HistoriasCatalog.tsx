@@ -7,6 +7,8 @@ import { AlignLeft, Headphones, Image as ImageIcon, Video } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
 import { EJES, ejeDeTema, getEje } from '@/lib/temas';
+import { countryCodeFromStored, countryMatches, displayCountryName } from '@/lib/i18n/country-name';
+import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -99,10 +101,7 @@ function publishedTime(iso: string | undefined): number {
 }
 
 function formatDate(iso: string | undefined, locale: 'es' | 'pt' | 'en'): string {
-  const time = publishedTime(iso);
-  if (!time) return '';
-  const tag = locale === 'en' ? 'en-US' : locale === 'pt' ? 'pt-BR' : 'es-CL';
-  return new Date(time).toLocaleDateString(tag, { day: 'numeric', month: 'long', year: 'numeric' });
+  return formatStoryWhen(iso, locale);
 }
 
 function FormatMark({ kind }: { kind: FormatKey }) {
@@ -123,7 +122,7 @@ function StoryCard({
 }) {
   const image = cardImage(story);
   const alias = formatPublicName(story.authorName || story.author?.name);
-  const place = formatPublicPlace(story.city, story.country);
+  const place = formatPublicPlace(story.city, story.country, locale);
   const who = alias ? `${copy.by} ${alias}` : '';
   const byline = [who, place].filter(Boolean).join(' · ');
   const when = formatDate(story.publishedAt, locale);
@@ -206,18 +205,28 @@ export default function HistoriasCatalog() {
   }, [stories, featuredIds, tab]);
 
   const countries = useMemo(() => {
-    const names = new Set<string>();
+    const byCode = new Map<string, { code: string; name: string }>();
+    const loose = new Map<string, { code: string; name: string }>();
     for (const story of inTab) {
-      const name = (story.country ?? '').trim();
-      if (name) names.add(name);
+      const raw = (story.country ?? '').trim();
+      if (!raw) continue;
+      const code = countryCodeFromStored(raw);
+      if (code) {
+        if (!byCode.has(code)) byCode.set(code, { code, name: displayCountryName(raw, locale) });
+      } else if (!loose.has(raw)) {
+        loose.set(raw, { code: raw, name: raw });
+      }
     }
-    return [...names].sort((a, b) => a.localeCompare(b, locale === 'en' ? 'en' : locale === 'pt' ? 'pt' : 'es'));
+    const tag = locale === 'en' ? 'en' : locale === 'pt' ? 'pt-BR' : 'es';
+    return [...byCode.values(), ...loose.values()].sort((a, b) =>
+      a.name.localeCompare(b.name, tag, { sensitivity: 'base' })
+    );
   }, [inTab, locale]);
 
   const filtered = useMemo(() => {
     const q = foldText(query.trim());
     const rows = inTab.filter((story) => {
-      if (country && (story.country ?? '').trim() !== country) return false;
+      if (country && !countryMatches(story.country, country)) return false;
       if (eje) {
         const onAxis =
           (story.ejes ?? []).includes(eje) ||
@@ -300,9 +309,9 @@ export default function HistoriasCatalog() {
             className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
           >
             <option value="">{copy.allCountries}</option>
-            {countries.map((name) => (
-              <option key={name} value={name}>
-                {name}
+            {countries.map((item) => (
+              <option key={item.code} value={item.code}>
+                {item.name}
               </option>
             ))}
           </select>
