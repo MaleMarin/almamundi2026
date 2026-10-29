@@ -4,7 +4,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { PREGUNTA_UI, preguntaPageHref, preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
@@ -32,7 +32,6 @@ export function RespuestaGlobeCard({
   const place = formatPublicPlace(item.city, item.country);
   const kicker = [KIND_LABEL[locale], pregunta?.tema[locale], place].filter(Boolean).join(' · ');
   const alias = preguntaAlias(item.alias);
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/pregunta/${item.questionId}` : '';
 
   useLayoutEffect(() => {
     const panel = panelRef.current;
@@ -239,15 +238,12 @@ export function RespuestaGlobeCard({
   return (
     <>
       {target instanceof HTMLElement ? createPortal(panel, target) : panel}
-      <EthicalShareFlow
+      <ShareAfterNotice
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        authorName={alias || item.alias}
-        storyTitle={question || kicker}
-        quote={item.contenido}
-        imageUrl={item.kind === 'foto' ? item.previewUrl ?? '' : ''}
-        shareUrl={shareUrl}
-        exhibitionLabel={KIND_LABEL[locale]}
+        kind="question"
+        questionId={item.questionId}
+        question={question ?? ''}
       />
     </>
   );

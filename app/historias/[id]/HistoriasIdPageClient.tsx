@@ -7,7 +7,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
@@ -148,7 +148,6 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
   const photos = (story.imagenes ?? []).map((item) => item.url).filter(Boolean);
   const image = story.imageUrl || photos[0] || '';
   const morePlace = formatPublicPlace(undefined, story.country) || place;
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/historias/${story.id}` : '';
 
   return (
     <main className={historiasInterior.mainClassName} style={{ backgroundColor: neu.bg, fontFamily: neu.APP_FONT }}>
@@ -278,15 +277,13 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
           </div>
         </section>
       </div>
-      <EthicalShareFlow
+      <ShareAfterNotice
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        authorName={alias || story.title || 'AlmaMundi'}
-        storyTitle={story.title || ''}
-        quote={story.quote ?? story.excerpt ?? ''}
-        imageUrl={image}
-        shareUrl={shareUrl}
-        exhibitionLabel={FORMAT_LABEL[locale][kind] ?? 'AlmaMundi'}
+        kind="story"
+        storyId={story.id}
+        title={story.title || ''}
+        city={story.city ?? ''}
       />
     </main>
   );

@@ -10,7 +10,7 @@ import { incrementStoriesRead, shouldShowMomentoJusto, markMomentoJustoShown } f
 import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -1014,35 +1014,13 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             {compact && moreBelow ? <div className="story-map-panel__more" aria-hidden /> : null}
           </div>
 
-          <EthicalShareFlow
+          <ShareAfterNotice
             open={shareOpen}
             onClose={() => setShareOpen(false)}
-            authorName={story.label}
-            storyTitle={story.title ?? story.label}
-            quote={story.quote ?? story.excerpt ?? ''}
-            imageUrl={story.imageUrl ?? photos[0]?.url ?? ''}
-            shareUrl={
-              typeof window !== 'undefined' && story.id
-                ? `${window.location.origin}/historias/${story.id}/${
-                    format === 'video'
-                      ? 'video'
-                      : format === 'audio'
-                        ? 'audio'
-                        : format === 'photos'
-                          ? 'foto'
-                          : 'texto'
-                  }`
-                : ''
-            }
-            exhibitionLabel={
-              format === 'video'
-                ? 'Video'
-                : format === 'audio'
-                  ? 'Audio'
-                  : format === 'photos'
-                    ? 'Fotografías'
-                    : 'Escrito'
-            }
+            kind="story"
+            storyId={story.id ?? ''}
+            title={story.title ?? story.label}
+            city={story.city ?? ''}
           />
         </div>
       </div>

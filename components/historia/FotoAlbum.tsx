@@ -2,7 +2,7 @@
 
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 import { neu } from '@/lib/historias-neumorph';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
@@ -564,19 +564,13 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
           </div>
         )}
       </div>
-      <EthicalShareFlow
+      <ShareAfterNotice
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        authorName={historia.autor.nombre}
-        storyTitle={historia.titulo}
-        quote={historia.subtitulo ?? ''}
-        imageUrl={historia.imagenes[0]?.url ?? historia.autor.avatar}
-        shareUrl={
-          typeof window !== 'undefined'
-            ? `${window.location.origin}/historias/${historia.id}/foto`
-            : ''
-        }
-        exhibitionLabel="Fotografías"
+        kind="story"
+        storyId={historia.id}
+        title={historia.titulo}
+        city={historia.autor.ubicacion ?? ''}
       />
     </>
   );

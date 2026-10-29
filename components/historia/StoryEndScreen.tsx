@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type CSSProperties } from 'react';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { HistoriaCreditos } from '@/components/historia/HistoriaCreditos';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
 import { neu } from '@/lib/historias-neumorph';
@@ -46,18 +46,6 @@ export type StoryEndScreenProps = {
   /** Id de la historia actual: muestra 2–3 relatos de tono cercano al final. */
   storyId?: string;
 };
-
-const FORMATO_TO_ROUTE: Record<StoryEndShareFormat, string> = {
-  video: 'video',
-  audio: 'audio',
-  escrito: 'texto',
-  foto: 'foto' };
-
-const FORMATO_TO_LABEL: Record<StoryEndShareFormat, string> = {
-  video: 'Video',
-  audio: 'Audio',
-  escrito: 'Escrito',
-  foto: 'Fotografías' };
 
 const TEXT_TITLE = neu.textMain;
 const TEXT_BODY = neu.textBody;
@@ -358,19 +346,13 @@ export function StoryEndScreen({
       </div>
 
       {share ? (
-        <EthicalShareFlow
+        <ShareAfterNotice
           open={shareOpen}
           onClose={() => setShareOpen(false)}
-          authorName={autor.nombre}
-          storyTitle={titulo}
-          quote={citaDestacada ?? subtitulo ?? ''}
-          imageUrl={share.imageUrl ?? thumbnailUrl ?? autor.avatar}
-          shareUrl={
-            typeof window !== 'undefined'
-              ? `${window.location.origin}/historias/${share.storyId}/${FORMATO_TO_ROUTE[share.formato]}`
-              : ''
-          }
-          exhibitionLabel={FORMATO_TO_LABEL[share.formato]}
+          kind="story"
+          storyId={share.storyId}
+          title={titulo}
+          city={autor.ubicacion ?? ''}
         />
       ) : null}
 

@@ -108,11 +108,6 @@ export default function HistoriasVideosPage() {
       Math.min(shareSlideIndex, Math.max(0, exhibitionHistorias.length - 1))
     ] ?? null;
 
-  const shareUrlForFlow = useMemo(() => {
-    if (typeof window === 'undefined' || !shareTarget) return '';
-    return `${window.location.origin}/historias/${shareTarget.id}/video`;
-  }, [shareTarget]);
-
   const openVideo = useCallback(
     (index: number) => {
       const s = videoStoriesForCarousel[index];
@@ -147,7 +142,6 @@ export default function HistoriasVideosPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        shareUrlForFlow={shareUrlForFlow}
         expoLabel={historiasListFormatExpoLabel.video}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}

@@ -28,7 +28,8 @@ import 'swiper/css/effect-coverflow';
 
 import type { HistoricalExhibitionStory } from '@/lib/historias/historical-exhibition-story-types';
 
-import { EthicalShareFlow, EthicalShareTriggerButton } from './EthicalShareFlow';
+import { EthicalShareTriggerButton } from './EthicalShareTrigger';
+import { ShareAfterNotice } from './ShareAfterNotice';
 import { ResonanceMailbox } from './ResonanceMailbox';
 
 export type ExhibitionContentMode = 'video' | 'audio' | 'texto' | 'foto';
@@ -78,13 +79,6 @@ const HALL_DEFAULT_IMAGE =
   encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 9"><rect fill="#0c0e16" width="16" height="9"/></svg>'
   );
-
-function segmentForMode(mode: ExhibitionContentMode): string {
-  if (mode === 'audio') return 'audio';
-  if (mode === 'texto') return 'texto';
-  if (mode === 'foto') return 'foto';
-  return 'video';
-}
 
 function canOpenPrimary(
   h: HistoricalExhibitionStory,
@@ -207,14 +201,6 @@ export function HistoricalExhibitionCarousel({
     if (!active) return '';
     return [active.fecha, active.lugar].filter(Boolean).join(' · ');
   }, [active]);
-
-  const shareUrl = useCallback(() => {
-    if (typeof window === 'undefined') return '';
-    const origin = window.location.origin;
-    if (active?.id)
-      return `${origin}/historias/${active.id}/${segmentForMode(contentMode)}`;
-    return window.location.href;
-  }, [active, contentMode]);
 
   const shellClass = embedded
     ? isLightHall
@@ -757,17 +743,14 @@ export function HistoricalExhibitionCarousel({
       </div>
 
       {shareInGalleryChrome && active ? (
-        <EthicalShareFlow
+        <ShareAfterNotice
           key={active.id}
           open={ethicalShareOpen}
           onClose={() => setEthicalShareOpen(false)}
-          authorName={active.nombre}
-          storyTitle={active.titulo}
-          quote={active.cita}
-          imageUrl={active.imagen_principal}
-          shareUrl={shareUrl()}
-          exhibitionLabel={tituloExposicion}
-          themeTag={active.tags[0] ?? 'resiliencia'}
+          kind="story"
+          storyId={active.id}
+          title={active.titulo}
+          city={active.lugar}
         />
       ) : null}
     </div>

@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Image as ImageIcon, Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { StoryShareMenu } from '@/components/home/StoryShareMenu';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
-import { PREGUNTA_COPY, preguntaShareText, preguntaThanksTitle } from '@/lib/i18n/pregunta-messages';
+import { PREGUNTA_COPY, preguntaThanksTitle } from '@/lib/i18n/pregunta-messages';
 import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
@@ -103,9 +103,6 @@ function PreguntaFormInner({
   const [saving, setSaving] = useState(false);
   const [sentAlias, setSentAlias] = useState<string | null>(null);
   const [shareOpen, setShareOpen] = useState(false);
-  const [shareUrl, setShareUrl] = useState('');
-  const [shareNotice, setShareNotice] = useState('');
-  const [shareFallback, setShareFallback] = useState<string | null>(null);
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(getTurnstileSiteKey() ? 'wait' : 'skip');
   const captchaTokenRef = useRef('');
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -342,7 +339,6 @@ function PreguntaFormInner({
   }
 
   if (sentAlias) {
-    const shareText = preguntaShareText(locale, pregunta[mode][locale], shareUrl);
     return (
       <div className="mx-auto flex w-full max-w-xl items-center px-4 py-10 text-[#1C1C2E]">
         <article className="w-full rounded-3xl bg-white px-6 py-8 text-center shadow-[0_12px_40px_rgba(20,29,38,0.08)]">
@@ -371,12 +367,7 @@ function PreguntaFormInner({
             <button
               type="button"
               className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
-              onClick={() => {
-                setShareNotice('');
-                setShareFallback(null);
-                setShareUrl(`${window.location.origin}/pregunta/${pregunta.id}`);
-                setShareOpen(true);
-              }}
+              onClick={() => setShareOpen(true)}
             >
               {copy.share[locale]}
             </button>
@@ -387,67 +378,14 @@ function PreguntaFormInner({
               {copy.seeWorld[locale]}
             </Link>
           </div>
-          {shareNotice ? (
-            <p className="m-0 mt-4 text-[length:var(--fs-pequeno)]" role="status">
-              {shareNotice}
-            </p>
-          ) : null}
-          {shareFallback ? (
-            <label className="mt-3 block text-left text-[length:var(--fs-etiqueta)]">
-              {t.modalShareCopyFailed}
-              <textarea readOnly value={shareFallback} className={`${fieldClass} mt-1`} onFocus={(event) => event.currentTarget.select()} />
-            </label>
-          ) : null}
         </article>
-        {shareOpen ? (
-          <StoryShareMenu
-            shareUrl={shareUrl}
-            shareTextShort={shareText}
-            shareTextLong={shareText}
-            emailSubject={pregunta[mode][locale].slice(0, 120)}
-            keepShareUrl
-            labels={{
-              title: t.modalShareMenuTitle,
-              facebook: t.modalShareFacebook,
-              x: t.modalShareX,
-              linkedin: t.modalShareLinkedIn,
-              instagram: t.modalShareInstagram,
-              tiktok: t.modalShareTikTok,
-              email: t.modalShareEmail,
-              copyLink: t.modalCopyLink,
-              download: t.modalDownloadImprint,
-              close: t.modalClose }}
-            showDownload={false}
-            showImageApps={false}
-            imageFile={null}
-            shareTitle={pregunta[mode][locale]}
-            onCopied={() => {
-              setShareFallback(null);
-              setShareNotice(t.modalShareLinkCopied);
-              setShareOpen(false);
-            }}
-            onTextCopied={() => {
-              setShareFallback(null);
-              setShareNotice(t.modalShareTextCopied);
-              setShareOpen(false);
-            }}
-            onAppHandoff={() => {
-              setShareOpen(false);
-            }}
-            onCopyFailed={(value) => {
-              setShareNotice(t.modalShareCopyFailed);
-              setShareFallback(value);
-              window.setTimeout(() => setShareOpen(false), 0);
-            }}
-            onDownload={() => undefined}
-            onEmail={() => {
-              setShareFallback(null);
-              setShareNotice(t.modalShareEmailCopied);
-              window.setTimeout(() => setShareOpen(false), 0);
-            }}
-            onClose={() => setShareOpen(false)}
-          />
-        ) : null}
+        <ShareAfterNotice
+          open={shareOpen}
+          onClose={() => setShareOpen(false)}
+          kind="question"
+          questionId={pregunta.id}
+          question={pregunta[mode][locale]}
+        />
       </div>
     );
   }

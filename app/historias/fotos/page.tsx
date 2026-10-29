@@ -109,11 +109,6 @@ export default function HistoriasFotosPage() {
       Math.min(shareSlideIndex, Math.max(0, exhibitionHistorias.length - 1))
     ] ?? null;
 
-  const shareUrlForFlow = useMemo(() => {
-    if (typeof window === 'undefined' || !shareTarget) return '';
-    return `${window.location.origin}/historias/${shareTarget.id}/foto`;
-  }, [shareTarget]);
-
   const openFoto = useCallback(
     (index: number) => {
       const s = photoStoriesForCarousel[index];
@@ -149,7 +144,6 @@ export default function HistoriasFotosPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        shareUrlForFlow={shareUrlForFlow}
         expoLabel={historiasListFormatExpoLabel.foto}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}

@@ -1,7 +1,6 @@
 'use client';
 
 import { Download, Mail, X } from 'lucide-react';
-import { downloadPngBlob } from '@/lib/huella/share-resonance-png';
 import {
   canonicalStoryShareUrl,
   buildStoryShareChannelUrls } from '@/lib/huella/share-story-channels';
@@ -98,8 +97,6 @@ export function StoryShareMenu({
   emailSubject,
   labels,
   showDownload,
-  showImageApps,
-  imageFile,
   shareTitle,
   onCopied,
   onTextCopied,
@@ -126,43 +123,33 @@ export function StoryShareMenu({
     });
   };
 
-  const shareImage = (app: 'Instagram' | 'TikTok') => {
+  const shareApp = (app: 'Instagram' | 'TikTok') => {
     const text = shareTextLong;
-    const native = Boolean(
-      showImageApps && imageFile && typeof navigator !== 'undefined' && typeof navigator.share === 'function'
-    );
-    if (!native && imageFile) {
-      window.open(
-        app === 'Instagram' ? 'https://www.instagram.com/' : 'https://www.tiktok.com/upload',
-        '_blank',
-        'noopener,noreferrer'
-      );
-    }
-    copyTextInClick(text, (ok) => {
-      if (!ok) onCopyFailed(text);
-      else if (native) onTextCopied();
-      else if (imageFile) onAppHandoff(app);
-      else onTextCopied();
-    });
-    if (native && imageFile) {
-      try {
-        const pendingShare = navigator.share({
-          files: [imageFile],
-          title: shareTitle,
-          text });
-        void pendingShare.catch((error: unknown) => {
+    const link = keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl);
+    const phone =
+      typeof navigator !== 'undefined' &&
+      (window.matchMedia('(pointer: coarse)').matches ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    if (phone && typeof navigator.share === 'function') {
+      const pendingShare = navigator.share({ title: shareTitle, text, url: link });
+      void pendingShare
+        .then(() => onClose())
+        .catch((error: unknown) => {
           const name = error instanceof Error ? error.name : '';
           if (name === 'AbortError') return;
           console.error('[StoryShareMenu] navigator.share', error);
-          downloadPngBlob(imageFile, imageFile.name);
         });
-      } catch (error) {
-        console.error('[StoryShareMenu] navigator.share', error);
-        downloadPngBlob(imageFile, imageFile.name);
-      }
       return;
     }
-    if (imageFile) downloadPngBlob(imageFile, imageFile.name);
+    window.open(
+      app === 'Instagram' ? 'https://www.instagram.com/' : 'https://www.tiktok.com/',
+      '_blank',
+      'noopener,noreferrer'
+    );
+    copyTextInClick(text, (ok) => {
+      if (ok) onAppHandoff(app);
+      else onCopyFailed(text);
+    });
   };
 
   const itemClass =
@@ -195,6 +182,9 @@ export function StoryShareMenu({
           </button>
         </div>
         <div className="grid grid-cols-1 gap-2">
+          <a className={itemClass} href={channels.whatsapp} target="_blank" rel="noreferrer">
+            WhatsApp
+          </a>
           <a className={itemClass} href={channels.facebook} target="_blank" rel="noreferrer">
             {labels.facebook}
           </a>
@@ -204,10 +194,10 @@ export function StoryShareMenu({
           <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
             {labels.linkedin}
           </a>
-          <button type="button" className={buttonClass} onClick={() => shareImage('Instagram')}>
+          <button type="button" className={buttonClass} onClick={() => shareApp('Instagram')}>
             {labels.instagram}
           </button>
-          <button type="button" className={buttonClass} onClick={() => shareImage('TikTok')}>
+          <button type="button" className={buttonClass} onClick={() => shareApp('TikTok')}>
             {labels.tiktok}
           </button>
           <a

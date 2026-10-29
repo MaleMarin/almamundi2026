@@ -108,11 +108,6 @@ export default function HistoriasEscritoPage() {
       Math.min(shareSlideIndex, Math.max(0, exhibitionHistorias.length - 1))
     ] ?? null;
 
-  const shareUrlForFlow = useMemo(() => {
-    if (typeof window === 'undefined' || !shareTarget) return '';
-    return `${window.location.origin}/historias/${shareTarget.id}/texto`;
-  }, [shareTarget]);
-
   const openTexto = useCallback(
     (index: number) => {
       const s = textStoriesForCarousel[index];
@@ -148,7 +143,6 @@ export default function HistoriasEscritoPage() {
         shareTarget={shareTarget}
         ethicalShareOpen={ethicalShareOpen}
         setEthicalShareOpen={setEthicalShareOpen}
-        shareUrlForFlow={shareUrlForFlow}
         expoLabel={historiasListFormatExpoLabel.texto}
         clearFilters={clearFilters}
         exhibitionHistorias={exhibitionHistorias}

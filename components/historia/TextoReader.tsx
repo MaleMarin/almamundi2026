@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { formatPublishedAtEsStable } from '@/lib/historias/format-published-es-stable';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
-import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { CancionRelacionadaLine } from '@/components/historia/CancionRelacionadaLine';
 import { StoryScrollBlock } from '@/components/historia/StoryScrollBlock';
 import { SimilarStories } from '@/components/mapa/SimilarStories';
@@ -424,19 +424,13 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         </div>
         </StoryScrollBlock>
       </div>
-      <EthicalShareFlow
+      <ShareAfterNotice
         open={shareOpen}
         onClose={() => setShareOpen(false)}
-        authorName={historia.autor.nombre}
-        storyTitle={historia.titulo}
-        quote={historia.subtitulo ?? ''}
-        imageUrl={historia.autor.avatar}
-        shareUrl={
-          typeof window !== 'undefined'
-            ? `${window.location.origin}/historias/${historia.id}/texto`
-            : ''
-        }
-        exhibitionLabel="Escrito"
+        kind="story"
+        storyId={historia.id}
+        title={historia.titulo}
+        city={historia.autor.ubicacion ?? ''}
       />
     </>
   );

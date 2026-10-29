@@ -5,7 +5,8 @@
  * Nav, hero y filtros en columna centrada (primera vista); carrusel a ancho completo.
  * Masthead: `GlobalSiteChrome` en layout raíz. Footer global en `app/layout.tsx`.
  */
-import { EthicalShareFlow, EthicalShareTriggerButton } from '@/components/stories/EthicalShareFlow';
+import { EthicalShareTriggerButton } from '@/components/stories/EthicalShareTrigger';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { ResonanceMailbox } from '@/components/stories/ResonanceMailbox';
 import {
   HistoricalExhibitionCarousel,
@@ -40,7 +41,6 @@ export type HistoriasFormatListPageLayoutProps = {
   shareTarget: HistoricalExhibitionStory | null;
   ethicalShareOpen: boolean;
   setEthicalShareOpen: (open: boolean) => void;
-  shareUrlForFlow: string;
   expoLabel: string;
   clearFilters: () => void;
   exhibitionHistorias: HistoricalExhibitionStory[];
@@ -67,7 +67,6 @@ export function HistoriasFormatListPageLayout({
   shareTarget,
   ethicalShareOpen,
   setEthicalShareOpen,
-  shareUrlForFlow,
   expoLabel,
   clearFilters,
   exhibitionHistorias,
@@ -228,17 +227,14 @@ export function HistoriasFormatListPageLayout({
       </div>
 
       {shareTarget ? (
-        <EthicalShareFlow
+        <ShareAfterNotice
           key={shareTarget.id}
           open={ethicalShareOpen}
           onClose={() => setEthicalShareOpen(false)}
-          authorName={shareTarget.nombre}
-          storyTitle={shareTarget.titulo}
-          quote={shareTarget.cita}
-          imageUrl={shareTarget.imagen_principal}
-          shareUrl={shareUrlForFlow}
-          exhibitionLabel={expoLabel}
-          themeTag={shareTarget.tags[0] ?? 'resiliencia'}
+          kind="story"
+          storyId={shareTarget.id}
+          title={shareTarget.titulo}
+          city={shareTarget.lugar}
         />
       ) : null}
       </main>
