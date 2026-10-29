@@ -109,6 +109,7 @@ export type StoryFlowMessages = {
   modalShareTikTok: string;
   modalShareAppHandoff: string;
   modalShareEmail: string;
+  modalShareEmailCopied: string;
   modalShareLinkCopied: string;
   modalAnotherPromptFoto: string;
   modalAnotherCtaFoto: string;
@@ -262,6 +263,8 @@ const es: StoryFlowMessages = {
   modalShareAppHandoff:
     'Descargamos tu imagen y copiamos el texto. Te abrimos la app en otra pestaña para que los subas.',
   modalShareEmail: 'Correo',
+  modalShareEmailCopied:
+    'Si tu correo no se abrió, el mensaje ya está copiado: pégalo donde quieras.',
   modalShareLinkCopied: 'Enlace copiado',
   modalAnotherPromptFoto: '¿Quieres subir más fotos?',
   modalAnotherCtaFoto: 'Subir más fotos',
@@ -369,6 +372,8 @@ const pt: StoryFlowMessages = {
   modalShareAppHandoff:
     'Baixamos sua imagem e copiamos o texto. Abrimos o app em outra aba para você publicar.',
   modalShareEmail: 'E-mail',
+  modalShareEmailCopied:
+    'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
   modalShareLinkCopied: 'Link copiado',
   modalAnotherPromptFoto: 'Quer enviar mais fotos?',
   modalAnotherCtaFoto: 'Enviar mais fotos',
@@ -480,6 +485,8 @@ const en: StoryFlowMessages = {
   modalShareAppHandoff:
     'We downloaded your image and copied the text. We opened the app in another tab so you can post them.',
   modalShareEmail: 'Email',
+  modalShareEmailCopied:
+    'If your email didn\'t open, the message is already copied: paste it wherever you like.',
   modalShareLinkCopied: 'Link copied',
   modalAnotherPromptFoto: 'Want to upload more photos?',
   modalAnotherCtaFoto: 'Upload more photos',

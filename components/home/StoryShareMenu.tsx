@@ -26,10 +26,12 @@ type StoryShareMenuProps = {
   emailSubject: string;
   labels: StoryShareMenuLabels;
   showDownload: boolean;
+  showImageApps: boolean;
   onCopied: () => void;
   onCopyFailed: () => void;
   onDownload: () => void;
-  onShareImageApp: (app: 'instagram' | 'tiktok') => void;
+  onShareImage: () => void;
+  onEmail: () => void;
   onClose: () => void;
 };
 
@@ -40,10 +42,12 @@ export function StoryShareMenu({
   emailSubject,
   labels,
   showDownload,
+  showImageApps,
   onCopied,
   onCopyFailed,
   onDownload,
-  onShareImageApp,
+  onShareImage,
+  onEmail,
   onClose }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(shareUrl, {
     short: shareTextShort,
@@ -95,13 +99,28 @@ export function StoryShareMenu({
           <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
             {labels.linkedin}
           </a>
-          <button type="button" className={buttonClass} onClick={() => onShareImageApp('instagram')}>
-            {labels.instagram}
-          </button>
-          <button type="button" className={buttonClass} onClick={() => onShareImageApp('tiktok')}>
-            {labels.tiktok}
-          </button>
-          <a className={itemClass} href={channels.email}>
+          {showImageApps ? (
+            <>
+              <button type="button" className={buttonClass} onClick={onShareImage}>
+                {labels.instagram}
+              </button>
+              <button type="button" className={buttonClass} onClick={onShareImage}>
+                {labels.tiktok}
+              </button>
+            </>
+          ) : null}
+          <a
+            className={itemClass}
+            href={channels.email}
+            onClick={(event) => {
+              event.preventDefault();
+              const pending = copyTextToClipboard(shareTextLong);
+              window.location.href = channels.email;
+              void pending.then((ok) => {
+                if (ok) onEmail();
+              });
+            }}
+          >
             <Mail size={15} className="mr-2" aria-hidden />
             {labels.email}
           </a>

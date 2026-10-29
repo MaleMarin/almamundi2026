@@ -59,8 +59,7 @@ import {
   PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
   PENDING_STORY_SHARE_TEXT_SHORT,
-  PENDING_STORY_SHARE_URL,
-  copyTextToClipboard } from '@/lib/huella/share-story-channels';
+  PENDING_STORY_SHARE_URL } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
 import { clearStoryAuthorCarryIfStale } from '@/lib/story-author-carry';
@@ -470,6 +469,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [shareNotice, setShareNotice] = useState('');
   const [shareMenuOpen, setShareMenuOpen] = useState(false);
   const [shareMenuShowDownload, setShareMenuShowDownload] = useState(false);
+  const [shareImageApps, setShareImageApps] = useState(false);
   const shareNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const shareRequestTokenRef = useRef(0);
 
@@ -1328,28 +1328,66 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setSaving(true);
     setErr('');
     setCreatingColors(false);
-    if (mode === 'audio' || mode === 'video') setUploadProgress(0);
     try {
+      const uploadPieces: { key: string; size: number }[] = [];
+      if (profilePhoto && profilePhoto.size > 0) {
+        uploadPieces.push({ key: 'profile', size: profilePhoto.size });
+      }
+      if (mode !== 'foto') {
+        extraFiles.forEach((file, index) => {
+          if (file.size > 0) uploadPieces.push({ key: `extra-${index}`, size: file.size });
+        });
+      }
+      if (mode === 'video' || mode === 'audio') {
+        const media = mediaBlob ?? (mode === 'video' ? uploadVideoFile : uploadAudioFile);
+        if (media && media.size > 0) uploadPieces.push({ key: 'media', size: media.size });
+      } else if (mode === 'foto') {
+        photos.forEach((photo) => {
+          if (photo.readyFile && photo.readyFile.size > 0) {
+            uploadPieces.push({ key: `photo-${photo.id}`, size: photo.readyFile.size });
+          }
+        });
+      }
+      const totalUploadBytes = uploadPieces.reduce((sum, piece) => sum + piece.size, 0);
+      const loadedByKey = new Map<string, number>();
+      let shownUploadPercent = 0;
+      const reportLoaded = (key: string, loaded: number) => {
+        if (totalUploadBytes <= 0 || !Number.isFinite(loaded)) return;
+        const size = uploadPieces.find((piece) => piece.key === key)?.size ?? 0;
+        if (size <= 0) return;
+        const nextLoaded = Math.min(size, Math.max(loadedByKey.get(key) ?? 0, loaded));
+        loadedByKey.set(key, nextLoaded);
+        let sum = 0;
+        loadedByKey.forEach((bytes) => {
+          sum += bytes;
+        });
+        const percent =
+          sum >= totalUploadBytes ? 100 : Math.min(99, Math.floor((sum / totalUploadBytes) * 100));
+        if (percent < shownUploadPercent) return;
+        shownUploadPercent = percent;
+        setUploadProgress((prev) => Math.max(prev ?? 0, percent));
+        if (percent >= 100) setCreatingColors(true);
+      };
+      if (totalUploadBytes > 0) setUploadProgress(0);
+
       const privateMediaPaths: string[] = [];
       const trackUpload = async (
         file: File | Blob,
         prefix: string,
         name: string,
-        cache?: { readUrl: string; storagePath: string } | null
+        cache: { readUrl: string; storagePath: string } | null | undefined,
+        progressKey: string
       ) => {
         if (cache?.readUrl && cache.storagePath) {
           privateMediaPaths.push(cache.storagePath);
+          reportLoaded(progressKey, file.size);
           return cache;
         }
-        const r = await uploadFileToStorage(
-          file,
-          prefix,
-          name,
-          mode === 'audio' || mode === 'video'
-            ? (ratio) => setUploadProgress(Math.min(100, Math.round(ratio * 100)))
-            : undefined
-        );
+        const r = await uploadFileToStorage(file, prefix, name, (ratio) => {
+          reportLoaded(progressKey, ratio * file.size);
+        });
         privateMediaPaths.push(r.storagePath);
+        reportLoaded(progressKey, file.size);
         return r;
       };
 
@@ -1359,7 +1397,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           profilePhoto,
           'submissions/avatars',
           `avatar-${profilePhoto.name}`,
-          profileUploadRef.current
+          profileUploadRef.current,
+          'profile'
         );
         profileUploadRef.current = r;
         profilePhotoUploaded = r.readUrl;
@@ -1371,7 +1410,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         const f = extraFiles[i]!;
         const key = `${i}-${f.name}-${f.size}`;
         const cached = extraUploadRef.current.find((x) => x.key === key);
-        const r = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`, cached);
+        const r = await trackUpload(f, 'submissions/extras', `extra-${i}-${f.name}`, cached, `extra-${i}`);
         extraNext.push({ key, readUrl: r.readUrl, storagePath: r.storagePath });
         extraAttachmentUrls.push(r.readUrl);
       }
@@ -1406,7 +1445,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             mediaBlob,
             'submissions',
             `video-grabado.${ext}`,
-            avUploadRef.current
+            avUploadRef.current,
+            'media'
           );
           avUploadRef.current = r;
           payload = { videoUrl: r.readUrl };
@@ -1422,7 +1462,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             uploadVideoFile,
             'submissions',
             `video-subido.${safeExt}`,
-            avUploadRef.current
+            avUploadRef.current,
+            'media'
           );
           avUploadRef.current = r;
           payload = { videoUrl: r.readUrl };
@@ -1447,7 +1488,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             mediaBlob,
             'submissions',
             `audio-grabado.${ext}`,
-            avUploadRef.current
+            avUploadRef.current,
+            'media'
           );
           avUploadRef.current = r;
           payload = { audioUrl: r.readUrl };
@@ -1461,7 +1503,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             uploadAudioFile,
             'submissions',
             `audio.${uploadAudioFile.name.split('.').pop() || 'mp3'}`,
-            avUploadRef.current
+            avUploadRef.current,
+            'media'
           );
           avUploadRef.current = r;
           payload = { audioUrl: r.readUrl };
@@ -1479,20 +1522,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           setErr('Faltan las fotos de la historia.');
           return;
         }
-        setUploadProgress(0);
-        const photoRatios = new Map(ready.map((p) => [p.id, 0]));
-        const reportPhotoProgress = () => {
-          let sum = 0;
-          photoRatios.forEach((ratio) => {
-            sum += ratio;
-          });
-          setUploadProgress(Math.min(100, Math.round((sum / ready.length) * 100)));
-        };
         const uploaded = await Promise.all(
           ready.map((p) =>
             uploadOnePhoto(p, (ratio) => {
-              photoRatios.set(p.id, ratio);
-              reportPhotoProgress();
+              reportLoaded(`photo-${p.id}`, ratio * (p.readyFile?.size ?? 0));
             })
           )
         );
@@ -1520,15 +1553,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         }
       }
 
-      const storyFileUploaded =
-        (mode === 'video' && (mediaBlob != null || uploadVideoFile != null)) ||
-        (mode === 'audio' && (mediaBlob != null || uploadAudioFile != null)) ||
-        mode === 'foto';
-      if (mode === 'texto') {
+      if (totalUploadBytes === 0) {
         setCreatingColors(true);
-      } else if (storyFileUploaded) {
-        setUploadProgress(100);
-        setCreatingColors(true);
+      } else {
+        uploadPieces.forEach((piece) => reportLoaded(piece.key, piece.size));
       }
 
       const res = await fetch('/api/submissions', {
@@ -1695,13 +1723,13 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
   }, [step, imprintId, imprintReceivedAt, imprintStoryTitle, mode, locale, city, country]);
 
-  const flashShareNotice = useCallback((msg: string) => {
+  const flashShareNotice = useCallback((msg: string, ms = 2800) => {
     if (shareNoticeTimerRef.current) clearTimeout(shareNoticeTimerRef.current);
     setShareNotice(msg);
     shareNoticeTimerRef.current = setTimeout(() => {
       setShareNotice('');
       shareNoticeTimerRef.current = null;
-    }, 2800);
+    }, ms);
   }, []);
 
   const downloadImprint = useCallback(async () => {
@@ -1727,24 +1755,39 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
   }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
 
-  const shareImprint = useCallback(() => {
+  const shareImprint = useCallback(async () => {
     setShareMenuShowDownload(false);
+    const canvas = imprintCanvasRef.current;
+    const phone =
+      typeof navigator !== 'undefined' &&
+      (window.matchMedia('(pointer: coarse)').matches ||
+        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+    let canShare = false;
+    if (
+      phone &&
+      canvas &&
+      typeof navigator.share === 'function' &&
+      typeof navigator.canShare === 'function'
+    ) {
+      try {
+        const blob = await canvasToPngBlob(canvas);
+        const file = new File([blob], huellaPngFilename(imprintStoryTitle || storyTitle, imprintId), {
+          type: 'image/png' });
+        canShare = navigator.canShare({ files: [file] });
+      } catch {
+        canShare = false;
+      }
+    }
+    setShareImageApps(canShare);
     setShareMenuOpen(true);
-  }, []);
+  }, [imprintId, imprintStoryTitle, storyTitle]);
 
-  const shareImageToApp = useCallback(async (app: 'instagram' | 'tiktok') => {
+  const shareImageToApp = useCallback(async () => {
     const c = imprintCanvasRef.current;
     if (!c) return;
     const requestToken = ++shareRequestTokenRef.current;
     const shareText = t.modalShareTextLong || PENDING_STORY_SHARE_TEXT;
     const filename = huellaPngFilename(imprintStoryTitle || storyTitle, imprintId);
-    const appUrl = app === 'tiktok' ? 'https://www.tiktok.com/upload' : 'https://www.instagram.com/';
-    const systemShare =
-      typeof navigator !== 'undefined' &&
-      typeof navigator.share === 'function' &&
-      (window.matchMedia('(pointer: coarse)').matches ||
-        /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
-    const fallbackWindow = systemShare ? null : window.open(appUrl, '_blank');
     try {
       const blob = await canvasToPngBlob(c);
       const file = new File([blob], filename, { type: 'image/png' });
@@ -1754,28 +1797,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         text: shareText,
         url: PENDING_STORY_SHARE_URL });
       if (requestToken !== shareRequestTokenRef.current) return;
-      if (native === 'aborted') {
-        fallbackWindow?.close();
-        return;
-      }
+      if (native === 'aborted') return;
       if (native === 'shared') {
-        fallbackWindow?.close();
         setShareMenuOpen(false);
         return;
       }
-      if (!fallbackWindow) window.open(appUrl, '_blank', 'noopener,noreferrer');
-      downloadPngBlob(blob, filename);
-      const copied = await copyTextToClipboard(shareText);
-      if (requestToken !== shareRequestTokenRef.current) return;
-      setShareMenuOpen(false);
-      flashShareNotice(copied ? t.modalShareAppHandoff : t.modalShareImageFailed);
+      flashShareNotice(t.modalShareImageFailed);
     } catch (error) {
       if (requestToken !== shareRequestTokenRef.current) return;
       const name = error instanceof Error ? error.name : '';
-      if (name === 'AbortError') {
-        fallbackWindow?.close();
-        return;
-      }
+      if (name === 'AbortError') return;
       flashShareNotice(t.modalShareImageFailed);
     }
   }, [
@@ -1783,7 +1814,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     imprintId,
     imprintStoryTitle,
     storyTitle,
-    t.modalShareAppHandoff,
     t.modalShareImageFailed,
     t.modalShareTextLong,
   ]);
@@ -3036,6 +3066,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 download: isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint,
                 close: t.modalClose }}
               showDownload={shareMenuShowDownload}
+              showImageApps={shareImageApps}
               onCopied={() => {
                 flashShareNotice(t.modalShareLinkCopied);
                 setShareMenuOpen(false);
@@ -3048,8 +3079,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 setShareMenuOpen(false);
                 void downloadImprint();
               }}
-              onShareImageApp={(app) => {
-                void shareImageToApp(app);
+              onShareImage={() => {
+                void shareImageToApp();
+              }}
+              onEmail={() => {
+                flashShareNotice(t.modalShareEmailCopied, 7000);
+                setShareMenuOpen(false);
               }}
               onClose={() => setShareMenuOpen(false)}
             />
