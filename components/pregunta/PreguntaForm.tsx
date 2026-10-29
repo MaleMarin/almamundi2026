@@ -385,7 +385,7 @@ function PreguntaFormInner({
               {copy.share[locale]}
             </button>
             <Link
-              href={`/pregunta/${pregunta.id}`}
+              href="/?capa=pregunta#mapa"
               className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
             >
               {copy.seeWorld[locale]}

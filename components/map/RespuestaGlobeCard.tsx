@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
-import { preguntaPageHref } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
 export function RespuestaGlobeCard({
@@ -33,7 +32,7 @@ export function RespuestaGlobeCard({
         <img src={item.previewUrl} alt={item.contenido} className="max-h-40 w-full rounded-xl object-cover" />
       ) : null}
       {item.kind === 'foto' && item.contenido ? <p className="mb-0 mt-2 text-[length:var(--fs-pequeno)] leading-relaxed">{item.contenido}</p> : null}
-      <Link href={preguntaPageHref(item.questionId)} className="mt-3 inline-flex text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">
+      <Link href="/?capa=pregunta#mapa" className="mt-3 inline-flex text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">
         {PREGUNTA_COPY.seeWorld[locale]}
       </Link>
     </div>

@@ -38,10 +38,12 @@ export async function GET(request: NextRequest) {
   try {
     const snap = await getAdminDb().collection(RESPUESTAS_COLLECTION).where("questionId", "==", questionId).get();
     const items: RespuestaPublica[] = [];
+    let total = 0;
     for (const doc of snap.docs) {
       const data = doc.data() as Record<string, unknown>;
       if (data.status !== "approved") continue;
       if (data.malwareScanStatus === "infected") continue;
+      total += 1;
       const itemMode = data.mode === "alguien" ? "alguien" : "tu";
       if (mode && itemMode !== mode) continue;
       const lat = typeof data.lat === "number" && Number.isFinite(data.lat) ? data.lat : null;
@@ -67,7 +69,7 @@ export async function GET(request: NextRequest) {
       return publicItem;
     });
     const nextOffset = offset + page.length < items.length ? offset + page.length : null;
-    return NextResponse.json({ items: page, nextOffset });
+    return NextResponse.json({ items: page, nextOffset, total });
   } catch (e) {
     console.error("[respuestas/public]", e instanceof Error ? e.message : "list");
     return NextResponse.json({ error: "list failed" }, { status: 500 });

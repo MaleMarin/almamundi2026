@@ -115,6 +115,18 @@ export function PreguntaPanel() {
           ))}
         </section>
       ) : null}
+      <Link
+        href={`/pregunta/${vigente.id}`}
+        style={{
+          alignSelf: 'flex-start',
+          fontWeight: 700,
+          fontSize: 'var(--fs-pequeno)',
+          color: '#FF6E49',
+          fontFamily: SITE_FONT_STACK,
+        }}
+      >
+        {PREGUNTA_COPY.seeAll[locale]}
+      </Link>
     </div>
   );
 }

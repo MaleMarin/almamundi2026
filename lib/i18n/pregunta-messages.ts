@@ -48,10 +48,30 @@ export const PREGUNTA_COPY = {
     pt: 'Veja como o mundo responde',
     en: 'See how the world answers',
   },
+  seeAll: {
+    es: 'Ver todas las respuestas',
+    pt: 'Ver todas as respostas',
+    en: 'See all answers',
+  },
+  weekKicker: {
+    es: 'La pregunta de la semana',
+    pt: 'A pergunta da semana',
+    en: "This week's question",
+  },
+  pastKicker: {
+    es: 'Pregunta anterior',
+    pt: 'Pergunta anterior',
+    en: 'Previous question',
+  },
+  answers: {
+    es: 'Respuestas',
+    pt: 'Respostas',
+    en: 'Answers',
+  },
   empty: {
-    es: 'Sé la primera persona en responder.',
-    pt: 'Seja a primeira pessoa a responder.',
-    en: 'Be the first to answer.',
+    es: 'Todavía no hay respuestas. Sé la primera persona en responder',
+    pt: 'Ainda não há respostas. Seja a primeira pessoa a responder',
+    en: 'No answers yet. Be the first to answer',
   },
   modeYou: { es: 'Responde tú', pt: 'Responda você', en: 'You answer' },
   modeYouLine: {

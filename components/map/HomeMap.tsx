@@ -227,6 +227,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const searchParams = useSearchParams();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const openedHistoriaRef = useRef<string | null>(null);
+  const openedCapaRef = useRef(false);
 
   const globeBitsMarkers = useMemo(
     () =>
@@ -695,6 +696,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       finishSurpriseOpen();
     }, 1400);
   }, [searchParams, stories, finishSurpriseOpen]);
+
+  useEffect(() => {
+    if (searchParams.get('capa') !== 'pregunta' || openedCapaRef.current) return;
+    openedCapaRef.current = true;
+    setGlobeLayers((prev) => ({ ...prev, news: true }));
+    setDrawerMode('news');
+    setDrawerOpen(true);
+    document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, [searchParams]);
 
   const closeStoryViewer = useCallback(() => {
     setStoryViewerClosing(true);
