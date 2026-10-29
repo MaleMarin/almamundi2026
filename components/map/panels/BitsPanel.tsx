@@ -1,7 +1,33 @@
 'use client';
 
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import type { HuellaPunto } from '@/lib/huellas';
+
+const TEXT = '#F7F8FC';
+
+const COPY = {
+  es: {
+    happened: 'Qué pasó aquí',
+    maps: 'Ver ubicación en Google Maps',
+    phrase: 'El mundo está lleno de historias sorprendentes. La tuya también merece contarse.',
+    tell: 'Cuenta tu historia',
+    empty: 'Este mapa se construye con historias como la tuya.',
+    places: (n: number) => `${n} lugares` },
+  pt: {
+    happened: 'O que aconteceu aqui',
+    maps: 'Ver localização no Google Maps',
+    phrase: 'O mundo está cheio de histórias surpreendentes. A sua também merece ser contada.',
+    tell: 'Conte sua história',
+    empty: 'Este mapa é feito de histórias como a sua.',
+    places: (n: number) => `${n} lugares` },
+  en: {
+    happened: 'What happened here',
+    maps: 'See location on Google Maps',
+    phrase: 'The world is full of surprising stories. Yours deserves to be told too.',
+    tell: 'Tell your story',
+    empty: 'This map is made of stories like yours.',
+    places: (n: number) => (n === 1 ? '1 place' : `${n} places`) } } as const;
 
 export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais' | 'lat' | 'lon'> & {
   categoria?: string;
@@ -15,22 +41,14 @@ function googleMapsUrl(lat: number, lon: number): string {
   return `https://www.google.com/maps?q=${lat},${lon}`;
 }
 
-const linkButtonStyle = (density: 'compact' | 'readable'): React.CSSProperties => ({
+const actionStyle: React.CSSProperties = {
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
   width: '100%',
-  padding: density === 'readable' ? '11px 18px' : '8px 14px',
-  borderRadius: 999,
-  fontFamily: SITE_FONT_STACK,
-  fontSize: density === 'readable' ? 13 : 11,
-  fontWeight: 600,
-  textDecoration: 'none',
-  border: '1px solid rgba(120, 180, 255, 0.45)',
-  background: 'rgba(30, 70, 120, 0.35)',
-  color: 'rgba(200, 230, 255, 0.98)',
-  boxShadow: '0 4px 18px rgba(0, 40, 90, 0.25)',
-  transition: 'background 160ms ease, border-color 160ms ease' });
+  minHeight: 44,
+  padding: '8px 16px',
+  textAlign: 'center' };
 
 export type BitsPanelProps = {
   bits: BitLike[] | HuellaPunto[];
@@ -50,26 +68,6 @@ function getBitAt(list: HuellaPunto[], index: number): HuellaPunto {
 
 function ensureHuellaPunto(x: unknown): HuellaPunto {
   return x as HuellaPunto;
-}
-
-function idLabel(id: number): string {
-  return id < 100 ? String(id).padStart(2, '0') : String(id);
-}
-
-function BitsPanelIntro() {
-  return (
-    <div style={{ flexShrink: 0, margin: '0 0 14px' }}>
-      <p
-        style={{
-          fontSize: 'var(--fs-texto)',
-          color: 'rgba(248, 250, 255, 0.82)',
-          lineHeight: 1.5,
-          margin: 0 }}
-      >
-        El mundo está lleno de historias sorprendentes. La tuya también merece contarse.
-      </p>
-    </div>
-  );
 }
 
 const rowBase: React.CSSProperties = {
@@ -95,7 +93,6 @@ function BitIndexRow({
   isActive: boolean;
   onClick: () => void;
 }) {
-  const num = idLabel(bit.id);
   return (
     <button
       type="button"
@@ -106,13 +103,10 @@ function BitIndexRow({
         border: `1px solid ${isActive ? 'rgba(255, 110, 50, 0.75)' : 'rgba(255,255,255,0.16)'}`,
         borderLeft: isActive ? '2px solid #FF4A1C' : '2px solid transparent' }}
     >
-      <span style={{ fontSize: 'var(--fs-etiqueta)', color: '#ff5719', fontWeight: 600, lineHeight: 1.2 }}>
-        #{num}
-      </span>
       <span
         style={{
           fontSize: 'var(--fs-etiqueta)',
-          color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.88)',
+          color: TEXT,
           lineHeight: 1.35,
           fontWeight: 500 }}
       >
@@ -127,14 +121,15 @@ type BitDetailDensity = 'compact' | 'readable';
 /** Ficha del Bit: en `readable` (solo clic en globo) tipografía amplia y aire; en `compact` cabe junto al índice. */
 function BitDetailCompact({
   bit,
+  copy,
   onSubirMiHistoria,
   relaxedHeight }: {
   bit: BitLike | HuellaPunto;
+  copy: (typeof COPY)[keyof typeof COPY];
   onSubirMiHistoria: () => void;
   relaxedHeight?: boolean;
 }) {
   const density: BitDetailDensity = relaxedHeight ? 'readable' : 'compact';
-  const num = idLabel(bit.id);
   const titulo = (bit.titulo ?? '').trim() || bit.lugar;
   const historia = (bit.historia ?? '').trim();
 
@@ -143,9 +138,6 @@ function BitDetailCompact({
       ? {
           padding: '22px 20px 26px',
           radius: 16,
-          meta: 11,
-          metaMb: 10,
-          metaTrack: '0.1em' as const,
           lugar: 19,
           lugarMb: 18,
           lugarLh: 1.3,
@@ -158,20 +150,11 @@ function BitDetailCompact({
           historia: 15,
           historiaLh: 1.68,
           historiaMb: 8,
-          historiaColor: 'rgba(212, 220, 232, 0.98)' as const,
           emptyFs: 14,
-          emptyLh: 1.55,
-          btnSectionMt: 48,
-          btnPy: 12,
-          btnPx: 22,
-          btnFs: 14,
-          btnRadius: 999 }
+          emptyLh: 1.55 }
       : {
           padding: '12px 11px 14px',
           radius: 11,
-          meta: 9,
-          metaMb: 6,
-          metaTrack: '0.12em' as const,
           lugar: 13,
           lugarMb: 12,
           lugarLh: 1.3,
@@ -184,23 +167,17 @@ function BitDetailCompact({
           historia: 11,
           historiaLh: 1.58,
           historiaMb: 6,
-          historiaColor: 'rgba(190, 202, 218, 0.96)' as const,
           emptyFs: 11,
-          emptyLh: 1.5,
-          btnSectionMt: 36,
-          btnPy: 9,
-          btnPx: 16,
-          btnFs: 12,
-          btnRadius: 999 };
+          emptyLh: 1.5 };
 
   const boxStyle: React.CSSProperties = {
     maxWidth: '100%',
     overflow: 'visible',
     padding: s.padding,
     borderRadius: s.radius,
-    border: '1px solid rgba(255,255,255,0.4)',
+    border: '1px solid rgba(255,255,255,0.28)',
     background:
-      'linear-gradient(168deg, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0.14) 50%, rgba(255,255,255,0.07) 75%, rgba(210, 228, 255, 0.12) 100%)',
+      'linear-gradient(168deg, rgba(18, 32, 54, 0.92) 0%, rgba(12, 22, 40, 0.94) 100%)',
     backdropFilter: 'blur(32px) saturate(1.5)',
     WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
     boxShadow: '0 12px 44px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.5)',
@@ -211,20 +188,9 @@ function BitDetailCompact({
     <div style={boxStyle}>
       <p
         style={{
-          fontSize: s.meta,
-          color: '#ff5a14',
-          letterSpacing: s.metaTrack,
-          textTransform: 'uppercase',
-          margin: `0 0 ${s.metaMb}px`,
-          lineHeight: 1.35 }}
-      >
-        #{num} · {bit.pais}
-      </p>
-      <p
-        style={{
           fontSize: s.lugar,
           fontWeight: 600,
-          color: 'rgba(255,255,255,0.94)',
+          color: TEXT,
           margin: `0 0 ${s.lugarMb}px`,
           lineHeight: s.lugarLh }}
       >
@@ -234,19 +200,20 @@ function BitDetailCompact({
       <p
         style={{
           fontSize: s.label,
-          color: 'rgba(255,255,255,0.48)',
+          color: TEXT,
+          fontWeight: 600,
           letterSpacing: s.labelTrack,
           textTransform: 'uppercase',
           margin: `0 0 ${s.labelMb}px`,
           lineHeight: 1.35 }}
       >
-        Qué pasó aquí
+        {copy.happened}
       </p>
       <p
         style={{
           fontSize: s.titulo,
           fontWeight: 600,
-          color: 'rgba(240,245,255,0.96)',
+          color: TEXT,
           lineHeight: s.tituloLh,
           margin: `0 0 ${s.tituloMb}px` }}
       >
@@ -257,7 +224,7 @@ function BitDetailCompact({
         <p
           style={{
             fontSize: s.historia,
-            color: s.historiaColor,
+            color: TEXT,
             lineHeight: s.historiaLh,
             margin: `0 0 ${s.historiaMb}px`,
             whiteSpace: 'pre-wrap' }}
@@ -268,11 +235,11 @@ function BitDetailCompact({
         <p
           style={{
             fontSize: s.emptyFs,
-            color: 'rgba(255,255,255,0.42)',
+            color: TEXT,
             lineHeight: s.emptyLh,
             margin: `0 0 ${s.historiaMb}px` }}
         >
-          Este mapa se construye con historias como la tuya.
+          {copy.empty}
         </p>
       )}
 
@@ -281,38 +248,28 @@ function BitDetailCompact({
           marginTop: density === 'readable' ? 20 : 14,
           display: 'flex',
           flexDirection: 'column',
-          gap: density === 'readable' ? 10 : 8 }}
+          gap: 16 }}
       >
         <a
+          className="btn-am-secundario"
           href={googleMapsUrl(bit.lat, bit.lon)}
           target="_blank"
           rel="noopener noreferrer"
-          style={linkButtonStyle(density)}
+          style={actionStyle}
         >
-          Ver ubicación en Google Maps
+          {copy.maps}
         </a>
-      </div>
-
-      <div style={{ marginTop: s.btnSectionMt }}>
-        <button
-          type="button"
-          onClick={onSubirMiHistoria}
+        <p
           style={{
-            padding: `${s.btnPy}px ${s.btnPx}px`,
-            borderRadius: s.btnRadius,
-            cursor: 'pointer',
-            fontFamily: SITE_FONT_STACK,
-            outline: 'none',
-            WebkitTapHighlightColor: 'transparent',
-            color: '#ffffff',
-            fontSize: s.btnFs,
-            fontWeight: 600,
-            width: '100%',
-            background: 'linear-gradient(180deg, #FF4A1C 0%, #FF4A1C 100%)',
-            border: '1px solid rgba(255, 170, 110, 0.9)',
-            boxShadow: '0 8px 28px rgba(255, 74, 28, 0.55), inset 0 1px 0 rgba(255, 210, 170, 0.45)' }}
+            fontSize: 'var(--fs-texto)',
+            color: TEXT,
+            lineHeight: 1.5,
+            margin: 0 }}
         >
-          Cuenta tu historia
+          {copy.phrase}
+        </p>
+        <button type="button" className="btn-am-secundario" onClick={onSubirMiHistoria} style={actionStyle}>
+          {copy.tell}
         </button>
       </div>
     </div>
@@ -325,13 +282,15 @@ export function BitsPanel({
   onSelectBit,
   onSubirMiHistoria,
   showIndexList = true }: BitsPanelProps) {
+  const { locale } = useHomeLocale();
+  const copy = COPY[locale];
   if (!showIndexList) {
     return (
       <div style={{ fontFamily: SITE_FONT_STACK }}>
-        <BitsPanelIntro />
         {selectedBit ? (
           <BitDetailCompact
             bit={selectedBit}
+            copy={copy}
             onSubirMiHistoria={onSubirMiHistoria}
             relaxedHeight
           />
@@ -349,7 +308,6 @@ export function BitsPanel({
       className="flex h-full min-h-0 w-full flex-col gap-2 overflow-hidden"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
-      <BitsPanelIntro />
       <div
         className={
           hasSelection
@@ -369,11 +327,11 @@ export function BitsPanel({
               fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.45)',
+              color: TEXT,
               margin: '0 0 6px',
               flexShrink: 0 }}
           >
-            {count} lugares
+            {copy.places(count)}
           </p>
           <div
             className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden"
@@ -400,7 +358,7 @@ export function BitsPanel({
             onWheel={(event) => event.stopPropagation()}
             style={{ scrollbarWidth: 'thin', overscrollBehavior: 'contain' }}
           >
-            <BitDetailCompact bit={selectedBit} onSubirMiHistoria={onSubirMiHistoria} />
+            <BitDetailCompact bit={selectedBit} copy={copy} onSubirMiHistoria={onSubirMiHistoria} />
           </div>
         ) : null}
       </div>
