@@ -59,6 +59,21 @@ export function shareMessageWithLink(text: string, url: string): string {
   return swapped ? `${swapped} ${link}` : link;
 }
 
+/** Única URL de WhatsApp: frase y enlace juntos, dentro de text. */
+export function whatsappShareUrl(text: string): string {
+  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+}
+
+/** Abre esa URL en el clic. Nunca navigator.share. */
+export function openWhatsappShare(url: string): void {
+  window.open(url, '_blank', 'noopener,noreferrer');
+}
+
+/** Hoja del sistema, Instagram y TikTok: el enlace va dentro del texto. */
+export function sharePlainText(text: string): Promise<void> {
+  return navigator.share({ text });
+}
+
 export function buildStoryShareChannelUrls(
   url: string,
   copy: StoryShareCopy,
@@ -69,7 +84,7 @@ export function buildStoryShareChannelUrls(
     const longMessage = shareMessageWithLink(copy.long, url);
     const shortMessage = shareMessageWithLink(copy.short, url);
     return {
-      whatsapp: `https://wa.me/?text=${encodeURIComponent(longMessage)}`,
+      whatsapp: whatsappShareUrl(longMessage),
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
       x: `https://x.com/intent/post?text=${encodeURIComponent(shortMessage)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
@@ -81,7 +96,7 @@ export function buildStoryShareChannelUrls(
   const longMessage = messageWithCanonicalUrl(copy.long);
   const subject = copy.emailSubject.trim() || PENDING_STORY_SHARE_EMAIL_SUBJECT;
   return {
-    whatsapp: `https://wa.me/?text=${encodeURIComponent(longMessage)}`,
+    whatsapp: whatsappShareUrl(longMessage),
     facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`,
     x: `https://x.com/intent/post?text=${encodeURIComponent(shortMessage)}`,
     linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`,

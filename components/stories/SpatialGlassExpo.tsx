@@ -195,10 +195,9 @@ export function SpatialGlassExpo({
     const url = storyShareUrl();
     try {
       if (navigator.share) {
-        await navigator.share({
-          title: active?.titulo ?? tituloExposicion,
-          text: active?.cita,
-          url });
+        const cita = active?.cita?.trim() ?? '';
+        const text = cita.includes(url) ? cita : `${cita} ${url}`.trim();
+        await navigator.share({ text });
         return;
       }
     } catch {

@@ -2,7 +2,7 @@
  * PNG de resonancia: descargar, compartir (móvil) o copiar al portapapeles (desktop).
  */
 
-import { canonicalStoryShareUrl } from '@/lib/huella/share-story-channels';
+import { shareMessageWithLink } from '@/lib/huella/share-story-channels';
 
 function isCoarsePointer(): boolean {
   if (typeof window === 'undefined') return false;
@@ -62,12 +62,10 @@ export async function shareNativeStoryWithImage(opts: {
   if (!isMobile) return 'unavailable';
 
   if (canShareFiles(opts.file)) {
-    const url = canonicalStoryShareUrl(opts.url);
-    const text = opts.text.includes(url) ? opts.text : `${opts.text.trim()} ${url}`.trim();
+    const text = shareMessageWithLink(opts.text, opts.url);
     try {
       await navigator.share({
         files: [opts.file],
-        title: opts.title,
         text,
       });
       return 'shared';
@@ -82,7 +80,7 @@ export async function shareNativeStoryWithImage(opts: {
 export async function shareOrCopyResonancePng(
   blob: Blob,
   filename: string,
-  shareTitle: string,
+  _shareTitle: string,
   shareText?: string
 ): Promise<ShareResonanceResult> {
   const file = new File([blob], filename, { type: 'image/png' });
@@ -93,7 +91,6 @@ export async function shareOrCopyResonancePng(
     try {
       await navigator.share({
         files: [file],
-        title: shareTitle,
         ...(shareText ? { text: shareText } : {}),
       });
       return 'shared';

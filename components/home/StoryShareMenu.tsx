@@ -4,7 +4,9 @@ import { Download, Mail, X } from 'lucide-react';
 import {
   canonicalStoryShareUrl,
   buildStoryShareChannelUrls,
-  shareMessageWithLink } from '@/lib/huella/share-story-channels';
+  openWhatsappShare,
+  shareMessageWithLink,
+  sharePlainText } from '@/lib/huella/share-story-channels';
 
 /** writeText en el mismo clic, sin await previos. Si no queda copiado, textarea oculto. */
 function copyTextInClick(text: string, onSettled: (ok: boolean) => void): void {
@@ -134,7 +136,7 @@ export function StoryShareMenu({
       (window.matchMedia('(pointer: coarse)').matches ||
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     if (phone && typeof navigator.share === 'function') {
-      const pendingShare = navigator.share({ text });
+      const pendingShare = sharePlainText(text);
       void pendingShare
         .then(() => onClose())
         .catch((error: unknown) => {
@@ -185,9 +187,9 @@ export function StoryShareMenu({
           </button>
         </div>
         <div className="grid grid-cols-1 gap-2">
-          <a className={itemClass} href={channels.whatsapp} target="_blank" rel="noreferrer">
+          <button type="button" className={itemClass} onClick={() => openWhatsappShare(channels.whatsapp)}>
             WhatsApp
-          </a>
+          </button>
           <a className={itemClass} href={channels.facebook} target="_blank" rel="noreferrer">
             {labels.facebook}
           </a>

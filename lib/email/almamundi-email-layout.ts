@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { escapeHtml } from "@/lib/email-html";
+import { whatsappShareUrl } from "@/lib/huella/share-story-channels";
 
 const PRODUCTION_SITE_FALLBACK = "https://www.almamundi.org";
 
@@ -79,7 +80,7 @@ export function emailLogoAttachment(logo: Buffer) {
 
 /** La persona elige a quién enviarle su historia. No es un canal hacia AlmaMundi. */
 export function whatsappShareHref(text: string): string {
-  return `https://wa.me/?text=${encodeURIComponent(text)}`;
+  return whatsappShareUrl(text);
 }
 
 export function brandHeaderHtml(): string {

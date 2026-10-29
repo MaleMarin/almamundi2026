@@ -116,8 +116,7 @@ export function useSubirHuella({
       if (navigator.share && navigator.canShare?.({ files: [file] })) {
         await navigator.share({
           files: [file],
-          title: 'Resonancia visual, AlmaMundi',
-          text: `Mi resonancia visual en ${SUBIR_HUELLA_FOOTER_SITE}`,
+          text: `Mi resonancia visual en https://${SUBIR_HUELLA_FOOTER_SITE}`,
         });
         return;
       }

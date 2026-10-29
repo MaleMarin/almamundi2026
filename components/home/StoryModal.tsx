@@ -1831,7 +1831,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         try {
           const file = new File([blob], filename, { type: 'image/png' });
           if (!navigator.canShare || navigator.canShare({ files: [file] })) {
-            await navigator.share({ files: [file] });
+            await navigator.share({
+              files: [file],
+              text: t.modalShareTextLong || PENDING_STORY_SHARE_TEXT,
+            });
             return;
           }
         } catch (e) {
@@ -1842,7 +1845,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     } catch {
       flashShareNotice(t.modalCopyImageFailed);
     }
-  }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, flashShareNotice]);
+  }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, t.modalShareTextLong, flashShareNotice]);
 
   const shareImprint = useCallback(async () => {
     setShareMenuShowDownload(false);
