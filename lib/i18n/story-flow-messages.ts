@@ -6,6 +6,20 @@ export type StoryFlowMessages = {
   modalLeaveConfirm: string;
   modalCameraPermissionHint: string;
   modalMicPermissionHint: string;
+  modalAvRecordNow: string;
+  modalAvRecordVideoLine: string;
+  modalAvUploadVideo: string;
+  modalAvUploadVideoLine: string;
+  modalAvRecordAudioLine: string;
+  modalAvUploadAudio: string;
+  modalAvUploadAudioLine: string;
+  modalTapCamera: string;
+  modalTapRecord: string;
+  modalTapStop: string;
+  modalRecordAgain: string;
+  modalChooseVideo: string;
+  modalChooseAudio: string;
+  modalPasteLink: string;
   modalCameraDenied: string;
   modalCameraUnsupported: string;
   modalCameraBusy: string;
@@ -121,6 +135,20 @@ const es: StoryFlowMessages = {
   modalLeaveConfirm: '¿Salir sin enviar?',
   modalCameraPermissionHint: 'Tu navegador te pedirá permiso para usar la cámara.',
   modalMicPermissionHint: 'Tu navegador te pedirá permiso para usar el micrófono.',
+  modalAvRecordNow: 'Grabar ahora',
+  modalAvRecordVideoLine: 'Usa la cámara de tu equipo.',
+  modalAvUploadVideo: 'Subir un video',
+  modalAvUploadVideoLine: 'Desde tu celular o computador, o con un enlace.',
+  modalAvRecordAudioLine: 'Usa el micrófono de tu equipo.',
+  modalAvUploadAudio: 'Subir un audio',
+  modalAvUploadAudioLine: 'Desde tu celular o computador.',
+  modalTapCamera: 'Toca para encender la cámara',
+  modalTapRecord: 'Toca para grabar',
+  modalTapStop: 'Toca para detener',
+  modalRecordAgain: 'Grabar de nuevo',
+  modalChooseVideo: 'Elige un video',
+  modalChooseAudio: 'Elige un audio',
+  modalPasteLink: 'o pega un enlace',
   modalCameraDenied:
     'No tenemos permiso para usar tu cámara. Actívalo en tu navegador o sube un video que ya tengas.',
   modalCameraUnsupported:
@@ -252,6 +280,20 @@ const es: StoryFlowMessages = {
 
 const pt: StoryFlowMessages = {
   ...es,
+  modalAvRecordNow: 'Gravar agora',
+  modalAvRecordVideoLine: 'Use a câmera do seu aparelho.',
+  modalAvUploadVideo: 'Enviar um vídeo',
+  modalAvUploadVideoLine: 'Do seu celular ou computador, ou com um link.',
+  modalAvRecordAudioLine: 'Use o microfone do seu aparelho.',
+  modalAvUploadAudio: 'Enviar um áudio',
+  modalAvUploadAudioLine: 'Do seu celular ou computador.',
+  modalTapCamera: 'Toque para ligar a câmera',
+  modalTapRecord: 'Toque para gravar',
+  modalTapStop: 'Toque para parar',
+  modalRecordAgain: 'Gravar de novo',
+  modalChooseVideo: 'Escolha um vídeo',
+  modalChooseAudio: 'Escolha um áudio',
+  modalPasteLink: 'ou cole um link',
   modalReadyTitleVideo: 'Vídeo pronto',
   modalReadyTitleAudio: 'Áudio pronto',
   modalChangeFile: 'Mudar ficheiro',
@@ -339,6 +381,20 @@ const pt: StoryFlowMessages = {
 
 const en: StoryFlowMessages = {
   ...es,
+  modalAvRecordNow: 'Record now',
+  modalAvRecordVideoLine: "Use your device's camera.",
+  modalAvUploadVideo: 'Upload a video',
+  modalAvUploadVideoLine: 'From your phone or computer, or with a link.',
+  modalAvRecordAudioLine: "Use your device's microphone.",
+  modalAvUploadAudio: 'Upload audio',
+  modalAvUploadAudioLine: 'From your phone or computer.',
+  modalTapCamera: 'Tap to turn on the camera',
+  modalTapRecord: 'Tap to record',
+  modalTapStop: 'Tap to stop',
+  modalRecordAgain: 'Record again',
+  modalChooseVideo: 'Choose a video',
+  modalChooseAudio: 'Choose audio',
+  modalPasteLink: 'or paste a link',
   modalReadyTitleVideo: 'Video ready',
   modalReadyTitleAudio: 'Audio ready',
   modalChangeFile: 'Change file',

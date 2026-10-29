@@ -16,8 +16,7 @@ import {
   Users,
   MapPin,
   Globe2,
-  Mail,
-  Link2 } from 'lucide-react';
+  Mail } from 'lucide-react';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
   probeAudioFileDurationSeconds,
@@ -194,6 +193,12 @@ function formatMmSs(totalSec: number): string {
   const m = Math.floor(totalSec / 60);
   const s = totalSec % 60;
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
+}
+
+function formatClock(totalSec: number): string {
+  const m = Math.floor(Math.max(0, totalSec) / 60);
+  const s = Math.max(0, totalSec) % 60;
+  return `${m}:${String(s).padStart(2, '0')}`;
 }
 
 function pickVideoMime(): string | undefined {
@@ -776,24 +781,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
   }, [applyMediaErr]);
 
-  const startAudioCapture = useCallback(async () => {
-    setErr('');
-    const requestToken = ++mediaRequestTokenRef.current;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (requestToken !== mediaRequestTokenRef.current) {
-        stream.getTracks().forEach((track) => track.stop());
-        return;
-      }
-      streamRef.current = stream;
-      setStreamReady(true);
-    } catch (e) {
-      if (requestToken !== mediaRequestTokenRef.current) return;
-      applyMediaErr(classifyMediaCaptureError(e, 'getUserMedia'), 'audio');
-      setStreamReady(false);
-    }
-  }, [applyMediaErr]);
-
   const startRecordingVideo = useCallback(() => {
     const stream = streamRef.current;
     if (!stream) return;
@@ -941,6 +928,25 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       applyMediaErr(classifyMediaCaptureError(e, 'recorder'), 'audio');
     }
   }, [applyMediaErr, revokePreview, stopStream, stopTimer, t.modalFileTooLongAudio]);
+
+  const beginAudioRecording = useCallback(async () => {
+    setErr('');
+    const requestToken = ++mediaRequestTokenRef.current;
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (requestToken !== mediaRequestTokenRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      streamRef.current = stream;
+      setStreamReady(true);
+      startRecordingAudio();
+    } catch (e) {
+      if (requestToken !== mediaRequestTokenRef.current) return;
+      applyMediaErr(classifyMediaCaptureError(e, 'getUserMedia'), 'audio');
+      setStreamReady(false);
+    }
+  }, [applyMediaErr, startRecordingAudio]);
 
   const stopRecording = useCallback(() => {
     const mr = recorderRef.current;
@@ -1940,6 +1946,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   if (step === 'capture') {
     const copy = t.upload[mode];
+    const avChoiceClass = (on: boolean) =>
+      `flex flex-col items-start gap-1 rounded-2xl border-2 bg-transparent px-4 py-3 text-left text-[length:var(--fs-pequeno)] ${
+        on ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/15 text-[#1C1C2E]'
+      }`;
     return (
       <FormatCaptureEditorialShell
         copy={copy}
@@ -1958,7 +1968,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {mediaErrKind && (mode === 'video' || mode === 'audio') ? (
               <button
                 type="button"
-                className={amStyles.amModalBtnPrimary}
+                className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
                 onClick={() => switchAvSource('archivo')}
               >
                 {mode === 'video' ? t.modalSwitchToUploadVideo : t.modalSwitchToUploadAudio}
@@ -1989,24 +1999,26 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
         {mode === 'video' && (
           <div className="space-y-4">
-            <div className={amStyles.amModalTabs}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
+                aria-pressed={avSource === 'grabar'}
                 onClick={() => switchAvSource('grabar')}
-                className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
+                className={avChoiceClass(avSource === 'grabar')}
               >
-                <Video className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
-                {t.modalRecordVideo}
+                <Video size={22} aria-hidden />
+                <span className="font-semibold">{t.modalAvRecordNow}</span>
+                <span className="font-normal leading-snug">{t.modalAvRecordVideoLine}</span>
               </button>
               <button
                 type="button"
+                aria-pressed={avSource === 'archivo'}
                 onClick={() => switchAvSource('archivo')}
-                className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
+                className={avChoiceClass(avSource === 'archivo')}
               >
-                <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
-                {t.modalUploadOrLink}
+                <Upload size={22} aria-hidden />
+                <span className="font-semibold">{t.modalAvUploadVideo}</span>
+                <span className="font-normal leading-snug">{t.modalAvUploadVideoLine}</span>
               </button>
             </div>
             {avSource === 'grabar' && !mediaBlob && (
@@ -2016,116 +2028,118 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     <button
                       type="button"
                       onClick={() => void startVideoCapture()}
-                      className={amStyles.amModalBtnPrimary}
-                      aria-label="Activar cámara para grabar"
+                      className="flex aspect-video w-full items-center justify-center rounded-2xl border-2 border-black/15 bg-transparent px-4 text-center text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
                     >
-                      {copy.primaryCta}
+                      {t.modalTapCamera}
                     </button>
-                    <p className="text-center text-[length:var(--fs-pequeno)] text-gray-700">{t.modalCameraPermissionHint}</p>
+                    <p className="m-0 text-center text-[length:var(--fs-etiqueta)] text-[#4A5568]">{t.modalCameraPermissionHint}</p>
                   </div>
                 )}
                 {streamReady && (
-                  <div className="space-y-3 text-center">
-                    <div
-                      className="relative mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-3xl bg-gray-300/40"
-                      style={soft.inset}
-                    >
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
                       <video
                         ref={videoLiveRef}
                         className="h-full w-full scale-x-[-1] object-cover"
                         playsInline
                         muted
                         autoPlay
-                        aria-label={recording ? 'Grabando: vista de cámara en vivo' : 'Vista previa de cámara en vivo'}
+                        aria-label={recording ? t.modalTapStop : t.modalTapCamera}
                       />
                     </div>
-                    {!recording ? (
-                      <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-                        <span className="text-[length:var(--fs-subtitulo)] font-mono font-semibold text-gray-700 " aria-live="polite">
-                          {formatMmSs(recordSec)}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={startRecordingVideo}
-                          className="flex items-center justify-center gap-2 rounded-full px-8 py-4 text-[length:var(--fs-texto)] font-bold text-white "
-                          style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
-                          aria-label="Comenzar a grabar video"
-                        >
-                          <Video size={22} aria-hidden />
-                          {t.modalRecord}
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <p className="text-[length:var(--fs-subtitulo)] font-semibold text-orange-600 " aria-live="polite">
-                          {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
-                        </p>
-                        {recordSec >= 270 ? (
-                          <p className="text-[length:var(--fs-pequeno)] font-semibold text-orange-700" aria-live="assertive">
-                            {t.modalRecordingSoonEnd}
-                          </p>
-                        ) : null}
-                        <button
-                          type="button"
-                          onClick={stopRecording}
-                          className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-4 text-[length:var(--fs-texto)] font-bold text-white shadow-lg "
-                          aria-label={t.modalStop}
-                        >
-                          <Square size={22} aria-hidden />
-                          {t.modalStop}
-                        </button>
-                      </>
-                    )}
+                    <button
+                      type="button"
+                      onClick={recording ? stopRecording : startRecordingVideo}
+                      aria-pressed={recording}
+                      aria-label={recording ? t.modalTapStop : t.modalTapRecord}
+                      className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
+                        recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
+                      }`}
+                    >
+                      {recording ? (
+                        <Square size={22} aria-hidden />
+                      ) : (
+                        <span className="h-6 w-6 rounded-full border-2 border-current" aria-hidden />
+                      )}
+                    </button>
+                    <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold" aria-live="polite">
+                      {formatClock(recordSec)} / {formatClock(MAX_AUDIO_VIDEO_DURATION_SECONDS)}
+                    </p>
+                    {recording && recordSec >= 270 ? (
+                      <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]" aria-live="assertive">
+                        {t.modalRecordingSoonEnd}
+                      </p>
+                    ) : null}
                   </div>
                 )}
               </>
             )}
-            {mediaBlob && previewUrl && avSource === 'grabar' &&
-              renderReadyCard(
-                'video',
-                `${t.modalRecordingName}.${mediaBlob.type.includes('mp4') ? 'mp4' : 'webm'}`,
-                mediaBlob.size
-              )}
+            {mediaBlob && previewUrl && avSource === 'grabar' ? (
+              <div className="flex flex-col items-center gap-3">
+                {avCardError ? (
+                  <p className="m-0 text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
+                    {avCardError}
+                  </p>
+                ) : null}
+                <video
+                  key={previewUrl}
+                  src={previewUrl}
+                  className="aspect-video w-full rounded-2xl bg-black object-contain"
+                  playsInline
+                  controls
+                  preload="metadata"
+                  aria-label={t.modalReadyTitleVideo}
+                />
+                <button
+                  type="button"
+                  onClick={discardRecording}
+                  className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
+                >
+                  {t.modalRecordAgain}
+                </button>
+              </div>
+            ) : null}
             {avSource === 'archivo' && (
               <div className="space-y-4">
-                {uploadVideoFile ? null : (
-                  <label htmlFor="story-video-file" className="flex items-center gap-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
-                    <Upload className="h-4 w-4 text-orange-500" aria-hidden />
-                    Video desde tu equipo (máx. {SUBIR_VIDEO_UPLOAD_MAX_MB} MB)
-                  </label>
+                {uploadVideoFile ? (
+                  renderReadyCard('video', uploadVideoFile.name, uploadVideoFile.size)
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => videoFileRef.current?.click()}
+                    className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
+                  >
+                    {t.modalChooseVideo}
+                  </button>
                 )}
                 <input
                   ref={videoFileRef}
                   id="story-video-file"
                   type="file"
                   accept={SUBIR_VIDEO_FILE_ACCEPT}
-                  aria-label="Elegir video desde tu equipo"
+                  aria-label={t.modalChooseVideo}
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
                     if (!f) return;
                     acceptUploadFile('video', f);
                   }}
-                  className={uploadVideoFile ? 'sr-only' : 'w-full text-[length:var(--fs-pequeno)] text-gray-600'}
+                  className="sr-only"
                 />
-                {uploadVideoFile
-                  ? renderReadyCard('video', uploadVideoFile.name, uploadVideoFile.size)
-                  : null}
-                <label htmlFor="story-video-url" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
-                  O pega un enlace (YouTube o Vimeo)
+                <label htmlFor="story-video-url" className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E]">
+                  {t.modalPasteLink}
+                  <input
+                    id="story-video-url"
+                    type="url"
+                    value={videoShareUrl}
+                    onChange={(e) => {
+                      setVideoShareUrl(e.target.value);
+                      if (e.target.value.trim()) removePickedFile();
+                    }}
+                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[16px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]"
+                    aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
+                  />
                 </label>
-                <input
-                  id="story-video-url"
-                  type="url"
-                  value={videoShareUrl}
-                  onChange={(e) => {
-                    setVideoShareUrl(e.target.value);
-                    if (e.target.value.trim()) removePickedFile();
-                  }}
-                  className="w-full rounded-xl px-3 py-2.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
-                  style={{ ...soft.flat, borderRadius: '12px' }}
-                  aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
-                />
                 <p className="text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalVideoLinkHint}</p>
                 {videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl) ? (
                   <p className="text-[length:var(--fs-etiqueta)] text-amber-700" role="alert">
@@ -2139,129 +2153,102 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
         {mode === 'audio' && (
           <div className="space-y-4">
-            <div className={amStyles.amModalTabs}>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <button
                 type="button"
+                aria-pressed={avSource === 'grabar'}
                 onClick={() => switchAvSource('grabar')}
-                className={amStyles.amModalTab}
-                style={avSource === 'grabar' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
+                className={avChoiceClass(avSource === 'grabar')}
               >
-                <Mic className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
-                {t.modalRecordVoice}
+                <Mic size={22} aria-hidden />
+                <span className="font-semibold">{t.modalAvRecordNow}</span>
+                <span className="font-normal leading-snug">{t.modalAvRecordAudioLine}</span>
               </button>
               <button
                 type="button"
+                aria-pressed={avSource === 'archivo'}
                 onClick={() => switchAvSource('archivo')}
-                className={amStyles.amModalTab}
-                style={avSource === 'archivo' ? { ...soft.button, color: 'var(--almamundi-orange)' } : soft.button}
+                className={avChoiceClass(avSource === 'archivo')}
               >
-                <Link2 className="mr-1 inline h-3.5 w-3.5 shrink-0 align-text-bottom" aria-hidden />
-                {t.modalUploadOrLink}
+                <Upload size={22} aria-hidden />
+                <span className="font-semibold">{t.modalAvUploadAudio}</span>
+                <span className="font-normal leading-snug">{t.modalAvUploadAudioLine}</span>
               </button>
             </div>
             {avSource === 'grabar' && !mediaBlob && (
-              <>
-                {!streamReady && !recording && (
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => void startAudioCapture()}
-                      className={amStyles.amModalBtnPrimary}
-                      aria-label="Activar micrófono"
-                    >
-                      {copy.primaryCta}
-                    </button>
-                    <p className="text-center text-[length:var(--fs-pequeno)] text-gray-700">{t.modalMicPermissionHint}</p>
-                  </div>
-                )}
-                {streamReady && !recording && (
-                  <div className="flex flex-col items-center gap-6 py-6">
-                    <div className="flex h-32 w-32 items-center justify-center rounded-full" style={soft.inset} aria-hidden>
-                      <Mic className="h-14 w-14 text-orange-500" />
-                    </div>
-                    <p className="font-mono text-[length:var(--fs-titular)] text-gray-700 " aria-live="polite">
-                      {formatMmSs(recordSec)}
-                    </p>
-                    <button
-                      type="button"
-                      onClick={startRecordingAudio}
-                      className="rounded-full px-10 py-4 text-[length:var(--fs-texto)] font-bold text-white "
-                      style={{ background: 'linear-gradient(180deg,#FF4A1C,#FF4A1C)', boxShadow: '0 8px 24px rgba(255, 74, 28,0.35)' }}
-                      aria-label={t.modalRecordVoice}
-                    >
-                      {t.modalRecord}
-                    </button>
-                  </div>
-                )}
-                {recording && (
-                  <div className="flex flex-col items-center gap-6 py-6">
-                    <div className="relative flex h-36 w-36 items-center justify-center rounded-full" style={soft.inset}>
-                      <span className="absolute inset-3 animate-pulse rounded-full bg-orange-400/25" aria-hidden />
-                      <Mic className="relative z-10 h-16 w-16 text-orange-600" aria-hidden />
-                    </div>
-                    <p className="text-[length:var(--fs-subtitulo)] font-semibold text-orange-600 " aria-live="polite">
-                      {interpolate(t.modalRecordingProgress, { time: formatMmSs(recordSec) })}
-                    </p>
-                    {recordSec >= 270 ? (
-                      <p className="text-[length:var(--fs-pequeno)] font-semibold text-orange-700" aria-live="assertive">
-                        {t.modalRecordingSoonEnd}
-                      </p>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={stopRecording}
-                      className="rounded-full bg-red-600 px-10 py-4 text-[length:var(--fs-texto)] font-bold text-white "
-                      aria-label={t.modalStop}
-                    >
-                      {t.modalStop}
-                    </button>
-                  </div>
-                )}
-              </>
+              <div className="flex flex-col items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => (recording ? stopRecording() : void beginAudioRecording())}
+                  aria-pressed={recording}
+                  aria-label={recording ? t.modalTapStop : t.modalTapRecord}
+                  className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
+                    recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
+                  }`}
+                >
+                  <Mic size={28} aria-hidden />
+                </button>
+                <p className="m-0 text-[length:var(--fs-pequeno)]">{recording ? t.modalTapStop : t.modalTapRecord}</p>
+                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold" aria-live="polite">
+                  {formatClock(recordSec)} / {formatClock(MAX_AUDIO_VIDEO_DURATION_SECONDS)}
+                </p>
+                {recording && recordSec >= 270 ? (
+                  <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]" aria-live="assertive">
+                    {t.modalRecordingSoonEnd}
+                  </p>
+                ) : null}
+              </div>
             )}
-            {mediaBlob && previewUrl && avSource === 'grabar' &&
-              renderReadyCard(
-                'audio',
-                `${t.modalRecordingName}.${mediaBlob.type.includes('mp4') ? 'm4a' : 'webm'}`,
-                mediaBlob.size
-              )}
+            {mediaBlob && previewUrl && avSource === 'grabar' ? (
+              <div className="flex flex-col items-center gap-3">
+                {avCardError ? (
+                  <p className="m-0 text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
+                    {avCardError}
+                  </p>
+                ) : null}
+                <audio
+                  key={previewUrl}
+                  src={previewUrl}
+                  controls
+                  preload="metadata"
+                  className="w-full"
+                  aria-label={t.modalReadyTitleAudio}
+                />
+                <button
+                  type="button"
+                  onClick={discardRecording}
+                  className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
+                >
+                  {t.modalRecordAgain}
+                </button>
+              </div>
+            ) : null}
             {avSource === 'archivo' && (
               <div className="space-y-4">
-                {uploadAudioFile ? null : (
-                  <label htmlFor="story-audio-file" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
-                    Audio desde tu equipo (hasta {SUBIR_AUDIO_UPLOAD_MAX_MB} MB)
-                  </label>
+                {uploadAudioFile ? (
+                  renderReadyCard('audio', uploadAudioFile.name, uploadAudioFile.size)
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => audioFileRef.current?.click()}
+                    className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
+                  >
+                    {t.modalChooseAudio}
+                  </button>
                 )}
                 <input
                   ref={audioFileRef}
                   id="story-audio-file"
                   type="file"
                   accept={SUBIR_AUDIO_FILE_ACCEPT}
-                  aria-label="Elegir audio desde tu equipo"
+                  aria-label={t.modalChooseAudio}
                   onChange={(e) => {
                     const f = e.target.files?.[0];
                     e.target.value = '';
                     if (!f) return;
                     acceptUploadFile('audio', f);
                   }}
-                  className={uploadAudioFile ? 'sr-only' : 'w-full text-[length:var(--fs-pequeno)] text-gray-600'}
-                />
-                {uploadAudioFile
-                  ? renderReadyCard('audio', uploadAudioFile.name, uploadAudioFile.size)
-                  : null}
-                <label htmlFor="story-audio-url" className="block text-[length:var(--fs-pequeno)] font-semibold text-gray-800">
-                  {t.modalAudioLinkLabel}
-                </label>
-                <input
-                  id="story-audio-url"
-                  type="url"
-                  value={audioShareUrl}
-                  onChange={(e) => {
-                    setAudioShareUrl(e.target.value);
-                    if (e.target.value.trim()) removePickedFile();
-                  }}
-                  className="w-full rounded-xl px-3 py-2.5 text-[length:var(--fs-pequeno)] outline-none text-gray-800"
-                  style={{ ...soft.flat, borderRadius: '12px' }}
+                  className="sr-only"
                 />
               </div>
             )}
