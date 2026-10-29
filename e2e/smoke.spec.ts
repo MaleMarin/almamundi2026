@@ -18,15 +18,10 @@ test.describe('smoke', () => {
     });
   });
 
-  test('/historias/videos muestra el carrusel de historias', async ({ page }) => {
-    const res = await page.goto('/historias/videos', { waitUntil: 'domcontentloaded' });
+  test('/historias muestra las pestañas del listado', async ({ page }) => {
+    const res = await page.goto('/historias', { waitUntil: 'domcontentloaded' });
     expect(res?.ok()).toBeTruthy();
-    const carousel = page.locator('#historias-carrusel');
-    await expect(carousel).toBeVisible({ timeout: 60_000 });
-    await expect(carousel).toHaveAttribute('aria-label', 'Carrusel de historias');
-    // Título de exposición o estado vacío (API/demo); ambos cuentan como “algo visible”.
-    await expect(
-      page.getByText(/historias en video|No hay historias para mostrar en este formato/i)
-    ).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole('tab', { name: 'Todas' })).toBeVisible({ timeout: 60_000 });
+    await expect(page.getByRole('tab', { name: 'Video' })).toBeVisible();
   });
 });

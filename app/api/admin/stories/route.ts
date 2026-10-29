@@ -412,7 +412,7 @@ export async function GET(request: NextRequest) {
         topic: Array.isArray(d.topic) ? d.topic : (d.tags as { themes?: string[] })?.themes ?? [],
         status: d.status ?? "pending",
         activeSince,
-        isFeatured: Boolean(d.isFeatured),
+        isFeatured: Boolean(d.isFeatured) || d.status === "featured",
         resonances: typeof d.resonances === "number" ? d.resonances : 0,
         createdAt,
         authorEmail: email || null,

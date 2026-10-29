@@ -11,7 +11,7 @@ import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
 
 export const runtime = "nodejs";
 
-type Action = "approve" | "reject" | "feature" | "archive";
+type Action = "approve" | "reject" | "feature" | "unfeature" | "archive";
 
 const PENDING_COLLECTIONS = ["submissions", "story_submissions"] as const;
 
@@ -111,7 +111,7 @@ export async function PATCH(
   }
 
   const action = body.action as Action | undefined;
-  if (!action || !["approve", "reject", "feature", "archive"].includes(action)) {
+  if (!action || !["approve", "reject", "feature", "unfeature", "archive"].includes(action)) {
     return NextResponse.json({ error: "invalid action" }, { status: 400 });
   }
 
@@ -128,6 +128,42 @@ export async function PATCH(
 
     const data = snap.data() as Record<string, unknown>;
     const currentStatus = String(data.status ?? "");
+    const destacada = currentStatus === "featured" || data.isFeatured === true;
+
+    if (action === "unfeature") {
+      if (!destacada) {
+        return NextResponse.json({ error: "Esta historia no está destacada." }, { status: 400 });
+      }
+      await ref.update({
+        status: currentStatus === "featured" ? "approved" : currentStatus,
+        isFeatured: false,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      await appendEditorialAuditLog(db, auth.email, "feature", {
+        storyId: id,
+        fromStatus: currentStatus,
+        toStatus: currentStatus === "featured" ? "approved" : currentStatus,
+        extras: { destacada: false },
+      });
+      return NextResponse.json({ ok: true, status: currentStatus === "featured" ? "approved" : currentStatus });
+    }
+
+    if (action === "feature" && !destacada) {
+      const [byStatus, byFlag] = await Promise.all([
+        db.collection("stories").where("status", "==", "featured").select("status").get(),
+        db.collection("stories").where("isFeatured", "==", true).select("isFeatured").get(),
+      ]);
+      const ids = new Set<string>();
+      for (const doc of byStatus.docs) ids.add(doc.id);
+      for (const doc of byFlag.docs) ids.add(doc.id);
+      ids.delete(id);
+      if (ids.size >= 3) {
+        return NextResponse.json(
+          { error: "Ya hay 3 historias destacadas. Quita una para marcar esta.", code: "featured_cap" },
+          { status: 409 }
+        );
+      }
+    }
 
     const nextStatus = nextStatusAfterAdminStoryAction(currentStatus, action);
     if (!nextStatus) {

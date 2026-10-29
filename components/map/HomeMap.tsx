@@ -170,7 +170,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [globeLayers, setGlobeLayers] = useState<GlobeLayerVisibility>({
     stories: true,
     bits: true,
-    news: false });
+    news: false,
+    respuestas: true });
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
   const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
 
@@ -191,8 +192,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, []);
 
   useEffect(() => {
-    if (!globeLayers.news) setOpenRespuesta(null);
-  }, [globeLayers.news]);
+    if (!globeLayers.respuestas) setOpenRespuesta(null);
+  }, [globeLayers.respuestas]);
   const [newsMarkersMounted, setNewsMarkersMounted] = useState(false);
 
   useEffect(() => {

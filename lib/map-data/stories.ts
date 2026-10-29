@@ -53,6 +53,10 @@ export type StoryPoint = {
   editorialStatus?: string;
   /** Conteo de «Me emocionó». No se publica en el sitio; el dato sigue en Firestore. */
   resonancesCount?: number;
+  /** Marcada en el admin. Entra al globo aunque no esté entre las 40 más recientes. */
+  featured?: boolean;
+  /** Tiene coordenadas y está entre las 40 recientes o es destacada. */
+  onGlobe?: boolean;
 };
 
 export function getStories(): StoryPoint[] {

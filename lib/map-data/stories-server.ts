@@ -4,7 +4,7 @@
  * El cliente usa getStoryById / getStories desde stories.ts (sin Firebase).
  *
  * Índice compuesto requerido: stories (status IN audience_public + publishedAt DESC).
- * El globo pide las `GLOBE_PUBLIC_STORY_CAP` más recientes (40); no hay TTL.
+ * El globo muestra las 40 aprobadas más recientes con coordenadas, más las destacadas.
  */
 import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
@@ -131,7 +131,10 @@ function firestoreDocToStoryPoint(
     lng: lngOut,
     label: title,
     authorName: authorNameRaw || undefined,
-    authorAvatar: (d.authorAvatar as string) ?? undefined,
+    authorAvatar:
+      (typeof d.authorAvatar === "string" && d.authorAvatar.trim()) ||
+      (typeof d.profilePhotoUrl === "string" && d.profilePhotoUrl.trim()) ||
+      undefined,
     title,
     description: excerpt ?? descripcion ?? (text ? String(text).slice(0, 200) : undefined),
     excerpt,
@@ -163,31 +166,60 @@ function firestoreDocToStoryPoint(
   return base;
 }
 
+function isDestacadaRecord(d: Record<string, unknown>): boolean {
+  return d.status === "featured" || d.isFeatured === true;
+}
+
+function publishedMillis(d: Record<string, unknown>): number {
+  const iso = publishedAtIso(d);
+  if (!iso) return 0;
+  const t = Date.parse(iso);
+  return Number.isFinite(t) ? t : 0;
+}
+
+async function loadAudienceStoryDocs(): Promise<{ id: string; data: Record<string, unknown> }[]> {
+  const { getAdminDb } = await import("@/lib/firebase/admin");
+  const db = getAdminDb();
+  const snap = await db
+    .collection("stories")
+    .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
+    .orderBy("publishedAt", "desc")
+    .get();
+  return snap.docs.map((doc) => ({ id: doc.id, data: doc.data() as Record<string, unknown> }));
+}
+
+function globeStoryIds(docs: { id: string; data: Record<string, unknown> }[]): Set<string> {
+  const withGeo = docs.filter((doc) => {
+    const { lat, lng } = resolveLatLng(doc.data);
+    if (lat == null || lng == null) {
+      console.warn(`[getStoriesAsync] Historia aprobada sin coordenadas, omitida del globo: ${doc.id}`);
+      return false;
+    }
+    return true;
+  });
+  const ordered = [...withGeo].sort((a, b) => publishedMillis(b.data) - publishedMillis(a.data));
+  const recent = ordered.slice(0, GLOBE_PUBLIC_STORY_CAP);
+  const ids = new Set(recent.map((doc) => doc.id));
+  for (const doc of ordered) {
+    if (isDestacadaRecord(doc.data)) ids.add(doc.id);
+  }
+  return ids;
+}
+
 export async function getStoriesAsync(): Promise<StoryPoint[]> {
   try {
-    const { getAdminDb } = await import("@/lib/firebase/admin");
-    const db = getAdminDb();
-
-    const snap = await db
-      .collection("stories")
-      .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
-      .orderBy("publishedAt", "desc")
-      .limit(GLOBE_PUBLIC_STORY_CAP)
-      .get();
-
+    const docs = await loadAudienceStoryDocs();
+    const ids = globeStoryIds(docs);
     const stories: StoryPoint[] = [];
-    for (const doc of snap.docs) {
-      const data = doc.data() as Record<string, unknown>;
-      const point = firestoreDocToStoryPoint(doc.id, data, true);
-      if (point) {
-        stories.push(point);
-        continue;
-      }
-      const { lat, lng } = resolveLatLng(data);
-      if (lat == null || lng == null) {
-        console.warn(`[getStoriesAsync] Historia aprobada sin coordenadas, omitida del globo: ${doc.id}`);
-      }
+    for (const doc of docs) {
+      if (!ids.has(doc.id)) continue;
+      const point = firestoreDocToStoryPoint(doc.id, doc.data, true);
+      if (!point) continue;
+      point.featured = isDestacadaRecord(doc.data);
+      point.onGlobe = true;
+      stories.push(point);
     }
+    stories.sort((a, b) => (Date.parse(b.publishedAt ?? "") || 0) - (Date.parse(a.publishedAt ?? "") || 0));
     return stories;
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -212,6 +244,32 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
     } else {
       console.error("[getStoriesAsync] Firestore error:", err);
     }
+    return [];
+  }
+}
+
+/** Todas las historias públicas, en el globo o no. Sin el texto del relato. */
+export async function getPublicCatalogAsync(): Promise<StoryPoint[]> {
+  try {
+    const docs = await loadAudienceStoryDocs();
+    const onGlobe = globeStoryIds(docs);
+    const stories: StoryPoint[] = [];
+    for (const doc of docs) {
+      const point = firestoreDocToStoryPoint(doc.id, doc.data, false);
+      if (!point) continue;
+      point.featured = isDestacadaRecord(doc.data);
+      point.onGlobe = onGlobe.has(doc.id);
+      point.body = undefined;
+      point.excerpt = undefined;
+      point.quote = undefined;
+      point.description = undefined;
+      point.transcription = undefined;
+      stories.push(point);
+    }
+    stories.sort((a, b) => (Date.parse(b.publishedAt ?? "") || 0) - (Date.parse(a.publishedAt ?? "") || 0));
+    return stories;
+  } catch (err) {
+    console.error("[getPublicCatalogAsync]", err);
     return [];
   }
 }

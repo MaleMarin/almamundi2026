@@ -52,16 +52,20 @@ export type GlobeLayerVisibility = {
   stories: boolean;
   bits: boolean;
   news: boolean;
+  /** Anillos de la pregunta vigente. Visibles siempre; el dock solo abre el panel. */
+  respuestas: boolean;
 };
 
 const DEFAULT_LAYER_VISIBILITY: GlobeLayerVisibility = {
   stories: true,
   bits: true,
-  news: false };
+  news: false,
+  respuestas: true };
 
 function markerLayerKind(bit: GlobeBitMarker): keyof GlobeLayerVisibility {
   if (bit.markerKind === 'story') return 'stories';
-  if (bit.markerKind === 'news' || bit.markerKind === 'respuesta') return 'news';
+  if (bit.markerKind === 'respuesta') return 'respuestas';
+  if (bit.markerKind === 'news') return 'news';
   return 'bits';
 }
 
@@ -143,7 +147,7 @@ function BitDot({
   storyRippleMatHover: THREE.ShaderMaterial;
   newsMat: THREE.ShaderMaterial;
   respuestaMat: THREE.ShaderMaterial;
-  layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number }>;
+  layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number; respuestas: number }>;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
     const p = latLngToCartesianThreeJS(bit.lat, bit.lon, BIT_SURFACE_RADIUS);
@@ -412,7 +416,7 @@ function GlobeBitsLayerMounted({
 }) {
   const bitsRootRef = useRef<THREE.Group>(null);
   const { camera, gl } = useThree();
-  const layerOpRef = useRef({ stories: 1, bits: 1, news: 0 });
+  const layerOpRef = useRef({ stories: 1, bits: 1, news: 0, respuestas: 1 });
 
   const [hoverCandidateId, setHoverCandidateId] = useState<number | null>(null);
   useCursor(!!hoverCandidateId && Boolean(onBitClick));
@@ -481,6 +485,7 @@ function GlobeBitsLayerMounted({
     op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? 1 : 0, 7, dt);
     op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? 1 : 0, 7, dt);
     op.news = THREE.MathUtils.damp(op.news, layerVisibility.news ? 1 : 0, 7, dt);
+    op.respuestas = THREE.MathUtils.damp(op.respuestas, layerVisibility.respuestas ? 1 : 0, 7, dt);
     setMatLayerOpacity(starMatNormal, op.bits);
     setMatLayerOpacity(starMatSelected, op.bits);
     setMatLayerOpacity(storyMatNormal, op.stories);
@@ -488,7 +493,7 @@ function GlobeBitsLayerMounted({
     setMatLayerOpacity(storyRippleMat, op.stories);
     setMatLayerOpacity(storyRippleMatHover, op.stories);
     setMatLayerOpacity(newsMat, op.news);
-    setMatLayerOpacity(respuestaMat, op.news);
+    setMatLayerOpacity(respuestaMat, op.respuestas);
   });
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {

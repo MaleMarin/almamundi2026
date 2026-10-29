@@ -8,20 +8,16 @@ import { siteOrigin } from '@/lib/site-origin';
 export const revalidate = 3600;
 
 /**
- * Rutas estáticas que responden 200. Sin /historias ni /mapa (redirigen)
+ * Rutas estáticas que responden 200. Sin /mapa ni /archivo (redirigen)
  * ni /muestras (recorrido demo).
  */
 const STATIC_PATHS: string[] = [
   '/',
-  '/historias/videos',
-  '/historias/audios',
-  '/historias/fotos',
-  '/historias/escrito',
+  '/historias',
   '/temas',
   '/exposiciones',
   '/educacion-mediatica',
   '/recorridos',
-  '/archivo',
   '/privacidad',
   '/terminos',
   '/vision',

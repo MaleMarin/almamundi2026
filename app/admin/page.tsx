@@ -567,7 +567,7 @@ export default function AdminPage() {
 
   const patchStory = async (
     id: string,
-    action: 'approve' | 'reject' | 'feature' | 'archive',
+    action: 'approve' | 'reject' | 'feature' | 'unfeature' | 'archive',
     place?: { city: string; country: string }
   ) => {
     setActionLoading(id);
@@ -603,7 +603,15 @@ export default function AdminPage() {
             showToast('Aprobada al mapa');
           }
         } else {
-          showToast(action === 'reject' ? 'Rechazada' : action === 'feature' ? 'Destacada' : 'Archivada');
+          showToast(
+            action === 'reject'
+              ? 'Rechazada'
+              : action === 'feature'
+                ? 'Destacada'
+                : action === 'unfeature'
+                  ? 'Ya no está destacada'
+                  : 'Archivada'
+          );
         }
         setPlacePrompt((prev) => {
           const next = { ...prev };
@@ -1054,29 +1062,27 @@ export default function AdminPage() {
                     ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8 }}>
-                    {!s.isFeatured && (
-                      <button
-                        type="button"
-                        disabled={actionLoading === s.id}
-                        onClick={() => patchStory(s.id, 'feature')}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: 6,
-                          padding: '8px 14px',
-                          borderRadius: 999,
-                          border: '1px solid rgba(255,215,0,0.4)',
-                          background: 'rgba(255,215,0,0.15)',
-                          color: '#fde047',
-                          fontWeight: 600,
-                          fontSize: 13,
-                          cursor: 'pointer',
-                          fontFamily: APP_FONT,
-                        }}
-                      >
-                        <Star size={16} /> Destacar
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      disabled={actionLoading === s.id}
+                      onClick={() => patchStory(s.id, s.isFeatured ? 'unfeature' : 'feature')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 6,
+                        padding: '8px 14px',
+                        borderRadius: 999,
+                        border: '1px solid rgba(255,215,0,0.4)',
+                        background: s.isFeatured ? 'rgba(255,215,0,0.28)' : 'rgba(255,215,0,0.15)',
+                        color: '#fde047',
+                        fontWeight: 600,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                        fontFamily: APP_FONT,
+                      }}
+                    >
+                      <Star size={16} /> {s.isFeatured ? 'Quitar destacada' : 'Destacada'}
+                    </button>
                     <button
                       type="button"
                       disabled={actionLoading === s.id}

@@ -94,10 +94,15 @@ const nextConfig: NextConfig = {
       { source: '/subir/', destination: '/contar', permanent: true },
       { source: '/subir/foto', destination: '/contar/foto', permanent: true },
       { source: '/subir/foto/', destination: '/contar/foto', permanent: true },
-      { source: '/historias', destination: '/historias/videos', permanent: false },
+      { source: '/archivo', destination: '/historias', permanent: true },
+      { source: '/archivo/', destination: '/historias', permanent: true },
+      { source: '/historias/videos', destination: '/historias?formato=video', permanent: true },
+      { source: '/historias/audios', destination: '/historias?formato=audio', permanent: true },
+      { source: '/historias/escrito', destination: '/historias?formato=texto', permanent: true },
+      { source: '/historias/fotos', destination: '/historias?formato=foto', permanent: true },
       {
         source: '/historias/videos/exhibicion-demo',
-        destination: '/historias/videos',
+        destination: '/historias?formato=video',
         permanent: false,
       },
     ];
