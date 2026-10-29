@@ -196,6 +196,9 @@ const FULL_STORY_LABEL = {
 /** El eco sigue en el código. No se muestra en el sitio público por ahora. */
 const SHOW_PUBLIC_ECO = false;
 
+/** «Me emocionó» y su contador siguen en el código. No se muestran en el sitio público. */
+const SHOW_PUBLIC_RESONANCE = false;
+
 const FORMAT_LABEL = {
   es: { video: 'Video', audio: 'Audio', image: 'Foto', text: 'Texto' },
   pt: { video: 'Vídeo', audio: 'Áudio', image: 'Foto', text: 'Texto' },
@@ -929,6 +932,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   flexWrap: 'wrap',
                   marginTop: 8 }}
               >
+                {SHOW_PUBLIC_RESONANCE ? (
                 <button
                   type="button"
                   className="btn-am-secundario"
@@ -960,6 +964,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     {(story.resonancesCount ?? 0) + resonanceExtra}
                   </span>
                 </button>
+                ) : null}
                 <button
                   type="button"
                   className="btn-am-principal"

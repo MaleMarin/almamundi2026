@@ -157,12 +157,6 @@ function firestoreDocToStoryPoint(
     isBetaDemo: isBetaDemo ? true : undefined,
     editorialStatus: typeof status === "string" ? status : undefined,
     isRealStory: !isBetaDemo,
-    resonancesCount:
-      typeof d.resonancesCount === 'number'
-        ? d.resonancesCount
-        : typeof d.resonances === 'number'
-          ? d.resonances
-          : 0,
     ...accessibility,
   };
 

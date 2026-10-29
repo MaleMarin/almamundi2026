@@ -51,7 +51,7 @@ export type StoryPoint = {
   isRealStory?: boolean;
   demoNotice?: string;
   editorialStatus?: string;
-  /** Personas que marcaron «Me emocionó». Conteo público. */
+  /** Conteo de «Me emocionó». No se publica en el sitio; el dato sigue en Firestore. */
   resonancesCount?: number;
 };
 

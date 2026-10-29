@@ -2,7 +2,7 @@
  * lib/userLocation.ts
  *
  * Obtiene la ubicación aproximada del usuario.
- * Solo se pide al tocar «Me emocionó».
+ * El código queda para «Me emocionó». Mientras esa función está oculta, no se pide ubicación.
  * No se pide al terminar de leer, oír o ver una historia.
  */
 
@@ -18,8 +18,12 @@ let inFlight: Promise<ApproxLocation | null> | null = null;
  * Intenta obtener la ubicación del usuario de forma silenciosa.
  * Cachea el resultado para no pedir permiso múltiples veces.
  * Llamadas concurrentes comparten la misma petición (un solo prompt).
+ * Mientras la resonancia pública está oculta, no se llama a la geolocalización.
  */
+const ASK_PUBLIC_LOCATION = false;
+
 export async function getApproxLocation(): Promise<ApproxLocation | null> {
+  if (!ASK_PUBLIC_LOCATION) return null;
   if (cachedLocation) return cachedLocation;
   if (typeof window === 'undefined') return null;
   if (inFlight) return inFlight;
