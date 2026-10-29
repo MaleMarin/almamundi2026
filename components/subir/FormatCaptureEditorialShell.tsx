@@ -16,6 +16,7 @@ type Props = {
   /** Título con saltos de línea (texto, foto). */
   titlePreLine?: boolean;
   footnote?: string | null;
+  className?: string;
 };
 
 export function FormatCaptureEditorialShell({
@@ -28,7 +29,8 @@ export function FormatCaptureEditorialShell({
   kicker,
   children,
   titlePreLine = false,
-  footnote }: Props) {
+  footnote,
+  className }: Props) {
   const title = titlePreLine ? copy.title : copy.title.replace(/\n/g, ' ');
 
   return (
@@ -43,6 +45,7 @@ export function FormatCaptureEditorialShell({
       closeAriaLabel={closeAriaLabel}
       kicker={kicker}
       footnote={footnote}
+      className={className}
     >
       {children}
     </AmUploadModalShell>

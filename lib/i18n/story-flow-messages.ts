@@ -20,6 +20,11 @@ export type StoryFlowMessages = {
   modalChooseVideo: string;
   modalChooseAudio: string;
   modalPasteLink: string;
+  modalRecordOrChooseVideo: string;
+  modalTurnOnCamera: string;
+  modalUploadVideoLink: string;
+  modalUploadAudioLink: string;
+  modalChangeVideo: string;
   modalCameraDenied: string;
   modalCameraUnsupported: string;
   modalCameraBusy: string;
@@ -153,6 +158,11 @@ const es: StoryFlowMessages = {
   modalChooseVideo: 'Elige un video',
   modalChooseAudio: 'Elige un audio',
   modalPasteLink: 'o pega un enlace',
+  modalRecordOrChooseVideo: 'Grabar o elegir video',
+  modalTurnOnCamera: 'Encender cámara',
+  modalUploadVideoLink: 'o sube un video',
+  modalUploadAudioLink: 'o sube un audio',
+  modalChangeVideo: 'Cambiar video',
   modalCameraDenied:
     'No tenemos permiso para usar tu cámara. Actívalo en tu navegador o sube un video que ya tengas.',
   modalCameraUnsupported:
@@ -302,6 +312,11 @@ const pt: StoryFlowMessages = {
   modalChooseVideo: 'Escolha um vídeo',
   modalChooseAudio: 'Escolha um áudio',
   modalPasteLink: 'ou cole um link',
+  modalRecordOrChooseVideo: 'Gravar ou escolher vídeo',
+  modalTurnOnCamera: 'Ligar câmera',
+  modalUploadVideoLink: 'ou envie um vídeo',
+  modalUploadAudioLink: 'ou envie um áudio',
+  modalChangeVideo: 'Trocar vídeo',
   modalReadyTitleVideo: 'Vídeo pronto',
   modalReadyTitleAudio: 'Áudio pronto',
   modalChangeFile: 'Mudar ficheiro',
@@ -407,6 +422,11 @@ const en: StoryFlowMessages = {
   modalChooseVideo: 'Choose a video',
   modalChooseAudio: 'Choose audio',
   modalPasteLink: 'or paste a link',
+  modalRecordOrChooseVideo: 'Record or choose a video',
+  modalTurnOnCamera: 'Turn on camera',
+  modalUploadVideoLink: 'or upload a video',
+  modalUploadAudioLink: 'or upload audio',
+  modalChangeVideo: 'Change video',
   modalReadyTitleVideo: 'Video ready',
   modalReadyTitleAudio: 'Audio ready',
   modalChangeFile: 'Change file',

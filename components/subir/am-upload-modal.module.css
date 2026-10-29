@@ -577,3 +577,34 @@
     flex: 1 1 auto;
   }
 }
+
+@media (max-width: 767px) {
+  .amModalAvCompact {
+    padding: 16px 16px 12px;
+  }
+
+  .amModalAvCompact .amModalHeader {
+    margin-bottom: 12px;
+  }
+
+  .amModalAvCompact .amModalKicker {
+    margin-bottom: 4px;
+  }
+
+  .amModalAvCompact .amModalTitle {
+    margin-bottom: 6px;
+  }
+
+  .amModalAvCompact .amModalSubtitle {
+    margin-bottom: 2px;
+  }
+
+  .amModalAvCompact .amModalLimit {
+    margin-bottom: 12px;
+  }
+
+  .amModalAvCompact .amModalFooter {
+    margin-top: 4px;
+    gap: 6px;
+  }
+}

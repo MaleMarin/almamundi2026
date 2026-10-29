@@ -7,7 +7,6 @@ import {
   Mic,
   Video,
   Square,
-  Check,
   Download,
   Share2,
   FileText,
@@ -30,7 +29,6 @@ import {
   SUBIR_PHOTO_MAX,
   SUBIR_PHOTO_MIN,
   SUBIR_TEXT_MAX_CHARS,
-  SUBIR_VIDEO_FILE_ACCEPT,
   SUBIR_VIDEO_UPLOAD_MAX_MB,
   isAllowedAudioUploadFile,
   isAllowedExtraAttachmentFile,
@@ -188,12 +186,6 @@ function buildModalSubmissionContext(
 type Sex = '' | 'femenino' | 'masculino' | 'no-binario' | 'prefiero-no-decir' | 'otro';
 
 type AgeRange = '' | AgeRangeId;
-
-function formatMmSs(totalSec: number): string {
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
-}
 
 function formatClock(totalSec: number): string {
   const m = Math.floor(Math.max(0, totalSec) / 60);
@@ -353,10 +345,6 @@ function huellaPngFilename(storyTitle: string, imprintId: string): string {
   return `almamundi-${slug || imprintId || 'historia'}.png`;
 }
 
-function fileWeightMb(file: { size: number }): string {
-  return (file.size / (1024 * 1024)).toFixed(1);
-}
-
 export type StoryModalProps = {
   isOpen: boolean;
   onClose: () => void;
@@ -374,13 +362,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [mediaErrKind, setMediaErrKind] = useState<MediaCaptureErrorKind | null>(null);
   const [fieldErr, setFieldErr] = useState<Partial<Record<'title' | 'alias' | 'country' | 'city' | 'age' | 'email', string>>>({});
   const [isCoarsePointer, setIsCoarsePointer] = useState(false);
+  const [phoneVideoUi, setPhoneVideoUi] = useState(false);
 
   const [mediaBlob, setMediaBlob] = useState<Blob | null>(null);
   const [uploadVideoFile, setUploadVideoFile] = useState<File | null>(null);
   const [uploadAudioFile, setUploadAudioFile] = useState<File | null>(null);
   const [videoShareUrl, setVideoShareUrl] = useState('');
   const [audioShareUrl, setAudioShareUrl] = useState('');
-  const [avSource, setAvSource] = useState<'grabar' | 'archivo'>('grabar');
+  const [showVideoLink, setShowVideoLink] = useState(false);
   const [durationInlineErr, setDurationInlineErr] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [avDurationSec, setAvDurationSec] = useState<number | null>(null);
@@ -397,7 +386,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const videoFileRef = useRef<HTMLInputElement>(null);
   const audioFileRef = useRef<HTMLInputElement>(null);
-  const wantFilePickerRef = useRef(false);
+  const videoUrlRef = useRef<HTMLInputElement>(null);
   const fileProbeRef = useRef(0);
   const recordSecRef = useRef(0);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -578,7 +567,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setUploadAudioFile(null);
       setVideoShareUrl('');
       setAudioShareUrl('');
-      setAvSource('grabar');
+      setShowVideoLink(false);
       setDurationInlineErr('');
       setSaving(false);
       setImprintId('');
@@ -606,7 +595,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       resetCaptureMedia();
       setUploadVideoFile(null);
       setUploadAudioFile(null);
-      setAvSource('grabar');
+      setShowVideoLink(false);
       setVideoShareUrl('');
       setAudioShareUrl('');
       if (opening) {
@@ -959,27 +948,26 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setErr('');
   }, [resetCaptureMedia]);
 
-  const switchAvSource = useCallback(
-    (next: 'grabar' | 'archivo') => {
-      setAvSource(next);
-      setErr('');
-      setMediaErrKind(null);
-      if (next === 'grabar') {
-        setUploadVideoFile(null);
-        setUploadAudioFile(null);
-        setVideoShareUrl('');
-        setAudioShareUrl('');
-        setAvCardError('');
-        setAvDurationSec(null);
-        setAvProbePending(false);
-        fileProbeRef.current += 1;
-        revokePreview();
-      } else {
-        resetCaptureMedia();
+  useLayoutEffect(() => {
+    const width = window.matchMedia('(max-width: 767px)');
+    const coarse = window.matchMedia('(pointer: coarse)');
+    const sync = () => {
+      const phone = width.matches || coarse.matches;
+      setPhoneVideoUi((prev) => (prev === phone ? prev : phone));
+      if (phone && mode === 'video' && streamRef.current) {
+        const mr = recorderRef.current;
+        if (mr && mr.state !== 'inactive') mr.stop();
+        else stopStream();
       }
-    },
-    [resetCaptureMedia, revokePreview]
-  );
+    };
+    sync();
+    width.addEventListener('change', sync);
+    coarse.addEventListener('change', sync);
+    return () => {
+      width.removeEventListener('change', sync);
+      coarse.removeEventListener('change', sync);
+    };
+  }, [mode, stopStream]);
 
   const acceptUploadFile = useCallback(
     (kind: 'video' | 'audio', file: File) => {
@@ -1044,22 +1032,6 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setErr('');
     revokePreview();
   }, [revokePreview]);
-
-  const changeAvFile = useCallback(() => {
-    if (avSource === 'archivo') {
-      (mode === 'video' ? videoFileRef : audioFileRef).current?.click();
-      return;
-    }
-    wantFilePickerRef.current = true;
-    switchAvSource('archivo');
-  }, [avSource, mode, switchAvSource]);
-
-  useEffect(() => {
-    if (!wantFilePickerRef.current || avSource !== 'archivo') return;
-    wantFilePickerRef.current = false;
-    const el = mode === 'video' ? videoFileRef.current : audioFileRef.current;
-    el?.click();
-  }, [avSource, mode]);
 
   const addPhotos = useCallback((list: FileList | null) => {
     if (!list?.length) return;
@@ -1854,7 +1826,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setUploadAudioFile(null);
     setVideoShareUrl('');
     setAudioShareUrl('');
-    setAvSource('grabar');
+    setShowVideoLink(false);
     setDurationInlineErr('');
     setSaving(false);
     setImprintId('');
@@ -1872,84 +1844,35 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const previewSha = previewCommitStamp();
   const previewLine = previewSha ? interpolate(t.modalPreviewVersion, { sha: previewSha }) : null;
 
-  const renderReadyCard = (kind: 'video' | 'audio', name: string, bytes: number) => {
-    const ready = !avCardError;
-    const durationLabel =
-      avDurationSec != null && Number.isFinite(avDurationSec)
-        ? formatMmSs(Math.round(avDurationSec))
-        : '--:--';
-    return (
-      <div className="space-y-3 rounded-2xl p-4" style={soft.inset} role="status">
-        {ready && !avProbePending ? (
-          <div className="flex items-center gap-2">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#1F7A4D] text-white">
-              <Check size={16} strokeWidth={2.4} aria-hidden />
-            </span>
-            <p className="text-[length:var(--fs-texto)] font-semibold text-gray-800 ">
-              {kind === 'video' ? t.modalReadyTitleVideo : t.modalReadyTitleAudio}
-            </p>
-          </div>
-        ) : null}
-        <p className="text-[length:var(--fs-pequeno)] text-gray-700 ">
-          {name} · {durationLabel} · {fileWeightMb({ size: bytes })} MB
-        </p>
-        {avCardError ? (
-          <p className="text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
-            {avCardError}
-          </p>
-        ) : null}
-        {previewUrl ? (
-          kind === 'video' ? (
-            <div className="mx-auto aspect-video max-h-[280px] w-full overflow-hidden rounded-2xl bg-[#1c1c2e]">
-              <video
-                key={previewUrl}
-                src={previewUrl}
-                className="h-full max-h-[280px] w-full object-contain"
-                playsInline
-                controls
-                preload="metadata"
-                aria-label={t.modalReadyTitleVideo}
-              />
-            </div>
-          ) : (
-            <audio
-              key={previewUrl}
-              src={previewUrl}
-              controls
-              preload="metadata"
-              className="w-full"
-              aria-label={t.modalReadyTitleAudio}
-            />
-          )
-        ) : null}
-        <div className="flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={changeAvFile}
-            className="rounded-full px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-700"
-            style={soft.button}
-          >
-            {t.modalChangeFile}
-          </button>
-          <button
-            type="button"
-            onClick={mediaBlob ? discardRecording : removePickedFile}
-            className="rounded-full px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold text-gray-700"
-            style={soft.button}
-          >
-            {t.modalRemove}
-          </button>
-        </div>
-      </div>
-    );
-  };
-
   if (step === 'capture') {
     const copy = t.upload[mode];
-    const avChoiceClass = (on: boolean) =>
-      `flex flex-col items-start gap-1 rounded-2xl border-2 bg-transparent px-4 py-3 text-left text-[length:var(--fs-pequeno)] ${
-        on ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/15 text-[#1C1C2E]'
-      }`;
+    const textLinkClass =
+      'm-0 cursor-pointer border-0 bg-transparent p-0 text-[length:var(--fs-etiqueta)] font-medium text-[#1C1C2E] underline underline-offset-2';
+    const clock = `${formatClock(recordSec)} / ${formatClock(MAX_AUDIO_VIDEO_DURATION_SECONDS)}`;
+    const hasVideo = Boolean(previewUrl && (mediaBlob || uploadVideoFile));
+    const hasAudio = Boolean(previewUrl && (mediaBlob || uploadAudioFile));
+    const videoLinkOpen = showVideoLink || videoShareUrl.trim().length > 0;
+    const openVideoLink = () => {
+      if (videoLinkOpen && !videoShareUrl.trim()) {
+        setShowVideoLink(false);
+        return;
+      }
+      setShowVideoLink(true);
+      requestAnimationFrame(() => videoUrlRef.current?.focus());
+    };
+    const clearVideo = () => {
+      discardRecording();
+      removePickedFile();
+      setVideoShareUrl('');
+      setShowVideoLink(false);
+      setMediaErrKind(null);
+    };
+    const clearAudio = () => {
+      discardRecording();
+      removePickedFile();
+      setAudioShareUrl('');
+      setMediaErrKind(null);
+    };
     return (
       <FormatCaptureEditorialShell
         copy={copy}
@@ -1961,6 +1884,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
         kicker={t.modalStep1}
+        className={mode === 'video' || mode === 'audio' ? amStyles.amModalAvCompact : undefined}
       >
         {err ? (
           <div className="mb-3 space-y-2">
@@ -1968,8 +1892,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {mediaErrKind && (mode === 'video' || mode === 'audio') ? (
               <button
                 type="button"
-                className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
-                onClick={() => switchAvSource('archivo')}
+                className={textLinkClass}
+                onClick={() => {
+                  setErr('');
+                  setMediaErrKind(null);
+                  (mode === 'video' ? videoFileRef : audioFileRef).current?.click();
+                }}
               >
                 {mode === 'video' ? t.modalSwitchToUploadVideo : t.modalSwitchToUploadAudio}
               </button>
@@ -1998,260 +1926,236 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         )}
 
         {mode === 'video' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                aria-pressed={avSource === 'grabar'}
-                onClick={() => switchAvSource('grabar')}
-                className={avChoiceClass(avSource === 'grabar')}
-              >
-                <Video size={22} aria-hidden />
-                <span className="font-semibold">{t.modalAvRecordNow}</span>
-                <span className="font-normal leading-snug">{t.modalAvRecordVideoLine}</span>
-              </button>
-              <button
-                type="button"
-                aria-pressed={avSource === 'archivo'}
-                onClick={() => switchAvSource('archivo')}
-                className={avChoiceClass(avSource === 'archivo')}
-              >
-                <Upload size={22} aria-hidden />
-                <span className="font-semibold">{t.modalAvUploadVideo}</span>
-                <span className="font-normal leading-snug">{t.modalAvUploadVideoLine}</span>
-              </button>
-            </div>
-            {avSource === 'grabar' && !mediaBlob && (
+          <div className="flex w-full flex-col items-center gap-3">
+            {hasVideo ? (
               <>
-                {!streamReady && !recording && (
-                  <div className="space-y-2">
-                    <button
-                      type="button"
-                      onClick={() => void startVideoCapture()}
-                      className="flex aspect-video w-full items-center justify-center rounded-2xl border-2 border-black/15 bg-transparent px-4 text-center text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
-                    >
-                      {t.modalTapCamera}
-                    </button>
-                    <p className="m-0 text-center text-[length:var(--fs-etiqueta)] text-[#4A5568]">{t.modalCameraPermissionHint}</p>
-                  </div>
-                )}
-                {streamReady && (
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="relative aspect-video w-full overflow-hidden rounded-2xl bg-black">
-                      <video
-                        ref={videoLiveRef}
-                        className="h-full w-full scale-x-[-1] object-cover"
-                        playsInline
-                        muted
-                        autoPlay
-                        aria-label={recording ? t.modalTapStop : t.modalTapCamera}
-                      />
-                    </div>
-                    <button
-                      type="button"
-                      onClick={recording ? stopRecording : startRecordingVideo}
-                      aria-pressed={recording}
-                      aria-label={recording ? t.modalTapStop : t.modalTapRecord}
-                      className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
-                        recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
-                      }`}
-                    >
-                      {recording ? (
-                        <Square size={22} aria-hidden />
-                      ) : (
-                        <span className="h-6 w-6 rounded-full border-2 border-current" aria-hidden />
-                      )}
-                    </button>
-                    <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold" aria-live="polite">
-                      {formatClock(recordSec)} / {formatClock(MAX_AUDIO_VIDEO_DURATION_SECONDS)}
-                    </p>
-                    {recording && recordSec >= 270 ? (
-                      <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]" aria-live="assertive">
-                        {t.modalRecordingSoonEnd}
-                      </p>
-                    ) : null}
-                  </div>
-                )}
-              </>
-            )}
-            {mediaBlob && previewUrl && avSource === 'grabar' ? (
-              <div className="flex flex-col items-center gap-3">
                 {avCardError ? (
-                  <p className="m-0 text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
+                  <p className="m-0 text-center text-[length:var(--fs-etiqueta)] font-medium text-red-600" role="alert">
                     {avCardError}
                   </p>
                 ) : null}
                 <video
-                  key={previewUrl}
-                  src={previewUrl}
-                  className="aspect-video w-full rounded-2xl bg-black object-contain"
+                  key={previewUrl ?? 'video'}
+                  src={previewUrl ?? undefined}
+                  className="mx-auto block aspect-video w-full max-w-[267px] rounded-2xl bg-[#1c1c2e] object-contain md:max-w-[391px]"
                   playsInline
                   controls
                   preload="metadata"
                   aria-label={t.modalReadyTitleVideo}
                 />
+                <button type="button" className={textLinkClass} onClick={clearVideo}>
+                  {t.modalChangeVideo}
+                </button>
+              </>
+            ) : phoneVideoUi ? (
+              <>
                 <button
                   type="button"
-                  onClick={discardRecording}
-                  className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
+                  className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 py-3"
+                  onClick={() => videoFileRef.current?.click()}
                 >
-                  {t.modalRecordAgain}
+                  {t.modalRecordOrChooseVideo}
                 </button>
-              </div>
-            ) : null}
-            {avSource === 'archivo' && (
-              <div className="space-y-4">
-                {uploadVideoFile ? (
-                  renderReadyCard('video', uploadVideoFile.name, uploadVideoFile.size)
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => videoFileRef.current?.click()}
-                    className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
-                  >
-                    {t.modalChooseVideo}
-                  </button>
-                )}
-                <input
-                  ref={videoFileRef}
-                  id="story-video-file"
-                  type="file"
-                  accept={SUBIR_VIDEO_FILE_ACCEPT}
-                  aria-label={t.modalChooseVideo}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    e.target.value = '';
-                    if (!f) return;
-                    acceptUploadFile('video', f);
-                  }}
-                  className="sr-only"
-                />
-                <label htmlFor="story-video-url" className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E]">
+                <button
+                  type="button"
+                  className={textLinkClass}
+                  aria-expanded={videoLinkOpen}
+                  onClick={openVideoLink}
+                >
                   {t.modalPasteLink}
-                  <input
-                    id="story-video-url"
-                    type="url"
-                    value={videoShareUrl}
-                    onChange={(e) => {
-                      setVideoShareUrl(e.target.value);
-                      if (e.target.value.trim()) removePickedFile();
-                    }}
-                    className="w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-[16px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]"
-                    aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
+                </button>
+              </>
+            ) : (
+              <>
+                <div className="relative mx-auto aspect-video w-full max-w-[533px] overflow-hidden rounded-2xl bg-[#1c1c2e]">
+                  <video
+                    ref={videoLiveRef}
+                    className={`absolute inset-0 h-full w-full scale-x-[-1] object-cover ${streamReady ? 'opacity-100' : 'opacity-0'}`}
+                    playsInline
+                    muted
+                    autoPlay
+                    aria-label={streamReady ? (recording ? t.modalTapStop : t.modalTapRecord) : t.modalTurnOnCamera}
                   />
-                </label>
-                <p className="text-[length:var(--fs-etiqueta)] text-gray-600">{t.modalVideoLinkHint}</p>
+                  <div
+                    className={`absolute inset-0 flex flex-col items-center gap-1 ${
+                      streamReady
+                        ? 'justify-end bg-gradient-to-t from-black/55 via-black/10 to-transparent pb-3'
+                        : 'justify-center'
+                    }`}
+                  >
+                    {streamReady ? (
+                      <>
+                        <button
+                          type="button"
+                          onClick={recording ? stopRecording : startRecordingVideo}
+                          aria-pressed={recording}
+                          aria-label={recording ? t.modalTapStop : t.modalTapRecord}
+                          className={`flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 bg-black/35 text-white ${
+                            recording ? 'border-[#FF4A1C]' : 'border-white'
+                          }`}
+                        >
+                          {recording ? (
+                            <Square size={22} aria-hidden />
+                          ) : (
+                            <span className="h-6 w-6 rounded-full bg-[#FF4A1C]" aria-hidden />
+                          )}
+                        </button>
+                        <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold text-white" aria-live="polite">
+                          {clock}
+                        </p>
+                        {recording && recordSec >= 270 ? (
+                          <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold text-[#FF4A1C]" aria-live="assertive">
+                            {t.modalRecordingSoonEnd}
+                          </p>
+                        ) : null}
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          type="button"
+                          onClick={() => void startVideoCapture()}
+                          aria-label={t.modalTurnOnCamera}
+                          className="flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 border-white bg-white/10 text-white"
+                        >
+                          <Video size={28} aria-hidden />
+                        </button>
+                        <p className="m-0 text-[length:var(--fs-etiqueta)] text-white">{t.modalTurnOnCamera}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
+                {!recording ? (
+                  <div className="flex items-center justify-center gap-4">
+                    <button type="button" className={textLinkClass} onClick={() => videoFileRef.current?.click()}>
+                      {t.modalUploadVideoLink}
+                    </button>
+                    <button
+                      type="button"
+                      className={textLinkClass}
+                      aria-expanded={videoLinkOpen}
+                      onClick={openVideoLink}
+                    >
+                      {t.modalPasteLink}
+                    </button>
+                  </div>
+                ) : null}
+              </>
+            )}
+            {!hasVideo && !recording && videoLinkOpen ? (
+              <div className="w-full space-y-1">
+                <input
+                  ref={videoUrlRef}
+                  id="story-video-url"
+                  type="url"
+                  inputMode="url"
+                  autoComplete="off"
+                  value={videoShareUrl}
+                  aria-label={t.modalPasteLink}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setVideoShareUrl(value);
+                    if (value.trim() && (streamReady || mediaBlob || uploadVideoFile)) {
+                      discardRecording();
+                      removePickedFile();
+                    }
+                  }}
+                  className="w-full rounded-xl border border-black/10 bg-white px-3 py-2 text-[16px] text-[#1C1C2E] outline-none focus:border-[#FF4A1C]"
+                  aria-invalid={videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl)}
+                />
+                <p className="m-0 text-[length:var(--fs-etiqueta)] text-[#6b6b7b]">{t.modalVideoLinkHint}</p>
                 {videoShareUrl.trim().length > 0 && !isVideoShareUrl(videoShareUrl) ? (
-                  <p className="text-[length:var(--fs-etiqueta)] text-amber-700" role="alert">
+                  <p className="m-0 text-[length:var(--fs-etiqueta)] text-amber-700" role="alert">
                     Usa un enlace de YouTube o Vimeo
                   </p>
                 ) : null}
               </div>
-            )}
+            ) : null}
+            <input
+              ref={videoFileRef}
+              id="story-video-file"
+              type="file"
+              accept="video/*"
+              aria-label={t.modalRecordOrChooseVideo}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (!f) return;
+                discardRecording();
+                setShowVideoLink(false);
+                acceptUploadFile('video', f);
+              }}
+              className="sr-only"
+            />
           </div>
         )}
 
         {mode === 'audio' && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                aria-pressed={avSource === 'grabar'}
-                onClick={() => switchAvSource('grabar')}
-                className={avChoiceClass(avSource === 'grabar')}
-              >
-                <Mic size={22} aria-hidden />
-                <span className="font-semibold">{t.modalAvRecordNow}</span>
-                <span className="font-normal leading-snug">{t.modalAvRecordAudioLine}</span>
-              </button>
-              <button
-                type="button"
-                aria-pressed={avSource === 'archivo'}
-                onClick={() => switchAvSource('archivo')}
-                className={avChoiceClass(avSource === 'archivo')}
-              >
-                <Upload size={22} aria-hidden />
-                <span className="font-semibold">{t.modalAvUploadAudio}</span>
-                <span className="font-normal leading-snug">{t.modalAvUploadAudioLine}</span>
-              </button>
-            </div>
-            {avSource === 'grabar' && !mediaBlob && (
-              <div className="flex flex-col items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() => (recording ? stopRecording() : void beginAudioRecording())}
-                  aria-pressed={recording}
-                  aria-label={recording ? t.modalTapStop : t.modalTapRecord}
-                  className={`flex h-20 w-20 items-center justify-center rounded-full border-2 bg-transparent ${
-                    recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
-                  }`}
-                >
-                  <Mic size={28} aria-hidden />
-                </button>
-                <p className="m-0 text-[length:var(--fs-pequeno)]">{recording ? t.modalTapStop : t.modalTapRecord}</p>
-                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold" aria-live="polite">
-                  {formatClock(recordSec)} / {formatClock(MAX_AUDIO_VIDEO_DURATION_SECONDS)}
-                </p>
-                {recording && recordSec >= 270 ? (
-                  <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]" aria-live="assertive">
-                    {t.modalRecordingSoonEnd}
-                  </p>
-                ) : null}
-              </div>
-            )}
-            {mediaBlob && previewUrl && avSource === 'grabar' ? (
-              <div className="flex flex-col items-center gap-3">
+          <div className="flex w-full flex-col items-center gap-2">
+            {hasAudio ? (
+              <>
                 {avCardError ? (
-                  <p className="m-0 text-[length:var(--fs-pequeno)] font-medium text-red-600" role="alert">
+                  <p className="m-0 text-center text-[length:var(--fs-etiqueta)] font-medium text-red-600" role="alert">
                     {avCardError}
                   </p>
                 ) : null}
                 <audio
-                  key={previewUrl}
-                  src={previewUrl}
+                  key={previewUrl ?? 'audio'}
+                  src={previewUrl ?? undefined}
                   controls
                   preload="metadata"
                   className="w-full"
                   aria-label={t.modalReadyTitleAudio}
                 />
-                <button
-                  type="button"
-                  onClick={discardRecording}
-                  className="text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E] underline"
-                >
+                <button type="button" className={textLinkClass} onClick={clearAudio}>
                   {t.modalRecordAgain}
                 </button>
-              </div>
-            ) : null}
-            {avSource === 'archivo' && (
-              <div className="space-y-4">
-                {uploadAudioFile ? (
-                  renderReadyCard('audio', uploadAudioFile.name, uploadAudioFile.size)
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => audioFileRef.current?.click()}
-                    className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
-                  >
-                    {t.modalChooseAudio}
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => (recording ? stopRecording() : void beginAudioRecording())}
+                  aria-pressed={recording}
+                  aria-label={recording ? t.modalTapStop : t.modalTapRecord}
+                  className={`flex h-[72px] w-[72px] items-center justify-center rounded-full border-2 bg-transparent ${
+                    recording ? 'border-[#FF4A1C] text-[#FF4A1C]' : 'border-black/20 text-[#1C1C2E]'
+                  }`}
+                >
+                  <Mic size={28} aria-hidden />
+                </button>
+                <p className="m-0 text-[length:var(--fs-pequeno)] text-[#1C1C2E]">
+                  {recording ? t.modalTapStop : t.modalTapRecord}
+                </p>
+                <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#1C1C2E]" aria-live="polite">
+                  {clock}
+                </p>
+                {recording && recordSec >= 270 ? (
+                  <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold text-[#FF4A1C]" aria-live="assertive">
+                    {t.modalRecordingSoonEnd}
+                  </p>
+                ) : null}
+                {!recording ? (
+                  <button type="button" className={textLinkClass} onClick={() => audioFileRef.current?.click()}>
+                    {t.modalUploadAudioLink}
                   </button>
-                )}
-                <input
-                  ref={audioFileRef}
-                  id="story-audio-file"
-                  type="file"
-                  accept={SUBIR_AUDIO_FILE_ACCEPT}
-                  aria-label={t.modalChooseAudio}
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    e.target.value = '';
-                    if (!f) return;
-                    acceptUploadFile('audio', f);
-                  }}
-                  className="sr-only"
-                />
-              </div>
+                ) : null}
+              </>
             )}
+            <input
+              ref={audioFileRef}
+              id="story-audio-file"
+              type="file"
+              accept={SUBIR_AUDIO_FILE_ACCEPT}
+              aria-label={t.modalUploadAudioLink}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (!f) return;
+                discardRecording();
+                acceptUploadFile('audio', f);
+              }}
+              className="sr-only"
+            />
           </div>
         )}
 
