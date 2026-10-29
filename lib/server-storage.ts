@@ -4,6 +4,7 @@ import {
   FILE_TYPE_PROBE_BYTES,
   isImageStoryMime,
 } from "@/lib/file-sniff";
+import { heicBufferToJpeg, bufferLooksLikeHeic, isDeclaredHeic, isRasterImageCandidate } from "@/lib/heic-jpeg";
 import { stripImageExif } from "@/lib/strip-image-exif";
 import { MAX_AUDIO_VIDEO_DURATION_SECONDS } from "@/lib/media-duration-rules";
 import {
@@ -249,6 +250,28 @@ function pickExtension(contentType: string, filename: string): string {
   return "";
 }
 
+/** Bytes privados de un envío. Solo rutas submissions/private/. */
+export async function readPrivateSubmissionObject(
+  storagePath: string
+): Promise<{ buffer: Buffer; contentType: string }> {
+  assertSafeSubmissionsPath(storagePath);
+  if (!storagePath.startsWith(`${PRIVATE_PREFIX}/`)) {
+    throw new Error("invalid_storage_path");
+  }
+  const file = getAdminBucket().file(storagePath);
+  const [exists] = await file.exists();
+  if (!exists) throw new Error("not_found");
+  const [meta] = await file.getMetadata();
+  const [buffer] = await file.download();
+  return { buffer, contentType: String(meta.contentType || "") };
+}
+
+export async function privateObjectContentType(storagePath: string): Promise<string> {
+  assertSafeSubmissionsPath(storagePath);
+  const [meta] = await getAdminBucket().file(storagePath).getMetadata();
+  return String(meta.contentType || "");
+}
+
 /** URL firmada de lectura para curadores (vida corta). */
 export async function signReadUrlForPath(
   storagePath: string,
@@ -337,6 +360,22 @@ export async function copyPrivateSubmissionToPublished(opts: {
   if (!exists) throw new Error("not_found");
 
   const base = sanitizeUploadFilename(opts.sourcePath.split("/").pop() || "file");
+  const [meta] = await src.getMetadata();
+  const contentType = String(meta.contentType || "");
+  if (isRasterImageCandidate(opts.sourcePath, contentType)) {
+    const [buffer] = await src.download();
+    if (bufferLooksLikeHeic(buffer) || isDeclaredHeic(opts.sourcePath, contentType)) {
+      const jpeg = await heicBufferToJpeg(buffer);
+      const stem = base.replace(/\.(heic|heif|png|jpe?g|webp|gif)$/i, "") || "foto";
+      const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${stem}.jpg`;
+      assertSafePublishedPath(destPath);
+      return savePublishedMediaObject({
+        destPath,
+        buffer: jpeg,
+        contentType: "image/jpeg",
+      });
+    }
+  }
   const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${base}`;
   assertSafePublishedPath(destPath);
   await src.copy(bucket.file(destPath));

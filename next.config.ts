@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV ?? "",
     NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA: process.env.VERCEL_GIT_COMMIT_SHA ?? "",
   },
-  serverExternalPackages: ["sharp", "file-type"],
+  serverExternalPackages: ["sharp", "file-type", "heic-convert"],
   transpilePackages: ["heic-to"],
   /**
    * `public/` pesa ~380 MB (videos, texturas, audio). El file tracing de Next

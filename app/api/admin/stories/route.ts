@@ -5,7 +5,9 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from "@/lib/editorial/status";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
 import { AUTHOR_CONTACTS_COLLECTION, authorEmailOnStory } from "@/lib/author-contacts";
-import { signReadUrlForPath } from "@/lib/server-storage";
+import { extractPrivateStoragePathFromUrl } from "@/lib/published-media";
+import { isDeclaredHeic } from "@/lib/heic-jpeg";
+import { privateObjectContentType, signReadUrlForPath } from "@/lib/server-storage";
 
 export const runtime = "nodejs";
 
@@ -20,7 +22,11 @@ function toMillis(ts: unknown): number | null {
   return null;
 }
 
-type PendingFile = { url: string; kind: "image" | "audio" | "video" | "file" };
+type PendingFile = {
+  url: string;
+  kind: "image" | "audio" | "video" | "file" | "heic";
+  storagePath?: string;
+};
 
 function submissionFormat(type: unknown): "video" | "audio" | "text" | "photos" {
   if (type === "video") return "video";
@@ -33,7 +39,8 @@ function submissionFormat(type: unknown): "video" | "audio" | "text" | "photos" 
 
 function fileKind(path: string, type: string): PendingFile["kind"] {
   const lower = path.toLowerCase();
-  if (/\.(png|jpe?g|webp|gif|heic|heif)$/.test(lower)) return "image";
+  if (/\.(heic|heif)$/.test(lower)) return "heic";
+  if (/\.(png|jpe?g|webp|gif)$/.test(lower)) return "image";
   if (/\.(mp3|m4a|wav|ogg|aac)$/.test(lower)) return "audio";
   if (/\.(mp4|mov|webm)$/.test(lower)) {
     if (type === "audio") return "audio";
@@ -67,6 +74,16 @@ async function filesForSubmission(data: Record<string, unknown>, type: string): 
   }
   const files: PendingFile[] = [];
   for (const storagePath of paths.slice(0, 8)) {
+    let contentType = "";
+    try {
+      contentType = await privateObjectContentType(storagePath);
+    } catch {
+      contentType = "";
+    }
+    if (isDeclaredHeic(storagePath, contentType)) {
+      files.push({ url: "", kind: "heic", storagePath });
+      continue;
+    }
     try {
       files.push({ url: await signReadUrlForPath(storagePath), kind: fileKind(storagePath, type) });
     } catch {
@@ -78,6 +95,14 @@ async function filesForSubmission(data: Record<string, unknown>, type: string): 
       if (typeof value !== "string") continue;
       const url = value.trim();
       if (!url.startsWith("https://") && !url.startsWith("http://")) continue;
+      if (isDeclaredHeic(url)) {
+        const storagePath = extractPrivateStoragePathFromUrl(url);
+        if (storagePath && files.some((file) => file.storagePath === storagePath)) continue;
+        files.push({ url: "", kind: "heic", ...(storagePath ? { storagePath } : {}) });
+        continue;
+      }
+      const storagePath = extractPrivateStoragePathFromUrl(url);
+      if (storagePath && files.some((file) => file.storagePath === storagePath)) continue;
       files.push({ url, kind: fileKind(url, type) });
     }
   }

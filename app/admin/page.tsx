@@ -88,7 +88,7 @@ type Story = {
   questionId: string | null;
   questionMode: 'tu' | 'alguien' | null;
   imagenes?: AdminImagen[];
-  files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' }[];
+  files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' | 'heic'; storagePath?: string }[];
   source?: 'submissions' | 'story_submissions';
 };
 
@@ -175,11 +175,73 @@ function EliminarHistoriaButton({ disabled, onClick }: { disabled: boolean; onCl
   );
 }
 
-function PendingFiles({ files }: { files?: Story['files'] }) {
+function FotoHeicBox() {
+  return (
+    <div
+      style={{
+        width: 132,
+        height: 96,
+        borderRadius: 8,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: 'rgba(255,255,255,0.08)',
+        color: 'rgba(255,255,255,0.85)',
+        fontSize: 13,
+        fontWeight: 700,
+      }}
+    >
+      Foto HEIC
+    </div>
+  );
+}
+
+function HeicAdminPhoto({ storagePath, token }: { storagePath?: string; token: string | null }) {
+  const [src, setSrc] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!storagePath || !token) return;
+    let objectUrl = '';
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch(`/api/admin/stories/heic?path=${encodeURIComponent(storagePath)}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) return;
+        const blob = await res.blob();
+        if (!blob.type.startsWith('image/')) return;
+        objectUrl = URL.createObjectURL(blob);
+        if (cancelled) {
+          URL.revokeObjectURL(objectUrl);
+          return;
+        }
+        setSrc(objectUrl);
+      } catch {
+        /* El recuadro Foto HEIC queda si la conversión falla. */
+      }
+    })();
+    return () => {
+      cancelled = true;
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [storagePath, token]);
+
+  if (!src) return <FotoHeicBox />;
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={src} alt="" style={{ width: 132, height: 96, objectFit: 'cover', borderRadius: 8 }} />
+  );
+}
+
+function PendingFiles({ files, token }: { files?: Story['files']; token: string | null }) {
   if (!files?.length) return null;
   return (
     <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, margin: '8px 0' }}>
       {files.map((file, i) => {
+        if (file.kind === 'heic' || /\.(heic|heif)(\?|$)/i.test(file.url)) {
+          return <HeicAdminPhoto key={file.storagePath || file.url || i} storagePath={file.storagePath} token={token} />;
+        }
         if (!file.url) {
           return (
             <p key={i} style={{ margin: 0, fontSize: 12, color: '#fbbf24' }}>
@@ -217,7 +279,9 @@ function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
         const when = img.anio ? (img.anioAprox ? `años ${img.anio}` : img.anio) : '';
         return (
           <div key={`${img.url}-${i}`} style={{ width: 132 }}>
-            {img.url ? (
+            {img.url && /\.(heic|heif)(\?|$)/i.test(img.url) ? (
+              <FotoHeicBox />
+            ) : img.url ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={img.url}
@@ -720,7 +784,7 @@ export default function AdminPage() {
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
-                  <PendingFiles files={s.files} />
+                  <PendingFiles files={s.files} token={idToken} />
                   <StoryQuestionLine story={s} />
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
                   <p style={{ fontSize: 12, margin: '6px 0 0', color: s.authorEmail ? 'rgba(255,255,255,0.45)' : '#fbbf24' }}>
