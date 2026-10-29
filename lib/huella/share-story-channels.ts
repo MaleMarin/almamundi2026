@@ -46,6 +46,19 @@ function messageWithCanonicalUrl(text: string): string {
   return stripped ? `${stripped} ${PENDING_STORY_SHARE_URL}` : PENDING_STORY_SHARE_URL;
 }
 
+const EMBEDDED_PUBLIC_LINK =
+  /https?:\/\/(?:www\.)?almamundi\.org\/(?:h|r|historias|pregunta)\/[^\s)]+/gi;
+
+/** Frase y enlace en un solo texto. Un enlace anterior se reemplaza; la frase se conserva. */
+export function shareMessageWithLink(text: string, url: string): string {
+  const link = url.trim();
+  const body = text.replace(/\s+/g, ' ').trim();
+  if (!link) return body;
+  const swapped = body.replace(EMBEDDED_PUBLIC_LINK, link).replace(/ {2,}/g, ' ').trim();
+  if (swapped.includes(link)) return swapped;
+  return swapped ? `${swapped} ${link}` : link;
+}
+
 export function buildStoryShareChannelUrls(
   url: string,
   copy: StoryShareCopy,
@@ -53,12 +66,14 @@ export function buildStoryShareChannelUrls(
 ): StoryShareChannelUrls {
   if (options?.exact && url) {
     const subject = copy.emailSubject.trim() || PENDING_STORY_SHARE_EMAIL_SUBJECT;
+    const longMessage = shareMessageWithLink(copy.long, url);
+    const shortMessage = shareMessageWithLink(copy.short, url);
     return {
-      whatsapp: `https://wa.me/?text=${encodeURIComponent(copy.long)}`,
+      whatsapp: `https://wa.me/?text=${encodeURIComponent(longMessage)}`,
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`,
-      x: `https://x.com/intent/post?text=${encodeURIComponent(copy.short)}`,
+      x: `https://x.com/intent/post?text=${encodeURIComponent(shortMessage)}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-      email: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(copy.long)}`,
+      email: `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(longMessage)}`,
     };
   }
   const shareUrl = canonicalStoryShareUrl(url);

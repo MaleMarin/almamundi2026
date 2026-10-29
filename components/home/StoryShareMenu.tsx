@@ -3,7 +3,8 @@
 import { Download, Mail, X } from 'lucide-react';
 import {
   canonicalStoryShareUrl,
-  buildStoryShareChannelUrls } from '@/lib/huella/share-story-channels';
+  buildStoryShareChannelUrls,
+  shareMessageWithLink } from '@/lib/huella/share-story-channels';
 
 /** writeText en el mismo clic, sin await previos. Si no queda copiado, textarea oculto. */
 function copyTextInClick(text: string, onSettled: (ok: boolean) => void): void {
@@ -126,7 +127,8 @@ export function StoryShareMenu({
   };
 
   const shareApp = (app: 'Instagram' | 'TikTok') => {
-    const text = shareTextSocial?.trim() || shareTextLong;
+    const raw = shareTextSocial?.trim() || shareTextLong;
+    const text = shareMessageWithLink(raw, keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl));
     const phone =
       typeof navigator !== 'undefined' &&
       (window.matchMedia('(pointer: coarse)').matches ||
