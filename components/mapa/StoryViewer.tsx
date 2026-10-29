@@ -9,7 +9,6 @@ import { EcoRecorder } from '@/components/mapa/EcoRecorder';
 import { RelatedCarousel } from '@/components/mapa/RelatedCarousel';
 import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { EthicalShareFlow } from '@/components/stories/EthicalShareFlow';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -193,6 +192,109 @@ const FULL_STORY_LABEL = {
   en: 'See full story',
 } as const;
 
+/** El eco sigue en el código. No se muestra en el sitio público por ahora. */
+const SHOW_PUBLIC_ECO = false;
+
+const FORMAT_LABEL = {
+  es: { video: 'Video', audio: 'Audio', image: 'Foto', text: 'Texto' },
+  pt: { video: 'Vídeo', audio: 'Áudio', image: 'Foto', text: 'Texto' },
+  en: { video: 'Video', audio: 'Audio', image: 'Photo', text: 'Text' },
+} as const;
+
+const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
+const BY_LABEL = { es: 'Por', pt: 'Por', en: 'By' } as const;
+
+function initialCapital(raw: string | undefined): string {
+  const name = (raw ?? '').trim();
+  if (!name) return '';
+  return name.charAt(0).toLocaleUpperCase('es-CL') + name.slice(1);
+}
+
+type PhotoSlide = {
+  url: string;
+  name?: string;
+  year?: string;
+  place?: string;
+  description?: string;
+};
+
+function photoSlides(story: StoryPoint): PhotoSlide[] {
+  const imagenes = story.imagenes as
+    | { url: string; titulo?: string; anio?: string; anioAprox?: boolean; lugar?: string; descripcion?: string; caption?: string }[]
+    | undefined;
+  if (imagenes?.length) {
+    return imagenes
+      .filter((img) => img.url)
+      .map((img) => {
+        const anio = img.anio?.trim();
+        return {
+          url: img.url,
+          name: img.titulo?.trim() || undefined,
+          year: anio ? (img.anioAprox ? `años ${anio}` : anio) : undefined,
+          place: img.lugar?.trim() || undefined,
+          description: img.descripcion?.trim() || undefined,
+        };
+      });
+  }
+  if (story.photos?.length) {
+    return story.photos.map((photo) => ({
+      url: photo.url,
+      name: photo.name?.trim() || undefined,
+      year: photo.date?.trim() || undefined,
+    }));
+  }
+  if (story.imageUrl) return [{ url: story.imageUrl }];
+  return [];
+}
+
+function PhotoNavigator({ slides }: { slides: PhotoSlide[] }) {
+  const [current, setCurrent] = useState(0);
+  const slide = slides[Math.min(current, slides.length - 1)];
+  if (!slide) return null;
+  const lines = [slide.name, slide.year, slide.place, slide.description].filter(Boolean);
+  return (
+    <div style={{ marginBottom: 24 }}>
+      <img
+        src={slide.url}
+        alt={slide.description || slide.name || ''}
+        style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 16, background: 'rgba(0,0,0,0.25)' }}
+      />
+      {lines.length > 0 ? (
+        <div style={{ marginTop: 10 }}>
+          {lines.map((line) => (
+            <p key={line} style={{ margin: '0 0 4px', fontSize: 'var(--fs-pequeno)', lineHeight: 1.45, color: 'rgba(255,255,255,0.82)', fontFamily: SITE_FONT_STACK }}>
+              {line}
+            </p>
+          ))}
+        </div>
+      ) : null}
+      {slides.length > 1 ? (
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+          <button
+            type="button"
+            className="btn-am-neutro"
+            onClick={() => setCurrent((i) => (i - 1 + slides.length) % slides.length)}
+            style={{ minHeight: 44, padding: '8px 14px', fontFamily: SITE_FONT_STACK }}
+          >
+            ‹
+          </button>
+          <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.55)', fontFamily: SITE_FONT_STACK }}>
+            {current + 1} / {slides.length}
+          </span>
+          <button
+            type="button"
+            className="btn-am-neutro"
+            onClick={() => setCurrent((i) => (i + 1) % slides.length)}
+            style={{ minHeight: 44, padding: '8px 14px', fontFamily: SITE_FONT_STACK }}
+          >
+            ›
+          </button>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full' }: Props) {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const compact = variant === 'compact';
@@ -245,13 +347,19 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   }, [story.id, compact]);
 
   const photos = story.photos ?? [];
+  const slides = photoSlides(story);
   const format = story.videoUrl
     ? 'video'
     : story.audioUrl
       ? 'audio'
-      : photos.length > 0
+      : slides.length > 0
         ? 'photos'
         : 'text';
+  const formatKey = format === 'photos' ? 'image' : format;
+  const place = formatPublicPlace(story.city, story.country);
+  const formatWord = FORMAT_LABEL[locale][formatKey];
+  const kicker = place ? `${formatWord} · ${place}` : formatWord;
+  const alias = initialCapital(story.authorName || story.author?.name);
 
   const startListening = () => {
     if (!story.body || typeof window === 'undefined') return;
@@ -327,35 +435,57 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
           0%, 100% { opacity: 0.6; }
           50%      { opacity: 1; }
         }
+        .story-map-panel {
+          position: absolute;
+          z-index: 40;
+          top: 24px;
+          right: 24px;
+          bottom: 24px;
+          width: 420px;
+          max-height: calc(100% - 48px);
+          display: flex;
+          pointer-events: none;
+        }
+        .story-map-panel__card {
+          width: 100%;
+          height: 100%;
+          max-height: 100%;
+        }
+        @media (max-width: 767px) {
+          .story-map-panel {
+            position: fixed;
+            top: auto;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 85vh;
+            max-height: 85vh;
+          }
+        }
       `}</style>
 
       <div
-        style={{
+        className={compact ? 'story-map-panel' : undefined}
+        style={compact ? undefined : {
           position: 'fixed',
-          ...(compact
-            ? {
-                right: 20,
-                bottom: 20,
-                left: 'auto',
-                top: 'auto',
-                width: 'min(460px, 48vw)',
-                maxHeight: '50vh' }
-            : {
-                left: 'clamp(0px, 30vw, 420px)',
-                right: 0,
-                bottom: 0,
-                top: 0 }),
+          left: 'clamp(0px, 30vw, 420px)',
+          right: 0,
+          bottom: 0,
+          top: 0,
           zIndex: 40,
           display: 'flex',
-          alignItems: compact ? 'stretch' : 'flex-end',
-          justifyContent: compact ? 'flex-end' : 'center',
+          alignItems: 'flex-end',
+          justifyContent: 'center',
           pointerEvents: 'none' }}
       >
         <div
+          className={compact ? 'story-map-panel__card' : undefined}
           style={{
             width: '100%',
             maxWidth: compact ? '100%' : 720,
-            maxHeight: compact ? '50vh' : '50vh',
+            maxHeight: compact ? '100%' : '85vh',
+            height: compact ? '100%' : undefined,
             margin: compact ? 0 : '0 auto',
             padding: compact ? 0 : '0 24px 24px',
             pointerEvents: 'auto',
@@ -380,7 +510,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 0 8px 32px rgba(0, 0, 0, 0.40)
               `,
               overflow:       'hidden',
-              maxHeight:      '50vh',
+              maxHeight:      compact ? '100%' : '85vh',
+              height:         compact ? '100%' : undefined,
               display:        'flex',
               flexDirection:  'column',
               position:       'relative' }}
@@ -416,7 +547,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     margin: '0 0 6px',
                     fontFamily: SITE_FONT_STACK }}
                 >
-                  {formatPublicPlace(story.city, story.country)}
+                  {kicker}
                 </p>
                 <h2
                   style={{
@@ -429,16 +560,17 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {story.title ?? story.label}
                 </h2>
+                {alias ? (
                 <p
                   style={{
                     fontSize: 'var(--fs-etiqueta)',
-                    color: 'rgba(255,255,255,0.35)',
+                    color: 'rgba(255,255,255,0.72)',
                     margin: 0,
-                    fontStyle: 'italic',
                     fontFamily: SITE_FONT_STACK }}
                 >
-                  , {story.authorName || story.label}
+                  {BY_LABEL[locale]} {alias}
                 </p>
+                ) : null}
                 {liveReaders > 1 && (
                   <p
                     style={{
@@ -487,18 +619,17 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 padding: '24px 24px 28px',
                 flex: 1 }}
             >
-              {format === 'video' && story.videoUrl && (
+              {story.videoUrl ? (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
                   <video
                     controls
-                    autoPlay
                     src={story.videoUrl}
-                    style={{ width: '100%', display: 'block', maxHeight: compact ? '22vh' : '40vh', objectFit: 'cover' }}
+                    style={{ width: '100%', display: 'block', maxHeight: 280, background: '#000' }}
                   />
                 </div>
-              )}
+              ) : null}
 
-              {format === 'audio' && story.audioUrl && (
+              {story.audioUrl ? (
                 <div
                   style={{
                     background: 'rgba(255,255,255,0.04)',
@@ -509,18 +640,15 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   <audio
                     controls
-                    autoPlay
                     src={story.audioUrl}
                     style={{ width: '100%' }}
                   />
                 </div>
-              )}
+              ) : null}
 
-              {format === 'photos' && photos.length > 0 && (
-                <KenBurnsViewer photos={photos} />
-              )}
+              {slides.length > 0 ? <PhotoNavigator slides={slides} /> : null}
 
-              {format === 'text' && story.body && (
+              {story.body ? (
                 <div
                   style={{
                     fontSize: 'var(--fs-texto)',
@@ -537,11 +665,11 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       </p>
                     ))}
                 </div>
-              )}
+              ) : null}
 
               <div ref={endRef} style={{ height: 1 }} />
 
-              {ecoPanel === 'voice' ? (
+              {SHOW_PUBLIC_ECO && ecoPanel === 'voice' ? (
                 <div
                   style={{
                     marginTop: 16,
@@ -581,7 +709,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
-              {ecoPanel === 'text' && !lastSecondSent ? (
+              {SHOW_PUBLIC_ECO && ecoPanel === 'text' && !lastSecondSent ? (
                 <div
                   style={{
                     marginTop: 16,
@@ -746,82 +874,41 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 borderTop: '1px solid rgba(255,255,255,0.07)',
                 zIndex: 2 }}
             >
-              {format === 'text' && story.body ? (
-                <button
-                  type="button"
-                  onClick={listening ? stopListening : startListening}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: 999,
-                    background: listening ? 'rgba(96,165,250,0.15)' : 'rgba(255,255,255,0.06)',
-                    border: `1px solid ${listening ? 'rgba(96,165,250,0.35)' : 'rgba(255,255,255,0.10)'}`,
-                    color: listening ? '#93c5fd' : 'rgba(255,255,255,0.55)',
-                    cursor: 'pointer',
-                    fontSize: 'var(--fs-etiqueta)',
-                    fontFamily: SITE_FONT_STACK }}
-                >
-                  {listening ? 'Detener lectura' : 'Cerrar los ojos'}
-                </button>
-              ) : null}
-              {story.id ? (
-                <a
-                  href={`/historias/${story.id}`}
-                  className="btn-am-principal"
-                  style={{
-                    padding: '8px 14px',
-                    fontSize: 'var(--fs-etiqueta)',
-                    fontFamily: SITE_FONT_STACK,
-                    textDecoration: 'none',
-                  }}
-                >
-                  {FULL_STORY_LABEL[locale]}
-                </a>
-              ) : null}
-              <ActionButton className="btn-am-secundario" label="Compartir" onClick={() => setShareOpen(true)} />
-              {!alreadySent && !resonanceSent ? (
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      const loc = await getApproxLocation();
-                      await fetch(`/api/stories/${story.id}/resonance`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }) });
-                    } catch {}
-                    if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
-                    setResonanceSent(true);
-                  }}
-                  style={{
-                    padding: '8px 14px',
-                    borderRadius: 999,
-                    background: 'rgba(255,255,255,0.06)',
-                    border: '1px solid rgba(255,255,255,0.10)',
-                    color: 'rgba(255,255,255,0.55)',
-                    cursor: 'pointer',
-                    fontSize: 'var(--fs-etiqueta)',
-                    fontFamily: SITE_FONT_STACK }}
-                >
-                  Esto me llegó
-                </button>
-              ) : null}
-              <ActionButton
-                label="¿Dejar un eco?"
-                onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
-                accent
-              />
-              <HomeHardLink
-                href="/#historias"
-                style={{
-                  marginLeft: 4,
-                  padding: '8px 2px',
-                  color: 'rgba(255,255,255,0.38)',
-                  fontSize: 'var(--fs-etiqueta)',
-                  fontFamily: SITE_FONT_STACK,
-                  textDecoration: 'none' }}
+              <button
+                type="button"
+                className="btn-am-secundario"
+                disabled={alreadySent || resonanceSent}
+                onClick={async () => {
+                  if (alreadySent || resonanceSent) return;
+                  try {
+                    const loc = await getApproxLocation();
+                    await fetch(`/api/stories/${story.id}/resonance`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ lat: loc?.lat, lng: loc?.lng }) });
+                  } catch {}
+                  if (typeof sessionStorage !== 'undefined') sessionStorage.setItem(alreadySentKey, '1');
+                  setResonanceSent(true);
+                }}
+                style={{ minHeight: 44, padding: '8px 16px', fontFamily: SITE_FONT_STACK }}
               >
-                Cuenta la tuya
-              </HomeHardLink>
+                Esto me llegó
+              </button>
+              <button
+                type="button"
+                className="btn-am-principal"
+                onClick={() => setShareOpen(true)}
+                style={{ minHeight: 44, padding: '8px 16px', fontFamily: SITE_FONT_STACK }}
+              >
+                {SHARE_LABEL[locale]}
+              </button>
+              {SHOW_PUBLIC_ECO ? (
+                <ActionButton
+                  label="¿Dejar un eco?"
+                  onClick={() => setEcoPanel((p) => (p ? null : 'voice'))}
+                  accent
+                />
+              ) : null}
             </div>
           </div>
 

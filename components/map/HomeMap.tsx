@@ -18,7 +18,6 @@ import dynamic from 'next/dynamic';
 import { createPortal } from 'react-dom';
 import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { storyGlobeMarkerColor } from '@/lib/huella/story-globe-color';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
@@ -627,13 +626,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       markerKind: 'story' as const,
       title: s.title ?? s.label,
       place: formatPublicPlace(s.city, s.country) || undefined,
-      color: storyGlobeMarkerColor({
-        antecedentes: s.antecedentes,
-        body: s.body,
-        transcription: s.transcription,
-        locale }) }));
+      color: '#FF4A1C' }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
-  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {
@@ -644,6 +639,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setHighlightedStoryId(story.id ?? null);
     setDrawerOpen(false);
     setOpenStory(story);
+    if (storyHasValidGeo(story)) {
+      setSurpriseFlying(true);
+      setFocusTarget({ lat: story.lat, lng: story.lng, nonce: Date.now() });
+    }
   }, []);
 
   const finishSurpriseOpen = useCallback(() => {
@@ -666,17 +665,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       return;
     }
     lastSurpriseIdRef.current = pick.id;
-    pendingSurpriseRef.current = pick;
     setGlobeLayers((prev) => ({ ...prev, stories: true }));
-    setHighlightedStoryId(pick.id);
-    setDrawerOpen(false);
-    setSurpriseFlying(true);
-    setFocusTarget({ lat: pick.lat, lng: pick.lng, nonce: Date.now() });
-    if (surpriseSafetyTimerRef.current) clearTimeout(surpriseSafetyTimerRef.current);
-    surpriseSafetyTimerRef.current = setTimeout(() => {
-      finishSurpriseOpen();
-    }, 1400);
-  }, [realPublishedStories, finishSurpriseOpen]);
+    openStoryViewer(pick);
+  }, [realPublishedStories, openStoryViewer]);
 
   useEffect(() => {
     const historiaId = searchParams.get('historia');
@@ -686,16 +677,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     openedHistoriaRef.current = historiaId;
     setGlobeLayers((prev) => ({ ...prev, stories: true }));
     document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    pendingSurpriseRef.current = story;
-    setHighlightedStoryId(story.id ?? null);
-    setDrawerOpen(false);
-    setSurpriseFlying(true);
-    setFocusTarget({ lat: story.lat, lng: story.lng, nonce: Date.now() });
-    if (surpriseSafetyTimerRef.current) clearTimeout(surpriseSafetyTimerRef.current);
-    surpriseSafetyTimerRef.current = setTimeout(() => {
-      finishSurpriseOpen();
-    }, 1400);
-  }, [searchParams, stories, finishSurpriseOpen]);
+    openStoryViewer(story);
+  }, [searchParams, stories, openStoryViewer]);
 
   useEffect(() => {
     if (searchParams.get('capa') !== 'pregunta' || openedCapaRef.current) return;
@@ -875,6 +858,14 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             {openRespuesta ? (
               <RespuestaGlobeCard item={openRespuesta} onClose={() => setOpenRespuesta(null)} />
             ) : null}
+            {openStory ? (
+              <StoryViewer
+                story={openStory}
+                onClose={closeStoryViewer}
+                isClosing={storyViewerClosing}
+                variant="compact"
+              />
+            ) : null}
           </div>
         </div>
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
@@ -990,17 +981,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <SoundsPanel {...sonidosProps} />
           )}
       </MapDrawer>
-      {openStory
-        ? createPortal(
-            <StoryViewer
-              story={openStory}
-              onClose={closeStoryViewer}
-              isClosing={storyViewerClosing}
-              variant="compact"
-            />,
-            document.body
-          )
-        : null}
       </div>
     </div>
   );

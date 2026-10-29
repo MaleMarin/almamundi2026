@@ -252,11 +252,14 @@ function StoryFocusFlyRig({
   planetSpinRef: RefObject<THREE.Group | null>;
   onArrived?: () => void;
 }) {
-  const { camera, controls } = useThree();
+  const { camera, controls, size } = useThree();
   const from = useRef(new THREE.Vector3());
   const to = useRef(new THREE.Vector3());
   const world = useRef(new THREE.Vector3());
   const center = useRef(new THREE.Vector3());
+  const right = useRef(new THREE.Vector3());
+  const up = useRef(new THREE.Vector3());
+  const dir = useRef(new THREE.Vector3());
   const tRef = useRef(1);
   const arrivedRef = useRef(false);
   const onArrivedRef = useRef(onArrived);
@@ -282,7 +285,21 @@ function StoryFocusFlyRig({
     }
     to.current.copy(world.current).sub(center.current);
     if (to.current.lengthSq() < 1e-10) return;
-    to.current.normalize().multiplyScalar(distance).add(center.current);
+    const zoomDistance = distance * 0.82;
+    to.current.normalize();
+    const radial = to.current.clone();
+    const phone = size.width < 768;
+    const persp = camera as THREE.PerspectiveCamera;
+    const vFov = THREE.MathUtils.degToRad(persp.fov || 40);
+    const hFov = 2 * Math.atan(Math.tan(vFov / 2) * (size.width / Math.max(1, size.height)));
+    const yaw = phone ? 0 : (((420 + 24) / 2) / Math.max(1, size.width)) * hFov;
+    const pitch = phone ? (0.5 - 0.075) * vFov : 0;
+    right.current.crossVectors(new THREE.Vector3(0, 1, 0), radial);
+    if (right.current.lengthSq() < 1e-8) right.current.set(1, 0, 0);
+    right.current.normalize();
+    up.current.crossVectors(radial, right.current).normalize();
+    dir.current.copy(radial).addScaledVector(right.current, Math.sin(yaw)).addScaledVector(up.current, -Math.sin(pitch)).normalize();
+    to.current.copy(center.current).addScaledVector(dir.current, zoomDistance);
 
     tRef.current = Math.min(1, tRef.current + dt / 0.9);
     const ease = 1 - (1 - tRef.current) ** 3;
