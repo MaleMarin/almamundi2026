@@ -1,10 +1,10 @@
 /**
- * Temas para submissions (formulario /subir) y filtros.
- * Fuente única: lib/temas.ts (20 temas).
+ * Temas para submissions y filtros.
+ * Fuente única: lib/temas.ts.
  */
 import { TEMAS } from '@/lib/temas'
 
-export const THEME_LIST = TEMAS.map((t) => ({ id: t.slug, label: t.titulo })) as ReadonlyArray<{
+export const THEME_LIST = TEMAS.map((t) => ({ id: t.id, label: t.es })) as ReadonlyArray<{
   id: string
   label: string
 }>

@@ -12,6 +12,7 @@ import { RespondeALine } from '@/components/historia/RespondeALine';
 import { neu, historiasInterior } from '@/lib/historias-neumorph';
 import { parseCancionRelacionadaHref } from '@/lib/cancion-relacionada';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { TemaTags } from '@/components/historias/TemaTags';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
 
@@ -142,10 +143,11 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
             {story.title || 'Sin título'}
           </h1>
           {alias ? (
-            <p className="mb-6 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
+            <p className="mb-4 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
               {copy.by(alias)}
             </p>
           ) : null}
+          <TemaTags ids={story.temas} tone="light" className="mb-6" />
 
           <div className="mb-5 overflow-hidden rounded-2xl" style={neu.card}>
             {kind === 'video' && story.videoUrl ? (

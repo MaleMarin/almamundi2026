@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
+import { TemaSelector } from '@/components/admin/TemaSelector';
+import { getTema } from '@/lib/temas';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 type Kind = 'texto' | 'voz' | 'foto';
@@ -26,6 +28,7 @@ type RespuestaItem = {
   previewUrl: string | null;
   hasLocation: boolean;
   antecedentes?: string;
+  temas?: string[];
 };
 
 const CONFIRM_DELETE = '¿Eliminar esta respuesta y sus archivos? No se puede deshacer.';
@@ -104,6 +107,7 @@ function formatDate(ms: number | null): string {
 
 export default function RespuestasAdmin({ token }: { token: string }) {
   const [tab, setTab] = useState<'pending' | 'approved' | 'archivo'>('pending');
+  const [themePick, setThemePick] = useState<Record<string, string[]>>({});
   const [items, setItems] = useState<RespuestaItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionId, setActionId] = useState<string | null>(null);
@@ -142,10 +146,14 @@ export default function RespuestasAdmin({ token }: { token: string }) {
     void load();
   }, [load]);
 
+  const chosenTemas = (item: RespuestaItem) =>
+    (themePick[item.id] ?? item.temas ?? []).filter((id) => getTema(id));
+
   const patch = async (
     id: string,
-    action: 'approve' | 'reject' | 'archive',
-    place?: { city: string; country: string }
+    action: 'approve' | 'reject' | 'archive' | 'themes',
+    place?: { city: string; country: string },
+    temas?: string[]
   ) => {
     setActionId(id);
     try {
@@ -155,6 +163,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
         body: JSON.stringify({
           action,
           ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
+          ...(temas ? { temas } : {}),
         }),
       });
       const data = (await res.json()) as { ok?: boolean; error?: string; code?: string };
@@ -349,13 +358,43 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                         </div>
                       </div>
                     ) : null}
+                    {item.status === 'pending' || item.status === 'approved' ? (
+                      <TemaSelector
+                        value={chosenTemas(item)}
+                        onChange={(ids) => setThemePick((prev) => ({ ...prev, [item.id]: ids }))}
+                      />
+                    ) : null}
+                    {item.status === 'approved' ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => {
+                          const temas = chosenTemas(item);
+                          if (temas.length < 1 || temas.length > 3) {
+                            setNotice('Elige de 1 a 3 temas');
+                            return;
+                          }
+                          void patch(item.id, 'themes', undefined, temas);
+                        }}
+                        style={{ ...neutralBtn, marginTop: 10 }}
+                      >
+                        Guardar temas
+                      </button>
+                    ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
                     {item.status === 'pending' && (
                       <button
                         type="button"
                         disabled={busy}
-                        onClick={() => patch(item.id, 'approve', placePrompt[item.id])}
+                        onClick={() => {
+                          const temas = chosenTemas(item);
+                          if (temas.length < 1 || temas.length > 3) {
+                            setNotice('Elige de 1 a 3 temas');
+                            return;
+                          }
+                          void patch(item.id, 'approve', placePrompt[item.id], temas);
+                        }}
                         style={okBtn}
                       >
                         <Check size={16} /> Aprobar

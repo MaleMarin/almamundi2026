@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
 export type StoriesPanelProps = {
@@ -20,30 +21,10 @@ export type StoriesPanelProps = {
   panelMode?: 'stories' | 'search';
 };
 
-function storyHaystack(s: StoryPoint): string {
-  return [
-    s.id,
-    s.title,
-    s.label,
-    s.city,
-    s.country,
-    s.topic,
-    s.description,
-    s.body,
-    s.authorName,
-    s.format,
-    s.excerpt,
-    s.subtitle,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-
 function storiesMatchingQuery(stories: StoryPoint[], q: string): StoryPoint[] {
-  const n = q.trim().toLowerCase();
+  const n = foldText(q.trim());
   if (!n) return [];
-  return stories.filter((s) => storyHaystack(s).includes(n));
+  return stories.filter((s) => haystackForStory(s).includes(n));
 }
 
 function formatStoryType(s: StoryPoint): string {

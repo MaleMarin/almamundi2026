@@ -1,178 +1,217 @@
 /**
- * Los 20 temas de AlmaMundi.
- * Cada tema tiene un slug único para rutas (/temas/[slug])
- * y palabras clave para auto-clasificación por IA.
+ * Taxonomía pública en dos niveles: 11 ejes y sus temas.
+ * El eje no se elige: sale del tema.
  */
 
+export type EjeId =
+  | 'vinculos'
+  | 'memoria'
+  | 'territorio'
+  | 'migracion'
+  | 'trabajo'
+  | 'cuerpo'
+  | 'perdidas'
+  | 'identidad'
+  | 'comunidad'
+  | 'cultura'
+  | 'suenos';
+
+export type TemaId = string;
+
+export type Eje = {
+  id: EjeId;
+  es: string;
+  pt: string;
+  en: string;
+};
+
 export type Tema = {
-  slug: string
-  titulo: string
-  descripcion: string
-  color: string // para UI
-  keywords: string[] // para auto-clasificación
+  id: string;
+  eje: EjeId;
+  es: string;
+  pt: string;
+  en: string;
+};
+
+type Locale = 'es' | 'pt' | 'en';
+
+export const EJES: readonly Eje[] = [
+  { id: 'vinculos', es: 'Vínculos', pt: 'Vínculos', en: 'Bonds' },
+  { id: 'memoria', es: 'Memoria', pt: 'Memória', en: 'Memory' },
+  { id: 'territorio', es: 'Territorio', pt: 'Território', en: 'Territory' },
+  { id: 'migracion', es: 'Migración y viajes', pt: 'Migração e viagens', en: 'Migration and travel' },
+  { id: 'trabajo', es: 'Trabajo y oficios', pt: 'Trabalho e ofícios', en: 'Work and trades' },
+  { id: 'cuerpo', es: 'Cuerpo y cuidado', pt: 'Corpo e cuidado', en: 'Body and care' },
+  { id: 'perdidas', es: 'Pérdidas y cambios', pt: 'Perdas e mudanças', en: 'Loss and change' },
+  { id: 'identidad', es: 'Identidad y creencias', pt: 'Identidade e crenças', en: 'Identity and beliefs' },
+  { id: 'comunidad', es: 'Comunidad y sociedad', pt: 'Comunidade e sociedade', en: 'Community and society' },
+  { id: 'cultura', es: 'Cultura y celebración', pt: 'Cultura e celebração', en: 'Culture and celebration' },
+  { id: 'suenos', es: 'Sueños y futuro', pt: 'Sonhos e futuro', en: 'Dreams and future' },
+];
+
+const TEMA_ROWS: readonly (readonly [string, EjeId, string, string, string])[] = [
+  ['familia', 'vinculos', 'familia', 'família', 'family'],
+  ['pareja-amor', 'vinculos', 'pareja y amor', 'casal e amor', 'couple and love'],
+  ['amistad', 'vinculos', 'amistad', 'amizade', 'friendship'],
+  ['maternidad-paternidad', 'vinculos', 'maternidad y paternidad', 'maternidade e paternidade', 'motherhood and fatherhood'],
+  ['abuelos', 'vinculos', 'abuelos', 'avós', 'grandparents'],
+  ['hijos', 'vinculos', 'hijos', 'filhos', 'children'],
+  ['vecinos', 'vinculos', 'vecinos', 'vizinhos', 'neighbors'],
+  ['infancia', 'memoria', 'infancia', 'infância', 'childhood'],
+  ['recuerdos', 'memoria', 'recuerdos', 'lembranças', 'memories'],
+  ['ancestros', 'memoria', 'ancestros', 'ancestrais', 'ancestors'],
+  ['tradiciones', 'memoria', 'tradiciones', 'tradições', 'traditions'],
+  ['objetos', 'memoria', 'objetos', 'objetos', 'objects'],
+  ['lugares-que-ya-no-existen', 'memoria', 'lugares que ya no existen', 'lugares que já não existem', 'places that no longer exist'],
+  ['historia-de-un-lugar', 'memoria', 'historia de un lugar', 'história de um lugar', 'story of a place'],
+  ['hogar', 'territorio', 'hogar', 'lar', 'home'],
+  ['barrio', 'territorio', 'barrio', 'bairro', 'neighborhood'],
+  ['ciudad', 'territorio', 'ciudad', 'cidade', 'city'],
+  ['campo', 'territorio', 'campo', 'campo', 'countryside'],
+  ['naturaleza', 'territorio', 'naturaleza', 'natureza', 'nature'],
+  ['mar', 'territorio', 'mar', 'mar', 'sea'],
+  ['montana', 'territorio', 'montaña', 'montanha', 'mountain'],
+  ['clima', 'territorio', 'clima', 'clima', 'climate'],
+  ['partir', 'migracion', 'partir', 'partir', 'leaving'],
+  ['llegar', 'migracion', 'llegar', 'chegar', 'arriving'],
+  ['exilio', 'migracion', 'exilio', 'exílio', 'exile'],
+  ['frontera', 'migracion', 'frontera', 'fronteira', 'border'],
+  ['regreso', 'migracion', 'regreso', 'retorno', 'return'],
+  ['viajes', 'migracion', 'viajes', 'viagens', 'travel'],
+  ['raices', 'migracion', 'raíces', 'raízes', 'roots'],
+  ['lengua', 'migracion', 'lengua', 'língua', 'language'],
+  ['trabajo', 'trabajo', 'trabajo', 'trabalho', 'work'],
+  ['oficios', 'trabajo', 'oficios', 'ofícios', 'trades'],
+  ['estudio', 'trabajo', 'estudio', 'estudo', 'study'],
+  ['emprendimiento', 'trabajo', 'emprendimiento', 'empreendimento', 'entrepreneurship'],
+  ['primer-empleo', 'trabajo', 'primer empleo', 'primeiro emprego', 'first job'],
+  ['jubilacion', 'trabajo', 'jubilación', 'aposentadoria', 'retirement'],
+  ['salud', 'cuerpo', 'salud', 'saúde', 'health'],
+  ['enfermedad', 'cuerpo', 'enfermedad', 'doença', 'illness'],
+  ['cuidado-de-otros', 'cuerpo', 'cuidado de otros', 'cuidado de outros', 'caring for others'],
+  ['deporte', 'cuerpo', 'deporte', 'esporte', 'sport'],
+  ['cuerpo', 'cuerpo', 'cuerpo', 'corpo', 'body'],
+  ['envejecer', 'cuerpo', 'envejecer', 'envelhecer', 'growing older'],
+  ['duelo', 'perdidas', 'duelo', 'luto', 'grief'],
+  ['despedidas', 'perdidas', 'despedidas', 'despedidas', 'farewells'],
+  ['crisis', 'perdidas', 'crisis', 'crise', 'crisis'],
+  ['decisiones', 'perdidas', 'decisiones', 'decisões', 'decisions'],
+  ['comenzar-de-nuevo', 'perdidas', 'comenzar de nuevo', 'começar de novo', 'starting over'],
+  ['miedo', 'perdidas', 'miedo', 'medo', 'fear'],
+  ['valentia', 'perdidas', 'valentía', 'coragem', 'courage'],
+  ['identidad', 'identidad', 'identidad', 'identidade', 'identity'],
+  ['pertenencia', 'identidad', 'pertenencia', 'pertencimento', 'belonging'],
+  ['fe-espiritualidad', 'identidad', 'fe y espiritualidad', 'fé e espiritualidade', 'faith and spirituality'],
+  ['genero', 'identidad', 'género', 'gênero', 'gender'],
+  ['pueblos-originarios', 'identidad', 'pueblos originarios', 'povos originários', 'Indigenous peoples'],
+  ['diversidad', 'identidad', 'diversidad', 'diversidade', 'diversity'],
+  ['organizacion', 'comunidad', 'organización', 'organização', 'organizing'],
+  ['solidaridad', 'comunidad', 'solidaridad', 'solidariedade', 'solidarity'],
+  ['derechos', 'comunidad', 'derechos', 'direitos', 'rights'],
+  ['justicia', 'comunidad', 'justicia', 'justiça', 'justice'],
+  ['protesta', 'comunidad', 'protesta', 'protesto', 'protest'],
+  ['educacion', 'comunidad', 'educación', 'educação', 'education'],
+  ['vida-publica', 'comunidad', 'vida pública', 'vida pública', 'public life'],
+  ['musica', 'cultura', 'música', 'música', 'music'],
+  ['arte', 'cultura', 'arte', 'arte', 'art'],
+  ['comida', 'cultura', 'comida', 'comida', 'food'],
+  ['fiestas', 'cultura', 'fiestas', 'festas', 'celebrations'],
+  ['juego', 'cultura', 'juego', 'brincadeira', 'play'],
+  ['humor', 'cultura', 'humor', 'humor', 'humor'],
+  ['cine-lectura', 'cultura', 'cine y lectura', 'cinema e leitura', 'film and reading'],
+  ['esperanza', 'suenos', 'esperanza', 'esperança', 'hope'],
+  ['proyectos', 'suenos', 'proyectos', 'projetos', 'projects'],
+  ['deseos', 'suenos', 'deseos', 'desejos', 'wishes'],
+  ['cartas-al-futuro', 'suenos', 'cartas al futuro', 'cartas para o futuro', 'letters to the future'],
+  ['lo-que-vendra', 'suenos', 'lo que vendrá', 'o que virá', 'what is to come'],
+];
+
+export const TEMAS: readonly Tema[] = TEMA_ROWS.map(([id, eje, es, pt, en]) => ({ id, eje, es, pt, en }));
+
+export const TEMAS_MAP: Record<string, Tema> = Object.fromEntries(TEMAS.map((tema) => [tema.id, tema]));
+
+const EJES_MAP: Record<string, Eje> = Object.fromEntries(EJES.map((eje) => [eje.id, eje]));
+
+export function getTema(id: string | null | undefined): Tema | undefined {
+  if (!id) return undefined;
+  return TEMAS_MAP[id];
 }
-
-export const TEMAS: Tema[] = [
-  {
-    slug: 'amor',
-    titulo: 'El amor como apertura',
-    descripcion: 'Amar implica salir de uno mismo, entregarse, arriesgarse y quedar...',
-    color: '#e8534a',
-    keywords: ['amor', 'amar', 'enamorar', 'querer', 'entrega', 'pareja', 'relación', 'afecto', 'cariño'],
-  },
-  {
-    slug: 'perdida',
-    titulo: 'La pérdida como experiencia',
-    descripcion: 'La vida humana está atravesada por lo que se rompe, se aleja, muere...',
-    color: '#6b7c8e',
-    keywords: ['pérdida', 'perder', 'duelo', 'muerte', 'ausencia', 'despedida', 'luto', 'extrañar'],
-  },
-  {
-    slug: 'abandono',
-    titulo: 'El abandono como herida',
-    descripcion: 'Una de las experiencias más profundas es sentir que quien debía cuidar...',
-    color: '#c47b3a',
-    keywords: ['abandono', 'abandonar', 'dejar', 'soltar', 'descuido', 'negligencia', 'desamparo'],
-  },
-  {
-    slug: 'ruptura',
-    titulo: 'La ruptura amorosa',
-    descripcion: 'No termina solo una relación: también se derrumba una promesa...',
-    color: '#d45f8a',
-    keywords: ['ruptura', 'separación', 'divorcio', 'terminar', 'romper', 'ex pareja', 'desamor'],
-  },
-  {
-    slug: 'familia',
-    titulo: 'La fractura familiar',
-    descripcion: 'Las heridas familiares suelen tocar lo más íntimo: pertenencia, cuidado...',
-    color: '#e8a23a',
-    keywords: ['familia', 'familiar', 'padre', 'madre', 'hijo', 'hermano', 'hogar', 'herencia', 'fractura'],
-  },
-  {
-    slug: 'violencia',
-    titulo: 'La violencia como imposición',
-    descripcion: 'La experiencia humana está marcada por la agresión, el abuso...',
-    color: '#8b3030',
-    keywords: ['violencia', 'abuso', 'agresión', 'maltrato', 'trauma', 'golpe', 'amenaza', 'acoso'],
-  },
-  {
-    slug: 'injusticia',
-    titulo: 'La injusticia como conciencia',
-    descripcion: 'Hay humanidad en la experiencia de ser menospreciado, excluido...',
-    color: '#3a6e8b',
-    keywords: ['injusticia', 'discriminación', 'exclusión', 'desigualdad', 'racismo', 'marginación', 'derechos'],
-  },
-  {
-    slug: 'miedo',
-    titulo: 'El miedo como percepción',
-    descripcion: 'El miedo revela nuestra fragilidad frente a la pérdida, el rechazo...',
-    color: '#5a4a8b',
-    keywords: ['miedo', 'temor', 'fobia', 'ansiedad', 'pánico', 'vulnerabilidad', 'fragilidad', 'angustia'],
-  },
-  {
-    slug: 'identidad',
-    titulo: 'La identidad como pregunta',
-    descripcion: 'Ser humano es no coincidir del todo consigo mismo y tener que...',
-    color: '#3a8b6e',
-    keywords: ['identidad', 'quien soy', 'pertenencia', 'origen', 'género', 'cultura', 'raíces', 'nombre'],
-  },
-  {
-    slug: 'memoria',
-    titulo: 'La memoria como defensa',
-    descripcion: 'Recordar no solo conserva el pasado: también protege lo vivido...',
-    color: '#8b7a3a',
-    keywords: ['memoria', 'recuerdo', 'pasado', 'historia', 'infancia', 'nostalgia', 'olvidar', 'remembrar'],
-  },
-  {
-    slug: 'esperanza',
-    titulo: 'La esperanza como forma',
-    descripcion: 'Incluso en condiciones adversas, el ser humano insiste en imaginar...',
-    color: '#4a8b3a',
-    keywords: ['esperanza', 'futuro', 'sueño', 'deseo', 'ilusión', 'posibilidad', 'cambio', 'creer'],
-  },
-  {
-    slug: 'trabajo',
-    titulo: 'El trabajo como necesidad',
-    descripcion: 'El trabajo no es solo producción: organiza el tiempo, da identidad...',
-    color: '#6b4a2a',
-    keywords: ['trabajo', 'empleo', 'oficio', 'profesión', 'desempleo', 'cansancio', 'esfuerzo', 'laboral'],
-  },
-  {
-    slug: 'precariedad',
-    titulo: 'La precariedad como inseguridad',
-    descripcion: 'Vivir sin estabilidad material, afectiva o social vuelve incierto...',
-    color: '#8b6a3a',
-    keywords: ['precariedad', 'pobreza', 'inestabilidad', 'inseguridad', 'deuda', 'crisis', 'subsistir'],
-  },
-  {
-    slug: 'soledad',
-    titulo: 'La soledad como prueba interior',
-    descripcion: 'A veces la soledad es elección y refugio; otras, es abandono...',
-    color: '#4a6a8b',
-    keywords: ['soledad', 'solo', 'aislamiento', 'silencio', 'introversión', 'desconexión', 'retiro'],
-  },
-  {
-    slug: 'familia-refugio',
-    titulo: 'La familia como refugio y herida',
-    descripcion: 'En ella conviven amor, protección, transmisión, pero también conflicto...',
-    color: '#8b4a6a',
-    keywords: ['familia', 'refugio', 'hogar', 'vínculo', 'raíz', 'cuidado', 'protección', 'conflicto familiar'],
-  },
-  {
-    slug: 'cambio',
-    titulo: 'El cambio como condición',
-    descripcion: 'Vivir es transformarse: crecer, migrar, perder certezas, adaptarse...',
-    color: '#3a8b8b',
-    keywords: ['cambio', 'transformación', 'migración', 'mudanza', 'adaptación', 'transición', 'evolución'],
-  },
-  {
-    slug: 'arte',
-    titulo: 'El arte como traducción',
-    descripcion: 'El arte aparece cuando vivir no basta y surge la necesidad de dar forma...',
-    color: '#8b3a8b',
-    keywords: ['arte', 'pintura', 'dibujo', 'escultura', 'creación', 'expresión artística', 'obra', 'estética'],
-  },
-  {
-    slug: 'escritura',
-    titulo: 'La escritura como acto de fijar',
-    descripcion: 'Escribir es ordenar el caos, dejar testimonio y convertir la experiencia...',
-    color: '#2a5a3a',
-    keywords: ['escritura', 'escribir', 'diario', 'carta', 'poesía', 'literatura', 'palabras', 'narrar'],
-  },
-  {
-    slug: 'musica-cine-foto',
-    titulo: 'La música, el cine y la fotografía',
-    descripcion: 'Cada una de estas formas permite expresar lo que a veces no logra decirse...',
-    color: '#3a3a8b',
-    keywords: ['música', 'cine', 'fotografía', 'canción', 'película', 'imagen', 'sonido', 'visual', 'ritmo'],
-  },
-  {
-    slug: 'sentido',
-    titulo: 'La búsqueda de sentido',
-    descripcion: 'Más allá del dolor, del trabajo, del amor o de la pérdida, persiste...',
-    color: '#5a3a2a',
-    keywords: ['sentido', 'propósito', 'fe', 'espiritualidad', 'filosofía', 'existencia', 'por qué', 'trascendencia'],
-  },
-]
-
-export const TEMAS_MAP = Object.fromEntries(TEMAS.map((t) => [t.slug, t]))
 
 export function getTemaBySlug(slug: string): Tema | undefined {
-  return TEMAS.find((t) => t.slug === slug)
+  return getTema(slug);
 }
 
-/** Detecta qué temas corresponden a un texto dado (título + descripción) */
-export function detectarTemas(texto: string): string[] {
-  const lower = texto.toLowerCase()
-  const matches: { slug: string; score: number }[] = []
+export function getEje(id: string | null | undefined): Eje | undefined {
+  if (!id) return undefined;
+  return EJES_MAP[id];
+}
 
-  for (const tema of TEMAS) {
-    const score = tema.keywords.filter((k) => lower.includes(k)).length
-    if (score > 0) matches.push({ slug: tema.slug, score })
+export function temasDeEje(ejeId: string): Tema[] {
+  return TEMAS.filter((tema) => tema.eje === ejeId);
+}
+
+export function ejeDeTema(temaId: string): EjeId | null {
+  return getTema(temaId)?.eje ?? null;
+}
+
+export function labelTema(id: string, locale: Locale): string {
+  const tema = getTema(id);
+  return tema ? tema[locale] : '';
+}
+
+export function labelEje(id: string, locale: Locale): string {
+  const eje = getEje(id);
+  return eje ? eje[locale] : '';
+}
+
+/** 1 a 3 temas conocidos. El eje se deriva y no se pide aparte. */
+export function temasGuardados(value: unknown): { temas: string[]; ejes: string[] } | null {
+  if (!Array.isArray(value)) return null;
+  const temas: string[] = [];
+  for (const item of value) {
+    if (typeof item !== 'string' || !TEMAS_MAP[item] || temas.includes(item)) continue;
+    temas.push(item);
   }
+  if (temas.length < 1 || temas.length > 3 || temas.length !== value.filter((item) => typeof item === 'string').length) {
+    return null;
+  }
+  const ejes = [...new Set(temas.map((id) => TEMAS_MAP[id].eje))];
+  return { temas, ejes };
+}
 
-  return matches
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
-    .map((m) => m.slug)
+export function idsPublicos(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter((item): item is string => typeof item === 'string' && Boolean(TEMAS_MAP[item]));
+}
+
+export function ejesPublicos(temas: string[], stored?: unknown): string[] {
+  const fromTemas = [...new Set(temas.map((id) => TEMAS_MAP[id]?.eje).filter((id): id is EjeId => Boolean(id)))];
+  if (fromTemas.length) return fromTemas;
+  if (!Array.isArray(stored)) return [];
+  return stored.filter((item): item is string => typeof item === 'string' && Boolean(EJES_MAP[item]));
+}
+
+/** Texto de ejes y temas en los tres idiomas, para el buscador público. */
+export function temasSearchText(temaIds: string[] | undefined): string {
+  const parts: string[] = [];
+  for (const id of temaIds ?? []) {
+    const tema = getTema(id);
+    if (!tema) continue;
+    const eje = getEje(tema.eje);
+    parts.push(tema.es, tema.pt, tema.en);
+    if (eje) parts.push(eje.es, eje.pt, eje.en);
+  }
+  return parts.join(' ');
+}
+
+/** Coincidencia simple para el panel de curación que aún importa esta función. */
+export function detectarTemas(texto: string): string[] {
+  const lower = texto.toLowerCase();
+  const matches: { id: string; score: number }[] = [];
+  for (const tema of TEMAS) {
+    const words = `${tema.es} ${tema.pt} ${tema.en}`.toLowerCase().split(/[^a-záéíóúñâêôãõçü]+/).filter((word) => word.length > 3);
+    const score = words.filter((word) => lower.includes(word)).length;
+    if (score > 0) matches.push({ id: tema.id, score });
+  }
+  return matches.sort((a, b) => b.score - a.score).slice(0, 3).map((item) => item.id);
 }

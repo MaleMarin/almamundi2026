@@ -36,6 +36,8 @@ import {
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
+import { TemaSelector } from '@/components/admin/TemaSelector';
+import { getTema } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
 
 const BG = '#0a0f24';
@@ -74,6 +76,7 @@ type Story = {
   format: StoryFormat;
   mediaUrl: string;
   topic: string[];
+  temas?: string[];
   status: StoryStatus;
   activeSince: number | null;
   isFeatured: boolean;
@@ -404,6 +407,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
+  const [themePick, setThemePick] = useState<Record<string, string[]>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [archivedFilter, setArchivedFilter] = useState<{ topic?: string; place?: string; format?: StoryFormat }>({});
   const [newCollectionTitle, setNewCollectionTitle] = useState('');
@@ -565,10 +569,14 @@ export default function AdminPage() {
     }
   };
 
+  const chosenTemas = (story: Story) =>
+    (themePick[story.id] ?? story.temas ?? []).filter((id) => getTema(id));
+
   const patchStory = async (
     id: string,
-    action: 'approve' | 'reject' | 'feature' | 'unfeature' | 'archive',
-    place?: { city: string; country: string }
+    action: 'approve' | 'reject' | 'feature' | 'unfeature' | 'archive' | 'themes',
+    place?: { city: string; country: string },
+    temas?: string[]
   ) => {
     setActionLoading(id);
     try {
@@ -578,6 +586,7 @@ export default function AdminPage() {
         body: JSON.stringify({
           action,
           ...(place?.city && place.country ? { city: place.city, country: place.country } : {}),
+          ...(temas ? { temas } : {}),
         }),
       });
       const data = (await res.json()) as {
@@ -610,7 +619,9 @@ export default function AdminPage() {
                 ? 'Destacada'
                 : action === 'unfeature'
                   ? 'Ya no está destacada'
-                  : 'Archivada'
+                  : action === 'themes'
+                    ? 'Temas guardados'
+                    : 'Archivada'
           );
         }
         setPlacePrompt((prev) => {
@@ -961,12 +972,23 @@ export default function AdminPage() {
                     </div>
                   ) : null}
                   <StoryPhotoFichas imagenes={s.imagenes} />
+                  <TemaSelector
+                    value={chosenTemas(s)}
+                    onChange={(ids) => setThemePick((prev) => ({ ...prev, [s.id]: ids }))}
+                  />
                 </div>
                 <div style={{ display: 'flex', gap: 8 }}>
                   <button
                     type="button"
                     disabled={actionLoading === s.id}
-                    onClick={() => patchStory(s.id, 'approve', placePrompt[s.id])}
+                    onClick={() => {
+                      const temas = chosenTemas(s);
+                      if (temas.length < 1 || temas.length > 3) {
+                        showToast('Elige de 1 a 3 temas');
+                        return;
+                      }
+                      void patchStory(s.id, 'approve', placePrompt[s.id], temas);
+                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -1047,6 +1069,36 @@ export default function AdminPage() {
                       token={idToken}
                     />
                     <StoryPhotoFichas imagenes={s.imagenes} />
+                    <TemaSelector
+                      value={chosenTemas(s)}
+                      onChange={(ids) => setThemePick((prev) => ({ ...prev, [s.id]: ids }))}
+                    />
+                    <button
+                      type="button"
+                      disabled={actionLoading === s.id}
+                      onClick={() => {
+                        const temas = chosenTemas(s);
+                        if (temas.length < 1 || temas.length > 3) {
+                          showToast('Elige de 1 a 3 temas');
+                          return;
+                        }
+                        void patchStory(s.id, 'themes', undefined, temas);
+                      }}
+                      style={{
+                        marginTop: 10,
+                        padding: '8px 14px',
+                        borderRadius: 999,
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        background: 'rgba(255,255,255,0.08)',
+                        color: 'rgba(255,255,255,0.9)',
+                        fontWeight: 600,
+                        fontSize: 13,
+                        cursor: 'pointer',
+                        fontFamily: APP_FONT,
+                      }}
+                    >
+                      Guardar temas
+                    </button>
                     {s.publicationMail?.status === 'sent' ? (
                       <p style={{ fontSize: 12, margin: '6px 0 0', color: '#86efac' }}>
                         Correo enviado a {s.publicationMail.to}

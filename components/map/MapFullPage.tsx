@@ -50,6 +50,7 @@ import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { useStories } from '@/hooks/useStories';
 import { usePulses } from '@/hooks/usePulses';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { haystackForStory } from '@/lib/historias/story-filter-helpers';
 import { SOUND_MOODS, type SoundMood, type StoryMeta } from '@/lib/map-data/story-meta';
 import { GLOBE_PACIFIC_POV, GLOBE_PACIFIC_POV_FAR, GLOBE_PACIFIC_POV_ORBIT, globePovForViewerTimeZone } from '@/lib/map-data/globe-pov';
 import { publishGlobeCameraLive } from '@/lib/globe/globe-camera-live';
@@ -1034,9 +1035,7 @@ function normalizeQuery(input: string): string {
     .trim();
 }
 function storySearchHaystack(s: StoryPoint): string {
-  return normalizeQuery(
-    [s.topic, s.label, s.description, s.city, s.country].filter(Boolean).join(' ')
-  );
+  return haystackForStory(s);
 }
 
 function isColeccionStoredItem(v: unknown): v is { kind: string; id: string; title?: string; subtitle?: string } {

@@ -13,6 +13,7 @@ import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { TemaTags } from '@/components/historias/TemaTags';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 
@@ -595,6 +596,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {story.title ?? story.label}
                 </h2>
+                <TemaTags ids={story.temas} tone="dark" className="mt-2" />
                 {alias ? (
                 <p
                   style={{

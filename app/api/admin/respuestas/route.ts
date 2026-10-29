@@ -112,6 +112,9 @@ export async function GET(request: NextRequest) {
           createdAt: toMillis(data.createdAt),
           previewUrl,
           hasLocation: lat != null && lng != null,
+          temas: Array.isArray(data.temas)
+            ? data.temas.filter((item): item is string => typeof item === "string")
+            : [],
         };
       })
     );

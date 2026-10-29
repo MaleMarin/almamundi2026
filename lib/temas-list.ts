@@ -1,8 +1,8 @@
 /**
  * Temas para /temas y /temas/[slug].
- * Fuente: lib/temas.ts (20 temas con slug, titulo, descripcion, color, keywords).
+ * Fuente: lib/temas.ts.
  */
-import { TEMAS as TEMAS_SOURCE, getTemaBySlug as getTemaBySlugSource } from '@/lib/temas'
+import { TEMAS as TEMAS_SOURCE, getEje, getTemaBySlug as getTemaBySlugSource } from '@/lib/temas'
 
 export type TemaItem = {
   slug: string
@@ -11,18 +11,17 @@ export type TemaItem = {
   color: string
 }
 
-/** Lista para la UI: slug, name (titulo), description (descripcion), color */
-export const TEMAS: TemaItem[] = TEMAS_SOURCE.map((t) => ({
-  slug: t.slug,
-  name: t.titulo,
-  description: t.descripcion,
-  color: t.color,
+export const TEMAS: TemaItem[] = TEMAS_SOURCE.map((tema) => ({
+  slug: tema.id,
+  name: tema.es,
+  description: getEje(tema.eje)?.es,
+  color: '#FF4A1C',
 }))
 
 export function getTemaBySlug(slug: string): TemaItem | undefined {
-  const t = getTemaBySlugSource(slug)
-  if (!t) return undefined
-  return { slug: t.slug, name: t.titulo, description: t.descripcion, color: t.color }
+  const tema = getTemaBySlugSource(slug)
+  if (!tema) return undefined
+  return { slug: tema.id, name: tema.es, description: getEje(tema.eje)?.es, color: '#FF4A1C' }
 }
 
 /** Normaliza un tema de historia para comparar con slug (lowercase, sin acentos). */

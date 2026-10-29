@@ -30,6 +30,9 @@ export type StoryPoint = {
   author?: { name?: string; avatar?: string; bio?: string };
   authorAvatar?: string;
   tags?: string[];
+  /** Ids de tema público. El eje se deriva de cada tema. */
+  temas?: string[];
+  ejes?: string[];
   quote?: string;
   cancionRelacionada?: string;
   antecedentes?: string;
@@ -39,7 +42,7 @@ export type StoryPoint = {
   transcription?: string;
   captionPhrases?: string[];
   images?: string[];
-  imagenes?: { url: string; caption?: string; descripcion?: string }[];
+  imagenes?: { url: string; caption?: string; descripcion?: string; titulo?: string }[];
   photos?: {
     url: string;
     name: string;

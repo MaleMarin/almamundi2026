@@ -410,6 +410,7 @@ export async function GET(request: NextRequest) {
         format: d.format ?? "text",
         mediaUrl: d.mediaUrl ?? (d.media as { videoUrl?: string; audioUrl?: string })?.videoUrl ?? (d.media as { videoUrl?: string; audioUrl?: string })?.audioUrl ?? "",
         topic: Array.isArray(d.topic) ? d.topic : (d.tags as { themes?: string[] })?.themes ?? [],
+        temas: Array.isArray(d.temas) ? d.temas.filter((item): item is string => typeof item === "string") : [],
         status: d.status ?? "pending",
         activeSince,
         isFeatured: Boolean(d.isFeatured) || d.status === "featured",

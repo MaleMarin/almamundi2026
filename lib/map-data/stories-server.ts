@@ -14,6 +14,7 @@ import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/ant
 import { publicCityCountry } from "@/lib/historias/story-ubicacion";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
 import { parseStoryImagenes } from "@/lib/historias/story-imagenes";
+import { ejesPublicos, idsPublicos } from "@/lib/temas";
 import {
   FIRESTORE_AUDIENCE_PUBLIC_STATUSES,
   GLOBE_PUBLIC_STORY_CAP,
@@ -143,6 +144,8 @@ function firestoreDocToStoryPoint(
     ...(questionId ? { questionId } : {}),
     ...(isQuestionMode(d.questionMode) ? { questionMode: d.questionMode } : {}),
     imagenes: parseStoryImagenes(d.imagenes),
+    temas: idsPublicos(d.temas),
+    ejes: ejesPublicos(idsPublicos(d.temas), d.ejes),
     format: formato,
     city: city || undefined,
     country: country || undefined,

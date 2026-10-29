@@ -174,10 +174,20 @@ async function resolveSubmission(
  * Crear documento público `stories` desde `story_submissions` o `submissions` (pipeline /subir).
  * No envía correo aquí — la capa HTTP decide (Resend, colas legacy, etc.).
  */
+function applyPublicTemas(
+  story: Record<string, unknown>,
+  temas?: { temas: string[]; ejes: string[] }
+) {
+  if (!temas) return;
+  story.temas = temas.temas;
+  story.ejes = temas.ejes;
+}
+
 export async function editorialPublishFromSubmission(
   db: Firestore,
   submissionId: string,
-  actorEmail: string
+  actorEmail: string,
+  temas?: { temas: string[]; ejes: string[] }
 ): Promise<PublishFromSubmissionResult> {
   const resolved = await resolveSubmission(db, submissionId);
   if (!resolved) return { ok: false, httpStatus: 404, error: "submission not found" };
@@ -250,6 +260,7 @@ export async function editorialPublishFromSubmission(
       tags,
       excerpt: typeof sub.title === "string" ? sub.title.slice(0, 160) : undefined,
     };
+    applyPublicTemas(story, temas);
     if (typeof sub.authorName === "string" && sub.authorName.trim()) story.authorName = sub.authorName;
     const authorEmailOnSub =
       typeof sub.authorEmail === "string"
@@ -370,6 +381,7 @@ export async function editorialPublishFromSubmission(
     city: sd.placeLabel ?? undefined,
     ...(imagenes?.length ? { imagenes } : {}),
   };
+  applyPublicTemas(story, temas);
   const pipelineNote = normalizeAntecedentes(sd.antecedentes);
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
   scrubPublicNote(story, pipelineNote);

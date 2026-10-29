@@ -19,11 +19,12 @@ import {
   deleteRespuestaStorageFiles,
 } from "@/lib/server-storage";
 import { geocodePublicPlace } from "@/lib/respuestas/geocode";
+import { temasGuardados } from "@/lib/temas";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-type Action = "approve" | "reject" | "archive";
+type Action = "approve" | "reject" | "archive" | "themes";
 
 function cleanPlace(value: unknown): string {
   if (typeof value !== "string") return "";
@@ -56,15 +57,19 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string; city?: string; country?: string };
+  let body: { action?: string; city?: string; country?: string; temas?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "invalid json" }, { status: 400 });
   }
   const action = body.action as Action | undefined;
-  if (!action || !["approve", "reject", "archive"].includes(action)) {
+  if (!action || !["approve", "reject", "archive", "themes"].includes(action)) {
     return NextResponse.json({ error: "invalid action" }, { status: 400 });
+  }
+  const temas = action === "approve" || action === "themes" ? temasGuardados(body.temas) : null;
+  if ((action === "approve" || action === "themes") && !temas) {
+    return NextResponse.json({ error: "Elige de 1 a 3 temas" }, { status: 400 });
   }
 
   try {
@@ -74,6 +79,17 @@ export async function PATCH(
     if (!snap.exists) return NextResponse.json({ error: "not found" }, { status: 404 });
     const data = snap.data() as Record<string, unknown>;
     const current = String(data.status ?? "");
+    if (action === "themes") {
+      if (current !== "approved") {
+        return NextResponse.json({ error: "transición inválida" }, { status: 400 });
+      }
+      await ref.update({
+        temas: temas?.temas ?? [],
+        ejes: temas?.ejes ?? [],
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      return NextResponse.json({ ok: true });
+    }
     if (action === "approve" && current !== "pending") {
       return NextResponse.json({ error: "transición inválida" }, { status: 400 });
     }
@@ -158,6 +174,8 @@ export async function PATCH(
           publishedUrl,
           publishedAt: FieldValue.serverTimestamp(),
           updatedAt: FieldValue.serverTimestamp(),
+          temas: temas?.temas ?? [],
+          ejes: temas?.ejes ?? [],
           ...(data.ageRange != null ? { ageRange: FieldValue.delete() } : {}),
           ...(data.sex != null ? { sex: FieldValue.delete() } : {}),
           ...(data.age != null ? { age: FieldValue.delete() } : {}),

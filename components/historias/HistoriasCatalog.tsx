@@ -5,7 +5,8 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlignLeft, Headphones, Image as ImageIcon, Video } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { foldText } from '@/lib/historias/story-filter-helpers';
+import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
+import { EJES, ejeDeTema, getEje } from '@/lib/temas';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
@@ -21,6 +22,7 @@ const COPY = {
     tabs: { todas: 'Todas', video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' } as const,
     country: 'País',
     allCountries: 'Todos',
+    axis: 'Eje',
     order: 'Orden',
     newest: 'Más recientes',
     oldest: 'Más antiguas',
@@ -34,6 +36,7 @@ const COPY = {
     tabs: { todas: 'Todas', video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' } as const,
     country: 'País',
     allCountries: 'Todos',
+    axis: 'Eixo',
     order: 'Ordem',
     newest: 'Mais recentes',
     oldest: 'Mais antigas',
@@ -47,6 +50,7 @@ const COPY = {
     tabs: { todas: 'All', video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' } as const,
     country: 'Country',
     allCountries: 'All',
+    axis: 'Theme',
     order: 'Order',
     newest: 'Newest',
     oldest: 'Oldest',
@@ -170,6 +174,8 @@ export default function HistoriasCatalog() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const tab = tabFromParam(searchParams.get('formato'));
+  const ejeParam = searchParams.get('eje') ?? '';
+  const eje = getEje(ejeParam) ? ejeParam : '';
   const [stories, setStories] = useState<StoryPoint[]>([]);
   const [country, setCountry] = useState('');
   const [order, setOrder] = useState<'newest' | 'oldest'>('newest');
@@ -193,7 +199,7 @@ export default function HistoriasCatalog() {
 
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [tab, country, order, query]);
+  }, [tab, country, order, query, eje]);
 
   const featured = useMemo(
     () => stories.filter((story) => story.featured).slice(0, 3),
@@ -218,17 +224,21 @@ export default function HistoriasCatalog() {
     const q = foldText(query.trim());
     const rows = inTab.filter((story) => {
       if (country && (story.country ?? '').trim() !== country) return false;
+      if (eje) {
+        const onAxis =
+          (story.ejes ?? []).includes(eje) ||
+          (story.temas ?? []).some((id) => ejeDeTema(id) === eje);
+        if (!onAxis) return false;
+      }
       if (!q) return true;
-      const title = foldText(story.title || story.label || '');
-      const city = foldText(story.city ?? '');
-      return title.includes(q) || city.includes(q);
+      return haystackForStory(story).includes(q);
     });
     rows.sort((a, b) => {
       const delta = publishedTime(a.publishedAt) - publishedTime(b.publishedAt);
       return order === 'oldest' ? delta : -delta;
     });
     return rows;
-  }, [inTab, country, query, order]);
+  }, [inTab, country, query, order, eje]);
 
   const shown = filtered.slice(0, visible);
 
@@ -239,6 +249,14 @@ export default function HistoriasCatalog() {
     const qs = params.toString();
     router.replace(qs ? `/historias?${qs}` : '/historias', { scroll: false });
     setCountry('');
+  };
+
+  const chooseEje = (next: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next) params.set('eje', next);
+    else params.delete('eje');
+    const qs = params.toString();
+    router.replace(qs ? `/historias?${qs}` : '/historias', { scroll: false });
   };
 
   return (
@@ -291,6 +309,21 @@ export default function HistoriasCatalog() {
             {countries.map((name) => (
               <option key={name} value={name}>
                 {name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className="flex min-w-[10rem] flex-col gap-1 text-[length:var(--fs-etiqueta)] font-semibold">
+          {copy.axis}
+          <select
+            value={eje}
+            onChange={(event) => chooseEje(event.target.value)}
+            className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
+          >
+            <option value="">{copy.allCountries}</option>
+            {EJES.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item[locale]}
               </option>
             ))}
           </select>

@@ -8,10 +8,11 @@ import { editorialDeleteStory, editorialDeleteSubmission, editorialPublishFromSu
 import { nextStatusAfterAdminStoryAction } from "@/lib/editorial/transitions";
 import { notifyAuthorStoryPublished } from "@/lib/email/notify-author-published";
 import { authorEmailOnStory, saveAuthorContact } from "@/lib/author-contacts";
+import { temasGuardados } from "@/lib/temas";
 
 export const runtime = "nodejs";
 
-type Action = "approve" | "reject" | "feature" | "unfeature" | "archive";
+type Action = "approve" | "reject" | "feature" | "unfeature" | "archive" | "themes";
 
 const PENDING_COLLECTIONS = ["submissions", "story_submissions"] as const;
 
@@ -26,7 +27,8 @@ async function moderatePendingSubmission(
   id: string,
   action: Action,
   actorEmail: string,
-  place?: { city: string; country: string }
+  place?: { city: string; country: string },
+  temas?: { temas: string[]; ejes: string[] }
 ) {
   if (action !== "approve" && action !== "reject") {
     return NextResponse.json({ error: "story not found" }, { status: 404 });
@@ -75,7 +77,7 @@ async function moderatePendingSubmission(
     });
     return NextResponse.json({ ok: true, status: "rejected" });
   }
-  const result = await editorialPublishFromSubmission(db, id, actorEmail);
+  const result = await editorialPublishFromSubmission(db, id, actorEmail, temas);
   if (!result.ok) {
     const missingPlace = result.error === "location_not_found";
     return NextResponse.json(
@@ -103,7 +105,7 @@ export async function PATCH(
     return NextResponse.json({ error: "missing id" }, { status: 400 });
   }
 
-  let body: { action?: string; city?: string; country?: string };
+  let body: { action?: string; city?: string; country?: string; temas?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -111,8 +113,12 @@ export async function PATCH(
   }
 
   const action = body.action as Action | undefined;
-  if (!action || !["approve", "reject", "feature", "unfeature", "archive"].includes(action)) {
+  if (!action || !["approve", "reject", "feature", "unfeature", "archive", "themes"].includes(action)) {
     return NextResponse.json({ error: "invalid action" }, { status: 400 });
+  }
+  const temas = action === "approve" || action === "themes" ? temasGuardados(body.temas) : null;
+  if ((action === "approve" || action === "themes") && !temas) {
+    return NextResponse.json({ error: "Elige de 1 a 3 temas" }, { status: 400 });
   }
 
   try {
@@ -120,15 +126,32 @@ export async function PATCH(
     const ref = db.collection("stories").doc(id);
     const snap = await ref.get();
     if (!snap.exists) {
-      return moderatePendingSubmission(db, id, action, auth.email, {
-        city: cleanPlace(body.city),
-        country: cleanPlace(body.country),
-      });
+      return moderatePendingSubmission(
+        db,
+        id,
+        action,
+        auth.email,
+        {
+          city: cleanPlace(body.city),
+          country: cleanPlace(body.country),
+        },
+        temas ?? undefined
+      );
     }
 
     const data = snap.data() as Record<string, unknown>;
     const currentStatus = String(data.status ?? "");
     const destacada = currentStatus === "featured" || data.isFeatured === true;
+
+    if (action === "themes") {
+      if (!temas) return NextResponse.json({ error: "Elige de 1 a 3 temas" }, { status: 400 });
+      await ref.update({
+        temas: temas.temas,
+        ejes: temas.ejes,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      return NextResponse.json({ ok: true, status: currentStatus });
+    }
 
     if (action === "unfeature") {
       if (!destacada) {
@@ -177,7 +200,9 @@ export async function PATCH(
       status: nextStatus,
       updatedAt: FieldValue.serverTimestamp(),
     };
-    if (action === "approve") {
+    if (action === "approve" && temas) {
+      updates.temas = temas.temas;
+      updates.ejes = temas.ejes;
       updates.publishedAt = FieldValue.serverTimestamp();
       const email = authorEmailOnStory(data);
       if (email) {

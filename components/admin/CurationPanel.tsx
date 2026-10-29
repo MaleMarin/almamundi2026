@@ -72,9 +72,11 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
   const [errorMsg, setErrorMsg] = useState('');
 
   const toggleTema = (slug: string) => {
-    setTemasSeleccionados((prev) =>
-      prev.includes(slug) ? prev.filter((t) => t !== slug) : [...prev, slug]
-    );
+    setTemasSeleccionados((prev) => {
+      if (prev.includes(slug)) return prev.filter((t) => t !== slug);
+      if (prev.length >= 3) return prev;
+      return [...prev, slug];
+    });
   };
 
   // ── Publicar ─────────────────────────────────────────────────────────────
@@ -233,19 +235,19 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
       >
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
           {TEMAS.map((tema) => {
-            const activo = temasSeleccionados.includes(tema.slug);
-            const esSugerido = sugeridos.includes(tema.slug);
+            const activo = temasSeleccionados.includes(tema.id);
+            const esSugerido = sugeridos.includes(tema.id);
             return (
               <button
-                key={tema.slug}
+                key={tema.id}
                 type="button"
-                onClick={() => toggleTema(tema.slug)}
+                onClick={() => toggleTema(tema.id)}
                 style={{
                   padding: '0.35rem 0.9rem',
                   borderRadius: '20px',
-                  border: activo ? `2px solid ${tema.color}` : '1.5px solid #e5e7eb',
-                  background: activo ? `${tema.color}18` : '#fff',
-                  color: activo ? tema.color : '#6b7280',
+                  border: activo ? '2px solid #FF4A1C' : '1.5px solid #e5e7eb',
+                  background: activo ? '#FF4A1C18' : '#fff',
+                  color: activo ? '#FF4A1C' : '#6b7280',
                   fontSize: '0.78rem',
                   fontWeight: activo ? 600 : 400,
                   cursor: 'pointer',
@@ -253,7 +255,7 @@ export function CurationPanel({ story, curadorId, onDone, getAuthHeaders }: Prop
                   position: 'relative',
                 }}
               >
-                {tema.titulo.split(' ').slice(0, 3).join(' ')}…
+                {tema.es}
                 {esSugerido && !activo && (
                   <span
                     style={{
