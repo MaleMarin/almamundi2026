@@ -2336,8 +2336,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         >
           {step === 'details' && (
             <div className="flex min-h-0 flex-1 flex-col">
+              <div aria-hidden className="h-6 shrink-0" />
               <div
-                className="story-submit-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-4"
+                className="story-submit-scroll min-h-0 flex-1 overflow-x-hidden overflow-y-auto overscroll-contain px-3 pb-3 sm:px-4 md:px-5"
                 onFocusCapture={(event) => {
                   const target = event.target;
                   if (!(target instanceof HTMLElement)) return;
@@ -2810,7 +2811,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   onGateChange={setCaptchaGate}
                 />
               </div>
-              <div className="mt-4 flex flex-wrap justify-end gap-2">
+              </div>
+              <div className="shrink-0 px-4 pt-3 md:px-8">
                   {creatingColors ? (
                     <div className="basis-full">
                       <style>{`
@@ -2859,25 +2861,30 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       <p className="mt-1 text-right text-[length:var(--fs-etiqueta)] font-semibold text-gray-700">{uploadProgress}%</p>
                     </div>
                   ) : null}
+                  {!saving && !(acceptedPrivacy && acceptedPublicacion && acceptedTerminos) ? (
+                    <p className="mb-2 text-right text-[length:var(--fs-etiqueta)] text-gray-600">
+                      {t.modalMarkThreeToSend}
+                    </p>
+                  ) : null}
+                  <div className="mb-6 flex flex-nowrap items-center justify-end gap-2">
                   <button
                     type="button"
                     onClick={() => {
                       setErr('');
                       setStep('capture');
                     }}
-                    className="btn-am-neutro min-h-11 px-5 py-2 text-[length:var(--fs-etiqueta)] font-semibold active:scale-95 md:px-6"
+                    className="btn-am-neutro inline-flex min-h-11 shrink-0 items-center justify-center whitespace-nowrap px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold active:scale-95 md:px-6"
                     style={{ fontFamily: APP_FONT }}
                   >
                     {t.modalBack}
                   </button>
-                  <div className="flex flex-col items-end gap-1">
                     <button
                       type="button"
                       onClick={submitDetails}
                       disabled={
                         saving || !acceptedPrivacy || !acceptedPublicacion || !acceptedTerminos
                       }
-                      className="btn-am-principal min-h-11 px-5 py-2 text-[length:var(--fs-etiqueta)] font-semibold active:scale-95 disabled:opacity-60 md:px-6"
+                      className="btn-am-principal inline-flex min-h-11 min-w-0 items-center justify-center px-4 py-2 text-center text-[length:var(--fs-pequeno)] font-semibold leading-tight active:scale-95 disabled:opacity-60 md:px-6"
                       style={{ fontFamily: APP_FONT }}
                     >
                       {creatingColors
@@ -2900,13 +2907,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                                 ? t.modalSendPhotos
                                 : t.modalSendPhoto}
                     </button>
-                    {!saving && !(acceptedPrivacy && acceptedPublicacion && acceptedTerminos) ? (
-                      <p className="max-w-[16rem] text-right text-[length:var(--fs-etiqueta)] text-gray-600">
-                        {t.modalMarkThreeToSend}
-                      </p>
-                    ) : null}
                   </div>
-              </div>
               </div>
             </div>
           )}
