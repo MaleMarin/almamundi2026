@@ -24,7 +24,7 @@ const CONTAR_META: Record<
   index: {
     title: 'Cuenta tu historia',
     description:
-      'Hay muchas formas de contar una historia. Elige la tuya: video, audio, foto o texto.',
+      'Hay muchas formas de contar. Elige la tuya: video, audio, foto o texto.',
   },
   video: {
     title: 'Graba el momento que todavía vive en ti',

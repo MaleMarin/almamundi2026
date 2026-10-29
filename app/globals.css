@@ -358,7 +358,7 @@ a.btn-am-neutro:focus-visible,
   font-family: var(--font-interna), sans-serif;
 }
 
-/* «Elige la tuya.»: naranja sólido, sin degradado, máscara ni transparencia. */
+/* «Elige la tuya»: naranja sólido, sin degradado, máscara ni transparencia. */
 .home-elige-tuya {
   color: #FF4A1C;
   background: none;
