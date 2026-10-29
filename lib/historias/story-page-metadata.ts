@@ -12,7 +12,17 @@ import {
 import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 
 const SITE_OG_IMAGE = '/og-image.png';
-const FALLBACK_DESCRIPTION = 'Una historia en AlmaMundi, el mapa de historias humanas.';
+function fallbackDescription(locale: AlmaLocale): string {
+  if (locale === 'pt') return 'Uma história no AlmaMundi, o mapa de histórias humanas.';
+  if (locale === 'en') return 'A story on AlmaMundi, the map of human stories.';
+  return 'Una historia en AlmaMundi, el mapa de historias humanas.';
+}
+
+function fallbackTitle(locale: AlmaLocale): string {
+  if (locale === 'pt') return 'História';
+  if (locale === 'en') return 'Story';
+  return 'Historia';
+}
 const OG_LOCALE: Record<AlmaLocale, string> = {
   es: 'es_CL',
   pt: 'pt_BR',
@@ -84,17 +94,18 @@ async function requestLocale(): Promise<AlmaLocale> {
 export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> {
   const story = await getStoryByIdAsync(id).catch(() => null);
   const metadataBase = new URL(PUBLIC_SITE_ORIGIN);
+  const locale = await requestLocale();
   if (!story) {
     return {
       metadataBase,
       title: { absolute: '404 · AlmaMundi' },
-      description: FALLBACK_DESCRIPTION,
+      description: fallbackDescription(locale),
       robots: { index: false, follow: false },
     };
   }
 
-  const titulo = (story.title ?? story.label ?? 'Historia').trim() || 'Historia';
-  const locale = await requestLocale();
+  const missing = fallbackTitle(locale);
+  const titulo = (story.title ?? story.label ?? missing).trim() || missing;
   const format = previewFormat(story);
   const description = publishedStoryPreviewDescription(
     locale,

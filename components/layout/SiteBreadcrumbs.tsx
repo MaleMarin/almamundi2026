@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Breadcrumbs, type BreadcrumbNavItem } from '@/components/layout/Breadcrumbs';
+import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import {
   buildSiteBreadcrumbs,
   shouldShowSiteBreadcrumbs,
@@ -19,6 +20,7 @@ export type SiteBreadcrumbsProps = {
 
 function SiteBreadcrumbsInner({ tone: toneProp, className = '' }: SiteBreadcrumbsProps) {
   const pathname = usePathname() ?? '/';
+  const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const searchParams = useSearchParams();
   const muestrasList =
     pathname === '/muestras' &&
@@ -28,7 +30,7 @@ function SiteBreadcrumbsInner({ tone: toneProp, className = '' }: SiteBreadcrumb
     return null;
   }
 
-  const items = buildSiteBreadcrumbs(pathname);
+  const items = buildSiteBreadcrumbs(pathname, locale);
   if (items.length <= 1) {
     return null;
   }

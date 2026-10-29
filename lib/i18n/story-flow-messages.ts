@@ -433,6 +433,22 @@ const pt: StoryFlowMessages = {
   modalFieldAgeMissing: 'Falta a idade.',
   modalFieldEmailMissing: 'Falta um e-mail válido.',
   modalImprintAlt: 'Fitas de cores criadas a partir da sua história «{titulo}»',
+  modalCameraDenied:
+    'Não temos permissão para usar sua câmera. Ative-a no navegador ou envie um vídeo que você já tenha.',
+  modalCameraUnsupported:
+    'Seu navegador não permite gravar aqui. Tente o Chrome ou o Safari atualizado, ou envie um vídeo.',
+  modalCameraBusy:
+    'A câmera está ocupada ou não responde. Feche outros aplicativos que a usem e tente de novo.',
+  modalMicDenied:
+    'Não temos permissão para usar seu microfone. Ative-o no navegador ou envie um áudio que você já tenha.',
+  modalMicUnsupported:
+    'Seu navegador não permite gravar aqui. Tente o Chrome ou o Safari atualizado, ou envie um áudio.',
+  modalMicBusy:
+    'O microfone está ocupado ou não responde. Feche outros aplicativos que o usem e tente de novo.',
+  modalSwitchToUploadVideo: 'Enviar um vídeo',
+  modalSwitchToUploadAudio: 'Enviar um áudio',
+  modalAliasHint: 'É assim que você aparece no mapa.',
+  modalLocationHint: 'É assim que localizamos sua história no mapa.',
 };
 
 const en: StoryFlowMessages = {
@@ -573,6 +589,22 @@ const en: StoryFlowMessages = {
   modalFieldAgeMissing: 'Age is missing.',
   modalFieldEmailMissing: 'A valid email is missing.',
   modalImprintAlt: 'Color ribbons created from your story «{titulo}»',
+  modalCameraDenied:
+    "We don't have permission to use your camera. Turn it on in your browser, or upload a video you already have.",
+  modalCameraUnsupported:
+    "Your browser can't record here. Try an updated Chrome or Safari, or upload a video.",
+  modalCameraBusy:
+    'The camera is busy or not responding. Close other apps using it and try again.',
+  modalMicDenied:
+    "We don't have permission to use your microphone. Turn it on in your browser, or upload an audio you already have.",
+  modalMicUnsupported:
+    "Your browser can't record here. Try an updated Chrome or Safari, or upload an audio.",
+  modalMicBusy:
+    'The microphone is busy or not responding. Close other apps using it and try again.',
+  modalSwitchToUploadVideo: 'Upload a video',
+  modalSwitchToUploadAudio: 'Upload an audio',
+  modalAliasHint: 'This is how you will appear on the map.',
+  modalLocationHint: 'This is how we place your story on the map.',
 };
 
 export const STORY_FLOW_MESSAGES: Record<AlmaLocale, StoryFlowMessages> = { es, pt, en };

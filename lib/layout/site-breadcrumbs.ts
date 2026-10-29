@@ -1,8 +1,65 @@
 /**
- * Migas de pan para rutas internas: etiquetas en español y hrefs coherentes con redirecciones (p. ej. /mapa/historias → /mapa).
+ * Migas de pan para rutas internas: etiquetas en el idioma del sitio y hrefs coherentes con redirecciones (p. ej. /mapa/historias → /mapa).
  */
 
+import type { AlmaLocale } from '@/lib/i18n/locale';
+
 export type SiteBreadcrumbItem = { href: string | null; label: string };
+
+const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
+  es: {
+    _inicio: 'Inicio',
+    _historia: 'Historia',
+    historias: 'Historias',
+    videos: 'Videos',
+    audios: 'Audios',
+    escrito: 'Textos',
+    fotos: 'Fotos',
+    audio: 'Audio',
+    video: 'Video',
+    texto: 'Texto',
+    foto: 'Foto',
+    mapa: 'Mapa',
+    contar: 'Contar',
+    pregunta: 'Pregunta',
+  },
+  pt: {
+    _inicio: 'Início',
+    _historia: 'História',
+    historias: 'Histórias',
+    videos: 'Vídeos',
+    audios: 'Áudios',
+    escrito: 'Textos',
+    fotos: 'Fotos',
+    audio: 'Áudio',
+    video: 'Vídeo',
+    texto: 'Texto',
+    foto: 'Foto',
+    mapa: 'Mapa',
+    contar: 'Contar',
+    pregunta: 'Pergunta',
+  },
+  en: {
+    _inicio: 'Home',
+    _historia: 'Story',
+    historias: 'Stories',
+    videos: 'Videos',
+    audios: 'Audios',
+    escrito: 'Texts',
+    fotos: 'Photos',
+    audio: 'Audio',
+    video: 'Video',
+    texto: 'Text',
+    foto: 'Photo',
+    mapa: 'Map',
+    contar: 'Tell',
+    pregunta: 'Question',
+  },
+};
+
+function crumb(locale: AlmaLocale, key: string): string | undefined {
+  return PUBLIC_CRUMBS[locale][key];
+}
 
 const STATIC_LABELS: Record<string, string> = {
   historias: 'Historias',
@@ -85,12 +142,12 @@ const HISTORIA_MEDIA_FORMAT_CRUMB: Record<string, [string, string]> = {
 /**
  * Construye la lista de migas a partir del pathname.
  */
-export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
+export function buildSiteBreadcrumbs(pathname: string, locale: AlmaLocale = 'es'): SiteBreadcrumbItem[] {
   const path = normalizePathnameForBreadcrumbs(pathname);
   if (path === '/') return [];
 
   const segments = path.split('/').filter(Boolean);
-  const items: SiteBreadcrumbItem[] = [{ href: '/', label: 'Inicio' }];
+  const items: SiteBreadcrumbItem[] = [{ href: '/', label: crumb(locale, '_inicio') ?? 'Inicio' }];
 
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
@@ -107,15 +164,16 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
     ) {
       const pair = HISTORIA_MEDIA_FORMAT_CRUMB[seg];
       if (pair) {
-        items.push({ href: pair[0], label: pair[1] });
-        items.push({ href: null, label: STATIC_LABELS[seg] ?? humanizeSegment(seg) });
+        const indexKey = seg === 'texto' ? 'escrito' : seg === 'foto' ? 'fotos' : `${seg}s`;
+        items.push({ href: pair[0], label: crumb(locale, indexKey) ?? pair[1] });
+        items.push({ href: null, label: crumb(locale, seg) ?? STATIC_LABELS[seg] ?? humanizeSegment(seg) });
         break;
       }
     }
 
     // /mapa/historias/:id — el índice /mapa/historias redirige; migas: Inicio · Mapa · Historia (Mapa ya añadida en la vuelta anterior)
     if (prev === 'mapa' && seg === 'historias' && segments[i + 1] !== undefined && i + 2 === segments.length) {
-      items.push({ href: null, label: 'Historia' });
+      items.push({ href: null, label: crumb(locale, '_historia') ?? 'Historia' });
       break;
     }
 
@@ -126,7 +184,7 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
       href = isLast ? null : '/#mapa';
     }
 
-    let label: string | undefined = STATIC_LABELS[seg];
+    let label: string | undefined = crumb(locale, seg) ?? STATIC_LABELS[seg];
     if (!label) {
       if (prev === 'u') {
         try {
@@ -135,7 +193,7 @@ export function buildSiteBreadcrumbs(pathname: string): SiteBreadcrumbItem[] {
           label = `@${seg}`;
         }
       } else if (prev === 'historias' && isLikelyStoryId(seg)) {
-        label = 'Historia';
+        label = crumb(locale, '_historia') ?? 'Historia';
       } else if (prev === 'temas' || prev === 'exposiciones' || prev === 'recorridos' || prev === 'muestras') {
         label = humanizeSegment(seg);
       } else if (prev === 'camaras') {
