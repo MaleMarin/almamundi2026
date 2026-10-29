@@ -36,9 +36,9 @@ export type Tema = {
 type Locale = 'es' | 'pt' | 'en';
 
 export const EJES: readonly Eje[] = [
-  { id: 'vinculos', es: 'Vínculos', pt: 'Vínculos', en: 'Bonds' },
+  { id: 'vinculos', es: 'Vínculos', pt: 'Vínculos', en: 'Relationships' },
   { id: 'memoria', es: 'Memoria', pt: 'Memória', en: 'Memory' },
-  { id: 'territorio', es: 'Territorio', pt: 'Território', en: 'Territory' },
+  { id: 'territorio', es: 'Territorio', pt: 'Território', en: 'Place' },
   { id: 'migracion', es: 'Migración y viajes', pt: 'Migração e viagens', en: 'Migration and travel' },
   { id: 'trabajo', es: 'Trabajo y oficios', pt: 'Trabalho e ofícios', en: 'Work and trades' },
   { id: 'cuerpo', es: 'Cuerpo y cuidado', pt: 'Corpo e cuidado', en: 'Body and care' },
