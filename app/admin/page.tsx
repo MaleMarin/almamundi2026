@@ -60,6 +60,7 @@ type AdminImagen = {
   anio?: string;
   anioAprox?: boolean;
   lugar?: string;
+  descripcion?: string;
 };
 
 type Story = {
@@ -88,6 +89,9 @@ type Story = {
   questionId: string | null;
   questionMode: 'tu' | 'alguien' | null;
   imagenes?: AdminImagen[];
+  text?: string;
+  antecedentes?: string;
+  cancionRelacionada?: string;
   files?: { url: string; kind: 'image' | 'audio' | 'video' | 'file' | 'heic'; storagePath?: string }[];
   source?: 'submissions' | 'story_submissions';
 };
@@ -298,10 +302,79 @@ function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
             {img.lugar ? (
               <p style={{ margin: 0, fontSize: 12, color: 'rgba(255,255,255,0.7)' }}>{img.lugar}</p>
             ) : null}
+            {img.descripcion ? (
+              <p style={{ margin: '4px 0 0', fontSize: 12, color: 'rgba(255,255,255,0.7)', whiteSpace: 'pre-wrap' }}>
+                {img.descripcion}
+              </p>
+            ) : null}
           </div>
         );
       })}
     </div>
+  );
+}
+
+const RELATO_PREVIEW = 600;
+
+function RelatoText({ text }: { text?: string }) {
+  const [open, setOpen] = useState(false);
+  const full = text?.trim() ?? '';
+  if (!full) return null;
+  const long = full.length > RELATO_PREVIEW;
+  const shown = long && !open ? full.slice(0, RELATO_PREVIEW) : full;
+  return (
+    <div style={{ marginTop: 8 }}>
+      <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+        {shown}
+      </p>
+      {long ? (
+        <button
+          type="button"
+          onClick={() => setOpen((value) => !value)}
+          style={{
+            marginTop: 6,
+            padding: 0,
+            border: 'none',
+            background: 'none',
+            color: '#fdba74',
+            fontWeight: 700,
+            fontSize: 13,
+            cursor: 'pointer',
+            fontFamily: APP_FONT,
+          }}
+        >
+          {open ? 'Ver menos' : 'Leer completo'}
+        </button>
+      ) : null}
+    </div>
+  );
+}
+
+function StoryReview({ story }: { story: Story }) {
+  const extra = story.antecedentes?.trim() ?? '';
+  const song = story.cancionRelacionada?.trim() ?? '';
+  return (
+    <>
+      {story.format === 'text' ? <RelatoText text={story.text} /> : null}
+      {extra ? (
+        <div style={{ marginTop: 10 }}>
+          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+            ¿Algo más que quieras contarnos?
+          </p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+            {extra}
+          </p>
+        </div>
+      ) : null}
+      {song ? (
+        <div style={{ marginTop: 10 }}>
+          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>Canción</p>
+          <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
+            {song}
+          </p>
+        </div>
+      ) : null}
+    </>
   );
 }
 
@@ -784,6 +857,7 @@ export default function AdminPage() {
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
                   <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                  <StoryReview story={s} />
                   <PendingFiles files={s.files} token={idToken} />
                   <StoryQuestionLine story={s} />
                   <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>Alias: {s.alias || '—'}</p>
@@ -867,6 +941,7 @@ export default function AdminPage() {
                       )}
                     </div>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
                     <StoryPhotoFichas imagenes={s.imagenes} />
@@ -1008,6 +1083,7 @@ export default function AdminPage() {
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
                     <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
                     <StoryPhotoFichas imagenes={s.imagenes} />

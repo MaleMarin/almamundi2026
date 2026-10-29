@@ -60,6 +60,82 @@ function textField(data: Record<string, unknown>, ...keys: string[]): string {
   return "";
 }
 
+function payloadOf(data: Record<string, unknown>): Record<string, unknown> {
+  const payload = data.payload;
+  if (!payload || typeof payload !== "object" || Array.isArray(payload)) return {};
+  return payload as Record<string, unknown>;
+}
+
+function relatoOf(data: Record<string, unknown>, source: PendingSource): string {
+  if (source === "story_submissions") return textField(data, "text", "body");
+  const body = textField(payloadOf(data), "textBody");
+  if (body) return body;
+  return textField(data, "context");
+}
+
+type AdminImagen = {
+  url: string;
+  titulo?: string;
+  anio?: string;
+  anioAprox?: boolean;
+  lugar?: string;
+  descripcion?: string;
+};
+
+function imagenFromParsed(img: {
+  url: string;
+  titulo?: string;
+  anio?: string;
+  anioAprox?: boolean;
+  lugar?: string;
+  descripcion?: string;
+}): AdminImagen {
+  return {
+    url: img.url,
+    ...(img.titulo ? { titulo: img.titulo } : {}),
+    ...(img.anio ? { anio: img.anio } : {}),
+    ...(img.anioAprox ? { anioAprox: true } : {}),
+    ...(img.lugar ? { lugar: img.lugar } : {}),
+    ...(img.descripcion ? { descripcion: img.descripcion } : {}),
+  };
+}
+
+/** Nombre, año, lugar y descripción escritos en cada foto del envío. */
+function photoNotesFromSubmission(data: Record<string, unknown>): AdminImagen[] {
+  const payload = payloadOf(data);
+  const fichas = Array.isArray(payload.photoFichas) ? payload.photoFichas : [];
+  const alts = Array.isArray(payload.photoAlts) ? payload.photoAlts : [];
+  const count = Math.max(fichas.length, alts.length);
+  const notes: AdminImagen[] = [];
+  for (let i = 0; i < count; i++) {
+    const raw = fichas[i];
+    const ficha = raw && typeof raw === "object" && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+    const titulo = textField(ficha, "nombre", "titulo");
+    const anioExacto = textField(ficha, "anio");
+    const decada = textField(ficha, "decada");
+    const anio = anioExacto || decada;
+    const lugar = textField(ficha, "lugar");
+    const descripcion = textField(ficha, "alt", "descripcion") || textField({ alt: alts[i] }, "alt");
+    if (!titulo && !anio && !lugar && !descripcion) continue;
+    notes.push({
+      url: "",
+      ...(titulo ? { titulo } : {}),
+      ...(anio ? { anio } : {}),
+      ...(anioExacto ? {} : decada ? { anioAprox: true } : {}),
+      ...(lugar ? { lugar } : {}),
+      ...(descripcion ? { descripcion } : {}),
+    });
+  }
+  return notes;
+}
+
+function imagenesOf(data: Record<string, unknown>, source: PendingSource): AdminImagen[] {
+  const parsed = (parseStoryImagenes(data.imagenes) ?? []).map(imagenFromParsed);
+  if (source === "story_submissions") return parsed;
+  const notes = photoNotesFromSubmission(data);
+  return notes.length ? notes : parsed;
+}
+
 async function filesForSubmission(data: Record<string, unknown>, type: string): Promise<PendingFile[]> {
   const paths = Array.isArray(data.privateMediaPaths)
     ? data.privateMediaPaths.filter((p): p is string => typeof p === "string" && p.startsWith("submissions/private/"))
@@ -139,7 +215,10 @@ function pendingRow(
     publicationMail: null,
     questionId: typeof data.questionId === "string" ? data.questionId : null,
     questionMode: data.questionMode === "tu" || data.questionMode === "alguien" ? data.questionMode : null,
-    imagenes: [],
+    text: submissionFormat(type) === "text" ? relatoOf(data, source) : "",
+    antecedentes: textField(data, "antecedentes"),
+    cancionRelacionada: textField(data, "cancionRelacionada"),
+    imagenes: imagenesOf(data, source),
     files,
     source,
   };
@@ -236,13 +315,10 @@ export async function GET(request: NextRequest) {
         publicationMail: d.publicationMail ?? null,
         questionId: typeof d.questionId === "string" ? d.questionId : null,
         questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
-        imagenes: (parseStoryImagenes(d.imagenes) ?? []).map((img) => ({
-          url: img.url,
-          ...(img.titulo ? { titulo: img.titulo } : {}),
-          ...(img.anio ? { anio: img.anio } : {}),
-          ...(img.anioAprox ? { anioAprox: true } : {}),
-          ...(img.lugar ? { lugar: img.lugar } : {}),
-        })),
+        text: typeof d.text === "string" ? d.text : "",
+        antecedentes: typeof d.antecedentes === "string" ? d.antecedentes : "",
+        cancionRelacionada: typeof d.cancionRelacionada === "string" ? d.cancionRelacionada : "",
+        imagenes: (parseStoryImagenes(d.imagenes) ?? []).map(imagenFromParsed),
       };
     });
 
