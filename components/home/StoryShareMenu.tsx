@@ -100,7 +100,6 @@ export function StoryShareMenu({
   emailSubject,
   labels,
   showDownload,
-  shareTitle,
   onCopied,
   onTextCopied,
   onAppHandoff,
@@ -133,7 +132,7 @@ export function StoryShareMenu({
       (window.matchMedia('(pointer: coarse)').matches ||
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     if (phone && typeof navigator.share === 'function') {
-      const pendingShare = navigator.share({ title: shareTitle, text });
+      const pendingShare = navigator.share({ text });
       void pendingShare
         .then(() => onClose())
         .catch((error: unknown) => {

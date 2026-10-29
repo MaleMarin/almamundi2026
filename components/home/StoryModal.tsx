@@ -3189,6 +3189,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
               shareUrl={PENDING_STORY_SHARE_URL}
               shareTextShort={t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT}
               shareTextLong={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
+              shareTextSocial={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
               emailSubject={t.modalShareEmailSubject || PENDING_STORY_SHARE_EMAIL_SUBJECT}
               labels={{
                 title: t.modalShareMenuTitle,
