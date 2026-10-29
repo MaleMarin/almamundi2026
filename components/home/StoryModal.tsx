@@ -1674,7 +1674,8 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             : {}),
           ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
-            : {}) }) });
+            : {}),
+          locale }) });
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
       if (!res.ok) {

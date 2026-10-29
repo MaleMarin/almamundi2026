@@ -6,6 +6,7 @@ import type { DocumentSnapshot, Firestore } from 'firebase-admin/firestore';
 import { isValidRecipientEmail } from '@/lib/email-html';
 import { sendReceivedEmail } from '@/lib/email/send-received-email';
 import { storyFormatLabel } from '@/lib/email/received-email-template';
+import { parseAlmaLocale } from '@/lib/i18n/locale';
 
 export type ReceivedMailStatus = 'sent' | 'skipped_no_email' | 'failed';
 
@@ -133,6 +134,7 @@ export async function notifyAuthorStoryReceived(args: {
     storyTitle: resolveStoryTitleFromSubmission(data),
     format: resolveFormatFromSubmission(data),
     submittedAt: resolveSubmittedAtFromSubmission(data),
+    locale: parseAlmaLocale(typeof data.locale === 'string' ? data.locale : undefined),
   });
 
   if (sent.ok) {

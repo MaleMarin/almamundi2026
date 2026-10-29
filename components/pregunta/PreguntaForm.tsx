@@ -321,7 +321,8 @@ function PreguntaFormInner({
           consentAdult: adult,
           consentPublicacion: publish,
           consentTerminos: terms,
-          consentPrivacyPolicy: terms }) });
+          consentPrivacyPolicy: terms,
+          locale }) });
       const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
       if (!res.ok || !data.ok) throw new Error(data.error || 'send_failed');
       setSentAlias(alias.trim());

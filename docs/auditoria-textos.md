@@ -1,6 +1,6 @@
 # Auditoría de textos visibles
 
-Inventario de lectura. No cambia ningún texto del sitio.
+Inventario de lectura, actualizado después de la corrección de traducciones. El cuerpo de las páginas legales sigue en español.
 
 Alcance: home, /contar, /pregunta, /historias, compartir, correos de recepción, publicación y rechazo, 404, cookies, legales, metaetiquetas, /h/ y /r/. Quedan fuera el admin, la curaduría y las páginas de laboratorio.
 
@@ -721,17 +721,7 @@ No hay raya (—) como puntuación en los textos de interfaz, compartir ni corre
 
 ### Textos en español dentro de PT o EN
 
-| pantalla | texto | archivo |
-| --- | --- | --- |
-| /contar, paso 1 y 2, permisos, errores de cámara y micrófono, consentimiento, campos obligatorios, «Guardar imagen», «Compartir» del menú | 47 claves de PT y 42 de EN quedan iguales al español. En PT, «Paso 1 de 2», «¿Salir sin enviar?», «Grabando», «Video listo», «Compartir» y los avisos de cámara, micrófono y casillas. En EN, el mismo bloque salvo el título del menú, que sí dice Share. Facebook, X, LinkedIn, Instagram y TikTok son marcas y coinciden a propósito. «Década», «Lugar» y «{n} de {max} fotos» sirven en portugués. | lib/i18n/story-flow-messages.ts |
-| Cookies, botón PT | Entendido | lib/i18n/site-ui-messages.ts |
-| Mapa, dock | Historias, También cuenta, Sonidos, Buscar, y casi todas las ayudas, solo en español. La leyenda sí está traducida. | components/map/HomeMap.tsx |
-| Mapa, paneles de historias, buscar y sonidos | Placeholders, vacíos, «Cuenta tu historia», «Últimas historias», Universo, Mar, Radio, Lluvia, Mercado, ON/OFF | components/map/panels/StoriesPanel.tsx, SoundsPanel.tsx |
-| Propósito y Cómo funciona | Todo el modal, solo en español | lib/proposito-text.ts, components/home/ComoFuncionaModal.tsx |
-| Correos de historias y de respuestas | Asunto y cuerpo, solo en español | lib/email/received-email-template.ts, send-publication-email.ts, send-rejection-email.ts, respuesta-mail.ts |
-| Metaetiquetas de home, /contar, /pregunta y el title del 404 | Solo en español | app/layout.tsx, app/page.tsx, lib/contar-routes.ts, app/pregunta/page.tsx, app/not-found.tsx |
-| /privacidad, /terminos, /contacto, /mis-datos-personales | Páginas enteras solo en español | app/privacidad/page.tsx, app/terminos/page.tsx, app/contacto/page.tsx |
-| Aviso de compartir, cerrar | Cerrar, también en PT y EN | components/stories/ShareAfterNotice.tsx |
+Esas pantallas quedaron traducidas en esta pasada. El detalle está en «Cambios», al final. Facebook, X, LinkedIn, Instagram y TikTok siguen igual porque son marcas. «Década», «Lugar» y «{n} de {max} fotos» siguen sirviendo en portugués. El cuerpo de /privacidad, /terminos, /contacto y /mis-datos-personales sigue en español, con un aviso arriba en PT y EN.
 | /h/ y /r/ | /r/ dice «Abriendo la historia en el mapa…» | components/short-link/ShortLinkRedirect.tsx |
 
 ### Términos retirados que siguen
@@ -797,4 +787,39 @@ No hay raya (—) como puntuación en los textos de interfaz, compartir ni corre
 | Lugar público | Si la ciudad ya contiene el país sin coma («Santiago de Chile» y país «Chile»), el país se repite: «Santiago de Chile, Chile». Con coma («Santiago, Chile») sí se quita. | lib/historias/story-ubicacion.ts |
 | Mosaico de respuestas | La ciudad se imprime tal cual, sin esa función. Puede verse en minúscula. | components/pregunta/RespuestasMosaic.tsx |
 | Compartir una historia | La ciudad del texto es solo lo que va antes de la primera coma, sin capitalizar el resto de las palabras. | lib/share/published-share.ts |
+
+## Cambios
+
+Traducciones y correcciones de esta pasada. El español público no se reescribió, salvo la metaetiqueta que aún decía «escrito» y ahora dice «texto».
+
+### Portugués de Brasil
+
+Glosario aplicado en el sitio público: compartilhar, baixar, arquivo, câmera, link, e-mail, contato, Entendi, você/sua, Enviando…, Trocar, vídeo y áudio con tilde. Botones de las tarjetas: Grave um vídeo, Grave um áudio, Escreva uma história, Envie uma foto. El de contar: Conte sua história.
+
+Agradecimiento de una respuesta: «Agradecemos sua resposta, [alias]».
+
+### PT y EN igualados al español
+
+- Tarjeta de video, audio, texto y foto, con los textos pedidos.
+- Título de audio en /contar: «Há histórias que se contam melhor em voz alta» y «Some stories are best told out loud».
+- Hero en inglés, en dos partes: «AlmaMundi is where your stories don't get lost in the scroll, they» y «awaken other stories».
+- Campos: canción, fotos extras, agregar fotos, foto de perfil, Idade / Age, «Escolha uma opção» / «Choose an option», «Enviar minha história» / «Send my story».
+
+### Lo que estaba solo en español
+
+- Formulario de /contar: pasos («Passo 1 de 2», «Step 1 of 2»), «Sair sem enviar?» / «Leave without sending?», permisos, errores, casillas y avisos.
+- Dock del mapa, paneles de historias, buscar y sonidos, y sus ayudas.
+- Modales Propósito y Cómo funciona.
+- Metaetiquetas de home, /contar y /pregunta, y el título de la 404.
+- Aviso de cerrar al compartir: Fechar / Close.
+- Cookies y el enlace «saltar al contenido».
+
+### Correos
+
+Al recibir una historia o una respuesta se guarda el idioma del sitio. Recepción, publicación y rechazo salen en ese idioma (ES, PT o EN). Si el documento no tiene idioma, el correo sigue en español.
+
+### Legales
+
+/privacidad, /terminos, /contacto y /mis-datos-personales siguen en español. En PT y EN, arriba: «Este documento está disponível em espanhol. Se precisar de ajuda, escreva para hola@almamundi.org.» y «This document is available in Spanish. If you need help, write to hola@almamundi.org.»
+
 

@@ -50,12 +50,13 @@ export async function sendReceivedEmail(
   }
 
   const from = mailFromAddress();
-  const subject = receivedEmailSubject(params.storyTitle);
+  const subject = receivedEmailSubject(params.storyTitle, params.locale);
   const content: ReceivedEmailContent = {
     authorName: params.authorName,
     storyTitle: params.storyTitle,
     format: params.format,
     submittedAt: params.submittedAt,
+    locale: params.locale,
   };
 
   try {

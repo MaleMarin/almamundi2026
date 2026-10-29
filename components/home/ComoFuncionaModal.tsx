@@ -5,6 +5,7 @@
  */
 import Link from 'next/link';
 import { useEffect } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const soft = {
@@ -30,6 +31,7 @@ export function ComoFuncionaModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
+  const { locale } = useHomeLocale();
   useEffect(() => {
     if (!isOpen) return;
     const onKey = (e: KeyboardEvent) => {
@@ -40,6 +42,55 @@ export function ComoFuncionaModal({
   }, [isOpen, onClose]);
 
   if (!isOpen) return null;
+
+  const copy =
+    locale === 'pt'
+      ? {
+          title: 'Como funciona?',
+          p1: 'O AlmaMundi é um mapa vivo de histórias humanas.',
+          formats: 'vídeo, áudio, texto ou foto',
+          p2: 'Você pode compartilhar seu relato em',
+          p2b: '. O envio em qualquer um desses formatos é para pessoas maiores de 18 anos, ou para um adulto responsável ou representante de uma instituição com autorização expressa de quem aparece. Cada história passa por revisão editorial:',
+          auto: 'nada é publicado automaticamente',
+          p3: 'Só publicamos relatos que respeitem a dignidade humana, a privacidade, os direitos autorais e os direitos humanos. Não aceitamos conteúdos com',
+          banned:
+            'insultos, injúrias, calúnias, discriminação, racismo, xenofobia, homofobia, ameaças, violência, abuso, exploração, exposição indevida de terceiros, violação de direitos de crianças e adolescentes, plágio ou uso não autorizado de material de outra pessoa',
+          p4: 'Para cuidar de cada história, revisamos o conteúdo, a autoria, o consentimento e os possíveis riscos para outras pessoas. Podemos pedir ajustes, não publicar ou retirar relatos quando for necessário.',
+          p5: 'Não pedimos dados sensíveis para identificar a autoria. Usamos só a informação necessária para revisar o envio e proteger quem participa.',
+          privacy: 'Ver política de privacidade',
+          close: 'Fechar',
+        }
+      : locale === 'en'
+        ? {
+            title: 'How it works?',
+            p1: 'AlmaMundi is a living map of human stories.',
+            formats: 'video, audio, text, or photo',
+            p2: 'You can share your story in',
+            p2b: '. Sending in any of these formats is for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Each story goes through editorial review:',
+            auto: 'nothing is published automatically',
+            p3: 'We only publish stories that respect human dignity, privacy, copyright, and human rights. We do not accept content with',
+            banned:
+              'insults, defamation, slander, discrimination, racism, xenophobia, homophobia, threats, violence, abuse, exploitation, improper exposure of others, violations of the rights of children and adolescents, plagiarism, or unauthorized use of material that belongs to someone else',
+            p4: 'To take care of each story, we review its content, authorship, consent, and possible risks to other people. We may ask for changes, decline to publish, or remove stories when needed.',
+            p5: 'We do not ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part.',
+            privacy: 'See the privacy policy',
+            close: 'Close',
+          }
+        : {
+            title: '¿Cómo funciona?',
+            p1: 'AlmaMundi es un mapa vivo de historias humanas.',
+            formats: 'video, audio, texto o fotografía',
+            p2: 'Puedes compartir tu relato en',
+            p2b: '. El envío en cualquiera de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial:',
+            auto: 'nada se publica automáticamente',
+            p3: 'Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los derechos humanos. No se aceptan contenidos con',
+            banned:
+              'insultos, injurias, calumnias, discriminación, racismo, xenofobia, homofobia, amenazas, violencia, abuso, explotación, exposición indebida de terceros, vulneración de derechos de niños, niñas y adolescentes, plagio o uso no autorizado de material ajeno',
+            p4: 'Para cuidar cada historia, revisamos su contenido, autoría, consentimiento y posibles riesgos para otras personas. Podemos pedir ajustes, no publicar o retirar relatos cuando sea necesario.',
+            p5: 'No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar el envío y proteger a quienes participan.',
+            privacy: 'Ver política de privacidad',
+            close: 'Cerrar',
+          };
 
   return (
     <div
@@ -65,38 +116,25 @@ export function ComoFuncionaModal({
           className="text-[length:var(--fs-subtitulo)] font-semibold "
           style={{ color: soft.textMain }}
         >
-          ¿Cómo funciona?
+          {copy.title}
         </h2>
         <div
           className="mt-5 space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5 "
           style={{ color: soft.textBody }}
         >
-          <p>AlmaMundi es un mapa vivo de historias humanas.</p>
+          <p>{copy.p1}</p>
           <p>
-            Puedes compartir tu relato en{' '}
-            <strong style={{ color: soft.textMain }}>video, audio, texto o fotografía</strong>. El envío en cualquiera
-            de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una
-            institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial:{' '}
-            <strong style={{ color: soft.textMain }}>nada se publica automáticamente</strong>.
+            {copy.p2}{' '}
+            <strong style={{ color: soft.textMain }}>{copy.formats}</strong>
+            {copy.p2b}{' '}
+            <strong style={{ color: soft.textMain }}>{copy.auto}</strong>.
           </p>
           <p>
-            Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los
-            derechos humanos. No se aceptan contenidos con{' '}
-            <strong style={{ color: soft.textMain }}>
-              insultos, injurias, calumnias, discriminación, racismo, xenofobia, homofobia, amenazas, violencia,
-              abuso, explotación, exposición indebida de terceros, vulneración de derechos de niños, niñas y
-              adolescentes, plagio o uso no autorizado de material ajeno
-            </strong>
-            .
+            {copy.p3}{' '}
+            <strong style={{ color: soft.textMain }}>{copy.banned}</strong>.
           </p>
-          <p>
-            Para cuidar cada historia, revisamos su contenido, autoría, consentimiento y posibles riesgos para otras
-            personas. Podemos pedir ajustes, no publicar o retirar relatos cuando sea necesario.
-          </p>
-          <p>
-            No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar
-            el envío y proteger a quienes participan.
-          </p>
+          <p>{copy.p4}</p>
+          <p>{copy.p5}</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
           <Link
@@ -105,7 +143,7 @@ export function ComoFuncionaModal({
             style={{ ...soft.button, color: soft.textMain }}
             onClick={onClose}
           >
-            Ver política de privacidad
+            {copy.privacy}
           </Link>
           <button
             type="button"
@@ -113,7 +151,7 @@ export function ComoFuncionaModal({
             className="btn-almamundi rounded-full px-6 py-3 text-[length:var(--fs-pequeno)] font-semibold transition active:scale-[0.98]"
             style={{ ...soft.button, color: soft.textMain }}
           >
-            Cerrar
+            {copy.close}
           </button>
         </div>
       </div>

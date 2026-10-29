@@ -1,6 +1,7 @@
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { escapeHtml } from "@/lib/email-html";
+import type { AlmaLocale } from "@/lib/i18n/locale";
 import { whatsappShareUrl } from "@/lib/huella/share-story-channels";
 
 const PRODUCTION_SITE_FALLBACK = "https://www.almamundi.org";
@@ -138,36 +139,58 @@ export function invitationHtml(): string {
   return primaryButtonHtml("Contar otra historia", absoluteEmailUrl("/contar"));
 }
 
-function receivedFooterHtml(): string {
+function receivedFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
+  const note =
+    locale === "pt"
+      ? "Você recebe este e-mail porque enviou uma história ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar."
+      : locale === "en"
+        ? "You receive this email because you sent a story to AlmaMundi. AlmaMundi is an initiative of Precisar."
+        : "Recibes este correo porque enviaste una historia a AlmaMundi. AlmaMundi es una iniciativa de Precisar.";
+  const policy = locale === "en" ? "Privacy policy" : "Política de privacidad";
+  const policyPt = locale === "pt" ? "Política de privacidade" : policy;
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
-        Recibes este correo porque enviaste una historia a AlmaMundi. AlmaMundi es una iniciativa de Precisar.
+        ${note}
         <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
-          style="color:${EMAIL_MUTED};text-decoration:underline;">Política de privacidad</a>.
+          style="color:${EMAIL_MUTED};text-decoration:underline;">${policyPt}</a>.
       </p>`;
 }
 
-function respuestaFooterHtml(): string {
+function respuestaFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
+  const note =
+    locale === "pt"
+      ? "Você recebe este e-mail porque enviou uma resposta ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar."
+      : locale === "en"
+        ? "You receive this email because you sent an answer to AlmaMundi. AlmaMundi is an initiative of Precisar."
+        : "Recibes este correo porque enviaste una respuesta a AlmaMundi. AlmaMundi es una iniciativa de Precisar.";
+  const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
-        Recibes este correo porque enviaste una respuesta a AlmaMundi. AlmaMundi es una iniciativa de Precisar.
+        ${note}
         <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
-          style="color:${EMAIL_MUTED};text-decoration:underline;">Política de privacidad</a>.
+          style="color:${EMAIL_MUTED};text-decoration:underline;">${policy}</a>.
       </p>`;
 }
 
-function accountFooterHtml(): string {
+function accountFooterHtml(locale: AlmaLocale = "es"): string {
   const home = absoluteEmailUrl("/");
   const privacy = absoluteEmailUrl("/privacidad");
+  const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
+  const note =
+    locale === "pt"
+      ? "Você recebeu este e-mail porque enviou uma história no AlmaMundi."
+      : locale === "en"
+        ? "You received this email because you sent a story on AlmaMundi."
+        : "Recibiste este correo porque enviaste una historia en AlmaMundi.";
   return `<p class="email-footer" style="margin:0 0 8px;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(home)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
           style="color:${EMAIL_MUTED};text-decoration:none;">almamundi.org</a>
         ·
         <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
-          style="color:${EMAIL_MUTED};text-decoration:underline;">Política de privacidad</a>
+          style="color:${EMAIL_MUTED};text-decoration:underline;">${policy}</a>
       </p>
       <p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
-        Recibiste este correo porque enviaste una historia en AlmaMundi.
+        ${note}
       </p>`;
 }
 
@@ -198,18 +221,20 @@ export function emailShell(opts: {
   preheader?: string;
   bodyHtml: string;
   footer?: "received" | "account" | "respuesta";
+  locale?: AlmaLocale;
 }): string {
   const preheader = opts.preheader
     ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
         ${escapeHtml(opts.preheader)}
       </div>`
     : "";
+  const locale = opts.locale === "pt" || opts.locale === "en" ? opts.locale : "es";
   const footer =
     opts.footer === "received"
-      ? receivedFooterHtml()
+      ? receivedFooterHtml(locale)
       : opts.footer === "respuesta"
-        ? respuestaFooterHtml()
-        : accountFooterHtml();
+        ? respuestaFooterHtml(locale)
+        : accountFooterHtml(locale);
 
   return `<!DOCTYPE html>
 <html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">

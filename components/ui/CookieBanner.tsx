@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 
 const STORAGE_KEY = 'am-cookies-ok';
 
 export function CookieBanner() {
+  const { t } = useHomeLocale();
   const [visible, setVisible] = useState(false);
   const [narrow, setNarrow] = useState(false);
 
@@ -95,11 +97,11 @@ export function CookieBanner() {
   };
 
   return (
-    <div style={panel} role="region" aria-label="Aviso de cookies">
+    <div style={panel} role="region" aria-label={t.cookieAria}>
       <p style={textStyle}>
-        AlmaMundi usa cookies esenciales y analítica básica.{' '}
+        {t.cookieBody}{' '}
         <a href="/privacidad" style={linkStyle}>
-          Política de privacidad
+          {t.cookiePrivacyLink}
         </a>
         .
       </p>
@@ -114,7 +116,7 @@ export function CookieBanner() {
           event.currentTarget.style.filter = '';
         }}
       >
-        Entendido
+        {t.cookieAccept}
       </button>
     </div>
   );

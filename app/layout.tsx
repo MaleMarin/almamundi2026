@@ -8,6 +8,7 @@ import { LocaleProvider } from '@/components/i18n/LocaleProvider';
 import { GlobalSiteChrome, SiteFontScope } from '@/components/layout/GlobalSiteChrome';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { NOSCRIPT_BY_LOCALE } from '@/lib/i18n/home-messages';
+import { PUBLIC_OG_LOCALE, publicSiteMeta } from '@/lib/i18n/public-meta';
 import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
@@ -27,43 +28,46 @@ function defaultMetadataBase(): URL {
   return new URL(PUBLIC_SITE_ORIGIN);
 }
 
-const SITE_TITLE = 'AlmaMundi, Entra y cuenta tu historia';
-const SITE_DESCRIPTION =
-  'Descubre historias de vida reales en video, audio o texto, y entra a contar la tuya. Cada historia despierta otra.';
-
-export const metadata: Metadata = {
-  metadataBase: defaultMetadataBase(),
-  title: {
-    default: SITE_TITLE,
-    template: '%s · AlmaMundi' },
-  description: SITE_DESCRIPTION,
-  alternates: { canonical: './' },
-  openGraph: {
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    url: './',
-    type: 'website',
-    locale: 'es_CL',
-    siteName: 'AlmaMundi',
-    images: [
-      {
-        url: '/og-image.png',
-        width: 1200,
-        height: 630,
-        alt: 'AlmaMundi, historias de vida en video, audio, escrito y foto' },
-    ] },
-  twitter: {
-    card: 'summary_large_image',
-    title: SITE_TITLE,
-    description: SITE_DESCRIPTION,
-    images: ['/og-image.png'] },
-  /**
-   * Favicon: `app/icon.png` (convención App Router).
-   * Apple: `app/apple-icon.png` (icono al guardar en pantalla de inicio).
-   */
-  icons: {
-    icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],
-    shortcut: '/icon.png' } };
+export async function generateMetadata(): Promise<Metadata> {
+  const jar = await cookies();
+  const locale = parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
+  const site = publicSiteMeta(locale);
+  return {
+    metadataBase: defaultMetadataBase(),
+    title: {
+      default: site.title,
+      template: '%s · AlmaMundi',
+    },
+    description: site.description,
+    alternates: { canonical: './' },
+    openGraph: {
+      title: site.title,
+      description: site.description,
+      url: './',
+      type: 'website',
+      locale: PUBLIC_OG_LOCALE[locale],
+      siteName: 'AlmaMundi',
+      images: [
+        {
+          url: '/og-image.png',
+          width: 1200,
+          height: 630,
+          alt: site.ogAlt,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: site.title,
+      description: site.description,
+      images: ['/og-image.png'],
+    },
+    icons: {
+      icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],
+      shortcut: '/icon.png',
+    },
+  };
+}
 
 export default async function RootLayout({
   children }: Readonly<{
@@ -84,7 +88,11 @@ export default async function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded text-[length:var(--fs-pequeno)] focus:font-bold"
         >
-          Saltar al contenido principal
+          {locale === 'pt'
+            ? 'Ir para o conteúdo principal'
+            : locale === 'en'
+              ? 'Skip to main content'
+              : 'Saltar al contenido principal'}
         </a>
         <noscript>
           <div className="p-8 text-center">

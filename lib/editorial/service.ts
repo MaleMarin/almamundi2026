@@ -30,6 +30,7 @@ import {
 } from "@/lib/server-storage";
 import { publishBlockedByMalware } from "@/lib/malware-scan";
 import { isQuestionMode, resolveQuestionId } from "@/lib/pregunta-semana";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 import { deleteAuthorContact, saveAuthorPrivate } from "@/lib/author-contacts";
 import {
   notifyAuthorStoryRejected,
@@ -88,6 +89,7 @@ type SubmissionsPipelineDoc = {
   publishedStoryId?: string;
   privateMediaPaths?: string[];
   profilePhotoUrl?: string;
+  locale?: string;
   lat?: number | null;
   lng?: number | null;
 };
@@ -282,6 +284,7 @@ export async function editorialPublishFromSubmission(
       story.publishedMediaPaths = promoted.publishedMediaPaths;
     }
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
+    story.locale = parseAlmaLocale(typeof sub.locale === "string" ? sub.locale : undefined);
     story.shortCode = await allocateShortCode(db, "stories");
 
     await storyRef.set(story);
@@ -386,6 +389,7 @@ export async function editorialPublishFromSubmission(
   applyPublicTemas(story, temas);
   const pipelineNote = normalizeAntecedentes(sd.antecedentes);
   copyOptionalPublicFields(story, sd as unknown as Record<string, unknown>);
+  story.locale = parseAlmaLocale(typeof sd.locale === "string" ? sd.locale : undefined);
   scrubPublicNote(story, pipelineNote);
   if (imagenes?.length) story.imagenes = imagenes;
   if (promoted.profilePhotoUrl) story.profilePhotoUrl = promoted.profilePhotoUrl;
@@ -515,6 +519,7 @@ export async function editorialPublishApprovedStorySubmission(
     storyData.publishedMediaPaths = promoted.publishedMediaPaths;
   }
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
+  storyData.locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
   storyData.shortCode = await allocateShortCode(db, "stories");
 
   await storyRef.set(storyData);

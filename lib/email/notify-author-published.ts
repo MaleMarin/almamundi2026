@@ -4,6 +4,7 @@
 import type { DocumentReference, Firestore } from 'firebase-admin/firestore';
 import { isValidRecipientEmail } from '@/lib/email-html';
 import { sendPublicationEmail } from '@/lib/email/send-publication-email';
+import { parseAlmaLocale } from '@/lib/i18n/locale';
 import {
   AUTHOR_ECO_TOKEN_FIELD,
   buildAuthorEcoPath,
@@ -142,6 +143,7 @@ export async function notifyAuthorStoryPublished(args: {
       'el mundo'
     ),
     ecoUrl,
+    locale: parseAlmaLocale(typeof data.locale === 'string' ? data.locale : undefined),
   });
 
   if (sent.ok) {

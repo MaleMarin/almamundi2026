@@ -1,4 +1,5 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { LegalLanguageNotice } from '@/components/legal/LegalLanguageNotice';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
@@ -23,6 +24,7 @@ export default function ContactoPage() {
         fontFamily: 'inherit' }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <LegalLanguageNotice />
         <HomeHardLink
           href="/"
           className="btn-am-neutro"

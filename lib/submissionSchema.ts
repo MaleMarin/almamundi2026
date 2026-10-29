@@ -124,6 +124,7 @@ export const CreateSubmissionBody = z.object({
     z.enum(QUESTION_IDS).optional()
   ),
   questionMode: z.enum(["tu", "alguien"]).optional(),
+  locale: z.enum(["es", "pt", "en"]).optional(),
 }).superRefine((data, ctx) => {
   if ((data.questionId == null) !== (data.questionMode == null)) {
     ctx.addIssue({ code: "custom", message: "pregunta", path: ["questionId"] });
@@ -186,6 +187,8 @@ export interface SubmissionDoc {
   questionId?: (typeof QUESTION_IDS)[number];
   /** `tu` = Responde tú. `alguien` = Pregúntale a alguien. */
   questionMode?: "tu" | "alguien";
+  /** Idioma del sitio en el momento del envío. Los correos salen en ese idioma. */
+  locale?: "es" | "pt" | "en";
   payload: {
     textBody?: string;
     photoUrl?: string;

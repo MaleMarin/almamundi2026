@@ -20,6 +20,7 @@ import { useStories } from '@/hooks/useStories';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
+import { mapChrome } from '@/lib/i18n/map-chrome';
 import { useNewsLayer, type NewsItem } from '@/components/NewsLayer';
 import {
   getNewsTopicApiQuery,
@@ -232,6 +233,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const stories = useStories();
   const searchParams = useSearchParams();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
+  const dockCopy = mapChrome(locale);
   const openedHistoriaRef = useRef<string | null>(null);
   const openedRespuestaRef = useRef<string | null>(null);
   const openedCapaRef = useRef(false);
@@ -973,31 +975,31 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {dockSlot &&
         createPortal(
           <div className="map-dock-stack">
-          <div className="map-dock-row" role="toolbar" aria-label="Capas y herramientas del mapa">
+          <div className="map-dock-row" role="toolbar" aria-label={dockCopy.dockAria}>
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'stories'}
-                title={globeLayers.stories ? 'Historias visibles. Clic para ver la lista o apagar la capa.' : 'Mostrar historias en el globo'}
+                title={globeLayers.stories ? dockCopy.storiesOn : dockCopy.storiesOff}
                 onClick={() => onGlobeLayerPill('stories', 'stories')}
               >
-                Historias
+                {dockCopy.stories}
               </PillNavButton>
               {SHOW_SURPRISE_ME_BUTTON ? (
               <PillNavButton
                 dock
-                title="Abrir una historia publicada al azar"
+                title={dockCopy.surpriseTitle}
                 onClick={handleSurpriseMe}
               >
-                Sorpréndeme
+                {dockCopy.surprise}
               </PillNavButton>
               ) : null}
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'bits'}
-                title={globeLayers.bits ? 'También cuenta está visible. Clic para ver la ficha o apagar la capa.' : 'Mostrar También cuenta en el globo'}
+                title={globeLayers.bits ? dockCopy.bitsOn : dockCopy.bitsOff}
                 onClick={() => onGlobeLayerPill('bits', 'bits')}
               >
-                También cuenta
+                {dockCopy.bits}
               </PillNavButton>
               <PillNavButton
                 dock
@@ -1016,18 +1018,18 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'sounds'}
-                title="Abrir sonidos del mapa"
+                title={dockCopy.soundsTitle}
                 onClick={() => open('sounds')}
               >
-                Sonidos
+                {dockCopy.sounds}
               </PillNavButton>
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'search'}
                 onClick={() => open('search')}
-                title="Buscar por título, ciudad o tema"
+                title={dockCopy.searchTitle}
               >
-                Buscar
+                {dockCopy.search}
               </PillNavButton>
           </div>
           <p className="map-dock-legend">

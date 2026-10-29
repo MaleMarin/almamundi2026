@@ -244,6 +244,9 @@ export async function POST(req: NextRequest) {
     (doc as SubmissionDoc).questionId = data.questionId;
     (doc as SubmissionDoc).questionMode = data.questionMode;
   }
+  if (data.locale) {
+    (doc as SubmissionDoc).locale = data.locale;
+  }
 
   try {
     const db = getAdminDb();

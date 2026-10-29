@@ -14,7 +14,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 
 const KIND_LABEL = { es: 'Respuesta', pt: 'Resposta', en: 'Answer' } as const;
-const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
+const SHARE_LABEL = { es: 'Compartir', pt: 'Compartilhar', en: 'Share' } as const;
 const BY_LABEL = { es: 'Por', pt: 'Por', en: 'By' } as const;
 
 export function RespuestaGlobeCard({

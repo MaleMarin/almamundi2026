@@ -103,7 +103,7 @@ const pt: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: 'Como funciona?',
   navStories: 'Histórias',
-  navHistoriasColeccion: 'A minha coleção',
+  navHistoriasColeccion: 'Minha coleção',
   navHistoriasVideos: 'Vídeos',
   navHistoriasAudios: 'Áudios',
   navHistoriasEscrito: 'Textos',
@@ -119,7 +119,7 @@ const pt: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi é o lugar onde as suas histórias não se perdem no scroll, mas sim',
+    'AlmaMundi é o lugar onde suas histórias não se perdem no scroll, e sim',
   heroBold: 'despertam outras histórias',
   heroSubBefore: 'Aqui, cada relato importa.',
   heroSubBold: 'Cada história é extraordinária.',
@@ -127,25 +127,25 @@ const pt: HomeMessages = {
   historiasLead2: 'Há muitas formas de contar',
   historiasLead2b: 'Escolha a sua',
   mapSectionTitle: 'A Alma do Mundo',
-  cardVideoTitle: 'A sua história,',
+  cardVideoTitle: 'Sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBody:
-    'Uma câmara pode guardar um gesto, uma pausa, uma voz, um olhar. Até 5 minutos.',
-  cardVideoCta: 'Grava um vídeo',
+    'Um gesto, uma pausa, um olhar. Tudo cabe em uma câmera. Até 5 minutos.',
+  cardVideoCta: 'Grave um vídeo',
   cardAudioTitle: 'Dê voz',
-  cardAudioSubtitle: 'ao que recorda',
+  cardAudioSubtitle: 'ao que você lembra',
   cardAudioBody:
-    'Há histórias que não precisam de ser vistas. Só precisam de ser ouvidas. Até 5 minutos.',
-  cardAudioCta: 'Grava um áudio',
+    'Há histórias que não precisam ser vistas, só ouvidas. Até 5 minutos.',
+  cardAudioCta: 'Grave um áudio',
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
-    'Escreva uma cena, uma carta, um adeus ou algo que ainda volta. Até 5000 caracteres.',
-  cardWriteCta: 'Escreve uma história',
+    'Há histórias que não precisam de som nem imagem, só de palavras. Até 5000 caracteres.',
+  cardWriteCta: 'Escreva uma história',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
-  cardPhotoBody: 'Carregue uma foto e conte a história que ela guarda. Até 8 fotos.',
-  cardPhotoCta: 'Envia uma foto',
+  cardPhotoBody: 'Uma foto guarda mais do que se vê à primeira vista. Até 8 fotos.',
+  cardPhotoCta: 'Envie uma foto',
 };
 
 const en: HomeMessages = {
@@ -168,8 +168,8 @@ const en: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi is the place where your stories don’t get lost in the scroll, instead,',
-  heroBold: 'they awaken other stories',
+    "AlmaMundi is where your stories don't get lost in the scroll, they",
+  heroBold: 'awaken other stories',
   heroSubBefore: 'Here, every story matters.',
   heroSubBold: 'Every story is extraordinary.',
   historiasLead1: 'There are stories only you can tell.',
@@ -179,21 +179,21 @@ const en: HomeMessages = {
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBody:
-    'A camera can hold a gesture, a pause, a voice, a look. Up to 5 minutes.',
+    'A gesture, a pause, a look. It all fits in a camera. Up to 5 minutes.',
   cardVideoCta: 'Record a video',
   cardAudioTitle: 'Give voice',
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
-    'Some stories don’t need to be seen. They only need to be heard. Up to 5 minutes.',
-  cardAudioCta: 'Record audio',
+    "Some stories don't need to be seen, only heard. Up to 5 minutes.",
+  cardAudioCta: 'Record an audio',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
-    'Write a scene, a letter, a farewell, or something that still comes back. Up to 5000 characters.',
+    'Some stories need no sound or image, only words. Up to 5,000 characters.',
   cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
-  cardPhotoBody: 'Upload a photo and tell the story it holds. Up to 8 photos.',
+  cardPhotoBody: 'A photo holds more than meets the eye. Up to 8 photos.',
   cardPhotoCta: 'Upload a photo',
 };
 

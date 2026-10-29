@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Play, Square, Minus, Plus } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { mapChrome } from '@/lib/i18n/map-chrome';
 import {
   dedupePublicAudioPaths,
   folderHintFromPublicPath,
@@ -51,6 +52,7 @@ function SoundRow({
   onVolumeChange: (v: number) => void;
 }) {
   const pct = Math.round(volume01 * 100);
+  const copy = mapChrome(useHomeLocale().locale);
 
   const step = (delta: number) => {
     onVolumeChange(Math.max(0, Math.min(1, volume01 + delta)));
@@ -122,10 +124,10 @@ function SoundRow({
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
       >
-        <span className="sr-only">Volumen de {mood.label}</span>
+        <span className="sr-only">{copy.volumeOf} {mood.label}</span>
         <button
           type="button"
-          aria-label={`Bajar volumen de ${mood.label}`}
+          aria-label={`${copy.volumeDown} ${mood.label}`}
           disabled={volume01 <= 0}
           onClick={() => step(-0.05)}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white/80 transition-colors hover:bg-white/10 disabled:opacity-30"
@@ -137,14 +139,14 @@ function SoundRow({
           min={0}
           max={100}
           value={pct}
-          aria-label={`Volumen de ${mood.label}: ${pct} por ciento`}
+          aria-label={`${copy.volumeOf} ${mood.label}: ${pct} ${copy.volumePercent}`}
           onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
           className="min-h-[44px] flex-1 cursor-pointer accent-orange-500"
           style={{ maxWidth: '100%' }}
         />
         <button
           type="button"
-          aria-label={`Subir volumen de ${mood.label}`}
+          aria-label={`${copy.volumeUp} ${mood.label}`}
           disabled={volume01 >= 1}
           onClick={() => step(0.05)}
           className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/15 bg-white/5 text-white/80 transition-colors hover:bg-white/10 disabled:opacity-30"
@@ -168,6 +170,14 @@ export function SoundsPanel({
   soundEnabled,
   onToggleSound }: SoundsPanelProps) {
   const { locale } = useHomeLocale();
+  const copy = mapChrome(locale);
+  const ambientLabels: Record<(typeof AMBIENT_OPTS)[number]['id'], string> = {
+    universo: copy.universo,
+    mar: copy.mar,
+    radio: copy.radio,
+    lluvia: copy.lluvia,
+    mercado: copy.mercado,
+  };
   const soundCopy = {
     es: { on: 'Encendido', off: 'Apagado', error: 'No pudimos cargar los sonidos.' },
     pt: { on: 'Ligado', off: 'Desligado', error: 'Não conseguimos carregar os sons.' },
@@ -243,7 +253,7 @@ export function SoundsPanel({
             margin: 0,
             fontFamily: SITE_FONT_STACK }}
         >
-          Estos sonidos pueden traerte recuerdos de otros lugares. Elige el que quieras mientras exploras el mapa.
+          {copy.soundsIntro}
         </p>
       </div>
       <div style={{ flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', flexWrap: 'wrap', gap: 8 }}>
@@ -251,7 +261,7 @@ export function SoundsPanel({
           type="button"
           onClick={onToggleSound}
           aria-pressed={soundEnabled}
-          aria-label={soundEnabled ? 'Desactivar sonido ambiente' : 'Activar sonido ambiente'}
+          aria-label={soundEnabled ? copy.soundOff : copy.soundOn}
           style={{
             padding: '8px 16px',
             borderRadius: 999,
@@ -273,7 +283,7 @@ export function SoundsPanel({
         </button>
       </div>
       <p className="text-[length:var(--fs-etiqueta)] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
-        Cada ambiente tiene su volumen guardado en este dispositivo. Ajusta con la barra o con − / +.
+        {copy.volumeHelp}
       </p>
       {publicListError ? (
         <p className="text-[length:var(--fs-etiqueta)] text-amber-200/80" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
@@ -285,7 +295,7 @@ export function SoundsPanel({
         {AMBIENT_OPTS.map((m) => (
           <SoundRow
             key={m.id}
-            mood={m}
+            mood={{ ...m, label: ambientLabels[m.id], place: ambientLabels[m.id] }}
             isActive={currentMood === m.id}
             isPlaying={soundEnabled && currentMood === m.id}
             volume01={volumes[m.id] ?? 1}

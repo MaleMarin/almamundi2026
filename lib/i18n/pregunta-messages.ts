@@ -31,7 +31,7 @@ export const PREGUNTA_COPY = {
   },
   thanksTitle: {
     es: 'Gracias, [alias]',
-    pt: 'Obrigado, [alias]',
+    pt: 'Agradecemos sua resposta, [alias]',
     en: 'Thank you, [alias]',
   },
   thanksBody: {

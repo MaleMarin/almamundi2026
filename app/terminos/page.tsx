@@ -1,4 +1,5 @@
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { LegalLanguageNotice } from '@/components/legal/LegalLanguageNotice';
 /**
  * /terminos — Términos de uso de AlmaMundi.
  * Mismo layout y estilo neumórfico que /privacidad.
@@ -70,6 +71,7 @@ export default function TerminosPage() {
         fontFamily: 'inherit' }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <LegalLanguageNotice />
         <HomeHardLink
           href="/"
           className="btn-am-neutro"

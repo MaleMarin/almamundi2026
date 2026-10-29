@@ -45,7 +45,7 @@ const COPY = {
     days: (n: number) => `há ${n} dias`,
     read: 'Ler em modo leitura',
     map: 'Ver no mapa',
-    share: 'Partilhar',
+    share: 'Compartilhar',
     songLead: 'Uma música para esta história:',
     song: (song: string) => `Uma música para esta história: ${song}`,
     ask: 'Tem uma história para contar?',

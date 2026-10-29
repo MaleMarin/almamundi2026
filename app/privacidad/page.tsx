@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { LegalLanguageNotice } from '@/components/legal/LegalLanguageNotice';
 /**
  * /privacidad — Aviso de Privacidad de AlmaMundi.
  * Enlazada desde footer y modales. Estilo neumórfico.
@@ -80,6 +81,7 @@ export default function PrivacidadPage() {
         fontFamily: 'inherit' }}
     >
       <div style={{ maxWidth: 720, margin: '0 auto' }}>
+        <LegalLanguageNotice />
         <HomeHardLink
           href="/"
           className="btn-am-neutro"

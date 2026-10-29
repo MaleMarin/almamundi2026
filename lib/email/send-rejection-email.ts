@@ -15,15 +15,16 @@ import {
   paragraphHtml,
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
+import type { AlmaLocale } from "@/lib/i18n/locale";
 
 export const REJECTION_CONTACT_EMAIL = "hola@almamundi.org";
 
-function storyTitleLine(storyTitle: string): string {
-  return storyTitle.replace(/[\r\n]+/g, " ").trim().slice(0, 200) || "tu historia";
+function storyTitleLine(storyTitle: string, locale: AlmaLocale): string {
+  return storyTitle.replace(/[\r\n]+/g, " ").trim().slice(0, 200) || rejectionCopy(locale).fallback;
 }
 
-export function rejectionEmailSubject(storyTitle: string): string {
-  return `Sobre tu historia «${storyTitleLine(storyTitle)}» en AlmaMundi`;
+export function rejectionEmailSubject(storyTitle: string, locale: AlmaLocale = "es"): string {
+  return rejectionCopy(locale).subject(storyTitleLine(storyTitle, locale));
 }
 
 export type SendRejectionEmailParams = {
@@ -31,49 +32,110 @@ export type SendRejectionEmailParams = {
   authorEmail: string;
   storyTitle: string;
   publicReason: string;
+  locale?: AlmaLocale;
 };
 
-function greetingLine(authorName: string): string {
-  const alias = capitalizeAlias(authorName);
-  return alias ? `Hola, ${alias}:` : "Hola:";
+function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
+  return locale === "pt" || locale === "en" ? locale : "es";
+}
+
+function rejectionCopy(locale: AlmaLocale) {
+  if (locale === "pt") {
+    return {
+      fallback: "sua história",
+      hello: (name: string) => (name ? `Olá, ${name}:` : "Olá:"),
+      subject: (title: string) => `Sobre sua história «${title}» no AlmaMundi`,
+      reviewed: (title: string) =>
+        `Revisamos sua história «${title}» e, desta vez, não poderemos publicá-la no AlmaMundi.`,
+      reason: "Motivo",
+      retry: (contact: string) =>
+        `Se você acha que houve um erro, responda este e-mail ou escreva para ${contact} e vamos revisá-la de novo.`,
+      thanks: "Agradecemos por confiar sua história a nós.<br>Equipe AlmaMundi",
+      thanksText: "Agradecemos por confiar sua história a nós.",
+      team: "Equipe AlmaMundi",
+      privacy: "Política de privacidade",
+      because: "Você recebeu este e-mail porque enviou uma história no AlmaMundi.",
+    };
+  }
+  if (locale === "en") {
+    return {
+      fallback: "your story",
+      hello: (name: string) => (name ? `Hello, ${name}:` : "Hello:"),
+      subject: (title: string) => `About your story «${title}» on AlmaMundi`,
+      reviewed: (title: string) =>
+        `We reviewed your story «${title}» and this time we will not be able to publish it on AlmaMundi.`,
+      reason: "Reason",
+      retry: (contact: string) =>
+        `If you think there was a mistake, reply to this email or write to ${contact} and we will review it again.`,
+      thanks: "Thank you for trusting us with your story.<br>The AlmaMundi team",
+      thanksText: "Thank you for trusting us with your story.",
+      team: "The AlmaMundi team",
+      privacy: "Privacy policy",
+      because: "You received this email because you sent a story on AlmaMundi.",
+    };
+  }
+  return {
+    fallback: "tu historia",
+    hello: (name: string) => (name ? `Hola, ${name}:` : "Hola:"),
+    subject: (title: string) => `Sobre tu historia «${title}» en AlmaMundi`,
+    reviewed: (title: string) =>
+      `Revisamos tu historia «${title}» y esta vez no podremos publicarla en AlmaMundi.`,
+    reason: "Motivo",
+    retry: (contact: string) =>
+      `Si crees que hubo un error, responde este correo o escríbenos a ${contact} y volveremos a revisarla.`,
+    thanks: "Gracias por confiarnos tu historia.<br>Equipo AlmaMundi",
+    thanksText: "Gracias por confiarnos tu historia.",
+    team: "Equipo AlmaMundi",
+    privacy: "Política de privacidad",
+    because: "Recibiste este correo porque enviaste una historia en AlmaMundi.",
+  };
+}
+
+function greetingLine(authorName: string, locale: AlmaLocale): string {
+  return rejectionCopy(locale).hello(capitalizeAlias(authorName));
 }
 
 export function buildRejectionEmailHtml(params: SendRejectionEmailParams): string {
-  const greeting = escapeHtml(greetingLine(params.authorName));
-  const storyTitle = escapeHtml(storyTitleLine(params.storyTitle));
+  const locale = mailLang(params.locale);
+  const copy = rejectionCopy(locale);
+  const greeting = escapeHtml(greetingLine(params.authorName, locale));
+  const storyTitle = escapeHtml(storyTitleLine(params.storyTitle, locale));
   const reason = escapeHtml(params.publicReason.trim());
   const contact = escapeHtml(REJECTION_CONTACT_EMAIL);
+  const retry = copy.retry(
+    `<a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${contact}</a>`
+  );
 
   const bodyHtml = `
       ${greetingHtml(greeting)}
-      ${paragraphHtml(`Revisamos tu historia «${storyTitle}» y esta vez no podremos publicarla en AlmaMundi.`)}
+      ${paragraphHtml(copy.reviewed(storyTitle))}
       <p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">
-        Motivo: ${reason}
+        ${copy.reason}: ${reason}
       </p>
-      ${paragraphHtml(`Si crees que hubo un error, responde este correo o escríbenos a
-        <a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${contact}</a>
-        y volveremos a revisarla.`)}
-      ${paragraphHtml("Gracias por confiarnos tu historia.<br>Equipo AlmaMundi", "0")}`;
+      ${paragraphHtml(retry)}
+      ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml });
+  return emailShell({ bodyHtml, locale });
 }
 
 export function buildRejectionEmailText(params: SendRejectionEmailParams): string {
-  const storyTitle = storyTitleLine(params.storyTitle);
+  const locale = mailLang(params.locale);
+  const copy = rejectionCopy(locale);
+  const storyTitle = storyTitleLine(params.storyTitle, locale);
   return [
-    greetingLine(params.authorName),
+    greetingLine(params.authorName, locale),
     "",
-    `Revisamos tu historia «${storyTitle}» y esta vez no podremos publicarla en AlmaMundi.`,
+    copy.reviewed(storyTitle),
     "",
-    `Motivo: ${params.publicReason.trim()}`,
+    `${copy.reason}: ${params.publicReason.trim()}`,
     "",
-    `Si crees que hubo un error, responde este correo o escríbenos a ${REJECTION_CONTACT_EMAIL} y volveremos a revisarla.`,
+    copy.retry(REJECTION_CONTACT_EMAIL),
     "",
-    "Gracias por confiarnos tu historia.",
-    "Equipo AlmaMundi",
+    copy.thanksText,
+    copy.team,
     "",
-    `Política de privacidad: ${absoluteEmailUrl("/privacidad")}`,
-    "Recibiste este correo porque enviaste una historia en AlmaMundi.",
+    `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
+    copy.because,
   ].join("\n");
 }
 
@@ -102,7 +164,7 @@ export async function sendRejectionEmail(
   }
 
   const from = mailFromAddress();
-  const subject = rejectionEmailSubject(params.storyTitle);
+  const subject = rejectionEmailSubject(params.storyTitle, mailLang(params.locale));
 
   try {
     const sent = await resend.emails.send({

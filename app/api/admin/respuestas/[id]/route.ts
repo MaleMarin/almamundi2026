@@ -22,6 +22,7 @@ import { geocodePublicPlace } from "@/lib/respuestas/geocode";
 import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -201,7 +202,12 @@ export async function PATCH(
       const questionId = typeof data.questionId === "string" ? data.questionId : "";
       const mailed =
         email && questionId
-          ? await sendRespuestaPublishedEmail({ to: email, alias, questionId })
+          ? await sendRespuestaPublishedEmail({
+              to: email,
+              alias,
+              questionId,
+              locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
+            })
           : { ok: false as const };
       await ref
         .update({
@@ -219,7 +225,11 @@ export async function PATCH(
       const email = await contactEmail(id);
       const alias = typeof data.alias === "string" ? data.alias : "";
       const mailed = email
-        ? await sendRespuestaRejectedEmail({ to: email, alias })
+        ? await sendRespuestaRejectedEmail({
+            to: email,
+            alias,
+            locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
+          })
         : { ok: false as const };
       await ref
         .update({

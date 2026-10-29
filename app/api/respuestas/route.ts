@@ -28,6 +28,7 @@ import {
 } from "@/lib/respuestas/constants";
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { verifyTurnstileStrict } from "@/lib/security/turnstile-strict";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -178,6 +179,7 @@ export async function POST(req: Request) {
           }
         : { consentPrivacyPolicy: true }),
       status: "pending",
+      locale: parseAlmaLocale(typeof body.locale === "string" ? body.locale : undefined),
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
@@ -217,7 +219,11 @@ export async function POST(req: Request) {
         console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
       }
       try {
-        const mailed = await sendRespuestaReceivedEmail({ to: email, alias });
+        const mailed = await sendRespuestaReceivedEmail({
+          to: email,
+          alias,
+          locale: parseAlmaLocale(typeof body.locale === "string" ? body.locale : undefined),
+        });
         await ref.update({
           receivedMail: {
             status: mailed.ok ? "sent" : "failed",

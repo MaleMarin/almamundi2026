@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { LegalLanguageNotice } from '@/components/legal/LegalLanguageNotice';
 import { MisDatosPersonalesForm } from './MisDatosPersonalesForm';
 
 export const metadata: Metadata = {
@@ -12,6 +13,7 @@ export default function MisDatosPersonalesPage() {
       className="min-h-svh bg-[#e8ecf0]"
       style={{ fontFamily: 'inherit' }}
     >
+      <LegalLanguageNotice />
       <MisDatosPersonalesForm />
     </main>
   );

@@ -6,6 +6,7 @@ import { X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_UI } from '@/lib/pregunta-semana';
+import { mapChrome } from '@/lib/i18n/map-chrome';
 import type { MapDockMode } from './MapDock';
 
 const DRAWER_WIDTH_DESKTOP = 360;
@@ -51,6 +52,7 @@ type MapDrawerProps = {
 
 export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent = false }: MapDrawerProps) {
   const { locale } = useHomeLocale();
+  const dockCopy = mapChrome(locale);
   const [animatingIn, setAnimatingIn] = useState(false);
 
   useEffect(() => {
@@ -76,7 +78,15 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   if (!open) return null;
 
   const title =
-    mode === 'stories' ? 'Historias' : mode === 'news' ? PREGUNTA_UI.tab[locale] : mode === 'sounds' ? 'Sonidos' : mode === 'bits' ? 'También cuenta' : 'Buscar por título, ciudad o tema';
+    mode === 'stories'
+      ? dockCopy.stories
+      : mode === 'news'
+        ? PREGUNTA_UI.tab[locale]
+        : mode === 'sounds'
+          ? dockCopy.sounds
+          : mode === 'bits'
+            ? dockCopy.bits
+            : dockCopy.searchTitle;
   const bitsMode = mode === 'bits';
   /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
   const innerScrollPanel =

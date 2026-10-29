@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import {
-  MANIFIESTO_SECTIONS,
-  MANIFIESTO_TITLE,
+  manifiestoFor,
   type ManifiestoBlock,
   type ManifiestoSection } from '@/lib/proposito-text';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -44,7 +44,7 @@ const soft = {
       'inset 1px 1px 2px rgba(255, 255, 255, 0.65)',
     ].join(', ') } } as const;
 
-const DEFAULT_SECTION_ID = MANIFIESTO_SECTIONS[0]?.id ?? 'por-que';
+const DEFAULT_SECTION_ID = 'por-que';
 
 function sectionChipStyle(active: boolean) {
   if (active) {
@@ -288,6 +288,8 @@ export function PropositoModal({
   onClose: () => void;
   onGoToHistorias?: () => void;
 }) {
+  const { locale } = useHomeLocale();
+  const { title: manifiestoTitle, sections: manifiestoSections } = manifiestoFor(locale);
   const [activeSectionId, setActiveSectionId] = useState(DEFAULT_SECTION_ID);
 
   useEffect(() => {
@@ -315,9 +317,9 @@ export function PropositoModal({
 
   if (!isOpen || typeof document === 'undefined') return null;
 
-  const activeIndex = MANIFIESTO_SECTIONS.findIndex((s) => s.id === activeSectionId);
+  const activeIndex = manifiestoSections.findIndex((s) => s.id === activeSectionId);
   const activeSection =
-    MANIFIESTO_SECTIONS[activeIndex >= 0 ? activeIndex : 0] ?? MANIFIESTO_SECTIONS[0];
+    manifiestoSections[activeIndex >= 0 ? activeIndex : 0] ?? manifiestoSections[0];
 
   return createPortal(
     <div
@@ -353,7 +355,7 @@ export function PropositoModal({
                 className="text-[length:var(--fs-titular)] font-semibold "
                 style={{ color: soft.textMain }}
               >
-                {MANIFIESTO_TITLE}
+                {manifiestoTitle}
               </h2>
             </div>
             <button
@@ -372,7 +374,7 @@ export function PropositoModal({
             aria-label="Secciones del propósito"
             role="tablist"
           >
-            {MANIFIESTO_SECTIONS.map((s) => {
+            {manifiestoSections.map((s) => {
               const active = s.id === activeSectionId;
               return (
                 <button

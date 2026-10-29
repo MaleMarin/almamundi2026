@@ -10,6 +10,7 @@ import {
 } from "@/lib/email/notify-author-received";
 import { resolveAuthorEmailFromRecord } from "@/lib/email/notify-author-published";
 import { readAuthorContactEmail } from "@/lib/author-contacts";
+import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 export type RejectionMailStatus = "sent" | "skipped_no_email" | "failed";
 
@@ -134,6 +135,7 @@ export async function notifyAuthorStoryRejected(args: {
     authorEmail: to,
     storyTitle: pickText(data.storyTitle, data.title, data.titulo, "tu historia"),
     publicReason,
+    locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
   });
 
   if (sent.ok) {

@@ -2,6 +2,8 @@
  * Manifiesto AlmaMundi — contenido del modal «Propósito» (/#proposito).
  */
 
+import type { AlmaLocale } from '@/lib/i18n/locale';
+
 export const MANIFIESTO_TITLE = 'Propósito';
 
 export type ManifiestoBlock =
@@ -101,3 +103,159 @@ export const PROPOSITO_TITLE = MANIFIESTO_TITLE;
 export const PROPOSITO_SUBTITLE = '';
 export const PROPOSITO_PARAGRAPHS: string[] = [];
 export const PROPOSITO_CIERRE = '';
+
+const PT_SECTIONS: ManifiestoSection[] = [
+  {
+    id: 'por-que',
+    title: 'Por que existimos',
+    blocks: [
+      {
+        type: 'lead',
+        lines: [
+          'O mundo está cheio de histórias que merecem ser contadas.',
+          'O AlmaMundi é o lugar onde isso acontece.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'Estamos construindo o lugar onde a humanidade se conta. Uma história real de cada vez.',
+      },
+      {
+        type: 'p',
+        text: 'Cada pessoa que vive algo vive de um jeito que ninguém mais vai viver exatamente igual. Esse momento, essa experiência, esse fragmento de vida, tem um valor que só existe se alguém contar.',
+      },
+      {
+        type: 'quote',
+        text: 'Vivemos na era mais documentada da história. E há milhões de histórias reais esperando o lugar certo para existir.',
+      },
+    ],
+  },
+  {
+    id: 'creemos',
+    title: 'O que acreditamos',
+    blocks: [
+      {
+        type: 'beliefs',
+        items: [
+          'Cada pessoa que viveu algo viveu de um jeito que ninguém mais vai viver exatamente igual. Isso, por definição, é uma história única.',
+          'Uma história real pode mudar a vida de alguém que você ainda não conhece. É o que as histórias fazem desde que os humanos se sentam ao redor do fogo.',
+          'O único requisito é querer compartilhar.',
+          'Vídeo, áudio, texto, foto. Quatro maneiras de contar. Quatro maneiras de conhecer.',
+          'As histórias que despertam outras histórias vêm da experiência vivida.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'diferente',
+    title: 'O que fazemos diferente',
+    blocks: [
+      { type: 'p', text: 'O AlmaMundi foi pensado para que as histórias durem.' },
+      {
+        type: 'p',
+        text: 'No AlmaMundi, cada história tem seu próprio tempo. Uma história publicada hoje pode encontrar quem precisa dela amanhã. Ou em três anos. O encontro entre uma história e a pessoa que precisa dela não tem pressa.',
+      },
+      {
+        type: 'p',
+        text: 'Aqui as histórias existem porque existem. Não há um sistema que decida quanto valem nem quando aparecem. Uma história publicada há três anos pode despertar alguém hoje com a mesma força do dia em que foi publicada.',
+      },
+      {
+        type: 'p',
+        text: 'Construímos o AlmaMundi para que cada história lida desperte uma que ainda não foi contada.',
+      },
+    ],
+  },
+  {
+    id: 'cierre',
+    title: 'Conte',
+    blocks: [
+      {
+        type: 'closing',
+        lines: [
+          'O formato é seu. A história também. O AlmaMundi é o lugar onde o que você viveu não desaparece.',
+        ],
+      },
+    ],
+  },
+];
+
+const EN_SECTIONS: ManifiestoSection[] = [
+  {
+    id: 'por-que',
+    title: 'Why we exist',
+    blocks: [
+      {
+        type: 'lead',
+        lines: [
+          'The world is full of stories that deserve to be told.',
+          'AlmaMundi is the place where that happens.',
+        ],
+      },
+      {
+        type: 'p',
+        text: 'We are building the place where humanity tells itself. One real story at a time.',
+      },
+      {
+        type: 'p',
+        text: 'Each person who lives something lives it in a way no one else will live exactly the same. That moment, that experience, that fragment of a life, has a value that exists only if someone tells it.',
+      },
+      {
+        type: 'quote',
+        text: 'We live in the most documented era in history. And there are millions of real stories waiting for the right place to exist.',
+      },
+    ],
+  },
+  {
+    id: 'creemos',
+    title: 'What we believe',
+    blocks: [
+      {
+        type: 'beliefs',
+        items: [
+          'Each person who has lived something has lived it in a way no one else will live exactly the same. That, by definition, is a unique story.',
+          'A real story can change the life of someone you do not know yet. That is what stories have done since humans sat around a fire.',
+          'The only requirement is wanting to share it.',
+          'Video, audio, text, photo. Four ways to tell. Four ways to know.',
+          'The stories that awaken other stories come from lived experience.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'diferente',
+    title: 'What we do differently',
+    blocks: [
+      { type: 'p', text: 'AlmaMundi was designed so that stories last.' },
+      {
+        type: 'p',
+        text: 'On AlmaMundi, each story has its own time. A story published today can find the person who needs it tomorrow. Or in three years. The meeting between a story and the person who needs it is not in a hurry.',
+      },
+      {
+        type: 'p',
+        text: 'Here stories exist because they exist. There is no system that decides how much they are worth or when they appear. A story published three years ago can awaken someone today with the same force as the day it was published.',
+      },
+      {
+        type: 'p',
+        text: 'We build AlmaMundi so that each story that is read awakens one that has not been told yet.',
+      },
+    ],
+  },
+  {
+    id: 'cierre',
+    title: 'Tell it',
+    blocks: [
+      {
+        type: 'closing',
+        lines: [
+          'The format is yours. The story is too. AlmaMundi is the place where what you lived does not disappear.',
+        ],
+      },
+    ],
+  },
+];
+
+export function manifiestoFor(locale: AlmaLocale): { title: string; sections: ManifiestoSection[] } {
+  if (locale === 'pt') return { title: 'Propósito', sections: PT_SECTIONS };
+  if (locale === 'en') return { title: 'Purpose', sections: EN_SECTIONS };
+  return { title: MANIFIESTO_TITLE, sections: MANIFIESTO_SECTIONS };
+}

@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { mapChrome } from '@/lib/i18n/map-chrome';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
@@ -119,6 +121,7 @@ export function StoriesPanel({
   onContarMiHistoria,
   panelMode = 'stories' }: StoriesPanelProps) {
   const isSearchPanel = panelMode === 'search';
+  const copy = mapChrome(useHomeLocale().locale);
   const qTrim = exploreQuery.trim();
   const searchMatches = useMemo(
     () => (isSearchPanel ? storiesMatchingQuery(stories, qTrim) : []),
@@ -146,8 +149,8 @@ export function StoriesPanel({
             type="search"
             value={exploreQuery}
             onChange={(e) => onExploreQueryChange(e.target.value)}
-            placeholder="Buscar por título, ciudad o tema"
-            aria-label="Buscar por título, ciudad o tema"
+            placeholder={copy.searchTitle}
+            aria-label={copy.searchTitle}
             style={{
               width: '100%',
               padding: '10px 12px 10px 36px',
@@ -188,7 +191,7 @@ export function StoriesPanel({
                   lineHeight: 1.55,
                   fontFamily: SITE_FONT_STACK }}
               >
-                Escribe palabras clave para buscar entre las historias del mapa (lugar, tema o texto).
+                {copy.searchHint}
               </p>
               <p
                 style={{
@@ -198,7 +201,7 @@ export function StoriesPanel({
                   lineHeight: 1.45,
                   fontFamily: SITE_FONT_STACK }}
               >
-                Para ver el listado completo, usa la pestaña Historias.
+                {copy.searchUseTab}
               </p>
             </div>
           ) : searchMatches.length === 0 ? (
@@ -211,13 +214,13 @@ export function StoriesPanel({
                   lineHeight: 1.5,
                   fontFamily: SITE_FONT_STACK }}
               >
-                No hay historias que coincidan con tu búsqueda.
+                {copy.searchEmpty}
               </p>
             </div>
           ) : (
             <>
               <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
-                Resultados
+                {copy.results}
               </p>
               {searchMatches.map((s, i) => (
                 <StoryRow
@@ -245,7 +248,7 @@ export function StoriesPanel({
               margin: '0 0 12px',
               lineHeight: 1.5,
               fontFamily: SITE_FONT_STACK }}>
-              Este mapa se construye con historias como la tuya.
+              {copy.storiesEmpty}
             </p>
             {onContarMiHistoria && (
               <button
@@ -264,14 +267,14 @@ export function StoriesPanel({
                   fontFamily: SITE_FONT_STACK,
                   transition: 'all 200ms ease' }}
               >
-                Cuenta tu historia
+                {copy.tell}
               </button>
             )}
           </div>
         ) : (
           <>
             <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
-              Últimas historias
+              {copy.latest}
             </p>
             {stories.map((s, i) => (
               <StoryRow

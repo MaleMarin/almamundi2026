@@ -198,7 +198,7 @@ const FORMAT_LABEL = {
   en: { video: 'Video', audio: 'Audio', image: 'Photo', text: 'Text' },
 } as const;
 
-const SHARE_LABEL = { es: 'Compartir', pt: 'Partilhar', en: 'Share' } as const;
+const SHARE_LABEL = { es: 'Compartir', pt: 'Compartilhar', en: 'Share' } as const;
 const TELL_LABEL = { es: 'Cuenta tu historia', pt: 'Conte sua história', en: 'Tell your story' } as const;
 const MOVED_LABEL = { es: 'Me emocionó', pt: 'Me emocionou', en: 'This moved me' } as const;
 
