@@ -319,7 +319,7 @@ const es: SiteUiMessages = {
     texto: {
       title: 'Escribe lo que no le contaste a nadie,\no lo que le contaste a todos',
       subtitle: 'Aquí no se pierde en el scroll. Queda.',
-      limit: 'Hasta 5000 caracteres.',
+      limit: '',
       primaryCta: '',
       uploadLabel: '',
     },
@@ -505,7 +505,7 @@ const pt: SiteUiMessages = {
     texto: {
       title: 'Escreva o que não contou a ninguém,\nou o que contou a todos',
       subtitle: 'Aqui não se perde no scroll. Fica.',
-      limit: 'Até 5000 caracteres.',
+      limit: '',
       primaryCta: '',
       uploadLabel: '',
     },
@@ -690,7 +690,7 @@ const en: SiteUiMessages = {
     texto: {
       title: 'Write what you never told anyone,\nor what you told everyone',
       subtitle: 'Here it is not lost in the scroll. It stays.',
-      limit: 'Up to 5000 characters.',
+      limit: '',
       primaryCta: '',
       uploadLabel: '',
     },

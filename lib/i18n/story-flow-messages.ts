@@ -55,6 +55,10 @@ export type StoryFlowMessages = {
   modalPhotoDecadeChoose: string;
   modalPhotoPlace: string;
   modalPhotoChoose: string;
+  modalPhotoCount: string;
+  modalPhotoRemove: string;
+  modalInspiration: string;
+  modalRemoveInspiration: string;
   modalPhotoAddAnother: string;
   modalPhotoDecadeOption: string;
   modalPhotoMissingName: string;
@@ -192,6 +196,10 @@ const es: StoryFlowMessages = {
   modalPhotoDecadeChoose: 'Elige una década',
   modalPhotoPlace: 'Lugar *',
   modalPhotoChoose: 'Elige tus fotos',
+  modalPhotoCount: '{n} de {max} fotos',
+  modalPhotoRemove: 'Eliminar foto',
+  modalInspiration: 'Inspiración',
+  modalRemoveInspiration: 'Quitar inspiración',
   modalPhotoAddAnother: 'Agrega otra foto',
   modalPhotoDecadeOption: 'años {year}',
   modalPhotoMissingName: 'Falta el nombre de la foto {foto}.',
@@ -322,6 +330,10 @@ const pt: StoryFlowMessages = {
   modalPhotoDecadeChoose: 'Escolha uma década',
   modalPhotoPlace: 'Lugar *',
   modalPhotoChoose: 'Escolha suas fotos',
+  modalPhotoCount: '{n} de {max} fotos',
+  modalPhotoRemove: 'Remover foto',
+  modalInspiration: 'Inspiração',
+  modalRemoveInspiration: 'Remover inspiração',
   modalPhotoAddAnother: 'Adicione outra foto',
   modalPhotoDecadeOption: 'anos {year}',
   modalPhotoMissingName: 'Falta o nome da foto {foto}.',
@@ -423,6 +435,10 @@ const en: StoryFlowMessages = {
   modalPhotoDecadeChoose: 'Choose a decade',
   modalPhotoPlace: 'Place *',
   modalPhotoChoose: 'Choose your photos',
+  modalPhotoCount: '{n} of {max} photos',
+  modalPhotoRemove: 'Remove photo',
+  modalInspiration: 'Inspiration',
+  modalRemoveInspiration: 'Remove inspiration',
   modalPhotoAddAnother: 'Add another photo',
   modalPhotoDecadeOption: '{year}s',
   modalPhotoMissingName: 'Photo {foto} is missing a name.',

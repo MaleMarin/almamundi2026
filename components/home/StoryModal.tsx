@@ -2260,15 +2260,15 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             {chosenTopic && (
               <div className="space-y-3 rounded-2xl p-4" style={soft.inset}>
                 <div className="flex flex-wrap items-start justify-between gap-2">
-                  <p className="text-[length:var(--fs-texto)] font-semibold text-gray-800 ">Inspiración · {chosenTopic.title}</p>
+                  <p className="text-[length:var(--fs-texto)] font-semibold text-gray-800 ">{t.modalInspiration} · {chosenTopic.title}</p>
                   <button
                     type="button"
                     onClick={onClearTopic}
                     className="rounded-full px-3 py-1.5 text-[length:var(--fs-etiqueta)] font-bold text-orange-700"
                     style={soft.button}
-                    aria-label="Quitar inspiración"
+                    aria-label={t.modalRemoveInspiration}
                   >
-                    Quitar inspiración
+                    {t.modalRemoveInspiration}
                   </button>
                 </div>
                 <ul className="list-inside list-disc space-y-2 text-[length:var(--fs-texto)] text-gray-600 ">

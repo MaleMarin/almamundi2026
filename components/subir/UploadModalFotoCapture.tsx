@@ -2,6 +2,8 @@
 
 import styles from '@/components/subir/am-upload-modal.module.css';
 import { UploadModalFotoGrid } from '@/components/subir/UploadModalFotoGrid';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { interpolate } from '@/lib/i18n/locale';
 import { SUBIR_PHOTO_MAX } from '@/lib/subir-limits';
 import type { StoryPhotoItem } from '@/lib/story-photo-item';
 
@@ -37,6 +39,7 @@ export function UploadModalFotoCapture({
   incompleteIds,
   fichaMessage,
   maxPhotos = SUBIR_PHOTO_MAX }: Props) {
+  const { t } = useHomeLocale();
   const converting = photos.some((p) => p.converting);
 
   return (
@@ -61,9 +64,11 @@ export function UploadModalFotoCapture({
         </p>
       ) : null}
       {inlineError ? <p className={styles.amModalInlineError}>{inlineError}</p> : null}
-      <p className={styles.amFotoCounter}>
-        {photos.length} de {maxPhotos} fotos
-      </p>
+      {photos.length > 0 ? (
+        <p className={styles.amFotoCounter}>
+          {interpolate(t.modalPhotoCount, { n: photos.length, max: maxPhotos })}
+        </p>
+      ) : null}
     </div>
   );
 }

@@ -81,7 +81,7 @@ export function UploadModalFotoGrid({
                   type="button"
                   className={styles.amFotoSlotRemove}
                   onClick={() => onRemove(index)}
-                  aria-label="Eliminar foto"
+                  aria-label={t.modalPhotoRemove}
                 >
                   ×
                 </button>
@@ -195,7 +195,7 @@ export function UploadModalFotoGrid({
       ) : null}
       {showCounter ? (
         <p className={styles.amFotoCounter}>
-          {photos.length} de {maxPhotos} fotos
+          {interpolate(t.modalPhotoCount, { n: photos.length, max: maxPhotos })}
         </p>
       ) : null}
     </div>
