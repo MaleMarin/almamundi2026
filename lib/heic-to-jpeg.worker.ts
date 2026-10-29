@@ -40,26 +40,11 @@ async function viaBitmap(file: File): Promise<Blob | null> {
   }
 }
 
-async function viaHeicTo(file: File): Promise<Blob | null> {
-  try {
-    const { heicTo } = await import('heic-to');
-    const blob = (await heicTo({
-      blob: file,
-      type: 'image/jpeg',
-      quality: 0.9,
-    })) as Blob;
-    if (!blob || blob.size < 32) return null;
-    return blob;
-  } catch {
-    return null;
-  }
-}
-
 self.onmessage = async (event: MessageEvent<HeicWorkerRequest>) => {
   const { id, buffer, name, type } = event.data;
   try {
     const file = new File([buffer], name, { type: type || 'image/heic' });
-    const blob = (await viaBitmap(file)) ?? (await viaHeicTo(file));
+    const blob = await viaBitmap(file);
     if (!blob) {
       const res: HeicWorkerResponse = { id, ok: false, error: 'heic_convert_failed' };
       self.postMessage(res);

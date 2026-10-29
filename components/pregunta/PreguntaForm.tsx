@@ -7,6 +7,7 @@ import { Image as ImageIcon, Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { PREGUNTA_COPY, preguntaShareText, preguntaThanks } from '@/lib/i18n/pregunta-messages';
+import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
   isQuestionMode,
@@ -98,6 +99,7 @@ function PreguntaFormInner({
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [photoPreparing, setPhotoPreparing] = useState(false);
   const [recording, setRecording] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [progress, setProgress] = useState<number | null>(null);
@@ -111,6 +113,7 @@ function PreguntaFormInner({
   const timerRef = useRef<number | null>(null);
   const audioInputRef = useRef<HTMLInputElement>(null);
   const photoInputRef = useRef<HTMLInputElement>(null);
+  const photoConvertToken = useRef(0);
 
   useEffect(() => {
     return () => {
@@ -227,37 +230,57 @@ function PreguntaFormInner({
     setAudioFile(file);
   }
 
-  function onPhotoPicked(file: File | null) {
+  async function onPhotoPicked(file: File | null) {
+    const token = ++photoConvertToken.current;
     setError('');
     if (photoUrl) URL.revokeObjectURL(photoUrl);
     if (!file) {
+      setPhotoPreparing(false);
       setPhotoFile(null);
       setPhotoUrl(null);
       return;
     }
     const type = file.type.toLowerCase();
-    const name = file.name.toLowerCase();
+    const heic = looksLikeHeic(file);
     const okType =
       type === 'image/jpeg' ||
       type === 'image/png' ||
       type === 'image/webp' ||
-      type === 'image/heic' ||
-      type === 'image/heif' ||
-      (!type && /\.(jpe?g|png|webp|heic|heif)$/.test(name));
+      heic;
     if (!okType) {
+      setPhotoPreparing(false);
       setPhotoFile(null);
       setPhotoUrl(null);
       setError(copy.errPhotoType[locale]);
       return;
     }
     if (file.size > RESPUESTA_PHOTO_MAX_BYTES) {
+      setPhotoPreparing(false);
       setPhotoFile(null);
       setPhotoUrl(null);
       setError(copy.errPhotoSize[locale]);
       return;
     }
-    setPhotoFile(file);
-    setPhotoUrl(URL.createObjectURL(file));
+    if (!heic) {
+      setPhotoPreparing(false);
+      setPhotoFile(file);
+      setPhotoUrl(URL.createObjectURL(file));
+      return;
+    }
+    setPhotoFile(null);
+    setPhotoUrl(null);
+    setPhotoPreparing(true);
+    const converted = await convertHeicToJpegIfNeeded(file);
+    if (token !== photoConvertToken.current) return;
+    setPhotoPreparing(false);
+    if (!converted || looksLikeHeic(converted)) {
+      setPhotoFile(null);
+      setPhotoUrl(null);
+      setError(copy.errPhotoRead[locale]);
+      return;
+    }
+    setPhotoFile(converted);
+    setPhotoUrl(URL.createObjectURL(converted));
   }
 
   async function onSubmit(event: FormEvent) {
@@ -272,6 +295,7 @@ function PreguntaFormInner({
     if (kind === 'texto' && !text.trim()) return;
     if (kind === 'texto' && text.trim().length > RESPUESTA_TEXT_MAX) return setError(copy.errText[locale]);
     if (kind === 'voz' && !audioFile) return;
+    if (photoPreparing) return;
     if (kind === 'foto' && !photoFile) return;
     if (kind === 'foto' && !caption.trim()) return setError(copy.errCaption[locale]);
     if (kind === 'foto' && caption.trim().length > RESPUESTA_CAPTION_MAX) return setError(copy.errCaptionLong[locale]);
@@ -485,8 +509,22 @@ function PreguntaFormInner({
             onClick={() => photoInputRef.current?.click()}
             className="flex min-h-36 w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-black/25 bg-transparent px-4 py-6 text-[length:var(--fs-pequeno)] text-[#1C1C2E]"
           >
-            {photoUrl ? (
-              <img src={photoUrl} alt="" className="max-h-64 w-full object-contain" />
+            {photoPreparing ? (
+              <span className="inline-flex items-center gap-2" role="status">
+                <span className="inline-block h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden />
+                {copy.photoPreparing[locale]}
+              </span>
+            ) : photoUrl ? (
+              <img
+                src={photoUrl}
+                alt=""
+                className="max-h-64 w-full object-contain"
+                onError={() => {
+                  setPhotoFile(null);
+                  setPhotoUrl(null);
+                  setError(copy.errPhotoRead[locale]);
+                }}
+              />
             ) : (
               copy.choosePhoto[locale]
             )}
@@ -497,7 +535,7 @@ function PreguntaFormInner({
             accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.jpg,.jpeg,.png,.webp,.heic"
             className="sr-only"
             onChange={(event) => {
-              onPhotoPicked(event.target.files?.[0] ?? null);
+              void onPhotoPicked(event.target.files?.[0] ?? null);
               event.target.value = '';
             }}
           />

@@ -95,6 +95,16 @@ export const PREGUNTA_COPY = {
     pt: 'A foto tem mais de 10 MB.',
     en: 'The photo is larger than 10 MB.',
   },
+  photoPreparing: {
+    es: 'Preparando tu foto…',
+    pt: 'Preparando sua foto…',
+    en: 'Preparing your photo…',
+  },
+  errPhotoRead: {
+    es: 'No pudimos leer esta foto. Prueba con una en JPG o PNG.',
+    pt: 'Não conseguimos ler esta foto. Tente uma em JPG ou PNG.',
+    en: "We couldn't read this photo. Try one in JPG or PNG.",
+  },
   errCaption: {
     es: 'Falta la frase de la foto.',
     pt: 'Falta a frase da foto.',

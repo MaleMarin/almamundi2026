@@ -401,8 +401,10 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [extraText, setExtraText] = useState('');
   const [cancionRelacionada, setCancionRelacionada] = useState('');
   const [extraFiles, setExtraFiles] = useState<File[]>([]);
+  const [extraPreparing, setExtraPreparing] = useState(false);
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState('');
+  const [profileConverting, setProfileConverting] = useState(false);
   const [sex, setSex] = useState<Sex>('');
   const [ageRange, setAgeRange] = useState<AgeRange>('');
   const [city, setCity] = useState('');
@@ -419,6 +421,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     storagePath: string;
   }[]>([]);
   const profileUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
+  const profileConvertToken = useRef(0);
   const avUploadRef = useRef<{ readUrl: string; storagePath: string } | null>(null);
   const captchaTokenRef = useRef('');
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -1081,6 +1084,16 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
     for (const { id, file } of pendingHeic) {
       void convertHeicToJpegIfNeeded(file).then((converted) => {
+        if (!converted || looksLikeHeic(converted)) {
+          setPhotos((prev) => {
+            const current = prev.find((p) => p.id === id);
+            if (!current) return prev;
+            if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+            return prev.filter((p) => p.id !== id);
+          });
+          setErr(t.modalPhotoReadError);
+          return;
+        }
         setPhotos((prev) =>
           prev.map((p) => {
             if (p.id !== id) return p;
@@ -1095,7 +1108,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         );
       });
     }
-  }, [t.modalPhotoSizeError, t.modalPhotoTypeError]);
+  }, [t.modalPhotoReadError, t.modalPhotoSizeError, t.modalPhotoTypeError]);
 
   const removePhotoAt = useCallback((index: number) => {
     setPhotos((prev) => {
@@ -1135,21 +1148,40 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
 
   const addExtraFiles = useCallback((files: FileList | null) => {
     if (!files) return;
-
-    const next = Array.from(files).filter((f) => {
-      if (!isAllowedExtraAttachmentFile(f)) {
-        setErr(UPLOAD_EXTRA_TYPE_ERROR);
-        return false;
+    const incoming = Array.from(files);
+    void (async () => {
+      const ready: File[] = [];
+      let failed = false;
+      let preparing = false;
+      for (const f of incoming) {
+        if (!isAllowedExtraAttachmentFile(f)) {
+          setErr(UPLOAD_EXTRA_TYPE_ERROR);
+          continue;
+        }
+        if (f.size > MAX_EXTRA_FILE_MB * 1024 * 1024) {
+          setErr(`Un archivo supera ${MAX_EXTRA_FILE_MB}MB. Prueba con uno más liviano.`);
+          continue;
+        }
+        if (!looksLikeHeic(f)) {
+          ready.push(f);
+          continue;
+        }
+        if (!preparing) {
+          preparing = true;
+          setExtraPreparing(true);
+        }
+        const converted = await convertHeicToJpegIfNeeded(f);
+        if (!converted || looksLikeHeic(converted)) {
+          failed = true;
+          continue;
+        }
+        ready.push(converted);
       }
-      const okSize = f.size <= MAX_EXTRA_FILE_MB * 1024 * 1024;
-      if (!okSize) {
-        setErr(`Un archivo supera ${MAX_EXTRA_FILE_MB}MB. Prueba con uno más liviano.`);
-      }
-      return okSize;
-    });
-
-    setExtraFiles((prev) => [...prev, ...next]);
-  }, []);
+      if (preparing) setExtraPreparing(false);
+      if (failed) setErr(t.modalPhotoReadError);
+      if (ready.length > 0) setExtraFiles((prev) => [...prev, ...ready]);
+    })();
+  }, [t.modalPhotoReadError]);
 
   const removeExtraFile = useCallback((idx: number) => {
     setExtraFiles((prev) => prev.filter((_, i) => i !== idx));
@@ -1168,9 +1200,25 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
 
     setErr('');
-    setProfilePhoto(await convertHeicToJpegIfNeeded(file));
+    if (!looksLikeHeic(file)) {
+      setProfileConverting(false);
+      setProfilePhoto(file);
+      profileUploadRef.current = null;
+      return;
+    }
+    const token = ++profileConvertToken.current;
+    setProfileConverting(true);
+    setProfilePhoto(null);
+    const converted = await convertHeicToJpegIfNeeded(file);
+    if (token !== profileConvertToken.current) return;
+    setProfileConverting(false);
+    if (!converted || looksLikeHeic(converted)) {
+      setErr(t.modalPhotoReadError);
+      return;
+    }
+    setProfilePhoto(converted);
     profileUploadRef.current = null;
-  }, []);
+  }, [t.modalPhotoReadError]);
 
   const canContinueCapture = useCallback((): boolean => {
     if (mode === 'video' || mode === 'audio') {
@@ -2230,6 +2278,14 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             onRetry={retryPhotoUpload}
             onPatch={patchPhoto}
             convertingLabel={t.modalPhotoConverting}
+            onUnreadable={(id) => {
+              setPhotos((prev) => {
+                const target = prev.find((p) => p.id === id);
+                if (target?.previewUrl) URL.revokeObjectURL(target.previewUrl);
+                return prev.filter((p) => p.id !== id);
+              });
+              setErr(t.modalPhotoReadError);
+            }}
             retryLabel={t.modalPhotoRetry}
             failedLabel={t.modalPhotoUploadFailed}
             inlineError={err || undefined}
@@ -2482,6 +2538,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                       <p className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-tight text-gray-500">
                         JPG, PNG, WEBP o HEIC.
                       </p>
+                      {extraPreparing ? (
+                        <p className="mt-1 inline-flex items-center gap-2 text-[length:var(--fs-etiqueta)] text-gray-700" role="status">
+                          <span className="inline-block h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" aria-hidden />
+                          {t.modalPhotoConverting}
+                        </p>
+                      ) : null}
                       {extraFiles.length > 0 && (
                         <ul className="mt-1 space-y-0.5 text-[length:var(--fs-etiqueta)] text-gray-700">
                           {extraFiles.map((f, idx) => (
@@ -2518,21 +2580,38 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                             onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
                           />
                         </label>
-                        {profilePhotoUrl && (
+                        {profileConverting ? (
+                          <p className="inline-flex min-h-11 items-center gap-2 text-[length:var(--fs-etiqueta)] text-gray-700" role="status">
+                            <span className="inline-block h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" aria-hidden />
+                            {t.modalPhotoConverting}
+                          </p>
+                        ) : profilePhotoUrl ? (
                           <>
                             <div className="h-8 w-8 overflow-hidden rounded-lg" style={{ ...soft.flat, borderRadius: '8px' }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                              <img
+                                src={profilePhotoUrl}
+                                alt=""
+                                className="h-full w-full object-cover"
+                                onError={() => {
+                                  setProfilePhoto(null);
+                                  setErr(t.modalPhotoReadError);
+                                }}
+                              />
                             </div>
                             <button
                               type="button"
-                              onClick={() => setProfilePhoto(null)}
+                              onClick={() => {
+                                profileConvertToken.current += 1;
+                                setProfileConverting(false);
+                                setProfilePhoto(null);
+                              }}
                               className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
                           </>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                     ) : null}
@@ -2587,21 +2666,38 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                             onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
                           />
                         </label>
-                        {profilePhotoUrl && (
+                        {profileConverting ? (
+                          <p className="inline-flex min-h-11 items-center gap-2 text-[length:var(--fs-etiqueta)] text-gray-700" role="status">
+                            <span className="inline-block h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" aria-hidden />
+                            {t.modalPhotoConverting}
+                          </p>
+                        ) : profilePhotoUrl ? (
                           <>
                             <div className="h-8 w-8 overflow-hidden rounded-lg" style={{ ...soft.flat, borderRadius: '8px' }}>
                               {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img src={profilePhotoUrl} alt="" className="h-full w-full object-cover" />
+                              <img
+                                src={profilePhotoUrl}
+                                alt=""
+                                className="h-full w-full object-cover"
+                                onError={() => {
+                                  setProfilePhoto(null);
+                                  setErr(t.modalPhotoReadError);
+                                }}
+                              />
                             </div>
                             <button
                               type="button"
-                              onClick={() => setProfilePhoto(null)}
+                              onClick={() => {
+                                profileConvertToken.current += 1;
+                                setProfileConverting(false);
+                                setProfilePhoto(null);
+                              }}
                               className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
                           </>
-                        )}
+                        ) : null}
                       </div>
                     </div>
                     </>

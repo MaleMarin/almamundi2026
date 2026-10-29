@@ -74,6 +74,7 @@ export type StoryFlowMessages = {
   modalPhotoTypeError: string;
   modalPhotoSizeError: string;
   modalPhotoConverting: string;
+  modalPhotoReadError: string;
   modalPhotoUploadFailed: string;
   modalPhotoRetry: string;
   modalRequiredFieldsNote: string;
@@ -222,7 +223,8 @@ const es: StoryFlowMessages = {
   modalPhotoMissingPlace: 'Falta el lugar de la foto {foto}.',
   modalPhotoTypeError: 'Ese archivo no es una foto. Usa JPG, PNG, WEBP o HEIC.',
   modalPhotoSizeError: 'Esa foto pesa más de 10 MB. Prueba con una más liviana.',
-  modalPhotoConverting: 'Convirtiendo tu foto…',
+  modalPhotoConverting: 'Preparando tu foto…',
+  modalPhotoReadError: 'No pudimos leer esta foto. Prueba con una en JPG o PNG.',
   modalPhotoUploadFailed: 'No pudimos subir esta foto.',
   modalPhotoRetry: 'Reintentar',
   modalRequiredFieldsNote: 'Los campos con * son obligatorios.',
@@ -340,7 +342,8 @@ const pt: StoryFlowMessages = {
   modalPreviewVersion: 'Versão de teste · {sha}',
   modalPhotoTypeError: 'Esse ficheiro não é uma foto. Use JPG, PNG, WEBP ou HEIC.',
   modalPhotoSizeError: 'Essa foto pesa mais de 10 MB. Tente uma mais leve.',
-  modalPhotoConverting: 'A converter a sua foto…',
+  modalPhotoConverting: 'Preparando sua foto…',
+  modalPhotoReadError: 'Não conseguimos ler esta foto. Tente uma em JPG ou PNG.',
   modalPhotoUploadFailed: 'Não foi possível enviar esta foto.',
   modalPhotoRetry: 'Tentar de novo',
   modalPhotoAltLabel:
@@ -454,7 +457,8 @@ const en: StoryFlowMessages = {
   modalPreviewVersion: 'Test version · {sha}',
   modalPhotoTypeError: 'That file is not a photo. Use JPG, PNG, WEBP, or HEIC.',
   modalPhotoSizeError: 'That photo is over 10 MB. Try a smaller one.',
-  modalPhotoConverting: 'Converting your photo…',
+  modalPhotoConverting: 'Preparing your photo…',
+  modalPhotoReadError: 'We couldn\'t read this photo. Try one in JPG or PNG.',
   modalPhotoUploadFailed: 'We could not upload this photo.',
   modalPhotoRetry: 'Try again',
   modalPhotoAltLabel:

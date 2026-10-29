@@ -1,6 +1,9 @@
 /**
  * Convierte HEIC/HEIF a JPEG en el navegador (sin GPS/EXIF del original).
- * Prioriza un Web Worker para no congelar la página; si falla, usa el hilo principal.
+ * El build por defecto de heic-to usa `new Function`, que la CSP de producción
+ * rechaza (no alcanza con wasm-unsafe-eval). heic-to/csp no lo usa y sí puede
+ * abrir su worker en blob:, que la CSP ya permite.
+ * Si el archivo es HEIC y no se puede leer, devuelve null.
  */
 
 import type { HeicWorkerRequest, HeicWorkerResponse } from './heic-to-jpeg.worker';
@@ -44,7 +47,7 @@ async function convertViaBitmap(file: File): Promise<File | null> {
 
 async function convertViaHeicTo(file: File): Promise<File | null> {
   try {
-    const { heicTo } = await import('heic-to');
+    const { heicTo } = await import('heic-to/csp');
     const blob = (await heicTo({
       blob: file,
       type: 'image/jpeg',
@@ -53,17 +56,9 @@ async function convertViaHeicTo(file: File): Promise<File | null> {
     if (!blob || blob.size < 32) return null;
     return new File([blob], jpegNameFrom(file), { type: 'image/jpeg' });
   } catch (err) {
-    console.warn('[heic] conversión heic-to falló; se sube el original', err);
+    console.warn('[heic] conversión heic-to falló', err);
     return null;
   }
-}
-
-function convertOnMainThread(file: File): Promise<File> {
-  return convertViaBitmap(file).then(async (viaBitmap) => {
-    if (viaBitmap) return viaBitmap;
-    const viaLib = await convertViaHeicTo(file);
-    return viaLib ?? file;
-  });
 }
 
 function convertInWorker(file: File): Promise<File | null> {
@@ -117,18 +112,21 @@ function convertInWorker(file: File): Promise<File | null> {
   });
 }
 
-/** HEIC/HEIF → JPEG. Cualquier otro tipo se devuelve igual. Nunca lanza. */
-export async function convertHeicToJpegIfNeeded(file: File): Promise<File> {
+/** HEIC/HEIF → JPEG. Cualquier otro tipo se devuelve igual. HEIC ilegible → null. Nunca lanza. */
+export async function convertHeicToJpegIfNeeded(file: File): Promise<File | null> {
   if (!looksLikeHeic(file)) return file;
   const viaWorker = await convertInWorker(file);
   if (viaWorker) return viaWorker;
-  return convertOnMainThread(file);
+  const viaBitmap = await convertViaBitmap(file);
+  if (viaBitmap) return viaBitmap;
+  return convertViaHeicTo(file);
 }
 
 export async function convertHeicFiles(files: File[]): Promise<File[]> {
   const out: File[] = [];
   for (const f of files) {
-    out.push(await convertHeicToJpegIfNeeded(f));
+    const converted = await convertHeicToJpegIfNeeded(f);
+    if (converted) out.push(converted);
   }
   return out;
 }

@@ -18,6 +18,7 @@ type Props = {
   onRetry: (id: string) => void;
   onPatch: (id: string, patch: PhotoPatch) => void;
   convertingLabel: string;
+  onUnreadable?: (id: string) => void;
   retryLabel: string;
   failedLabel: string;
   inlineError?: string;
@@ -33,6 +34,7 @@ export function UploadModalFotoCapture({
   onRetry,
   onPatch,
   convertingLabel,
+  onUnreadable,
   retryLabel,
   failedLabel,
   inlineError,
@@ -40,7 +42,6 @@ export function UploadModalFotoCapture({
   fichaMessage,
   maxPhotos = SUBIR_PHOTO_MAX }: Props) {
   const { t } = useHomeLocale();
-  const converting = photos.some((p) => p.converting);
 
   return (
     <div className={styles.amFotoUploader}>
@@ -51,6 +52,7 @@ export function UploadModalFotoCapture({
         onRetry={onRetry}
         onPatch={onPatch}
         convertingLabel={convertingLabel}
+        onUnreadable={onUnreadable}
         retryLabel={retryLabel}
         failedLabel={failedLabel}
         incompleteIds={incompleteIds}
@@ -58,11 +60,6 @@ export function UploadModalFotoCapture({
         maxPhotos={maxPhotos}
         showCounter={false}
       />
-      {converting ? (
-        <p className={styles.amModalInlineError} role="status" aria-live="polite">
-          {convertingLabel}
-        </p>
-      ) : null}
       {inlineError ? <p className={styles.amModalInlineError}>{inlineError}</p> : null}
       {photos.length > 0 ? (
         <p className={styles.amFotoCounter}>

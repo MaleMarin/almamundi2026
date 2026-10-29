@@ -400,6 +400,21 @@
   background: #d8dbe3;
 }
 
+.amFotoSpinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 255, 255, 0.45);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: amFotoSpin 0.8s linear infinite;
+}
+
+@keyframes amFotoSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .amFotoSlotStatus,
 .amFotoSlotError {
   position: absolute;

@@ -18,6 +18,7 @@ type Props = {
   onRetry: (id: string) => void;
   onPatch: (id: string, patch: PhotoPatch) => void;
   convertingLabel: string;
+  onUnreadable?: (id: string) => void;
   retryLabel: string;
   failedLabel: string;
   incompleteIds?: string[];
@@ -33,6 +34,7 @@ export function UploadModalFotoGrid({
   onRetry,
   onPatch,
   convertingLabel,
+  onUnreadable,
   retryLabel,
   failedLabel,
   incompleteIds = [],
@@ -54,13 +56,18 @@ export function UploadModalFotoGrid({
               role="listitem"
             >
               <div className={styles.amFotoCardMedia}>
-                {photo.previewUrl ? (
-                  <img src={photo.previewUrl} alt={photo.titulo.trim() || photo.name} />
+                {photo.previewUrl && !photo.converting ? (
+                  <img
+                    src={photo.previewUrl}
+                    alt={photo.titulo.trim()}
+                    onError={() => onUnreadable?.(photo.id)}
+                  />
                 ) : (
                   <div className={styles.amFotoSlotPlaceholder} aria-hidden />
                 )}
                 {photo.converting ? (
                   <p className={styles.amFotoSlotStatus} role="status">
+                    <span className={styles.amFotoSpinner} aria-hidden />
                     {convertingLabel}
                   </p>
                 ) : null}
