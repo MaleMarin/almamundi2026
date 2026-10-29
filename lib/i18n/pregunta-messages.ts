@@ -160,6 +160,11 @@ export const PREGUNTA_COPY = {
     pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pregunta] Eu já respondi. E você? [enlace]',
     en: 'This week AlmaMundi is asking the world: [pregunta] I already answered. What about you? [enlace]',
   },
+  shareInvite: {
+    es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] ¿Tú qué responderías? [enlace]',
+    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pregunta] O que você responderia? [enlace]',
+    en: 'This week AlmaMundi is asking the world: [pregunta] What would you answer? [enlace]',
+  },
 } as const satisfies Record<string, L3>;
 
 export function preguntaAlias(alias: string): string {
@@ -172,6 +177,17 @@ export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {
   return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', preguntaAlias(alias));
 }
 
+function preguntaShareLine(template: string, pregunta: string, enlace: string): string {
+  const text = template.replace('[pregunta]', pregunta).replace('[enlace]', enlace);
+  return text.includes(enlace) ? text : `${text} ${enlace}`;
+}
+
+/** Después de responder: la persona ya contestó. */
 export function preguntaShareText(locale: AlmaLocale, pregunta: string, enlace: string): string {
-  return PREGUNTA_COPY.shareBody[locale].replace('[pregunta]', pregunta).replace('[enlace]', enlace);
+  return preguntaShareLine(PREGUNTA_COPY.shareBody[locale], pregunta, enlace);
+}
+
+/** Desde el mapa o la página de la pregunta, antes de responder. */
+export function preguntaInviteShareText(locale: AlmaLocale, pregunta: string, enlace: string): string {
+  return preguntaShareLine(PREGUNTA_COPY.shareInvite[locale], pregunta, enlace);
 }

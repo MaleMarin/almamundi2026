@@ -128,13 +128,12 @@ export function StoryShareMenu({
 
   const shareApp = (app: 'Instagram' | 'TikTok') => {
     const text = shareTextSocial?.trim() || shareTextLong;
-    const link = keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl);
     const phone =
       typeof navigator !== 'undefined' &&
       (window.matchMedia('(pointer: coarse)').matches ||
         /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
     if (phone && typeof navigator.share === 'function') {
-      const pendingShare = navigator.share({ title: shareTitle, text, url: link });
+      const pendingShare = navigator.share({ title: shareTitle, text });
       void pendingShare
         .then(() => onClose())
         .catch((error: unknown) => {

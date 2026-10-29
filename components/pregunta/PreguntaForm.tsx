@@ -383,6 +383,7 @@ function PreguntaFormInner({
           open={shareOpen}
           onClose={() => setShareOpen(false)}
           kind="question"
+          afterAnswer
           questionId={pregunta.id}
           question={pregunta[mode][locale]}
         />

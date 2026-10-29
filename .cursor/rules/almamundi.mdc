@@ -18,3 +18,4 @@ alwaysApply: true
 - Si el build falla, no hagas commit ni push: detente e informa.
 - Edad, género, correo y «¿Algo más…?» son internos: nunca en documentos públicos, APIs públicas ni páginas.
 - Nunca modificar el texto, título ni contenido de una historia o respuesta de una persona sin aprobación explícita de Ana.
+- No agregar botones, textos, enlaces ni funciones que Ana no haya pedido. Cada botón hace exactamente lo que dice.

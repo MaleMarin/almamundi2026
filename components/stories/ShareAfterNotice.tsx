@@ -6,7 +6,7 @@ import { X } from 'lucide-react';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
-import { preguntaShareText } from '@/lib/i18n/pregunta-messages';
+import { preguntaInviteShareText, preguntaShareText } from '@/lib/i18n/pregunta-messages';
 import {
   publishedQuestionShareUrl,
   publishedStoryEmailSubject,
@@ -15,18 +15,33 @@ import {
   publishedStorySocialText,
   type PublishedStoryFormat } from '@/lib/share/published-share';
 
-const NOTICE_TITLE = 'Antes de compartir';
-const NOTICE_BODY_1 =
-  'Esta historia fue confiada a AlmaMundi por alguien que decidió contarla.';
-const NOTICE_BODY_2 =
-  'Al compartirla, cuida su nombre, su voz y su dignidad. Este es un espacio de encuentro, no de viralización.';
+const NOTICE = {
+  es: {
+    title: 'Compartir con cuidado',
+    body: 'Alguien decidió contar esta historia en AlmaMundi. Si la compartes, que viaje con el mismo respeto con que fue contada.',
+    share: 'Compartir',
+    back: 'Volver',
+  },
+  pt: {
+    title: 'Compartilhar com cuidado',
+    body: 'Alguém decidiu contar esta história no AlmaMundi. Se você a compartilhar, que ela viaje com o mesmo respeito com que foi contada.',
+    share: 'Compartilhar',
+    back: 'Voltar',
+  },
+  en: {
+    title: 'Share with care',
+    body: 'Someone chose to tell this story on AlmaMundi. If you share it, let it travel with the same respect it was told with.',
+    share: 'Share',
+    back: 'Go back',
+  },
+} as const;
 
 type ShareAfterNoticeProps = {
   open: boolean;
   onClose: () => void;
 } & (
   | { kind: 'story'; storyId: string; title: string; city: string; format: PublishedStoryFormat }
-  | { kind: 'question'; questionId: string; question: string }
+  | { kind: 'question'; questionId: string; question: string; afterAnswer?: boolean }
 );
 
 export function ShareAfterNotice(props: ShareAfterNoticeProps) {
@@ -66,7 +81,9 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
   const shareText =
     props.kind === 'story'
       ? publishedStoryShareText(locale, props.format, props.title, props.city, shareUrl)
-      : preguntaShareText(locale, props.question, shareUrl);
+      : props.afterAnswer
+        ? preguntaShareText(locale, props.question, shareUrl)
+        : preguntaInviteShareText(locale, props.question, shareUrl);
   const emailSubject =
     props.kind === 'story'
       ? publishedStoryEmailSubject(locale)
@@ -75,7 +92,8 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
   const shareTextSocial =
     props.kind === 'story'
       ? publishedStorySocialText(locale, props.title, props.city, shareUrl)
-      : undefined;
+      : shareText;
+  const notice = NOTICE[locale];
 
   return createPortal(
     <>
@@ -102,24 +120,23 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
             </button>
             <div className="pr-8">
               <h2 id="share-notice-title" className="text-[length:var(--fs-texto)] font-semibold leading-snug">
-                {NOTICE_TITLE}
+                {notice.title}
               </h2>
-              <p className="mt-4 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">{NOTICE_BODY_1}</p>
-              <p className="mt-3 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">{NOTICE_BODY_2}</p>
+              <p className="mt-4 text-[length:var(--fs-pequeno)] leading-relaxed text-white/90">{notice.body}</p>
               <div className="mt-6 flex flex-nowrap items-stretch gap-2">
                 <button
                   type="button"
                   onClick={() => setStep('menu')}
                   className="btn-am-principal inline-flex min-h-11 flex-1 items-center justify-center px-4 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium leading-tight"
                 >
-                  Entiendo y quiero compartir
+                  {notice.share}
                 </button>
                 <button
                   type="button"
                   onClick={onClose}
                   className="btn-am-secundario inline-flex min-h-11 flex-1 items-center justify-center px-4 py-2.5 text-center text-[length:var(--fs-pequeno)] font-medium leading-tight"
                 >
-                  Cancelar
+                  {notice.back}
                 </button>
               </div>
             </div>
