@@ -1,12 +1,13 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
-import { preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
+import { preguntaPageHref, preguntaPorId, preguntaTexto, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { isShortCode } from '@/lib/short-code';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -183,7 +184,7 @@ export function RespuestaGlobeCard({
                 <img
                   src={item.previewUrl}
                   alt={item.contenido}
-                  style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 16, marginBottom: 16, background: '#000' }}
+                  style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 16, marginBottom: 16, background: 'var(--home-bg)' }}
                 />
               ) : null}
               {item.contenido ? (
@@ -200,7 +201,7 @@ export function RespuestaGlobeCard({
                 </p>
               ) : null}
               <div aria-hidden style={{ height: 32, flexShrink: 0 }} />
-              <div style={{ display: 'flex', alignItems: 'stretch', gap: 8, marginTop: 0 }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'stretch', gap: 8, marginTop: 0 }}>
                 <button
                   type="button"
                   className="btn-am-principal"
@@ -216,6 +217,20 @@ export function RespuestaGlobeCard({
                 >
                   {SHARE_LABEL[locale]}
                 </button>
+                <Link
+                  href={preguntaPageHref(item.questionId)}
+                  className="btn-am-secundario"
+                  style={{
+                    minHeight: 44,
+                    padding: '8px 16px',
+                    fontFamily: SITE_FONT_STACK,
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center' }}
+                >
+                  {RESPONDE_TU_LABEL[locale]}
+                </Link>
               </div>
             </div>
             {moreBelow ? <div className="story-map-panel__more" aria-hidden /> : null}

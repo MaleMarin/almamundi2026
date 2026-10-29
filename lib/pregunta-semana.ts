@@ -267,6 +267,12 @@ export function preguntaPorId(id: string | null | undefined): PreguntaSemana | n
   return resolved ? PREGUNTA_POR_ID[resolved] : null;
 }
 
+export const RESPONDE_TU_LABEL = {
+  es: 'Responde tú esta pregunta',
+  pt: 'Responda você esta pergunta',
+  en: 'Answer this question yourself',
+} as const;
+
 /** /pregunta es la semana vigente. Con id, abre esa pregunta. */
 export function preguntaPageHref(id?: string | null, mode?: string | null): string {
   const resolved = resolveQuestionId(id);

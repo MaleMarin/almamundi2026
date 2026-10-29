@@ -1,5 +1,5 @@
 /** Lado mayor máximo antes de subir. */
-export const STORY_PHOTO_MAX_EDGE = 2560;
+export const STORY_PHOTO_MAX_EDGE = 2048;
 /** JPEG de salida. */
 export const STORY_PHOTO_JPEG_QUALITY = 0.85;
 
@@ -9,13 +9,13 @@ function jpegNameFrom(file: File): string {
 }
 
 /**
- * Reduce a 2560 px en el lado mayor y comprime a JPEG 0,85.
- * Si falla el canvas, devuelve el archivo original.
+ * Reduce a 2048 px en el lado mayor, aplica la orientación y guarda JPEG 0,85 sin EXIF.
+ * No agranda una foto más chica. Si falla el canvas, devuelve el archivo original.
  */
 export async function prepareStoryPhotoForUpload(file: File): Promise<File> {
   if (typeof createImageBitmap !== 'function') return file;
   try {
-    const bmp = await createImageBitmap(file);
+    const bmp = await createImageBitmap(file, { imageOrientation: 'from-image' });
     const maxSide = Math.max(bmp.width, bmp.height);
     const scale = maxSide > STORY_PHOTO_MAX_EDGE ? STORY_PHOTO_MAX_EDGE / maxSide : 1;
     const w = Math.max(1, Math.round(bmp.width * scale));

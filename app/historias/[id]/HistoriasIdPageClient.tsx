@@ -159,7 +159,7 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
             ) : kind === 'image' && (image || photos.length > 0) ? (
               <div className="flex flex-col gap-3 p-3 sm:p-4">
                 {(photos.length > 0 ? photos : [image]).map((url) => (
-                  <img key={url} src={url} alt="" className="w-full rounded-xl object-contain" />
+                  <img key={url} src={url} alt="" className="w-full rounded-xl bg-[var(--home-bg)] object-contain" />
                 ))}
               </div>
             ) : (

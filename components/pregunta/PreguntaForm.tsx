@@ -9,6 +9,7 @@ import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { PREGUNTA_COPY, preguntaThanksTitle } from '@/lib/i18n/pregunta-messages';
 import { convertHeicToJpegIfNeeded, looksLikeHeic } from '@/lib/convert-heic-client';
+import { prepareStoryPhotoForUpload } from '@/lib/prepare-story-photo';
 import { probeAudioFileDurationSeconds } from '@/lib/media-duration-rules';
 import {
   preguntaPorId,
@@ -258,26 +259,23 @@ function PreguntaFormInner({
       setError(copy.errPhotoSize[locale]);
       return;
     }
-    if (!heic) {
-      setPhotoPreparing(false);
-      setPhotoFile(file);
-      setPhotoUrl(URL.createObjectURL(file));
-      return;
-    }
     setPhotoFile(null);
     setPhotoUrl(null);
     setPhotoPreparing(true);
-    const converted = await convertHeicToJpegIfNeeded(file);
+    const source = heic ? await convertHeicToJpegIfNeeded(file) : file;
     if (token !== photoConvertToken.current) return;
-    setPhotoPreparing(false);
-    if (!converted || looksLikeHeic(converted)) {
+    if (!source || looksLikeHeic(source)) {
+      setPhotoPreparing(false);
       setPhotoFile(null);
       setPhotoUrl(null);
       setError(copy.errPhotoRead[locale]);
       return;
     }
-    setPhotoFile(converted);
-    setPhotoUrl(URL.createObjectURL(converted));
+    const prepared = await prepareStoryPhotoForUpload(source);
+    if (token !== photoConvertToken.current) return;
+    setPhotoPreparing(false);
+    setPhotoFile(prepared);
+    setPhotoUrl(URL.createObjectURL(prepared));
   }
 
   async function onSubmit(event: FormEvent) {
@@ -522,7 +520,7 @@ function PreguntaFormInner({
               <img
                 src={photoUrl}
                 alt=""
-                className="max-h-64 w-full object-contain"
+                className="max-h-64 w-full rounded-2xl bg-[var(--home-bg)] object-contain"
                 onError={() => {
                   setPhotoFile(null);
                   setPhotoUrl(null);

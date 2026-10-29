@@ -3,7 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
-import { preguntaPorId, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import Link from 'next/link';
+import { preguntaPageHref, preguntaPorId, preguntasDeLaSemana, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
@@ -17,7 +18,7 @@ function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }
           <img
             src={item.previewUrl}
             alt={item.contenido}
-            className={large ? 'max-h-[70vh] w-full rounded-2xl object-contain' : 'h-40 w-full rounded-xl object-cover'}
+            className={large ? 'max-h-[70vh] w-full rounded-2xl bg-[var(--home-bg)] object-contain' : 'h-40 w-full rounded-xl object-cover'}
           />
         ) : null}
         {item.contenido ? <p className="text-[length:var(--fs-texto)] font-normal leading-relaxed">{item.contenido}</p> : null}
@@ -134,6 +135,14 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
               </button>
             </div>
             <AnswerBody item={open} large />
+            <div className="mt-4">
+              <Link
+                href={preguntaPageHref(open.questionId)}
+                className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-4 text-center text-[length:var(--fs-pequeno)] font-semibold"
+              >
+                {RESPONDE_TU_LABEL[locale]}
+              </Link>
+            </div>
           </div>
         </div>
       ) : null}

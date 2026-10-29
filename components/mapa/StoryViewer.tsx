@@ -55,14 +55,6 @@ function KenBurnsViewer({
   const photo = photos[current];
   if (!photo) return null;
 
-  const moves = [
-    'scale(1.08) translate(-1%, -1%)',
-    'scale(1.08) translate(1%, -1%)',
-    'scale(1.08) translate(0%, 1%)',
-    'scale(1.06) translate(-1%, 0%)',
-  ];
-  const startMove = moves[current % moves.length];
-
   return (
     <div
       style={{
@@ -79,7 +71,7 @@ function KenBurnsViewer({
           position: 'relative',
           overflow: 'hidden',
           borderRadius: 16,
-          background: '#0a0f1e' }}
+          background: 'var(--home-bg)' }}
       >
         <img
           key={photo.url}
@@ -88,13 +80,8 @@ function KenBurnsViewer({
           style={{
             width: '100%',
             height: '100%',
-            objectFit: 'cover',
-            transform:
-              phase === 'enter'
-                ? 'scale(1.0) translate(0%, 0%)'
-                : phase === 'hold' || phase === 'exit'
-                  ? startMove
-                  : 'scale(1.0)',
+            objectFit: 'contain',
+            transform: 'none',
             opacity: phase === 'enter' ? 0 : phase === 'exit' ? 0 : 1,
             transition:
               phase === 'enter'
@@ -273,7 +260,7 @@ function PhotoNavigator({ slides }: { slides: PhotoSlide[] }) {
       <img
         src={slide.url}
         alt={slide.description || slide.name || ''}
-        style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 16, background: 'rgba(0,0,0,0.25)' }}
+        style={{ width: '100%', maxHeight: 280, objectFit: 'contain', borderRadius: 16, background: 'var(--home-bg)' }}
       />
       {lines.length > 0 ? (
         <div style={{ marginTop: 10 }}>

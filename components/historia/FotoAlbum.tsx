@@ -143,19 +143,6 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
 
   return (
     <>
-      <style>{`
-        .fotoalbum-kenburns { animation: fotoalbumKenBurns 10s ease-in-out infinite alternate; }
-        .fotoalbum-kenburns-alt { animation: fotoalbumKenBurnsAlt 12s ease-in-out infinite alternate; }
-        @keyframes fotoalbumKenBurns {
-          from { transform: scale(1) translate(0, 0); }
-          to { transform: scale(1.08) translate(1.5%, 1%); }
-        }
-        @keyframes fotoalbumKenBurnsAlt {
-          from { transform: scale(1) translate(0, 0); }
-          to { transform: scale(1.08) translate(-1.5%, -1%); }
-        }
-      `}</style>
-
       <div
         style={{
           background: bgColor,
@@ -283,11 +270,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   <img
                     src={img.url}
                     alt={photoAlt(img)}
-                    className={i % 2 === 0 ? 'fotoalbum-kenburns' : 'fotoalbum-kenburns-alt'}
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover' }}
+                      objectFit: 'contain',
+                      background: 'var(--home-bg)' }}
                   />
                   <div
                     style={{
@@ -335,11 +322,11 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                     <img
                       src={img.url}
                       alt={photoAlt(img)}
-                    className="fotoalbum-kenburns"
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover' }}
+                      objectFit: 'contain',
+                      background: 'var(--home-bg)' }}
                   />
                   <div style={{ position: 'absolute', inset: 0, boxShadow: 'inset 0 0 0 10px rgba(255,255,255,0.92)' }} />
                   </div>
@@ -358,12 +345,12 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   <img
                     src={img.url}
                     alt={photoAlt(img)}
-                    className="fotoalbum-kenburns"
                     style={{
                       width: '100%',
                       height: 'auto',
                       maxHeight: 'calc(100vw * 1.2 - 80px)',
-                      objectFit: 'cover' }}
+                      objectFit: 'contain',
+                      background: 'var(--home-bg)' }}
                   />
                   {fichaCaption(img) ? (
                     <p style={{ fontFamily: INTERIOR_FONT_STACK, fontWeight: 400, fontSize: 'var(--fs-etiqueta)', color: CREAM_SOFT, padding: '12px 20px', margin: 0, textAlign: 'center' }}>

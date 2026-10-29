@@ -73,7 +73,6 @@ import { prepareStoryPhotoForUpload } from '@/lib/prepare-story-photo';
 import { reportStorySubmitError } from '@/lib/story-submit-error';
 import {
   createStoryPhotoId,
-  isDisplayableStoryPhoto,
   type StoryPhotoItem } from '@/lib/story-photo-item';
 import { classifyMediaCaptureError, type MediaCaptureErrorKind } from '@/lib/media-capture-error';
 import { duckAmbient } from '@/lib/sound/ambient';
@@ -1041,7 +1040,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     if (!list?.length) return;
     setErr('');
     const incoming = Array.from(list);
-    const pendingHeic: { id: string; file: File }[] = [];
+    const accepted: { id: string; file: File }[] = [];
 
     setPhotos((prev) => {
       const next = [...prev];
@@ -1060,13 +1059,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           setErr(t.modalPhotoSizeError);
           continue;
         }
-        const heic = looksLikeHeic(f);
         const item: StoryPhotoItem = {
           id: createStoryPhotoId(),
           name: f.name,
-          readyFile: heic ? null : f,
-          previewUrl: isDisplayableStoryPhoto(f) ? URL.createObjectURL(f) : '',
-          converting: heic,
+          readyFile: null,
+          previewUrl: '',
+          converting: true,
           uploadStatus: 'idle',
           progress: 0,
           error: null,
@@ -1077,36 +1075,42 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           lugar: '',
           alt: '' };
         next.push(item);
-        if (heic) pendingHeic.push({ id: item.id, file: f });
+        accepted.push({ id: item.id, file: f });
       }
       return next;
     });
 
-    for (const { id, file } of pendingHeic) {
-      void convertHeicToJpegIfNeeded(file).then((converted) => {
-        if (!converted || looksLikeHeic(converted)) {
-          setPhotos((prev) => {
-            const current = prev.find((p) => p.id === id);
-            if (!current) return prev;
-            if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
-            return prev.filter((p) => p.id !== id);
-          });
-          setErr(t.modalPhotoReadError);
-          return;
+    for (const { id, file } of accepted) {
+      void (async () => {
+        let source = file;
+        if (looksLikeHeic(file)) {
+          const converted = await convertHeicToJpegIfNeeded(file);
+          if (!converted || looksLikeHeic(converted)) {
+            setPhotos((prev) => {
+              const current = prev.find((p) => p.id === id);
+              if (!current) return prev;
+              if (current.previewUrl) URL.revokeObjectURL(current.previewUrl);
+              return prev.filter((p) => p.id !== id);
+            });
+            setErr(t.modalPhotoReadError);
+            return;
+          }
+          source = converted;
         }
+        const prepared = await prepareStoryPhotoForUpload(source);
         setPhotos((prev) =>
           prev.map((p) => {
             if (p.id !== id) return p;
             if (p.previewUrl) URL.revokeObjectURL(p.previewUrl);
             return {
               ...p,
-              readyFile: converted,
-              previewUrl: URL.createObjectURL(converted),
+              readyFile: prepared,
+              previewUrl: URL.createObjectURL(prepared),
               converting: false,
-              name: converted.name };
+              name: prepared.name };
           })
         );
-      });
+      })();
     }
   }, [t.modalPhotoReadError, t.modalPhotoSizeError, t.modalPhotoTypeError]);
 
@@ -1163,7 +1167,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           continue;
         }
         if (!looksLikeHeic(f)) {
-          ready.push(f);
+          ready.push(await prepareStoryPhotoForUpload(f));
           continue;
         }
         if (!preparing) {
@@ -1175,7 +1179,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           failed = true;
           continue;
         }
-        ready.push(converted);
+        ready.push(await prepareStoryPhotoForUpload(converted));
       }
       if (preparing) setExtraPreparing(false);
       if (failed) setErr(t.modalPhotoReadError);
@@ -1200,23 +1204,20 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     }
 
     setErr('');
-    if (!looksLikeHeic(file)) {
-      setProfileConverting(false);
-      setProfilePhoto(file);
-      profileUploadRef.current = null;
-      return;
-    }
     const token = ++profileConvertToken.current;
     setProfileConverting(true);
     setProfilePhoto(null);
-    const converted = await convertHeicToJpegIfNeeded(file);
+    const source = looksLikeHeic(file) ? await convertHeicToJpegIfNeeded(file) : file;
     if (token !== profileConvertToken.current) return;
-    setProfileConverting(false);
-    if (!converted || looksLikeHeic(converted)) {
+    if (!source || looksLikeHeic(source)) {
+      setProfileConverting(false);
       setErr(t.modalPhotoReadError);
       return;
     }
-    setProfilePhoto(converted);
+    const prepared = await prepareStoryPhotoForUpload(source);
+    if (token !== profileConvertToken.current) return;
+    setProfileConverting(false);
+    setProfilePhoto(prepared);
     profileUploadRef.current = null;
   }, [t.modalPhotoReadError]);
 

@@ -364,17 +364,29 @@ export async function copyPrivateSubmissionToPublished(opts: {
   const contentType = String(meta.contentType || "");
   if (isRasterImageCandidate(opts.sourcePath, contentType)) {
     const [buffer] = await src.download();
+    let bytes = buffer;
+    let mime = contentType || "image/jpeg";
     if (bufferLooksLikeHeic(buffer) || isDeclaredHeic(opts.sourcePath, contentType)) {
-      const jpeg = await heicBufferToJpeg(buffer);
-      const stem = base.replace(/\.(heic|heif|png|jpe?g|webp|gif)$/i, "") || "foto";
-      const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${stem}.jpg`;
-      assertSafePublishedPath(destPath);
-      return savePublishedMediaObject({
-        destPath,
-        buffer: jpeg,
-        contentType: "image/jpeg",
-      });
+      bytes = await heicBufferToJpeg(buffer);
+      mime = "image/jpeg";
     }
+    const stripped = await stripImageExif(bytes, mime);
+    const stem = base.replace(/\.(heic|heif|png|jpe?g|webp|gif)$/i, "") || "foto";
+    const ext =
+      stripped.contentType === "image/png"
+        ? "png"
+        : stripped.contentType === "image/webp"
+          ? "webp"
+          : stripped.contentType === "image/gif"
+            ? "gif"
+            : "jpg";
+    const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${stem}.${ext}`;
+    assertSafePublishedPath(destPath);
+    return savePublishedMediaObject({
+      destPath,
+      buffer: stripped.buffer,
+      contentType: stripped.contentType,
+    });
   }
   const destPath = `${PUBLISHED_PREFIX}/${storyId}/${crypto.randomUUID()}/${base}`;
   assertSafePublishedPath(destPath);
@@ -508,6 +520,34 @@ export async function copyPrivateSubmissionToPublishedRespuesta(opts: {
   if (!exists) throw new Error("not_found");
 
   const base = sanitizeUploadFilename(opts.sourcePath.split("/").pop() || "file");
+  const [meta] = await src.getMetadata();
+  const contentType = String(meta.contentType || "");
+  if (isRasterImageCandidate(opts.sourcePath, contentType) || isImageStoryMime(contentType)) {
+    const [buffer] = await src.download();
+    let bytes = buffer;
+    let mime = contentType || "image/jpeg";
+    if (bufferLooksLikeHeic(buffer) || isDeclaredHeic(opts.sourcePath, contentType)) {
+      bytes = await heicBufferToJpeg(buffer);
+      mime = "image/jpeg";
+    }
+    const stripped = await stripImageExif(bytes, mime);
+    const stem = base.replace(/\.(heic|heif|png|jpe?g|webp|gif)$/i, "") || "foto";
+    const ext =
+      stripped.contentType === "image/png"
+        ? "png"
+        : stripped.contentType === "image/webp"
+          ? "webp"
+          : stripped.contentType === "image/gif"
+            ? "gif"
+            : "jpg";
+    const destPath = `${RESPUESTA_PUBLISHED_PREFIX}/${respuestaId}/${crypto.randomUUID()}/${stem}.${ext}`;
+    assertSafePublishedPath(destPath);
+    return savePublishedMediaObject({
+      destPath,
+      buffer: stripped.buffer,
+      contentType: stripped.contentType,
+    });
+  }
   const destPath = `${RESPUESTA_PUBLISHED_PREFIX}/${respuestaId}/${crypto.randomUUID()}/${base}`;
   assertSafePublishedPath(destPath);
   await src.copy(bucket.file(destPath));
