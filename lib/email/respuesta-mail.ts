@@ -41,12 +41,48 @@ function hello(alias: string, locale: AlmaLocale = "es"): string {
   return name ? `Hola, ${name}:` : "Hola:";
 }
 
+function quotedQuestion(question: string, html: boolean): string {
+  const text = question.trim();
+  return `«${html ? escapeHtml(text) : text}»`;
+}
+
+function receivedBody(locale: AlmaLocale, question: string, html: boolean): string {
+  const q = quotedQuestion(question, html);
+  if (locale === "pt") {
+    return `Recebemos sua resposta à pergunta ${q}. Vamos revisá-la e escrever se ela aparecer no mapa.`;
+  }
+  if (locale === "en") {
+    return `We received your answer to the question ${q}. We will review it and write to you if it appears on the map.`;
+  }
+  return `Recibimos tu respuesta a la pregunta ${q}. La revisaremos y te escribiremos si aparece en el mapa.`;
+}
+
+function publishedBody(locale: AlmaLocale, question: string, html: boolean): string {
+  const q = quotedQuestion(question, html);
+  if (locale === "pt") {
+    return `Sua resposta à pergunta ${q} já está publicada. Qualquer pessoa pode vê-la junto com as outras respostas desta pergunta.`;
+  }
+  if (locale === "en") {
+    return `Your answer to the question ${q} is now published. Anyone can see it alongside the other answers to this question.`;
+  }
+  return `Tu respuesta a la pregunta ${q} ya está publicada. Cualquier persona puede verla junto a las demás respuestas de esta pregunta.`;
+}
+
+function rejectedBody(locale: AlmaLocale, question: string, html: boolean): string {
+  const q = quotedQuestion(question, html);
+  if (locale === "pt") {
+    return `Revisamos sua resposta à pergunta ${q} e, desta vez, não vamos publicá-la. Se quiser, você pode enviar outra.`;
+  }
+  if (locale === "en") {
+    return `We reviewed your answer to the question ${q} and this time we will not publish it. If you want, you can send another.`;
+  }
+  return `Revisamos tu respuesta a la pregunta ${q} y esta vez no la publicaremos. Si quieres, puedes enviar otra.`;
+}
+
 function respuestaCopy(locale: AlmaLocale) {
   if (locale === "pt") {
     return {
       receivedSubject: "Recebemos sua resposta",
-      receivedBody:
-        "Recebemos sua resposta à pergunta da semana. Vamos revisá-la e escrever se ela aparecer no mapa.",
       now: "O que acontece agora",
       step1: "1. Revisamos sua resposta.",
       step2: "2. Se cumprir os termos de uso, publicamos.",
@@ -56,11 +92,8 @@ function respuestaCopy(locale: AlmaLocale) {
       thanksText: "Agradecemos sua resposta.",
       team: "Equipe AlmaMundi",
       publishedSubject: "Sua resposta já está no AlmaMundi",
-      publishedBody:
-        "Sua resposta já está publicada. Qualquer pessoa pode vê-la junto com as outras respostas desta pergunta.",
       see: "Ver a pergunta",
       rejectedSubject: "Sobre sua resposta no AlmaMundi",
-      rejectedBody: "Revisamos sua resposta e, desta vez, não vamos publicá-la. Se quiser, você pode enviar outra.",
       reason: "Motivo",
       again: "Responder de novo",
     };
@@ -68,8 +101,6 @@ function respuestaCopy(locale: AlmaLocale) {
   if (locale === "en") {
     return {
       receivedSubject: "We received your answer",
-      receivedBody:
-        "We received your answer to the question of the week. We will review it and write to you if it appears on the map.",
       now: "What happens now",
       step1: "1. We review your answer.",
       step2: "2. If it meets the terms of use, we publish it.",
@@ -79,19 +110,14 @@ function respuestaCopy(locale: AlmaLocale) {
       thanksText: "Thank you for answering.",
       team: "The AlmaMundi team",
       publishedSubject: "Your answer is now on AlmaMundi",
-      publishedBody:
-        "Your answer is now published. Anyone can see it alongside the other answers to this question.",
       see: "See the question",
       rejectedSubject: "About your answer on AlmaMundi",
-      rejectedBody: "We reviewed your answer and this time we will not publish it. If you want, you can send another.",
       reason: "Reason",
       again: "Answer again",
     };
   }
   return {
     receivedSubject: "Recibimos tu respuesta",
-    receivedBody:
-      "Recibimos tu respuesta a la pregunta de la semana. La revisaremos y te escribiremos si aparece en el mapa.",
     now: "Qué pasa ahora",
     step1: "1. Revisamos tu respuesta.",
     step2: "2. Si cumple los términos de uso, la publicamos.",
@@ -101,11 +127,8 @@ function respuestaCopy(locale: AlmaLocale) {
     thanksText: "Gracias por responder.",
     team: "Equipo AlmaMundi",
     publishedSubject: "Tu respuesta ya está en AlmaMundi",
-    publishedBody:
-      "Tu respuesta ya está publicada. Cualquier persona puede verla junto a las demás respuestas de esta pregunta.",
     see: "Ver la pregunta",
     rejectedSubject: "Sobre tu respuesta en AlmaMundi",
-    rejectedBody: "Revisamos tu respuesta y esta vez no la publicaremos. Si quieres, puedes enviar otra.",
     reason: "Motivo",
     again: "Responder de nuevo",
   };
@@ -162,18 +185,20 @@ async function deliver(opts: {
 export async function sendRespuestaReceivedEmail(opts: {
   to: string;
   alias: string;
+  question: string;
   locale?: AlmaLocale;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
+  const body = receivedBody(locale, opts.question, false);
   const html = emailShell({
     preheader: copy.receivedSubject,
     footer: "respuesta",
     locale,
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(copy.receivedBody),
+      paragraphHtml(receivedBody(locale, opts.question, true)),
       paragraphHtml(copy.now, "0 0 8px"),
       paragraphHtml(copy.step1, "0 0 8px"),
       paragraphHtml(copy.step2, "0 0 8px"),
@@ -185,7 +210,7 @@ export async function sendRespuestaReceivedEmail(opts: {
   const text = [
     greeting,
     "",
-    copy.receivedBody,
+    body,
     "",
     copy.now,
     copy.step1,
@@ -211,19 +236,21 @@ export async function sendRespuestaPublishedEmail(opts: {
   to: string;
   alias: string;
   questionId: string;
+  question: string;
   locale?: AlmaLocale;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
-  const url = absoluteEmailUrl(`/pregunta/${encodeURIComponent(opts.questionId)}`);
+  const body = publishedBody(locale, opts.question, false);
+  const url = absoluteEmailUrl(`/preguntas?p=${encodeURIComponent(opts.questionId)}`);
   const html = emailShell({
     preheader: copy.publishedSubject,
     footer: "respuesta",
     locale,
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(copy.publishedBody),
+      paragraphHtml(publishedBody(locale, opts.question, true)),
       primaryButtonHtml(copy.see, url),
       paragraphHtml(copy.thanks, "0"),
     ].join(""),
@@ -231,7 +258,7 @@ export async function sendRespuestaPublishedEmail(opts: {
   const text = [
     greeting,
     "",
-    copy.publishedBody,
+    body,
     "",
     `${copy.see}: ${url}`,
     "",
@@ -251,13 +278,16 @@ export async function sendRespuestaPublishedEmail(opts: {
 export async function sendRespuestaRejectedEmail(opts: {
   to: string;
   alias: string;
+  questionId: string;
+  question: string;
   locale?: AlmaLocale;
   publicReason: string;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
-  const url = absoluteEmailUrl("/pregunta");
+  const body = rejectedBody(locale, opts.question, false);
+  const url = absoluteEmailUrl(`/preguntas?p=${encodeURIComponent(opts.questionId)}`);
   const reason = escapeHtml(reasonSentence(opts.publicReason));
   const html = emailShell({
     preheader: copy.rejectedSubject,
@@ -265,7 +295,7 @@ export async function sendRespuestaRejectedEmail(opts: {
     locale,
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(copy.rejectedBody),
+      paragraphHtml(rejectedBody(locale, opts.question, true)),
       `<p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${copy.reason}: ${reason}</p>`,
       primaryButtonHtml(copy.again, url),
       contactLine(locale),
@@ -275,7 +305,7 @@ export async function sendRespuestaRejectedEmail(opts: {
   const text = [
     greeting,
     "",
-    copy.rejectedBody,
+    body,
     "",
     `${copy.reason}: ${reasonSentence(opts.publicReason)}`,
     "",

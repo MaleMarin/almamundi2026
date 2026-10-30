@@ -23,6 +23,7 @@ import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { preguntaTexto } from "@/lib/pregunta-semana";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 
 export const runtime = "nodejs";
@@ -208,13 +209,16 @@ export async function PATCH(
       const email = await contactEmail(id);
       const alias = typeof data.alias === "string" ? data.alias : "";
       const questionId = typeof data.questionId === "string" ? data.questionId : "";
+      const locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
+      const mode = typeof data.mode === "string" ? data.mode : "tu";
       const mailed =
         email && questionId
           ? await sendRespuestaPublishedEmail({
               to: email,
               alias,
               questionId,
-              locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
+              question: preguntaTexto(questionId, mode, locale) ?? questionId,
+              locale,
             })
           : { ok: false as const };
       await ref
@@ -238,10 +242,14 @@ export async function PATCH(
       });
       const email = await contactEmail(id);
       const alias = typeof data.alias === "string" ? data.alias : "";
+      const questionId = typeof data.questionId === "string" ? data.questionId : "";
+      const mode = typeof data.mode === "string" ? data.mode : "tu";
       const mailed = email
         ? await sendRespuestaRejectedEmail({
             to: email,
             alias,
+            questionId,
+            question: preguntaTexto(questionId, mode, locale) ?? questionId,
             locale,
             publicReason: reason.publicText,
           })

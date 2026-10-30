@@ -9,7 +9,7 @@ import { getAdminBucket, getAdminDb } from "@/lib/firebase/admin";
 import { stripHtml } from "@/lib/api/input-validation";
 import { LEGAL_TEXTS_VERSION } from "@/lib/legal-consent";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
-import { resolveQuestionId } from "@/lib/pregunta-semana";
+import { resolveQuestionId, preguntaTexto } from "@/lib/pregunta-semana";
 import {
   clientIpFromRequest,
   enforceRateLimit,
@@ -219,10 +219,12 @@ export async function POST(req: Request) {
         console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
       }
       try {
+        const locale = parseAlmaLocale(typeof body.locale === "string" ? body.locale : undefined);
         const mailed = await sendRespuestaReceivedEmail({
           to: email,
           alias,
-          locale: parseAlmaLocale(typeof body.locale === "string" ? body.locale : undefined),
+          locale,
+          question: preguntaTexto(questionId, "tu", locale) ?? questionId,
         });
         await ref.update({
           receivedMail: {
