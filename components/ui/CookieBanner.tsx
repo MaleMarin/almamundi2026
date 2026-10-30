@@ -2,12 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import type { CSSProperties } from 'react';
-import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { uiMessages, useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 
 const STORAGE_KEY = 'am-cookies-ok';
 
 export function CookieBanner() {
-  const { t } = useHomeLocale();
+  const t = useHomeLocaleOptional()?.t ?? uiMessages('es');
   const [visible, setVisible] = useState(false);
   const [narrow, setNarrow] = useState(false);
 

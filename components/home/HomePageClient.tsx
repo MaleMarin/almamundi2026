@@ -17,6 +17,11 @@ import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
   scrollToHomeMapaSection } from '@/lib/mapa-home-nav';
+import {
+  applyHomeScroll,
+  homeScrollRestored,
+  markHomeScrollRestored,
+  peekHomeRestore } from '@/lib/home-return';
 
 /**
  * Home AlmaMundi — neumorfismo, intro, cuatro tarjetas, mapa (#mapa). Footer en layout raíz.
@@ -163,9 +168,20 @@ export function HomePageClient() {
     syncModalsFromHash();
   }, [syncModalsFromHash]);
 
+  /** Atrás recupera el scroll guardado en la entrada de la home. */
+  useLayoutEffect(() => {
+    const saved = peekHomeRestore();
+    if (!saved) {
+      markHomeScrollRestored(false);
+      return;
+    }
+    markHomeScrollRestored(true);
+    applyHomeScroll(saved.scrollY);
+  }, []);
+
   /** Llegada con `/#mapa` o `/?section=mapa` (menú Mapa, redirect desde `/mapa`). */
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || homeScrollRestored()) return;
     const u = new URL(window.location.href);
     const wantsMapa = u.hash === '#mapa' || u.searchParams.get('section') === 'mapa';
     if (!wantsMapa) return;
@@ -185,6 +201,7 @@ export function HomePageClient() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const onHash = () => {
+      if (homeScrollRestored()) return;
       if (window.location.hash === '#mapa') scrollToHomeMapaSection();
     };
     window.addEventListener('hashchange', onHash);

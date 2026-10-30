@@ -1,5 +1,6 @@
 'use client';
 
+import { externalAnchorProps } from '@/lib/public-link';
 import { splitTextWithSafeHttpUrls } from '@/lib/safe-external-href';
 import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
@@ -36,8 +37,9 @@ export function AntecedentesText({ value, tone = 'light' }: AntecedentesTextProp
           <a
             key={`a-${i}`}
             href={part.href}
-            target="_blank"
-            rel="noopener noreferrer nofollow ugc"
+            {...(externalAnchorProps(part.href).target
+              ? { target: '_blank' as const, rel: 'noopener noreferrer nofollow ugc' }
+              : {})}
             style={{
               color: isDark ? 'rgba(255, 180, 140, 0.95)' : '#FF4A1C',
               textDecoration: 'underline',

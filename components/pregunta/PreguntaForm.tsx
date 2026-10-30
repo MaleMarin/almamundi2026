@@ -584,11 +584,23 @@ function PreguntaFormInner({
           <input type="checkbox" checked={terms} onChange={(event) => setTerms(event.target.checked)} className="mt-1" />
           <span>
             {termsBits[0]}
-            <a className="text-[#FF4A1C] underline" href="/terminos" target="_blank" rel="noreferrer">
+            <a
+              className="text-[#FF4A1C] underline"
+              href="/terminos"
+              {...(text.trim() || caption.trim() || audioFile || photoFile || recording
+                ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                : {})}
+            >
               {t.modalConsentTermsLink}
             </a>
             {afterTerms[0]}
-            <a className="text-[#FF4A1C] underline" href="/privacidad" target="_blank" rel="noreferrer">
+            <a
+              className="text-[#FF4A1C] underline"
+              href="/privacidad"
+              {...(text.trim() || caption.trim() || audioFile || photoFile || recording
+                ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                : {})}
+            >
               {t.modalConsentPrivacyLink}
             </a>
             {afterTerms[1] ?? ''}

@@ -27,6 +27,13 @@ import {
   NEWS_TOPIC_GROUPS } from '@/lib/news-topics';
 import { filterRealNewsItems } from '@/components/NewsLayer';
 import { type MapDockMode } from '@/components/map/MapDock';
+import {
+  consumeHomeRestore,
+  currentHomeScrollY,
+  homeScrollRestored,
+  rememberHomeView,
+  replaceHomePanel,
+  type HomeView } from '@/lib/home-return';
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
@@ -178,6 +185,37 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
   const [pinnedStory, setPinnedStory] = useState<StoryPoint | null>(null);
   const [pinnedRespuesta, setPinnedRespuesta] = useState<RespuestaPublica | null>(null);
+  const hadPanelRef = useRef(false);
+
+  useLayoutEffect(() => {
+    const saved = consumeHomeRestore();
+    if (!saved) return;
+    setGlobeLayers(saved.layers);
+    setDrawerMode(saved.capa ?? 'stories');
+    setDrawerOpen(Boolean(saved.capa));
+  }, []);
+
+  const homeView = useCallback((): HomeView => {
+    return {
+      scrollY: currentHomeScrollY(),
+      capa: drawerOpen ? drawerMode : null,
+      layers: globeLayers,
+    };
+  }, [drawerMode, drawerOpen, globeLayers]);
+
+  useEffect(() => {
+    rememberHomeView(homeView());
+  }, [homeView]);
+
+  useEffect(() => {
+    const storyId = openStory?.id ?? null;
+    const respuestaId = openRespuesta?.id ?? null;
+    if (!storyId && !respuestaId && !hadPanelRef.current) return;
+    hadPanelRef.current = Boolean(storyId || respuestaId);
+    const kind = storyId ? 'historia' : respuestaId ? 'respuesta' : null;
+    const id = storyId ?? respuestaId;
+    replaceHomePanel(kind, id, homeView());
+  }, [openStory?.id, openRespuesta?.id, homeView]);
 
   useEffect(() => {
     const questionId = preguntasDeLaSemana().vigente.id;
@@ -697,7 +735,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       openedHistoriaRef.current = historiaId;
       setPinnedStory(null);
       setGlobeLayers((prev) => ({ ...prev, stories: true }));
-      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!homeScrollRestored()) {
+        document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       openStoryViewer(known);
       return;
     }
@@ -711,7 +751,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         openedHistoriaRef.current = historiaId;
         setPinnedStory(story);
         setGlobeLayers((prev) => ({ ...prev, stories: true }));
-        document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (!homeScrollRestored()) {
+          document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         openStoryViewer(story);
       })
       .catch(() => undefined);
@@ -730,7 +772,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setHighlightedStoryId(null);
       setOpenRespuesta(item);
       setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
-      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (!homeScrollRestored()) {
+        document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
       if (storyHasValidGeo(item) && item.lat != null && item.lng != null) {
         setSurpriseFlying(true);
         setFocusTarget({ lat: item.lat, lng: item.lng, nonce: Date.now() });
@@ -762,7 +806,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setGlobeLayers((prev) => ({ ...prev, news: true }));
     setDrawerMode('news');
     setDrawerOpen(true);
-    document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!homeScrollRestored()) {
+      document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   }, [searchParams]);
 
   const closeStoryViewer = useCallback(() => {
@@ -812,7 +858,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         const idx = id - NEWS_GLOBE_ID_BASE;
         const marker = globeNewsMarkers[idx];
         if (marker?.url) {
-          window.open(marker.url, '_blank', 'noopener,noreferrer');
+          const external = !marker.url.startsWith('/') && !/almamundi\.org/i.test(marker.url);
+          if (external) window.open(marker.url, '_blank', 'noopener,noreferrer');
+          else window.location.assign(marker.url);
         }
         return;
       }

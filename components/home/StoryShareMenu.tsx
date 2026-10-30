@@ -190,13 +190,13 @@ export function StoryShareMenu({
           <button type="button" className={itemClass} onClick={() => openWhatsappShare(channels.whatsapp)}>
             WhatsApp
           </button>
-          <a className={itemClass} href={channels.facebook} target="_blank" rel="noreferrer">
+          <a className={itemClass} href={channels.facebook} target="_blank" rel="noopener noreferrer">
             {labels.facebook}
           </a>
-          <a className={itemClass} href={channels.x} target="_blank" rel="noreferrer">
+          <a className={itemClass} href={channels.x} target="_blank" rel="noopener noreferrer">
             {labels.x}
           </a>
-          <a className={itemClass} href={channels.linkedin} target="_blank" rel="noreferrer">
+          <a className={itemClass} href={channels.linkedin} target="_blank" rel="noopener noreferrer">
             {labels.linkedin}
           </a>
           <button type="button" className={buttonClass} onClick={() => shareApp('Instagram')}>

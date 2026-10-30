@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useState, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { Heart, Share2 } from 'lucide-react';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { duckAmbient } from '@/lib/sound/ambient';
@@ -407,6 +408,11 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
   const alias = formatPublicName(story.authorName || story.author?.name);
+  const fullHref = isShortCode(story.shortCode)
+    ? `/h/${story.shortCode}`
+    : story.id
+      ? `/historias/${story.id}`
+      : null;
 
   const startListening = () => {
     if (!story.body || typeof window === 'undefined') return;
@@ -896,9 +902,33 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               <div
                 style={{
                   display: 'flex',
-                  alignItems: 'stretch',
+                  flexDirection: 'column',
                   gap: 8,
                   marginTop: 0 }}
+              >
+                {fullHref ? (
+                  <Link
+                    href={fullHref}
+                    className="btn-am-principal"
+                    style={{
+                      minHeight: 44,
+                      width: '100%',
+                      padding: '8px 12px',
+                      fontFamily: SITE_FONT_STACK,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      textAlign: 'center',
+                      textDecoration: 'none' }}
+                  >
+                    {FULL_STORY_LABEL[locale]}
+                  </Link>
+                ) : null}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'stretch',
+                  gap: 8 }}
               >
                 <button
                   type="button"
@@ -932,6 +962,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {TELL_LABEL[locale]}
                 </button>
+              </div>
               </div>
               ) : (
               <div

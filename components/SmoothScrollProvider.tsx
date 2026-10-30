@@ -5,10 +5,12 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import Lenis from 'lenis';
 import {
   createContext,
+  useEffect,
   useLayoutEffect,
   useState,
   type ReactNode } from 'react';
 import 'lenis/dist/lenis.css';
+import { installHomeReturnListener } from '@/lib/home-return';
 
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -18,6 +20,10 @@ export const LenisContext = createContext<Lenis | null>(null);
 
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
+
+  useEffect(() => {
+    installHomeReturnListener();
+  }, []);
 
   useLayoutEffect(() => {
     let lenisInstance: Lenis | null = null;

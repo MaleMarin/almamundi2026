@@ -2923,11 +2923,23 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   />
                   <label htmlFor="consent-terminos" className="text-[length:var(--fs-etiqueta)] font-semibold leading-snug text-gray-700 ">
                     Acepto los{' '}
-                    <a className="text-orange-600 underline" href="/terminos" target="_blank" rel="noreferrer">
+                    <a
+                      className="text-orange-600 underline"
+                      href="/terminos"
+                      {...(textBody.trim() || storyTitle.trim() || mediaBlob || photos.length > 0 || recording
+                        ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                        : {})}
+                    >
                       {t.modalConsentTermsLink}
                     </a>
                     {' y la '}
-                    <a className="text-orange-600 underline" href="/privacidad" target="_blank" rel="noreferrer">
+                    <a
+                      className="text-orange-600 underline"
+                      href="/privacidad"
+                      {...(textBody.trim() || storyTitle.trim() || mediaBlob || photos.length > 0 || recording
+                        ? { target: '_blank' as const, rel: 'noopener noreferrer' }
+                        : {})}
+                    >
                       {t.modalConsentPrivacyLink}
                     </a>.
                   </label>
