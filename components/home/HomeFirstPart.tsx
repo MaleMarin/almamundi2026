@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useState } from 'react';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
@@ -15,93 +14,8 @@ import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 
 /** Neumorfismo con más volumen: sombras más largas + highlight blanco fuerte + bisel suave. */
 const soft = {
-  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#616C7C',
-  flat: {
-    backgroundColor: '#FBFAF8',
-    borderRadius: '40px',
-    border: '1px solid rgba(255,255,255,0.55)',
-    boxShadow: [
-      '22px 22px 52px rgba(120, 135, 155, 0.58)',
-      '-20px -20px 52px rgba(255, 255, 255, 1)',
-      'inset 3px 3px 6px rgba(255, 255, 255, 0.92)',
-      'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
-    ].join(', ') } } as const;
-
-const GREET_TYPED_KEY = 'almamundi-hero-share-typed';
-
-function greetPauseAt(text: string): number {
-  if (text.startsWith('Hola,')) return 'Hola,'.length;
-  if (text.startsWith('Olá,')) return 'Olá,'.length;
-  if (text.startsWith('Hi,')) return 'Hi,'.length;
-  return 0;
-}
-
-function greetAlreadyComplete(): boolean {
-  if (typeof window === 'undefined') return false;
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
-  try {
-    return sessionStorage.getItem(GREET_TYPED_KEY) === '1';
-  } catch {
-    return true;
-  }
-}
-
-function HeroGreeting() {
-  const { t } = useHomeLocale();
-  const full = t.heroShareToday;
-  const [count, setCount] = useState(0);
-  const [done, setDone] = useState(false);
-
-  useLayoutEffect(() => {
-    if (!greetAlreadyComplete()) return;
-    setCount(full.length);
-    setDone(true);
-  }, [full]);
-
-  useEffect(() => {
-    if (greetAlreadyComplete()) return;
-
-    setCount(0);
-    setDone(false);
-    const pauseAt = greetPauseAt(full);
-    let i = 0;
-    let timer = 0;
-    const tick = () => {
-      i += 1;
-      setCount(i);
-      if (i >= full.length) {
-        setDone(true);
-        try {
-          sessionStorage.setItem(GREET_TYPED_KEY, '1');
-        } catch {
-          /* la frase ya quedó completa */
-        }
-        return;
-      }
-      timer = window.setTimeout(tick, i === pauseAt ? 600 : 45);
-    };
-    timer = window.setTimeout(tick, 45);
-    return () => window.clearTimeout(timer);
-  }, [full]);
-
-  return (
-    <p
-      className="relative mb-3 w-full text-center text-[15px] leading-snug"
-      style={{ color: soft.textBody, fontWeight: 500 }}
-      aria-label={full}
-    >
-      <span className="invisible block" aria-hidden="true">
-        {full}
-      </span>
-      <span className="absolute inset-x-0 top-0 block" aria-hidden="true">
-        {full.slice(0, count)}
-        {done ? null : <span className="hero-greet-caret" />}
-      </span>
-    </p>
-  );
-}
+} as const;
 
 export type HomeFirstPartProps = {
   onShowPurpose: () => void;
@@ -139,7 +53,7 @@ export function HomeFirstPart({
         onShowComoFunciona={onShowComoFunciona}
       />
 
-      <div className="lg:mt-[13.5rem] lg:flex lg:h-[calc(100svh-13.5rem)] lg:min-h-0 lg:flex-col">
+      <div className="lg:mt-[13.5rem]">
       <section
         id="intro"
         className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[12.75rem] text-center sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[15.25rem] lg:min-h-0 lg:shrink-0 lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
@@ -147,13 +61,12 @@ export function HomeFirstPart({
         <div aria-hidden className="home-hero-head-gap" />
         <div className="mx-auto w-full max-w-[min(100%,42rem)] shrink-0 lg:max-w-[1000px]">
           <div className="home-first-part-float relative">
-            <HeroGreeting />
             <h1
-              className="mx-auto mb-2 max-w-[min(100%,42rem)] leading-[1.15] md:mb-3 lg:mb-10 lg:max-w-[1000px] text-[length:var(--fs-titular)]"
+              className="mx-auto mb-2 max-w-[min(100%,42rem)] leading-[1.15] md:mb-3 lg:max-w-[1000px] text-[length:var(--fs-titular)]"
               style={{ color: soft.textMain, fontWeight: 400 }}
             >
-              {t.heroBeforeBold}{' '}
-              <span style={{ fontWeight: 700 }}>{t.heroBold}</span>
+              {t.heroScrollBefore}{' '}
+              <span className="mt-1 block" style={{ fontWeight: 700 }}>{t.heroScrollBold}</span>
             </h1>
             <div className="home-hero-sign lg:mb-0">
               <svg

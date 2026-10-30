@@ -18,10 +18,10 @@ const soft = {
     borderRadius: '40px',
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [
-      '22px 22px 52px rgba(120, 135, 155, 0.58)',
+      '22px 22px 52px rgba(120, 110, 100, 0.58)',
       '-20px -20px 52px rgba(255, 255, 255, 1)',
       'inset 3px 3px 6px rgba(255, 255, 255, 0.92)',
-      'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
+      'inset -5px -5px 14px rgba(120, 110, 100, 0.34)',
     ].join(', ') } } as const;
 
 type HistoriasCardHoverKind = 'video' | 'audio' | 'text' | 'photo';
@@ -255,20 +255,23 @@ export function HomeFormatCards({
       }
     >
       {!fillViewport ? <div aria-hidden className="home-hero-lead-gap" /> : null}
-      <p
-        className={
-          fillViewport
-            ? 'home-intro-avenir mx-auto mb-3 max-w-[min(100%,40rem)] shrink-0 px-1 text-center leading-snug tracking-normal md:mb-4 lg:mb-5'
-            : 'home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center leading-snug tracking-normal sm:mb-5 md:mb-6 lg:mb-0 lg:w-full lg:max-w-none'
-        }
-      >
-        <span className="block text-[length:var(--fs-subtitulo)] font-medium tracking-normal text-[#FF4A1C] ">
-          {t.historiasLead2}
-        </span>
-        <span className="home-elige-tuya mt-1 block text-[length:var(--fs-subtitulo)] font-bold tracking-normal">
-          {t.historiasLeadHow}
-        </span>
-      </p>
+      {fillViewport ? (
+        <p className="home-intro-avenir mx-auto mb-3 max-w-[min(100%,40rem)] shrink-0 px-1 text-center leading-snug tracking-normal md:mb-4 lg:mb-5">
+          <span className="block text-[length:var(--fs-subtitulo)] font-medium tracking-normal text-[#FF4A1C] ">
+            {t.historiasLead2}
+          </span>
+          <span className="home-elige-tuya mt-1 block text-[length:var(--fs-subtitulo)] font-bold tracking-normal">
+            {t.historiasLeadHow}
+          </span>
+        </p>
+      ) : (
+        <p
+          className="home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.14em] sm:mb-5 md:mb-6 lg:mb-0 lg:w-full lg:max-w-none"
+          style={{ color: '#B8340F' }}
+        >
+          {t.heroFormatLabel}
+        </p>
+      )}
       <div
         className={
           fillViewport

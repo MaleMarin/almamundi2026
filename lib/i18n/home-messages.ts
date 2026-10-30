@@ -34,6 +34,11 @@ export type HomeMessages = {
   heroShareToday: string;
   /** La frase en Caveat, en minúscula. */
   heroHandScript: string;
+  /** Título de la home, sin saludo. La segunda parte va en negrita. */
+  heroScrollBefore: string;
+  heroScrollBold: string;
+  /** Etiqueta en mayúsculas bajo el título de la home. */
+  heroFormatLabel: string;
   heroSubBefore: string;
   heroSubBold: string;
   /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
@@ -96,6 +101,9 @@ const es: HomeMessages = {
   heroGreetNightPlace: 'Buenas noches desde {lugar}. ¿Qué historia traes hoy?',
   heroShareToday: 'Hola, ¿qué historia vas a compartir hoy?',
   heroHandScript: 'como la tuya',
+  heroScrollBefore: 'Aquí tus historias no se pierden en el scroll,',
+  heroScrollBold: 'despiertan otras',
+  heroFormatLabel: 'Elige cómo contarla',
   heroSubBefore: 'Aquí, cada historia',
   heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
@@ -157,6 +165,9 @@ const pt: HomeMessages = {
   heroGreetNightPlace: 'Boa noite em {lugar}. Que história você traz hoje?',
   heroShareToday: 'Olá, que história você vai compartilhar hoje?',
   heroHandScript: 'como a sua',
+  heroScrollBefore: 'Aqui suas histórias não se perdem no scroll,',
+  heroScrollBold: 'despertam outras',
+  heroFormatLabel: 'Escolha como contar',
   heroSubBefore: 'Aqui, cada história',
   heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
@@ -218,6 +229,9 @@ const en: HomeMessages = {
   heroGreetNightPlace: 'Good evening in {place}. What story are you bringing today?',
   heroShareToday: 'Hi, what story will you share today?',
   heroHandScript: 'like yours',
+  heroScrollBefore: "Here your stories don't get lost in the scroll,",
+  heroScrollBold: 'they awaken others',
+  heroFormatLabel: 'Choose how to tell it',
   heroSubBefore: 'Here, every story',
   heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',

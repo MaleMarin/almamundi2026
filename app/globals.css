@@ -124,22 +124,6 @@ select {
   margin-bottom: 2px;
 }
 
-.hero-greet-caret {
-  display: inline-block;
-  width: 1px;
-  height: 0.9em;
-  margin-left: 1px;
-  background: currentColor;
-  vertical-align: -0.05em;
-  animation: hero-greet-blink 1s steps(1, end) infinite;
-}
-
-@keyframes hero-greet-blink {
-  50% {
-    opacity: 0;
-  }
-}
-
 @media (min-width: 1024px) {
   .home-hero-sign {
     margin-top: 0;
@@ -183,7 +167,7 @@ select {
 
 .home-neu-card:hover {
   box-shadow:
-    18px 18px 42px rgba(120, 135, 155, 0.42),
+    18px 18px 42px rgba(120, 110, 100, 0.42),
     -18px -18px 46px rgba(255, 255, 255, 1),
     inset 2px 2px 5px rgba(255, 255, 255, 0.85),
     inset -4px -4px 10px rgba(120,110,100,0.18) !important;
@@ -200,10 +184,10 @@ select {
   .home-neu-card.home-historias-card-surface:hover {
     transform: translateY(-0.65rem);
     box-shadow:
-      26px 26px 60px rgba(120, 135, 155, 0.62),
+      26px 26px 60px rgba(120, 110, 100, 0.62),
       -24px -24px 62px rgba(255, 255, 255, 1),
       inset 3px 3px 7px rgba(255, 255, 255, 0.94),
-      inset -6px -6px 16px rgba(140, 155, 175, 0.36) !important;
+      inset -6px -6px 16px rgba(120, 110, 100, 0.36) !important;
   }
 }
 
@@ -436,8 +420,9 @@ a.btn-am-neutro:focus-visible,
 
   .home-hero-lead-gap {
     display: block;
-    flex: 1 1 24px;
+    flex: 0 0 24px;
     min-height: 24px;
+    height: 24px;
   }
 }
 
