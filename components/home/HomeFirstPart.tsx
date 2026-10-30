@@ -1,9 +1,12 @@
 'use client';
 
 import { useEffect, useLayoutEffect, useState } from 'react';
+import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
 import { HomeFormatCards } from '@/components/home/HomeFormatCards';
+import type { ContarPregunta } from '@/lib/contar-routes';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
@@ -111,6 +114,8 @@ export type HomeFirstPartProps = {
   onMediaEducation: () => void;
   /** Historias: ancla #historias. Mapa: sección del mapa en la home `/#mapa`. */
   basePath?: string;
+  /** Si la persona llegó desde un hilo, las tarjetas conservan `?pregunta=`. */
+  pregunta?: ContarPregunta | null;
 };
 
 export function HomeFirstPart({
@@ -121,9 +126,10 @@ export function HomeFirstPart({
   onWriteStory,
   onRecordPhoto,
   onMediaEducation: _onMediaEducation,
-  basePath: _basePath = ''
+  basePath: _basePath = '',
+  pregunta = null,
 }: HomeFirstPartProps) {
-  const { t } = useHomeLocale();
+  const { t, locale } = useHomeLocale();
 
   return (
     <>
@@ -178,8 +184,17 @@ export function HomeFirstPart({
         onRecordAudio={onRecordAudio}
         onWriteStory={onWriteStory}
         onRecordPhoto={onRecordPhoto}
+        pregunta={pregunta}
       />
       </div>
+      <p className="mx-auto mb-4 mt-2 max-w-[min(100%,40rem)] px-6 text-center md:mb-8">
+        <Link
+          href="/preguntas"
+          className="inline-flex min-h-11 items-center text-center text-[length:var(--fs-pequeno)] font-medium text-[#4A5568] underline decoration-[#FF4A1C]/40 underline-offset-4 hover:text-[#FF4A1C] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]"
+        >
+          {HILOS_UI[locale].entrada}
+        </Link>
+      </p>
     </>
   );
 }

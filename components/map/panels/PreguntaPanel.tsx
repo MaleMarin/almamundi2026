@@ -2,122 +2,74 @@
 
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
-import {
-  PREGUNTA_UI,
-  preguntaPageHref,
-  preguntasDeLaSemana,
-  type PreguntaSemana } from '@/lib/pregunta-semana';
-import type { AlmaLocale } from '@/lib/i18n/locale';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
+import { preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
-function PreguntaCard({
-  pregunta,
-  locale }: {
-  pregunta: PreguntaSemana;
-  locale: AlmaLocale;
-}) {
-  return (
-    <div
-      style={{
-        padding: '14px 14px 12px',
-        borderRadius: 16,
-        background: 'rgba(255,255,255,0.08)',
-        border: '1px solid rgba(255,255,255,0.16)' }}
-    >
-      <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', lineHeight: 1.45, color: 'rgba(255,255,255,0.78)' }}>
-        {pregunta.tu[locale]}
-      </p>
-      <Link
-        href={preguntaPageHref(pregunta.id)}
-        className="btn-am-principal"
-        style={{
-          display: 'inline-flex',
-          marginTop: 12,
-          padding: '8px 14px',
-          fontWeight: 700,
-          fontSize: 'var(--fs-etiqueta)',
-          fontFamily: SITE_FONT_STACK }}
-      >
-        {PREGUNTA_UI.responder[locale]}
-      </Link>
-    </div>
-  );
-}
+const FOCUS = 'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]';
 
-function SemanaBlock({
-  pregunta,
-  locale,
-  linkTema = false }: {
-  pregunta: PreguntaSemana;
-  locale: AlmaLocale;
-  linkTema?: boolean;
-}) {
-  const title = (
-    <h3 style={{ margin: 0, fontSize: 'var(--fs-texto)', fontWeight: 700, color: 'rgba(255,255,255,0.95)' }}>
-      {linkTema ? (
-        <Link href={`/pregunta/${pregunta.id}`} style={{ color: 'inherit' }}>
-          {pregunta.tema[locale]}
-        </Link>
-      ) : (
-        pregunta.tema[locale]
-      )}
-    </h3>
-  );
-  return (
-    <section style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-      {title}
-      <PreguntaCard pregunta={pregunta} locale={locale} />
-    </section>
-  );
-}
-
+/** Panel del globo: el hilo de la semana, en lugar de la respuesta breve. */
 export function PreguntaPanel() {
   const { locale } = useHomeLocale();
-  const { vigente, anteriores } = preguntasDeLaSemana();
+  const copy = HILOS_UI[locale];
+  const semana = preguntasDeLaSemana().vigente;
 
   return (
     <div
       style={{
         display: 'flex',
         flexDirection: 'column',
-        gap: 22,
+        gap: 16,
         fontFamily: SITE_FONT_STACK,
-        paddingBottom: 8 }}
+        color: 'rgba(255,255,255,0.92)',
+        paddingBottom: 8,
+      }}
     >
-      <p style={{ margin: 0, fontSize: 'var(--fs-pequeno)', lineHeight: 1.5, color: 'rgba(255,255,255,0.78)' }}>
-        {PREGUNTA_COPY.intro[locale]}
-      </p>
-      <SemanaBlock pregunta={vigente} locale={locale} />
-      {anteriores.length > 0 ? (
-        <section style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-          <h3
-            style={{
-              margin: 0,
-              fontSize: 'var(--fs-etiqueta)',
-              fontWeight: 700,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              color: 'rgba(255,255,255,0.55)' }}
-          >
-            {PREGUNTA_UI.anteriores[locale]}
-          </h3>
-          {anteriores.map((pregunta) => (
-            <SemanaBlock key={pregunta.id} pregunta={pregunta} locale={locale} linkTema />
-          ))}
-        </section>
-      ) : null}
-      <Link
-        href={`/pregunta/${vigente.id}`}
+      <p
         style={{
-          alignSelf: 'flex-start',
+          margin: 0,
+          fontSize: 'var(--fs-etiqueta)',
           fontWeight: 700,
-          fontSize: 'var(--fs-pequeno)',
-          color: '#FF6E49',
-          fontFamily: SITE_FONT_STACK,
+          letterSpacing: '0.12em',
+          textTransform: 'uppercase',
+          color: '#FF4A1C',
         }}
       >
-        {PREGUNTA_COPY.seeAll[locale]}
+        {copy.semana}
+      </p>
+      <p
+        style={{
+          margin: 0,
+          fontSize: 'var(--fs-texto)',
+          fontWeight: 700,
+          lineHeight: 1.35,
+          color: 'rgba(255,255,255,0.95)',
+        }}
+      >
+        {semana.tu[locale]}
+      </p>
+      <Link
+        href={`/preguntas?p=${encodeURIComponent(semana.id)}`}
+        className={`btn-am-principal inline-flex min-h-11 items-center justify-center px-5 ${FOCUS}`}
+        style={{ alignSelf: 'flex-start', textDecoration: 'none' }}
+      >
+        {copy.cuentala}
+      </Link>
+      <Link
+        href="/preguntas"
+        className={FOCUS}
+        style={{
+          alignSelf: 'flex-start',
+          minHeight: 44,
+          display: 'inline-flex',
+          alignItems: 'center',
+          fontWeight: 700,
+          color: '#FF6E49',
+          textDecoration: 'underline',
+          textUnderlineOffset: 3,
+        }}
+      >
+        {copy.tirar}
       </Link>
     </div>
   );

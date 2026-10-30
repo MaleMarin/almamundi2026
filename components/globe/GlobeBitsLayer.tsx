@@ -42,6 +42,8 @@ export type GlobeBitMarker = {
   color?: string;
   /** Historias, bits curados, titulares o respuestas de la pregunta. */
   markerKind?: 'bit' | 'story' | 'news' | 'respuesta';
+  /** Historia publicada que nació de un hilo: anillo naranja, misma capa que las historias. */
+  hilo?: boolean;
   title?: string;
   place?: string;
   url?: string;
@@ -208,6 +210,7 @@ function BitDot({
   storyRippleMatHover,
   newsMat,
   respuestaMat,
+  hiloRingMat,
   layerOpRef }: {
   bit: GlobeBitMarker;
   selected: boolean;
@@ -220,6 +223,7 @@ function BitDot({
   storyRippleMatHover: THREE.ShaderMaterial;
   newsMat: THREE.ShaderMaterial;
   respuestaMat: THREE.ShaderMaterial;
+  hiloRingMat: THREE.ShaderMaterial;
   layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number; respuestas: number }>;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
@@ -275,8 +279,9 @@ function BitDot({
   const isStory = bit.markerKind === 'story';
   const isNews = bit.markerKind === 'news';
   const isRespuesta = bit.markerKind === 'respuesta';
+  const isHilo = isStory && bit.hilo === true;
 
-  const storyTint = isStory ? bit.color : undefined;
+  const storyTint = isStory && !isHilo ? bit.color : undefined;
   const tintedMats = useMemo(() => {
     if (!storyTint) return null;
     const disk = storyMatNormal.clone();
@@ -314,7 +319,9 @@ function BitDot({
     setMatLayerOpacity(mats.rippleHover, op);
   });
 
-  const starMat = isRespuesta
+  const starMat = isHilo
+    ? hiloRingMat
+    : isRespuesta
     ? respuestaMat
     : isNews
     ? newsMat
@@ -326,10 +333,16 @@ function BitDot({
       ? tintedMats?.disk ?? storyMatNormal
       : starMatNormal;
   const sel = selected ? 1.08 : 1.0;
-  const mag = magneticActive && !selected ? (isStory ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
+  const mag = magneticActive && !selected ? (isStory && !isHilo ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
   const planeScale =
     STAR_PLANE_SCALE *
-    (isStory ? STORY_PLANE_MUL : isRespuesta ? RESPUESTA_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
+    (isHilo || isRespuesta
+      ? RESPUESTA_PLANE_MUL
+      : isStory
+        ? STORY_PLANE_MUL
+        : isNews
+          ? NEWS_PLANE_MUL
+          : BIT_PLANE_MUL);
   const rippleScale = STAR_PLANE_SCALE * STORY_RIPPLE_MUL;
   const coreScale = CORE_SCALE * (isStory ? 1 : 2.4);
 
@@ -346,7 +359,7 @@ function BitDot({
 
       <group position={flareBump}>
         <Billboard follow>
-          {isStory ? (
+          {isStory && !isHilo ? (
             <HeartbeatRing
               baseScale={rippleScale * sel * mag}
               beat={bit.pulse === true}
@@ -399,7 +412,7 @@ function BitDot({
           ) : null}
         </Billboard>
 
-        {isRespuesta ? (
+        {isRespuesta || isHilo ? (
         <mesh
           ref={(m) => disableMeshRaycast(m)}
           scale={coreScale * sel * mag}
@@ -511,6 +524,13 @@ function GlobeBitsLayerMounted({
     mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
     return mat;
   }, []);
+  const hiloRingMat = useMemo(() => {
+    const mat = createNewsRingMaterial(0.95, 'GlobeHiloRing');
+    const color = new THREE.Color('#FF4A1C').convertSRGBToLinear();
+    mat.uniforms.uCore.value = new THREE.Vector3(color.r, color.g, color.b);
+    mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
+    return mat;
+  }, []);
 
   useEffect(() => {
     return () => {
@@ -522,6 +542,7 @@ function GlobeBitsLayerMounted({
       storyRippleMatHover.dispose();
       newsMat.dispose();
       respuestaMat.dispose();
+      hiloRingMat.dispose();
     };
   }, [
     starMatNormal,
@@ -532,6 +553,7 @@ function GlobeBitsLayerMounted({
     storyRippleMatHover,
     newsMat,
     respuestaMat,
+    hiloRingMat,
   ]);
 
   useFrame(({ clock }, dt) => {
@@ -540,6 +562,7 @@ function GlobeBitsLayerMounted({
     storyRippleMatHover.uniforms.uTime.value = t;
     newsMat.uniforms.uTime.value = t;
     respuestaMat.uniforms.uTime.value = t;
+    hiloRingMat.uniforms.uTime.value = t;
     const op = layerOpRef.current;
     op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? 1 : 0, 7, dt);
     op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? 1 : 0, 7, dt);
@@ -553,6 +576,7 @@ function GlobeBitsLayerMounted({
     setMatLayerOpacity(storyRippleMatHover, op.stories);
     setMatLayerOpacity(newsMat, op.news);
     setMatLayerOpacity(respuestaMat, op.respuestas);
+    setMatLayerOpacity(hiloRingMat, op.stories);
   });
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {
@@ -715,6 +739,7 @@ function GlobeBitsLayerMounted({
     storyRippleMatHover,
     newsMat,
     respuestaMat,
+    hiloRingMat,
     layerOpRef };
 
   return (

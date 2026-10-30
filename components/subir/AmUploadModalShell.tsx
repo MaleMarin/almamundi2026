@@ -21,6 +21,8 @@ export type AmUploadModalShellProps = {
   cardOnly?: boolean;
   /** Línea al pie, solo en builds que no son production. */
   footnote?: string | null;
+  /** Línea sobre el título, por ejemplo la pregunta que se está respondiendo. */
+  lead?: ReactNode;
 };
 
 export function AmUploadModalShell({
@@ -38,7 +40,8 @@ export function AmUploadModalShell({
   showContinue = true,
   className,
   cardOnly = false,
-  footnote }: AmUploadModalShellProps) {
+  footnote,
+  lead }: AmUploadModalShellProps) {
   const card = (
     <div className={`${styles.amModalCard} font-interna ${className ?? ''}`}>
       <header className={styles.amModalHeader}>
@@ -49,6 +52,7 @@ export function AmUploadModalShell({
       </header>
 
       <div className={styles.amModalBody}>
+        {lead}
         {kicker ? (
           <p className={styles.amModalKicker} aria-live="polite">
             {kicker}

@@ -792,6 +792,8 @@ export default function AdminPage() {
     );
   }
 
+  /** Respuestas breves: el módulo sigue en el archivo, fuera de la vista. */
+  const SHOW_RESPUESTAS_ADMIN = false;
   const sections: { id: typeof section; label: string; icon: React.ReactNode }[] = [
     { id: 'pendientes', label: 'Historias pendientes', icon: <FileText size={18} /> },
     { id: 'mapa', label: 'En el mapa', icon: <MapPin size={18} /> },
@@ -800,6 +802,9 @@ export default function AdminPage() {
     { id: 'colecciones', label: 'Colecciones', icon: <FolderOpen size={18} /> },
     { id: 'stats', label: 'Estadísticas', icon: <BarChart3 size={18} /> },
   ];
+  const visibleSections = sections.filter(
+    (item): item is (typeof sections)[number] => SHOW_RESPUESTAS_ADMIN || item.id !== 'respuestas'
+  );
 
   const filteredArchived = archivedStories.filter((s) => {
     if (archivedFilter.topic && !s.topic?.includes(archivedFilter.topic)) return false;
@@ -864,7 +869,7 @@ export default function AdminPage() {
       </header>
 
       <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 24 }}>
-        {sections.map((s) => (
+        {visibleSections.map((s) => (
           <button
             key={s.id}
             type="button"
@@ -894,7 +899,7 @@ export default function AdminPage() {
         <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Cargando…</p>
       )}
 
-      {section === 'respuestas' && idToken && <RespuestasAdmin token={idToken} />}
+      {SHOW_RESPUESTAS_ADMIN && section === 'respuestas' && idToken && <RespuestasAdmin token={idToken} />}
 
       {/* 1. Historias pendientes */}
       {section === 'pendientes' && !loading && (

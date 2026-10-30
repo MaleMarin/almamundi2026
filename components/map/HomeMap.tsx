@@ -44,7 +44,8 @@ import {
   MAP_NAV_GESTURE_EVENT,
   peekMapAmbientPending } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
-import { PREGUNTA_UI, preguntasDeLaSemana } from '@/lib/pregunta-semana';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
+import { preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
 import { RespuestaGlobeCard } from '@/components/map/RespuestaGlobeCard';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
@@ -53,6 +54,8 @@ import { StoryViewer } from '@/components/mapa/StoryViewer';
 
 /** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
 const SHOW_SURPRISE_ME_BUTTON = false;
+/** Respuestas breves: el código sigue, pero no se dibujan en el globo. */
+const SHOW_PUBLIC_RESPUESTAS = false;
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
@@ -225,6 +228,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [openStory?.id, openRespuesta?.id, homeView]);
 
   useEffect(() => {
+    if (!SHOW_PUBLIC_RESPUESTAS) {
+      setRespuestasReady(true);
+      return;
+    }
     const questionId = preguntasDeLaSemana().vigente.id;
     let cancel = false;
     void fetch(`/api/respuestas/public?questionId=${encodeURIComponent(questionId)}&limit=40`)
@@ -687,11 +694,18 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       lat: s.lat,
       lon: s.lng,
       markerKind: 'story' as const,
+      hilo: Boolean(resolveQuestionId(s.questionId)),
       title: s.title ?? s.label,
       place: formatPublicPlace(s.city, s.country, locale) || undefined,
       color: '#FF4A1C',
-      pulse: storyPublishedWithinDays(s.publishedAt, now, 7) }));
-    return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
+      pulse: storyPublishedWithinDays(s.publishedAt, now, 7),
+    }));
+    return [
+      ...globeBitsMarkers,
+      ...storyLayer,
+      ...globeNewsMarkers,
+      ...(SHOW_PUBLIC_RESPUESTAS ? globeRespuestaMarkers : []),
+    ];
   }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
@@ -773,7 +787,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   useEffect(() => {
     const respuestaId = searchParams.get('respuesta');
-    if (!respuestaId || openedRespuestaRef.current === respuestaId || !respuestasReady) return;
+    if (!SHOW_PUBLIC_RESPUESTAS || !respuestaId || openedRespuestaRef.current === respuestaId || !respuestasReady) return;
     const openRespuestaOnGlobe = (item: RespuestaPublica) => {
       openedRespuestaRef.current = respuestaId;
       setPinnedRespuesta(item);
@@ -988,7 +1002,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               focusTarget={focusTarget}
               onFocusArrived={finishSurpriseOpen}
             />
-            {openRespuesta ? (
+            {SHOW_PUBLIC_RESPUESTAS && openRespuesta ? (
               <RespuestaGlobeCard
                 item={openRespuesta}
                 onClose={() => {
@@ -1056,17 +1070,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               </PillNavButton>
               <PillNavButton
                 dock
-                active={drawerOpen && drawerMode === 'news'}
-                title={PREGUNTA_UI.tab[locale]}
-                onClick={() => {
-                  if (drawerOpen && drawerMode === 'news') {
-                    close();
-                    return;
-                  }
-                  open('news');
-                }}
+                href="/preguntas"
+                title={HILOS_UI[locale].nav}
               >
-                {PREGUNTA_UI.tab[locale]}
+                {HILOS_UI[locale].nav}
               </PillNavButton>
               <PillNavButton
                 dock
@@ -1092,11 +1099,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             </span>
             <span className="map-dock-legend__item">
               <span className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
-              {locale === 'pt'
-                ? 'Respostas à pergunta da semana'
-                : locale === 'en'
-                  ? "Answers to this week's question"
-                  : 'Respuestas a la pregunta de la semana'}
+              {HILOS_UI[locale].leyenda}
             </span>
             <span className="map-dock-legend__item">
               <span className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />

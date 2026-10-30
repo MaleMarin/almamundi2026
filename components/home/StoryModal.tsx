@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   X,
@@ -45,6 +46,7 @@ import {
   TURNSTILE_REJECT_MESSAGE } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
+import { AnsweringStrip } from '@/components/home/AnsweringStrip';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -61,6 +63,7 @@ import {
   PENDING_STORY_SHARE_TEXT_SHORT,
   PENDING_STORY_SHARE_URL } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
+import type { ContarPregunta } from '@/lib/contar-routes';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
 import { clearStoryAuthorCarryIfStale } from '@/lib/story-author-carry';
 import { currentPhotoYear, photoFichaIssue, type PhotoFichaIssue } from '@/lib/story-photo-ficha';
@@ -339,9 +342,19 @@ export type StoryModalProps = {
   mode: StoryModalMode;
   chosenTopic: ChosenInspirationTopic | null;
   onClearTopic: () => void;
+  /** Pregunta de un hilo. Sin ella, el formulario es el de siempre. */
+  pregunta?: ContarPregunta | null;
 };
 
-export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic }: StoryModalProps) {
+export function StoryModal({
+  isOpen,
+  onClose,
+  onExploreMap,
+  mode,
+  chosenTopic,
+  onClearTopic,
+  pregunta = null,
+}: StoryModalProps) {
   const { t, locale } = useHomeLocale();
   const router = useRouter();
   const [step, setStep] = useState<StoryModalStep>('capture');
@@ -1678,6 +1691,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
             : {}),
           ...(newsletterOptIn ? { newsletterOptIn: true } : {}),
+          ...(pregunta ? { questionId: pregunta.id, questionMode: pregunta.mode } : {}),
           locale }) });
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
@@ -1761,6 +1775,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     profilePhoto,
     extraFiles,
     mode,
+    pregunta,
     textBody,
     mediaBlob,
     uploadVideoFile,
@@ -1991,6 +2006,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
         kicker={t.modalStep1}
+        lead={
+          pregunta ? (
+            <AnsweringStrip questionId={pregunta.id} questionMode={pregunta.mode} variant="modal" />
+          ) : null
+        }
         className={mode === 'video' || mode === 'audio' ? amStyles.amModalAvCompact : undefined}
       >
         {err ? (
@@ -2444,6 +2464,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 }}
               >
               <div className="space-y-1 px-0.5">
+                {pregunta ? (
+                  <AnsweringStrip questionId={pregunta.id} questionMode={pregunta.mode} variant="modal" />
+                ) : null}
                 <p className="text-[length:var(--fs-etiqueta)] font-semibold text-gray-700" aria-live="polite">
                   {t.modalStep2}
                 </p>
@@ -3128,15 +3151,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 </div>
                 <div className="mt-8">
                   <p className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      router.push('/pregunta');
-                    }}
-                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]"
+                  <Link
+                    href="/preguntas"
+                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] no-underline transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
                   >
                     {t.modalAnswerWeekQuestion}
-                  </button>
+                  </Link>
                   <div className="flex flex-col gap-2 md:flex-row">
                     <button
                       type="button"

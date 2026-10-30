@@ -294,7 +294,7 @@ const es: StoryFlowMessages = {
     'Los colores salen de las palabras con que presentaste tu video. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
   modalExtrasColorHint: 'Lo que escribas aquí también da color a tu imagen.',
   modalNowWhat: '¿Y ahora?',
-  modalAnswerWeekQuestion: 'Responde la pregunta de la semana',
+  modalAnswerWeekQuestion: 'Tira de un hilo',
   modalContactLead: '¿Tienes dudas? Escríbenos a',
 };
 
@@ -403,7 +403,7 @@ const pt: StoryFlowMessages = {
     'As cores saem das palavras com que você apresentou seu vídeo. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
   modalExtrasColorHint: 'O que você escrever aqui também dá cor à sua imagem.',
   modalNowWhat: 'E agora?',
-  modalAnswerWeekQuestion: 'Responda à pergunta da semana',
+  modalAnswerWeekQuestion: 'Puxe um fio',
   modalContactLead: 'Tem dúvidas? Escreva para',
   modalCaptchaFailed: 'Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo.',
   modalStep1: 'Passo 1 de 2',
@@ -561,7 +561,7 @@ const en: StoryFlowMessages = {
     'The colors come from the words you used to present your video. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
   modalExtrasColorHint: 'What you write here also gives color to your image.',
   modalNowWhat: 'What now?',
-  modalAnswerWeekQuestion: "Answer this week's question",
+  modalAnswerWeekQuestion: 'Pull a thread',
   modalContactLead: 'Questions? Write to us at',
   modalCaptchaFailed: "We couldn't confirm the submission. Wait a few seconds and try again.",
   modalStep1: 'Step 1 of 2',

@@ -125,8 +125,17 @@ export function preguntaFromSearch(params: { get(name: string): string | null })
 
 function withPregunta(path: string, pregunta?: ContarPregunta | null): string {
   if (!pregunta) return path;
-  const q = new URLSearchParams({ pregunta: pregunta.id, modo: pregunta.mode });
+  const q = new URLSearchParams({ pregunta: pregunta.id });
+  if (pregunta.mode === 'alguien') q.set('modo', pregunta.mode);
   return `${path}?${q.toString()}`;
+}
+
+/** `?pregunta=` abre la pregunta «tú». `modo=alguien` conserva el otro modo. */
+export function hiloContarPregunta(params: { get(name: string): string | null }): ContarPregunta | null {
+  const id = resolveQuestionId(params.get('pregunta'));
+  if (!id) return null;
+  const modeRaw = params.get('modo');
+  return { id, mode: isQuestionMode(modeRaw) ? modeRaw : 'tu' };
 }
 
 export function contarIndexHref(pregunta?: ContarPregunta | null): string {
