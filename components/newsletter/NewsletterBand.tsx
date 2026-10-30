@@ -72,76 +72,84 @@ export function NewsletterBand() {
   return (
     <section
       aria-labelledby="newsletter-band-title"
-      className="relative z-20 w-full bg-[#050811] px-6 py-16 text-[#F7F8FC] md:py-20"
+      className="relative z-20 w-full bg-transparent px-6 py-6 md:px-10 md:py-8"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
-      <div className="mx-auto w-full max-w-xl">
-        <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">{copy.eyebrow}</p>
-        <h2 id="newsletter-band-title" className="mt-3 text-[length:var(--fs-subtitulo)] font-semibold leading-snug">
-          {copy.title}
-        </h2>
-        <p className="mt-3 text-[length:var(--fs-pequeno)] font-normal leading-relaxed text-[#F7F8FC]">{copy.text}</p>
-        {sent ? (
-          <p className="mt-6 text-[length:var(--fs-pequeno)] font-semibold leading-relaxed" role="status">
-            {copy.sent}
-          </p>
-        ) : (
-          <form className="mt-6" onSubmit={onSubmit}>
-            <label htmlFor="newsletter-email" className="mb-2 block text-[length:var(--fs-etiqueta)] font-semibold">
-              {copy.email}
-            </label>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <input
-                id="newsletter-email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder={copy.email}
-                className="min-h-11 w-full rounded-full bg-[#F7F8FC] px-4 text-[length:var(--fs-pequeno)] text-[#1C1C2E] outline-none placeholder:text-[#4A5568] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
-              />
-              <button
-                type="submit"
-                disabled={sending}
-                className="btn-am-principal inline-flex min-h-11 shrink-0 items-center justify-center px-6 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C] disabled:opacity-60"
-              >
-                {copy.button}
-              </button>
-            </div>
-            <div className="mt-4 flex items-start gap-3">
-              <input
-                id="newsletter-consent"
-                type="checkbox"
-                required
-                checked={accepted}
-                onChange={(event) => setAccepted(event.target.checked)}
-                className="mt-1 h-5 w-5 shrink-0 accent-[#FF4A1C] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
-              />
-              <label htmlFor="newsletter-consent" className="text-[length:var(--fs-etiqueta)] font-normal leading-snug">
-                {copy.consentBefore}
+      <div className="mx-auto w-full max-w-[min(100%,1560px)] rounded-[28px] bg-[#FBFAF8] px-5 py-5 shadow-[0_12px_28px_rgba(120,110,100,0.2)] md:px-8 md:py-6">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
+          <div className="min-w-0 lg:max-w-[36rem]">
+            <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#B8340F]">{copy.eyebrow}</p>
+            <h2
+              id="newsletter-band-title"
+              className="mt-1 text-[length:var(--fs-subtitulo)] font-bold leading-snug text-[#4A5568]"
+            >
+              {copy.title}
+            </h2>
+            <p className="mt-1 text-[length:var(--fs-pequeno)] font-normal leading-snug text-[#616C7C]">{copy.text}</p>
+          </div>
+          {sent ? (
+            <p className="text-[length:var(--fs-pequeno)] font-semibold leading-snug text-[#4A5568]" role="status">
+              {copy.sent}
+            </p>
+          ) : (
+            <form className="w-full lg:max-w-[28rem] lg:shrink-0" onSubmit={onSubmit}>
+              <label htmlFor="newsletter-email" className="sr-only">
+                {copy.email}
+              </label>
+              <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
+                <input
+                  id="newsletter-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder={copy.email}
+                  className="min-h-11 w-full rounded-full border-2 border-[#8A847C] bg-white px-4 text-[length:var(--fs-pequeno)] text-[#4A5568] outline-none placeholder:text-[#4A5568] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
+                />
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="btn-am-principal inline-flex min-h-11 w-full shrink-0 items-center justify-center px-6 focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C] disabled:opacity-60 lg:w-auto"
+                >
+                  {copy.button}
+                </button>
+              </div>
+              <div className="mt-3 flex items-start gap-3">
+                <input
+                  id="newsletter-consent"
+                  type="checkbox"
+                  required
+                  checked={accepted}
+                  onChange={(event) => setAccepted(event.target.checked)}
+                  className="mt-0.5 h-5 w-5 shrink-0 rounded border-2 border-[#8A847C] accent-[#FF4A1C] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
+                />
+                <label htmlFor="newsletter-consent" className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#616C7C]">
+                  {copy.consentBefore}
                 <a
                   href="/privacidad"
-                  className="font-semibold text-[#FF4A1C] underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
+                  className="font-semibold underline focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
+                  style={{ color: '#B8340F' }}
                 >
-                  {copy.privacy}
-                </a>
-                {copy.consentAfter}
-              </label>
-            </div>
-            {getTurnstileSiteKey() ? (
-              <div className="mt-3 rounded-xl bg-[#F7F8FC] px-3 py-2 text-[#1C1C2E] has-[.h-0]:hidden">
-                <TurnstileWidget onTokenChange={setCaptchaToken} onGateChange={() => {}} />
+                    {copy.privacy}
+                  </a>
+                  {copy.consentAfter}
+                </label>
               </div>
-            ) : null}
-            {error ? (
-              <p className="mt-3 text-[length:var(--fs-etiqueta)] font-semibold text-[#FFB4A8]" role="alert">
-                {error}
-              </p>
-            ) : null}
-          </form>
-        )}
+              {getTurnstileSiteKey() ? (
+                <div className="mt-3 has-[.h-0]:hidden">
+                  <TurnstileWidget onTokenChange={setCaptchaToken} onGateChange={() => {}} />
+                </div>
+              ) : null}
+              {error ? (
+                <p className="mt-3 text-[length:var(--fs-etiqueta)] font-semibold text-[#B8340F]" role="alert">
+                  {error}
+                </p>
+              ) : null}
+            </form>
+          )}
+        </div>
       </div>
     </section>
   );
