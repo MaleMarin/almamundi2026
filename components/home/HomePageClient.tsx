@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -9,7 +9,7 @@ import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
-import { contarHref, parseContarFormat, contarIndexHref } from '@/lib/contar-routes';
+import { contarHref, parseContarFormat, contarIndexHref, hiloContarPregunta } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { PREGUNTA_UI, preguntaPageHref, preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
@@ -42,6 +42,11 @@ export function HomePageClient() {
   const [chosenTopic, setChosenTopic] = useState<ChosenInspirationTopic | null>(null);
   const [comoFuncionaOpen, setComoFuncionaOpen] = useState(false);
   const [propositoOpen, setPropositoOpen] = useState(false);
+  const [locationSearch, setLocationSearch] = useState('');
+  const preguntaContar = useMemo(
+    () => hiloContarPregunta({ get: (name) => new URLSearchParams(locationSearch).get(name) }),
+    [locationSearch]
+  );
 
   useEffect(() => {
     router.refresh();
@@ -76,13 +81,15 @@ export function HomePageClient() {
     if (clearTopic) setChosenTopic(null);
     setStoryMode(mode);
     setStoryOpen(true);
-    router.push(contarHref(mode));
+    const pregunta = hiloContarPregunta({ get: (name) => new URLSearchParams(window.location.search).get(name) });
+    router.push(contarHref(mode, pregunta));
   }, [router]);
 
   const closeStory = useCallback(() => {
     setStoryOpen(false);
     if (parseContarFormat(pathname)) {
-      router.replace(contarIndexHref());
+      const pregunta = hiloContarPregunta({ get: (name) => new URLSearchParams(window.location.search).get(name) });
+      router.replace(contarIndexHref(pregunta));
     }
   }, [pathname, router]);
 
@@ -100,6 +107,7 @@ export function HomePageClient() {
   }, [router]);
 
   useLayoutEffect(() => {
+    setLocationSearch(window.location.search);
     const format = parseContarFormat(pathname);
     if (format) {
       setStoryMode(format);
@@ -282,6 +290,7 @@ export function HomePageClient() {
         onWriteStory={() => openStory('texto', true)}
         onRecordPhoto={() => openStory('foto', true)}
         onMediaEducation={() => router.push('/educacion-mediatica')}
+        pregunta={preguntaContar}
         basePath="/"
       />
       <section
@@ -358,6 +367,7 @@ export function HomePageClient() {
         onExploreMap={exploreMapFromStory}
         mode={storyMode}
         chosenTopic={chosenTopic}
+        pregunta={preguntaContar}
         onClearTopic={() => setChosenTopic(null)}
       />
     </main>

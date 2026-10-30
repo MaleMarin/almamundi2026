@@ -45,6 +45,7 @@ import {
   TURNSTILE_REJECT_MESSAGE } from '@/lib/subir-upload-modal-copy';
 import amStyles from '@/components/subir/am-upload-modal.module.css';
 import { FormatCaptureEditorialShell } from '@/components/subir/FormatCaptureEditorialShell';
+import { AnsweringStrip } from '@/components/home/AnsweringStrip';
 import { UploadModalFotoCapture } from '@/components/subir/UploadModalFotoCapture';
 import { AGE_RANGE_OPTIONS, type AgeRangeId } from '@/lib/subir-author-fields';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -61,6 +62,7 @@ import {
   PENDING_STORY_SHARE_TEXT_SHORT,
   PENDING_STORY_SHARE_URL } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
+import type { ContarPregunta } from '@/lib/contar-routes';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
 import { clearStoryAuthorCarryIfStale } from '@/lib/story-author-carry';
 import { currentPhotoYear, photoFichaIssue, type PhotoFichaIssue } from '@/lib/story-photo-ficha';
@@ -339,9 +341,19 @@ export type StoryModalProps = {
   mode: StoryModalMode;
   chosenTopic: ChosenInspirationTopic | null;
   onClearTopic: () => void;
+  /** Pregunta de un hilo. Sin ella, el formulario es el de siempre. */
+  pregunta?: ContarPregunta | null;
 };
 
-export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, onClearTopic }: StoryModalProps) {
+export function StoryModal({
+  isOpen,
+  onClose,
+  onExploreMap,
+  mode,
+  chosenTopic,
+  onClearTopic,
+  pregunta = null,
+}: StoryModalProps) {
   const { t, locale } = useHomeLocale();
   const router = useRouter();
   const [step, setStep] = useState<StoryModalStep>('capture');
@@ -1675,6 +1687,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
             : {}),
+          ...(pregunta ? { questionId: pregunta.id, questionMode: pregunta.mode } : {}),
           locale }) });
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
@@ -1757,6 +1770,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     profilePhoto,
     extraFiles,
     mode,
+    pregunta,
     textBody,
     mediaBlob,
     uploadVideoFile,
@@ -1985,6 +1999,11 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}
         kicker={t.modalStep1}
+        lead={
+          pregunta ? (
+            <AnsweringStrip questionId={pregunta.id} questionMode={pregunta.mode} variant="modal" />
+          ) : null
+        }
         className={mode === 'video' || mode === 'audio' ? amStyles.amModalAvCompact : undefined}
       >
         {err ? (
@@ -2438,6 +2457,9 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                 }}
               >
               <div className="space-y-1 px-0.5">
+                {pregunta ? (
+                  <AnsweringStrip questionId={pregunta.id} questionMode={pregunta.mode} variant="modal" />
+                ) : null}
                 <p className="text-[length:var(--fs-etiqueta)] font-semibold text-gray-700" aria-live="polite">
                   {t.modalStep2}
                 </p>

@@ -22,6 +22,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Mapa',
     contar: 'Cuenta tu historia',
     pregunta: 'Pregunta',
+    preguntas: 'Preguntas',
   },
   pt: {
     _inicio: 'Início',
@@ -38,6 +39,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Mapa',
     contar: 'Conte sua história',
     pregunta: 'Pergunta',
+    preguntas: 'Perguntas',
   },
   en: {
     _inicio: 'Home',
@@ -54,6 +56,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Map',
     contar: 'Tell your story',
     pregunta: 'Question',
+    preguntas: 'Questions',
   },
 };
 

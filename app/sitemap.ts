@@ -14,6 +14,7 @@ export const revalidate = 3600;
 const STATIC_PATHS: string[] = [
   '/',
   '/historias',
+  '/preguntas',
   '/temas',
   '/exposiciones',
   '/educacion-mediatica',

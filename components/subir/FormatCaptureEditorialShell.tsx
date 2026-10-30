@@ -18,6 +18,7 @@ type Props = {
   titlePreLine?: boolean;
   footnote?: string | null;
   className?: string;
+  lead?: ReactNode;
 };
 
 export function FormatCaptureEditorialShell({
@@ -32,7 +33,8 @@ export function FormatCaptureEditorialShell({
   children,
   titlePreLine = false,
   footnote,
-  className }: Props) {
+  className,
+  lead }: Props) {
   const title = titlePreLine ? copy.title : copy.title.replace(/\n/g, ' ');
 
   return (
@@ -49,6 +51,7 @@ export function FormatCaptureEditorialShell({
       kicker={kicker}
       footnote={footnote}
       className={className}
+      lead={lead}
     >
       {children}
     </AmUploadModalShell>
