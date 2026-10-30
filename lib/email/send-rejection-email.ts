@@ -40,6 +40,12 @@ function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
   return locale === "pt" || locale === "en" ? locale : "es";
 }
 
+function reasonSentence(reason: string): string {
+  const text = reason.trim();
+  if (!text || /[.!?…]$/.test(text)) return text;
+  return `${text}.`;
+}
+
 function rejectionCopy(locale: AlmaLocale) {
   if (locale === "pt") {
     return {
@@ -60,13 +66,13 @@ function rejectionCopy(locale: AlmaLocale) {
   if (locale === "en") {
     return {
       fallback: "your story",
-      hello: (name: string) => (name ? `Hello, ${name}:` : "Hello:"),
+      hello: (name: string) => (name ? `Hi ${name},` : "Hi,"),
       subject: (title: string) => `About your story “${title}” on AlmaMundi`,
       reviewed: (title: string) =>
-        `We reviewed your story “${title}” and this time we will not be able to publish it on AlmaMundi.`,
+        `We reviewed your story “${title}” and this time we won't be able to publish it on AlmaMundi.`,
       reason: "Reason",
       retry: (contact: string) =>
-        `If you think there was a mistake, reply to this email or write to ${contact} and we will review it again.`,
+        `If you think there was a mistake, reply to this email or write to ${contact} and we'll review it again.`,
       thanks: "Thank you for trusting us with your story.<br>The AlmaMundi team",
       thanksText: "Thank you for trusting us with your story.",
       team: "The AlmaMundi team",
@@ -98,7 +104,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
   const copy = rejectionCopy(locale);
   const greeting = escapeHtml(greetingLine(params.authorName, locale));
   const storyTitle = escapeHtml(storyTitleLine(params.storyTitle, locale));
-  const reason = escapeHtml(params.publicReason.trim());
+  const reason = escapeHtml(reasonSentence(params.publicReason));
   const contact = escapeHtml(REJECTION_CONTACT_EMAIL);
   const retry = copy.retry(
     `<a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${contact}</a>`
@@ -125,7 +131,7 @@ export function buildRejectionEmailText(params: SendRejectionEmailParams): strin
     "",
     copy.reviewed(storyTitle),
     "",
-    `${copy.reason}: ${params.publicReason.trim()}`,
+    `${copy.reason}: ${reasonSentence(params.publicReason)}`,
     "",
     copy.retry(REJECTION_CONTACT_EMAIL),
     "",

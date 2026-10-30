@@ -143,12 +143,12 @@ export const PREGUNTA_COPY = {
   },
   shareBody: {
     es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
-    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pregunta] Eu já respondi. E você? [enlace]',
+    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pergunta] Eu já respondi. E você? [enlace]',
     en: 'This week AlmaMundi is asking the world: [pregunta] I already answered. What about you? [enlace]',
   },
   shareInvite: {
     es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] ¿Tú qué responderías? [enlace]',
-    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pregunta] O que você responderia? [enlace]',
+    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pergunta] O que você responderia? [enlace]',
     en: 'This week AlmaMundi is asking the world: [pregunta] What would you answer? [enlace]',
   },
 } as const satisfies Record<string, L3>;
@@ -162,7 +162,10 @@ export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {
 }
 
 function preguntaShareLine(template: string, pregunta: string, enlace: string): string {
-  const text = template.replace('[pregunta]', pregunta).replace('[enlace]', enlace);
+  const text = template
+    .replace('[pregunta]', pregunta)
+    .replace('[pergunta]', pregunta)
+    .replace('[enlace]', enlace);
   return text.includes(enlace) ? text : `${text} ${enlace}`;
 }
 

@@ -58,7 +58,7 @@ function publicationCopy(locale: AlmaLocale) {
   if (locale === "en") {
     return {
       fallback: "your story",
-      hello: (name: string) => (name ? `Hello, ${name}:` : "Hello:"),
+      hello: (name: string) => (name ? `Hi ${name},` : "Hi,"),
       subject: (title: string) => `Your story “${title}” is now on AlmaMundi`,
       lead: (title: string, where: string) => {
         const base = `Your story “${title}” is now published on the AlmaMundi map`;

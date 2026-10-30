@@ -37,7 +37,7 @@ function mailFromAddress(): string {
 function hello(alias: string, locale: AlmaLocale = "es"): string {
   const name = capitalizeAlias(alias);
   if (locale === "pt") return name ? `Olá, ${name}:` : "Olá:";
-  if (locale === "en") return name ? `Hello, ${name}:` : "Hello:";
+  if (locale === "en") return name ? `Hi ${name},` : "Hi,";
   return name ? `Hola, ${name}:` : "Hola:";
 }
 
@@ -113,6 +113,12 @@ function respuestaCopy(locale: AlmaLocale) {
 
 function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
   return locale === "pt" || locale === "en" ? locale : "es";
+}
+
+function reasonSentence(reason: string): string {
+  const text = reason.trim();
+  if (!text || /[.!?…]$/.test(text)) return text;
+  return `${text}.`;
 }
 
 function contactLine(locale: AlmaLocale): string {
@@ -252,7 +258,7 @@ export async function sendRespuestaRejectedEmail(opts: {
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
   const url = absoluteEmailUrl("/pregunta");
-  const reason = escapeHtml(opts.publicReason.trim());
+  const reason = escapeHtml(reasonSentence(opts.publicReason));
   const html = emailShell({
     preheader: copy.rejectedSubject,
     footer: "respuesta",
@@ -271,7 +277,7 @@ export async function sendRespuestaRejectedEmail(opts: {
     "",
     copy.rejectedBody,
     "",
-    `${copy.reason}: ${opts.publicReason.trim()}`,
+    `${copy.reason}: ${reasonSentence(opts.publicReason)}`,
     "",
     `${copy.again}: ${url}`,
     "",

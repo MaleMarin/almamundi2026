@@ -100,7 +100,7 @@ function receivedCopy(locale: AlmaLocale) {
   if (locale === "en") {
     return {
       fallback: "your story",
-      hello: (alias: string) => (alias ? `Hello, ${alias}:` : "Hello:"),
+      hello: (alias: string) => (alias ? `Hi ${alias},` : "Hi,"),
       subject: (title: string) => `We received your story “${title}”`,
       preview: "It's now being reviewed. We'll let you know when it's on the map.",
       thanks: (title: string) => `We received your story “${title}”. Thank you for telling it on AlmaMundi.`,
