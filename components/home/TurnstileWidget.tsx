@@ -179,7 +179,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
     <div className={status === 'solved' ? 'h-0 overflow-hidden' : 'space-y-1.5'}>
       <div ref={hostRef} />
       {status === 'loading' ? (
-        <p className="text-[length:var(--fs-etiqueta)] leading-tight text-gray-500 ">
+        <p className="text-[length:var(--fs-etiqueta)] leading-tight text-[#646E7E] ">
           Cargando verificación de seguridad…
         </p>
       ) : null}

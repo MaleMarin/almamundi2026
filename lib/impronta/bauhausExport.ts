@@ -47,7 +47,7 @@ export function drawImprontaBauhaus(
   const cw = W;
   const ch = H - fh;
 
-  const pageBg = "#E0E5EC";
+  const pageBg = "#F5F4F2";
   ctx.fillStyle = pageBg;
   ctx.fillRect(0, 0, W, H);
 

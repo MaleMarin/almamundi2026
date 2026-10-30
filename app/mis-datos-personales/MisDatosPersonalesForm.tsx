@@ -49,7 +49,7 @@ const PRIVACY_COUNTRIES = [
 ] as const;
 
 const fieldClass =
-  'mt-1 w-full rounded-xl border border-gray-300/50 bg-[#f0f2f7] px-3 py-2.5 text-[length:var(--fs-pequeno)] text-gray-900 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.35),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/35';
+  'mt-1 w-full rounded-xl border border-gray-300/50 bg-[#FBFAF8] px-3 py-2.5 text-[length:var(--fs-pequeno)] text-gray-900 shadow-[inset_2px_2px_6px_rgba(120,110,100,0.28),inset_-2px_-2px_6px_rgba(255,255,255,0.85)] outline-none focus:ring-2 focus:ring-orange-400/35';
 
 const labelClass = 'block text-[length:var(--fs-pequeno)] font-medium text-gray-700';
 
@@ -138,14 +138,14 @@ export function MisDatosPersonalesForm() {
 
       {status === 'ok' ? (
         <div
-          className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 text-center text-[length:var(--fs-pequeno)] text-gray-700 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
+          className="rounded-2xl border border-white/60 bg-[#FBFAF8] p-6 text-center text-[length:var(--fs-pequeno)] text-gray-700 shadow-[6px_6px_14px_rgba(120,110,100,0.28),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
           role="status"
         >
           <p className="font-medium text-gray-900">Recibimos tu solicitud.</p>
           <p className="mt-2 leading-relaxed">
             La enviamos al equipo de AlmaMundi. Si necesitamos aclarar algo, te escribiremos al correo que indicaste.
           </p>
-          <p className="mt-3 text-[length:var(--fs-etiqueta)] text-gray-500">
+          <p className="mt-3 text-[length:var(--fs-etiqueta)] text-[#646E7E]">
             Si el envío automático no estuviera disponible en este momento, puedes escribir a{' '}
             <a href="mailto:hola@almamundi.org" className="font-semibold text-orange-600 underline underline-offset-2">
               hola@almamundi.org
@@ -175,7 +175,7 @@ export function MisDatosPersonalesForm() {
           </div>
 
           <section
-            className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
+            className="rounded-2xl border border-white/60 bg-[#FBFAF8] p-6 shadow-[6px_6px_14px_rgba(120,110,100,0.28),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="campos-solicitud"
           >
             <h2 id="campos-solicitud" className="sr-only">
@@ -215,7 +215,7 @@ export function MisDatosPersonalesForm() {
                   className={fieldClass}
                   placeholder=""
                 />
-                <p className="mt-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-gray-500">
+                <p className="mt-2 text-[length:var(--fs-etiqueta)] leading-relaxed text-[#646E7E]">
                   Describe tu solicitud con el mayor detalle posible para poder ayudarte mejor. Puedes indicar qué datos
                   quieres revisar, corregir o eliminar; en qué parte del sitio participaste; si enviaste una historia,
                   fotografía, audio, texto o video; y el correo que usaste al participar.
@@ -225,7 +225,7 @@ export function MisDatosPersonalesForm() {
           </section>
 
           <section
-            className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
+            className="rounded-2xl border border-white/60 bg-[#FBFAF8] p-6 shadow-[6px_6px_14px_rgba(120,110,100,0.28),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="identificacion"
           >
             <h2 id="identificacion" className="text-[length:var(--fs-pequeno)] font-semibold text-gray-900">
@@ -264,7 +264,7 @@ export function MisDatosPersonalesForm() {
               </div>
               <div>
                 <label htmlFor="telefono" className={labelClass}>
-                  Teléfono o medio de contacto alternativo <span className="font-normal text-gray-500">(opcional)</span>
+                  Teléfono o medio de contacto alternativo <span className="font-normal text-[#646E7E]">(opcional)</span>
                 </label>
                 <input
                   id="telefono"
@@ -321,7 +321,7 @@ export function MisDatosPersonalesForm() {
           </section>
 
           <section
-            className="rounded-2xl border border-white/60 bg-[#eceff4] p-6 shadow-[6px_6px_14px_rgba(163,177,198,0.35),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
+            className="rounded-2xl border border-white/60 bg-[#FBFAF8] p-6 shadow-[6px_6px_14px_rgba(120,110,100,0.28),-4px_-4px_12px_rgba(255,255,255,0.9)] md:p-8"
             aria-labelledby="verificacion"
           >
             <h2 id="verificacion" className="text-[length:var(--fs-pequeno)] font-semibold text-gray-900">
@@ -341,7 +341,7 @@ export function MisDatosPersonalesForm() {
             ) : null}
           </section>
 
-          <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#e8ebf2]/90 p-5 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 ">
+          <div className="space-y-3 rounded-2xl border border-gray-300/40 bg-[#FBFAF8]/90 p-5 text-[length:var(--fs-pequeno)] leading-relaxed text-gray-600 ">
             <p>
               Al enviar esta solicitud, confirmas que la información entregada es correcta y que AlmaMundi puede
               contactarte para gestionar tu requerimiento.

@@ -4,7 +4,7 @@
   --background: #ffffff;
   --foreground: #171717;
   /* Mapa home: mismo gris que las cards (no usar blanco) */
-  --home-bg: #E0E5EC;
+  --home-bg: #F5F4F2;
   /* Espacio detrás del globo: negro neutro (sin tinte azul) */
   --universe-bg: #000000;
   /* Espacio profundo al pie del mapa (continúa el degradado, no negro/azul duro) */
@@ -42,7 +42,7 @@
 }
 
 /**
- * Base en @layer para que utilidades Tailwind (p. ej. bg-[#E0E5EC] en layout) ganen al body.
+ * Base en @layer para que utilidades Tailwind (p. ej. bg-[var(--home-bg)] en layout) ganen al body.
  * Si body queda con var(--background) #fff, el hueco flex bajo el contenido (min-h del layout)
  * muestra una franja blanca encima del footer.
  */
@@ -170,7 +170,7 @@ select {
     18px 18px 42px rgba(120, 135, 155, 0.42),
     -18px -18px 46px rgba(255, 255, 255, 1),
     inset 2px 2px 5px rgba(255, 255, 255, 0.85),
-    inset -4px -4px 10px rgba(163, 177, 198, 0.18) !important;
+    inset -4px -4px 10px rgba(120,110,100,0.18) !important;
 }
 
 /* Cards #historias: subida al hover con curva suave (no linear). */
@@ -341,7 +341,7 @@ a.btn-am-principal:focus-visible {
 .btn-am-secundario,
 a.btn-am-secundario,
 a.btn-am-secundario:visited {
-  background: #E9ECF3 !important;
+  background: #FBFAF8 !important;
   color: var(--almamundi-orange) !important;
   font-weight: 500 !important;
   font-size: var(--fs-pequeno) !important;
@@ -351,7 +351,7 @@ a.btn-am-secundario:visited {
     8px 8px 20px rgba(136, 150, 170, 0.34),
     -8px -8px 20px rgba(255, 255, 255, 0.9),
     inset 1px 1px 2px rgba(255, 255, 255, 0.58),
-    inset -2px -2px 5px rgba(163, 177, 198, 0.16) !important;
+    inset -2px -2px 5px rgba(120,110,100,0.18) !important;
   text-decoration: none;
   cursor: pointer;
 }
@@ -366,7 +366,7 @@ a.btn-am-secundario:focus-visible {
 .btn-am-neutro,
 a.btn-am-neutro,
 a.btn-am-neutro:visited {
-  background: #E0E5EC !important;
+  background: var(--home-bg) !important;
   color: #4b5563 !important;
   border: 1px solid rgba(255, 255, 255, 0.48) !important;
   border-radius: 9999px !important;
@@ -374,7 +374,7 @@ a.btn-am-neutro:visited {
     14px 14px 30px rgba(136, 150, 170, 0.58),
     -14px -14px 32px rgba(255, 255, 255, 0.96),
     inset 3px 3px 6px rgba(255, 255, 255, 0.82),
-    inset -4px -4px 12px rgba(163, 177, 198, 0.32) !important;
+    inset -4px -4px 12px rgba(120,110,100,0.28) !important;
   text-decoration: none;
   cursor: pointer;
 }
@@ -439,12 +439,12 @@ a.btn-am-neutro:focus-visible,
     16px 16px 36px rgba(120, 135, 155, 0.52),
     -16px -16px 40px rgba(255, 255, 255, 1),
     inset 3px 3px 7px rgba(255, 255, 255, 0.88),
-    inset -4px -4px 14px rgba(163, 177, 198, 0.26) !important;
+    inset -4px -4px 14px rgba(120,110,100,0.26) !important;
 }
 .home-map-neu-pill:active {
   /* Sin scale: el activo y el clic no deben cambiar tamaño de la píldora */
   box-shadow:
-    inset 8px 8px 18px rgba(163, 177, 198, 0.42),
+    inset 8px 8px 18px rgba(120,110,100,0.28),
     inset -5px -5px 14px rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -505,7 +505,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   overflow: hidden;
   box-shadow:
     inset 2px 2px 5px rgba(255, 255, 255, 0.9),
-    inset -2px -2px 6px rgba(163, 177, 198, 0.28) !important;
+    inset -2px -2px 6px rgba(120,110,100,0.28) !important;
   font-family: var(--font-sans);
   font-size: var(--fs-pequeno);
   font-weight: 500;
@@ -523,7 +523,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 }
 
 #map-dock-slot .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
-  color: #6b7280 !important;
+  color: #646E7E !important;
   border-color: rgba(255, 255, 255, 0.55) !important;
 }
 
@@ -546,9 +546,9 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
     180deg,
     var(--home-bg) 0,
     var(--home-bg) 10vh,
-    #e8edf3 14vh,
-    #dfe6ee 20vh,
-    #d4dde8 26vh,
+    var(--home-bg) 14vh,
+    #F0EEEA 20vh,
+    #E7E4DE 26vh,
     #c2cfdd 32vh,
     #adbdd0 38vh,
     #96a9bf 44vh,
@@ -750,7 +750,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   max-width: 100%;
   margin: 24px 0 0;
   padding: 0;
-  color: #718096;
+  color: #616C7C;
   font-family: var(--font-interna), sans-serif;
   font-size: var(--fs-pequeno);
   font-weight: 400;
@@ -890,7 +890,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   margin-inline: auto;
   /* Compensa letter-spacing negativo para centrado óptico real */
   padding-inline-end: 0.06em;
-  color: #E0E5EC;
+  color: var(--home-bg);
   /* Logotipo de texto: fuera de Montserrat y de la escala tipográfica (2766ae7b). */
   font-family: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   font-weight: 900;
@@ -904,15 +904,15 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   /* Sombras en `em` para que el relieve neumórfico escale con el font-size */
   text-shadow:
     -0.01em -0.01em 0.02em rgba(255, 255, 255, 0.95),
-    0.01em 0.01em 0.02em rgba(163, 177, 198, 0.85),
+    0.01em 0.01em 0.02em rgba(120,110,100,0.28),
     -0.03em -0.03em 0.06em rgba(255, 255, 255, 0.8),
-    0.03em 0.03em 0.06em rgba(163, 177, 198, 0.7),
+    0.03em 0.03em 0.06em rgba(120,110,100,0.28),
     -0.06em -0.06em 0.12em rgba(255, 255, 255, 0.6),
-    0.06em 0.06em 0.12em rgba(163, 177, 198, 0.5);
+    0.06em 0.06em 0.12em rgba(120,110,100,0.28);
 }
 
 .almamundi-footer-tagline {
-  color: #6b7280;
+  color: #646E7E;
 }
 
 /* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */
@@ -972,7 +972,7 @@ a:focus,
  */
 footer a.almamundi-footer-link,
 footer a.almamundi-footer-link:visited {
-  color: #718096 !important;
+  color: #616C7C !important;
   font-size: var(--fs-pequeno);
   font-weight: 500;
 }

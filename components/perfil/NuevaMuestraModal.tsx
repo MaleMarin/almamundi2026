@@ -8,7 +8,7 @@ import { auth } from '@/lib/firebase/client';
 
 const BG = '#e8ecf0';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
-const SH_DARK = 'rgba(163,177,198,0.6)';
+const SH_DARK = 'rgba(120,110,100,0.28)';
 const ORANGE = '#FF4A1C';
 const TEXT_1 = '#1a2332';
 const TEXT_2 = '#4a5568';

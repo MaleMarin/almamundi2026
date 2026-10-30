@@ -21,7 +21,7 @@ export function AnsweringStrip({
     return (
       <div
         className="shrink-0 border-b border-white/50 px-5 py-3 md:px-8"
-        style={{ backgroundColor: '#E8EBF2' }}
+        style={{ backgroundColor: '#FBFAF8' }}
       >
         <p className="text-[length:var(--fs-pequeno)] leading-snug text-gray-700 ">{text}</p>
       </div>

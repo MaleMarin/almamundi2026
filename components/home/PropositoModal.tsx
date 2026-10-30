@@ -10,12 +10,12 @@ import {
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const soft = {
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#3d4a5c',
   textBody: '#5c6b7e',
   orange: '#FF4A1C',
   card: {
-    backgroundColor: '#E9ECF3',
+    backgroundColor: '#FBFAF8',
     borderRadius: 20,
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [
@@ -24,7 +24,7 @@ const soft = {
       'inset 1px 1px 2px rgba(255, 255, 255, 0.7)',
     ].join(', ') },
   shell: {
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     borderRadius: 32,
     border: '1px solid rgba(255,255,255,0.6)',
     boxShadow: [
@@ -33,7 +33,7 @@ const soft = {
       'inset 2px 2px 4px rgba(255, 255, 255, 0.65)',
     ].join(', ') },
   button: {
-    backgroundColor: '#E9ECF3',
+    backgroundColor: '#FBFAF8',
     borderRadius: 9999,
     border: '1px solid rgba(255,255,255,0.5)',
     cursor: 'pointer',
@@ -158,7 +158,7 @@ function ClosingBlock({ lines }: { lines: string[] }) {
     <div
       className="rounded-3xl px-6 py-8 text-center md:px-10 md:py-10"
       style={{
-        background: 'linear-gradient(145deg, rgba(255, 74, 28, 0.08) 0%, rgba(233, 236, 243, 0.95) 48%, #E9ECF3 100%)',
+        background: 'linear-gradient(145deg, rgba(255, 74, 28, 0.08) 0%, rgba(251,250,248,0.95) 48%, #FBFAF8 100%)',
         border: '1px solid rgba(255, 140, 90, 0.25)',
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.8), 0 8px 28px rgba(255, 74, 28, 0.08)' }}
     >
@@ -340,7 +340,7 @@ export function PropositoModal({
       >
         <div
           className="shrink-0 border-b border-white/35 px-6 pb-4 pt-6 md:px-10 md:pt-8"
-          style={{ background: 'linear-gradient(180deg, #E8EBF2 0%, #E0E5EC 100%)' }}
+          style={{ background: 'linear-gradient(180deg, #FBFAF8 0%, var(--home-bg) 100%)' }}
         >
           <div className="flex items-start justify-between gap-4">
             <div>
@@ -410,7 +410,7 @@ export function PropositoModal({
 
         {onGoToHistorias ? (
           <div
-            className="flex shrink-0 justify-center border-t border-white/35 bg-[#E0E5EC] px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:px-10 md:py-5"
+            className="flex shrink-0 justify-center border-t border-white/35 bg-[var(--home-bg)] px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:px-10 md:py-5"
             style={{
               boxShadow: '0 -8px 24px rgba(136, 150, 170, 0.12)' }}
           >

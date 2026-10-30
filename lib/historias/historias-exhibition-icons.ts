@@ -6,7 +6,7 @@ export const HISTORIAS_SHARE_ICON_SRC = '/icons/compartir.svg';
 export const HISTORIAS_MAILBOX_ICON_SRC = '/icons/correo.svg';
 
 /**
- * Contenedor inset sobre fondo #E0E5EC (barra de filtros / botones claros):
+ * Contenedor inset sobre fondo var(--home-bg) (barra de filtros / botones claros):
  * da relieve y contraste a los PNG neumórficos claros.
  */
 export const HISTORIAS_FILTER_ICON_WELL_CLASS =

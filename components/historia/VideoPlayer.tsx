@@ -133,7 +133,7 @@ export default function VideoPlayer({ historia, onClose, skipIntertitle = false,
     const prevBg = document.body.style.backgroundColor
     document.body.style.overflow = 'hidden'
     document.body.style.backgroundColor =
-      stage === 'ended' ? '#E0E5EC' : 'var(--film, #111009)'
+      stage === 'ended' ? 'var(--home-bg)' : 'var(--film, #111009)'
     return () => {
       document.body.style.overflow = prevOverflow
       document.body.style.backgroundColor = prevBg

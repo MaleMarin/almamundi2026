@@ -14,7 +14,7 @@ const APP_FONT = SITE_FONT_STACK;
 
 const soft = {
   flat: {
-    backgroundColor: '#E8EBF2',
+    backgroundColor: '#FBFAF8',
     borderRadius: '40px',
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [

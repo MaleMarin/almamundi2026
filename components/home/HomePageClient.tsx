@@ -232,7 +232,7 @@ export function HomePageClient() {
   }, [syncModalsFromHash]);
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#E0E5EC]">
+    <main className="min-h-screen overflow-x-hidden bg-[var(--home-bg)]">
       <div className="font-home">
       {cuentaEliminadaToast ? (
         <div
@@ -326,7 +326,7 @@ export function HomePageClient() {
             </h2>
             <p
               className="mb-0 mt-4 text-[length:var(--fs-texto)] font-normal leading-relaxed"
-              style={{ color: '#718096', textWrap: 'balance' }}
+              style={{ color: '#616C7C', textWrap: 'balance' }}
             >
               {PREGUNTA_COPY.intro[locale]}
             </p>

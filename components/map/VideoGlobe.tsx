@@ -402,7 +402,7 @@ export function VideoGlobe({ points = [], bits, onPointClick, highlightedPointId
             height: 'var(--globe-size)',
             maxWidth: 'min(85vw, 85vh)',
             maxHeight: 'min(85vw, 85vh)',
-            backgroundColor: 'var(--home-bg, #E0E5EC)',
+            backgroundColor: 'var(--home-bg)',
             border: 'none',
             outline: 'none',
             boxShadow: atmosphereShadow,

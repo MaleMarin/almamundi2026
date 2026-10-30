@@ -14,15 +14,12 @@
  * Uso: <TimeBar className="pointer-events-none ..." />
  */
 import { useEffect, useMemo, useState } from 'react';
+import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import WorldClock from '@/components/mapa/WorldClock';
 import type { WorldClockLocation } from '@/components/mapa/WorldClock';
 
 const HUD_CLASS =
   'text-[length:var(--fs-pequeno)] tracking-[0.28em] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]';
-
-/** Nota bajo fecha/hora: sonido en el vacío y sonificación (científica). */
-const SPACE_SOUND_NOTE =
-  'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles, un proceso llamado sonificación.';
 
 type Props = {
   selectedLocation?: WorldClockLocation | null;
@@ -45,6 +42,7 @@ function useLocalTimeZone(): string {
 }
 
 export function TimeBar({ selectedLocation, className }: Props) {
+  const { t } = useHomeLocale();
   const browserTz = useLocalTimeZone();
   const location = useMemo<WorldClockLocation>(
     () => ({
@@ -60,7 +58,7 @@ export function TimeBar({ selectedLocation, className }: Props) {
       <p
         className="m-0 max-w-full font-sans font-normal normal-case italic text-[length:var(--fs-pequeno)] leading-[1.48] text-slate-400/80"
       >
-        {SPACE_SOUND_NOTE}
+        {t.mapSpaceSoundNote}
       </p>
     </div>
   );

@@ -94,27 +94,27 @@ export type ChosenInspirationTopic = {
 const APP_FONT = 'var(--font-interna), sans-serif';
 
 const soft = {
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#718096',
+  textBody: '#616C7C',
   flat: {
-    backgroundColor: '#E8EBF2',
+    backgroundColor: '#FBFAF8',
     borderRadius: '32px',
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [
       '14px 14px 34px rgba(136, 150, 170, 0.48)',
       '-14px -14px 38px rgba(255, 255, 255, 0.98)',
       'inset 2px 2px 4px rgba(255, 255, 255, 0.75)',
-      'inset -3px -3px 8px rgba(163, 177, 198, 0.22)',
+      'inset -3px -3px 8px rgba(120,110,100,0.22)',
     ].join(', ') },
   inset: {
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     borderRadius: '20px',
     border: '1px solid rgba(255,255,255,0.15)',
     boxShadow:
-      'inset 8px 8px 14px rgba(163,177,198,0.7), inset -8px -8px 14px rgba(255,255,255,0.85)' },
+      'inset 8px 8px 14px rgba(120,110,100,0.28), inset -8px -8px 14px rgba(255,255,255,0.85)' },
   button: {
-    backgroundColor: '#E9ECF3',
+    backgroundColor: '#FBFAF8',
     borderRadius: '9999px',
     border: '1px solid rgba(255,255,255,0.5)',
     cursor: 'pointer',
@@ -124,7 +124,7 @@ const soft = {
       '11px 11px 26px rgba(136, 150, 170, 0.45)',
       '-11px -11px 26px rgba(255, 255, 255, 0.96)',
       'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
-      'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
+      'inset -2px -2px 6px rgba(120,110,100,0.18)',
     ].join(', ') } } as const;
 
 const MAX_PROFILE_PHOTO_MB = SUBIR_PHOTO_FILE_MAX_MB;
@@ -2454,7 +2454,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                   {t.modalDetailsTitle}
                 </h3>
                 <p className="text-[length:var(--fs-etiqueta)] leading-snug text-gray-600">{t.modalDetailsSubtitle}</p>
-                <p className="text-[length:var(--fs-etiqueta)] text-gray-500">{t.modalRequiredFieldsNote}</p>
+                <p className="text-[length:var(--fs-etiqueta)] text-[#646E7E]">{t.modalRequiredFieldsNote}</p>
               </div>
 
               <div className="mt-2 grid grid-cols-1 items-start gap-2 md:grid-cols-2 md:gap-4">
@@ -2576,7 +2576,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                           onChange={(e) => addExtraFiles(e.target.files)}
                         />
                       </label>
-                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-tight text-gray-500">
+                      <p className="mt-0.5 text-[length:var(--fs-etiqueta)] leading-tight text-[#646E7E]">
                         JPG, PNG, WEBP o HEIC.
                       </p>
                       {extraPreparing ? (
@@ -2593,7 +2593,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                               <button
                                 type="button"
                                 onClick={() => removeExtraFile(idx)}
-                                className="shrink-0 text-[length:var(--fs-etiqueta)] font-bold uppercase text-gray-500 hover:text-red-500 tracking-[0.12em]"
+                                className="shrink-0 text-[length:var(--fs-etiqueta)] font-bold uppercase text-[#646E7E] hover:text-red-500 tracking-[0.12em]"
                               >
                                 ×
                               </button>
@@ -2647,7 +2647,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                                 setProfileConverting(false);
                                 setProfilePhoto(null);
                               }}
-                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
+                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#646E7E] hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>
@@ -2733,7 +2733,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                                 setProfileConverting(false);
                                 setProfilePhoto(null);
                               }}
-                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-gray-500 hover:text-red-500"
+                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#646E7E] hover:text-red-500"
                             >
                               {t.modalRemove}
                             </button>

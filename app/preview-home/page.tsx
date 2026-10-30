@@ -13,7 +13,7 @@ export default function PreviewHomePage() {
   const add = (msg: string) => setLog((prev) => [...prev, `${new Date().toLocaleTimeString()}: ${msg}`]);
 
   return (
-    <main className="min-h-screen bg-[#E0E5EC] font-sans">
+    <main className="min-h-screen bg-[var(--home-bg)] font-sans">
       <HomeFirstPart
         onShowPurpose={() => add('Propósito')}
         onShowComoFunciona={() => add('¿Cómo funciona?')}
@@ -26,7 +26,7 @@ export default function PreviewHomePage() {
       />
 
       {/* Pie de preview: en el original aquí iría el mapa y el footer */}
-      <section className="py-20 px-6 text-center text-gray-500">
+      <section className="py-20 px-6 text-center text-[#646E7E]">
         <p className="text-[length:var(--fs-pequeno)]">Fin de la primera parte (clone).</p>
         <p className="text-[length:var(--fs-etiqueta)] mt-2">En la home completa aquí sigue el Mapa y el Footer.</p>
         <p className="text-[length:var(--fs-etiqueta)] mt-4 max-w-md mx-auto">

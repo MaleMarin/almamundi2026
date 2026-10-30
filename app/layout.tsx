@@ -90,7 +90,7 @@ export default async function RootLayout({
       lang={locale}
       className={`${montserrat.variable} ${caveat.variable}`}
     >
-      <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-interna">
+      <body className="antialiased min-h-screen bg-[var(--home-bg)] text-gray-800 font-interna">
         <CursorGlobal />
         <a
           href="#main-content"

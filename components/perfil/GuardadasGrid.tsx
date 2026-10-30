@@ -5,7 +5,7 @@ import Link from 'next/link';
 import type { StoryData } from '@/lib/story-schema';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
-const SH_DARK = 'rgba(163,177,198,0.6)';
+const SH_DARK = 'rgba(120,110,100,0.28)';
 const SH_LIGHT = 'rgba(255,255,255,0.85)';
 const ORANGE = '#FF4A1C';
 

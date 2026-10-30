@@ -25,7 +25,7 @@ const linkDark =
 const currentLight = 'min-w-0 max-w-[min(46vw,12rem)] shrink truncate font-semibold text-gray-800 sm:max-w-[18rem] md:max-w-[22rem]';
 const currentDark = 'min-w-0 max-w-[min(46vw,12rem)] shrink truncate font-semibold text-white/90 sm:max-w-[18rem] md:max-w-[22rem]';
 
-const sepLight = 'text-gray-400';
+const sepLight = 'text-[#646E7E]';
 const sepDark = 'text-white/35';
 
 export function Breadcrumbs({ items, tone = 'light', className = '' }: BreadcrumbsProps) {

@@ -470,7 +470,7 @@ export function HistoricalExhibitionCarousel({
                         boxShadow: '0 28px 58px rgba(15,23,42,0.1), inset 1px 1px 0 rgba(255,255,255,0.92)' }}
                     >
                       <CintaStripe colors={h.cintaColors} height={8} className="absolute inset-x-0 top-0 z-[2]" />
-                      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.35)]">
+                      <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(120,110,100,0.28)]">
                         {/* eslint-disable-next-line @next/next/no-img-element -- portada de la historia */}
                         <img
                           src={h.imagen_principal}
@@ -516,16 +516,16 @@ export function HistoricalExhibitionCarousel({
                       <div
                         className="relative z-10 mt-3 flex min-w-0 shrink-0 items-center gap-2.5 rounded-[14px] border border-gray-400/38 px-3 py-2.5"
                         style={{
-                          backgroundColor: '#ebeef4',
+                          backgroundColor: '#FBFAF8',
                           boxShadow:
-                            'inset 6px 6px 12px rgba(163,177,198,0.38), inset -5px -5px 12px rgba(255,255,255,0.88)' }}
+                            'inset 6px 6px 12px rgba(120,110,100,0.28), inset -5px -5px 12px rgba(255,255,255,0.88)' }}
                       >
-                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/76 bg-gray-200/92 shadow-[2px_2px_6px_rgba(163,177,198,0.45)]">
+                        <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border border-white/76 bg-gray-200/92 shadow-[2px_2px_6px_rgba(120,110,100,0.28)]">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img src={h.foto_perfil} alt="" className="h-full w-full object-cover" />
                         </div>
                         <div className="min-w-0 text-left leading-tight">
-                          <p className="truncate text-[length:var(--fs-etiqueta)] font-semibold uppercase text-gray-500 tracking-[0.12em]">
+                          <p className="truncate text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#646E7E] tracking-[0.12em]">
                             {copy.narrator}
                           </p>
                           <p className="truncate text-[length:var(--fs-pequeno)] font-semibold text-gray-900">{h.nombre}</p>
@@ -544,7 +544,7 @@ export function HistoricalExhibitionCarousel({
                           className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-[length:var(--fs-etiqueta)] font-bold uppercase tracking-[0.17em] transition ${
                             canOpenThis
                               ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#FF4A1C_0%,#FF4A1C_52%,#FF4A1C_100%)] text-white shadow-[0_18px_40px_rgba(255,74,28,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
-                              : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-gray-500 opacity-95'
+                              : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-[#646E7E] opacity-95'
                           }`}
                         >
                           {canOpenThis ? primaryOpenLabel(contentMode, copy) : copy.unavailable}

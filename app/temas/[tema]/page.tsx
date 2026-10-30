@@ -121,9 +121,9 @@ export default function TemaPage() {
                     {s.description && <p className="text-[length:var(--fs-pequeno)] text-gray-600 line-clamp-1 mt-1">{s.description}</p>}
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="text-[length:var(--fs-etiqueta)] text-gray-500 capitalize">{getFormat(s)}</span>
+                    <span className="text-[length:var(--fs-etiqueta)] text-[#646E7E] capitalize">{getFormat(s)}</span>
                     {formatStoryWhen(s.publishedAt, locale) ? (
-                      <span className="text-[length:var(--fs-etiqueta)] text-gray-400">{formatStoryWhen(s.publishedAt, locale)}</span>
+                      <span className="text-[length:var(--fs-etiqueta)] text-[#646E7E]">{formatStoryWhen(s.publishedAt, locale)}</span>
                     ) : null}
                   </div>
                 </div>

@@ -23,12 +23,12 @@ export const MAP_HOME_DOCK_LABEL_STYLE: CSSProperties = {
  * Altura fija ~60px, padding horizontal fijo, mismas sombras y radio.
  */
 export const MAP_HOME_NEU_BUTTON_STYLE: CSSProperties = {
-  backgroundColor: '#E0E5EC',
+  backgroundColor: 'var(--home-bg)',
   boxShadow: [
     '14px 14px 30px rgba(136, 150, 170, 0.58)',
     '-14px -14px 32px rgba(255, 255, 255, 0.96)',
     'inset 3px 3px 6px rgba(255, 255, 255, 0.82)',
-    'inset -4px -4px 12px rgba(163, 177, 198, 0.32)',
+    'inset -4px -4px 12px rgba(120,110,100,0.28)',
   ].join(', '),
   border: '1px solid rgba(255,255,255,0.48)',
   borderRadius: 9999,

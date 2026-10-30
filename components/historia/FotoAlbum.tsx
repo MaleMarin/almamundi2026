@@ -375,7 +375,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
               justifyContent: 'center',
               textAlign: 'center',
               padding: 'clamp(2rem, 5vw, 3.25rem) 1.25rem',
-              background: `linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)`,
+              background: `linear-gradient(180deg, ${neu.bg} 0%, #E4E1DC 100%)`,
               fontFamily: INTERIOR_FONT_STACK }}
           >
             <div
@@ -385,7 +385,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                 maxWidth: 520,
                 padding: '2.25rem clamp(1.25rem, 4vw, 2.5rem)',
                 borderRadius: 28,
-                boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(163,177,198,0.22)` }}
+                boxShadow: `${neu.cardProminent.boxShadow as string}, 0 36px 56px rgba(120,110,100,0.22)` }}
             >
               {imagenes.length > 0 ? (
                 <p
@@ -428,7 +428,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   objectFit: 'cover',
                   border: `2px solid ${SEPIA}55`,
                   marginBottom: '0.85rem',
-                  boxShadow: '8px 8px 14px rgba(163,177,198,0.4), -4px -4px 10px rgba(255,255,255,0.75)' }}
+                  boxShadow: '8px 8px 14px rgba(120,110,100,0.28), -4px -4px 10px rgba(255,255,255,0.75)' }}
               />
               <HistoriaCreditos
                 cancionRelacionada={historia.cancionRelacionada}

@@ -128,8 +128,6 @@ import {
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
 import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
-import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
-
 /** Encuadre inicial del globo en home (Sudamérica de frente). La noche usa la zona horaria, sin GPS. */
 const HOME_GLOBE_FRAME_LAT = -15;
 const HOME_GLOBE_FRAME_LNG = -60;
@@ -953,8 +951,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     soundEnabled,
     onToggleSound: handleToggleSound };
 
-  /** Altura mínima de la franja fecha/hora + nota sobre sonido en el vacío (TimeBar). */
-  const TIME_STRIP_HEIGHT = 200;
   return (
     <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-hidden">
       <div aria-hidden className="map-universe-fade map-universe-fade-top" />
@@ -1024,10 +1020,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {/* Franja fecha/hora: capa independiente debajo del globo (regla mapa-seccion-lock); z-10 para que nunca quede tapada */}
       <div
         className="map-timebar-stage relative z-20 -mt-px flex w-full flex-shrink-0 flex-col items-center justify-end border-0 pb-8 pt-2 shadow-none outline-none"
-        style={{ minHeight: `${TIME_STRIP_HEIGHT}px` }}
       >
         <TimeBar className="pointer-events-none text-center text-[length:var(--fs-etiqueta)] text-slate-400/85 drop-shadow-[0_1px_6px_rgba(0,0,0,0.35)]" />
-        <MapRealtimeSyncLine userLat={viewerLat} userLng={viewerLng} />
       </div>
 
       {/* Dock: Historias, También cuenta, Noticias (capas), luego Sonidos (audio), luego buscar. */}

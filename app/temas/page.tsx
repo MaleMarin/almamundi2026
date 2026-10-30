@@ -57,7 +57,7 @@ export default function TemasPage() {
       <section className="px-6 md:px-12 pt-10 md:pt-14 pb-20 md:pb-28 max-w-5xl mx-auto">
         <p className="text-[length:var(--fs-etiqueta)] font-semibold text-amber-700 uppercase mb-3 tracking-[0.12em]">Explorar por tema</p>
         <h1 className="text-[length:var(--fs-titular)] font-normal leading-[1.1] mb-4" style={{ color: neu.textMain }}>
-          ¿Qué quieres <span className="font-medium text-gray-500">encontrar?</span>
+          ¿Qué quieres <span className="font-medium text-[#646E7E]">encontrar?</span>
         </h1>
         <p className="text-[length:var(--fs-texto)] max-w-xl mb-10" style={{ color: neu.textBody }}>
           Cada experiencia humana tiene su lugar aquí.

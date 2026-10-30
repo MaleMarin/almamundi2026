@@ -280,7 +280,7 @@ export default function AudioPlayer({
               : {
                   position: 'fixed',
                   inset: 0,
-                  background: `linear-gradient(165deg, ${PAGE_BG} 0%, #dce1e9 48%, ${PAGE_BG} 100%)`,
+                  background: `linear-gradient(165deg, ${PAGE_BG} 0%, #E4E1DC 48%, ${PAGE_BG} 100%)`,
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -369,7 +369,7 @@ export default function AudioPlayer({
                 border: '2px solid rgba(255, 74, 28,0.45)',
                 marginBottom: '1.25rem',
                 flexShrink: 0,
-                boxShadow: '8px 8px 20px rgba(163,177,198,0.35), -6px -6px 16px rgba(255,255,255,0.85)' }}
+                boxShadow: '8px 8px 20px rgba(120,110,100,0.28), -6px -6px 16px rgba(255,255,255,0.85)' }}
             >
               <img
                 src={historia.autor.avatar}
@@ -500,7 +500,7 @@ export default function AudioPlayer({
                     border: `2px solid ${SEPIA}`,
                     background: 'rgba(255, 74, 28,0.12)',
                     color: SEPIA,
-                    boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.9)',
+                    boxShadow: '6px 6px 14px rgba(120,110,100,0.28), -4px -4px 12px rgba(255,255,255,0.9)',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',

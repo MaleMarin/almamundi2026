@@ -141,7 +141,7 @@ function StoryCard({
         {image ? (
           <img src={image} alt="" className="h-full w-full object-cover" />
         ) : null}
-        <span className="absolute left-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[#E0E5EC]/90">
+        <span className="absolute left-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--home-bg)_90%,transparent)]">
           <FormatMark kind={formatKey(story)} />
         </span>
       </div>
@@ -152,7 +152,7 @@ function StoryCard({
         {byline ? (
           <p className="text-[length:var(--fs-etiqueta)] text-gray-600">{byline}</p>
         ) : null}
-        {when ? <p className="text-[length:var(--fs-etiqueta)] text-gray-500">{when}</p> : null}
+        {when ? <p className="text-[length:var(--fs-etiqueta)] text-[#646E7E]">{when}</p> : null}
         {story.onGlobe ? (
           <p className="mt-auto pt-2 text-[length:var(--fs-etiqueta)] font-semibold" style={{ color: 'var(--almamundi-orange)' }}>
             {copy.onGlobe}
@@ -289,11 +289,11 @@ export default function HistoriasCatalog() {
               onClick={() => chooseTab(key)}
               className="min-h-11 rounded-full px-4 py-2 text-[length:var(--fs-pequeno)] font-semibold"
               style={{
-                background: active ? 'var(--almamundi-orange)' : '#E0E5EC',
+                background: active ? 'var(--almamundi-orange)' : 'var(--home-bg)',
                 color: active ? '#fff' : neu.textMain,
                 boxShadow: active
                   ? 'none'
-                  : '6px 6px 14px rgba(163,177,198,0.45), -6px -6px 14px rgba(255,255,255,0.8)',
+                  : '6px 6px 14px rgba(120,110,100,0.28), -6px -6px 14px rgba(255,255,255,0.8)',
               }}
             >
               {copy.tabs[key]}
@@ -308,7 +308,7 @@ export default function HistoriasCatalog() {
           <select
             value={country}
             onChange={(event) => setCountry(event.target.value)}
-            className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
           >
             <option value="">{copy.allCountries}</option>
             {countries.map((item) => (
@@ -323,7 +323,7 @@ export default function HistoriasCatalog() {
           <select
             value={eje}
             onChange={(event) => chooseEje(event.target.value)}
-            className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
           >
             <option value="">{copy.allCountries}</option>
             {EJES.map((item) => (
@@ -338,7 +338,7 @@ export default function HistoriasCatalog() {
           <select
             value={order}
             onChange={(event) => setOrder(event.target.value === 'oldest' ? 'oldest' : 'newest')}
-            className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
           >
             <option value="newest">{copy.newest}</option>
             <option value="oldest">{copy.oldest}</option>
@@ -351,7 +351,7 @@ export default function HistoriasCatalog() {
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={copy.search}
-            className="min-h-11 rounded-xl border border-white/50 bg-[#E0E5EC] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
           />
         </label>
       </div>

@@ -39,6 +39,8 @@ export type HomeMessages = {
   historiasLead2b: string;
   /** Título grande sobre la sección del mapa (home #mapa y cabecera /mapa). */
   mapSectionTitle: string;
+  /** Nota bajo el reloj del globo: sonido en el vacío y sonificación. */
+  mapSpaceSoundNote: string;
   cardVideoTitle: string;
   cardVideoSubtitle: string;
   cardVideoBody: string;
@@ -92,6 +94,8 @@ const es: HomeMessages = {
   historiasLead2: 'Hay muchas formas de contar',
   historiasLead2b: 'Elige la tuya',
   mapSectionTitle: 'El Alma del Mundo',
+  mapSpaceSoundNote:
+    'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles, un proceso llamado sonificación.',
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBody:
@@ -148,6 +152,8 @@ const pt: HomeMessages = {
   historiasLead2: 'Há muitas formas de contar',
   historiasLead2b: 'Escolha a sua',
   mapSectionTitle: 'A Alma do Mundo',
+  mapSpaceSoundNote:
+    'No espaço não há som porque não há ar para transmiti-lo. Para estudar eventos como explosões, os cientistas convertem dados de telescópios em frequências audíveis, um processo chamado sonificação.',
   cardVideoTitle: 'Sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBody:
@@ -204,6 +210,8 @@ const en: HomeMessages = {
   historiasLead2: 'There are many ways to tell it',
   historiasLead2b: 'Choose yours',
   mapSectionTitle: 'The Soul of the World',
+  mapSpaceSoundNote:
+    'In space there is no sound because there is no air to carry it. To study events such as explosions, scientists turn telescope data into audible frequencies, a process called sonification.',
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBody:

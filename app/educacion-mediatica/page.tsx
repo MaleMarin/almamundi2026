@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 export default function EducacionMediaticaPage() {
   return (
     <main
-      className="min-h-screen bg-[#E0E5EC] px-6 pb-32 pt-28 md:px-14 md:pb-44 md:pt-36"
+      className="min-h-screen bg-[var(--home-bg)] px-6 pb-32 pt-28 md:px-14 md:pb-44 md:pt-36"
       style={{ fontFamily: 'inherit', color: '#1a1f2a' }}
     >
       <div className="mx-auto max-w-3xl">

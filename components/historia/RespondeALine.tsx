@@ -6,7 +6,7 @@ import { INTERIOR_FONT_STACK } from '@/lib/typography';
 
 export function RespondeALine({
   questionId,
-  color = '#718096',
+  color = '#616C7C',
   align = 'left' }: {
   questionId?: string | null;
   questionMode?: string | null;

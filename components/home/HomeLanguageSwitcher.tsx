@@ -14,7 +14,7 @@ export function HomeLanguageSwitcher({ className = '' }: { className?: string })
 
   return (
     <div
-      className={`flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-[#E0E5EC]/90 px-1 py-0.5 shadow-sm backdrop-blur-sm ${className}`}
+      className={`flex shrink-0 items-center gap-0.5 rounded-full border border-white/40 bg-[color-mix(in_srgb,var(--home-bg)_90%,transparent)] px-1 py-0.5 shadow-sm backdrop-blur-sm ${className}`}
       role="group"
       aria-label={t.ariaLanguage}
     >

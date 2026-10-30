@@ -12,8 +12,8 @@ export default function VistaPreviaPage() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-[#E0E5EC] flex items-center justify-center">
-      <p className="text-gray-500">Redirigiendo al inicio…</p>
+    <main className="min-h-screen bg-[var(--home-bg)] flex items-center justify-center">
+      <p className="text-[#646E7E]">Redirigiendo al inicio…</p>
     </main>
   );
 }

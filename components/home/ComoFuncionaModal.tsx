@@ -9,11 +9,11 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { COMO_FUNCIONA } from '@/lib/i18n/como-funciona';
 import { SITE_FONT_STACK } from '@/lib/typography';
 const soft = {
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#718096',
+  textBody: '#616C7C',
   button: {
-    backgroundColor: '#E9ECF3',
+    backgroundColor: '#FBFAF8',
     borderRadius: '9999px',
     border: '1px solid rgba(255,255,255,0.5)',
     cursor: 'pointer',
@@ -22,7 +22,7 @@ const soft = {
       '11px 11px 26px rgba(136, 150, 170, 0.45)',
       '-11px -11px 26px rgba(255, 255, 255, 0.96)',
       'inset 1px 1px 3px rgba(255, 255, 255, 0.65)',
-      'inset -2px -2px 6px rgba(163, 177, 198, 0.18)',
+      'inset -2px -2px 6px rgba(120,110,100,0.18)',
     ].join(', ') } } as const;
 
 export function ComoFuncionaModal({

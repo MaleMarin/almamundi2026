@@ -95,7 +95,7 @@ export function HistoriasFormatListPageLayout({
 
             <div className="mt-5 flex-shrink-0 md:mt-6" aria-label={copy.filterAria}>
               <div
-                className="w-full overflow-visible rounded-[22px] px-3 py-3.5 shadow-[inset_6px_6px_12px_rgba(163,177,198,0.35),inset_-5px_-5px_12px_rgba(255,255,255,0.88)] sm:px-4 sm:py-4 md:rounded-3xl"
+                className="w-full overflow-visible rounded-[22px] px-3 py-3.5 shadow-[inset_6px_6px_12px_rgba(120,110,100,0.28),inset_-5px_-5px_12px_rgba(255,255,255,0.88)] sm:px-4 sm:py-4 md:rounded-3xl"
                 style={{
                   ...neu.cardInset,
                   borderRadius: 22 }}
@@ -120,7 +120,7 @@ export function HistoriasFormatListPageLayout({
                     <select
                       value={filterYear}
                       onChange={(e) => setFilterYear(e.target.value)}
-                      className="box-border w-full min-h-[2.75rem] min-w-[15.5rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] py-2 pl-3 pr-12 text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+                      className="box-border w-full min-h-[2.75rem] min-w-[15.5rem] rounded-xl border border-gray-300/45 bg-[var(--home-bg)] py-2 pl-3 pr-12 text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(120,110,100,0.28),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     >
                       <option value="">{copy.allYears}</option>
@@ -139,7 +139,7 @@ export function HistoriasFormatListPageLayout({
                       onChange={(e) => setFilterKeywords(e.target.value)}
                       placeholder={copy.keywordPlaceholder}
                       autoComplete="off"
-                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+                      className="w-full min-h-[2.75rem] rounded-xl border border-gray-300/45 bg-[var(--home-bg)] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-[#646E7E] shadow-[inset_2px_2px_6px_rgba(120,110,100,0.28),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
                       style={{ fontFamily: neu.APP_FONT }}
                     />
                   </label>
@@ -148,7 +148,7 @@ export function HistoriasFormatListPageLayout({
                       <div className="flex shrink-0 items-center gap-2.5">
                         <EthicalShareTriggerButton
                           onClick={() => setEthicalShareOpen(true)}
-                          className="flex min-h-11 min-w-11 shrink-0 cursor-help items-center justify-center rounded-full border-2 border-[color:var(--almamundi-orange)] bg-[#E9ECF3] text-[color:var(--almamundi-orange)] shadow-[3px_3px_10px_rgba(163,177,198,0.5),-2px_-2px_8px_rgba(255,255,255,0.92)] transition hover:bg-[#e2e7f0]"
+                          className="flex min-h-11 min-w-11 shrink-0 cursor-help items-center justify-center rounded-full border-2 border-[color:var(--almamundi-orange)] bg-[#FBFAF8] text-[color:var(--almamundi-orange)] shadow-[3px_3px_10px_rgba(120,110,100,0.28),-2px_-2px_8px_rgba(255,255,255,0.92)] transition hover:bg-[#E6E3DE]"
                           title={shareLegend}
                           ariaLabel={`${copy.shareLabel}. ${copy.shareText}`}
                         />
@@ -171,8 +171,8 @@ export function HistoriasFormatListPageLayout({
                       disabled={!hasActiveFilters}
                       className={`w-full whitespace-nowrap rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-semibold transition disabled:cursor-not-allowed disabled:opacity-55 sm:w-auto ${
                         hasActiveFilters
-                          ? 'text-gray-800 ring-1 ring-orange-400/35 ring-offset-2 ring-offset-[#E0E5EC]'
-                          : 'text-gray-500'
+                          ? 'text-gray-800 ring-1 ring-orange-400/35 ring-offset-2 ring-offset-[var(--home-bg)]'
+                          : 'text-[#646E7E]'
                       }`}
                       style={{
                         ...neu.button,
@@ -188,7 +188,7 @@ export function HistoriasFormatListPageLayout({
                   </p>
                 ) : null}
                 {hasActiveFilters && !showingUnfilteredBecauseNoMatches ? (
-                  <p className="mt-2 text-[length:var(--fs-etiqueta)] text-gray-500" role="status">
+                  <p className="mt-2 text-[length:var(--fs-etiqueta)] text-[#646E7E]" role="status">
                     {interpolate(copy.showing, { shown: filteredStoryCount, total: allStoryCount })}
                   </p>
                 ) : null}
@@ -200,7 +200,7 @@ export function HistoriasFormatListPageLayout({
         <section
           id="historias-carrusel"
           aria-label={copy.carouselAria}
-          className="mt-4 flex min-h-[min(480px,calc(100dvh-11rem))] flex-1 flex-col overflow-visible border-t border-gray-400/25 bg-[linear-gradient(180deg,rgba(224,229,236,0.42)_0%,#E0E5EC_16%,#e2e7ee_100%)] scroll-mt-24 px-2 pb-4 pt-5 sm:mt-5 sm:px-3 sm:pb-6 md:px-6 lg:min-h-[min(520px,calc(100dvh-10.5rem))] lg:px-10 lg:pb-8"
+          className="mt-4 flex min-h-[min(480px,calc(100dvh-11rem))] flex-1 flex-col overflow-visible border-t border-gray-400/25 bg-[linear-gradient(180deg,rgba(245,244,242,0.42)_0%,var(--home-bg)_16%,#E6E3DE_100%)] scroll-mt-24 px-2 pb-4 pt-5 sm:mt-5 sm:px-3 sm:pb-6 md:px-6 lg:min-h-[min(520px,calc(100dvh-10.5rem))] lg:px-10 lg:pb-8"
         >
           <div className="flex min-h-0 w-full flex-1 flex-col items-stretch justify-center">
             <HistoricalExhibitionCarousel

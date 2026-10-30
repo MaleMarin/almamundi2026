@@ -81,12 +81,12 @@ export function HistoriasFilterCountrySelect({
         aria-expanded={open}
         aria-controls={open ? listboxId : undefined}
         onClick={() => setOpen((o) => !o)}
-        className="flex min-h-[2.75rem] w-full items-center gap-1.5 rounded-xl border border-gray-300/45 bg-[#E0E5EC] px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.42),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
+        className="flex min-h-[2.75rem] w-full items-center gap-1.5 rounded-xl border border-gray-300/45 bg-[var(--home-bg)] px-3 py-2 text-left text-[length:var(--fs-pequeno)] text-gray-800 shadow-[inset_2px_2px_6px_rgba(120,110,100,0.28),inset_-2px_-2px_6px_rgba(255,255,255,0.88)] outline-none transition focus:ring-2 focus:ring-orange-400/40"
         style={{ fontFamily: neu.APP_FONT }}
       >
         <span className="min-w-0 flex-1 truncate">{labelShown}</span>
         <ChevronDown
-          className={`h-4 w-4 shrink-0 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`}
+          className={`h-4 w-4 shrink-0 text-[#646E7E] transition-transform ${open ? 'rotate-180' : ''}`}
           aria-hidden
         />
       </button>
@@ -104,7 +104,7 @@ export function HistoriasFilterCountrySelect({
               placeholder={copy.countrySearch}
               autoComplete="off"
               aria-label={copy.countrySearchAria}
-              className="w-full rounded-xl border border-gray-300/35 bg-[#E0E5EC] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-gray-400 shadow-[inset_2px_2px_6px_rgba(163,177,198,0.4),inset_-2px_-2px_6px_rgba(255,255,255,0.8)] outline-none focus:ring-2 focus:ring-orange-400/35"
+              className="w-full rounded-xl border border-gray-300/35 bg-[var(--home-bg)] px-3 py-2 text-[length:var(--fs-pequeno)] text-gray-800 placeholder:text-[#646E7E] shadow-[inset_2px_2px_6px_rgba(120,110,100,0.28),inset_-2px_-2px_6px_rgba(255,255,255,0.8)] outline-none focus:ring-2 focus:ring-orange-400/35"
               style={{ fontFamily: neu.APP_FONT }}
               onKeyDown={(e) => e.stopPropagation()}
             />
@@ -142,7 +142,7 @@ export function HistoriasFilterCountrySelect({
               </li>
             ))}
             {filtered.length === 0 ? (
-              <li className="px-3 py-4 text-center text-[length:var(--fs-pequeno)] text-gray-500">{copy.countryEmpty}</li>
+              <li className="px-3 py-4 text-center text-[length:var(--fs-pequeno)] text-[#646E7E]">{copy.countryEmpty}</li>
             ) : null}
           </ul>
         </div>

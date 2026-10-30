@@ -53,7 +53,7 @@ export type StoryEndScreenProps = {
 const TEXT_TITLE = neu.textMain;
 const TEXT_BODY = neu.textBody;
 const ORANGE = 'var(--almamundi-orange, #FF4A1C)';
-const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(255, 74, 28,0.18), inset 0 -1px 0 rgba(163,177,198,0.25)`;
+const SOFT_ORANGE_SHADOW = `0 22px 48px rgba(255, 74, 28,0.18), inset 0 -1px 0 rgba(120,110,100,0.25)`;
 
 function formatEndFecha(raw: string | undefined, locale: AlmaLocale): string | null {
   if (!raw || !String(raw).trim()) return null;
@@ -109,8 +109,8 @@ export function StoryEndScreen({
         backgroundColor: neu.bg,
         backgroundImage: `
           radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 74, 28,0.085) 0%, transparent 55%),
-          radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
-          linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
+          radial-gradient(ellipse 90% 60% at 100% 100%, rgba(120,110,100,0.22) 0%, transparent 50%),
+          linear-gradient(180deg, ${neu.bg} 0%, #E4E1DC 100%)
         ` }
     : {
         position: 'fixed',
@@ -126,8 +126,8 @@ export function StoryEndScreen({
         backgroundColor: neu.bg,
         backgroundImage: `
           radial-gradient(ellipse 120% 80% at 50% -20%, rgba(255, 74, 28,0.085) 0%, transparent 55%),
-          radial-gradient(ellipse 90% 60% at 100% 100%, rgba(163,177,198,0.22) 0%, transparent 50%),
-          linear-gradient(180deg, ${neu.bg} 0%, #dbe0e9 100%)
+          radial-gradient(ellipse 90% 60% at 100% 100%, rgba(120,110,100,0.22) 0%, transparent 50%),
+          linear-gradient(180deg, ${neu.bg} 0%, #E4E1DC 100%)
         ` };
 
   return (
@@ -169,7 +169,7 @@ export function StoryEndScreen({
           padding: '2.65rem clamp(1.35rem, 4vw, 2.85rem)',
           borderRadius: 28,
           textAlign: 'center',
-          boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(163,177,198,0.26)` }}
+          boxShadow: `${neu.cardProminent.boxShadow as string}, 0 38px 64px rgba(120,110,100,0.26)` }}
       >
         <RespondeALine
           questionId={questionId}
@@ -269,7 +269,7 @@ export function StoryEndScreen({
               objectFit: 'cover',
               border: `2px solid ${ORANGE}50`,
               flexShrink: 0,
-              boxShadow: '8px 8px 14px rgba(163,177,198,0.42), -4px -4px 10px rgba(255,255,255,0.65)' }}
+              boxShadow: '8px 8px 14px rgba(120,110,100,0.28), -4px -4px 10px rgba(255,255,255,0.65)' }}
           />
           <div style={{ minWidth: 0 }}>
             <p style={{ fontWeight: 600, fontSize: 'var(--fs-pequeno)', color: TEXT_TITLE, marginBottom: autor.ubicacion ? '0.2rem' : 0 }}>

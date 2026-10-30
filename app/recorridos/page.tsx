@@ -9,8 +9,8 @@ import { neu, historiasInterior } from '@/lib/historias-neumorph';
 
 const soft = {
   flat: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+    backgroundColor: 'var(--home-bg)',
+    boxShadow: '9px 9px 16px rgba(120,110,100,0.28), -9px -9px 16px rgba(255,255,255,0.5)',
     border: '1px solid rgba(255,255,255,0.3)',
     borderRadius: '40px' } } as const;
 

@@ -19,7 +19,6 @@ import { StoryViewer } from '@/components/mapa/StoryViewer';
 import { isNightAtLocation, sunDirectionUtc, terminatorCssGradientAngleDeg } from '@/lib/sunPosition';
 import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
 import { TimeBar } from '@/components/map/TimeBar';
-import { MapRealtimeSyncLine } from '@/components/map/MapRealtimeSyncLine';
 import { UniverseBackground } from '@/components/UniverseBackground';
 import { AtmosphereOverlay } from '@/components/AtmosphereOverlay';
 import { useAtmosphere } from '@/hooks/useAtmosphere';
@@ -365,24 +364,24 @@ const GLOBE_BUMP_IMAGE: string | null = null;
 const STARFIELD_DEBUG = false;
 
 const soft = {
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#718096',
+  textBody: '#616C7C',
   flat: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '9px 9px 16px rgba(163,177,198,0.6), -9px -9px 16px rgba(255,255,255,0.5)',
+    backgroundColor: 'var(--home-bg)',
+    boxShadow: '9px 9px 16px rgba(120,110,100,0.28), -9px -9px 16px rgba(255,255,255,0.5)',
     border: '1px solid rgba(255,255,255,0.3)',
     borderRadius: '40px'
   },
   inset: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: 'inset 6px 6px 10px rgba(163,177,198,0.7), inset -6px -6px 10px rgba(255,255,255,0.8)',
+    backgroundColor: 'var(--home-bg)',
+    boxShadow: 'inset 6px 6px 10px rgba(120,110,100,0.28), inset -6px -6px 10px rgba(255,255,255,0.8)',
     border: '1px solid rgba(255,255,255,0.1)',
     borderRadius: '30px'
   },
   button: {
-    backgroundColor: '#E0E5EC',
-    boxShadow: '8px 8px 16px rgba(163,177,198,0.6), -8px -8px 16px rgba(255,255,255,0.8)',
+    backgroundColor: 'var(--home-bg)',
+    boxShadow: '8px 8px 16px rgba(120,110,100,0.28), -8px -8px 16px rgba(255,255,255,0.8)',
     border: '1px solid rgba(255,255,255,0.3)',
     borderRadius: '9999px',
     cursor: 'pointer',
@@ -5191,7 +5190,7 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
         })()}
       </MapCanvas>
       </div>
-      {/* HUD: Fecha/Hora/Ciudad — fixed al viewport en la franja reservada (200px); z-[100] siempre por encima del globo (z-0) */}
+      {/* HUD: Fecha/Hora/Ciudad. z-[100] siempre por encima del globo (z-0). */}
       <div
         className="pointer-events-none left-0 right-0 z-[100] flex flex-col items-center justify-end"
         style={embedded ? { position: 'absolute', bottom: '48px' } : { position: 'fixed', bottom: '56px', left: 0, right: 0 }}
@@ -5200,7 +5199,6 @@ function MapaPageContent({ embedded = false, sectionTopOffset = 0, sectionHeight
           selectedLocation={selectedLocation}
           className="text-[length:var(--fs-etiqueta)] text-slate-300/70 drop-shadow-[0_10px_30px_rgba(0,0,0,0.55)]"
         />
-        <MapRealtimeSyncLine />
       </div>
       </div>
     </div>

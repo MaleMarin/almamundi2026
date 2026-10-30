@@ -30,7 +30,7 @@ export function ExhibitionCompromisoStatement({
 
   const titleCls =
     variant === 'footer' || variant === 'share-intro'
-      ? 'mb-3 text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-gray-500'
+      ? 'mb-3 text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-[#646E7E]'
       : variant === 'band'
         ? bandTone === 'light'
           ? 'text-[length:var(--fs-etiqueta)] font-normal uppercase tracking-[0.22em] text-gray-600'

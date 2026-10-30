@@ -78,7 +78,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
         marginTop: light ? 28 : 48,
         paddingTop: light ? 24 : 40,
         textAlign: 'left',
-        borderTop: light ? `1px solid rgba(163,177,198,0.35)` : '1px solid rgba(255,255,255,0.06)' }}
+        borderTop: light ? `1px solid rgba(120,110,100,0.28)` : '1px solid rgba(255,255,255,0.06)' }}
     >
       <p
         style={{
@@ -102,10 +102,10 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
             style={{
               textAlign: 'left',
               borderRadius: 18,
-              background: light ? '#ebeef4' : 'rgba(255,255,255,0.04)',
+              background: light ? '#FBFAF8' : 'rgba(255,255,255,0.04)',
               border: light ? '1px solid rgba(255,255,255,0.55)' : '1px solid rgba(255,255,255,0.08)',
               boxShadow: light
-                ? '10px 10px 20px rgba(163,177,198,0.4), -8px -8px 16px rgba(255,255,255,0.85)'
+                ? '10px 10px 20px rgba(120,110,100,0.28), -8px -8px 16px rgba(255,255,255,0.85)'
                 : undefined,
               cursor: 'pointer',
               transition: 'transform 250ms ease, box-shadow 250ms ease',

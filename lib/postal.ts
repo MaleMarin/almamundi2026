@@ -7,7 +7,7 @@ import { canvasFontFamily } from '@/lib/typography';
 
 const W = 1200;
 const H = 630;
-const BG = '#E0E5EC';
+const BG = '#F5F4F2';
 const TEXT_MAIN = '#4A5568';
 const ACCENT = '#FF4A1C';
 

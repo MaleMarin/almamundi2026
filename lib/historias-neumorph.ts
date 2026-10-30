@@ -10,9 +10,9 @@ export const APP_FONT = INTERIOR_FONT_STACK;
 
 export const neu = {
   APP_FONT,
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#718096',
+  textBody: '#616C7C',
   /** Menú superior en interiores: inactivo negro; activo / hover píldora = naranja (`ACTIVE_NAV_CLASS` + `.btn-almamundi`). */
   navLinkIdle: '#0a0a0a',
   /** Naranja fuerte como la home (--almamundi-orange) */
@@ -21,9 +21,9 @@ export const neu = {
   /** Card elevada (relieve hacia fuera) */
   card: {
     position: 'relative' as const,
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     boxShadow:
-      '14px 14px 28px rgba(163,177,198,0.65), -14px -14px 28px rgba(255,255,255,0.7)',
+      '14px 14px 28px rgba(120,110,100,0.28), -14px -14px 28px rgba(255,255,255,0.7)',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '24px',
   },
@@ -33,7 +33,7 @@ export const neu = {
    */
   cardProminent: {
     position: 'relative' as const,
-    backgroundColor: '#ebeef4',
+    backgroundColor: '#FBFAF8',
     boxShadow:
       '14px 14px 32px rgba(130, 148, 172, 0.48), -12px -12px 28px rgba(255, 255, 255, 0.95)',
     border: '1px solid rgba(255, 255, 255, 0.55)',
@@ -41,9 +41,9 @@ export const neu = {
   },
   /** Card hundida (inset) */
   cardInset: {
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     boxShadow:
-      'inset 8px 8px 14px rgba(163,177,198,0.7), inset -8px -8px 14px rgba(255,255,255,0.85)',
+      'inset 8px 8px 14px rgba(120,110,100,0.28), inset -8px -8px 14px rgba(255,255,255,0.85)',
     border: '1px solid rgba(255,255,255,0.15)',
     borderRadius: '20px',
   },
@@ -57,9 +57,9 @@ export const neu = {
   },
   /** Botón / CTA (nav interiores: sombras acordes a píldoras más compactas) */
   button: {
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     boxShadow:
-      '6px 6px 12px rgba(163,177,198,0.55), -6px -6px 12px rgba(255,255,255,0.78)',
+      '6px 6px 12px rgba(120,110,100,0.28), -6px -6px 12px rgba(255,255,255,0.78)',
     border: '1px solid rgba(255,255,255,0.35)',
     borderRadius: '9999px',
     cursor: 'pointer',
@@ -68,9 +68,9 @@ export const neu = {
   },
   /** Badge "En el mapa" */
   badge: {
-    backgroundColor: '#E0E5EC',
+    backgroundColor: 'var(--home-bg)',
     boxShadow:
-      'inset 4px 4px 8px rgba(163,177,198,0.6), inset -4px -4px 8px rgba(255,255,255,0.7)',
+      'inset 4px 4px 8px rgba(120,110,100,0.28), inset -4px -4px 8px rgba(255,255,255,0.7)',
     border: '1px solid rgba(255,255,255,0.25)',
     borderRadius: '9999px',
   },
@@ -91,8 +91,8 @@ export const historiasInterior = {
   navClassName:
     'sticky top-0 z-50 flex items-center justify-between gap-3 px-6 md:px-12 py-2 md:py-2.5 min-h-[5rem] md:min-h-[6rem] border-b border-gray-300/50',
   navBarStyle: {
-    backgroundColor: 'rgba(224,229,236,0.95)',
-    boxShadow: '0 4px 24px rgba(163,177,198,0.3)',
+    backgroundColor: 'rgba(245,244,242,0.95)',
+    boxShadow: '0 4px 24px rgba(120,110,100,0.28)',
   } as const,
   /** Marca gráfica oficial (PNG en /public). No usar logo.svg de texto plano. */
   logoSrc: '/logo.png' as const,

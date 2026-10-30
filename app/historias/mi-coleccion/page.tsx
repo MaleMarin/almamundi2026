@@ -52,7 +52,7 @@ export default function MiColeccionPage() {
         {saved.length === 0 ? (
           <div className="rounded-2xl p-8 text-center" style={neu.cardInset}>
             <p className="text-gray-600 mb-4">Aún no has guardado ninguna historia.</p>
-            <p className="text-[length:var(--fs-pequeno)] text-gray-500 mb-6">En Videos o Audios, elige una historia y haz clic en &quot;Guardar en mi colección&quot;.</p>
+            <p className="text-[length:var(--fs-pequeno)] text-[#646E7E] mb-6">En Videos o Audios, elige una historia y haz clic en &quot;Guardar en mi colección&quot;.</p>
             <Link href="/historias/videos" className="inline-block px-5 py-2.5 rounded-full text-[length:var(--fs-pequeno)] font-medium" style={{ ...neu.button, color: neu.textMain }}>Ir a Historias</Link>
           </div>
         ) : (
@@ -95,7 +95,7 @@ export default function MiColeccionPage() {
                     <button
                       type="button"
                       onClick={() => remove(s.id)}
-                      className="text-[length:var(--fs-etiqueta)] text-gray-500 hover:text-red-600"
+                      className="text-[length:var(--fs-etiqueta)] text-[#646E7E] hover:text-red-600"
                       aria-label="Quitar de mi colección"
                     >
                       Quitar

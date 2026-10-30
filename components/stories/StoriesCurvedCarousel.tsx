@@ -112,7 +112,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
 
   if (stories.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] text-gray-400">
+      <div className="flex flex-col items-center justify-center min-h-[60vh] text-[#646E7E]">
         <p className="text-[length:var(--fs-texto)]">Las historias también se ven. Cuenta tu historia en video.</p>
         <Link href="/historias" className="mt-4 text-amber-500 hover:underline">
           Ver todas las historias
@@ -122,7 +122,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
   }
 
   return (
-    <div className="flex w-full h-full min-h-[80vh] bg-[#E0E5EC] text-gray-800 overflow-hidden font-sans">
+    <div className="flex w-full h-full min-h-[80vh] bg-[var(--home-bg)] text-gray-800 overflow-hidden font-sans">
       {/* Columna izquierda: rueda curva de thumbnails */}
       <div
         ref={containerRef}
@@ -186,7 +186,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
             );
           })}
         </div>
-        <p className="text-[length:var(--fs-etiqueta)] uppercase text-gray-500 mt-4 text-center tracking-[0.12em]">
+        <p className="text-[length:var(--fs-etiqueta)] uppercase text-[#646E7E] mt-4 text-center tracking-[0.12em]">
           Gira o arrastra
         </p>
       </div>
@@ -210,7 +210,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
                 {selected.title || 'Sin título'}
               </h1>
               {formatDate(selected.publishedAt) ? (
-              <p className="text-[length:var(--fs-pequeno)] text-gray-500 mb-6">{formatDate(selected.publishedAt)}</p>
+              <p className="text-[length:var(--fs-pequeno)] text-[#646E7E] mb-6">{formatDate(selected.publishedAt)}</p>
               ) : null}
 
               {selected.videoUrl ? (
@@ -272,7 +272,7 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
             )
           )}
           {selected && !selected.images?.length && !selected.imageUrl && (
-            <div className="col-span-2 aspect-video rounded-lg bg-gray-300/30 flex items-center justify-center text-gray-500 text-[length:var(--fs-pequeno)]">
+            <div className="col-span-2 aspect-video rounded-lg bg-gray-300/30 flex items-center justify-center text-[#646E7E] text-[length:var(--fs-pequeno)]">
               Sin imágenes
             </div>
           )}

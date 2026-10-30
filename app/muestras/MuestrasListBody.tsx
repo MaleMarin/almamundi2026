@@ -79,7 +79,7 @@ export function MuestrasListBody() {
               style={{
                 background: '#FF4A1C',
                 color: '#fff',
-                boxShadow: '6px 6px 14px rgba(163,177,198,0.45), -4px -4px 12px rgba(255,255,255,0.5)' }}
+                boxShadow: '6px 6px 14px rgba(120,110,100,0.28), -4px -4px 12px rgba(255,255,255,0.5)' }}
             >
               Recorrido cinematográfico
             </Link>

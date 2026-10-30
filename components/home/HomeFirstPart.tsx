@@ -15,11 +15,11 @@ import { visitorGreetingPlace } from '@/components/mapa/WorldClock';
 
 /** Neumorfismo con más volumen: sombras más largas + highlight blanco fuerte + bisel suave. */
 const soft = {
-  bg: '#E0E5EC',
+  bg: 'var(--home-bg)',
   textMain: '#4A5568',
-  textBody: '#718096',
+  textBody: '#616C7C',
   flat: {
-    backgroundColor: '#E8EBF2',
+    backgroundColor: '#FBFAF8',
     borderRadius: '40px',
     border: '1px solid rgba(255,255,255,0.55)',
     boxShadow: [
