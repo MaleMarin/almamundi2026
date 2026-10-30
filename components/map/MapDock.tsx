@@ -2,7 +2,7 @@
 
 import type { CSSProperties } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { PREGUNTA_UI } from '@/lib/pregunta-semana';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 
 export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search';
 
@@ -68,7 +68,7 @@ export function MapDock({ activeMode, onModeChange, onResetView, hidden, drawerO
   const buttons: { mode: MapDockMode; label: string }[] = [
     { mode: 'stories', label: 'Historias' },
     { mode: 'bits', label: 'También cuenta' },
-    { mode: 'news', label: PREGUNTA_UI.tab[locale] },
+    { mode: 'news', label: HILOS_UI[locale].nav },
     { mode: 'sounds', label: 'Sonidos' },
     { mode: 'search', label: 'Buscar por título, ciudad o tema' },
   ];

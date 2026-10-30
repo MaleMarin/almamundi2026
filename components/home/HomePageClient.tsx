@@ -11,8 +11,8 @@ import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat, contarIndexHref, hiloContarPregunta } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { PREGUNTA_UI, preguntaPageHref, preguntasDeLaSemana } from '@/lib/pregunta-semana';
-import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
+import { preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
@@ -320,7 +320,7 @@ export function HomePageClient() {
           >
             <div className="mx-auto flex w-full max-w-[760px] flex-col items-center">
             <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#FF4A1C] tracking-[0.12em]">
-              {PREGUNTA_COPY.homeEyebrow[locale]}
+              {HILOS_UI[locale].semana}
             </p>
             <h2
               id="pregunta-semana-titulo"
@@ -333,18 +333,12 @@ export function HomePageClient() {
             >
               {preguntaVigente.tu[locale]}
             </h2>
-            <p
-              className="mb-0 mt-4 text-[length:var(--fs-texto)] font-normal leading-relaxed"
-              style={{ color: '#718096', textWrap: 'balance' }}
-            >
-              {PREGUNTA_COPY.intro[locale]}
-            </p>
             <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
               <Link
-                href={preguntaPageHref(preguntaVigente.id)}
+                href={`/preguntas?p=${encodeURIComponent(preguntaVigente.id)}`}
                 className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 py-3"
               >
-                {PREGUNTA_UI.responder[locale]}
+                {HILOS_UI[locale].cuentala}
               </Link>
             </div>
             </div>

@@ -9,7 +9,7 @@ import {
   SITE_FOOTER_LEGAL_LINKS,
 } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
-import { PREGUNTA_UI } from '@/lib/pregunta-semana';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const FOOTER_LINK =
@@ -40,7 +40,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       label: t.navMap,
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
-    { id: 'pregunta', kind: 'internal', href: '/pregunta', label: PREGUNTA_UI.tab[locale] },
+    { id: 'hilos', kind: 'internal', href: '/preguntas', label: HILOS_UI[locale].nav },
     { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
     { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
   ];

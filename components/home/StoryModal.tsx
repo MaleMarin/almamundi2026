@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   X,
@@ -3138,15 +3139,12 @@ export function StoryModal({
                 </div>
                 <div className="mt-8">
                   <p className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      router.push('/pregunta');
-                    }}
-                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)]"
+                  <Link
+                    href="/preguntas"
+                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] no-underline transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
                   >
                     {t.modalAnswerWeekQuestion}
-                  </button>
+                  </Link>
                   <div className="flex flex-col gap-2 md:flex-row">
                     <button
                       type="button"

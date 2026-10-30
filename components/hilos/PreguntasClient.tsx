@@ -21,7 +21,7 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { enlacePregunta, HILOS_UI, textoCompartirHilo, tituloHiloPartes } from '@/lib/i18n/hilos-messages';
 import { interpolate } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { PREGUNTA_UI, preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
+import { preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
 
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
@@ -153,6 +153,25 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
           </button>
         </div>
       </header>
+
+      <section
+        className="mt-14 scroll-mt-40 rounded-[32px] bg-white px-6 py-8 text-center shadow-[0_16px_40px_rgba(20,29,38,0.06)] md:mt-16 md:px-10"
+        aria-labelledby="hilo-semana-titulo"
+      >
+        <h2 id="hilo-semana-titulo" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">
+          {copy.semana}
+        </h2>
+        <p className="mx-auto mt-4 max-w-2xl text-[length:var(--fs-subtitulo)] font-semibold leading-snug text-[#1A1916]">
+          {semana.tu[locale]}
+        </p>
+        <button
+          type="button"
+          className={`btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6 ${FOCUS}`}
+          onClick={() => abrir(preguntaHiloPorId(semana.id))}
+        >
+          {copy.cuentala}
+        </button>
+      </section>
 
       <section id="hilos" className="mt-14 scroll-mt-40 md:mt-20 md:scroll-mt-52" aria-labelledby="hilos-titulo">
         <h2
@@ -297,21 +316,6 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
           ) : null}
         </section>
       ) : null}
-
-      <section
-        className="mt-16 rounded-[32px] bg-white px-6 py-8 text-center shadow-[0_16px_40px_rgba(20,29,38,0.06)] md:px-10"
-        aria-labelledby="hilo-semana-titulo"
-      >
-        <h2 id="hilo-semana-titulo" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">
-          {copy.semana}
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-[length:var(--fs-subtitulo)] font-semibold leading-snug text-[#1A1916]">
-          {semana.tu[locale]}
-        </p>
-        <Link href="/pregunta" className={`btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6 ${FOCUS}`}>
-          {PREGUNTA_UI.responder[locale]}
-        </Link>
-      </section>
 
       {compartir && abierta ? (
         <StoryShareMenu

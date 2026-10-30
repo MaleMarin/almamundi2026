@@ -5,7 +5,7 @@ import type { CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { PREGUNTA_UI } from '@/lib/pregunta-semana';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { mapChrome } from '@/lib/i18n/map-chrome';
 import type { MapDockMode } from './MapDock';
 
@@ -81,7 +81,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
     mode === 'stories'
       ? dockCopy.stories
       : mode === 'news'
-        ? PREGUNTA_UI.tab[locale]
+        ? HILOS_UI[locale].nav
         : mode === 'sounds'
           ? dockCopy.sounds
           : mode === 'bits'

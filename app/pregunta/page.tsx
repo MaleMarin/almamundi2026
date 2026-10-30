@@ -1,21 +1,20 @@
-import { Suspense } from 'react';
-import type { Metadata } from 'next';
-import { cookies } from 'next/headers';
-import PreguntaForm from '@/components/pregunta/PreguntaForm';
-import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
-import { preguntaPageMeta } from '@/lib/i18n/public-meta';
+import { permanentRedirect } from 'next/navigation';
+import { resolveQuestionId } from '@/lib/pregunta-semana';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const jar = await cookies();
-  return preguntaPageMeta(parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value));
+export const dynamic = 'force-dynamic';
+
+/** La pregunta breve ya no se publica. El hilo vive en /preguntas. */
+export default async function PreguntaPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ pregunta?: string | string[]; p?: string | string[] }>;
+}) {
+  const params = await searchParams;
+  const raw = first(params.p) || first(params.pregunta);
+  const id = resolveQuestionId(raw);
+  permanentRedirect(id ? `/preguntas?p=${encodeURIComponent(id)}` : '/preguntas');
 }
 
-export default function PreguntaPage() {
-  return (
-    <main>
-      <Suspense fallback={null}>
-        <PreguntaForm />
-      </Suspense>
-    </main>
-  );
+function first(value: string | string[] | undefined): string {
+  return Array.isArray(value) ? value[0] || '' : value || '';
 }

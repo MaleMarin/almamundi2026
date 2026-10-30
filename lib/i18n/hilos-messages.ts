@@ -14,6 +14,9 @@ type HilosCopy = {
   mandar: string;
   otros: string;
   semana: string;
+  cuentala: string;
+  nav: string;
+  leyenda: string;
   elige: string;
   entrada: string;
   respondes: string;
@@ -35,6 +38,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     mandar: 'Mándasela a alguien',
     otros: 'Así la contaron otros',
     semana: 'Hilo de la semana',
+    cuentala: 'Cuéntala',
+    nav: 'Hilos',
+    leyenda: 'Historias que nacieron de un hilo',
     elige: 'Elige un hilo',
     entrada: '¿No sabes por dónde empezar? Tira de un hilo',
     respondes: 'Respondes a:',
@@ -55,6 +61,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     mandar: 'Mande para alguém',
     otros: 'Assim outras pessoas contaram',
     semana: 'Fio da semana',
+    cuentala: 'Conte',
+    nav: 'Fios',
+    leyenda: 'Histórias que nasceram de um fio',
     elige: 'Escolha um fio',
     entrada: 'Não sabe por onde começar? Puxe um fio',
     respondes: 'Você está respondendo:',
@@ -75,6 +84,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     mandar: 'Send it to someone',
     otros: 'How others told it',
     semana: 'Thread of the week',
+    cuentala: 'Tell it',
+    nav: 'Threads',
+    leyenda: 'Stories born from a thread',
     elige: 'Pick a thread',
     entrada: 'Not sure where to start? Pull a thread',
     respondes: "You're answering:",
