@@ -321,15 +321,29 @@ function civilParts(isoDate: string): { y: number; m: number; d: number } {
 }
 
 function santiagoCivil(date: Date): { y: number; m: number; d: number } {
-  const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone: PREGUNTA_ZONA,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(date);
-  const num = (type: Intl.DateTimeFormatPartTypes) =>
-    Number(parts.find((p) => p.type === type)?.value);
-  return { y: num('year'), m: num('month'), d: num('day') };
+  const fallback = {
+    y: date.getUTCFullYear(),
+    m: date.getUTCMonth() + 1,
+    d: date.getUTCDate(),
+  };
+  if (Number.isNaN(date.getTime())) return { y: 0, m: 0, d: 0 };
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', {
+      timeZone: PREGUNTA_ZONA,
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).formatToParts(date);
+    const num = (type: Intl.DateTimeFormatPartTypes) =>
+      Number(parts.find((p) => p.type === type)?.value);
+    const y = num('year');
+    const m = num('month');
+    const d = num('day');
+    if (!y || !m || !d) return fallback;
+    return { y, m, d };
+  } catch {
+    return fallback;
+  }
 }
 
 function civilDayNumber(y: number, m: number, d: number): number {

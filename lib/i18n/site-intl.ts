@@ -17,14 +17,19 @@ export function formatCalendarDate(
   day: number,
   locale: AlmaLocale
 ): string {
-  if (month < 1 || month > 12 || day < 1 || day > 31) return '';
+  if (!Number.isFinite(year) || month < 1 || month > 12 || day < 1 || day > 31) return '';
   const utc = new Date(Date.UTC(year, month - 1, day));
-  return new Intl.DateTimeFormat(intlTag(locale), {
-    timeZone: 'UTC',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).format(utc);
+  if (Number.isNaN(utc.getTime())) return '';
+  try {
+    return new Intl.DateTimeFormat(intlTag(locale), {
+      timeZone: 'UTC',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    }).format(utc);
+  } catch {
+    return '';
+  }
 }
 
 function ymdFromIso(iso: string): { year: number; month: number; day: number } | null {
@@ -37,38 +42,58 @@ function ymdFromIso(iso: string): { year: number; month: number; day: number } |
   return { year: d.getUTCFullYear(), month: d.getUTCMonth() + 1, day: d.getUTCDate() };
 }
 
-/** Fecha larga de una historia a partir de su ISO. Vacío si no se puede leer. */
+/** Fecha larga de una historia a partir de su ISO. El texto guardado si no se puede leer. */
 export function formatSiteDate(iso: string | undefined | null, locale: AlmaLocale): string {
-  if (!iso || iso.trim() === '—' || iso.trim() === '-') return '';
-  const ymd = ymdFromIso(iso);
-  if (!ymd) return '';
-  return formatCalendarDate(ymd.year, ymd.month, ymd.day, locale);
+  const raw = (iso ?? '').trim();
+  if (!raw || raw === '—' || raw === '-') return '';
+  const ymd = ymdFromIso(raw);
+  if (!ymd) return raw;
+  return formatCalendarDate(ymd.year, ymd.month, ymd.day, locale) || raw;
 }
 
 /** Día civil en una zona, para el correo de recepción. */
 export function formatZonedDate(at: Date, locale: AlmaLocale, timeZone: string): string {
-  const when = Number.isNaN(at.getTime()) ? new Date() : at;
-  const parts = new Intl.DateTimeFormat(intlTag(locale), {
-    timeZone,
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-  }).formatToParts(when);
-  const day = Number(parts.find((part) => part.type === 'day')?.value);
-  const month = Number(parts.find((part) => part.type === 'month')?.value);
-  const year = Number(parts.find((part) => part.type === 'year')?.value);
-  if (!day || !month || !year) return '';
-  return formatCalendarDate(year, month, day, locale);
+  if (Number.isNaN(at.getTime()) || !timeZone.trim()) return '';
+  try {
+    const parts = new Intl.DateTimeFormat(intlTag(locale), {
+      timeZone,
+      day: 'numeric',
+      month: 'numeric',
+      year: 'numeric',
+    }).formatToParts(at);
+    const day = Number(parts.find((part) => part.type === 'day')?.value);
+    const month = Number(parts.find((part) => part.type === 'month')?.value);
+    const year = Number(parts.find((part) => part.type === 'year')?.value);
+    if (!day || !month || !year) return '';
+    return formatCalendarDate(year, month, day, locale);
+  } catch {
+    return '';
+  }
 }
 
 const relativeCache = new Map<AlmaLocale, Intl.RelativeTimeFormat>();
 
-function relativeFormat(locale: AlmaLocale): Intl.RelativeTimeFormat {
+function relativeFormat(locale: AlmaLocale): Intl.RelativeTimeFormat | null {
   const cached = relativeCache.get(locale);
   if (cached) return cached;
-  const format = new Intl.RelativeTimeFormat(intlTag(locale), { numeric: 'auto' });
-  relativeCache.set(locale, format);
-  return format;
+  try {
+    const format = new Intl.RelativeTimeFormat(intlTag(locale), { numeric: 'auto' });
+    relativeCache.set(locale, format);
+    return format;
+  } catch {
+    return null;
+  }
+}
+
+function formatRelative(locale: AlmaLocale, value: number, unit: Intl.RelativeTimeFormatUnit): string {
+  if (!Number.isFinite(value)) return '';
+  const format = relativeFormat(locale);
+  if (!format) return '';
+  try {
+    return format.format(value, unit);
+  } catch {
+    return '';
+  }
 }
 
 /** «hace 3 días», «há 3 dias», «3 days ago», y lo mismo para minutos, horas y semanas. */
@@ -81,20 +106,19 @@ export function formatRelativeTime(
   const then = Date.parse(iso);
   if (!Number.isFinite(then)) return '';
   const deltaSec = Math.round((then - now) / 1000);
-  const rtf = relativeFormat(locale);
   const absSec = Math.abs(deltaSec);
-  if (absSec < 45) return rtf.format(0, 'second');
+  if (absSec < 45) return formatRelative(locale, 0, 'second');
   const deltaMin = Math.round(deltaSec / 60);
-  if (Math.abs(deltaMin) < 60) return rtf.format(deltaMin, 'minute');
+  if (Math.abs(deltaMin) < 60) return formatRelative(locale, deltaMin, 'minute');
   const deltaHour = Math.round(deltaSec / 3600);
-  if (Math.abs(deltaHour) < 24) return rtf.format(deltaHour, 'hour');
+  if (Math.abs(deltaHour) < 24) return formatRelative(locale, deltaHour, 'hour');
   const deltaDay = Math.round(deltaSec / 86400);
-  if (Math.abs(deltaDay) < 7) return rtf.format(deltaDay, 'day');
+  if (Math.abs(deltaDay) < 7) return formatRelative(locale, deltaDay, 'day');
   const deltaWeek = Math.round(deltaDay / 7);
-  if (Math.abs(deltaWeek) < 5) return rtf.format(deltaWeek, 'week');
+  if (Math.abs(deltaWeek) < 5) return formatRelative(locale, deltaWeek, 'week');
   const deltaMonth = Math.round(deltaDay / 30);
-  if (Math.abs(deltaMonth) < 12) return rtf.format(deltaMonth, 'month');
-  return rtf.format(Math.round(deltaDay / 365), 'year');
+  if (Math.abs(deltaMonth) < 12) return formatRelative(locale, deltaMonth, 'month');
+  return formatRelative(locale, Math.round(deltaDay / 365), 'year');
 }
 
 /**
@@ -109,6 +133,6 @@ export function formatStoryWhen(
   const then = Date.parse(iso);
   if (!Number.isFinite(then)) return formatSiteDate(iso, locale);
   const days = Math.floor((now - then) / 86400000);
-  if (days >= 0 && days < 7) return formatRelativeTime(iso, now, locale);
+  if (days >= 0 && days < 7) return formatRelativeTime(iso, now, locale) || formatSiteDate(iso, locale);
   return formatSiteDate(iso, locale);
 }

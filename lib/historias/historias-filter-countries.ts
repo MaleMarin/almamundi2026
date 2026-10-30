@@ -53,7 +53,12 @@ function collectFromIntl(): string[] | null {
     for (let i = 65; i < 91; i++) {
       for (let j = 65; j < 91; j++) {
         const code = `${String.fromCharCode(i)}${String.fromCharCode(j)}`;
-        const name = dn.of(code);
+        let name: string | undefined;
+        try {
+          name = dn.of(code);
+        } catch {
+          continue;
+        }
         if (!name || name === code) continue;
         if (name.length < 3) continue;
         set.add(name);

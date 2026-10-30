@@ -255,13 +255,19 @@ export function formatMapRealtimeSyncCaption(
   const lng = options?.userLng ?? (inChile ? -70.6693 : null);
   const copy = MAP_SYNC_COPY[options?.locale ?? 'es'];
 
-  const timeFmt = new Intl.DateTimeFormat(MAP_SYNC_TIME_LOCALE[options?.locale ?? 'es'], {
-    timeZone: inChile ? 'America/Santiago' : timeZone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: false,
-  });
-  const timeStr = timeFmt.format(now);
+  let timeStr = '';
+  try {
+    if (!Number.isNaN(now.getTime())) {
+      timeStr = new Intl.DateTimeFormat(MAP_SYNC_TIME_LOCALE[options?.locale ?? 'es'], {
+        timeZone: inChile ? 'America/Santiago' : timeZone,
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }).format(now);
+    }
+  } catch {
+    timeStr = '';
+  }
 
   const night =
     lat != null && lng != null ? isNightAtLocation(lat, lng, now) : null;

@@ -53,12 +53,17 @@ export function getUserCalendarDayForNewsApi(): { tz: string; day: string } {
     const d = new Date();
     return { tz: "UTC", day: d.toISOString().slice(0, 10) };
   }
-  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  const day = new Intl.DateTimeFormat("en-CA", {
-    timeZone: tz,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date());
-  return { tz, day };
+  let tz = "UTC";
+  try {
+    tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+    const day = new Intl.DateTimeFormat("en-CA", {
+      timeZone: tz,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+    return { tz, day };
+  } catch {
+    return { tz, day: new Date().toISOString().slice(0, 10) };
+  }
 }
