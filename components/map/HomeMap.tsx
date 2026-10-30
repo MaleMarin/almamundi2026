@@ -59,6 +59,15 @@ const STORY_GLOBE_ID_BASE = 9_000_000;
 const NEWS_GLOBE_ID_BASE = 8_000_000;
 const RESPUESTA_GLOBE_ID_BASE = 7_000_000;
 const GLOBE_NEWS_MAX = 20;
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+function storyPublishedWithinDays(publishedAt: string | undefined, now: number, days: number): boolean {
+  if (!publishedAt) return false;
+  const at = Date.parse(publishedAt);
+  if (!Number.isFinite(at)) return false;
+  const age = now - at;
+  return age >= 0 && age <= days * DAY_MS;
+}
 
 function jitterNewsOffset(id: string): { dLat: number; dLng: number } {
   let h = 2166136261;
@@ -674,6 +683,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [respuestasOnGlobe]);
 
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
+    const now = Date.now();
     const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
       id: STORY_GLOBE_ID_BASE + i,
       lat: s.lat,
@@ -681,7 +691,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       markerKind: 'story' as const,
       title: s.title ?? s.label,
       place: formatPublicPlace(s.city, s.country, locale) || undefined,
-      color: '#FF4A1C' }));
+      color: '#FF4A1C',
+      pulse: storyPublishedWithinDays(s.publishedAt, now, 7) }));
     return [...globeBitsMarkers, ...storyLayer, ...globeNewsMarkers, ...globeRespuestaMarkers];
   }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
 

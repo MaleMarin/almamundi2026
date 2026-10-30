@@ -14,7 +14,7 @@ import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
-import { Montserrat } from 'next/font/google';
+import { Caveat, Montserrat } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
@@ -24,6 +24,13 @@ const montserrat = Montserrat({
   variable: '--font-interna',
   display: 'swap',
   adjustFontFallback: true });
+
+const caveat = Caveat({
+  weight: '600',
+  subsets: ['latin', 'latin-ext'],
+  variable: '--font-caveat',
+  display: 'swap',
+});
 
 function defaultMetadataBase(): URL {
   return new URL(PUBLIC_SITE_ORIGIN);
@@ -81,7 +88,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={montserrat.variable}
+      className={`${montserrat.variable} ${caveat.variable}`}
     >
       <body className="antialiased min-h-screen bg-[#E0E5EC] text-gray-800 font-interna">
         <CursorGlobal />

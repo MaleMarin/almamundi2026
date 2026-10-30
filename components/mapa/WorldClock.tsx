@@ -25,6 +25,21 @@ function getCityFromTimeZone(timeZone: string): string {
   return part.replace(/_/g, ' ').toUpperCase();
 }
 
+/** La misma región del reloj, en frase. Sin lugar si la zona no dice una ciudad. */
+export function visitorGreetingPlace(): string | null {
+  let timeZone = 'UTC';
+  try {
+    timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return null;
+  }
+  const label = getCityFromTimeZone(timeZone);
+  if (!label || label === 'LOCAL' || label === 'UTC') return null;
+  return label.toLowerCase().replace(/(^|\s)([a-záéíóúüñ])/gi, (chunk, space: string, letter: string) => {
+    return `${space}${letter.toUpperCase()}`;
+  });
+}
+
 /** Abreviatura de zona horaria (ej. CLT, EST). */
 function getTimeZoneShortName(now: Date, timeZone: string): string {
   try {

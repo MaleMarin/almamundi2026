@@ -23,6 +23,7 @@ import {
   isAudiencePublicStoryStatus,
 } from "@/lib/editorial/status";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
+import { resolveCintaColors } from "@/lib/cinta-colors";
 
 function publishedAtIso(d: Record<string, unknown>): string | undefined {
   const p = d.publishedAt;
@@ -167,6 +168,12 @@ function firestoreDocToStoryPoint(
     isBetaDemo: isBetaDemo ? true : undefined,
     editorialStatus: typeof status === "string" ? status : undefined,
     isRealStory: !isBetaDemo,
+    cintaColors: resolveCintaColors({
+      storyId: id,
+      format: formato,
+      content: [title, text].filter(Boolean).join("\n"),
+      stored: d.cintaColors,
+    }),
     ...accessibility,
   };
 

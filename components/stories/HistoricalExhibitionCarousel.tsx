@@ -33,6 +33,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { EthicalShareTriggerButton } from './EthicalShareTrigger';
 import { ShareAfterNotice } from './ShareAfterNotice';
 import { ResonanceMailbox } from './ResonanceMailbox';
+import { CintaStripe } from '@/components/historias/CintaStripe';
 
 export type ExhibitionContentMode = 'video' | 'audio' | 'texto' | 'foto';
 
@@ -468,6 +469,7 @@ export function HistoricalExhibitionCarousel({
                         background: 'linear-gradient(168deg, rgba(255,255,255,0.58) 0%, rgba(235,239,246,0.42) 100%)',
                         boxShadow: '0 28px 58px rgba(15,23,42,0.1), inset 1px 1px 0 rgba(255,255,255,0.92)' }}
                     >
+                      <CintaStripe colors={h.cintaColors} height={8} className="absolute inset-x-0 top-0 z-[2]" />
                       <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden rounded-[14px] bg-gray-200/45 shadow-[inset_3px_3px_8px_rgba(163,177,198,0.35)]">
                         {/* eslint-disable-next-line @next/next/no-img-element -- portada de la historia */}
                         <img

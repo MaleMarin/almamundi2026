@@ -16,4 +16,5 @@ export type HistoricalExhibitionStory = {
   /** Historia demo / beta_demo — mostrar aviso en carrusel. */
   isDemoStory?: boolean;
   demoNotice?: string;
+  cintaColors?: string[];
 };

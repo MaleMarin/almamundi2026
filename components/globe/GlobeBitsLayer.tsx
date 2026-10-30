@@ -32,7 +32,6 @@ import {
   createNewsRingMaterial,
   createStoryRippleMaterial,
   createStoryStarBurstMaterial,
-  makeStoryRippleGeometry,
   tintStoryMarkerMaterial } from '@/components/globe/bitStarBurstMaterial';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
@@ -46,6 +45,8 @@ export type GlobeBitMarker = {
   title?: string;
   place?: string;
   url?: string;
+  /** Historia publicada en los últimos 7 días: el anillo late. */
+  pulse?: boolean;
 };
 
 export type GlobeLayerVisibility = {
@@ -86,6 +87,78 @@ const RESPUESTA_PLANE_MUL = 1.55;
 
 function disableMeshRaycast(obj: THREE.Object3D | null) {
   if (obj instanceof THREE.Mesh) obj.raycast = () => {};
+}
+
+/** Dos pulsos cortos y una pausa, cada 2 segundos. Con reducir movimiento, el anillo queda quieto. */
+function HeartbeatRing({
+  baseScale,
+  beat,
+  layerOpRef,
+}: {
+  baseScale: number;
+  beat: boolean;
+  layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number; respuestas: number }>;
+}) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const reducedRef = useRef(false);
+  const mat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#FF4A1C',
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+        depthTest: false,
+        side: THREE.DoubleSide,
+      }),
+    []
+  );
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const apply = () => {
+      reducedRef.current = media.matches;
+    };
+    apply();
+    media.addEventListener('change', apply);
+    return () => {
+      media.removeEventListener('change', apply);
+      mat.dispose();
+    };
+  }, [mat]);
+
+  useFrame(({ clock }) => {
+    const mesh = meshRef.current;
+    if (!mesh) return;
+    const layer = layerOpRef.current.stories;
+    let amp = 0;
+    if (beat && !reducedRef.current) {
+      const cycle = ((clock.elapsedTime % 2) + 2) % 2;
+      const lobe = (start: number) => {
+        const u = (cycle - start) / 0.22;
+        if (u < 0 || u > 1) return 0;
+        return Math.sin(u * Math.PI);
+      };
+      amp = Math.max(lobe(0.04), lobe(0.34));
+    }
+    const grow = 1 + amp * 0.75;
+    mesh.scale.set(baseScale * grow, baseScale * grow, 1);
+    mat.opacity = 0.55 * (1 - amp * 0.92) * layer;
+  });
+
+  return (
+    <mesh
+      ref={(mesh) => {
+        meshRef.current = mesh;
+        disableMeshRaycast(mesh);
+      }}
+      material={mat}
+      scale={[baseScale, baseScale, 1]}
+      renderOrder={16}
+    >
+      <ringGeometry args={[0.38, 0.5, 48]} />
+    </mesh>
+  );
 }
 
 /**
@@ -202,15 +275,6 @@ function BitDot({
   const isStory = bit.markerKind === 'story';
   const isNews = bit.markerKind === 'news';
   const isRespuesta = bit.markerKind === 'respuesta';
-  const rippleGeom = useMemo(
-    () => (isStory ? makeStoryRippleGeometry(bit.id) : null),
-    [bit.id, isStory]
-  );
-  useEffect(() => {
-    return () => {
-      rippleGeom?.dispose();
-    };
-  }, [rippleGeom]);
 
   const storyTint = isStory ? bit.color : undefined;
   const tintedMats = useMemo(() => {
@@ -268,9 +332,6 @@ function BitDot({
     (isStory ? STORY_PLANE_MUL : isRespuesta ? RESPUESTA_PLANE_MUL : isNews ? NEWS_PLANE_MUL : BIT_PLANE_MUL);
   const rippleScale = STAR_PLANE_SCALE * STORY_RIPPLE_MUL;
   const coreScale = CORE_SCALE * (isStory ? 1 : 2.4);
-  const rippleMat = selected || magneticActive
-    ? tintedMats?.rippleHover ?? storyRippleMatHover
-    : tintedMats?.ripple ?? storyRippleMat;
 
   return (
     <group ref={rootRef} position={surfacePos}>
@@ -285,13 +346,11 @@ function BitDot({
 
       <group position={flareBump}>
         <Billboard follow>
-          {isStory && rippleGeom ? (
-            <mesh
-              ref={(m) => disableMeshRaycast(m)}
-              geometry={rippleGeom}
-              material={rippleMat}
-              scale={[rippleScale * sel * mag, rippleScale * sel * mag, 1]}
-              renderOrder={16}
+          {isStory ? (
+            <HeartbeatRing
+              baseScale={rippleScale * sel * mag}
+              beat={bit.pulse === true}
+              layerOpRef={layerOpRef}
             />
           ) : null}
           <mesh

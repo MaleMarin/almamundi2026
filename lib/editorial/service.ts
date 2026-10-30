@@ -18,6 +18,7 @@ import {
   type StoryData,
 } from "@/lib/story-schema";
 import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-accessibility";
+import { stampCintaColors } from "@/lib/cinta-colors";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
@@ -286,6 +287,7 @@ export async function editorialPublishFromSubmission(
     Object.assign(story, storyAccessibilityFieldsFromRecord(sub));
     story.locale = parseAlmaLocale(typeof sub.locale === "string" ? sub.locale : undefined);
     story.shortCode = await allocateShortCode(db, "stories");
+    stampCintaColors(story, storyRef.id);
 
     await storyRef.set(story);
     await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(sub, authorEmailOnSub));
@@ -398,6 +400,7 @@ export async function editorialPublishFromSubmission(
   }
   Object.assign(story, storyAccessibilityFieldsFromRecord(sd as unknown as Record<string, unknown>));
   story.shortCode = await allocateShortCode(db, "stories");
+  stampCintaColors(story, storyRef.id);
 
   await storyRef.set(story);
   const pipelineEmail = typeof sd.email === "string" ? sd.email.trim() : "";
@@ -521,6 +524,7 @@ export async function editorialPublishApprovedStorySubmission(
   Object.assign(storyData, storyAccessibilityFieldsFromRecord(data));
   storyData.locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
   storyData.shortCode = await allocateShortCode(db, "stories");
+  stampCintaColors(storyData, storyRef.id);
 
   await storyRef.set(storyData);
   await saveAuthorPrivate(db, storyRef.id, privateFieldsFromSource(data, authorEmailLegacy));

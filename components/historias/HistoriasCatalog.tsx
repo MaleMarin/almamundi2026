@@ -12,6 +12,7 @@ import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { CintaStripe } from '@/components/historias/CintaStripe';
 
 const PAGE_SIZE = 24;
 
@@ -129,9 +130,10 @@ function StoryCard({
   return (
     <Link
       href={`/historias/${story.id}`}
-      className="flex h-full flex-col overflow-hidden"
+      className="relative flex h-full flex-col overflow-hidden"
       style={{ ...neu.card, borderRadius: large ? 28 : 22 }}
     >
+      <CintaStripe colors={story.cintaColors} height={8} className="absolute inset-x-0 top-0 z-[2]" />
       <div
         className="relative w-full overflow-hidden"
         style={{ height: large ? 240 : 160, background: '#c5ceda' }}

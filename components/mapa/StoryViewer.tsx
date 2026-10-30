@@ -18,6 +18,7 @@ import { TemaTags } from '@/components/historias/TemaTags';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 import { isShortCode } from '@/lib/short-code';
+import { CintaStripe } from '@/components/historias/CintaStripe';
 
 type Props = {
   story: StoryPoint;
@@ -545,6 +546,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               flexDirection:  'column',
               position:       'relative' }}
           >
+            <CintaStripe colors={story.cintaColors} height={6} className="absolute inset-x-0 top-0 z-[3]" />
             {/* Reflejo de luz en el borde superior */}
             <div aria-hidden style={{
               position:      'absolute',

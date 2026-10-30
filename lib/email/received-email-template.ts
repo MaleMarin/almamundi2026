@@ -77,7 +77,7 @@ function receivedCopy(locale: AlmaLocale) {
     return {
       fallback: "sua história",
       hello: (alias: string) => (alias ? `Olá, ${alias}:` : "Olá:"),
-      subject: (title: string) => `Recebemos sua história “${title}”`,
+      subject: (title: string) => `Sua história “${title}” já está com a gente`,
       preview: "Agora ela passa por uma revisão. Avisaremos quando estiver no mapa.",
       thanks: (title: string) => `Recebemos sua história “${title}”. Agradecemos por contá-la no AlmaMundi.`,
       before: "Antes de publicá-la, uma pessoa da nossa equipe vai lê-la. Escreveremos para este e-mail quando ela aparecer no mapa.",
@@ -101,7 +101,7 @@ function receivedCopy(locale: AlmaLocale) {
     return {
       fallback: "your story",
       hello: (alias: string) => (alias ? `Hi ${alias},` : "Hi,"),
-      subject: (title: string) => `We received your story “${title}”`,
+      subject: (title: string) => `Your story “${title}” is with us now`,
       preview: "It's now being reviewed. We'll let you know when it's on the map.",
       thanks: (title: string) => `We received your story “${title}”. Thank you for telling it on AlmaMundi.`,
       before: "Before we publish it, someone on our team will read it. We'll write to you at this address when it appears on the map.",
@@ -124,7 +124,7 @@ function receivedCopy(locale: AlmaLocale) {
   return {
     fallback: "tu historia",
     hello: (alias: string) => (alias ? `Hola, ${alias}:` : "Hola:"),
-    subject: (title: string) => `Recibimos tu historia «${title}»`,
+    subject: (title: string) => `Tu historia «${title}» ya está con nosotros`,
     preview: RECEIVED_EMAIL_PREVIEW,
     thanks: (title: string) => `Recibimos tu historia «${title}». Gracias por contarla en AlmaMundi.`,
     before: "Antes de publicarla, la leerá una persona de nuestro equipo. Te escribiremos a este correo cuando aparezca en el mapa.",

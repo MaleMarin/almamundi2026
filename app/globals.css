@@ -94,6 +94,43 @@ select {
   pointer-events: none;
 }
 
+.home-hero-sign {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  gap: 2px;
+}
+
+.home-hero-sign .home-intro-underline {
+  width: min(34vw, 220px);
+  min-width: 88px;
+  height: 12px;
+  flex: 0 1 auto;
+}
+
+.home-hero-hand {
+  font-family: var(--font-caveat), cursive;
+  font-weight: 600;
+  font-size: 30px;
+  line-height: 0.85;
+  color: #c2410c;
+  transform: rotate(-4deg);
+  transform-origin: left bottom;
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+
+@media (min-width: 1024px) {
+  .home-hero-sign {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+}
+
 .home-intro-underline path {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
@@ -666,7 +703,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 
 /* Título «El Alma del Mundo»: grande en desktop, más contenido en laptop. */
 .map-section-hero-title {
-  font-weight: 300;
+  font-weight: 400;
   font-size: var(--fs-portada);
   line-height: 0.95;
 }

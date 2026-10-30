@@ -63,6 +63,7 @@ export function storyPointToHistoricalExhibitionStory(
     imagen_principal: imagen,
     tags: tagsFromStory(s),
     videoUrl: v || undefined,
+    cintaColors: s.cintaColors,
   };
 }
 

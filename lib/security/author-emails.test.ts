@@ -54,7 +54,7 @@ describe('correos al autor', () => {
 
     const html = buildReceivedEmailHtml(sampleReceived);
     const text = buildReceivedEmailText(sampleReceived);
-    assert.equal(receivedEmailSubject('El río'), 'Recibimos tu historia «El río»');
+    assert.equal(receivedEmailSubject('El río'), 'Tu historia «El río» ya está con nosotros');
     assert.equal(capitalizeAlias('ana'), 'Ana');
     assert.equal(capitalizeAlias('ana maría'), 'Ana María');
     assert.equal(storyFormatLabel('foto'), 'fotos');

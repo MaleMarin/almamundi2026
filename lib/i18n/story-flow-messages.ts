@@ -245,7 +245,7 @@ const es: StoryFlowMessages = {
   modalFieldAgeMissing: 'Falta la edad.',
   modalFieldEmailMissing: 'Falta un correo válido.',
   modalReviewInProgress:
-    'Tu historia está en revisión. Te escribiremos cuando aparezca en el mapa.',
+    'Tu historia ya está con nosotros. Te escribiremos cuando aparezca en el mapa.',
   modalSaveImage: 'Guardar imagen',
   modalShareTextShort:
     'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar',
@@ -387,7 +387,7 @@ const pt: StoryFlowMessages = {
   modalAnotherCtaTexto: 'Escrever outra história',
   modalAnotherFormatLink: 'ou conte em outro formato',
   modalReviewInProgress:
-    'Sua história está em revisão. Vamos escrever quando ela aparecer no mapa.',
+    'Sua história já está com a gente. Vamos te escrever quando ela aparecer no mapa.',
   modalSectionYourStory: 'Sua história',
   modalSectionAbout: 'Sobre você',
   modalSectionWhere: 'Onde você está e como avisar você',
@@ -545,7 +545,7 @@ const en: StoryFlowMessages = {
   modalAnotherCtaTexto: 'Write another story',
   modalAnotherFormatLink: 'or tell it in another format',
   modalReviewInProgress:
-    "Your story is under review. We'll write to you when it appears on the map.",
+    "Your story is with us now. We'll write to you when it appears on the map.",
   modalSectionYourStory: 'Your story',
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',

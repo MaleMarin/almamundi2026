@@ -62,6 +62,8 @@ export type StoryPoint = {
   featured?: boolean;
   /** Tiene coordenadas y está entre las 40 recientes o es destacada. */
   onGlobe?: boolean;
+  /** Cuatro colores de la cinta, en hex. Si faltan, se calculan al leer. */
+  cintaColors?: string[];
 };
 
 export function getStories(): StoryPoint[] {

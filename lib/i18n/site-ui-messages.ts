@@ -112,7 +112,7 @@ export type SiteUiMessages = {
 };
 
 const es: SiteUiMessages = {
-  footerInitiativeOf: 'Una iniciativa de',
+  footerInitiativeOf: 'Un proyecto sin fines de lucro de',
   footerLegalAria: 'Información legal y datos personales',
   footerPrivacy: 'Aviso de privacidad',
   footerTerms: 'Términos de uso',
@@ -151,7 +151,7 @@ const es: SiteUiMessages = {
   modalWaitVideo: 'Termina de grabar tu video',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmación de envío',
-  modalDetailsTitle: 'Por favor, déjanos tus datos',
+  modalDetailsTitle: 'Cuéntanos un poco de ti',
   modalDetailsSubtitle:
     'Así podremos ubicar tu historia en el mapa y avisarte cuando esté publicada.',
   modalSendVideo: 'Enviar mi video',
@@ -251,7 +251,7 @@ const es: SiteUiMessages = {
 };
 
 const pt: SiteUiMessages = {
-  footerInitiativeOf: 'Uma iniciativa de',
+  footerInitiativeOf: 'Um projeto sem fins lucrativos da',
   footerLegalAria: 'Informação legal e dados pessoais',
   footerPrivacy: 'Aviso de privacidade',
   footerTerms: 'Termos de uso',
@@ -290,7 +290,7 @@ const pt: SiteUiMessages = {
   modalWaitVideo: 'Termine de gravar seu vídeo',
   modalCapture: 'Captura',
   modalConfirmSend: 'Confirmação de envio',
-  modalDetailsTitle: 'Por favor, deixe seus dados',
+  modalDetailsTitle: 'Conte um pouco sobre você',
   modalDetailsSubtitle:
     'Assim podemos colocar sua história no mapa e avisar você quando estiver publicada.',
   modalSendVideo: 'Enviar meu vídeo',
@@ -390,7 +390,7 @@ const pt: SiteUiMessages = {
 };
 
 const en: SiteUiMessages = {
-  footerInitiativeOf: 'An initiative of',
+  footerInitiativeOf: 'A nonprofit project by',
   footerLegalAria: 'Legal information and personal data',
   footerPrivacy: 'Privacy notice',
   footerTerms: 'Terms of use',
@@ -429,7 +429,7 @@ const en: SiteUiMessages = {
   modalWaitVideo: 'Finish recording your video',
   modalCapture: 'Capture',
   modalConfirmSend: 'Submission confirmation',
-  modalDetailsTitle: 'Please leave us your details',
+  modalDetailsTitle: 'Tell us a little about yourself',
   modalDetailsSubtitle:
     "This is how we can place your story on the map and let you know when it's published.",
   modalSendVideo: 'Send my video',

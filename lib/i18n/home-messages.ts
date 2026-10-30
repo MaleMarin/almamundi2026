@@ -23,6 +23,13 @@ export type HomeMessages = {
   langShortEn: string;
   heroBeforeBold: string;
   heroBold: string;
+  heroHand: string;
+  heroGreetMorning: string;
+  heroGreetAfternoon: string;
+  heroGreetNight: string;
+  heroGreetMorningPlace: string;
+  heroGreetAfternoonPlace: string;
+  heroGreetNightPlace: string;
   heroSubBefore: string;
   heroSubBold: string;
   /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
@@ -72,6 +79,13 @@ const es: HomeMessages = {
   heroBeforeBold:
     'AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que',
   heroBold: 'despiertan otras historias',
+  heroHand: 'Como la tuya',
+  heroGreetMorning: 'Buenos días. ¿Qué historia traes hoy?',
+  heroGreetAfternoon: 'Buenas tardes. ¿Qué historia traes hoy?',
+  heroGreetNight: 'Buenas noches. ¿Qué historia traes hoy?',
+  heroGreetMorningPlace: 'Buenos días desde {lugar}. ¿Qué historia traes hoy?',
+  heroGreetAfternoonPlace: 'Buenas tardes desde {lugar}. ¿Qué historia traes hoy?',
+  heroGreetNightPlace: 'Buenas noches desde {lugar}. ¿Qué historia traes hoy?',
   heroSubBefore: 'Aquí, cada historia',
   heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
@@ -121,6 +135,13 @@ const pt: HomeMessages = {
   heroBeforeBold:
     'AlmaMundi é o lugar onde suas histórias não se perdem no scroll, e sim',
   heroBold: 'despertam outras histórias',
+  heroHand: 'como a sua',
+  heroGreetMorning: 'Bom dia. Que história você traz hoje?',
+  heroGreetAfternoon: 'Boa tarde. Que história você traz hoje?',
+  heroGreetNight: 'Boa noite. Que história você traz hoje?',
+  heroGreetMorningPlace: 'Bom dia em {lugar}. Que história você traz hoje?',
+  heroGreetAfternoonPlace: 'Boa tarde em {lugar}. Que história você traz hoje?',
+  heroGreetNightPlace: 'Boa noite em {lugar}. Que história você traz hoje?',
   heroSubBefore: 'Aqui, cada história',
   heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
@@ -170,6 +191,13 @@ const en: HomeMessages = {
   heroBeforeBold:
     "AlmaMundi is where your stories don't get lost in the scroll, they",
   heroBold: 'awaken other stories',
+  heroHand: 'like yours',
+  heroGreetMorning: 'Good morning. What story are you bringing today?',
+  heroGreetAfternoon: 'Good afternoon. What story are you bringing today?',
+  heroGreetNight: 'Good evening. What story are you bringing today?',
+  heroGreetMorningPlace: 'Good morning in {place}. What story are you bringing today?',
+  heroGreetAfternoonPlace: 'Good afternoon in {place}. What story are you bringing today?',
+  heroGreetNightPlace: 'Good evening in {place}. What story are you bringing today?',
   heroSubBefore: 'Here, every story',
   heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',

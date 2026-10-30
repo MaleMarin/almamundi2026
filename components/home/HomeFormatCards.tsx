@@ -179,10 +179,16 @@ function SoftCard({
           }
         >
           <div className="shrink-0 min-w-0">
-            <p className="text-[length:var(--fs-subtitulo)] font-normal leading-snug text-gray-600">
+            <p
+              className="text-[length:var(--fs-subtitulo)] leading-snug text-gray-600"
+              style={{ fontWeight: 400 }}
+            >
               {title}
             </p>
-            <h2 className="mt-1 text-[length:var(--fs-subtitulo)] font-bold leading-snug text-gray-800 ">
+            <h2
+              className="mt-1 text-[length:var(--fs-subtitulo)] leading-snug text-gray-800"
+              style={{ fontWeight: 700 }}
+            >
               {subtitle}
             </h2>
           </div>

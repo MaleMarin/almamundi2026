@@ -16,6 +16,7 @@ import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubica
 import { TemaTags } from '@/components/historias/TemaTags';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import { CintaStripe } from '@/components/historias/CintaStripe';
 
 const FORMAT_LABEL: Record<AlmaLocale, Record<string, string>> = {
   es: { video: 'Video', audio: 'Audio', image: 'Foto', foto: 'Foto', photos: 'Foto', text: 'Texto', texto: 'Texto' },
@@ -127,9 +128,10 @@ export default function HistoriasIdPageClient({ story }: { story: StoryPoint }) 
             {kicker}
           </p>
           <RespondeALine questionId={story.questionId} questionMode={story.questionMode} color={neu.textBody} />
-          <h1 className="mb-2 text-[length:var(--fs-titular)] font-normal leading-[1.1]" style={{ color: neu.textMain }}>
+          <h1 className="mb-2 text-[length:var(--fs-titular)] leading-[1.1]" style={{ color: neu.textMain, fontWeight: 400 }}>
             {story.title || 'Sin título'}
           </h1>
+          <CintaStripe colors={story.cintaColors} height={8} className="mb-4" />
           {alias ? (
             <p className="mb-4 text-[length:var(--fs-pequeno)]" style={{ color: neu.textBody }}>
               {copy.by(alias)}
