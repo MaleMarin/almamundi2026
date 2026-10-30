@@ -1,4 +1,4 @@
-type HomeCapa = 'stories' | 'news' | 'sounds' | 'bits' | 'search';
+type HomeCapa = 'stories' | 'news' | 'sounds' | 'bits' | 'search' | 'respuestas';
 
 /** Vista de la home guardada en la entrada actual del historial. */
 export type HomeView = {
@@ -14,7 +14,7 @@ export type HomeView = {
 };
 
 const STORAGE_KEY = 'alma-home-view';
-const CAPAS = new Set<HomeCapa>(['stories', 'news', 'sounds', 'bits', 'search']);
+const CAPAS = new Set<HomeCapa>(['stories', 'news', 'sounds', 'bits', 'search', 'respuestas']);
 
 let pending: HomeView | null = null;
 let scrollRestored = false;

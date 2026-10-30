@@ -22,6 +22,10 @@ export type StoriesPanelProps = {
    * solo resultados cuando hay texto en el campo.
    */
   panelMode?: 'stories' | 'search';
+  /** Listado de respuestas: misma fila, con la pregunta y el formato. */
+  answerRows?: boolean;
+  kicker?: string;
+  emptyText?: string;
 };
 
 function storiesMatchingQuery(stories: StoryPoint[], q: string): StoryPoint[] {
@@ -41,13 +45,17 @@ function formatStoryType(s: StoryPoint): string {
 function StoryRow({
   story,
   isActive,
-  onClick }: {
+  onClick,
+  line,
+  kind }: {
   story: StoryPoint;
   isActive: boolean;
   onClick: () => void;
+  line?: string | null;
+  kind?: string | null;
 }) {
   const { locale } = useHomeLocale();
-  const tipo = formatStoryType(story);
+  const tipo = kind || formatStoryType(story);
   const ago = formatRelativeTime(story.publishedAt, Date.now(), locale);
   const cardShell = {
     borderRadius: 16,
@@ -90,6 +98,18 @@ function StoryRow({
         whiteSpace: 'nowrap' }}>
         {story.title ?? story.label}
       </p>
+      {line ? (
+        <p style={{
+          fontSize: 'var(--fs-etiqueta)',
+          color: 'rgba(255,255,255,0.62)',
+          margin: '0 0 4px',
+          lineHeight: 1.35,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap' }}>
+          {line}
+        </p>
+      ) : null}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
         <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)' }}>
           {formatPublicPlace(story.city, story.country, locale)}
@@ -111,7 +131,10 @@ export function StoriesPanel({
   onStoryFocus,
   highlightedStoryId,
   onContarMiHistoria,
-  panelMode = 'stories' }: StoriesPanelProps) {
+  panelMode = 'stories',
+  answerRows = false,
+  kicker,
+  emptyText }: StoriesPanelProps) {
   const isSearchPanel = panelMode === 'search';
   const copy = mapChrome(useHomeLocale().locale);
   const qTrim = exploreQuery.trim();
@@ -220,6 +243,8 @@ export function StoriesPanel({
                   story={s}
                   isActive={highlightedStoryId === s.id}
                   onClick={() => onStoryFocus(s)}
+                  line={answerRows ? s.subtitle : undefined}
+                  kind={answerRows ? s.format : undefined}
                 />
               ))}
             </>
@@ -240,7 +265,7 @@ export function StoriesPanel({
               margin: '0 0 12px',
               lineHeight: 1.5,
               fontFamily: SITE_FONT_STACK }}>
-              {copy.storiesEmpty}
+              {emptyText ?? copy.storiesEmpty}
             </p>
             {onContarMiHistoria && (
               <button
@@ -266,7 +291,7 @@ export function StoriesPanel({
         ) : (
           <>
             <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
-              {copy.latest}
+              {kicker ?? copy.latest}
             </p>
             {stories.map((s, i) => (
               <StoryRow
@@ -274,6 +299,8 @@ export function StoriesPanel({
                 story={s}
                 isActive={highlightedStoryId === s.id}
                 onClick={() => onStoryFocus(s)}
+                line={answerRows ? s.subtitle : undefined}
+                kind={answerRows ? s.format : undefined}
               />
             ))}
           </>

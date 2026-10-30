@@ -30,6 +30,10 @@ type Props = {
   variant?: 'full' | 'compact';
   /** Cierra el panel y abre las cuatro tarjetas del hero. */
   onTellStory?: () => void;
+  /** Respuesta del mapa: sin ficha de /historias. */
+  catalog?: boolean;
+  /** Vuelve al listado del mismo panel. */
+  onBack?: () => void;
 };
 
 function KenBurnsViewer({
@@ -183,6 +187,7 @@ function KenBurnsViewer({
   );
 }
 
+const BACK_LABEL = { es: 'Volver', pt: 'Voltar', en: 'Back' } as const;
 const FULL_STORY_LABEL = {
   es: 'Ver historia completa',
   pt: 'Ver história completa',
@@ -295,7 +300,7 @@ function PhotoNavigator({ slides }: { slides: PhotoSlide[] }) {
   );
 }
 
-export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full', onTellStory }: Props) {
+export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full', onTellStory, catalog = true, onBack }: Props) {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const compact = variant === 'compact';
   const [mounted, setMounted] = useState(false);
@@ -310,6 +315,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const [liveReaders, setLiveReaders] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   const scrollRef = useRef<HTMLDivElement>(null);
   const [moreBelow, setMoreBelow] = useState(false);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
@@ -410,11 +417,13 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
   const alias = formatPublicName(story.authorName || story.author?.name);
-  const fullHref = isShortCode(story.shortCode)
-    ? `/h/${story.shortCode}`
-    : story.id
-      ? `/historias/${story.id}`
-      : null;
+  const fullHref = !catalog
+    ? null
+    : isShortCode(story.shortCode)
+      ? `/h/${story.shortCode}`
+      : story.id
+        ? `/historias/${story.id}`
+        : null;
 
   const startListening = () => {
     if (!story.body || typeof window === 'undefined') return;
@@ -450,6 +459,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   }, []);
 
   useEffect(() => {
+    if (!catalog) return;
     const ping = async () => {
       try {
         const headers: HeadersInit = {};
@@ -469,7 +479,41 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
         fetch(`/api/stories/${story.id}/readers`, { method: 'DELETE', headers: { 'x-reader-id': id } }).catch(() => {});
       }
     };
-  }, [story.id]);
+  }, [story.id, catalog]);
+
+  useEffect(() => {
+    if (catalog) return;
+    const root = panelRef.current;
+    if (!root) return;
+    const focusable = () =>
+      [...root.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(
+        (el) => !el.hasAttribute('disabled')
+      );
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseRef.current();
+    };
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      const list = focusable();
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    root.addEventListener('keydown', onTab);
+    focusable()[0]?.focus();
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      root.removeEventListener('keydown', onTab);
+    };
+  }, [catalog, story.id]);
 
   return (
     <>
@@ -495,6 +539,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
       <GlobePanelFrame active={compact}>
       <div
         ref={panelRef}
+        role={catalog ? undefined : 'dialog'}
+        aria-modal={catalog ? undefined : true}
+        aria-label={catalog ? undefined : story.title ?? story.label}
         className={compact ? 'story-map-panel' : undefined}
         style={compact ? undefined : {
           position: 'fixed',
@@ -623,6 +670,26 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 )}
               </div>
 
+              <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexShrink: 0, marginLeft: 16 }}>
+              {onBack ? (
+              <button
+                type="button"
+                onClick={onBack}
+                style={{
+                  minHeight: 36,
+                  padding: '0 12px',
+                  borderRadius: 999,
+                  background: 'rgba(255,255,255,0.08)',
+                  border: '1px solid rgba(255,255,255,0.12)',
+                  color: 'rgba(255,255,255,0.82)',
+                  cursor: 'pointer',
+                  fontSize: 'var(--fs-etiqueta)',
+                  fontFamily: SITE_FONT_STACK,
+                  flexShrink: 0 }}
+              >
+                {BACK_LABEL[locale]}
+              </button>
+              ) : null}
               <button
                 type="button"
                 aria-label="Cerrar"
@@ -640,12 +707,12 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
-                  marginLeft: 16,
                   outline: 'none',
                   transition: 'all 150ms ease' }}
               >
                 ×
               </button>
+              </div>
             </div>
 
             <div
@@ -932,6 +999,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     {FULL_STORY_LABEL[locale]}
                   </Link>
                 ) : null}
+              {catalog ? (
               <div
                 style={{
                   display: 'flex',
@@ -971,6 +1039,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   {TELL_LABEL[locale]}
                 </button>
               </div>
+              ) : null}
               </div>
               ) : (
               <div

@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -50,10 +50,19 @@ type MapDrawerProps = {
   sectionHeight?: number;
 };
 
+function focusableIn(root: HTMLElement): HTMLElement[] {
+  return [...root.querySelectorAll<HTMLElement>('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])')].filter(
+    (el) => !el.hasAttribute('disabled') && el.tabIndex !== -1
+  );
+}
+
 export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent = false }: MapDrawerProps) {
   const { locale } = useHomeLocale();
   const dockCopy = mapChrome(locale);
   const [animatingIn, setAnimatingIn] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
 
   useEffect(() => {
     if (open) {
@@ -66,31 +75,52 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   }, [open]);
 
   useEffect(() => {
-    if (open) {
-      const onEscape = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') onClose();
-      };
-      window.addEventListener('keydown', onEscape);
-      return () => window.removeEventListener('keydown', onEscape);
-    }
-  }, [open, onClose]);
+    if (!open) return;
+    const root = dialogRef.current;
+    const onEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onCloseRef.current();
+    };
+    const onTab = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab' || !root) return;
+      const list = focusableIn(root);
+      if (list.length === 0) return;
+      const first = list[0];
+      const last = list[list.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener('keydown', onEscape);
+    root?.addEventListener('keydown', onTab);
+    if (root) focusableIn(root)[0]?.focus();
+    return () => {
+      window.removeEventListener('keydown', onEscape);
+      root?.removeEventListener('keydown', onTab);
+    };
+  }, [open, mode]);
 
   if (!open) return null;
 
   const title =
     mode === 'stories'
       ? dockCopy.stories
-      : mode === 'news'
-        ? HILOS_UI[locale].nav
-        : mode === 'sounds'
-          ? dockCopy.sounds
-          : mode === 'bits'
-            ? dockCopy.bits
-            : dockCopy.searchTitle;
+      : mode === 'respuestas'
+        ? HILOS_UI[locale].leyenda
+        : mode === 'news'
+          ? HILOS_UI[locale].nav
+          : mode === 'sounds'
+            ? dockCopy.sounds
+            : mode === 'bits'
+              ? dockCopy.bits
+              : dockCopy.searchTitle;
   const bitsMode = mode === 'bits';
   /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
   const innerScrollPanel =
-    mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits';
+    mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits' || mode === 'respuestas';
   const dialogAriaLabel = title;
   const drawerBodyClass = fitContent
     ? 'max-h-[min(70vh,calc(100dvh-8rem))] overflow-y-auto overflow-x-hidden px-5 py-4'
@@ -108,6 +138,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
           aria-hidden
         />
         <div
+          ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label={dialogAriaLabel}
@@ -160,6 +191,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
         aria-hidden
       />
       <aside
+        ref={dialogRef}
         role="dialog"
         aria-modal="true"
         aria-label={dialogAriaLabel}

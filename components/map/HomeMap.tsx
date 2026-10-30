@@ -45,8 +45,8 @@ import {
   peekMapAmbientPending } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
-import { QUESTION_IDS, resolveQuestionId } from '@/lib/pregunta-semana';
-import { RespuestaGlobeCard } from '@/components/map/RespuestaGlobeCard';
+import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
+import { QUESTION_IDS, preguntaTexto, resolveQuestionId } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
@@ -90,6 +90,40 @@ function storyHasValidGeo(s: { lat?: number | null; lng?: number | null }): bool
     Math.abs(lat) <= 90 &&
     Math.abs(lng) <= 180
   );
+}
+
+const RESPUESTA_KIND = {
+  es: { texto: 'texto', voz: 'voz', foto: 'foto' },
+  pt: { texto: 'texto', voz: 'voz', foto: 'foto' },
+  en: { texto: 'text', voz: 'voice', foto: 'photo' },
+} as const;
+
+function respuestaAsStory(item: RespuestaPublica, locale: keyof typeof RESPUESTA_KIND): StoryPoint {
+  const alias = preguntaAlias(item.alias);
+  const question = preguntaTexto(item.questionId, item.mode, locale) ?? '';
+  const story: StoryPoint = {
+    id: item.id,
+    lat: item.lat ?? Number.NaN,
+    lng: item.lng ?? Number.NaN,
+    label: alias,
+    title: alias,
+    city: item.city,
+    country: item.country,
+    questionId: item.questionId,
+    questionMode: item.mode,
+    subtitle: question,
+    format: RESPUESTA_KIND[locale][item.kind],
+  };
+  if (item.kind === 'texto') {
+    story.body = item.contenido;
+    story.hasText = Boolean(item.contenido);
+  } else if (item.kind === 'voz' && item.previewUrl) {
+    story.audioUrl = item.previewUrl;
+    story.hasAudio = true;
+  } else if (item.kind === 'foto' && item.previewUrl) {
+    story.imagenes = [{ url: item.previewUrl, descripcion: item.contenido || undefined }];
+  }
+  return story;
 }
 
 function pickSurpriseStory(stories: StoryPoint[], lastId: string | null): StoryPoint | null {
@@ -167,6 +201,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   const [soundEnabled, setSoundEnabled] = useState(false);
   const [selectedMood, setSelectedMood] = useState<string>('universo');
   const [exploreQuery, setExploreQuery] = useState('');
+  const [respuestaQuery, setRespuestaQuery] = useState('');
   const [highlightedStoryId, setHighlightedStoryId] = useState<string | null>(null);
   const [openStory, setOpenStory] = useState<StoryPoint | null>(null);
   const [storyViewerClosing, setStoryViewerClosing] = useState(false);
@@ -741,6 +776,24 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     }
   }, []);
 
+  const showRespuesta = useCallback((item: RespuestaPublica) => {
+    if (storyCloseTimerRef.current) {
+      clearTimeout(storyCloseTimerRef.current);
+      storyCloseTimerRef.current = null;
+    }
+    setStoryViewerClosing(false);
+    setOpenStory(null);
+    setHighlightedStoryId(null);
+    setDrawerOpen(false);
+    setPinnedStory(null);
+    setPinnedRespuesta(item);
+    setOpenRespuesta(item);
+    if (storyHasValidGeo(item) && item.lat != null && item.lng != null) {
+      setSurpriseFlying(true);
+      setFocusTarget({ lat: item.lat, lng: item.lng, nonce: Date.now() });
+    }
+  }, []);
+
   const finishSurpriseOpen = useCallback(() => {
     const story = pendingSurpriseRef.current;
     pendingSurpriseRef.current = null;
@@ -808,6 +861,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setPinnedRespuesta(item);
       setOpenStory(null);
       setHighlightedStoryId(null);
+      setDrawerOpen(false);
       setOpenRespuesta(item);
       setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
       if (!homeScrollRestored()) {
@@ -875,13 +929,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [surpriseNotice]);
 
   const selectedGlobeMarkerId = useMemo(() => {
+    if (openRespuesta) {
+      const idx = respuestasOnGlobe.findIndex((item) => item.id === openRespuesta.id);
+      if (idx >= 0) return RESPUESTA_GLOBE_ID_BASE + idx;
+    }
     if (drawerMode === 'bits' && selectedBit) return selectedBit.id;
     if (highlightedStoryId != null) {
       const idx = storiesOnGlobe.findIndex((s) => s.id === highlightedStoryId);
       return idx >= 0 ? STORY_GLOBE_ID_BASE + idx : null;
     }
     return null;
-  }, [drawerMode, selectedBit, highlightedStoryId, storiesOnGlobe]);
+  }, [drawerMode, selectedBit, highlightedStoryId, storiesOnGlobe, openRespuesta, respuestasOnGlobe]);
 
   const handleGlobeMarkerClick = useCallback(
     (id: number) => {
@@ -905,9 +963,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       if (id >= RESPUESTA_GLOBE_ID_BASE) {
         const item = respuestasOnGlobe[id - RESPUESTA_GLOBE_ID_BASE];
         if (!item) return;
-        setOpenStory(null);
-        setHighlightedStoryId(null);
-        setOpenRespuesta(item);
+        showRespuesta(item);
         return;
       }
       const bit = huellasPuntos.find((h) => h.id === id);
@@ -918,10 +974,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setDrawerMode('bits');
       setDrawerOpen(true);
     },
-    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe]
+    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe, showRespuesta]
   );
 
-  function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits', key: keyof GlobeLayerVisibility) {
+  function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits' | 'respuestas', key: keyof GlobeLayerVisibility) {
     const layerOn = globeLayers[key];
     if (drawerOpen && drawerMode === mode) {
       setGlobeLayers((prev) => ({ ...prev, [key]: !layerOn }));
@@ -1018,12 +1074,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               onFocusArrived={finishSurpriseOpen}
             />
             {SHOW_PUBLIC_RESPUESTAS && openRespuesta ? (
-              <RespuestaGlobeCard
-                item={openRespuesta}
+              <StoryViewer
+                story={respuestaAsStory(openRespuesta, locale)}
                 onClose={() => {
                   setOpenRespuesta(null);
                   setPinnedRespuesta(null);
                 }}
+                onBack={() => {
+                  setOpenRespuesta(null);
+                  setDrawerMode('respuestas');
+                  setDrawerOpen(true);
+                }}
+                isClosing={false}
+                variant="compact"
+                catalog={false}
               />
             ) : null}
             {openStory ? (
@@ -1085,10 +1149,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               </PillNavButton>
               <PillNavButton
                 dock
-                href="/preguntas"
-                title={HILOS_UI[locale].nav}
+                active={drawerOpen && drawerMode === 'respuestas'}
+                title={HILOS_UI[locale].leyenda}
+                onClick={() => onGlobeLayerPill('respuestas', 'respuestas')}
               >
-                {HILOS_UI[locale].nav}
+                {HILOS_UI[locale].leyenda}
               </PillNavButton>
               <PillNavButton
                 dock
@@ -1158,6 +1223,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             />
           ) : drawerMode === 'news' ? (
             <PreguntaPanel />
+          ) : drawerMode === 'respuestas' ? (
+            <StoriesPanel
+              stories={respuestas.map((item) => respuestaAsStory(item, locale))}
+              exploreQuery={respuestaQuery}
+              onExploreQueryChange={setRespuestaQuery}
+              onStoryFocus={(story) => {
+                const item = respuestas.find((entry) => entry.id === story.id);
+                if (item) showRespuesta(item);
+              }}
+              highlightedStoryId={openRespuesta?.id ?? null}
+              answerRows
+              kicker={HILOS_UI[locale].leyenda}
+              emptyText={PREGUNTA_COPY.empty[locale]}
+            />
           ) : drawerMode === 'bits' ? (
             <BitsPanel
               showIndexList={false}
