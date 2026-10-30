@@ -80,9 +80,6 @@ export function NewsletterBand() {
         <h2 id="newsletter-band-title" className="mt-3 text-[length:var(--fs-subtitulo)] font-semibold leading-snug">
           {copy.title}
         </h2>
-        <p className="mt-3 text-[length:var(--fs-pequeno)] font-normal italic leading-relaxed text-[#F7F8FC]">
-          {copy.definition}
-        </p>
         <p className="mt-3 text-[length:var(--fs-pequeno)] font-normal leading-relaxed text-[#F7F8FC]">{copy.text}</p>
         {sent ? (
           <p className="mt-6 text-[length:var(--fs-pequeno)] font-semibold leading-relaxed" role="status">
