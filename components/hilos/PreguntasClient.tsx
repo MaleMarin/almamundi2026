@@ -4,39 +4,28 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { AlignLeft, Headphones, Image as ImageIcon, Shuffle, Video } from 'lucide-react';
 import { CintaMini } from '@/components/hilos/CintaMini';
+import { FilaCintas } from '@/components/hilos/CintaColgante';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import RespuestasMosaic from '@/components/pregunta/RespuestasMosaic';
 import type { ContarFormat } from '@/lib/contar-routes';
 import {
-  HILOS,
   PREGUNTAS_HILO,
   hiloPorId,
   preguntaAlAzar,
   preguntaDeOtroHilo,
   preguntaHiloPorId,
-  type Hilo,
   type PreguntaHilo,
 } from '@/lib/hilos';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { enlacePregunta, HILOS_UI, textoCompartirHilo, tituloHiloPartes } from '@/lib/i18n/hilos-messages';
 import { interpolate } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { preguntaPorId, preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
+import { preguntaPorId, resolveQuestionId } from '@/lib/pregunta-semana';
 
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
-
-const LARGOS = [168, 214, 186, 252, 198, 276, 162, 238, 190, 264, 174, 228];
-
-const SATIN = [
-  { base: '#FF4A1C', brillo: '#FF8A66' },
-  { base: '#E5A100', brillo: '#F6C14A' },
-  { base: '#D94F8C', brillo: '#F09AC0' },
-  { base: '#4C8C3A', brillo: '#7CB86A' },
-  { base: '#8E4FD6', brillo: '#C09AE8' },
-] as const;
 
 function formatKey(story: StoryPoint): ContarFormat {
   const format = (story.format ?? '').toLowerCase();
@@ -82,7 +71,6 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
   const { locale, t } = useHomeLocale();
   const copy = HILOS_UI[locale];
   const titulo = tituloHiloPartes(copy.titulo);
-  const semana = preguntasDeLaSemana().vigente;
   const [abierta, setAbierta] = useState<PreguntaHilo | null>(() => preguntaHiloPorId(initialId));
   const [respondiendo, setRespondiendo] = useState(false);
   const [historias, setHistorias] = useState<StoryPoint[]>([]);
@@ -160,25 +148,6 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
         </div>
       </header>
 
-      <section
-        className="mt-14 scroll-mt-40 rounded-[32px] bg-white px-6 py-8 text-center shadow-[0_16px_40px_rgba(20,29,38,0.06)] md:mt-16 md:px-10"
-        aria-labelledby="hilo-semana-titulo"
-      >
-        <h2 id="hilo-semana-titulo" className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">
-          {copy.semana}
-        </h2>
-        <p className="mx-auto mt-4 max-w-2xl text-[length:var(--fs-subtitulo)] font-semibold leading-snug text-[#1A1916]">
-          {semana.tu[locale]}
-        </p>
-        <button
-          type="button"
-          className={`btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6 ${FOCUS}`}
-          onClick={() => abrir(preguntaHiloPorId(semana.id), true)}
-        >
-          {copy.responde}
-        </button>
-      </section>
-
       <section id="hilos" className="mt-14 scroll-mt-40 md:mt-20 md:scroll-mt-52" aria-labelledby="hilos-titulo">
         <h2
           id="hilos-titulo"
@@ -187,38 +156,12 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
         >
           {copy.elige}
         </h2>
-        <div className="hidden md:block">
-          <div className="overflow-x-auto pb-2">
-            <div className="min-w-[1240px] px-1">
-              <div className="h-[3px] rounded-full bg-[#B8C0CC]" />
-              <div className="flex items-start justify-between">
-                {HILOS.map((item, index) => (
-                  <HiloColgante
-                    key={item.id}
-                    hilo={item}
-                    index={index}
-                    nombre={item.nombre[locale]}
-                    selected={abierta?.hiloId === item.id}
-                    onPick={() => abrir(PREGUNTAS_HILO.find((pregunta) => pregunta.hiloId === item.id) ?? null)}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="flex gap-2 overflow-x-auto pb-2 md:hidden">
-          {HILOS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              aria-pressed={abierta?.hiloId === item.id}
-              className={`inline-flex min-h-11 shrink-0 items-center gap-2 rounded-full bg-white px-4 text-[13px] font-semibold text-[#4A5568] ${FOCUS}`}
-              onClick={() => abrir(PREGUNTAS_HILO.find((pregunta) => pregunta.hiloId === item.id) ?? null)}
-            >
-              <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: item.color }} aria-hidden />
-              {item.nombre[locale]}
-            </button>
-          ))}
+        <div className="mt-8">
+          <FilaCintas
+            locale={locale}
+            selectedId={abierta?.hiloId ?? null}
+            onPick={(hilo) => abrir(PREGUNTAS_HILO.find((pregunta) => pregunta.hiloId === hilo.id) ?? null)}
+          />
         </div>
       </section>
 
@@ -375,54 +318,4 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
 function FormatoIcono({ kind }: { kind: ContarFormat }) {
   const Icon = kind === 'video' ? Video : kind === 'audio' ? Headphones : kind === 'foto' ? ImageIcon : AlignLeft;
   return <Icon size={16} aria-hidden className="text-[#FF4A1C]" />;
-}
-
-function HiloColgante({
-  hilo,
-  index,
-  nombre,
-  selected,
-  onPick,
-}: {
-  hilo: Hilo;
-  index: number;
-  nombre: string;
-  selected: boolean;
-  onPick: () => void;
-}) {
-  const largo = LARGOS[index] ?? 180;
-  const lean = index % 2 === 0 ? 10 : -10;
-  const satin = SATIN[index % SATIN.length] ?? SATIN[0];
-  const cx = 36;
-  const endY = largo - 10;
-  const d = `M ${cx} 0 Q ${cx + lean} ${Math.round(largo * 0.55)} ${cx} ${endY}`;
-  const grad = `cinta-satin-${hilo.id}`;
-  return (
-    <button
-      type="button"
-      aria-pressed={selected}
-      onClick={onPick}
-      className={`flex w-[100px] shrink-0 flex-col items-center border-0 bg-transparent px-1 pt-0 text-center motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out hover:motion-safe:translate-y-2 ${FOCUS}`}
-    >
-      <svg
-        width="72"
-        height={largo}
-        viewBox={`0 0 72 ${largo}`}
-        aria-hidden
-        className="cinta-satin"
-        style={{ animationDelay: `${index * 0.18}s` }}
-      >
-        <defs>
-          <linearGradient id={grad} gradientUnits="userSpaceOnUse" x1={cx - 10} y1="0" x2={cx + 10} y2="0">
-            <stop offset="0%" stopColor={satin.base} />
-            <stop offset="38%" stopColor={satin.brillo} />
-            <stop offset="62%" stopColor={satin.base} />
-            <stop offset="100%" stopColor={satin.base} stopOpacity="0.86" />
-          </linearGradient>
-        </defs>
-        <path d={d} fill="none" stroke={`url(#${grad})`} strokeWidth="16" strokeLinecap="round" />
-      </svg>
-      <span className="mt-2 text-[13px] font-semibold leading-tight text-[#4A5568]">{nombre}</span>
-    </button>
-  );
 }

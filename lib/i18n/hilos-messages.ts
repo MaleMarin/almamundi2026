@@ -21,6 +21,8 @@ type HilosCopy = {
   entrada: string;
   /** Píldora bajo las tarjetas de la home, y título de /preguntas. */
   pill: string;
+  bloqueTitulo: string;
+  azar: string;
   responde: string;
   respondes: string;
   formatos: Formatos;
@@ -47,6 +49,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Elige una cinta',
     entrada: '¿Y si empiezas por una pregunta? Tira de una cinta',
     pill: '¿Y si empiezas por una pregunta? Tira de una cinta',
+    bloqueTitulo: '¿Y si empiezas por una pregunta? Tira de una cinta.',
+    azar: 'o deja que el azar elija',
     responde: 'Responde aquí',
     respondes: 'Respondes a:',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' },
@@ -72,6 +76,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Escolha uma fita',
     entrada: 'E se você começar por uma pergunta? Puxe uma fita',
     pill: 'E se você começar por uma pergunta? Puxe uma fita',
+    bloqueTitulo: 'E se você começar por uma pergunta? Puxe uma fita.',
+    azar: 'ou deixe o acaso escolher',
     responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
@@ -97,6 +103,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Pick a ribbon',
     entrada: 'What if you start with a question? Pull a ribbon',
     pill: 'What if you start with a question? Pull a ribbon',
+    bloqueTitulo: 'What if you start with a question? Pull a ribbon.',
+    azar: 'or let chance choose',
     responde: 'Answer here',
     respondes: "You're answering:",
     formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' },

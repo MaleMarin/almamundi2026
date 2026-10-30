@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { PREGUNTA_COPY } from '@/lib/i18n/pregunta-messages';
 import Link from 'next/link';
-import { preguntaPageHref, preguntaPorId, preguntasDeLaSemana, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
+import { preguntaPageHref, preguntaPorId, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
@@ -88,15 +88,13 @@ export default function RespuestasMosaic({
   }, [load, nextOffset]);
 
   if (!pregunta) return null;
-  const current = preguntasDeLaSemana().vigente.id === pregunta.id;
-  const kicker = current ? PREGUNTA_COPY.weekKicker[locale] : PREGUNTA_COPY.pastKicker[locale];
 
   return (
     <div className={embedded ? 'mt-10 flex w-full flex-col gap-4 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]'}>
       {embedded ? null : (
         <>
           <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-wide text-[#FF4A1C]">
-            {kicker} · {pregunta.tema[locale]}
+            {pregunta.tema[locale]}
           </p>
           <article className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
             <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>

@@ -1,18 +1,16 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ComoFuncionaModal } from '@/components/home/ComoFuncionaModal';
 import { HomeFirstPart } from '@/components/home/HomeFirstPart';
 import { PropositoModal } from '@/components/home/PropositoModal';
 import { MapSectionLocked } from '@/components/politica-v2/MapSectionLocked';
+import { BloqueCintasHome } from '@/components/hilos/CintaColgante';
 import { StoryModal, type ChosenInspirationTopic, type StoryModalMode } from '@/components/home/StoryModal';
 import { contarHref, parseContarFormat, contarIndexHref, hiloContarPregunta } from '@/lib/contar-routes';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import { HILOS_UI } from '@/lib/i18n/hilos-messages';
-import { preguntasDeLaSemana } from '@/lib/pregunta-semana';
 import {
   navigateToHomeMapa,
   primeMapAmbientFromNavGesture,
@@ -35,7 +33,6 @@ export function HomePageClient() {
   const router = useRouter();
   const pathname = usePathname() ?? '/';
   const { locale } = useHomeLocale();
-  const preguntaVigente = preguntasDeLaSemana().vigente;
   const [cuentaEliminadaToast, setCuentaEliminadaToast] = useState(false);
   const [storyOpen, setStoryOpen] = useState(false);
   const [storyMode, setStoryMode] = useState<StoryModalMode>('video');
@@ -294,58 +291,7 @@ export function HomePageClient() {
         cintaPill={pathname === '/' || pathname === '/preview-home'}
         basePath="/"
       />
-      <section
-        className="relative z-20 mx-auto mt-[56px] mb-[72px] w-full px-6 md:mt-[96px] md:mb-[120px] md:px-10"
-        aria-labelledby="pregunta-semana-titulo"
-      >
-        <div className="relative mx-auto w-full max-w-[min(100%,1560px)] px-1 sm:px-0">
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -left-8 top-1/2 z-0 h-48 w-48 -translate-y-1/2 rounded-full"
-            style={{ background: 'rgba(255,74,28,0.18)', filter: 'blur(40px)' }}
-          />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -right-6 top-1/2 z-0 h-44 w-44 -translate-y-1/2 rounded-full"
-            style={{ background: 'rgba(90,120,160,0.15)', filter: 'blur(40px)' }}
-          />
-          <div
-            className="relative z-[1] flex flex-col items-center px-7 py-7 text-center md:px-12 md:py-12"
-            style={{
-              borderRadius: '1.75rem',
-              background: 'linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.15))',
-              backdropFilter: 'blur(18px) saturate(160%)',
-              WebkitBackdropFilter: 'blur(18px) saturate(160%)',
-              border: '1px solid rgba(255,255,255,0.8)',
-              boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 8px 32px rgba(20,29,38,0.10)' }}
-          >
-            <div className="mx-auto flex w-full max-w-[760px] flex-col items-center">
-            <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#FF4A1C] tracking-[0.12em]">
-              {HILOS_UI[locale].semana}
-            </p>
-            <h2
-              id="pregunta-semana-titulo"
-              className="mb-0 mt-5 text-[length:var(--fs-titular)] leading-[1.25] "
-              style={{
-                fontFamily: 'var(--font-interna), sans-serif',
-                fontWeight: 400,
-                color: '#4A5568',
-                textWrap: 'balance' }}
-            >
-              {preguntaVigente.tu[locale]}
-            </h2>
-            <div className="mt-8 flex w-full flex-col items-stretch justify-center gap-3 sm:w-auto sm:flex-row sm:items-center">
-              <Link
-                href={`/preguntas?p=${encodeURIComponent(preguntaVigente.id)}`}
-                className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 py-3"
-              >
-                {HILOS_UI[locale].cuentala}
-              </Link>
-            </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {pathname === '/' || pathname === '/preview-home' ? <BloqueCintasHome locale={locale} /> : null}
       <MapSectionLocked />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
