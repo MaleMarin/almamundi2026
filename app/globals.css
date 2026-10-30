@@ -1196,3 +1196,32 @@ html body :is(input, textarea, select):not([type='checkbox']):not([type='radio']
     animation: none;
   }
 }
+
+a.cinta-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(100%, 40rem);
+  padding: 14px 22px;
+  border-radius: 999px;
+  background: #fbfaf8;
+  color: #b8340f;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+  text-decoration: none;
+  box-shadow: 0 12px 28px rgba(120, 110, 100, 0.2);
+}
+
+.cinta-pill-minis {
+  display: flex;
+  flex: none;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.cinta-pill-mini {
+  display: block;
+  width: 10px;
+  border-radius: 0 0 6px 6px;
+}

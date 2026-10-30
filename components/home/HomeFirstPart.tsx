@@ -13,6 +13,8 @@ import { HILOS_UI } from '@/lib/i18n/hilos-messages';
  */
 
 /** Neumorfismo con más volumen: sombras más largas + highlight blanco fuerte + bisel suave. */
+const CINTA_PILL = ['#FF4A1C', '#E5A100', '#D94F8C', '#4C8C3A', '#8E4FD6'] as const;
+
 const soft = {
   textMain: '#4A5568',
 } as const;
@@ -30,6 +32,8 @@ export type HomeFirstPartProps = {
   basePath?: string;
   /** Si la persona llegó desde un hilo, las tarjetas conservan `?pregunta=`. */
   pregunta?: ContarPregunta | null;
+  /** Píldora bajo las tarjetas. En /contar queda el enlace de siempre. */
+  cintaPill?: boolean;
 };
 
 export function HomeFirstPart({
@@ -42,6 +46,7 @@ export function HomeFirstPart({
   onMediaEducation: _onMediaEducation,
   basePath: _basePath = '',
   pregunta = null,
+  cintaPill = false,
 }: HomeFirstPartProps) {
   const { t, locale } = useHomeLocale();
 
@@ -100,6 +105,26 @@ export function HomeFirstPart({
         pregunta={pregunta}
       />
       </div>
+      {cintaPill ? (
+        <p className="mx-auto mb-4 mt-2 flex justify-center px-6 md:mb-8">
+          <Link
+            href="/preguntas"
+            className="cinta-pill focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]"
+            style={{ color: '#B8340F' }}
+          >
+            <span className="cinta-pill-minis" aria-hidden>
+              {CINTA_PILL.map((color, index) => (
+                <span
+                  key={color}
+                  className="cinta-satin cinta-pill-mini"
+                  style={{ backgroundColor: color, animationDelay: `${index * 0.16}s`, height: 22 + (index % 3) * 6 }}
+                />
+              ))}
+            </span>
+            {HILOS_UI[locale].pill}
+          </Link>
+        </p>
+      ) : (
       <p className="mx-auto mb-4 mt-2 max-w-[min(100%,40rem)] px-6 text-center md:mb-8">
         <Link
           href="/preguntas"
@@ -108,6 +133,7 @@ export function HomeFirstPart({
           {HILOS_UI[locale].entrada}
         </Link>
       </p>
+      )}
     </>
   );
 }

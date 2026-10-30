@@ -291,6 +291,7 @@ export function HomePageClient() {
         onRecordPhoto={() => openStory('foto', true)}
         onMediaEducation={() => router.push('/educacion-mediatica')}
         pregunta={preguntaContar}
+        cintaPill={pathname === '/' || pathname === '/preview-home'}
         basePath="/"
       />
       <section

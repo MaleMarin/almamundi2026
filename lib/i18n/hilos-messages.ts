@@ -20,6 +20,7 @@ type HilosCopy = {
   elige: string;
   entrada: string;
   responde: string;
+  pill: string;
   respondes: string;
   formatos: Formatos;
   compartir: string;
@@ -29,7 +30,7 @@ type HilosCopy = {
 export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   es: {
     ceja: 'Preguntas que despiertan historias',
-    titulo: '¿No sabes por dónde empezar? Tira de un hilo.',
+    titulo: '¿Y si empiezas por una pregunta? Tira de una cinta',
     bajada:
       'Cada cinta guarda preguntas sobre un pedazo de la vida. Elige una, o deja que el azar elija por ti.',
     tirar: 'Tira de una cinta',
@@ -45,6 +46,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Elige una cinta',
     entrada: '¿No sabes por dónde empezar? Tira de un hilo',
     responde: 'Responde aquí',
+    pill: '¿Y si empiezas por una pregunta? Tira de una cinta',
     respondes: 'Respondes a:',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -53,7 +55,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   pt: {
     ceja: 'Perguntas que despertam histórias',
-    titulo: 'Não sabe por onde começar? Puxe um fio.',
+    titulo: 'E se você começar por uma pergunta? Puxe uma fita',
     bajada:
       'Cada fita guarda perguntas sobre um pedaço da vida. Escolha uma, ou deixe o acaso escolher por você.',
     tirar: 'Puxe uma fita',
@@ -69,6 +71,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Escolha uma fita',
     entrada: 'Não sabe por onde começar? Puxe um fio',
     responde: 'Responda aqui',
+    pill: 'E se você começar por uma pergunta? Puxe uma fita',
     respondes: 'Você está respondendo:',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -77,7 +80,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   en: {
     ceja: 'Questions that awaken stories',
-    titulo: 'Not sure where to start? Pull a thread.',
+    titulo: 'What if you start with a question? Pull a ribbon',
     bajada:
       'Each ribbon holds questions about a piece of life. Pick one, or let chance pick for you.',
     tirar: 'Pull a ribbon',
@@ -93,6 +96,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Pick a ribbon',
     entrada: 'Not sure where to start? Pull a thread',
     responde: 'Answer here',
+    pill: 'What if you start with a question? Pull a ribbon',
     respondes: "You're answering:",
     formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' },
     compartir:
