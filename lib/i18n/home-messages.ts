@@ -108,21 +108,21 @@ const es: HomeMessages = {
   cardVideoTitle: 'Tu historia,',
   cardVideoSubtitle: 'en primer plano',
   cardVideoBody:
-    'Un gesto, una pausa, una mirada. Todo cabe en una cámara. Hasta 5 minutos.',
+    'Un gesto, una pausa, una mirada. Todo cabe en una cámara.',
   cardVideoCta: 'Graba un video',
   cardAudioTitle: 'Dale voz',
   cardAudioSubtitle: 'a lo que recuerdas',
   cardAudioBody:
-    'Hay historias que no necesitan verse, solo ser escuchadas. Hasta 5 minutos.',
+    'Hay historias que no necesitan verse, solo ser escuchadas.',
   cardAudioCta: 'Graba un audio',
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
-    'Hay historias que no necesitan sonido ni imagen, solo palabras. Hasta 5000 caracteres.',
+    'Hay historias que no necesitan sonido ni imagen, solo palabras.',
   cardWriteCta: 'Escribe una historia',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
-  cardPhotoBody: 'Una foto guarda más de lo que se ve a simple vista. Hasta 8 fotos.',
+  cardPhotoBody: 'Una foto guarda más de lo que se ve a simple vista.',
   cardPhotoCta: 'Sube una foto',
 };
 
@@ -169,21 +169,21 @@ const pt: HomeMessages = {
   cardVideoTitle: 'Sua história,',
   cardVideoSubtitle: 'em primeiro plano',
   cardVideoBody:
-    'Um gesto, uma pausa, um olhar. Tudo cabe em uma câmera. Até 5 minutos.',
+    'Um gesto, uma pausa, um olhar. Tudo cabe em uma câmera.',
   cardVideoCta: 'Grave um vídeo',
   cardAudioTitle: 'Dê voz',
   cardAudioSubtitle: 'ao que você lembra',
   cardAudioBody:
-    'Há histórias que não precisam ser vistas, só ouvidas. Até 5 minutos.',
+    'Há histórias que não precisam ser vistas, só ouvidas.',
   cardAudioCta: 'Grave um áudio',
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
-    'Há histórias que não precisam de som nem imagem, só de palavras. Até 5000 caracteres.',
+    'Há histórias que não precisam de som nem imagem, só de palavras.',
   cardWriteCta: 'Escreva uma história',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
-  cardPhotoBody: 'Uma foto guarda mais do que se vê à primeira vista. Até 8 fotos.',
+  cardPhotoBody: 'Uma foto guarda mais do que se vê à primeira vista.',
   cardPhotoCta: 'Envie uma foto',
 };
 
@@ -230,21 +230,21 @@ const en: HomeMessages = {
   cardVideoTitle: 'Your story,',
   cardVideoSubtitle: 'center stage',
   cardVideoBody:
-    'A gesture, a pause, a look. It all fits in a camera. Up to 5 minutes.',
+    'A gesture, a pause, a look. It all fits in a camera.',
   cardVideoCta: 'Record a video',
   cardAudioTitle: 'Give voice',
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
-    "Some stories don't need to be seen, only heard. Up to 5 minutes.",
+    "Some stories don't need to be seen, only heard.",
   cardAudioCta: 'Record audio',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
-    'Some stories need no sound or image, only words. Up to 5,000 characters.',
+    'Some stories need no sound or image, only words.',
   cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
-  cardPhotoBody: 'A photo holds more than meets the eye. Up to 8 photos.',
+  cardPhotoBody: 'A photo holds more than meets the eye.',
   cardPhotoCta: 'Upload a photo',
 };
 

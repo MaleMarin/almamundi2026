@@ -43,11 +43,11 @@ const CONTAR_META: Record<
     },
     video: {
       title: 'Graba el momento que todavía vive en ti',
-      description: 'Tu historia merece verse. Hasta 5 minutos de video.',
+      description: 'Tu historia merece verse.',
     },
     audio: {
       title: 'Hay historias que se cuentan mejor en voz alta',
-      description: 'Tu voz guarda lo que las palabras escritas no siempre pueden. Hasta 5 minutos de audio.',
+      description: 'Tu voz guarda lo que las palabras escritas no siempre pueden.',
     },
     foto: {
       title: 'Una imagen puede guardar lo que las palabras no alcanzan',
@@ -55,7 +55,7 @@ const CONTAR_META: Record<
     },
     texto: {
       title: 'Escribe lo que no le contaste a nadie',
-      description: 'Aquí no se pierde en el scroll. Queda. Hasta 5000 caracteres.',
+      description: 'Aquí no se pierde en el scroll. Queda.',
     },
   },
   pt: {
@@ -65,11 +65,11 @@ const CONTAR_META: Record<
     },
     video: {
       title: 'Grave o momento que ainda vive em você',
-      description: 'Sua história merece ser vista. Até 5 minutos de vídeo.',
+      description: 'Sua história merece ser vista.',
     },
     audio: {
       title: 'Há histórias que se contam melhor em voz alta',
-      description: 'Sua voz guarda o que as palavras escritas nem sempre podem. Até 5 minutos de áudio.',
+      description: 'Sua voz guarda o que as palavras escritas nem sempre podem.',
     },
     foto: {
       title: 'Uma imagem pode guardar o que as palavras não alcançam',
@@ -77,7 +77,7 @@ const CONTAR_META: Record<
     },
     texto: {
       title: 'Escreva o que você não contou a ninguém',
-      description: 'Aqui não se perde no scroll. Fica. Até 5000 caracteres.',
+      description: 'Aqui não se perde no scroll. Fica.',
     },
   },
   en: {
@@ -87,11 +87,11 @@ const CONTAR_META: Record<
     },
     video: {
       title: 'Record the moment that still lives in you',
-      description: 'Your story deserves to be seen. Up to 5 minutes of video.',
+      description: 'Your story deserves to be seen.',
     },
     audio: {
       title: 'Some stories are best told out loud',
-      description: "Your voice holds what written words can't always carry. Up to 5 minutes of audio.",
+      description: "Your voice holds what written words can't always carry.",
     },
     foto: {
       title: "An image can hold what words can't reach",
@@ -99,7 +99,7 @@ const CONTAR_META: Record<
     },
     texto: {
       title: 'Write what you never told anyone',
-      description: "Here, it doesn't get lost in the scroll. It stays. Up to 5,000 characters.",
+      description: "Here, it doesn't get lost in the scroll. It stays.",
     },
   },
 };
