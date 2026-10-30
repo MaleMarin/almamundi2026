@@ -124,6 +124,22 @@ select {
   margin-bottom: 2px;
 }
 
+.hero-greet-caret {
+  display: inline-block;
+  width: 1px;
+  height: 0.9em;
+  margin-left: 1px;
+  background: currentColor;
+  vertical-align: -0.05em;
+  animation: hero-greet-blink 1s steps(1, end) infinite;
+}
+
+@keyframes hero-greet-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
 @media (min-width: 1024px) {
   .home-hero-sign {
     margin-top: 0;

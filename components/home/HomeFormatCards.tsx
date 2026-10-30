@@ -6,7 +6,6 @@
  */
 import type { ReactNode } from 'react';
 import Link from 'next/link';
-import { AlignLeft, Image as ImageIcon, Mic, Video, type LucideIcon } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { contarHref, type ContarPregunta } from '@/lib/contar-routes';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -222,37 +221,6 @@ function SoftCard({
   );
 }
 
-function CompactCard({
-  icon: Icon,
-  title,
-  line,
-  href,
-  onClick,
-}: {
-  icon: LucideIcon;
-  title: string;
-  line: string;
-  href: string;
-  onClick: () => void;
-}) {
-  return (
-    <Link
-      href={href}
-      onClick={(e) => {
-        if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-        e.preventDefault();
-        onClick();
-      }}
-      className="flex h-full min-h-11 flex-col rounded-[28px] border-2 border-transparent bg-[#FBFAF8] px-4 py-4 text-left shadow-[0_12px_28px_rgba(120,110,100,0.2)] outline-none hover:border-[#FF4A1C] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
-      style={{ fontFamily: APP_FONT }}
-    >
-      <Icon size={22} strokeWidth={1.6} className="text-[#FF4A1C]" aria-hidden />
-      <p className="mt-2 text-[length:var(--fs-pequeno)] font-bold leading-snug text-[#4A5568]">{title}</p>
-      <p className="text-[length:var(--fs-pequeno)] font-normal leading-snug text-[#616C7C]">{line}</p>
-    </Link>
-  );
-}
-
 export type HomeFormatCardsProps = {
   onRecordVideo: () => void;
   onRecordAudio: () => void;
@@ -275,51 +243,6 @@ export function HomeFormatCards({
   fillViewport = false,
   pregunta = null }: HomeFormatCardsProps) {
   const { t } = useHomeLocale();
-
-  if (!fillViewport) {
-    return (
-      <section
-        id={sectionId}
-        aria-label="Formatos para compartir tu historia"
-        className="relative z-[18] mb-4 px-6 pb-4 pt-0 sm:pt-1 md:px-10 lg:mb-0 lg:flex lg:min-h-0 lg:grow lg:shrink lg:flex-col lg:px-10 lg:pb-6 lg:pt-0"
-      >
-        <div aria-hidden className="home-hero-lead-gap" />
-        <p className="mx-auto mb-3 shrink-0 text-center text-[12px] font-semibold uppercase tracking-[0.14em] text-[#B8340F] lg:mb-4">
-          {t.formatChoose}
-        </p>
-        <div className="mx-auto grid w-full max-w-[min(100%,1560px)] shrink-0 grid-cols-2 items-stretch gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          <CompactCard
-            icon={Video}
-            title={t.cardVideoCta}
-            line={t.cardVideoLine}
-            href={contarHref('video', pregunta)}
-            onClick={onRecordVideo}
-          />
-          <CompactCard
-            icon={Mic}
-            title={t.cardAudioCta}
-            line={t.cardAudioLine}
-            href={contarHref('audio', pregunta)}
-            onClick={onRecordAudio}
-          />
-          <CompactCard
-            icon={AlignLeft}
-            title={t.cardWriteCta}
-            line={t.cardWriteLine}
-            href={contarHref('texto', pregunta)}
-            onClick={onWriteStory}
-          />
-          <CompactCard
-            icon={ImageIcon}
-            title={t.cardPhotoCta}
-            line={t.cardPhotoLine}
-            href={contarHref('foto', pregunta)}
-            onClick={onRecordPhoto}
-          />
-        </div>
-      </section>
-    );
-  }
 
   return (
     <section

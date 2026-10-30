@@ -34,11 +34,6 @@ export type HomeMessages = {
   heroShareToday: string;
   /** La frase en Caveat, en minúscula. */
   heroHandScript: string;
-  /** Título de la hero, en dos líneas. La segunda va en negrita. */
-  heroScrollBefore: string;
-  heroScrollBold: string;
-  /** Etiqueta sobre las tarjetas de formato. */
-  formatChoose: string;
   heroSubBefore: string;
   heroSubBold: string;
   /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
@@ -56,22 +51,18 @@ export type HomeMessages = {
   cardVideoSubtitle: string;
   cardVideoBody: string;
   cardVideoCta: string;
-  cardVideoLine: string;
   cardAudioTitle: string;
   cardAudioSubtitle: string;
   cardAudioBody: string;
   cardAudioCta: string;
-  cardAudioLine: string;
   cardWriteTitle: string;
   cardWriteSubtitle: string;
   cardWriteBody: string;
   cardWriteCta: string;
-  cardWriteLine: string;
   cardPhotoTitle: string;
   cardPhotoSubtitle: string;
   cardPhotoBody: string;
   cardPhotoCta: string;
-  cardPhotoLine: string;
 };
 
 const es: HomeMessages = {
@@ -105,9 +96,6 @@ const es: HomeMessages = {
   heroGreetNightPlace: 'Buenas noches desde {lugar}. ¿Qué historia traes hoy?',
   heroShareToday: 'Hola, ¿qué historia vas a compartir hoy?',
   heroHandScript: 'como la tuya',
-  heroScrollBefore: 'Aquí tus historias no se pierden en el scroll,',
-  heroScrollBold: 'despiertan otras',
-  formatChoose: 'Elige cómo contarla',
   heroSubBefore: 'Aquí, cada historia',
   heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
@@ -122,24 +110,20 @@ const es: HomeMessages = {
   cardVideoBody:
     'Un gesto, una pausa, una mirada. Todo cabe en una cámara.',
   cardVideoCta: 'Graba un video',
-  cardVideoLine: 'Un gesto, una pausa, una mirada.',
   cardAudioTitle: 'Dale voz',
   cardAudioSubtitle: 'a lo que recuerdas',
   cardAudioBody:
     'Hay historias que no necesitan verse, solo ser escuchadas.',
   cardAudioCta: 'Graba un audio',
-  cardAudioLine: 'Para historias que se escuchan.',
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
     'Hay historias que no necesitan sonido ni imagen, solo palabras.',
   cardWriteCta: 'Escribe una historia',
-  cardWriteLine: 'Cuando bastan las palabras.',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
   cardPhotoBody: 'Una foto guarda más de lo que se ve a simple vista.',
   cardPhotoCta: 'Sube una foto',
-  cardPhotoLine: 'Una imagen guarda más de lo que se ve.',
 };
 
 const pt: HomeMessages = {
@@ -173,9 +157,6 @@ const pt: HomeMessages = {
   heroGreetNightPlace: 'Boa noite em {lugar}. Que história você traz hoje?',
   heroShareToday: 'Olá, que história você vai compartilhar hoje?',
   heroHandScript: 'como a sua',
-  heroScrollBefore: 'Aqui suas histórias não se perdem no scroll,',
-  heroScrollBold: 'despertam outras',
-  formatChoose: 'Escolha como contar',
   heroSubBefore: 'Aqui, cada história',
   heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
@@ -190,24 +171,20 @@ const pt: HomeMessages = {
   cardVideoBody:
     'Um gesto, uma pausa, um olhar. Tudo cabe em uma câmera.',
   cardVideoCta: 'Grave um vídeo',
-  cardVideoLine: 'Um gesto, uma pausa, um olhar.',
   cardAudioTitle: 'Dê voz',
   cardAudioSubtitle: 'ao que você lembra',
   cardAudioBody:
     'Há histórias que não precisam ser vistas, só ouvidas.',
   cardAudioCta: 'Grave um áudio',
-  cardAudioLine: 'Para histórias que se escutam.',
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
     'Há histórias que não precisam de som nem imagem, só de palavras.',
   cardWriteCta: 'Escreva uma história',
-  cardWriteLine: 'Quando as palavras bastam.',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
   cardPhotoBody: 'Uma foto guarda mais do que se vê à primeira vista.',
   cardPhotoCta: 'Envie uma foto',
-  cardPhotoLine: 'Uma imagem guarda mais do que se vê.',
 };
 
 const en: HomeMessages = {
@@ -241,9 +218,6 @@ const en: HomeMessages = {
   heroGreetNightPlace: 'Good evening in {place}. What story are you bringing today?',
   heroShareToday: 'Hi, what story will you share today?',
   heroHandScript: 'like yours',
-  heroScrollBefore: "Here your stories don't get lost in the scroll,",
-  heroScrollBold: 'they awaken others',
-  formatChoose: 'Choose how to tell it',
   heroSubBefore: 'Here, every story',
   heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',
@@ -258,24 +232,20 @@ const en: HomeMessages = {
   cardVideoBody:
     'A gesture, a pause, a look. It all fits in a camera.',
   cardVideoCta: 'Record a video',
-  cardVideoLine: 'A gesture, a pause, a glance.',
   cardAudioTitle: 'Give voice',
   cardAudioSubtitle: 'to what you remember',
   cardAudioBody:
     "Some stories don't need to be seen, only heard.",
   cardAudioCta: 'Record audio',
-  cardAudioLine: 'For stories meant to be heard.',
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
     'Some stories need no sound or image, only words.',
   cardWriteCta: 'Write a story',
-  cardWriteLine: 'When words are enough.',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
   cardPhotoBody: 'A photo holds more than meets the eye.',
   cardPhotoCta: 'Upload a photo',
-  cardPhotoLine: 'A picture holds more than meets the eye.',
 };
 
 export const HOME_MESSAGES: Record<AlmaLocale, HomeMessages> = { es, pt, en };
