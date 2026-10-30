@@ -16,3 +16,6 @@ alwaysApply: false
 
 # Código
 - Snippets completos, sin "// resto del código". Helpers nuevos donde el proyecto ya organiza utilidades.
+
+# Revisión
+- Antes de cada commit que toque la interfaz: npm run build y npm run start, abre la home, /historias, una ficha /historias/[id], /contar y /pregunta, y confirma que ninguna muestra "Algo salió mal". Que el build pase no basta.

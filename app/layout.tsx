@@ -122,12 +122,12 @@ export default async function RootLayout({
                   <GlobalSiteChrome>{children}</GlobalSiteChrome>
                   <Footer initialLocale={locale} />
                 </SiteFontScope>
+                <CookieBanner />
               </LocaleProvider>
             </div>
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
-        <CookieBanner />
         <Script
           src="https://www.googletagmanager.com/gtag/js?id=AW-17718043044"
           strategy="afterInteractive"
