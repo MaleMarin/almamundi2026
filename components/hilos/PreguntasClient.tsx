@@ -30,6 +30,14 @@ const FOCUS =
 
 const LARGOS = [168, 214, 186, 252, 198, 276, 162, 238, 190, 264, 174, 228];
 
+const SATIN = [
+  { base: '#FF4A1C', brillo: '#FF8A66' },
+  { base: '#E5A100', brillo: '#F6C14A' },
+  { base: '#D94F8C', brillo: '#F09AC0' },
+  { base: '#4C8C3A', brillo: '#7CB86A' },
+  { base: '#8E4FD6', brillo: '#C09AE8' },
+] as const;
+
 function formatKey(story: StoryPoint): ContarFormat {
   const format = (story.format ?? '').toLowerCase();
   if (format === 'video' || story.videoUrl || story.hasVideo) return 'video';
@@ -181,7 +189,7 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
         </h2>
         <div className="hidden md:block">
           <div className="overflow-x-auto pb-2">
-            <div className="min-w-[1120px] px-1">
+            <div className="min-w-[1240px] px-1">
               <div className="h-[3px] rounded-full bg-[#B8C0CC]" />
               <div className="flex items-start justify-between">
                 {HILOS.map((item, index) => (
@@ -384,19 +392,35 @@ function HiloColgante({
 }) {
   const largo = LARGOS[index] ?? 180;
   const lean = index % 2 === 0 ? 10 : -10;
-  const cx = 18;
-  const endY = largo - 7;
+  const satin = SATIN[index % SATIN.length] ?? SATIN[0];
+  const cx = 36;
+  const endY = largo - 10;
   const d = `M ${cx} 0 Q ${cx + lean} ${Math.round(largo * 0.55)} ${cx} ${endY}`;
+  const grad = `cinta-satin-${hilo.id}`;
   return (
     <button
       type="button"
       aria-pressed={selected}
       onClick={onPick}
-      className={`flex w-[92px] shrink-0 flex-col items-center border-0 bg-transparent px-1 pt-0 text-center motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out hover:motion-safe:translate-y-2 ${FOCUS}`}
+      className={`flex w-[100px] shrink-0 flex-col items-center border-0 bg-transparent px-1 pt-0 text-center motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out hover:motion-safe:translate-y-2 ${FOCUS}`}
     >
-      <svg width="36" height={largo} viewBox={`0 0 36 ${largo}`} aria-hidden>
-        <path d={d} fill="none" stroke={hilo.color} strokeWidth="3" strokeLinecap="round" />
-        <circle cx={cx} cy={endY} r="7" fill={hilo.color} />
+      <svg
+        width="72"
+        height={largo}
+        viewBox={`0 0 72 ${largo}`}
+        aria-hidden
+        className="cinta-satin"
+        style={{ animationDelay: `${index * 0.18}s` }}
+      >
+        <defs>
+          <linearGradient id={grad} gradientUnits="userSpaceOnUse" x1={cx - 10} y1="0" x2={cx + 10} y2="0">
+            <stop offset="0%" stopColor={satin.base} />
+            <stop offset="38%" stopColor={satin.brillo} />
+            <stop offset="62%" stopColor={satin.base} />
+            <stop offset="100%" stopColor={satin.base} stopOpacity="0.86" />
+          </linearGradient>
+        </defs>
+        <path d={d} fill="none" stroke={`url(#${grad})`} strokeWidth="16" strokeLinecap="round" />
       </svg>
       <span className="mt-2 text-[13px] font-semibold leading-tight text-[#4A5568]">{nombre}</span>
     </button>

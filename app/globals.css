@@ -1175,3 +1175,24 @@ html[data-cursor-global="on"]:has(.story-submit-modal) *::after {
 html body :is(input, textarea, select):not([type='checkbox']):not([type='radio']):not([type='hidden']):not([type='range']):not([type='color']):not([type='file']) {
   font-size: 16px !important;
 }
+
+.cinta-satin {
+  transform-origin: top center;
+  animation: cinta-satin-sway 4.8s ease-in-out infinite;
+}
+
+@keyframes cinta-satin-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinta-satin {
+    animation: none;
+  }
+}
