@@ -129,6 +129,11 @@ service cloud.firestore {
       allow create, read, update, delete: if false;
     }
 
+    /** Newsletter: solo Admin SDK. El cliente no lee ni escribe. */
+    match /newsletter_subscribers/{id} {
+      allow create, read, update, delete: if false;
+    }
+
     match /editorial_audit_log/{id} {
       allow create, read, update, delete: if false;
     }

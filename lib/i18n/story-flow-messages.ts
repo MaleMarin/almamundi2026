@@ -85,6 +85,8 @@ export type StoryFlowMessages = {
   modalConsentTermsAndPrivacy: string;
   modalConsentTermsLink: string;
   modalConsentPrivacyLink: string;
+  /** Casilla opcional, debajo de los consentimientos. Solo /contar. */
+  modalNewsletterOptIn: string;
   modalMarkThreeToSend: string;
   modalSubmitFailedKeep: string;
   modalCaptchaFailed: string;
@@ -231,6 +233,7 @@ const es: StoryFlowMessages = {
   modalConsentTermsAndPrivacy: 'Acepto los {terminos} y la {privacidad}.',
   modalConsentTermsLink: 'Términos de uso',
   modalConsentPrivacyLink: 'Política de privacidad',
+  modalNewsletterOptIn: 'Quiero recibir historias nuevas en mi correo',
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
     'No pudimos enviar tu historia. Lo que grabaste y escribiste sigue aquí. Revisa tu conexión e intenta de nuevo.',
@@ -423,6 +426,7 @@ const pt: StoryFlowMessages = {
   modalConsentTermsAndPrivacy: 'Aceito os {terminos} e a {privacidad}.',
   modalConsentTermsLink: 'Termos de uso',
   modalConsentPrivacyLink: 'Política de privacidade',
+  modalNewsletterOptIn: 'Quero receber novas histórias no meu e-mail',
   modalMarkThreeToSend: 'Marque as três caixas para enviar.',
   modalSubmitFailedKeep:
     'Não conseguimos enviar sua história. O que você gravou e escreveu continua aqui. Verifique sua conexão e tente de novo.',
@@ -579,6 +583,7 @@ const en: StoryFlowMessages = {
   modalConsentTermsAndPrivacy: 'I accept the {terminos} and the {privacidad}.',
   modalConsentTermsLink: 'Terms of use',
   modalConsentPrivacyLink: 'Privacy policy',
+  modalNewsletterOptIn: 'I want to receive new stories by email',
   modalMarkThreeToSend: 'Check the three boxes to send.',
   modalSubmitFailedKeep:
     "We couldn't send your story. What you recorded and wrote is still here. Check your connection and try again.",

@@ -1,6 +1,7 @@
 import { SmoothScrollProvider } from '@/components/SmoothScrollProvider';
 import { CursorGlobal } from '@/components/ui/CursorGlobal';
 import { Footer } from '@/components/layout/Footer';
+import { NewsletterBand } from '@/components/newsletter/NewsletterBand';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { HighContrastToggle } from '@/components/layout/HighContrastToggle';
 import { CookieBanner } from '@/components/ui/CookieBanner';
@@ -120,6 +121,7 @@ export default async function RootLayout({
               <LocaleProvider initialLocale={locale}>
                 <SiteFontScope>
                   <GlobalSiteChrome>{children}</GlobalSiteChrome>
+                  <NewsletterBand />
                   <Footer initialLocale={locale} />
                 </SiteFontScope>
                 <CookieBanner />

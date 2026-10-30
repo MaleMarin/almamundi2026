@@ -175,6 +175,22 @@ function respuestaFooterHtml(locale: AlmaLocale = "es"): string {
       </p>`;
 }
 
+function newsletterFooterHtml(locale: AlmaLocale = "es"): string {
+  const privacy = absoluteEmailUrl("/privacidad");
+  const policy =
+    locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
+  const note =
+    locale === "pt"
+      ? "Você recebeu este e-mail porque pediu a newsletter do AlmaMundi. "
+      : locale === "en"
+        ? "You received this email because you asked for the AlmaMundi newsletter. "
+        : "Recibes este correo porque pediste la newsletter de AlmaMundi. ";
+  return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
+        ${note}<a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
+          style="color:${EMAIL_MUTED};text-decoration:underline;">${policy}</a>.
+      </p>`;
+}
+
 function accountFooterHtml(locale: AlmaLocale = "es"): string {
   const home = absoluteEmailUrl("/");
   const privacy = absoluteEmailUrl("/privacidad");
@@ -223,7 +239,7 @@ function darkModeCss(): string {
 export function emailShell(opts: {
   preheader?: string;
   bodyHtml: string;
-  footer?: "received" | "account" | "respuesta";
+  footer?: "received" | "account" | "respuesta" | "newsletter";
   locale?: AlmaLocale;
 }): string {
   const preheader = opts.preheader
@@ -237,10 +253,12 @@ export function emailShell(opts: {
       ? receivedFooterHtml(locale)
       : opts.footer === "respuesta"
         ? respuestaFooterHtml(locale)
-        : accountFooterHtml(locale);
+        : opts.footer === "newsletter"
+          ? newsletterFooterHtml(locale)
+          : accountFooterHtml(locale);
 
   return `<!DOCTYPE html>
-<html lang="es" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="${locale}" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">

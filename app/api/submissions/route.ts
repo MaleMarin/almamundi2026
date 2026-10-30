@@ -24,6 +24,7 @@ import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
+import { requestNewsletterConfirmation } from "@/lib/newsletter/service";
 
 export const runtime = "nodejs";
 
@@ -294,6 +295,18 @@ export async function POST(req: NextRequest) {
         }
       } catch (mailErr) {
         console.error("[submissions POST] received mail falló:", mailErr);
+      }
+      if (data.newsletterOptIn === true) {
+        try {
+          const news = await requestNewsletterConfirmation({
+            email: data.email,
+            locale: data.locale === "pt" || data.locale === "en" ? data.locale : "es",
+            origin: "contar",
+          });
+          if (!news.ok) console.error("[submissions POST] newsletter", news.error);
+        } catch (newsErr) {
+          console.error("[submissions POST] newsletter", newsErr instanceof Error ? newsErr.name : "newsletter");
+        }
       }
     });
     return NextResponse.json({ ok: true, id: submissionId });

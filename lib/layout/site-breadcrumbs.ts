@@ -222,5 +222,6 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/terminos') return false;
   if (p === '/contacto') return false;
   if (p === '/vision') return false;
+  if (p === '/newsletter' || p.startsWith('/newsletter/')) return false;
   return true;
 }

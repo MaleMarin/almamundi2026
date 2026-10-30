@@ -125,6 +125,8 @@ export const CreateSubmissionBody = z.object({
   ),
   questionMode: z.enum(["tu", "alguien"]).optional(),
   locale: z.enum(["es", "pt", "en"]).optional(),
+  /** Casilla opcional de /contar. No se guarda en la historia. */
+  newsletterOptIn: z.boolean().optional(),
 }).superRefine((data, ctx) => {
   if ((data.questionId == null) !== (data.questionMode == null)) {
     ctx.addIssue({ code: "custom", message: "pregunta", path: ["questionId"] });

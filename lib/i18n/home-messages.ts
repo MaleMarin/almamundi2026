@@ -72,8 +72,8 @@ const es: HomeMessages = {
   heroBeforeBold:
     'AlmaMundi es el lugar donde tus historias no se pierden en el scroll, sino que',
   heroBold: 'despiertan otras historias',
-  heroSubBefore: 'Aquí, cada relato importa.',
-  heroSubBold: 'Cada historia es extraordinaria.',
+  heroSubBefore: 'Aquí, cada historia',
+  heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
   historiasLead2: 'Hay muchas formas de contar',
   historiasLead2b: 'Elige la tuya',
@@ -121,8 +121,8 @@ const pt: HomeMessages = {
   heroBeforeBold:
     'AlmaMundi é o lugar onde suas histórias não se perdem no scroll, e sim',
   heroBold: 'despertam outras histórias',
-  heroSubBefore: 'Aqui, cada relato importa.',
-  heroSubBold: 'Cada história é extraordinária.',
+  heroSubBefore: 'Aqui, cada história',
+  heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
   historiasLead2: 'Há muitas formas de contar',
   historiasLead2b: 'Escolha a sua',
@@ -170,8 +170,8 @@ const en: HomeMessages = {
   heroBeforeBold:
     "AlmaMundi is where your stories don't get lost in the scroll, they",
   heroBold: 'awaken other stories',
-  heroSubBefore: 'Here, every story matters.',
-  heroSubBold: 'Every story is extraordinary.',
+  heroSubBefore: 'Here, every story',
+  heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',
   historiasLead2: 'There are many ways to tell it',
   historiasLead2b: 'Choose yours',

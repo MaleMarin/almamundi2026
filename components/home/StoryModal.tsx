@@ -402,6 +402,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
   const [acceptedPublicacion, setAcceptedPublicacion] = useState(false);
   const [acceptedTerminos, setAcceptedTerminos] = useState(false);
+  const [newsletterOptIn, setNewsletterOptIn] = useState(false);
   const [saving, setSaving] = useState(false);
   const submitInFlightRef = useRef(false);
   const extraUploadRef = useRef<{
@@ -553,6 +554,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setCountry('');
       setEmail('');
       setAcceptedPrivacy(false);
+      setNewsletterOptIn(false);
       setAcceptedPublicacion(false);
       setAcceptedTerminos(false);
       setUploadVideoFile(null);
@@ -1675,6 +1677,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
           ...(mode !== 'foto' && extraText.trim()
             ? { antecedentes: extraText.trim().slice(0, ANTECEDENTES_MAX) }
             : {}),
+          ...(newsletterOptIn ? { newsletterOptIn: true } : {}),
           locale }) });
 
       const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
@@ -1736,6 +1739,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
       setAudioShareUrl('');
       resetCaptureMedia();
       setAcceptedPrivacy(false);
+      setNewsletterOptIn(false);
       setAcceptedPublicacion(false);
       setAcceptedTerminos(false);
       captchaTokenRef.current = '';
@@ -1776,6 +1780,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     acceptedPrivacy,
     acceptedPublicacion,
     acceptedTerminos,
+    newsletterOptIn,
     captchaGate,
     resetCaptureMedia,
     t.modalCaptchaFailed,
@@ -1920,6 +1925,7 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
     setCountry('');
     setEmail('');
     setAcceptedPrivacy(false);
+    setNewsletterOptIn(false);
     setAcceptedPublicacion(false);
     setAcceptedTerminos(false);
     setUploadVideoFile(null);
@@ -2944,6 +2950,12 @@ export function StoryModal({ isOpen, onClose, onExploreMap, mode, chosenTopic, o
                     </a>.
                   </label>
                 </div>
+                <AdultConsentCheckbox
+                  id="consent-newsletter"
+                  checked={newsletterOptIn}
+                  onChange={setNewsletterOptIn}
+                  label={t.modalNewsletterOptIn}
+                />
                 <p className={amStyles.amModalLegal}>{t.modalLegalNote}</p>
                 <TurnstileWidget
                   ref={turnstileRef}

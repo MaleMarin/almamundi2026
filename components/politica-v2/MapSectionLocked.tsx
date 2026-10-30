@@ -39,7 +39,7 @@ export function MapSectionLocked() {
               style={{ color: '#4A5568' }}
             >
               {t.heroSubBefore}{' '}
-              <span className="font-normal">{t.heroSubBold}</span>
+              <span className="font-bold">{t.heroSubBold}</span>.
             </p>
             {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. */}
             <div id="map-dock-slot" className="w-full px-2 md:px-3" />
