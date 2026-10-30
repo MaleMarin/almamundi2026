@@ -263,7 +263,7 @@ export function HomeFormatCards({
           {t.historiasLead2}
         </span>
         <span className="home-elige-tuya mt-1 block text-[length:var(--fs-subtitulo)] font-bold tracking-normal">
-          {t.historiasLead2b}
+          {t.historiasLeadHow}
         </span>
       </p>
       <div

@@ -1,12 +1,9 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { Moon, Sun } from 'lucide-react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
 import { HomeFormatCards } from '@/components/home/HomeFormatCards';
-import { interpolate } from '@/lib/i18n/locale';
-import { visitorGreetingPlace } from '@/components/mapa/WorldClock';
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
@@ -29,63 +26,76 @@ const soft = {
       'inset -5px -5px 14px rgba(140, 155, 175, 0.34)',
     ].join(', ') } } as const;
 
-type DayPart = 'morning' | 'afternoon' | 'night';
+const GREET_TYPED_KEY = 'almamundi-hero-share-typed';
 
-function dayPart(hour: number): DayPart {
-  if (hour >= 6 && hour < 12) return 'morning';
-  if (hour >= 12 && hour < 20) return 'afternoon';
-  return 'night';
+function greetPauseAt(text: string): number {
+  if (text.startsWith('Hola,')) return 'Hola,'.length;
+  if (text.startsWith('Olá,')) return 'Olá,'.length;
+  if (text.startsWith('Hi,')) return 'Hi,'.length;
+  return 0;
 }
 
-/** Solo en local, para revisar las tres franjas: ?hora=8 | 14 | 21 */
-function reviewHour(): number | null {
-  if (typeof window === 'undefined') return null;
-  const host = window.location.hostname;
-  if (host !== 'localhost' && host !== '127.0.0.1') return null;
-  const raw = new URLSearchParams(window.location.search).get('hora');
-  if (raw == null) return null;
-  const hour = Number(raw);
-  if (!Number.isInteger(hour) || hour < 0 || hour > 23) return null;
-  return hour;
+function greetAlreadyComplete(): boolean {
+  if (typeof window === 'undefined') return false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return true;
+  try {
+    return sessionStorage.getItem(GREET_TYPED_KEY) === '1';
+  } catch {
+    return true;
+  }
 }
 
 function HeroGreeting() {
   const { t } = useHomeLocale();
-  const [line, setLine] = useState<{ text: string; night: boolean } | null>(null);
+  const full = t.heroShareToday;
+  const [count, setCount] = useState(0);
+  const [done, setDone] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!greetAlreadyComplete()) return;
+    setCount(full.length);
+    setDone(true);
+  }, [full]);
 
   useEffect(() => {
-    const hour = reviewHour() ?? new Date().getHours();
-    const part = dayPart(hour);
-    const place = visitorGreetingPlace();
-    const template = place
-      ? part === 'morning'
-        ? t.heroGreetMorningPlace
-        : part === 'afternoon'
-          ? t.heroGreetAfternoonPlace
-          : t.heroGreetNightPlace
-      : part === 'morning'
-        ? t.heroGreetMorning
-        : part === 'afternoon'
-          ? t.heroGreetAfternoon
-          : t.heroGreetNight;
-    setLine({
-      text: place ? interpolate(template, { lugar: place, place }) : template,
-      night: part === 'night',
-    });
-  }, [t]);
+    if (greetAlreadyComplete()) return;
 
-  if (!line) {
-    return <p className="mb-3 min-h-[22px]" aria-hidden />;
-  }
+    setCount(0);
+    setDone(false);
+    const pauseAt = greetPauseAt(full);
+    let i = 0;
+    let timer = 0;
+    const tick = () => {
+      i += 1;
+      setCount(i);
+      if (i >= full.length) {
+        setDone(true);
+        try {
+          sessionStorage.setItem(GREET_TYPED_KEY, '1');
+        } catch {
+          /* la frase ya quedó completa */
+        }
+        return;
+      }
+      timer = window.setTimeout(tick, i === pauseAt ? 600 : 45);
+    };
+    timer = window.setTimeout(tick, 45);
+    return () => window.clearTimeout(timer);
+  }, [full]);
 
-  const Icon = line.night ? Moon : Sun;
   return (
     <p
-      className="mb-3 flex w-full items-start justify-center gap-2 text-[15px] leading-snug"
+      className="relative mb-3 w-full text-center text-[15px] leading-snug"
       style={{ color: soft.textBody, fontWeight: 500 }}
+      aria-label={full}
     >
-      <Icon aria-hidden className="mt-[3px] shrink-0" size={16} color="#FF4A1C" strokeWidth={2} />
-      <span className="max-w-[calc(100%-1.5rem)]">{line.text}</span>
+      <span className="invisible block" aria-hidden="true">
+        {full}
+      </span>
+      <span className="absolute inset-x-0 top-0 block" aria-hidden="true">
+        {full.slice(0, count)}
+        {done ? null : <span className="hero-greet-caret" />}
+      </span>
     </p>
   );
 }
@@ -156,7 +166,7 @@ export function HomeFirstPart({
                   strokeLinecap="round"
                 />
               </svg>
-              <span className="home-hero-hand">{t.heroHand}</span>
+              <span className="home-hero-hand">{t.heroHandScript}</span>
             </div>
           </div>
         </div>

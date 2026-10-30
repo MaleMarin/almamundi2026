@@ -30,6 +30,10 @@ export type HomeMessages = {
   heroGreetMorningPlace: string;
   heroGreetAfternoonPlace: string;
   heroGreetNightPlace: string;
+  /** Saludo único, sin hora ni región. */
+  heroShareToday: string;
+  /** La frase en Caveat, en minúscula. */
+  heroHandScript: string;
   heroSubBefore: string;
   heroSubBold: string;
   /** Encima de las cuatro cards (#historias): primera frase + segunda frase. */
@@ -37,6 +41,8 @@ export type HomeMessages = {
   historiasLead2: string;
   /** Segunda línea de la frase naranja (misma familia y color que `historiasLead2`). */
   historiasLead2b: string;
+  /** Segunda línea bajo «Hay muchas formas de contar». */
+  historiasLeadHow: string;
   /** Título grande sobre la sección del mapa (home #mapa y cabecera /mapa). */
   mapSectionTitle: string;
   /** Nota bajo el reloj del globo: sonido en el vacío y sonificación. */
@@ -88,11 +94,14 @@ const es: HomeMessages = {
   heroGreetMorningPlace: 'Buenos días desde {lugar}. ¿Qué historia traes hoy?',
   heroGreetAfternoonPlace: 'Buenas tardes desde {lugar}. ¿Qué historia traes hoy?',
   heroGreetNightPlace: 'Buenas noches desde {lugar}. ¿Qué historia traes hoy?',
+  heroShareToday: 'Hola, ¿qué historia vas a compartir hoy?',
+  heroHandScript: 'como la tuya',
   heroSubBefore: 'Aquí, cada historia',
   heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
   historiasLead2: 'Hay muchas formas de contar',
   historiasLead2b: 'Elige la tuya',
+  historiasLeadHow: 'Elige cómo',
   mapSectionTitle: 'El Alma del Mundo',
   mapSpaceSoundNote:
     'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles, un proceso llamado sonificación.',
@@ -146,11 +155,14 @@ const pt: HomeMessages = {
   heroGreetMorningPlace: 'Bom dia em {lugar}. Que história você traz hoje?',
   heroGreetAfternoonPlace: 'Boa tarde em {lugar}. Que história você traz hoje?',
   heroGreetNightPlace: 'Boa noite em {lugar}. Que história você traz hoje?',
+  heroShareToday: 'Olá, que história você vai compartilhar hoje?',
+  heroHandScript: 'como a sua',
   heroSubBefore: 'Aqui, cada história',
   heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
   historiasLead2: 'Há muitas formas de contar',
   historiasLead2b: 'Escolha a sua',
+  historiasLeadHow: 'Escolha como',
   mapSectionTitle: 'A Alma do Mundo',
   mapSpaceSoundNote:
     'No espaço não há som porque não há ar para transmiti-lo. Para estudar eventos como explosões, os cientistas convertem dados de telescópios em frequências audíveis, um processo chamado sonificação.',
@@ -204,11 +216,14 @@ const en: HomeMessages = {
   heroGreetMorningPlace: 'Good morning in {place}. What story are you bringing today?',
   heroGreetAfternoonPlace: 'Good afternoon in {place}. What story are you bringing today?',
   heroGreetNightPlace: 'Good evening in {place}. What story are you bringing today?',
+  heroShareToday: 'Hi, what story will you share today?',
+  heroHandScript: 'like yours',
   heroSubBefore: 'Here, every story',
   heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',
   historiasLead2: 'There are many ways to tell it',
   historiasLead2b: 'Choose yours',
+  historiasLeadHow: 'Choose how',
   mapSectionTitle: 'The Soul of the World',
   mapSpaceSoundNote:
     'In space there is no sound because there is no air to carry it. To study events such as explosions, scientists turn telescope data into audible frequencies, a process called sonification.',
