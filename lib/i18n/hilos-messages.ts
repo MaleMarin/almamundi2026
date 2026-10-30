@@ -19,8 +19,9 @@ type HilosCopy = {
   leyenda: string;
   elige: string;
   entrada: string;
-  responde: string;
+  /** Píldora bajo las tarjetas de la home, y título de /preguntas. */
   pill: string;
+  responde: string;
   respondes: string;
   formatos: Formatos;
   compartir: string;
@@ -44,9 +45,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     nav: 'Preguntas',
     leyenda: 'Respuestas',
     elige: 'Elige una cinta',
-    entrada: '¿No sabes por dónde empezar? Tira de un hilo',
-    responde: 'Responde aquí',
+    entrada: '¿Y si empiezas por una pregunta? Tira de una cinta',
     pill: '¿Y si empiezas por una pregunta? Tira de una cinta',
+    responde: 'Responde aquí',
     respondes: 'Respondes a:',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -69,9 +70,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     nav: 'Perguntas',
     leyenda: 'Respostas',
     elige: 'Escolha uma fita',
-    entrada: 'Não sabe por onde começar? Puxe um fio',
-    responde: 'Responda aqui',
+    entrada: 'E se você começar por uma pergunta? Puxe uma fita',
     pill: 'E se você começar por uma pergunta? Puxe uma fita',
+    responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -94,9 +95,9 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     nav: 'Questions',
     leyenda: 'Answers',
     elige: 'Pick a ribbon',
-    entrada: 'Not sure where to start? Pull a thread',
-    responde: 'Answer here',
+    entrada: 'What if you start with a question? Pull a ribbon',
     pill: 'What if you start with a question? Pull a ribbon',
+    responde: 'Answer here',
     respondes: "You're answering:",
     formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' },
     compartir:
