@@ -29,7 +29,13 @@ function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }
   return <p className={large ? 'whitespace-pre-wrap text-[length:var(--fs-texto)] font-normal leading-relaxed' : 'line-clamp-4 whitespace-pre-wrap text-[length:var(--fs-texto)] font-normal leading-relaxed'}>{item.contenido}</p>;
 }
 
-export default function RespuestasMosaic({ questionId }: { questionId: string }) {
+export default function RespuestasMosaic({
+  questionId,
+  embedded = false,
+}: {
+  questionId: string;
+  embedded?: boolean;
+}) {
   const { locale, t } = useHomeLocale();
   const pregunta = preguntaPorId(questionId);
   const [items, setItems] = useState<RespuestaPublica[]>([]);
@@ -86,13 +92,17 @@ export default function RespuestasMosaic({ questionId }: { questionId: string })
   const kicker = current ? PREGUNTA_COPY.weekKicker[locale] : PREGUNTA_COPY.pastKicker[locale];
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]">
-      <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-wide text-[#FF4A1C]">
-        {kicker} · {pregunta.tema[locale]}
-      </p>
-      <article className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
-        <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>
-      </article>
+    <div className={embedded ? 'mt-10 flex w-full flex-col gap-4 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]'}>
+      {embedded ? null : (
+        <>
+          <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-wide text-[#FF4A1C]">
+            {kicker} · {pregunta.tema[locale]}
+          </p>
+          <article className="flex flex-col gap-3 rounded-2xl border border-black/10 bg-white p-5">
+            <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>
+          </article>
+        </>
+      )}
       <section className="flex flex-col gap-4">
         <h2 className="m-0 text-[length:var(--fs-texto)] font-semibold">
           {PREGUNTA_COPY.answers[locale]}

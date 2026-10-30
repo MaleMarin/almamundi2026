@@ -45,7 +45,7 @@ import {
   peekMapAmbientPending } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
-import { preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
+import { QUESTION_IDS, resolveQuestionId } from '@/lib/pregunta-semana';
 import { RespuestaGlobeCard } from '@/components/map/RespuestaGlobeCard';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
@@ -54,8 +54,8 @@ import { StoryViewer } from '@/components/mapa/StoryViewer';
 
 /** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
 const SHOW_SURPRISE_ME_BUTTON = false;
-/** Respuestas breves: el código sigue, pero no se dibujan en el globo. */
-const SHOW_PUBLIC_RESPUESTAS = false;
+/** Respuestas aprobadas en el globo. No entran al catálogo de historias. */
+const SHOW_PUBLIC_RESPUESTAS = true;
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
@@ -232,12 +232,27 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setRespuestasReady(true);
       return;
     }
-    const questionId = preguntasDeLaSemana().vigente.id;
     let cancel = false;
-    void fetch(`/api/respuestas/public?questionId=${encodeURIComponent(questionId)}&limit=40`)
-      .then((res) => res.json())
-      .then((data: { items?: RespuestaPublica[] }) => {
-        if (!cancel) setRespuestas(Array.isArray(data.items) ? data.items : []);
+    void Promise.all(
+      QUESTION_IDS.map((questionId) =>
+        fetch(`/api/respuestas/public?questionId=${encodeURIComponent(questionId)}&limit=40`)
+          .then((res) => res.json())
+          .then((data: { items?: RespuestaPublica[] }) => (Array.isArray(data.items) ? data.items : []))
+          .catch(() => [] as RespuestaPublica[])
+      )
+    )
+      .then((pages) => {
+        if (cancel) return;
+        const seen = new Set<string>();
+        const merged: RespuestaPublica[] = [];
+        for (const page of pages) {
+          for (const item of page) {
+            if (seen.has(item.id)) continue;
+            seen.add(item.id);
+            merged.push(item);
+          }
+        }
+        setRespuestas(merged);
       })
       .catch(() => {
         if (!cancel) setRespuestas([]);

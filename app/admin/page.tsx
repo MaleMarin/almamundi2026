@@ -792,8 +792,8 @@ export default function AdminPage() {
     );
   }
 
-  /** Respuestas breves: el módulo sigue en el archivo, fuera de la vista. */
-  const SHOW_RESPUESTAS_ADMIN = false;
+  /** Respuestas breves, con la pregunta a la que responden. */
+  const SHOW_RESPUESTAS_ADMIN = true;
   const sections: { id: typeof section; label: string; icon: React.ReactNode }[] = [
     { id: 'pendientes', label: 'Historias pendientes', icon: <FileText size={18} /> },
     { id: 'mapa', label: 'En el mapa', icon: <MapPin size={18} /> },

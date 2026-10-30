@@ -76,8 +76,11 @@ function uploadMedia(
 }
 
 function PreguntaFormInner({
-  pregunta }: {
+  pregunta,
+  embedded = false,
+}: {
   pregunta: PreguntaSemana;
+  embedded?: boolean;
 }) {
   const { locale, t } = useHomeLocale();
   const copy = PREGUNTA_COPY;
@@ -402,13 +405,16 @@ function PreguntaFormInner({
   const question = pregunta[mode][locale];
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className="mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]">
-      <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
-
-      <div>
-        <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
-        <h1 className="m-0 mt-2 text-[length:var(--fs-titular)] font-normal leading-snug">{question}</h1>
-      </div>
+    <form onSubmit={(event) => void onSubmit(event)} className={embedded ? 'mx-auto flex w-full flex-col gap-5 pt-8 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]'}>
+      {embedded ? null : (
+        <>
+          <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
+          <div>
+            <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold text-[#FF4A1C]">{pregunta.tema[locale]}</p>
+            <h1 className="m-0 mt-2 text-[length:var(--fs-titular)] font-normal leading-snug">{question}</h1>
+          </div>
+        </>
+      )}
 
       <div className="flex flex-col gap-2">
         <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{copy.how[locale]}</p>
@@ -636,6 +642,10 @@ function PreguntaFormInner({
       </button>
     </form>
   );
+}
+
+export function PreguntaFormForQuestion({ pregunta }: { pregunta: PreguntaSemana }) {
+  return <PreguntaFormInner key={pregunta.id} pregunta={pregunta} embedded />;
 }
 
 export default function PreguntaForm() {

@@ -6,7 +6,9 @@ import { AlignLeft, Headphones, Image as ImageIcon, Shuffle, Video } from 'lucid
 import { CintaMini } from '@/components/hilos/CintaMini';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { contarHref, type ContarFormat } from '@/lib/contar-routes';
+import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
+import RespuestasMosaic from '@/components/pregunta/RespuestasMosaic';
+import type { ContarFormat } from '@/lib/contar-routes';
 import {
   HILOS,
   PREGUNTAS_HILO,
@@ -21,19 +23,12 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { enlacePregunta, HILOS_UI, textoCompartirHilo, tituloHiloPartes } from '@/lib/i18n/hilos-messages';
 import { interpolate } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntasDeLaSemana, resolveQuestionId } from '@/lib/pregunta-semana';
 
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
 
 const LARGOS = [168, 214, 186, 252, 198, 276, 162, 238, 190, 264, 174, 228];
-
-const FORMATOS: { id: ContarFormat; icon: typeof Video }[] = [
-  { id: 'video', icon: Video },
-  { id: 'audio', icon: Headphones },
-  { id: 'texto', icon: AlignLeft },
-  { id: 'foto', icon: ImageIcon },
-];
 
 function formatKey(story: StoryPoint): ContarFormat {
   const format = (story.format ?? '').toLowerCase();
@@ -81,6 +76,7 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
   const titulo = tituloHiloPartes(copy.titulo);
   const semana = preguntasDeLaSemana().vigente;
   const [abierta, setAbierta] = useState<PreguntaHilo | null>(() => preguntaHiloPorId(initialId));
+  const [respondiendo, setRespondiendo] = useState(false);
   const [historias, setHistorias] = useState<StoryPoint[]>([]);
   const [compartir, setCompartir] = useState(false);
   const [aviso, setAviso] = useState('');
@@ -107,13 +103,15 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
     scrollToId('hilo-abierta');
   }, [abierta]);
 
-  function abrir(pregunta: PreguntaHilo | null) {
+  function abrir(pregunta: PreguntaHilo | null, conFormulario = false) {
     if (!pregunta) return;
     setAbierta(pregunta);
+    setRespondiendo(conFormulario);
     setAviso('');
     publicarUrl(pregunta.id);
   }
 
+  const preguntaForm = abierta ? preguntaPorId(abierta.id) : null;
   const hilo = abierta ? hiloPorId(abierta.hiloId) : null;
   const contadas = abierta
     ? historias.filter((story) => resolveQuestionId(story.questionId) === abierta.id)
@@ -167,9 +165,9 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
         <button
           type="button"
           className={`btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6 ${FOCUS}`}
-          onClick={() => abrir(preguntaHiloPorId(semana.id))}
+          onClick={() => abrir(preguntaHiloPorId(semana.id), true)}
         >
-          {copy.cuentala}
+          {copy.responde}
         </button>
       </section>
 
@@ -236,21 +234,18 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
                 {abierta.texto[locale]}
               </h2>
             </div>
-            <p className="mb-3 mt-8 text-[13px] font-semibold text-[#4A5568]">{copy.cuentaEn}</p>
-            <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-              {FORMATOS.map((formato) => {
-                const Icon = formato.icon;
-                return (
-                  <Link
-                    key={formato.id}
-                    href={contarHref(formato.id, { id: abierta.hiloId, mode: 'tu' })}
-                    className={`btn-am-neutro inline-flex min-h-16 flex-col items-center justify-center gap-2 px-3 py-3 text-center ${FOCUS}`}
-                  >
-                    <Icon size={22} aria-hidden />
-                    {copy.formatos[formato.id]}
-                  </Link>
-                );
-              })}
+            <div className="mt-8">
+              {respondiendo && preguntaForm ? (
+                <PreguntaFormForQuestion pregunta={preguntaForm} />
+              ) : (
+                <button
+                  type="button"
+                  className={`btn-am-principal inline-flex min-h-11 items-center justify-center px-6 ${FOCUS}`}
+                  onClick={() => setRespondiendo(true)}
+                >
+                  {copy.responde}
+                </button>
+              )}
             </div>
             <div className="mt-6 grid grid-cols-2 gap-3">
               <button
@@ -314,6 +309,8 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
               </ul>
             </div>
           ) : null}
+
+          <RespuestasMosaic questionId={abierta.id} embedded />
         </section>
       ) : null}
 

@@ -19,6 +19,7 @@ type HilosCopy = {
   leyenda: string;
   elige: string;
   entrada: string;
+  responde: string;
   respondes: string;
   formatos: Formatos;
   compartir: string;
@@ -40,9 +41,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     semana: 'Preguntas que despiertan historias',
     cuentala: 'Cuéntala',
     nav: 'Preguntas',
-    leyenda: 'Historias que nacieron de un hilo',
+    leyenda: 'Respuestas',
     elige: 'Elige un hilo',
     entrada: '¿No sabes por dónde empezar? Tira de un hilo',
+    responde: 'Responde aquí',
     respondes: 'Respondes a:',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -63,9 +65,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     semana: 'Perguntas que despertam histórias',
     cuentala: 'Conte',
     nav: 'Perguntas',
-    leyenda: 'Histórias que nasceram de um fio',
+    leyenda: 'Respostas',
     elige: 'Escolha um fio',
     entrada: 'Não sabe por onde começar? Puxe um fio',
+    responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
     compartir:
@@ -86,9 +89,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     semana: 'Questions that awaken stories',
     cuentala: 'Tell it',
     nav: 'Questions',
-    leyenda: 'Stories born from a thread',
+    leyenda: 'Answers',
     elige: 'Pick a thread',
     entrada: 'Not sure where to start? Pull a thread',
+    responde: 'Answer here',
     respondes: "You're answering:",
     formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' },
     compartir:
