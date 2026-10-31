@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type CSSProperties, type MouseEvent } from 'react';
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { HILOS, preguntaAlAzar, type Hilo } from '@/lib/hilos';
@@ -10,104 +10,41 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
 
-const LARGOS = [168, 214, 186, 252, 198, 276, 162, 238, 190, 264, 174, 228];
+const ALTOS = [214, 252, 228, 276, 206, 264, 198, 248, 220, 268, 210, 240];
 
-const SATIN = [
-  { base: '#FF4A1C', brillo: '#FF8A66', pliegue: '#C4320E' },
-  { base: '#E5A100', brillo: '#F6C14A', pliegue: '#A87400' },
-  { base: '#D94F8C', brillo: '#F09AC0', pliegue: '#A33368' },
-  { base: '#4C8C3A', brillo: '#7CB86A', pliegue: '#2F5C24' },
-  { base: '#8E4FD6', brillo: '#C09AE8', pliegue: '#62349A' },
-] as const;
-
-const TEMBLOR = [3.1, 4.4, 2.8, 5.1, 3.6, 4.8, 2.6, 4.1, 3.4, 5.4, 3.8, 4.6];
-const BRILLO = [4.2, 3.3, 5.6, 3.8, 4.9, 3.1, 5.2, 4.4, 3.6, 5.8, 4.0, 3.5];
-const PUNTAS: Array<[number, number]> = [
-  [0, 0],
-  [0, 7],
-  [6, 0],
-  [0, 0],
-  [8, 0],
-  [0, 5],
-  [0, 0],
-  [7, 0],
-  [0, 6],
-  [0, 0],
-  [5, 0],
-  [0, 8],
-];
-
-const TIRON_MS = 420;
-
-function sinMovimiento(): boolean {
-  return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function hrefTema(id: string) {
+  return `/preguntas?tema=${encodeURIComponent(id)}`;
 }
 
-export function hrefTema(id: string): string {
-  return `/preguntas?p=${encodeURIComponent(id)}`;
-}
-
-export function CintaTema({
+function CintaTema({
   index,
   nombre,
+  imagen,
+  aspecto,
   href,
   selected = false,
   onPick,
 }: {
   index: number;
   nombre: string;
+  imagen: string;
+  aspecto: number;
   href?: string;
   selected?: boolean;
   onPick?: () => void;
 }) {
-  const router = useRouter();
-  const [tirando, setTirando] = useState(false);
-  const largo = LARGOS[index] ?? 180;
-  const satin = SATIN[index % SATIN.length] ?? SATIN[0];
-  const [puntaIzquierda, puntaDerecha] = PUNTAS[index] ?? [0, 0];
-
-  function ir() {
-    if (href) router.push(href);
-    else onPick?.();
-  }
-
-  function activar(event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) {
-    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
-    if (sinMovimiento()) {
-      if (!href) ir();
-      return;
-    }
-    event.preventDefault();
-    if (tirando) return;
-    setTirando(true);
-    window.setTimeout(ir, TIRON_MS);
-  }
-
-  const className = `flex w-[4.75rem] shrink-0 flex-col items-center border-0 bg-transparent px-0.5 pt-0 text-center no-underline motion-safe:transition-transform motion-safe:duration-300 motion-safe:ease-out hover:motion-safe:translate-y-2 md:w-[6.25rem] ${FOCUS}`;
+  const alto = ALTOS[index] ?? 220;
+  const ancho = Math.round(alto * aspecto) + 16;
+  const className = `flex w-[6.4rem] shrink-0 flex-col items-center border-0 bg-transparent px-0.5 pt-0 text-center no-underline md:w-[7.6rem] ${FOCUS}`;
   const cuerpo = (
     <>
-      <span
-        className={`cinta-hoja-eje${tirando ? ' is-tiron' : ''}`}
-        style={tirando ? undefined : { animationDelay: `${index * 0.14}s` }}
-      >
+      <span className="cinta-tela-eje">
         <span
-          className="cinta-hoja"
-          aria-hidden
-          style={
-            {
-              height: largo,
-              '--cinta-base': satin.base,
-              '--cinta-brillo': satin.brillo,
-              '--cinta-pliegue': satin.pliegue,
-              '--punta-i': `${puntaIzquierda}px`,
-              '--punta-d': `${puntaDerecha}px`,
-              '--temblor': `${TEMBLOR[index] ?? 3.5}s`,
-              '--brillo': `${BRILLO[index] ?? 4}s`,
-              '--temblor-retraso': `${index * 0.27}s`,
-              '--brillo-retraso': `${index * 0.19}s`,
-            } as CSSProperties
-          }
-        />
+          className="cinta-tela-caja"
+          style={{ '--cinta-alto': `${alto}px`, '--cinta-ancho': `${ancho}px` } as CSSProperties}
+        >
+          <img src={imagen} alt="" draggable={false} decoding="async" className="cinta-tela-img" />
+        </span>
       </span>
       <span className="mt-2 text-[12px] font-semibold leading-tight text-[#4A5568] md:text-[13px]">{nombre}</span>
     </>
@@ -115,14 +52,14 @@ export function CintaTema({
 
   if (href) {
     return (
-      <Link href={href} className={className} onClick={activar} aria-current={selected ? 'true' : undefined}>
+      <Link href={href} className={className} aria-current={selected ? 'true' : undefined}>
         {cuerpo}
       </Link>
     );
   }
 
   return (
-    <button type="button" className={className} onClick={activar} aria-pressed={selected}>
+    <button type="button" className={className} onClick={onPick} aria-pressed={selected}>
       {cuerpo}
     </button>
   );
@@ -140,15 +77,17 @@ export function FilaCintas({
   onPick?: (hilo: Hilo) => void;
 }) {
   return (
-    <div className="overflow-x-auto pb-2" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="overflow-x-auto pb-8" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="w-max min-w-full px-1">
         <div className="h-[3px] rounded-full bg-[#B8C0CC]" />
-        <div className="flex items-start justify-between gap-2 md:gap-0">
+        <div className="flex items-start justify-between gap-2 md:gap-3">
           {HILOS.map((item, index) => (
             <CintaTema
               key={item.id}
               index={index}
               nombre={item.nombre[locale]}
+              imagen={item.imagen}
+              aspecto={item.aspecto}
               href={enlazar ? hrefTema(item.id) : undefined}
               selected={selectedId === item.id}
               onPick={onPick ? () => onPick(item) : undefined}
@@ -168,7 +107,7 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
   function alAzar() {
     const tema = preguntaAlAzar(null);
     if (!tema) return;
-    router.push(hrefTema(tema.id));
+    router.push(`/preguntas?p=${encodeURIComponent(tema.id)}`);
   }
 
   return (

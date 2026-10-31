@@ -1226,172 +1226,59 @@ a.cinta-pill {
   border-radius: 0 0 6px 6px;
 }
 
-.cinta-hoja-eje {
-  display: flex;
-  justify-content: center;
-  transform-origin: top center;
-  animation: cinta-eje 17s linear infinite;
+.cinta-tela-eje {
+  display: block;
 }
 
-.cinta-hoja {
+.cinta-tela-eje.is-tiron {
+  transform: translateY(16px);
+  transition: transform 420ms ease;
+}
+
+.cinta-tela-caja {
   position: relative;
   display: block;
-  width: 22px;
-  overflow: hidden;
-  transform-origin: top center;
-  background-color: var(--cinta-base);
-  background-image: linear-gradient(
-    90deg,
-    var(--cinta-pliegue) 0%,
-    transparent 11%,
-    transparent 30%,
-    color-mix(in srgb, var(--cinta-pliegue) 55%, transparent) 36%,
-    transparent 44%,
-    transparent 72%,
-    color-mix(in srgb, var(--cinta-pliegue) 40%, transparent) 80%,
-    transparent 88%,
-    var(--cinta-pliegue) 100%
-  );
-  clip-path: polygon(
-    0 0,
-    100% 0,
-    100% calc(100% - var(--punta-d, 0px)),
-    0 calc(100% - var(--punta-i, 0px))
-  );
-  animation: cinta-temblor var(--temblor, 3.6s) linear infinite;
-  animation-delay: var(--temblor-retraso, 0s);
+  width: calc(var(--cinta-ancho) * 0.78);
+  height: calc(var(--cinta-alto) * 0.78);
 }
 
-.cinta-hoja::after {
-  content: '';
+.cinta-tela-img,
+.cinta-tela-lienzo {
   position: absolute;
-  inset: -12% -70%;
-  background: linear-gradient(
-    118deg,
-    transparent 46%,
-    var(--cinta-brillo) 50%,
-    transparent 54%
-  );
-  animation: cinta-brillo var(--brillo, 4.2s) linear infinite;
-  animation-delay: var(--brillo-retraso, 0s);
+  display: block;
+}
+
+.cinta-tela-img {
+  top: 0;
+  right: 8px;
+  bottom: 0;
+  left: 8px;
+  width: calc(100% - 16px);
+  height: 100%;
+  object-fit: fill;
+}
+
+.cinta-tela-img.is-oculta {
+  visibility: hidden;
+}
+
+.cinta-tela-lienzo {
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 @media (min-width: 768px) {
-  .cinta-hoja {
-    width: 32px;
-  }
-}
-
-@keyframes cinta-temblor {
-  0%,
-  9% {
-    rotate: -0.7deg;
-  }
-  16% {
-    rotate: 1.3deg;
-  }
-  24%,
-  41% {
-    rotate: -0.25deg;
-  }
-  49% {
-    rotate: 1deg;
-  }
-  57%,
-  76% {
-    rotate: -1.15deg;
-  }
-  84% {
-    rotate: 0.55deg;
-  }
-  92%,
-  100% {
-    rotate: -0.7deg;
-  }
-}
-
-@keyframes cinta-brillo {
-  0%,
-  18% {
-    translate: -16% 0;
-  }
-  34% {
-    translate: 10% 0;
-  }
-  51%,
-  68% {
-    translate: -6% 0;
-  }
-  83% {
-    translate: 18% 0;
-  }
-  100% {
-    translate: -16% 0;
-  }
-}
-
-@keyframes cinta-eje {
-  0%,
-  12% {
-    translate: 0 0;
-    rotate: y -3deg;
-  }
-  18% {
-    translate: 1px 0;
-    rotate: y 5deg;
-  }
-  23% {
-    translate: 8px 1px;
-    rotate: y 24deg;
-  }
-  28% {
-    translate: 2px 0;
-    rotate: y -7deg;
-  }
-  35%,
-  63% {
-    translate: 0 0;
-    rotate: y 2deg;
-  }
-  69% {
-    translate: 2px 0;
-    rotate: y -4deg;
-  }
-  74% {
-    translate: 10px 2px;
-    rotate: y 30deg;
-  }
-  79% {
-    translate: -2px 0;
-    rotate: y -6deg;
-  }
-  87%,
-  100% {
-    translate: 0 0;
-    rotate: y -3deg;
-  }
-}
-
-.cinta-hoja-eje.is-tiron {
-  animation: cinta-tiron 420ms ease-in forwards;
-}
-
-@keyframes cinta-tiron {
-  0% {
-    translate: 0 0;
-    scale: 1 1;
-  }
-  100% {
-    translate: 0 22px;
-    scale: 1 1.14;
+  .cinta-tela-caja {
+    width: var(--cinta-ancho);
+    height: var(--cinta-alto);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cinta-hoja,
-  .cinta-hoja::after,
-  .cinta-hoja-eje,
-  .cinta-hoja-eje.is-tiron {
-    animation: none;
+  .cinta-tela-eje,
+  .cinta-tela-eje.is-tiron {
+    transform: none;
+    transition: none;
   }
 }
