@@ -1,3 +1,4 @@
+import { idPreguntaHilo, preguntaParaFormulario } from '@/lib/hilos';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 /**
@@ -262,7 +263,9 @@ export function isQuestionMode(value: unknown): value is QuestionMode {
 
 export function preguntaPorId(id: string | null | undefined): PreguntaSemana | null {
   const resolved = resolveQuestionId(id);
-  return resolved ? PREGUNTA_POR_ID[resolved] : null;
+  if (resolved) return PREGUNTA_POR_ID[resolved];
+  const delBanco = preguntaParaFormulario(id);
+  return delBanco ? (delBanco as PreguntaSemana) : null;
 }
 
 export const RESPONDE_TU_LABEL = {
@@ -271,13 +274,17 @@ export const RESPONDE_TU_LABEL = {
   en: 'Answer this question yourself',
 } as const;
 
-/** /pregunta es la semana vigente. Con id, abre esa pregunta. */
+/** /pregunta es la semana vigente. El banco nuevo abre /preguntas. */
 export function preguntaPageHref(id?: string | null, mode?: string | null): string {
   const resolved = resolveQuestionId(id);
-  if (!resolved) return '/pregunta';
-  const q = new URLSearchParams({ pregunta: resolved });
-  if (isQuestionMode(mode)) q.set('modo', mode);
-  return `/pregunta?${q.toString()}`;
+  if (resolved) {
+    const q = new URLSearchParams({ pregunta: resolved });
+    if (isQuestionMode(mode)) q.set('modo', mode);
+    return `/pregunta?${q.toString()}`;
+  }
+  const delBanco = idPreguntaHilo(id);
+  if (delBanco) return `/preguntas?p=${encodeURIComponent(delBanco)}`;
+  return '/pregunta';
 }
 
 /** Texto de la pregunta en el idioma activo. Sin modo, usa el tema. */

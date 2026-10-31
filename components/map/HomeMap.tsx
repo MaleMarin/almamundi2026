@@ -46,7 +46,7 @@ import {
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
-import { QUESTION_IDS, preguntaTexto, resolveQuestionId } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntaTexto, resolveQuestionId } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
@@ -100,7 +100,9 @@ const RESPUESTA_KIND = {
 
 function respuestaAsStory(item: RespuestaPublica, locale: keyof typeof RESPUESTA_KIND): StoryPoint {
   const alias = preguntaAlias(item.alias);
+  const pregunta = preguntaPorId(item.questionId);
   const question = preguntaTexto(item.questionId, item.mode, locale) ?? '';
+  const tema = pregunta?.tema[locale] ?? '';
   const story: StoryPoint = {
     id: item.id,
     lat: item.lat ?? Number.NaN,
@@ -111,7 +113,7 @@ function respuestaAsStory(item: RespuestaPublica, locale: keyof typeof RESPUESTA
     country: item.country,
     questionId: item.questionId,
     questionMode: item.mode,
-    subtitle: question,
+    subtitle: tema && question ? `${tema} · ${question}` : question || tema,
     format: RESPUESTA_KIND[locale][item.kind],
   };
   if (item.kind === 'texto') {
@@ -268,26 +270,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       return;
     }
     let cancel = false;
-    void Promise.all(
-      QUESTION_IDS.map((questionId) =>
-        fetch(`/api/respuestas/public?questionId=${encodeURIComponent(questionId)}&limit=40`)
-          .then((res) => res.json())
-          .then((data: { items?: RespuestaPublica[] }) => (Array.isArray(data.items) ? data.items : []))
-          .catch(() => [] as RespuestaPublica[])
-      )
-    )
-      .then((pages) => {
+    void fetch('/api/respuestas/public?banco=hilos&limit=500')
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: RespuestaPublica[] }) => {
         if (cancel) return;
-        const seen = new Set<string>();
-        const merged: RespuestaPublica[] = [];
-        for (const page of pages) {
-          for (const item of page) {
-            if (seen.has(item.id)) continue;
-            seen.add(item.id);
-            merged.push(item);
-          }
-        }
-        setRespuestas(merged);
+        setRespuestas(Array.isArray(data.items) ? data.items : []);
       })
       .catch(() => {
         if (!cancel) setRespuestas([]);

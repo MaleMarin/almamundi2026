@@ -16,6 +16,7 @@ import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { TemaTags } from '@/components/historias/TemaTags';
 import { RespondeALine } from '@/components/historia/RespondeALine';
+import { preguntaPorId } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 import { isShortCode } from '@/lib/short-code';
@@ -416,6 +417,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const place = formatPublicPlace(story.city, story.country, locale);
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
+  const temaPregunta = catalog ? null : preguntaPorId(story.questionId)?.tema[locale];
   const alias = formatPublicName(story.authorName || story.author?.name);
   const fullHref = !catalog
     ? null
@@ -639,6 +641,19 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 >
                   {story.title ?? story.label}
                 </h2>
+                {temaPregunta ? (
+                  <p
+                    style={{
+                      fontSize: 'var(--fs-etiqueta)',
+                      letterSpacing: '0.08em',
+                      textTransform: 'uppercase',
+                      color: 'rgba(255,255,255,0.62)',
+                      margin: '0 0 4px',
+                      fontFamily: SITE_FONT_STACK }}
+                  >
+                    {temaPregunta}
+                  </p>
+                ) : null}
                 <RespondeALine
                   questionId={story.questionId}
                   questionMode={story.questionMode}
