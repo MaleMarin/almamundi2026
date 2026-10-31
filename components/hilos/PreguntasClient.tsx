@@ -11,18 +11,19 @@ import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import RespuestasMosaic from '@/components/pregunta/RespuestasMosaic';
 import type { ContarFormat } from '@/lib/contar-routes';
 import {
-  PREGUNTAS_HILO,
   hiloPorId,
   preguntaAlAzar,
   preguntaDeOtroHilo,
+  preguntaDeTema,
   preguntaHiloPorId,
+  preguntaParaFormulario,
   type PreguntaHilo,
 } from '@/lib/hilos';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { enlacePregunta, HILOS_UI, textoCompartirHilo, tituloHiloPartes } from '@/lib/i18n/hilos-messages';
 import { interpolate } from '@/lib/i18n/locale';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { preguntaPorId, resolveQuestionId } from '@/lib/pregunta-semana';
+import { resolveQuestionId, type PreguntaSemana } from '@/lib/pregunta-semana';
 
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
@@ -95,6 +96,7 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
 
   useEffect(() => {
     if (!abierta) return;
+    publicarUrl(abierta.id);
     tituloRef.current?.focus();
     scrollToId('hilo-abierta');
   }, [abierta]);
@@ -107,10 +109,12 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
     publicarUrl(pregunta.id);
   }
 
-  const preguntaForm = abierta ? preguntaPorId(abierta.id) : null;
+  const preguntaForm = (abierta ? preguntaParaFormulario(abierta.id) : null) as PreguntaSemana | null;
   const hilo = abierta ? hiloPorId(abierta.hiloId) : null;
   const contadas = abierta
-    ? historias.filter((story) => resolveQuestionId(story.questionId) === abierta.id)
+    ? historias.filter(
+        (story) => story.questionId === abierta.id || resolveQuestionId(story.questionId) === abierta.id
+      )
     : [];
   const enlace = abierta ? enlacePregunta(abierta.id) : '';
   const textoCompartir =
@@ -160,22 +164,26 @@ export function PreguntasClient({ initialId }: PreguntasClientProps) {
           <FilaCintas
             locale={locale}
             selectedId={abierta?.hiloId ?? null}
-            onPick={(hilo) => abrir(PREGUNTAS_HILO.find((pregunta) => pregunta.hiloId === hilo.id) ?? null)}
+            onPick={(item) =>
+              abrir(preguntaDeTema(item.id, abierta?.hiloId === item.id ? abierta.id : null))
+            }
           />
         </div>
       </section>
 
-      {abierta && hilo ? (
+      {abierta ? (
         <section id="hilo-abierta" className="mt-10 scroll-mt-40 md:scroll-mt-52" aria-labelledby="hilo-pregunta-titulo">
           <div
             className="bg-white px-5 py-8 shadow-[0_16px_40px_rgba(20,29,38,0.08)] md:px-10 md:py-10"
-            style={{ borderRadius: 32, borderTop: `6px solid ${hilo.color}` }}
+            style={{ borderRadius: 32, borderTop: `6px solid ${hilo?.color ?? '#FF4A1C'}` }}
           >
             <div aria-live="polite" aria-atomic="true">
-              <p className="flex items-center gap-2 text-[13px] font-semibold text-[#4A5568]">
-                <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: hilo.color }} aria-hidden />
-                {hilo.nombre[locale]}
-              </p>
+              {hilo ? (
+                <p className="flex items-center gap-2 text-[13px] font-semibold text-[#4A5568]">
+                  <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: hilo.color }} aria-hidden />
+                  {hilo.nombre[locale]}
+                </p>
+              ) : null}
               <h2
                 id="hilo-pregunta-titulo"
                 ref={tituloRef}

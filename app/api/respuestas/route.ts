@@ -9,6 +9,7 @@ import { getAdminBucket, getAdminDb } from "@/lib/firebase/admin";
 import { stripHtml } from "@/lib/api/input-validation";
 import { LEGAL_TEXTS_VERSION } from "@/lib/legal-consent";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
+import { idPreguntaHilo, textoPreguntaHilo } from "@/lib/hilos";
 import { resolveQuestionId, preguntaTexto } from "@/lib/pregunta-semana";
 import {
   clientIpFromRequest,
@@ -70,7 +71,7 @@ export async function POST(req: Request) {
   }
 
   if (!isRespuestaKind(body.kind)) return jsonError("invalid_kind", 400);
-  const questionId = resolveQuestionId(body.questionId);
+  const questionId = resolveQuestionId(body.questionId) ?? idPreguntaHilo(body.questionId);
   if (!questionId) return jsonError("invalid_question", 400);
   if (body.kind === "texto") {
     const captcha = await verifyTurnstileStrict(
@@ -224,7 +225,7 @@ export async function POST(req: Request) {
           to: email,
           alias,
           locale,
-          question: preguntaTexto(questionId, "tu", locale) ?? questionId,
+          question: preguntaTexto(questionId, "tu", locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
         });
         await ref.update({
           receivedMail: {

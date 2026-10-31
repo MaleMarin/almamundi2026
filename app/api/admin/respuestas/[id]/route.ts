@@ -23,6 +23,7 @@ import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { textoPreguntaHilo } from "@/lib/hilos";
 import { preguntaTexto } from "@/lib/pregunta-semana";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 
@@ -217,7 +218,7 @@ export async function PATCH(
               to: email,
               alias,
               questionId,
-              question: preguntaTexto(questionId, mode, locale) ?? questionId,
+              question: preguntaTexto(questionId, mode, locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
               locale,
             })
           : { ok: false as const };
@@ -249,7 +250,7 @@ export async function PATCH(
             to: email,
             alias,
             questionId,
-            question: preguntaTexto(questionId, mode, locale) ?? questionId,
+            question: preguntaTexto(questionId, mode, locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
             locale,
             publicReason: reason.publicText,
           })

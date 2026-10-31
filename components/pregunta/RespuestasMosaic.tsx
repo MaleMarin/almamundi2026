@@ -87,11 +87,11 @@ export default function RespuestasMosaic({
     return () => observer.disconnect();
   }, [load, nextOffset]);
 
-  if (!pregunta) return null;
+  if (!pregunta && !embedded) return null;
 
   return (
     <div className={embedded ? 'mt-10 flex w-full flex-col gap-4 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]'}>
-      {embedded ? null : (
+      {!embedded && pregunta ? (
         <>
           <p className="m-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-wide text-[#FF4A1C]">
             {pregunta.tema[locale]}
@@ -100,7 +100,7 @@ export default function RespuestasMosaic({
             <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed">{pregunta.tu[locale]}</p>
           </article>
         </>
-      )}
+      ) : null}
       <section className="flex flex-col gap-4">
         <h2 className="m-0 text-[length:var(--fs-texto)] font-semibold">
           {PREGUNTA_COPY.answers[locale]}
@@ -150,7 +150,11 @@ export default function RespuestasMosaic({
             <AnswerBody item={open} large />
             <div className="mt-4">
               <Link
-                href={preguntaPageHref(open.questionId)}
+                href={
+                  preguntaPorId(open.questionId)
+                    ? preguntaPageHref(open.questionId)
+                    : `/preguntas?p=${encodeURIComponent(open.questionId)}`
+                }
                 className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-4 text-center text-[length:var(--fs-pequeno)] font-semibold"
               >
                 {RESPONDE_TU_LABEL[locale]}

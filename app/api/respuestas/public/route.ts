@@ -1,6 +1,7 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
+import { idPreguntaHilo } from "@/lib/hilos";
 import { resolveQuestionId } from "@/lib/pregunta-semana";
 import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from "@/lib/rate-limit";
 import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
@@ -27,7 +28,8 @@ export async function GET(request: NextRequest) {
   );
   if (blocked) return blocked;
 
-  const questionId = resolveQuestionId(request.nextUrl.searchParams.get("questionId"));
+  const preguntaPedida = request.nextUrl.searchParams.get("questionId");
+  const questionId = resolveQuestionId(preguntaPedida) ?? idPreguntaHilo(preguntaPedida);
   if (!questionId) return NextResponse.json({ error: "invalid_question" }, { status: 400 });
   const limitRaw = Number(request.nextUrl.searchParams.get("limit") ?? 24);
   const offsetRaw = Number(request.nextUrl.searchParams.get("offset") ?? 0);
