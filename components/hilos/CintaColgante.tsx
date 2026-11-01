@@ -15,9 +15,11 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { CapituloHome } from '@/components/home/CapituloHome';
 import { CortinaTemas } from '@/components/hilos/CortinaTemas';
 import { HILOS, type Hilo } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
+import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const FOCUS =
@@ -443,9 +445,19 @@ export function FilaCintas({
 }
 
 export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
+  const copy = HILOS_UI[locale];
+  const home = HOME_MESSAGES[locale];
   return (
-    <section className="relative z-20 mb-16 w-full scroll-mt-[10.5rem] px-6 md:mb-24 md:scroll-mt-[13rem] md:px-10 lg:scroll-mt-[14.75rem]">
-      <CortinaTemas locale={locale} />
+    <section className="home-capitulo-bloque relative z-20 w-full scroll-mt-[10.5rem] md:scroll-mt-[13rem] lg:scroll-mt-[14.75rem]">
+      <CapituloHome
+        ceja={home.cejaInspira}
+        titulo={copy.bloqueTitulo}
+        fuerte
+        bajada={home.bajadaInspira}
+      />
+      <div className="home-capitulo-ancho">
+        <CortinaTemas locale={locale} capitulo />
+      </div>
     </section>
   );
 }

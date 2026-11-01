@@ -50,6 +50,14 @@ export type HomeMessages = {
   historiasLeadHow: string;
   /** Título grande sobre la sección del mapa (home #mapa y cabecera /mapa). */
   mapSectionTitle: string;
+  cejaCuenta: string;
+  cejaInspira: string;
+  cejaDescubre: string;
+  bajadaCuenta: string;
+  bajadaInspira: string;
+  leyendaHistorias: string;
+  leyendaRespuestas: string;
+  leyendaBits: string;
   /** Nota bajo el reloj del globo: sonido en el vacío y sonificación. */
   mapSpaceSoundNote: string;
   cardVideoTitle: string;
@@ -104,13 +112,21 @@ const es: HomeMessages = {
   heroScrollBefore: 'Aquí tus historias no se pierden en el scroll,',
   heroScrollBold: 'despiertan otras',
   heroFormatLabel: 'Elige cómo contarla',
-  heroSubBefore: 'Aquí, cada historia',
+  heroSubBefore: 'Cada historia',
   heroSubBold: 'merece ser conocida',
   historiasLead1: 'Hay historias que solo tú puedes contar.',
   historiasLead2: 'Hay muchas formas de contar',
-  historiasLead2b: 'Elige la tuya',
+  historiasLead2b: 'Elige cómo',
   historiasLeadHow: 'Elige cómo',
   mapSectionTitle: 'El Alma del Mundo',
+  cejaCuenta: 'Cuenta',
+  cejaInspira: 'Inspírate',
+  cejaDescubre: 'Descubre',
+  bajadaCuenta: 'Hay muchas formas de contarla.',
+  bajadaInspira: 'Toca una cinta y descubre sus preguntas.',
+  leyendaHistorias: 'Historias',
+  leyendaRespuestas: 'Respuestas',
+  leyendaBits: 'También cuenta: datos curiosos de lugares',
   mapSpaceSoundNote:
     'En el espacio no hay sonido porque no hay aire que lo transmita. Para estudiar eventos como explosiones, los científicos convierten datos de telescopios en frecuencias audibles, un proceso llamado sonificación.',
   cardVideoTitle: 'Tu historia,',
@@ -168,13 +184,21 @@ const pt: HomeMessages = {
   heroScrollBefore: 'Aqui suas histórias não se perdem no scroll,',
   heroScrollBold: 'despertam outras',
   heroFormatLabel: 'Escolha como contar',
-  heroSubBefore: 'Aqui, cada história',
+  heroSubBefore: 'Cada história',
   heroSubBold: 'merece ser conhecida',
   historiasLead1: 'Há histórias que só você pode contar.',
   historiasLead2: 'Há muitas formas de contar',
-  historiasLead2b: 'Escolha a sua',
+  historiasLead2b: 'Escolha como',
   historiasLeadHow: 'Escolha como',
   mapSectionTitle: 'A Alma do Mundo',
+  cejaCuenta: 'Conte',
+  cejaInspira: 'Inspire-se',
+  cejaDescubre: 'Descubra',
+  bajadaCuenta: 'Há muitas formas de contá-la.',
+  bajadaInspira: 'Toque em uma fita e descubra as perguntas dela.',
+  leyendaHistorias: 'Histórias',
+  leyendaRespuestas: 'Respostas',
+  leyendaBits: 'Também conta: curiosidades dos lugares',
   mapSpaceSoundNote:
     'No espaço não há som porque não há ar para transmiti-lo. Para estudar eventos como explosões, os cientistas convertem dados de telescópios em frequências audíveis, um processo chamado sonificação.',
   cardVideoTitle: 'Sua história,',
@@ -232,13 +256,21 @@ const en: HomeMessages = {
   heroScrollBefore: "Here your stories don't get lost in the scroll,",
   heroScrollBold: 'they awaken others',
   heroFormatLabel: 'Choose how to tell it',
-  heroSubBefore: 'Here, every story',
+  heroSubBefore: 'Every story',
   heroSubBold: 'deserves to be known',
   historiasLead1: 'There are stories only you can tell.',
   historiasLead2: 'There are many ways to tell it',
-  historiasLead2b: 'Choose yours',
+  historiasLead2b: 'Choose how',
   historiasLeadHow: 'Choose how',
   mapSectionTitle: 'The Soul of the World',
+  cejaCuenta: 'Tell',
+  cejaInspira: 'Get inspired',
+  cejaDescubre: 'Discover',
+  bajadaCuenta: 'There are many ways to tell it.',
+  bajadaInspira: 'Tap a ribbon and discover its questions.',
+  leyendaHistorias: 'Stories',
+  leyendaRespuestas: 'Answers',
+  leyendaBits: 'Also tells: curious facts about places',
   mapSpaceSoundNote:
     'In space there is no sound because there is no air to carry it. To study events such as explosions, scientists turn telescope data into audible frequencies, a process called sonification.',
   cardVideoTitle: 'Your story,',

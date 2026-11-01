@@ -232,6 +232,8 @@ export type HomeFormatCardsProps = {
   fillViewport?: boolean;
   /** Conserva la pregunta del hilo al abrir un formato. */
   pregunta?: ContarPregunta | null;
+  /** Home: el capítulo ya dice la bajada. Las tarjetas no cambian. */
+  sinEtiqueta?: boolean;
 };
 
 export function HomeFormatCards({
@@ -241,7 +243,8 @@ export function HomeFormatCards({
   onRecordPhoto,
   sectionId,
   fillViewport = false,
-  pregunta = null }: HomeFormatCardsProps) {
+  pregunta = null,
+  sinEtiqueta = false }: HomeFormatCardsProps) {
   const { t } = useHomeLocale();
 
   return (
@@ -251,10 +254,12 @@ export function HomeFormatCards({
       className={
         fillViewport
           ? 'relative z-[18] flex min-h-0 flex-1 flex-col px-4 py-2 sm:px-6 md:px-10 md:py-3 lg:px-12'
+          : sinEtiqueta
+          ? 'relative z-[18] px-6 pt-0 md:px-10 lg:flex lg:min-h-0 lg:grow lg:shrink lg:flex-col lg:px-10 lg:pt-0'
           : 'relative z-[18] mb-8 px-6 pb-10 pt-0 sm:pt-1 md:mb-12 md:px-10 md:pb-12 md:pt-2 lg:mb-0 lg:flex lg:min-h-0 lg:grow lg:shrink lg:flex-col lg:px-10 lg:pb-8 lg:pt-0'
       }
     >
-      {!fillViewport ? <div aria-hidden className="home-hero-lead-gap" /> : null}
+      {!fillViewport && !sinEtiqueta ? <div aria-hidden className="home-hero-lead-gap" /> : null}
       {fillViewport ? (
         <p className="home-intro-avenir mx-auto mb-3 max-w-[min(100%,40rem)] shrink-0 px-1 text-center leading-snug tracking-normal md:mb-4 lg:mb-5">
           <span className="block text-[length:var(--fs-subtitulo)] font-medium tracking-normal text-[#FF4A1C] ">
@@ -264,7 +269,7 @@ export function HomeFormatCards({
             {t.historiasLeadHow}
           </span>
         </p>
-      ) : (
+      ) : sinEtiqueta ? null : (
         <p
           className="home-intro-avenir mx-auto mb-4 max-w-[min(100%,40rem)] shrink-0 px-1 text-center text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.14em] sm:mb-5 md:mb-6 lg:mb-0 lg:w-full lg:max-w-none"
           style={{ color: '#B8340F' }}
@@ -276,7 +281,9 @@ export function HomeFormatCards({
         className={
           fillViewport
             ? 'mx-auto grid h-full min-h-0 w-full max-w-[min(100%,1600px)] flex-1 grid-cols-2 grid-rows-2 items-stretch gap-4 sm:gap-5 md:gap-6 lg:grid-cols-4 lg:grid-rows-1 lg:gap-7 xl:gap-8'
-            : 'mx-auto mt-6 grid w-full max-w-[min(100%,1560px)] shrink-0 grid-cols-1 gap-y-12 px-1 sm:mt-7 sm:px-0 md:mt-8 lg:mt-14 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11'
+            : sinEtiqueta
+              ? 'home-hero-cards-gap mx-auto grid w-full max-w-[min(100%,1560px)] shrink-0 grid-cols-1 gap-y-12 px-1 sm:px-0 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11'
+              : 'mx-auto mt-6 grid w-full max-w-[min(100%,1560px)] shrink-0 grid-cols-1 gap-y-12 px-1 sm:mt-7 sm:px-0 md:mt-8 lg:mt-14 lg:grid-cols-4 lg:gap-x-7 lg:gap-y-0 xl:gap-x-9 2xl:gap-x-11'
         }
       >
         <SoftCard

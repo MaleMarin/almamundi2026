@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useRef } from 'react';
+import { CapituloHome } from '@/components/home/CapituloHome';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 
 /**
@@ -23,27 +24,20 @@ export function MapSectionLocked() {
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
       <section
         id="mapa"
-        className="relative z-[15] w-full scroll-mt-[9.75rem] bg-transparent -mt-[9.75rem] pt-[9.75rem] md:scroll-mt-[12.25rem] md:-mt-[12.25rem] md:pt-[12.25rem] lg:scroll-mt-[13.5rem] lg:-mt-[13.5rem] lg:pt-[13.5rem]"
+        className="home-capitulo-bloque relative z-[15] w-full scroll-mt-[9.75rem] bg-transparent md:scroll-mt-[12.25rem] lg:scroll-mt-[13.5rem]"
       >
-        {/* Un solo degradado continuo (claro → noche → espacio); sin franja intermedia. */}
+        <CapituloHome
+          ceja={t.cejaDescubre}
+          titulo={t.mapSectionTitle}
+          portada
+          bajada={t.heroSubBefore}
+          bajadaFuerte={`${t.heroSubBold}.`}
+        />
+        <div className="map-section-editorial relative z-[1] w-full bg-[#F5F4F2]">
+          <div id="map-dock-slot" className="w-full bg-[#F5F4F2] px-2 pb-2 md:px-3" />
+        </div>
+        <div className="home-noche" aria-hidden />
         <div className="map-section-atmosphere w-full">
-          <div className="map-section-editorial relative z-[1] w-full">
-            <h2
-              className="mapa-almamundi-title map-section-hero-title text-center pt-10 pb-2 md:pt-12 md:pb-3"
-              style={{ color: 'var(--almamundi-orange)' }}
-            >
-              {t.mapSectionTitle}
-            </h2>
-            <p
-              className="home-intro-avenir mx-auto max-w-[min(100%,42rem)] text-balance px-6 pb-5 text-center text-[length:var(--fs-subtitulo)] font-normal leading-[1.35] tracking-normal md:pb-7 lg:max-w-none lg:whitespace-nowrap"
-              style={{ color: '#4A5568' }}
-            >
-              {t.heroSubBefore}{' '}
-              <span className="font-bold">{t.heroSubBold}</span>.
-            </p>
-            {/* Franja de funciones: aquí debajo de la frase (portal desde HomeMap). NO está en el universo. */}
-            <div id="map-dock-slot" className="w-full px-2 md:px-3" />
-          </div>
           <div
             ref={globeUniverseRef}
             className="map-universe-stage relative z-[1] flex w-full min-h-[88vh] flex-col overflow-hidden pt-0"

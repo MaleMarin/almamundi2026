@@ -407,7 +407,7 @@ function PreguntaFormInner({
   const question = pregunta[mode][locale];
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className={embedded ? 'mx-auto flex w-full flex-col gap-5 pt-8 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]'}>
+    <form onSubmit={(event) => void onSubmit(event)} className={embedded ? 'cortina-form mx-auto flex w-full flex-col gap-5 pt-8' : 'mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]'}>
       {embedded ? null : (
         <>
           <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
@@ -433,7 +433,7 @@ function PreguntaFormInner({
               type="button"
               aria-pressed={kind === id}
               onClick={() => setKind(id)}
-              className={`${pickClass(kind === id)} flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-[length:var(--fs-pequeno)] font-semibold`}
+              className={`${embedded ? 'cortina-opcion' : pickClass(kind === id)} flex flex-col items-center gap-2 rounded-2xl px-2 py-3 text-[length:var(--fs-pequeno)] font-semibold`}
             >
               <Icon size={22} aria-hidden />
               {label}

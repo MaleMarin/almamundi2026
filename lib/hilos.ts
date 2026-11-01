@@ -1278,6 +1278,111 @@ export function preguntaAlAzar(exceptoId: string | null): PreguntaHilo | null {
   return elegir(pool);
 }
 
+/** Los 12 colores de las cintas. No son los de `HILOS.color`. */
+const COLOR_CINTA: Record<HiloId, string> = {
+  infancia: '#FFD000',
+  familia: '#FF6200',
+  amor: '#FF1A1A',
+  amistad: '#FF7EB6',
+  crecer: '#A8E000',
+  aprender: '#00B140',
+  trabajo: '#0047FF',
+  creencias: '#7A12E0',
+  ausentes: '#B07CFF',
+  justicia: '#FF0A8A',
+  viajes: '#00C2D6',
+  historia: '#A0003C',
+};
+
+/** Tema editorial público → cinta. Los ids que ya son una cinta se resuelven solos. */
+const TEMA_A_CINTA: Record<string, HiloId> = {
+  familia: 'familia',
+  'pareja-amor': 'amor',
+  amistad: 'amistad',
+  'maternidad-paternidad': 'crecer',
+  abuelos: 'familia',
+  hijos: 'crecer',
+  vecinos: 'familia',
+  infancia: 'infancia',
+  recuerdos: 'infancia',
+  ancestros: 'historia',
+  tradiciones: 'historia',
+  objetos: 'historia',
+  'lugares-que-ya-no-existen': 'historia',
+  'historia-de-un-lugar': 'historia',
+  hogar: 'familia',
+  barrio: 'historia',
+  ciudad: 'viajes',
+  campo: 'viajes',
+  naturaleza: 'viajes',
+  mar: 'viajes',
+  montana: 'viajes',
+  clima: 'viajes',
+  partir: 'viajes',
+  llegar: 'viajes',
+  exilio: 'viajes',
+  frontera: 'viajes',
+  regreso: 'viajes',
+  viajes: 'viajes',
+  raices: 'historia',
+  lengua: 'historia',
+  trabajo: 'trabajo',
+  oficios: 'trabajo',
+  estudio: 'aprender',
+  emprendimiento: 'trabajo',
+  'primer-empleo': 'trabajo',
+  jubilacion: 'trabajo',
+  salud: 'crecer',
+  enfermedad: 'crecer',
+  'cuidado-de-otros': 'crecer',
+  deporte: 'crecer',
+  cuerpo: 'crecer',
+  envejecer: 'crecer',
+  duelo: 'ausentes',
+  despedidas: 'ausentes',
+  crisis: 'crecer',
+  decisiones: 'crecer',
+  'comenzar-de-nuevo': 'crecer',
+  miedo: 'crecer',
+  valentia: 'crecer',
+  identidad: 'creencias',
+  pertenencia: 'creencias',
+  'fe-espiritualidad': 'creencias',
+  genero: 'creencias',
+  'pueblos-originarios': 'historia',
+  diversidad: 'creencias',
+  organizacion: 'justicia',
+  solidaridad: 'justicia',
+  derechos: 'justicia',
+  justicia: 'justicia',
+  protesta: 'justicia',
+  educacion: 'aprender',
+  'vida-publica': 'justicia',
+  musica: 'historia',
+  arte: 'historia',
+  comida: 'familia',
+  fiestas: 'amistad',
+  juego: 'infancia',
+  humor: 'amistad',
+  'cine-lectura': 'aprender',
+  esperanza: 'crecer',
+  proyectos: 'aprender',
+  deseos: 'crecer',
+  'cartas-al-futuro': 'historia',
+  'lo-que-vendra': 'crecer',
+};
+
+export function colorCintaDe(preguntaId?: string | null, temas?: string[] | null): string | null {
+  const porPregunta = preguntaHiloPorId(preguntaId)?.hiloId;
+  if (porPregunta && porPregunta in COLOR_CINTA) return COLOR_CINTA[porPregunta];
+  for (const tema of temas ?? []) {
+    if (tema in COLOR_CINTA) return COLOR_CINTA[tema as HiloId];
+    const mapeado = TEMA_A_CINTA[tema];
+    if (mapeado) return COLOR_CINTA[mapeado];
+  }
+  return null;
+}
+
 export function preguntasDelTema(hiloId: string | null | undefined): PreguntaHilo[] {
   if (!hiloId || !HILOS.some((hilo) => hilo.id === hiloId)) return [];
   return TEMAS.filter((pregunta) => pregunta.hiloId === hiloId);

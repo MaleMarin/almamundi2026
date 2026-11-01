@@ -24,6 +24,36 @@ const TELON: { fondo: string; texto: string }[] = [
   { fondo: '#A0003C', texto: '#fff' },
 ];
 
+/** Fondo del panel. Si el blanco no llega a 4.5 sobre la cinta, el mismo tono baja de luz. Las cintas siguen en TELON. */
+const PANEL: { fondo: string; texto: string; boton: string }[] = [
+  { fondo: '#FFD000', texto: '#3C2F00', boton: '#3C2F00' },
+  { fondo: '#CC4E00', texto: '#fff', boton: '#CC4E00' },
+  { fondo: '#EE0000', texto: '#fff', boton: '#EE0000' },
+  { fondo: '#FF7EB6', texto: '#4A1A30', boton: '#4A1A30' },
+  { fondo: '#A8E000', texto: '#2A3300', boton: '#2A3300' },
+  { fondo: '#008932', texto: '#fff', boton: '#008932' },
+  { fondo: '#0047FF', texto: '#fff', boton: '#0047FF' },
+  { fondo: '#7A12E0', texto: '#fff', boton: '#7A12E0' },
+  { fondo: '#B07CFF', texto: '#2A1B47', boton: '#2A1B47' },
+  { fondo: '#E60078', texto: '#fff', boton: '#E60078' },
+  { fondo: '#008391', texto: '#fff', boton: '#008391' },
+  { fondo: '#A0003C', texto: '#fff', boton: '#A0003C' },
+];
+
+function marcaCasilla(color: string) {
+  const tinta = color.replace('#', '%23');
+  return `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3E%3Cpath d='M4.5 10.5l3.2 3.2 7.8-8' fill='none' stroke='${tinta}' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")`;
+}
+
+function aplicarPanel(nodo: HTMLElement, indice: number) {
+  const tela = PANEL[indice];
+  if (!tela) return;
+  nodo.style.setProperty('--cortina-fondo', tela.fondo);
+  nodo.style.setProperty('--cortina-texto', tela.texto);
+  nodo.style.setProperty('--cortina-boton', tela.boton);
+  nodo.style.setProperty('--cortina-check', marcaCasilla(tela.texto));
+}
+
 type Formato = 'texto' | 'voz' | 'foto';
 
 function indiceDe(tema: string | null, pregunta: string | null) {
@@ -47,6 +77,11 @@ function reduceMotion(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
+/** Las demás cintas bajan a este nivel. El camino se recorre casi entero en 400 ms. */
+const ATENUAR = 0.55;
+const ATENUAR_MS = 170;
+const ESPERA_TEMA_MS = 120;
+
 function aleatorio(): number {
   return Math.floor(Math.random() * HILOS.length);
 }
@@ -57,12 +92,15 @@ export function CortinaTemas({
   initialPregunta = null,
   enPagina = false,
   titulo = 'h2',
+  capitulo = false,
 }: {
   locale: AlmaLocale;
   initialTema?: string | null;
   initialPregunta?: string | null;
   enPagina?: boolean;
   titulo?: 'h1' | 'h2';
+  /** En la home el capítulo ya trae el título y las cintas no muestran etiquetas. */
+  capitulo?: boolean;
 }) {
   const copy = HILOS_UI[locale];
   const raizRef = useRef<HTMLDivElement>(null);
@@ -110,8 +148,7 @@ export function CortinaTemas({
     if (nombreRef.current) nombreRef.current.hidden = true;
     const detras = detrasRef.current;
     if (detras) {
-      detras.style.setProperty('--cortina-fondo', tela.fondo);
-      detras.style.setProperty('--cortina-texto', tela.texto);
+      aplicarPanel(detras, indice);
       detras.style.visibility = 'visible';
       detras.scrollTop = 0;
     }
@@ -142,7 +179,7 @@ export function CortinaTemas({
   }
 
   function altoCortina() {
-    return Math.max(380, Math.min(520, window.innerHeight * 0.7));
+    return Math.max(640, Math.min(960, window.innerHeight * 0.9));
   }
 
   function altoContenido() {
@@ -224,7 +261,7 @@ export function CortinaTemas({
     function armar() {
       const dpr = Math.min(2, window.devicePixelRatio || 1);
       const ancho = stage.clientWidth;
-      const alto = Math.max(380, Math.min(520, window.innerHeight * 0.7));
+      const alto = Math.max(640, Math.min(960, window.innerHeight * 0.9));
       if (cintasRef.current.length && ancho === anchoRef.current && alto === altoRef.current) return;
       anchoRef.current = ancho;
       altoRef.current = alto;
@@ -241,7 +278,7 @@ export function CortinaTemas({
           x: x + w / 2,
           w,
           th: Math.floor(azar() * 12),
-          L: alto * (0.86 + azar() * 0.16),
+          L: alto * (0.92 + azar() * 0.08),
           curve: (azar() - 0.5) * 50,
           A: 3 + azar() * 6,
           f: 0.6 + azar() * 0.7,
@@ -279,6 +316,47 @@ export function CortinaTemas({
       return -1;
     }
 
+    const alfas = HILOS.map(() => 1);
+    let esperaTema = 0;
+    let temaPendiente = -1;
+    let punteroX = 0;
+    let punteroY = 0;
+
+    function mostrarNombre(tema: number) {
+      const nombre = nombreRef.current;
+      const hilo = HILOS[tema];
+      if (!nombre) return;
+      if (tema >= 0 && hilo) {
+        nombre.hidden = false;
+        nombre.textContent = hilo.nombre[locale];
+        nombre.style.left = `${punteroX}px`;
+        nombre.style.top = `${punteroY}px`;
+      } else {
+        nombre.hidden = true;
+      }
+    }
+
+    function comprometer(tema: number) {
+      hoverRef.current = tema;
+      setMarcada(tema);
+      mostrarNombre(tema);
+    }
+
+    function pedirTema(tema: number) {
+      if (tema === hoverRef.current) {
+        window.clearTimeout(esperaTema);
+        temaPendiente = tema;
+        return;
+      }
+      if (tema === temaPendiente) return;
+      temaPendiente = tema;
+      window.clearTimeout(esperaTema);
+      esperaTema = window.setTimeout(() => {
+        if (metaRef.current > 0 || temaPendiente !== tema) return;
+        comprometer(tema);
+      }, ESPERA_TEMA_MS);
+    }
+
     let previo = performance.now();
 
     function pintar(ahora: number) {
@@ -313,10 +391,21 @@ export function CortinaTemas({
       canvas.style.visibility = 'visible';
       ctx.clearRect(0, 0, anchoRef.current, altoRef.current);
       const hover = hoverRef.current;
+      const atenuar = !quieto && hover >= 0 && progreso < 0.05;
+      const avanceAlfa = quieto ? 1 : 1 - Math.exp(-paso / ATENUAR_MS);
+      for (let tema = 0; tema < alfas.length; tema += 1) {
+        const meta = atenuar && tema !== hover ? ATENUAR : 1;
+        if (quieto) {
+          alfas[tema] = 1;
+          continue;
+        }
+        const siguiente = alfas[tema] + (meta - alfas[tema]) * avanceAlfa;
+        alfas[tema] = Math.abs(meta - siguiente) <= 0.004 ? meta : siguiente;
+      }
       for (const cinta of cintasRef.current) {
         const tela = TELON[cinta.th];
         if (!tela) continue;
-        ctx.globalAlpha = hover >= 0 && cinta.th !== hover && progreso < 0.05 ? 0.28 : 1;
+        ctx.globalAlpha = alfas[cinta.th] ?? 1;
         ctx.beginPath();
         const pasos = 18;
         for (let i = 0; i <= pasos; i += 1) {
@@ -335,6 +424,18 @@ export function CortinaTemas({
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
+      const fundido = 140;
+      const alto = altoRef.current;
+      if (alto > fundido) {
+        ctx.save();
+        ctx.globalCompositeOperation = 'destination-out';
+        const degrade = ctx.createLinearGradient(0, alto - fundido, 0, alto);
+        degrade.addColorStop(0, 'rgba(0,0,0,0)');
+        degrade.addColorStop(1, 'rgba(0,0,0,1)');
+        ctx.fillStyle = degrade;
+        ctx.fillRect(0, alto - fundido, anchoRef.current, fundido);
+        ctx.restore();
+      }
       canvas.style.pointerEvents = progreso > 0.5 ? 'none' : 'auto';
       detras.style.visibility = progreso > 0.02 || meta > 0 ? 'visible' : 'hidden';
     }
@@ -394,12 +495,8 @@ export function CortinaTemas({
       canvas.style.pointerEvents = 'none';
     }
     if (abiertoRef.current >= 0) {
-      const tela = TELON[abiertoRef.current];
-      if (tela) {
-        detras.style.setProperty('--cortina-fondo', tela.fondo);
-        detras.style.setProperty('--cortina-texto', tela.texto);
-        detras.style.visibility = 'visible';
-      }
+      aplicarPanel(detras, abiertoRef.current);
+      detras.style.visibility = 'visible';
     } else {
       detras.style.visibility = 'hidden';
     }
@@ -422,25 +519,20 @@ export function CortinaTemas({
       const quieto = reduceMotion();
       const tiempo = (performance.now() - inicioRef.current) / 1000;
       const tema = temaEn(mx, my, tiempo, quieto);
-      hoverRef.current = tema;
-      setMarcada(tema);
+      punteroX = mx;
+      punteroY = my;
+      pedirTema(tema);
       const nombre = nombreRef.current;
-      const hilo = HILOS[tema];
-      if (!nombre) return;
-      if (tema >= 0 && hilo) {
-        nombre.hidden = false;
-        nombre.textContent = hilo.nombre[locale];
+      if (nombre && !nombre.hidden) {
         nombre.style.left = `${mx}px`;
         nombre.style.top = `${my}px`;
-      } else {
-        nombre.hidden = true;
       }
     }
 
     function salir() {
-      hoverRef.current = -1;
-      setMarcada(-1);
-      if (nombreRef.current) nombreRef.current.hidden = true;
+      window.clearTimeout(esperaTema);
+      temaPendiente = -1;
+      comprometer(-1);
     }
 
     function clic(event: MouseEvent) {
@@ -459,6 +551,7 @@ export function CortinaTemas({
     canvas.addEventListener('click', clic);
 
     return () => {
+      window.clearTimeout(esperaTema);
       cancelarMarco();
       vista.disconnect();
       tamanos.disconnect();
@@ -541,14 +634,18 @@ export function CortinaTemas({
   }, []);
 
   return (
-    <div className="cortina font-interna" ref={raizRef}>
-      <p className="cortina-ceja">{copy.ceja}</p>
-      {titulo === 'h1' ? (
-        <h1 className="cortina-titulo">{copy.bloqueTitulo}</h1>
-      ) : (
-        <h2 className="cortina-titulo">{copy.bloqueTitulo}</h2>
+    <div className={capitulo ? 'cortina cortina-en-capitulo font-interna' : 'cortina font-interna'} ref={raizRef}>
+      {capitulo ? null : (
+        <>
+          <p className="cortina-ceja">{copy.ceja}</p>
+          {titulo === 'h1' ? (
+            <h1 className="cortina-titulo">{copy.bloqueTitulo}</h1>
+          ) : (
+            <h2 className="cortina-titulo">{copy.bloqueTitulo}</h2>
+          )}
+          <p className="cortina-sub">{copy.descubre}</p>
+        </>
       )}
-      <p className="cortina-sub">{copy.descubre}</p>
       <div className={temaId ? 'cortina-stage abierta' : 'cortina-stage'} ref={stageRef}>
         <section
           ref={detrasRef}
@@ -559,8 +656,12 @@ export function CortinaTemas({
             temaId
               ? {
                   visibility: 'visible',
-                  ['--cortina-fondo' as string]: TELON[HILOS.findIndex((item) => item.id === temaId)]?.fondo,
-                  ['--cortina-texto' as string]: TELON[HILOS.findIndex((item) => item.id === temaId)]?.texto,
+                  ['--cortina-fondo' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.fondo,
+                  ['--cortina-texto' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.texto,
+                  ['--cortina-boton' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.boton,
+                  ['--cortina-check' as string]: marcaCasilla(
+                    PANEL[HILOS.findIndex((item) => item.id === temaId)]?.texto ?? '#fff'
+                  ),
                 }
               : undefined
           }
@@ -634,8 +735,8 @@ export function CortinaTemas({
         <canvas ref={canvasRef} className="cortina-lienzo" aria-hidden />
         <div ref={nombreRef} className="cortina-nombre" hidden />
       </div>
-      {temaId ? null : <p className="cortina-pista">{copy.pista}</p>}
-      <div className="cortina-leyenda">
+      {temaId || capitulo ? null : <p className="cortina-pista">{copy.pista}</p>}
+      <div className={capitulo ? 'cortina-leyenda cortina-leyenda-teclado' : 'cortina-leyenda'}>
         {HILOS.map((hiloTema, indice) => (
           <button
             key={hiloTema.id}
@@ -667,13 +768,15 @@ export function CortinaTemas({
           </button>
         ))}
       </div>
-      <button
-        type="button"
-        className="cortina-azar"
-        onClick={() => verTema(aleatorio())}
-      >
-        {copy.azar}
-      </button>
+      {capitulo ? null : (
+        <button
+          type="button"
+          className="cortina-azar"
+          onClick={() => verTema(aleatorio())}
+        >
+          {copy.azar}
+        </button>
+      )}
     </div>
   );
 }

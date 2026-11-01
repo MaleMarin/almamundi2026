@@ -1,15 +1,10 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Play, Square, Minus, Plus } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { mapChrome } from '@/lib/i18n/map-chrome';
-import {
-  dedupePublicAudioPaths,
-  folderHintFromPublicPath,
-  friendlyTitleFromPublicPath,
-  publicAudioMoodIdFromPath } from '@/lib/public-audio-mood';
 import {
   getAmbientOrPublicTrackVolume,
   setAmbientOrPublicTrackVolume } from '@/lib/sound/ambient';
@@ -22,13 +17,7 @@ const AMBIENT_OPTS = [
   { id: 'mercado' as const, label: 'Mercado', desc: '', place: 'Mercado', country: '' },
 ];
 
-type SoundRowMood = (typeof AMBIENT_OPTS)[number] | {
-  id: string;
-  label: string;
-  desc: string;
-  place: string;
-  country: string;
-};
+type SoundRowMood = (typeof AMBIENT_OPTS)[number];
 
 export type SoundsPanelProps = {
   currentMood: string;
@@ -82,7 +71,7 @@ function SoundRow({
         onClick={onSelect}
         style={{
           textAlign: 'left',
-          padding: '14px 16px',
+          padding: '8px 16px',
           cursor: 'pointer',
           transition: 'all 200ms ease',
           width: '100%',
@@ -119,7 +108,7 @@ function SoundRow({
       </button>
 
       <div
-        className="flex items-center gap-2 px-4 pb-3 pt-0"
+        className="flex items-center gap-2 px-4 pb-1 pt-0"
         onMouseDown={(e) => e.stopPropagation()}
         onClick={(e) => e.stopPropagation()}
         onKeyDown={(e) => e.stopPropagation()}
@@ -141,7 +130,7 @@ function SoundRow({
           value={pct}
           aria-label={`${copy.volumeOf} ${mood.label}: ${pct} ${copy.volumePercent}`}
           onChange={(e) => onVolumeChange(Number(e.target.value) / 100)}
-          className="min-h-[44px] flex-1 cursor-pointer accent-orange-500"
+          className="min-h-8 flex-1 cursor-pointer accent-orange-500"
           style={{ maxWidth: '100%' }}
         />
         <button
@@ -179,35 +168,11 @@ export function SoundsPanel({
     mercado: copy.mercado,
   };
   const soundCopy = {
-    es: { on: 'Encendido', off: 'Apagado', error: 'No pudimos cargar los sonidos.' },
-    pt: { on: 'Ligado', off: 'Desligado', error: 'Não conseguimos carregar os sons.' },
-    en: { on: 'On', off: 'Off', error: "We couldn't load the sounds." },
+    es: { on: 'Encendido', off: 'Apagado' },
+    pt: { on: 'Ligado', off: 'Desligado' },
+    en: { on: 'On', off: 'Off' },
   }[locale];
-  const [publicPaths, setPublicPaths] = useState<string[]>([]);
-  const [publicListError, setPublicListError] = useState<string | null>(null);
   const [volTick, setVolTick] = useState(0);
-
-  useEffect(() => {
-    let cancelled = false;
-    fetch('/api/public-audio')
-      .then((res) => {
-        if (!res.ok) throw new Error(String(res.status));
-        return res.json() as Promise<{ paths?: string[] }>;
-      })
-      .then((data) => {
-        if (cancelled) return;
-        setPublicPaths(Array.isArray(data.paths) ? data.paths : []);
-        setPublicListError(null);
-      })
-      .catch(() => {
-        if (cancelled) return;
-        setPublicPaths([]);
-        setPublicListError(soundCopy.error);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [locale]);
 
   const volumes = useMemo(() => {
     void volTick;
@@ -215,32 +180,13 @@ export function SoundsPanel({
     for (const m of AMBIENT_OPTS) {
       next[m.id] = getAmbientOrPublicTrackVolume(m.id);
     }
-    for (const p of publicPaths) {
-      const id = publicAudioMoodIdFromPath(p);
-      next[id] = getAmbientOrPublicTrackVolume(id);
-    }
     return next;
-  }, [publicPaths, volTick]);
+  }, [volTick]);
 
   const handleVolume = useCallback((id: string, v: number) => {
     setAmbientOrPublicTrackVolume(id, v);
     setVolTick((t) => t + 1);
   }, []);
-
-  const publicPathsDeduped = useMemo(
-    () =>
-      dedupePublicAudioPaths(publicPaths).filter((p) => {
-        const n = p.toLowerCase();
-        return !(
-          n.endsWith('/neblina.mp3') ||
-          n.endsWith('/amanecer.mp3') ||
-          n.endsWith('/anochecer.mp3') ||
-          n.endsWith('/dia.mp3') ||
-          n.endsWith('/auto.mp3')
-        );
-      }),
-    [publicPaths]
-  );
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
@@ -285,61 +231,18 @@ export function SoundsPanel({
       <p className="text-[length:var(--fs-etiqueta)] leading-snug text-white/40" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
         {copy.volumeHelp}
       </p>
-      {publicListError ? (
-        <p className="text-[length:var(--fs-etiqueta)] text-amber-200/80" style={{ fontFamily: SITE_FONT_STACK, margin: 0 }}>
-          {publicListError}
-        </p>
-      ) : null}
-      {/* Un solo scroll: el cuerpo del MapDrawer (evita doble capa y pérdida de rueda hacia el globo). */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
         {AMBIENT_OPTS.map((m) => (
           <SoundRow
             key={m.id}
             mood={{ ...m, label: ambientLabels[m.id], place: ambientLabels[m.id] }}
             isActive={currentMood === m.id}
             isPlaying={soundEnabled && currentMood === m.id}
-            volume01={volumes[m.id] ?? 1}
+            volume01={volumes[m.id] ?? 0.25}
             onSelect={() => onMoodChange(m.id)}
             onVolumeChange={(v) => handleVolume(m.id, v)}
           />
         ))}
-        {publicPathsDeduped.length > 0 ? (
-          <>
-            <p
-              className="text-[length:var(--fs-etiqueta)] uppercase text-white/35 tracking-[0.12em]"
-              style={{ fontFamily: SITE_FONT_STACK, margin: '10px 0 2px', flexShrink: 0 }}
-            >
-              Más sonidos (tu carpeta public)
-            </p>
-            <div
-              className="grid grid-cols-1 gap-x-4 gap-y-5 md:grid-cols-2"
-              style={{ alignContent: 'start' }}
-            >
-              {publicPathsDeduped.map((p) => {
-                const id = publicAudioMoodIdFromPath(p);
-                const title = friendlyTitleFromPublicPath(p);
-                const row = {
-                  id,
-                  label: title,
-                  desc: '',
-                  place: title,
-                  country: folderHintFromPublicPath(p) };
-                return (
-                  <div key={id} style={{ minWidth: 0 }} title={p}>
-                    <SoundRow
-                      mood={row}
-                      isActive={currentMood === id}
-                      isPlaying={soundEnabled && currentMood === id}
-                      volume01={volumes[id] ?? 1}
-                      onSelect={() => onMoodChange(id)}
-                      onVolumeChange={(v) => handleVolume(id, v)}
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          </>
-        ) : null}
       </div>
     </div>
   );

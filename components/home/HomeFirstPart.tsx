@@ -5,17 +5,13 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeFirstPartSiteHeader } from '@/components/home/HomeFirstPartSiteHeader';
 import { HomeFormatCards } from '@/components/home/HomeFormatCards';
 import type { ContarPregunta } from '@/lib/contar-routes';
+import { CapituloHome } from '@/components/home/CapituloHome';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 
 /**
  * Primera parte de la home (header + intro + tarjetas).
  * LOCK diseño: tarjetas neumórficas E0E5EC; SoftCard tamaño marzo 2026 (max-w 400px, min-h 450px).
  */
-
-/** Neumorfismo con más volumen: sombras más largas + highlight blanco fuerte + bisel suave. */
-const soft = {
-  textMain: '#4A5568',
-} as const;
 
 export type HomeFirstPartProps = {
   onShowPurpose: () => void;
@@ -59,43 +55,23 @@ export function HomeFirstPart({
       <div className="lg:mt-[13.5rem]">
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center px-6 pb-2 pt-[12.75rem] text-center sm:pb-2 md:scroll-mt-[12.25rem] md:px-10 md:pb-3 md:pt-[15.25rem] lg:min-h-0 lg:shrink-0 lg:scroll-mt-[13.5rem] lg:px-10 lg:pb-0 lg:pt-0"
+        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center pb-0 pt-[calc(9.75rem+clamp(32px,5vw,64px))] text-center md:scroll-mt-[12.25rem] md:pt-[calc(12.25rem+clamp(32px,5vw,64px))] lg:min-h-0 lg:shrink-0 lg:scroll-mt-[13.5rem] lg:pt-0"
       >
         <div aria-hidden className="home-hero-head-gap" />
-        <div className="mx-auto w-full max-w-[min(100%,42rem)] shrink-0 lg:max-w-[1000px]">
-          <div className="home-first-part-float relative">
-            <h1
-              className="mx-auto mb-2 max-w-[min(100%,42rem)] leading-[1.15] md:mb-3 lg:max-w-[1000px] text-[length:var(--fs-titular)]"
-              style={{ color: soft.textMain, fontWeight: 400 }}
-            >
-              {t.heroScrollBefore}{' '}
-              <span className="mt-1 block" style={{ fontWeight: 700 }}>{t.heroScrollBold}</span>
-            </h1>
-            <div className="home-hero-sign lg:mb-0">
-              <svg
-                width="360"
-                height="12"
-                viewBox="0 0 360 12"
-                className="home-intro-underline block max-w-full"
-                aria-hidden="true"
-              >
-                <path
-                  pathLength={1}
-                  d="M4 8 Q90 12 180 8 Q270 4 356 8"
-                  stroke="#FF4A1C"
-                  strokeWidth="2.5"
-                  fill="none"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span className="home-hero-hand">{t.heroHandScript}</span>
-            </div>
-          </div>
-        </div>
+        <CapituloHome
+          nivel="h1"
+          ceja={t.cejaCuenta}
+          titulo={t.heroBeforeBold}
+          tituloFuerte={`${t.heroBold},`}
+          cita={`${t.heroHandScript}.`}
+          bajada={t.bajadaCuenta}
+          bajadaFuerte={`${t.historiasLead2b}.`}
+        />
       </section>
 
       <HomeFormatCards
         sectionId="historias"
+        sinEtiqueta
         onRecordVideo={onRecordVideo}
         onRecordAudio={onRecordAudio}
         onWriteStory={onWriteStory}

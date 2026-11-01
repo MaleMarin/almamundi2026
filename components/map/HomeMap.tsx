@@ -39,18 +39,30 @@ import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
 import { BITS_DATA } from '@/lib/bits-data';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
-import {
-  consumeMapAmbientPending,
-  MAP_NAV_GESTURE_EVENT,
-  peekMapAmbientPending } from '@/lib/mapa-home-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
+import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
 import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
-import { preguntaPorId, preguntaTexto, resolveQuestionId } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
+
+function LeyendaMapa({ kind, text }: { kind: 'story' | 'answer' | 'bit'; text: string }) {
+  const corte = text.indexOf(' ');
+  const primero = corte === -1 ? text : text.slice(0, corte);
+  const resto = corte === -1 ? '' : text.slice(corte);
+  return (
+    <span className="map-dock-legend__item">
+      <span className="map-dock-legend__keep">
+        <i className={`map-dock-legend__dot map-dock-legend__dot--${kind}`} aria-hidden />
+        {primero}
+      </span>
+      {resto}
+    </span>
+  );
+}
 
 /** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
 const SHOW_SURPRISE_ME_BUTTON = false;
@@ -162,7 +174,6 @@ import {
   playAmbientFromPublicUrl,
   stopAmbient,
   setAmbientEnabled,
-  hasActiveAmbientPlayback,
   type AmbientKey } from '@/lib/sound/ambient';
 import { MAP_LAYOUT_MOBILE_MAX_WIDTH_PX } from '@/lib/map-layout';
 import { useViewportBelow } from '@/hooks/useViewportBelow';
@@ -296,6 +307,28 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     setDockSlot(typeof document !== 'undefined' ? document.getElementById('map-dock-slot') : null);
   }, []);
 
+  useLayoutEffect(() => {
+    if (!dockSlot) return;
+    const scroller = dockSlot.querySelector('.map-dock-scroller');
+    const row = dockSlot.querySelector('.map-dock-row');
+    if (!(scroller instanceof HTMLElement) || !(row instanceof HTMLElement)) return;
+    const fit = () => {
+      row.style.zoom = '1';
+      void row.offsetWidth;
+      const available = scroller.clientWidth;
+      const needed = row.scrollWidth;
+      row.style.zoom = needed > available + 1 ? String(available / needed) : '';
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(scroller);
+    window.addEventListener('resize', fit);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', fit);
+    };
+  }, [dockSlot]);
+
   useEffect(() => {
     let cancelled = false;
     fetchHuellas()
@@ -373,18 +406,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   soundEnabledRef.current = soundEnabled;
   selectedMoodRef.current = selectedMood;
 
-  /** Primera vez que la sección del mapa entra en vista: fijar ambiente «universo» (luego el usuario puede cambiarlo en Sonidos). */
-  const hasPrimedUniverseForMapRef = useRef(false);
-  /** True solo si la persona apagó el sonido con el botón del mapa (no reactivar con IO ni con clics en #mapa). */
-  const userSilencedMapAmbientRef = useRef((() => {
-    if (typeof window === 'undefined') return false;
-    try {
-      return window.localStorage.getItem('almamundi_sound_enabled') === 'false';
-    } catch {
-      return false;
-    }
-  })());
-
   const startMapAmbientFromRefs = useCallback(() => {
     initFromUserGesture();
     const m = selectedMoodRef.current;
@@ -394,16 +415,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         if (!soundEnabledRef.current) return;
         if (isPublicAudioMoodId(m)) {
           const path = publicAudioPathFromMoodId(m);
-          if (path) await playAmbientFromPublicUrl(path);
+          if (path) await playAmbientFromPublicUrl(path, { fadeMs: 1500 });
           return;
         }
-        // «universo»: fade de 2 s al entrar al globo; otros presets, entrada más rápida.
-        await playAmbient(m as AmbientKey, m === 'universo' ? undefined : { fadeMs: 900 });
+        await playAmbient(m as AmbientKey, { fadeMs: 1500 });
       })
       .catch(() => {});
   }, []);
 
-  // Sonido ambiente: solo mientras el contenedor del universo (globo) es visible; al ir a hero o footer se corta vía `stopAmbient` en el efecto de reproducción.
+  // Visibilidad del globo. El sonido no arranca solo: solo el botón del parlante lo enciende.
   useLayoutEffect(() => {
     const section =
       universeSectionRef?.current ??
@@ -421,13 +441,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         setGlobeInView(visible);
 
         if (!visible) continue;
-
-        if (userSilencedMapAmbientRef.current) return;
-        if (!hasPrimedUniverseForMapRef.current) {
-          hasPrimedUniverseForMapRef.current = true;
-          setSelectedMood('universo');
-        }
-        setSoundEnabled(true);
         window.dispatchEvent(new CustomEvent('almamundi:mapInView'));
       }
     };
@@ -442,128 +455,30 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   // Reproducir o cortar el ambient según visibilidad del universo + soundEnabled (misma API: stopAmbient / startMapAmbientFromRefs).
   useEffect(() => {
-    if (!globeInView) {
+    if (!globeInView || !soundEnabled || !selectedMood) {
       stopAmbient();
-      setAmbientEnabled(false);
       return;
     }
-    if (!soundEnabled) {
-      stopAmbient();
-      setAmbientEnabled(false);
-      return;
-    }
-    if (!selectedMood) return;
     setAmbientEnabled(true);
     void startMapAmbientFromRefs();
   }, [globeInView, soundEnabled, selectedMood, startMapAmbientFromRefs]);
 
-  const primeUniverseAmbientForMap = useCallback(() => {
-    if (userSilencedMapAmbientRef.current) return;
-    if (!hasPrimedUniverseForMapRef.current) {
-      hasPrimedUniverseForMapRef.current = true;
-      setSelectedMood('universo');
-    }
-    soundEnabledRef.current = true;
-    setSoundEnabled(true);
+  /** Al irse de la página el ambiente se apaga con el mismo fundido, no de golpe. */
+  useEffect(() => {
+    const fadeOut = () => {
+      stopAmbient();
+    };
+    window.addEventListener('pagehide', fadeOut);
+    return () => {
+      window.removeEventListener('pagehide', fadeOut);
+      stopAmbient();
+    };
   }, []);
-
-  const tryPlayUniverseWhenMapVisible = useCallback(() => {
-    if (!globeInViewRef.current) return;
-    if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
-    primeUniverseAmbientForMap();
-    if (hasActiveAmbientPlayback()) return;
-    void startMapAmbientFromRefs();
-  }, [primeUniverseAmbientForMap, startMapAmbientFromRefs]);
-
-  /** Clic en menú «Mapa»: audio desbloqueado en el mismo gesto; reproducir al entrar el globo en vista. */
-  useEffect(() => {
-    const onMapNavGesture = () => {
-      initFromUserGesture();
-      void unlockAmbientAudio();
-      primeUniverseAmbientForMap();
-      tryPlayUniverseWhenMapVisible();
-    };
-    window.addEventListener(MAP_NAV_GESTURE_EVENT, onMapNavGesture);
-    return () => window.removeEventListener(MAP_NAV_GESTURE_EVENT, onMapNavGesture);
-  }, [primeUniverseAmbientForMap, tryPlayUniverseWhenMapVisible]);
-
-  /** Tras recarga desde otra ruta (`/?section=mapa`), el primer toque en la página reintenta el ambiente. */
-  useEffect(() => {
-    if (!peekMapAmbientPending()) return;
-    const onFirstGesture = () => {
-      if (!peekMapAmbientPending()) return;
-      initFromUserGesture();
-      void unlockAmbientAudio().then(() => {
-        if (!globeInViewRef.current) return;
-        consumeMapAmbientPending();
-        tryPlayUniverseWhenMapVisible();
-      });
-    };
-    document.addEventListener('pointerdown', onFirstGesture, { capture: true, passive: true, once: true });
-    document.addEventListener('keydown', onFirstGesture, { capture: true, once: true });
-    return () => {
-      document.removeEventListener('pointerdown', onFirstGesture, { capture: true });
-      document.removeEventListener('keydown', onFirstGesture, { capture: true });
-    };
-  }, [tryPlayUniverseWhenMapVisible]);
-
-  /**
-   * Gesto en la página o en #mapa: activar sonido si el universo ya es visible.
-   * Respeta silencio explícito del usuario (`userSilencedMapAmbientRef`).
-   */
-  useEffect(() => {
-    const onPointerDown = (e: PointerEvent) => {
-      initFromUserGesture();
-      const pending = peekMapAmbientPending();
-      const node = e.target;
-      if (!(node instanceof Node)) return;
-      const root =
-        node instanceof Element ? node : node.parentElement != null ? node.parentElement : null;
-      const inMapa = root != null && root.closest('#mapa') != null;
-      if (!pending && !inMapa) return;
-      if (pending) consumeMapAmbientPending();
-      tryPlayUniverseWhenMapVisible();
-    };
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      initFromUserGesture();
-      const pending = peekMapAmbientPending();
-      const ae = document.activeElement;
-      const inMapa = ae instanceof Element && ae.closest('#mapa') != null;
-      if (!pending && !inMapa) return;
-      if (pending) consumeMapAmbientPending();
-      tryPlayUniverseWhenMapVisible();
-    };
-    document.addEventListener('pointerdown', onPointerDown, { capture: true, passive: true });
-    document.addEventListener('keydown', onKeyDown, { capture: true });
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown, { capture: true });
-      document.removeEventListener('keydown', onKeyDown, { capture: true });
-    };
-  }, [tryPlayUniverseWhenMapVisible]);
-
-  /** Scroll al mapa sin menú: el primer toque en la página desbloquea y arranca «universo» si aún no suena. */
-  useEffect(() => {
-    if (!globeInView || userSilencedMapAmbientRef.current) return;
-    if (hasActiveAmbientPlayback()) return;
-
-    const onGesture = () => {
-      initFromUserGesture();
-      void unlockAmbientAudio().then(() => tryPlayUniverseWhenMapVisible());
-    };
-    document.addEventListener('pointerdown', onGesture, { capture: true, passive: true, once: true });
-    return () => document.removeEventListener('pointerdown', onGesture, { capture: true });
-  }, [globeInView, tryPlayUniverseWhenMapVisible]);
 
   const handleToggleSound = useCallback(() => {
     setSoundEnabled((v) => {
       const next = !v;
-      if (next) {
-        userSilencedMapAmbientRef.current = false;
-        initFromUserGesture();
-      } else {
-        userSilencedMapAmbientRef.current = true;
-      }
+      if (next) initFromUserGesture();
       try {
         window.localStorage.setItem('almamundi_sound_enabled', String(next));
       } catch {
@@ -731,7 +646,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       lat: s.lat,
       lon: s.lng,
       markerKind: 'story' as const,
-      hilo: Boolean(resolveQuestionId(s.questionId)),
       title: s.title ?? s.label,
       place: formatPublicPlace(s.city, s.country, locale) || undefined,
       color: '#FF4A1C',
@@ -1024,20 +938,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     onToggleSound: handleToggleSound };
 
   return (
-    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-hidden">
-      <div aria-hidden className="map-universe-fade map-universe-fade-top" />
+    <div className="relative flex min-h-[88vh] w-full flex-1 flex-col overflow-hidden bg-[#05070D]">
       {/* Globo — crece dentro del alto del padre (#mapa universo), sin forzar 72vh+ extra */}
       <div
         ref={globeContainerRef}
         className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-hidden"
-        onPointerDownCapture={() => {
-          if (!globeInViewRef.current) return;
-          if (userSilencedMapAmbientRef.current || !selectedMoodRef.current) return;
-          initFromUserGesture();
-          soundEnabledRef.current = true;
-          setSoundEnabled(true);
-          if (!hasActiveAmbientPlayback()) void startMapAmbientFromRefs();
-        }}
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
         <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
@@ -1108,6 +1013,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       {dockSlot &&
         createPortal(
           <div className="map-dock-stack">
+          <div className="map-dock-scroller">
           <div className="map-dock-row" role="toolbar" aria-label={dockCopy.dockAria}>
               <PillNavButton
                 dock
@@ -1159,23 +1065,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 {dockCopy.search}
               </PillNavButton>
           </div>
+          </div>
           <p className="map-dock-legend">
-            <span className="map-dock-legend__item">
-              <span className="map-dock-legend__dot map-dock-legend__dot--story" aria-hidden />
-              {locale === 'pt' ? 'Histórias' : locale === 'en' ? 'Stories' : 'Historias'}
+            <LeyendaMapa kind="story" text={HOME_MESSAGES[locale].leyendaHistorias} />
+            <span className="map-dock-legend__sep" aria-hidden>
+              {' · '}
             </span>
-            <span className="map-dock-legend__item">
-              <span className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
-              {HILOS_UI[locale].leyenda}
+            <LeyendaMapa kind="answer" text={HOME_MESSAGES[locale].leyendaRespuestas} />
+            <span className="map-dock-legend__sep" aria-hidden>
+              {' · '}
             </span>
-            <span className="map-dock-legend__item">
-              <span className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />
-              {locale === 'pt'
-                ? 'Também conta: curiosidades de lugares'
-                : locale === 'en'
-                  ? 'Also counts: curious facts about places'
-                  : 'También cuenta: datos curiosos de lugares'}
-            </span>
+            <LeyendaMapa kind="bit" text={HOME_MESSAGES[locale].leyendaBits} />
           </p>
           </div>,
           dockSlot
@@ -1201,7 +1101,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         </p>
       ) : null}
 
-      <MapDrawer open={drawerOpen} mode={drawerMode} onClose={close} isMobile={isMobile} fitContent={drawerMode === 'bits'}>
+      <MapDrawer open={drawerOpen} mode={drawerMode} onClose={close} isMobile={isMobile} fitContent={drawerMode === 'bits' || drawerMode === 'sounds'}>
           {drawerMode === 'stories' || drawerMode === 'search' ? (
             <StoriesPanel
               {...historiasProps}

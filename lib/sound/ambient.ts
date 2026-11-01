@@ -88,7 +88,7 @@ function ambientKeys(): AmbientKey[] {
 }
 
 function defaultTrackVolumes(): Record<AmbientKey, number> {
-  return Object.fromEntries(ambientKeys().map((k) => [k, 1])) as Record<AmbientKey, number>;
+  return Object.fromEntries(ambientKeys().map((k) => [k, 0.25])) as Record<AmbientKey, number>;
 }
 
 function readTrackVolumesFromStorage(): Partial<Record<AmbientKey, number>> {
@@ -117,11 +117,11 @@ function writeTrackVolumesToStorage(all: Record<AmbientKey, number>) {
   } catch { /* quota / private mode */ }
 }
 
-/** Volumen guardado del ambiente `key` (0–1). Por defecto 1. */
+/** Volumen guardado del ambiente `key` (0–1). Por defecto 0.25. */
 export function getAmbientTrackVolume(key: AmbientKey): number {
   const merged = { ...defaultTrackVolumes(), ...readTrackVolumesFromStorage() };
   const v = merged[key];
-  return typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 1;
+  return typeof v === "number" && Number.isFinite(v) ? Math.max(0, Math.min(1, v)) : 0.25;
 }
 
 /**
@@ -214,8 +214,13 @@ export function setAmbientOrPublicTrackVolume(id: string, vol: number): void {
 
 /** Volumen base nominal del master. */
 const AMBIENT_MASTER_VOL = 1.0;
-/** Tope audible del universo / ambiente (0–1). */
-const AMBIENT_OUTPUT_MAX = 0.15;
+/**
+ * Tope audible (0–1). Antes era 0.15: con la atmósfera de la hora
+ * el parlante siempre llegaba a ese techo. La mitad es 0.075, menor que 0.25.
+ */
+const AMBIENT_OUTPUT_MAX = 0.075;
+/** Fundido al encender, apagar o dejar la página. */
+const AMBIENT_FADE_S = 1.5;
 
 /** Volumen base actual (0–1) para la atmósfera del mapa. */
 let ambientBaseVolume = 0.1;
@@ -526,7 +531,7 @@ export async function playAmbient(key: AmbientKey, opts?: { fadeMs?: number }) {
   if (ctx.state === "suspended") return;
   if (!canFetchAmbient()) return;
   if (myGen !== ambientPlayGeneration) return;
-  const defaultFade = key === "universo" ? 2000 : 250;
+  const defaultFade = key === "universo" ? AMBIENT_FADE_S * 1000 : 250;
   const fade = (opts?.fadeMs ?? defaultFade) / 1000;
 
   let buf: AudioBuffer;
@@ -595,7 +600,7 @@ export function stopAmbient() {
     try {
       cur.gain.gain.cancelScheduledValues(t);
       cur.gain.gain.setValueAtTime(cur.gain.gain.value, t);
-      cur.gain.gain.linearRampToValueAtTime(0, t + 2);
+      cur.gain.gain.linearRampToValueAtTime(0, t + AMBIENT_FADE_S);
     } catch {
       /* noop */
     }
@@ -606,7 +611,7 @@ export function stopAmbient() {
         state.current = null;
         silenceAmbientMaster();
       }
-    }, 2000);
+    }, AMBIENT_FADE_S * 1000);
   } else {
     hardStopCurrent();
     state.current = null;
@@ -630,8 +635,15 @@ export function stopAmbient() {
 
 export function setAmbientEnabled(enabled: boolean) {
   if (!state.master || !state.ctx) return;
-  const ramp = enabled ? 0.08 : 0.15;
-  state.master.gain.setTargetAtTime(enabled ? ambientMasterTarget() : 0.0, state.ctx.currentTime, ramp);
+  const t = state.ctx.currentTime;
+  const target = enabled ? ambientMasterTarget() : 0;
+  try {
+    state.master.gain.cancelScheduledValues(t);
+    state.master.gain.setValueAtTime(state.master.gain.value, t);
+    state.master.gain.linearRampToValueAtTime(target, t + AMBIENT_FADE_S);
+  } catch {
+    state.master.gain.value = target;
+  }
 }
 
 export function duckAmbient(duck: boolean) {
