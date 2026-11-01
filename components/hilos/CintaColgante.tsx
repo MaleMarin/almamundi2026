@@ -15,7 +15,8 @@ import {
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { HILOS, preguntaAlAzar, type Hilo } from '@/lib/hilos';
+import { CortinaTemas } from '@/components/hilos/CortinaTemas';
+import { HILOS, type Hilo } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
@@ -442,37 +443,9 @@ export function FilaCintas({
 }
 
 export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
-  const router = useRouter();
-  const copy = HILOS_UI[locale];
-
-  function alAzar() {
-    const tema = preguntaAlAzar(null);
-    if (!tema) return;
-    router.push(`/preguntas?p=${encodeURIComponent(tema.id)}`);
-  }
-
   return (
-    <section className="relative z-20 mx-auto mt-10 mb-16 w-full max-w-[80rem] scroll-mt-[10.5rem] px-4 sm:px-6 md:mb-24 md:mt-14 md:scroll-mt-[13rem] lg:scroll-mt-[14.75rem]">
-      <header className="mx-auto max-w-3xl text-center">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">{copy.ceja}</p>
-        <h2 className="mx-auto mt-4 text-[length:var(--fs-titular)] font-bold leading-[1.2] whitespace-nowrap text-[#4A5568]">
-          {copy.bloqueTitulo}
-        </h2>
-        <p className="mx-auto mt-3 max-w-xl text-[length:var(--fs-texto)] leading-relaxed text-[#4A5568]">{copy.descubre}</p>
-      </header>
-      <div className="mt-10">
-        <FilaCintas locale={locale} enlazar />
-      </div>
-      <p className="mx-auto mt-4 text-center text-[13px] font-medium text-[#4A5568]">{copy.toca}</p>
-      <p className="mx-auto mt-1 text-center">
-        <button
-          type="button"
-          onClick={alAzar}
-          className={`inline-flex min-h-11 items-center text-[length:var(--fs-pequeno)] font-medium text-[#4A5568] underline decoration-[#FF4A1C]/40 underline-offset-4 hover:text-[#FF4A1C] ${FOCUS}`}
-        >
-          {copy.azar}
-        </button>
-      </p>
+    <section className="relative z-20 mb-16 w-full scroll-mt-[10.5rem] px-6 md:mb-24 md:scroll-mt-[13rem] md:px-10 lg:scroll-mt-[14.75rem]">
+      <CortinaTemas locale={locale} />
     </section>
   );
 }

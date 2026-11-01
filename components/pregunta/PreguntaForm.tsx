@@ -78,14 +78,16 @@ function uploadMedia(
 function PreguntaFormInner({
   pregunta,
   embedded = false,
+  formato = 'texto',
 }: {
   pregunta: PreguntaSemana;
   embedded?: boolean;
+  formato?: Kind;
 }) {
   const { locale, t } = useHomeLocale();
   const copy = PREGUNTA_COPY;
   const mode = 'tu' as const;
-  const [kind, setKind] = useState<Kind>('texto');
+  const [kind, setKind] = useState<Kind>(formato);
   const [text, setText] = useState('');
   const [caption, setCaption] = useState('');
   const [alias, setAlias] = useState('');
@@ -645,8 +647,14 @@ function PreguntaFormInner({
   );
 }
 
-export function PreguntaFormForQuestion({ pregunta }: { pregunta: PreguntaSemana }) {
-  return <PreguntaFormInner key={pregunta.id} pregunta={pregunta} embedded />;
+export function PreguntaFormForQuestion({
+  pregunta,
+  formato = 'texto',
+}: {
+  pregunta: PreguntaSemana;
+  formato?: Kind;
+}) {
+  return <PreguntaFormInner key={`${pregunta.id}-${formato}`} pregunta={pregunta} embedded formato={formato} />;
 }
 
 export default function PreguntaForm() {

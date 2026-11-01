@@ -26,6 +26,14 @@ type HilosCopy = {
   toca: string;
   invita: string;
   azar: string;
+  volver: string;
+  pista: string;
+  paso: string;
+  escribir: string;
+  contarVoz: string;
+  conFoto: string;
+  previa: string;
+  proxima: string;
   responde: string;
   respondes: string;
   anterior: string;
@@ -38,8 +46,8 @@ type HilosCopy = {
 export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   es: {
     ceja: 'Preguntas que despiertan historias',
-    titulo: 'Tira de una cinta',
-    bajada: 'Cada cinta guarda preguntas sobre un momento de la vida.',
+    titulo: 'Elige un tema',
+    bajada: 'y descubre las preguntas que guarda para ti.',
     tirar: 'Tira de una cinta',
     verTemas: 'Ver todos los temas',
     cuentaEn: 'Cuéntala en',
@@ -53,11 +61,19 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Elige una cinta',
     entrada: '¿Y si empiezas por una pregunta? Tira de una cinta',
     pill: '¿Y si empiezas por una pregunta? Tira de una cinta',
-    bloqueTitulo: 'Tira de una cinta',
-    descubre: 'y descubre la pregunta que guarda para ti.',
+    bloqueTitulo: 'Elige un tema',
+    descubre: 'y descubre las preguntas que guarda para ti.',
     toca: 'Toca una cinta',
     invita: 'Elige una pregunta y respóndela como quieras.',
     azar: 'o deja que el azar elija',
+    volver: '← Volver a los temas',
+    pista: 'Pasa el mouse por la cortina y toca una cinta, o elige un tema aquí:',
+    paso: 'Una pregunta a la vez. Pasa a la siguiente hasta que una te despierte algo.',
+    escribir: 'Escríbela',
+    contarVoz: 'Cuéntala con tu voz',
+    conFoto: 'Con una foto',
+    previa: 'Anterior',
+    proxima: 'Siguiente',
     responde: 'Responde aquí',
     respondes: 'Respondes a:',
     anterior: 'Cintas anteriores',
@@ -69,8 +85,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   pt: {
     ceja: 'Perguntas que despertam histórias',
-    titulo: 'Puxe uma fita',
-    bajada: 'Cada fita guarda perguntas sobre um momento da vida.',
+    titulo: 'Escolha um tema',
+    bajada: 'e descubra as perguntas que ele guarda para você.',
     tirar: 'Puxe uma fita',
     verTemas: 'Ver todos os temas',
     cuentaEn: 'Conte em',
@@ -84,11 +100,19 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Escolha uma fita',
     entrada: 'E se você começar por uma pergunta? Puxe uma fita',
     pill: 'E se você começar por uma pergunta? Puxe uma fita',
-    bloqueTitulo: 'Puxe uma fita',
-    descubre: 'e descubra a pergunta que ela guarda para você.',
+    bloqueTitulo: 'Escolha um tema',
+    descubre: 'e descubra as perguntas que ele guarda para você.',
     toca: 'Toque em uma fita',
     invita: 'Escolha uma pergunta e responda do seu jeito.',
     azar: 'ou deixe o acaso escolher',
+    volver: '← Voltar aos temas',
+    pista: 'Passe o mouse pela cortina e toque em uma fita, ou escolha um tema aqui:',
+    paso: 'Uma pergunta de cada vez. Passe para a próxima até que uma desperte algo em você.',
+    escribir: 'Escreva',
+    contarVoz: 'Conte com a sua voz',
+    conFoto: 'Com uma foto',
+    previa: 'Anterior',
+    proxima: 'Próxima',
     responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     anterior: 'Fitas anteriores',
@@ -100,8 +124,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   en: {
     ceja: 'Questions that awaken stories',
-    titulo: 'Pull a ribbon',
-    bajada: 'Each ribbon holds questions about a moment in life.',
+    titulo: 'Choose a theme',
+    bajada: 'and discover the questions it holds for you.',
     tirar: 'Pull a ribbon',
     verTemas: 'See all themes',
     cuentaEn: 'Tell it in',
@@ -115,11 +139,19 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Pick a ribbon',
     entrada: 'What if you start with a question? Pull a ribbon',
     pill: 'What if you start with a question? Pull a ribbon',
-    bloqueTitulo: 'Pull a ribbon',
-    descubre: 'and discover the question it holds for you.',
+    bloqueTitulo: 'Choose a theme',
+    descubre: 'and discover the questions it holds for you.',
     toca: 'Tap a ribbon',
     invita: 'Pick a question and answer it your way.',
     azar: 'or let chance choose',
+    volver: '← Back to the themes',
+    pista: 'Hover over the curtain and tap a ribbon, or choose a theme here:',
+    paso: 'One question at a time. Move on until one sparks something.',
+    escribir: 'Write it',
+    contarVoz: 'Tell it with your voice',
+    conFoto: 'With a photo',
+    previa: 'Previous',
+    proxima: 'Next',
     responde: 'Answer here',
     respondes: "You're answering:",
     anterior: 'Previous ribbons',

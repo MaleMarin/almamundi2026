@@ -51,7 +51,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function PreguntasPage({ searchParams }: Props) {
   const params = await searchParams;
-  const porId = preguntaHiloPorId(firstParam(params.p));
-  const tema = porId?.hiloId ?? hiloPorId(firstParam(params.tema))?.id ?? null;
-  return <PreguntasClient initialId={porId?.id ?? null} initialTema={tema} />;
+  const pedido = firstParam(params.p);
+  const porId = preguntaHiloPorId(pedido);
+  const tema =
+    porId?.hiloId ?? hiloPorId(pedido)?.id ?? hiloPorId(firstParam(params.tema))?.id ?? null;
+  const pregunta = porId && !hiloPorId(pedido) ? porId.id : null;
+  return <PreguntasClient initialId={pregunta} initialTema={tema} />;
 }

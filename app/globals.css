@@ -1365,3 +1365,362 @@ a.cinta-pill {
     transform: none !important;
   }
 }
+
+.cortina {
+  display: flex;
+  width: 100%;
+  max-width: min(100%, 1560px);
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-inline: auto;
+  padding-block: 36px 48px;
+  text-align: center;
+  color: #3c4655;
+  scroll-margin-top: 7.5rem;
+}
+
+.cortina-ceja {
+  margin: 0;
+  color: #b8340f;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cortina-titulo {
+  margin: 4px 0 0;
+  color: #3c4655;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  text-wrap: balance;
+}
+
+.cortina-sub {
+  margin: 0;
+  color: #616c7c;
+  font-size: 16px;
+}
+
+.cortina-stage {
+  position: relative;
+  width: 100%;
+  height: min(520px, 70vh);
+  min-height: 380px;
+  margin-top: 22px;
+  overflow: hidden;
+  border-radius: 6px;
+  transition: height 480ms ease;
+}
+
+.cortina-detras {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  padding: 24px clamp(16px, 4vw, 40px);
+  background: var(--cortina-fondo, #fff);
+  color: var(--cortina-texto, #fff);
+  text-align: left;
+}
+
+.cortina-cuerpo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cortina-detras h2 {
+  margin: 6px 0 0;
+  font-size: clamp(30px, 5vw, 48px);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.cortina-lead {
+  margin: 0 0 6px;
+  font-size: 16px;
+  opacity: 0.92;
+}
+
+.cortina-cabecera {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px 24px;
+  flex-wrap: wrap;
+}
+
+.cortina-cabecera h2 {
+  margin: 0;
+  font-size: clamp(26px, 3.4vw, 40px);
+  font-weight: 700;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.cortina-volver {
+  margin-left: auto;
+  padding: 0 0 1px;
+  border: 0;
+  border-bottom: 1px solid currentColor;
+  border-radius: 0;
+  background: none;
+  color: var(--cortina-texto, #fff);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.3;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.cortina-paso {
+  margin: 4px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.cortina-pregunta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px auto 0;
+  font-size: clamp(28px, 4.6vw, 48px);
+  font-weight: 500;
+  line-height: 1.2;
+  min-height: 6em;
+  touch-action: pan-y;
+}
+
+.cortina-pregunta p {
+  max-width: 22ch;
+  margin: 0;
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.2;
+  text-align: center;
+  text-wrap: balance;
+  animation: cortina-fundido 280ms ease;
+}
+
+.cortina-formatos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.cortina-formato {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--cortina-texto, #fff);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.cortina-pasador {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.cortina-flecha {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--cortina-texto, #fff);
+  cursor: pointer;
+}
+
+.cortina-puntos {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cortina-punto {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: currentColor;
+  color: var(--cortina-texto, #fff);
+  opacity: 0.4;
+  cursor: pointer;
+}
+
+.cortina-punto.ahora {
+  width: 22px;
+  opacity: 1;
+}
+
+@keyframes cortina-fundido {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cortina-qs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cortina-q,
+.cortina-q-abierta {
+  padding: 16px 18px;
+  border: 0;
+  border-radius: 14px;
+  background: #fbfaf8;
+  color: #3c4655;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.cortina-q {
+  cursor: pointer;
+}
+
+.cortina-q-abierta {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.cortina-lienzo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+
+.cortina-nombre {
+  position: absolute;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #fbfaf8;
+  color: #3c4655;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translate(-50%, -140%);
+  pointer-events: none;
+}
+
+.cortina-pista {
+  margin: 10px 0 0;
+  color: #616c7c;
+  font-size: 13px;
+}
+
+.cortina-leyenda {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+}
+
+.cortina-etiqueta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 14px;
+  border: 1px solid #e2ded8;
+  border-radius: 999px;
+  background: #fbfaf8;
+  color: #3c4655;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: normal;
+  text-align: left;
+  cursor: pointer;
+}
+
+.cortina-etiqueta i {
+  width: 12px;
+  height: 12px;
+  flex: none;
+  border-radius: 2px;
+  background: var(--cortina-fondo);
+}
+
+.cortina-etiqueta:hover,
+.cortina-etiqueta.esta {
+  border-color: var(--cortina-fondo);
+}
+
+.cortina-etiqueta:focus-visible,
+.cortina-volver:focus-visible,
+.cortina-formato:focus-visible,
+.cortina-flecha:focus-visible,
+.cortina-punto:focus-visible,
+.cortina-azar:focus-visible {
+  outline: 3px solid #b8340f;
+  outline-offset: 3px;
+}
+
+.cortina-azar {
+  margin-top: 4px;
+  padding: 2px 0;
+  border: 0;
+  border-bottom: 1px solid #b8340f;
+  background: none;
+  color: #3c4655;
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cortina-stage.abierta .cortina-lienzo,
+.cortina-stage.abierta .cortina-nombre {
+  height: min(520px, 70vh);
+  min-height: 380px;
+  bottom: auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cortina-stage {
+    transition: none;
+  }
+
+  .cortina-pregunta p {
+    animation: none;
+  }
+}
