@@ -1,8 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createPortal } from 'react-dom';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { HomeDialogFrame } from '@/components/home/HomeDialogFrame';
 import {
   propositoFor,
   type ManifiestoBlock,
@@ -298,129 +298,83 @@ export function PropositoModal({
     setActiveSectionId(DEFAULT_SECTION_ID);
   }, [isOpen]);
 
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prev;
-    };
-  }, [isOpen]);
-
-  if (!isOpen || typeof document === 'undefined') return null;
-
   const activeIndex = manifiestoSections.findIndex((s) => s.id === activeSectionId);
   const activeSection =
     manifiestoSections[activeIndex >= 0 ? activeIndex : 0] ?? manifiestoSections[0];
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[99990] flex items-end justify-center p-0 sm:items-center sm:p-4 md:p-6"
-      style={{ background: 'rgba(30, 38, 52, 0.58)', backdropFilter: 'blur(10px)' }}
-      role="presentation"
-      onClick={onClose}
+  return (
+    <HomeDialogFrame
+      isOpen={isOpen}
+      onClose={onClose}
+      labelledBy="proposito-titulo"
+      scrollKey={`${locale}:${activeSection.id}`}
+      panelClassName="md:max-w-3xl"
+      panelStyle={{ ...soft.shell, fontFamily: SITE_FONT_STACK }}
+      eyebrow={
+        <p
+          className="mb-1 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
+          style={{ color: soft.orange }}
+        >
+          {copy.brand}
+        </p>
+      }
+      title={
+        <h2
+          id="proposito-titulo"
+          className="text-[length:var(--fs-titular)] font-semibold"
+          style={{ color: soft.textMain }}
+        >
+          {copy.title}
+        </h2>
+      }
+      belowTitle={
+        <nav
+          className="mt-4 -mx-1 flex min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          aria-label="Secciones del propósito"
+          role="tablist"
+        >
+          {manifiestoSections.map((s) => {
+            const active = s.id === activeSectionId;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                role="tab"
+                aria-selected={active}
+                aria-controls={`manifiesto-panel-${s.id}`}
+                id={`manifiesto-tab-${s.id}`}
+                style={sectionChipStyle(active)}
+                className="shrink-0 whitespace-nowrap"
+                onClick={() => setActiveSectionId(s.id)}
+              >
+                {s.title}
+              </button>
+            );
+          })}
+        </nav>
+      }
     >
       <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="proposito-titulo"
-        className="flex max-h-[min(92dvh,880px)] w-full max-w-3xl flex-col overflow-hidden rounded-t-[28px] sm:max-h-[min(90dvh,900px)] sm:rounded-[32px]"
-        style={{
-          ...soft.shell,
-          fontFamily: SITE_FONT_STACK }}
-        onClick={(e) => e.stopPropagation()}
+        id={`manifiesto-panel-${activeSection.id}`}
+        role="tabpanel"
+        aria-labelledby={`manifiesto-tab-${activeSection.id}`}
       >
-        <div
-          className="shrink-0 border-b border-white/35 px-6 pb-4 pt-6 md:px-10 md:pt-8"
-          style={{ background: 'linear-gradient(180deg, #FBFAF8 0%, var(--home-bg) 100%)' }}
-        >
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <p
-                className="mb-1 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
-                style={{ color: soft.orange }}
-              >
-                {copy.brand}
-              </p>
-              <h2
-                id="proposito-titulo"
-                className="text-[length:var(--fs-titular)] font-semibold "
-                style={{ color: soft.textMain }}
-              >
-                {copy.title}
-              </h2>
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="shrink-0 rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-semibold uppercase transition active:scale-[0.97] tracking-[0.12em]"
-              style={{ ...soft.button, color: soft.textMain }}
-              aria-label={copy.closeAria}
+        <ManifiestoSectionView
+          section={activeSection}
+          index={activeIndex >= 0 ? activeIndex : 0}
+        />
+        {activeSection.id === 'cierre' ? (
+          <div className="mt-6 flex flex-col items-center gap-4">
+            {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
+            <p
+              className="text-center text-[length:var(--fs-pequeno)] leading-relaxed"
+              style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
             >
-              {copy.close}
-            </button>
+              {copy.credit}
+            </p>
           </div>
-
-          <nav
-            className="mt-4 -mx-1 flex gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            aria-label="Secciones del propósito"
-            role="tablist"
-          >
-            {manifiestoSections.map((s) => {
-              const active = s.id === activeSectionId;
-              return (
-                <button
-                  key={s.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  aria-controls={`manifiesto-panel-${s.id}`}
-                  id={`manifiesto-tab-${s.id}`}
-                  style={sectionChipStyle(active)}
-                  className="shrink-0 whitespace-nowrap"
-                  onClick={() => setActiveSectionId(s.id)}
-                >
-                  {s.title}
-                </button>
-              );
-            })}
-          </nav>
-        </div>
-
-        <div
-          id={`manifiesto-panel-${activeSection.id}`}
-          role="tabpanel"
-          aria-labelledby={`manifiesto-tab-${activeSection.id}`}
-          className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-6 py-6 md:px-10 md:py-8"
-          style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255, 74, 28,0.35) transparent' }}
-        >
-          <ManifiestoSectionView
-            section={activeSection}
-            index={activeIndex >= 0 ? activeIndex : 0}
-          />
-          {activeSection.id === 'cierre' ? (
-            <div className="mt-6 flex flex-col items-center gap-4">
-              {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
-              <p
-                className="text-center text-[length:var(--fs-pequeno)] leading-relaxed"
-                style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
-              >
-                {copy.credit}
-              </p>
-            </div>
-          ) : null}
-        </div>
+        ) : null}
       </div>
-    </div>,
-    document.body
+    </HomeDialogFrame>
   );
 }

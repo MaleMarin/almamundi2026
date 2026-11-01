@@ -4,8 +4,8 @@
  * Explicación del sitio + acceso a privacidad (copy acordado con el equipo editorial).
  */
 import Link from 'next/link';
-import { useEffect } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { HomeDialogFrame } from '@/components/home/HomeDialogFrame';
 import { COMO_FUNCIONA } from '@/lib/i18n/como-funciona';
 import { SITE_FONT_STACK } from '@/lib/typography';
 const soft = {
@@ -32,47 +32,33 @@ export function ComoFuncionaModal({
   onClose: () => void;
 }) {
   const { locale } = useHomeLocale();
-  useEffect(() => {
-    if (!isOpen) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [isOpen, onClose]);
-
-  if (!isOpen) return null;
-
   const copy = COMO_FUNCIONA[locale];
 
   return (
-    <div
-      className="fixed inset-0 z-[200] flex items-center justify-center p-4"
-      style={{ background: 'rgba(30, 35, 45, 0.55)', backdropFilter: 'blur(8px)' }}
-      role="presentation"
-      onClick={onClose}
-    >
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="como-funciona-titulo"
-        className="max-h-[min(90vh,680px)] w-full max-w-lg overflow-y-auto rounded-[28px] p-6 shadow-2xl md:p-8"
-        style={{
-          ...soft.button,
-          backgroundColor: soft.bg,
-          borderRadius: 28,
-          fontFamily: SITE_FONT_STACK }}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <HomeDialogFrame
+      isOpen={isOpen}
+      onClose={onClose}
+      labelledBy="como-funciona-titulo"
+      scrollKey={locale}
+      panelClassName="md:max-w-lg"
+      panelStyle={{
+        ...soft.button,
+        backgroundColor: soft.bg,
+        borderRadius: 28,
+        fontFamily: SITE_FONT_STACK,
+      }}
+      title={
         <h2
           id="como-funciona-titulo"
-          className="text-[length:var(--fs-subtitulo)] font-semibold "
+          className="text-[length:var(--fs-subtitulo)] font-semibold"
           style={{ color: soft.textMain }}
         >
           {copy.title}
         </h2>
+      }
+    >
         <div
-          className="mt-5 space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5 "
+          className="space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5"
           style={{ color: soft.textBody }}
         >
           <p>{copy.intro}</p>
@@ -120,7 +106,6 @@ export function ComoFuncionaModal({
             {copy.close}
           </button>
         </div>
-      </div>
-    </div>
+    </HomeDialogFrame>
   );
 }
