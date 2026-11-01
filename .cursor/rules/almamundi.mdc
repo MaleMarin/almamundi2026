@@ -12,10 +12,10 @@ alwaysApply: true
 - No reintroducir contenido falso, demos, seeds ni imágenes de picsum o pravatar.
 - Lee solo los archivos que nombra el prompt. Si falta uno, pregunta; no busques en todo el repo ni inventes rutas.
 - Cambios mínimos y reversibles, sin refactors no pedidos.
-- Sin Playwright ni capturas salvo pedido. Un solo npm run build al final. Ana verifica en el navegador.
+- Sin Playwright ni capturas salvo pedido. Ana verifica en el navegador.
 - Informe de máximo 5 líneas: qué cambió, archivos y commit.
 - El formulario de /contar empieza siempre en blanco y el recuadro de Turnstile no se muestra salvo que Cloudflare pida interacción.
-- Si el build falla, no hagas commit ni push: detente e informa.
+- Antes de cada push: borrar `.next` y correr `npm run build`. Si falla, no hay commit ni push: detente e informa.
 - Edad, género, correo y «¿Algo más…?» son internos: nunca en documentos públicos, APIs públicas ni páginas.
 - Nunca modificar el texto, título ni contenido de una historia o respuesta de una persona sin aprobación explícita de Ana.
 - No agregar botones, textos, enlaces ni funciones que Ana no haya pedido. Cada botón hace exactamente lo que dice.

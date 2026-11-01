@@ -116,7 +116,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     anterior: 'Fitas anteriores',
-    seguinte: 'Fitas seguintes',
+    siguiente: 'Fitas seguintes',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
     compartir:
       'Te mando uma pergunta do AlmaMundi: {pregunta} Eu adoraria que você me contasse: {enlace}',

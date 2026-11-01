@@ -242,12 +242,16 @@ export function CortinaTemas({
   }, []);
 
   useLayoutEffect(() => {
-    const stage = stageRef.current;
-    const canvas = canvasRef.current;
-    const detras = detrasRef.current;
-    if (!stage || !canvas || !detras) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const stageNode = stageRef.current;
+    const canvasNode = canvasRef.current;
+    const detrasNode = detrasRef.current;
+    if (!stageNode || !canvasNode || !detrasNode) return;
+    const ctxNode = canvasNode.getContext('2d');
+    if (!ctxNode) return;
+    const stage = stageNode;
+    const canvas = canvasNode;
+    const detras = detrasNode;
+    const ctx = ctxNode;
     inicioRef.current = performance.now();
     let marco = 0;
     let viva = true;
