@@ -31,13 +31,28 @@ export const PREGUNTA_COPY = {
   },
   thanksTitle: {
     es: 'Gracias, [alias]',
-    pt: 'Agradecemos sua resposta, [alias]',
+    pt: 'Obrigado, [alias]',
     en: 'Thank you, [alias]',
   },
-  thanksBody: {
-    es: 'Tu respuesta está en revisión. Te escribiremos cuando aparezca en el mapa.',
-    pt: 'Sua resposta está em revisão. Vamos te avisar quando aparecer no mapa.',
-    en: "Your answer is under review. We'll write to you when it appears on the map.",
+  thanksMail: {
+    es: 'Vamos a revisarla. Si se publica, te avisamos por correo.',
+    pt: 'Vamos revisá-la. Se for publicada, avisamos por e-mail.',
+    en: "We'll review it. If it's published, we'll let you know by email.",
+  },
+  thanksMap: {
+    es: 'Vamos a revisarla. Si se publica, aparecerá en el mapa.',
+    pt: 'Vamos revisá-la. Se for publicada, vai aparecer no mapa.',
+    en: "We'll review it. If it's published, it will appear on the map.",
+  },
+  another: {
+    es: 'Responde otra pregunta',
+    pt: 'Responda outra pergunta',
+    en: 'Answer another question',
+  },
+  sending: {
+    es: 'Enviando…',
+    pt: 'Enviando…',
+    en: 'Sending…',
   },
   share: {
     es: 'Comparte la pregunta',
@@ -45,9 +60,9 @@ export const PREGUNTA_COPY = {
     en: 'Share the question',
   },
   seeWorld: {
-    es: 'Mira cómo responde el mundo',
-    pt: 'Veja como o mundo responde',
-    en: 'See how the world answers',
+    es: 'Ver respuestas en el mapa',
+    pt: 'Ver respostas no mapa',
+    en: 'See answers on the map',
   },
   seeAll: {
     es: 'Ver todas las respuestas',
@@ -141,6 +156,16 @@ export const PREGUNTA_COPY = {
     pt: 'Não conseguimos enviar sua resposta. O que você escreveu continua aqui.',
     en: "We couldn't send your answer. What you wrote is still here.",
   },
+  errEmail: {
+    es: 'Revisa tu correo, parece incompleto.',
+    pt: 'Confira seu e-mail, parece incompleto.',
+    en: 'Check your email, it looks incomplete.',
+  },
+  errAudioType: {
+    es: 'Este formato de audio no es compatible. Prueba con .mp3, .m4a o .wav.',
+    pt: 'Este formato de áudio não é compatível. Tente .mp3, .m4a ou .wav.',
+    en: "This audio format isn't supported. Try .mp3, .m4a or .wav.",
+  },
   emailLabel: {
     es: 'Correo electrónico (opcional)',
     pt: 'E-mail (opcional)',
@@ -152,9 +177,9 @@ export const PREGUNTA_COPY = {
     en: "If you leave it, we'll let you know when your answer is on the map. We never show it.",
   },
   shareBody: {
-    es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
-    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pergunta] Eu já respondi. E você? [enlace]',
-    en: 'This week AlmaMundi is asking the world: [pregunta] I already answered. What about you? [enlace]',
+    es: 'AlmaMundi pregunta: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
+    pt: 'O AlmaMundi pergunta: [pergunta] Eu já respondi. E você? [enlace]',
+    en: 'AlmaMundi asks: [pregunta] I already answered. What about you? [enlace]',
   },
   shareInvite: {
     es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] ¿Tú qué responderías? [enlace]',
@@ -168,7 +193,7 @@ export function preguntaAlias(alias: string): string {
 }
 
 export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {
-  return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', preguntaAlias(alias));
+  return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', alias.trim());
 }
 
 function preguntaShareLine(template: string, pregunta: string, enlace: string): string {

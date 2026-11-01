@@ -687,7 +687,11 @@ export function CortinaTemas({
               </div>
             ) : null}
             {formulario ? (
-              <PreguntaFormForQuestion pregunta={formulario} formato={formato ?? 'texto'} />
+              <PreguntaFormForQuestion
+                pregunta={formulario}
+                formato={formato ?? 'texto'}
+                onAnother={cerrar}
+              />
             ) : (
               <div className="cortina-formatos">
                 <button type="button" className="cortina-formato" onClick={() => elegirFormato('texto')}>

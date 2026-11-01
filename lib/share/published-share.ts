@@ -21,6 +21,11 @@ export function publishedQuestionShareUrl(id: string): string {
   return `${ORIGIN}/pregunta/${id}`;
 }
 
+/** Enlace para compartir después de responder. */
+export function publishedQuestionPageUrl(id: string): string {
+  return `${ORIGIN}/preguntas?p=${encodeURIComponent(id)}`;
+}
+
 /** Ciudad pública, sin repetir el país si el nombre ya lo trae. */
 export function publishedStoryCity(value: string | null | undefined): string {
   const raw = (value ?? '').replace(/\s+/g, ' ').trim();

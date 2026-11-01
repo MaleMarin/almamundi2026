@@ -23,6 +23,7 @@ import {
   RESPUESTA_VOICE_MAX_BYTES,
   RESPUESTA_VOICE_MAX_SECONDS } from '@/lib/respuestas/constants';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
+import { isValidRecipientEmail } from '@/lib/email-html';
 
 type Kind = 'texto' | 'voz' | 'foto';
 
@@ -79,10 +80,12 @@ function PreguntaFormInner({
   pregunta,
   embedded = false,
   formato = 'texto',
+  onAnother,
 }: {
   pregunta: PreguntaSemana;
   embedded?: boolean;
   formato?: Kind;
+  onAnother?: () => void;
 }) {
   const { locale, t } = useHomeLocale();
   const copy = PREGUNTA_COPY;
@@ -156,8 +159,8 @@ function PreguntaFormInner({
     if (code === 'alias_required') return t.modalFieldAliasMissing;
     if (code === 'country_required') return t.modalFieldCountryMissing;
     if (code === 'city_required') return t.modalFieldCityMissing;
-    if (code === 'email_required') return t.modalFieldEmailMissing;
-    if (code === 'audio_type') return t.modalFileTypeAudio;
+    if (code === 'email_required') return copy.errEmail[locale];
+    if (code === 'audio_type') return copy.errAudioType[locale];
     return copy.errSend[locale];
   }
 
@@ -290,7 +293,7 @@ function PreguntaFormInner({
     if (alias.trim().length < 2) return setError(t.modalFieldAliasMissing);
     if (country.trim().length < 2) return setError(t.modalFieldCountryMissing);
     if (city.trim().length < 1) return setError(t.modalFieldCityMissing);
-    if (email.trim() && !email.trim().includes('@')) return setError(t.modalFieldEmailMissing);
+    if (email.trim() && !isValidRecipientEmail(email)) return setError(copy.errEmail[locale]);
     if (!adult || !publish || !terms) return setError(t.modalMarkThreeToSend);
     if (kind === 'texto' && !text.trim()) return;
     if (kind === 'texto' && text.trim().length > RESPUESTA_TEXT_MAX) return setError(copy.errText[locale]);
@@ -349,7 +352,9 @@ function PreguntaFormInner({
           <h1 className="m-0 text-[length:var(--fs-titular)] font-semibold leading-tight">
             {preguntaThanksTitle(locale, sentAlias)}
           </h1>
-          <p className="m-0 mt-3 text-[length:var(--fs-texto)] leading-relaxed">{copy.thanksBody[locale]}</p>
+          <p className="m-0 mt-3 text-[length:var(--fs-texto)] leading-relaxed">
+            {email.trim() ? copy.thanksMail[locale] : copy.thanksMap[locale]}
+          </p>
           <div className="mt-6 text-left">
             <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-[#4A5568]">{pregunta[mode][locale]}</p>
             {kind === 'texto' ? (
@@ -368,19 +373,35 @@ function PreguntaFormInner({
             ) : null}
           </div>
           <div className="mt-8 flex flex-col gap-3 md:flex-row md:justify-center">
-            <button
-              type="button"
-              className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
-              onClick={() => setShareOpen(true)}
-            >
-              {copy.share[locale]}
-            </button>
+            {onAnother ? (
+              <button
+                type="button"
+                className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+                onClick={onAnother}
+              >
+                {copy.another[locale]}
+              </button>
+            ) : (
+              <Link
+                href="/preguntas"
+                className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+              >
+                {copy.another[locale]}
+              </Link>
+            )}
             <Link
-              href="/?capa=pregunta#mapa"
+              href="/?capa=respuestas#mapa"
               className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
             >
               {copy.seeWorld[locale]}
             </Link>
+            <button
+              type="button"
+              className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+              onClick={() => setShareOpen(true)}
+            >
+              {copy.share[locale]}
+            </button>
           </div>
         </article>
         <ShareAfterNotice
@@ -407,7 +428,7 @@ function PreguntaFormInner({
   const question = pregunta[mode][locale];
 
   return (
-    <form onSubmit={(event) => void onSubmit(event)} className={embedded ? 'cortina-form mx-auto flex w-full flex-col gap-5 pt-8' : 'mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]'}>
+    <form noValidate onSubmit={(event) => void onSubmit(event)} className={embedded ? 'cortina-form mx-auto flex w-full flex-col gap-5 pt-8' : 'mx-auto flex w-full max-w-2xl flex-col gap-5 px-4 py-8 text-[#1C1C2E]'}>
       {embedded ? null : (
         <>
           <p className="m-0 text-[length:var(--fs-texto)] font-normal leading-relaxed text-[#4A5568]">{copy.intro[locale]}</p>
@@ -641,7 +662,7 @@ function PreguntaFormInner({
         </p>
       ) : null}
       <button type="submit" disabled={saving || Boolean(fileWait)} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold disabled:opacity-60">
-        {copy.submit[locale]}
+        {saving ? copy.sending[locale] : copy.submit[locale]}
       </button>
     </form>
   );
@@ -650,11 +671,21 @@ function PreguntaFormInner({
 export function PreguntaFormForQuestion({
   pregunta,
   formato = 'texto',
+  onAnother,
 }: {
   pregunta: PreguntaSemana;
   formato?: Kind;
+  onAnother?: () => void;
 }) {
-  return <PreguntaFormInner key={`${pregunta.id}-${formato}`} pregunta={pregunta} embedded formato={formato} />;
+  return (
+    <PreguntaFormInner
+      key={`${pregunta.id}-${formato}`}
+      pregunta={pregunta}
+      embedded
+      formato={formato}
+      onAnother={onAnother}
+    />
+  );
 }
 
 export default function PreguntaForm() {

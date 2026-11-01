@@ -794,10 +794,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [searchParams, respuestas, respuestasReady]);
 
   useEffect(() => {
-    if (searchParams.get('capa') !== 'pregunta' || openedCapaRef.current) return;
+    const capa = searchParams.get('capa');
+    if (openedCapaRef.current) return;
+    if (capa !== 'pregunta' && capa !== 'respuestas') return;
     openedCapaRef.current = true;
-    setGlobeLayers((prev) => ({ ...prev, news: true }));
-    setDrawerMode('news');
+    if (capa === 'respuestas') {
+      setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
+      setDrawerMode('respuestas');
+    } else {
+      setGlobeLayers((prev) => ({ ...prev, news: true }));
+      setDrawerMode('news');
+    }
     setDrawerOpen(true);
     if (!homeScrollRestored()) {
       document.getElementById('mapa')?.scrollIntoView({ behavior: 'smooth', block: 'start' });

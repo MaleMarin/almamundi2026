@@ -12,6 +12,7 @@ import { isShortCode } from '@/lib/short-code';
 import {
   publishedAnswerShortUrl,
   publishedAnswerShareText,
+  publishedQuestionPageUrl,
   publishedQuestionShareUrl,
   publishedStoryEmailSubject,
   publishedStoryShareText,
@@ -120,7 +121,10 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       return;
     }
     if (props.kind === 'question') {
-      setPacket(sharePacket(props, locale, publishedQuestionShareUrl(props.questionId)));
+      const url = props.afterAnswer
+        ? publishedQuestionPageUrl(props.questionId)
+        : publishedQuestionShareUrl(props.questionId);
+      setPacket(sharePacket(props, locale, url));
       return;
     }
     if (props.kind === 'answer' && isShortCode(props.shortCode)) {

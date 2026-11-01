@@ -139,17 +139,14 @@ export function invitationHtml(): string {
   return primaryButtonHtml("Contar otra historia", absoluteEmailUrl("/contar"));
 }
 
-export function authorEmailFooterNote(locale: AlmaLocale, kind: "historia" | "respuesta"): string {
-  if (locale === "pt") {
-    const what = kind === "respuesta" ? "uma resposta" : "uma história";
-    return `Você está recebendo este e-mail porque enviou ${what} ao AlmaMundi. O AlmaMundi é uma iniciativa da Precisar.`;
-  }
-  if (locale === "en") {
-    const what = kind === "respuesta" ? "an answer" : "a story";
-    return `You're receiving this email because you sent ${what} to AlmaMundi. AlmaMundi is an initiative of Precisar.`;
-  }
-  const what = kind === "respuesta" ? "una respuesta" : "una historia";
-  return `Recibes este correo porque enviaste ${what} a AlmaMundi. AlmaMundi es una iniciativa de Precisar.`;
+export function nonprofitFooterNote(locale: AlmaLocale): string {
+  if (locale === "pt") return "O AlmaMundi é um projeto sem fins lucrativos da Precisar.";
+  if (locale === "en") return "AlmaMundi is a nonprofit project by Precisar.";
+  return "AlmaMundi es un proyecto sin fines de lucro de Precisar.";
+}
+
+export function authorEmailFooterNote(locale: AlmaLocale, _kind: "historia" | "respuesta"): string {
+  return nonprofitFooterNote(locale);
 }
 
 function receivedFooterHtml(locale: AlmaLocale = "es"): string {
@@ -179,12 +176,7 @@ function newsletterFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
   const policy =
     locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
-  const note =
-    locale === "pt"
-      ? "Você recebeu este e-mail porque pediu a newsletter do AlmaMundi. "
-      : locale === "en"
-        ? "You received this email because you asked for the AlmaMundi newsletter. "
-        : "Recibes este correo porque pediste la newsletter de AlmaMundi. ";
+  const note = `${nonprofitFooterNote(locale)} `;
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         ${note}<a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
           style="color:${EMAIL_MUTED};text-decoration:underline;">${policy}</a>.
@@ -195,12 +187,7 @@ function accountFooterHtml(locale: AlmaLocale = "es"): string {
   const home = absoluteEmailUrl("/");
   const privacy = absoluteEmailUrl("/privacidad");
   const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
-  const note =
-    locale === "pt"
-      ? "Você recebeu este e-mail porque enviou uma história no AlmaMundi."
-      : locale === "en"
-        ? "You received this email because you sent a story on AlmaMundi."
-        : "Recibiste este correo porque enviaste una historia en AlmaMundi.";
+  const note = nonprofitFooterNote(locale);
   return `<p class="email-footer" style="margin:0 0 8px;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(home)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
           style="color:${EMAIL_MUTED};text-decoration:none;">almamundi.org</a>

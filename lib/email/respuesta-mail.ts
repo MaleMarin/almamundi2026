@@ -44,15 +44,14 @@ function quotedQuestion(question: string, html: boolean): string {
   return `«${html ? escapeHtml(text) : text}»`;
 }
 
-function receivedBody(locale: AlmaLocale, question: string, html: boolean): string {
-  const q = quotedQuestion(question, html);
+function receivedBody(locale: AlmaLocale): string {
   if (locale === "pt") {
-    return `Recebemos sua resposta à pergunta ${q}. Vamos revisá-la e escrever se ela aparecer no mapa.`;
+    return "Vamos revisá-la. Se for publicada, avisamos por e-mail.";
   }
   if (locale === "en") {
-    return `We received your answer to the question ${q}. We will review it and write to you if it appears on the map.`;
+    return "We'll review it. If it's published, we'll let you know by email.";
   }
-  return `Recibimos tu respuesta a la pregunta ${q}. La revisaremos y te escribiremos si aparece en el mapa.`;
+  return "Vamos a revisarla. Si se publica, te avisamos por correo.";
 }
 
 function publishedHello(alias: string, locale: AlmaLocale): string {
@@ -90,7 +89,7 @@ function respuestaCopy(locale: AlmaLocale) {
       receivedSubject: "Recebemos sua resposta",
       now: "O que acontece agora",
       step1: "1. Revisamos sua resposta.",
-      step2: "2. Se cumprir os termos de uso, publicamos.",
+      step2: "2. Se estiver tudo certo, publicamos.",
       step3: "3. Enviamos o link por e-mail.",
       doubts: "Tem dúvidas? Escreva para",
       thanks: "Agradecemos sua resposta.<br>Equipe AlmaMundi",
@@ -109,7 +108,7 @@ function respuestaCopy(locale: AlmaLocale) {
       receivedSubject: "We received your answer",
       now: "What happens now",
       step1: "1. We review your answer.",
-      step2: "2. If it meets the terms of use, we publish it.",
+      step2: "2. If all is well, we publish it.",
       step3: "3. We send you the link by email.",
       doubts: "Questions? Write to",
       thanks: "Thank you for answering.<br>The AlmaMundi team",
@@ -127,7 +126,7 @@ function respuestaCopy(locale: AlmaLocale) {
     receivedSubject: "Recibimos tu respuesta",
     now: "Qué pasa ahora",
     step1: "1. Revisamos tu respuesta.",
-    step2: "2. Si cumple los términos de uso, la publicamos.",
+    step2: "2. Si todo está bien, la publicamos.",
     step3: "3. Te enviamos el enlace por correo.",
     doubts: "¿Tienes dudas? Escríbenos a",
     thanks: "Gracias por responder.<br>Equipo AlmaMundi",
@@ -201,14 +200,14 @@ export async function sendRespuestaReceivedEmail(opts: {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
-  const body = receivedBody(locale, opts.question, false);
+  const body = receivedBody(locale);
   const html = emailShell({
     preheader: copy.receivedSubject,
     footer: "respuesta",
     locale,
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(receivedBody(locale, opts.question, true)),
+      paragraphHtml(receivedBody(locale)),
       paragraphHtml(copy.now, "0 0 8px"),
       paragraphHtml(copy.step1, "0 0 8px"),
       paragraphHtml(copy.step2, "0 0 8px"),
