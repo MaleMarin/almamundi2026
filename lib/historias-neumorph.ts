@@ -84,7 +84,7 @@ export const historiasInterior = {
   /**
    * Padding superior cuando el menú usa header fijo (`HistoriasInteriorSiteHeader` = misma altura que `HomeFirstPart`).
    */
-  fixedHeaderContentPadClassName: 'pt-[9.75rem] md:pt-[12.25rem] lg:pt-[13.5rem]',
+  fixedHeaderContentPadClassName: 'pt-[9.75rem] md:pt-[var(--header-h)]',
   /** main: fuerza scroll antes del footer */
   mainClassName:
     'min-h-[calc(100svh+32vh)] overflow-x-hidden flex flex-col',

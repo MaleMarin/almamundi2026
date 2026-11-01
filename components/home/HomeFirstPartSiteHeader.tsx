@@ -25,7 +25,7 @@ import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
 /** Misma franja que la home sobre fondo claro `var(--home-bg)`. */
 const HOME_HEADER_SHELL =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[12.25rem] lg:h-[13.5rem] bg-[color-mix(in_srgb,var(--home-bg)_70%,transparent)] backdrop-blur-lg border-b border-white/20 font-sans';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[var(--header-h)] bg-[color-mix(in_srgb,var(--home-bg)_70%,transparent)] backdrop-blur-lg border-b border-white/20 font-sans';
 
 /**
  * Reproductores en portal (audio z-9999, texto z-1000…): masthead por encima del contenido.
@@ -36,7 +36,7 @@ const HEADER_Z_LAYER_IMMERSIVE = 'z-[11000]';
  * Sin transparencia sobre vídeo/imagen: mismo color percibido que en la home, sin «manchar» el fondo.
  */
 const HOME_HEADER_SHELL_OVER_MEDIA =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[12.25rem] lg:h-[13.5rem] border-b border-white/35 bg-[var(--home-bg)] font-sans shadow-[0_10px_32px_rgba(0,0,0,0.16)]';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[var(--header-h)] border-b border-white/35 bg-[var(--home-bg)] font-sans shadow-[0_10px_32px_rgba(0,0,0,0.16)]';
 
 const softHeaderButton = {
   backgroundColor: '#FBFAF8',
@@ -248,7 +248,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           <img
             src="/logo.png"
             alt="AlmaMundi"
-            className="h-[8.5rem] md:h-[11rem] lg:h-[12.25rem] xl:h-[13.5rem] w-auto object-contain object-left select-none filter drop-shadow-md"
+            className="h-[8.5rem] w-auto object-contain object-left select-none filter drop-shadow-md md:h-[calc(var(--header-h)_-_16px)]"
           />
         </HomeHardLink>
       </div>

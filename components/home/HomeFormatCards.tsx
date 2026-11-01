@@ -26,9 +26,17 @@ const soft = {
 
 type HistoriasCardHoverKind = 'video' | 'audio' | 'text' | 'photo';
 
-function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
-  const wrap =
-    'pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
+function HistoriasCardHoverDecor({
+  kind,
+  enMedio = false,
+}: {
+  kind: HistoriasCardHoverKind;
+  /** El efecto llena el hueco entre el título y la frase. */
+  enMedio?: boolean;
+}) {
+  const wrap = enMedio
+    ? 'pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100'
+    : 'pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
 
   if (kind === 'video') {
     return (
@@ -96,7 +104,7 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
             key={i}
             className="home-historias-card-audio-bar w-[8px] rounded-full bg-[#FF4A1C]/70 shadow-[0_0_14px_rgba(255,74,28,0.45)]"
             style={{
-              height: h,
+              height: enMedio ? `${(h / 44) * 100}%` : h,
               animationDelay: `${i * 0.08}s` }}
           />
         ))}
@@ -107,8 +115,20 @@ function HistoriasCardHoverDecor({ kind }: { kind: HistoriasCardHoverKind }) {
   if (kind === 'text') {
     return (
       <div className={`${wrap} flex flex-col items-center justify-center gap-4 pt-[6%]`} aria-hidden>
-        <div className="relative h-11 w-[82%] max-w-[240px] rounded-md border-2 border-[#FF4A1C]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]">
-          <span className="home-historias-card-type-cursor absolute bottom-3 left-3.5 inline-block h-4 w-[3px] rounded-sm bg-[#FF4A1C] shadow-[0_0_10px_rgba(255,74,28,0.65)]" />
+        <div
+          className={
+            enMedio
+              ? 'relative min-h-0 w-[82%] max-w-[240px] flex-1 rounded-md border-2 border-[#FF4A1C]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]'
+              : 'relative h-11 w-[82%] max-w-[240px] rounded-md border-2 border-[#FF4A1C]/35 bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]'
+          }
+        >
+          <span
+            className={
+              enMedio
+                ? 'home-historias-card-type-cursor absolute bottom-[18%] left-3.5 inline-block h-[36%] w-[3px] rounded-sm bg-[#FF4A1C] shadow-[0_0_10px_rgba(255,74,28,0.65)]'
+                : 'home-historias-card-type-cursor absolute bottom-3 left-3.5 inline-block h-4 w-[3px] rounded-sm bg-[#FF4A1C] shadow-[0_0_10px_rgba(255,74,28,0.65)]'
+            }
+          />
           <span
             className="home-historias-card-type-line absolute bottom-3 left-3.5 h-[2px] rounded-full bg-gray-600/45"
             style={{ width: '48%' }}
@@ -170,7 +190,7 @@ function SoftCard({
           borderRadius: '28px',
           fontFamily: APP_FONT }}
       >
-        <HistoriasCardHoverDecor kind={hoverKind} />
+        {fillViewport ? <HistoriasCardHoverDecor kind={hoverKind} /> : null}
         <div
           className={
             fillViewport
@@ -192,11 +212,16 @@ function SoftCard({
               {subtitle}
             </h2>
           </div>
+          {fillViewport ? null : (
+            <div className="home-historias-card-efecto relative min-h-7 w-full flex-1">
+              <HistoriasCardHoverDecor kind={hoverKind} enMedio />
+            </div>
+          )}
           <div
             className={
               fillViewport
                 ? 'flex min-h-0 shrink-0 flex-col gap-3 md:gap-4'
-                : 'flex min-h-0 flex-1 flex-col justify-end gap-3 md:gap-4'
+                : 'flex shrink-0 flex-col justify-end gap-3 md:gap-4'
             }
           >
             <p className="shrink-0 overflow-y-auto pr-0.5 text-[length:var(--fs-texto)] font-normal leading-[1.6] text-gray-600 md:leading-[1.62]">

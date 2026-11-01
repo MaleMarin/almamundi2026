@@ -52,10 +52,10 @@ export function HomeFirstPart({
         onShowComoFunciona={onShowComoFunciona}
       />
 
-      <div className="lg:mt-[13.5rem]">
+      <div className="home-hero-pantalla">
       <section
         id="intro"
-        className="home-intro-avenir relative z-[20] flex shrink-0 scroll-mt-[9.75rem] flex-col items-center pb-0 pt-[calc(9.75rem+clamp(32px,5vw,64px))] text-center md:scroll-mt-[12.25rem] md:pt-[calc(12.25rem+clamp(32px,5vw,64px))] lg:min-h-0 lg:shrink-0 lg:scroll-mt-[13.5rem] lg:pt-0"
+        className="home-intro-avenir home-hero-intro relative z-[20] flex shrink-0 flex-col items-center pb-0 text-center"
       >
         <div aria-hidden className="home-hero-head-gap" />
         <CapituloHome

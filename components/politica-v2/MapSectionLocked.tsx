@@ -24,7 +24,7 @@ export function MapSectionLocked() {
       {/* Sección mapa: solo tras scroll (título fuera de la primera vista) */}
       <section
         id="mapa"
-        className="home-capitulo-bloque relative z-[15] w-full scroll-mt-[9.75rem] bg-transparent md:scroll-mt-[12.25rem] lg:scroll-mt-[13.5rem]"
+        className="home-capitulo-bloque relative z-[15] w-full scroll-mt-[9.75rem] bg-transparent md:scroll-mt-[var(--header-h)]"
       >
         <CapituloHome
           ceja={t.cejaDescubre}
