@@ -57,7 +57,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       <ActiveInternalNavLink
         href={item.href}
         className={FOOTER_GROUP_LINK}
-        activeClassName="!text-[var(--almamundi-orange)]"
+        activeClassName="almamundi-cierre-link-activo"
       >
         {item.label}
       </ActiveInternalNavLink>
@@ -91,18 +91,35 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
         </HomeHardLink>
       </div>
 
-      <nav className="mt-8 w-full max-w-4xl px-2 md:mt-10" aria-label={t.ariaMainNav}>
-        <ul className="m-0 flex list-none flex-wrap items-center justify-center p-0">
-          {rowLinks.map((item, index) => (
-            <li key={item.id} className="inline-flex items-center">
-              {index > 0 ? (
-                <span aria-hidden className="text-[length:var(--fs-pequeno)] text-[#616C7C]">
-                  {' · '}
-                </span>
-              ) : null}
-              {renderTextLink(item)}
-            </li>
-          ))}
+      <nav className="almamundi-cierre-nav" aria-label={t.ariaMainNav}>
+        <ul>
+          <li className="almamundi-cierre-linea">
+            {rowLinks.slice(0, 3).map((item, index) => (
+              <span key={item.id} className="almamundi-cierre-item">
+                {index > 0 ? (
+                  <span aria-hidden className="almamundi-cierre-sep">
+                    ·
+                  </span>
+                ) : null}
+                {renderTextLink(item)}
+              </span>
+            ))}
+          </li>
+          <li aria-hidden className="almamundi-cierre-sep almamundi-cierre-sep-puente">
+            ·
+          </li>
+          <li className="almamundi-cierre-linea">
+            {rowLinks.slice(3).map((item, index) => (
+              <span key={item.id} className="almamundi-cierre-item">
+                {index > 0 ? (
+                  <span aria-hidden className="almamundi-cierre-sep">
+                    ·
+                  </span>
+                ) : null}
+                {renderTextLink(item)}
+              </span>
+            ))}
+          </li>
         </ul>
       </nav>
 

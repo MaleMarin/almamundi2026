@@ -977,6 +977,68 @@ footer a.almamundi-footer-link:hover {
   font-weight: 500;
 }
 
+/* Menú de cierre, bajo «Cuenta tu historia». El punto no es parte del enlace. */
+.almamundi-cierre-nav {
+  margin-top: 28px;
+  width: 100%;
+  max-width: 72rem;
+  padding-inline: 8px;
+}
+.almamundi-cierre-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.almamundi-cierre-linea {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+}
+.almamundi-cierre-item {
+  display: inline-flex;
+  align-items: center;
+}
+.almamundi-cierre-sep {
+  color: #B8B2AA;
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1;
+  margin-inline: 10px;
+}
+.almamundi-cierre-nav a.almamundi-footer-link,
+.almamundi-cierre-nav a.almamundi-footer-link:visited {
+  color: #3C4655 !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+}
+.almamundi-cierre-nav a.almamundi-footer-link:hover {
+  color: var(--almamundi-orange) !important;
+}
+.almamundi-cierre-nav a.almamundi-footer-link.almamundi-cierre-link-activo,
+.almamundi-cierre-nav a.almamundi-footer-link.almamundi-cierre-link-activo:visited,
+.almamundi-cierre-nav a.almamundi-footer-link.almamundi-cierre-link-activo:hover {
+  color: #B8340F !important;
+}
+@media (max-width: 639px) {
+  .almamundi-cierre-nav ul {
+    flex-direction: column;
+    row-gap: 8px;
+  }
+  .almamundi-cierre-sep-puente {
+    display: none;
+  }
+}
+@media (min-width: 640px) {
+  .almamundi-cierre-sep {
+    margin-inline: 14px;
+  }
+}
+
 /* Modo alto contraste AlmaMundi */
 [data-high-contrast="true"] {
   --color-bg: #000000 !important;
