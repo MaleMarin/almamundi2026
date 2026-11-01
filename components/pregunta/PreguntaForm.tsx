@@ -288,7 +288,7 @@ function PreguntaFormInner({
     if (alias.trim().length < 2) return setError(t.modalFieldAliasMissing);
     if (country.trim().length < 2) return setError(t.modalFieldCountryMissing);
     if (city.trim().length < 1) return setError(t.modalFieldCityMissing);
-    if (!email.trim().includes('@')) return setError(t.modalFieldEmailMissing);
+    if (email.trim() && !email.trim().includes('@')) return setError(t.modalFieldEmailMissing);
     if (!adult || !publish || !terms) return setError(t.modalMarkThreeToSend);
     if (kind === 'texto' && !text.trim()) return;
     if (kind === 'texto' && text.trim().length > RESPUESTA_TEXT_MAX) return setError(copy.errText[locale]);
@@ -573,8 +573,9 @@ function PreguntaFormInner({
         <input value={city} onChange={(event) => setCity(event.target.value)} autoComplete="address-level2" className={fieldClass} />
       </label>
       <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
-        {t.modalEmail}
+        {copy.emailLabel[locale]}
         <input value={email} onChange={(event) => setEmail(event.target.value)} type="email" autoComplete="email" className={fieldClass} />
+        <span className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#4A5568]">{copy.emailHint[locale]}</span>
       </label>
 
       <div className="flex flex-col gap-2 text-[length:var(--fs-pequeno)]">

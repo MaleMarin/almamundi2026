@@ -217,7 +217,7 @@ export async function PATCH(
           ? await sendRespuestaPublishedEmail({
               to: email,
               alias,
-              questionId,
+              respuestaId: id,
               question: preguntaTexto(questionId, mode, locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
               locale,
             })

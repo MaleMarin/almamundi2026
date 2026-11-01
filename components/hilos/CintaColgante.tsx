@@ -10,36 +10,54 @@ import {
   useState,
   type CSSProperties,
   type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
 } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { HILOS, preguntaAlAzar, type Hilo } from '@/lib/hilos';
-import { HILOS_UI, tituloHiloPartes } from '@/lib/i18n/hilos-messages';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
 
-const ALTOS = [214, 252, 228, 276, 206, 264, 198, 248, 220, 268, 210, 240];
+const ALTOS = [232, 246, 236, 250, 228, 244, 230, 242, 234, 248, 226, 240];
 
 const RITMO = [
-  { periodo: 3.3, freq: 0.42, fase: 0.4, brisa: 4.6, rafaga: 13 },
-  { periodo: 4.2, freq: 0.5, fase: 1.8, brisa: 3.8, rafaga: 15 },
-  { periodo: 2.9, freq: 0.36, fase: 2.6, brisa: 5.2, rafaga: 12 },
-  { periodo: 3.8, freq: 0.55, fase: 0.9, brisa: 4.2, rafaga: 14 },
-  { periodo: 4.6, freq: 0.33, fase: 3.4, brisa: 3.6, rafaga: 16 },
-  { periodo: 3.1, freq: 0.48, fase: 1.2, brisa: 5.0, rafaga: 13 },
-  { periodo: 4.0, freq: 0.4, fase: 4.1, brisa: 4.0, rafaga: 15 },
-  { periodo: 2.7, freq: 0.58, fase: 2.1, brisa: 5.4, rafaga: 12 },
-  { periodo: 3.6, freq: 0.37, fase: 5.0, brisa: 4.4, rafaga: 14 },
-  { periodo: 4.4, freq: 0.46, fase: 0.2, brisa: 3.7, rafaga: 16 },
-  { periodo: 3.0, freq: 0.52, fase: 2.9, brisa: 4.8, rafaga: 13 },
-  { periodo: 3.9, freq: 0.34, fase: 1.5, brisa: 4.1, rafaga: 15 },
+  { periodo: 6.4, fase: 0.4 },
+  { periodo: 7.6, fase: 1.8 },
+  { periodo: 5.8, fase: 2.6 },
+  { periodo: 7.1, fase: 0.9 },
+  { periodo: 8.2, fase: 3.4 },
+  { periodo: 6.1, fase: 1.2 },
+  { periodo: 7.4, fase: 4.1 },
+  { periodo: 5.5, fase: 2.1 },
+  { periodo: 6.8, fase: 5.0 },
+  { periodo: 8.0, fase: 0.2 },
+  { periodo: 5.9, fase: 2.9 },
+  { periodo: 7.3, fase: 1.5 },
 ] as const;
 
-const TIRON_MS = 420;
+const ESTIRA_MS = 500;
 
-type Dibujo = (now: number, rafagaEn: number) => void;
+type Dibujo = (now: number) => void;
+
+function estira(t: number): number {
+  const cae = Math.exp(-3.4 * t);
+  return 1 + 0.2 * Math.sin(t * Math.PI) + 0.07 * Math.sin(t * Math.PI * 2.15) * cae;
+}
+
+function pose(now: number, index: number, escala: number) {
+  const ritmo = RITMO[index % RITMO.length] ?? RITMO[0];
+  const t = now / 1000;
+  const omega = (Math.PI * 2) / ritmo.periodo;
+  const brisa = Math.sin(t * omega + ritmo.fase);
+  const onda = Math.sin(t * omega * 0.7 + ritmo.fase + 0.8);
+  const rot = brisa * 2.6;
+  const skew = onda * 1.15;
+  return `scaleY(${escala.toFixed(3)}) rotate(${rot.toFixed(2)}deg) skewX(${skew.toFixed(2)}deg)`;
+}
 
 type Viento = {
   registrar: (dibujo: Dibujo) => () => void;
@@ -52,75 +70,41 @@ function sinMovimiento(): boolean {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 }
 
-function pintarCinta(
-  canvas: HTMLCanvasElement,
-  img: HTMLImageElement,
-  now: number,
-  rafagaEn: number,
-  index: number
-) {
-  const ritmo = RITMO[index % RITMO.length] ?? RITMO[0];
-  const rect = canvas.getBoundingClientRect();
-  if (rect.width < 2 || rect.height < 2) return;
-  const pequeno = rect.width < 90;
-  const tope = pequeno ? 150 : 170;
-  const dpr = Math.min(window.devicePixelRatio || 1, pequeno ? 1.25 : 1.35, tope / rect.height);
-  const w = Math.max(1, Math.round(rect.width * dpr));
-  const h = Math.max(1, Math.round(rect.height * dpr));
-  if (canvas.width !== w || canvas.height !== h) {
-    canvas.width = w;
-    canvas.height = h;
-  }
-  const ctx = canvas.getContext('2d');
-  if (!ctx) return;
-  ctx.clearRect(0, 0, w, h);
-  ctx.imageSmoothingEnabled = true;
-  const pad = Math.min(8 * dpr, w * 0.14);
-  const drawW = w - pad * 2;
-  const t = now / 1000;
-  const local = now - rafagaEn - index * 120;
-  const gust = local > 0 && local < 1700 ? Math.sin((local / 1700) * Math.PI) : 0;
-  const omega = (Math.PI * 2) / ritmo.periodo;
-  const step = 1;
-  for (let y = 0; y < h; y += step) {
-    const fall = (y / (h - 1)) ** 1.7;
-    const onda = (y / h) * 8;
-    const brisa = Math.sin(t * omega + onda + ritmo.fase) * ritmo.brisa * dpr * fall;
-    const ola = Math.sin(t * 2.4 + onda * 1.2 + ritmo.fase) * ritmo.rafaga * dpr * fall * gust;
-    const sy = (y / (h - 1)) * (img.naturalHeight - 1);
-    ctx.drawImage(img, 0, sy, img.naturalWidth, 1, pad + brisa + ola, y, drawW, 1);
-  }
-}
-
 export function hrefTema(id: string): string {
   return `/preguntas?tema=${encodeURIComponent(id)}`;
 }
 
 export function CintaTema({
+  id,
   index,
   nombre,
   imagen,
   aspecto,
   href,
   selected = false,
+  atenuada = false,
   onPick,
 }: {
+  id: string;
   index: number;
   nombre: string;
   imagen: string;
   aspecto: number;
   href?: string;
   selected?: boolean;
+  atenuada?: boolean;
   onPick?: () => void;
 }) {
   const router = useRouter();
   const viento = useContext(VientoCtx);
   const imgRef = useRef<HTMLImageElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [tirando, setTirando] = useState(false);
+  const escalaRef = useRef(1);
+  const animando = useRef(false);
+  const trago = useRef(false);
+  const puntero = useRef<{ id: number; x: number; y: number; arrastre: boolean } | null>(null);
   const [mueve, setMueve] = useState(false);
-  const alto = ALTOS[index] ?? 220;
-  const ancho = Math.round(alto * aspecto) + 16;
+  const alto = ALTOS[index] ?? 232;
+  const ancho = Math.round(alto * aspecto);
   const animar = mueve && Boolean(viento?.viva);
 
   useEffect(() => {
@@ -133,20 +117,86 @@ export function CintaTema({
 
   useEffect(() => {
     if (!animar || !viento) return;
-    const canvas = canvasRef.current;
-    const img = imgRef.current;
-    if (!canvas || !img) return;
-    const draw: Dibujo = (now, rafagaEn) => {
-      if (!img.complete || !img.naturalWidth) return;
-      pintarCinta(canvas, img, now, rafagaEn, index);
+    const draw: Dibujo = (now) => {
+      const el = imgRef.current;
+      if (!el) return;
+      el.style.transform = pose(now, index, escalaRef.current);
     };
-    draw(performance.now(), -1e12);
-    return viento.registrar(draw);
+    const stop = viento.registrar(draw);
+    return () => {
+      stop();
+      if (imgRef.current) imgRef.current.style.transform = '';
+    };
   }, [animar, index, viento]);
 
+  function pintar(now = performance.now()) {
+    const el = imgRef.current;
+    if (!el) return;
+    el.style.transform = pose(now, index, escalaRef.current);
+  }
+
   function ir() {
+    escalaRef.current = 1;
     if (href) router.push(href);
     else onPick?.();
+  }
+
+  function jugarEstiron() {
+    if (animando.current) return;
+    animando.current = true;
+    const inicio = performance.now();
+    const paso = (now: number) => {
+      const t = Math.min(1, (now - inicio) / ESTIRA_MS);
+      escalaRef.current = estira(t);
+      pintar(now);
+      if (t < 1) {
+        requestAnimationFrame(paso);
+        return;
+      }
+      animando.current = false;
+      escalaRef.current = 1;
+      ir();
+    };
+    requestAnimationFrame(paso);
+  }
+
+  function alBajar(event: ReactPointerEvent<HTMLAnchorElement | HTMLButtonElement>) {
+    if (event.button !== 0) return;
+    trago.current = false;
+    puntero.current = { id: event.pointerId, x: event.clientX, y: event.clientY, arrastre: false };
+  }
+
+  function alMover(event: ReactPointerEvent<HTMLAnchorElement | HTMLButtonElement>) {
+    const p = puntero.current;
+    if (!p || p.id !== event.pointerId || animando.current) return;
+    const dx = event.clientX - p.x;
+    const dy = event.clientY - p.y;
+    if (!p.arrastre) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+        puntero.current = null;
+        trago.current = true;
+        return;
+      }
+      if (dy > 8 && dy > Math.abs(dx)) {
+        p.arrastre = true;
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+    }
+    if (!p.arrastre) return;
+    escalaRef.current = 1 + Math.min(dy, 96) / 320;
+    pintar();
+  }
+
+  function alSoltar(event: ReactPointerEvent<HTMLAnchorElement | HTMLButtonElement>) {
+    const p = puntero.current;
+    puntero.current = null;
+    if (!p || p.id !== event.pointerId) return;
+    if (!p.arrastre) return;
+    trago.current = true;
+    const dy = event.clientY - p.y;
+    escalaRef.current = 1;
+    pintar();
+    if (dy > 36) ir();
   }
 
   function activar(event: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) {
@@ -156,29 +206,28 @@ export function CintaTema({
       return;
     }
     event.preventDefault();
-    if (tirando) return;
-    setTirando(true);
-    window.setTimeout(ir, TIRON_MS);
+    if (trago.current) {
+      trago.current = false;
+      return;
+    }
+    jugarEstiron();
   }
 
-  const className = `flex w-[6.4rem] shrink-0 flex-col items-center border-0 bg-transparent px-0.5 pt-0 text-center no-underline md:w-[7.6rem] ${FOCUS}`;
+  const className = `cinta-tema flex w-[6.2rem] shrink-0 flex-col items-center border-0 bg-transparent px-1 pt-0 text-center no-underline transition-opacity duration-200 md:w-[6.4rem] ${atenuada ? 'opacity-50' : 'opacity-100'}`;
   const cuerpo = (
     <>
-      <span className={`cinta-tela-eje${tirando ? ' is-tiron' : ''}`}>
-        <span
-          className="cinta-tela-caja"
-          style={{ '--cinta-alto': `${alto}px`, '--cinta-ancho': `${ancho}px` } as CSSProperties}
-        >
-          <img
-            ref={imgRef}
-            src={imagen}
-            alt=""
-            draggable={false}
-            decoding="async"
-            className={animar ? 'cinta-tela-img is-oculta' : 'cinta-tela-img'}
-          />
-          {animar ? <canvas ref={canvasRef} className="cinta-tela-lienzo" aria-hidden /> : null}
-        </span>
+      <span
+        className="cinta-tela-caja"
+        style={{ '--cinta-ancho': `${ancho}px` } as CSSProperties}
+      >
+        <img
+          ref={imgRef}
+          src={imagen}
+          alt=""
+          draggable={false}
+          decoding="async"
+          className="cinta-tela-img"
+        />
       </span>
       <span className="mt-2 text-[12px] font-semibold leading-tight text-[#4A5568] md:text-[13px]">{nombre}</span>
     </>
@@ -186,14 +235,34 @@ export function CintaTema({
 
   if (href) {
     return (
-      <Link href={href} className={className} onClick={activar} aria-current={selected ? 'true' : undefined}>
+      <Link
+        href={href}
+        data-hilo={id}
+        className={className}
+        onPointerDown={alBajar}
+        onPointerMove={alMover}
+        onPointerUp={alSoltar}
+        onPointerCancel={alSoltar}
+        onClick={activar}
+        aria-current={selected ? 'true' : undefined}
+      >
         {cuerpo}
       </Link>
     );
   }
 
   return (
-    <button type="button" className={className} onClick={activar} aria-pressed={selected}>
+    <button
+      type="button"
+      data-hilo={id}
+      className={className}
+      onPointerDown={alBajar}
+      onPointerMove={alMover}
+      onPointerUp={alSoltar}
+      onPointerCancel={alSoltar}
+      onClick={activar}
+      aria-pressed={selected}
+    >
       {cuerpo}
     </button>
   );
@@ -213,6 +282,9 @@ export function FilaCintas({
   const filaRef = useRef<HTMLDivElement>(null);
   const dibujos = useRef<Set<Dibujo>>(new Set());
   const [viva, setViva] = useState(false);
+  const [enInicio, setEnInicio] = useState(true);
+  const [enFin, setEnFin] = useState(false);
+  const copy = HILOS_UI[locale];
   const registrar = useCallback((dibujo: Dibujo) => {
     dibujos.current.add(dibujo);
     return () => {
@@ -228,8 +300,6 @@ export function FilaCintas({
     let raf = 0;
     let running = false;
     let visible = false;
-    let rafagaEn = -1e12;
-    let proxima = 0;
     let ultimo = 0;
 
     const parar = () => {
@@ -241,16 +311,11 @@ export function FilaCintas({
       raf = requestAnimationFrame(tick);
       if (now - ultimo < 34) return;
       ultimo = now;
-      if (now >= proxima) {
-        rafagaEn = now;
-        proxima = now + 6800 + Math.random() * 8400;
-      }
-      dibujos.current.forEach((dibujo) => dibujo(now, rafagaEn));
+      dibujos.current.forEach((dibujo) => dibujo(now));
     };
     const seguir = () => {
       if (running || reduce.matches || !visible || document.hidden) return;
       running = true;
-      if (!proxima) proxima = performance.now() + 1600 + Math.random() * 2200;
       raf = requestAnimationFrame(tick);
     };
     const io = new IntersectionObserver(
@@ -281,26 +346,96 @@ export function FilaCintas({
     };
   }, []);
 
+  useEffect(() => {
+    const node = filaRef.current;
+    if (!node) return;
+    const medir = () => {
+      const max = node.scrollWidth - node.clientWidth;
+      setEnInicio(node.scrollLeft <= 1);
+      setEnFin(max <= 1 || node.scrollLeft >= max - 1);
+    };
+    medir();
+    node.addEventListener('scroll', medir, { passive: true });
+    const ro = new ResizeObserver(medir);
+    ro.observe(node);
+    return () => {
+      node.removeEventListener('scroll', medir);
+      ro.disconnect();
+    };
+  }, []);
+
+  useEffect(() => {
+    const fila = filaRef.current;
+    if (!fila || !selectedId) return;
+    const el = fila.querySelector<HTMLElement>(`[data-hilo="${selectedId}"]`);
+    if (!el) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const filaRect = fila.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const left = elRect.left - filaRect.left + fila.scrollLeft - (fila.clientWidth - elRect.width) / 2;
+    fila.scrollTo({ left: Math.max(0, left), behavior: reduce ? 'auto' : 'smooth' });
+  }, [selectedId]);
+
+  function mover(direccion: -1 | 1) {
+    const node = filaRef.current;
+    if (!node) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    node.scrollBy({
+      left: direccion * Math.max(160, node.clientWidth * 0.72),
+      behavior: reduce ? 'auto' : 'smooth',
+    });
+  }
+
   return (
     <VientoCtx.Provider value={viento}>
-      <div ref={filaRef} className="overflow-x-auto pb-8" style={{ WebkitOverflowScrolling: 'touch' }}>
-        <div className="w-max min-w-full px-1">
-          <div className="h-[3px] rounded-full bg-[#B8C0CC]" />
-          <div className="flex items-start justify-between gap-2 md:gap-3">
-            {HILOS.map((item, index) => (
-              <CintaTema
-                key={item.id}
-                index={index}
-                nombre={item.nombre[locale]}
-                imagen={item.imagen}
-                aspecto={item.aspecto}
-                href={enlazar ? hrefTema(item.id) : undefined}
-                selected={selectedId === item.id}
-                onPick={onPick ? () => onPick(item) : undefined}
+      <div className="cinta-marco">
+        <button
+          type="button"
+          className={`cinta-flecha ${FOCUS}`}
+          aria-label={copy.anterior}
+          disabled={enInicio}
+          onClick={() => mover(-1)}
+        >
+          <ChevronLeft size={20} aria-hidden />
+        </button>
+        <div className="cinta-ventana">
+          {enInicio ? null : <div className="cinta-fade cinta-fade-izq" aria-hidden />}
+          {enFin ? null : <div className="cinta-fade cinta-fade-der" aria-hidden />}
+          <div ref={filaRef} className="cinta-fila" style={{ WebkitOverflowScrolling: 'touch' }}>
+            <div className="cinta-carril w-max">
+              <div
+                className="cinta-vidrio"
+                style={{ backdropFilter: 'blur(14px)', WebkitBackdropFilter: 'blur(14px)' }}
+                aria-hidden
               />
-            ))}
+              <div className="flex items-start gap-3 md:gap-4">
+                {HILOS.map((item, index) => (
+                  <CintaTema
+                    key={item.id}
+                    id={item.id}
+                    index={index}
+                    nombre={item.nombre[locale]}
+                    imagen={item.imagen}
+                    aspecto={item.aspecto}
+                    href={enlazar ? hrefTema(item.id) : undefined}
+                    selected={selectedId === item.id}
+                    atenuada={selectedId != null && selectedId !== item.id}
+                    onPick={onPick ? () => onPick(item) : undefined}
+                  />
+                ))}
+              </div>
+            </div>
           </div>
         </div>
+        <button
+          type="button"
+          className={`cinta-flecha ${FOCUS}`}
+          aria-label={copy.siguiente}
+          disabled={enFin}
+          onClick={() => mover(1)}
+        >
+          <ChevronRight size={20} aria-hidden />
+        </button>
       </div>
     </VientoCtx.Provider>
   );
@@ -309,7 +444,6 @@ export function FilaCintas({
 export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
   const router = useRouter();
   const copy = HILOS_UI[locale];
-  const titulo = tituloHiloPartes(copy.bloqueTitulo);
 
   function alAzar() {
     const tema = preguntaAlAzar(null);
@@ -321,14 +455,16 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
     <section className="relative z-20 mx-auto mt-10 mb-16 w-full max-w-[80rem] scroll-mt-[10.5rem] px-4 sm:px-6 md:mb-24 md:mt-14 md:scroll-mt-[13rem] lg:scroll-mt-[14.75rem]">
       <header className="mx-auto max-w-3xl text-center">
         <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-[#FF4A1C]">{copy.ceja}</p>
-        <h2 className="mx-auto mt-4 max-w-[22ch] text-[length:var(--fs-titular)] font-normal leading-[1.2] text-[#4A5568] md:max-w-none">
-          {titulo.antes} <strong className="font-bold">{titulo.cierre}</strong>
+        <h2 className="mx-auto mt-4 text-[length:var(--fs-titular)] font-bold leading-[1.2] whitespace-nowrap text-[#4A5568]">
+          {copy.bloqueTitulo}
         </h2>
+        <p className="mx-auto mt-3 max-w-xl text-[length:var(--fs-texto)] leading-relaxed text-[#4A5568]">{copy.descubre}</p>
       </header>
       <div className="mt-10">
         <FilaCintas locale={locale} enlazar />
       </div>
-      <p className="mx-auto mt-6 text-center">
+      <p className="mx-auto mt-4 text-center text-[13px] font-medium text-[#4A5568]">{copy.toca}</p>
+      <p className="mx-auto mt-1 text-center">
         <button
           type="button"
           onClick={alAzar}

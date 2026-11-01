@@ -22,9 +22,14 @@ type HilosCopy = {
   /** Píldora bajo las tarjetas de la home, y título de /preguntas. */
   pill: string;
   bloqueTitulo: string;
+  descubre: string;
+  toca: string;
+  invita: string;
   azar: string;
   responde: string;
   respondes: string;
+  anterior: string;
+  siguiente: string;
   formatos: Formatos;
   compartir: string;
   asunto: string;
@@ -33,9 +38,8 @@ type HilosCopy = {
 export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   es: {
     ceja: 'Preguntas que despiertan historias',
-    titulo: '¿Y si empiezas por una pregunta? Tira de una cinta',
-    bajada:
-      'Cada cinta guarda preguntas sobre un pedazo de la vida. Elige una, o deja que el azar elija por ti.',
+    titulo: 'Tira de una cinta',
+    bajada: 'Cada cinta guarda preguntas sobre un momento de la vida.',
     tirar: 'Tira de una cinta',
     verTemas: 'Ver todos los temas',
     cuentaEn: 'Cuéntala en',
@@ -49,10 +53,15 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Elige una cinta',
     entrada: '¿Y si empiezas por una pregunta? Tira de una cinta',
     pill: '¿Y si empiezas por una pregunta? Tira de una cinta',
-    bloqueTitulo: '¿Y si empiezas por una pregunta? Tira de una cinta.',
+    bloqueTitulo: 'Tira de una cinta',
+    descubre: 'y descubre la pregunta que guarda para ti.',
+    toca: 'Toca una cinta',
+    invita: 'Elige una pregunta y respóndela como quieras.',
     azar: 'o deja que el azar elija',
     responde: 'Responde aquí',
     respondes: 'Respondes a:',
+    anterior: 'Cintas anteriores',
+    siguiente: 'Cintas siguientes',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' },
     compartir:
       'Te mando una pregunta de AlmaMundi: {pregunta} Me encantaría que me la contaras: {enlace}',
@@ -60,9 +69,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   pt: {
     ceja: 'Perguntas que despertam histórias',
-    titulo: 'E se você começar por uma pergunta? Puxe uma fita',
-    bajada:
-      'Cada fita guarda perguntas sobre um pedaço da vida. Escolha uma, ou deixe o acaso escolher por você.',
+    titulo: 'Puxe uma fita',
+    bajada: 'Cada fita guarda perguntas sobre um momento da vida.',
     tirar: 'Puxe uma fita',
     verTemas: 'Ver todos os temas',
     cuentaEn: 'Conte em',
@@ -76,10 +84,15 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Escolha uma fita',
     entrada: 'E se você começar por uma pergunta? Puxe uma fita',
     pill: 'E se você começar por uma pergunta? Puxe uma fita',
-    bloqueTitulo: 'E se você começar por uma pergunta? Puxe uma fita.',
+    bloqueTitulo: 'Puxe uma fita',
+    descubre: 'e descubra a pergunta que ela guarda para você.',
+    toca: 'Toque em uma fita',
+    invita: 'Escolha uma pergunta e responda do seu jeito.',
     azar: 'ou deixe o acaso escolher',
     responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
+    anterior: 'Fitas anteriores',
+    seguinte: 'Fitas seguintes',
     formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' },
     compartir:
       'Te mando uma pergunta do AlmaMundi: {pregunta} Eu adoraria que você me contasse: {enlace}',
@@ -87,9 +100,8 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   },
   en: {
     ceja: 'Questions that awaken stories',
-    titulo: 'What if you start with a question? Pull a ribbon',
-    bajada:
-      'Each ribbon holds questions about a piece of life. Pick one, or let chance pick for you.',
+    titulo: 'Pull a ribbon',
+    bajada: 'Each ribbon holds questions about a moment in life.',
     tirar: 'Pull a ribbon',
     verTemas: 'See all themes',
     cuentaEn: 'Tell it in',
@@ -103,10 +115,15 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     elige: 'Pick a ribbon',
     entrada: 'What if you start with a question? Pull a ribbon',
     pill: 'What if you start with a question? Pull a ribbon',
-    bloqueTitulo: 'What if you start with a question? Pull a ribbon.',
+    bloqueTitulo: 'Pull a ribbon',
+    descubre: 'and discover the question it holds for you.',
+    toca: 'Tap a ribbon',
+    invita: 'Pick a question and answer it your way.',
     azar: 'or let chance choose',
     responde: 'Answer here',
     respondes: "You're answering:",
+    anterior: 'Previous ribbons',
+    siguiente: 'Next ribbons',
     formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' },
     compartir:
       "Here's a question from AlmaMundi: {pregunta} I'd love for you to tell me: {enlace}",

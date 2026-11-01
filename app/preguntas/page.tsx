@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import { PreguntasClient } from '@/components/hilos/PreguntasClient';
-import { preguntaDeTema, preguntaHiloPorId } from '@/lib/hilos';
+import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { PUBLIC_OG_LOCALE } from '@/lib/i18n/public-meta';
@@ -52,6 +52,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PreguntasPage({ searchParams }: Props) {
   const params = await searchParams;
   const porId = preguntaHiloPorId(firstParam(params.p));
-  const inicial = porId?.id ?? preguntaDeTema(firstParam(params.tema))?.id ?? null;
-  return <PreguntasClient initialId={inicial} />;
+  const tema = porId?.hiloId ?? hiloPorId(firstParam(params.tema))?.id ?? null;
+  return <PreguntasClient initialId={porId?.id ?? null} initialTema={tema} />;
 }

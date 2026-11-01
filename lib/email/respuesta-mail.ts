@@ -19,8 +19,6 @@ import {
 } from "@/lib/email/almamundi-email-layout";
 import { capitalizeAlias } from "@/lib/email/received-email-template";
 import type { AlmaLocale } from "@/lib/i18n/locale";
-import { getResend } from "@/lib/emailSubmission";
-import { noteEmailSent } from "@/lib/ops/usage-state";
 
 export type RespuestaMailResult = { ok: true } | { ok: false };
 
@@ -57,15 +55,22 @@ function receivedBody(locale: AlmaLocale, question: string, html: boolean): stri
   return `Recibimos tu respuesta a la pregunta ${q}. La revisaremos y te escribiremos si aparece en el mapa.`;
 }
 
+function publishedHello(alias: string, locale: AlmaLocale): string {
+  const name = capitalizeAlias(alias);
+  if (locale === "pt") return name ? `Olá, ${name}:` : "Olá:";
+  if (locale === "en") return name ? `Hi, ${name}:` : "Hi:";
+  return name ? `Hola, ${name}:` : "Hola:";
+}
+
 function publishedBody(locale: AlmaLocale, question: string, html: boolean): string {
   const q = quotedQuestion(question, html);
   if (locale === "pt") {
-    return `Sua resposta à pergunta ${q} já está publicada. Qualquer pessoa pode vê-la junto com as outras respostas desta pergunta.`;
+    return `Sua resposta à pergunta ${q} já está publicada no mapa do AlmaMundi. Pode ser vista de qualquer lugar do mundo, junto com as outras respostas a essa pergunta.`;
   }
   if (locale === "en") {
-    return `Your answer to the question ${q} is now published. Anyone can see it alongside the other answers to this question.`;
+    return `Your answer to the question ${q} is now published on the AlmaMundi map. It can be seen from anywhere in the world, alongside the other answers to that question.`;
   }
-  return `Tu respuesta a la pregunta ${q} ya está publicada. Cualquier persona puede verla junto a las demás respuestas de esta pregunta.`;
+  return `Tu respuesta a la pregunta ${q} ya está publicada en el mapa de AlmaMundi. Puede verse desde cualquier parte del mundo, junto a las demás respuestas de esa pregunta.`;
 }
 
 function rejectedBody(locale: AlmaLocale, question: string, html: boolean): string {
@@ -92,7 +97,8 @@ function respuestaCopy(locale: AlmaLocale) {
       thanksText: "Agradecemos sua resposta.",
       team: "Equipe AlmaMundi",
       publishedSubject: "Sua resposta já está no AlmaMundi",
-      see: "Ver a pergunta",
+      see: "Ver minha resposta",
+      another: "Responder outra pergunta",
       rejectedSubject: "Sobre sua resposta no AlmaMundi",
       reason: "Motivo",
       again: "Responder de novo",
@@ -110,7 +116,8 @@ function respuestaCopy(locale: AlmaLocale) {
       thanksText: "Thank you for answering.",
       team: "The AlmaMundi team",
       publishedSubject: "Your answer is now on AlmaMundi",
-      see: "See the question",
+      see: "See my answer",
+      another: "Answer another question",
       rejectedSubject: "About your answer on AlmaMundi",
       reason: "Reason",
       again: "Answer again",
@@ -127,7 +134,8 @@ function respuestaCopy(locale: AlmaLocale) {
     thanksText: "Gracias por responder.",
     team: "Equipo AlmaMundi",
     publishedSubject: "Tu respuesta ya está en AlmaMundi",
-    see: "Ver la pregunta",
+    see: "Ver mi respuesta",
+    another: "Responder otra pregunta",
     rejectedSubject: "Sobre tu respuesta en AlmaMundi",
     reason: "Motivo",
     again: "Responder de nuevo",
@@ -159,6 +167,7 @@ async function deliver(opts: {
   text: string;
 }): Promise<RespuestaMailResult> {
   if (!isValidRecipientEmail(opts.to)) return { ok: false };
+  const { getResend } = await import("@/lib/emailSubmission");
   const resend = getResend();
   if (!resend) return { ok: false };
   try {
@@ -174,6 +183,7 @@ async function deliver(opts: {
       console.error("[respuesta-mail] Resend no aceptó el correo");
       return { ok: false };
     }
+    const { noteEmailSent } = await import("@/lib/ops/usage-state");
     await noteEmailSent();
     return { ok: true };
   } catch {
@@ -232,18 +242,18 @@ export async function sendRespuestaReceivedEmail(opts: {
   });
 }
 
-export async function sendRespuestaPublishedEmail(opts: {
-  to: string;
+export function buildRespuestaPublishedEmail(opts: {
   alias: string;
-  questionId: string;
+  respuestaId: string;
   question: string;
   locale?: AlmaLocale;
-}): Promise<RespuestaMailResult> {
+}): { subject: string; html: string; text: string } {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
-  const greeting = hello(opts.alias, locale);
+  const greeting = publishedHello(opts.alias, locale);
   const body = publishedBody(locale, opts.question, false);
-  const url = absoluteEmailUrl(`/preguntas?p=${encodeURIComponent(opts.questionId)}`);
+  const mapUrl = absoluteEmailUrl(`/?respuesta=${encodeURIComponent(opts.respuestaId)}`);
+  const againUrl = absoluteEmailUrl("/preguntas");
   const html = emailShell({
     preheader: copy.publishedSubject,
     footer: "respuesta",
@@ -251,8 +261,8 @@ export async function sendRespuestaPublishedEmail(opts: {
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(publishedBody(locale, opts.question, true)),
-      primaryButtonHtml(copy.see, url),
-      paragraphHtml(copy.thanks, "0"),
+      primaryButtonHtml(copy.see, mapUrl),
+      primaryButtonHtml(copy.another, againUrl),
     ].join(""),
   });
   const text = [
@@ -260,18 +270,27 @@ export async function sendRespuestaPublishedEmail(opts: {
     "",
     body,
     "",
-    `${copy.see}: ${url}`,
-    "",
-    copy.thanksText,
-    copy.team,
+    `${copy.see}: ${mapUrl}`,
+    `${copy.another}: ${againUrl}`,
     "",
     authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");
+  return { subject: copy.publishedSubject, html, text };
+}
+
+export async function sendRespuestaPublishedEmail(opts: {
+  to: string;
+  alias: string;
+  respuestaId: string;
+  question: string;
+  locale?: AlmaLocale;
+}): Promise<RespuestaMailResult> {
+  const mail = buildRespuestaPublishedEmail(opts);
   return deliver({
     to: opts.to,
-    subject: copy.publishedSubject,
-    html,
-    text,
+    subject: mail.subject,
+    html: mail.html,
+    text: mail.text,
   });
 }
 

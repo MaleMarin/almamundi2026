@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import type { HuellaPunto } from '@/lib/huellas';
@@ -13,21 +14,33 @@ const COPY = {
     phrase: 'El mundo está lleno de historias sorprendentes. La tuya también merece contarse.',
     tell: 'Cuenta tu historia',
     empty: 'Este mapa se construye con historias como la tuya.',
-    places: (n: number) => `${n} lugares` },
+    places: (n: number) => `${n} lugares`,
+    dots: '¿Ves los puntos blancos en el globo? Cada uno guarda un dato curioso de ese lugar. Haz clic en uno y descúbrelo.',
+    ask: '¿Tienes algo que contar?',
+    tellStory: 'Cuenta tu historia',
+    answer: 'Responde una pregunta' },
   pt: {
     happened: 'O que aconteceu aqui',
     maps: 'Ver localização no Google Maps',
     phrase: 'O mundo está cheio de histórias surpreendentes. A sua também merece ser contada.',
     tell: 'Conte sua história',
     empty: 'Este mapa é feito de histórias como a sua.',
-    places: (n: number) => `${n} lugares` },
+    places: (n: number) => `${n} lugares`,
+    dots: 'Está vendo os pontos brancos no globo? Cada um guarda uma curiosidade sobre aquele lugar. Clique em um e descubra.',
+    ask: 'Tem algo para contar?',
+    tellStory: 'Conte a sua história',
+    answer: 'Responda a uma pergunta' },
   en: {
     happened: 'What happened here',
     maps: 'See location on Google Maps',
     phrase: 'The world is full of surprising stories. Yours deserves to be told too.',
     tell: 'Tell your story',
     empty: 'This map is made of stories like yours.',
-    places: (n: number) => (n === 1 ? '1 place' : `${n} places`) } } as const;
+    places: (n: number) => (n === 1 ? '1 place' : `${n} places`),
+    dots: 'See the white dots on the globe? Each one holds a curious fact about that place. Click one and find out.',
+    ask: 'Got something to tell?',
+    tellStory: 'Tell your story',
+    answer: 'Answer a question' } } as const;
 
 export type BitLike = Pick<HuellaPunto, 'id' | 'lugar' | 'pais' | 'lat' | 'lon'> & {
   categoria?: string;
@@ -276,6 +289,23 @@ function BitDetailCompact({
   );
 }
 
+function BitsIntro({ copy }: { copy: (typeof COPY)[keyof typeof COPY] }) {
+  return (
+    <div style={{ fontFamily: SITE_FONT_STACK, color: TEXT, paddingBottom: 8 }}>
+      <p style={{ margin: 0, fontSize: 'var(--fs-texto)', fontWeight: 500, lineHeight: 1.55 }}>{copy.dots}</p>
+      <p style={{ margin: '18px 0 0', fontSize: 'var(--fs-texto)', fontWeight: 600, lineHeight: 1.45 }}>{copy.ask}</p>
+      <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 10 }}>
+        <Link href="/contar" className="btn-am-principal" style={actionStyle}>
+          {copy.tellStory}
+        </Link>
+        <Link href="/preguntas" className="btn-am-secundario" style={actionStyle}>
+          {copy.answer}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 export function BitsPanel({
   bits,
   selectedBit,
@@ -294,7 +324,9 @@ export function BitsPanel({
             onSubirMiHistoria={onSubirMiHistoria}
             relaxedHeight
           />
-        ) : null}
+        ) : (
+          <BitsIntro copy={copy} />
+        )}
       </div>
     );
   }

@@ -88,7 +88,7 @@ export async function POST(req: Request) {
   if (alias.length < 2) return jsonError("alias_required", 400);
   if (city.length < 1) return jsonError("city_required", 400);
   if (country.length < 2) return jsonError("country_required", 400);
-  if (!isValidRecipientEmail(email)) return jsonError("email_required", 400);
+  if (email && !isValidRecipientEmail(email)) return jsonError("email_required", 400);
   const versionedConsent = body.consentAdult === true;
   if (
     body.consentPrivacyPolicy !== true ||
@@ -184,10 +184,12 @@ export async function POST(req: Request) {
       createdAt: FieldValue.serverTimestamp(),
       updatedAt: FieldValue.serverTimestamp(),
     });
-    batch.set(db.collection(RESPUESTA_CONTACTS_COLLECTION).doc(ref.id), {
-      email,
-      createdAt: FieldValue.serverTimestamp(),
-    });
+    if (email) {
+      batch.set(db.collection(RESPUESTA_CONTACTS_COLLECTION).doc(ref.id), {
+        email,
+        createdAt: FieldValue.serverTimestamp(),
+      });
+    }
     try {
       await batch.commit();
     } catch (err) {
@@ -218,6 +220,14 @@ export async function POST(req: Request) {
         await writeCoordsIfMissing(ref, city, country);
       } catch (err) {
         console.error("[respuestas POST] geocode", err instanceof Error ? err.message : "geo");
+      }
+      if (!email) {
+        await ref
+          .update({
+            receivedMail: { status: "skipped_no_email", at: new Date().toISOString() },
+          })
+          .catch(() => undefined);
+        return;
       }
       try {
         const locale = parseAlmaLocale(typeof body.locale === "string" ? body.locale : undefined);

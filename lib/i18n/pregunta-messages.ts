@@ -141,6 +141,16 @@ export const PREGUNTA_COPY = {
     pt: 'Não conseguimos enviar sua resposta. O que você escreveu continua aqui.',
     en: "We couldn't send your answer. What you wrote is still here.",
   },
+  emailLabel: {
+    es: 'Correo electrónico (opcional)',
+    pt: 'E-mail (opcional)',
+    en: 'Email (optional)',
+  },
+  emailHint: {
+    es: 'Si lo dejas, te avisamos cuando tu respuesta esté en el mapa. Nunca lo mostramos.',
+    pt: 'Se você deixar, avisamos quando sua resposta estiver no mapa. Nunca o mostramos.',
+    en: "If you leave it, we'll let you know when your answer is on the map. We never show it.",
+  },
   shareBody: {
     es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
     pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pergunta] Eu já respondi. E você? [enlace]',

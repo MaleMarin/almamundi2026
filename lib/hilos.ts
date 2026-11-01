@@ -1278,9 +1278,13 @@ export function preguntaAlAzar(exceptoId: string | null): PreguntaHilo | null {
   return elegir(pool);
 }
 
+export function preguntasDelTema(hiloId: string | null | undefined): PreguntaHilo[] {
+  if (!hiloId || !HILOS.some((hilo) => hilo.id === hiloId)) return [];
+  return TEMAS.filter((pregunta) => pregunta.hiloId === hiloId);
+}
+
 export function preguntaDeTema(hiloId: string | null | undefined, exceptoId?: string | null): PreguntaHilo | null {
-  if (!hiloId || !HILOS.some((hilo) => hilo.id === hiloId)) return null;
-  const delTema = TEMAS.filter((pregunta) => pregunta.hiloId === hiloId);
+  const delTema = preguntasDelTema(hiloId);
   const pool = delTema.filter((pregunta) => pregunta.id !== exceptoId);
   return elegir(pool.length > 0 ? pool : delTema);
 }
