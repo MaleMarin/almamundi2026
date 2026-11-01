@@ -1,66 +1,175 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
-export const COMO_FUNCIONA: Record<
-  AlmaLocale,
-  {
-    title: string;
-    p1: string;
-    formats: string;
-    p2: string;
-    p2b: string;
-    auto: string;
-    p3: string;
-    banned: string;
-    p4: string;
-    p5: string;
-    privacy: string;
-    close: string;
-  }
-> = {
+export type ComoFuncionaStep = {
+  lead: string;
+  rest: string;
+};
+
+export type ComoFuncionaSafeItem =
+  | { kind: 'text'; text: string }
+  | { kind: 'link'; before: string; link: string; after: string };
+
+export type ComoFuncionaCopy = {
+  title: string;
+  intro: string;
+  steps: ComoFuncionaStep[];
+  safeTitle: string;
+  safe: ComoFuncionaSafeItem[];
+  privacy: string;
+  close: string;
+};
+
+export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
   es: {
     title: '¿Cómo funciona?',
-    p1: 'AlmaMundi es un mapa vivo de historias humanas.',
-    formats: 'video, audio, texto o foto',
-    p2: 'Puedes compartir tu relato en',
-    p2b: '. El envío en cualquiera de estos formatos es para personas mayores de 18 años, o para un adulto responsable o representante de una institución con autorización expresa de quien aparece. Cada historia pasa por revisión editorial:',
-    auto: 'nada se publica automáticamente',
-    p3: 'Solo publicamos relatos que respeten la dignidad humana, la privacidad, los derechos de autor y los derechos humanos. No se aceptan contenidos con',
-    banned:
-      'insultos, injurias, calumnias, discriminación, racismo, xenofobia, homofobia, amenazas, violencia, abuso, explotación, exposición indebida de terceros, vulneración de derechos de niños, niñas y adolescentes, plagio o uso no autorizado de material ajeno',
-    p4: 'Para cuidar cada historia, revisamos su contenido, autoría, consentimiento y posibles riesgos para otras personas. Podemos pedir ajustes, no publicar o retirar relatos cuando sea necesario.',
-    p5: 'No pedimos datos sensibles para identificar la autoría. Usamos solo la información necesaria para revisar el envío y proteger a quienes participan.',
-    privacy: 'Ver política de privacidad',
+    intro:
+      'AlmaMundi es un mapa vivo de historias contadas en primera persona, desde cualquier lugar del mundo. Contar la tuya toma unos minutos y no necesitas crear una cuenta.',
+    steps: [
+      {
+        lead: 'Elige cómo contarla.',
+        rest: 'En video, audio, texto o foto, desde tu celular o tu computador.',
+      },
+      {
+        lead: 'Si no sabes por dónde empezar, tira de una cinta.',
+        rest: 'Cada cinta es un tema y guarda preguntas para despertar un recuerdo. Puedes responder una pregunta con unas líneas, tu voz o una foto.',
+      },
+      {
+        lead: 'Dinos dónde ocurrió.',
+        rest: 'Así tu historia encuentra su lugar en el mapa. Tu correo es opcional y nunca se muestra.',
+      },
+      {
+        lead: 'La revisamos con cuidado.',
+        rest: 'Una persona del equipo lee o escucha cada envío. Nada se publica de forma automática.',
+      },
+      {
+        lead: 'Te avisamos cuando esté en el mapa.',
+        rest: 'Si dejaste tu correo, te escribimos con el enlace. Desde ese momento, cualquiera puede encontrarla en el globo.',
+      },
+    ],
+    safeTitle: 'Para que este sea un lugar seguro',
+    safe: [
+      {
+        kind: 'text',
+        text: 'Puedes contar si tienes 18 años o más. Si en tu historia aparece otra persona, necesitas su permiso. Si es menor de edad, el envío lo hace una persona adulta responsable o una institución, con autorización.',
+      },
+      {
+        kind: 'text',
+        text: 'No publicamos insultos, discriminación, amenazas, violencia, abusos, contenido que exponga a otras personas sin su permiso ni material copiado de otros.',
+      },
+      {
+        kind: 'text',
+        text: 'Podemos pedirte ajustes, no publicar una historia o retirarla si pone en riesgo a alguien.',
+      },
+      {
+        kind: 'link',
+        before:
+          'Solo te pedimos lo necesario para revisar tu envío. Si quieres corregir o retirar lo que compartiste, usa ',
+        link: 'Mis datos personales',
+        after: ' o escríbenos a hola@almamundi.org.',
+      },
+    ],
+    privacy: 'Lee nuestra política de privacidad',
     close: 'Cerrar',
   },
   pt: {
     title: 'Como funciona?',
-    p1: 'O AlmaMundi é um mapa vivo de histórias humanas.',
-    formats: 'vídeo, áudio, texto ou foto',
-    p2: 'Você pode compartilhar seu relato em',
-    p2b: '. O envio em qualquer um desses formatos é para pessoas maiores de 18 anos, ou para um adulto responsável ou representante de uma instituição com autorização expressa de quem aparece. Cada história passa por revisão editorial:',
-    auto: 'nada é publicado automaticamente',
-    p3: 'Só publicamos relatos que respeitem a dignidade humana, a privacidade, os direitos autorais e os direitos humanos. Não aceitamos conteúdos com',
-    banned:
-      'insultos, injúrias, calúnias, discriminação, racismo, xenofobia, homofobia, ameaças, violência, abuso, exploração, exposição indevida de terceiros, violação de direitos de crianças e adolescentes, plágio ou uso não autorizado de material de outra pessoa',
-    p4: 'Para cuidar de cada história, revisamos o conteúdo, a autoria, o consentimento e os possíveis riscos para outras pessoas. Podemos pedir ajustes, não publicar ou retirar relatos quando for necessário.',
-    p5: 'Não pedimos dados sensíveis para identificar a autoria. Usamos só a informação necessária para revisar o envio e proteger quem participa.',
-    privacy: 'Ver política de privacidade',
+    intro:
+      'O AlmaMundi é um mapa vivo de histórias contadas em primeira pessoa, de qualquer lugar do mundo. Contar a sua leva poucos minutos, e você não precisa criar uma conta.',
+    steps: [
+      {
+        lead: 'Escolha como contar.',
+        rest: 'Em vídeo, áudio, texto ou foto, pelo celular ou pelo computador.',
+      },
+      {
+        lead: 'Se não sabe por onde começar, puxe uma fita.',
+        rest: 'Cada fita é um tema e guarda perguntas para despertar uma lembrança. Você pode responder a uma pergunta com algumas linhas, com a sua voz ou com uma foto.',
+      },
+      {
+        lead: 'Conte onde aconteceu.',
+        rest: 'Assim a sua história encontra o seu lugar no mapa. O e-mail é opcional e nunca aparece.',
+      },
+      {
+        lead: 'Revisamos com cuidado.',
+        rest: 'Uma pessoa da equipe lê ou escuta cada envio. Nada é publicado automaticamente.',
+      },
+      {
+        lead: 'Avisamos quando estiver no mapa.',
+        rest: 'Se você deixou o seu e-mail, escrevemos com o link. A partir daí, qualquer pessoa pode encontrá-la no globo.',
+      },
+    ],
+    safeTitle: 'Para que este seja um lugar seguro',
+    safe: [
+      {
+        kind: 'text',
+        text: 'Você pode contar se tiver 18 anos ou mais. Se outra pessoa aparece na sua história, você precisa da permissão dela. Se for menor de idade, o envio é feito por um adulto responsável ou por uma instituição, com autorização.',
+      },
+      {
+        kind: 'text',
+        text: 'Não publicamos insultos, discriminação, ameaças, violência, abusos, conteúdos que exponham outras pessoas sem permissão nem material copiado de terceiros.',
+      },
+      {
+        kind: 'text',
+        text: 'Podemos pedir ajustes, não publicar uma história ou retirá-la se ela colocar alguém em risco.',
+      },
+      {
+        kind: 'link',
+        before:
+          'Pedimos só o necessário para revisar o seu envio. Para corrigir ou retirar o que você compartilhou, use ',
+        link: 'Meus dados pessoais',
+        after: ' ou escreva para hola@almamundi.org.',
+      },
+    ],
+    privacy: 'Leia nossa política de privacidade',
     close: 'Fechar',
   },
   en: {
     title: 'How does it work?',
-    p1: 'AlmaMundi is a living map of human stories.',
-    formats: 'video, audio, text, or photo',
-    p2: 'You can share your story in',
-    p2b: '. Submissions in any of these formats are for people 18 or older, or for a responsible adult or institutional representative with express permission from the people who appear. Every story goes through editorial review:',
-    auto: 'nothing is published automatically',
-    p3: "We only publish stories that respect human dignity, privacy, copyright, and human rights. We don't accept content with",
-    banned:
-      'insults, defamation, slander, discrimination, racism, xenophobia, homophobia, threats, violence, abuse, exploitation, improper exposure of others, violations of the rights of children and adolescents, plagiarism, or unauthorized use of material that belongs to someone else',
-    p4: 'To take care of each story, we review its content, authorship, consent, and possible risks to other people. We may ask for changes, decline to publish, or remove stories when needed.',
-    p5: "We don't ask for sensitive data to identify authorship. We use only the information needed to review the submission and protect the people who take part.",
-    privacy: 'See the privacy policy',
+    intro:
+      "AlmaMundi is a living map of stories told in the first person, from anywhere in the world. Telling yours takes a few minutes, and you don't need to create an account.",
+    steps: [
+      {
+        lead: 'Choose how to tell it.',
+        rest: 'Video, audio, text or photo, from your phone or your computer.',
+      },
+      {
+        lead: 'Not sure where to start? Pull a ribbon.',
+        rest: 'Each ribbon is a theme that holds questions to spark a memory. You can answer a question with a few lines, your voice or a photo.',
+      },
+      {
+        lead: 'Tell us where it happened.',
+        rest: "That's how your story finds its place on the map. Your email is optional and never shown.",
+      },
+      {
+        lead: 'We review it with care.',
+        rest: 'Someone on our team reads or listens to every submission. Nothing is published automatically.',
+      },
+      {
+        lead: "We let you know when it's on the map.",
+        rest: "If you left your email, we'll send you the link. From then on, anyone can find it on the globe.",
+      },
+    ],
+    safeTitle: 'Keeping this a safe place',
+    safe: [
+      {
+        kind: 'text',
+        text: "You can tell your story if you're 18 or older. If someone else appears in it, you need their permission. If they're a minor, the submission must come from a responsible adult or an institution, with authorization.",
+      },
+      {
+        kind: 'text',
+        text: "We don't publish insults, discrimination, threats, violence, abuse, content that exposes others without their permission, or material copied from someone else.",
+      },
+      {
+        kind: 'text',
+        text: 'We may ask for changes, decline to publish a story, or remove it if it puts someone at risk.',
+      },
+      {
+        kind: 'link',
+        before: 'We only ask for what we need to review your submission. To correct or remove what you shared, use ',
+        link: 'My personal data',
+        after: ' or write to hola@almamundi.org.',
+      },
+    ],
+    privacy: 'Read our privacy policy',
     close: 'Close',
   },
 };
-

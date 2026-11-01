@@ -4,9 +4,9 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import {
-  manifiestoFor,
+  propositoFor,
   type ManifiestoBlock,
-  type ManifiestoSection } from '@/lib/proposito-text';
+  type ManifiestoSection } from '@/lib/i18n/proposito';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const soft = {
@@ -262,7 +262,7 @@ function ManifiestoSectionView({ section, index }: { section: ManifiestoSection;
   );
 }
 
-function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
+function HistoriasCtaButton({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -275,7 +275,7 @@ function HistoriasCtaButton({ onClick }: { onClick: () => void }) {
         boxShadow: '0 6px 20px rgba(255, 74, 28, 0.35), inset 0 1px 0 rgba(255,220,180,0.4)',
         fontFamily: SITE_FONT_STACK }}
     >
-      Cuenta tu historia, ver los 4 formatos
+      {label}
     </button>
   );
 }
@@ -289,7 +289,8 @@ export function PropositoModal({
   onGoToHistorias?: () => void;
 }) {
   const { locale } = useHomeLocale();
-  const { title: manifiestoTitle, sections: manifiestoSections } = manifiestoFor(locale);
+  const copy = propositoFor(locale);
+  const manifiestoSections = copy.sections;
   const [activeSectionId, setActiveSectionId] = useState(DEFAULT_SECTION_ID);
 
   useEffect(() => {
@@ -348,14 +349,14 @@ export function PropositoModal({
                 className="mb-1 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em]"
                 style={{ color: soft.orange }}
               >
-                AlmaMundi
+                {copy.brand}
               </p>
               <h2
                 id="proposito-titulo"
                 className="text-[length:var(--fs-titular)] font-semibold "
                 style={{ color: soft.textMain }}
               >
-                {manifiestoTitle}
+                {copy.title}
               </h2>
             </div>
             <button
@@ -363,9 +364,9 @@ export function PropositoModal({
               onClick={onClose}
               className="shrink-0 rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-semibold uppercase transition active:scale-[0.97] tracking-[0.12em]"
               style={{ ...soft.button, color: soft.textMain }}
-              aria-label="Cerrar propósito"
+              aria-label={copy.closeAria}
             >
-              Cerrar
+              {copy.close}
             </button>
           </div>
 
@@ -406,17 +407,18 @@ export function PropositoModal({
             section={activeSection}
             index={activeIndex >= 0 ? activeIndex : 0}
           />
+          {activeSection.id === 'cierre' ? (
+            <div className="mt-6 flex flex-col items-center gap-4">
+              {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
+              <p
+                className="text-center text-[length:var(--fs-pequeno)] leading-relaxed"
+                style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
+              >
+                {copy.credit}
+              </p>
+            </div>
+          ) : null}
         </div>
-
-        {onGoToHistorias ? (
-          <div
-            className="flex shrink-0 justify-center border-t border-white/35 bg-[var(--home-bg)] px-6 py-4 pb-[max(1rem,env(safe-area-inset-bottom,0px))] md:px-10 md:py-5"
-            style={{
-              boxShadow: '0 -8px 24px rgba(136, 150, 170, 0.12)' }}
-          >
-            <HistoriasCtaButton onClick={onGoToHistorias} />
-          </div>
-        ) : null}
       </div>
     </div>,
     document.body

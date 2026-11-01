@@ -75,19 +75,32 @@ export function ComoFuncionaModal({
           className="mt-5 space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5 "
           style={{ color: soft.textBody }}
         >
-          <p>{copy.p1}</p>
-          <p>
-            {copy.p2}{' '}
-            <strong style={{ color: soft.textMain }}>{copy.formats}</strong>
-            {copy.p2b}{' '}
-            <strong style={{ color: soft.textMain }}>{copy.auto}</strong>.
-          </p>
-          <p>
-            {copy.p3}{' '}
-            <strong style={{ color: soft.textMain }}>{copy.banned}</strong>.
-          </p>
-          <p>{copy.p4}</p>
-          <p>{copy.p5}</p>
+          <p>{copy.intro}</p>
+          <ol className="list-decimal space-y-3 pl-5">
+            {copy.steps.map((step) => (
+              <li key={step.lead}>
+                <strong style={{ color: soft.textMain }}>{step.lead}</strong> {step.rest}
+              </li>
+            ))}
+          </ol>
+          <h3 className="pt-1 text-[length:var(--fs-pequeno)] font-semibold" style={{ color: soft.textMain }}>
+            {copy.safeTitle}
+          </h3>
+          <ul className="list-disc space-y-3 pl-5">
+            {copy.safe.map((item) =>
+              item.kind === 'text' ? (
+                <li key={item.text}>{item.text}</li>
+              ) : (
+                <li key={item.link}>
+                  {item.before}
+                  <Link href="/mis-datos-personales" className="underline" style={{ color: soft.textMain }} onClick={onClose}>
+                    {item.link}
+                  </Link>
+                  {item.after}
+                </li>
+              )
+            )}
+          </ul>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-end">
           <Link

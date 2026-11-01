@@ -48,3 +48,6 @@ firebase-service-account.json
 firebase-debug.log
 *.tsbuildinfo
 .tmp-screenshots/
+
+# Borrador local de textos. No va al repositorio.
+docs/*.docx
