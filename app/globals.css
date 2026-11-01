@@ -1462,13 +1462,36 @@ a.cinta-pill {
 }
 
 #intro .home-capitulo-ceja,
-#intro .home-capitulo-titulo,
 #intro .home-capitulo-cita,
 #intro .home-capitulo-bajada {
   width: fit-content;
   max-width: 100%;
   margin-inline: auto;
   text-align: center;
+}
+
+#intro .home-capitulo-titulo {
+  width: 100%;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+  text-wrap: balance;
+}
+
+#intro .home-capitulo-bajada {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  max-width: 36rem;
+  margin-top: 28px;
+}
+
+@media (min-width: 768px) {
+  #intro .home-capitulo-bajada {
+    margin-top: 40px;
+  }
 }
 
 .home-capitulo-bloque {

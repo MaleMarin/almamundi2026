@@ -6,6 +6,8 @@ type CapituloHomeProps = {
   bajada?: string;
   bajadaFuerte?: string;
   cita?: string;
+  /** La bajada y la bajada fuerte van en dos renglones. */
+  bajadaEnDosLineas?: boolean;
   portada?: boolean;
   nivel?: 'h1' | 'h2';
 };
@@ -18,6 +20,7 @@ export function CapituloHome({
   bajada,
   bajadaFuerte,
   cita,
+  bajadaEnDosLineas = false,
   portada = false,
   nivel = 'h2',
 }: CapituloHomeProps) {
@@ -42,12 +45,16 @@ export function CapituloHome({
       {cita ? <p className="home-capitulo-cita">{cita}</p> : null}
       {bajada ? (
         <p className="home-capitulo-bajada">
-          {bajada}
+          {bajadaEnDosLineas ? <span>{bajada}</span> : bajada}
           {bajadaFuerte ? (
-            <>
-              {' '}
+            bajadaEnDosLineas ? (
               <strong>{bajadaFuerte}</strong>
-            </>
+            ) : (
+              <>
+                {' '}
+                <strong>{bajadaFuerte}</strong>
+              </>
+            )
           ) : null}
         </p>
       ) : null}

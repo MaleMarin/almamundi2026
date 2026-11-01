@@ -63,9 +63,10 @@ export function HomeFirstPart({
           ceja={t.cejaCuenta}
           titulo={t.heroBeforeBold}
           tituloFuerte={`${t.heroBold},`}
-          cita={`${t.heroHandScript}.`}
+          cita={t.heroHandScript}
           bajada={t.bajadaCuenta}
-          bajadaFuerte={`${t.historiasLead2b}.`}
+          bajadaFuerte={t.historiasLead2b}
+          bajadaEnDosLineas
         />
       </section>
 

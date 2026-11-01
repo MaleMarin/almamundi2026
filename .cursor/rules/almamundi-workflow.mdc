@@ -19,3 +19,7 @@ alwaysApply: false
 
 # Revisión
 - Antes de cada commit que toque la interfaz: npm run build y npm run start, abre la home, /historias, una ficha /historias/[id], /contar y /pregunta, y confirma que ninguna muestra "Algo salió mal". Que el build pase no basta.
+
+# Push
+- Antes de cada push, borrar .next y correr npm run build. Si falla, no hay push.
+- Después de cada push, confirmar que Vercel marque el despliegue como Ready antes de dar la tarea por terminada.
