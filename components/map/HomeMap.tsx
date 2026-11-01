@@ -952,7 +952,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         className="relative flex min-h-[min(520px,62vh)] w-full flex-1 flex-col overflow-hidden"
       >
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
-        <div className="relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
+        <div className="map-globe-home relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
             <GlobeV2Home
               embedded

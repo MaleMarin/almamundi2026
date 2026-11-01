@@ -824,6 +824,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
 }
 
 #map-dock-slot .map-dock-scroller {
+  container-type: inline-size;
   width: 100%;
   overflow: hidden;
 }
@@ -836,7 +837,14 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   justify-content: center;
   column-gap: 12px;
   width: max-content;
-  margin-inline: auto;
+  margin-inline: 0;
+  transform: translateX(calc(50cqw - 50%));
+}
+
+@media (max-width: 767px) {
+  #map-dock-slot .map-dock-row {
+    transform: none;
+  }
 }
 
 #map-dock-slot .map-dock-legend {
@@ -1717,8 +1725,19 @@ a.cinta-pill {
 }
 
 .home-noche {
-  height: 200px;
+  height: 80px;
   background: linear-gradient(to bottom, #f5f4f2, #05070d);
+}
+
+/* El disco no nace en el borde del lienzo. Sube el globo, sin cambiar tamaño ni giro. */
+.map-universe-stage .map-globe-home {
+  transform: translateY(-49px);
+}
+
+@media (min-width: 768px) {
+  .map-universe-stage .map-globe-home {
+    transform: translateY(-41px);
+  }
 }
 
 @media (min-width: 768px) {
@@ -1726,6 +1745,15 @@ a.cinta-pill {
   .home-capitulo-ancho {
     width: min(100%, calc(1560px + 5rem));
     padding-inline: 2.5rem;
+  }
+
+  /* Descubre se centra en la página, no dentro de la caja de 1640px. */
+  #mapa .home-capitulo {
+    width: 100%;
+    max-width: none;
+    margin-inline: auto;
+    padding-inline: 1.5rem;
+    text-align: center;
   }
 }
 
