@@ -1,6 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HomeDialogFrame } from '@/components/home/HomeDialogFrame';
 import {
@@ -43,37 +42,6 @@ const soft = {
       '-8px -8px 20px rgba(255, 255, 255, 0.94)',
       'inset 1px 1px 2px rgba(255, 255, 255, 0.65)',
     ].join(', ') } } as const;
-
-const DEFAULT_SECTION_ID = 'por-que';
-
-function sectionChipStyle(active: boolean) {
-  if (active) {
-    return {
-      padding: '7px 12px',
-      borderRadius: 999,
-      cursor: 'pointer' as const,
-      fontSize: 'var(--fs-etiqueta)',
-      fontWeight: 600,
-      textTransform: 'uppercase' as const,
-      letterSpacing: '0.12em',
-      fontFamily: SITE_FONT_STACK,
-      color: '#fff8f2',
-      background: `linear-gradient(180deg, rgba(255, 88, 28, 0.85) 0%, ${soft.orange} 100%)`,
-      border: '1px solid rgba(255, 150, 90, 0.75)',
-      boxShadow: '0 2px 10px rgba(255, 74, 28, 0.22)' };
-  }
-  return {
-    ...soft.card,
-    padding: '7px 12px',
-    borderRadius: 999,
-    cursor: 'pointer' as const,
-    fontSize: 'var(--fs-etiqueta)',
-    fontWeight: 500,
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.12em',
-    fontFamily: SITE_FONT_STACK,
-    color: soft.textBody };
-}
 
 function SectionHeader({ title, index }: { title: string; index: number }) {
   return (
@@ -291,23 +259,15 @@ export function PropositoModal({
   const { locale } = useHomeLocale();
   const copy = propositoFor(locale);
   const manifiestoSections = copy.sections;
-  const [activeSectionId, setActiveSectionId] = useState(DEFAULT_SECTION_ID);
-
-  useEffect(() => {
-    if (!isOpen) return;
-    setActiveSectionId(DEFAULT_SECTION_ID);
-  }, [isOpen]);
-
-  const activeIndex = manifiestoSections.findIndex((s) => s.id === activeSectionId);
-  const activeSection =
-    manifiestoSections[activeIndex >= 0 ? activeIndex : 0] ?? manifiestoSections[0];
+  const cierre = manifiestoSections.find((s) => s.id === 'cierre');
+  const cuerpo = manifiestoSections.filter((s) => s.id !== 'cierre');
 
   return (
     <HomeDialogFrame
       isOpen={isOpen}
       onClose={onClose}
       labelledBy="proposito-titulo"
-      scrollKey={`${locale}:${activeSection.id}`}
+      scrollKey={locale}
       panelClassName="md:max-w-3xl"
       panelStyle={{ ...soft.shell, fontFamily: SITE_FONT_STACK }}
       eyebrow={
@@ -327,44 +287,15 @@ export function PropositoModal({
           {copy.title}
         </h2>
       }
-      belowTitle={
-        <nav
-          className="mt-4 flex min-w-0 max-w-full flex-wrap justify-center gap-2 pb-1"
-          aria-label="Secciones del propósito"
-          role="tablist"
-        >
-          {manifiestoSections.map((s) => {
-            const active = s.id === activeSectionId;
-            return (
-              <button
-                key={s.id}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                aria-controls={`manifiesto-panel-${s.id}`}
-                id={`manifiesto-tab-${s.id}`}
-                style={sectionChipStyle(active)}
-                className="shrink-0 whitespace-nowrap"
-                onClick={() => setActiveSectionId(s.id)}
-              >
-                {s.title}
-              </button>
-            );
-          })}
-        </nav>
-      }
     >
-      <div
-        id={`manifiesto-panel-${activeSection.id}`}
-        role="tabpanel"
-        aria-labelledby={`manifiesto-tab-${activeSection.id}`}
-      >
-        <ManifiestoSectionView
-          section={activeSection}
-          index={activeIndex >= 0 ? activeIndex : 0}
-        />
-        {activeSection.id === 'cierre' ? (
-          <div className="mt-6 flex flex-col items-center gap-4">
+      {/* Un solo texto que se lee bajando; la frase de cierre y el botón van al final. */}
+      <div className="space-y-10">
+        {cuerpo.map((section, index) => (
+          <ManifiestoSectionView key={section.id} section={section} index={index} />
+        ))}
+        {cierre ? (
+          <div className="flex flex-col items-center gap-6">
+            <ManifiestoSectionView section={cierre} index={cuerpo.length} />
             {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
           </div>
         ) : null}

@@ -12,7 +12,6 @@ import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
-import { CintaStripe } from '@/components/historias/CintaStripe';
 
 const PAGE_SIZE = 24;
 
@@ -133,7 +132,6 @@ function StoryCard({
       className="relative flex h-full flex-col overflow-hidden"
       style={{ ...neu.card, borderRadius: large ? 28 : 22 }}
     >
-      <CintaStripe colors={story.cintaColors} height={8} className="absolute inset-x-0 top-0 z-[2]" />
       <div
         className="relative w-full overflow-hidden"
         style={{ height: large ? 240 : 160, background: '#c5ceda' }}
@@ -145,7 +143,7 @@ function StoryCard({
           <FormatMark kind={formatKey(story)} />
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-1 px-4 py-4">
+      <div className="flex flex-1 flex-col gap-1.5 px-5 py-5">
         <h2 className="text-[length:var(--fs-pequeno)] font-semibold leading-snug text-gray-800">
           {story.title || story.label}
         </h2>
@@ -265,11 +263,11 @@ export default function HistoriasCatalog() {
   };
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16 sm:px-6" style={{ color: neu.textMain }}>
+    <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:px-6 md:pt-10" style={{ color: neu.textMain }}>
       {featured.length > 0 ? (
-        <section className="mb-10">
+        <section className="mb-14">
           <h1 className="mb-4 text-[length:var(--fs-titular)] font-normal">{copy.featured}</h1>
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
             {featured.map((story) => (
               <StoryCard key={story.id} story={story} large locale={locale} copy={copy} />
             ))}
@@ -277,7 +275,7 @@ export default function HistoriasCatalog() {
         </section>
       ) : null}
 
-      <div role="tablist" aria-label={copy.tabs.todas} className="mb-5 flex flex-wrap gap-2">
+      <div role="tablist" aria-label={copy.tabs.todas} className="mb-8 flex flex-wrap gap-3">
         {(Object.keys(copy.tabs) as Tab[]).map((key) => {
           const active = tab === key;
           return (
@@ -302,8 +300,8 @@ export default function HistoriasCatalog() {
         })}
       </div>
 
-      <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-        <label className="flex min-w-[10rem] flex-col gap-1 text-[length:var(--fs-etiqueta)] font-semibold">
+      <div className="mb-12 flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-end">
+        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.country}
           <select
             value={country}
@@ -318,7 +316,7 @@ export default function HistoriasCatalog() {
             ))}
           </select>
         </label>
-        <label className="flex min-w-[10rem] flex-col gap-1 text-[length:var(--fs-etiqueta)] font-semibold">
+        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.axis}
           <select
             value={eje}
@@ -333,7 +331,7 @@ export default function HistoriasCatalog() {
             ))}
           </select>
         </label>
-        <label className="flex min-w-[10rem] flex-col gap-1 text-[length:var(--fs-etiqueta)] font-semibold">
+        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.order}
           <select
             value={order}
@@ -344,7 +342,7 @@ export default function HistoriasCatalog() {
             <option value="oldest">{copy.oldest}</option>
           </select>
         </label>
-        <label className="flex min-w-[16rem] flex-1 flex-col gap-1 text-[length:var(--fs-etiqueta)] font-semibold">
+        <label className="flex min-w-[16rem] flex-1 flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.search}
           <input
             type="search"
@@ -356,14 +354,14 @@ export default function HistoriasCatalog() {
         </label>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
         {shown.map((story) => (
           <StoryCard key={story.id} story={story} locale={locale} copy={copy} />
         ))}
       </div>
 
       {visible < filtered.length ? (
-        <div className="mt-8 flex justify-center">
+        <div className="mt-12 flex justify-center">
           <button type="button" className="btn-am-principal min-h-11 px-6" onClick={() => setVisible((count) => count + PAGE_SIZE)}>
             {copy.more}
           </button>
