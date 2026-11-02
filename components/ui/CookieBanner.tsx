@@ -71,7 +71,7 @@ export function CookieBanner() {
     left: 16,
     right: 16,
     zIndex: 40,
-    maxWidth: 960,
+    maxWidth: 1080,
     margin: '0 auto',
     boxSizing: 'border-box',
     background: '#e6e9ee',
