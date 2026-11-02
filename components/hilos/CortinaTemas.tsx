@@ -24,6 +24,15 @@ const TELON: { fondo: string; texto: string }[] = [
   { fondo: '#A0003C', texto: '#fff' },
 ];
 
+/** Colores de las cintas en la cortina: los mismos 12 temas, más intensos y brillantes. */
+const VIVO = ['#FFE600', '#FF6A00', '#FF2238', '#FF5FB0', '#B8FF00', '#00D35A', '#1E5BFF', '#9B1FFF', '#C08CFF', '#FF0FA0', '#00E1F0', '#E0004F'];
+/** Capa de atrás: el mismo color, más oscuro, para que se lea más lejos. */
+const VIVO_ATRAS = VIVO.map((hex) => {
+  const n = parseInt(hex.slice(1), 16);
+  const k = 0.65;
+  return `rgb(${Math.round((n >> 16) * k)},${Math.round(((n >> 8) & 255) * k)},${Math.round((n & 255) * k)})`;
+});
+
 /** Fondo del panel. Si el blanco no llega a 4.5 sobre la cinta, el mismo tono baja de luz. Las cintas siguen en TELON. */
 const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#FFD000', texto: '#3C2F00', boton: '#3C2F00' },
@@ -109,6 +118,7 @@ export function CortinaTemas({
   const nombreRef = useRef<HTMLDivElement>(null);
   const volverRef = useRef<HTMLButtonElement>(null);
   const cintasRef = useRef<Cinta[]>([]);
+  const atrasRef = useRef<Cinta[]>([]);
   const anchoRef = useRef(0);
   const altoRef = useRef(0);
   const semillaRef = useRef(7);
@@ -279,9 +289,28 @@ export function CortinaTemas({
           f: 0.6 + azar() * 0.7,
           ph: azar() * 6.28,
         });
-        x += w * (0.62 + azar() * 0.25);
+        // Con aire entre cintas para que se vea la capa de atrás.
+        x += w * (1.05 + azar() * 0.5);
       }
       cintasRef.current = cintas;
+      semillaRef.current = 31;
+      const atras: Cinta[] = [];
+      let xa = -6;
+      while (xa < ancho + 10) {
+        const w = base * 0.75 * (0.8 + azar() * 0.9);
+        atras.push({
+          x: xa + w / 2,
+          w,
+          th: Math.floor(azar() * 12),
+          L: alto * (0.92 + azar() * 0.08),
+          curve: (azar() - 0.5) * 60,
+          A: (3 + azar() * 6) * 1.4,
+          f: (0.6 + azar() * 0.7) * 0.6,
+          ph: azar() * 6.28,
+        });
+        xa += w * (0.62 + azar() * 0.25);
+      }
+      atrasRef.current = atras;
       if (centroRef.current === 0) centroRef.current = ancho / 2;
     }
 
@@ -398,6 +427,26 @@ export function CortinaTemas({
         const siguiente = alfas[tema] + (meta - alfas[tema]) * avanceAlfa;
         alfas[tema] = Math.abs(meta - siguiente) <= 0.004 ? meta : siguiente;
       }
+      const dibujar = (cinta: Cinta, color: string) => {
+        ctx.beginPath();
+        const pasos = 18;
+        for (let i = 0; i <= pasos; i += 1) {
+          const y = (cinta.L * i) / pasos;
+          ctx.lineTo(xEn(cinta, y, tiempo, quieto) - cinta.w / 2, y);
+        }
+        for (let i = pasos; i >= 0; i -= 1) {
+          const y = (cinta.L * i) / pasos;
+          ctx.lineTo(xEn(cinta, y, tiempo, quieto) + cinta.w / 2, y);
+        }
+        ctx.closePath();
+        ctx.fillStyle = color;
+        ctx.fill();
+      };
+      // Capa de atrás: más oscura, más angosta y más lenta.
+      for (const cinta of atrasRef.current) {
+        ctx.globalAlpha = alfas[cinta.th] ?? 1;
+        dibujar(cinta, VIVO_ATRAS[cinta.th] ?? '#666');
+      }
       for (const cinta of cintasRef.current) {
         const tela = TELON[cinta.th];
         if (!tela) continue;
@@ -413,7 +462,7 @@ export function CortinaTemas({
           ctx.lineTo(xEn(cinta, y, tiempo, quieto) + cinta.w / 2, y);
         }
         ctx.closePath();
-        ctx.fillStyle = tela.fondo;
+        ctx.fillStyle = VIVO[cinta.th] ?? tela.fondo;
         ctx.fill();
         ctx.strokeStyle = 'rgba(0,0,0,.07)';
         ctx.lineWidth = 1;
@@ -430,6 +479,12 @@ export function CortinaTemas({
         degrade.addColorStop(1, 'rgba(0,0,0,1)');
         ctx.fillStyle = degrade;
         ctx.fillRect(0, alto - fundido, anchoRef.current, fundido);
+        // Arriba las cintas nacen del fondo, sin corte recto.
+        const nace = ctx.createLinearGradient(0, 0, 0, 40);
+        nace.addColorStop(0, 'rgba(0,0,0,1)');
+        nace.addColorStop(1, 'rgba(0,0,0,0)');
+        ctx.fillStyle = nace;
+        ctx.fillRect(0, 0, anchoRef.current, 40);
         ctx.restore();
       }
       canvas.style.pointerEvents = progreso > 0.5 ? 'none' : 'auto';
