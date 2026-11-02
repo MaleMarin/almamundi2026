@@ -30,7 +30,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         rest: 'En video, audio, texto o foto, desde tu celular o tu computador.',
       },
       {
-        lead: 'Si no sabes por dónde empezar, mira las preguntas para ti.',
+        lead: 'Empieza por una pregunta: toca una cinta.',
         rest: 'Cada cinta es un tema y guarda preguntas para despertar un recuerdo. Puedes responder una pregunta con unas líneas, tu voz o una foto.',
       },
       {
@@ -81,7 +81,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         rest: 'Em vídeo, áudio, texto ou foto, pelo celular ou pelo computador.',
       },
       {
-        lead: 'Se não sabe por onde começar, veja as perguntas para você.',
+        lead: 'Comece por uma pergunta: toque uma fita.',
         rest: 'Cada fita é um tema e guarda perguntas para despertar uma lembrança. Você pode responder a uma pergunta com algumas linhas, com a sua voz ou com uma foto.',
       },
       {
@@ -132,7 +132,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         rest: 'Video, audio, text or photo, from your phone or your computer.',
       },
       {
-        lead: 'Not sure where to start? See the questions for you.',
+        lead: 'Start with a question: tap a ribbon.',
         rest: 'Each ribbon is a theme that holds questions to spark a memory. You can answer a question with a few lines, your voice or a photo.',
       },
       {

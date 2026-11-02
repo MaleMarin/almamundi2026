@@ -288,10 +288,11 @@ export function HomePageClient() {
         onRecordPhoto={() => openStory('foto', true)}
         onMediaEducation={() => router.push('/educacion-mediatica')}
         pregunta={preguntaContar}
-        cintaPill={pathname === '/' || pathname === '/preview-home'}
+        cintaPill
         basePath="/"
       />
-      {pathname === '/' || pathname === '/preview-home' ? <BloqueCintasHome locale={locale} /> : null}
+      {/* La cortina de cintas siempre a la vista, también en /contar tras abrir y cerrar el formulario. */}
+      <BloqueCintasHome locale={locale} />
       <MapSectionLocked />
 
       <ComoFuncionaModal isOpen={comoFuncionaOpen} onClose={closeComoFunciona} />
