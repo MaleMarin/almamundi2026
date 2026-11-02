@@ -13,10 +13,10 @@ import {
   EMAIL_CONTACT_ADDRESS,
   EMAIL_FONT,
   EMAIL_INK,
+  emailActionsText,
   emailShell,
   greetingHtml,
   paragraphHtml,
-  primaryButtonHtml,
 } from "@/lib/email/almamundi-email-layout";
 
 export const RECEIVED_EMAIL_PREVIEW =
@@ -158,10 +158,6 @@ export function receivedEmailSubject(storyTitle: string, locale: AlmaLocale = "e
   return receivedCopy(locale).subject(title);
 }
 
-function termsLink(label: string): string {
-  return `<a href="${escapeHtml(absoluteEmailUrl("/terminos"))}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${label}</a>`;
-}
-
 function summaryBoxHtml(params: ReceivedEmailContent): string {
   const locale = mailLocale(params);
   const copy = receivedCopy(locale);
@@ -181,29 +177,6 @@ function summaryBoxHtml(params: ReceivedEmailContent): string {
     </table>`;
 }
 
-function stepsHtml(locale: AlmaLocale): string {
-  const copy = receivedCopy(locale);
-  const linked =
-    locale === "pt"
-      ? `Se cumprir os ${termsLink("termos de uso")}, publicamos no mapa.`
-      : locale === "en"
-        ? `If it meets the ${termsLink("terms of use")}, we publish it on the map.`
-        : `Si cumple los ${termsLink("términos de uso")}, la publicamos en el mapa.`;
-  const steps = [copy.steps[0], linked, copy.steps[2]];
-  const rows = steps
-    .map(
-      (step, index) => `<tr>
-          <td class="email-text" valign="top" width="28" style="width:28px;padding:0 8px 8px 0;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${index + 1}.</td>
-          <td class="email-text" valign="top" style="padding:0 0 8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${step}</td>
-        </tr>`
-    )
-    .join("");
-  return `<p class="email-text" style="margin:0 0 8px;font-size:16px;line-height:1.6;font-weight:700;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${copy.now}</p>
-      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
-        ${rows}
-      </table>`;
-}
-
 function contactHtml(locale: AlmaLocale): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
@@ -217,14 +190,11 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
   const copy = receivedCopy(locale);
   const title = escapeHtml(storyTitleOrFallback(params.storyTitle, locale));
   const mapUrl = absoluteEmailUrl("/#mapa");
-  const tellUrl = absoluteEmailUrl("/contar");
   const bodyHtml = `
       ${greetingHtml(escapeHtml(greetingLine(params.authorName, locale)))}
       ${paragraphHtml(copy.thanks(title))}
       ${paragraphHtml(copy.before)}
       ${summaryBoxHtml(params)}
-      ${stepsHtml(locale)}
-      ${primaryButtonHtml(copy.another, tellUrl)}
       <p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${copy.map}</a>
       </p>
@@ -235,6 +205,7 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
     bodyHtml,
     footer: "received",
     locale,
+    actions: "historia",
   });
 }
 
@@ -246,8 +217,6 @@ export function buildReceivedEmailText(params: ReceivedEmailContent): string {
   return [
     greetingLine(params.authorName, locale),
     "",
-    copy.preview,
-    "",
     copy.thanks(title),
     "",
     copy.before,
@@ -256,16 +225,11 @@ export function buildReceivedEmailText(params: ReceivedEmailContent): string {
     `${copy.formatLabel}: ${storyFormatLabel(params.format, locale)}`,
     `${copy.dateLabel}: ${formatSubmissionDate(params.submittedAt, locale)}`,
     "",
-    copy.now,
-    `1. ${copy.steps[0]}`,
-    `2. ${copy.steps[1]}`,
-    `   ${absoluteEmailUrl("/terminos")}`,
-    `3. ${copy.steps[2]}`,
-    "",
-    `${copy.another}: ${absoluteEmailUrl("/contar")}`,
     `${copy.map}: ${originHome}`,
     "",
     `${copy.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
+    "",
+    ...emailActionsText(locale, "historia"),
     "",
     copy.footerNote,
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,

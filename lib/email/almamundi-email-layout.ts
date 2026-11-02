@@ -135,6 +135,116 @@ export function secondaryLinkHtml(label: string, href: string): string {
       </p>`;
 }
 
+/** Botón con borde naranja (acción secundaria). */
+export function outlineButtonHtml(label: string, href: string): string {
+  const safeHref = escapeHtml(href);
+  const safeLabel = escapeHtml(label);
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" align="center" style="margin:0 auto 16px;">
+        <tr>
+          <td align="center" height="46"
+            style="height:46px;border:2px solid ${BRAND_ORANGE};border-radius:8px;text-align:center;">
+            <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="email-btn-outline"
+              style="display:inline-block;height:46px;line-height:46px;padding:0 26px;color:${BRAND_ORANGE};text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:600;border-radius:8px;">
+              ${safeLabel}
+            </a>
+          </td>
+        </tr>
+      </table>`;
+}
+
+/**
+ * Acciones al pie de los correos (docs/decisiones-cerradas.md):
+ * - "historia": Cuenta otra historia · Responde una pregunta · Comparte AlmaMundi
+ * - "respuesta": Responde otra pregunta · Cuenta tu historia · Comparte AlmaMundi
+ * - "solo-historia" / "solo-respuesta": un solo botón (correos de no publicación).
+ */
+export type EmailActions = "historia" | "respuesta" | "solo-historia" | "solo-respuesta";
+
+function actionsCopy(locale: AlmaLocale) {
+  if (locale === "pt") {
+    return {
+      tellAnother: "Conte outra história",
+      tellYours: "Conte sua história",
+      answerOne: "Responda uma pergunta",
+      answerAnother: "Responda outra pergunta",
+      shareLead: "Compartilhe o AlmaMundi com alguém:",
+      whatsapp: "Pelo WhatsApp",
+      mail: "Por e-mail",
+      shareText: "Compartilho com você o AlmaMundi, um mapa de histórias de vida de pessoas do mundo todo:",
+      shareSubject: "Conheça o AlmaMundi",
+    };
+  }
+  if (locale === "en") {
+    return {
+      tellAnother: "Share another story",
+      tellYours: "Share your story",
+      answerOne: "Answer a question",
+      answerAnother: "Answer another question",
+      shareLead: "Share AlmaMundi with someone:",
+      whatsapp: "On WhatsApp",
+      mail: "By email",
+      shareText: "I'm sharing AlmaMundi with you, a map of life stories from people all over the world:",
+      shareSubject: "Discover AlmaMundi",
+    };
+  }
+  return {
+    tellAnother: "Cuenta otra historia",
+    tellYours: "Cuenta tu historia",
+    answerOne: "Responde una pregunta",
+    answerAnother: "Responde otra pregunta",
+    shareLead: "Comparte AlmaMundi con alguien:",
+    whatsapp: "Por WhatsApp",
+    mail: "Por correo",
+    shareText: "Te comparto AlmaMundi, un mapa de historias de vida de personas de todo el mundo:",
+    shareSubject: "Te comparto AlmaMundi",
+  };
+}
+
+function shareLinks(locale: AlmaLocale) {
+  const c = actionsCopy(locale);
+  const home = absoluteEmailUrl("/");
+  const text = `${c.shareText} ${home}`;
+  return {
+    whatsapp: whatsappShareUrl(text),
+    mail: `mailto:?subject=${encodeURIComponent(c.shareSubject)}&body=${encodeURIComponent(text)}`,
+  };
+}
+
+export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string {
+  const c = actionsCopy(locale);
+  const tell = absoluteEmailUrl("/contar");
+  const answer = absoluteEmailUrl("/preguntas");
+  if (kind === "solo-historia") return primaryButtonHtml(c.tellAnother, tell);
+  if (kind === "solo-respuesta") return primaryButtonHtml(c.answerAnother, answer);
+  const buttons =
+    kind === "historia"
+      ? primaryButtonHtml(c.tellAnother, tell) + outlineButtonHtml(c.answerOne, answer)
+      : primaryButtonHtml(c.answerAnother, answer) + outlineButtonHtml(c.tellYours, tell);
+  const share = shareLinks(locale);
+  const link = (label: string, href: string) =>
+    `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(label)}</a>`;
+  return `<div style="margin:28px 0 0;padding-top:24px;border-top:1px solid #E6E3DF;">
+        ${buttons}
+        <p class="email-text" style="margin:8px 0 0;text-align:center;font-size:15px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
+          ${escapeHtml(c.shareLead)} ${link(c.whatsapp, share.whatsapp)} · ${link(c.mail, share.mail)}
+        </p>
+      </div>`;
+}
+
+export function emailActionsText(locale: AlmaLocale, kind: EmailActions): string[] {
+  const c = actionsCopy(locale);
+  const tell = absoluteEmailUrl("/contar");
+  const answer = absoluteEmailUrl("/preguntas");
+  if (kind === "solo-historia") return [`${c.tellAnother}: ${tell}`];
+  if (kind === "solo-respuesta") return [`${c.answerAnother}: ${answer}`];
+  const share = shareLinks(locale);
+  const first =
+    kind === "historia"
+      ? [`${c.tellAnother}: ${tell}`, `${c.answerOne}: ${answer}`]
+      : [`${c.answerAnother}: ${answer}`, `${c.tellYours}: ${tell}`];
+  return [...first, `${c.shareLead} ${absoluteEmailUrl("/")}`, `${c.whatsapp}: ${share.whatsapp}`];
+}
+
 export function invitationHtml(): string {
   return primaryButtonHtml("Contar otra historia", absoluteEmailUrl("/contar"));
 }
@@ -228,6 +338,7 @@ export function emailShell(opts: {
   bodyHtml: string;
   footer?: "received" | "account" | "respuesta" | "newsletter";
   locale?: AlmaLocale;
+  actions?: EmailActions;
 }): string {
   const preheader = opts.preheader
     ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
@@ -265,6 +376,7 @@ export function emailShell(opts: {
             <td class="email-pad email-text" style="padding:32px;font-family:${EMAIL_FONT};color:${EMAIL_INK};">
               ${brandHeaderHtml()}
               ${opts.bodyHtml}
+              ${opts.actions ? emailActionsHtml(locale, opts.actions) : ""}
               <div style="margin-top:28px;">
                 ${footer}
               </div>

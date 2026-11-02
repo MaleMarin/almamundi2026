@@ -2,7 +2,6 @@ import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
   EMAIL_FONT,
-  EMAIL_INK,
   EMAIL_MUTED,
   emailShell,
   paragraphHtml,

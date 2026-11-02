@@ -7,6 +7,7 @@ import {
   absoluteEmailUrl,
   authorEmailFooterNote,
   AUTHOR_REPLY_TO,
+  emailActionsText,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -151,10 +152,11 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     `Facebook: ${share.facebook}`,
     `X: ${share.x}`,
     `LinkedIn: ${share.linkedin}`,
-    `${copy.another}: ${absoluteEmailUrl("/contar")}`,
     "",
     copy.thanksText,
     copy.team,
+    "",
+    ...emailActionsText(locale, "historia"),
     "",
     authorEmailFooterNote(locale, "historia"),
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
@@ -180,10 +182,9 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
       ${primaryButtonHtml("Facebook", share.facebook)}
       ${primaryButtonHtml("X", share.x)}
       ${primaryButtonHtml("LinkedIn", share.linkedin)}
-      ${primaryButtonHtml(copy.another, absoluteEmailUrl("/contar"))}
       ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml, footer: "received", locale });
+  return emailShell({ bodyHtml, footer: "received", locale, actions: "historia" });
 }
 
 export type SendPublicationEmailResult =

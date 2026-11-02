@@ -8,7 +8,7 @@ import {
   absoluteEmailUrl,
   AUTHOR_REPLY_TO,
   emailShell,
-  invitationHtml,
+  primaryButtonHtml,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
@@ -21,7 +21,9 @@ export type SendAnniversaryEmailParams = {
 
 function greetingLine(authorName: string): string {
   const n = authorName.trim();
-  return n ? `Hola ${escapeHtml(n)},` : "Hola,";
+  // «Hola, Ana:» con mayúscula inicial, igual que los demás correos.
+  const pretty = n ? n.charAt(0).toLocaleUpperCase("es") + n.slice(1) : "";
+  return pretty ? `Hola, ${escapeHtml(pretty)}:` : "Hola:";
 }
 
 export function buildAnniversaryEmailHtml(params: SendAnniversaryEmailParams): string {
@@ -37,30 +39,17 @@ export function buildAnniversaryEmailHtml(params: SendAnniversaryEmailParams): s
         Hace un año contaste tu historia en AlmaMundi.
       </p>
       <p style="margin:0 0 24px;padding:16px 18px;background:#f7f8fb;border-radius:12px;font-size:16px;color:#4A5568;line-height:1.6">
-        <strong>"${storyTitle}"</strong>
+        <strong>«${storyTitle}»</strong>
       </p>
       <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
         Puedes volver a verla cuando quieras, y si tienes otra que contar, la puerta sigue abierta.
       </p>
-      <table cellpadding="0" cellspacing="0" style="margin:0 auto 24px">
-        <tr>
-          <td style="background:#FF4A1C;border-radius:100px;padding:14px 32px">
-            <a href="${historiasUrl}"
-              style="color:white;text-decoration:none;
-              font-size:13px;font-weight:700;
-              letter-spacing:0.1em;text-transform:uppercase">
-              VER MI HISTORIA
-            </a>
-          </td>
-        </tr>
-      </table>
-      ${invitationHtml()}
+      ${primaryButtonHtml("Ver mi historia", historiasUrl)}
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
-        Un abrazo,<br>
         Equipo AlmaMundi
       </p>`;
 
-  return emailShell({ bodyHtml });
+  return emailShell({ bodyHtml, actions: "historia" });
 }
 
 export type SendAnniversaryEmailResult =

@@ -12,6 +12,7 @@ import {
   EMAIL_CONTACT_ADDRESS,
   EMAIL_FONT,
   EMAIL_INK,
+  emailActionsText,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -44,14 +45,15 @@ function quotedQuestion(question: string, html: boolean): string {
   return `«${html ? escapeHtml(text) : text}»`;
 }
 
-function receivedBody(locale: AlmaLocale): string {
+function receivedBody(locale: AlmaLocale, question: string, html: boolean): string {
+  const q = quotedQuestion(question, html);
   if (locale === "pt") {
-    return "Vamos revisá-la. Se for publicada, avisamos por e-mail.";
+    return `Recebemos sua resposta à pergunta ${q}. Uma pessoa da equipe vai lê-la antes de publicá-la e avisaremos quando estiver no mapa.`;
   }
   if (locale === "en") {
-    return "We'll review it. If it's published, we'll let you know by email.";
+    return `We received your answer to the question ${q}. Someone on our team will read it before it's published, and we'll let you know when it's on the map.`;
   }
-  return "Vamos a revisarla. Si se publica, te avisamos por correo.";
+  return `Recibimos tu respuesta a la pregunta ${q}. Una persona del equipo la leerá antes de publicarla y te avisaremos cuando esté en el mapa.`;
 }
 
 function publishedHello(alias: string, locale: AlmaLocale): string {
@@ -200,18 +202,15 @@ export async function sendRespuestaReceivedEmail(opts: {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
-  const body = receivedBody(locale);
+  const body = receivedBody(locale, opts.question, false);
   const html = emailShell({
     preheader: copy.receivedSubject,
     footer: "respuesta",
     locale,
+    actions: "respuesta",
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(receivedBody(locale)),
-      paragraphHtml(copy.now, "0 0 8px"),
-      paragraphHtml(copy.step1, "0 0 8px"),
-      paragraphHtml(copy.step2, "0 0 8px"),
-      paragraphHtml(copy.step3, "0 0 16px"),
+      paragraphHtml(receivedBody(locale, opts.question, true)),
       contactLine(locale),
       paragraphHtml(copy.thanks, "0"),
     ].join(""),
@@ -221,15 +220,12 @@ export async function sendRespuestaReceivedEmail(opts: {
     "",
     body,
     "",
-    copy.now,
-    copy.step1,
-    copy.step2,
-    copy.step3,
-    "",
     `${copy.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
     "",
     copy.thanksText,
     copy.team,
+    "",
+    ...emailActionsText(locale, "respuesta"),
     "",
     authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");
@@ -252,16 +248,15 @@ export function buildRespuestaPublishedEmail(opts: {
   const greeting = publishedHello(opts.alias, locale);
   const body = publishedBody(locale, opts.question, false);
   const mapUrl = absoluteEmailUrl(`/?respuesta=${encodeURIComponent(opts.respuestaId)}`);
-  const againUrl = absoluteEmailUrl("/preguntas");
   const html = emailShell({
     preheader: copy.publishedSubject,
     footer: "respuesta",
     locale,
+    actions: "respuesta",
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(publishedBody(locale, opts.question, true)),
       primaryButtonHtml(copy.see, mapUrl),
-      primaryButtonHtml(copy.another, againUrl),
     ].join(""),
   });
   const text = [
@@ -270,7 +265,8 @@ export function buildRespuestaPublishedEmail(opts: {
     body,
     "",
     `${copy.see}: ${mapUrl}`,
-    `${copy.another}: ${againUrl}`,
+    "",
+    ...emailActionsText(locale, "respuesta"),
     "",
     authorEmailFooterNote(locale, "respuesta"),
   ].join("\n");

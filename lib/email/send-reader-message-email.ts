@@ -8,7 +8,6 @@ import { getResend } from "@/lib/emailSubmission";
 import {
   AUTHOR_REPLY_TO,
   emailShell,
-  invitationHtml,
 } from "@/lib/email/almamundi-email-layout";
 import { noteEmailSent } from "@/lib/ops/usage-state";
 
@@ -22,7 +21,9 @@ export type SendReaderMessageEmailParams = {
 
 function greetingLine(authorName: string): string {
   const n = authorName.trim();
-  return n ? `Hola ${escapeHtml(n)},` : "Hola,";
+  // «Hola, Ana:» con mayúscula inicial, igual que los demás correos.
+  const pretty = n ? n.charAt(0).toLocaleUpperCase("es") + n.slice(1) : "";
+  return pretty ? `Hola, ${escapeHtml(pretty)}:` : "Hola:";
 }
 
 function messageBlockHtml(readerMessage: string): string {
@@ -38,7 +39,7 @@ export function buildReaderMessageEmailHtml(params: SendReaderMessageEmailParams
         ${greeting}
       </p>
       <p style="margin:0 0 24px;font-size:16px;color:#4A5568;line-height:1.6">
-        Alguien que leyó tu historia <strong>"${storyTitle}"</strong> en AlmaMundi
+        Alguien que leyó tu historia <strong>«${storyTitle}»</strong> en AlmaMundi
         te dejó este mensaje:
       </p>
       <table cellpadding="0" cellspacing="0" width="100%" style="margin:0 0 24px">
@@ -53,13 +54,11 @@ export function buildReaderMessageEmailHtml(params: SendReaderMessageEmailParams
         Este correo es un reenvío. No incluye datos de quien escribió.
         Si respondes, el mensaje llega al equipo de AlmaMundi.
       </p>
-      ${invitationHtml()}
       <p style="margin:0;font-size:16px;color:#4A5568;line-height:1.6">
-        Un abrazo,<br>
         Equipo AlmaMundi
       </p>`;
 
-  return emailShell({ bodyHtml });
+  return emailShell({ bodyHtml, actions: "historia" });
 }
 
 export type SendReaderMessageEmailResult =

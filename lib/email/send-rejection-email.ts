@@ -11,6 +11,7 @@ import {
   EMAIL_BOX,
   EMAIL_FONT,
   EMAIL_INK,
+  emailActionsText,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -119,7 +120,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
       ${paragraphHtml(retry)}
       ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml, footer: "received", locale });
+  return emailShell({ bodyHtml, footer: "received", locale, actions: "solo-historia" });
 }
 
 export function buildRejectionEmailText(params: SendRejectionEmailParams): string {
@@ -137,6 +138,8 @@ export function buildRejectionEmailText(params: SendRejectionEmailParams): strin
     "",
     copy.thanksText,
     copy.team,
+    "",
+    ...emailActionsText(locale, "solo-historia"),
     "",
     authorEmailFooterNote(locale, "historia"),
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
