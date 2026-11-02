@@ -80,7 +80,7 @@ const CORE_SCALE = 0.00043;
 const BIT_PLANE_MUL = 1.15;
 /** Historias: disco mayor que el bit, sin tapar el planeta. */
 const STORY_PLANE_MUL = 3.05;
-const STORY_RIPPLE_MUL = 5.6;
+const STORY_RIPPLE_MUL = 4.2;
 const STORY_HOVER_SCALE = 1.32;
 /** Noticias: anillo más chico y frío que las historias. */
 const NEWS_PLANE_MUL = 2.22;
@@ -122,13 +122,12 @@ function HeartbeatRing({
   const haloMat = useMemo(
     () =>
       new THREE.MeshBasicMaterial({
-        color: '#FF6A3D',
+        color: '#FF4A1C',
         transparent: true,
         opacity: 0,
         depthWrite: false,
         depthTest: false,
         side: THREE.DoubleSide,
-        blending: THREE.AdditiveBlending,
       }),
     []
   );
@@ -165,12 +164,12 @@ function HeartbeatRing({
     mesh.scale.set(baseScale * grow, baseScale * grow, 1);
     // Selección: pulso lento y sutil (5 s), anillo al 70 % con halo. Sin selección, anillo fino y tenue.
     const slow = reducedRef.current ? 0.5 : 0.5 + 0.5 * Math.sin((clock.elapsedTime * Math.PI * 2) / 5);
-    const base = selected ? 0.55 + 0.15 * slow : 0.4;
+    const base = selected ? 0.75 + 0.15 * slow : 0.6;
     mat.opacity = base * (1 - amp * 0.92) * layer;
     const halo = haloRef.current;
     if (halo) {
       halo.scale.set(baseScale * grow, baseScale * grow, 1);
-      haloMat.opacity = selected ? (0.12 + 0.1 * slow) * layer : 0;
+      haloMat.opacity = selected ? (0.14 + 0.08 * slow) * layer : 0;
     }
   });
 
@@ -561,14 +560,16 @@ function GlobeBitsLayerMounted({
   const newsMat = useMemo(() => createNewsRingMaterial(0.9, 'GlobeNewsRing'), []);
   const respuestaMat = useMemo(() => {
     const mat = createNewsRingMaterial(0.95, 'GlobeRespuestaRing');
-    const color = new THREE.Color('#FF4A1C').convertSRGBToLinear();
+    // sRGB tal cual (el shader no convierte a la salida); en lineal se veía rojo.
+    const color = new THREE.Color().setRGB(0xff / 255, 0x4a / 255, 0x1c / 255, THREE.LinearSRGBColorSpace);
     mat.uniforms.uCore.value = new THREE.Vector3(color.r, color.g, color.b);
     mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
     return mat;
   }, []);
   const hiloRingMat = useMemo(() => {
     const mat = createNewsRingMaterial(0.95, 'GlobeHiloRing');
-    const color = new THREE.Color('#FF4A1C').convertSRGBToLinear();
+    // sRGB tal cual (el shader no convierte a la salida); en lineal se veía rojo.
+    const color = new THREE.Color().setRGB(0xff / 255, 0x4a / 255, 0x1c / 255, THREE.LinearSRGBColorSpace);
     mat.uniforms.uCore.value = new THREE.Vector3(color.r, color.g, color.b);
     mat.uniforms.uRim.value = new THREE.Vector3(color.r, color.g, color.b);
     return mat;

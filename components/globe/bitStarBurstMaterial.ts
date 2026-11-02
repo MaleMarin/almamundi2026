@@ -119,9 +119,13 @@ export function createHuellaDotMaterial(materialName = 'GlobeHuellaDot'): THREE.
   return mat;
 }
 
-/** Naranja de marca de historias (`#FF4A1C`, docs/decisiones-cerradas.md), en lineal para ShaderMaterial. */
+/**
+ * Naranja de marca de historias (`#FF4A1C`, docs/decisiones-cerradas.md).
+ * Va en sRGB tal cual: estos ShaderMaterial escriben el color directo a la pantalla (no pasan
+ * por la conversión de salida de three). Convertirlo a lineal lo dejaba rojo puro.
+ */
 function almaMundiCoralLinear(): THREE.Vector3 {
-  const c = new THREE.Color('#FF4A1C').convertSRGBToLinear();
+  const c = new THREE.Color().setRGB(0xff / 255, 0x4a / 255, 0x1c / 255, THREE.LinearSRGBColorSpace);
   return new THREE.Vector3(c.r, c.g, c.b);
 }
 
@@ -134,7 +138,7 @@ export function createStoryStarBurstMaterial(
 ): THREE.ShaderMaterial {
   const coral = almaMundiCoralLinear();
   // Centro un poco más claro del mismo naranja: da la «luz» sin pasar al amarillo.
-  const core = new THREE.Color('#FF8A5C').convertSRGBToLinear();
+  const core = new THREE.Color().setRGB(0xff / 255, 0x8a / 255, 0x5c / 255, THREE.LinearSRGBColorSpace);
   const mat = new THREE.ShaderMaterial({
     name: materialName,
     uniforms: {

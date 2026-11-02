@@ -271,6 +271,26 @@ function StoryFocusFlyRig({
     from.current.copy(camera.position);
   }, [nonce, camera, lat, lng]);
 
+  /*
+   * Escritorio: mientras el panel de la historia está abierto (420 px a la derecha + márgenes),
+   * el dibujo del globo se corre a la izquierda la mitad de ese ancho, para que el globo quede
+   * entero en el espacio libre y el panel no lo tape. Se quita al cerrar el panel.
+   */
+  useLayoutEffect(() => {
+    const persp = camera as THREE.PerspectiveCamera;
+    if (!persp.isPerspectiveCamera) return;
+    const phone = size.width < 768;
+    if (phone) {
+      persp.clearViewOffset();
+      return;
+    }
+    const shift = (420 + 24 + 56) / 2;
+    persp.setViewOffset(size.width, size.height, shift, 0, size.width, size.height);
+    return () => {
+      persp.clearViewOffset();
+    };
+  }, [camera, size.width, size.height]);
+
   useFrame((_, dt) => {
     if (tRef.current >= 1) return;
     const local = latLngToCartesianThreeJS(lat, lng, 1);
@@ -285,14 +305,17 @@ function StoryFocusFlyRig({
     }
     to.current.copy(world.current).sub(center.current);
     if (to.current.lengthSq() < 1e-10) return;
-    const zoomDistance = distance * 0.82;
+    const phoneView = size.width < 768;
+    // En escritorio el globo queda en el espacio libre junto al panel: se acerca menos.
+    const zoomDistance = distance * (phoneView ? 0.82 : 1.0);
     to.current.normalize();
     const radial = to.current.clone();
     const phone = size.width < 768;
     const persp = camera as THREE.PerspectiveCamera;
     const vFov = THREE.MathUtils.degToRad(persp.fov || 40);
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * (size.width / Math.max(1, size.height)));
-    const yaw = phone ? 0 : (((420 + 24) / 2) / Math.max(1, size.width)) * hFov;
+    // El corrimiento por el panel ahora lo hace setViewOffset (arriba): el punto queda al centro del globo.
+    const yaw = 0 * hFov;
     const pitch = phone ? (0.5 - 0.075) * vFov : 0;
     right.current.crossVectors(new THREE.Vector3(0, 1, 0), radial);
     if (right.current.lengthSq() < 1e-8) right.current.set(1, 0, 0);
