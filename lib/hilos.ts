@@ -1220,9 +1220,9 @@ export const PREGUNTAS_HILO: PreguntaHilo[] = TEMAS;
 const POR_ID = new Map<string, PreguntaHilo>([...TEMAS, ...AZAR].map((pregunta) => [pregunta.id, pregunta]));
 
 const TEMA_NOMBRE: Record<AlmaLocale, string> = {
-  es: 'Al azar',
-  pt: 'Ao acaso',
-  en: 'At random',
+  es: 'Sorpréndeme',
+  pt: 'Surpreenda-me',
+  en: 'Surprise me',
 };
 
 function elegir(pool: PreguntaHilo[]): PreguntaHilo | null {
