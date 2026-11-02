@@ -158,7 +158,7 @@ export function outlineButtonHtml(label: string, href: string): string {
  * - "respuesta": Responde otra pregunta · Cuenta tu historia · Comparte AlmaMundi
  * - "solo-historia" / "solo-respuesta": un solo botón (correos de no publicación).
  */
-export type EmailActions = "historia" | "respuesta" | "solo-historia" | "solo-respuesta";
+export type EmailActions = "historia" | "respuesta" | "solo-historia" | "solo-respuesta" | "invitacion";
 
 function actionsCopy(locale: AlmaLocale) {
   if (locale === "pt") {
@@ -219,7 +219,9 @@ export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string
   const buttons =
     kind === "historia"
       ? primaryButtonHtml(c.tellAnother, tell) + outlineButtonHtml(c.answerOne, answer)
-      : primaryButtonHtml(c.answerAnother, answer) + outlineButtonHtml(c.tellYours, tell);
+      : kind === "invitacion"
+        ? outlineButtonHtml(c.tellYours, tell) + outlineButtonHtml(c.answerOne, answer)
+        : primaryButtonHtml(c.answerAnother, answer) + outlineButtonHtml(c.tellYours, tell);
   const share = shareLinks(locale);
   const link = (label: string, href: string) =>
     `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(label)}</a>`;
@@ -241,7 +243,9 @@ export function emailActionsText(locale: AlmaLocale, kind: EmailActions): string
   const first =
     kind === "historia"
       ? [`${c.tellAnother}: ${tell}`, `${c.answerOne}: ${answer}`]
-      : [`${c.answerAnother}: ${answer}`, `${c.tellYours}: ${tell}`];
+      : kind === "invitacion"
+        ? [`${c.tellYours}: ${tell}`, `${c.answerOne}: ${answer}`]
+        : [`${c.answerAnother}: ${answer}`, `${c.tellYours}: ${tell}`];
   return [...first, `${c.shareLead} ${absoluteEmailUrl("/")}`, `${c.whatsapp}: ${share.whatsapp}`];
 }
 

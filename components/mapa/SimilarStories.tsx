@@ -136,7 +136,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
                 {truncateAtWord(s.title, 45)}
               </span>
             </div>
-            {s.description && (
+            {s.description && s.description.trim().toLowerCase() !== s.title.trim().toLowerCase() && (
               <p
                 className="am-related-stories-desc"
                 style={{

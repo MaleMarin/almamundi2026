@@ -130,7 +130,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           margin: '0 auto',
           boxSizing: 'border-box' }}
       >
-        <StoryScrollBlock scene>
+        {/* Encabezado sin alto mínimo: el texto empieza justo después (sin hueco). */}
+        <StoryScrollBlock>
         {/* Fecha */}
         <p
           style={{
@@ -161,7 +162,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
         </h1>
 
         {/* Subtítulo */}
-        {historia.subtitulo && (
+        {historia.subtitulo &&
+          historia.subtitulo.trim().toLowerCase() !== historia.titulo.trim().toLowerCase() && (
           <p
             style={{
               fontFamily: INTERIOR_FONT_STACK,

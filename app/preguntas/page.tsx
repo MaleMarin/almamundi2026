@@ -17,13 +17,14 @@ function firstParam(value: string | string[] | undefined): string | null {
   return value ?? null;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const pedido = firstParam((await searchParams).p);
   const jar = await cookies();
   const locale = parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
   const copy = HILOS_UI[locale];
   const title = `${copy.ceja} · AlmaMundi`;
   const image = {
-    url: '/og-image.png',
+    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og-image.png',
     width: 1200,
     height: 630,
     alt: copy.ceja,
@@ -34,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       title,
       description: copy.bajada,
-      url: '/preguntas',
+      url: pedido ? `/preguntas?p=${encodeURIComponent(pedido)}` : '/preguntas',
       type: 'website',
       locale: PUBLIC_OG_LOCALE[locale],
       siteName: 'AlmaMundi',

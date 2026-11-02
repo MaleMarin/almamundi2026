@@ -3,6 +3,7 @@ import {
   absoluteEmailUrl,
   EMAIL_FONT,
   EMAIL_MUTED,
+  emailActionsText,
   emailShell,
   paragraphHtml,
   primaryButtonHtml,
@@ -21,11 +22,12 @@ export function buildNewsletterConfirmHtml(locale: AlmaLocale, token: string): s
     preheader: copy.body,
     locale,
     footer: "newsletter",
+    actions: "invitacion",
     bodyHtml: `${paragraphHtml(escapeHtml(copy.body))}${primaryButtonHtml(copy.button, newsletterConfirmUrl(token))}${note}`,
   });
 }
 
 export function buildNewsletterConfirmText(locale: AlmaLocale, token: string): string {
   const copy = newsletterConfirmMail(locale);
-  return [copy.body, "", `${copy.button}: ${newsletterConfirmUrl(token)}`, "", copy.note].join("\n");
+  return [copy.body, "", `${copy.button}: ${newsletterConfirmUrl(token)}`, "", copy.note, "", ...emailActionsText(locale, "invitacion")].join("\n");
 }

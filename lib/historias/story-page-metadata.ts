@@ -11,7 +11,6 @@ import {
 } from '@/lib/share/published-share';
 import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 
-const SITE_OG_IMAGE = '/og-image.png';
 function fallbackDescription(locale: AlmaLocale): string {
   if (locale === 'pt') return 'Uma história no AlmaMundi, o mapa de histórias humanas.';
   if (locale === 'en') return 'A story on AlmaMundi, the map of human stories.';
@@ -28,13 +27,6 @@ const OG_LOCALE: Record<AlmaLocale, string> = {
   pt: 'pt_BR',
   en: 'en_US',
 };
-
-function publicImage(url: string | null | undefined): string {
-  const value = (url ?? '').trim();
-  if (!value || value.startsWith('data:') || value.startsWith('blob:')) return '';
-  if (/^https?:\/\//i.test(value) || value.startsWith('/')) return value;
-  return '';
-}
 
 function previewFormat(story: StoryPoint): PublishedStoryFormat {
   const named = (story.format ?? '').trim().toLowerCase();
@@ -54,28 +46,6 @@ function previewFormat(story: StoryPoint): PublishedStoryFormat {
   if (story.audioUrl || story.hasAudio) return 'audio';
   if ((story.imagenes?.length ?? 0) > 0) return 'photo';
   return 'text';
-}
-
-function ogImageForStory(
-  story: StoryPoint,
-  title: string,
-  format: PublishedStoryFormat
-): { url: string; width: number; height: number; alt: string } {
-  const firstPhoto =
-    publicImage(story.imagenes?.[0]?.url) || (format === 'photo' ? publicImage(story.imageUrl) : '');
-  const videoFrame =
-    format === 'video' ? publicImage(story.thumbnailUrl) || publicImage(story.imageUrl) : '';
-  const profile = publicImage(story.authorAvatar) || publicImage(story.author?.avatar);
-  const url = firstPhoto || videoFrame || profile || SITE_OG_IMAGE;
-  return {
-    url,
-    width: 1200,
-    height: 630,
-    alt:
-      url === SITE_OG_IMAGE
-        ? 'AlmaMundi, historias de vida en video, audio, escrito y foto'
-        : title,
-  };
 }
 
 async function requestLocale(): Promise<AlmaLocale> {
@@ -112,7 +82,8 @@ export async function buildHistoriaStoryMetadata(id: string): Promise<Metadata> 
     format,
     formatPublicPlace(story.city, story.country, locale)
   );
-  const image = ogImageForStory(story, titulo, format);
+  // Tarjeta propia para WhatsApp y redes: imagen o imagen de cintas, título, autor y lugar.
+  const image = { url: `/og/historia/${encodeURIComponent(id)}`, width: 1200, height: 630, alt: titulo };
 
   return {
     metadataBase,

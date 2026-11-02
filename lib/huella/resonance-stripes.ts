@@ -177,6 +177,21 @@ function drawResonancePieceFooter(
   ctx.restore();
 }
 
+/** Franjas de la imagen de cintas (color en hsl y ancho en px), sin dibujar. Sirve en el servidor. */
+export function resonanceStripeUnits(args: { storyId: string; text: string; locale: AlmaLocale }): { hex: string; width: number }[] {
+  const hitsRaw = hitsFromText(args.text, args.locale);
+  const hits = hitsRaw.length > 0 ? hitsRaw : fallbackHits(args.storyId);
+  const colored = expandSparseVadColors(colorizeVadHits(hits));
+  const counts = colored.map((h) => h.count);
+  return orderForContrast(
+    colored.map((h) => ({
+      ...h,
+      width: stripeWidthForCounts(h.count, counts, RESONANCE_STRIPE_MIN_PX, RESONANCE_STRIPE_MAX_PX),
+      hex: hslCss(h.h, h.s, h.l),
+    }))
+  ).map((u) => ({ hex: u.hex, width: u.width }));
+}
+
 export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: DrawVadResonanceArgs): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
