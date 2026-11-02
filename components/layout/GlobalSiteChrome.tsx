@@ -56,7 +56,7 @@ export function GlobalSiteChrome({ children }: { children: ReactNode }) {
         className={`flex w-full min-h-0 flex-1 flex-col ${historiasInterior.fixedHeaderContentPadClassName}`}
       >
         {showBreadcrumbsSlot ? (
-          <div className="w-full shrink-0 px-4 pb-2 md:px-6 lg:px-10">
+          <div className="w-full shrink-0 px-4 pb-2 pt-3 md:px-6 md:pt-6 lg:px-10">
             <div className="mx-auto w-full max-w-7xl">
               <SiteBreadcrumbs />
             </div>

@@ -192,7 +192,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 href="https://precisar.net"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline underline-offset-2 transition-opacity hover:opacity-75"
+                className="!text-[#646E7E] no-underline underline-offset-2 hover:underline"
               >
                 Precisar
               </a>
