@@ -1,6 +1,5 @@
 'use client';
 
-import Link from 'next/link';
 
 import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvider';
 import type { AlmaLocale } from '@/lib/i18n/locale';
@@ -89,12 +88,12 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           >
             {t.navTellStory}
           </HomeHardLink>
-          <Link
-            href="/preguntas"
+          <HomeHardLink
+            href="/#cintas"
             className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3"
           >
             {HILOS_UI[locale].nav}
-          </Link>
+          </HomeHardLink>
         </div>
       </div>
 

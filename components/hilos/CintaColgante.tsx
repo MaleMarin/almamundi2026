@@ -448,7 +448,7 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
   const copy = HILOS_UI[locale];
   const home = HOME_MESSAGES[locale];
   return (
-    <section className="home-capitulo-bloque relative z-20 w-full scroll-mt-[10.5rem] md:scroll-mt-[var(--header-h)]">
+    <section id="cintas" className="home-capitulo-bloque relative z-20 w-full scroll-mt-[10.5rem] md:scroll-mt-[var(--header-h)]">
       <CapituloHome
         ceja={home.cejaInspira}
         titulo={copy.bloqueTitulo}
