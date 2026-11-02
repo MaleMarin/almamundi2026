@@ -223,7 +223,7 @@ export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string
   const share = shareLinks(locale);
   const link = (label: string, href: string) =>
     `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(label)}</a>`;
-  return `<div style="margin:28px 0 0;padding-top:24px;border-top:1px solid #E6E3DF;">
+  return `<div style="margin:8px 0 0;padding-bottom:24px;border-bottom:1px solid #E6E3DF;">
         ${buttons}
         <p class="email-text" style="margin:8px 0 0;text-align:center;font-size:15px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
           ${escapeHtml(c.shareLead)} ${link(c.whatsapp, share.whatsapp)} · ${link(c.mail, share.mail)}
@@ -339,6 +339,8 @@ export function emailShell(opts: {
   footer?: "received" | "account" | "respuesta" | "newsletter";
   locale?: AlmaLocale;
   actions?: EmailActions;
+  /** Va después de los botones: «Explorar el mapa», «¿Tienes dudas?», despedida. */
+  afterActionsHtml?: string;
 }): string {
   const preheader = opts.preheader
     ? `<div style="display:none;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;">
@@ -377,6 +379,7 @@ export function emailShell(opts: {
               ${brandHeaderHtml()}
               ${opts.bodyHtml}
               ${opts.actions ? emailActionsHtml(locale, opts.actions) : ""}
+              ${opts.afterActionsHtml ? `<div style="margin-top:24px;">${opts.afterActionsHtml}</div>` : ""}
               <div style="margin-top:28px;">
                 ${footer}
               </div>

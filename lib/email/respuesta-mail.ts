@@ -211,9 +211,8 @@ export async function sendRespuestaReceivedEmail(opts: {
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(receivedBody(locale, opts.question, true)),
-      contactLine(locale),
-      paragraphHtml(copy.thanks, "0"),
     ].join(""),
+    afterActionsHtml: [contactLine(locale), paragraphHtml(copy.thanks, "0")].join(""),
   });
   const text = [
     greeting,

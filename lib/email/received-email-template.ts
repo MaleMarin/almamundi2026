@@ -194,7 +194,8 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
       ${greetingHtml(escapeHtml(greetingLine(params.authorName, locale)))}
       ${paragraphHtml(copy.thanks(title))}
       ${paragraphHtml(copy.before)}
-      ${summaryBoxHtml(params)}
+      ${summaryBoxHtml(params)}`;
+  const afterActionsHtml = `
       <p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${copy.map}</a>
       </p>
@@ -206,6 +207,7 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
     footer: "received",
     locale,
     actions: "historia",
+    afterActionsHtml,
   });
 }
 
@@ -225,11 +227,11 @@ export function buildReceivedEmailText(params: ReceivedEmailContent): string {
     `${copy.formatLabel}: ${storyFormatLabel(params.format, locale)}`,
     `${copy.dateLabel}: ${formatSubmissionDate(params.submittedAt, locale)}`,
     "",
+    ...emailActionsText(locale, "historia"),
+    "",
     `${copy.map}: ${originHome}`,
     "",
     `${copy.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
-    "",
-    ...emailActionsText(locale, "historia"),
     "",
     copy.footerNote,
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
