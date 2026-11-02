@@ -28,12 +28,10 @@ type HilosCopy = {
   azar: string;
   volver: string;
   pista: string;
-  paso: string;
+  indice: string;
   escribir: string;
   contarVoz: string;
   conFoto: string;
-  previa: string;
-  proxima: string;
   responde: string;
   respondes: string;
   anterior: string;
@@ -68,12 +66,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     azar: 'o deja que el azar elija',
     volver: '← Volver a los temas',
     pista: 'Pasa el mouse por la cortina y toca una cinta, o elige un tema aquí:',
-    paso: 'Una pregunta a la vez. Pasa a la siguiente hasta que una te despierte algo.',
+    indice: 'Toca una pregunta y elige cómo responderla.',
     escribir: 'Escríbela',
     contarVoz: 'Cuéntala con tu voz',
     conFoto: 'Con una foto',
-    previa: 'Anterior',
-    proxima: 'Siguiente',
     responde: 'Responde aquí',
     respondes: 'Respondes a:',
     anterior: 'Cintas anteriores',
@@ -107,12 +103,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     azar: 'ou deixe o acaso escolher',
     volver: '← Voltar aos temas',
     pista: 'Passe o mouse pela cortina e toque em uma fita, ou escolha um tema aqui:',
-    paso: 'Uma pergunta de cada vez. Passe para a próxima até que uma desperte algo em você.',
+    indice: 'Toque em uma pergunta e escolha como responder.',
     escribir: 'Escreva',
     contarVoz: 'Conte com a sua voz',
     conFoto: 'Com uma foto',
-    previa: 'Anterior',
-    proxima: 'Próxima',
     responde: 'Responda aqui',
     respondes: 'Você está respondendo:',
     anterior: 'Fitas anteriores',
@@ -146,12 +140,10 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     azar: 'or let chance choose',
     volver: '← Back to the themes',
     pista: 'Hover over the curtain and tap a ribbon, or choose a theme here:',
-    paso: 'One question at a time. Move on until one sparks something.',
+    indice: 'Tap a question and choose how to answer.',
     escribir: 'Write it',
     contarVoz: 'Tell it with your voice',
     conFoto: 'With a photo',
-    previa: 'Previous',
-    proxima: 'Next',
     responde: 'Answer here',
     respondes: "You're answering:",
     anterior: 'Previous ribbons',

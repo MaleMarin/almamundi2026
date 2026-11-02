@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useLayoutEffect, useRef, useState, type TouchEvent } from 'react';
-import { Camera, ChevronLeft, ChevronRight, Mic, PenLine } from 'lucide-react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Camera, Mic, PenLine } from 'lucide-react';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import { HILOS, preguntaParaFormulario, preguntasDelTema } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
@@ -56,10 +56,9 @@ function aplicarPanel(nodo: HTMLElement, indice: number) {
 
 type Formato = 'texto' | 'voz' | 'foto';
 
-function indiceDe(tema: string | null, pregunta: string | null) {
-  const lista = preguntasDelTema(tema);
-  const indice = lista.findIndex((item) => item.id === pregunta);
-  return indice >= 0 ? indice : 0;
+function preguntaInicial(tema: string | null, pregunta: string | null) {
+  if (!tema || !pregunta) return null;
+  return preguntasDelTema(tema).some((item) => item.id === pregunta) ? pregunta : null;
 }
 
 type Cinta = {
@@ -121,12 +120,11 @@ export function CortinaTemas({
   const inicioRef = useRef(0);
   const seguirRef = useRef<(() => void) | null>(null);
   const contenidoRef = useRef<HTMLDivElement>(null);
-  const toqueRef = useRef<{ x: number; y: number } | null>(null);
-  const pasoRef = useRef(indiceDe(initialTema, initialPregunta));
-  const moverRef = useRef<(delta: number) => void>(() => {});
   const [temaId, setTemaId] = useState<string | null>(initialTema);
   const [preguntaId, setPreguntaId] = useState<string | null>(null);
-  const [pasoIndice, setPasoIndice] = useState(() => indiceDe(initialTema, initialPregunta));
+  const [abiertaId, setAbiertaId] = useState<string | null>(() =>
+    preguntaInicial(initialTema, initialPregunta)
+  );
   const [formato, setFormato] = useState<Formato | null>(null);
   const [marcada, setMarcada] = useState(initialTema ? HILOS.findIndex((hilo) => hilo.id === initialTema) : -1);
 
@@ -155,8 +153,7 @@ export function CortinaTemas({
     setTemaId(hilo.id);
     setPreguntaId(null);
     setFormato(null);
-    pasoRef.current = 0;
-    setPasoIndice(0);
+    setAbiertaId(null);
     publicar(hilo.id);
     const lienzo = canvasRef.current;
     if (lienzo) {
@@ -194,7 +191,7 @@ export function CortinaTemas({
   function fijarAlto(abierta: boolean) {
     const stage = stageRef.current;
     if (!stage) return;
-    const destino = abierta ? Math.max(altoCortina(), altoContenido()) : altoCortina();
+    const destino = abierta ? altoContenido() : altoCortina();
     if (reduceMotion()) {
       stage.style.height = abierta ? `${Math.round(destino)}px` : '';
       return;
@@ -230,12 +227,6 @@ export function CortinaTemas({
   useEffect(() => {
     function alTeclado(event: KeyboardEvent) {
       if (event.key === 'Escape' && metaRef.current === 1) cerrar();
-      if (metaRef.current !== 1 || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
-      const campo = event.target as HTMLElement | null;
-      const etiqueta = campo?.tagName;
-      if (etiqueta === 'INPUT' || etiqueta === 'TEXTAREA' || etiqueta === 'SELECT' || campo?.isContentEditable) return;
-      event.preventDefault();
-      moverRef.current(event.key === 'ArrowRight' ? 1 : -1);
     }
     window.addEventListener('keydown', alTeclado);
     return () => window.removeEventListener('keydown', alTeclado);
@@ -384,6 +375,7 @@ export function CortinaTemas({
         canvas.style.visibility = 'visible';
         setTemaId(null);
         setPreguntaId(null);
+        setAbiertaId(null);
         publicar(null);
       }
       if (progreso === 1 && meta === 1) {
@@ -569,45 +561,28 @@ export function CortinaTemas({
 
   const hilo = HILOS.find((item) => item.id === temaId) ?? null;
   const preguntas = preguntasDelTema(temaId);
-  const preguntaActual = preguntas[pasoIndice] ?? null;
+  const preguntaAbierta = preguntas.find((item) => item.id === abiertaId) ?? null;
   const formulario =
-    formato && preguntaActual ? (preguntaParaFormulario(preguntaActual.id) as PreguntaSemana | null) : null;
+    formato && preguntaAbierta
+      ? (preguntaParaFormulario(preguntaAbierta.id) as PreguntaSemana | null)
+      : null;
 
   function verTema(indice: number) {
     abrir(indice, anchoRef.current / 2);
   }
 
-  function moverPaso(delta: number) {
-    const total = preguntasDelTema(temaId).length;
-    if (!total) return;
-    const siguiente = (pasoRef.current + delta + total) % total;
-    pasoRef.current = siguiente;
-    setPasoIndice(siguiente);
-    setPreguntaId(null);
+  function alternarPregunta(id: string) {
     setFormato(null);
+    setPreguntaId(null);
+    setAbiertaId((actual) => (actual === id ? null : id));
     if (temaId) publicar(temaId);
   }
 
-  moverRef.current = moverPaso;
-
   function elegirFormato(kind: Formato) {
-    const pregunta = preguntasDelTema(temaId)[pasoIndice];
-    if (!pregunta) return;
+    if (!preguntaAbierta) return;
     setFormato(kind);
-    setPreguntaId(pregunta.id);
-    publicar(pregunta.id);
-  }
-
-  function soltarDedo(event: TouchEvent) {
-    const inicio = toqueRef.current;
-    toqueRef.current = null;
-    if (!inicio) return;
-    const dedo = event.changedTouches[0];
-    if (!dedo) return;
-    const dx = dedo.clientX - inicio.x;
-    const dy = dedo.clientY - inicio.y;
-    if (Math.abs(dx) < 48 || Math.abs(dx) < Math.abs(dy)) return;
-    moverPaso(dx < 0 ? 1 : -1);
+    setPreguntaId(preguntaAbierta.id);
+    publicar(preguntaAbierta.id);
   }
 
   useLayoutEffect(() => {
@@ -620,7 +595,7 @@ export function CortinaTemas({
     });
     obs.observe(cuerpo);
     return () => obs.disconnect();
-  }, [temaId, preguntaId, locale]);
+  }, [temaId, preguntaId, abiertaId, locale]);
 
   useEffect(() => {
     const stage = stageRef.current;
@@ -677,67 +652,50 @@ export function CortinaTemas({
                 {copy.volver}
               </button>
             </div>
-            <p className="cortina-paso">{copy.paso}</p>
-            {preguntaActual ? (
-              <div
-                className="cortina-pregunta"
-                onTouchStart={(event) => {
-                  const dedo = event.changedTouches[0];
-                  if (dedo) toqueRef.current = { x: dedo.clientX, y: dedo.clientY };
-                }}
-                onTouchEnd={soltarDedo}
-              >
-                <p key={preguntaActual.id}>{preguntaActual.texto[locale]}</p>
-              </div>
-            ) : null}
-            {formulario ? (
-              <PreguntaFormForQuestion
-                pregunta={formulario}
-                formato={formato ?? 'texto'}
-                onAnother={cerrar}
-              />
-            ) : (
-              <div className="cortina-formatos">
-                <button type="button" className="cortina-formato" onClick={() => elegirFormato('texto')}>
-                  <PenLine size={20} strokeWidth={1.75} aria-hidden />
-                  {copy.escribir}
-                </button>
-                <button type="button" className="cortina-formato" onClick={() => elegirFormato('voz')}>
-                  <Mic size={20} strokeWidth={1.75} aria-hidden />
-                  {copy.contarVoz}
-                </button>
-                <button type="button" className="cortina-formato" onClick={() => elegirFormato('foto')}>
-                  <Camera size={20} strokeWidth={1.75} aria-hidden />
-                  {copy.conFoto}
-                </button>
-              </div>
-            )}
-            <div className="cortina-pasador">
-              <button type="button" className="cortina-flecha" aria-label={copy.previa} onClick={() => moverPaso(-1)}>
-                <ChevronLeft size={26} strokeWidth={1.75} aria-hidden />
-              </button>
-              <div className="cortina-puntos">
-                {preguntas.map((pregunta, indice) => (
-                  <button
-                    key={pregunta.id}
-                    type="button"
-                    className={indice === pasoIndice ? 'cortina-punto ahora' : 'cortina-punto'}
-                    aria-label={`${indice + 1}`}
-                    aria-current={indice === pasoIndice ? 'true' : undefined}
-                    onClick={() => {
-                      pasoRef.current = indice;
-                      setPasoIndice(indice);
-                      setPreguntaId(null);
-                      setFormato(null);
-                      if (temaId) publicar(temaId);
-                    }}
-                  />
-                ))}
-              </div>
-              <button type="button" className="cortina-flecha" aria-label={copy.proxima} onClick={() => moverPaso(1)}>
-                <ChevronRight size={26} strokeWidth={1.75} aria-hidden />
-              </button>
-            </div>
+            <p className="cortina-indice-ayuda">{copy.indice}</p>
+            <ul className="cortina-indice">
+              {preguntas.map((pregunta) => {
+                const abierta = pregunta.id === abiertaId;
+                return (
+                  <li key={pregunta.id}>
+                    <button
+                      type="button"
+                      className="cortina-indice-pregunta"
+                      aria-expanded={abierta}
+                      onClick={() => alternarPregunta(pregunta.id)}
+                    >
+                      {pregunta.texto[locale]}
+                    </button>
+                    {abierta ? (
+                      <div className="cortina-indice-respuesta">
+                        {formulario ? (
+                          <PreguntaFormForQuestion
+                            pregunta={formulario}
+                            formato={formato ?? 'texto'}
+                            onAnother={cerrar}
+                          />
+                        ) : (
+                          <div className="cortina-formatos">
+                            <button type="button" className="cortina-formato" onClick={() => elegirFormato('texto')}>
+                              <PenLine size={20} strokeWidth={1.75} aria-hidden />
+                              {copy.escribir}
+                            </button>
+                            <button type="button" className="cortina-formato" onClick={() => elegirFormato('voz')}>
+                              <Mic size={20} strokeWidth={1.75} aria-hidden />
+                              {copy.contarVoz}
+                            </button>
+                            <button type="button" className="cortina-formato" onClick={() => elegirFormato('foto')}>
+                              <Camera size={20} strokeWidth={1.75} aria-hidden />
+                              {copy.conFoto}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </section>
         <canvas ref={canvasRef} className="cortina-lienzo" aria-hidden />
