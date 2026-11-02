@@ -23,6 +23,7 @@ export function paisesEnEspanol(): [string, ...string[]] {
     .filter((nombre) => nombre.length > 2)
     .filter((nombre, indice, todos) => todos.indexOf(nombre) === indice)
     .sort((a, b) => a.localeCompare(b, 'es'));
+  if (lista.length === 0) return ['Otro'];
   return [...lista, 'Otro'];
 }
 
