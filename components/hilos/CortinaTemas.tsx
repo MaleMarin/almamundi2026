@@ -26,12 +26,8 @@ const TELON: { fondo: string; texto: string }[] = [
 
 /** Colores de las cintas en la cortina: los 12 colores originales de los temas. */
 const VIVO = TELON.map((t) => t.fondo);
-/** Capa de atrás: el mismo color, más oscuro, para que se lea más lejos. */
-const VIVO_ATRAS = VIVO.map((hex) => {
-  const n = parseInt(hex.slice(1), 16);
-  const k = 0.65;
-  return `rgb(${Math.round((n >> 16) * k)},${Math.round(((n >> 8) & 255) * k)},${Math.round((n & 255) * k)})`;
-});
+/** Capa de atrás: los mismos colores, sin oscurecer. */
+const VIVO_ATRAS = VIVO;
 
 /** Fondo del panel. Si el blanco no llega a 4.5 sobre la cinta, el mismo tono baja de luz. Las cintas siguen en TELON. */
 const PANEL: { fondo: string; texto: string; boton: string }[] = [
