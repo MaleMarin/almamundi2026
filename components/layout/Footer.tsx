@@ -31,7 +31,10 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
   const locale = localeCtx?.locale ?? initialLocale;
 
   const rowLinks: FooterPillItem[] = [
+    { id: 'contar', kind: 'hard', href: '/#historias', label: t.navTellStory },
+    { id: 'hilos', kind: 'internal', href: '/preguntas', label: HILOS_UI[locale].nav },
     { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
+    { id: 'respuestas', kind: 'hard', href: '/?capa=respuestas#mapa', label: HILOS_UI[locale].leyenda },
     {
       id: 'mapa',
       kind: 'hard',
@@ -39,9 +42,8 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       label: t.navMap,
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
-    { id: 'hilos', kind: 'internal', href: '/preguntas', label: HILOS_UI[locale].nav },
-    { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
     { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
+    { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
   ];
 
   function renderTextLink(item: FooterPillItem) {

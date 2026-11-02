@@ -2258,3 +2258,32 @@ a.cinta-pill {
     white-space: normal !important;
   }
 }
+
+/* Menú superior con 7 opciones: en pantallas medianas, letra y aire un poco menores para que quepa entero. */
+@media (min-width: 768px) and (max-width: 1499px) {
+  .site-header-nav a,
+  .site-header-nav button,
+  header .btn-am-secundario {
+    font-size: 14px !important;
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+  }
+  .site-header-nav {
+    column-gap: 0.3rem !important;
+  }
+  .site-header-nav [role="tablist"] button { padding: 0 !important; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .site-header-nav a,
+  .site-header-nav button,
+  header .btn-am-secundario {
+    font-size: 12px !important;
+    padding-left: 0.4rem !important;
+    padding-right: 0.4rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  header .home-logo { height: auto !important; width: 7.5rem !important; }
+  header { padding-left: 1rem !important; padding-right: 1rem !important; }
+}
