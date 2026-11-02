@@ -2239,7 +2239,13 @@ a.cinta-pill {
 
 /* Descubre: «son las historias de cada persona» continúa el título, pegado a él. */
 #mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea {
-  margin-top: 6px;
+  margin-top: 14px;
+}
+
+/* Descubre: portada contenida (máx. 64 px) para que no choque con los demás capítulos. */
+#mapa .home-capitulo-titulo.home-capitulo-titulo-portada {
+  font-size: clamp(2.25rem, 1.4rem + 2.8vw, 4rem);
+  line-height: 1.05;
 }
 
 /* Celular: los botones de Descubre con nombres largos se acomodan en varias filas centradas. */
