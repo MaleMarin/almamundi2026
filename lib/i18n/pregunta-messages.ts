@@ -30,19 +30,19 @@ export const PREGUNTA_COPY = {
     en: 'Wait until your photo is ready',
   },
   thanksTitle: {
-    es: 'Gracias, [alias]',
-    pt: 'Obrigado, [alias]',
-    en: 'Thank you, [alias]',
+    es: 'Tu respuesta llegó, [alias]',
+    pt: 'Sua resposta chegou, [alias]',
+    en: 'Your answer arrived, [alias]',
   },
   thanksMail: {
-    es: 'Vamos a revisarla. Si se publica, te avisamos por correo.',
-    pt: 'Vamos revisá-la. Se for publicada, avisamos por e-mail.',
-    en: "We'll review it. If it's published, we'll let you know by email.",
+    es: 'Una persona del equipo la leerá antes de publicarla. Mientras tanto, ¿te animas con otra pregunta?',
+    pt: 'Uma pessoa da equipe vai lê-la antes de publicá-la. Enquanto isso, que tal responder outra pergunta?',
+    en: "Someone on our team will read it before it's published. Meanwhile, how about another question?",
   },
   thanksMap: {
-    es: 'Vamos a revisarla. Si se publica, aparecerá en el mapa.',
-    pt: 'Vamos revisá-la. Se for publicada, vai aparecer no mapa.',
-    en: "We'll review it. If it's published, it will appear on the map.",
+    es: 'Una persona del equipo la leerá antes de publicarla. Mientras tanto, ¿te animas con otra pregunta?',
+    pt: 'Uma pessoa da equipe vai lê-la antes de publicá-la. Enquanto isso, que tal responder outra pergunta?',
+    en: "Someone on our team will read it before it's published. Meanwhile, how about another question?",
   },
   another: {
     es: 'Responde otra pregunta',
@@ -172,9 +172,9 @@ export const PREGUNTA_COPY = {
     en: 'Email (optional)',
   },
   emailHint: {
-    es: 'Si lo dejas, te avisamos cuando tu respuesta esté en el mapa. Nunca lo mostramos.',
-    pt: 'Se você deixar, avisamos quando sua resposta estiver no mapa. Nunca o mostramos.',
-    en: "If you leave it, we'll let you know when your answer is on the map. We never show it.",
+    es: 'Si quieres saber cuándo publicamos tu respuesta, déjanos tu correo y te avisaremos. Tu correo no será público.',
+    pt: 'Se quiser saber quando publicarmos sua resposta, deixe seu e-mail e avisaremos você. Seu e-mail não será público.',
+    en: "If you'd like to know when we publish your answer, leave your email and we'll let you know. Your email won't be public.",
   },
   shareBody: {
     es: 'AlmaMundi pregunta: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
@@ -193,7 +193,10 @@ export function preguntaAlias(alias: string): string {
 }
 
 export function preguntaThanksTitle(locale: AlmaLocale, alias: string): string {
-  return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', alias.trim());
+  const name = alias.trim();
+  // Nombre con mayúscula inicial («ana» → «Ana»), sin tocar el resto.
+  const pretty = name ? name.charAt(0).toLocaleUpperCase(locale) + name.slice(1) : name;
+  return PREGUNTA_COPY.thanksTitle[locale].replace('[alias]', pretty);
 }
 
 function preguntaShareLine(template: string, pregunta: string, enlace: string): string {
