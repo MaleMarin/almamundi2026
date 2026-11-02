@@ -95,13 +95,16 @@ function disableMeshRaycast(obj: THREE.Object3D | null) {
 function HeartbeatRing({
   baseScale,
   beat,
+  selected,
   layerOpRef,
 }: {
   baseScale: number;
   beat: boolean;
+  selected: boolean;
   layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number; respuestas: number }>;
 }) {
   const meshRef = useRef<THREE.Mesh>(null);
+  const haloRef = useRef<THREE.Mesh>(null);
   const reducedRef = useRef(false);
   const mat = useMemo(
     () =>
@@ -112,6 +115,20 @@ function HeartbeatRing({
         depthWrite: false,
         depthTest: false,
         side: THREE.DoubleSide,
+      }),
+    []
+  );
+  /** Halo naranja suave alrededor del anillo fino (solo visible en la selección). */
+  const haloMat = useMemo(
+    () =>
+      new THREE.MeshBasicMaterial({
+        color: '#FF6A3D',
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        depthTest: false,
+        side: THREE.DoubleSide,
+        blending: THREE.AdditiveBlending,
       }),
     []
   );
@@ -126,8 +143,9 @@ function HeartbeatRing({
     return () => {
       media.removeEventListener('change', apply);
       mat.dispose();
+      haloMat.dispose();
     };
-  }, [mat]);
+  }, [mat, haloMat]);
 
   useFrame(({ clock }) => {
     const mesh = meshRef.current;
@@ -145,21 +163,42 @@ function HeartbeatRing({
     }
     const grow = 1 + amp * 0.75;
     mesh.scale.set(baseScale * grow, baseScale * grow, 1);
-    mat.opacity = 0.55 * (1 - amp * 0.92) * layer;
+    // Selección: pulso lento y sutil (5 s), anillo al 70 % con halo. Sin selección, anillo fino y tenue.
+    const slow = reducedRef.current ? 0.5 : 0.5 + 0.5 * Math.sin((clock.elapsedTime * Math.PI * 2) / 5);
+    const base = selected ? 0.55 + 0.15 * slow : 0.4;
+    mat.opacity = base * (1 - amp * 0.92) * layer;
+    const halo = haloRef.current;
+    if (halo) {
+      halo.scale.set(baseScale * grow, baseScale * grow, 1);
+      haloMat.opacity = selected ? (0.12 + 0.1 * slow) * layer : 0;
+    }
   });
 
   return (
-    <mesh
-      ref={(mesh) => {
-        meshRef.current = mesh;
-        disableMeshRaycast(mesh);
-      }}
-      material={mat}
-      scale={[baseScale, baseScale, 1]}
-      renderOrder={16}
-    >
-      <ringGeometry args={[0.38, 0.5, 48]} />
-    </mesh>
+    <>
+      <mesh
+        ref={(mesh) => {
+          haloRef.current = mesh;
+          disableMeshRaycast(mesh);
+        }}
+        material={haloMat}
+        scale={[baseScale, baseScale, 1]}
+        renderOrder={15}
+      >
+        <ringGeometry args={[0.4, 0.62, 64]} />
+      </mesh>
+      <mesh
+        ref={(mesh) => {
+          meshRef.current = mesh;
+          disableMeshRaycast(mesh);
+        }}
+        material={mat}
+        scale={[baseScale, baseScale, 1]}
+        renderOrder={16}
+      >
+        <ringGeometry args={[0.48, 0.5, 64]} />
+      </mesh>
+    </>
   );
 }
 
@@ -281,7 +320,9 @@ function BitDot({
   const isRespuesta = bit.markerKind === 'respuesta';
   const isHilo = isStory && bit.hilo === true;
 
-  const storyTint = isStory && !isHilo ? bit.color : undefined;
+  // Decisión cerrada (docs/decisiones-cerradas.md): todas las historias usan el naranja de marca.
+  // El color por tono queda desactivado; para volver a usarlo, cambiar a `bit.color`.
+  const storyTint: string | undefined = undefined;
   const tintedMats = useMemo(() => {
     if (!storyTint) return null;
     const disk = storyMatNormal.clone();
@@ -363,6 +404,7 @@ function BitDot({
             <HeartbeatRing
               baseScale={rippleScale * sel * mag}
               beat={bit.pulse === true}
+              selected={selected}
               layerOpRef={layerOpRef}
             />
           ) : null}

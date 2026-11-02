@@ -119,9 +119,9 @@ export function createHuellaDotMaterial(materialName = 'GlobeHuellaDot'): THREE.
   return mat;
 }
 
-/** Naranja fuerte de historias (`#ff7a00`), en lineal para ShaderMaterial. */
+/** Naranja de marca de historias (`#FF4A1C`, docs/decisiones-cerradas.md), en lineal para ShaderMaterial. */
 function almaMundiCoralLinear(): THREE.Vector3 {
-  const c = new THREE.Color('#ff7a00').convertSRGBToLinear();
+  const c = new THREE.Color('#FF4A1C').convertSRGBToLinear();
   return new THREE.Vector3(c.r, c.g, c.b);
 }
 
@@ -133,7 +133,8 @@ export function createStoryStarBurstMaterial(
   materialName = 'GlobeStoryStarBurst'
 ): THREE.ShaderMaterial {
   const coral = almaMundiCoralLinear();
-  const core = new THREE.Color('#ffb020').convertSRGBToLinear();
+  // Centro un poco más claro del mismo naranja: da la «luz» sin pasar al amarillo.
+  const core = new THREE.Color('#FF8A5C').convertSRGBToLinear();
   const mat = new THREE.ShaderMaterial({
     name: materialName,
     uniforms: {
@@ -165,11 +166,13 @@ export function createStoryStarBurstMaterial(
         float d = length(c) * 2.0;
         if (d > 1.0) discard;
 
-        float fill = 1.0 - smoothstep(0.56, 0.66, d);
-        float ring = smoothstep(0.74, 0.80, d) * (1.0 - smoothstep(0.90, 0.98, d));
-        float alpha = max(fill, ring) * clamp(uIntensity, 0.0, 1.0) * uLayerOpacity;
+        // Punto naranja con luz suave: núcleo, halo que se desvanece y un borde fino y delicado.
+        float fill = 1.0 - smoothstep(0.50, 0.60, d);
+        float glow = (1.0 - smoothstep(0.58, 1.0, d)) * 0.32;
+        float ring = smoothstep(0.86, 0.89, d) * (1.0 - smoothstep(0.92, 0.95, d)) * 0.7;
+        float alpha = max(max(fill, glow), ring) * clamp(uIntensity, 0.0, 1.0) * uLayerOpacity;
         if (alpha < 0.03) discard;
-        vec3 col = mix(uRim, uCore, fill);
+        vec3 col = mix(uRim, uCore, fill * (1.0 - smoothstep(0.0, 0.5, d)));
         fragColor = vec4(col, alpha);
       }
     `,
