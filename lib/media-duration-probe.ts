@@ -114,20 +114,50 @@ function durationFromMpeg(head: Uint8Array, totalSize: number): number | null {
   return Number.isFinite(sec) && sec >= 0 ? sec : null;
 }
 
+/**
+ * Duración de un WebM/Matroska a partir del elemento Duration (0x4489) de Segment Info.
+ *
+ * - Solo se busca ANTES del primer Cluster (0x1F43B675): más adelante vienen los datos de
+ *   audio, donde los bytes 0x44 0x89 aparecen por azar y daban duraciones inventadas
+ *   (un audio de 14 s salía como «más de 2 minutos»).
+ * - Duration está en unidades de TimecodeScale (0x2AD7B1, por defecto 1 000 000 ns = 1 ms),
+ *   no en segundos.
+ * - Las grabaciones de MediaRecorder suelen no traer Duration: entonces devuelve null y
+ *   manda el tope de tiempo de la grabación en el navegador.
+ */
 function durationFromWebm(head: Uint8Array): number | null {
-  for (let i = 0; i < head.length - 10; i++) {
+  let end = head.length;
+  for (let i = 0; i + 4 <= head.length; i++) {
+    if (head[i] === 0x1f && head[i + 1] === 0x43 && head[i + 2] === 0xb6 && head[i + 3] === 0x75) {
+      end = i;
+      break;
+    }
+  }
+
+  let timecodeScale = 1_000_000;
+  for (let i = 0; i + 4 < end; i++) {
+    if (head[i] !== 0x2a || head[i + 1] !== 0xd7 || head[i + 2] !== 0xb1) continue;
+    const sizeByte = head[i + 3] ?? 0;
+    const len = sizeByte & 0x80 ? sizeByte & 0x7f : 0;
+    if (len < 1 || len > 8 || i + 4 + len > end) continue;
+    let v = 0;
+    for (let k = 0; k < len; k++) v = v * 256 + (head[i + 4 + k] ?? 0);
+    if (v > 0) timecodeScale = v;
+    break;
+  }
+
+  for (let i = 0; i + 3 < end; i++) {
     if (head[i] !== 0x44 || head[i + 1] !== 0x89) continue;
     const sizeByte = head[i + 2] ?? 0;
-    if (sizeByte === 0x88 && i + 11 <= head.length) {
-      const view = new DataView(head.buffer, head.byteOffset + i + 3, 8);
-      const sec = view.getFloat64(0);
-      if (Number.isFinite(sec) && sec >= 0 && sec < 24 * 3600) return sec;
+    let raw: number | null = null;
+    if (sizeByte === 0x88 && i + 11 <= end) {
+      raw = new DataView(head.buffer, head.byteOffset + i + 3, 8).getFloat64(0);
+    } else if (sizeByte === 0x84 && i + 7 <= end) {
+      raw = new DataView(head.buffer, head.byteOffset + i + 3, 4).getFloat32(0);
     }
-    if (sizeByte === 0x84 && i + 7 <= head.length) {
-      const view = new DataView(head.buffer, head.byteOffset + i + 3, 4);
-      const sec = view.getFloat32(0);
-      if (Number.isFinite(sec) && sec >= 0 && sec < 24 * 3600) return sec;
-    }
+    if (raw == null) continue;
+    const sec = (raw * timecodeScale) / 1e9;
+    if (Number.isFinite(sec) && sec >= 0 && sec < 24 * 3600) return sec;
   }
   return null;
 }
