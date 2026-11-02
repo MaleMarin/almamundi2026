@@ -25,7 +25,7 @@ function formatDate(publishedAt: string | undefined): string {
   if (!publishedAt) return '';
   const d = new Date(publishedAt);
   if (Number.isNaN(d.getTime())) return '';
-  return d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+  return String(d.getFullYear());
 }
 
 function formatPlace(s: StoryPoint): string {

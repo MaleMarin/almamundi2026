@@ -1,4 +1,3 @@
-import { formatCalendarDate } from '@/lib/i18n/site-intl';
 
 export type AlmaLocale = 'es' | 'pt' | 'en';
 
@@ -23,5 +22,7 @@ export function interpolate(
 /** Fecha larga para el pie de la pieza: «20 de agosto de 2026» / «August 20, 2026». */
 export function formatLongDate(at: Date, locale: AlmaLocale): string {
   if (Number.isNaN(at.getTime())) return '';
-  return formatCalendarDate(at.getFullYear(), at.getMonth() + 1, at.getDate(), locale);
+  void locale;
+  // Público: solo el año.
+  return String(at.getFullYear());
 }

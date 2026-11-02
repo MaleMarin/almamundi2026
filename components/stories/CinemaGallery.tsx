@@ -21,8 +21,8 @@ import type { StoryPoint } from '@/lib/map-data/stories';
 // ─── Helpers ────────────────────────────────────────────────────────────────
 function formatDate(iso: string | undefined): string {
   if (!iso) return '';
-  return new Date(iso).toLocaleDateString('es-ES', {
-    day: 'numeric', month: 'long', year: 'numeric' });
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '' : String(d.getFullYear());
 }
 function formatPlace(s: StoryPoint): string {
   return [s.city, s.country].filter(Boolean).join(' · ') || s.label || '';

@@ -46,9 +46,10 @@ function ymdFromIso(iso: string): { year: number; month: number; day: number } |
 export function formatSiteDate(iso: string | undefined | null, locale: AlmaLocale): string {
   const raw = (iso ?? '').trim();
   if (!raw || raw === '—' || raw === '-') return '';
+  void locale;
+  // Público: solo el año (decisión editorial, nov. 2026).
   const ymd = ymdFromIso(raw);
-  if (!ymd) return raw;
-  return formatCalendarDate(ymd.year, ymd.month, ymd.day, locale) || raw;
+  return ymd ? String(ymd.year) : '';
 }
 
 /** Día civil en una zona, para el correo de recepción. */
@@ -129,10 +130,7 @@ export function formatStoryWhen(
   locale: AlmaLocale,
   now = Date.now()
 ): string {
-  if (!iso) return '';
-  const then = Date.parse(iso);
-  if (!Number.isFinite(then)) return formatSiteDate(iso, locale);
-  const days = Math.floor((now - then) / 86400000);
-  if (days >= 0 && days < 7) return formatRelativeTime(iso, now, locale) || formatSiteDate(iso, locale);
+  void now;
+  // Público: solo el año, sin «hace X días».
   return formatSiteDate(iso, locale);
 }

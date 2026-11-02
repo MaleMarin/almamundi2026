@@ -7,7 +7,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { mapChrome } from '@/lib/i18n/map-chrome';
 import type { StoryPoint } from '@/lib/map-data/stories';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
-import { formatRelativeTime } from '@/lib/i18n/site-intl';
+import { formatSiteDate } from '@/lib/i18n/site-intl';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
 export type StoriesPanelProps = {
@@ -56,7 +56,7 @@ function StoryRow({
 }) {
   const { locale } = useHomeLocale();
   const tipo = kind || formatStoryType(story);
-  const ago = formatRelativeTime(story.publishedAt, Date.now(), locale);
+  const ago = formatSiteDate(story.publishedAt, locale);
   const cardShell = {
     borderRadius: 16,
     background: isActive
