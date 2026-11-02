@@ -68,7 +68,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         after: ' o escríbenos a hola@almamundi.org.',
       },
     ],
-    privacy: 'Lee nuestra política de privacidad',
+    privacy: 'Lee el Aviso de privacidad',
     close: 'Cerrar',
   },
   pt: {
@@ -119,7 +119,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         after: ' ou escreva para hola@almamundi.org.',
       },
     ],
-    privacy: 'Leia nossa política de privacidade',
+    privacy: 'Leia o Aviso de privacidade',
     close: 'Fechar',
   },
   en: {
@@ -169,7 +169,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         after: ' or write to hola@almamundi.org.',
       },
     ],
-    privacy: 'Read our privacy policy',
+    privacy: 'Read the Privacy notice',
     close: 'Close',
   },
 };

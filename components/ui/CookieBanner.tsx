@@ -67,7 +67,8 @@ export function CookieBanner() {
 
   const panel: CSSProperties = {
     position: 'fixed',
-    bottom: 16,
+    // En celular, por encima del botón de accesibilidad «AA» (abajo a la izquierda).
+    bottom: narrow ? 76 : 16,
     left: 16,
     right: 16,
     zIndex: 40,
