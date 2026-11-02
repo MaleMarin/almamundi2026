@@ -1093,7 +1093,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         )}
 
       {/* Cortar sonido del universo: a la derecha del globo para que la persona pueda apagarlo si no quiere escucharlo */}
-      <div className="absolute top-0 right-4 md:right-6 z-30 pt-2 md:pt-3">
+      <div
+        className={`map-sound-control absolute top-0 right-4 md:right-6 z-30 pt-2 md:pt-3${
+          openStory || (SHOW_PUBLIC_RESPUESTAS && openRespuesta) ? ' map-sound-control--panel-open' : ''
+        }`}
+      >
         <MapTopControls
           embedded
           soundEnabled={soundEnabled}

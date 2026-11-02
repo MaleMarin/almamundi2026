@@ -804,6 +804,18 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   overscroll-behavior: contain;
 }
 
+/* Con el panel de una historia abierto, el botón de sonido se corre a su izquierda
+   (escritorio) o al lado izquierdo (celular) para no tapar la X del panel. */
+.map-sound-control--panel-open {
+  right: calc(24px + 420px + 16px);
+}
+@media (max-width: 767px) {
+  .map-sound-control--panel-open {
+    right: auto;
+    left: 1rem;
+  }
+}
+
 .story-map-panel__card {
   width: 100%;
   height: auto;

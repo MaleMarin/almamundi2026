@@ -419,7 +419,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
   const temaPregunta = catalog ? null : preguntaPorId(story.questionId)?.tema[locale];
   const alias = formatPublicName(story.authorName || story.author?.name);
-  const fullHref = !catalog
+  // «Ver historia completa» solo cuando el panel no muestra todo: una historia de texto
+  // ya se lee completa aquí (docs/decisiones-cerradas.md).
+  const fullHref = !catalog || format === 'text'
     ? null
     : isShortCode(story.shortCode)
       ? `/h/${story.shortCode}`
