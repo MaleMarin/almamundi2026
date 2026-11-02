@@ -52,7 +52,7 @@ function publicationCopy(locale: AlmaLocale) {
       thanks: "Agradecemos por contá-la.<br>Equipe AlmaMundi",
       thanksText: "Agradecemos por contá-la.",
       team: "Equipe AlmaMundi",
-      privacy: "Política de privacidade",
+      privacy: "Aviso de privacidade",
     };
   }
   if (locale === "en") {
@@ -71,7 +71,7 @@ function publicationCopy(locale: AlmaLocale) {
       thanks: "Thank you for telling it.<br>The AlmaMundi team",
       thanksText: "Thank you for telling it.",
       team: "The AlmaMundi team",
-      privacy: "Privacy policy",
+      privacy: "Privacy notice",
     };
   }
   return {
@@ -89,7 +89,7 @@ function publicationCopy(locale: AlmaLocale) {
     thanks: "Gracias por contarla.<br>Equipo AlmaMundi",
     thanksText: "Gracias por contarla.",
     team: "Equipo AlmaMundi",
-    privacy: "Política de privacidad",
+    privacy: "Aviso de privacidad",
   };
 }
 

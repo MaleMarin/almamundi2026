@@ -140,9 +140,9 @@ export function invitationHtml(): string {
 }
 
 export function nonprofitFooterNote(locale: AlmaLocale): string {
-  if (locale === "pt") return "O AlmaMundi é um projeto sem fins lucrativos da Precisar.";
-  if (locale === "en") return "AlmaMundi is a nonprofit project by Precisar.";
-  return "AlmaMundi es un proyecto sin fines de lucro de Precisar.";
+  if (locale === "pt") return "O AlmaMundi é uma iniciativa sem fins lucrativos da Precisar.";
+  if (locale === "en") return "AlmaMundi is a nonprofit initiative of Precisar.";
+  return "AlmaMundi es una iniciativa sin fines de lucro de Precisar.";
 }
 
 export function authorEmailFooterNote(locale: AlmaLocale, _kind: "historia" | "respuesta"): string {
@@ -152,8 +152,8 @@ export function authorEmailFooterNote(locale: AlmaLocale, _kind: "historia" | "r
 function receivedFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
   const note = authorEmailFooterNote(locale, "historia");
-  const policy = locale === "en" ? "Privacy policy" : "Política de privacidad";
-  const policyPt = locale === "pt" ? "Política de privacidade" : policy;
+  const policy = locale === "en" ? "Privacy notice" : "Aviso de privacidad";
+  const policyPt = locale === "pt" ? "Aviso de privacidade" : policy;
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         ${note}
         <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
@@ -164,7 +164,7 @@ function receivedFooterHtml(locale: AlmaLocale = "es"): string {
 function respuestaFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
   const note = authorEmailFooterNote(locale, "respuesta");
-  const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
+  const policy = locale === "pt" ? "Aviso de privacidade" : locale === "en" ? "Privacy notice" : "Aviso de privacidad";
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         ${note}
         <a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
@@ -175,7 +175,7 @@ function respuestaFooterHtml(locale: AlmaLocale = "es"): string {
 function newsletterFooterHtml(locale: AlmaLocale = "es"): string {
   const privacy = absoluteEmailUrl("/privacidad");
   const policy =
-    locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
+    locale === "pt" ? "Aviso de privacidade" : locale === "en" ? "Privacy notice" : "Aviso de privacidad";
   const note = `${nonprofitFooterNote(locale)} `;
   return `<p class="email-footer" style="margin:0;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         ${note}<a href="${escapeHtml(privacy)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"
@@ -186,7 +186,7 @@ function newsletterFooterHtml(locale: AlmaLocale = "es"): string {
 function accountFooterHtml(locale: AlmaLocale = "es"): string {
   const home = absoluteEmailUrl("/");
   const privacy = absoluteEmailUrl("/privacidad");
-  const policy = locale === "pt" ? "Política de privacidade" : locale === "en" ? "Privacy policy" : "Política de privacidad";
+  const policy = locale === "pt" ? "Aviso de privacidade" : locale === "en" ? "Privacy notice" : "Aviso de privacidad";
   const note = nonprofitFooterNote(locale);
   return `<p class="email-footer" style="margin:0 0 8px;font-size:13px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(home)}" target="_blank" rel="noopener noreferrer" class="email-footer-link"

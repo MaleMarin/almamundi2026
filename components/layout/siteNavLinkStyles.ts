@@ -38,7 +38,7 @@ export const SITE_FOOTER_LEGAL_LINKS = [
   { href: '/mis-datos-personales', label: 'Mis datos personales' },
 ] as const;
 
-export const SITE_FOOTER_GUIA_CONDUCTA_HREF = '/Guia%20de%20conducta%20AlmaMundi.pdf';
+export const SITE_FOOTER_GUIA_CONDUCTA_HREF = '/codigo-de-conducta';
 
 /** `/historias` o `${base}/historias` si la home está bajo un prefijo (p. ej. preview). */
 export function historiasListHrefFromBasePath(basePath: string): string {

@@ -2,7 +2,7 @@
  * Recordatorio para casos límite en curaduría. No reemplaza el criterio de Ana.
  */
 
-export const CONDUCT_GUIDE_HREF = "/Guia%20de%20conducta%20AlmaMundi.pdf";
+export const CONDUCT_GUIDE_HREF = "/codigo-de-conducta";
 
 export function moreInfoMailto(args: { authorEmail: string; storyTitle: string }): string {
   const to = args.authorEmail.trim();

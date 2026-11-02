@@ -4,10 +4,7 @@ import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvi
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import {
-  SITE_FOOTER_GUIA_CONDUCTA_HREF,
-  SITE_FOOTER_LEGAL_LINKS,
-} from '@/components/layout/siteNavLinkStyles';
+import { SITE_FOOTER_LEGAL_LINKS } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -131,11 +128,18 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               <p className="mb-3 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#646E7E] tracking-[0.12em]">
                 {t.footerInitiativeOf}
               </p>
-              <img
-                src="/logo-precisar.png?v=3"
-                alt="Precisar"
-                className="h-11 w-auto md:h-14"
-              />
+              <a
+                href="https://precisar.net"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block transition-opacity hover:opacity-75"
+              >
+                <img
+                  src="/logo-precisar.png?v=3"
+                  alt="Precisar"
+                  className="h-11 w-auto md:h-14"
+                />
+              </a>
             </div>
           </div>
 
@@ -158,16 +162,13 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                       : t.footerMyData}
                 </ActiveInternalNavLink>
               ))}
-              <a
-                href={SITE_FOOTER_GUIA_CONDUCTA_HREF}
+              <ActiveInternalNavLink
+                href="/codigo-de-conducta"
                 className={FOOTER_LEGAL_LINK}
-                target="_blank"
-                rel="noopener noreferrer"
-                type="application/pdf"
-                title={t.footerConductGuideTitle}
+                activeClassName="!text-gray-900 font-semibold"
               >
                 {t.footerConductGuide}
-              </a>
+              </ActiveInternalNavLink>
               <ActiveInternalNavLink
                 href="/contacto"
                 className={FOOTER_LEGAL_LINK}
@@ -176,8 +177,19 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
                 {t.footerContact}
               </ActiveInternalNavLink>
             </nav>
-            <p className="text-[length:var(--fs-etiqueta)] font-medium text-[#646E7E]">
-              © 2026 AlmaMundi
+            <p className="text-center text-[length:var(--fs-etiqueta)] font-medium text-[#646E7E]">
+              © AlmaMundi 2026
+              <span aria-hidden> · </span>
+              {locale === 'pt' ? 'A ' : null}
+              <a
+                href="https://precisar.net"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline underline-offset-2 transition-opacity hover:opacity-75"
+              >
+                Precisar
+              </a>
+              {t.footerPrecisarRest}
             </p>
           </div>
         </div>

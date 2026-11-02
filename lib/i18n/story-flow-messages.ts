@@ -232,7 +232,7 @@ const es: StoryFlowMessages = {
   modalConsentPublish: 'Autorizo que mi imagen, voz y nombre o alias se publiquen en AlmaMundi.',
   modalConsentTermsAndPrivacy: 'Acepto los {terminos} y la {privacidad}.',
   modalConsentTermsLink: 'Términos de uso',
-  modalConsentPrivacyLink: 'Política de privacidad',
+  modalConsentPrivacyLink: 'Aviso de privacidad',
   modalNewsletterOptIn: 'Quiero recibir historias nuevas en mi correo',
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
@@ -425,7 +425,7 @@ const pt: StoryFlowMessages = {
   modalConsentPublish: 'Autorizo que minha imagem, voz e nome ou apelido sejam publicados no AlmaMundi.',
   modalConsentTermsAndPrivacy: 'Aceito os {terminos} e a {privacidad}.',
   modalConsentTermsLink: 'Termos de uso',
-  modalConsentPrivacyLink: 'Política de privacidade',
+  modalConsentPrivacyLink: 'Aviso de privacidade',
   modalNewsletterOptIn: 'Quero receber novas histórias no meu e-mail',
   modalMarkThreeToSend: 'Marque as três caixas para enviar.',
   modalSubmitFailedKeep:
@@ -582,7 +582,7 @@ const en: StoryFlowMessages = {
   modalConsentPublish: 'I authorize my image, voice, and name or alias to be published on AlmaMundi.',
   modalConsentTermsAndPrivacy: 'I accept the {terminos} and the {privacidad}.',
   modalConsentTermsLink: 'Terms of use',
-  modalConsentPrivacyLink: 'Privacy policy',
+  modalConsentPrivacyLink: 'Privacy notice',
   modalNewsletterOptIn: 'I want to receive new stories by email',
   modalMarkThreeToSend: 'Check the three boxes to send.',
   modalSubmitFailedKeep:

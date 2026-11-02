@@ -31,7 +31,7 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Cerrar',
     closeAria: 'Cerrar propósito',
     cta: 'Cuenta tu historia',
-    credit: 'AlmaMundi es un proyecto sin fines de lucro de Precisar.',
+    credit: 'AlmaMundi es una iniciativa sin fines de lucro de Precisar.',
     sections: [
       {
         id: 'por-que',
@@ -92,7 +92,7 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Fechar',
     closeAria: 'Fechar propósito',
     cta: 'Conte sua história',
-    credit: 'O AlmaMundi é um projeto sem fins lucrativos da Precisar.',
+    credit: 'O AlmaMundi é uma iniciativa sem fins lucrativos da Precisar.',
     sections: [
       {
         id: 'por-que',
@@ -153,7 +153,7 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Close',
     closeAria: 'Close purpose',
     cta: 'Tell your story',
-    credit: 'AlmaMundi is a nonprofit project by Precisar.',
+    credit: 'AlmaMundi is a nonprofit initiative of Precisar.',
     sections: [
       {
         id: 'por-que',

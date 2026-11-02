@@ -60,7 +60,7 @@ function rejectionCopy(locale: AlmaLocale) {
       thanks: "Agradecemos por confiar sua história a nós.<br>Equipe AlmaMundi",
       thanksText: "Agradecemos por confiar sua história a nós.",
       team: "Equipe AlmaMundi",
-      privacy: "Política de privacidade",
+      privacy: "Aviso de privacidade",
     };
   }
   if (locale === "en") {
@@ -76,7 +76,7 @@ function rejectionCopy(locale: AlmaLocale) {
       thanks: "Thank you for trusting us with your story.<br>The AlmaMundi team",
       thanksText: "Thank you for trusting us with your story.",
       team: "The AlmaMundi team",
-      privacy: "Privacy policy",
+      privacy: "Privacy notice",
     };
   }
   return {
@@ -91,7 +91,7 @@ function rejectionCopy(locale: AlmaLocale) {
     thanks: "Gracias por confiarnos tu historia.<br>Equipo AlmaMundi",
     thanksText: "Gracias por confiarnos tu historia.",
     team: "Equipo AlmaMundi",
-    privacy: "Política de privacidad",
+    privacy: "Aviso de privacidad",
   };
 }
 

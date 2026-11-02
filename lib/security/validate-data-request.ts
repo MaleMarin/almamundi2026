@@ -1,5 +1,6 @@
 import { createHash } from 'crypto';
 import { z } from 'zod';
+import { paisesEnEspanol } from '@/lib/i18n/paises';
 
 export const MAX_PRIVACY_BODY_BYTES = 10 * 1024;
 
@@ -13,6 +14,7 @@ export const MSG_RELOAD = 'Recarga la página e intenta de nuevo.';
 export const MSG_SUCCESS = 'Recibimos tu solicitud.';
 
 export const REQUEST_TYPES = [
+  'retirar_historia',
   'confirmar_tratamiento',
   'acceder',
   'corregir',
@@ -27,6 +29,7 @@ export const REQUEST_TYPES = [
 export type PrivacyRequestType = (typeof REQUEST_TYPES)[number];
 
 export const REQUEST_TYPE_LABELS: Record<PrivacyRequestType, string> = {
+  retirar_historia: 'Retirar mi historia o mi respuesta del sitio',
   confirmar_tratamiento: 'Confirmar si tratamos datos personales tuyos.',
   acceder: 'Acceder a los datos personales que tenemos sobre ti.',
   corregir: 'Corregir datos incompletos, incorrectos o desactualizados.',
@@ -38,37 +41,8 @@ export const REQUEST_TYPE_LABELS: Record<PrivacyRequestType, string> = {
   otro: 'Otro tipo de solicitud.',
 };
 
-/** Chile y México primero; lista cerrada para el select. */
-export const PRIVACY_COUNTRIES = [
-  'Chile',
-  'México',
-  'Argentina',
-  'Bolivia',
-  'Brasil',
-  'Canadá',
-  'Colombia',
-  'Costa Rica',
-  'Cuba',
-  'Ecuador',
-  'El Salvador',
-  'España',
-  'Estados Unidos',
-  'Francia',
-  'Guatemala',
-  'Honduras',
-  'Italia',
-  'Nicaragua',
-  'Panamá',
-  'Paraguay',
-  'Perú',
-  'Portugal',
-  'Puerto Rico',
-  'Reino Unido',
-  'República Dominicana',
-  'Uruguay',
-  'Venezuela',
-  'Alemania',
-] as const;
+/** Países en español, orden alfabético, con «Otro» al final. El valor guardado es siempre el nombre en español. */
+export const PRIVACY_COUNTRIES = paisesEnEspanol();
 
 const NAME_RE = /^(?=.{2,100}$)[\p{L}]+(?:[ '\-][\p{L}]+)*$/u;
 

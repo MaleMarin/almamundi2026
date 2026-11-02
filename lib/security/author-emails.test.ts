@@ -71,7 +71,7 @@ describe('correos al autor', () => {
     assert.doesNotMatch(html, /WhatsApp/);
     assert.doesNotMatch(html, /wa\.me/);
     assert.doesNotMatch(text, /WhatsApp/);
-    assert.match(html, /Política de privacidad/);
+    assert.match(html, /Aviso de privacidad/);
     assert.match(html, /prefers-color-scheme:\s*dark/);
     assert.match(html, /height:48px/);
     assert.match(html, /Ahora pasa por una revisión/);

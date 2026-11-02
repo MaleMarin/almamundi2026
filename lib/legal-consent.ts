@@ -18,7 +18,7 @@ const LABELS = {
   adult: "Mayor de 18 o adulto responsable",
   publish: "Autoriza publicar imagen, voz y nombre",
   terms: "Términos de uso",
-  privacy: "Política de privacidad",
+  privacy: "Aviso de privacidad",
 } as const;
 
 function flag(data: Record<string, unknown>, key: string): boolean {

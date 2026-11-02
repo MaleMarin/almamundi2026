@@ -94,7 +94,7 @@ function receivedCopy(locale: AlmaLocale) {
       map: "Explorar o mapa",
       doubts: "Tem dúvidas? Escreva para",
       footerNote: authorEmailFooterNote("pt", "historia"),
-      privacy: "Política de privacidade",
+      privacy: "Aviso de privacidade",
     };
   }
   if (locale === "en") {
@@ -118,7 +118,7 @@ function receivedCopy(locale: AlmaLocale) {
       map: "Explore the map",
       doubts: "Questions? Write to",
       footerNote: authorEmailFooterNote("en", "historia"),
-      privacy: "Privacy policy",
+      privacy: "Privacy notice",
     };
   }
   return {
@@ -141,7 +141,7 @@ function receivedCopy(locale: AlmaLocale) {
     map: "Explorar el mapa",
     doubts: "¿Tienes dudas? Escríbenos a",
     footerNote: authorEmailFooterNote("es", "historia"),
-    privacy: "Política de privacidad",
+    privacy: "Aviso de privacidad",
   };
 }
 

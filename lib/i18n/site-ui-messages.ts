@@ -9,6 +9,7 @@ export type SiteUiMessages = {
   footerMyData: string;
   footerConductGuide: string;
   footerConductGuideTitle: string;
+  footerPrecisarRest: string;
   footerContact: string;
   cookieAria: string;
   cookieBody: string;
@@ -112,18 +113,18 @@ export type SiteUiMessages = {
 };
 
 const es: SiteUiMessages = {
-  footerInitiativeOf: 'Un proyecto sin fines de lucro de',
+  footerInitiativeOf: 'Una iniciativa sin fines de lucro de',
   footerLegalAria: 'Información legal y datos personales',
   footerPrivacy: 'Aviso de privacidad',
   footerTerms: 'Términos de uso',
   footerMyData: 'Mis datos personales',
-  footerConductGuide: 'Guía de conducta',
-  footerConductGuideTitle:
-    'Guía de conducta AlmaMundi (PDF): respeto, cuidado y uso responsable del sitio',
+  footerConductGuide: 'Código de conducta',
+  footerConductGuideTitle: 'Código de conducta',
+  footerPrecisarRest: ' es una iniciativa de la Fundación Democracia Abierta',
   footerContact: 'Contacto',
   cookieAria: 'Aviso de cookies',
   cookieBody: 'AlmaMundi usa cookies esenciales y analítica básica.',
-  cookiePrivacyLink: 'Política de privacidad',
+  cookiePrivacyLink: 'Aviso de privacidad',
   cookieAccept: 'Entendido',
   listHeroTitle: 'El mundo tiene millones de historias que nadie conoce.',
   listHeroSubtitle: 'Estas son algunas.',
@@ -251,18 +252,18 @@ const es: SiteUiMessages = {
 };
 
 const pt: SiteUiMessages = {
-  footerInitiativeOf: 'Um projeto sem fins lucrativos da',
+  footerInitiativeOf: 'Uma iniciativa sem fins lucrativos da',
   footerLegalAria: 'Informação legal e dados pessoais',
   footerPrivacy: 'Aviso de privacidade',
   footerTerms: 'Termos de uso',
   footerMyData: 'Meus dados pessoais',
-  footerConductGuide: 'Guia de conduta',
-  footerConductGuideTitle:
-    'Guia de conduta AlmaMundi (PDF): respeito, cuidado e uso responsável do site',
+  footerConductGuide: 'Código de conduta',
+  footerConductGuideTitle: 'Código de conduta',
+  footerPrecisarRest: ' é uma iniciativa da Fundación Democracia Abierta',
   footerContact: 'Contato',
   cookieAria: 'Aviso de cookies',
   cookieBody: 'AlmaMundi usa cookies essenciais e análise básica.',
-  cookiePrivacyLink: 'Política de privacidade',
+  cookiePrivacyLink: 'Aviso de privacidade',
   cookieAccept: 'Entendi',
   listHeroTitle: 'O mundo tem milhões de histórias que ninguém conhece.',
   listHeroSubtitle: 'Estas são algumas.',
@@ -390,18 +391,18 @@ const pt: SiteUiMessages = {
 };
 
 const en: SiteUiMessages = {
-  footerInitiativeOf: 'A nonprofit project by',
+  footerInitiativeOf: 'A nonprofit initiative of',
   footerLegalAria: 'Legal information and personal data',
   footerPrivacy: 'Privacy notice',
   footerTerms: 'Terms of use',
   footerMyData: 'My personal data',
   footerConductGuide: 'Code of conduct',
-  footerConductGuideTitle:
-    'AlmaMundi code of conduct (PDF): respect, care, and responsible use of the site',
+  footerConductGuideTitle: 'Code of conduct',
+  footerPrecisarRest: ' is an initiative of Fundación Democracia Abierta',
   footerContact: 'Contact',
   cookieAria: 'Cookie notice',
   cookieBody: 'AlmaMundi uses essential cookies and basic analytics.',
-  cookiePrivacyLink: 'Privacy policy',
+  cookiePrivacyLink: 'Privacy notice',
   cookieAccept: 'Got it',
   listHeroTitle: 'The world holds millions of stories no one knows.',
   listHeroSubtitle: 'These are a few of them.',
