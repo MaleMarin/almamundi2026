@@ -2236,3 +2236,25 @@ a.cinta-pill {
     transition: none;
   }
 }
+
+/* Descubre: «son las historias de cada persona» continúa el título, pegado a él. */
+#mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea {
+  margin-top: 6px;
+}
+
+/* Celular: los botones de Descubre con nombres largos se acomodan en varias filas centradas. */
+@media (max-width: 767px) {
+  #map-dock-slot .map-dock-scroller,
+  #map-dock-slot .map-dock-row {
+    overflow: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #map-dock-slot .map-dock-line {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    white-space: normal !important;
+  }
+}

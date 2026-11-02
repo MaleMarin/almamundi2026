@@ -49,21 +49,6 @@ import { PillNavButton } from '@/components/home/PillNavButton';
 import type { GlobeBitMarker, GlobeLayerVisibility } from '@/components/globe/GlobeBitsLayer';
 import { StoryViewer } from '@/components/mapa/StoryViewer';
 
-function LeyendaMapa({ kind, text }: { kind: 'story' | 'answer' | 'bit'; text: string }) {
-  const corte = text.indexOf(' ');
-  const primero = corte === -1 ? text : text.slice(0, corte);
-  const resto = corte === -1 ? '' : text.slice(corte);
-  return (
-    <span className="map-dock-legend__item">
-      <span className="map-dock-legend__keep">
-        <i className={`map-dock-legend__dot map-dock-legend__dot--${kind}`} aria-hidden />
-        {primero}
-      </span>
-      {resto}
-    </span>
-  );
-}
-
 /** Píldora «Sorpréndeme» del dock: ocultar en el lanzamiento (aún no hay historias publicadas). Volver a `true` para reactivarla. */
 const SHOW_SURPRISE_ME_BUTTON = false;
 /** Respuestas aprobadas en el globo. No entran al catálogo de historias. */
@@ -1029,6 +1014,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 title={globeLayers.stories ? dockCopy.storiesOn : dockCopy.storiesOff}
                 onClick={() => onGlobeLayerPill('stories', 'stories')}
               >
+                <i className="map-dock-legend__dot map-dock-legend__dot--story" aria-hidden />
                 {dockCopy.stories}
               </PillNavButton>
               {SHOW_SURPRISE_ME_BUTTON ? (
@@ -1046,6 +1032,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 title={globeLayers.bits ? dockCopy.bitsOn : dockCopy.bitsOff}
                 onClick={() => onGlobeLayerPill('bits', 'bits')}
               >
+                <i className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />
                 {dockCopy.bits}
               </PillNavButton>
               <PillNavButton
@@ -1054,6 +1041,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 title={HILOS_UI[locale].leyenda}
                 onClick={() => onGlobeLayerPill('respuestas', 'respuestas')}
               >
+                <i className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
                 {HILOS_UI[locale].leyenda}
               </PillNavButton>
             </div>
@@ -1077,17 +1065,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             </div>
           </div>
           </div>
-          <p className="map-dock-legend">
-            <LeyendaMapa kind="story" text={HOME_MESSAGES[locale].leyendaHistorias} />
-            <span className="map-dock-legend__sep" aria-hidden>
-              {' · '}
-            </span>
-            <LeyendaMapa kind="bit" text={HOME_MESSAGES[locale].leyendaBits} />
-            <span className="map-dock-legend__sep" aria-hidden>
-              {' · '}
-            </span>
-            <LeyendaMapa kind="answer" text={HOME_MESSAGES[locale].leyendaRespuestas} />
-          </p>
           </div>,
           dockSlot
         )}
