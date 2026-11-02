@@ -56,6 +56,10 @@ export type HomeMessages = {
   cejaDescubre: string;
   bajadaCuenta: string;
   bajadaInspira: string;
+  inspiraTitulo: string;
+  inspiraFuerte: string;
+  inspiraCita: string;
+  inspiraLlamada: string;
   leyendaHistorias: string;
   leyendaRespuestas: string;
   leyendaBits: string;
@@ -125,7 +129,11 @@ const es: HomeMessages = {
   cejaInspira: 'Inspírate',
   cejaDescubre: 'Descubre',
   bajadaCuenta: 'Hay muchas formas de contarla',
-  bajadaInspira: 'Toca una cinta y descubre sus preguntas.',
+  bajadaInspira: 'Doce temas, muchas preguntas',
+  inspiraTitulo: 'Detrás de cada pregunta',
+  inspiraFuerte: 'hay una historia esperando ser contada,',
+  inspiraCita: 'la tuya',
+  inspiraLlamada: 'Encuentra la tuya',
   leyendaHistorias: 'Historias',
   leyendaRespuestas: 'Respuestas',
   leyendaBits: 'También cuenta: datos curiosos de lugares',
@@ -198,7 +206,11 @@ const pt: HomeMessages = {
   cejaInspira: 'Inspire-se',
   cejaDescubre: 'Descubra',
   bajadaCuenta: 'Há muitas formas de contá-la',
-  bajadaInspira: 'Toque em uma fita e descubra as perguntas dela.',
+  bajadaInspira: 'Doze temas, muitas perguntas',
+  inspiraTitulo: 'Por trás de cada pergunta',
+  inspiraFuerte: 'há uma história esperando para ser contada,',
+  inspiraCita: 'a sua',
+  inspiraLlamada: 'Encontre a sua',
   leyendaHistorias: 'Histórias',
   leyendaRespuestas: 'Respostas',
   leyendaBits: 'Também conta: curiosidades dos lugares',
@@ -271,7 +283,11 @@ const en: HomeMessages = {
   cejaInspira: 'Get inspired',
   cejaDescubre: 'Discover',
   bajadaCuenta: 'There are many ways to tell it',
-  bajadaInspira: 'Tap a ribbon and discover its questions.',
+  bajadaInspira: 'Twelve themes, many questions',
+  inspiraTitulo: 'Behind every question',
+  inspiraFuerte: "there's a story waiting to be told,",
+  inspiraCita: 'yours',
+  inspiraLlamada: 'Find yours',
   leyendaHistorias: 'Stories',
   leyendaRespuestas: 'Answers',
   leyendaBits: 'Also tells: curious facts about places',

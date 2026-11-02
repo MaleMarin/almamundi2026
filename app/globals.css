@@ -2317,3 +2317,46 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   header .home-logo { height: auto !important; width: 7.5rem !important; }
   header { padding-left: 1rem !important; padding-right: 1rem !important; }
 }
+
+/* Inspírate con el mismo esquema y tamaños que la hero (CUENTA): frase, cierre en naranja, línea suave y llamada. */
+#cintas .home-capitulo-titulo {
+  max-width: 30em;
+  margin-inline: auto;
+  text-align: center;
+  text-wrap: balance;
+}
+#cintas .home-capitulo-ceja,
+#cintas .home-capitulo-cita,
+#cintas .home-capitulo-bajada {
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  text-align: center;
+}
+#cintas .home-capitulo-bajada-linea { margin-top: 28px; }
+#cintas .home-capitulo-bajada-elige { margin-top: 6px; }
+@media (min-width: 768px) {
+  #cintas .home-capitulo-bajada-linea { margin-top: 40px; }
+}
+@media (min-width: 768px) and (min-height: 600px) {
+  #cintas .home-capitulo-titulo {
+    margin-top: 14px;
+    font-size: clamp(22px, 1.5vw + 0.8vh, 34px);
+    line-height: 1.15;
+  }
+  #cintas .home-capitulo-cita {
+    margin-top: 10px;
+    font-size: clamp(28px, 1.4vw + 1.2vh, 38px);
+    line-height: 1.15;
+  }
+  #cintas .home-capitulo-bajada-linea {
+    margin-top: clamp(20px, 3.5vh, 36px);
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  #cintas .home-capitulo-bajada-elige {
+    font-size: clamp(22px, 0.8vw + 1vh, 28px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+}
