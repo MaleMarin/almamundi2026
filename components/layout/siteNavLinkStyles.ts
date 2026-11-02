@@ -19,6 +19,7 @@ export const SITE_NAV_PILL_LINK_CLASS =
 
 /** Submenú Historias del header (mismo orden en footer). */
 export const SITE_HEADER_STORIES_LINKS = [
+  { href: '/historias', label: 'Todas' },
   { href: '/historias/videos', label: 'Videos' },
   { href: '/historias/audios', label: 'Audios' },
   { href: '/historias/escrito', label: 'Textos' },

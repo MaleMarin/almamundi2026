@@ -6,6 +6,7 @@ export type HomeMessages = {
   navStories: string;
   /** Enlaces planos a formatos de historias (cabecera home). */
   navHistoriasColeccion: string;
+  navHistoriasTodas: string;
   navHistoriasVideos: string;
   navHistoriasAudios: string;
   navHistoriasEscrito: string;
@@ -83,6 +84,7 @@ const es: HomeMessages = {
   navHow: '¿Cómo funciona?',
   navStories: 'Historias',
   navHistoriasColeccion: 'Mi colección',
+  navHistoriasTodas: 'Todas',
   navHistoriasVideos: 'Videos',
   navHistoriasAudios: 'Audios',
   navHistoriasEscrito: 'Textos',
@@ -155,6 +157,7 @@ const pt: HomeMessages = {
   navHow: 'Como funciona?',
   navStories: 'Histórias',
   navHistoriasColeccion: 'Minha coleção',
+  navHistoriasTodas: 'Todas',
   navHistoriasVideos: 'Vídeos',
   navHistoriasAudios: 'Áudios',
   navHistoriasEscrito: 'Textos',
@@ -227,6 +230,7 @@ const en: HomeMessages = {
   navHow: 'How does it work?',
   navStories: 'Stories',
   navHistoriasColeccion: 'My collection',
+  navHistoriasTodas: 'All',
   navHistoriasVideos: 'Videos',
   navHistoriasAudios: 'Audio',
   navHistoriasEscrito: 'Texts',
@@ -318,6 +322,8 @@ export const NOSCRIPT_BY_LOCALE: Record<AlmaLocale, NoscriptCopy> = {
 
 export function storiesLinkLabel(t: HomeMessages, href: string): string {
   switch (href) {
+    case '/historias':
+      return t.navHistoriasTodas;
     case '/historias/mi-coleccion':
       return t.navHistoriasColeccion;
     case '/historias/videos':
