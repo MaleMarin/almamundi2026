@@ -32,6 +32,7 @@ export function MapSectionLocked() {
           portada
           bajada={t.heroSubBefore}
           bajadaFuerte={t.heroSubBold}
+          bajadaEnDosLineas
         />
         <div className="map-section-editorial relative z-[1] w-full bg-[#F5F4F2]">
           <div id="map-dock-slot" className="w-full bg-[#F5F4F2] px-2 pb-2 md:px-3" />
