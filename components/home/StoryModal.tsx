@@ -2626,7 +2626,7 @@ export function StoryModal({
                       )}
                     </div>
                     ) : null}
-                    {mode === 'foto' ? (
+                    {/* Imagen que identifica la historia: en la columna izquierda en todos los formatos. */}
                     <div>
                       <p className="mb-2 text-[length:var(--fs-etiqueta)] leading-snug text-gray-700">
                         {t.modalProfilePhotoNote}
@@ -2678,7 +2678,6 @@ export function StoryModal({
                         ) : null}
                       </div>
                     </div>
-                    ) : null}
                   </div>
                 </div>
 
@@ -2713,60 +2712,9 @@ export function StoryModal({
                         <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.alias}</p>
                       ) : null}
                     </div>
-                    <div className="sm:col-span-2">
-                      <p className="mb-2 text-[length:var(--fs-etiqueta)] leading-snug text-gray-700">
-                        {t.modalProfilePhotoNote}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-2">
-                        <label
-                          className="inline-flex min-h-11 cursor-pointer items-center rounded-xl px-4 text-[length:var(--fs-etiqueta)] text-gray-600"
-                          style={{ ...soft.flat, borderRadius: '12px' }}
-                        >
-                          {profilePhoto ? t.modalChange : t.modalUpload}
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="hidden"
-                            onChange={(e) => onPickProfilePhoto(e.target.files?.[0] ?? null)}
-                          />
-                        </label>
-                        {profileConverting ? (
-                          <p className="inline-flex min-h-11 items-center gap-2 text-[length:var(--fs-etiqueta)] text-gray-700" role="status">
-                            <span className="inline-block h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" aria-hidden />
-                            {t.modalPhotoConverting}
-                          </p>
-                        ) : profilePhotoUrl ? (
-                          <>
-                            <div className="h-8 w-8 overflow-hidden rounded-lg" style={{ ...soft.flat, borderRadius: '8px' }}>
-                              {/* eslint-disable-next-line @next/next/no-img-element */}
-                              <img
-                                src={profilePhotoUrl}
-                                alt=""
-                                className="h-full w-full object-cover"
-                                onError={() => {
-                                  setProfilePhoto(null);
-                                  setErr(t.modalPhotoReadError);
-                                }}
-                              />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => {
-                                profileConvertToken.current += 1;
-                                setProfileConverting(false);
-                                setProfilePhoto(null);
-                              }}
-                              className="inline-flex min-h-11 items-center px-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#646E7E] hover:text-red-500"
-                            >
-                              {t.modalRemove}
-                            </button>
-                          </>
-                        ) : null}
-                      </div>
-                    </div>
                     </>
                     ) : null}
-                    <div className="sm:col-span-2">
+                    <div>
                       <label
                         htmlFor="story-country"
                         className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
@@ -2789,7 +2737,7 @@ export function StoryModal({
                         <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.country}</p>
                       ) : null}
                     </div>
-                    <div className="sm:col-span-2">
+                    <div>
                       <label
                         htmlFor="story-city"
                         className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
@@ -2813,7 +2761,7 @@ export function StoryModal({
                         <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.city}</p>
                       ) : null}
                     </div>
-                    <div className="sm:col-span-2">
+                    <div>
                       <label
                         htmlFor="story-age"
                         className="mb-0.5 block text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
@@ -2847,7 +2795,7 @@ export function StoryModal({
                         <p className="mt-0.5 text-[length:var(--fs-etiqueta)] text-red-600" role="alert">{fieldErr.age}</p>
                       ) : null}
                     </div>
-                    <div className="sm:col-span-2">
+                    <div>
                       <label
                         htmlFor="story-gender"
                         className="mb-0.5 flex items-center gap-1.5 text-[length:var(--fs-etiqueta)] font-semibold normal-case text-gray-700"
