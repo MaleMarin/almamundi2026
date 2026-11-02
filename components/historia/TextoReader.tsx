@@ -99,7 +99,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
   const maxWidth = isMobile ? '100%' : '640px';
   const maxWidthDesktop = '720px';
   const paddingX = isMobile ? 20 : 24;
-  const avatarSize = isMobile ? 48 : 64;
 
   return (
     <>
@@ -107,10 +106,11 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
       <div
         style={{
           position: 'fixed',
-          top: siteLayout ? 'clamp(6.75rem, 11vw, 11rem)' : 0,
+          // Justo bajo el menú fijo (antes quedaba a la altura del menú antiguo y cruzaba el texto).
+          top: siteLayout && !isMobile ? 'var(--header-h)' : 0,
           left: 0,
           right: 0,
-          height: 3,
+          height: 2,
           background: `linear-gradient(90deg, ${SEPIA_DK}, ${SEPIA})`,
           width: `${readProgress}%`,
           zIndex: 1000,
@@ -320,70 +320,8 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           <CancionRelacionadaLine value={historia.cancionRelacionada} />
         </div>
 
-        {/* Firma del autor */}
-        <div style={{ marginTop: '4rem' }}>
-          <div
-            style={{
-              width: 40,
-              height: 1,
-              background: SEPIA,
-              margin: '0 auto 2rem' }}
-          />
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <img
-              src={historia.autor.avatar}
-              alt={copy.portrait(historia.autor.nombre)}
-              style={{
-                width: avatarSize,
-                height: avatarSize,
-                borderRadius: '50%',
-                objectFit: 'cover',
-                border: `1.5px solid ${SEPIA}`,
-                marginBottom: '0.75rem' }}
-            />
-            <p
-              style={{
-                fontFamily: INTERIOR_FONT_STACK,
-                fontStyle: 'italic',
-                fontSize: 'var(--fs-subtitulo)',
-                color: TINTA,
-                marginBottom: '0.25rem' }}
-            >
-              {historia.autor.nombre}
-            </p>
-            {historia.autor.ubicacion && (
-              <p
-                style={{
-                  fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 400,
-                  fontSize: 'var(--fs-etiqueta)',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.12em',
-                  color: SEPIA,
-                  marginBottom: '0.5rem' }}
-              >
-                {historia.autor.ubicacion}
-              </p>
-            )}
-            {historia.autor.bio && (
-              <p
-                style={{
-                  fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 400,
-                  fontSize: 'var(--fs-pequeno)',
-                  color: TINTA_SOFT,
-                  maxWidth: 360,
-                  marginBottom: '1rem',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden' }}
-              >
-                {historia.autor.bio}
-              </p>
-            )}
-          </div>
-        </div>
+        {/* El autor aparece una sola vez, arriba (docs/decisiones-cerradas.md). */}
+        <div style={{ marginTop: '3rem' }} />
 
         <SimilarStories storyId={historia.id} variant="light" />
 
