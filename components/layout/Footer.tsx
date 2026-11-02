@@ -31,8 +31,6 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
   const locale = localeCtx?.locale ?? initialLocale;
 
   const rowLinks: FooterPillItem[] = [
-    { id: 'contar', kind: 'hard', href: '/#historias', label: t.navTellStory },
-    { id: 'hilos', kind: 'internal', href: '/preguntas', label: HILOS_UI[locale].nav },
     { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
     { id: 'respuestas', kind: 'hard', href: '/?capa=respuestas#mapa', label: HILOS_UI[locale].leyenda },
     {
@@ -103,7 +101,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       <nav className="almamundi-cierre-nav" aria-label={t.ariaMainNav}>
         <ul>
           <li className="almamundi-cierre-linea">
-            {rowLinks.slice(0, 3).map((item, index) => (
+            {rowLinks.slice(0, 2).map((item, index) => (
               <span key={item.id} className="almamundi-cierre-item">
                 {index > 0 ? (
                   <span aria-hidden className="almamundi-cierre-sep">
@@ -118,7 +116,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             ·
           </li>
           <li className="almamundi-cierre-linea">
-            {rowLinks.slice(3).map((item, index) => (
+            {rowLinks.slice(2).map((item, index) => (
               <span key={item.id} className="almamundi-cierre-item">
                 {index > 0 ? (
                   <span aria-hidden className="almamundi-cierre-sep">
