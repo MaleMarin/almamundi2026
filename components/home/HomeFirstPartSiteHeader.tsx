@@ -27,7 +27,7 @@ import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
 /** Misma franja que la home sobre fondo claro `var(--home-bg)`. */
 const HOME_HEADER_SHELL =
-  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[var(--header-h)] bg-[color-mix(in_srgb,var(--home-bg)_70%,transparent)] backdrop-blur-lg border-b border-white/20 font-sans';
+  'fixed top-0 left-0 w-full flex items-center justify-between gap-3 px-6 md:px-14 h-[9.75rem] md:h-[var(--header-h)] md:pt-2 bg-[color-mix(in_srgb,var(--home-bg)_70%,transparent)] backdrop-blur-lg border-b border-white/20 font-sans';
 
 /**
  * Reproductores en portal (audio z-9999, texto z-1000…): masthead por encima del contenido.

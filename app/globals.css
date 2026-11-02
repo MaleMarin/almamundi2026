@@ -21,7 +21,7 @@
   --fs-pequeno: clamp(0.9375rem, 0.9375rem, 0.9375rem);
   --fs-etiqueta: clamp(0.75rem, 0.75rem, 0.75rem);
   /* Alto del menú superior en escritorio. El celular conserva el suyo. */
-  --header-h: 76px;
+  --header-h: 88px;
 }
 
 /* El archivo es cuadrado y el dibujo ocupa una franja. El ancho manda; el alto es el del dibujo. */
