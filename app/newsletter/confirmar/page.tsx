@@ -35,5 +35,18 @@ export default async function ConfirmarNewsletterPage({
       : result.kind === "unsubscribed"
         ? copy.unsubscribed
         : copy.invalid;
+  if (result.kind === "confirmed") {
+    return (
+      <NewsletterOutcome
+        brand={copy.brand}
+        eyebrow={copy.eyebrow}
+        title={copy.confirmedTitle}
+        message={copy.confirmed}
+        mapLabel={copy.map}
+        tellLabel={copy.tell}
+        note={copy.leaveNote}
+      />
+    );
+  }
   return <NewsletterOutcome brand={copy.brand} message={message} mapLabel={copy.map} />;
 }
