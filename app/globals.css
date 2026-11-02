@@ -2276,6 +2276,7 @@ header .site-header-nav .btn-am-neutro,
   border-color: transparent !important;
   box-shadow: none !important;
   color: #3c4655 !important;
+  font-weight: 500 !important;
 }
 header .site-header-nav .btn-am-neutro:hover,
 header .site-header-nav .btn-am-neutro:focus-visible,
