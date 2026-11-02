@@ -85,7 +85,32 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
   const [desktopStoriesOpen, setDesktopStoriesOpen] = useState(false);
   const [mobileStoriesOpen, setMobileStoriesOpen] = useState(false);
   const storiesDesktopRef = useRef<HTMLDivElement | null>(null);
+  const logoRef = useRef<HTMLImageElement | null>(null);
   const closeMobileNav = useCallback(() => setMobileNavOpen(false), []);
+
+  useEffect(() => {
+    const img = logoRef.current;
+    if (!img) return;
+    const medir = () => {
+      if (window.innerWidth < 768) {
+        document.documentElement.style.removeProperty('--header-h');
+        return;
+      }
+      const alto = img.getBoundingClientRect().height;
+      if (alto < 8) return;
+      document.documentElement.style.setProperty('--header-h', `${Math.round(alto + 32)}px`);
+    };
+    medir();
+    const obs = new ResizeObserver(medir);
+    obs.observe(img);
+    window.addEventListener('resize', medir);
+    img.addEventListener('load', medir);
+    return () => {
+      obs.disconnect();
+      window.removeEventListener('resize', medir);
+      img.removeEventListener('load', medir);
+    };
+  }, []);
 
   useEffect(() => {
     if (!mobileNavOpen) return;
@@ -248,7 +273,8 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           <img
             src="/logo.png"
             alt="AlmaMundi"
-            className="h-[8.5rem] w-auto object-contain object-left select-none filter drop-shadow-md md:h-[calc(var(--header-h)_-_16px)]"
+            ref={logoRef}
+            className="home-logo select-none filter drop-shadow-md"
           />
         </HomeHardLink>
       </div>

@@ -1022,6 +1022,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="map-dock-stack">
           <div className="map-dock-scroller">
           <div className="map-dock-row" role="toolbar" aria-label={dockCopy.dockAria}>
+            <div className="map-dock-line">
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'stories'}
@@ -1055,6 +1056,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 {HILOS_UI[locale].leyenda}
               </PillNavButton>
+            </div>
+            <div className="map-dock-line">
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'sounds'}
@@ -1071,6 +1074,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               >
                 {dockCopy.search}
               </PillNavButton>
+            </div>
           </div>
           </div>
           <p className="map-dock-legend">

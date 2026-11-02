@@ -44,19 +44,26 @@ export function CapituloHome({
       </Titulo>
       {cita ? <p className="home-capitulo-cita">{cita}</p> : null}
       {bajada ? (
-        <p className="home-capitulo-bajada">
-          {bajadaEnDosLineas ? <span>{bajada}</span> : bajada}
-          {bajadaFuerte ? (
-            bajadaEnDosLineas ? (
-              <strong>{bajadaFuerte}</strong>
-            ) : (
+        bajadaEnDosLineas ? (
+          <>
+            <p className="home-capitulo-bajada home-capitulo-bajada-linea">{bajada}</p>
+            {bajadaFuerte ? (
+              <p className="home-capitulo-bajada home-capitulo-bajada-elige">
+                <strong>{bajadaFuerte}</strong>
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <p className="home-capitulo-bajada">
+            {bajada}
+            {bajadaFuerte ? (
               <>
                 {' '}
                 <strong>{bajadaFuerte}</strong>
               </>
-            )
-          ) : null}
-        </p>
+            ) : null}
+          </p>
+        )
       ) : null}
     </header>
   );
