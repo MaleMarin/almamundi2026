@@ -77,6 +77,8 @@ function reduceMotion(): boolean {
 }
 
 /** Las demás cintas bajan a este nivel. El camino se recorre casi entero en 400 ms. */
+/** Alto de la barra de la que cuelga la cortina (px CSS). */
+const BARRA_ALTO = 12;
 const ATENUAR = 0.55;
 const ATENUAR_MS = 170;
 const ESPERA_TEMA_MS = 120;
@@ -415,11 +417,55 @@ export function CortinaTemas({
         ctx.closePath();
         ctx.fillStyle = tela.fondo;
         ctx.fill();
+        // Cuerpo de tela: brillo suave al centro y bordes algo más oscuros.
+        const cx = xEn(cinta, cinta.L * 0.4, tiempo, quieto);
+        const cuerpo = ctx.createLinearGradient(cx - cinta.w / 2, 0, cx + cinta.w / 2, 0);
+        cuerpo.addColorStop(0, 'rgba(0,0,0,0.16)');
+        cuerpo.addColorStop(0.35, 'rgba(255,255,255,0.10)');
+        cuerpo.addColorStop(0.5, 'rgba(255,255,255,0.18)');
+        cuerpo.addColorStop(0.65, 'rgba(255,255,255,0.06)');
+        cuerpo.addColorStop(1, 'rgba(0,0,0,0.18)');
+        ctx.fillStyle = cuerpo;
+        ctx.fill();
         ctx.strokeStyle = 'rgba(0,0,0,.07)';
         ctx.lineWidth = 1;
         ctx.stroke();
       }
       ctx.globalAlpha = 1;
+      // Sombra de la barra sobre las cintas (solo pinta donde hay cinta).
+      {
+        const sombra = ctx.createLinearGradient(0, BARRA_ALTO, 0, BARRA_ALTO + 26);
+        sombra.addColorStop(0, 'rgba(40,30,25,0.34)');
+        sombra.addColorStop(1, 'rgba(40,30,25,0)');
+        ctx.save();
+        ctx.globalCompositeOperation = 'source-atop';
+        ctx.fillStyle = sombra;
+        ctx.fillRect(0, 0, anchoRef.current, BARRA_ALTO + 26);
+        ctx.restore();
+      }
+      // Barra de la que cuelgan las cintas, con el relieve suave del sitio.
+      {
+        const ancho = anchoRef.current;
+        const r = BARRA_ALTO / 2;
+        ctx.save();
+        ctx.shadowColor = 'rgba(120,110,100,0.35)';
+        ctx.shadowBlur = 8;
+        ctx.shadowOffsetY = 3;
+        const barra = ctx.createLinearGradient(0, 0, 0, BARRA_ALTO);
+        barra.addColorStop(0, '#FFFFFF');
+        barra.addColorStop(0.45, '#F5F4F2');
+        barra.addColorStop(1, '#D9D4CC');
+        ctx.fillStyle = barra;
+        ctx.beginPath();
+        ctx.moveTo(r, 0);
+        ctx.lineTo(ancho - r, 0);
+        ctx.arc(ancho - r, r, r, -Math.PI / 2, Math.PI / 2);
+        ctx.lineTo(r, BARRA_ALTO);
+        ctx.arc(r, r, r, Math.PI / 2, (3 * Math.PI) / 2);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
       const fundido = 140;
       const alto = altoRef.current;
       if (alto > fundido) {
