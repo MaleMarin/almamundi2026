@@ -16,7 +16,7 @@ const COPY = {
     empty: 'Este mapa se construye con historias como la tuya.',
     places: (n: number) => `${n} lugares`,
     dots: '¿Ves los puntos blancos en el globo? Cada uno guarda un dato curioso de ese lugar. Haz clic en uno y descúbrelo.',
-    ask: '¿Tienes algo que contar?',
+    ask: '¿Te animas a sumar la tuya?',
     tellStory: 'Cuenta tu historia',
     answer: 'Responde una pregunta' },
   pt: {
@@ -27,7 +27,7 @@ const COPY = {
     empty: 'Este mapa é feito de histórias como a sua.',
     places: (n: number) => `${n} lugares`,
     dots: 'Está vendo os pontos brancos no globo? Cada um guarda uma curiosidade sobre aquele lugar. Clique em um e descubra.',
-    ask: 'Tem algo para contar?',
+    ask: 'Que tal somar a sua?',
     tellStory: 'Conte a sua história',
     answer: 'Responda a uma pergunta' },
   en: {
@@ -38,7 +38,7 @@ const COPY = {
     empty: 'This map is made of stories like yours.',
     places: (n: number) => (n === 1 ? '1 place' : `${n} places`),
     dots: 'See the white dots on the globe? Each one holds a curious fact about that place. Click one and find out.',
-    ask: 'Got something to tell?',
+    ask: 'Will you add yours?',
     tellStory: 'Tell your story',
     answer: 'Answer a question' } } as const;
 
