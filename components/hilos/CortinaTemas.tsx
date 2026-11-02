@@ -82,6 +82,8 @@ function reduceMotion(): boolean {
 }
 
 /** Las demás cintas bajan a este nivel. El camino se recorre casi entero en 400 ms. */
+/** Cuánto se mecen las cintas con el viento (1 = movimiento original). */
+const VIENTO = 1.6;
 const ATENUAR = 0.55;
 const ATENUAR_MS = 170;
 const ESPERA_TEMA_MS = 120;
@@ -314,14 +316,14 @@ export function CortinaTemas({
       const avance = Math.pow(y / cinta.L, 1.6);
       let desplazamiento = cinta.curve * avance;
       if (!quieto) {
-        desplazamiento += cinta.A * Math.sin(tiempo * cinta.f + cinta.ph) * avance;
+        desplazamiento += cinta.A * VIENTO * Math.sin(tiempo * cinta.f + cinta.ph) * avance;
         const rafaga = ((tiempo * 0.18) % 1.6) * (anchoRef.current + 600) - 300;
         const distancia = (cinta.x - rafaga) / 160;
-        desplazamiento += 14 * Math.exp(-(distancia * distancia)) * avance;
+        desplazamiento += 22 * Math.exp(-(distancia * distancia)) * avance;
       }
       const lado = cinta.x < centroRef.current ? -1 : 1;
       const avanceApertura = progresoRef.current * progresoRef.current;
-      const salida = anchoRef.current + cinta.w + Math.abs(cinta.curve) + cinta.A + 14;
+      const salida = anchoRef.current + cinta.w + Math.abs(cinta.curve) + cinta.A * VIENTO + 22;
       const apertura = avanceApertura * salida;
       return cinta.x + desplazamiento + lado * apertura;
     }
