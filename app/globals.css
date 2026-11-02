@@ -2360,3 +2360,11 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
     line-height: 1.2;
   }
 }
+
+/* Textos según el equipo: con mouse se dice «pasa el mouse», en pantallas táctiles «toca». */
+.solo-mouse { display: none; }
+.solo-tactil { display: inline; }
+@media (hover: hover) and (pointer: fine) {
+  .solo-mouse { display: inline; }
+  .solo-tactil { display: none; }
+}

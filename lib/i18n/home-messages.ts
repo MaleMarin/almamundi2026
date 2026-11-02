@@ -57,6 +57,7 @@ export type HomeMessages = {
   bajadaCuenta: string;
   bajadaInspira: string;
   inspiraTitulo: string;
+  bajadaInspiraTactil: string;
   inspiraFuerte: string;
   inspiraCita: string;
   inspiraLlamada: string;
@@ -129,7 +130,8 @@ const es: HomeMessages = {
   cejaInspira: 'Inspírate',
   cejaDescubre: 'Descubre',
   bajadaCuenta: 'Hay muchas formas de contarla',
-  bajadaInspira: 'Doce temas, muchas preguntas',
+  bajadaInspira: 'Pasa el mouse por las cintas y descubre sus temas',
+  bajadaInspiraTactil: 'Toca una cinta y descubre su tema',
   inspiraTitulo: 'Detrás de cada pregunta',
   inspiraFuerte: 'hay una historia esperando ser contada,',
   inspiraCita: 'la tuya',
@@ -206,7 +208,8 @@ const pt: HomeMessages = {
   cejaInspira: 'Inspire-se',
   cejaDescubre: 'Descubra',
   bajadaCuenta: 'Há muitas formas de contá-la',
-  bajadaInspira: 'Doze temas, muitas perguntas',
+  bajadaInspira: 'Passe o mouse pelas fitas e descubra seus temas',
+  bajadaInspiraTactil: 'Toque em uma fita e descubra seu tema',
   inspiraTitulo: 'Por trás de cada pergunta',
   inspiraFuerte: 'há uma história esperando para ser contada,',
   inspiraCita: 'a sua',
@@ -283,7 +286,8 @@ const en: HomeMessages = {
   cejaInspira: 'Get inspired',
   cejaDescubre: 'Discover',
   bajadaCuenta: 'There are many ways to tell it',
-  bajadaInspira: 'Twelve themes, many questions',
+  bajadaInspira: 'Hover over the ribbons to discover their themes',
+  bajadaInspiraTactil: 'Tap a ribbon to discover its theme',
   inspiraTitulo: 'Behind every question',
   inspiraFuerte: "there's a story waiting to be told,",
   inspiraCita: 'yours',

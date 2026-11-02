@@ -455,6 +455,7 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
         tituloFuerte={home.inspiraFuerte}
         cita={home.inspiraCita}
         bajada={home.bajadaInspira}
+        bajadaTactil={home.bajadaInspiraTactil}
         bajadaFuerte={home.inspiraLlamada}
         bajadaEnDosLineas
       />

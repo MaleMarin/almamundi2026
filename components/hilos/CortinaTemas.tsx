@@ -84,7 +84,7 @@ function reduceMotion(): boolean {
 /** Las demás cintas bajan a este nivel. El camino se recorre casi entero en 400 ms. */
 /** Cuánto se mecen las cintas con el viento (1 = movimiento original). */
 const VIENTO = 1.6;
-const ATENUAR = 0.55;
+const ATENUAR = 0.75;
 const ATENUAR_MS = 170;
 const ESPERA_TEMA_MS = 120;
 
