@@ -1082,11 +1082,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <span className="map-dock-legend__sep" aria-hidden>
               {' · '}
             </span>
-            <LeyendaMapa kind="answer" text={HOME_MESSAGES[locale].leyendaRespuestas} />
+            <LeyendaMapa kind="bit" text={HOME_MESSAGES[locale].leyendaBits} />
             <span className="map-dock-legend__sep" aria-hidden>
               {' · '}
             </span>
-            <LeyendaMapa kind="bit" text={HOME_MESSAGES[locale].leyendaBits} />
+            <LeyendaMapa kind="answer" text={HOME_MESSAGES[locale].leyendaRespuestas} />
           </p>
           </div>,
           dockSlot
