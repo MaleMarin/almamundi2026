@@ -147,21 +147,17 @@ export function publishedStorySocialText(
 export function publishedAuthorShareText(
   locale: AlmaLocale,
   title: string,
-  city: string,
+  _city: string,
   link: string
 ): string {
   const name = titled(locale, title);
-  const place = publishedStoryCity(city);
   if (locale === 'pt') {
-    const told = place ? ` e eu a contei de ${place}` : '';
-    return `Minha história já está no mapa do AlmaMundi. Ela se chama ${name}${told}: ${link}`;
+    return `Contei minha história no AlmaMundi. Ela se chama ${name} e estas são as suas cores. Quais seriam as da sua? ${link}`;
   }
   if (locale === 'en') {
-    const told = place ? ` and I told it from ${place}` : '';
-    return `My story is now on the AlmaMundi map. It's called ${name}${told}: ${link}`;
+    return `I told my story on AlmaMundi. It's called ${name} and these are its colors. What would yours be? ${link}`;
   }
-  const told = place ? ` y la conté desde ${place}` : '';
-  return `Mi historia ya está en el mapa de AlmaMundi. Se llama ${name}${told}: ${link}`;
+  return `Conté mi historia en AlmaMundi. Se llama ${name} y estos son sus colores. ¿Cuáles serían los de la tuya? ${link}`;
 }
 
 /** Línea corta de la vista previa: formato y lugar público, sin el texto de la historia. */

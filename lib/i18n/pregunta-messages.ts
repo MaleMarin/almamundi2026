@@ -182,9 +182,9 @@ export const PREGUNTA_COPY = {
     en: 'AlmaMundi asks: [pregunta] I already answered. What about you? [enlace]',
   },
   shareInvite: {
-    es: 'Esta semana AlmaMundi le pregunta al mundo: [pregunta] ¿Tú qué responderías? [enlace]',
-    pt: 'Esta semana o AlmaMundi pergunta ao mundo: [pergunta] O que você responderia? [enlace]',
-    en: 'This week AlmaMundi is asking the world: [pregunta] What would you answer? [enlace]',
+    es: 'AlmaMundi tiene una pregunta para ti: [pregunta] ¿Qué responderías? [enlace]',
+    pt: 'O AlmaMundi tem uma pergunta para você: [pergunta] O que você responderia? [enlace]',
+    en: 'AlmaMundi has a question for you: [pregunta] What would you answer? [enlace]',
   },
 } as const satisfies Record<string, L3>;
 

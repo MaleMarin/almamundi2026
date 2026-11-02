@@ -154,7 +154,7 @@ describe('correos al autor', () => {
     assert.match(text, /Santiago/);
     assert.match(
       text,
-      /Mi historia ya está en el mapa de AlmaMundi\. Se llama «El río» y la conté desde Santiago: https:\/\/www\.almamundi\.org\/h\/abc234/
+      /Conté mi historia en AlmaMundi\. Se llama «El río» y estos son sus colores\. ¿Cuáles serían los de la tuya\? https:\/\/www\.almamundi\.org\/h\/abc234/
     );
     assert.match(text, /WhatsApp: https:\/\/wa\.me\/\?text=/);
     assert.doesNotMatch(text, /Te invito a leer/);
