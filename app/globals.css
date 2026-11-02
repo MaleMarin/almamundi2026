@@ -2248,21 +2248,44 @@ a.cinta-pill {
   line-height: 1.05;
 }
 
-/* Celular: los botones de Descubre con nombres largos se acomodan en varias filas centradas. */
+/* Celular: los cinco botones de Descubre, centrados en filas, todos visibles sin deslizar. */
 @media (max-width: 767px) {
-  #map-dock-slot .map-dock-scroller,
   #map-dock-slot .map-dock-row {
-    overflow: visible !important;
-    width: 100% !important;
-    max-width: 100% !important;
-  }
-  #map-dock-slot .map-dock-line {
     display: flex !important;
+    flex-direction: row !important;
     flex-wrap: wrap !important;
     justify-content: center !important;
     gap: 8px !important;
-    white-space: normal !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+    zoom: 1 !important;
   }
+  #map-dock-slot .map-dock-line { display: contents !important; }
+
+  /* Globo: alto propio para que el lienzo no quede chico ni metido bajo el fundido. */
+  .map-universe-stage { min-height: 0 !important; }
+  .map-universe-stage .map-globe-home { transform: none !important; min-height: 0 !important; }
+  .map-globe-home > div { flex: none !important; height: min(440px, 58svh) !important; min-height: 0 !important; }
+}
+
+/* Menú superior limpio: solo «Cuenta tu historia» lleva borde; el resto es texto. */
+header .site-header-nav .btn-am-neutro,
+[id$='-header-mobile-nav'] .btn-am-neutro {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: #3c4655 !important;
+}
+header .site-header-nav .btn-am-neutro:hover,
+header .site-header-nav .btn-am-neutro:focus-visible,
+header .site-header-nav .btn-am-neutro[aria-expanded='true'],
+[id$='-header-mobile-nav'] .btn-am-neutro:hover {
+  color: var(--almamundi-orange) !important;
+  border-color: transparent !important;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
 }
 
 /* Menú superior con 7 opciones: en pantallas medianas, letra y aire un poco menores para que quepa entero. */
