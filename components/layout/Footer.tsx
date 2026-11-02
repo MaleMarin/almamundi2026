@@ -5,6 +5,7 @@ import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvi
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { NewsletterBand } from '@/components/newsletter/NewsletterBand';
 import { SITE_FOOTER_LEGAL_LINKS } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
@@ -128,6 +129,13 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           </li>
         </ul>
       </nav>
+
+      {/* Sonder va debajo del menú del pie. */}
+      {!embedded ? (
+        <div className="mt-14 w-full md:mt-20">
+          <NewsletterBand />
+        </div>
+      ) : null}
 
       {/* 3. Bloque institucional */}
       <div className="mt-16 w-full max-w-6xl border-t border-black/[0.06] pt-10 md:mt-24 md:pt-14">
