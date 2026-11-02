@@ -36,7 +36,7 @@ export function PreguntaPanel() {
         {copy.semana}
       </p>
       <Link
-        href="/preguntas"
+        href="/#cintas"
         className={FOCUS}
         style={{
           alignSelf: 'flex-start',

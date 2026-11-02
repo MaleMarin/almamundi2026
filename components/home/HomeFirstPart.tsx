@@ -83,7 +83,7 @@ export function HomeFirstPart({
       {cintaPill ? null : (
       <p className="mx-auto mb-4 mt-2 max-w-[min(100%,40rem)] px-6 text-center md:mb-8">
         <Link
-          href="/preguntas"
+          href="/#cintas"
           className="inline-flex min-h-11 items-center text-center text-[length:var(--fs-pequeno)] font-medium text-[#4A5568] underline decoration-[#FF4A1C]/40 underline-offset-4 hover:text-[#FF4A1C] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]"
         >
           {HILOS_UI[locale].entrada}

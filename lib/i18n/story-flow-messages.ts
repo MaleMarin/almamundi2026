@@ -245,7 +245,7 @@ const es: StoryFlowMessages = {
   modalFieldAgeMissing: 'Falta la edad.',
   modalFieldEmailMissing: 'Falta un correo válido.',
   modalReviewInProgress:
-    'Tu historia ya está con nosotros. Te escribiremos cuando aparezca en el mapa.',
+    'Una persona del equipo la leerá antes de publicarla. Si nos dejaste tu correo, te avisaremos cuando aparezca en el mapa.',
   modalSaveImage: 'Guardar imagen',
   modalShareTextShort:
     'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar',
@@ -277,7 +277,7 @@ const es: StoryFlowMessages = {
   modalAnotherPromptAudio: '¿Quieres grabar otro momento?',
   modalAnotherCtaAudio: 'Grabar otro audio',
   modalAnotherPromptTexto: '¿Quieres escribir otra historia?',
-  modalAnotherCtaTexto: 'Escribir otra historia',
+  modalAnotherCtaTexto: 'Cuenta otra historia',
   modalAnotherFormatLink: 'o cuéntala en otro formato',
   modalSectionYourStory: 'Tu historia',
   modalSectionAbout: 'Sobre ti',
@@ -293,8 +293,8 @@ const es: StoryFlowMessages = {
   modalImprintHowVideo:
     'Los colores salen de las palabras con que presentaste tu video. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
   modalExtrasColorHint: 'Lo que escribas aquí también da color a tu imagen.',
-  modalNowWhat: '¿Y ahora?',
-  modalAnswerWeekQuestion: '¿Y si empiezas por una pregunta? Tira de una cinta',
+  modalNowWhat: '¿Quieres seguir?',
+  modalAnswerWeekQuestion: 'Preguntas para ti',
   modalContactLead: '¿Tienes dudas? Escríbenos a',
 };
 
@@ -384,10 +384,10 @@ const pt: StoryFlowMessages = {
   modalAnotherPromptAudio: 'Quer gravar outro momento?',
   modalAnotherCtaAudio: 'Gravar outro áudio',
   modalAnotherPromptTexto: 'Quer escrever outra história?',
-  modalAnotherCtaTexto: 'Escrever outra história',
+  modalAnotherCtaTexto: 'Conte outra história',
   modalAnotherFormatLink: 'ou conte em outro formato',
   modalReviewInProgress:
-    'Sua história já está com a gente. Vamos te escrever quando ela aparecer no mapa.',
+    'Uma pessoa da equipe vai lê-la antes de publicá-la. Se você deixou seu e-mail, vamos te avisar quando ela aparecer no mapa.',
   modalSectionYourStory: 'Sua história',
   modalSectionAbout: 'Sobre você',
   modalSectionWhere: 'Onde você está e como avisar você',
@@ -402,8 +402,8 @@ const pt: StoryFlowMessages = {
   modalImprintHowVideo:
     'As cores saem das palavras com que você apresentou seu vídeo. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
   modalExtrasColorHint: 'O que você escrever aqui também dá cor à sua imagem.',
-  modalNowWhat: 'E agora?',
-  modalAnswerWeekQuestion: 'E se você começar por uma pergunta? Puxe uma fita',
+  modalNowWhat: 'Quer continuar?',
+  modalAnswerWeekQuestion: 'Perguntas para você',
   modalContactLead: 'Tem dúvidas? Escreva para',
   modalCaptchaFailed: 'Não conseguimos confirmar o envio. Espere alguns segundos e tente de novo.',
   modalStep1: 'Passo 1 de 2',
@@ -542,10 +542,10 @@ const en: StoryFlowMessages = {
   modalAnotherPromptAudio: 'Want to record another moment?',
   modalAnotherCtaAudio: 'Record another audio',
   modalAnotherPromptTexto: 'Want to write another story?',
-  modalAnotherCtaTexto: 'Write another story',
+  modalAnotherCtaTexto: 'Tell another story',
   modalAnotherFormatLink: 'or tell it in another format',
   modalReviewInProgress:
-    "Your story is with us now. We'll write to you when it appears on the map.",
+    "Someone on our team will read it before it's published. If you left your email, we'll let you know when it appears on the map.",
   modalSectionYourStory: 'Your story',
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',
@@ -560,8 +560,8 @@ const en: StoryFlowMessages = {
   modalImprintHowVideo:
     'The colors come from the words you used to present your video. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
   modalExtrasColorHint: 'What you write here also gives color to your image.',
-  modalNowWhat: 'What now?',
-  modalAnswerWeekQuestion: 'What if you start with a question? Pull a ribbon',
+  modalNowWhat: 'Want to keep going?',
+  modalAnswerWeekQuestion: 'Questions for you',
   modalContactLead: 'Questions? Write to us at',
   modalCaptchaFailed: "We couldn't confirm the submission. Wait a few seconds and try again.",
   modalStep1: 'Step 1 of 2',

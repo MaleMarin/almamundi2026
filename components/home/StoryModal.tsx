@@ -1,8 +1,8 @@
 'use client';
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { hardNavigateTo } from '@/lib/home-hard-nav';
 import {
   X,
   Mic,
@@ -3099,25 +3099,21 @@ export function StoryModal({
                 </div>
                 <div className="mt-8">
                   <p className="mb-2 text-[length:var(--fs-etiqueta)] font-semibold text-[#5C5C52]">{t.modalNowWhat}</p>
-                  <Link
-                    href="/preguntas"
-                    className="mb-2 inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] no-underline transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
-                  >
-                    {t.modalAnswerWeekQuestion}
-                  </Link>
+                  {/* Los mismos tres caminos que los correos: otra historia, preguntas, mapa. */}
                   <div className="flex flex-col gap-2 md:flex-row">
                     <button
                       type="button"
-                      onClick={startAnotherStory}
+                      onClick={() => hardNavigateTo('/#historias')}
                       className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
-                      {mode === 'foto'
-                        ? t.modalAnotherCtaFoto
-                        : mode === 'video'
-                          ? t.modalAnotherCtaVideo
-                          : mode === 'audio'
-                            ? t.modalAnotherCtaAudio
-                            : t.modalAnotherCtaTexto}
+                      {t.modalAnotherCtaTexto}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => hardNavigateTo('/#cintas')}
+                      className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
+                    >
+                      {t.modalAnswerWeekQuestion}
                     </button>
                     <button
                       type="button"
@@ -3127,18 +3123,6 @@ export function StoryModal({
                       {t.modalBackToMap}
                     </button>
                   </div>
-                  <p className="mt-2 text-center">
-                    <a
-                      href="/contar"
-                      onClick={(event) => {
-                        event.preventDefault();
-                        router.push('/contar');
-                      }}
-                      className="inline-flex min-h-11 items-center text-[length:var(--fs-etiqueta)] text-[#6B6B60] underline-offset-2 hover:text-[var(--almamundi-orange)] hover:underline"
-                    >
-                      {t.modalAnotherFormatLink}
-                    </a>
-                  </p>
                   <p className="mt-4 text-center text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52]">
                     {t.modalContactLead}{' '}
                     <a

@@ -5,9 +5,9 @@ type L3 = Record<AlmaLocale, string>;
 
 export const PREGUNTA_COPY = {
   intro: {
-    es: 'Además de contar tu historia, aquí puedes responder. Cada semana lanzamos una pregunta al mundo, y cada respuesta enciende un punto en el mapa.',
-    pt: 'Além de contar sua história, aqui você pode responder. Toda semana lançamos uma pergunta ao mundo, e cada resposta acende um ponto no mapa.',
-    en: 'Besides telling your story, here you can answer. Every week we ask the world a question, and every answer lights up a point on the map.',
+    es: 'Además de contar tu historia, aquí puedes responder. Elige una pregunta y respóndela como quieras: cada respuesta enciende un punto en el mapa.',
+    pt: 'Além de contar sua história, aqui você pode responder. Escolha uma pergunta e responda como quiser: cada resposta acende um ponto no mapa.',
+    en: 'Besides telling your story, here you can answer. Pick a question and answer it however you like: every answer lights up a point on the map.',
   },
   homeEyebrow: {
     es: 'La pregunta de la semana',
