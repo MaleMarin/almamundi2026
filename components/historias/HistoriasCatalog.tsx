@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { AlignLeft, Headphones, Image as ImageIcon, Video } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers';
-import { EJES, ejeDeTema, getEje } from '@/lib/temas';
+import { ejeDeTema, getEje } from '@/lib/temas';
 import { countryCodeFromStored, countryMatches, displayCountryName } from '@/lib/i18n/country-name';
 import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
@@ -134,7 +134,7 @@ function StoryCard({
     >
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: large ? 240 : 160, background: '#c5ceda' }}
+        style={{ height: large ? 260 : 200, background: '#c5ceda' }}
       >
         {image ? (
           <img src={image} alt="" className="h-full w-full object-cover" />
@@ -143,7 +143,7 @@ function StoryCard({
           <FormatMark kind={formatKey(story)} />
         </span>
       </div>
-      <div className="flex flex-1 flex-col gap-1.5 px-5 py-5">
+      <div className="flex flex-1 flex-col gap-2 px-6 pb-6 pt-5">
         <h2 className="text-[length:var(--fs-pequeno)] font-semibold leading-snug text-gray-800">
           {story.title || story.label}
         </h2>
@@ -254,13 +254,6 @@ export default function HistoriasCatalog() {
     setCountry('');
   };
 
-  const chooseEje = (next: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next) params.set('eje', next);
-    else params.delete('eje');
-    const qs = params.toString();
-    router.replace(qs ? `/historias?${qs}` : '/historias', { scroll: false });
-  };
 
   return (
     <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:px-6 md:pt-10" style={{ color: neu.textMain }}>
@@ -275,7 +268,7 @@ export default function HistoriasCatalog() {
         </section>
       ) : null}
 
-      <div role="tablist" aria-label={copy.tabs.todas} className="mb-8 flex flex-wrap gap-3">
+      <div role="tablist" aria-label={copy.tabs.todas} className="mb-10 flex flex-wrap gap-3">
         {(Object.keys(copy.tabs) as Tab[]).map((key) => {
           const active = tab === key;
           return (
@@ -300,7 +293,7 @@ export default function HistoriasCatalog() {
         })}
       </div>
 
-      <div className="mb-12 flex flex-col gap-5 sm:flex-row sm:flex-wrap sm:items-end">
+      <div className="mb-16 flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:items-end">
         <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.country}
           <select
@@ -316,21 +309,7 @@ export default function HistoriasCatalog() {
             ))}
           </select>
         </label>
-        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
-          {copy.axis}
-          <select
-            value={eje}
-            onChange={(event) => chooseEje(event.target.value)}
-            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
-          >
-            <option value="">{copy.allCountries}</option>
-            {EJES.map((item) => (
-              <option key={item.id} value={item.id}>
-                {item[locale]}
-              </option>
-            ))}
-          </select>
-        </label>
+        {/* Filtro por eje oculto por ahora (decisión de Ana, 2 nov 2026). */}
         <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
           {copy.order}
           <select
@@ -354,7 +333,7 @@ export default function HistoriasCatalog() {
         </label>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+      <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-14">
         {shown.map((story) => (
           <StoryCard key={story.id} story={story} locale={locale} copy={copy} />
         ))}
