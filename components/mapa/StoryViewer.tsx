@@ -20,7 +20,6 @@ import { preguntaPorId } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { bindGlobePanelScroll, globePanelHasMore, placeGlobeStoryPanel } from '@/components/map/globeStoryPanel';
 import { isShortCode } from '@/lib/short-code';
-import { CintaStripe } from '@/components/historias/CintaStripe';
 
 type Props = {
   story: StoryPoint;
@@ -189,11 +188,6 @@ function KenBurnsViewer({
 }
 
 const BACK_LABEL = { es: 'Volver', pt: 'Voltar', en: 'Back' } as const;
-const FULL_STORY_LABEL = {
-  es: 'Ver historia completa',
-  pt: 'Ver história completa',
-  en: 'See full story',
-} as const;
 
 /** El eco sigue en el código. No se muestra en el sitio público por ahora. */
 const SHOW_PUBLIC_ECO = false;
@@ -419,15 +413,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const kicker = place ? `${formatWord} · ${place}` : formatWord;
   const temaPregunta = catalog ? null : preguntaPorId(story.questionId)?.tema[locale];
   const alias = formatPublicName(story.authorName || story.author?.name);
-  // «Ver historia completa» solo cuando el panel no muestra todo: una historia de texto
-  // ya se lee completa aquí (docs/decisiones-cerradas.md).
-  const fullHref = !catalog || format === 'text'
-    ? null
-    : isShortCode(story.shortCode)
-      ? `/h/${story.shortCode}`
-      : story.id
-        ? `/historias/${story.id}`
-        : null;
 
   const startListening = () => {
     if (!story.body || typeof window === 'undefined') return;
@@ -598,7 +583,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               flexDirection:  'column',
               position:       'relative' }}
           >
-            <CintaStripe colors={story.cintaColors} height={6} className="absolute inset-x-0 top-0 z-[3]" />
             {/* Reflejo de luz en el borde superior */}
             <div aria-hidden style={{
               position:      'absolute',
@@ -998,24 +982,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   gap: 8,
                   marginTop: 0 }}
               >
-                {fullHref ? (
-                  <Link
-                    href={fullHref}
-                    className="btn-am-principal"
-                    style={{
-                      minHeight: 44,
-                      width: '100%',
-                      padding: '8px 12px',
-                      fontFamily: SITE_FONT_STACK,
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      textAlign: 'center',
-                      textDecoration: 'none' }}
-                  >
-                    {FULL_STORY_LABEL[locale]}
-                  </Link>
-                ) : null}
               {catalog ? (
               <div
                 style={{
