@@ -20,7 +20,6 @@ export type PropositoCopy = {
   close: string;
   closeAria: string;
   cta: string;
-  credit: string;
   sections: ManifiestoSection[];
 };
 
@@ -31,7 +30,6 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Cerrar',
     closeAria: 'Cerrar propósito',
     cta: 'Cuenta tu historia',
-    credit: 'AlmaMundi es una iniciativa sin fines de lucro de Precisar.',
     sections: [
       {
         id: 'por-que',
@@ -92,7 +90,6 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Fechar',
     closeAria: 'Fechar propósito',
     cta: 'Conte sua história',
-    credit: 'O AlmaMundi é uma iniciativa sem fins lucrativos da Precisar.',
     sections: [
       {
         id: 'por-que',
@@ -153,7 +150,6 @@ export const PROPOSITO: Record<AlmaLocale, PropositoCopy> = {
     close: 'Close',
     closeAria: 'Close purpose',
     cta: 'Tell your story',
-    credit: 'AlmaMundi is a nonprofit initiative of Precisar.',
     sections: [
       {
         id: 'por-que',

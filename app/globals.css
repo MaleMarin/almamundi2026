@@ -1098,10 +1098,11 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   color: #646E7E;
 }
 
-/* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde */
-button:focus,
-a:focus,
-[role="button"]:focus {
+/* Un solo borde naranja al hacer foco en botones/enlaces; sin doble borde.
+   Solo con teclado (:focus-visible): al hacer clic con el mouse no aparece recuadro. */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
   outline: 2px solid rgba(var(--almamundi-orange-rgb), 0.55);
   outline-offset: 0;
   border-color: transparent;

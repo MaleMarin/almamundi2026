@@ -329,7 +329,7 @@ export function PropositoModal({
       }
       belowTitle={
         <nav
-          className="mt-4 -mx-1 flex min-w-0 max-w-full gap-2 overflow-x-auto overscroll-x-contain px-1 pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="mt-4 flex min-w-0 max-w-full flex-wrap justify-center gap-2 pb-1"
           aria-label="Secciones del propósito"
           role="tablist"
         >
@@ -366,12 +366,6 @@ export function PropositoModal({
         {activeSection.id === 'cierre' ? (
           <div className="mt-6 flex flex-col items-center gap-4">
             {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
-            <p
-              className="text-center text-[length:var(--fs-pequeno)] leading-relaxed"
-              style={{ color: soft.textBody, fontFamily: SITE_FONT_STACK }}
-            >
-              {copy.credit}
-            </p>
           </div>
         ) : null}
       </div>

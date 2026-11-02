@@ -68,7 +68,8 @@ export function HomeDialogFrame({
     lenis?.stop?.();
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
-    dialog?.querySelector<HTMLElement>('[data-dialog-close]')?.focus();
+    // Foco inicial en el contenedor (sin contorno): la X solo muestra contorno con teclado.
+    dialog?.focus({ preventScroll: true });
 
     function onKey(event: KeyboardEvent) {
       if (event.key === 'Escape') {
@@ -127,7 +128,8 @@ export function HomeDialogFrame({
         role="dialog"
         aria-modal="true"
         aria-labelledby={labelledBy}
-        className={`grid h-[100svh] w-[calc(100%-32px)] min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-[28px] md:h-auto md:max-h-[calc(100svh-48px)] md:w-full ${panelClassName ?? ''}`}
+        tabIndex={-1}
+        className={`grid h-[100svh] outline-none w-[calc(100%-32px)] min-w-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden rounded-[28px] md:h-auto md:max-h-[calc(100svh-48px)] md:w-full ${panelClassName ?? ''}`}
         style={panelStyle}
         onClick={(event) => event.stopPropagation()}
       >
@@ -151,6 +153,8 @@ export function HomeDialogFrame({
           <div
             ref={scrollerRef}
             onScroll={refreshFade}
+            data-lenis-prevent=""
+            tabIndex={0}
             className="h-full min-w-0 overflow-y-auto overscroll-contain px-5 py-4 md:px-8 md:py-6"
           >
             {children}
