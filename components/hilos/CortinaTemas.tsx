@@ -24,8 +24,8 @@ const TELON: { fondo: string; texto: string }[] = [
   { fondo: '#A0003C', texto: '#fff' },
 ];
 
-/** Colores de las cintas en la cortina: los mismos 12 temas, más intensos y brillantes. */
-const VIVO = ['#FFE600', '#FF6A00', '#FF2238', '#FF5FB0', '#B8FF00', '#00D35A', '#1E5BFF', '#9B1FFF', '#C08CFF', '#FF0FA0', '#00E1F0', '#E0004F'];
+/** Colores de las cintas en la cortina: los mismos 12 temas, algo más intensos (a medio camino de la versión más brillante). */
+const VIVO = ['#FFDC00', '#FF6600', '#FF1E2A', '#FF6DB3', '#B1F100', '#00C44E', '#1052FF', '#8C19F1', '#B985FF', '#FF0D96', '#00D3E4', '#C30046'];
 /** Capa de atrás: el mismo color, más oscuro, para que se lea más lejos. */
 const VIVO_ATRAS = VIVO.map((hex) => {
   const n = parseInt(hex.slice(1), 16);
