@@ -1,0 +1,8 @@
+---
+description: Decisiones de Ana que no se cambian sin su OK.
+alwaysApply: true
+---
+# Decisiones cerradas
+- Antes de cada tarea, lee docs/decisiones-cerradas.md.
+- Nada de esa lista se cambia sin el OK explícito de Ana. Si un pedido choca con ella, pregunta antes de tocar el código.
+- Si al trabajar ves que algo de la lista ya no se cumple en el sitio, avísalo en tu informe.
