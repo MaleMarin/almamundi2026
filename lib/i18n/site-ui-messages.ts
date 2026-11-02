@@ -15,6 +15,8 @@ export type SiteUiMessages = {
   cookieBody: string;
   cookiePrivacyLink: string;
   cookieAccept: string;
+  cookieDecline: string;
+  cookiePreferences: string;
   listHeroTitle: string;
   listHeroSubtitle: string;
   listFilterAria: string;
@@ -123,9 +125,12 @@ const es: SiteUiMessages = {
   footerPrecisarRest: ' es una iniciativa de la Fundación Democracia Abierta',
   footerContact: 'Contacto',
   cookieAria: 'Aviso de cookies',
-  cookieBody: 'AlmaMundi usa cookies esenciales y analítica básica.',
+  cookieBody:
+    'Usamos lo esencial para que el sitio funcione y recuerde tu idioma. Con tu permiso, también medimos nuestras campañas en Google para llegar a más personas.',
   cookiePrivacyLink: 'Aviso de privacidad',
-  cookieAccept: 'Entendido',
+  cookieAccept: 'Aceptar',
+  cookieDecline: 'Rechazar',
+  cookiePreferences: 'Preferencias de cookies',
   listHeroTitle: 'El mundo tiene millones de historias que nadie conoce.',
   listHeroSubtitle: 'Estas son algunas.',
   listFilterAria: 'Filtros de historias',
@@ -262,9 +267,12 @@ const pt: SiteUiMessages = {
   footerPrecisarRest: ' é uma iniciativa da Fundación Democracia Abierta',
   footerContact: 'Contato',
   cookieAria: 'Aviso de cookies',
-  cookieBody: 'AlmaMundi usa cookies essenciais e análise básica.',
+  cookieBody:
+    'Usamos o essencial para que o site funcione e lembre seu idioma. Com sua permissão, também medimos nossas campanhas no Google para chegar a mais pessoas.',
   cookiePrivacyLink: 'Aviso de privacidade',
-  cookieAccept: 'Entendi',
+  cookieAccept: 'Aceitar',
+  cookieDecline: 'Recusar',
+  cookiePreferences: 'Preferências de cookies',
   listHeroTitle: 'O mundo tem milhões de histórias que ninguém conhece.',
   listHeroSubtitle: 'Estas são algumas.',
   listFilterAria: 'Filtros de histórias',
@@ -401,9 +409,12 @@ const en: SiteUiMessages = {
   footerPrecisarRest: ' is an initiative of Fundación Democracia Abierta',
   footerContact: 'Contact',
   cookieAria: 'Cookie notice',
-  cookieBody: 'AlmaMundi uses essential cookies and basic analytics.',
+  cookieBody:
+    "We use what's essential to make the site work and remember your language. With your permission, we also measure our Google campaigns to reach more people.",
   cookiePrivacyLink: 'Privacy notice',
-  cookieAccept: 'Got it',
+  cookieAccept: 'Accept',
+  cookieDecline: 'Decline',
+  cookiePreferences: 'Cookie preferences',
   listHeroTitle: 'The world holds millions of stories no one knows.',
   listHeroSubtitle: 'These are a few of them.',
   listFilterAria: 'Story filters',

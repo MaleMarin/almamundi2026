@@ -17,6 +17,7 @@ import {
   MapPin,
   Globe2,
   Mail } from 'lucide-react';
+import { enviarConversionAds } from '@/lib/ads-consent';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import {
   MAX_AUDIO_VIDEO_DURATION_SECONDS,
@@ -1716,8 +1717,7 @@ export function StoryModal({
           : `AM-${Date.now().toString(36).toUpperCase()}`;
       if (typeof data.id === 'string' && data.id && adsConversionSentRef.current !== data.id) {
         adsConversionSentRef.current = data.id;
-        window.gtag?.('event', 'conversion', {
-          send_to: 'AW-17718043044/dK-ICKuv_KMdEKTDz4BC' });
+        enviarConversionAds();
       }
       imprintSnapRef.current = {
         textBody,

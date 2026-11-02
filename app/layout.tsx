@@ -138,16 +138,17 @@ export default async function RootLayout({
           </SmoothScrollProvider>
         </div>
         <HighContrastToggle />
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=AW-17718043044"
-          strategy="afterInteractive"
-        />
-        <Script id="google-ads" strategy="afterInteractive">
+        <Script id="google-ads-consent" strategy="beforeInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'AW-17718043044');
+            window.gtag = gtag;
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              analytics_storage: 'denied'
+            });
           `}
         </Script>
         <SpeedInsights />

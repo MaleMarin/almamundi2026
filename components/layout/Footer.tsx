@@ -176,6 +176,13 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
               >
                 {t.footerContact}
               </ActiveInternalNavLink>
+              <button
+                type="button"
+                className={`${FOOTER_LEGAL_LINK} cursor-pointer bg-transparent`}
+                onClick={() => window.dispatchEvent(new Event('am-consent-open'))}
+              >
+                {t.cookiePreferences}
+              </button>
             </nav>
             <p className="text-center text-[length:var(--fs-etiqueta)] font-medium text-[#646E7E]">
               © AlmaMundi 2026
