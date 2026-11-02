@@ -8,17 +8,18 @@ type CintaMiniProps = {
   storyId: string;
   text: string;
   locale: AlmaLocale;
+  className?: string;
+  width?: number;
+  height?: number;
 };
 
 /** Miniatura de las cintas de la historia. El lienzo es decorativo: el enlace lleva el título. */
-export function CintaMini({ storyId, text, locale }: CintaMiniProps) {
+export function CintaMini({ storyId, text, locale, className = 'h-[88px] w-full', width = 480, height = 168 }: CintaMiniProps) {
   const ref = useRef<HTMLCanvasElement>(null);
 
   useLayoutEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    const width = 480;
-    const height = 168;
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext('2d');
@@ -28,7 +29,7 @@ export function CintaMini({ storyId, text, locale }: CintaMiniProps) {
       text: text.trim() || ' ',
       locale,
     });
-  }, [storyId, text, locale]);
+  }, [storyId, text, locale, width, height]);
 
-  return <canvas ref={ref} className="h-[88px] w-full" aria-hidden />;
+  return <canvas ref={ref} className={className} aria-hidden />;
 }

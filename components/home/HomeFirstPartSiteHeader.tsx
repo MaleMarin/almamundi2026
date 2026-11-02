@@ -1,5 +1,6 @@
 'use client';
 
+import { PreguntasNavMenu } from '@/components/home/PreguntasNavMenu';
 /**
  * Masthead único de la marca: copiado textualmente desde `HomeFirstPart` y reutilizado en
  * `/historias/*`. Mismas clases, logo sin envoltorio de enlace, mismo menú neumático y mismo panel móvil.
@@ -280,11 +281,13 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
       </div>
       <div className="flex items-center justify-end gap-2 shrink-0 md:gap-3">
         <nav className="hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
-          {desktopFirstTwoLinks}
+          {/* Mismo orden que el menú del pie: Historias · Mapa · Preguntas para ti · Propósito · ¿Cómo funciona? */}
           {desktopHistoriasSegment}
           <HomeHardLink href={MAPA_HOME_LINK_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
             {t.navMap}
           </HomeHardLink>
+          <PreguntasNavMenu />
+          {desktopFirstTwoLinks}
         </nav>
         <HomeHardLink href="/#historias" className={`${SITE_NAV_CTA_CLASS} shrink-0`} onClick={closeMobileNav}>
           {t.navTellStory}
@@ -318,7 +321,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             role="navigation"
             aria-label={t.ariaMainNav}
           >
-            {mobilePurposeHow}
             {mobileHistoriasSegment}
             <HomeHardLink
               href={MAPA_HOME_LINK_HREF}
@@ -327,6 +329,8 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             >
               {t.navMap}
             </HomeHardLink>
+            <PreguntasNavMenu mobile onNavigate={closeMobileNav} />
+            {mobilePurposeHow}
             <div className="flex justify-center border-t border-white/20 pt-2 md:hidden">
               <HomeLanguageSwitcher />
             </div>

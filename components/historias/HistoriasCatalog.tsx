@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
+import { CintaMini } from '@/components/hilos/CintaMini';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { AlignLeft, Headphones, Image as ImageIcon, Video } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -20,6 +21,8 @@ type FormatKey = Exclude<Tab, 'todas'>;
 
 const COPY = {
   es: {
+    pageTitle: 'Historias',
+    pageLead: 'Historias de vida contadas en primera persona, desde todo el mundo.',
     featured: 'Destacadas',
     tabs: { todas: 'Todas', video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' } as const,
     country: 'País',
@@ -34,6 +37,8 @@ const COPY = {
     more: 'Ver más',
   },
   pt: {
+    pageTitle: 'Histórias',
+    pageLead: 'Histórias de vida contadas em primeira pessoa, do mundo todo.',
     featured: 'Destaques',
     tabs: { todas: 'Todas', video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' } as const,
     country: 'País',
@@ -48,6 +53,8 @@ const COPY = {
     more: 'Ver mais',
   },
   en: {
+    pageTitle: 'Stories',
+    pageLead: 'Life stories told in the first person, from all over the world.',
     featured: 'Featured',
     tabs: { todas: 'All', video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' } as const,
     country: 'Country',
@@ -92,16 +99,6 @@ function cardImage(story: StoryPoint): string {
   return story.thumbnailUrl || story.imageUrl || '';
 }
 
-/** Sin foto: la cinta de colores que crea cada historia, como portada de satén. */
-function cintaCover(colors: string[] | undefined): string {
-  const list = (colors ?? []).filter((color) => /^#[0-9A-Fa-f]{6}$/.test(color));
-  const base = list.length > 0 ? list : ['#FF4A1C', '#FF8A5C'];
-  const stops = base.length === 1 ? [base[0], base[0]] : base;
-  return [
-    'linear-gradient(115deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0) 75%)',
-    `linear-gradient(120deg, ${stops.join(', ')})`,
-  ].join(', ');
-}
 
 function publishedTime(iso: string | undefined): number {
   if (!iso) return 0;
@@ -143,11 +140,21 @@ function StoryCard({
     >
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: large ? 260 : 200, background: image ? '#c5ceda' : cintaCover(story.cintaColors) }}
+        style={{ height: large ? 260 : 200, background: '#F7F4EE' }}
       >
         {image ? (
           <img src={image} alt="" className="h-full w-full object-cover" />
-        ) : null}
+        ) : (
+          /* Sin imagen: la misma imagen de cintas que la persona descargó al enviar su historia. */
+          <CintaMini
+            storyId={story.id}
+            text={story.body || story.excerpt || story.description || story.title || story.label}
+            locale={locale}
+            className="h-full w-full object-cover"
+            width={800}
+            height={large ? 520 : 400}
+          />
+        )}
         <span className="absolute left-3 top-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-[color-mix(in_srgb,var(--home-bg)_90%,transparent)]">
           <FormatMark kind={formatKey(story)} />
         </span>
@@ -265,10 +272,15 @@ export default function HistoriasCatalog() {
 
 
   return (
-    <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-24 pt-6 sm:px-6 md:pt-10" style={{ color: neu.textMain }}>
+    <main className="w-full flex-1 px-4 pb-24 pt-6 md:px-6 md:pt-10 lg:px-10" style={{ color: neu.textMain }}>
+      <div className="mx-auto w-full max-w-7xl">
+      <header className="mb-10">
+        <h1 className="text-[length:var(--fs-titular)] font-normal leading-tight">{copy.pageTitle}</h1>
+        <p className="mt-2 text-[length:var(--fs-pequeno)] text-[#616C7C]">{copy.pageLead}</p>
+      </header>
       {featured.length > 0 ? (
         <section className="mb-14">
-          <h1 className="mb-4 text-[length:var(--fs-titular)] font-normal">{copy.featured}</h1>
+          <h2 className="mb-5 text-[length:var(--fs-subtitulo)] font-normal">{copy.featured}</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8">
             {featured.map((story) => (
               <StoryCard key={story.id} story={story} large locale={locale} copy={copy} />
@@ -277,7 +289,8 @@ export default function HistoriasCatalog() {
         </section>
       ) : null}
 
-      <div role="tablist" aria-label={copy.tabs.todas} className="mb-10 flex flex-wrap gap-3">
+      <div className="mb-14 flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div role="tablist" aria-label={copy.tabs.todas} className="flex flex-wrap gap-3">
         {(Object.keys(copy.tabs) as Tab[]).map((key) => {
           const active = tab === key;
           return (
@@ -302,13 +315,13 @@ export default function HistoriasCatalog() {
         })}
       </div>
 
-      <div className="mb-16 flex flex-col gap-6 sm:flex-row sm:flex-wrap sm:items-end">
-        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
-          {copy.country}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <label className="flex sm:w-44">
+          <span className="sr-only">{copy.country}</span>
           <select
             value={country}
             onChange={(event) => setCountry(event.target.value)}
-            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 w-full rounded-full border border-[#DDD8D1] bg-[#FBFAF8] px-4 text-[length:var(--fs-pequeno)]"
           >
             <option value="">{copy.allCountries}</option>
             {countries.map((item) => (
@@ -319,27 +332,28 @@ export default function HistoriasCatalog() {
           </select>
         </label>
         {/* Filtro por eje oculto por ahora (decisión de Ana, 2 nov 2026). */}
-        <label className="flex min-w-[10rem] flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
-          {copy.order}
+        <label className="flex sm:w-44">
+          <span className="sr-only">{copy.order}</span>
           <select
             value={order}
             onChange={(event) => setOrder(event.target.value === 'oldest' ? 'oldest' : 'newest')}
-            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 w-full rounded-full border border-[#DDD8D1] bg-[#FBFAF8] px-4 text-[length:var(--fs-pequeno)]"
           >
             <option value="newest">{copy.newest}</option>
             <option value="oldest">{copy.oldest}</option>
           </select>
         </label>
-        <label className="flex min-w-[16rem] flex-1 flex-col gap-2 text-[length:var(--fs-etiqueta)] font-semibold">
-          {copy.search}
+        <label className="flex sm:w-80">
+          <span className="sr-only">{copy.search}</span>
           <input
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder={copy.search}
-            className="min-h-11 rounded-xl border border-white/50 bg-[var(--home-bg)] px-3 text-[length:var(--fs-pequeno)]"
+            className="min-h-11 w-full rounded-full border border-[#DDD8D1] bg-[#FBFAF8] px-4 text-[length:var(--fs-pequeno)]"
           />
         </label>
+      </div>
       </div>
 
       <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 lg:gap-x-10 lg:gap-y-14">
@@ -355,6 +369,7 @@ export default function HistoriasCatalog() {
           </button>
         </div>
       ) : null}
+      </div>
     </main>
   );
 }

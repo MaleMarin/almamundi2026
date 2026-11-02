@@ -283,7 +283,7 @@ const es: StoryFlowMessages = {
   modalSectionAbout: 'Sobre ti',
   modalSectionWhere: 'Dónde estás y cómo avisarte',
   modalProfilePhotoNote:
-    'Tu foto (opcional, hasta 10 MB). Aparecerá junto a tu historia cuando se publique. Puedes no subirla.',
+    'Una imagen que identifique tu historia (opcional, hasta 10 MB). Puede ser una foto tuya, de un lugar, de un objeto o de lo que quieras. Si no subes ninguna, usaremos la imagen de cintas que crea tu historia.',
   modalImprintHowTexto:
     'Los colores salen de las palabras de tu relato. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
   modalImprintHowFoto:
@@ -392,7 +392,7 @@ const pt: StoryFlowMessages = {
   modalSectionAbout: 'Sobre você',
   modalSectionWhere: 'Onde você está e como avisar você',
   modalProfilePhotoNote:
-    'Sua foto (opcional, até 10 MB). Ela aparecerá junto da sua história quando for publicada. Você pode não enviá-la.',
+    'Uma imagem que identifique sua história (opcional, até 10 MB). Pode ser uma foto sua, de um lugar, de um objeto ou do que você quiser. Se não enviar nenhuma, usaremos a imagem de fitas que sua história cria.',
   modalImprintHowTexto:
     'As cores saem das palavras do seu relato. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
   modalImprintHowFoto:
@@ -550,7 +550,7 @@ const en: StoryFlowMessages = {
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',
   modalProfilePhotoNote:
-    "Your photo (optional, up to 10 MB). It'll appear next to your story when it's published. You can skip it.",
+    'An image that identifies your story (optional, up to 10 MB). It can be a photo of you, a place, an object or anything you like. If you don\'t upload one, we\'ll use the ribbon image your story creates.',
   modalImprintHowTexto:
     'The colors come from the words of your story. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
   modalImprintHowFoto:
