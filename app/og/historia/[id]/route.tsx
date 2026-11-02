@@ -21,12 +21,11 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     locale: 'es',
   });
 
-  const total = units.reduce((n, u) => n + Math.max(1, u.width), 0) || 1;
   const stripes: { hex: string; width: number }[] = [];
   let x = 0;
   for (let guard = 0; x < W && units.length > 0 && guard < 600; guard++) {
     for (const u of units) {
-      const w = Math.min(Math.max(2, Math.round((Math.max(1, u.width) / total) * W)), W - x);
+      const w = Math.min(Math.max(2, Math.round(u.width * 1.4)), W - x);
       if (w <= 0) break;
       stripes.push({ hex: u.hex, width: w });
       x += w;
