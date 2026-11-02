@@ -71,7 +71,6 @@ function splitParrafos(contenido: string): string[] {
 export default function TextoReader({ historia, onClose, siteLayout = false }: TextoReaderProps) {
   const { locale } = useHomeLocale();
   const copy = formatPagesCopy(locale);
-  const [readProgress, setReadProgress] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
 
@@ -82,18 +81,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  useEffect(() => {
-    const onScroll = () => {
-      const el = document.documentElement;
-      const max = el.scrollHeight - el.clientHeight;
-      const pct = max > 0 ? (el.scrollTop / max) * 100 : 0;
-      setReadProgress(pct);
-    };
-    window.addEventListener('scroll', onScroll);
-    onScroll();
-    return () => window.removeEventListener('scroll', onScroll);
-  }, [historia.id]);
-
   const { drop, rest: restOfFirst, otherParrafos } = getFirstParagraphDropAndRest(historia.contenido);
 
   const maxWidth = isMobile ? '100%' : '640px';
@@ -102,21 +89,6 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
 
   return (
     <>
-      {/* Barra de progreso */}
-      <div
-        style={{
-          position: 'fixed',
-          // Justo bajo el menú fijo (antes quedaba a la altura del menú antiguo y cruzaba el texto).
-          top: siteLayout && !isMobile ? 'var(--header-h)' : 0,
-          left: 0,
-          right: 0,
-          height: 2,
-          background: `linear-gradient(90deg, ${SEPIA_DK}, ${SEPIA})`,
-          width: `${readProgress}%`,
-          zIndex: 1000,
-          transition: 'width 0.15s ease-out' }}
-      />
-
       {/* Botón Volver */}
       {onClose && (
         <button

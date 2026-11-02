@@ -72,16 +72,16 @@ export function NewsletterBand() {
   return (
     <section
       aria-labelledby="newsletter-band-title"
-      className="relative z-20 w-full bg-transparent px-6 py-6 md:px-10 md:py-8"
+      className="relative z-20 w-full bg-transparent px-6 pb-4 pt-12 md:px-10 md:pb-6 md:pt-20"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
-      <div className="mx-auto w-full max-w-[min(100%,1560px)] rounded-[28px] bg-[#FBFAF8] px-5 py-5 shadow-[0_12px_28px_rgba(120,110,100,0.2)] md:px-8 md:py-6">
+      <div className="mx-auto w-full max-w-[min(100%,1080px)] rounded-[20px] border border-[#8A847C]/25 bg-[#FBFAF8] px-5 py-4 md:px-7 md:py-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
           <div className="min-w-0 lg:max-w-[36rem]">
             <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#B8340F]">{copy.eyebrow}</p>
             <h2
               id="newsletter-band-title"
-              className="mt-1 text-[length:var(--fs-subtitulo)] font-bold leading-snug text-[#4A5568]"
+              className="mt-1 text-[18px] font-semibold leading-snug text-[#4A5568]"
             >
               {copy.title}
             </h2>
@@ -106,7 +106,7 @@ export function NewsletterBand() {
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
                   placeholder={copy.email}
-                  className="min-h-11 w-full rounded-full border-2 border-[#8A847C] bg-white px-4 text-[length:var(--fs-pequeno)] text-[#4A5568] outline-none placeholder:text-[#4A5568] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
+                  className="min-h-10 w-full rounded-full border border-[#8A847C] bg-white px-4 text-[length:var(--fs-pequeno)] text-[#4A5568] outline-none placeholder:text-[#4A5568] focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-2 focus-visible:outline-[#FF4A1C]"
                 />
                 <button
                   type="submit"
