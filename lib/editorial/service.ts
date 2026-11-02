@@ -949,7 +949,7 @@ export async function editorialDeleteSubmission(args: {
   deletedBy: string;
 }): Promise<{ ok: true } | { ok: false; httpStatus: number; error: string }> {
   const id = args.submissionId.trim();
-  if (!/^[A-Za-z0-9]{8,128}$/.test(id)) {
+  if (!/^[A-Za-z0-9_-]{8,128}$/.test(id)) {
     return { ok: false, httpStatus: 400, error: "Envío no válido" };
   }
   let ref: DocumentReference | null = null;
