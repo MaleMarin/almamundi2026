@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { CSSProperties } from 'react';
 import { uiMessages, useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import {
@@ -15,6 +15,7 @@ export function CookieBanner() {
   const t = useHomeLocaleOptional()?.t ?? uiMessages('es');
   const [visible, setVisible] = useState(false);
   const [narrow, setNarrow] = useState(false);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     try {
@@ -32,7 +33,7 @@ export function CookieBanner() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    const mq = window.matchMedia('(max-width: 599px)');
+    const mq = window.matchMedia('(max-width: 639px)');
     const update = () => setNarrow(mq.matches);
     update();
     mq.addEventListener('change', update);
@@ -42,13 +43,23 @@ export function CookieBanner() {
   useEffect(() => {
     const body = document.body;
     const prev = body.style.paddingBottom;
-    if (visible) {
-      body.style.paddingBottom = narrow ? '128px' : '88px';
-    } else {
-      body.style.paddingBottom = prev || '';
+    const el = panelRef.current;
+    if (!visible || !el) {
+      body.style.paddingBottom = '';
+      return () => {
+        body.style.paddingBottom = prev;
+      };
     }
+    const apply = () => {
+      const alto = el.getBoundingClientRect().height;
+      body.style.paddingBottom = `${Math.ceil(alto + 16)}px`;
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(el);
     return () => {
-      body.style.paddingBottom = prev || '';
+      observer.disconnect();
+      body.style.paddingBottom = prev;
     };
   }, [visible, narrow]);
 
@@ -56,52 +67,65 @@ export function CookieBanner() {
 
   const panel: CSSProperties = {
     position: 'fixed',
-    bottom: 8,
-    left: 12,
-    right: 12,
+    bottom: 16,
+    left: 16,
+    right: 16,
     zIndex: 40,
-    maxWidth: 640,
+    maxWidth: 960,
     margin: '0 auto',
     boxSizing: 'border-box',
     background: '#e6e9ee',
-    borderRadius: 12,
-    padding: narrow ? '12px 14px' : '12px 18px',
+    borderRadius: 14,
+    padding: '12px 20px',
     display: 'flex',
-    alignItems: 'center',
+    alignItems: narrow ? 'stretch' : 'center',
     flexDirection: narrow ? 'column' : 'row',
-    gap: narrow ? 10 : 16,
+    gap: 12,
     border: '1px solid rgba(163,177,198,0.35)',
+    maxHeight: narrow ? '40vh' : undefined,
+    overflow: narrow ? 'auto' : undefined,
   };
 
   const textStyle: CSSProperties = {
-    fontSize: 'var(--fs-pequeno)',
+    fontSize: 14,
     fontWeight: 500,
     color: '#5a6070',
-    lineHeight: 1.45,
+    lineHeight: 1.4,
     margin: 0,
+    flex: narrow ? '0 0 auto' : 1,
+    minWidth: 0,
   };
 
   const linkStyle: CSSProperties = {
     color: '#FF4A1C',
     fontWeight: 600,
-    fontSize: 'var(--fs-pequeno)',
+    fontSize: 14,
+    lineHeight: 1.4,
     textDecoration: 'none',
+    whiteSpace: 'nowrap',
+    flexShrink: 0,
+    textAlign: narrow ? 'center' : 'left',
   };
 
   const buttonStyle: CSSProperties = {
     background: '#FF4A1C',
     color: 'white',
     border: '1.5px solid #FF4A1C',
-    padding: '7px 16px',
+    padding: '0 18px',
+    height: 36,
+    boxSizing: 'border-box',
     borderRadius: 100,
-    fontSize: 'var(--fs-pequeno)',
+    fontSize: 14,
     fontWeight: 600,
-    lineHeight: 1.2,
+    lineHeight: 1,
+    fontFamily: 'inherit',
     cursor: 'pointer',
     whiteSpace: 'nowrap',
     flexShrink: 0,
-    minWidth: narrow ? 0 : 112,
-    alignSelf: narrow ? 'stretch' : 'auto',
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: narrow ? 'calc(50% - 6px)' : 'auto',
   };
 
   function elegir(valor: ConsentValor) {
@@ -115,28 +139,52 @@ export function CookieBanner() {
   }
 
   return (
-    <div style={panel} role="region" aria-label={t.cookieAria}>
+    <div ref={panelRef} style={panel} role="region" aria-label={t.cookieAria}>
       <p style={textStyle}>{t.cookieBody}</p>
-      <div
-        style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 10,
-          flexShrink: 0,
-        }}
-      >
-        <button type="button" style={buttonStyle} onClick={() => elegir('aceptar')}>
-          {t.cookieAccept}
-        </button>
-        <button type="button" style={buttonStyle} onClick={() => elegir('rechazar')}>
-          {t.cookieDecline}
-        </button>
-        <a href="/privacidad" style={linkStyle}>
-          {t.cookiePrivacyLink}
-        </a>
-      </div>
+      {narrow ? (
+        <div
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            columnGap: 12,
+            rowGap: 12,
+            width: '100%',
+          }}
+        >
+          <button type="button" style={buttonStyle} onClick={() => elegir('aceptar')}>
+            {t.cookieAccept}
+          </button>
+          <button type="button" style={buttonStyle} onClick={() => elegir('rechazar')}>
+            {t.cookieDecline}
+          </button>
+          <a href="/privacidad" style={{ ...linkStyle, flexBasis: '100%' }}>
+            {t.cookiePrivacyLink}
+          </a>
+        </div>
+      ) : (
+        <>
+          <span
+            style={{
+              display: 'inline-grid',
+              gridAutoFlow: 'column',
+              gridAutoColumns: '1fr',
+              gap: 12,
+              flexShrink: 0,
+            }}
+          >
+            <button type="button" style={{ ...buttonStyle, width: '100%' }} onClick={() => elegir('aceptar')}>
+              {t.cookieAccept}
+            </button>
+            <button type="button" style={{ ...buttonStyle, width: '100%' }} onClick={() => elegir('rechazar')}>
+              {t.cookieDecline}
+            </button>
+          </span>
+          <a href="/privacidad" style={linkStyle}>
+            {t.cookiePrivacyLink}
+          </a>
+        </>
+      )}
     </div>
   );
 }
