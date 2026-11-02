@@ -85,13 +85,22 @@ function formatKey(story: StoryPoint): FormatKey {
   return 'texto';
 }
 
+/** Foto o portada de la propia historia. Nunca la foto de perfil de quien la contó. */
 function cardImage(story: StoryPoint): string {
   const photo = story.imagenes?.find((item) => item.url)?.url || story.photos?.[0]?.url;
   if (photo) return photo;
-  if (story.videoUrl || story.hasVideo) {
-    return story.thumbnailUrl || story.imageUrl || story.authorAvatar || story.author?.avatar || '';
-  }
-  return story.imageUrl || story.thumbnailUrl || story.authorAvatar || story.author?.avatar || '';
+  return story.thumbnailUrl || story.imageUrl || '';
+}
+
+/** Sin foto: la cinta de colores que crea cada historia, como portada de satén. */
+function cintaCover(colors: string[] | undefined): string {
+  const list = (colors ?? []).filter((color) => /^#[0-9A-Fa-f]{6}$/.test(color));
+  const base = list.length > 0 ? list : ['#FF4A1C', '#FF8A5C'];
+  const stops = base.length === 1 ? [base[0], base[0]] : base;
+  return [
+    'linear-gradient(115deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 35%, rgba(255,255,255,0.18) 55%, rgba(255,255,255,0) 75%)',
+    `linear-gradient(120deg, ${stops.join(', ')})`,
+  ].join(', ');
 }
 
 function publishedTime(iso: string | undefined): number {
@@ -134,7 +143,7 @@ function StoryCard({
     >
       <div
         className="relative w-full overflow-hidden"
-        style={{ height: large ? 260 : 200, background: '#c5ceda' }}
+        style={{ height: large ? 260 : 200, background: image ? '#c5ceda' : cintaCover(story.cintaColors) }}
       >
         {image ? (
           <img src={image} alt="" className="h-full w-full object-cover" />
