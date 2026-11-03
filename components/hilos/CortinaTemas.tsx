@@ -51,7 +51,7 @@ const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#3C4655', texto: '#fff', boton: '#3C4655' },
 ];
 
-/** Los 12 temas y «Me pregunto…», la cinta multicolor de las preguntas de la gente. */
+/** Los 12 temas y «Me pregunto…», la cinta multicolor de las preguntas de las personas. */
 const ME_HILO = {
   id: ME_PREGUNTO_ID,
   nombre: { es: ME_PREGUNTO_UI.es.nombre, pt: ME_PREGUNTO_UI.pt.nombre, en: ME_PREGUNTO_UI.en.nombre },

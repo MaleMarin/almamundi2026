@@ -172,8 +172,8 @@ export const ME_PREGUNTO_MAPA: Record<
 > = {
   es: {
     titulo: 'Respuestas de Me pregunto',
-    intro: 'Preguntas que dejó la gente y lo que respondieron personas de todo el mundo.',
-    vacio: 'Aquí aparecerán las preguntas de la gente y sus respuestas. ¿Te animas a dejar la primera?',
+    intro: 'Preguntas que dejaron personas de todo el mundo y lo que otras personas respondieron.',
+    vacio: 'Aquí aparecerán las preguntas de las personas y sus respuestas. ¿Te animas a dejar la primera?',
     ir: 'Ir a Me pregunto…',
     buscar: 'Busca por palabra: abuela, mar, miedo…',
     sinResultados: 'Prueba con otra palabra.',

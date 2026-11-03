@@ -705,7 +705,7 @@ const TEMAS: PreguntaHilo[] = [
     hiloId: 'trabajo',
     nivel: 'empezar',
     texto: {
-      es: '¿Cómo era tu lugar de trabajo: sus ruidos, su gente, sus olores?',
+      es: '¿Cómo era tu lugar de trabajo: sus ruidos, sus personas, sus olores?',
       pt: 'Como era o seu lugar de trabalho: seus ruídos, suas pessoas, seus cheiros?',
       en: 'What was your workplace like: its sounds, its people, its smells?',
     },
@@ -725,7 +725,7 @@ const TEMAS: PreguntaHilo[] = [
     hiloId: 'trabajo',
     nivel: 'empezar',
     texto: {
-      es: '¿Qué te gustaría que la gente supiera de tu oficio?',
+      es: '¿Qué te gustaría que las personas supieran de tu oficio?',
       pt: 'O que você gostaria que as pessoas soubessem do seu ofício?',
       en: 'What would you like people to know about your work?',
     },
@@ -935,7 +935,7 @@ const TEMAS: PreguntaHilo[] = [
     hiloId: 'justicia',
     nivel: 'empezar',
     texto: {
-      es: '¿Qué cambio en tu barrio o en tu país viste nacer de la gente?',
+      es: '¿Qué cambio en tu barrio o en tu país viste nacer de las personas?',
       pt: 'Que mudança no seu bairro ou no seu país você viu nascer das pessoas?',
       en: 'What change in your neighborhood or country did you see grow from the people?',
     },

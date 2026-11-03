@@ -261,7 +261,7 @@ const MUESTRAS_MOCK: Muestra[] = [
         title: "Nombres que no están en el mapa",
         alias: "Inés",
         date: "2024",
-        context: "Lugares que la gente nombra.",
+        context: "Lugares que las personas nombran.",
         mediaUrl: "/muestra2.jpg",
       },
     ],

@@ -2,10 +2,9 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { Camera, ChevronDown, Mic, PenLine, Search, X } from 'lucide-react';
+import { ChevronDown, Search, X } from 'lucide-react';
 import { comoFormulario } from '@/components/hilos/MePreguntoPanel';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
-import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
@@ -13,8 +12,6 @@ import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import type { AlmaLocale } from '@/lib/i18n/locale';
-
-type Formato = 'texto' | 'voz' | 'foto';
 
 const POR_PAGINA = 10;
 
@@ -42,12 +39,11 @@ export function MePreguntoMapPanel({
 }) {
   const ui = ME_PREGUNTO_UI[locale];
   const copy = ME_PREGUNTO_MAPA[locale];
-  const hilos = HILOS_UI[locale];
   const [query, setQuery] = useState('');
   const [abierta, setAbierta] = useState<string | null>(abrirId);
   const [limite, setLimite] = useState(POR_PAGINA);
-  /** Pregunta que se está respondiendo y el formato elegido (null = eligiendo formato). */
-  const [respondiendo, setRespondiendo] = useState<{ id: string; formato: Formato | null } | null>(null);
+  /** Pregunta que se está respondiendo aquí mismo. */
+  const [respondiendo, setRespondiendo] = useState<string | null>(null);
   const [abrirVisto, setAbrirVisto] = useState<string | null>(null);
 
   // Al tocar un punto multicolor: se despliega su pregunta (patrón de estado derivado, sin efecto).
@@ -188,8 +184,11 @@ export function MePreguntoMapPanel({
               ) : null}
               {/* «Responder» siempre a la vista. Se responde aquí mismo, sin salir del mapa. */}
               <div className="px-4 pb-4">
-                {respondiendo?.id === pregunta.id ? (
-                  <div className="relative rounded-2xl bg-[#F4F2EE] p-4 text-[#1C1C2E]">
+                {respondiendo === pregunta.id ? (
+                  <div
+                    className="relative rounded-2xl bg-[#F4F2EE] p-4 pt-10 text-[#1C1C2E]"
+                    style={{ ['--cortina-texto' as string]: '#3C4655', ['--cortina-fondo' as string]: '#F4F2EE' }}
+                  >
                     <button
                       type="button"
                       onClick={() => setRespondiendo(null)}
@@ -198,38 +197,16 @@ export function MePreguntoMapPanel({
                     >
                       <X size={18} aria-hidden />
                     </button>
-                    {respondiendo.formato ? (
-                      <PreguntaFormForQuestion
-                        pregunta={comoFormulario(pregunta, locale)}
-                        formato={respondiendo.formato}
-                        onAnother={() => setRespondiendo(null)}
-                      />
-                    ) : (
-                      <div className="flex flex-col gap-2 pt-6">
-                        {(
-                          [
-                            ['texto', PenLine, hilos.escribir],
-                            ['voz', Mic, hilos.contarVoz],
-                            ['foto', Camera, hilos.conFoto],
-                          ] as const
-                        ).map(([formato, Icono, label]) => (
-                          <button
-                            key={formato}
-                            type="button"
-                            onClick={() => setRespondiendo({ id: pregunta.id, formato })}
-                            className="btn-am-secundario inline-flex min-h-11 items-center justify-center gap-2 px-4 text-[length:var(--fs-etiqueta)] font-semibold"
-                          >
-                            <Icono size={18} strokeWidth={1.75} aria-hidden />
-                            {label}
-                          </button>
-                        ))}
-                      </div>
-                    )}
+                    {/* El formulario trae su propia elección: texto, voz o foto. */}
+                    <PreguntaFormForQuestion
+                      pregunta={comoFormulario(pregunta, locale)}
+                      onAnother={() => setRespondiendo(null)}
+                    />
                   </div>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setRespondiendo({ id: pregunta.id, formato: null })}
+                    onClick={() => setRespondiendo(pregunta.id)}
                     className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white"
                   >
                     {copy.primera}

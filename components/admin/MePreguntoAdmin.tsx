@@ -43,7 +43,7 @@ function fecha(ms: number | null): string {
   }
 }
 
-/** Pestaña «Me pregunto»: aprobar, rechazar o borrar las preguntas que deja la gente. */
+/** Pestaña «Me pregunto»: aprobar, rechazar o borrar las preguntas que dejan las personas. */
 export default function MePreguntoAdmin({ token }: { token: string }) {
   const [tab, setTab] = useState<'pending' | 'approved' | 'rejected'>('pending');
   const [items, setItems] = useState<Item[]>([]);

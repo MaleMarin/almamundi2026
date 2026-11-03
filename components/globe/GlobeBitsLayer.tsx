@@ -87,7 +87,7 @@ const NEWS_PLANE_MUL = 2.22;
 /** Respuestas: anillo fino y chico, naranja. */
 const RESPUESTA_PLANE_MUL = 1.55;
 /** Preguntas de «Me pregunto…»: punto multicolor (los colores de las cintas) con luz suave. */
-const PREGUNTA_PLANE_MUL = 2.6;
+const PREGUNTA_PLANE_MUL = 3.4;
 const PREGUNTA_COLORES = [
   '#ffd000', '#ff6200', '#ff1a1a', '#ff7eb6', '#a8e000', '#00b140',
   '#00c2d6', '#0047ff', '#7a12e0', '#b07cff', '#ff0a8a', '#a0003c',
@@ -108,7 +108,7 @@ function createPreguntaDotMaterial(): THREE.MeshBasicMaterial {
     halo.addColorStop(1, 'rgba(255,255,255,0)');
     ctx.fillStyle = halo;
     ctx.fillRect(0, 0, size, size);
-    const r = size * 0.24;
+    const r = size * 0.3;
     const paso = (Math.PI * 2) / PREGUNTA_COLORES.length;
     PREGUNTA_COLORES.forEach((color, i) => {
       ctx.beginPath();

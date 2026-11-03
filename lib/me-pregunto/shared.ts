@@ -1,4 +1,4 @@
-/** «Me pregunto…»: preguntas que deja la gente. Tipos y límites compartidos por cliente y servidor. */
+/** «Me pregunto…»: preguntas que dejan las personas. Tipos y límites compartidos por cliente y servidor. */
 
 export const ME_PREGUNTO_ID = 'me-pregunto';
 export const ME_PREGUNTAS_COLLECTION = 'preguntas_comunidad';

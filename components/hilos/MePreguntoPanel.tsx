@@ -27,7 +27,7 @@ export function comoFormulario(p: MePreguntaPublica, locale: AlmaLocale): Pregun
   return { id: p.id as PreguntaSemana['id'], tema, tu: texto, alguien: texto };
 }
 
-/** Panel de la cinta «Me pregunto…»: preguntas de la gente y formulario para dejar una. */
+/** Panel de la cinta «Me pregunto…»: preguntas de las personas y formulario para dejar una. */
 export function MePreguntoPanel({
   locale,
   initialPregunta = null,
