@@ -1,6 +1,8 @@
 'use client';
 
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { ComoFuncionaContenido } from '@/components/home/ComoFuncionaModal';
+import { COMO_FUNCIONA } from '@/lib/i18n/como-funciona';
 import { HomeDialogFrame } from '@/components/home/HomeDialogFrame';
 import {
   propositoFor,
@@ -299,6 +301,13 @@ export function PropositoModal({
             {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
           </div>
         ) : null}
+        {/* Propósito primero; debajo, cómo funciona (un solo ítem en el menú). */}
+        <section aria-labelledby="proposito-como-funciona" className="border-t pt-8" style={{ borderColor: 'rgba(60,70,85,0.15)' }}>
+          <h3 id="proposito-como-funciona" className="mb-4 text-[length:var(--fs-subtitulo)] font-semibold" style={{ color: soft.textMain }}>
+            {COMO_FUNCIONA[locale].title}
+          </h3>
+          <ComoFuncionaContenido onClose={onClose} />
+        </section>
       </div>
     </HomeDialogFrame>
   );

@@ -1,7 +1,6 @@
 'use client';
 
 import { PreguntasNavMenu } from '@/components/home/PreguntasNavMenu';
-import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 /**
  * Masthead único de la marca: copiado textualmente desde `HomeFirstPart` y reutilizado en
  * `/historias/*`. Mismas clases, logo sin envoltorio de enlace, mismo menú neumático y mismo panel móvil.
@@ -142,18 +141,12 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
 
   const desktopHowPurpose = scope === 'home' ? (
     <>
-      <button type="button" className={SITE_NAV_LINK_CLASS} onClick={() => { props.onShowComoFunciona(); closeMobileNav(); }}>
-        {t.navHow}
-      </button>
       <button type="button" className={SITE_NAV_LINK_CLASS} onClick={() => { props.onShowPurpose(); closeMobileNav(); }}>
         {t.navPurpose}
       </button>
     </>
   ) : (
     <>
-      <HomeHardLink href="/#como-funciona" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
-        {t.navHow}
-      </HomeHardLink>
       <HomeHardLink href="/#proposito" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
         {t.navPurpose}
       </HomeHardLink>
@@ -199,16 +192,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
         type="button"
         className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
         onClick={() => {
-          props.onShowComoFunciona();
-          closeMobileNav();
-        }}
-      >
-        {t.navHow}
-      </button>
-      <button
-        type="button"
-        className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
-        onClick={() => {
           props.onShowPurpose();
           closeMobileNav();
         }}
@@ -218,9 +201,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
     </>
   ) : (
     <>
-      <HomeHardLink href="/#como-funciona" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
-        {t.navHow}
-      </HomeHardLink>
       <HomeHardLink href="/#proposito" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
         {t.navPurpose}
       </HomeHardLink>
@@ -285,12 +265,9 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           {t.navTellStory}
         </HomeHardLink>
         <nav className="site-header-nav hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
-          {/* Mismo orden que el pie: Cuenta tu historia · Preguntas para ti · Historias · Así respondieron · Mapa · ¿Cómo funciona? · Propósito */}
+          {/* Mismo orden que el pie: Cuenta tu historia · Preguntas para ti · Historias contadas · Mapa · Propósito */}
           <PreguntasNavMenu />
           {desktopHistoriasSegment}
-          <HomeHardLink href="/?capa=respuestas#mapa" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
-            {HILOS_UI[locale].leyenda}
-          </HomeHardLink>
           <HomeHardLink href={MAPA_HOME_LINK_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
             {t.navMap}
           </HomeHardLink>
@@ -327,13 +304,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           >
             <PreguntasNavMenu mobile onNavigate={closeMobileNav} />
             {mobileHistoriasSegment}
-            <HomeHardLink
-              href="/?capa=respuestas#mapa"
-              className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
-              onClick={closeMobileNav}
-            >
-              {HILOS_UI[locale].leyenda}
-            </HomeHardLink>
             <HomeHardLink
               href={MAPA_HOME_LINK_HREF}
               className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}

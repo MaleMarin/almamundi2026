@@ -87,7 +87,7 @@ export type HomeMessages = {
 const es: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: '¿Cómo funciona?',
-  navStories: 'Historias',
+  navStories: 'Historias contadas',
   navHistoriasColeccion: 'Mi colección',
   navHistoriasTodas: 'Todas',
   navHistoriasVideos: 'Videos',
@@ -165,7 +165,7 @@ const es: HomeMessages = {
 const pt: HomeMessages = {
   navPurpose: 'Propósito',
   navHow: 'Como funciona?',
-  navStories: 'Histórias',
+  navStories: 'Histórias contadas',
   navHistoriasColeccion: 'Minha coleção',
   navHistoriasTodas: 'Todas',
   navHistoriasVideos: 'Vídeos',
@@ -243,7 +243,7 @@ const pt: HomeMessages = {
 const en: HomeMessages = {
   navPurpose: 'Purpose',
   navHow: 'How does it work?',
-  navStories: 'Stories',
+  navStories: 'Stories told',
   navHistoriasColeccion: 'My collection',
   navHistoriasTodas: 'All',
   navHistoriasVideos: 'Videos',

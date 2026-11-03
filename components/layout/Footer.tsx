@@ -32,7 +32,6 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
 
   const rowLinks: FooterPillItem[] = [
     { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
-    { id: 'respuestas', kind: 'hard', href: '/?capa=respuestas#mapa', label: HILOS_UI[locale].leyenda },
     {
       id: 'mapa',
       kind: 'hard',
@@ -40,7 +39,6 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       label: t.navMap,
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
-    { id: 'como-funciona', kind: 'hard', href: '/#como-funciona', label: t.navHow },
     { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
   ];
 

@@ -57,6 +57,17 @@ export function ComoFuncionaModal({
         </h2>
       }
     >
+        <ComoFuncionaContenido onClose={onClose} />
+    </HomeDialogFrame>
+  );
+}
+
+/** Pasos y reglas de «¿Cómo funciona?». También va dentro de Propósito. */
+export function ComoFuncionaContenido({ onClose }: { onClose: () => void }) {
+  const { locale } = useHomeLocale();
+  const copy = COMO_FUNCIONA[locale];
+  return (
+    <>
         <div
           className="space-y-3 text-[length:var(--fs-pequeno)] leading-relaxed md:space-y-3.5"
           style={{ color: soft.textBody }}
@@ -98,6 +109,6 @@ export function ComoFuncionaModal({
             {copy.privacy}
           </Link>
         </div>
-    </HomeDialogFrame>
+    </>
   );
 }
