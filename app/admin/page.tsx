@@ -32,11 +32,13 @@ import {
   FolderOpen,
   Trash2,
   MessageCircle,
+  Mail,
 } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
 import MePreguntoAdmin from '@/components/admin/MePreguntoAdmin';
+import SonderAdmin from '@/components/admin/SonderAdmin';
 import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
@@ -402,7 +404,7 @@ export default function AdminPage() {
   const [loginError, setLoginError] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
 
-  const [section, setSection] = useState<'pendientes' | 'mapa' | 'archivo' | 'respuestas' | 'mepregunto' | 'colecciones' | 'stats'>('pendientes');
+  const [section, setSection] = useState<'pendientes' | 'mapa' | 'archivo' | 'respuestas' | 'mepregunto' | 'colecciones' | 'sonder' | 'stats'>('pendientes');
   const [pendingStories, setPendingStories] = useState<Story[]>([]);
   const [pendingError, setPendingError] = useState('');
   const [activeStories, setActiveStories] = useState<Story[]>([]);
@@ -802,6 +804,7 @@ export default function AdminPage() {
     { id: 'respuestas', label: 'Respuestas', icon: <MessageCircle size={18} /> },
     { id: 'mepregunto', label: 'Me pregunto', icon: <MessageCircle size={18} /> },
     { id: 'colecciones', label: 'Colecciones', icon: <FolderOpen size={18} /> },
+    { id: 'sonder', label: 'Sonder', icon: <Mail size={18} /> },
     { id: 'stats', label: 'Estadísticas', icon: <BarChart3 size={18} /> },
   ];
   const visibleSections = sections.filter(
@@ -897,12 +900,13 @@ export default function AdminPage() {
         ))}
       </nav>
 
-      {loading && section !== 'stats' && section !== 'respuestas' && section !== 'mepregunto' && (
+      {loading && section !== 'stats' && section !== 'respuestas' && section !== 'mepregunto' && section !== 'sonder' && (
         <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Cargando…</p>
       )}
 
       {SHOW_RESPUESTAS_ADMIN && section === 'respuestas' && idToken && <RespuestasAdmin token={idToken} />}
       {section === 'mepregunto' && idToken && <MePreguntoAdmin token={idToken} />}
+      {section === 'sonder' && idToken && <SonderAdmin token={idToken} />}
 
       {/* 1. Historias pendientes */}
       {section === 'pendientes' && !loading && (
