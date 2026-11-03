@@ -1943,6 +1943,20 @@ export function StoryModal({
     window.setTimeout(() => setShareMenuOpen(false), 0);
   }, [t.modalShareCopyFailed]);
 
+  /** Botones de «¿Quieres seguir?»: primero cierra el formulario y luego lleva a la sección. */
+  const cerrarEIr = useCallback(
+    (href: string) => {
+      onClose();
+      // La página de fondo ya es la portada (/ o /contar): basta con bajar a la sección.
+      window.setTimeout(() => {
+        const el = document.getElementById(href.replace(/^\/#/, ''));
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        else hardNavigateTo(href);
+      }, 150);
+    },
+    [onClose]
+  );
+
   const startAnotherStory = useCallback(() => {
     setShareMenuOpen(false);
     setShareMenuShowDownload(false);
@@ -3148,14 +3162,14 @@ export function StoryModal({
                   <div className="flex flex-col gap-2 md:flex-row">
                     <button
                       type="button"
-                      onClick={() => hardNavigateTo('/#historias')}
+                      onClick={() => cerrarEIr('/#historias')}
                       className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {t.modalAnotherCtaTexto}
                     </button>
                     <button
                       type="button"
-                      onClick={() => hardNavigateTo('/#cintas')}
+                      onClick={() => cerrarEIr('/#cintas')}
                       className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-[#D4D4C4] bg-white px-4 text-[length:var(--fs-pequeno)] font-medium text-[#141D26] transition hover:border-[var(--almamundi-orange)] hover:text-[var(--almamundi-orange)] md:flex-1"
                     >
                       {t.modalAnswerWeekQuestion}
