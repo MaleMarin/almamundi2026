@@ -250,6 +250,13 @@ function HistoriasCtaButton({ label, onClick }: { label: string; onClick: () => 
   );
 }
 
+/** Quién está detrás de AlmaMundi. */
+const QUIEN: Record<'es' | 'pt' | 'en', string> = {
+  es: 'AlmaMundi es una iniciativa sin fines de lucro de Fundación Democracia Abierta, desarrollada por Precisar.',
+  pt: 'O AlmaMundi é uma iniciativa sem fins lucrativos da Fundación Democracia Abierta, desenvolvida pela Precisar.',
+  en: 'AlmaMundi is a nonprofit initiative of Fundación Democracia Abierta, developed by Precisar.',
+};
+
 export function PropositoModal({
   isOpen,
   onClose,
@@ -301,6 +308,9 @@ export function PropositoModal({
             {onGoToHistorias ? <HistoriasCtaButton label={copy.cta} onClick={onGoToHistorias} /> : null}
           </div>
         ) : null}
+        <p className="text-center text-[length:var(--fs-pequeno)] leading-relaxed" style={{ color: soft.textBody }}>
+          {QUIEN[locale]}
+        </p>
         {/* Propósito primero; debajo, cómo funciona (un solo ítem en el menú). */}
         <section aria-labelledby="proposito-como-funciona" className="border-t pt-8" style={{ borderColor: 'rgba(60,70,85,0.15)' }}>
           <h3 id="proposito-como-funciona" className="mb-4 text-[length:var(--fs-subtitulo)] font-semibold" style={{ color: soft.textMain }}>
