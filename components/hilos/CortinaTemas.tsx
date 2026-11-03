@@ -320,7 +320,7 @@ export function CortinaTemas({
         });
         if (cintas[mejor]) {
           cintas[mejor].th = ME_INDICE;
-          cintas[mejor].w = Math.max(cintas[mejor].w, base * 1.6);
+          cintas[mejor].w = base * 2.8;
         }
       }
       cintasRef.current = cintas;
