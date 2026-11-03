@@ -478,7 +478,9 @@ export function CortinaTemas({
         ctx.globalAlpha = alfas[cinta.th] ?? 1;
         dibujar(cinta, VIVO_ATRAS[cinta.th] ?? '#666');
       }
-      for (const cinta of cintasRef.current) {
+      // Las cintas multicolor de «Me pregunto…» van encima, para que se vean completas.
+      const orden = cintasRef.current.filter((c) => c.th !== ME_INDICE).concat(cintasRef.current.filter((c) => c.th === ME_INDICE));
+      for (const cinta of orden) {
         const tela = TELON[cinta.th];
         if (!tela) continue;
         ctx.globalAlpha = alfas[cinta.th] ?? 1;
