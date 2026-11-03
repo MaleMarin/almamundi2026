@@ -157,7 +157,7 @@ export function contarMetadata(kind: ContarFormat | 'index', rawLocale?: string 
   const socialTitle = kind === 'index' ? card.title : `${title} · AlmaMundi`;
   const socialDescription = kind === 'index' ? card.description : description;
   const image = {
-    url: '/og-image.png',
+    url: '/og/sitio',
     width: 1200,
     height: 630,
     alt: OG_ALT[locale],

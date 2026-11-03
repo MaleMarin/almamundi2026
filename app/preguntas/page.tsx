@@ -25,7 +25,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const copy = HILOS_UI[locale];
   const title = `${copy.ceja} · AlmaMundi`;
   const image = {
-    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og-image.png',
+    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio',
     width: 1200,
     height: 630,
     alt: copy.ceja,

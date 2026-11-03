@@ -62,7 +62,8 @@ import {
   PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
   PENDING_STORY_SHARE_TEXT_SHORT,
-  PENDING_STORY_SHARE_URL } from '@/lib/huella/share-story-channels';
+  PENDING_STORY_SHARE_URL,
+  shareMessageWithLink } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import type { ContarPregunta } from '@/lib/contar-routes';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
@@ -467,6 +468,10 @@ export function StoryModal({
   /** Audio y video: mientras se transcribe la voz para crear los colores. */
   const [escuchando, setEscuchando] = useState(false);
   const [imprintUnits, setImprintUnits] = useState<{ hex: string; width: number }[] | null>(null);
+  /** Enlace para compartir recién enviada la historia: su tarjeta de WhatsApp muestra sus colores. */
+  const pendingShareUrl = /^[A-Za-z0-9]{8,40}$/.test(imprintId)
+    ? `${PENDING_STORY_SHARE_URL}?c=${imprintId}`
+    : PENDING_STORY_SHARE_URL;
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const [imprintStoryTitle, setImprintStoryTitle] = useState('');
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1876,7 +1881,7 @@ export function StoryModal({
           if (!navigator.canShare || navigator.canShare({ files: [file] })) {
             await navigator.share({
               files: [file],
-              text: t.modalShareTextLong || PENDING_STORY_SHARE_TEXT,
+              text: shareMessageWithLink(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT, pendingShareUrl),
             });
             return;
           }
@@ -1888,7 +1893,7 @@ export function StoryModal({
     } catch {
       flashShareNotice(t.modalCopyImageFailed);
     }
-  }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, t.modalShareTextLong, flashShareNotice]);
+  }, [imprintId, imprintStoryTitle, isCoarsePointer, storyTitle, t.modalCopyImageFailed, t.modalShareTextLong, flashShareNotice, pendingShareUrl]);
 
   const shareImprint = useCallback(async () => {
     setShareMenuShowDownload(false);
@@ -3198,7 +3203,8 @@ export function StoryModal({
 
           {shareMenuOpen ? (
             <StoryShareMenu
-              shareUrl={PENDING_STORY_SHARE_URL}
+              shareUrl={pendingShareUrl}
+              keepShareUrl
               shareTextShort={t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT}
               shareTextLong={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
               shareTextSocial={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
