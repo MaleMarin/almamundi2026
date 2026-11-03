@@ -13,6 +13,10 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 
 const POR_PAGINA = 10;
 
+function normalizar(texto: string): string {
+  return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+}
+
 /** Panel del mapa: las preguntas de «Me pregunto…» y, al desplegar cada una, sus respuestas. */
 export function MePreguntoMapPanel({
   locale,
@@ -66,8 +70,20 @@ export function MePreguntoMapPanel({
       orden.push({ pregunta: p, respuestas: lista });
     }
     for (const p of preguntas) if (!porPregunta.has(p.id)) orden.push({ pregunta: p, respuestas: [] });
-    const q = query.trim().toLowerCase();
-    return q ? orden.filter((g) => g.pregunta.texto.toLowerCase().includes(q)) : orden;
+    // Búsqueda por palabras, sin importar tildes ni mayúsculas: en la pregunta, en sus respuestas y en los lugares.
+    const palabras = normalizar(query).split(/\s+/).filter(Boolean);
+    if (!palabras.length) return orden;
+    return orden.filter((g) => {
+      const texto = normalizar(
+        [
+          g.pregunta.texto,
+          g.pregunta.city,
+          g.pregunta.country,
+          ...g.respuestas.map((r) => `${r.contenido} ${r.city} ${r.country}`),
+        ].join(' ')
+      );
+      return palabras.every((palabra) => texto.includes(palabra));
+    });
   }, [respuestas, preguntas, query]);
 
   const visibles = grupos.slice(0, limite);
@@ -75,6 +91,7 @@ export function MePreguntoMapPanel({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
       <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-white/75">{copy.intro}</p>
+      {grupos.length === 0 && !query.trim() ? null : (
       <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
         <Search size={16} className="text-[#FF6E49]" aria-hidden />
         <span className="sr-only">{copy.buscar}</span>
@@ -88,6 +105,10 @@ export function MePreguntoMapPanel({
           className="w-full bg-transparent text-[length:var(--fs-pequeno)] text-white outline-none placeholder:text-white/50"
         />
       </label>
+      )}
+      {query.trim() && grupos.length === 0 ? (
+        <p className="m-0 text-center text-[length:var(--fs-etiqueta)] text-white/75">{copy.sinResultados}</p>
+      ) : null}
       {grupos.length === 0 && !query.trim() ? (
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 text-center">
           <p className="m-0 text-[length:var(--fs-pequeno)] leading-snug text-white/85">{copy.vacio}</p>

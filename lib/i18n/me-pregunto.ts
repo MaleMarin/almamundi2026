@@ -153,6 +153,7 @@ export const ME_PREGUNTO_MAPA: Record<
     intro: string;
     vacio: string;
     ir: string;
+    sinResultados: string;
     buscar: string;
     cuantas: (n: number) => string;
     primera: string;
@@ -166,7 +167,8 @@ export const ME_PREGUNTO_MAPA: Record<
     intro: 'Preguntas que dejó la gente y lo que respondieron personas de todo el mundo.',
     vacio: 'Aquí aparecerán las preguntas de la gente y sus respuestas. ¿Te animas a dejar la primera?',
     ir: 'Ir a Me pregunto…',
-    buscar: 'Buscar una pregunta',
+    buscar: 'Busca por palabra: abuela, mar, miedo…',
+    sinResultados: 'Prueba con otra palabra.',
     cuantas: (n) => (n === 1 ? '1 respuesta' : `${n} respuestas`),
     primera: 'Sé la primera persona en responder',
     mas: 'Ver más preguntas',
@@ -178,7 +180,8 @@ export const ME_PREGUNTO_MAPA: Record<
     intro: 'Perguntas deixadas pelas pessoas e o que responderam pessoas do mundo todo.',
     vacio: 'Aqui vão aparecer as perguntas das pessoas e suas respostas. Que tal deixar a primeira?',
     ir: 'Ir para Me pergunto…',
-    buscar: 'Buscar uma pergunta',
+    buscar: 'Busque por palavra: avó, mar, medo…',
+    sinResultados: 'Tente outra palavra.',
     cuantas: (n) => (n === 1 ? '1 resposta' : `${n} respostas`),
     primera: 'Seja a primeira pessoa a responder',
     mas: 'Ver mais perguntas',
@@ -190,7 +193,8 @@ export const ME_PREGUNTO_MAPA: Record<
     intro: 'Questions people left and what people from all over the world answered.',
     vacio: 'Questions from people and their answers will appear here. Want to leave the first one?',
     ir: 'Go to I wonder…',
-    buscar: 'Search a question',
+    buscar: 'Search by word: grandma, sea, fear…',
+    sinResultados: 'Try another word.',
     cuantas: (n) => (n === 1 ? '1 answer' : `${n} answers`),
     primera: 'Be the first person to answer',
     mas: 'See more questions',
