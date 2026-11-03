@@ -35,12 +35,12 @@ function copy(locale: AlmaLocale) {
     return {
       subject: {
         recibida: "Recebemos sua pergunta",
-        publicada: "Sua pergunta já está em Me pergunto…",
+        publicada: "Sua pergunta já está no AlmaMundi",
         respuesta: "Alguém respondeu sua pergunta",
       },
       recibida: (p: string) => `Recebemos sua pergunta ${p}. Uma pessoa da equipe vai lê-la antes de publicá-la.`,
       publicada: (p: string) =>
-        `Sua pergunta ${p} já está em Me pergunto… A partir de agora, qualquer pessoa do mundo pode respondê-la.`,
+        `Sua pergunta ${p} já está publicada no AlmaMundi. A partir de agora, outras pessoas podem respondê-la.`,
       respuesta: (p: string, lugar: string) =>
         `Alguém${lugar ? ` de ${lugar}` : ""} respondeu sua pergunta ${p}. Leia no mapa:`,
       ver: "Ver no mapa",
@@ -52,12 +52,12 @@ function copy(locale: AlmaLocale) {
     return {
       subject: {
         recibida: "We received your question",
-        publicada: "Your question is now in I wonder…",
+        publicada: "Your question is now on AlmaMundi",
         respuesta: "Someone answered your question",
       },
       recibida: (p: string) => `We received your question ${p}. Someone on our team will read it before it's published.`,
       publicada: (p: string) =>
-        `Your question ${p} is now in I wonder… From now on, anyone in the world can answer it.`,
+        `Your question ${p} is now published on AlmaMundi. From now on, other people can answer it.`,
       respuesta: (p: string, lugar: string) =>
         `Someone${lugar ? ` from ${lugar}` : ""} answered your question ${p}. Read it on the map:`,
       ver: "See it on the map",
@@ -68,12 +68,12 @@ function copy(locale: AlmaLocale) {
   return {
     subject: {
       recibida: "Recibimos tu pregunta",
-      publicada: "Tu pregunta ya está en Me pregunto…",
+      publicada: "Tu pregunta ya está en AlmaMundi",
       respuesta: "Alguien respondió tu pregunta",
     },
     recibida: (p: string) => `Recibimos tu pregunta ${p}. Una persona del equipo la leerá antes de publicarla.`,
     publicada: (p: string) =>
-      `Tu pregunta ${p} ya está en Me pregunto… Desde ahora, cualquier persona del mundo puede responderla.`,
+      `Tu pregunta ${p} ya está publicada en AlmaMundi. Desde ahora, otras personas pueden responderla.`,
     respuesta: (p: string, lugar: string) =>
       `Alguien${lugar ? ` desde ${lugar}` : ""} respondió tu pregunta ${p}. Léela en el mapa:`,
     ver: "Ver en el mapa",

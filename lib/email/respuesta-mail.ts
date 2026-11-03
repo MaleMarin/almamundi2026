@@ -89,9 +89,9 @@ function publishedBody(locale: AlmaLocale, question: string, html: boolean, aske
   const q = quotedQuestion(question, html);
   if (asker) {
     const a = quien(asker, html);
-    if (locale === "pt") return `Sua resposta a ${q} já está no mapa, em Me pergunto. Agora ${a} e o mundo todo podem lê-la.`;
-    if (locale === "en") return `Your answer to ${q} is now on the map, in I wonder. Now ${a} and the whole world can read it.`;
-    return `Tu respuesta a ${q} ya está en el mapa, en Me pregunto. Ahora ${a} y todo el mundo pueden leerla.`;
+    if (locale === "pt") return `Sua resposta a ${q} já está no mapa. Agora ${a} e outras pessoas podem lê-la.`;
+    if (locale === "en") return `Your answer to ${q} is now on the map. Now ${a} and other people can read it.`;
+    return `Tu respuesta a ${q} ya está en el mapa. Ahora ${a} y otras personas pueden leerla.`;
   }
   if (locale === "pt") {
     return `Sua resposta à pergunta ${q} já está publicada no mapa do AlmaMundi. Pode ser vista de qualquer lugar do mundo, junto com as outras respostas a essa pergunta.`;

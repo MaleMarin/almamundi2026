@@ -170,7 +170,7 @@ function actionsCopy(locale: AlmaLocale) {
       shareLead: "Compartilhe o AlmaMundi com alguém:",
       whatsapp: "Pelo WhatsApp",
       mail: "Por e-mail",
-      shareText: "Compartilho com você o AlmaMundi, um mapa de histórias de vida de pessoas do mundo todo:",
+      shareText: "Compartilho com você o AlmaMundi, um mapa de histórias contadas por pessoas de diferentes lugares:",
       shareSubject: "Conheça o AlmaMundi",
     };
   }
@@ -183,7 +183,7 @@ function actionsCopy(locale: AlmaLocale) {
       shareLead: "Share AlmaMundi with someone:",
       whatsapp: "On WhatsApp",
       mail: "By email",
-      shareText: "I'm sharing AlmaMundi with you, a map of life stories from people all over the world:",
+      shareText: "I'm sharing AlmaMundi with you, a map of stories told by people from different places:",
       shareSubject: "Discover AlmaMundi",
     };
   }
@@ -195,7 +195,7 @@ function actionsCopy(locale: AlmaLocale) {
     shareLead: "Comparte AlmaMundi con alguien:",
     whatsapp: "Por WhatsApp",
     mail: "Por correo",
-    shareText: "Te comparto AlmaMundi, un mapa de historias de vida de personas de todo el mundo:",
+    shareText: "Te comparto AlmaMundi, un mapa de historias contadas por personas de distintos lugares:",
     shareSubject: "Te comparto AlmaMundi",
   };
 }

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAdminDb } from '@/lib/firebase/admin';
+import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from '@/lib/rate-limit';
 import { FieldValue } from 'firebase-admin/firestore';
 
 export const runtime = 'nodejs';
@@ -8,6 +9,13 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  // Límite por IP: evita escrituras masivas.
+  const ip = clientIpFromRequest(req);
+  const blocked = await enforceRateLimit(getRateLimiter('story-readers', 120, 60), `story-readers:${ip}`, {
+    max: 120,
+    windowMs: 60_000,
+  });
+  if (blocked) return blocked;
   try {
     const { id } = await params;
     const readerId = req.headers.get('x-reader-id') ?? `r_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
