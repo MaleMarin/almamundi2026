@@ -93,3 +93,16 @@ los textos antiguos equivalentes y cámbialos también.
 ## Producto
 - Sin selector de audiencia y sin edición de la historia por su autor.
 - Mayores de 18 años para enviar historias y respuestas, en cualquier formato.
+
+## Me pregunto… (3 nov 2026)
+- Cinta 13 de Inspírate, multicolor con rayas verticales; pocas cintas (3 en escritorio, 2 en celular), repartidas y dibujadas encima.
+- La gente deja preguntas (hasta 140 caracteres) con los mismos datos y consentimientos que una respuesta; revisión humana en el admin (pestaña «Me pregunto»).
+- Respuestas con texto, voz o foto; en el mapa, botón «Me pregunto» con panel «Respuestas de Me pregunto», ordenado por pregunta y con búsqueda por palabras.
+- Correos a quien preguntó: recibida, publicada y cada nueva respuesta publicada.
+- No se mezclan con «Así respondieron».
+
+## Mapa y sonidos (3 nov 2026)
+- Arriba del mapa solo contenidos: Historias de vida · Lugares que también cuentan · Así respondieron · Me pregunto · Buscar una historia.
+- Sonidos: botón con nota musical junto al parlante. Tocar un sonido lo hace sonar; tocar el que suena lo detiene. Sonido nuevo «Bosque» (Floresta, Forest).
+- Lugares que también cuentan: los 100 lugares verificados (public/huellas2.json).
+- Modales: una sola X para cerrar.
