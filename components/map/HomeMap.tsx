@@ -1067,14 +1067,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             <div className="map-dock-line">
               <PillNavButton
                 dock
-                active={drawerOpen && drawerMode === 'sounds'}
-                title={dockCopy.soundsTitle}
-                onClick={() => open('sounds')}
-              >
-                {dockCopy.sounds}
-              </PillNavButton>
-              <PillNavButton
-                dock
                 active={drawerOpen && drawerMode === 'search'}
                 onClick={() => open('search')}
                 title={dockCopy.searchTitle}
@@ -1098,6 +1090,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           embedded
           soundEnabled={soundEnabled}
           onToggleSound={handleToggleSound}
+          onOpenSounds={() => (drawerOpen && drawerMode === 'sounds' ? close() : open('sounds'))}
+          soundsLabel={dockCopy.changeSound}
         />
       </div>
       {surpriseNotice ? (

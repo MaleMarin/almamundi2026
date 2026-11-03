@@ -12,6 +12,7 @@ export type MapChrome = {
   bitsOff: string;
   sounds: string;
   soundsTitle: string;
+  changeSound: string;
   search: string;
   searchTitle: string;
   searchHint: string;
@@ -48,6 +49,7 @@ const es: MapChrome = {
   bitsOff: 'Mostrar También cuenta en el globo',
   sounds: 'Sonidos del mundo',
   soundsTitle: 'Abrir sonidos del mapa',
+  changeSound: 'Cambiar sonido',
   search: 'Buscar una historia',
   searchTitle: 'Buscar por título, ciudad o tema',
   searchHint: 'Escribe palabras clave para buscar entre las historias del mapa (lugar, tema o texto).',
@@ -84,6 +86,7 @@ const pt: MapChrome = {
   bitsOff: 'Mostrar Também conta no globo',
   sounds: 'Sons do mundo',
   soundsTitle: 'Abrir sons do mapa',
+  changeSound: 'Trocar som',
   search: 'Buscar uma história',
   searchTitle: 'Buscar por título, cidade ou tema',
   searchHint: 'Escreva palavras-chave para buscar entre as histórias do mapa (lugar, tema ou texto).',
@@ -120,6 +123,7 @@ const en: MapChrome = {
   bitsOff: 'Show Also counts on the globe',
   sounds: 'Sounds of the world',
   soundsTitle: 'Open map sounds',
+  changeSound: 'Change sound',
   search: 'Search a story',
   searchTitle: 'Search by title, city, or theme',
   searchHint: 'Type keywords to search the stories on the map (place, theme, or text).',

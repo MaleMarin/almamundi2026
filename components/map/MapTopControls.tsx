@@ -1,6 +1,6 @@
 'use client';
 
-import { Volume2, VolumeX } from 'lucide-react';
+import { Music, Volume2, VolumeX } from 'lucide-react';
 
 type MapTopControlsProps = {
   soundEnabled: boolean;
@@ -12,13 +12,16 @@ type MapTopControlsProps = {
   topOffset?: number;
   /** z-index del navbar flotante (full page) */
   navbarZIndex?: number;
+  /** Abre el panel para cambiar el sonido de fondo. */
+  onOpenSounds?: () => void;
+  soundsLabel?: string;
 };
 
 const NEO_BG = 'linear-gradient(145deg, #1e293b 0%, #0f172a 100%)';
 const NEO_RAISED = '4px 4px 10px rgba(0,0,0,0.4), -2px -2px 6px rgba(255,255,255,0.04)';
 const NEO_PRESSED = 'inset 2px 2px 5px rgba(0,0,0,0.35)';
 
-export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, topOffset, navbarZIndex }: MapTopControlsProps) {
+export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, topOffset, navbarZIndex, onOpenSounds, soundsLabel }: MapTopControlsProps) {
   if (hidden) return null;
 
   const topPx = topOffset ?? 20;
@@ -33,7 +36,11 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
     <div
       style={{
         ...positionStyle,
-        zIndex: navbarZIndex ?? 22 }}
+        zIndex: navbarZIndex ?? 22,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 10 }}
     >
       <button
         type="button"
@@ -60,6 +67,25 @@ export function MapTopControls({ soundEnabled, onToggleSound, hidden, embedded, 
       >
         {soundEnabled ? <Volume2 size={iconSize} /> : <VolumeX size={iconSize} />}
       </button>
+      {onOpenSounds ? (
+        <button
+          type="button"
+          onClick={onOpenSounds}
+          title={soundsLabel}
+          aria-label={soundsLabel}
+          className="shrink-0 rounded-full border border-solid border-white/10 h-11 w-11 sm:h-12 sm:w-12 active:scale-[0.98]"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            background: NEO_BG,
+            color: 'rgba(255,255,255,0.8)',
+            cursor: 'pointer',
+            boxShadow: NEO_RAISED }}
+        >
+          <Music size={iconSize - 4} aria-hidden />
+        </button>
+      ) : null}
     </div>
   );
 }
