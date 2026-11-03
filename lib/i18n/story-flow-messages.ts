@@ -250,7 +250,7 @@ const es: StoryFlowMessages = {
   modalShareTextShort:
     'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar',
   modalShareTextLong:
-    'Todos guardamos una historia que vale la pena contar. Yo conté la mía en AlmaMundi y estos son sus colores. Te toca. https://www.almamundi.org/contar',
+    'Todos guardamos una historia que vale la pena contar. Te toca. https://www.almamundi.org/contar',
   modalShareEmailSubject: 'Conté una historia en AlmaMundi',
   modalCopyImageFailed: 'No pudimos copiar la imagen. Prueba con Descargar.',
   modalShareImageFailed:
@@ -363,7 +363,7 @@ const pt: StoryFlowMessages = {
   modalShareTextShort:
     'Contei uma história e ela me devolveu suas cores. Você também tem uma. https://www.almamundi.org/contar',
   modalShareTextLong:
-    'Todos guardamos uma história que vale a pena contar. Eu contei a minha no AlmaMundi e estas são as cores dela. Agora é sua vez. https://www.almamundi.org/contar',
+    'Todos guardamos uma história que vale a pena contar. Agora é sua vez. https://www.almamundi.org/contar',
   modalShareEmailSubject: 'Contei uma história no AlmaMundi',
   modalShareImageFailed:
     'Não foi possível compartilhar. Baixe a imagem e compartilhe a partir do seu dispositivo.',
@@ -520,7 +520,7 @@ const en: StoryFlowMessages = {
   modalShareTextShort:
     'I told a story and it gave me back its colors. You have one too. https://www.almamundi.org/contar',
   modalShareTextLong:
-    'We all carry a story worth telling. I told mine on AlmaMundi and these are its colors. Your turn. https://www.almamundi.org/contar',
+    'We all carry a story worth telling. Your turn. https://www.almamundi.org/contar',
   modalShareEmailSubject: 'I told a story on AlmaMundi',
   modalShareImageFailed:
     "We couldn't share this. Download the image and share it from your device.",

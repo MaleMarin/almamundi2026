@@ -4,7 +4,7 @@ export const PENDING_STORY_SHARE_TEXT_SHORT =
   'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar';
 
 export const PENDING_STORY_SHARE_TEXT =
-  'Todos guardamos una historia que vale la pena contar. Yo conté la mía en AlmaMundi y estos son sus colores. Te toca. https://www.almamundi.org/contar';
+  'Todos guardamos una historia que vale la pena contar. Te toca. https://www.almamundi.org/contar';
 
 export const PENDING_STORY_SHARE_EMAIL_SUBJECT = 'Conté una historia en AlmaMundi';
 
