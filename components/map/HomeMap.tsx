@@ -830,6 +830,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     if (capa !== 'pregunta' && capa !== 'respuestas' && capa !== 'me-pregunto') return;
     openedCapaRef.current = true;
     if (capa === 'me-pregunto') {
+      const mp = searchParams.get('mp');
+      if (esMePreguntaId(mp)) setAbrirPregunta(mp);
       setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
       setDrawerMode('mepregunto');
     } else if (capa === 'respuestas') {

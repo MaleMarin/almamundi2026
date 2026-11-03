@@ -49,6 +49,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
             to,
             alias: String(data.alias ?? ""),
             pregunta: texto,
+            preguntaId: `mp-${id}`,
             locale: parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined),
           });
           await ref.update({ publishedMail: { status: mailed.ok ? "sent" : "failed", at: new Date().toISOString() } }).catch(() => undefined);

@@ -91,6 +91,8 @@ export async function sendMePreguntaEmail(opts: {
   /** Solo para «respuesta»: ciudad y país de quien respondió, y el id de la respuesta. */
   lugar?: string;
   respuestaId?: string;
+  /** `mp-<id>`: el botón del correo de pregunta publicada abre su punto en el globo. */
+  preguntaId?: string;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const c = copy(locale);
@@ -112,7 +114,9 @@ export async function sendMePreguntaEmail(opts: {
     opts.tipo === "respuesta" && opts.respuestaId
       ? absoluteEmailUrl(`/?respuesta=${encodeURIComponent(opts.respuestaId)}`)
       : opts.tipo === "publicada"
-        ? absoluteEmailUrl("/#cintas")
+        ? absoluteEmailUrl(
+            opts.preguntaId ? `/?capa=me-pregunto&mp=${encodeURIComponent(opts.preguntaId)}#mapa` : "/?capa=me-pregunto#mapa"
+          )
         : "";
   const subject = c.subject[opts.tipo];
   const html = emailShell({
@@ -123,7 +127,7 @@ export async function sendMePreguntaEmail(opts: {
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(bodyHtml),
-      url && opts.tipo === "respuesta" ? primaryButtonHtml(c.ver, url) : "",
+      url && opts.tipo !== "recibida" ? primaryButtonHtml(c.ver, url) : "",
     ].join(""),
     afterActionsHtml: [contactLine(locale), paragraphHtml(c.team, "0")].join(""),
   });
@@ -131,7 +135,7 @@ export async function sendMePreguntaEmail(opts: {
     greeting,
     "",
     bodyText,
-    ...(url && opts.tipo === "respuesta" ? ["", url] : []),
+    ...(url && opts.tipo !== "recibida" ? ["", url] : []),
     "",
     `${c.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
     "",

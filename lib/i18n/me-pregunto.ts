@@ -168,6 +168,11 @@ export const ME_PREGUNTO_MAPA: Record<
     mas: string;
     voz: string;
     foto: string;
+    verTodas: string;
+    verPreguntas: string;
+    todasLasPreguntas: string;
+    verRespuestas: string;
+    responderEnMapa: string;
   }
 > = {
   es: {
@@ -182,6 +187,11 @@ export const ME_PREGUNTO_MAPA: Record<
     mas: 'Ver más preguntas',
     voz: 'Respuesta en voz',
     foto: 'Respuesta con foto',
+    verTodas: 'Ver todas las respuestas',
+    verPreguntas: 'Ver todas las preguntas',
+    todasLasPreguntas: 'Todas las preguntas',
+    verRespuestas: 'Ver respuestas',
+    responderEnMapa: 'Responder en el mapa',
   },
   pt: {
     titulo: 'Respostas de Me pergunto',
@@ -195,6 +205,11 @@ export const ME_PREGUNTO_MAPA: Record<
     mas: 'Ver mais perguntas',
     voz: 'Resposta em voz',
     foto: 'Resposta com foto',
+    verTodas: 'Ver todas as respostas',
+    verPreguntas: 'Ver todas as perguntas',
+    todasLasPreguntas: 'Todas as perguntas',
+    verRespuestas: 'Ver respostas',
+    responderEnMapa: 'Responder no mapa',
   },
   en: {
     titulo: 'Answers from I wonder',
@@ -208,5 +223,10 @@ export const ME_PREGUNTO_MAPA: Record<
     mas: 'See more questions',
     voz: 'Voice answer',
     foto: 'Photo answer',
+    verTodas: 'See all answers',
+    verPreguntas: 'See all questions',
+    todasLasPreguntas: 'All questions',
+    verRespuestas: 'See answers',
+    responderEnMapa: 'Answer on the map',
   },
 };

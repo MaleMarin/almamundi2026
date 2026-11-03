@@ -163,7 +163,7 @@ export function MePreguntoMapPanel({
               </button>
               {open && lista.length > 0 ? (
                 <div className="flex flex-col gap-2 px-4 pb-4">
-                  {lista.map((item) => (
+                  {lista.slice(0, 5).map((item) => (
                       <button
                         key={item.id}
                         type="button"
@@ -180,6 +180,14 @@ export function MePreguntoMapPanel({
                         </span>
                       </button>
                   ))}
+                  {lista.length > 5 ? (
+                    <Link
+                      href={`/me-pregunto?p=${encodeURIComponent(pregunta.id)}`}
+                      className="text-center text-[length:var(--fs-etiqueta)] font-semibold text-white underline underline-offset-4 visited:text-white"
+                    >
+                      {copy.verTodas}
+                    </Link>
+                  ) : null}
                 </div>
               ) : null}
               {/* «Responder» siempre a la vista. Se responde aquí mismo, sin salir del mapa. */}
@@ -217,6 +225,14 @@ export function MePreguntoMapPanel({
           );
         })}
       </ul>
+      {preguntas.length > 0 ? (
+        <Link
+          href="/me-pregunto"
+          className="text-center text-[length:var(--fs-etiqueta)] font-semibold text-white underline underline-offset-4 visited:text-white"
+        >
+          {copy.verPreguntas}
+        </Link>
+      ) : null}
       {grupos.length > limite ? (
         <button
           type="button"

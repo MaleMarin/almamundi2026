@@ -7,7 +7,8 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
-import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import Link from 'next/link';
+import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { ME_PREGUNTA_MAX, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
@@ -134,6 +135,11 @@ export function MePreguntoPanel({
           );
         })}
       </ul>
+      {items && items.length > 0 ? (
+        <Link href="/me-pregunto" className="cortina-indice-ayuda font-semibold underline underline-offset-4" style={{ color: "inherit" }}>
+          {ME_PREGUNTO_MAPA[locale].verPreguntas}
+        </Link>
+      ) : null}
     </>
   );
 }
