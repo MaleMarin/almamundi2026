@@ -1,6 +1,6 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
-import { FieldValue } from "firebase-admin/firestore";
+import { FieldValue, type Firestore } from "firebase-admin/firestore";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { isValidRecipientEmail } from "@/lib/email-html";
@@ -22,7 +22,16 @@ import { geocodePublicPlace } from "@/lib/respuestas/geocode";
 import { isShortCode } from "@/lib/short-code";
 import { allocateShortCode } from "@/lib/short-code-store";
 import { temasGuardados } from "@/lib/temas";
-import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { parseAlmaLocale, type AlmaLocale } from "@/lib/i18n/locale";
+import type { Asker } from "@/lib/email/respuesta-mail";
+import { sendMePreguntaEmail } from "@/lib/email/me-pregunto-mail";
+import { formatPublicPlace } from "@/lib/historias/story-ubicacion";
+import {
+  docIdDeMePregunta,
+  esMePreguntaId,
+  ME_PREGUNTAS_COLLECTION,
+  ME_PREGUNTA_CONTACTS_COLLECTION,
+} from "@/lib/me-pregunto/shared";
 import { textoPreguntaHilo } from "@/lib/hilos";
 import { preguntaTexto } from "@/lib/pregunta-semana";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
@@ -51,6 +60,47 @@ async function contactEmail(id: string): Promise<string | null> {
 }
 
 /** PATCH /api/admin/respuestas/[id] — aprobar, rechazar o archivar. */
+
+function questionTextFrom(data: Record<string, unknown>, questionId: string, mode: string, locale: AlmaLocale): string {
+  if (typeof data.questionText === "string" && data.questionText.trim()) return data.questionText;
+  return preguntaTexto(questionId, mode as "tu" | "alguien", locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId;
+}
+
+function asker(data: Record<string, unknown>, locale: AlmaLocale): Asker | null {
+  if (typeof data.askerAlias !== "string" || !data.askerAlias) return null;
+  return {
+    alias: data.askerAlias,
+    place: formatPublicPlace(String(data.askerCity ?? ""), String(data.askerCountry ?? ""), locale),
+  };
+}
+
+async function avisarAQuienPregunto(
+  db: Firestore,
+  questionId: string,
+  respuestaId: string,
+  data: Record<string, unknown>,
+  respuestaLocale: AlmaLocale
+) {
+  const docId = docIdDeMePregunta(questionId);
+  const [pregunta, contacto] = await Promise.all([
+    db.collection(ME_PREGUNTAS_COLLECTION).doc(docId).get(),
+    db.collection(ME_PREGUNTA_CONTACTS_COLLECTION).doc(docId).get(),
+  ]);
+  const to = contacto.exists ? String((contacto.data() ?? {}).email ?? "") : "";
+  if (!pregunta.exists || !to) return;
+  const p = (pregunta.data() ?? {}) as Record<string, unknown>;
+  const locale = parseAlmaLocale(typeof p.locale === "string" ? p.locale : respuestaLocale);
+  await sendMePreguntaEmail({
+    tipo: "respuesta",
+    to,
+    alias: String(p.alias ?? ""),
+    pregunta: String(p.texto ?? ""),
+    locale,
+    lugar: formatPublicPlace(String(data.city ?? ""), String(data.country ?? ""), locale),
+    respuestaId,
+  });
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -218,10 +268,17 @@ export async function PATCH(
               to: email,
               alias,
               respuestaId: id,
-              question: preguntaTexto(questionId, mode, locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
+              question: questionTextFrom(data, questionId, mode, locale),
               locale,
+              ...(asker(data, locale) ? { asker: asker(data, locale)! } : {}),
             })
           : { ok: false as const };
+      // «Me pregunto…»: avisar a quien hizo la pregunta.
+      if (esMePreguntaId(questionId)) {
+        await avisarAQuienPregunto(db, questionId, id, data, locale).catch((err) =>
+          console.error("[admin/respuestas] aviso me-pregunto", err instanceof Error ? err.message : "mail")
+        );
+      }
       await ref
         .update({
           publishedMail: {
@@ -250,7 +307,7 @@ export async function PATCH(
             to: email,
             alias,
             questionId,
-            question: preguntaTexto(questionId, mode, locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
+            question: questionTextFrom(data, questionId, mode, locale),
             locale,
             publicReason: reason.publicText,
           })

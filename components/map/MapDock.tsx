@@ -4,7 +4,7 @@ import type { CSSProperties } from 'react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 
-export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search' | 'respuestas';
+export type MapDockMode = 'stories' | 'news' | 'sounds' | 'bits' | 'search' | 'respuestas' | 'mepregunto';
 
 type MapDockProps = {
   activeMode: MapDockMode;

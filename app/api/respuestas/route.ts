@@ -30,6 +30,9 @@ import {
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { verifyTurnstileStrict } from "@/lib/security/turnstile-strict";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
+import { mePreguntaAprobada } from "@/lib/me-pregunto/server";
+import { esMePreguntaId } from "@/lib/me-pregunto/shared";
+import { formatPublicPlace } from "@/lib/historias/story-ubicacion";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -71,7 +74,9 @@ export async function POST(req: Request) {
   }
 
   if (!isRespuestaKind(body.kind)) return jsonError("invalid_kind", 400);
-  const questionId = resolveQuestionId(body.questionId) ?? idPreguntaHilo(body.questionId);
+  // «Me pregunto…»: la pregunta la dejó una persona y debe estar aprobada.
+  const mePregunta = esMePreguntaId(body.questionId) ? await mePreguntaAprobada(getAdminDb(), body.questionId) : null;
+  const questionId = mePregunta?.id ?? resolveQuestionId(body.questionId) ?? idPreguntaHilo(body.questionId);
   if (!questionId) return jsonError("invalid_question", 400);
   if (body.kind === "texto") {
     const captcha = await verifyTurnstileStrict(
@@ -159,6 +164,15 @@ export async function POST(req: Request) {
     const batch = db.batch();
     batch.set(ref, {
       questionId,
+      ...(mePregunta
+        ? {
+            capa: "me-pregunto",
+            questionText: mePregunta.texto,
+            askerAlias: mePregunta.alias,
+            askerCity: mePregunta.city,
+            askerCountry: mePregunta.country,
+          }
+        : {}),
       mode: "tu",
       kind: body.kind,
       contenido,
@@ -235,7 +249,11 @@ export async function POST(req: Request) {
           to: email,
           alias,
           locale,
-          question: preguntaTexto(questionId, "tu", locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
+          question:
+            mePregunta?.texto ?? preguntaTexto(questionId, "tu", locale) ?? textoPreguntaHilo(questionId, locale) ?? questionId,
+          ...(mePregunta
+            ? { asker: { alias: mePregunta.alias, place: formatPublicPlace(mePregunta.city, mePregunta.country, locale) } }
+            : {}),
         });
         await ref.update({
           receivedMail: {

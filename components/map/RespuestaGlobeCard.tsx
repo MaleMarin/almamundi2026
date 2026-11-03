@@ -1,5 +1,6 @@
 'use client';
 
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import Link from 'next/link';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -29,9 +30,15 @@ export function RespuestaGlobeCard({
   const [shareOpen, setShareOpen] = useState(false);
   const [moreBelow, setMoreBelow] = useState(false);
   const pregunta = preguntaPorId(item.questionId);
-  const question = preguntaTexto(item.questionId, 'tu', locale);
+  const question = item.questionText || preguntaTexto(item.questionId, 'tu', locale);
   const place = formatPublicPlace(item.city, item.country, locale);
-  const kicker = [KIND_LABEL[locale], pregunta?.tema[locale], place].filter(Boolean).join(' · ');
+  // «Me pregunto…»: «Respuesta a una pregunta de [alias] · [lugar]».
+  const kicker = item.questionText
+    ? ME_PREGUNTO_UI[locale].respuestaDe(
+        preguntaAlias(item.askerAlias ?? ''),
+        formatPublicPlace(item.askerCity ?? '', item.askerCountry ?? '', locale)
+      )
+    : [KIND_LABEL[locale], pregunta?.tema[locale], place].filter(Boolean).join(' · ');
   const alias = preguntaAlias(item.alias);
 
   useEffect(() => {

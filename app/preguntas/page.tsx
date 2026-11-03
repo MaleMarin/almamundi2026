@@ -5,6 +5,7 @@ import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { PUBLIC_OG_LOCALE } from '@/lib/i18n/public-meta';
+import { esMePreguntaId, ME_PREGUNTO_ID } from '@/lib/me-pregunto/shared';
 
 export const dynamic = 'force-dynamic';
 
@@ -53,6 +54,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 export default async function PreguntasPage({ searchParams }: Props) {
   const params = await searchParams;
   const pedido = firstParam(params.p);
+  if (esMePreguntaId(pedido) || pedido === ME_PREGUNTO_ID || firstParam(params.tema) === ME_PREGUNTO_ID) {
+    return <PreguntasClient initialId={esMePreguntaId(pedido) ? pedido : null} initialTema={ME_PREGUNTO_ID} />;
+  }
   const porId = preguntaHiloPorId(pedido);
   const tema =
     porId?.hiloId ?? hiloPorId(pedido)?.id ?? hiloPorId(firstParam(params.tema))?.id ?? null;

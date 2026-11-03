@@ -1,5 +1,6 @@
 'use client';
 
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { X } from 'lucide-react';
@@ -110,6 +111,8 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
       ? dockCopy.stories
       : mode === 'respuestas'
         ? HILOS_UI[locale].leyenda
+        : mode === 'mepregunto'
+          ? ME_PREGUNTO_UI[locale].capa
         : mode === 'news'
           ? HILOS_UI[locale].nav
           : mode === 'sounds'
@@ -121,7 +124,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   const soundsMode = mode === 'sounds';
   /** Noticias, Historias, búsqueda y Bits: un solo scroller, el del panel. Sonidos sigue scrolleando el cuerpo. */
   const innerScrollPanel =
-    mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits' || mode === 'respuestas';
+    mode === 'news' || mode === 'stories' || mode === 'search' || mode === 'bits' || mode === 'respuestas' || mode === 'mepregunto';
   const dialogAriaLabel = title;
   const drawerBodyClass = soundsMode
     ? 'min-h-0 overflow-y-auto overflow-x-hidden px-5 pb-5 pt-1'

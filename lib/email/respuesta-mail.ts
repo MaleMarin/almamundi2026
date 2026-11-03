@@ -33,7 +33,7 @@ function mailFromAddress(): string {
   return raw.includes("<") ? raw : `AlmaMundi <${raw}>`;
 }
 
-function hello(alias: string, locale: AlmaLocale = "es"): string {
+export function hello(alias: string, locale: AlmaLocale = "es"): string {
   const name = capitalizeAlias(alias);
   if (locale === "pt") return name ? `Olá, ${name}:` : "Olá:";
   if (locale === "en") return name ? `Hi ${name},` : "Hi,";
@@ -45,8 +45,30 @@ function quotedQuestion(question: string, html: boolean): string {
   return `«${html ? escapeHtml(text) : text}»`;
 }
 
-function receivedBody(locale: AlmaLocale, question: string, html: boolean): string {
+export type Asker = { alias: string; place: string };
+
+function quien(asker: Asker, html: boolean): string {
+  const name = capitalizeAlias(asker.alias) || asker.alias;
+  return html ? escapeHtml(name) : name;
+}
+
+function donde(asker: Asker, html: boolean): string {
+  return html ? escapeHtml(asker.place) : asker.place;
+}
+
+function receivedBody(locale: AlmaLocale, question: string, html: boolean, asker?: Asker): string {
   const q = quotedQuestion(question, html);
+  if (asker) {
+    const a = quien(asker, html);
+    const lugar = asker.place ? donde(asker, html) : '';
+    if (locale === "pt") {
+      return `Recebemos sua resposta a ${q}, que ${a} deixou${lugar ? ` de ${lugar}` : ""}. Uma pessoa da equipe vai lê-la antes de publicá-la.`;
+    }
+    if (locale === "en") {
+      return `We received your answer to ${q}, asked by ${a}${lugar ? ` from ${lugar}` : ""}. Someone on our team will read it before it's published.`;
+    }
+    return `Recibimos tu respuesta a ${q}, que dejó ${a}${lugar ? ` desde ${lugar}` : ""}. Una persona del equipo la leerá antes de publicarla.`;
+  }
   if (locale === "pt") {
     return `Recebemos sua resposta à pergunta ${q}. Uma pessoa da equipe vai lê-la antes de publicá-la e avisaremos quando estiver no mapa.`;
   }
@@ -63,8 +85,14 @@ function publishedHello(alias: string, locale: AlmaLocale): string {
   return name ? `Hola, ${name}:` : "Hola:";
 }
 
-function publishedBody(locale: AlmaLocale, question: string, html: boolean): string {
+function publishedBody(locale: AlmaLocale, question: string, html: boolean, asker?: Asker): string {
   const q = quotedQuestion(question, html);
+  if (asker) {
+    const a = quien(asker, html);
+    if (locale === "pt") return `Sua resposta a ${q} já está no mapa, em Me pergunto. Agora ${a} e o mundo todo podem lê-la.`;
+    if (locale === "en") return `Your answer to ${q} is now on the map, in I wonder. Now ${a} and the whole world can read it.`;
+    return `Tu respuesta a ${q} ya está en el mapa, en Me pregunto. Ahora ${a} y todo el mundo pueden leerla.`;
+  }
   if (locale === "pt") {
     return `Sua resposta à pergunta ${q} já está publicada no mapa do AlmaMundi. Pode ser vista de qualquer lugar do mundo, junto com as outras respostas a essa pergunta.`;
   }
@@ -143,7 +171,7 @@ function respuestaCopy(locale: AlmaLocale) {
   };
 }
 
-function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
+export function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
   return locale === "pt" || locale === "en" ? locale : "es";
 }
 
@@ -153,7 +181,7 @@ function reasonSentence(reason: string): string {
   return `${text}.`;
 }
 
-function contactLine(locale: AlmaLocale): string {
+export function contactLine(locale: AlmaLocale): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
     `${respuestaCopy(locale).doubts} <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${mail}</a>.`,
@@ -161,7 +189,7 @@ function contactLine(locale: AlmaLocale): string {
   );
 }
 
-async function deliver(opts: {
+export async function deliver(opts: {
   to: string;
   subject: string;
   html: string;
@@ -198,11 +226,12 @@ export async function sendRespuestaReceivedEmail(opts: {
   alias: string;
   question: string;
   locale?: AlmaLocale;
+  asker?: Asker;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
-  const body = receivedBody(locale, opts.question, false);
+  const body = receivedBody(locale, opts.question, false, opts.asker);
   const html = emailShell({
     preheader: copy.receivedSubject,
     footer: "respuesta",
@@ -210,7 +239,7 @@ export async function sendRespuestaReceivedEmail(opts: {
     actions: "respuesta",
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(receivedBody(locale, opts.question, true)),
+      paragraphHtml(receivedBody(locale, opts.question, true, opts.asker)),
     ].join(""),
     afterActionsHtml: [contactLine(locale), paragraphHtml(copy.thanks, "0")].join(""),
   });
@@ -241,11 +270,12 @@ export function buildRespuestaPublishedEmail(opts: {
   respuestaId: string;
   question: string;
   locale?: AlmaLocale;
+  asker?: Asker;
 }): { subject: string; html: string; text: string } {
   const locale = mailLang(opts.locale);
   const copy = respuestaCopy(locale);
   const greeting = publishedHello(opts.alias, locale);
-  const body = publishedBody(locale, opts.question, false);
+  const body = publishedBody(locale, opts.question, false, opts.asker);
   const mapUrl = absoluteEmailUrl(`/?respuesta=${encodeURIComponent(opts.respuestaId)}`);
   const html = emailShell({
     preheader: copy.publishedSubject,
@@ -254,7 +284,7 @@ export function buildRespuestaPublishedEmail(opts: {
     actions: "respuesta",
     bodyHtml: [
       greetingHtml(escapeHtml(greeting)),
-      paragraphHtml(publishedBody(locale, opts.question, true)),
+      paragraphHtml(publishedBody(locale, opts.question, true, opts.asker)),
       primaryButtonHtml(copy.see, mapUrl),
     ].join(""),
   });
@@ -278,6 +308,7 @@ export async function sendRespuestaPublishedEmail(opts: {
   respuestaId: string;
   question: string;
   locale?: AlmaLocale;
+  asker?: Asker;
 }): Promise<RespuestaMailResult> {
   const mail = buildRespuestaPublishedEmail(opts);
   return deliver({

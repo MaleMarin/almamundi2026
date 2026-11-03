@@ -1,5 +1,7 @@
 'use client';
 
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
@@ -81,7 +83,9 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
     return { url, text, social: text };
   }
   const text =
-    props.kind === 'question' && props.afterAnswer
+    props.kind === 'question' && props.afterAnswer && esMePreguntaId(props.questionId)
+      ? `${ME_PREGUNTO_UI[locale].compartir(props.question)} ${url}`
+      : props.kind === 'question' && props.afterAnswer
       ? preguntaShareText(locale, props.question, url)
       : preguntaInviteShareText(locale, props.question, url);
   return { url, text, social: text };

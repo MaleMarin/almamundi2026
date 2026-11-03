@@ -2368,3 +2368,36 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   .solo-mouse { display: inline; }
   .solo-tactil { display: none; }
 }
+
+/* «Me pregunto…»: panel de las preguntas de la gente. */
+.me-pregunto-autor {
+  display: block;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+.me-pregunto-dejar,
+.me-pregunto-enviar {
+  margin: 4px 0 18px;
+  background: var(--cortina-texto, #fff);
+  color: var(--cortina-fondo, #3c4655);
+}
+.me-pregunto-form {
+  margin: 4px 0 24px;
+  color: var(--cortina-texto, #fff);
+}
+.me-pregunto-form a { color: inherit; }
+.me-pregunto-gracias { margin: 4px 0 24px; }
+.me-pregunto-gracias h3 {
+  margin: 0 0 8px;
+  font-size: clamp(20px, 2.4vw, 26px);
+  font-weight: 600;
+}
+.me-pregunto-gracias p { margin: 0 0 16px; line-height: 1.5; }
+.me-pregunto-gracias .cortina-formatos { flex-wrap: wrap; }
+.map-dock-legend__dot--me {
+  background: conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}

@@ -90,6 +90,7 @@ const esPrivacidad: LegalDoc = {
     seccion('datos', '2. Qué datos recibimos', [
       p('Cuando cuentas una historia: tu nombre o alias, país, ciudad, la fecha y el lugar de la historia, tu correo, y el contenido que envías (video, audio, texto o fotos, con su título, antecedentes y canción, si los agregas).'),
       p('Cuando respondes una pregunta: tu nombre o alias, país, ciudad, tu respuesta (texto, voz o foto con su frase) y, si quieres, tu correo.'),
+      p('Si dejas una pregunta en Me pregunto…, tratamos los mismos datos que cuando respondes una pregunta: tu alias, país y ciudad (públicos junto a tu pregunta) y tu correo, si lo das, que nunca es público y solo usamos para avisarte cuando se publique tu pregunta o alguien la responda.'),
       p('Cuando te suscribes a Sonder, nuestro boletín: tu correo y la fecha en que confirmaste la suscripción.'),
       p('Cuando escribes a una persona que contó su historia o usas un formulario: tu mensaje y los datos de contacto que nos entregues.'),
       p('Cuando navegas: datos técnicos básicos, como el tipo de navegador y de dispositivo, las páginas visitadas, la fecha y hora, y la dirección IP, que usamos para la seguridad y para que el sitio funcione bien.'),
@@ -188,12 +189,13 @@ const esTerminos: LegalDoc = {
         'Explorar las historias, las respuestas y los datos de «También cuenta» en el mapa.',
         'Contar tu historia en video, audio, texto o foto.',
         'Responder las preguntas de las cintas con texto, voz o foto.',
+        'Dejar tus propias preguntas en Me pregunto… y responder las de otras personas. Las preguntas también se revisan antes de publicarse.',
         'Suscribirte a Sonder, nuestro boletín.',
         'Guardar historias en tu colección.',
       ]),
     ]),
     seccion('quien', '3. Quién puede enviar', [
-      p('Para enviar una historia o una respuesta, en cualquier formato, hay que tener 18 años o más. Si aparece otra persona, necesitas su permiso. Si es menor de edad, el envío lo hace una persona adulta responsable o una institución, con autorización expresa.'),
+      p('Para enviar una historia, una respuesta o una pregunta, en cualquier formato, hay que tener 18 años o más. Si aparece otra persona, necesitas su permiso. Si es menor de edad, el envío lo hace una persona adulta responsable o una institución, con autorización expresa.'),
     ]),
     seccion('prohibido', '4. Qué no está permitido', [
       items([
@@ -277,6 +279,7 @@ const ptPrivacidad: LegalDoc = {
     seccion('datos', '2. Quais dados recebemos', [
       p('Quando você conta uma história: seu nome ou apelido, país, cidade, a data e o lugar da história, seu e-mail e o conteúdo que você envia (vídeo, áudio, texto ou fotos, com título, contexto e música, se você adicionar).'),
       p('Quando você responde a uma pergunta: seu nome ou apelido, país, cidade, sua resposta (texto, voz ou foto com sua frase) e, se quiser, seu e-mail.'),
+      p('Se você deixar uma pergunta em Me pergunto…, tratamos os mesmos dados de quando você responde a uma pergunta: seu apelido, país e cidade (públicos junto com sua pergunta) e seu e-mail, se você o informar, que nunca é público e só usamos para avisar quando sua pergunta for publicada ou alguém a responder.'),
       p('Quando você assina o Sonder, nossa newsletter: seu e-mail e a data em que confirmou a inscrição.'),
       p('Quando você escreve para quem contou uma história ou usa um formulário: sua mensagem e os dados de contato que nos informar.'),
       p('Quando você navega: dados técnicos básicos, como navegador, dispositivo, páginas visitadas, data e hora e endereço IP, usados para a segurança e o bom funcionamento do site.'),
@@ -375,12 +378,13 @@ const ptTerminos: LegalDoc = {
         'Explorar as histórias, as respostas e os dados do «Também conta» no mapa.',
         'Contar sua história em vídeo, áudio, texto ou foto.',
         'Responder às perguntas das fitas com texto, voz ou foto.',
+        'Deixar suas próprias perguntas em Me pergunto… e responder as de outras pessoas. As perguntas também são revisadas antes de serem publicadas.',
         'Assinar o Sonder, nossa newsletter.',
         'Guardar histórias na sua coleção.',
       ]),
     ]),
     seccion('quien', '3. Quem pode enviar', [
-      p('Para enviar uma história ou uma resposta, em qualquer formato, é preciso ter 18 anos ou mais. Se outra pessoa aparece, você precisa da permissão dela. Se for menor de idade, o envio é feito por um adulto responsável ou por uma instituição, com autorização expressa.'),
+      p('Para enviar uma história, uma resposta ou uma pergunta, em qualquer formato, é preciso ter 18 anos ou mais. Se outra pessoa aparece, você precisa da permissão dela. Se for menor de idade, o envio é feito por um adulto responsável ou por uma instituição, com autorização expressa.'),
     ]),
     seccion('prohibido', '4. O que não é permitido', [
       items([
@@ -464,6 +468,7 @@ const enPrivacidad: LegalDoc = {
     seccion('datos', '2. What data we receive', [
       p('When you tell a story: your name or alias, country, city, the date and place of the story, your email, and the content you send (video, audio, text or photos, with a title, background and song, if you add them).'),
       p('When you answer a question: your name or alias, country, city, your answer (text, voice or photo with its caption) and, if you wish, your email.'),
+      p('If you leave a question in I wonder…, we process the same data as when you answer a question: your alias, country and city (public alongside your question) and your email, if you give it, which is never public and is only used to let you know when your question is published or someone answers it.'),
       p('When you subscribe to Sonder, our newsletter: your email and the date you confirmed your subscription.'),
       p('When you write to someone who told a story or use a form: your message and the contact details you give us.'),
       p('When you browse: basic technical data, such as your browser, device, pages visited, date and time, and IP address, which we use to keep the site secure and working well.'),
@@ -562,12 +567,13 @@ const enTerminos: LegalDoc = {
         'Explore the stories, the answers and the «Also tells» facts on the map.',
         'Tell your story in video, audio, text or photo.',
         'Answer the ribbon questions with text, voice or photo.',
+        'Leave your own questions in I wonder… and answer other people’s. Questions are also reviewed before they’re published.',
         'Subscribe to Sonder, our newsletter.',
         'Save stories to your collection.',
       ]),
     ]),
     seccion('quien', '3. Who can submit', [
-      p("To send a story or an answer, in any format, you must be 18 or older. If someone else appears, you need their permission. If they're a minor, the submission must come from a responsible adult or an institution, with express authorization."),
+      p("To send a story, an answer or a question, in any format, you must be 18 or older. If someone else appears, you need their permission. If they're a minor, the submission must come from a responsible adult or an institution, with express authorization."),
     ]),
     seccion('prohibido', "4. What isn't allowed", [
       items([

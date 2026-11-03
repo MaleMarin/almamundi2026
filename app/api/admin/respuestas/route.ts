@@ -85,6 +85,7 @@ export async function GET(request: NextRequest) {
         return {
           id: doc.id,
           questionId: typeof data.questionId === "string" ? data.questionId : "",
+          questionText: typeof data.questionText === "string" ? data.questionText : "",
           mode: data.mode === "alguien" ? "alguien" : "tu",
           kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
           contenido: typeof data.contenido === "string" ? data.contenido : "",

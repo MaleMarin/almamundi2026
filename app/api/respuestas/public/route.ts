@@ -8,6 +8,8 @@ import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
 import { isShortCode } from "@/lib/short-code";
 import type { RespuestaPublica } from "@/lib/respuestas/public";
 
+import { esMePreguntaId } from "@/lib/me-pregunto/shared";
+
 export const runtime = "nodejs";
 
 function toMillis(ts: unknown): number {
@@ -44,6 +46,14 @@ function filaPublica(
     previewUrl: typeof data.publishedUrl === "string" ? data.publishedUrl : null,
     lat,
     lng,
+    ...(typeof data.questionText === "string" && data.questionText
+      ? {
+          questionText: data.questionText,
+          askerAlias: typeof data.askerAlias === "string" ? data.askerAlias : "",
+          askerCity: typeof data.askerCity === "string" ? data.askerCity : "",
+          askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",
+        }
+      : {}),
     createdAt: toMillis(data.createdAt),
   };
 }
@@ -93,6 +103,23 @@ export async function GET(request: NextRequest) {
       return pagina(items, offset, limit);
     } catch (e) {
       console.error("[respuestas/public]", e instanceof Error ? e.message : "list");
+      return NextResponse.json({ error: "list failed" }, { status: 500 });
+    }
+  }
+  if (banco === "me-pregunto") {
+    try {
+      const snap = await getAdminDb().collection(RESPUESTAS_COLLECTION).where("capa", "==", "me-pregunto").get();
+      const items: (RespuestaPublica & { createdAt: number })[] = [];
+      for (const doc of snap.docs) {
+        const data = doc.data() as Record<string, unknown>;
+        const qid = typeof data.questionId === "string" ? data.questionId : "";
+        if (!esMePreguntaId(qid)) continue;
+        const item = filaPublica(doc.id, data, qid);
+        if (item) items.push(item);
+      }
+      return pagina(items, 0, BANCO_TOPE);
+    } catch (e) {
+      console.error("[respuestas/public me-pregunto]", e instanceof Error ? e.message : "list");
       return NextResponse.json({ error: "list failed" }, { status: 500 });
     }
   }

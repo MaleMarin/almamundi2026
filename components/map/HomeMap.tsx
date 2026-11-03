@@ -37,6 +37,8 @@ import {
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
 import { BITS_DATA } from '@/lib/bits-data';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
@@ -98,8 +100,8 @@ const RESPUESTA_KIND = {
 function respuestaAsStory(item: RespuestaPublica, locale: keyof typeof RESPUESTA_KIND): StoryPoint {
   const alias = preguntaAlias(item.alias);
   const pregunta = preguntaPorId(item.questionId);
-  const question = preguntaTexto(item.questionId, item.mode, locale) ?? '';
-  const tema = pregunta?.tema[locale] ?? '';
+  const question = item.questionText || (preguntaTexto(item.questionId, item.mode, locale) ?? '');
+  const tema = item.questionText ? ME_PREGUNTO_UI[locale].capa : pregunta?.tema[locale] ?? '';
   const story: StoryPoint = {
     id: item.id,
     lat: item.lat ?? Number.NaN,
@@ -266,11 +268,16 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       return;
     }
     let cancel = false;
-    void fetch('/api/respuestas/public?banco=hilos&limit=500')
-      .then((res) => (res.ok ? res.json() : { items: [] }))
-      .then((data: { items?: RespuestaPublica[] }) => {
+    const lista = (url: string) =>
+      fetch(url)
+        .then((res) => (res.ok ? res.json() : { items: [] }))
+        .then((data: { items?: RespuestaPublica[] }) => (Array.isArray(data.items) ? data.items : []))
+        .catch(() => [] as RespuestaPublica[]);
+    // Las respuestas de las preguntas del sitio y las de «Me pregunto…» van juntas en el globo.
+    void Promise.all([lista('/api/respuestas/public?banco=hilos&limit=500'), lista('/api/respuestas/public?banco=me-pregunto')])
+      .then(([hilos, me]) => {
         if (cancel) return;
-        setRespuestas(Array.isArray(data.items) ? data.items : []);
+        setRespuestas([...hilos, ...me]);
       })
       .catch(() => {
         if (!cancel) setRespuestas([]);
@@ -781,9 +788,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   useEffect(() => {
     const capa = searchParams.get('capa');
     if (openedCapaRef.current) return;
-    if (capa !== 'pregunta' && capa !== 'respuestas') return;
+    if (capa !== 'pregunta' && capa !== 'respuestas' && capa !== 'me-pregunto') return;
     openedCapaRef.current = true;
-    if (capa === 'respuestas') {
+    if (capa === 'me-pregunto') {
+      setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
+      setDrawerMode('mepregunto');
+    } else if (capa === 'respuestas') {
       setGlobeLayers((prev) => ({ ...prev, respuestas: true }));
       setDrawerMode('respuestas');
     } else {
@@ -870,7 +880,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe, showRespuesta]
   );
 
-  function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits' | 'respuestas', key: keyof GlobeLayerVisibility) {
+  function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits' | 'respuestas' | 'mepregunto', key: keyof GlobeLayerVisibility) {
     const layerOn = globeLayers[key];
     if (drawerOpen && drawerMode === mode) {
       setGlobeLayers((prev) => ({ ...prev, [key]: !layerOn }));
@@ -1044,6 +1054,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 <i className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
                 {HILOS_UI[locale].leyenda}
               </PillNavButton>
+              <PillNavButton
+                dock
+                active={drawerOpen && drawerMode === 'mepregunto'}
+                title={ME_PREGUNTO_UI[locale].capa}
+                onClick={() => onGlobeLayerPill('mepregunto', 'respuestas')}
+              >
+                <i className="map-dock-legend__dot map-dock-legend__dot--me" aria-hidden />
+                {ME_PREGUNTO_UI[locale].capa}
+              </PillNavButton>
             </div>
             <div className="map-dock-line">
               <PillNavButton
@@ -1102,9 +1121,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             />
           ) : drawerMode === 'news' ? (
             <PreguntaPanel />
-          ) : drawerMode === 'respuestas' ? (
+          ) : drawerMode === 'respuestas' || drawerMode === 'mepregunto' ? (
             <StoriesPanel
-              stories={respuestas.map((item) => respuestaAsStory(item, locale))}
+              stories={respuestas
+                .filter((item) => esMePreguntaId(item.questionId) === (drawerMode === 'mepregunto'))
+                .map((item) => respuestaAsStory(item, locale))}
               exploreQuery={respuestaQuery}
               onExploreQueryChange={setRespuestaQuery}
               onStoryFocus={(story) => {
@@ -1113,7 +1134,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               }}
               highlightedStoryId={openRespuesta?.id ?? null}
               answerRows
-              kicker={HILOS_UI[locale].leyenda}
+              kicker={drawerMode === 'mepregunto' ? ME_PREGUNTO_UI[locale].capa : HILOS_UI[locale].leyenda}
               emptyText={PREGUNTA_COPY.empty[locale]}
             />
           ) : drawerMode === 'bits' ? (

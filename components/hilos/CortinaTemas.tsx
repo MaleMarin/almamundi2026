@@ -3,7 +3,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Camera, Mic, PenLine } from 'lucide-react';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
-import { HILOS, preguntaParaFormulario, preguntasDelTema } from '@/lib/hilos';
+import { HILOS, preguntaParaFormulario, preguntasDelTema, type Hilo } from '@/lib/hilos';
+import { ME_PREGUNTO_ID } from '@/lib/me-pregunto/shared';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { MePreguntoPanel } from '@/components/hilos/MePreguntoPanel';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
@@ -22,6 +25,8 @@ const TELON: { fondo: string; texto: string }[] = [
   { fondo: '#FF0A8A', texto: '#fff' },
   { fondo: '#00C2D6', texto: '#fff' },
   { fondo: '#A0003C', texto: '#fff' },
+  // 13: «Me pregunto…» (en la cortina se dibuja multicolor).
+  { fondo: '#3C4655', texto: '#fff' },
 ];
 
 /** Colores de las cintas en la cortina: los 12 colores originales de los temas. */
@@ -43,7 +48,34 @@ const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#E60078', texto: '#fff', boton: '#E60078' },
   { fondo: '#008391', texto: '#fff', boton: '#008391' },
   { fondo: '#A0003C', texto: '#fff', boton: '#A0003C' },
+  { fondo: '#3C4655', texto: '#fff', boton: '#3C4655' },
 ];
+
+/** Los 12 temas y «Me pregunto…», la cinta multicolor de las preguntas de la gente. */
+const ME_HILO = {
+  id: ME_PREGUNTO_ID,
+  nombre: { es: ME_PREGUNTO_UI.es.nombre, pt: ME_PREGUNTO_UI.pt.nombre, en: ME_PREGUNTO_UI.en.nombre },
+  color: '#3C4655',
+  imagen: '',
+  aspecto: 1,
+} as unknown as Hilo;
+const TEMAS: Hilo[] = [...HILOS, ME_HILO];
+const ME_INDICE = TEMAS.length - 1;
+
+/** Franjas horizontales con los 12 colores para la cinta multicolor. */
+function patronMulticolor(ctx: CanvasRenderingContext2D, colores: string[]): CanvasPattern | null {
+  const banda = 34;
+  const lienzo = document.createElement('canvas');
+  lienzo.width = 4;
+  lienzo.height = banda * colores.length;
+  const c = lienzo.getContext('2d');
+  if (!c) return null;
+  colores.forEach((color, i) => {
+    c.fillStyle = color;
+    c.fillRect(0, i * banda, 4, banda);
+  });
+  return ctx.createPattern(lienzo, 'repeat');
+}
 
 function marcaCasilla(color: string) {
   const tinta = color.replace('#', '%23');
@@ -121,7 +153,7 @@ export function CortinaTemas({
   const altoRef = useRef(0);
   const semillaRef = useRef(7);
   const hoverRef = useRef(-1);
-  const abiertoRef = useRef(initialTema ? HILOS.findIndex((hilo) => hilo.id === initialTema) : -1);
+  const abiertoRef = useRef(initialTema ? TEMAS.findIndex((hilo) => hilo.id === initialTema) : -1);
   const centroRef = useRef(0);
   const progresoRef = useRef(initialTema ? 1 : 0);
   const metaRef = useRef(initialTema ? 1 : 0);
@@ -134,7 +166,7 @@ export function CortinaTemas({
     preguntaInicial(initialTema, initialPregunta)
   );
   const [formato, setFormato] = useState<Formato | null>(null);
-  const [marcada, setMarcada] = useState(initialTema ? HILOS.findIndex((hilo) => hilo.id === initialTema) : -1);
+  const [marcada, setMarcada] = useState(initialTema ? TEMAS.findIndex((hilo) => hilo.id === initialTema) : -1);
 
   function publicar(id: string | null) {
     if (!enPagina) return;
@@ -143,7 +175,7 @@ export function CortinaTemas({
   }
 
   function abrir(indice: number, x?: number) {
-    const hilo = HILOS[indice];
+    const hilo = TEMAS[indice];
     const tela = TELON[indice];
     if (!hilo || !tela) return;
     abiertoRef.current = indice;
@@ -280,7 +312,7 @@ export function CortinaTemas({
         cintas.push({
           x: x + w / 2,
           w,
-          th: Math.floor(azar() * 12),
+          th: Math.floor(azar() * TEMAS.length),
           L: alto * (0.92 + azar() * 0.08),
           curve: (azar() - 0.5) * 50,
           A: 3 + azar() * 6,
@@ -338,7 +370,8 @@ export function CortinaTemas({
       return -1;
     }
 
-    const alfas = HILOS.map(() => 1);
+    const alfas = TEMAS.map(() => 1);
+    const multicolor = patronMulticolor(ctx, VIVO.slice(0, 12));
     let esperaTema = 0;
     let temaPendiente = -1;
     let punteroX = 0;
@@ -346,7 +379,7 @@ export function CortinaTemas({
 
     function mostrarNombre(tema: number) {
       const nombre = nombreRef.current;
-      const hilo = HILOS[tema];
+      const hilo = TEMAS[tema];
       if (!nombre) return;
       if (tema >= 0 && hilo) {
         nombre.hidden = false;
@@ -460,7 +493,7 @@ export function CortinaTemas({
           ctx.lineTo(xEn(cinta, y, tiempo, quieto) + cinta.w / 2, y);
         }
         ctx.closePath();
-        ctx.fillStyle = VIVO[cinta.th] ?? tela.fondo;
+        ctx.fillStyle = cinta.th === ME_INDICE && multicolor ? multicolor : VIVO[cinta.th] ?? tela.fondo;
         ctx.fill();
         ctx.strokeStyle = 'rgba(0,0,0,.07)';
         ctx.lineWidth = 1;
@@ -612,7 +645,8 @@ export function CortinaTemas({
     };
   }, [enPagina, locale]);
 
-  const hilo = HILOS.find((item) => item.id === temaId) ?? null;
+  const hilo = TEMAS.find((item) => item.id === temaId) ?? null;
+  const esMe = temaId === ME_PREGUNTO_ID;
   const preguntas = preguntasDelTema(temaId);
   const preguntaAbierta = preguntas.find((item) => item.id === abiertaId) ?? null;
   const formulario =
@@ -688,11 +722,11 @@ export function CortinaTemas({
             temaId
               ? {
                   visibility: 'visible',
-                  ['--cortina-fondo' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.fondo,
-                  ['--cortina-texto' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.texto,
-                  ['--cortina-boton' as string]: PANEL[HILOS.findIndex((item) => item.id === temaId)]?.boton,
+                  ['--cortina-fondo' as string]: PANEL[TEMAS.findIndex((item) => item.id === temaId)]?.fondo,
+                  ['--cortina-texto' as string]: PANEL[TEMAS.findIndex((item) => item.id === temaId)]?.texto,
+                  ['--cortina-boton' as string]: PANEL[TEMAS.findIndex((item) => item.id === temaId)]?.boton,
                   ['--cortina-check' as string]: marcaCasilla(
-                    PANEL[HILOS.findIndex((item) => item.id === temaId)]?.texto ?? '#fff'
+                    PANEL[TEMAS.findIndex((item) => item.id === temaId)]?.texto ?? '#fff'
                   ),
                 }
               : undefined
@@ -705,8 +739,16 @@ export function CortinaTemas({
                 {copy.volver}
               </button>
             </div>
-            <p className="cortina-indice-ayuda">{copy.indice}</p>
-            <ul className="cortina-indice">
+            {esMe ? (
+              <MePreguntoPanel
+                key={`me-${locale}`}
+                locale={locale}
+                initialPregunta={initialPregunta && initialTema === ME_PREGUNTO_ID ? initialPregunta : null}
+                onClose={cerrar}
+              />
+            ) : null}
+            {esMe ? null : <p className="cortina-indice-ayuda">{copy.indice}</p>}
+            <ul className="cortina-indice" hidden={esMe}>
               {preguntas.map((pregunta) => {
                 const abierta = pregunta.id === abiertaId;
                 return (
@@ -756,12 +798,12 @@ export function CortinaTemas({
       </div>
       {temaId || capitulo ? null : <p className="cortina-pista">{copy.pista}</p>}
       <div className={capitulo ? 'cortina-leyenda cortina-leyenda-teclado' : 'cortina-leyenda'}>
-        {HILOS.map((hiloTema, indice) => (
+        {TEMAS.map((hiloTema, indice) => (
           <button
             key={hiloTema.id}
             type="button"
             className={marcada === indice ? 'cortina-etiqueta esta' : 'cortina-etiqueta'}
-            style={{ ['--cortina-fondo' as string]: TELON[indice]?.fondo }}
+            style={{ ['--cortina-fondo' as string]: indice === ME_INDICE ? 'conic-gradient(#FFD000, #FF6200, #FF1A1A, #FF7EB6, #A8E000, #00B140, #00C2D6, #0047FF, #7A12E0, #B07CFF, #FF0A8A, #A0003C, #FFD000)' : TELON[indice]?.fondo }}
             onMouseEnter={() => {
               if (metaRef.current !== 0) return;
               hoverRef.current = indice;

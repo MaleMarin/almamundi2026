@@ -17,6 +17,7 @@ type Status = 'pending' | 'approved' | 'rejected' | 'archived';
 type RespuestaItem = {
   id: string;
   questionId: string;
+  questionText?: string;
   mode: string;
   kind: Kind;
   contenido: string;
@@ -273,7 +274,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
                     </div>
                     <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>
-                      {preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
+                      {item.questionText ? `Me pregunto: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
                     </p>
                     <SenderConsentBlocks
                       sender={item.sender}

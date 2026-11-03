@@ -85,6 +85,14 @@ export async function getRespuestaPublicById(id: string): Promise<RespuestaPubli
       previewUrl: typeof data.publishedUrl === "string" ? data.publishedUrl : null,
       lat,
       lng,
+      ...(typeof data.questionText === "string" && data.questionText
+        ? {
+            questionText: data.questionText,
+            askerAlias: typeof data.askerAlias === "string" ? data.askerAlias : "",
+            askerCity: typeof data.askerCity === "string" ? data.askerCity : "",
+            askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",
+          }
+        : {}),
     };
   } catch (err) {
     console.error("[getRespuestaPublicById]", err);

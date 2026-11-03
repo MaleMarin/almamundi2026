@@ -12,4 +12,9 @@ export type RespuestaPublica = {
   previewUrl: string | null;
   lat: number | null;
   lng: number | null;
+  /** «Me pregunto…»: texto de la pregunta y quién la hizo. */
+  questionText?: string;
+  askerAlias?: string;
+  askerCity?: string;
+  askerCountry?: string;
 };

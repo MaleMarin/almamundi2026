@@ -1,5 +1,6 @@
 'use client';
 
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -23,6 +24,9 @@ import {
   RESPUESTA_VOICE_MAX_BYTES,
   RESPUESTA_VOICE_MAX_SECONDS } from '@/lib/respuestas/constants';
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { isValidRecipientEmail } from '@/lib/email-html';
 
 type Kind = 'texto' | 'voz' | 'foto';
@@ -111,6 +115,7 @@ function PreguntaFormInner({
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [sentAlias, setSentAlias] = useState<string | null>(null);
+  const esMe = esMePreguntaId(pregunta.id);
   const [shareOpen, setShareOpen] = useState(false);
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(getTurnstileSiteKey() ? 'wait' : 'skip');
   const captchaTokenRef = useRef('');
@@ -353,7 +358,7 @@ function PreguntaFormInner({
             {preguntaThanksTitle(locale, sentAlias)}
           </h1>
           <p className="m-0 mt-3 text-[length:var(--fs-texto)] leading-relaxed">
-            {email.trim() ? copy.thanksMail[locale] : copy.thanksMap[locale]}
+            {esMe ? ME_PREGUNTO_UI[locale].graciasRespuesta : email.trim() ? copy.thanksMail[locale] : copy.thanksMap[locale]}
           </p>
           <div className="mt-6 text-left">
             <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-[#4A5568]">{pregunta[mode][locale]}</p>
@@ -372,6 +377,26 @@ function PreguntaFormInner({
               </figure>
             ) : null}
           </div>
+          {esMe ? (
+            <div className="mt-8 flex flex-col gap-3 md:flex-row md:flex-wrap md:justify-center">
+              <HomeHardLink href="/#historias" className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
+                {t.navTellStory}
+              </HomeHardLink>
+              <HomeHardLink href="/#cintas" className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
+                {HILOS_UI[locale].nav}
+              </HomeHardLink>
+              <HomeHardLink href="/?capa=me-pregunto#mapa" className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
+                {t.modalBackToMap}
+              </HomeHardLink>
+              <button
+                type="button"
+                className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto"
+                onClick={() => setShareOpen(true)}
+              >
+                {copy.share[locale]}
+              </button>
+            </div>
+          ) : (
           <div className="mt-8 flex flex-col gap-3 md:flex-row md:justify-center">
             {onAnother ? (
               <button
@@ -403,6 +428,7 @@ function PreguntaFormInner({
               {copy.share[locale]}
             </button>
           </div>
+          )}
         </article>
         <ShareAfterNotice
           open={shareOpen}
