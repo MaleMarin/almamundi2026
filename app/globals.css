@@ -2446,3 +2446,16 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   border: 1.5px solid #ff4a1c !important;
   font-size: 1.05em;
 }
+
+/* Menú del globo con nombres largos: si no cabe en una fila, baja a dos filas centradas. */
+@media (min-width: 768px) {
+  #map-dock-slot .map-dock-row {
+    display: flex !important;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px 12px;
+    width: min(100%, 1180px) !important;
+    margin-inline: auto !important;
+    transform: none !important;
+  }
+}
