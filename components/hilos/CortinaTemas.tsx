@@ -26,7 +26,7 @@ const TELON: { fondo: string; texto: string }[] = [
   { fondo: '#00C2D6', texto: '#fff' },
   { fondo: '#A0003C', texto: '#fff' },
   // 13: «Me pregunto…» (en la cortina se dibuja multicolor).
-  { fondo: '#3C4655', texto: '#fff' },
+  { fondo: '#FF4A1C', texto: '#fff' },
 ];
 
 /** Colores de las cintas en la cortina: los 12 colores originales de los temas. */
@@ -48,14 +48,14 @@ const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#E60078', texto: '#fff', boton: '#E60078' },
   { fondo: '#008391', texto: '#fff', boton: '#008391' },
   { fondo: '#A0003C', texto: '#fff', boton: '#A0003C' },
-  { fondo: '#3C4655', texto: '#fff', boton: '#3C4655' },
+  { fondo: '#FF4A1C', texto: '#fff', boton: '#B8340F' },
 ];
 
 /** Los 12 temas y «Me pregunto…», la cinta multicolor de las preguntas de las personas. */
 const ME_HILO = {
   id: ME_PREGUNTO_ID,
-  nombre: { es: ME_PREGUNTO_UI.es.nombre, pt: ME_PREGUNTO_UI.pt.nombre, en: ME_PREGUNTO_UI.en.nombre },
-  color: '#3C4655',
+  nombre: { es: ME_PREGUNTO_UI.es.titulo, pt: ME_PREGUNTO_UI.pt.titulo, en: ME_PREGUNTO_UI.en.titulo },
+  color: '#FF4A1C',
   imagen: '',
   aspecto: 1,
 } as unknown as Hilo;

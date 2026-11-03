@@ -8,6 +8,8 @@ export const ME_PREGUNTO_UI: Record<
     botonTePreguntan: string;
     nombre: string;
     capa: string;
+    titulo: string;
+    respondeAqui: string;
     bajada: string;
     dejar: string;
     vacio: string;
@@ -38,7 +40,9 @@ export const ME_PREGUNTO_UI: Record<
     navTePreguntan: 'Te preguntan',
     botonTePreguntan: 'Personas de distintos lugares quieren conocer tu experiencia. Mira lo que te preguntan.',
     capa: 'Me pregunto',
-    bajada: 'Preguntas que dejan personas de todo el mundo. Responde la que te llame o deja una nueva.',
+    titulo: 'Me gustaría saber de ti',
+    respondeAqui: 'Respóndele aquí',
+    bajada: 'Otras personas quieren saber cómo lo viviste tú. Elige una pregunta y respóndele, o deja la tuya.',
     dejar: 'Dejar mi pregunta',
     vacio: 'Sé la primera persona en dejar una pregunta.',
     loPregunta: (alias, lugar) => `Lo pregunta ${alias}${lugar ? ` desde ${lugar}` : ''}`,
@@ -80,7 +84,9 @@ export const ME_PREGUNTO_UI: Record<
     navTePreguntan: 'Te perguntam',
     botonTePreguntan: 'Pessoas de diferentes lugares querem conhecer a sua experiência. Veja o que te perguntam.',
     capa: 'Me pergunto',
-    bajada: 'Perguntas deixadas por pessoas do mundo todo. Responda a que chamar sua atenção ou deixe uma nova.',
+    titulo: 'Eu gostaria de saber de você',
+    respondeAqui: 'Responda aqui',
+    bajada: 'Outras pessoas querem saber como você viveu isso. Escolha uma pergunta e responda, ou deixe a sua.',
     dejar: 'Deixar minha pergunta',
     vacio: 'Seja a primeira pessoa a deixar uma pergunta.',
     loPregunta: (alias, lugar) => `Pergunta de ${alias}${lugar ? `, de ${lugar}` : ''}`,
@@ -122,7 +128,9 @@ export const ME_PREGUNTO_UI: Record<
     navTePreguntan: 'They ask you',
     botonTePreguntan: 'People from different places want to hear about your experience. See what they ask you.',
     capa: 'I wonder',
-    bajada: 'Questions left by people from all over the world. Answer the one that calls you or leave a new one.',
+    titulo: 'I’d love to hear from you',
+    respondeAqui: 'Answer here',
+    bajada: 'Other people want to know how you lived it. Pick a question and answer it, or leave your own.',
     dejar: 'Leave my question',
     vacio: 'Be the first person to leave a question.',
     loPregunta: (alias, lugar) => `Asked by ${alias}${lugar ? ` from ${lugar}` : ''}`,

@@ -2460,3 +2460,15 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
     transform: none !important;
   }
 }
+
+/* Me pregunto: invitación visible a responder en cada pregunta. */
+.me-pregunto-responde {
+  display: flex;
+  width: fit-content;
+  margin-top: 10px;
+  padding: 6px 14px;
+  border: 1.5px solid currentColor;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+}

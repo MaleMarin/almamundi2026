@@ -108,6 +108,7 @@ export function MePreguntoPanel({
               >
                 {pregunta.texto}
                 <span className="me-pregunto-autor">{copy.loPregunta(pregunta.alias, lugar)}</span>
+                {open ? null : <span className="me-pregunto-responde">{copy.respondeAqui} →</span>}
               </button>
               {open && abierta ? (
                 <div className="cortina-indice-respuesta">
