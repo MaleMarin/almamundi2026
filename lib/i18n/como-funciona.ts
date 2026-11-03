@@ -34,6 +34,10 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         rest: 'Cada cinta es un tema y guarda preguntas para despertar un recuerdo. Puedes responder una pregunta con unas líneas, tu voz o una foto.',
       },
       {
+        lead: 'Deja tu pregunta o responde la de otra persona.',
+        rest: 'En Me pregunto… puedes dejar una pregunta para que personas de todo el mundo la respondan, o responder una con unas líneas, tu voz o una foto. Cada pregunta aparece en el globo con un punto de colores.',
+      },
+      {
         lead: 'Dinos dónde ocurrió.',
         rest: 'Así tu historia encuentra su lugar en el mapa. Tu correo es opcional y nunca se muestra.',
       },
@@ -85,6 +89,10 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
         rest: 'Cada fita é um tema e guarda perguntas para despertar uma lembrança. Você pode responder a uma pergunta com algumas linhas, com a sua voz ou com uma foto.',
       },
       {
+        lead: 'Deixe sua pergunta ou responda à de outra pessoa.',
+        rest: 'Em Me pergunto… você pode deixar uma pergunta para que pessoas do mundo todo respondam, ou responder a uma com algumas linhas, sua voz ou uma foto. Cada pergunta aparece no globo com um ponto colorido.',
+      },
+      {
         lead: 'Conte onde aconteceu.',
         rest: 'Assim a sua história encontra o seu lugar no mapa. O e-mail é opcional e nunca aparece.',
       },
@@ -134,6 +142,10 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
       {
         lead: 'Start with a question: tap a ribbon.',
         rest: 'Each ribbon is a theme that holds questions to spark a memory. You can answer a question with a few lines, your voice or a photo.',
+      },
+      {
+        lead: 'Leave your question or answer someone else\'s.',
+        rest: 'In I wonder… you can leave a question for people around the world to answer, or answer one with a few lines, your voice or a photo. Each question appears on the globe as a colorful dot.',
       },
       {
         lead: 'Tell us where it happened.',

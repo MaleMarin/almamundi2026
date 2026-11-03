@@ -117,6 +117,7 @@ const esPrivacidad: LegalDoc = {
     ]),
     seccion('publicacion', '5. Qué se publica', [
       p('Nada se publica de forma automática. Si aprobamos tu historia o tu respuesta, se muestra en el sitio con tu nombre o alias, tu país y ciudad, el lugar en el mapa y el contenido que enviaste. Tu correo nunca se publica.'),
+      p('Las preguntas y respuestas pasan por la misma revisión que las historias. Se publican el texto, la voz o la foto que enviaste, tu nombre o alias, tu ciudad y tu país. Tu correo nunca es público.'),
     ]),
     seccion('compartir', '6. Con quién los compartimos', [
       p('Solo con proveedores que nos ayudan a operar el sitio, y solo para eso:'),
@@ -209,6 +210,7 @@ const esTerminos: LegalDoc = {
     ]),
     seccion('revision', '5. Revisión y publicación', [
       p('Cada envío pasa por revisión editorial antes de publicarse. Podemos aprobarlo, pedirte ajustes, no publicarlo o retirarlo más adelante si aparece un riesgo. Cuando no publicamos un envío y dejaste tu correo, te contamos el motivo.'),
+      p('Las preguntas y respuestas pasan por la misma revisión que las historias. Se publican el texto, la voz o la foto que enviaste, tu nombre o alias, tu ciudad y tu país. Tu correo nunca es público.'),
     ]),
     seccion('tuyos', '6. Tus derechos sobre lo que cuentas', [
       p('Lo que cuentas sigue siendo tuyo. Al enviarlo, declaras que tienes derecho a compartirlo y le das a Precisar un permiso gratuito y no exclusivo para publicarlo en AlmaMundi y para difundirlo en los canales de AlmaMundi y de Precisar (redes sociales, boletín, exposiciones y materiales de la iniciativa), siempre con tu nombre o alias y sin fines comerciales.'),
@@ -245,7 +247,7 @@ const esContacto: LegalDoc = {
 const esConducta: LegalDoc = {
   title: 'Código de conducta',
   updated: `Última actualización: ${fecha.es}`,
-  lede: 'En AlmaMundi, cada historia y cada respuesta es parte de la vida de alguien. Por eso las recibimos, las cuidamos y las mostramos con el mismo respeto con que nos gustaría que trataran las nuestras.',
+  lede: 'En AlmaMundi, cada historia y cada respuesta es parte de la vida de alguien. Por eso las recibimos, las cuidamos y las mostramos con el mismo respeto con que nos gustaría que trataran las nuestras. Estas reglas valen igual para historias, preguntas y respuestas.',
   sections: [
     seccion('compromiso', 'Nuestro compromiso', [
       items([
@@ -306,6 +308,7 @@ const ptPrivacidad: LegalDoc = {
     ]),
     seccion('publicacion', '5. O que é publicado', [
       p('Nada é publicado automaticamente. Se aprovarmos sua história ou sua resposta, ela aparece no site com seu nome ou apelido, seu país e cidade, o lugar no mapa e o conteúdo que você enviou. Seu e-mail nunca é publicado.'),
+      p('As perguntas e respostas passam pela mesma revisão que as histórias. São publicados o texto, a voz ou a foto que você enviou, seu nome ou apelido, sua cidade e seu país. Seu e-mail nunca é público.'),
     ]),
     seccion('compartir', '6. Com quem compartilhamos', [
       p('Somente com fornecedores que nos ajudam a operar o site, e só para isso:'),
@@ -398,6 +401,7 @@ const ptTerminos: LegalDoc = {
     ]),
     seccion('revision', '5. Revisão e publicação', [
       p('Cada envio passa por revisão editorial antes de ser publicado. Podemos aprová-lo, pedir ajustes, não publicá-lo ou retirá-lo depois, se surgir um risco. Quando não publicamos um envio e você deixou seu e-mail, explicamos o motivo.'),
+      p('As perguntas e respostas passam pela mesma revisão que as histórias. São publicados o texto, a voz ou a foto que você enviou, seu nome ou apelido, sua cidade e seu país. Seu e-mail nunca é público.'),
     ]),
     seccion('tuyos', '6. Seus direitos sobre o que você conta', [
       p('O que você conta continua sendo seu. Ao enviar, você declara que tem o direito de compartilhá-lo e concede à Precisar uma licença gratuita e não exclusiva para publicá-lo no AlmaMundi e divulgá-lo nos canais do AlmaMundi e da Precisar (redes sociais, newsletter, exposições e materiais da iniciativa), sempre com seu nome ou apelido e sem fins comerciais.'),
@@ -434,7 +438,7 @@ const ptContacto: LegalDoc = {
 const ptConducta: LegalDoc = {
   title: 'Código de conduta',
   updated: `Última atualização: ${fecha.pt}`,
-  lede: 'No AlmaMundi, cada história e cada resposta é parte da vida de alguém. Por isso, nós as recebemos, cuidamos e mostramos com o mesmo respeito com que gostaríamos que tratassem as nossas.',
+  lede: 'No AlmaMundi, cada história e cada resposta é parte da vida de alguém. Por isso, nós as recebemos, cuidamos e mostramos com o mesmo respeito com que gostaríamos que tratassem as nossas. Estas regras valem igualmente para histórias, perguntas e respostas.',
   sections: [
     seccion('compromiso', 'Nosso compromisso', [
       items([
@@ -495,6 +499,7 @@ const enPrivacidad: LegalDoc = {
     ]),
     seccion('publicacion', '5. What is published', [
       p("Nothing is published automatically. If we approve your story or answer, it appears on the site with your name or alias, your country and city, its place on the map and the content you sent. Your email is never published."),
+      p('Questions and answers go through the same review as stories. We publish the text, voice or photo you sent, your name or alias, your city and your country. Your email is never public.'),
     ]),
     seccion('compartir', '6. Who we share it with', [
       p('Only with providers that help us run the site, and only for that purpose:'),
@@ -587,6 +592,7 @@ const enTerminos: LegalDoc = {
     ]),
     seccion('revision', '5. Review and publication', [
       p("Every submission goes through editorial review before it's published. We may approve it, ask for changes, decline to publish it or remove it later if a risk appears. When we don't publish a submission and you left your email, we tell you why."),
+      p('Questions and answers go through the same review as stories. We publish the text, voice or photo you sent, your name or alias, your city and your country. Your email is never public.'),
     ]),
     seccion('tuyos', '6. Your rights over what you tell', [
       p("What you tell remains yours. By sending it, you confirm you have the right to share it and grant Precisar a free, non-exclusive permission to publish it on AlmaMundi and share it on AlmaMundi's and Precisar's channels (social media, newsletter, exhibitions and initiative materials), always with your name or alias and never for commercial purposes."),
@@ -623,7 +629,7 @@ const enContacto: LegalDoc = {
 const enConducta: LegalDoc = {
   title: 'Code of conduct',
   updated: `Last updated: ${fecha.en}`,
-  lede: "At AlmaMundi, every story and every answer is part of someone's life. That's why we receive them, care for them and share them with the same respect we'd want for our own.",
+  lede: "At AlmaMundi, every story and every answer is part of someone's life. That's why we receive them, care for them and share them with the same respect we'd want for our own. These rules apply equally to stories, questions and answers.",
   sections: [
     seccion('compromiso', 'Our commitment', [
       items([

@@ -336,6 +336,10 @@ export async function DELETE(
     return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("[admin/stories DELETE]", e);
-    return NextResponse.json({ error: "delete failed" }, { status: 500 });
+    // Solo lo ve el equipo en /admin: ayuda a saber qué falló.
+    return NextResponse.json(
+      { error: `No se pudo eliminar: ${e instanceof Error ? e.message : "error desconocido"}` },
+      { status: 500 }
+    );
   }
 }

@@ -926,20 +926,28 @@ export async function editorialDeleteStory(args: {
   if (!snap.exists) return { ok: false, httpStatus: 404, error: "Historia no encontrada" };
 
   const data = (snap.data() ?? {}) as Record<string, unknown>;
+  // Los archivos y el envío de origen se limpian aparte: si uno falla, la historia igual sale del mapa.
+  const paso = async (nombre: string, fn: () => Promise<unknown>) => {
+    try {
+      await fn();
+    } catch (e) {
+      console.error(`[editorial] delete story ${storyId}: ${nombre}`, e instanceof Error ? e.message : e);
+    }
+  };
   const paths: string[] = [];
   collectStoryStorageRefs(data, paths);
-  await collectTreeStorageRefs(ref, paths);
-  await collectSourceSubmissionStorageRefs(db, data, paths);
-  await deleteStoryStorageFiles(storyId, paths);
-  await deleteOriginSubmission(db, storyId, data);
+  await paso("tree refs", () => collectTreeStorageRefs(ref, paths));
+  await paso("source refs", () => collectSourceSubmissionStorageRefs(db, data, paths));
+  await paso("storage", () => deleteStoryStorageFiles(storyId, paths));
+  await paso("origin submission", () => deleteOriginSubmission(db, storyId, data));
   await deleteDocumentTree(ref);
-  await deleteAuthorContact(db, storyId);
+  await paso("author contact", () => deleteAuthorContact(db, storyId));
   try {
     await detachStoryFromCollections(db, storyId);
   } catch (e) {
     console.error("[editorial] detach story from collections", e);
   }
-  await appendDeleteStoryLog(db, storyId, deletedBy);
+  await paso("log", () => appendDeleteStoryLog(db, storyId, deletedBy));
   return { ok: true };
 }
 
