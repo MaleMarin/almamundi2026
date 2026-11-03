@@ -93,6 +93,8 @@ type StoryShareMenuProps = {
   onClose: () => void;
   /** Conserva el enlace recibido. Sin esto, el menú lo cambia por /contar. */
   keepShareUrl?: boolean;
+  /** Instagram y TikTok copian el texto tal cual, sin sumar el enlace. */
+  socialSinEnlace?: boolean;
 };
 
 export function StoryShareMenu({
@@ -110,7 +112,8 @@ export function StoryShareMenu({
   onDownload,
   onEmail,
   onClose,
-  keepShareUrl = false }: StoryShareMenuProps) {
+  keepShareUrl = false,
+  socialSinEnlace = false }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(
     shareUrl,
     {
@@ -130,7 +133,9 @@ export function StoryShareMenu({
 
   const shareApp = (app: 'Instagram' | 'TikTok') => {
     const raw = shareTextSocial?.trim() || shareTextLong;
-    const text = shareMessageWithLink(raw, keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl));
+    const text = socialSinEnlace
+      ? raw
+      : shareMessageWithLink(raw, keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl));
     const phone =
       typeof navigator !== 'undefined' &&
       (window.matchMedia('(pointer: coarse)').matches ||

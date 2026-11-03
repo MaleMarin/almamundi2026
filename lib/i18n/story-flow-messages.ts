@@ -100,6 +100,8 @@ export type StoryFlowMessages = {
   modalSaveImage: string;
   modalShareTextShort: string;
   modalShareTextLong: string;
+  /** Instagram y TikTok: se copia sin enlace, porque ahí el enlace no se puede tocar. */
+  modalShareTextSocial: string;
   modalShareEmailSubject: string;
   modalCopyImageFailed: string;
   modalShareImageFailed: string;
@@ -248,9 +250,11 @@ const es: StoryFlowMessages = {
     'Una persona del equipo la leerá antes de publicarla. Si nos dejaste tu correo, te avisaremos cuando aparezca en el mapa.',
   modalSaveImage: 'Guardar imagen',
   modalShareTextShort:
-    'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar',
+    'Hay historias que no se pierden en el scroll. Acabo de contar la mía en AlmaMundi. ¿Y tú, qué historia guardas? https://www.almamundi.org/contar',
   modalShareTextLong:
     'Todos guardamos una historia que vale la pena contar. Te toca. https://www.almamundi.org/contar',
+  modalShareTextSocial:
+    'Conté mi historia en AlmaMundi y estos son sus colores. ¿Cuáles serían los de la tuya? Cuéntala en almamundi.org',
   modalShareEmailSubject: 'Conté una historia en AlmaMundi',
   modalCopyImageFailed: 'No pudimos copiar la imagen. Prueba con Descargar.',
   modalShareImageFailed:
@@ -263,7 +267,7 @@ const es: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Te abrimos {app}. Tu imagen ya se descargó y el texto está copiado.',
+    'Copiamos el texto. Descarga tu imagen y súbela con él.',
   modalShareEmail: 'Correo',
   modalShareEmailCopied:
     'Si tu correo no se abrió, el mensaje ya está copiado: pégalo donde quieras.',
@@ -361,16 +365,18 @@ const pt: StoryFlowMessages = {
   modalPhotoMissingPlace: 'Falta o lugar da foto {foto}.',
   modalRequiredFieldsNote: 'Os campos com * são obrigatórios.',
   modalShareTextShort:
-    'Contei uma história e ela me devolveu suas cores. Você também tem uma. https://www.almamundi.org/contar',
+    'Há histórias que não se perdem no scroll. Acabei de contar a minha no AlmaMundi. E você, que história guarda? https://www.almamundi.org/contar',
   modalShareTextLong:
     'Todos guardamos uma história que vale a pena contar. Agora é sua vez. https://www.almamundi.org/contar',
+  modalShareTextSocial:
+    'Contei minha história no AlmaMundi e estas são as cores dela. Quais seriam as da sua? Conte em almamundi.org',
   modalShareEmailSubject: 'Contei uma história no AlmaMundi',
   modalShareImageFailed:
     'Não foi possível compartilhar. Baixe a imagem e compartilhe a partir do seu dispositivo.',
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'Abrimos o {app}. Sua imagem já foi baixada e o texto está copiado.',
+    'Copiamos o texto. Baixe sua imagem e publique com ele.',
   modalShareEmail: 'E-mail',
   modalShareEmailCopied:
     'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
@@ -518,9 +524,11 @@ const en: StoryFlowMessages = {
   modalPhotoMissingPlace: 'Photo {foto} is missing the place.',
   modalRequiredFieldsNote: 'Fields marked with * are required.',
   modalShareTextShort:
-    'I told a story and it gave me back its colors. You have one too. https://www.almamundi.org/contar',
+    'Some stories don’t get lost in the scroll. I just told mine on AlmaMundi. What story do you carry? https://www.almamundi.org/contar',
   modalShareTextLong:
     'We all carry a story worth telling. Your turn. https://www.almamundi.org/contar',
+  modalShareTextSocial:
+    'I told my story on AlmaMundi and these are its colors. What would yours be? Tell it at almamundi.org',
   modalShareEmailSubject: 'I told a story on AlmaMundi',
   modalShareImageFailed:
     "We couldn't share this. Download the image and share it from your device.",
@@ -528,7 +536,7 @@ const en: StoryFlowMessages = {
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
-    'We opened {app}. Your image is downloaded and the text is copied.',
+    'We copied the text. Download your image and post it with the text.',
   modalShareEmail: 'Email',
   modalShareEmailCopied:
     'If your email didn\'t open, the message is already copied: paste it wherever you like.',

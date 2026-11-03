@@ -3223,7 +3223,8 @@ export function StoryModal({
               keepShareUrl
               shareTextShort={conEnlace(t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT)}
               shareTextLong={conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT)}
-              shareTextSocial={conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT)}
+              shareTextSocial={t.modalShareTextSocial}
+              socialSinEnlace
               emailSubject={t.modalShareEmailSubject || PENDING_STORY_SHARE_EMAIL_SUBJECT}
               labels={{
                 title: t.modalShareMenuTitle,

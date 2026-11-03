@@ -1,7 +1,7 @@
 export const PENDING_STORY_SHARE_URL = 'https://www.almamundi.org/contar';
 
 export const PENDING_STORY_SHARE_TEXT_SHORT =
-  'Conté una historia y me devolvió sus colores. Tú también tienes una. https://www.almamundi.org/contar';
+  'Hay historias que no se pierden en el scroll. Acabo de contar la mía en AlmaMundi. ¿Y tú, qué historia guardas? https://www.almamundi.org/contar';
 
 export const PENDING_STORY_SHARE_TEXT =
   'Todos guardamos una historia que vale la pena contar. Te toca. https://www.almamundi.org/contar';
