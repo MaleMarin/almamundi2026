@@ -5,7 +5,7 @@ import { Camera, Mic, PenLine } from 'lucide-react';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import { HILOS, preguntaParaFormulario, preguntasDelTema, type Hilo } from '@/lib/hilos';
 import { ME_PREGUNTO_ID } from '@/lib/me-pregunto/shared';
-import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { MePreguntoPanel } from '@/components/hilos/MePreguntoPanel';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
@@ -790,6 +790,13 @@ export function CortinaTemas({
                     </button>
                     {abierta ? (
                       <div className="cortina-indice-respuesta">
+                        <a
+                          href={`/respuestas?p=${encodeURIComponent(pregunta.id)}`}
+                          className="cortina-indice-ayuda font-semibold underline underline-offset-4"
+                          style={{ color: 'inherit', display: 'inline-block', marginBottom: 12 }}
+                        >
+                          {ME_PREGUNTO_MAPA[locale].verTodas}
+                        </a>
                         {formulario ? (
                           <PreguntaFormForQuestion
                             pregunta={formulario}

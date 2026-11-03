@@ -625,9 +625,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [filteredNewsItems, newsMarkersMounted]);
 
   const respuestasOnGlobe = useMemo(() => {
-    const list = respuestas
-      .filter((item) => storyHasValidGeo(item))
-      .slice(0, 40);
+    // Topes separados: 40 respuestas a preguntas de AlmaMundi y 40 a preguntas de las personas.
+    const conGeo = respuestas.filter((item) => storyHasValidGeo(item));
+    const list = [
+      ...conGeo.filter((item) => !esMePreguntaId(item.questionId)).slice(0, 40),
+      ...conGeo.filter((item) => esMePreguntaId(item.questionId)).slice(0, 40),
+    ];
     if (
       pinnedRespuesta &&
       openRespuesta?.id === pinnedRespuesta.id &&
