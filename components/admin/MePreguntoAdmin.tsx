@@ -128,7 +128,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
                 onChange={(event) => setDraft((prev) => ({ ...prev, [item.id]: event.target.value }))}
                 rows={2}
                 maxLength={160}
-                style={{ width: '100%', fontSize: 18, padding: 10, borderRadius: 10, color: '#111', fontFamily: SITE_FONT_STACK }}
+                style={{ width: '100%', fontSize: 18, padding: 10, borderRadius: 10, color: '#111', background: '#fff', border: '1px solid rgba(255,255,255,0.25)', fontFamily: SITE_FONT_STACK }}
               />
             ) : (
               <p style={{ margin: 0, fontSize: 18, fontWeight: 600 }}>{item.texto}</p>
