@@ -1,6 +1,6 @@
 'use client';
 
-import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import { useEffect, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { X } from 'lucide-react';
@@ -112,7 +112,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
       : mode === 'respuestas'
         ? HILOS_UI[locale].leyenda
         : mode === 'mepregunto'
-          ? ME_PREGUNTO_UI[locale].capa
+          ? ME_PREGUNTO_MAPA[locale].titulo
         : mode === 'news'
           ? HILOS_UI[locale].nav
           : mode === 'sounds'

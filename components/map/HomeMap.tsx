@@ -39,6 +39,7 @@ import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import { MePreguntoMapPanel } from '@/components/map/panels/MePreguntoMapPanel';
 import { BITS_DATA } from '@/lib/bits-data';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
 import { fetchHuellas, type HuellaPunto } from '@/lib/huellas';
@@ -1115,10 +1116,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
             />
           ) : drawerMode === 'news' ? (
             <PreguntaPanel />
-          ) : drawerMode === 'respuestas' || drawerMode === 'mepregunto' ? (
+          ) : drawerMode === 'mepregunto' ? (
+            <MePreguntoMapPanel
+              locale={locale}
+              respuestas={respuestas.filter((item) => esMePreguntaId(item.questionId))}
+              openId={openRespuesta?.id ?? null}
+              onOpen={showRespuesta}
+            />
+          ) : drawerMode === 'respuestas' ? (
             <StoriesPanel
               stories={respuestas
-                .filter((item) => esMePreguntaId(item.questionId) === (drawerMode === 'mepregunto'))
+                .filter((item) => !esMePreguntaId(item.questionId))
                 .map((item) => respuestaAsStory(item, locale))}
               exploreQuery={respuestaQuery}
               onExploreQueryChange={setRespuestaQuery}
@@ -1128,7 +1136,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               }}
               highlightedStoryId={openRespuesta?.id ?? null}
               answerRows
-              kicker={drawerMode === 'mepregunto' ? ME_PREGUNTO_UI[locale].capa : HILOS_UI[locale].leyenda}
+              kicker={HILOS_UI[locale].leyenda}
               emptyText={PREGUNTA_COPY.empty[locale]}
             />
           ) : drawerMode === 'bits' ? (

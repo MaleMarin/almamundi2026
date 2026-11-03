@@ -68,6 +68,7 @@ function SoundRow({
     >
       <button
         type="button"
+        aria-pressed={isPlaying}
         onClick={onSelect}
         style={{
           textAlign: 'left',
@@ -239,7 +240,15 @@ export function SoundsPanel({
             isActive={currentMood === m.id}
             isPlaying={soundEnabled && currentMood === m.id}
             volume01={volumes[m.id] ?? 0.25}
-            onSelect={() => onMoodChange(m.id)}
+            onSelect={() => {
+              // Tocar un sonido lo hace sonar de inmediato; tocar el que suena lo detiene.
+              if (currentMood === m.id) {
+                onToggleSound();
+                return;
+              }
+              onMoodChange(m.id);
+              if (!soundEnabled) onToggleSound();
+            }}
             onVolumeChange={(v) => handleVolume(m.id, v)}
           />
         ))}

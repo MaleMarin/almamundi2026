@@ -144,3 +144,45 @@ export const ME_PREGUNTO_UI: Record<
     },
   },
 };
+
+/** Panel «Me pregunto» del mapa. */
+export const ME_PREGUNTO_MAPA: Record<
+  AlmaLocale,
+  {
+    titulo: string;
+    buscar: string;
+    cuantas: (n: number) => string;
+    primera: string;
+    mas: string;
+    voz: string;
+    foto: string;
+  }
+> = {
+  es: {
+    titulo: 'Respuestas de Me pregunto',
+    buscar: 'Buscar una pregunta',
+    cuantas: (n) => (n === 1 ? '1 respuesta' : `${n} respuestas`),
+    primera: 'Sé la primera persona en responder',
+    mas: 'Ver más preguntas',
+    voz: 'Respuesta en voz',
+    foto: 'Respuesta con foto',
+  },
+  pt: {
+    titulo: 'Respostas de Me pergunto',
+    buscar: 'Buscar uma pergunta',
+    cuantas: (n) => (n === 1 ? '1 resposta' : `${n} respostas`),
+    primera: 'Seja a primeira pessoa a responder',
+    mas: 'Ver mais perguntas',
+    voz: 'Resposta em voz',
+    foto: 'Resposta com foto',
+  },
+  en: {
+    titulo: 'Answers from I wonder',
+    buscar: 'Search a question',
+    cuantas: (n) => (n === 1 ? '1 answer' : `${n} answers`),
+    primera: 'Be the first person to answer',
+    mas: 'See more questions',
+    voz: 'Voice answer',
+    foto: 'Photo answer',
+  },
+};

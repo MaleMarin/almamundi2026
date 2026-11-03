@@ -97,14 +97,6 @@ export function ComoFuncionaModal({
           >
             {copy.privacy}
           </Link>
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn-almamundi rounded-full px-6 py-3 text-[length:var(--fs-pequeno)] font-semibold transition active:scale-[0.98]"
-            style={{ ...soft.button, color: soft.textMain }}
-          >
-            {copy.close}
-          </button>
         </div>
     </HomeDialogFrame>
   );
