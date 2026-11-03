@@ -60,7 +60,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         >
           <div style={{ fontSize: 24, letterSpacing: 8, fontWeight: 700, color: '#FF4A1C' }}>ALMAMUNDI</div>
           <div style={{ marginTop: 18, fontSize: 50, lineHeight: 1.15, color: '#3C4655', fontWeight: 600 }}>
-            {`Alguien en ${lugar} contó esta historia en AlmaMundi. ¿Qué historia contarías tú?`}
+            {`Alguien en ${lugar}, contó esta historia en AlmaMundi. ¿Qué historia contarías tú?`}
           </div>
           {shortTitle ? (
             <div style={{ marginTop: 18, fontSize: 26, color: '#616C7C' }}>{`«${shortTitle}» · almamundi.org`}</div>
