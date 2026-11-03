@@ -95,9 +95,9 @@ export const PREGUNTA_COPY = {
     en: 'Answers',
   },
   empty: {
-    es: 'Todavía no hay respuestas. Sé la primera persona en responder.',
-    pt: 'Ainda não há respostas. Seja a primeira pessoa a responder.',
-    en: 'No answers yet. Be the first to answer.',
+    es: 'Todavía no hay respuestas.',
+    pt: 'Ainda não há respostas.',
+    en: 'No answers yet.',
   },
   how: {
     es: '¿Cómo quieres responder?',

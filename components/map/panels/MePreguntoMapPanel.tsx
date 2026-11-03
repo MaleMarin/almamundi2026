@@ -140,17 +140,9 @@ export function MePreguntoMapPanel({
                 </span>
                 <ChevronDown size={18} className={`mt-1 shrink-0 transition ${open ? 'rotate-180' : ''}`} aria-hidden />
               </button>
-              {open ? (
+              {open && lista.length > 0 ? (
                 <div className="flex flex-col gap-2 px-4 pb-4">
-                  {lista.length === 0 ? (
-                    <Link
-                      href={`/preguntas?p=${encodeURIComponent(pregunta.id)}`}
-                      className="inline-flex min-h-11 items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white no-underline"
-                    >
-                      {copy.primera}
-                    </Link>
-                  ) : (
-                    lista.map((item) => (
+                  {lista.map((item) => (
                       <button
                         key={item.id}
                         type="button"
@@ -166,10 +158,18 @@ export function MePreguntoMapPanel({
                           {item.kind === 'texto' ? item.contenido : item.kind === 'voz' ? copy.voz : item.contenido || copy.foto}
                         </span>
                       </button>
-                    ))
-                  )}
+                  ))}
                 </div>
               ) : null}
+              {/* «Responder» siempre a la vista, con o sin respuestas. */}
+              <div className="px-4 pb-4">
+                <Link
+                  href={`/preguntas?p=${encodeURIComponent(pregunta.id)}`}
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white no-underline visited:text-white"
+                >
+                  {copy.primera}
+                </Link>
+              </div>
             </li>
           );
         })}
