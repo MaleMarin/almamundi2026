@@ -652,7 +652,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
 
   const preguntasOnGlobe = useMemo(
     () =>
-      mePreguntas.filter(
+      mePreguntas.slice(0, 40).filter(
         (p) => typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)
       ),
     [mePreguntas]
