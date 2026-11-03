@@ -2,7 +2,7 @@
 
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Camera, Mic, PenLine } from 'lucide-react';
+import { Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
@@ -122,10 +122,6 @@ export function MePreguntoPanel({
                       <button type="button" className="cortina-formato" onClick={() => setFormato('voz')}>
                         <Mic size={20} strokeWidth={1.75} aria-hidden />
                         {hilos.contarVoz}
-                      </button>
-                      <button type="button" className="cortina-formato" onClick={() => setFormato('foto')}>
-                        <Camera size={20} strokeWidth={1.75} aria-hidden />
-                        {hilos.conFoto}
                       </button>
                     </div>
                   )}

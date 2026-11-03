@@ -475,14 +475,17 @@ function PreguntaFormInner({
 
       <div className="flex flex-col gap-2">
         <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{copy.how[locale]}</p>
-        <div className="grid grid-cols-3 gap-2">
+        <div className={`grid gap-2 ${esMe ? 'grid-cols-2' : 'grid-cols-3'}`}>
           {(
             [
               ['texto', copy.write[locale], PenLine],
               ['voz', copy.kindVoice[locale], Mic],
               ['foto', copy.kindPhoto[locale], ImageIcon],
             ] as const
-          ).map(([id, label, Icon]) => (
+          )
+            // «Me pregunto…»: solo por escrito o con la voz.
+            .filter(([id]) => !(esMe && id === 'foto'))
+            .map(([id, label, Icon]) => (
             <button
               key={id}
               type="button"

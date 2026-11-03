@@ -35,7 +35,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
       },
       {
         lead: 'Deja tu pregunta o responde la de otra persona.',
-        rest: 'En Me pregunto… puedes dejar una pregunta para que personas de todo el mundo la respondan, o responder una con unas líneas, tu voz o una foto. Cada pregunta aparece en el globo con un punto de colores.',
+        rest: 'En Me pregunto… puedes dejar una pregunta para que personas de todo el mundo la respondan, o responder una por escrito o con tu voz. Cada pregunta aparece en el globo con un punto de colores.',
       },
       {
         lead: 'Dinos dónde ocurrió.',
@@ -90,7 +90,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
       },
       {
         lead: 'Deixe sua pergunta ou responda à de outra pessoa.',
-        rest: 'Em Me pergunto… você pode deixar uma pergunta para que pessoas do mundo todo respondam, ou responder a uma com algumas linhas, sua voz ou uma foto. Cada pergunta aparece no globo com um ponto colorido.',
+        rest: 'Em Me pergunto… você pode deixar uma pergunta para que pessoas do mundo todo respondam, ou responder a uma por escrito ou com sua voz. Cada pergunta aparece no globo com um ponto colorido.',
       },
       {
         lead: 'Conte onde aconteceu.',
@@ -145,7 +145,7 @@ export const COMO_FUNCIONA: Record<AlmaLocale, ComoFuncionaCopy> = {
       },
       {
         lead: 'Leave your question or answer someone else\'s.',
-        rest: 'In I wonder… you can leave a question for people around the world to answer, or answer one with a few lines, your voice or a photo. Each question appears on the globe as a colorful dot.',
+        rest: 'In I wonder… you can leave a question for people around the world to answer, or answer one in writing or with your voice. Each question appears on the globe as a colorful dot.',
       },
       {
         lead: 'Tell us where it happened.',

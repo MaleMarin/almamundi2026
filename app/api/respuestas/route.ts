@@ -78,6 +78,8 @@ export async function POST(req: Request) {
   const mePregunta = esMePreguntaId(body.questionId) ? await mePreguntaAprobada(getAdminDb(), body.questionId) : null;
   const questionId = mePregunta?.id ?? resolveQuestionId(body.questionId) ?? idPreguntaHilo(body.questionId);
   if (!questionId) return jsonError("invalid_question", 400);
+  // Las preguntas de las personas se responden solo por escrito o con la voz.
+  if (esMePreguntaId(questionId) && body.kind === "foto") return jsonError("invalid_kind", 400);
   if (body.kind === "texto") {
     const captcha = await verifyTurnstileStrict(
       typeof body.captchaToken === "string" ? body.captchaToken : null,
