@@ -154,6 +154,8 @@ export function CortinaTemas({
     preguntaInicial(initialTema, initialPregunta)
   );
   const [formato, setFormato] = useState<Formato | null>(null);
+  /** Tras enviar una pregunta en «Me pregunto…» se ocultan el título y la bajada. */
+  const [meEnviada, setMeEnviada] = useState(false);
   const [marcada, setMarcada] = useState(initialTema ? TEMAS.findIndex((hilo) => hilo.id === initialTema) : -1);
 
   function publicar(id: string | null) {
@@ -756,7 +758,7 @@ export function CortinaTemas({
         >
           <div className="cortina-cuerpo" ref={contenidoRef}>
             <div className="cortina-cabecera">
-              {hilo ? <h2>{hilo.nombre[locale]}</h2> : null}
+              {hilo ? esMe && meEnviada ? <span /> : <h2>{hilo.nombre[locale]}</h2> : null}
               <button ref={volverRef} className="cortina-volver" type="button" onClick={cerrar}>
                 {copy.volver}
               </button>
@@ -767,6 +769,7 @@ export function CortinaTemas({
                 locale={locale}
                 initialPregunta={initialPregunta && initialTema === ME_PREGUNTO_ID ? initialPregunta : null}
                 onClose={cerrar}
+                onEnviada={setMeEnviada}
               />
             ) : null}
             {esMe ? null : <p className="cortina-indice-ayuda">{copy.indice}</p>}

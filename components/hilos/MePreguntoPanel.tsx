@@ -32,12 +32,21 @@ export function MePreguntoPanel({
   locale,
   initialPregunta = null,
   onClose,
+  onEnviada,
 }: {
   locale: AlmaLocale;
   initialPregunta?: string | null;
   onClose: () => void;
+  onEnviada?: (enviada: boolean) => void;
 }) {
   const copy = ME_PREGUNTO_UI[locale];
+  const [enviada, setEnviada] = useState(false);
+  // Al cerrar el panel, el título vuelve a mostrarse la próxima vez.
+  const onEnviadaRef = useRef(onEnviada);
+  useEffect(() => {
+    onEnviadaRef.current = onEnviada;
+  });
+  useEffect(() => () => onEnviadaRef.current?.(false), []);
   const hilos = HILOS_UI[locale];
   const [items, setItems] = useState<MePreguntaPublica[] | null>(null);
   const [abiertaId, setAbiertaId] = useState<string | null>(initialPregunta);
@@ -63,9 +72,16 @@ export function MePreguntoPanel({
 
   return (
     <>
-      <p className="cortina-indice-ayuda">{copy.bajada}</p>
+      {enviada ? null : <p className="cortina-indice-ayuda">{copy.bajada}</p>}
       {dejando ? (
-        <DejarPregunta locale={locale} onCancel={() => setDejando(false)} />
+        <DejarPregunta
+          locale={locale}
+          onCancel={() => setDejando(false)}
+          onSent={() => {
+            setEnviada(true);
+            onEnviada?.(true);
+          }}
+        />
       ) : (
         <button type="button" className="cortina-formato me-pregunto-dejar" onClick={() => setDejando(true)}>
           <PenLine size={20} strokeWidth={1.75} aria-hidden />
@@ -121,7 +137,7 @@ export function MePreguntoPanel({
   );
 }
 
-function DejarPregunta({ locale, onCancel }: { locale: AlmaLocale; onCancel: () => void }) {
+function DejarPregunta({ locale, onCancel, onSent }: { locale: AlmaLocale; onCancel: () => void; onSent?: () => void }) {
   const { t } = useHomeLocale();
   const copy = ME_PREGUNTO_UI[locale];
   const [texto, setTexto] = useState('');
@@ -173,6 +189,7 @@ function DejarPregunta({ locale, onCancel }: { locale: AlmaLocale; onCancel: () 
       if (res.status === 429) throw new Error('rate_limited');
       if (!res.ok || !data.ok) throw new Error(data.error || 'send_failed');
       setSentAlias(alias.trim());
+      onSent?.();
     } catch (err) {
       const code = err instanceof Error ? err.message : 'send_failed';
       setError(copy.errores[code] ?? copy.errores.send_failed);
