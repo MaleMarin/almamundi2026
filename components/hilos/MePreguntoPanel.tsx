@@ -84,14 +84,9 @@ export function MePreguntoPanel({
             onEnviada?.(true);
           }}
         />
-      ) : (
-        <button type="button" className="cortina-formato me-pregunto-dejar" onClick={() => setDejando(true)}>
-          <PenLine size={20} strokeWidth={1.75} aria-hidden />
-          {copy.dejar}
-        </button>
-      )}
+      ) : null}
       {items && items.length === 0 && !dejando ? <p className="cortina-indice-ayuda">{copy.vacio}</p> : null}
-      <ul className="cortina-indice">
+      <ul className="cortina-indice" hidden={dejando}>
         {(items ?? []).map((pregunta) => {
           const open = pregunta.id === abiertaId;
           const lugar = formatPublicPlace(pregunta.city, pregunta.country, locale);
@@ -132,11 +127,21 @@ export function MePreguntoPanel({
           );
         })}
       </ul>
-      {items && items.length > 0 ? (
+      {items && items.length > 0 && !dejando ? (
         <Link href="/me-pregunto" className="cortina-indice-ayuda font-semibold underline underline-offset-4" style={{ color: "inherit" }}>
           {ME_PREGUNTO_MAPA[locale].verPreguntas}
         </Link>
       ) : null}
+      {/* Dejar una pregunta es lo secundario: va al final, separado de las preguntas para responder. */}
+      {dejando ? null : (
+        <div className="me-pregunto-invita">
+          <p className="cortina-indice-ayuda">{copy.invitaDejar}</p>
+          <button type="button" className="cortina-formato" onClick={() => setDejando(true)}>
+            <PenLine size={20} strokeWidth={1.75} aria-hidden />
+            {copy.dejar}
+          </button>
+        </div>
+      )}
     </>
   );
 }

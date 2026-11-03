@@ -8,6 +8,7 @@ export const ME_PREGUNTO_UI: Record<
     botonTePreguntan: string;
     nombre: string;
     capa: string;
+    invitaDejar: string;
     titulo: string;
     respondeAqui: string;
     bajada: string;
@@ -42,7 +43,8 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'Me pregunto',
     titulo: 'Me gustaría saber de ti',
     respondeAqui: 'Respóndele aquí',
-    bajada: 'Otras personas quieren saber cómo lo viviste tú. Elige una pregunta y respóndele, o deja la tuya.',
+    bajada: 'Cada pregunta la dejó alguien que quiere conocer tu experiencia. Elige una y cuéntale lo tuyo. Si nos dejó su correo, le avisaremos cuando publiquemos tu respuesta.',
+    invitaDejar: '¿Tú también quieres saber algo de otras personas? Deja tu pregunta.',
     dejar: 'Dejar mi pregunta',
     vacio: 'Sé la primera persona en dejar una pregunta.',
     loPregunta: (alias, lugar) => `Lo pregunta ${alias}${lugar ? ` desde ${lugar}` : ''}`,
@@ -86,7 +88,8 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'Me pergunto',
     titulo: 'Eu gostaria de saber de você',
     respondeAqui: 'Responda aqui',
-    bajada: 'Outras pessoas querem saber como você viveu isso. Escolha uma pergunta e responda, ou deixe a sua.',
+    bajada: 'Cada pergunta foi deixada por alguém que quer conhecer a sua experiência. Escolha uma e conte a sua. Se essa pessoa deixou o e-mail, vamos avisá-la quando publicarmos a sua resposta.',
+    invitaDejar: 'Você também quer saber algo de outras pessoas? Deixe a sua pergunta.',
     dejar: 'Deixar minha pergunta',
     vacio: 'Seja a primeira pessoa a deixar uma pergunta.',
     loPregunta: (alias, lugar) => `Pergunta de ${alias}${lugar ? `, de ${lugar}` : ''}`,
@@ -130,7 +133,8 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'I wonder',
     titulo: 'I’d love to hear from you',
     respondeAqui: 'Answer here',
-    bajada: 'Other people want to know how you lived it. Pick a question and answer it, or leave your own.',
+    bajada: 'Each question was left by someone who wants to hear about your experience. Pick one and tell them yours. If they left their email, we will let them know when we publish your answer.',
+    invitaDejar: 'Do you also want to know something from other people? Leave your question.',
     dejar: 'Leave my question',
     vacio: 'Be the first person to leave a question.',
     loPregunta: (alias, lugar) => `Asked by ${alias}${lugar ? ` from ${lugar}` : ''}`,

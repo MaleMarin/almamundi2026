@@ -937,6 +937,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   );
 
   function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits' | 'respuestas' | 'mepregunto', key: keyof GlobeLayerVisibility) {
+    if (mode === 'mepregunto') setAbrirPregunta(null);
     const layerOn = globeLayers[key];
     if (drawerOpen && drawerMode === mode) {
       setGlobeLayers((prev) => ({ ...prev, [key]: !layerOn }));

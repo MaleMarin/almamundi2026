@@ -2472,3 +2472,10 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   font-size: 14px;
   font-weight: 600;
 }
+
+.me-pregunto-invita {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid color-mix(in srgb, var(--cortina-texto, #fff) 35%, transparent);
+}
+.me-pregunto-invita .cortina-indice-ayuda { margin-bottom: 12px; }

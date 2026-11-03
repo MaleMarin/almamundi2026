@@ -96,6 +96,11 @@ export function MePreguntoMapPanel({
   }, [respuestas, preguntas, query]);
 
   const visibles = useMemo(() => {
+    // Tocada en el globo: solo esa pregunta.
+    if (abrirId) {
+      const sola = grupos.find((g) => g.pregunta.id === abrirId);
+      if (sola) return [sola];
+    }
     const page = grupos.slice(0, limite);
     // La pregunta tocada en el globo siempre se ve, aunque esté más abajo en la lista.
     if (abierta && !page.some((g) => g.pregunta.id === abierta)) {
@@ -103,12 +108,12 @@ export function MePreguntoMapPanel({
       if (extra) return [extra, ...page];
     }
     return page;
-  }, [grupos, limite, abierta]);
+  }, [grupos, limite, abierta, abrirId]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
       <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-white/75">{copy.intro}</p>
-      {grupos.length === 0 && !query.trim() ? null : (
+      {abrirId || (grupos.length === 0 && !query.trim()) ? null : (
       <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
         <Search size={16} className="text-[#FF6E49]" aria-hidden />
         <span className="sr-only">{copy.buscar}</span>
@@ -233,7 +238,7 @@ export function MePreguntoMapPanel({
           {copy.verPreguntas}
         </Link>
       ) : null}
-      {grupos.length > limite ? (
+      {!abrirId && grupos.length > limite ? (
         <button
           type="button"
           onClick={() => setLimite((n) => n + POR_PAGINA)}
