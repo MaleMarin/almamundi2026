@@ -62,20 +62,8 @@ const ME_HILO = {
 const TEMAS: Hilo[] = [...HILOS, ME_HILO];
 const ME_INDICE = TEMAS.length - 1;
 
-/** Franjas horizontales con los 12 colores para la cinta multicolor. */
-function patronMulticolor(ctx: CanvasRenderingContext2D, colores: string[]): CanvasPattern | null {
-  const banda = 34;
-  const lienzo = document.createElement('canvas');
-  lienzo.width = 4;
-  lienzo.height = banda * colores.length;
-  const c = lienzo.getContext('2d');
-  if (!c) return null;
-  colores.forEach((color, i) => {
-    c.fillStyle = color;
-    c.fillRect(0, i * banda, 4, banda);
-  });
-  return ctx.createPattern(lienzo, 'repeat');
-}
+/** Rayas de la cinta multicolor: seis colores de los temas. */
+const MULTI = ['#FFD000', '#FF1A1A', '#FF0A8A', '#7A12E0', '#0047FF', '#00B140'];
 
 function marcaCasilla(color: string) {
   const tinta = color.replace('#', '%23');
@@ -312,7 +300,7 @@ export function CortinaTemas({
         cintas.push({
           x: x + w / 2,
           w,
-          th: Math.floor(azar() * TEMAS.length),
+          th: Math.floor(azar() * 12),
           L: alto * (0.92 + azar() * 0.08),
           curve: (azar() - 0.5) * 50,
           A: 3 + azar() * 6,
@@ -321,6 +309,19 @@ export function CortinaTemas({
         });
         // Con aire entre cintas para que se vea la capa de atrás.
         x += w * (1.05 + azar() * 0.5);
+      }
+      // «Me pregunto…»: pocas cintas multicolor, repartidas a lo ancho y un poco más anchas.
+      const puntos = ancho < 640 ? [0.25, 0.75] : [0.17, 0.5, 0.83];
+      for (const punto of puntos) {
+        const meta = ancho * punto;
+        let mejor = 0;
+        cintas.forEach((cinta, i) => {
+          if (Math.abs(cinta.x - meta) < Math.abs(cintas[mejor].x - meta)) mejor = i;
+        });
+        if (cintas[mejor]) {
+          cintas[mejor].th = ME_INDICE;
+          cintas[mejor].w = Math.max(cintas[mejor].w, base * 1.6);
+        }
       }
       cintasRef.current = cintas;
       semillaRef.current = 31;
@@ -371,7 +372,6 @@ export function CortinaTemas({
     }
 
     const alfas = TEMAS.map(() => 1);
-    const multicolor = patronMulticolor(ctx, VIVO.slice(0, 12));
     let esperaTema = 0;
     let temaPendiente = -1;
     let punteroX = 0;
@@ -493,8 +493,28 @@ export function CortinaTemas({
           ctx.lineTo(xEn(cinta, y, tiempo, quieto) + cinta.w / 2, y);
         }
         ctx.closePath();
-        ctx.fillStyle = cinta.th === ME_INDICE && multicolor ? multicolor : VIVO[cinta.th] ?? tela.fondo;
+        ctx.fillStyle = VIVO[cinta.th] ?? tela.fondo;
         ctx.fill();
+        if (cinta.th === ME_INDICE) {
+          // Rayas verticales con los colores de los temas, a lo largo de la cinta.
+          const rayas = MULTI.length;
+          const ancho = cinta.w / rayas;
+          for (let k = 0; k < rayas; k += 1) {
+            const izquierda = -cinta.w / 2 + k * ancho;
+            ctx.beginPath();
+            for (let i = 0; i <= pasos; i += 1) {
+              const y = (cinta.L * i) / pasos;
+              ctx.lineTo(xEn(cinta, y, tiempo, quieto) + izquierda, y);
+            }
+            for (let i = pasos; i >= 0; i -= 1) {
+              const y = (cinta.L * i) / pasos;
+              ctx.lineTo(xEn(cinta, y, tiempo, quieto) + izquierda + ancho + 0.5, y);
+            }
+            ctx.closePath();
+            ctx.fillStyle = MULTI[k];
+            ctx.fill();
+          }
+        }
         ctx.strokeStyle = 'rgba(0,0,0,.07)';
         ctx.lineWidth = 1;
         ctx.stroke();
