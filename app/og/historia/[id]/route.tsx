@@ -1,6 +1,7 @@
 import { ImageResponse } from 'next/og';
 import { getStoryByIdAsync } from '@/lib/map-data/stories-server';
 import { resonanceStripeUnits } from '@/lib/huella/resonance-stripes';
+import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
 export const runtime = 'nodejs';
 
@@ -9,7 +10,7 @@ const H = 630;
 
 /**
  * Tarjeta para WhatsApp y redes de una historia: la imagen de cintas de la historia
- * ocupa toda la tarjeta, con una frase en primera persona que invita a contar la propia.
+ * ocupa toda la tarjeta. La comparte cualquier persona, así que la frase habla de la historia, no de quien comparte.
  */
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -33,6 +34,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     }
   }
 
+  const lugar = formatPublicPlace(story?.city, story?.country, 'es');
   const shortTitle = title.length > 70 ? `${title.slice(0, 68)}…` : title;
 
   return new ImageResponse(
@@ -58,7 +60,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         >
           <div style={{ fontSize: 24, letterSpacing: 8, fontWeight: 700, color: '#FF4A1C' }}>ALMAMUNDI</div>
           <div style={{ marginTop: 18, fontSize: 50, lineHeight: 1.15, color: '#3C4655', fontWeight: 600 }}>
-            Conté mi historia en AlmaMundi y estos son sus colores. ¿Cuáles serían los de la tuya?
+            {`Alguien en ${lugar} contó esta historia en AlmaMundi. ¿Qué historia contarías tú?`}
           </div>
           {shortTitle ? (
             <div style={{ marginTop: 18, fontSize: 26, color: '#616C7C' }}>{`«${shortTitle}» · almamundi.org`}</div>
