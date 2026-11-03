@@ -1998,6 +1998,11 @@ a.cinta-pill {
   cursor: pointer;
 }
 
+/* Los enlaces visitados no se vuelven naranjos dentro de las cintas (a:visited del sitio ganaba). */
+a.cortina-formato:visited {
+  color: var(--cortina-texto, #fff);
+}
+
 .cortina-detras .cortina-form {
   color: var(--cortina-texto, #fff);
 }

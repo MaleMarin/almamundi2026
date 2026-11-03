@@ -382,7 +382,15 @@ function PreguntaFormInner({
               <HomeHardLink href="/#historias" className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
                 {t.navTellStory}
               </HomeHardLink>
-              <HomeHardLink href="/#cintas" className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
+              <HomeHardLink
+                href="/#cintas"
+                onClick={(event) => {
+                if (!onAnother) return;
+                event.preventDefault();
+                onAnother();
+                document.getElementById('cintas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              }}
+                className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
                 {HILOS_UI[locale].nav}
               </HomeHardLink>
               <HomeHardLink href="/?capa=me-pregunto#mapa" className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">

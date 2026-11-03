@@ -77,6 +77,7 @@ export function MePreguntoPanel({
         <DejarPregunta
           locale={locale}
           onCancel={() => setDejando(false)}
+          onVolver={onClose}
           onSent={() => {
             setEnviada(true);
             onEnviada?.(true);
@@ -137,7 +138,17 @@ export function MePreguntoPanel({
   );
 }
 
-function DejarPregunta({ locale, onCancel, onSent }: { locale: AlmaLocale; onCancel: () => void; onSent?: () => void }) {
+function DejarPregunta({
+  locale,
+  onCancel,
+  onVolver,
+  onSent,
+}: {
+  locale: AlmaLocale;
+  onCancel: () => void;
+  onVolver: () => void;
+  onSent?: () => void;
+}) {
   const { t } = useHomeLocale();
   const copy = ME_PREGUNTO_UI[locale];
   const [texto, setTexto] = useState('');
@@ -209,7 +220,18 @@ function DejarPregunta({ locale, onCancel, onSent }: { locale: AlmaLocale; onCan
         <p>{copy.graciasTexto}</p>
         <div className="cortina-formatos">
           <HomeHardLink className="cortina-formato" href="/#historias">{t.navTellStory}</HomeHardLink>
-          <HomeHardLink className="cortina-formato" href="/#cintas">{HILOS_UI[locale].nav}</HomeHardLink>
+          <HomeHardLink
+            className="cortina-formato"
+            href="/#cintas"
+            onClick={(event) => {
+              // Ya estamos dentro de las cintas: el ancla no haría nada. Se vuelve a los temas.
+              event.preventDefault();
+              onVolver();
+              document.getElementById('cintas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+          >
+            {HILOS_UI[locale].nav}
+          </HomeHardLink>
           <HomeHardLink className="cortina-formato" href="/?capa=me-pregunto#mapa">{t.modalBackToMap}</HomeHardLink>
         </div>
       </div>
