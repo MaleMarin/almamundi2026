@@ -2380,8 +2380,10 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
 .me-pregunto-dejar,
 .me-pregunto-enviar {
   margin: 4px 0 18px;
-  background: var(--cortina-texto, #fff);
-  color: var(--cortina-fondo, #3c4655);
+  background: #fff;
+  border-color: #fff;
+  /* Me pregunto tiene fondo multicolor: el texto del botón va en gris fijo para que siempre se lea. */
+  color: #3c4655 !important;
 }
 .me-pregunto-form {
   margin: 4px 0 24px;
