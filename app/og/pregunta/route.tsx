@@ -22,7 +22,7 @@ export async function GET(req: Request) {
   const texto = persona?.texto ?? pregunta?.texto.es ?? '¿Qué historia guardas que nadie te ha preguntado?';
   const temaNombre = persona
     ? lugar
-      ? `Alguien en ${lugar} pregunta`
+      ? `Alguien en ${lugar}, pregunta`
       : 'Alguien pregunta'
     : tema?.nombre.es ?? 'Preguntas para ti';
   const pie = persona ? 'Respóndela tú en almamundi.org' : 'Tenemos una pregunta para ti · almamundi.org';
