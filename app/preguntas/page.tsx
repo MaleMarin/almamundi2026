@@ -1,4 +1,7 @@
 import type { Metadata } from 'next';
+import { getAdminDb } from '@/lib/firebase/admin';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { mePreguntaAprobada } from '@/lib/me-pregunto/server';
 import { cookies } from 'next/headers';
 import { PreguntasClient } from '@/components/hilos/PreguntasClient';
 import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
@@ -23,7 +26,9 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const jar = await cookies();
   const locale = parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
   const copy = HILOS_UI[locale];
-  const title = `${copy.ceja} · AlmaMundi`;
+  const persona = esMePreguntaId(pedido) ? await mePreguntaAprobada(getAdminDb(), pedido).catch(() => null) : null;
+  const title = persona ? `${persona.texto} · AlmaMundi` : `${copy.ceja} · AlmaMundi`;
+  const description = persona ? ME_PREGUNTO_UI[locale].bajada : copy.bajada;
   const image = {
     url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio',
     width: 1200,
@@ -32,10 +37,10 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   };
   return {
     title: { absolute: title },
-    description: copy.bajada,
+    description,
     openGraph: {
       title,
-      description: copy.bajada,
+      description,
       url: pedido ? `/preguntas?p=${encodeURIComponent(pedido)}` : '/preguntas',
       type: 'website',
       locale: PUBLIC_OG_LOCALE[locale],
@@ -45,7 +50,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     twitter: {
       card: 'summary_large_image',
       title,
-      description: copy.bajada,
+      description,
       images: [image.url],
     },
   };

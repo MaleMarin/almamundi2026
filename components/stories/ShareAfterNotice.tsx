@@ -76,6 +76,8 @@ type SharePacket = { url: string; text: string; social: string };
 function sinEnlace(texto: string, url: string, nombrar = true): string {
   const sin = texto.split(url).join('').replace(/[\s:]+$/, '').trim();
   if (!nombrar) return /[.?!]$/.test(sin) ? sin : `${sin}.`;
+  // «Respóndela tú en» ya trae la preposición.
+  if (/\s(en|em|at)$/.test(sin)) return `${sin} almamundi.org`;
   return /[?!.]$/.test(sin) ? `${sin} almamundi.org` : `${sin} en almamundi.org`;
 }
 

@@ -43,7 +43,7 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'Me pregunto',
     titulo: 'Me gustaría saber de ti',
     respondeAqui: 'Respóndele aquí',
-    bajada: 'Cada pregunta la dejó alguien que quiere conocer tu experiencia. Elige una y cuéntale lo tuyo. Si nos dejó su correo, le avisaremos cuando publiquemos tu respuesta.',
+    bajada: 'Cada pregunta la dejó alguien que quiere conocer tu experiencia. Elige una y cuéntale lo tuyo.',
     invitaDejar: '¿Tú también quieres saber algo de otras personas? Deja tu pregunta.',
     dejar: 'Dejar mi pregunta',
     vacio: 'Sé la primera persona en dejar una pregunta.',
@@ -65,9 +65,9 @@ export const ME_PREGUNTO_UI: Record<
     consentAdulto: 'Soy mayor de 18 años, o adulto responsable o representante de una institución.',
     consentPublicar: 'Autorizo que mi pregunta y mi nombre o alias se publiquen en AlmaMundi.',
     graciasRespuesta:
-      'Una persona del equipo la leerá antes de publicarla. Cuando se publique, le avisaremos a quien hizo la pregunta. Mientras tanto, ¿te animas con otra?',
+      'Una persona del equipo la leerá antes de publicarla. Cuando la publiquemos, quien dejó la pregunta recibirá un correo de AlmaMundi para leerla.',
     respuestaDe: (alias, lugar) => `Respuesta a una pregunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (pregunta) => `Respondí una pregunta que alguien dejó en AlmaMundi: ${pregunta} ¿Qué responderías tú?`,
+    compartir: (pregunta) => `Respondí una pregunta que alguien dejó en AlmaMundi: ${pregunta} Respóndela tú en`,
     errores: {
       question_required: 'Escribe tu pregunta (al menos 8 caracteres).',
       question_too_long: 'La pregunta puede tener hasta 140 caracteres.',
@@ -88,7 +88,7 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'Me pergunto',
     titulo: 'Eu gostaria de saber de você',
     respondeAqui: 'Responda aqui',
-    bajada: 'Cada pergunta foi deixada por alguém que quer conhecer a sua experiência. Escolha uma e conte a sua. Se essa pessoa deixou o e-mail, vamos avisá-la quando publicarmos a sua resposta.',
+    bajada: 'Cada pergunta foi deixada por alguém que quer conhecer a sua experiência. Escolha uma e conte a sua.',
     invitaDejar: 'Você também quer saber algo de outras pessoas? Deixe a sua pergunta.',
     dejar: 'Deixar minha pergunta',
     vacio: 'Seja a primeira pessoa a deixar uma pergunta.',
@@ -110,9 +110,9 @@ export const ME_PREGUNTO_UI: Record<
     consentAdulto: 'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição.',
     consentPublicar: 'Autorizo que minha pergunta e meu nome ou apelido sejam publicados no AlmaMundi.',
     graciasRespuesta:
-      'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando for publicada, avisaremos quem fez a pergunta. Enquanto isso, que tal outra?',
+      'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando a publicarmos, quem deixou a pergunta vai receber um e-mail do AlmaMundi para lê-la.',
     respuestaDe: (alias, lugar) => `Resposta a uma pergunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (pergunta) => `Respondi uma pergunta que alguém deixou no AlmaMundi: ${pergunta} O que você responderia?`,
+    compartir: (pergunta) => `Respondi uma pergunta que alguém deixou no AlmaMundi: ${pergunta} Responda você também em`,
     errores: {
       question_required: 'Escreva sua pergunta (pelo menos 8 caracteres).',
       question_too_long: 'A pergunta pode ter até 140 caracteres.',
@@ -133,7 +133,7 @@ export const ME_PREGUNTO_UI: Record<
     capa: 'I wonder',
     titulo: 'I’d love to hear from you',
     respondeAqui: 'Answer here',
-    bajada: 'Each question was left by someone who wants to hear about your experience. Pick one and tell them yours. If they left their email, we will let them know when we publish your answer.',
+    bajada: 'Each question was left by someone who wants to hear about your experience. Pick one and tell them yours.',
     invitaDejar: 'Do you also want to know something from other people? Leave your question.',
     dejar: 'Leave my question',
     vacio: 'Be the first person to leave a question.',
@@ -155,9 +155,9 @@ export const ME_PREGUNTO_UI: Record<
     consentAdulto: 'I am 18 or older, or a responsible adult or institutional representative.',
     consentPublicar: 'I authorize my question and my name or alias to be published on AlmaMundi.',
     graciasRespuesta:
-      "Someone on our team will read it before it's published. Once it is, we'll let the person who asked know. Meanwhile, up for another one?",
+      "Someone on our team will read it before it's published. Once we publish it, the person who asked will get an email from AlmaMundi to read it.",
     respuestaDe: (alias, lugar) => `Answer to a question from ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (question) => `I answered a question someone left on AlmaMundi: ${question} What would you answer?`,
+    compartir: (question) => `I answered a question someone left on AlmaMundi: ${question} Answer it yourself at`,
     errores: {
       question_required: 'Write your question (at least 8 characters).',
       question_too_long: 'The question can be up to 140 characters.',

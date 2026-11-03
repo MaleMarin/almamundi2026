@@ -453,8 +453,10 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
         ceja={home.cejaInspira}
         titulo={home.inspiraTitulo}
         tituloFuerte={home.inspiraFuerte}
+        cita={home.inspiraCita}
         bajada={home.bajadaInspira}
         bajadaTactil={home.bajadaInspiraTactil}
+        bajadaFuerte={home.inspiraLlamada}
         bajadaEnDosLineas
       />
       <div className="home-capitulo-ancho">
