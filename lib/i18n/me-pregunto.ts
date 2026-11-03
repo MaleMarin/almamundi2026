@@ -150,6 +150,9 @@ export const ME_PREGUNTO_MAPA: Record<
   AlmaLocale,
   {
     titulo: string;
+    intro: string;
+    vacio: string;
+    ir: string;
     buscar: string;
     cuantas: (n: number) => string;
     primera: string;
@@ -160,6 +163,9 @@ export const ME_PREGUNTO_MAPA: Record<
 > = {
   es: {
     titulo: 'Respuestas de Me pregunto',
+    intro: 'Preguntas que dejó la gente y lo que respondieron personas de todo el mundo.',
+    vacio: 'Aquí aparecerán las preguntas de la gente y sus respuestas. ¿Te animas a dejar la primera?',
+    ir: 'Ir a Me pregunto…',
     buscar: 'Buscar una pregunta',
     cuantas: (n) => (n === 1 ? '1 respuesta' : `${n} respuestas`),
     primera: 'Sé la primera persona en responder',
@@ -169,6 +175,9 @@ export const ME_PREGUNTO_MAPA: Record<
   },
   pt: {
     titulo: 'Respostas de Me pergunto',
+    intro: 'Perguntas deixadas pelas pessoas e o que responderam pessoas do mundo todo.',
+    vacio: 'Aqui vão aparecer as perguntas das pessoas e suas respostas. Que tal deixar a primeira?',
+    ir: 'Ir para Me pergunto…',
     buscar: 'Buscar uma pergunta',
     cuantas: (n) => (n === 1 ? '1 resposta' : `${n} respostas`),
     primera: 'Seja a primeira pessoa a responder',
@@ -178,6 +187,9 @@ export const ME_PREGUNTO_MAPA: Record<
   },
   en: {
     titulo: 'Answers from I wonder',
+    intro: 'Questions people left and what people from all over the world answered.',
+    vacio: 'Questions from people and their answers will appear here. Want to leave the first one?',
+    ir: 'Go to I wonder…',
     buscar: 'Search a question',
     cuantas: (n) => (n === 1 ? '1 answer' : `${n} answers`),
     primera: 'Be the first person to answer',

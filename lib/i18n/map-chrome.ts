@@ -35,6 +35,7 @@ export type MapChrome = {
   radio: string;
   lluvia: string;
   mercado: string;
+  bosque: string;
 };
 
 const es: MapChrome = {
@@ -72,6 +73,7 @@ const es: MapChrome = {
   radio: 'Radio',
   lluvia: 'Lluvia',
   mercado: 'Mercado',
+  bosque: 'Bosque',
 };
 
 const pt: MapChrome = {
@@ -109,6 +111,7 @@ const pt: MapChrome = {
   radio: 'Rádio',
   lluvia: 'Chuva',
   mercado: 'Mercado',
+  bosque: 'Floresta',
 };
 
 const en: MapChrome = {
@@ -146,6 +149,7 @@ const en: MapChrome = {
   radio: 'Radio',
   lluvia: 'Rain',
   mercado: 'Market',
+  bosque: 'Forest',
 };
 
 const COPY: Record<AlmaLocale, MapChrome> = { es, pt, en };

@@ -15,6 +15,7 @@ const AMBIENT_OPTS = [
   { id: 'radio' as const, label: 'Radio', desc: '', place: 'Radio', country: '' },
   { id: 'lluvia' as const, label: 'Lluvia', desc: '', place: 'Lluvia', country: '' },
   { id: 'mercado' as const, label: 'Mercado', desc: '', place: 'Mercado', country: '' },
+  { id: 'bosque' as const, label: 'Bosque', desc: '', place: 'Bosque', country: '' },
 ];
 
 type SoundRowMood = (typeof AMBIENT_OPTS)[number];
@@ -167,6 +168,7 @@ export function SoundsPanel({
     radio: copy.radio,
     lluvia: copy.lluvia,
     mercado: copy.mercado,
+    bosque: copy.bosque,
   };
   const soundCopy = {
     es: { on: 'Encendido', off: 'Apagado' },

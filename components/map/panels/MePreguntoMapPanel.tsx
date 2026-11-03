@@ -74,6 +74,7 @@ export function MePreguntoMapPanel({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
+      <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-white/75">{copy.intro}</p>
       <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
         <Search size={16} className="text-[#FF6E49]" aria-hidden />
         <span className="sr-only">{copy.buscar}</span>
@@ -87,10 +88,16 @@ export function MePreguntoMapPanel({
           className="w-full bg-transparent text-[length:var(--fs-pequeno)] text-white outline-none placeholder:text-white/50"
         />
       </label>
-      {grupos.length === 0 ? (
-        <p className="m-0 rounded-2xl border border-white/15 bg-white/5 p-5 text-center text-[length:var(--fs-pequeno)] text-white/80">
-          {ui.vacio}
-        </p>
+      {grupos.length === 0 && !query.trim() ? (
+        <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 text-center">
+          <p className="m-0 text-[length:var(--fs-pequeno)] leading-snug text-white/85">{copy.vacio}</p>
+          <Link
+            href="/preguntas?p=me-pregunto"
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-[length:var(--fs-etiqueta)] font-semibold text-[#3C4655] no-underline"
+          >
+            {copy.ir}
+          </Link>
+        </div>
       ) : null}
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
         {visibles.map(({ pregunta, respuestas: lista }) => {
