@@ -2062,7 +2062,7 @@ a.cinta-pill {
   background-size: 14px 14px;
 }
 
-.cortina-detras .cortina-form button:not(.cortina-opcion):not(.btn-am-principal) {
+.cortina-detras .cortina-form button:not(.cortina-opcion):not(.btn-am-principal):not(.me-pregunto-enviar) {
   color: var(--cortina-texto, #fff) !important;
   border-color: var(--cortina-texto, #fff) !important;
 }
