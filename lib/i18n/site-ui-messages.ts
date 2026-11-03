@@ -99,6 +99,7 @@ export type SiteUiMessages = {
   modalReceivedAnonBefore: string;
   modalReceivedEmph: string;
   modalImprintAria: string;
+  modalListeningColors: string;
   modalDownloadImprint: string;
   modalShareImprint: string;
   modalShareCopied: string;
@@ -216,6 +217,7 @@ const es: SiteUiMessages = {
   modalReceivedAnonBefore: 'Tu historia llegó.',
   modalReceivedEmph: 'colores.',
   modalImprintAria: 'Tu relato en colores',
+  modalListeningColors: 'Escuchando tu historia para crear sus colores…',
   modalDownloadImprint: 'Descargar',
   modalShareImprint: 'Compartir',
   modalShareCopied: 'Imagen copiada. Puedes pegarla donde quieras.',
@@ -358,6 +360,7 @@ const pt: SiteUiMessages = {
   modalReceivedAnonBefore: 'Sua história chegou.',
   modalReceivedEmph: 'cores.',
   modalImprintAria: 'Seu relato em cores',
+  modalListeningColors: 'Ouvindo sua história para criar suas cores…',
   modalDownloadImprint: 'Baixar',
   modalShareImprint: 'Compartilhar',
   modalShareCopied: 'Imagem copiada. Você pode colar onde quiser.',
@@ -500,6 +503,7 @@ const en: SiteUiMessages = {
   modalReceivedAnonBefore: 'Your story arrived.',
   modalReceivedEmph: 'colors.',
   modalImprintAria: 'Your story in colors',
+  modalListeningColors: 'Listening to your story to create its colors…',
   modalDownloadImprint: 'Download',
   modalShareImprint: 'Share',
   modalShareCopied: 'Image copied. You can paste it wherever you like.',

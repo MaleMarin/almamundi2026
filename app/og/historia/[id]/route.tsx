@@ -15,7 +15,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const { id } = await params;
   const story = await getStoryByIdAsync(id).catch(() => null);
   const title = (story?.title || story?.label || '').trim();
-  const units = resonanceStripeUnits({
+  const units = story?.huellaUnits?.length ? story.huellaUnits : resonanceStripeUnits({
     storyId: id,
     text: story?.body || story?.excerpt || title || id,
     locale: 'es',

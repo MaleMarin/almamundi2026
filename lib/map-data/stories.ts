@@ -64,6 +64,8 @@ export type StoryPoint = {
   onGlobe?: boolean;
   /** Cuatro colores de la cinta, en hex. Si faltan, se calculan al leer. */
   cintaColors?: string[];
+  /** Imagen de cintas calculada al recibir (con la transcripción de audio y video). */
+  huellaUnits?: { hex: string; width: number }[];
 };
 
 export function getStories(): StoryPoint[] {

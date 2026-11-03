@@ -92,7 +92,22 @@ export type DrawVadResonanceArgs = {
    * solo acerca poco a poco el color. Ausente = cinta del día de publicar.
    */
   ecoVad?: (VadTriple & { n: number }) | null;
+  /** Franjas ya calculadas en el servidor (p. ej. con la transcripción de un audio o video). */
+  units?: { hex: string; width: number }[] | null;
 };
+
+/** Valida franjas guardadas (hex y ancho) antes de dibujarlas. */
+export function franjasValidas(value: unknown): { hex: string; width: number }[] | null {
+  if (!Array.isArray(value) || value.length === 0 || value.length > 400) return null;
+  const out: { hex: string; width: number }[] = [];
+  for (const item of value) {
+    const hex = (item as { hex?: unknown })?.hex;
+    const width = Number((item as { width?: unknown })?.width);
+    if (typeof hex !== 'string' || hex.length > 40 || !Number.isFinite(width) || width <= 0 || width > 200) return null;
+    out.push({ hex, width });
+  }
+  return out;
+}
 
 function truncateCanvasLine(ctx: CanvasRenderingContext2D, text: string, maxW: number): string {
   if (ctx.measureText(text).width <= maxW) return text;
@@ -201,13 +216,14 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
   const hits = t > 0 && args.ecoVad ? blendHitsTowardVad(hitsBase, args.ecoVad, t) : hitsBase;
   const colored = expandSparseVadColors(colorizeVadHits(hits));
   const counts = colored.map((h) => h.count);
-  const units = orderForContrast(
+  const calculadas = orderForContrast(
     colored.map((h) => ({
       ...h,
       width: stripeWidthForCounts(h.count, counts, RESONANCE_STRIPE_MIN_PX, RESONANCE_STRIPE_MAX_PX),
       hex: hslCss(h.h, h.s, h.l),
     }))
   );
+  const units = franjasValidas(args.units) ?? calculadas;
 
   ctx.imageSmoothingEnabled = false;
   (ctx as CanvasRenderingContext2D & { webkitImageSmoothingEnabled?: boolean }).webkitImageSmoothingEnabled = false;

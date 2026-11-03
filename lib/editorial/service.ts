@@ -2,6 +2,7 @@
  * Servicio editorial canónico: publicar desde envíos y operaciones de moderación sobre `stories`.
  * Las rutas API (`/api/admin/publish`, `/api/curate/publish`, etc.) delegan aquí sin duplicar lógica Firestore.
  */
+import { franjasValidas } from "@/lib/huella/resonance-stripes";
 import "server-only";
 import type { CollectionReference, DocumentReference, Firestore } from "firebase-admin/firestore";
 import { FieldPath, FieldValue } from "firebase-admin/firestore";
@@ -110,6 +111,9 @@ function copyOptionalPublicFields(story: Record<string, unknown>, source: Record
   const questionId = resolveQuestionId(source.questionId);
   if (questionId) story.questionId = questionId;
   if (isQuestionMode(source.questionMode)) story.questionMode = source.questionMode;
+  // Imagen de cintas calculada con la transcripción de la voz (solo colores, nunca el texto).
+  const huella = franjasValidas(source.huellaUnits);
+  if (huella) story.huellaUnits = huella;
 }
 
 function coerceFiniteNumber(v: unknown): number | null {

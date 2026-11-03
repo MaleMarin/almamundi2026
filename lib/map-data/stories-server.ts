@@ -6,6 +6,7 @@
  * Índice compuesto requerido: stories (status IN audience_public + publishedAt DESC).
  * El globo muestra las 40 aprobadas más recientes con coordenadas, más las destacadas.
  */
+import { franjasValidas } from "@/lib/huella/resonance-stripes";
 import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
@@ -174,6 +175,7 @@ function firestoreDocToStoryPoint(
       content: [title, text].filter(Boolean).join("\n"),
       stored: d.cintaColors,
     }),
+    ...(franjasValidas(d.huellaUnits) ? { huellaUnits: franjasValidas(d.huellaUnits)! } : {}),
     ...accessibility,
   };
 

@@ -280,6 +280,8 @@ type ImprintDrawArgs = {
   locale: 'es' | 'pt' | 'en';
   city: string;
   country: string;
+  /** Franjas calculadas con la transcripción de la voz (audio y video). */
+  units?: { hex: string; width: number }[] | null;
 };
 
 function aliasForGreeting(alias: string, _locale: string): string {
@@ -298,7 +300,8 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     mediaBlob,
     locale,
     city,
-    country } = args;
+    country,
+    units } = args;
   canvas.width = RESONANCE_EXPORT_PX;
   canvas.height = RESONANCE_EXPORT_PX;
   const ctx = canvas.getContext('2d');
@@ -316,6 +319,7 @@ function drawImprintPreview(canvas: HTMLCanvasElement, args: ImprintDrawArgs): v
     storyId,
     text: content,
     locale,
+    units,
     footer: {
       at: receivedAt,
       title: storyTitle,
@@ -460,6 +464,9 @@ export function StoryModal({
   }, [mode, recording, previewUrl, mediaBlob]);
 
   const [imprintId, setImprintId] = useState('');
+  /** Audio y video: mientras se transcribe la voz para crear los colores. */
+  const [escuchando, setEscuchando] = useState(false);
+  const [imprintUnits, setImprintUnits] = useState<{ hex: string; width: number }[] | null>(null);
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const [imprintStoryTitle, setImprintStoryTitle] = useState('');
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1731,6 +1738,30 @@ export function StoryModal({
         city,
         country };
       setImprintStoryTitle(title);
+      setImprintUnits(null);
+      if ((mode === 'video' || mode === 'audio') && typeof data.id === 'string' && data.id) {
+        // Transcribe la voz para que los colores salgan de lo que se contó. Máximo 30 segundos.
+        setEscuchando(true);
+        const control = new AbortController();
+        const corte = window.setTimeout(() => control.abort(), 30_000);
+        void fetch('/api/transcribir', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: data.id }),
+          signal: control.signal,
+        })
+          .then((res) => (res.ok ? res.json() : { units: null }))
+          .then((json: { units?: { hex: string; width: number }[] | null }) => {
+            if (Array.isArray(json.units) && json.units.length) setImprintUnits(json.units);
+          })
+          .catch(() => undefined)
+          .finally(() => {
+            window.clearTimeout(corte);
+            setEscuchando(false);
+          });
+      } else {
+        setEscuchando(false);
+      }
       setImprintId(id);
       setImprintReceivedAt(new Date());
       clearStoryDraft();
@@ -1803,7 +1834,7 @@ export function StoryModal({
   ]);
 
   useEffect(() => {
-    if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId) return;
+    if (step !== 'received' || !imprintCanvasRef.current || !imprintReceivedAt || !imprintId || escuchando) return;
     const snap = imprintSnapRef.current;
     try {
       drawImprintPreview(imprintCanvasRef.current, {
@@ -1817,11 +1848,12 @@ export function StoryModal({
         mediaBlob: snap?.mediaBlob ?? null,
         locale,
         city: snap?.city ?? city,
-        country: snap?.country ?? country });
+        country: snap?.country ?? country,
+        units: imprintUnits });
     } catch (e) {
       console.error('[StoryModal] drawImprintPreview', e);
     }
-  }, [step, imprintId, imprintReceivedAt, imprintStoryTitle, mode, locale, city, country]);
+  }, [step, imprintId, imprintReceivedAt, imprintStoryTitle, mode, locale, city, country, escuchando, imprintUnits]);
 
   const flashShareNotice = useCallback((msg: string, ms = 2800) => {
     if (shareNoticeTimerRef.current) clearTimeout(shareNoticeTimerRef.current);
@@ -3059,9 +3091,15 @@ export function StoryModal({
               </div>
 
               <div className="mx-auto mt-4 aspect-square w-full shrink-0 overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[420px]">
+                  {escuchando ? (
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 px-6 text-center" role="status">
+                      <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-[#FF4A1C] border-t-transparent" aria-hidden />
+                      <p className="m-0 text-[length:var(--fs-pequeno)] text-[#5C5C52]">{t.modalListeningColors}</p>
+                    </div>
+                  ) : null}
                   <canvas
                     ref={imprintCanvasRef}
-                    className="block h-full w-full object-contain"
+                    className={escuchando ? 'hidden' : 'block h-full w-full object-contain'}
                     aria-label={t.modalImprintAria}
                   />
               </div>
@@ -3082,6 +3120,7 @@ export function StoryModal({
                 <div className="flex flex-col gap-2 md:flex-row">
                   <button
                     type="button"
+                    disabled={escuchando}
                     onClick={() => void downloadImprint()}
                     className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-[length:var(--fs-pequeno)] font-semibold md:flex-1"
                   >
@@ -3090,6 +3129,7 @@ export function StoryModal({
                   </button>
                   <button
                     type="button"
+                    disabled={escuchando}
                     onClick={() => void shareImprint()}
                     className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center gap-2 px-4 text-[length:var(--fs-pequeno)] font-medium md:flex-1"
                   >

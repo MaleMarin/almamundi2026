@@ -148,6 +148,7 @@ function StoryCard({
           /* Sin imagen: la misma imagen de cintas que la persona descargó al enviar su historia. */
           <CintaMini
             storyId={story.id}
+            units={story.huellaUnits}
             text={story.body || story.excerpt || story.description || story.title || story.label}
             locale={locale}
             className="h-full w-full object-cover"
