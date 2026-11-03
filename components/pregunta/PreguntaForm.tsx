@@ -630,11 +630,11 @@ function PreguntaFormInner({
       <div className="flex flex-col gap-2 text-[length:var(--fs-pequeno)]">
         <label className="flex items-start gap-2">
           <input type="checkbox" checked={adult} onChange={(event) => setAdult(event.target.checked)} className="mt-1" />
-          <span>{t.modalConsentAdult}</span>
+          <span>{copy.consentAdult[locale]}</span>
         </label>
         <label className="flex items-start gap-2">
           <input type="checkbox" checked={publish} onChange={(event) => setPublish(event.target.checked)} className="mt-1" />
-          <span>{t.modalConsentPublish}</span>
+          <span>{copy.consentPublish[locale]}</span>
         </label>
         <label className="flex items-start gap-2">
           <input type="checkbox" checked={terms} onChange={(event) => setTerms(event.target.checked)} className="mt-1" />

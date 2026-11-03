@@ -14,6 +14,16 @@ export const PREGUNTA_COPY = {
     pt: 'A pergunta da semana',
     en: "This week's question",
   },
+  consentAdult: {
+    es: 'Soy mayor de 18 años, o adulto responsable o representante de una institución, y tengo autorización de quienes aparecen en mi respuesta.',
+    pt: 'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição, e tenho autorização de quem aparece na minha resposta.',
+    en: 'I am 18 or older, or a responsible adult or institutional representative, and I have permission from the people who appear in my answer.',
+  },
+  consentPublish: {
+    es: 'Autorizo que mi respuesta y mi nombre o alias se publiquen en AlmaMundi.',
+    pt: 'Autorizo que minha resposta e meu nome ou apelido sejam publicados no AlmaMundi.',
+    en: 'I authorize my answer and my name or alias to be published on AlmaMundi.',
+  },
   submit: {
     es: 'Enviar mi respuesta',
     pt: 'Enviar minha resposta',
