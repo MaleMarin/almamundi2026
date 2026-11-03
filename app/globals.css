@@ -2213,6 +2213,38 @@ a.cortina-formato:visited {
   outline-offset: 3px;
 }
 
+.cortina-te-preguntan {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(100%, 1080px);
+  margin: 20px auto 8px;
+  padding: 16px 24px;
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  background:
+    linear-gradient(#fff, #fff) padding-box,
+    conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000) border-box;
+  color: #3c4655;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(60, 70, 85, 0.12);
+}
+.cortina-te-preguntan i {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000);
+}
+.cortina-te-preguntan:hover { box-shadow: 0 8px 24px rgba(60, 70, 85, 0.2); }
+.cortina-te-preguntan:focus-visible { outline: 3px solid #b8340f; outline-offset: 3px; }
+
 .cortina-azar {
   margin-top: 4px;
   padding: 2px 0;
@@ -2407,4 +2439,10 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   background: conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000) !important;
   border: 0 !important;
   box-shadow: none !important;
+}
+
+/* Menú del globo: «Historias contadas» es el principal (las historias del hero). */
+.map-dock-line button:has(.map-dock-legend__dot--story) {
+  border: 1.5px solid #ff4a1c !important;
+  font-size: 1.05em;
 }

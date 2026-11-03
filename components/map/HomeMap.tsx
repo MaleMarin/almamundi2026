@@ -37,7 +37,7 @@ import {
 import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
-import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { esMePreguntaId, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import { MePreguntoMapPanel } from '@/components/map/panels/MePreguntoMapPanel';
 import { BITS_DATA } from '@/lib/bits-data';
@@ -1104,20 +1104,20 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'respuestas'}
-                title={HILOS_UI[locale].leyenda}
+                title={ME_PREGUNTO_MAPA[locale].dockAlmaMundi}
                 onClick={() => onGlobeLayerPill('respuestas', 'respuestas')}
               >
                 <i className="map-dock-legend__dot map-dock-legend__dot--answer" aria-hidden />
-                {HILOS_UI[locale].leyenda}
+                {ME_PREGUNTO_MAPA[locale].dockAlmaMundi}
               </PillNavButton>
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'mepregunto'}
-                title={ME_PREGUNTO_UI[locale].capa}
+                title={ME_PREGUNTO_MAPA[locale].titulo}
                 onClick={() => onGlobeLayerPill('mepregunto', 'respuestas')}
               >
                 <i className="map-dock-legend__dot map-dock-legend__dot--me" aria-hidden />
-                {ME_PREGUNTO_UI[locale].capa}
+                {ME_PREGUNTO_MAPA[locale].titulo}
               </PillNavButton>
             </div>
             <div className="map-dock-line">

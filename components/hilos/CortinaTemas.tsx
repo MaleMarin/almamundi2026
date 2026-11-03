@@ -61,6 +61,7 @@ const ME_HILO = {
 } as unknown as Hilo;
 const TEMAS: Hilo[] = [...HILOS, ME_HILO];
 const ME_INDICE = TEMAS.length - 1;
+const SIN_CINTAS_ME = true;
 
 /** Rayas de la cinta multicolor: seis colores de los temas. */
 const MULTI = ['#FFD000', '#FF1A1A', '#FF0A8A', '#7A12E0', '#0047FF', '#00B140'];
@@ -314,7 +315,8 @@ export function CortinaTemas({
       }
       // «Me pregunto…»: pocas cintas multicolor, repartidas a lo ancho y un poco más anchas.
       const puntos = ancho < 640 ? [0.25, 0.75] : [0.17, 0.5, 0.83];
-      for (const punto of puntos) {
+      // Las preguntas de las personas ya no son cintas de la cortina: se abren con el botón ancho «Te preguntan».
+      for (const punto of SIN_CINTAS_ME ? [] : puntos) {
         const meta = ancho * punto;
         let mejor = 0;
         cintas.forEach((cinta, i) => {
@@ -823,7 +825,7 @@ export function CortinaTemas({
       </div>
       {temaId || capitulo ? null : <p className="cortina-pista">{copy.pista}</p>}
       <div className={capitulo ? 'cortina-leyenda cortina-leyenda-teclado' : 'cortina-leyenda'}>
-        {TEMAS.map((hiloTema, indice) => (
+        {TEMAS.map((hiloTema, indice) => indice === ME_INDICE ? null : (
           <button
             key={hiloTema.id}
             type="button"
@@ -854,6 +856,12 @@ export function CortinaTemas({
           </button>
         ))}
       </div>
+      {temaId ? null : (
+        <button type="button" className="cortina-te-preguntan" onClick={() => verTema(ME_INDICE)}>
+          <i aria-hidden />
+          {ME_PREGUNTO_UI[locale].botonTePreguntan}
+        </button>
+      )}
       {capitulo ? null : (
         <button
           type="button"

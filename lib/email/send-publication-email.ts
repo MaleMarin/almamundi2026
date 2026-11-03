@@ -43,12 +43,13 @@ function publicationCopy(locale: AlmaLocale) {
       hello: (name: string) => (name ? `Olá, ${name}:` : "Olá:"),
       subject: (title: string) => `Sua história “${title}” já está no AlmaMundi`,
       lead: (title: string, where: string) => {
-        const base = `Sua história “${title}” já está publicada no mapa do AlmaMundi`;
-        const located = where ? `${base}, em ${where}` : base;
-        return `${located}. A partir de hoje, qualquer pessoa que visite o site pode vê-la.`;
+        void where;
+        return `Sua história “${title}” já está no mapa do AlmaMundi, junto às histórias que outras pessoas contaram.`;
       },
+      find: (title: string) =>
+        `O botão abaixo leva você direto a ela. Se mais adiante quiser encontrá-la de novo, entre em almamundi.org, desça até o mapa e toque em “Buscar uma história”. Ali você pode escrever o título, “${title}”, ou algumas palavras do que contou.`,
       share: "Se quiser, compartilhe com quem você escolher.",
-      see: "Ver minha história",
+      see: "Ver minha história no mapa",
       another: "Conte outra história",
       thanks: "Agradecemos por contá-la.<br>Equipe AlmaMundi",
       thanksText: "Agradecemos por contá-la.",
@@ -62,12 +63,13 @@ function publicationCopy(locale: AlmaLocale) {
       hello: (name: string) => (name ? `Hi ${name},` : "Hi,"),
       subject: (title: string) => `Your story “${title}” is now on AlmaMundi`,
       lead: (title: string, where: string) => {
-        const base = `Your story “${title}” is now published on the AlmaMundi map`;
-        const located = where ? `${base}, in ${where}` : base;
-        return `${located}. Starting today, anyone who visits the site can see it.`;
+        void where;
+        return `Your story “${title}” is now on the AlmaMundi map, alongside the stories other people have told.`;
       },
+      find: (title: string) =>
+        `The button below takes you straight to it. If you want to find it again later, go to almamundi.org, scroll down to the map and tap “Search a story”. There you can type its title, “${title}”, or a few words from what you told.`,
       share: "If you'd like, share it with anyone you choose.",
-      see: "See my story",
+      see: "See my story on the map",
       another: "Tell another story",
       thanks: "Thank you for telling it.<br>The AlmaMundi team",
       thanksText: "Thank you for telling it.",
@@ -80,12 +82,13 @@ function publicationCopy(locale: AlmaLocale) {
     hello: (name: string) => (name ? `Hola, ${name}:` : "Hola:"),
     subject: (title: string) => `Tu historia «${title}» ya está en AlmaMundi`,
     lead: (title: string, where: string) => {
-      const base = `Tu historia «${title}» ya está publicada en el mapa de AlmaMundi`;
-      const located = where ? `${base}, en ${where}` : base;
-      return `${located}. Desde hoy, cualquier persona que visite el sitio puede verla.`;
+      void where;
+      return `Tu historia «${title}» ya está en el mapa de AlmaMundi, junto a las historias que han contado otras personas.`;
     },
+    find: (title: string) =>
+      `El botón de abajo te lleva directo a ella. Si más adelante quieres volver a encontrarla, entra a almamundi.org, baja al mapa y toca «Buscar una historia». Ahí puedes escribir su título, «${title}», o algunas palabras de lo que contaste.`,
     share: "Si quieres, compártela con quien tú elijas.",
-    see: "Ver mi historia",
+    see: "Ver mi historia en el mapa",
     another: "Contar otra historia",
     thanks: "Gracias por contarla.<br>Equipo AlmaMundi",
     thanksText: "Gracias por contarla.",
@@ -143,11 +146,14 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     "",
     publishedLead(title, params.placeName, locale),
     "",
+    copy.find(title),
+    "",
+    `${copy.see}: ${storyUrl}`,
+    "",
     copy.share,
     "",
     share.text,
     "",
-    `${copy.see}: ${storyUrl}`,
     `WhatsApp: ${share.whatsapp}`,
     `Facebook: ${share.facebook}`,
     `X: ${share.x}`,
@@ -176,8 +182,9 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const bodyHtml = `
       ${greetingHtml(copy.hello(authorName))}
       ${paragraphHtml(lead)}
-      ${paragraphHtml(copy.share, "0 0 28px")}
+      ${paragraphHtml(escapeHtml(copy.find(title)))}
       ${primaryButtonHtml(copy.see, historiasUrl)}
+      ${paragraphHtml(copy.share, "28px 0 28px")}
       ${primaryButtonHtml("WhatsApp", share.whatsapp)}
       ${primaryButtonHtml("Facebook", share.facebook)}
       ${primaryButtonHtml("X", share.x)}

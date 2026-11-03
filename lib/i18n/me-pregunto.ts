@@ -4,6 +4,8 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 export const ME_PREGUNTO_UI: Record<
   AlmaLocale,
   {
+    navTePreguntan: string;
+    botonTePreguntan: string;
     nombre: string;
     capa: string;
     bajada: string;
@@ -33,6 +35,8 @@ export const ME_PREGUNTO_UI: Record<
 > = {
   es: {
     nombre: 'Me pregunto…',
+    navTePreguntan: 'Te preguntan',
+    botonTePreguntan: 'Personas de distintos lugares quieren conocer tu experiencia. Mira lo que te preguntan.',
     capa: 'Me pregunto',
     bajada: 'Preguntas que dejan personas de todo el mundo. Responde la que te llame o deja una nueva.',
     dejar: 'Dejar mi pregunta',
@@ -73,6 +77,8 @@ export const ME_PREGUNTO_UI: Record<
   },
   pt: {
     nombre: 'Me pergunto…',
+    navTePreguntan: 'Te perguntam',
+    botonTePreguntan: 'Pessoas de diferentes lugares querem conhecer a sua experiência. Veja o que te perguntam.',
     capa: 'Me pergunto',
     bajada: 'Perguntas deixadas por pessoas do mundo todo. Responda a que chamar sua atenção ou deixe uma nova.',
     dejar: 'Deixar minha pergunta',
@@ -113,6 +119,8 @@ export const ME_PREGUNTO_UI: Record<
   },
   en: {
     nombre: 'I wonder…',
+    navTePreguntan: 'They ask you',
+    botonTePreguntan: 'People from different places want to hear about your experience. See what they ask you.',
     capa: 'I wonder',
     bajada: 'Questions left by people from all over the world. Answer the one that calls you or leave a new one.',
     dejar: 'Leave my question',
@@ -157,6 +165,7 @@ export const ME_PREGUNTO_UI: Record<
 export const ME_PREGUNTO_MAPA: Record<
   AlmaLocale,
   {
+    dockAlmaMundi: string;
     titulo: string;
     intro: string;
     vacio: string;
@@ -176,7 +185,8 @@ export const ME_PREGUNTO_MAPA: Record<
   }
 > = {
   es: {
-    titulo: 'Respuestas de Me pregunto',
+    titulo: 'Respuestas a lo que preguntan las personas',
+    dockAlmaMundi: 'Respuestas a las preguntas de AlmaMundi',
     intro: 'Preguntas que dejaron personas de todo el mundo y lo que otras personas respondieron.',
     vacio: 'Aquí aparecerán las preguntas de las personas y sus respuestas. ¿Te animas a dejar la primera?',
     ir: 'Ir a Me pregunto…',
@@ -194,7 +204,8 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEnMapa: 'Responder en el mapa',
   },
   pt: {
-    titulo: 'Respostas de Me pergunto',
+    titulo: 'Respostas ao que as pessoas perguntam',
+    dockAlmaMundi: 'Respostas às perguntas do AlmaMundi',
     intro: 'Perguntas deixadas pelas pessoas e o que responderam pessoas do mundo todo.',
     vacio: 'Aqui vão aparecer as perguntas das pessoas e suas respostas. Que tal deixar a primeira?',
     ir: 'Ir para Me pergunto…',
@@ -212,7 +223,8 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEnMapa: 'Responder no mapa',
   },
   en: {
-    titulo: 'Answers from I wonder',
+    titulo: 'Answers to what people ask',
+    dockAlmaMundi: 'Answers to AlmaMundi’s questions',
     intro: 'Questions people left and what people from all over the world answered.',
     vacio: 'Questions from people and their answers will appear here. Want to leave the first one?',
     ir: 'Go to I wonder…',

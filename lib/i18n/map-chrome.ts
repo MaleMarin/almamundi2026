@@ -40,7 +40,7 @@ export type MapChrome = {
 
 const es: MapChrome = {
   dockAria: 'Capas y herramientas del mapa',
-  stories: 'Historias de vida',
+  stories: 'Historias contadas',
   storiesOn: 'Historias visibles. Clic para ver la lista o apagar la capa.',
   storiesOff: 'Mostrar historias en el globo',
   surprise: 'Sorpréndeme',
@@ -78,7 +78,7 @@ const es: MapChrome = {
 
 const pt: MapChrome = {
   dockAria: 'Camadas e ferramentas do mapa',
-  stories: 'Histórias de vida',
+  stories: 'Histórias contadas',
   storiesOn: 'Histórias visíveis. Clique para ver a lista ou desligar a camada.',
   storiesOff: 'Mostrar histórias no globo',
   surprise: 'Surpreenda-me',
@@ -116,7 +116,7 @@ const pt: MapChrome = {
 
 const en: MapChrome = {
   dockAria: 'Map layers and tools',
-  stories: 'Life stories',
+  stories: 'Stories told',
   storiesOn: 'Stories are visible. Click to see the list or turn the layer off.',
   storiesOff: 'Show stories on the globe',
   surprise: 'Surprise me',

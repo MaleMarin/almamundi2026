@@ -249,7 +249,7 @@ const es: StoryFlowMessages = {
   modalFieldAgeMissing: 'Falta la edad.',
   modalFieldEmailMissing: 'Falta un correo válido.',
   modalReviewInProgress:
-    'Una persona del equipo la leerá antes de publicarla. Si nos dejaste tu correo, te avisaremos cuando aparezca en el mapa.',
+    'Una persona del equipo la leerá antes de publicarla. Cuando la publiquemos, aparecerá en el mapa junto a las demás historias contadas. Te avisaremos por correo.',
   modalSaveImage: 'Guardar imagen',
   modalShareTextShort:
     'Hay historias que no se pierden en el scroll. Acabo de contar la mía en AlmaMundi. ¿Y tú, qué historia guardas? https://www.almamundi.org/contar',
@@ -397,7 +397,7 @@ const pt: StoryFlowMessages = {
   modalAnotherCtaTexto: 'Conte outra história',
   modalAnotherFormatLink: 'ou conte em outro formato',
   modalReviewInProgress:
-    'Uma pessoa da equipe vai lê-la antes de publicá-la. Se você deixou seu e-mail, vamos te avisar quando ela aparecer no mapa.',
+    'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando a publicarmos, ela aparecerá no mapa junto às outras histórias contadas. Vamos te avisar por e-mail.',
   modalSectionYourStory: 'Sua história',
   modalSectionAbout: 'Sobre você',
   modalSectionWhere: 'Onde você está e como avisar você',
@@ -558,7 +558,7 @@ const en: StoryFlowMessages = {
   modalAnotherCtaTexto: 'Tell another story',
   modalAnotherFormatLink: 'or tell it in another format',
   modalReviewInProgress:
-    "Someone on our team will read it before it's published. If you left your email, we'll let you know when it appears on the map.",
+    "Someone on our team will read it before it's published. Once we publish it, it will appear on the map alongside the other stories told. We'll let you know by email.",
   modalSectionYourStory: 'Your story',
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',
