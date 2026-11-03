@@ -26,19 +26,19 @@ import {
 
 const NOTICE = {
   es: {
-    title: 'Compartir con cuidado',
+    title: 'Compartir con cariño',
     body: 'Alguien decidió contar esta historia en AlmaMundi. Si la compartes, que viaje con el mismo respeto con que fue contada.',
     share: 'Compartir',
     back: 'Volver',
   },
   pt: {
-    title: 'Compartilhar com cuidado',
+    title: 'Compartilhar com carinho',
     body: 'Alguém decidiu contar esta história no AlmaMundi. Se você a compartilhar, que ela viaje com o mesmo respeito com que foi contada.',
     share: 'Compartilhar',
     back: 'Voltar',
   },
   en: {
-    title: 'Share with care',
+    title: 'Share with love',
     body: 'Someone chose to tell this story on AlmaMundi. If you share it, let it travel with the same respect it was told with.',
     share: 'Share',
     back: 'Go back',
@@ -69,18 +69,28 @@ type ShareAfterNoticeProps = {
 
 type SharePacket = { url: string; text: string; social: string };
 
+/**
+ * Instagram y TikTok: el enlace ahí no se puede tocar. Se cambia por «almamundi.org»,
+ * o se quita si el texto ya nombra el sitio.
+ */
+function sinEnlace(texto: string, url: string, nombrar = true): string {
+  const sin = texto.split(url).join('').replace(/[\s:]+$/, '').trim();
+  if (!nombrar) return /[.?!]$/.test(sin) ? sin : `${sin}.`;
+  return /[?!.]$/.test(sin) ? `${sin} almamundi.org` : `${sin} en almamundi.org`;
+}
+
 function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', url: string): SharePacket {
   if (props.kind === 'story') {
     return {
       url,
       text: publishedStoryShareText(locale, props.format, props.title, props.city, url),
-      social: publishedStorySocialText(locale, props.title, props.city, url),
+      social: sinEnlace(publishedStorySocialText(locale, props.title, props.city, url), url, false),
     };
   }
   if (props.kind === 'answer') {
     const question = preguntaTexto(props.questionId, 'tu', locale) ?? props.question;
     const text = publishedAnswerShareText(locale, props.answerKind, question, url);
-    return { url, text, social: text };
+    return { url, text, social: sinEnlace(text, url) };
   }
   const text =
     props.kind === 'question' && props.afterAnswer && esMePreguntaId(props.questionId)
@@ -88,7 +98,7 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
       : props.kind === 'question' && props.afterAnswer
       ? preguntaShareText(locale, props.question, url)
       : preguntaInviteShareText(locale, props.question, url);
-  return { url, text, social: text };
+  return { url, text, social: sinEnlace(text, url) };
 }
 
 export function ShareAfterNotice(props: ShareAfterNoticeProps) {
@@ -258,6 +268,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
           shareTextSocial={packet.social}
           emailSubject={emailSubject}
           keepShareUrl
+          socialSinEnlace
           labels={{
             title: t.modalShareMenuTitle,
             facebook: t.modalShareFacebook,
@@ -285,7 +296,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
           }}
           onAppHandoff={(app) => {
             setFallback(null);
-            setToast(interpolate(t.modalShareAppHandoff, { app }));
+            setToast(interpolate(t.modalShareAppHandoffTexto, { app }));
             onClose();
           }}
           onCopyFailed={(value) => {

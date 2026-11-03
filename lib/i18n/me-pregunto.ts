@@ -23,6 +23,8 @@ export const ME_PREGUNTO_UI: Record<
     gracias: (alias: string) => string;
     graciasTexto: string;
     respondesA: string;
+    consentAdulto: string;
+    consentPublicar: string;
     graciasRespuesta: string;
     respuestaDe: (alias: string, lugar: string) => string;
     compartir: (pregunta: string) => string;
@@ -50,6 +52,8 @@ export const ME_PREGUNTO_UI: Record<
     graciasTexto:
       'Una persona del equipo la leerá antes de publicarla. Cuando aparezca en Me pregunto…, cualquiera podrá responderla.',
     respondesA: 'Respondes a:',
+    consentAdulto: 'Soy mayor de 18 años, o adulto responsable o representante de una institución.',
+    consentPublicar: 'Autorizo que mi pregunta y mi nombre o alias se publiquen en AlmaMundi.',
     graciasRespuesta:
       'Una persona del equipo la leerá antes de publicarla. Cuando se publique, le avisaremos a quien hizo la pregunta. Mientras tanto, ¿te animas con otra?',
     respuestaDe: (alias, lugar) => `Respuesta a una pregunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
@@ -88,6 +92,8 @@ export const ME_PREGUNTO_UI: Record<
     graciasTexto:
       'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando aparecer em Me pergunto…, qualquer pessoa poderá respondê-la.',
     respondesA: 'Você responde a:',
+    consentAdulto: 'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição.',
+    consentPublicar: 'Autorizo que minha pergunta e meu nome ou apelido sejam publicados no AlmaMundi.',
     graciasRespuesta:
       'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando for publicada, avisaremos quem fez a pergunta. Enquanto isso, que tal outra?',
     respuestaDe: (alias, lugar) => `Resposta a uma pergunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
@@ -126,6 +132,8 @@ export const ME_PREGUNTO_UI: Record<
     graciasTexto:
       "Someone on our team will read it before it's published. Once it appears in I wonder…, anyone can answer it.",
     respondesA: "You're answering:",
+    consentAdulto: 'I am 18 or older, or a responsible adult or institutional representative.',
+    consentPublicar: 'I authorize my question and my name or alias to be published on AlmaMundi.',
     graciasRespuesta:
       "Someone on our team will read it before it's published. Once it is, we'll let the person who asked know. Meanwhile, up for another one?",
     respuestaDe: (alias, lugar) => `Answer to a question from ${alias}${lugar ? ` · ${lugar}` : ''}`,

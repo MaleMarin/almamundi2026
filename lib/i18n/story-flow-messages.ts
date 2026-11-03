@@ -113,6 +113,8 @@ export type StoryFlowMessages = {
   modalShareInstagram: string;
   modalShareTikTok: string;
   modalShareAppHandoff: string;
+  /** Instagram y TikTok cuando se comparte sin imagen. */
+  modalShareAppHandoffTexto: string;
   modalShareEmail: string;
   modalShareEmailCopied: string;
   modalShareLinkCopied: string;
@@ -232,7 +234,7 @@ const es: StoryFlowMessages = {
   modalConsentAdult:
     'Soy mayor de 18 años, o adulto responsable o representante de una institución, y tengo autorización de quienes aparecen en esta historia.',
   modalConsentPublish: 'Autorizo que mi imagen, voz y nombre o alias se publiquen en AlmaMundi.',
-  modalConsentTermsAndPrivacy: 'Acepto los {terminos} y la {privacidad}.',
+  modalConsentTermsAndPrivacy: 'Acepto los {terminos} y el {privacidad}.',
   modalConsentTermsLink: 'Términos de uso',
   modalConsentPrivacyLink: 'Aviso de privacidad',
   modalNewsletterOptIn: 'Quiero recibir historias nuevas en mi correo',
@@ -268,6 +270,7 @@ const es: StoryFlowMessages = {
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
     'Copiamos el texto. Descarga tu imagen y súbela con él.',
+  modalShareAppHandoffTexto: 'Copiamos el texto. Pégalo en {app}.',
   modalShareEmail: 'Correo',
   modalShareEmailCopied:
     'Si tu correo no se abrió, el mensaje ya está copiado: pégalo donde quieras.',
@@ -377,6 +380,7 @@ const pt: StoryFlowMessages = {
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
     'Copiamos o texto. Baixe sua imagem e publique com ele.',
+  modalShareAppHandoffTexto: 'Copiamos o texto. Cole no {app}.',
   modalShareEmail: 'E-mail',
   modalShareEmailCopied:
     'Se seu e-mail não abriu, a mensagem já está copiada: cole onde quiser.',
@@ -429,7 +433,7 @@ const pt: StoryFlowMessages = {
   modalConsentAdult:
     'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição, e tenho autorização de quem aparece nesta história.',
   modalConsentPublish: 'Autorizo que minha imagem, voz e nome ou apelido sejam publicados no AlmaMundi.',
-  modalConsentTermsAndPrivacy: 'Aceito os {terminos} e a {privacidad}.',
+  modalConsentTermsAndPrivacy: 'Aceito os {terminos} e o {privacidad}.',
   modalConsentTermsLink: 'Termos de uso',
   modalConsentPrivacyLink: 'Aviso de privacidade',
   modalNewsletterOptIn: 'Quero receber novas histórias no meu e-mail',
@@ -537,6 +541,7 @@ const en: StoryFlowMessages = {
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:
     'We copied the text. Download your image and post it with the text.',
+  modalShareAppHandoffTexto: 'We copied the text. Paste it into {app}.',
   modalShareEmail: 'Email',
   modalShareEmailCopied:
     'If your email didn\'t open, the message is already copied: paste it wherever you like.',
