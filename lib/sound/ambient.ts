@@ -54,7 +54,7 @@ const URLS: Record<AmbientKey, string[]> = {
   mar: ["/audio/ambients/ocean.mp3", "/audio/ambients/ocean.wav", "/audio/mar.m4a", MAR_VIDEO_AUDIO_URL],
   ciudad: ["/audio/ambients/city.mp3", "/audio/ambients/city.wav"],
   /** Bosque con un río pequeño y pájaros (grabación de campo, freesound_community). */
-  bosque: ["/audio/ambients/bosque-rio.mp3", "/audio/ambients/forest.mp3"],
+  bosque: ["/audio/ambients/bosque-rio-v2.mp3", "/audio/ambients/forest.mp3"],
   /** No hay wind.* en repo: neblina + bosque como aire */
   viento: ["/audio/neblina.mp3", "/audio/ambients/forest.mp3", "/audio/ambients/forest.wav"],
   animales: ["/audio/ambients/animals.mp3", "/audio/ambients/animals.wav"],
