@@ -62,8 +62,7 @@ import {
   PENDING_STORY_SHARE_EMAIL_SUBJECT,
   PENDING_STORY_SHARE_TEXT,
   PENDING_STORY_SHARE_TEXT_SHORT,
-  PENDING_STORY_SHARE_URL,
-  shareMessageWithLink } from '@/lib/huella/share-story-channels';
+  PENDING_STORY_SHARE_URL } from '@/lib/huella/share-story-channels';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import type { ContarPregunta } from '@/lib/contar-routes';
 import { clearStoryAuthorSession } from '@/lib/story-author-session';
@@ -472,6 +471,9 @@ export function StoryModal({
   const pendingShareUrl = /^[A-Za-z0-9]{8,40}$/.test(imprintId)
     ? `${PENDING_STORY_SHARE_URL}?c=${imprintId}`
     : PENDING_STORY_SHARE_URL;
+  /** Texto para compartir con un solo enlace, el de esta historia (WhatsApp muestra la tarjeta del primero). */
+  const conEnlace = (texto: string) =>
+    `${texto.replace(/https?:\/\/(?:www\.)?almamundi\.org\/contar\S*/gi, '').replace(/\s{2,}/g, ' ').trim()} ${pendingShareUrl}`;
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const [imprintStoryTitle, setImprintStoryTitle] = useState('');
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1881,7 +1883,7 @@ export function StoryModal({
           if (!navigator.canShare || navigator.canShare({ files: [file] })) {
             await navigator.share({
               files: [file],
-              text: shareMessageWithLink(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT, pendingShareUrl),
+              text: conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT),
             });
             return;
           }
@@ -3219,9 +3221,9 @@ export function StoryModal({
             <StoryShareMenu
               shareUrl={pendingShareUrl}
               keepShareUrl
-              shareTextShort={t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT}
-              shareTextLong={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
-              shareTextSocial={t.modalShareTextLong || PENDING_STORY_SHARE_TEXT}
+              shareTextShort={conEnlace(t.modalShareTextShort || PENDING_STORY_SHARE_TEXT_SHORT)}
+              shareTextLong={conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT)}
+              shareTextSocial={conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT)}
               emailSubject={t.modalShareEmailSubject || PENDING_STORY_SHARE_EMAIL_SUBJECT}
               labels={{
                 title: t.modalShareMenuTitle,
