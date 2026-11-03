@@ -38,7 +38,7 @@ import { MapDrawer } from '@/components/map/MapDrawer';
 import { MapTopControls } from '@/components/map/MapTopControls';
 import { TimeBar } from '@/components/map/TimeBar';
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
-import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import { esMePreguntaId, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import { MePreguntoMapPanel } from '@/components/map/panels/MePreguntoMapPanel';
 import { BITS_DATA } from '@/lib/bits-data';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
@@ -61,6 +61,8 @@ const SHOW_PUBLIC_RESPUESTAS = true;
 const STORY_GLOBE_ID_BASE = 9_000_000;
 const NEWS_GLOBE_ID_BASE = 8_000_000;
 const RESPUESTA_GLOBE_ID_BASE = 7_000_000;
+/** Preguntas de «Me pregunto…»: punto multicolor. */
+const PREGUNTA_GLOBE_ID_BASE = 6_000_000;
 const GLOBE_NEWS_MAX = 20;
 const DAY_MS = 24 * 60 * 60 * 1000;
 
@@ -228,6 +230,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     respuestas: true });
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
   const [respuestasReady, setRespuestasReady] = useState(false);
+  const [mePreguntas, setMePreguntas] = useState<MePreguntaPublica[]>([]);
+  /** Pregunta de «Me pregunto…» tocada en el globo. */
+  const [abrirPregunta, setAbrirPregunta] = useState<string | null>(null);
   const [openRespuesta, setOpenRespuesta] = useState<RespuestaPublica | null>(null);
   const [pinnedStory, setPinnedStory] = useState<StoryPoint | null>(null);
   const [pinnedRespuesta, setPinnedRespuesta] = useState<RespuestaPublica | null>(null);
@@ -286,6 +291,19 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       .finally(() => {
         if (!cancel) setRespuestasReady(true);
       });
+    return () => {
+      cancel = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancel = false;
+    void fetch('/api/me-pregunto')
+      .then((res) => (res.ok ? res.json() : { items: [] }))
+      .then((data: { items?: MePreguntaPublica[] }) => {
+        if (!cancel) setMePreguntas(Array.isArray(data.items) ? data.items : []);
+      })
+      .catch(() => undefined);
     return () => {
       cancel = true;
     };
@@ -632,6 +650,25 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       color: '#FF4A1C' }));
   }, [respuestasOnGlobe]);
 
+  const preguntasOnGlobe = useMemo(
+    () =>
+      mePreguntas.filter(
+        (p) => typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)
+      ),
+    [mePreguntas]
+  );
+
+  const globePreguntaMarkers = useMemo((): GlobeBitMarker[] => {
+    return preguntasOnGlobe.map((p, i) => ({
+      id: PREGUNTA_GLOBE_ID_BASE + i,
+      lat: p.lat as number,
+      lon: p.lng as number,
+      markerKind: 'pregunta' as const,
+      title: p.texto.length > 90 ? `${p.texto.slice(0, 88)}…` : p.texto,
+      place: formatPublicPlace(p.city, p.country, locale) || undefined,
+    }));
+  }, [preguntasOnGlobe, locale]);
+
   const globeMarkers = useMemo((): GlobeBitMarker[] => {
     const now = Date.now();
     const storyLayer: GlobeBitMarker[] = storiesOnGlobe.map((s, i) => ({
@@ -649,8 +686,9 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       ...storyLayer,
       ...globeNewsMarkers,
       ...(SHOW_PUBLIC_RESPUESTAS ? globeRespuestaMarkers : []),
+      ...globePreguntaMarkers,
     ];
-  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, locale]);
+  }, [globeBitsMarkers, storiesOnGlobe, globeNewsMarkers, globeRespuestaMarkers, globePreguntaMarkers, locale]);
 
   const openStoryViewer = useCallback((story: StoryPoint) => {
     if (storyCloseTimerRef.current) {
@@ -837,13 +875,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       const idx = respuestasOnGlobe.findIndex((item) => item.id === openRespuesta.id);
       if (idx >= 0) return RESPUESTA_GLOBE_ID_BASE + idx;
     }
+    if (drawerMode === 'mepregunto' && abrirPregunta) {
+      const idx = preguntasOnGlobe.findIndex((p) => p.id === abrirPregunta);
+      if (idx >= 0) return PREGUNTA_GLOBE_ID_BASE + idx;
+    }
     if (drawerMode === 'bits' && selectedBit) return selectedBit.id;
     if (highlightedStoryId != null) {
       const idx = storiesOnGlobe.findIndex((s) => s.id === highlightedStoryId);
       return idx >= 0 ? STORY_GLOBE_ID_BASE + idx : null;
     }
     return null;
-  }, [drawerMode, selectedBit, highlightedStoryId, storiesOnGlobe, openRespuesta, respuestasOnGlobe]);
+  }, [drawerMode, selectedBit, highlightedStoryId, storiesOnGlobe, openRespuesta, respuestasOnGlobe, abrirPregunta, preguntasOnGlobe]);
 
   const handleGlobeMarkerClick = useCallback(
     (id: number) => {
@@ -870,6 +912,17 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         showRespuesta(item);
         return;
       }
+      if (id >= PREGUNTA_GLOBE_ID_BASE) {
+        const pregunta = preguntasOnGlobe[id - PREGUNTA_GLOBE_ID_BASE];
+        if (!pregunta) return;
+        setOpenStory(null);
+        setHighlightedStoryId(null);
+        setOpenRespuesta(null);
+        setAbrirPregunta(pregunta.id);
+        setDrawerMode('mepregunto');
+        setDrawerOpen(true);
+        return;
+      }
       const bit = huellasPuntos.find((h) => h.id === id);
       if (!bit) return;
       setOpenStory(null);
@@ -878,7 +931,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       setDrawerMode('bits');
       setDrawerOpen(true);
     },
-    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe, showRespuesta]
+    [storiesOnGlobe, huellasPuntos, openStoryViewer, globeNewsMarkers, respuestasOnGlobe, showRespuesta, preguntasOnGlobe]
   );
 
   function onGlobeLayerPill(mode: 'stories' | 'news' | 'bits' | 'respuestas' | 'mepregunto', key: keyof GlobeLayerVisibility) {
@@ -1122,6 +1175,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               respuestas={respuestas.filter((item) => esMePreguntaId(item.questionId))}
               openId={openRespuesta?.id ?? null}
               onOpen={showRespuesta}
+              preguntas={mePreguntas}
+              abrirId={abrirPregunta}
             />
           ) : drawerMode === 'respuestas' ? (
             <StoriesPanel

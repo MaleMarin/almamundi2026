@@ -20,7 +20,7 @@ type Formato = 'texto' | 'voz' | 'foto';
 const campo =
   'cortina-campo min-h-11 w-full rounded-xl border border-black/15 bg-white px-3 py-2 text-[length:var(--fs-texto)] font-normal text-[#1C1C2E]';
 
-function comoFormulario(p: MePreguntaPublica, locale: AlmaLocale): PreguntaSemana {
+export function comoFormulario(p: MePreguntaPublica, locale: AlmaLocale): PreguntaSemana {
   const texto = { es: p.texto, pt: p.texto, en: p.texto };
   const tema = { es: ME_PREGUNTO_UI.es.capa, pt: ME_PREGUNTO_UI.pt.capa, en: ME_PREGUNTO_UI.en.capa };
   void locale;

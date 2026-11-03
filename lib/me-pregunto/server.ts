@@ -19,6 +19,8 @@ export function mePreguntaPublica(docId: string, data: Record<string, unknown>):
     alias: str(data.alias),
     city: str(data.city),
     country: str(data.country),
+    lat: typeof data.lat === 'number' && Number.isFinite(data.lat) ? data.lat : null,
+    lng: typeof data.lng === 'number' && Number.isFinite(data.lng) ? data.lng : null,
   };
 }
 

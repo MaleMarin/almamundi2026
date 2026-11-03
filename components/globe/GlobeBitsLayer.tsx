@@ -41,7 +41,7 @@ export type GlobeBitMarker = {
   lon: number;
   color?: string;
   /** Historias, bits curados, titulares o respuestas de la pregunta. */
-  markerKind?: 'bit' | 'story' | 'news' | 'respuesta';
+  markerKind?: 'bit' | 'story' | 'news' | 'respuesta' | 'pregunta';
   /** Historia publicada que nació de un hilo: anillo naranja, misma capa que las historias. */
   hilo?: boolean;
   title?: string;
@@ -67,7 +67,7 @@ const DEFAULT_LAYER_VISIBILITY: GlobeLayerVisibility = {
 
 function markerLayerKind(bit: GlobeBitMarker): keyof GlobeLayerVisibility {
   if (bit.markerKind === 'story') return 'stories';
-  if (bit.markerKind === 'respuesta') return 'respuestas';
+  if (bit.markerKind === 'respuesta' || bit.markerKind === 'pregunta') return 'respuestas';
   if (bit.markerKind === 'news') return 'news';
   return 'bits';
 }
@@ -86,6 +86,56 @@ const STORY_HOVER_SCALE = 1.32;
 const NEWS_PLANE_MUL = 2.22;
 /** Respuestas: anillo fino y chico, naranja. */
 const RESPUESTA_PLANE_MUL = 1.55;
+/** Preguntas de «Me pregunto…»: punto multicolor (los colores de las cintas) con luz suave. */
+const PREGUNTA_PLANE_MUL = 2.6;
+const PREGUNTA_COLORES = [
+  '#ffd000', '#ff6200', '#ff1a1a', '#ff7eb6', '#a8e000', '#00b140',
+  '#00c2d6', '#0047ff', '#7a12e0', '#b07cff', '#ff0a8a', '#a0003c',
+];
+
+/** Mismo dibujo que el ícono del botón «Me pregunto»: rueda de colores, aquí con un halo blanco suave. */
+function createPreguntaDotMaterial(): THREE.MeshBasicMaterial {
+  const size = 128;
+  const canvas = document.createElement('canvas');
+  canvas.width = size;
+  canvas.height = size;
+  const ctx = canvas.getContext('2d');
+  const c = size / 2;
+  if (ctx) {
+    const halo = ctx.createRadialGradient(c, c, size * 0.16, c, c, c);
+    halo.addColorStop(0, 'rgba(255,255,255,0.55)');
+    halo.addColorStop(0.45, 'rgba(255,255,255,0.14)');
+    halo.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = halo;
+    ctx.fillRect(0, 0, size, size);
+    const r = size * 0.24;
+    const paso = (Math.PI * 2) / PREGUNTA_COLORES.length;
+    PREGUNTA_COLORES.forEach((color, i) => {
+      ctx.beginPath();
+      ctx.moveTo(c, c);
+      ctx.arc(c, c, r, -Math.PI / 2 + i * paso, -Math.PI / 2 + (i + 1) * paso + 0.01);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+    });
+    ctx.beginPath();
+    ctx.arc(c, c, r, 0, Math.PI * 2);
+    ctx.lineWidth = size * 0.025;
+    ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+    ctx.stroke();
+  }
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  const mat = new THREE.MeshBasicMaterial({
+    map: texture,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+    toneMapped: false,
+  });
+  mat.name = 'GlobePreguntaDot';
+  return mat;
+}
 
 function disableMeshRaycast(obj: THREE.Object3D | null) {
   if (obj instanceof THREE.Mesh) obj.raycast = () => {};
@@ -249,6 +299,7 @@ function BitDot({
   newsMat,
   respuestaMat,
   hiloRingMat,
+  preguntaMat,
   layerOpRef }: {
   bit: GlobeBitMarker;
   selected: boolean;
@@ -262,12 +313,13 @@ function BitDot({
   newsMat: THREE.ShaderMaterial;
   respuestaMat: THREE.ShaderMaterial;
   hiloRingMat: THREE.ShaderMaterial;
+  preguntaMat: THREE.MeshBasicMaterial;
   layerOpRef: MutableRefObject<{ stories: number; bits: number; news: number; respuestas: number }>;
 }) {
   const { surfacePos, flareBump } = useMemo(() => {
     const p = latLngToCartesianThreeJS(bit.lat, bit.lon, BIT_SURFACE_RADIUS);
     const s = new THREE.Vector3(p.x, p.y, p.z);
-    const lift = bit.markerKind === 'story' ? 0.0064 : bit.markerKind === 'news' || bit.markerKind === 'respuesta' ? 0.0052 : 0.0042;
+    const lift = bit.markerKind === 'story' ? 0.0064 : bit.markerKind === 'news' || bit.markerKind === 'respuesta' || bit.markerKind === 'pregunta' ? 0.0052 : 0.0042;
     const b = s.clone().normalize().multiplyScalar(lift);
     return { surfacePos: s, flareBump: b };
   }, [bit.lat, bit.lon, bit.markerKind]);
@@ -317,6 +369,7 @@ function BitDot({
   const isStory = bit.markerKind === 'story';
   const isNews = bit.markerKind === 'news';
   const isRespuesta = bit.markerKind === 'respuesta';
+  const isPregunta = bit.markerKind === 'pregunta';
   const isHilo = isStory && bit.hilo === true;
 
   // Decisión cerrada (docs/decisiones-cerradas.md): todas las historias usan el naranja de marca.
@@ -359,7 +412,9 @@ function BitDot({
     setMatLayerOpacity(mats.rippleHover, op);
   });
 
-  const starMat = isHilo
+  const starMat: THREE.Material = isPregunta
+    ? preguntaMat
+    : isHilo
     ? hiloRingMat
     : isRespuesta
     ? respuestaMat
@@ -376,7 +431,9 @@ function BitDot({
   const mag = magneticActive && !selected ? (isStory && !isHilo ? STORY_HOVER_SCALE : ACTIVE_BIT_SCALE) : 1;
   const planeScale =
     STAR_PLANE_SCALE *
-    (isHilo || isRespuesta
+    (isPregunta
+      ? PREGUNTA_PLANE_MUL
+      : isHilo || isRespuesta
       ? RESPUESTA_PLANE_MUL
       : isStory
         ? STORY_PLANE_MUL
@@ -411,11 +468,11 @@ function BitDot({
             ref={(m) => disableMeshRaycast(m)}
             material={starMat}
             scale={[planeScale * sel * mag, planeScale * sel * mag, 1]}
-            renderOrder={isStory ? 15 : isNews || isRespuesta ? 13 : 10}
+            renderOrder={isStory ? 15 : isPregunta ? 14 : isNews || isRespuesta ? 13 : 10}
           >
             <planeGeometry args={[1, 1]} />
           </mesh>
-          {(isStory || isNews || isRespuesta) && magneticActive && (bit.title || bit.place) ? (
+          {(isStory || isNews || isRespuesta || isPregunta) && magneticActive && (bit.title || bit.place) ? (
             <Html
               center
               sprite
@@ -506,6 +563,10 @@ export function GlobeBitsLayer({
   );
 }
 
+function setBasicOpacity(mat: THREE.MeshBasicMaterial, value: number) {
+  mat.opacity = value;
+}
+
 function setMatLayerOpacity(mat: THREE.ShaderMaterial, value: number) {
   const u = mat.uniforms.uLayerOpacity;
   if (u) u.value = value;
@@ -558,6 +619,7 @@ function GlobeBitsLayerMounted({
   const storyRippleMat = useMemo(() => createStoryRippleMaterial(1.0, 'GlobeStoryRipple'), []);
   const storyRippleMatHover = useMemo(() => createStoryRippleMaterial(1.55, 'GlobeStoryRippleHover'), []);
   const newsMat = useMemo(() => createNewsRingMaterial(0.9, 'GlobeNewsRing'), []);
+  const preguntaMat = useMemo(() => createPreguntaDotMaterial(), []);
   const respuestaMat = useMemo(() => {
     const mat = createNewsRingMaterial(0.95, 'GlobeRespuestaRing');
     // sRGB tal cual (el shader no convierte a la salida); en lineal se veía rojo.
@@ -586,6 +648,8 @@ function GlobeBitsLayerMounted({
       newsMat.dispose();
       respuestaMat.dispose();
       hiloRingMat.dispose();
+      preguntaMat.map?.dispose();
+      preguntaMat.dispose();
     };
   }, [
     starMatNormal,
@@ -597,6 +661,7 @@ function GlobeBitsLayerMounted({
     newsMat,
     respuestaMat,
     hiloRingMat,
+    preguntaMat,
   ]);
 
   useFrame(({ clock }, dt) => {
@@ -620,6 +685,7 @@ function GlobeBitsLayerMounted({
     setMatLayerOpacity(newsMat, op.news);
     setMatLayerOpacity(respuestaMat, op.respuestas);
     setMatLayerOpacity(hiloRingMat, op.stories);
+    setBasicOpacity(preguntaMat, op.respuestas);
   });
 
   const updateMagneticFromPointer = (clientX: number, clientY: number) => {
@@ -783,6 +849,7 @@ function GlobeBitsLayerMounted({
     newsMat,
     respuestaMat,
     hiloRingMat,
+    preguntaMat,
     layerOpRef };
 
   return (

@@ -14,6 +14,9 @@ export type MePreguntaPublica = {
   alias: string;
   city: string;
   country: string;
+  /** Punto público en el globo (ciudad y país con desplazamiento). Null si aún no se ubica. */
+  lat?: number | null;
+  lng?: number | null;
 };
 
 export function esMePreguntaId(value: unknown): value is string {

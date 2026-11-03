@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Search } from 'lucide-react';
+import { Camera, ChevronDown, Mic, PenLine, Search, X } from 'lucide-react';
+import { comoFormulario } from '@/components/hilos/MePreguntoPanel';
+import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
+import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
@@ -10,6 +13,8 @@ import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import type { AlmaLocale } from '@/lib/i18n/locale';
+
+type Formato = 'texto' | 'voz' | 'foto';
 
 const POR_PAGINA = 10;
 
@@ -23,31 +28,39 @@ export function MePreguntoMapPanel({
   respuestas,
   openId,
   onOpen,
+  preguntas,
+  abrirId = null,
 }: {
   locale: AlmaLocale;
   respuestas: RespuestaPublica[];
   openId: string | null;
   onOpen: (item: RespuestaPublica) => void;
+  /** Preguntas publicadas (las carga el mapa, que también las dibuja en el globo). */
+  preguntas: MePreguntaPublica[];
+  /** Pregunta tocada en el globo: se despliega y se muestra. */
+  abrirId?: string | null;
 }) {
   const ui = ME_PREGUNTO_UI[locale];
   const copy = ME_PREGUNTO_MAPA[locale];
-  const [preguntas, setPreguntas] = useState<MePreguntaPublica[]>([]);
+  const hilos = HILOS_UI[locale];
   const [query, setQuery] = useState('');
-  const [abierta, setAbierta] = useState<string | null>(null);
+  const [abierta, setAbierta] = useState<string | null>(abrirId);
   const [limite, setLimite] = useState(POR_PAGINA);
+  /** Pregunta que se está respondiendo y el formato elegido (null = eligiendo formato). */
+  const [respondiendo, setRespondiendo] = useState<{ id: string; formato: Formato | null } | null>(null);
+  const [abrirVisto, setAbrirVisto] = useState<string | null>(null);
+
+  // Al tocar un punto multicolor: se despliega su pregunta (patrón de estado derivado, sin efecto).
+  if (abrirId && abrirId !== abrirVisto) {
+    setAbrirVisto(abrirId);
+    setAbierta(abrirId);
+    setQuery('');
+  }
 
   useEffect(() => {
-    let cancel = false;
-    void fetch('/api/me-pregunto')
-      .then((res) => (res.ok ? res.json() : { items: [] }))
-      .then((data: { items?: MePreguntaPublica[] }) => {
-        if (!cancel) setPreguntas(Array.isArray(data.items) ? data.items : []);
-      })
-      .catch(() => undefined);
-    return () => {
-      cancel = true;
-    };
-  }, []);
+    if (!abrirId) return;
+    document.getElementById(`mp-card-${abrirId}`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }, [abrirId, preguntas.length]);
 
   const grupos = useMemo(() => {
     const porPregunta = new Map<string, RespuestaPublica[]>();
@@ -86,7 +99,15 @@ export function MePreguntoMapPanel({
     });
   }, [respuestas, preguntas, query]);
 
-  const visibles = grupos.slice(0, limite);
+  const visibles = useMemo(() => {
+    const page = grupos.slice(0, limite);
+    // La pregunta tocada en el globo siempre se ve, aunque esté más abajo en la lista.
+    if (abierta && !page.some((g) => g.pregunta.id === abierta)) {
+      const extra = grupos.find((g) => g.pregunta.id === abierta);
+      if (extra) return [extra, ...page];
+    }
+    return page;
+  }, [grupos, limite, abierta]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
@@ -125,7 +146,11 @@ export function MePreguntoMapPanel({
           const open = abierta === pregunta.id;
           const lugar = formatPublicPlace(pregunta.city, pregunta.country, locale);
           return (
-            <li key={pregunta.id} className="rounded-2xl border border-white/15 bg-white/5">
+            <li
+              key={pregunta.id}
+              id={`mp-card-${pregunta.id}`}
+              className={`rounded-2xl border bg-white/5 ${open ? 'border-white/40' : 'border-white/15'}`}
+            >
               <button
                 type="button"
                 aria-expanded={open}
@@ -161,14 +186,55 @@ export function MePreguntoMapPanel({
                   ))}
                 </div>
               ) : null}
-              {/* «Responder» siempre a la vista, con o sin respuestas. */}
+              {/* «Responder» siempre a la vista. Se responde aquí mismo, sin salir del mapa. */}
               <div className="px-4 pb-4">
-                <Link
-                  href={`/preguntas?p=${encodeURIComponent(pregunta.id)}`}
-                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white no-underline visited:text-white"
-                >
-                  {copy.primera}
-                </Link>
+                {respondiendo?.id === pregunta.id ? (
+                  <div className="relative rounded-2xl bg-[#F4F2EE] p-4 text-[#1C1C2E]">
+                    <button
+                      type="button"
+                      onClick={() => setRespondiendo(null)}
+                      aria-label={ui.cancelar}
+                      className="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-[#3C4655]"
+                    >
+                      <X size={18} aria-hidden />
+                    </button>
+                    {respondiendo.formato ? (
+                      <PreguntaFormForQuestion
+                        pregunta={comoFormulario(pregunta, locale)}
+                        formato={respondiendo.formato}
+                        onAnother={() => setRespondiendo(null)}
+                      />
+                    ) : (
+                      <div className="flex flex-col gap-2 pt-6">
+                        {(
+                          [
+                            ['texto', PenLine, hilos.escribir],
+                            ['voz', Mic, hilos.contarVoz],
+                            ['foto', Camera, hilos.conFoto],
+                          ] as const
+                        ).map(([formato, Icono, label]) => (
+                          <button
+                            key={formato}
+                            type="button"
+                            onClick={() => setRespondiendo({ id: pregunta.id, formato })}
+                            className="btn-am-secundario inline-flex min-h-11 items-center justify-center gap-2 px-4 text-[length:var(--fs-etiqueta)] font-semibold"
+                          >
+                            <Icono size={18} strokeWidth={1.75} aria-hidden />
+                            {label}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setRespondiendo({ id: pregunta.id, formato: null })}
+                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white"
+                  >
+                    {copy.primera}
+                  </button>
+                )}
               </div>
             </li>
           );

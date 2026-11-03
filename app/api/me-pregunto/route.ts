@@ -15,6 +15,7 @@ import {
   type MePreguntaPublica,
 } from "@/lib/me-pregunto/shared";
 import { mePreguntaPublica } from "@/lib/me-pregunto/server";
+import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { sendMePreguntaEmail } from "@/lib/email/me-pregunto-mail";
 
 export const runtime = "nodejs";
@@ -50,6 +51,17 @@ export async function GET(req: Request) {
       return { ...mePreguntaPublica(doc.id, data), t: toMillis(data.approvedAt) || toMillis(data.createdAt) };
     });
     items.sort((a, b) => b.t - a.t);
+    // Las preguntas publicadas antes de tener punto se ubican de a poco, sin demorar la respuesta.
+    const sinPunto = snap.docs
+      .filter((doc) => typeof doc.get("lat") !== "number" || typeof doc.get("lng") !== "number")
+      .slice(0, 5);
+    if (sinPunto.length) {
+      after(async () => {
+        for (const doc of sinPunto) {
+          await writeCoordsIfMissing(doc.ref, String(doc.get("city") ?? ""), String(doc.get("country") ?? "")).catch(() => undefined);
+        }
+      });
+    }
     return NextResponse.json(
       { items: items.slice(0, 80).map(({ t: _t, ...item }) => item) },
       { headers: { "Cache-Control": "public, max-age=30, s-maxage=60" } }

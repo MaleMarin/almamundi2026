@@ -1,6 +1,7 @@
 import "server-only";
 import { NextRequest, NextResponse } from "next/server";
 import { FieldValue } from "firebase-admin/firestore";
+import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
@@ -35,6 +36,10 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       typeof body.texto === "string" && body.texto.trim() ? body.texto.trim().slice(0, 160) : String(data.texto ?? "");
     if (body.action === "approve") {
       await ref.update({ status: "approved", texto, approvedAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+      // Punto multicolor en el globo: ciudad y país, nunca el lugar exacto.
+      await writeCoordsIfMissing(ref, String(data.city ?? ""), String(data.country ?? "")).catch((err) => {
+        console.error("[admin/me-pregunto] geocode", err instanceof Error ? err.message : "geo");
+      });
       if (from !== "approved") {
         const contact = await db.collection(ME_PREGUNTA_CONTACTS_COLLECTION).doc(id).get();
         const to = contact.exists ? String((contact.data() ?? {}).email ?? "") : "";
