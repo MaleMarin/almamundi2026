@@ -2554,3 +2554,28 @@ b {
 /* Inspírate: el llamado va primero y la línea gris debajo. */
 #cintas .home-capitulo-bajada-elige + .home-capitulo-bajada-linea { margin-top: 8px; }
 #cintas .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 28px; }
+
+/* Capítulos de la portada iguales (4 nov 2026): Cuenta, Inspírate y Descubre con los mismos tamaños.
+   «El Alma del Mundo» deja de ser título de portada y mide como las frases naranjas. */
+#mapa .home-capitulo-titulo.home-capitulo-titulo-portada {
+  font-size: var(--fs-titular);
+  line-height: 1.15;
+}
+@media (min-width: 768px) and (min-height: 600px) {
+  #mapa .home-capitulo-titulo.home-capitulo-titulo-portada {
+    font-size: clamp(28px, 1.4vw + 1.2vh, 38px);
+    line-height: 1.15;
+  }
+  #mapa .home-capitulo-bajada-linea {
+    font-size: 17px;
+    line-height: 1.35;
+  }
+  #mapa .home-capitulo-bajada-elige {
+    font-size: clamp(22px, 0.8vw + 1vh, 28px);
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  #cintas .home-capitulo-titulo {
+    line-height: 1.32;
+  }
+}
