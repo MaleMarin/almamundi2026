@@ -1,5 +1,6 @@
 'use client';
 
+import { EstadoRevision } from '@/components/admin/EstadoRevision';
 import { useCallback, useEffect, useState } from 'react';
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
@@ -265,19 +266,8 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 6 }}>
                       <span style={{ fontSize: 11, fontWeight: 600, color: '#fdba74' }}>{KIND_LABEL[item.kind]}</span>
-                      {item.status === 'rejected' && (
-                        <span style={{ fontSize: 11, color: '#fca5a5' }}>Rechazada</span>
-                      )}
-                      {item.status === 'archived' && (
-                        <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.45)' }}>Archivada</span>
-                      )}
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{place}</span>
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
-                      {item.status === 'approved' ? (
-                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.45)', color: '#86efac' }}>
-                          ✓ Aprobada{item.publishedAt ? ` el ${formatDate(item.publishedAt)}` : ''}
-                        </span>
-                      ) : null}
                     </div>
                     <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>
                       {item.questionText ? `Me pregunto: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
@@ -417,6 +407,10 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                     ) : null}
                   </div>
                   <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'flex-start' }}>
+                    <EstadoRevision
+                      estado={item.status === 'approved' ? 'aprobada' : item.status === 'rejected' ? 'rechazada' : item.status === 'archived' ? 'archivada' : 'pendiente'}
+                      el={item.publishedAt}
+                    />
                     {item.status === 'pending' && (
                       <button
                         type="button"

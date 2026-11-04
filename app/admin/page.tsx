@@ -5,6 +5,7 @@
  * Solo usuarios con email en lib/adminEmails.ts pueden entrar; el resto → redirect al mapa home (/#mapa).
  */
 
+import { EstadoRevision } from '@/components/admin/EstadoRevision';
 import { useEffect, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/lib/firebase/client';
@@ -143,14 +144,6 @@ function formatDate(ts: number | null): string {
     hour: '2-digit',
     minute: '2-digit',
   });
-}
-
-function fechaAprobacion(ms: number): string {
-  try {
-    return new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Santiago' }).format(new Date(ms));
-  } catch {
-    return '';
-  }
 }
 
 function daysRemaining(activeSince: number | null): number | null {
@@ -1031,7 +1024,8 @@ export default function AdminPage() {
                     }
                   />
                 </div>
-                <div style={{ display: 'flex', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                  <EstadoRevision estado="pendiente" />
                   <button
                     type="button"
                     disabled={actionLoading === s.id}
@@ -1116,9 +1110,6 @@ export default function AdminPage() {
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.9)' }}>
                         <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                       </span>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.45)', color: '#86efac' }}>
-                        ✓ Aprobada{s.activeSince ? ` el ${fechaAprobacion(s.activeSince)}` : ''}
-                      </span>
                       {s.isFeatured && (
                         <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,215,0,0.2)', color: '#fde047' }}>⭐ Destacada</span>
                       )}
@@ -1181,7 +1172,8 @@ export default function AdminPage() {
                       </p>
                     ) : null}
                   </div>
-                  <div style={{ display: 'flex', gap: 8 }}>
+                  <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+                    <EstadoRevision estado="aprobada" el={s.activeSince} />
                     <button
                       type="button"
                       disabled={actionLoading === s.id}
@@ -1315,6 +1307,7 @@ export default function AdminPage() {
                     <StoryPhotoFichas imagenes={s.imagenes} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    <EstadoRevision estado={s.status === 'rejected' ? 'rechazada' : 'archivada'} />
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Agregar a colección:</span>
                     <select
                       onChange={(e) => {

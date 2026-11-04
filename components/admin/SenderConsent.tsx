@@ -144,7 +144,7 @@ export function SenderConsentBlocks({
         </p>
       ))}
       <ProfilePhoto sender={person} token={token} />
-      <p style={{ ...labelStyle, marginTop: 12 }}>Consentimientos</p>
+      <p style={{ ...labelStyle, marginTop: 12 }}>Consentimientos que dio la persona</p>
       {rows.map((row) => (
         <p key={row.label} style={{ ...valueStyle, marginTop: 2 }}>
           <span style={{ color: 'rgba(255,255,255,0.55)' }}>{row.label}: </span>
