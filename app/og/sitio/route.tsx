@@ -42,7 +42,6 @@ export async function GET() {
           <div style={{ marginTop: 18, fontSize: 52, lineHeight: 1.15, color: '#3C4655', fontWeight: 600 }}>
             Historias que no se pierden en el scroll
           </div>
-          <div style={{ marginTop: 18, fontSize: 26, color: '#616C7C' }}>Cuenta la tuya en video, audio, texto o foto · almamundi.org</div>
         </div>
       </div>
     ),
