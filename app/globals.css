@@ -482,7 +482,8 @@ a.btn-am-neutro:focus-visible,
     /* Aire mínimo arriba; el que sobra se reparte arriba del texto (margin-top: auto en #intro).
        Abajo, un aire fijo para que los botones naranjas queden dentro de la primera pantalla. */
     padding-top: clamp(20px, 4vh, 48px);
-    padding-bottom: clamp(24px, 4.5vh, 48px);
+    /* Más abajo, pero con aire para que la sombra de las tarjetas no se corte. */
+    padding-bottom: clamp(14px, 2vh, 24px);
     min-height: 0;
   }
 
@@ -2493,8 +2494,3 @@ b {
 /* Inspírate: el llamado va primero y la línea gris debajo. */
 #cintas .home-capitulo-bajada-elige + .home-capitulo-bajada-linea { margin-top: 8px; }
 #cintas .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 28px; }
-
-/* Hero: la frase y las tarjetas un poco más abajo, siempre dentro de la primera pantalla. */
-@media (min-width: 768px) {
-  .home-hero-pantalla #intro { padding-top: clamp(8px, 2.6vh, 30px); }
-}
