@@ -29,6 +29,7 @@ type RespuestaItem = {
   consentTextsVersion?: string | null;
   status: Status;
   createdAt: number | null;
+  publishedAt?: number | null;
   previewUrl: string | null;
   hasLocation: boolean;
   antecedentes?: string;
@@ -272,6 +273,11 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       )}
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{place}</span>
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
+                      {item.status === 'approved' ? (
+                        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.45)', color: '#86efac' }}>
+                          ✓ Aprobada{item.publishedAt ? ` el ${formatDate(item.publishedAt)}` : ''}
+                        </span>
+                      ) : null}
                     </div>
                     <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>
                       {item.questionText ? `Me pregunto: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}

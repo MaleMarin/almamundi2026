@@ -112,6 +112,7 @@ export async function GET(request: NextRequest) {
           consentTextsVersion: consent.version,
           status,
           createdAt: toMillis(data.createdAt),
+          publishedAt: toMillis(data.publishedAt),
           previewUrl,
           hasLocation: lat != null && lng != null,
           temas: Array.isArray(data.temas)

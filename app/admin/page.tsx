@@ -145,6 +145,14 @@ function formatDate(ts: number | null): string {
   });
 }
 
+function fechaAprobacion(ms: number): string {
+  try {
+    return new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'America/Santiago' }).format(new Date(ms));
+  } catch {
+    return '';
+  }
+}
+
 function daysRemaining(activeSince: number | null): number | null {
   if (activeSince == null) return null;
   const days = 15;
@@ -1107,6 +1115,9 @@ export default function AdminPage() {
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.9)' }}>
                         <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
+                      </span>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.45)', color: '#86efac' }}>
+                        ✓ Aprobada{s.activeSince ? ` el ${fechaAprobacion(s.activeSince)}` : ''}
                       </span>
                       {s.isFeatured && (
                         <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,215,0,0.2)', color: '#fde047' }}>⭐ Destacada</span>

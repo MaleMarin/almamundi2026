@@ -40,6 +40,7 @@ export async function GET(request: NextRequest) {
           locale: String(d.locale ?? "es"),
           email: emailById.get(doc.id) ?? "",
           createdAt: toMillis(d.createdAt),
+          approvedAt: toMillis(d.approvedAt),
         };
       })
       .sort((a, b) => (b.createdAt ?? 0) - (a.createdAt ?? 0));

@@ -13,6 +13,7 @@ type Item = {
   locale: string;
   email: string;
   createdAt: number | null;
+  approvedAt?: number | null;
 };
 
 const btn = (tone: 'ok' | 'danger' | 'neutral') =>
@@ -135,6 +136,11 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
             )}
             <p style={{ margin: '8px 0 12px', fontSize: 14, opacity: 0.75 }}>
               {item.alias} · {[item.city, item.country].filter(Boolean).join(', ')} · {item.locale.toUpperCase()} · {fecha(item.createdAt)}
+              {tab === 'approved' ? (
+                <span style={{ marginLeft: 8, display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(34,197,94,0.18)', border: '1px solid rgba(34,197,94,0.45)', color: '#86efac' }}>
+                  ✓ Aprobada{item.approvedAt ? ` el ${fecha(item.approvedAt)}` : ''}
+                </span>
+              ) : null}
               {item.email ? ` · ${item.email}` : ' · sin correo'}
             </p>
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
