@@ -503,12 +503,12 @@ a.btn-am-neutro:focus-visible,
   .home-hero-pantalla #intro .home-capitulo-titulo {
     margin-top: 14px;
     /* Siempre en dos líneas, también en pantallas anchas. */
-    max-width: 30em;
+    max-width: 34em;
     margin-left: auto;
     margin-right: auto;
     text-wrap: balance;
     font-size: clamp(22px, 1.5vw + 0.8vh, 34px);
-    line-height: 1.15;
+    line-height: 1.32;
   }
 
   .home-hero-pantalla #intro .home-capitulo-cita {
@@ -2485,3 +2485,7 @@ strong,
 b {
   font-weight: 600;
 }
+
+/* Cuenta: más aire entre la frase naranja y «Elige cómo». */
+.home-hero-pantalla #intro .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 18px; }
+.home-hero-pantalla #intro .home-capitulo-cita { margin-top: 14px; }

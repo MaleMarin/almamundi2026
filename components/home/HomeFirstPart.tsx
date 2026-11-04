@@ -63,7 +63,7 @@ export function HomeFirstPart({
           ceja={t.cejaCuenta}
           titulo={t.heroBeforeBold}
           tituloFuerte={`${t.heroBold},`}
-          cita={`${t.bajadaCuenta.charAt(0).toLocaleLowerCase()}${t.bajadaCuenta.slice(1)},`}
+          cita={t.citaCuenta}
           bajadaFuerte={t.historiasLead2b}
           bajadaEnDosLineas
         />

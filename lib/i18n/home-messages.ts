@@ -55,6 +55,7 @@ export type HomeMessages = {
   cejaInspira: string;
   cejaDescubre: string;
   bajadaCuenta: string;
+  citaCuenta: string;
   bajadaInspira: string;
   inspiraTitulo: string;
   bajadaInspiraTactil: string;
@@ -105,8 +106,8 @@ const es: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi es el lugar donde tus historias no se pierden en el scroll, porque la vida no es solo lo que viviste,',
-  heroBold: 'sino cómo lo recuerdas para contarlo',
+    'AlmaMundi es el lugar donde tus historias no se pierden en el scroll. La vida no es solo la que viviste,',
+  heroBold: 'sino cómo la recuerdas',
   heroHand: 'Como la tuya',
   heroGreetMorning: 'Buenos días. ¿Qué historia traes hoy?',
   heroGreetAfternoon: 'Buenas tardes. ¿Qué historia traes hoy?',
@@ -130,6 +131,7 @@ const es: HomeMessages = {
   cejaInspira: 'Inspírate',
   cejaDescubre: 'Descubre',
   bajadaCuenta: 'Hay muchas formas de contarla',
+  citaCuenta: 'y hay muchas formas de contarla',
   bajadaInspira: 'Toca una cinta y descubre las preguntas que guarda',
   bajadaInspiraTactil: 'Toca una cinta y descubre las preguntas que guarda',
   inspiraTitulo: 'Las historias pueden comenzar',
@@ -183,8 +185,8 @@ const pt: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi é o lugar onde suas histórias não se perdem no scroll, porque a vida não é só o que você viveu,',
-  heroBold: 'mas como você se lembra para contá-lo',
+    'AlmaMundi é o lugar onde suas histórias não se perdem no scroll. A vida não é só a que você viveu,',
+  heroBold: 'mas como você se lembra dela',
   heroHand: 'como a sua',
   heroGreetMorning: 'Bom dia. Que história você traz hoje?',
   heroGreetAfternoon: 'Boa tarde. Que história você traz hoje?',
@@ -208,6 +210,7 @@ const pt: HomeMessages = {
   cejaInspira: 'Inspire-se',
   cejaDescubre: 'Descubra',
   bajadaCuenta: 'Há muitas formas de contá-la',
+  citaCuenta: 'e há muitas formas de contá-la',
   bajadaInspira: 'Toque uma fita e descubra as perguntas que ela guarda',
   bajadaInspiraTactil: 'Toque uma fita e descubra as perguntas que ela guarda',
   inspiraTitulo: 'As histórias podem começar',
@@ -261,8 +264,8 @@ const en: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    "AlmaMundi is where your stories don't get lost in the scroll, because life is not only what you lived,",
-  heroBold: 'but how you remember it to tell it',
+    "AlmaMundi is where your stories don't get lost in the scroll. Life is not only the one you lived,",
+  heroBold: 'but how you remember it',
   heroHand: 'like yours',
   heroGreetMorning: 'Good morning. What story are you bringing today?',
   heroGreetAfternoon: 'Good afternoon. What story are you bringing today?',
@@ -286,6 +289,7 @@ const en: HomeMessages = {
   cejaInspira: 'Get inspired',
   cejaDescubre: 'Discover',
   bajadaCuenta: 'There are many ways to tell it',
+  citaCuenta: 'and there are many ways to tell it',
   bajadaInspira: 'Tap a ribbon and discover the questions it holds',
   bajadaInspiraTactil: 'Tap a ribbon and discover the questions it holds',
   inspiraTitulo: 'Stories can begin',
