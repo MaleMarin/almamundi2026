@@ -4,7 +4,7 @@ import { MAX_AUDIO_VIDEO_DURATION_SECONDS } from "@/lib/media-duration-rules";
 export const SUBIR_AV_MAX_MINUTES = MAX_AUDIO_VIDEO_DURATION_SECONDS / 60;
 
 /** Escrito: tope único (validación, contador y textos). */
-export const SUBIR_TEXT_MAX_CHARS = 5000;
+export const SUBIR_TEXT_MAX_CHARS = 3000;
 
 /** Video subido desde dispositivo. */
 export const SUBIR_VIDEO_UPLOAD_MAX_MB = 200;
