@@ -9,9 +9,9 @@ export const dynamic = 'force-dynamic';
 type Props = { searchParams: Promise<{ c?: string | string[] }> };
 
 const COLORES = {
-  es: { title: 'AlmaMundi · Historias que no se pierden en el scroll', description: 'Cuenta la tuya en video, audio, texto o foto.' },
-  pt: { title: 'AlmaMundi · Histórias que não se perdem no scroll', description: 'Conte a sua em vídeo, áudio, texto ou foto.' },
-  en: { title: 'AlmaMundi · Stories that don’t get lost in the scroll', description: 'Tell yours in video, audio, text or photo.' },
+  es: { title: 'AlmaMundi · Historias que no se pierden en el scroll', description: '' },
+  pt: { title: 'AlmaMundi · Histórias que não se perdem no scroll', description: '' },
+  en: { title: 'AlmaMundi · Stories that don’t get lost in the scroll', description: '' },
 } as const;
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
