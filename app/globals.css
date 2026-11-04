@@ -497,7 +497,9 @@ a.btn-am-neutro:focus-visible,
 
   .home-hero-pantalla .home-hero-intro {
     flex: 0 0 auto;
+    /* El aire que sobra se reparte arriba y abajo del texto, así queda más arriba sin mover el menú ni las tarjetas. */
     margin-top: auto;
+    margin-bottom: auto;
     padding-top: 0;
     scroll-margin-top: var(--header-h);
   }
