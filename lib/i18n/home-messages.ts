@@ -106,7 +106,7 @@ const es: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi es el lugar donde tus historias no se pierden en el scroll. La vida no es solo la que viviste,',
+    'AlmaMundi es el lugar donde tus historias no se pierden en el scroll.\nLa vida no es solo la que viviste,',
   heroBold: 'sino cómo la recuerdas',
   heroHand: 'Como la tuya',
   heroGreetMorning: 'Buenos días. ¿Qué historia traes hoy?',
@@ -185,7 +185,7 @@ const pt: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    'AlmaMundi é o lugar onde suas histórias não se perdem no scroll. A vida não é só a que você viveu,',
+    'AlmaMundi é o lugar onde suas histórias não se perdem no scroll.\nA vida não é só a que você viveu,',
   heroBold: 'mas como você se lembra dela',
   heroHand: 'como a sua',
   heroGreetMorning: 'Bom dia. Que história você traz hoje?',
@@ -264,7 +264,7 @@ const en: HomeMessages = {
   langShortPt: 'PT',
   langShortEn: 'EN',
   heroBeforeBold:
-    "AlmaMundi is where your stories don't get lost in the scroll. Life is not only the one you lived,",
+    "AlmaMundi is where your stories don't get lost in the scroll.\nLife is not only the one you lived,",
   heroBold: 'but how you remember it',
   heroHand: 'like yours',
   heroGreetMorning: 'Good morning. What story are you bringing today?',

@@ -37,7 +37,13 @@ export function CapituloHome({
     <header className="home-capitulo">
       <p className="home-capitulo-ceja">{ceja}</p>
       <Titulo className={claseTitulo}>
-        {titulo}
+        {/* «\n» en el texto = punto aparte. */}
+        {titulo.split('\n').map((parte, i) => (
+          <span key={i}>
+            {i > 0 ? <br /> : null}
+            {parte}
+          </span>
+        ))}
         {tituloFuerte ? (
           <>
             {' '}
