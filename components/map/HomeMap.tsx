@@ -5,6 +5,7 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
+import { DEMO_HISTORIAS, demoHistoriasActiva } from '@/lib/map-data/demo-historias';
 import { Search } from 'lucide-react';
 import {
   useCallback,
@@ -364,7 +365,16 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     return () => window.clearTimeout(t);
   }, [globeLayers.news]);
 
-  const stories = useStories();
+  const storiesReales = useStories();
+  // Vista previa: historias inventadas para probar la tarjeta (?demo=historias). Nunca en producción.
+  const [demoHistorias, setDemoHistorias] = useState(false);
+  useEffect(() => {
+    if (demoHistoriasActiva()) setDemoHistorias(true);
+  }, []);
+  const stories = useMemo(
+    () => (demoHistorias ? [...DEMO_HISTORIAS, ...storiesReales] : storiesReales),
+    [demoHistorias, storiesReales]
+  );
   const searchParams = useSearchParams();
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const dockCopy = mapChrome(locale);
