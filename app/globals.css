@@ -2721,3 +2721,10 @@ b {
     margin-top: 28px;
   }
 }
+
+/* Títulos de Cuenta, Inspírate y Descubre sin negrita (Ana, 4 nov 2026): frase normal y frase naranja. */
+#intro .home-capitulo-titulo strong,
+#cintas .home-capitulo-titulo strong,
+#mapa .home-capitulo-titulo strong {
+  font-weight: 400;
+}
