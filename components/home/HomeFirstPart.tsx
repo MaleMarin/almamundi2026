@@ -62,8 +62,7 @@ export function HomeFirstPart({
           nivel="h1"
           ceja={t.cejaCuenta}
           titulo={t.heroBeforeBold}
-          tituloFuerte={`${t.heroBold},`}
-          cita={t.heroHandScript}
+          tituloFuerte={t.heroBold}
           bajada={t.bajadaCuenta}
           bajadaFuerte={t.historiasLead2b}
           bajadaEnDosLineas
