@@ -206,27 +206,36 @@ select {
 }
 
 /* Cards #historias: efecto por turnos (una a la vez) y también con el mouse. */
+.home-historias-card-surface .card-hover-decor {
+  transition: opacity 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
 .home-historias-card-surface.encendida .card-hover-decor {
   opacity: 1;
 }
+/* La tarjeta encendida sube y gana luz, igual que con el mouse. */
 .home-neu-card.home-historias-card-surface.encendida {
-  transform: translateY(-0.65rem);
+  transform: translateY(-1rem);
+    box-shadow:
+      28px 28px 64px rgba(120, 110, 100, 0.64),
+      -26px -26px 66px rgba(255, 255, 255, 1),
+      inset 3px 3px 8px rgba(255, 255, 255, 0.96),
+      inset -6px -6px 16px rgba(120, 110, 100, 0.36) !important;
 }
 
 /* Cards #historias: subida al hover con curva suave (no linear). */
 .home-neu-card.home-historias-card-surface {
   transition:
-    box-shadow 0.55s cubic-bezier(0.22, 1, 0.32, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.32, 1);
+    box-shadow 0.95s cubic-bezier(0.25, 1, 0.5, 1),
+    transform 1.05s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .home-neu-card.home-historias-card-surface:hover {
-    transform: translateY(-0.65rem);
+    transform: translateY(-1rem);
     box-shadow:
-      26px 26px 60px rgba(120, 110, 100, 0.62),
-      -24px -24px 62px rgba(255, 255, 255, 1),
-      inset 3px 3px 7px rgba(255, 255, 255, 0.94),
+      28px 28px 64px rgba(120, 110, 100, 0.64),
+      -26px -26px 66px rgba(255, 255, 255, 1),
+      inset 3px 3px 8px rgba(255, 255, 255, 0.96),
       inset -6px -6px 16px rgba(120, 110, 100, 0.36) !important;
   }
 }
@@ -303,15 +312,17 @@ select {
 }
 .home-historias-card-photo-shine {
   pointer-events: none;
+  /* Barrido de luz cálida sobre el marco, como el reflejo en una foto. */
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(255, 255, 255, 0.62) 42%,
-    rgba(255, 255, 255, 0.18) 52%,
+    rgba(255, 196, 150, 0.18) 34%,
+    rgba(255, 255, 255, 0.95) 44%,
+    rgba(255, 170, 120, 0.32) 54%,
     transparent 78%
   );
   background-size: 260% 100%;
-  animation: home-historias-photo-shine 1.75s ease-in-out infinite;
+  animation: home-historias-photo-shine 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
   opacity: 1;
 }
 

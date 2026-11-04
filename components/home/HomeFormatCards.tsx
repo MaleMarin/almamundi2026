@@ -271,7 +271,7 @@ export type HomeFormatCardsProps = {
   sinEtiqueta?: boolean;
 };
 
-const TURNO_MS = 2600;
+const TURNO_MS = 3200;
 
 /** Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima. */
 function useTurnoTarjetas() {
