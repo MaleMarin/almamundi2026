@@ -292,13 +292,13 @@ const es: StoryFlowMessages = {
   modalProfilePhotoNote:
     'Una imagen que identifique tu historia (opcional, hasta 10 MB). Puede ser una foto tuya, de un lugar, de un objeto o de lo que quieras. Si no subes ninguna, usaremos la imagen de cintas que crea tu historia.',
   modalImprintHowTexto:
-    'Los colores salen de las palabras de tu relato. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+    'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales.',
   modalImprintHowFoto:
-    'Los colores salen de los nombres, los lugares y las descripciones que diste a tus fotos. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+    'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales.',
   modalImprintHowAudio:
-    'Los colores salen de las palabras con que presentaste tu audio. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+    'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales.',
   modalImprintHowVideo:
-    'Los colores salen de las palabras con que presentaste tu video. Cada palabra con carga emocional se volvió una franja: su color viene de la emoción que transmite y su ancho, de cuántas veces aparece.',
+    'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales.',
   modalExtrasColorHint: 'Lo que escribas aquí también da color a tu imagen.',
   modalNowWhat: '¿Quieres seguir?',
   modalAnswerWeekQuestion: 'Preguntas para ti',
@@ -404,13 +404,13 @@ const pt: StoryFlowMessages = {
   modalProfilePhotoNote:
     'Uma imagem que identifique sua história (opcional, até 10 MB). Pode ser uma foto sua, de um lugar, de um objeto ou do que você quiser. Se não enviar nenhuma, usaremos a imagem de fitas que sua história cria.',
   modalImprintHowTexto:
-    'As cores saem das palavras do seu relato. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
+    'Suas cores saem da sua história. Do que você conta, de como ela termina e das cores que aparecem nela. Por isso não há duas iguais.',
   modalImprintHowFoto:
-    'As cores saem dos nomes, dos lugares e das descrições que você deu às suas fotos. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
+    'Suas cores saem da sua história. Do que você conta, de como ela termina e das cores que aparecem nela. Por isso não há duas iguais.',
   modalImprintHowAudio:
-    'As cores saem das palavras com que você apresentou seu áudio. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
+    'Suas cores saem da sua história. Do que você conta, de como ela termina e das cores que aparecem nela. Por isso não há duas iguais.',
   modalImprintHowVideo:
-    'As cores saem das palavras com que você apresentou seu vídeo. Cada palavra com carga emocional virou uma faixa: a cor vem da emoção que ela transmite e a largura, de quantas vezes aparece.',
+    'Suas cores saem da sua história. Do que você conta, de como ela termina e das cores que aparecem nela. Por isso não há duas iguais.',
   modalExtrasColorHint: 'O que você escrever aqui também dá cor à sua imagem.',
   modalNowWhat: 'Quer continuar?',
   modalAnswerWeekQuestion: 'Perguntas para você',
@@ -565,13 +565,13 @@ const en: StoryFlowMessages = {
   modalProfilePhotoNote:
     'An image that identifies your story (optional, up to 10 MB). It can be a photo of you, a place, an object or anything you like. If you don\'t upload one, we\'ll use the ribbon image your story creates.',
   modalImprintHowTexto:
-    'The colors come from the words of your story. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+    'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That’s why no two are alike.',
   modalImprintHowFoto:
-    'The colors come from the names, the places and the descriptions you gave your photos. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+    'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That’s why no two are alike.',
   modalImprintHowAudio:
-    'The colors come from the words you used to present your audio. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+    'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That’s why no two are alike.',
   modalImprintHowVideo:
-    'The colors come from the words you used to present your video. Each word with emotional weight became a stripe: its color comes from the emotion it carries and its width from how many times it appears.',
+    'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That’s why no two are alike.',
   modalExtrasColorHint: 'What you write here also gives color to your image.',
   modalNowWhat: 'Want to keep going?',
   modalAnswerWeekQuestion: 'Questions for you',
