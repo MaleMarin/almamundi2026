@@ -516,7 +516,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
         role={catalog ? undefined : 'dialog'}
         aria-modal={catalog ? undefined : true}
         aria-label={catalog ? undefined : story.title ?? story.label}
-        className={compact ? 'story-map-panel' : undefined}
+        className={compact ? 'story-map-panel story-map-panel--historia' : undefined}
         style={compact ? undefined : {
           position: 'fixed',
           left: 'clamp(0px, 30vw, 420px)',
@@ -547,7 +547,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             opacity: mounted ? 1 : 0 }}
         >
           <div
-            className={compact ? `story-map-panel__sheet${tieneMedio ? '' : ' story-map-panel__sheet--sin-medio'}` : undefined}
+            className={compact ? `story-map-panel__sheet story-map-panel__sheet--historia${tieneMedio ? '' : ' story-map-panel__sheet--sin-medio'}` : undefined}
             style={{
               background:     compact ? '#FBFAF8' : 'rgba(6, 10, 22, 0.82)',
               backdropFilter: 'blur(48px) saturate(180%)',
@@ -1123,9 +1123,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
 
 function GlobePanelFrame({ active, children }: { active: boolean; children: ReactNode }) {
   if (!active || typeof document === 'undefined') return children;
-  const target = document.querySelector('.map-section-atmosphere');
-  if (!(target instanceof HTMLElement)) return children;
-  return createPortal(children, target);
+  // La historia se abre al centro de la pantalla (Ana, 4 nov 2026): va directo al body,
+  // para que ningún contenedor del mapa la corra ni la recorte.
+  return createPortal(children, document.body);
 }
 
 function ActionButton({

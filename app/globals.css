@@ -2729,41 +2729,50 @@ b {
   font-weight: 400;
 }
 
-/* Historia abierta en el mapa (opción 1, Ana, 4 nov 2026): tarjeta ancha al centro sobre el globo atenuado.
-   A la izquierda el medio (video, foto o audio con su cinta), a la derecha los datos y el relato. */
-.story-map-panel {
-  top: 50%;
-  right: auto;
-  left: 50%;
-  width: min(820px, calc(100vw - 48px));
-  max-height: min(68vh, calc(100dvh - 64px));
-  transform: translate(-50%, -50%);
+/* Historia abierta en el mapa (opción 1, Ana, 4 nov 2026): tarjeta ancha al centro de la pantalla,
+   con el globo atenuado detrás. A la izquierda el medio, a la derecha los datos y el relato. */
+.story-map-panel.story-map-panel--historia {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  width: auto;
+  height: auto;
+  max-height: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-block: 24px;
+  padding-left: max(24px, env(safe-area-inset-left, 0px));
+  padding-right: max(24px, env(safe-area-inset-right, 0px));
+  pointer-events: none;
 }
-.story-map-panel__card {
+.story-map-panel--historia .story-map-panel__card {
+  width: min(820px, 100%) !important;
+  max-height: min(70vh, 100%) !important;
   border-radius: 28px;
-  box-shadow: 0 0 0 100vmax rgba(8, 12, 24, 0.35);
+  box-shadow: 0 0 0 100vmax rgba(8, 12, 24, 0.4);
 }
-.story-map-panel__sheet {
+.story-map-panel--historia .story-map-panel__card:has(.story-map-panel__sheet--sin-medio) {
+  width: min(680px, 100%) !important;
+}
+.story-map-panel__sheet--historia {
   display: grid !important;
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   grid-template-rows: auto minmax(0, 1fr);
+  height: 100%;
   box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
 }
-.story-map-panel__sheet--sin-medio {
-  grid-template-columns: minmax(0, 1fr);
-  max-width: 680px;
-  margin-inline: auto;
-}
-.story-map-panel__medio {
+.story-map-panel__sheet--historia.story-map-panel__sheet--sin-medio { grid-template-columns: minmax(0, 1fr); }
+.story-map-panel__sheet--historia .story-map-panel__medio {
   position: relative;
   grid-column: 1;
   grid-row: 1 / span 2;
-  min-height: 320px;
+  min-height: 340px;
   overflow: hidden;
   background: #e9e4dc;
 }
-.story-map-panel__cabecera { grid-column: -2; grid-row: 1; }
-.story-map-panel__scroll { grid-column: -2; grid-row: 2; }
+.story-map-panel__sheet--historia .story-map-panel__cabecera { grid-column: -2; grid-row: 1; }
+.story-map-panel__sheet--historia .story-map-panel__scroll { grid-column: -2; grid-row: 2; }
 .story-map-panel__medio .story-map-panel__cinta {
   position: absolute;
   inset: 0;
@@ -2781,41 +2790,36 @@ b {
   background: rgba(251, 250, 248, 0.92);
   box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
 }
-.story-map-panel__relato p { max-width: 62ch; }
-.story-map-panel__more {
-  background: linear-gradient(to bottom, rgba(251, 250, 248, 0), rgba(251, 250, 248, 0.95));
-}
-.map-sound-control--panel-open { right: 1.5rem; }
-
-/* Celular: la historia sube desde abajo, un poco más de la mitad de la pantalla, en una columna. */
-@media (max-width: 767px) {
-  .story-map-panel {
-    top: auto;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    max-height: 62dvh;
-    transform: none;
-  }
-  .story-map-panel__card {
-    border-radius: 26px 26px 0 0;
-    box-shadow: none;
-  }
-  .story-map-panel__sheet {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto auto minmax(0, 1fr);
-    border-radius: 26px 26px 0 0 !important;
-  }
-  .story-map-panel__medio { grid-column: 1; grid-row: 1; min-height: 0; height: 180px; margin: 12px 16px 0; border-radius: 16px; }
-  .story-map-panel__cabecera { grid-column: 1; grid-row: 2; padding: 16px 20px 12px !important; }
-  .story-map-panel__scroll { grid-column: 1; grid-row: 3; padding: 14px 20px 20px !important; }
-  .story-map-panel__sheet--sin-medio { grid-template-rows: auto minmax(0, 1fr); }
-  .story-map-panel__sheet--sin-medio .story-map-panel__cabecera { grid-row: 1; }
-  .story-map-panel__sheet--sin-medio .story-map-panel__scroll { grid-row: 2; }
-  .map-sound-control--panel-open { right: auto; left: 1rem; }
-}
-/* Fotos dentro de la tarjeta clara: leyendas en tinta oscura y la foto llena el espacio. */
 .story-map-panel__medio:not(.story-map-panel__medio--audio) { display: flex; flex-direction: column; justify-content: center; padding: 16px; }
 .story-map-panel__medio p,
 .story-map-panel__medio span { color: #3c4655 !important; }
 .story-map-panel__medio img { max-height: 46vh !important; }
+.story-map-panel__relato p { max-width: 62ch; }
+.story-map-panel__sheet--historia .story-map-panel__more {
+  background: linear-gradient(to bottom, rgba(251, 250, 248, 0), rgba(251, 250, 248, 0.95));
+}
+
+/* Celular: la historia sube desde abajo, un poco más de la mitad de la pantalla, en una columna. */
+@media (max-width: 767px) {
+  .story-map-panel.story-map-panel--historia {
+    align-items: flex-end;
+    padding: 0;
+  }
+  .story-map-panel--historia .story-map-panel__card,
+  .story-map-panel--historia .story-map-panel__card:has(.story-map-panel__sheet--sin-medio) {
+    width: 100% !important;
+    max-height: 62dvh !important;
+    border-radius: 26px 26px 0 0;
+  }
+  .story-map-panel__sheet--historia {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    border-radius: 26px 26px 0 0 !important;
+  }
+  .story-map-panel__sheet--historia .story-map-panel__medio { grid-column: 1; grid-row: 1; min-height: 0; height: 180px; margin: 12px 16px 0; border-radius: 16px; }
+  .story-map-panel__sheet--historia .story-map-panel__cabecera { grid-column: 1; grid-row: 2; padding: 16px 20px 12px !important; }
+  .story-map-panel__sheet--historia .story-map-panel__scroll { grid-column: 1; grid-row: 3; padding: 14px 20px 20px !important; }
+  .story-map-panel__sheet--historia.story-map-panel__sheet--sin-medio { grid-template-rows: auto minmax(0, 1fr); }
+  .story-map-panel__sheet--sin-medio .story-map-panel__cabecera { grid-row: 1; }
+  .story-map-panel__sheet--sin-medio .story-map-panel__scroll { grid-row: 2; }
+}
