@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { clientIpFromRequest, enforceRateLimit, getRateLimiter } from "@/lib/rate-limit";
 import { transcribirArchivoPrivado } from "@/lib/huella/transcribe-server";
-import { resonanceStripeUnits } from "@/lib/huella/resonance-stripes";
+import { cintasSinModelo, textoParaCintas } from "@/lib/cintas-v2/sin-modelo";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     const snap = await ref.get();
     if (!snap.exists) return NextResponse.json({ error: "not found" }, { status: 404 });
     const data = (snap.data() ?? {}) as Record<string, unknown>;
-    if (Array.isArray(data.huellaUnits) && data.huellaUnits.length) {
+    if (data.transcripcionEstado === "ok" && Array.isArray(data.huellaUnits) && data.huellaUnits.length) {
       return NextResponse.json({ units: data.huellaUnits });
     }
     const createdAt = typeof data.createdAt === "number" ? data.createdAt : 0;
@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     const titulo = typeof data.storyTitle === "string" ? data.storyTitle : "";
     const contexto = typeof data.context === "string" ? data.context : "";
     const locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
-    const units = resonanceStripeUnits({ storyId: id, text: [titulo, contexto, transcripcion].filter(Boolean).join("\n"), locale });
+    const units = cintasSinModelo({ id, texto: textoParaCintas({ storyTitle: titulo, context: contexto, textBody: transcripcion }), locale });
     await ref.update({ transcripcion, transcripcionEstado: "ok", huellaUnits: units });
     return NextResponse.json({ units });
   } catch (e) {

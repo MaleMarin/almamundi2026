@@ -42,16 +42,15 @@ export async function GET(req: Request) {
   }
   if (!units.length) units = resonanceStripeUnits({ storyId: 'almamundi', text: 'almamundi', locale });
 
+  // Una sola composición a todo el ancho, sin repetir el patrón.
+  const total = units.reduce((s, u) => s + u.width, 0) || 1;
   const stripes: { hex: string; width: number }[] = [];
-  let x = 0;
-  for (let guard = 0; x < W && guard < 600; guard++) {
-    for (const u of units) {
-      const w = Math.min(Math.max(2, Math.round(u.width * 1.4)), W - x);
-      if (w <= 0) break;
-      stripes.push({ hex: u.hex, width: w });
-      x += w;
-      if (x >= W) break;
-    }
+  let acumulado = 0;
+  for (const u of units) {
+    const x0 = Math.round((acumulado / total) * W);
+    acumulado += u.width;
+    const x1 = Math.round((acumulado / total) * W);
+    if (x1 > x0) stripes.push({ hex: u.hex, width: x1 - x0 });
   }
 
   return new ImageResponse(

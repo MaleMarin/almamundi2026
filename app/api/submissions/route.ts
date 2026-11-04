@@ -1,3 +1,4 @@
+import { cintasSinModelo, textoParaCintas } from "@/lib/cintas-v2/sin-modelo";
 import { after, NextRequest, NextResponse } from "next/server";
 import * as Sentry from "@sentry/nextjs";
 import { getAdminDb } from "@/lib/firebase/admin";
@@ -252,8 +253,27 @@ export async function POST(req: NextRequest) {
 
   try {
     const db = getAdminDb();
-    const ref = await db.collection("submissions").add({
+    const ref = db.collection("submissions").doc();
+    // Cintas privadas (estilo Gene Davis, sin modelo). En audio y video se recalculan con la transcripción.
+    let huellaUnits: { hex: string; width: number }[] = [];
+    try {
+      huellaUnits = cintasSinModelo({
+        id: ref.id,
+        texto: textoParaCintas({
+          storyTitle,
+          context,
+          textBody: data.payload.textBody,
+          photoFichas: data.payload.photoFichas,
+        }),
+        locale: data.locale === "pt" || data.locale === "en" ? data.locale : "es",
+        coloresImagen: data.huellaColoresFoto,
+      });
+    } catch (cintaErr) {
+      console.error("[submissions POST] cintas", cintaErr instanceof Error ? cintaErr.message : "cintas");
+    }
+    await ref.set({
       ...doc,
+      ...(huellaUnits.length ? { huellaUnits } : {}),
       malwareScanStatus:
         process.env.CLAMAV_SCAN_URL?.trim() && data.privateMediaPaths?.length
           ? "pending"
@@ -323,7 +343,7 @@ export async function POST(req: NextRequest) {
       console.error("[submissions POST] share code", shareErr instanceof Error ? shareErr.message : "share");
       share = "";
     }
-    return NextResponse.json({ ok: true, id: submissionId, ...(share ? { share } : {}) });
+    return NextResponse.json({ ok: true, id: submissionId, ...(share ? { share } : {}), ...(huellaUnits.length ? { units: huellaUnits } : {}) });
   } catch (e) {
     Sentry.captureException(e, {
       tags: { source: 'api.submissions.firestore_add' },

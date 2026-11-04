@@ -22,17 +22,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     locale: 'es',
   });
 
+  const total = units.reduce((s, u) => s + u.width, 0) || 1;
   const stripes: { hex: string; width: number }[] = [];
-  let x = 0;
-  for (let guard = 0; x < W && units.length > 0 && guard < 600; guard++) {
-    for (const u of units) {
-      const w = Math.min(Math.max(2, Math.round(u.width * 1.4)), W - x);
-      if (w <= 0) break;
-      stripes.push({ hex: u.hex, width: w });
-      x += w;
-      if (x >= W) break;
-    }
+  let acumulado = 0;
+  for (const u of units) {
+    const x0 = Math.round((acumulado / total) * W);
+    acumulado += u.width;
+    const x1 = Math.round((acumulado / total) * W);
+    if (x1 > x0) stripes.push({ hex: u.hex, width: x1 - x0 });
   }
+
 
   const lugar = formatPublicPlace(story?.city, story?.country, 'es');
   const shortTitle = title.length > 70 ? `${title.slice(0, 68)}…` : title;

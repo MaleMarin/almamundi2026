@@ -1,76 +1,19 @@
 /**
- * Resonancia visual por franjas verticales de borde duro.
- * Palabras del relato → léxico AlmaMundi → VAD → HSL.
+ * Cintas de colores (estilo Gene Davis, metodología final de exp/cintas-v2).
+ * Se calculan sin modelo: léxico, colores dichos en el relato y colores de la foto.
  */
 
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { canvasFontFamily } from '@/lib/typography';
 import { displayCountryName } from '@/lib/i18n/country-name';
 import { formatLongDate } from '@/lib/i18n/locale';
-import { seedFn, seededRnd } from '@/lib/huella/huellaV2';
-import { hitsFromText, type LexiconHit } from '@/lib/huella/almamundi-lexicon';
-import {
-  colorizeVadHits,
-  expandSparseVadColors,
-  hslCss,
-  stripeWidthForCounts,
-  type ColorizedVadHit,
-  type VadTriple,
-} from '@/lib/huella/vad-color';
-import { blendHitsTowardVad, ecoBlendT } from '@/lib/huella/eco-vad';
+import type { VadTriple } from '@/lib/huella/vad-color';
+import { cintasSinModelo } from '@/lib/cintas-v2/sin-modelo';
 
 export const RESONANCE_BG = '#F7F4EE';
-export const RESONANCE_STRIPE_MIN_PX = 8;
-export const RESONANCE_STRIPE_MAX_PX = 60;
 export const RESONANCE_EXPORT_PX = 1080;
 export const RESONANCE_FOOTER_SITE = 'almamundi.org';
 const FOOTER_INK = '#1A1916';
-
-function hueDist(a: number, b: number): number {
-  const d = Math.abs(a - b) % 360;
-  return d > 180 ? 360 - d : d;
-}
-
-type StripeUnit = ColorizedVadHit<LexiconHit> & { width: number; hex: string };
-
-function orderForContrast(units: StripeUnit[]): StripeUnit[] {
-  if (units.length <= 2) return units;
-  const leftover = [...units];
-  const out: StripeUnit[] = [leftover.shift()!];
-  while (leftover.length) {
-    const prev = out[out.length - 1]!.h;
-    leftover.sort((a, b) => hueDist(b.h, prev) - hueDist(a.h, prev));
-    out.push(leftover.shift()!);
-  }
-  return out;
-}
-
-function fallbackHits(storyId: string): LexiconHit[] {
-  const S = seedFn(storyId);
-  const seeds: LexiconHit[] = [
-    { lemma: 'casa', lang: 'es', v: 0.64, a: 0.32, d: 0.52, count: 1 },
-    { lemma: 'camino', lang: 'es', v: 0.42, a: 0.48, d: 0.44, count: 1 },
-    { lemma: 'memoria', lang: 'es', v: 0.7, a: 0.55, d: 0.48, count: 1 },
-    { lemma: 'fuego', lang: 'es', v: 0.4, a: 0.82, d: 0.55, count: 1 },
-    { lemma: 'agua', lang: 'es', v: 0.6, a: 0.38, d: 0.54, count: 1 },
-    { lemma: 'noche', lang: 'es', v: 0.52, a: 0.34, d: 0.5, count: 1 },
-  ];
-  const n = 4;
-  const used = new Set<number>();
-  const hits: LexiconHit[] = [];
-  for (let i = 0; i < n; i++) {
-    let idx = Math.floor(seededRnd(S, 80 + i) * seeds.length);
-    let guard = 0;
-    while (used.has(idx) && guard < 12) {
-      idx = (idx + 1) % seeds.length;
-      guard += 1;
-    }
-    used.add(idx);
-    const s = seeds[idx]!;
-    hits.push({ ...s, count: 1 + Math.floor(seededRnd(S, 120 + i) * 3) });
-  }
-  return hits;
-}
 
 export type ResonancePieceFooter = {
   at: Date;
@@ -94,6 +37,8 @@ export type DrawVadResonanceArgs = {
   ecoVad?: (VadTriple & { n: number }) | null;
   /** Franjas ya calculadas en el servidor (p. ej. con la transcripción de un audio o video). */
   units?: { hex: string; width: number }[] | null;
+  /** Colores medidos de una foto (hex), si los hay. */
+  coloresImagen?: string[];
 };
 
 /** Valida franjas guardadas (hex y ancho) antes de dibujarlas. */
@@ -192,38 +137,22 @@ function drawResonancePieceFooter(
   ctx.restore();
 }
 
-/** Franjas de la imagen de cintas (color en hsl y ancho en px), sin dibujar. Sirve en el servidor. */
-export function resonanceStripeUnits(args: { storyId: string; text: string; locale: AlmaLocale }): { hex: string; width: number }[] {
-  const hitsRaw = hitsFromText(args.text, args.locale);
-  const hits = hitsRaw.length > 0 ? hitsRaw : fallbackHits(args.storyId);
-  const colored = expandSparseVadColors(colorizeVadHits(hits));
-  const counts = colored.map((h) => h.count);
-  return orderForContrast(
-    colored.map((h) => ({
-      ...h,
-      width: stripeWidthForCounts(h.count, counts, RESONANCE_STRIPE_MIN_PX, RESONANCE_STRIPE_MAX_PX),
-      hex: hslCss(h.h, h.s, h.l),
-    }))
-  ).map((u) => ({ hex: u.hex, width: u.width }));
+/** Franjas de la imagen de cintas (hex y ancho en px, suman 1080), sin dibujar. Sirve en el servidor. */
+export function resonanceStripeUnits(args: {
+  storyId: string;
+  text: string;
+  locale: AlmaLocale;
+  coloresImagen?: string[];
+}): { hex: string; width: number }[] {
+  return cintasSinModelo({ id: args.storyId, texto: args.text, locale: args.locale, coloresImagen: args.coloresImagen });
 }
 
 export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: DrawVadResonanceArgs): void {
   const W = ctx.canvas.width;
   const H = ctx.canvas.height;
-  const hitsRaw = hitsFromText(args.text, args.locale);
-  const hitsBase = hitsRaw.length > 0 ? hitsRaw : fallbackHits(args.storyId);
-  const t = args.ecoVad && args.ecoVad.n > 0 ? ecoBlendT(args.ecoVad.n) : 0;
-  const hits = t > 0 && args.ecoVad ? blendHitsTowardVad(hitsBase, args.ecoVad, t) : hitsBase;
-  const colored = expandSparseVadColors(colorizeVadHits(hits));
-  const counts = colored.map((h) => h.count);
-  const calculadas = orderForContrast(
-    colored.map((h) => ({
-      ...h,
-      width: stripeWidthForCounts(h.count, counts, RESONANCE_STRIPE_MIN_PX, RESONANCE_STRIPE_MAX_PX),
-      hex: hslCss(h.h, h.s, h.l),
-    }))
-  );
-  const units = franjasValidas(args.units) ?? calculadas;
+  const units =
+    franjasValidas(args.units) ??
+    cintasSinModelo({ id: args.storyId, texto: args.text, locale: args.locale, coloresImagen: args.coloresImagen });
 
   ctx.imageSmoothingEnabled = false;
   (ctx as CanvasRenderingContext2D & { webkitImageSmoothingEnabled?: boolean }).webkitImageSmoothingEnabled = false;
@@ -239,22 +168,16 @@ export function drawVadResonanceOnCanvas(ctx: CanvasRenderingContext2D, args: Dr
   const footerH = footer ? footerMetrics(W, Boolean(footer.title?.trim())).height : 0;
   const fieldH = H - footerH;
 
-  let x = 0;
-  let repeat = 0;
-  while (x < W && repeat < 400) {
-    for (let u = 0; u < units.length; u++) {
-      const unit = units[u]!;
-      let stripeW = unit.width;
-      const xi = Math.round(x);
-      if (xi + stripeW > W) stripeW = W - xi;
-      stripeW = Math.max(0, Math.round(stripeW));
-      if (stripeW <= 0) break;
-      ctx.fillStyle = unit.hex;
-      ctx.fillRect(xi, 0, stripeW, fieldH);
-      x = xi + stripeW;
-      if (x >= W) break;
-    }
-    repeat += 1;
+  // Una sola composición a todo el ancho, sin repetir el patrón.
+  const total = units.reduce((s, u) => s + u.width, 0) || 1;
+  let acumulado = 0;
+  for (const unit of units) {
+    const x0 = Math.round((acumulado / total) * W);
+    acumulado += unit.width;
+    const x1 = Math.round((acumulado / total) * W);
+    if (x1 <= x0) continue;
+    ctx.fillStyle = unit.hex;
+    ctx.fillRect(x0, 0, x1 - x0, fieldH);
   }
 
   if (footer) drawResonancePieceFooter(ctx, fieldH, footer);

@@ -56,6 +56,7 @@ import { interpolate } from '@/lib/i18n/locale';
 import {
   drawVadResonanceOnCanvas,
   RESONANCE_EXPORT_PX } from '@/lib/huella/resonance-stripes';
+import { coloresDeFotoEnNavegador } from '@/lib/cintas-v2/colores-imagen';
 import {
   canvasToPngBlob,
   downloadPngBlob } from '@/lib/huella/share-resonance-png';
@@ -1672,6 +1673,13 @@ export function StoryModal({
         uploadPieces.forEach((piece) => reportLoaded(piece.key, piece.size));
       }
 
+      // Colores de las fotos, medidos aquí mismo (sin modelo). Solo sirven para la cinta privada.
+      let huellaColoresFoto: string[] = [];
+      if (mode === 'foto') {
+        const listas = await Promise.all(photos.slice(0, 3).map((p) => coloresDeFotoEnNavegador(p.previewUrl ?? '', 3)));
+        huellaColoresFoto = [...new Set(listas.flatMap((lista, i) => (i === 0 ? lista : lista.slice(0, 1))))].slice(0, 5);
+      }
+
       const res = await fetch('/api/submissions', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1711,9 +1719,15 @@ export function StoryModal({
             : {}),
           ...(newsletterOptIn ? { newsletterOptIn: true } : {}),
           ...(pregunta ? { questionId: pregunta.id, questionMode: pregunta.mode } : {}),
+          ...(huellaColoresFoto.length ? { huellaColoresFoto } : {}),
           locale }) });
 
-      const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string; share?: string };
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        id?: string;
+        share?: string;
+        units?: { hex: string; width: number }[];
+      };
       if (!res.ok) {
         reportStorySubmitError(data.error || `submissions_${res.status}`, 'submissions', data.error);
         if (res.status === 400) turnstileRef.current?.reset();
@@ -1749,7 +1763,7 @@ export function StoryModal({
         city,
         country };
       setImprintStoryTitle(title);
-      setImprintUnits(null);
+      setImprintUnits(Array.isArray(data.units) && data.units.length ? data.units : null);
       if ((mode === 'video' || mode === 'audio') && typeof data.id === 'string' && data.id) {
         // Transcribe la voz para que los colores salgan de lo que se contó. Máximo 30 segundos.
         setEscuchando(true);

@@ -125,6 +125,8 @@ export const CreateSubmissionBody = z.object({
   ),
   questionMode: z.enum(["tu", "alguien"]).optional(),
   locale: z.enum(["es", "pt", "en"]).optional(),
+  /** Colores medidos de las fotos en el navegador (hex). Solo sirven para la cinta privada. */
+  huellaColoresFoto: z.array(z.string().regex(/^#[0-9a-fA-F]{6}$/)).max(5).optional(),
   /** Casilla opcional de /contar. No se guarda en la historia. */
   newsletterOptIn: z.boolean().optional(),
 }).superRefine((data, ctx) => {
