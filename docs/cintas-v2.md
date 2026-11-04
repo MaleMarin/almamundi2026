@@ -6,7 +6,9 @@ Cada relato se analiza una vez. El resultado queda en un JSON privado, en `tmp-c
 
 El análisis no se publica. Sirve para armar la cinta y, si hace falta, para revisarlo en administración.
 
-Las cintas son privadas. La persona las recibe en la pantalla final y por correo apenas envía su relato. No se publican en el mapa ni en ninguna página pública. La semilla de la historia alcanza para elegir la paleta.
+La persona recibe sus cintas en la pantalla final y por correo apenas envía su relato. No se muestran en el mapa. Única excepción (decisión de Ana, 4 nov 2026): en Historias contadas, si la historia no tiene foto, su cinta sirve de portada.
+
+En video, los colores salen solo de la voz (la transcripción), no de las imágenes del video (decisión de Ana, 4 nov 2026). La semilla de la historia alcanza para elegir la paleta.
 
 ## Paleta madre
 
