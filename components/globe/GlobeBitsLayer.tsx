@@ -725,7 +725,8 @@ function GlobeBitsLayerMounted({
       aux.ndc.copy(aux.bitWorld).project(camera);
       const sx = (aux.ndc.x * 0.5 + 0.5) * w;
       const sy = (-aux.ndc.y * 0.5 + 0.5) * h;
-      const d = Math.hypot(sx - px, sy - py);
+      // Si una historia y otro punto quedan encima, gana la historia: es lo más importante del globo.
+      const d = Math.max(0, Math.hypot(sx - px, sy - py) - (kind === 'stories' ? 12 : 0));
       aux.distById.set(id, d);
     }
 

@@ -306,6 +306,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const botonFondo = compact ? 'rgba(60,70,85,0.06)' : 'rgba(255,255,255,0.08)';
   const botonBorde = compact ? 'rgba(60,70,85,0.14)' : 'rgba(255,255,255,0.12)';
   const soloAudio = Boolean(story.audioUrl) && !story.videoUrl;
+  // Video y audio: después de quien cuenta y su lugar, solo los dos botones, sin texto (Ana, 4 nov 2026).
+  const sinRelato = Boolean(story.videoUrl) || soloAudio;
   const [mounted, setMounted] = useState(false);
   const [ecoPanel, setEcoPanel] = useState<null | 'voice' | 'text'>(null);
   const [listening, setListening] = useState(false);
@@ -770,7 +772,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               {!compact && slides.length > 0 ? <PhotoNavigator slides={slides} /> : null}
 
               {/* Audio: solo nombre de la historia, quien la cuenta, ciudad y país, sin texto (Ana, 4 nov 2026). */}
-              {story.body && !soloAudio ? (
+              {story.body && !sinRelato ? (
                 <div
                   className={compact ? 'story-map-panel__relato' : undefined}
                   style={{
@@ -985,7 +987,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
-              {compact ? <div aria-hidden style={{ height: soloAudio ? 8 : 24, flexShrink: 0 }} /> : null}
+              {compact ? <div aria-hidden style={{ height: sinRelato ? 8 : 24, flexShrink: 0 }} /> : null}
               {compact ? (
               <div
                 style={{
