@@ -5,6 +5,7 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
+import { DEMO_PREGUNTAS, DEMO_RESPUESTAS, demoConstelacionActiva } from '@/lib/me-pregunto/demo-constelacion';
 import type { GlobeArc } from '@/components/globe/GlobeArcsLayer';
 import { Search } from 'lucide-react';
 import {
@@ -292,7 +293,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     void Promise.all([lista('/api/respuestas/public?banco=hilos&limit=500'), lista('/api/respuestas/public?banco=me-pregunto')])
       .then(([hilos, me]) => {
         if (cancel) return;
-        setRespuestas([...hilos, ...me]);
+        setRespuestas([...hilos, ...me, ...(demoConstelacionActiva() ? DEMO_RESPUESTAS : [])]);
       })
       .catch(() => {
         if (!cancel) setRespuestas([]);
@@ -310,7 +311,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     void fetch('/api/me-pregunto')
       .then((res) => (res.ok ? res.json() : { items: [] }))
       .then((data: { items?: MePreguntaPublica[] }) => {
-        if (!cancel) setMePreguntas(Array.isArray(data.items) ? data.items : []);
+        if (!cancel) setMePreguntas([...(demoConstelacionActiva() ? DEMO_PREGUNTAS : []), ...(Array.isArray(data.items) ? data.items : [])]);
       })
       .catch(() => undefined);
     return () => {
