@@ -57,7 +57,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'AlmaMundi',
       images: [
         {
-          url: '/og/sitio',
+          url: '/og/sitio?v=2',
           width: 1200,
           height: 630,
           alt: site.ogAlt,
@@ -68,7 +68,7 @@ export async function generateMetadata(): Promise<Metadata> {
       card: 'summary_large_image',
       title: site.title,
       description: site.description,
-      images: ['/og/sitio'],
+      images: ['/og/sitio?v=2'],
     },
     icons: {
       icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],

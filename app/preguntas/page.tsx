@@ -30,7 +30,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const title = persona ? `${persona.texto} · AlmaMundi` : `${copy.ceja} · AlmaMundi`;
   const description = persona ? ME_PREGUNTO_UI[locale].bajada : copy.bajada;
   const image = {
-    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio',
+    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio?v=2',
     width: 1200,
     height: 630,
     alt: copy.ceja,

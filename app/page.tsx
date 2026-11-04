@@ -23,7 +23,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'AlmaMundi',
       images: [
         {
-          url: '/og/sitio',
+          url: '/og/sitio?v=2',
           width: 1200,
           height: 630,
           alt: site.ogAlt,
