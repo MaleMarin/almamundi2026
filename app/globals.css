@@ -316,10 +316,11 @@ select {
   background: linear-gradient(
     105deg,
     transparent 0%,
-    rgba(255, 196, 150, 0.18) 34%,
-    rgba(255, 255, 255, 0.95) 44%,
-    rgba(255, 170, 120, 0.32) 54%,
-    transparent 78%
+    transparent 36%,
+    rgba(255, 255, 255, 0.95) 45%,
+    rgba(255, 120, 70, 0.2) 50%,
+    transparent 58%,
+    transparent 100%
   );
   background-size: 260% 100%;
   animation: home-historias-photo-shine 2.4s cubic-bezier(0.45, 0, 0.25, 1) infinite;
@@ -2544,6 +2545,10 @@ b {
 
 /* Cuenta: más aire entre la frase naranja y «Elige cómo». */
 .home-hero-pantalla #intro .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 18px; }
+/* En computador, «Tú eliges cuál» baja y hace de puente hacia las tarjetas. */
+@media (min-width: 768px) and (min-height: 600px) {
+  .home-hero-pantalla #intro .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: clamp(40px, 6vh, 72px); }
+}
 .home-hero-pantalla #intro .home-capitulo-cita { margin-top: 14px; }
 
 /* Inspírate: el llamado va primero y la línea gris debajo. */
