@@ -306,7 +306,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const [resonanceExtra, setResonanceExtra] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
   const [showMomentoJusto, setShowMomentoJusto] = useState(false);
-  const [liveReaders, setLiveReaders] = useState(0);
   const endRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const onCloseRef = useRef(onClose);
@@ -314,7 +313,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const scrollRef = useRef<HTMLDivElement>(null);
   const [moreBelow, setMoreBelow] = useState(false);
   const synthRef = useRef<SpeechSynthesisUtterance | null>(null);
-  const readerIdRef = useRef<string | null>(null);
 
   const alreadySentKey = `resonance_${story.id}`;
   const alreadySent =
@@ -446,28 +444,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
     };
   }, []);
 
-  useEffect(() => {
-    if (!catalog) return;
-    const ping = async () => {
-      try {
-        const headers: HeadersInit = {};
-        if (readerIdRef.current) headers['x-reader-id'] = readerIdRef.current;
-        const res = await fetch(`/api/stories/${story.id}/readers`, { method: 'POST', headers });
-        const d = (await res.json()) as { count?: number; readerId?: string };
-        if (d.readerId) readerIdRef.current = d.readerId;
-        setLiveReaders(d.count ?? 0);
-      } catch {}
-    };
-    void ping();
-    const interval = setInterval(() => void ping(), 15_000);
-    return () => {
-      clearInterval(interval);
-      const id = readerIdRef.current;
-      if (id) {
-        fetch(`/api/stories/${story.id}/readers`, { method: 'DELETE', headers: { 'x-reader-id': id } }).catch(() => {});
-      }
-    };
-  }, [story.id, catalog]);
 
   useEffect(() => {
     if (catalog) return;
@@ -666,18 +642,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   {place}
                 </p>
                 ) : null}
-                {liveReaders > 1 && (
-                  <p
-                    style={{
-                      fontSize: 'var(--fs-etiqueta)',
-                      color: 'rgba(255,255,255,0.28)',
-                      margin: '6px 0 0',
-                      fontFamily: SITE_FONT_STACK,
-                      fontStyle: 'italic' }}
-                  >
-                    Alguien más está aquí ahora.
-                  </p>
-                )}
               </div>
 
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, flexShrink: 0, marginLeft: 16 }}>
