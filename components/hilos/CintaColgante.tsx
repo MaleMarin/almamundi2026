@@ -458,6 +458,7 @@ export function BloqueCintasHome({ locale }: { locale: AlmaLocale }) {
         bajadaTactil={home.bajadaInspiraTactil}
         bajadaFuerte={home.inspiraLlamada}
         bajadaEnDosLineas
+        llamadoPrimero
       />
       <div className="home-capitulo-ancho">
         <CortinaTemas locale={locale} capitulo />

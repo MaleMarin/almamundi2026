@@ -2489,3 +2489,7 @@ b {
 /* Cuenta: más aire entre la frase naranja y «Elige cómo». */
 .home-hero-pantalla #intro .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 18px; }
 .home-hero-pantalla #intro .home-capitulo-cita { margin-top: 14px; }
+
+/* Inspírate: el llamado va primero y la línea gris debajo. */
+#cintas .home-capitulo-bajada-elige + .home-capitulo-bajada-linea { margin-top: 8px; }
+#cintas .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 28px; }

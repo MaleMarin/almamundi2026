@@ -8,6 +8,8 @@ type CapituloHomeProps = {
   /** Variante de la bajada para pantallas táctiles (sin mouse). */
   bajadaTactil?: string;
   cita?: string;
+  /** El llamado en negrita va antes de la línea gris. */
+  llamadoPrimero?: boolean;
   /** La bajada y la bajada fuerte van en dos renglones. */
   bajadaEnDosLineas?: boolean;
   portada?: boolean;
@@ -23,6 +25,7 @@ export function CapituloHome({
   bajadaFuerte,
   bajadaTactil,
   cita,
+  llamadoPrimero = false,
   bajadaEnDosLineas = false,
   portada = false,
   nivel = 'h2',
@@ -55,6 +58,26 @@ export function CapituloHome({
       {bajada ? (
         bajadaEnDosLineas ? (
           <>
+            {llamadoPrimero ? (
+              <>
+            {bajadaFuerte ? (
+              <p className="home-capitulo-bajada home-capitulo-bajada-elige">
+                <strong>{bajadaFuerte}</strong>
+              </p>
+            ) : null}
+            <p className="home-capitulo-bajada home-capitulo-bajada-linea">
+              {bajadaTactil ? (
+                <>
+                  <span className="solo-mouse">{bajada}</span>
+                  <span className="solo-tactil">{bajadaTactil}</span>
+                </>
+              ) : (
+                bajada
+              )}
+            </p>
+              </>
+            ) : (
+              <>
             <p className="home-capitulo-bajada home-capitulo-bajada-linea">
               {bajadaTactil ? (
                 <>
@@ -70,6 +93,8 @@ export function CapituloHome({
                 <strong>{bajadaFuerte}</strong>
               </p>
             ) : null}
+              </>
+            )}
           </>
         ) : (
           <p className="home-capitulo-bajada">
