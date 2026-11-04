@@ -152,7 +152,9 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
           className={`absolute bottom-0 left-0 right-0 flex flex-col rounded-t-[28px] p-0 ${
             soundsMode
               ? 'h-auto max-h-full'
-              : fitContent
+              : mode === 'mepregunto'
+                ? /* Preguntas de las personas: media pantalla, para ver arriba el globo con las líneas. */ 'h-[52vh] max-h-[52vh]'
+                : fitContent
                 ? 'h-auto max-h-[70vh]'
                 : innerScrollPanel
                   ? 'h-[70vh] max-h-[70vh]'

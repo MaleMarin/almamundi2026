@@ -5,6 +5,7 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
+import type { GlobeArc } from '@/components/globe/GlobeArcsLayer';
 import { Search } from 'lucide-react';
 import {
   useCallback,
@@ -57,6 +58,13 @@ import { StoryViewer } from '@/components/mapa/StoryViewer';
 const SHOW_SURPRISE_ME_BUTTON = false;
 /** Respuestas aprobadas en el globo. No entran al catálogo de historias. */
 const SHOW_PUBLIC_RESPUESTAS = true;
+/** Regla del globo para las preguntas de las personas (Ana, 4 nov 2026). */
+const PREGUNTAS_GLOBO_COMPUTADOR = 20;
+const PREGUNTAS_GLOBO_CELULAR = 12;
+const LINEAS_PREGUNTA_COMPUTADOR = 8;
+const LINEAS_PREGUNTA_CELULAR = 5;
+/** Los mismos colores del punto multicolor de las preguntas. */
+const COLORES_CONSTELACION = ['#FF6200', '#FF0A8A', '#0047FF', '#00B140', '#7A12E0', '#00C2D6', '#FFD000', '#FF1A1A'];
 
 /** IDs sintéticos en el globo para historias (bits reales usan ids bajos desde huellas). */
 const STORY_GLOBE_ID_BASE = 9_000_000;
@@ -626,12 +634,10 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   }, [filteredNewsItems, newsMarkersMounted]);
 
   const respuestasOnGlobe = useMemo(() => {
-    // Topes separados: 40 respuestas a preguntas de AlmaMundi y 40 a preguntas de las personas.
+    // 40 respuestas a preguntas de AlmaMundi. Las respuestas a preguntas de las personas no son puntos:
+    // viven en la tarjeta de su pregunta y se ven como líneas al abrirla (constelación, 4 nov 2026).
     const conGeo = respuestas.filter((item) => storyHasValidGeo(item));
-    const list = [
-      ...conGeo.filter((item) => !esMePreguntaId(item.questionId)).slice(0, 40),
-      ...conGeo.filter((item) => esMePreguntaId(item.questionId)).slice(0, 40),
-    ];
+    const list = conGeo.filter((item) => !esMePreguntaId(item.questionId)).slice(0, 40);
     if (
       pinnedRespuesta &&
       openRespuesta?.id === pinnedRespuesta.id &&
@@ -654,13 +660,71 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
       color: '#FF4A1C' }));
   }, [respuestasOnGlobe]);
 
-  const preguntasOnGlobe = useMemo(
-    () =>
-      mePreguntas.slice(0, 40).filter(
-        (p) => typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)
-      ),
-    [mePreguntas]
-  );
+  /** Respuestas a preguntas de las personas, agrupadas por pregunta (llegan de la más nueva a la más antigua). */
+  const respuestasPorPregunta = useMemo(() => {
+    const mapa = new Map<string, RespuestaPublica[]>();
+    for (const item of respuestas) {
+      if (!esMePreguntaId(item.questionId)) continue;
+      const lista = mapa.get(item.questionId) ?? [];
+      lista.push(item);
+      mapa.set(item.questionId, lista);
+    }
+    return mapa;
+  }, [respuestas]);
+
+  /**
+   * Regla del globo: máximo 20 preguntas en computador y 12 en celular.
+   * Primero las que tienen respuestas (la de respuesta más reciente primero); después el resto.
+   * La pregunta abierta siempre está.
+   */
+  const preguntasOnGlobe = useMemo(() => {
+    const conGeo = mePreguntas.filter(
+      (p) => typeof p.lat === 'number' && typeof p.lng === 'number' && Number.isFinite(p.lat) && Number.isFinite(p.lng)
+    );
+    const ordenRespuesta = new Map<string, number>();
+    [...respuestasPorPregunta.keys()].forEach((id, i) => ordenRespuesta.set(id, i));
+    const ordenadas = [...conGeo].sort((a, b) => {
+      const ra = ordenRespuesta.get(a.id);
+      const rb = ordenRespuesta.get(b.id);
+      if (ra != null && rb != null) return ra - rb;
+      if (ra != null) return -1;
+      if (rb != null) return 1;
+      return 0;
+    });
+    const tope = isMobile ? PREGUNTAS_GLOBO_CELULAR : PREGUNTAS_GLOBO_COMPUTADOR;
+    const lista = ordenadas.slice(0, tope);
+    const abierta = abrirPregunta ? conGeo.find((p) => p.id === abrirPregunta) : undefined;
+    if (abierta && !lista.some((p) => p.id === abierta.id)) lista.push(abierta);
+    return lista;
+  }, [mePreguntas, respuestasPorPregunta, isMobile, abrirPregunta]);
+
+  /**
+   * Constelación de la pregunta abierta: una línea por lugar (varias respuestas de la misma ciudad = una línea),
+   * con las respuestas más recientes. Máximo 8 en computador y 5 en celular.
+   */
+  const preguntaArcs = useMemo((): GlobeArc[] => {
+    if (!drawerOpen || drawerMode !== 'mepregunto' || !abrirPregunta) return [];
+    const pregunta = preguntasOnGlobe.find((p) => p.id === abrirPregunta);
+    if (!pregunta || typeof pregunta.lat !== 'number' || typeof pregunta.lng !== 'number') return [];
+    const tope = isMobile ? LINEAS_PREGUNTA_CELULAR : LINEAS_PREGUNTA_COMPUTADOR;
+    const vistos = new Set<string>();
+    const arcs: GlobeArc[] = [];
+    for (const item of respuestasPorPregunta.get(abrirPregunta) ?? []) {
+      if (typeof item.lat !== 'number' || typeof item.lng !== 'number') continue;
+      const lugar = item.city.trim()
+        ? `${item.city.trim().toLowerCase()}|${item.country.trim().toLowerCase()}`
+        : `${item.lat.toFixed(1)},${item.lng.toFixed(1)}`;
+      if (vistos.has(lugar)) continue;
+      vistos.add(lugar);
+      arcs.push({
+        from: { lat: pregunta.lat, lon: pregunta.lng },
+        to: { lat: item.lat, lon: item.lng },
+        color: COLORES_CONSTELACION[arcs.length % COLORES_CONSTELACION.length]!,
+      });
+      if (arcs.length >= tope) break;
+    }
+    return arcs;
+  }, [drawerOpen, drawerMode, abrirPregunta, preguntasOnGlobe, respuestasPorPregunta, isMobile]);
 
   const globePreguntaMarkers = useMemo((): GlobeBitMarker[] => {
     return preguntasOnGlobe.map((p, i) => ({
@@ -1025,6 +1089,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 Boolean(openStory) || Boolean(openRespuesta) || surpriseFlying || (drawerOpen && drawerMode === 'bits')
               }
               onBitClick={handleGlobeMarkerClick}
+              arcs={preguntaArcs}
+              arcsMobile={isMobile}
               focusTarget={focusTarget}
               onFocusArrived={finishSurpriseOpen}
             />
