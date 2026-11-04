@@ -1,6 +1,6 @@
 # Cintas v2
 
-Metodología final del prototipo. No cambia el envío de relatos, la cinta que ya está en producción, Firebase ni Vercel. Vive en la rama `exp/cintas-v2`. El código de composición está en `lib/cintas-v2/`. Los guiones que arman las hojas están en `scripts/cintas-v2/`. Las historias de prueba están en `scripts/cintas-v2/fixtures/` y no las usa el sitio.
+Metodología final de las cintas: la imagen privada que recibe cada persona apenas envía su historia, en la pantalla final y por correo. Se aprobó en el prototipo de la rama `exp/cintas-v2` (ronda 10) y desde el 4 de noviembre de 2026 está conectada al sitio, sin modelo (ver «En el sitio, sin modelo», al final). El código de composición está en `lib/cintas-v2/`. Los guiones que arman las hojas están en `scripts/cintas-v2/`. Las historias de prueba están en `scripts/cintas-v2/fixtures/` y no las usa el sitio.
 
 Cada relato se analiza una vez. El resultado queda en un JSON privado, en `tmp-cintas-v2/analisis/`. Ese JSON no lleva nombres de personas. La cinta se vuelve a dibujar desde ese archivo, sin llamar al modelo. Recomponer cuesta 0.
 
@@ -132,3 +132,31 @@ El correo sale cuando la cinta está lista. El análisis tarda de unos segundos 
 Si el análisis falla, la persona igual recibe sus cintas, armadas con una paleta de respaldo. No se queda sin cinta. En el prototipo, si el modelo no responde, hoy entra un diccionario de respaldo y la cinta se dibuja igual. Al integrar, el respaldo tiene que ser la paleta de la casilla, no un mensaje de error.
 
 Probar el circuito completo con las primeras historias reales antes de dejarlo en el sitio.
+
+## En el sitio, sin modelo
+
+Desde el 4 de noviembre de 2026 el sitio dibuja las cintas con esta metodología, sin llamar a ningún modelo de lenguaje. La paleta madre, las 36 paletas de respaldo, la ley de la extensión y el trazado de los anchos son los de la ronda 10, sin cambios. Solo cambia quién lee el relato. Costo por cinta: 0.
+
+El código está en `lib/cintas-v2/sin-modelo.ts`. La cinta se calcula en el servidor al recibir la historia, se guarda en el envío y la pantalla final la muestra. La tarjeta para compartir usa la misma.
+
+**Quién lee el relato.** En lugar del modelo, el léxico AlmaMundi lee la emoción, y una lista de reglas detecta los colores propios que dice la historia, con las mismas reglas de «Color propio real» de arriba. Lee el título, el contexto y el relato.
+
+**Audio y video.** Se leen con la transcripción de OpenAI (whisper-1), que ya existía en el sitio. La cinta se dibuja primero con el título y el contexto, y se vuelve a dibujar cuando llega la transcripción. Es lo único que cuesta: unos centavos por minuto.
+
+**Fotos.** Los colores se miden en el navegador de la persona, sobre la foto que subió (40 × 40 píxeles), aunque sea una sola. Los grises, blancos y negros no cuentan. El color más presente puede ser protagonista. Si la foto no tiene colores con tono propio, la paleta de respaldo completa.
+
+**Pocas palabras.** Si el léxico no encuentra ninguna palabra, la semilla de la historia elige una de las nueve casillas, y dentro de ella una de las cuatro paletas. Así puede caer en cualquiera de las 36.
+
+**Composición que no cumple.** Si una composición no pasa la revisión de la ronda 10, se prueba otra variante trazada desde la misma historia, hasta seis veces. La sexta se acepta igual. Nadie queda sin cinta.
+
+### Ajustes del 4 de noviembre de 2026
+
+Al probar «La radio de mi padre», la cinta salió demasiado luminosa para una historia nostálgica que termina en una pérdida. El léxico lee palabra por palabra y no ve el sentido del cierre. Se hicieron tres ajustes, todos sin costo:
+
+1. **El final pesa más.** Las palabras del primer tercio del relato pesan 1, las del segundo 1,5 y las del último 2, al calcular la luz y la intensidad. Si el relato tiene más de 8 frases, los momentos se eligen repartidos de principio a fin, incluida la última frase (antes se tomaban solo las 8 primeras).
+2. **Expresiones de pérdida y ausencia.** Frases como «nunca fui a buscarla», «terminó botándola», «me dio lata», «se fue», «desarmamos la casa» o «ya no está» cuentan como palabras de valencia baja. Incluye modismos de Chile y México, y algunas en portugués e inglés.
+3. **Escala del léxico.** Los tercios de luz e intensidad y los modos se calibraron con el modelo, que usa todo el rango de 0 a 1. El léxico casi siempre queda entre 0,40 y 0,66 de valencia y entre 0,30 y 0,60 de activación, así que todas las historias caían en la casilla del medio. Ahora ese rango se estira de 0 a 1 antes de elegir la casilla y el modo. Una historia muy triste llega a la luz profunda y una muy alegre a la luminosa.
+
+Prueba: 300 historias distintas, ninguna sin cinta, ninguna con negro ni blanco, 286 diferentes entre sí.
+
+**Límite conocido.** El léxico no entiende negación, ironía ni metáfora. El modelo leía con más finura. Si más adelante se vuelve a usar el modelo, basta cambiar la lectura: la composición no cambia.
