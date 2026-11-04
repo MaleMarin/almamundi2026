@@ -2214,6 +2214,31 @@ a.cortina-formato:visited {
   outline-offset: 3px;
 }
 
+/* Celulares y pantallas táctiles: no hay puntero que pase sobre las cintas,
+   así que los nombres de los temas se muestran siempre como etiquetas bajo la cortina. */
+@media (hover: none), (max-width: 767px) {
+  .cortina-leyenda.cortina-leyenda-teclado {
+    position: static;
+    width: 100%;
+    height: auto;
+    margin: 16px 0 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+  .cortina-leyenda,
+  .cortina-etiqueta {
+    pointer-events: auto;
+  }
+  .cortina-leyenda {
+    gap: 6px;
+  }
+  .cortina-etiqueta {
+    padding: 6px 11px;
+    font-size: 13px;
+  }
+}
+
 .cortina-te-preguntan {
   display: flex;
   align-items: center;
