@@ -1,5 +1,6 @@
 'use client';
 
+import { CintaMini } from '@/components/hilos/CintaMini';
 import { useCallback, useEffect, useLayoutEffect, useState, useRef, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
@@ -297,6 +298,14 @@ function PhotoNavigator({ slides }: { slides: PhotoSlide[] }) {
 export function StoryViewer({ story, onClose, isClosing, onSelectRelated, variant = 'full', onTellStory, catalog = true, onBack }: Props) {
   const locale = useHomeLocaleOptional()?.locale ?? 'es';
   const compact = variant === 'compact';
+  // Tarjeta del mapa (decisión de Ana, 4 nov 2026): fondo hueso como el resto del sitio, texto oscuro.
+  const tinta = compact ? '#3c4655' : 'rgba(255,255,255,0.96)';
+  const tintaSuave = compact ? '#616c7c' : 'rgba(255,255,255,0.72)';
+  const tintaTexto = compact ? '#3c4655' : 'rgba(255,255,255,0.78)';
+  const lineaSuave = compact ? 'rgba(60,70,85,0.10)' : 'rgba(255,255,255,0.07)';
+  const botonFondo = compact ? 'rgba(60,70,85,0.06)' : 'rgba(255,255,255,0.08)';
+  const botonBorde = compact ? 'rgba(60,70,85,0.14)' : 'rgba(255,255,255,0.12)';
+  const soloAudio = Boolean(story.audioUrl) && !story.videoUrl;
   const [mounted, setMounted] = useState(false);
   const [ecoPanel, setEcoPanel] = useState<null | 'voice' | 'text'>(null);
   const [listening, setListening] = useState(false);
@@ -397,6 +406,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
 
   const photos = story.photos ?? [];
   const slides = photoSlides(story);
+  const tieneMedio = Boolean(story.videoUrl || story.audioUrl || slides.length > 0);
   const format = story.videoUrl
     ? 'video'
     : story.audioUrl
@@ -537,12 +547,12 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
             opacity: mounted ? 1 : 0 }}
         >
           <div
-            className={compact ? 'story-map-panel__sheet' : undefined}
+            className={compact ? `story-map-panel__sheet${tieneMedio ? '' : ' story-map-panel__sheet--sin-medio'}` : undefined}
             style={{
-              background:     'rgba(6, 10, 22, 0.82)',
+              background:     compact ? '#FBFAF8' : 'rgba(6, 10, 22, 0.82)',
               backdropFilter: 'blur(48px) saturate(180%)',
               WebkitBackdropFilter: 'blur(48px) saturate(180%)',
-              border:         '1px solid rgba(255, 255, 255, 0.10)',
+              border:         compact ? '1px solid rgba(255, 255, 255, 0.7)' : '1px solid rgba(255, 255, 255, 0.10)',
               borderRadius:   28,
               boxShadow: `
                 inset 0 1.5px 0 rgba(255, 255, 255, 0.14),
@@ -558,6 +568,30 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               flexDirection:  'column',
               position:       'relative' }}
           >
+            {compact && tieneMedio ? (
+              <div className={`story-map-panel__medio${soloAudio ? ' story-map-panel__medio--audio' : ''}`}>
+                {story.videoUrl ? (
+                  <video controls src={story.videoUrl} style={{ width: '100%', height: '100%', display: 'block', objectFit: 'contain', background: '#000' }} />
+                ) : soloAudio ? (
+                  <>
+                    <CintaMini
+                      storyId={story.id ?? ''}
+                      units={story.huellaUnits ?? null}
+                      text={story.body ?? story.title ?? ''}
+                      locale={locale}
+                      className="story-map-panel__cinta"
+                      width={800}
+                      height={800}
+                    />
+                    <div className="story-map-panel__reproductor">
+                      <audio controls src={story.audioUrl} style={{ width: '100%' }} />
+                    </div>
+                  </>
+                ) : (
+                  <PhotoNavigator slides={slides} />
+                )}
+              </div>
+            ) : null}
             {/* Reflejo de luz en el borde superior */}
             <div aria-hidden style={{
               position:      'absolute',
@@ -569,11 +603,12 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
               pointerEvents: 'none',
               zIndex:        1 }} />
             <div
+              className={compact ? 'story-map-panel__cabecera' : undefined}
               style={{
                 position: 'relative',
                 zIndex: 2,
-                padding: '22px 24px 16px',
-                borderBottom: '1px solid rgba(255,255,255,0.07)',
+                padding: compact ? '30px 32px 16px' : '22px 24px 16px',
+                borderBottom: `1px solid ${lineaSuave}`,
                 flexShrink: 0,
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -585,7 +620,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     fontSize: 'var(--fs-etiqueta)',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',
-                    color: 'rgba(var(--almamundi-orange-rgb), 0.70)',
+                    color: compact ? '#b8340f' : 'rgba(var(--almamundi-orange-rgb), 0.70)',
                     margin: '0 0 6px',
                     fontFamily: SITE_FONT_STACK }}
                 >
@@ -595,7 +630,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   style={{
                     fontSize: 'var(--fs-titular)',
                     fontWeight: 400,
-                    color: 'rgba(255,255,255,0.96)',
+                    color: tinta,
                     margin: '0 0 4px',
                     lineHeight: 1.2,
                     fontFamily: SITE_FONT_STACK }}
@@ -608,7 +643,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                       fontSize: 'var(--fs-etiqueta)',
                       letterSpacing: '0.08em',
                       textTransform: 'uppercase',
-                      color: 'rgba(255,255,255,0.62)',
+                      color: tintaSuave,
                       margin: '0 0 4px',
                       fontFamily: SITE_FONT_STACK }}
                   >
@@ -618,13 +653,14 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 <RespondeALine
                   questionId={story.questionId}
                   questionMode={story.questionMode}
-                  color="rgba(255,255,255,0.92)"
+                  color={compact ? '#3c4655' : 'rgba(255,255,255,0.92)'}
                 />
                 {alias ? (
                 <p
                   style={{
                     fontSize: 'var(--fs-etiqueta)',
-                    color: 'rgba(255,255,255,0.72)',
+                    color: compact ? tinta : 'rgba(255,255,255,0.72)',
+                    fontWeight: compact ? 600 : undefined,
                     margin: 0,
                     fontFamily: SITE_FONT_STACK }}
                 >
@@ -635,7 +671,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 <p
                   style={{
                     fontSize: 'var(--fs-etiqueta)',
-                    color: 'rgba(255,255,255,0.72)',
+                    color: tintaSuave,
                     margin: '2px 0 0',
                     fontFamily: SITE_FONT_STACK }}
                 >
@@ -653,9 +689,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   minHeight: 36,
                   padding: '0 12px',
                   borderRadius: 999,
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.82)',
+                  background: botonFondo,
+                  border: `1px solid ${botonBorde}`,
+                  color: compact ? tinta : 'rgba(255,255,255,0.82)',
                   cursor: 'pointer',
                   fontSize: 'var(--fs-etiqueta)',
                   fontFamily: SITE_FONT_STACK,
@@ -672,9 +708,9 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   width: 36,
                   height: 36,
                   borderRadius: '50%',
-                  background: 'rgba(255,255,255,0.08)',
-                  border: '1px solid rgba(255,255,255,0.12)',
-                  color: 'rgba(255,255,255,0.60)',
+                  background: botonFondo,
+                  border: `1px solid ${botonBorde}`,
+                  color: compact ? tinta : 'rgba(255,255,255,0.60)',
                   cursor: 'pointer',
                   fontSize: 'var(--fs-texto)',
                   display: 'flex',
@@ -697,13 +733,13 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 zIndex: 2,
                 overflowY: 'auto',
                 scrollbarWidth: 'none',
-                padding: compact ? '24px 24px 24px' : '24px 24px 28px',
+                padding: compact ? '20px 32px 26px' : '24px 24px 28px',
                 flex: compact ? '1 1 auto' : 1,
                 minHeight: compact ? 0 : undefined,
                 overscrollBehavior: compact ? 'contain' : undefined,
                 touchAction: compact ? 'pan-y' : undefined }}
             >
-              {story.videoUrl ? (
+              {!compact && story.videoUrl ? (
                 <div style={{ borderRadius: 16, overflow: 'hidden', marginBottom: 24 }}>
                   <video
                     controls
@@ -713,7 +749,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
-              {story.audioUrl ? (
+              {!compact && story.audioUrl ? (
                 <div
                   style={{
                     background: 'rgba(255,255,255,0.04)',
@@ -730,14 +766,16 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
-              {slides.length > 0 ? <PhotoNavigator slides={slides} /> : null}
+              {!compact && slides.length > 0 ? <PhotoNavigator slides={slides} /> : null}
 
-              {story.body ? (
+              {/* Audio: solo nombre de la historia, quien la cuenta, ciudad y país, sin texto (Ana, 4 nov 2026). */}
+              {story.body && !soloAudio ? (
                 <div
+                  className={compact ? 'story-map-panel__relato' : undefined}
                   style={{
                     fontSize: 'var(--fs-texto)',
-                    lineHeight: 1.85,
-                    color: 'rgba(255,255,255,0.78)',
+                    lineHeight: compact ? 1.7 : 1.85,
+                    color: tintaTexto,
                     fontFamily: SITE_FONT_STACK }}
                 >
                   {story.body
@@ -946,7 +984,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 </div>
               ) : null}
 
-              {compact ? <div aria-hidden style={{ height: 32, flexShrink: 0 }} /> : null}
+              {compact ? <div aria-hidden style={{ height: soloAudio ? 8 : 24, flexShrink: 0 }} /> : null}
               {compact ? (
               <div
                 style={{
