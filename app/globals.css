@@ -2683,9 +2683,39 @@ b {
   }
 }
 
-/* «El Alma del Mundo» con el mismo estilo que las frases naranjas de Cuenta e Inspírate: cursiva y el mismo naranja. */
+/* Descubre como la hero (decisión de Ana, 4 nov 2026): «El Alma del Mundo» en gris oscuro como la frase
+   principal de Cuenta, y «son las historias de cada persona» en naranja cursiva como «y hay muchas formas de contarla». */
 #mapa .home-capitulo-titulo.home-capitulo-titulo-portada {
+  color: #3c4655;
+  font-family: inherit;
+  font-style: normal;
+  font-weight: 400;
+  font-size: var(--fs-titular);
+  line-height: 1.2;
+}
+#mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea {
+  margin-top: 14px;
   color: #d9431c;
+  font-family: var(--font-interna), sans-serif;
+  font-size: var(--fs-titular);
   font-style: italic;
   font-weight: 300;
+  line-height: 1.2;
+}
+#mapa .home-capitulo-bajada-linea + .home-capitulo-bajada-elige {
+  margin-top: 28px;
+}
+@media (min-width: 768px) and (min-height: 600px) {
+  #mapa .home-capitulo-titulo.home-capitulo-titulo-portada {
+    font-size: clamp(22px, 1.5vw + 0.8vh, 34px);
+    line-height: 1.32;
+  }
+  #mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea {
+    margin-top: 14px;
+    font-size: clamp(28px, 1.4vw + 1.2vh, 38px);
+    line-height: 1.15;
+  }
+  #mapa .home-capitulo-bajada-linea + .home-capitulo-bajada-elige {
+    margin-top: 28px;
+  }
 }
