@@ -62,8 +62,8 @@ export function HomeFirstPart({
           nivel="h1"
           ceja={t.cejaCuenta}
           titulo={t.heroBeforeBold}
-          tituloFuerte={t.heroBold}
-          bajada={t.bajadaCuenta}
+          tituloFuerte={`${t.heroBold},`}
+          cita={`${t.bajadaCuenta.charAt(0).toLocaleLowerCase()}${t.bajadaCuenta.slice(1)},`}
           bajadaFuerte={t.historiasLead2b}
           bajadaEnDosLineas
         />

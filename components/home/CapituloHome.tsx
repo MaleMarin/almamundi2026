@@ -76,6 +76,10 @@ export function CapituloHome({
             ) : null}
           </p>
         )
+      ) : bajadaFuerte ? (
+        <p className="home-capitulo-bajada home-capitulo-bajada-elige">
+          <strong>{bajadaFuerte}</strong>
+        </p>
       ) : null}
     </header>
   );
