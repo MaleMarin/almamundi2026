@@ -14,7 +14,6 @@ import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
-import { TemaTags } from '@/components/historias/TemaTags';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { preguntaPorId } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -410,7 +409,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   const formatKey = format === 'photos' ? 'image' : format;
   const place = formatPublicPlace(story.city, story.country, locale);
   const formatWord = FORMAT_LABEL[locale][formatKey];
-  const kicker = place ? `${formatWord} · ${place}` : formatWord;
+  const kicker = formatWord;
   const temaPregunta = catalog ? null : preguntaPorId(story.questionId)?.tema[locale];
   const alias = formatPublicName(story.authorName || story.author?.name);
 
@@ -645,7 +644,6 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                   questionMode={story.questionMode}
                   color="rgba(255,255,255,0.92)"
                 />
-                <TemaTags ids={story.temas} tone="dark" className="mt-2" />
                 {alias ? (
                 <p
                   style={{
@@ -655,6 +653,17 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                     fontFamily: SITE_FONT_STACK }}
                 >
                   {BY_LABEL[locale]} {alias}
+                </p>
+                ) : null}
+                {place ? (
+                <p
+                  style={{
+                    fontSize: 'var(--fs-etiqueta)',
+                    color: 'rgba(255,255,255,0.72)',
+                    margin: '2px 0 0',
+                    fontFamily: SITE_FONT_STACK }}
+                >
+                  {place}
                 </p>
                 ) : null}
                 {liveReaders > 1 && (
