@@ -2493,3 +2493,8 @@ b {
 /* Inspírate: el llamado va primero y la línea gris debajo. */
 #cintas .home-capitulo-bajada-elige + .home-capitulo-bajada-linea { margin-top: 8px; }
 #cintas .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: 28px; }
+
+/* Hero: la frase y las tarjetas un poco más abajo, siempre dentro de la primera pantalla. */
+@media (min-width: 768px) {
+  .home-hero-pantalla #intro { padding-top: clamp(8px, 2.6vh, 30px); }
+}
