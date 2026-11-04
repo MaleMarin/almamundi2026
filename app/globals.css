@@ -205,6 +205,14 @@ select {
     inset -4px -4px 10px rgba(120,110,100,0.18) !important;
 }
 
+/* Cards #historias: efecto por turnos (una a la vez) y también con el mouse. */
+.home-historias-card-surface.encendida .card-hover-decor {
+  opacity: 1;
+}
+.home-neu-card.home-historias-card-surface.encendida {
+  transform: translateY(-0.65rem);
+}
+
 /* Cards #historias: subida al hover con curva suave (no linear). */
 .home-neu-card.home-historias-card-surface {
   transition:

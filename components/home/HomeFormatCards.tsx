@@ -3,8 +3,10 @@
 /**
  * Las 4 tarjetas de formato (home y /contar). Misma pieza: textos, neumorfismo y hover.
  * LOCK visual: no alterar tamaños, sombras ni animaciones sin petición explícita.
+ * Efecto por turnos (pedido de Ana, 4 nov 2026): se enciende una tarjeta a la vez, en ronda;
+ * si el mouse pasa por una, se enciende esa y la ronda se detiene hasta que sale.
  */
-import type { ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { contarHref, type ContarPregunta } from '@/lib/contar-routes';
@@ -35,8 +37,8 @@ function HistoriasCardHoverDecor({
   enMedio?: boolean;
 }) {
   const wrap = enMedio
-    ? 'pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100'
-    : 'pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
+    ? 'card-hover-decor pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100'
+    : 'card-hover-decor pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
 
   if (kind === 'video') {
     return (
@@ -159,7 +161,9 @@ function SoftCard({
   onClick,
   delay,
   hoverKind,
-  fillViewport = false }: {
+  fillViewport = false,
+  encendida = false,
+  onPasar }: {
   title: string;
   subtitle: string;
   children: ReactNode;
@@ -169,6 +173,10 @@ function SoftCard({
   delay: string;
   hoverKind: HistoriasCardHoverKind;
   fillViewport?: boolean;
+  /** Le toca el turno del efecto. */
+  encendida?: boolean;
+  /** El mouse entra (true) o sale (false) de la tarjeta. */
+  onPasar?: (dentro: boolean) => void;
 }) {
   return (
     <div
@@ -178,12 +186,14 @@ function SoftCard({
           : 'home-historias-card-float-wrap mx-auto flex h-full w-full min-w-0 max-w-[min(100%,26rem)] justify-center sm:max-w-[28rem] md:max-w-[30rem] lg:mx-0 lg:max-w-full'
       }
       style={{ animationDelay: delay }}
+      onMouseEnter={() => onPasar?.(true)}
+      onMouseLeave={() => onPasar?.(false)}
     >
       <div
         className={
           fillViewport
-            ? 'home-neu-card home-historias-card-surface group relative flex h-full min-h-0 w-full min-w-0 flex-col items-stretch overflow-hidden rounded-[28px] p-3 transition-[transform,box-shadow] duration-500 sm:p-4 md:p-5'
-            : 'home-neu-card home-historias-card-surface group relative flex min-h-0 aspect-square w-full min-w-0 max-w-full flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-[transform,box-shadow] duration-500 md:p-5'
+            ? `home-neu-card home-historias-card-surface${encendida ? ' encendida' : ''} group relative flex h-full min-h-0 w-full min-w-0 flex-col items-stretch overflow-hidden rounded-[28px] p-3 transition-[transform,box-shadow] duration-500 sm:p-4 md:p-5`
+            : `home-neu-card home-historias-card-surface${encendida ? ' encendida' : ''} group relative flex min-h-0 aspect-square w-full min-w-0 max-w-full flex-col items-stretch overflow-hidden rounded-[28px] p-4 transition-[transform,box-shadow] duration-500 md:p-5`
         }
         style={{
           ...soft.flat,
@@ -261,6 +271,37 @@ export type HomeFormatCardsProps = {
   sinEtiqueta?: boolean;
 };
 
+const TURNO_MS = 2600;
+
+/** Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima. */
+function useTurnoTarjetas() {
+  const [ronda, setRonda] = useState(-1);
+  const [mouse, setMouse] = useState<number | null>(null);
+
+  useEffect(() => {
+    let quieto = false;
+    try {
+      quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    } catch {
+      quieto = false;
+    }
+    if (quieto) return;
+    const id = window.setInterval(() => {
+      if (document.visibilityState === 'hidden') return;
+      setRonda((n) => (n + 1) % 4);
+    }, TURNO_MS);
+    return () => window.clearInterval(id);
+  }, []);
+
+  return {
+    encendida: mouse ?? ronda,
+    pasar: (indice: number, dentro: boolean) => {
+      setMouse(dentro ? indice : null);
+      if (!dentro) setRonda(indice);
+    },
+  };
+}
+
 export function HomeFormatCards({
   onRecordVideo,
   onRecordAudio,
@@ -271,6 +312,7 @@ export function HomeFormatCards({
   pregunta = null,
   sinEtiqueta = false }: HomeFormatCardsProps) {
   const { t } = useHomeLocale();
+  const turno = useTurnoTarjetas();
 
   return (
     <section
@@ -319,6 +361,8 @@ export function HomeFormatCards({
           onClick={onRecordVideo}
           delay="0s"
           hoverKind="video"
+          encendida={turno.encendida === 0}
+          onPasar={(dentro) => turno.pasar(0, dentro)}
           fillViewport={fillViewport}
         >
           {t.cardVideoBody}
@@ -331,6 +375,8 @@ export function HomeFormatCards({
           onClick={onRecordAudio}
           delay="0.45s"
           hoverKind="audio"
+          encendida={turno.encendida === 1}
+          onPasar={(dentro) => turno.pasar(1, dentro)}
           fillViewport={fillViewport}
         >
           {t.cardAudioBody}
@@ -343,6 +389,8 @@ export function HomeFormatCards({
           onClick={onWriteStory}
           delay="0.9s"
           hoverKind="text"
+          encendida={turno.encendida === 2}
+          onPasar={(dentro) => turno.pasar(2, dentro)}
           fillViewport={fillViewport}
         >
           {t.cardWriteBody}
@@ -355,6 +403,8 @@ export function HomeFormatCards({
           onClick={onRecordPhoto}
           delay="1.35s"
           hoverKind="photo"
+          encendida={turno.encendida === 3}
+          onPasar={(dentro) => turno.pasar(3, dentro)}
           fillViewport={fillViewport}
         >
           {t.cardPhotoBody}
