@@ -550,7 +550,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
           <div
             className={compact ? `story-map-panel__sheet story-map-panel__sheet--historia${tieneMedio ? '' : ' story-map-panel__sheet--sin-medio'}` : undefined}
             style={{
-              background:     compact ? '#FBFAF8' : 'rgba(6, 10, 22, 0.82)',
+              background:     compact ? 'rgba(251, 250, 248, 0.93)' : 'rgba(6, 10, 22, 0.82)',
               backdropFilter: 'blur(48px) saturate(180%)',
               WebkitBackdropFilter: 'blur(48px) saturate(180%)',
               border:         compact ? '1px solid rgba(255, 255, 255, 0.7)' : '1px solid rgba(255, 255, 255, 0.10)',

@@ -48,7 +48,7 @@ export function ProceduralStarfield({
       colors[i * 3 + 1] = 0.90 + 0.05 * hash01(i, 6);
       colors[i * 3 + 2] = 0.97 + 0.03 * (1.0 - temp);
 
-      opacities[i] = 0.16 + Math.pow(hash01(i, 4), 3.1) * 0.72;
+      opacities[i] = 0.3 + Math.pow(hash01(i, 4), 2.4) * 0.7;
       phases[i] = hash01(i, 8) * Math.PI * 2;
     }
     return { positions, colors, opacities, phases };

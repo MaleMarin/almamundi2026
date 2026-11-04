@@ -1176,7 +1176,7 @@ function GlobeScene({
     }
   }, -100);
   /* Estrellas: radio 420 < camera.far 1000. Tamaño en px (sin attenuation). */
-  const starsCount = embedded ? 2500 : 4200;
+  const starsCount = embedded ? 5200 : 6000;
   const starsRadius = 420;
 
   /* ACES: exposición alta; el contenedor ya no aplica vignette fuerte (ver globe-earth-night.module.css).
