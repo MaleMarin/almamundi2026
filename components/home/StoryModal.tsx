@@ -3230,6 +3230,7 @@ export function StoryModal({
               shareTextLong={conEnlace(t.modalShareTextLong || PENDING_STORY_SHARE_TEXT)}
               shareTextSocial={t.modalShareTextSocial}
               socialSinEnlace
+              copyMessage
               emailSubject={t.modalShareEmailSubject || PENDING_STORY_SHARE_EMAIL_SUBJECT}
               labels={{
                 title: t.modalShareMenuTitle,
@@ -3239,7 +3240,7 @@ export function StoryModal({
                 instagram: t.modalShareInstagram,
                 tiktok: t.modalShareTikTok,
                 email: t.modalShareEmail,
-                copyLink: t.modalCopyLink,
+                copyLink: t.modalCopyMessage,
                 download: isCoarsePointer ? t.modalSaveImage : t.modalDownloadImprint,
                 close: t.modalClose }}
               showDownload={shareMenuShowDownload}
@@ -3248,7 +3249,7 @@ export function StoryModal({
               shareTitle={(imprintStoryTitle || storyTitle).trim() || 'AlmaMundi'}
               onCopied={() => {
                 setShareCopyFallback(null);
-                flashShareNotice(t.modalShareLinkCopied);
+                flashShareNotice(t.modalShareTextCopied);
                 setShareMenuOpen(false);
               }}
               onTextCopied={() => {

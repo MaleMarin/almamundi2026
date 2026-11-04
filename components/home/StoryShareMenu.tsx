@@ -95,6 +95,8 @@ type StoryShareMenuProps = {
   keepShareUrl?: boolean;
   /** Instagram y TikTok copian el texto tal cual, sin sumar el enlace. */
   socialSinEnlace?: boolean;
+  /** «Copiar mensaje»: copia el texto largo con su enlace, no solo el enlace. */
+  copyMessage?: boolean;
 };
 
 export function StoryShareMenu({
@@ -113,7 +115,8 @@ export function StoryShareMenu({
   onEmail,
   onClose,
   keepShareUrl = false,
-  socialSinEnlace = false }: StoryShareMenuProps) {
+  socialSinEnlace = false,
+  copyMessage = false }: StoryShareMenuProps) {
   const channels = buildStoryShareChannelUrls(
     shareUrl,
     {
@@ -125,9 +128,10 @@ export function StoryShareMenu({
 
   const copyLink = () => {
     const link = keepShareUrl ? shareUrl : canonicalStoryShareUrl(shareUrl);
-    copyTextInClick(link, (ok) => {
+    const texto = copyMessage ? shareTextLong : link;
+    copyTextInClick(texto, (ok) => {
       if (ok) onCopied();
-      else onCopyFailed(link);
+      else onCopyFailed(texto);
     });
   };
 

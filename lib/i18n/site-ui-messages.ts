@@ -106,6 +106,7 @@ export type SiteUiMessages = {
   modalShareDownloaded: string;
   modalShareFailed: string;
   modalCopyLink: string;
+  modalCopyMessage: string;
   modalAnotherStory: string;
   modalLinkCopied: string;
   modalImprintWhat: string;
@@ -224,6 +225,7 @@ const es: SiteUiMessages = {
   modalShareDownloaded: 'Tu navegador no pudo copiar la imagen; se descargó el PNG.',
   modalShareFailed: 'No pudimos compartir la imagen. Guárdala y compártela desde tu galería.',
   modalCopyLink: 'Copiar enlace',
+  modalCopyMessage: 'Copiar mensaje',
   modalAnotherStory: 'Otra historia',
   modalLinkCopied: 'Enlace copiado',
   modalImprintWhat: '¿De dónde salen estos colores?',
@@ -367,6 +369,7 @@ const pt: SiteUiMessages = {
   modalShareDownloaded: 'Seu navegador não pôde copiar a imagem; o PNG foi baixado.',
   modalShareFailed: 'Não foi possível compartilhar a imagem. Salve e compartilhe a partir da sua galeria.',
   modalCopyLink: 'Copiar link',
+  modalCopyMessage: 'Copiar mensagem',
   modalAnotherStory: 'Outra história',
   modalLinkCopied: 'Link copiado',
   modalImprintWhat: 'De onde vêm estas cores?',
@@ -510,6 +513,7 @@ const en: SiteUiMessages = {
   modalShareDownloaded: "Your browser couldn't copy the image; the PNG was downloaded instead.",
   modalShareFailed: "We couldn't share the image. Save it and share it from your gallery.",
   modalCopyLink: 'Copy link',
+  modalCopyMessage: 'Copy message',
   modalAnotherStory: 'Another story',
   modalLinkCopied: 'Link copied',
   modalImprintWhat: 'Where do these colors come from?',
