@@ -2712,8 +2712,10 @@ b {
   }
   #mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea {
     margin-top: 14px;
+    max-width: none;
     font-size: clamp(28px, 1.4vw + 1.2vh, 38px);
     line-height: 1.15;
+    white-space: nowrap;
   }
   #mapa .home-capitulo-bajada-linea + .home-capitulo-bajada-elige {
     margin-top: 28px;
