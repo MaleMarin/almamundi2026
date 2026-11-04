@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic';
 type Props = { params: Promise<{ code: string }> };
 
 const COPY = {
-  es: { title: 'AlmaMundi · Historias que no se pierden en el scroll', description: '' },
-  pt: { title: 'AlmaMundi · Histórias que não se perdem no scroll', description: '' },
-  en: { title: 'AlmaMundi · Stories that don’t get lost in the scroll', description: '' },
+  es: { title: 'AlmaMundi · Historias que no se pierden en el scroll' },
+  pt: { title: 'AlmaMundi · Histórias que não se perdem no scroll' },
+  en: { title: 'AlmaMundi · Stories that don’t get lost in the scroll' },
 } as const;
 
 /** Enlace corto de una historia recién enviada: busca su envío por el código. */
@@ -32,10 +32,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!id) return base;
   const copy = COPY[parseAlmaLocale(raw)];
   const image = { url: `/og/colores?c=${id}`, width: 1200, height: 630, alt: copy.title };
+  const { description: _ogDescription, ...ogBase } = base.openGraph ?? {};
+  void _ogDescription;
   return {
     ...base,
-    openGraph: { ...base.openGraph, title: copy.title, description: copy.description, images: [image] },
-    twitter: { card: 'summary_large_image', title: copy.title, description: copy.description, images: [image.url] },
+    description: null,
+    openGraph: { ...ogBase, title: copy.title, images: [image] },
+    twitter: { card: 'summary_large_image', title: copy.title, images: [image.url] },
   };
 }
 
