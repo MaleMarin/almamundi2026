@@ -25,6 +25,7 @@ import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { requestNewsletterConfirmation } from "@/lib/newsletter/service";
+import { randomShortCode } from "@/lib/short-code";
 
 export const runtime = "nodejs";
 
@@ -309,7 +310,20 @@ export async function POST(req: NextRequest) {
         }
       }
     });
-    return NextResponse.json({ ok: true, id: submissionId });
+    // Código corto para compartir antes de publicar: almamundi.org/c/xxxxxx muestra la tarjeta de colores.
+    let share = "";
+    try {
+      for (let i = 0; i < 8 && !share; i += 1) {
+        const code = randomShortCode();
+        const used = await db.collection("submissions").where("pendingShareCode", "==", code).limit(1).get();
+        if (used.empty) share = code;
+      }
+      if (share) await ref.update({ pendingShareCode: share });
+    } catch (shareErr) {
+      console.error("[submissions POST] share code", shareErr instanceof Error ? shareErr.message : "share");
+      share = "";
+    }
+    return NextResponse.json({ ok: true, id: submissionId, ...(share ? { share } : {}) });
   } catch (e) {
     Sentry.captureException(e, {
       tags: { source: 'api.submissions.firestore_add' },

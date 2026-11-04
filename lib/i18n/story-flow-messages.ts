@@ -254,7 +254,7 @@ const es: StoryFlowMessages = {
   modalShareTextShort:
     'Hay historias que no se pierden en el scroll. Acabo de contar la mía en AlmaMundi. ¿Y tú, qué historia guardas? https://www.almamundi.org/contar',
   modalShareTextLong:
-    'Todos guardamos una historia que vale la pena contar. Te toca. https://www.almamundi.org/contar',
+    'La vida no es solo la que viviste, sino cómo la recuerdas, y hay muchas formas de contarla. Entra y elige cómo contar la tuya: https://www.almamundi.org/contar',
   modalShareTextSocial:
     'Conté mi historia en AlmaMundi y estos son sus colores. ¿Cuáles serían los de la tuya? Cuéntala en almamundi.org',
   modalShareEmailSubject: 'Conté una historia en AlmaMundi',
@@ -370,7 +370,7 @@ const pt: StoryFlowMessages = {
   modalShareTextShort:
     'Há histórias que não se perdem no scroll. Acabei de contar a minha no AlmaMundi. E você, que história guarda? https://www.almamundi.org/contar',
   modalShareTextLong:
-    'Todos guardamos uma história que vale a pena contar. Agora é sua vez. https://www.almamundi.org/contar',
+    'A vida não é só a que você viveu, mas como você se lembra dela, e há muitas formas de contá-la. Entre e escolha como contar a sua: https://www.almamundi.org/contar',
   modalShareTextSocial:
     'Contei minha história no AlmaMundi e estas são as cores dela. Quais seriam as da sua? Conte em almamundi.org',
   modalShareEmailSubject: 'Contei uma história no AlmaMundi',
@@ -530,7 +530,7 @@ const en: StoryFlowMessages = {
   modalShareTextShort:
     'Some stories don’t get lost in the scroll. I just told mine on AlmaMundi. What story do you carry? https://www.almamundi.org/contar',
   modalShareTextLong:
-    'We all carry a story worth telling. Your turn. https://www.almamundi.org/contar',
+    'Life is not only the one you lived, but how you remember it, and there are many ways to tell it. Come in and choose how to tell yours: https://www.almamundi.org/contar',
   modalShareTextSocial:
     'I told my story on AlmaMundi and these are its colors. What would yours be? Tell it at almamundi.org',
   modalShareEmailSubject: 'I told a story on AlmaMundi',

@@ -1,5 +1,6 @@
 'use client';
 
+import { isShortCode } from '@/lib/short-code';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { hardNavigateTo } from '@/lib/home-hard-nav';
@@ -468,12 +469,15 @@ export function StoryModal({
   const [escuchando, setEscuchando] = useState(false);
   const [imprintUnits, setImprintUnits] = useState<{ hex: string; width: number }[] | null>(null);
   /** Enlace para compartir recién enviada la historia: su tarjeta de WhatsApp muestra sus colores. */
-  const pendingShareUrl = /^[A-Za-z0-9]{8,40}$/.test(imprintId)
-    ? `${PENDING_STORY_SHARE_URL}?c=${imprintId}`
-    : PENDING_STORY_SHARE_URL;
+  const [shareCode, setShareCode] = useState('');
+  const pendingShareUrl = shareCode
+    ? `https://almamundi.org/c/${shareCode}`
+    : /^[A-Za-z0-9]{8,40}$/.test(imprintId)
+      ? `${PENDING_STORY_SHARE_URL}?c=${imprintId}`
+      : PENDING_STORY_SHARE_URL;
   /** Texto para compartir con un solo enlace, el de esta historia (WhatsApp muestra la tarjeta del primero). */
   const conEnlace = (texto: string) =>
-    `${texto.replace(/https?:\/\/(?:www\.)?almamundi\.org\/contar\S*/gi, '').replace(/\s{2,}/g, ' ').trim()} ${pendingShareUrl}`;
+    `${texto.replace(/https?:\/\/(?:www\.)?almamundi\.org\/(?:contar|c\/)\S*/gi, '').replace(/\s{2,}/g, ' ').trim()} ${pendingShareUrl}`;
   const [imprintReceivedAt, setImprintReceivedAt] = useState<Date | null>(null);
   const [imprintStoryTitle, setImprintStoryTitle] = useState('');
   const imprintCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1709,7 +1713,7 @@ export function StoryModal({
           ...(pregunta ? { questionId: pregunta.id, questionMode: pregunta.mode } : {}),
           locale }) });
 
-      const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string };
+      const data = (await res.json().catch(() => ({}))) as { error?: string; id?: string; share?: string };
       if (!res.ok) {
         reportStorySubmitError(data.error || `submissions_${res.status}`, 'submissions', data.error);
         if (res.status === 400) turnstileRef.current?.reset();
@@ -1770,6 +1774,7 @@ export function StoryModal({
         setEscuchando(false);
       }
       setImprintId(id);
+      setShareCode(isShortCode(data.share) ? data.share : '');
       setImprintReceivedAt(new Date());
       clearStoryDraft();
       setStoryTitle('');
