@@ -11,7 +11,7 @@ export function publicSiteMeta(locale: AlmaLocale): { title: string; description
     return {
       title: 'AlmaMundi · Histórias que não se perdem no scroll',
       description:
-        'AlmaMundi é o lugar onde suas histórias não se perdem no scroll. A vida não é só a que você viveu, mas como você a lembra, e há muitas formas de contá-la.',
+        'Aqui suas histórias ficam. A vida não é só a que você viveu, mas como você a lembra, e há muitas formas de contá-la.',
       ogAlt: 'AlmaMundi, histórias de vida em vídeo, áudio, texto e foto',
     };
   }
@@ -19,14 +19,14 @@ export function publicSiteMeta(locale: AlmaLocale): { title: string; description
     return {
       title: 'AlmaMundi · Stories that don’t get lost in the scroll',
       description:
-        'AlmaMundi is the place where your stories don’t get lost in the scroll. Life is not only what you lived, but how you remember it, and there are many ways to tell it.',
+        'Here, your stories stay. Life is not only what you lived, but how you remember it, and there are many ways to tell it.',
       ogAlt: 'AlmaMundi, life stories in video, audio, text, and photo',
     };
   }
   return {
     title: 'AlmaMundi · Historias que no se pierden en el scroll',
     description:
-      'AlmaMundi es el lugar donde tus historias no se pierden en el scroll. La vida no es solo la que viviste, sino cómo la recuerdas, y hay muchas formas de contarla.',
+      'Aquí tus historias se quedan. La vida no es solo la que viviste, sino cómo la recuerdas, y hay muchas formas de contarla.',
     ogAlt: 'AlmaMundi, historias de vida en video, audio, texto y foto',
   };
 }
