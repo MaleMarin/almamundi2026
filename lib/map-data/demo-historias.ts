@@ -64,8 +64,8 @@ export const DEMO_HISTORIAS: StoryPoint[] = [
     format: 'foto',
     imageUrl: '/cintas/web/morado.webp',
     imagenes: [
-      { url: '/cintas/web/morado.webp', titulo: 'Cintas moradas', anio: '1994', lugar: 'Bogotá' },
-      { url: '/cintas/web/limon.webp', titulo: 'Fiesta del barrio', anio: '1996', lugar: 'Bogotá' },
+      { url: '/cintas/web/morado.webp', titulo: 'Cintas moradas', descripcion: '1994, Bogotá' },
+      { url: '/cintas/web/limon.webp', titulo: 'Fiesta del barrio', descripcion: '1996, Bogotá' },
     ],
     body: 'En el patio de la casa de mis abuelos colgábamos cintas de colores para las fiestas del barrio.',
   },
