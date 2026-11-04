@@ -5,6 +5,7 @@
  * Globo: GlobeV2 (R3F). El vídeo NASA sigue en @/components/NASAEpicEarthVideo para rollback.
  */
 
+import { Search } from 'lucide-react';
 import {
   useCallback,
   useEffect,
@@ -1076,7 +1077,8 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         createPortal(
           <div className="map-dock-stack">
           <div className="map-dock-scroller">
-          <div className="map-dock-row" role="toolbar" aria-label={dockCopy.dockAria}>
+          <div className="map-dock-row map-dock-barra" role="toolbar" aria-label={dockCopy.dockAria}>
+            {/* Orden (Ana, 4 nov 2026): historias, las dos respuestas juntas, lugares y, aparte, buscar. */}
             <div className="map-dock-line">
               <PillNavButton
                 dock
@@ -1098,15 +1100,6 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               ) : null}
               <PillNavButton
                 dock
-                active={drawerOpen && drawerMode === 'bits'}
-                title={globeLayers.bits ? dockCopy.bitsOn : dockCopy.bitsOff}
-                onClick={() => onGlobeLayerPill('bits', 'bits')}
-              >
-                <i className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />
-                {dockCopy.bits}
-              </PillNavButton>
-              <PillNavButton
-                dock
                 active={drawerOpen && drawerMode === 'respuestas'}
                 title={ME_PREGUNTO_MAPA[locale].dockAlmaMundi}
                 onClick={() => onGlobeLayerPill('respuestas', 'respuestas')}
@@ -1123,14 +1116,24 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 <i className="map-dock-legend__dot map-dock-legend__dot--me" aria-hidden />
                 {ME_PREGUNTO_MAPA[locale].titulo}
               </PillNavButton>
+              <PillNavButton
+                dock
+                active={drawerOpen && drawerMode === 'bits'}
+                title={globeLayers.bits ? dockCopy.bitsOn : dockCopy.bitsOff}
+                onClick={() => onGlobeLayerPill('bits', 'bits')}
+              >
+                <i className="map-dock-legend__dot map-dock-legend__dot--bit" aria-hidden />
+                {dockCopy.bits}
+              </PillNavButton>
             </div>
-            <div className="map-dock-line">
+            <div className="map-dock-line map-dock-line--buscar">
               <PillNavButton
                 dock
                 active={drawerOpen && drawerMode === 'search'}
                 onClick={() => open('search')}
                 title={dockCopy.searchTitle}
               >
+                <Search size={16} strokeWidth={2} aria-hidden />
                 {dockCopy.search}
               </PillNavButton>
             </div>

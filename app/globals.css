@@ -2603,3 +2603,82 @@ b {
     line-height: 1.32;
   }
 }
+
+/* Descubre: mismos espacios que Inspírate (4 nov 2026). */
+@media (min-width: 768px) and (min-height: 600px) {
+  #mapa .home-capitulo-titulo-portada + .home-capitulo-bajada-linea { margin-top: 28px; }
+  #mapa .home-capitulo-bajada-linea + .home-capitulo-bajada-elige { margin-top: 8px; }
+}
+
+/* Menú del globo, opción A (4 nov 2026): una sola barra de vidrio con segmentos.
+   La opción activa se llena de naranja; «Buscar» va aparte, con forma de buscador. */
+#map-dock-slot .map-dock-row.map-dock-barra {
+  column-gap: 4px;
+  padding: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.2));
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 8px 26px rgba(60, 70, 85, 0.12);
+}
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi,
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi:active,
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi[data-layer-on='true'],
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
+  border-color: transparent !important;
+  border-radius: 999px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: #3c4655 !important;
+  transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi:hover {
+  border-color: transparent !important;
+  background: rgba(255, 255, 255, 0.6) !important;
+  box-shadow: none !important;
+  color: #3c4655 !important;
+}
+#map-dock-slot .map-dock-barra .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  border-color: transparent !important;
+  background: #ff4a1c !important;
+  color: #fff !important;
+  box-shadow: 0 4px 14px rgba(255, 74, 28, 0.3) !important;
+}
+#map-dock-slot .map-dock-barra [data-active='true'] .map-dock-legend__dot {
+  box-shadow: 0 0 0 2px #fff;
+}
+#map-dock-slot .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi,
+#map-dock-slot .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi:hover {
+  min-width: 12rem;
+  margin-left: 8px;
+  justify-content: flex-start;
+  background: rgba(255, 255, 255, 0.75) !important;
+  box-shadow: inset 0 1px 3px rgba(60, 70, 85, 0.14) !important;
+  color: #616c7c !important;
+}
+#map-dock-slot .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  background: #fff !important;
+  box-shadow: inset 0 0 0 1.5px #ff4a1c !important;
+  color: #3c4655 !important;
+}
+#map-dock-slot .map-dock-barra .map-dock-line--buscar .pill-nav-dock-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Celular: la barra se vuelve un bloque de vidrio con esquinas redondeadas. */
+@media (max-width: 767px) {
+  #map-dock-slot .map-dock-row.map-dock-barra {
+    width: auto !important;
+    max-width: calc(100% - 16px) !important;
+    margin-inline: auto !important;
+    border-radius: 24px;
+  }
+  #map-dock-slot .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi {
+    min-width: 0;
+    margin-left: 0;
+  }
+}
