@@ -26,7 +26,7 @@ export type ConsentInfo = {
 const labelStyle = {
   margin: '0 0 2px',
   fontSize: 12,
-  fontWeight: 700,
+  fontWeight: 600,
   color: 'rgba(255,255,255,0.55)',
 } as const;
 

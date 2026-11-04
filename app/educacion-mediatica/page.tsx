@@ -41,7 +41,7 @@ export default function EducacionMediaticaPage() {
           </Link>
           <Link
             href="/#mapa"
-            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-[length:var(--fs-pequeno)] font-bold uppercase text-[#2d3748] transition-colors hover:border-[#FF4A1C] hover:text-[#FF4A1C] tracking-[0.12em]"
+            className="inline-flex items-center justify-center rounded-full border-2 border-[#4A5568]/35 bg-transparent px-6 py-3 text-[length:var(--fs-pequeno)] font-semibold uppercase text-[#2d3748] transition-colors hover:border-[#FF4A1C] hover:text-[#FF4A1C] tracking-[0.12em]"
           >
             Ir al mapa
           </Link>

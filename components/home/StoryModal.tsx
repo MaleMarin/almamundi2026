@@ -2096,7 +2096,7 @@ export function StoryModal({
             <button
               type="button"
               onClick={onClearTopic}
-              className="rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-bold uppercase text-orange-700 tracking-[0.12em]"
+              className="rounded-full px-4 py-2 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-orange-700 tracking-[0.12em]"
               style={soft.button}
               aria-label={t.modalRemove}
             >
@@ -2348,7 +2348,7 @@ export function StoryModal({
                   <button
                     type="button"
                     onClick={onClearTopic}
-                    className="rounded-full px-3 py-1.5 text-[length:var(--fs-etiqueta)] font-bold text-orange-700"
+                    className="rounded-full px-3 py-1.5 text-[length:var(--fs-etiqueta)] font-semibold text-orange-700"
                     style={soft.button}
                     aria-label={t.modalRemoveInspiration}
                   >
@@ -2474,7 +2474,7 @@ export function StoryModal({
           style={{ backgroundColor: soft.bg }}
         >
           <div className="min-w-0 space-y-1">
-            <p className="text-[length:var(--fs-pequeno)] font-bold uppercase text-orange-600 tracking-[0.12em]">
+            <p className="text-[length:var(--fs-pequeno)] font-semibold uppercase text-orange-600 tracking-[0.12em]">
               ALMAMUNDI
             </p>
             {step !== 'details' && (
@@ -2669,7 +2669,7 @@ export function StoryModal({
                               <button
                                 type="button"
                                 onClick={() => removeExtraFile(idx)}
-                                className="shrink-0 text-[length:var(--fs-etiqueta)] font-bold uppercase text-[#646E7E] hover:text-red-500 tracking-[0.12em]"
+                                className="shrink-0 text-[length:var(--fs-etiqueta)] font-semibold uppercase text-[#646E7E] hover:text-red-500 tracking-[0.12em]"
                               >
                                 ×
                               </button>

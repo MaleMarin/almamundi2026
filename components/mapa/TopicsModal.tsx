@@ -166,7 +166,7 @@ export function TopicsModal({
           <div className="min-h-0 flex-1 overflow-y-auto p-4 md:p-6 space-y-6">
             {/* Lista de temas filtrados */}
             <section>
-              <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/55 mb-3 tracking-[0.12em]">
+              <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/55 mb-3 tracking-[0.12em]">
                 Temas
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -190,7 +190,7 @@ export function TopicsModal({
             {q.length > 0 && (
               <section>
                 <div className="flex items-center justify-between gap-3">
-                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/55 tracking-[0.12em]">
+                  <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/55 tracking-[0.12em]">
                     Historias
                   </div>
                   <div className="text-[length:var(--fs-etiqueta)] text-white/40">

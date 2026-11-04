@@ -181,7 +181,7 @@ function EliminarHistoriaButton({ disabled, onClick }: { disabled: boolean; onCl
         border: '1px solid rgba(239,68,68,0.5)',
         background: 'rgba(239,68,68,0.2)',
         color: '#fca5a5',
-        fontWeight: 700,
+        fontWeight: 600,
         fontSize: 13,
         cursor: disabled ? 'default' : 'pointer',
         fontFamily: APP_FONT,
@@ -206,7 +206,7 @@ function FotoHeicBox() {
         background: 'rgba(255,255,255,0.08)',
         color: 'rgba(255,255,255,0.85)',
         fontSize: 13,
-        fontWeight: 700,
+        fontWeight: 600,
       }}
     >
       Foto HEIC
@@ -307,7 +307,7 @@ function StoryPhotoFichas({ imagenes }: { imagenes?: AdminImagen[] }) {
                 style={{ width: 132, height: 96, objectFit: 'cover', borderRadius: 8, display: 'block' }}
               />
             ) : null}
-            <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.9)' }}>
+            <p style={{ margin: '6px 0 0', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.9)' }}>
               {img.titulo || `Foto ${i + 1}`}
             </p>
             {when ? (
@@ -351,7 +351,7 @@ function RelatoText({ text }: { text?: string }) {
             border: 'none',
             background: 'none',
             color: '#fdba74',
-            fontWeight: 700,
+            fontWeight: 600,
             fontSize: 13,
             cursor: 'pointer',
             fontFamily: APP_FONT,
@@ -372,7 +372,7 @@ function StoryReview({ story }: { story: Story }) {
       {story.format === 'text' ? <RelatoText text={story.text} /> : null}
       {extra ? (
         <div style={{ marginTop: 10 }}>
-          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>
+          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>
             ¿Algo más que quieras contarnos?
           </p>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
@@ -382,7 +382,7 @@ function StoryReview({ story }: { story: Story }) {
       ) : null}
       {song ? (
         <div style={{ marginTop: 10 }}>
-          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.55)' }}>Canción</p>
+          <p style={{ margin: '0 0 2px', fontSize: 12, fontWeight: 600, color: 'rgba(255,255,255,0.55)' }}>Canción</p>
           <p style={{ margin: 0, fontSize: 14, lineHeight: 1.5, color: 'rgba(255,255,255,0.88)', whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>
             {song}
           </p>
@@ -730,7 +730,7 @@ export default function AdminPage() {
       <div style={{ minHeight: '100dvh', background: BG, fontFamily: APP_FONT, display: 'flex', flexDirection: 'column', padding: 24 }}>
         <div style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ ...glassCard, maxWidth: 400, width: '100%' }}>
-          <h1 style={{ fontSize: 22, fontWeight: 700, color: 'rgba(255,255,255,0.95)', marginBottom: 8 }}>Panel Admin AlmaMundi</h1>
+          <h1 style={{ fontSize: 22, fontWeight: 600, color: 'rgba(255,255,255,0.95)', marginBottom: 8 }}>Panel Admin AlmaMundi</h1>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', marginBottom: 24 }}>Inicia sesión con tu cuenta del equipo.</p>
           <form onSubmit={handleLogin}>
             <input
@@ -779,7 +779,7 @@ export default function AdminPage() {
                 borderRadius: 999,
                 background: '#FF4A1C',
                 color: '#fff',
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 14,
                 border: 'none',
                 cursor: 'pointer',
@@ -848,7 +848,7 @@ export default function AdminPage() {
       )}
 
       <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 16, marginBottom: 24 }}>
-        <h1 style={{ fontSize: 24, fontWeight: 700, margin: 0 }}>Panel Admin AlmaMundi</h1>
+        <h1 style={{ fontSize: 24, fontWeight: 600, margin: 0 }}>Panel Admin AlmaMundi</h1>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{user.email}</span>
           <button
@@ -922,7 +922,7 @@ export default function AdminPage() {
               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(255,74,28,0.2)', border: '1px solid rgba(255,74,28,0.4)', color: '#fdba74' }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,74,28,0.2)', border: '1px solid rgba(255,74,28,0.4)', color: '#fdba74' }}>
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{s.place}</span>
@@ -931,7 +931,7 @@ export default function AdminPage() {
                     ) : null}
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(s.createdAt)}</span>
                   </div>
-                  <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                  <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                   <StoryReview story={s} />
                   <PendingFiles files={s.files} token={idToken} />
                   <StoryQuestionLine story={s} />
@@ -1044,7 +1044,7 @@ export default function AdminPage() {
                       border: '1px solid rgba(34,197,94,0.5)',
                       background: 'rgba(34,197,94,0.2)',
                       color: '#86efac',
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 13,
                       cursor: 'pointer',
                       fontFamily: APP_FONT,
@@ -1076,7 +1076,7 @@ export default function AdminPage() {
                       border: '1px solid rgba(239,68,68,0.5)',
                       background: 'rgba(239,68,68,0.2)',
                       color: '#fca5a5',
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 13,
                       cursor: 'pointer',
                       fontFamily: APP_FONT,
@@ -1105,17 +1105,17 @@ export default function AdminPage() {
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6, flexWrap: 'wrap' }}>
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.9)' }}>
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.1)', border: '1px solid rgba(255,255,255,0.2)', color: 'rgba(255,255,255,0.9)' }}>
                         <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                       </span>
                       {s.isFeatured && (
-                        <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(255,215,0,0.2)', color: '#fde047' }}>⭐ Destacada</span>
+                        <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,215,0,0.2)', color: '#fde047' }}>⭐ Destacada</span>
                       )}
                       {days != null && (
                         <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{days} días restantes</span>
                       )}
                     </div>
-                    <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.alias || '—'}</p>
@@ -1288,10 +1288,10 @@ export default function AdminPage() {
               <div key={s.id} style={glassCard}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 700, background: 'rgba(255,255,255,0.08)', marginBottom: 6 }}>
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,255,255,0.08)', marginBottom: 6 }}>
                       <FormatIcon format={s.format} /> {FORMAT_LABEL[s.format] ?? s.format}
                     </span>
-                    <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
+                    <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
                     <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
@@ -1341,7 +1341,7 @@ export default function AdminPage() {
       {section === 'colecciones' && !loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
           <div style={glassCard}>
-            <h2 style={{ fontSize: 18, fontWeight: 700, marginBottom: 12 }}>Nueva colección</h2>
+            <h2 style={{ fontSize: 18, fontWeight: 600, marginBottom: 12 }}>Nueva colección</h2>
             <input
               type="text"
               placeholder="Título"
@@ -1391,7 +1391,7 @@ export default function AdminPage() {
                 border: 'none',
                 background: '#FF4A1C',
                 color: '#fff',
-                fontWeight: 700,
+                fontWeight: 600,
                 fontSize: 14,
                 cursor: 'pointer',
                 fontFamily: APP_FONT,
@@ -1406,7 +1406,7 @@ export default function AdminPage() {
             )}
             {collections.map((c) => (
               <div key={c.id} style={glassCard}>
-                <p style={{ fontSize: 17, fontWeight: 700, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{c.title}</p>
+                <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{c.title}</p>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)', margin: 0 }}>/{c.slug}</p>
                 {c.description && <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.65)', marginTop: 8 }}>{c.description}</p>}
                 <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginTop: 8 }}>{c.storyIds.length} historias</p>
@@ -1423,24 +1423,24 @@ export default function AdminPage() {
             <>
               <div style={glassCard}>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Pendientes</p>
-                <p style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#f59e0b' }}>{stats.pending}</p>
+                <p style={{ fontSize: 28, fontWeight: 600, margin: 0, color: '#f59e0b' }}>{stats.pending}</p>
               </div>
               <div style={glassCard}>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>En el mapa</p>
-                <p style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#22c55e' }}>{stats.active}</p>
+                <p style={{ fontSize: 28, fontWeight: 600, margin: 0, color: '#22c55e' }}>{stats.active}</p>
               </div>
               <div style={glassCard}>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Archivadas</p>
-                <p style={{ fontSize: 28, fontWeight: 700, margin: 0, color: 'rgba(255,255,255,0.8)' }}>{stats.archived}</p>
+                <p style={{ fontSize: 28, fontWeight: 600, margin: 0, color: 'rgba(255,255,255,0.8)' }}>{stats.archived}</p>
               </div>
               <div style={glassCard}>
                 <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Resonancias (total)</p>
-                <p style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#a78bfa' }}>{stats.totalResonances}</p>
+                <p style={{ fontSize: 28, fontWeight: 600, margin: 0, color: '#a78bfa' }}>{stats.totalResonances}</p>
               </div>
               {stats.mostSharedStory && (
                 <div style={{ ...glassCard, gridColumn: '1 / -1' }}>
                   <p style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)', margin: '0 0 4px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Historia más compartida</p>
-                  <p style={{ fontSize: 16, fontWeight: 700, margin: '0 0 2px', color: 'rgba(255,255,255,0.95)' }}>{stats.mostSharedStory.title}</p>
+                  <p style={{ fontSize: 16, fontWeight: 600, margin: '0 0 2px', color: 'rgba(255,255,255,0.95)' }}>{stats.mostSharedStory.title}</p>
                   <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{stats.mostSharedStory.resonances} resonancias</p>
                 </div>
               )}

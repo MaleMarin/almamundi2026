@@ -197,7 +197,7 @@ export const TurnstileWidget = forwardRef<TurnstileWidgetHandle, TurnstileWidget
               onGateRef.current('wait');
               setRetryKey((k) => k + 1);
             }}
-            className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-orange-600 underline tracking-[0.12em]"
+            className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-orange-600 underline tracking-[0.12em]"
           >
             Reintentar
           </button>

@@ -27,7 +27,7 @@ export function PreguntaPanel() {
         style={{
           margin: 0,
           fontSize: 'var(--fs-etiqueta)',
-          fontWeight: 700,
+          fontWeight: 600,
           letterSpacing: '0.12em',
           textTransform: 'uppercase',
           color: '#FF4A1C',
@@ -43,7 +43,7 @@ export function PreguntaPanel() {
           minHeight: 44,
           display: 'inline-flex',
           alignItems: 'center',
-          fontWeight: 700,
+          fontWeight: 600,
           color: '#FF6E49',
           textDecoration: 'underline',
           textUnderlineOffset: 3,

@@ -207,7 +207,7 @@ function SoftCard({
             </p>
             <h2
               className="mt-1 text-[length:var(--fs-subtitulo)] leading-snug text-gray-800"
-              style={{ fontWeight: 700 }}
+              style={{ fontWeight: 600 }}
             >
               {subtitle}
             </h2>
@@ -290,7 +290,7 @@ export function HomeFormatCards({
           <span className="block text-[length:var(--fs-subtitulo)] font-medium tracking-normal text-[#FF4A1C] ">
             {t.historiasLead2}
           </span>
-          <span className="home-elige-tuya mt-1 block text-[length:var(--fs-subtitulo)] font-bold tracking-normal">
+          <span className="home-elige-tuya mt-1 block text-[length:var(--fs-subtitulo)] font-semibold tracking-normal">
             {t.historiasLeadHow}
           </span>
         </p>

@@ -539,7 +539,7 @@ export function HistoricalExhibitionCarousel({
                             if (!canOpenThis) return;
                             openHandler(slideIdx);
                           }}
-                          className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-[length:var(--fs-etiqueta)] font-bold uppercase tracking-[0.17em] transition ${
+                          className={`relative z-10 mt-4 w-full rounded-full px-4 py-[0.7rem] text-center text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.17em] transition ${
                             canOpenThis
                               ? 'border border-orange-500/41 bg-[linear-gradient(165deg,#FF4A1C_0%,#FF4A1C_52%,#FF4A1C_100%)] text-white shadow-[0_18px_40px_rgba(255,74,28,0.22)] hover:brightness-[1.03] active:scale-[0.99]'
                               : 'cursor-not-allowed border border-gray-400/45 bg-[#dfe4ea]/95 text-[#646E7E] opacity-95'

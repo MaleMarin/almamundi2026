@@ -1670,7 +1670,7 @@ a.cinta-pill {
   margin: 4px 0 0;
   color: #3c4655;
   font-size: clamp(28px, 4vw, 40px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.15;
   text-wrap: balance;
 }
@@ -1802,7 +1802,7 @@ a.cinta-pill {
 .home-capitulo-titulo-fuerte,
 .home-capitulo-titulo strong,
 .home-capitulo-bajada strong {
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .home-capitulo-cita {
@@ -1881,7 +1881,7 @@ a.cinta-pill {
 .cortina-detras h2 {
   margin: 6px 0 0;
   font-size: clamp(30px, 5vw, 48px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
 }
 
@@ -1902,7 +1902,7 @@ a.cinta-pill {
 .cortina-cabecera h2 {
   margin: 0;
   font-size: clamp(26px, 3.4vw, 40px);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.1;
   text-align: left;
 }
@@ -2479,3 +2479,9 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
   border-top: 1px solid color-mix(in srgb, var(--cortina-texto, #fff) 35%, transparent);
 }
 .me-pregunto-invita .cortina-indice-ayuda { margin-bottom: 12px; }
+
+/* Negritas más delgadas en todo el sitio (Montserrat 600 en vez de 700). */
+strong,
+b {
+  font-weight: 600;
+}

@@ -333,7 +333,7 @@ export function StoryEndScreen({
               borderRadius: 999,
               border: `1px solid rgba(255, 74, 28,0.32)`,
               fontFamily: INTERIOR_FONT_STACK,
-              fontWeight: 700,
+              fontWeight: 600,
               fontSize: 'var(--fs-etiqueta)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',

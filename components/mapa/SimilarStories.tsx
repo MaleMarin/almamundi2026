@@ -119,7 +119,7 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
               <span
                 className="am-related-stories-format"
                 style={{
-                  fontWeight: 700,
+                  fontWeight: 600,
                   letterSpacing: '0.12em',
                   textTransform: 'uppercase',
                   color: light ? 'var(--almamundi-orange)' : 'rgba(var(--almamundi-orange-rgb), 0.85)' }}

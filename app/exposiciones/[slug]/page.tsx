@@ -179,7 +179,7 @@ export default function ExposicionDetailPage() {
           <section className="rounded-[40px] overflow-hidden" style={neu.card}>
             <div className="p-8 md:p-10 min-h-[280px] flex flex-col">
               <div className="flex-1">
-                <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase mb-2 tracking-[0.12em]" style={{ color: neu.textBody }}>
+                <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase mb-2 tracking-[0.12em]" style={{ color: neu.textBody }}>
                   Pieza {indexPieza + 1} de {total}
                 </p>
                 <h2 className="text-[length:var(--fs-titular)] font-semibold mb-4" style={{ color: neu.textMain }}>

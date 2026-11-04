@@ -460,7 +460,7 @@ export default function FotoAlbum({ historia, onClose, siteLayout = false }: Fot
                   onClick={() => setShareOpen(true)}
                   style={{
                     fontFamily: INTERIOR_FONT_STACK,
-                    fontWeight: 700,
+                    fontWeight: 600,
                     fontSize: 'var(--fs-etiqueta)',
                     letterSpacing: '0.12em',
                     textTransform: 'uppercase',

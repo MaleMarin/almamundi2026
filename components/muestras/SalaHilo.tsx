@@ -460,7 +460,7 @@ export function SalaHilo({
           <h1
             style={{
               fontSize: 'var(--fs-titular)',
-              fontWeight: 700,
+              fontWeight: 600,
               lineHeight: 1.02,
               color: '#1a1f2a',
               maxWidth: 700,
@@ -524,7 +524,7 @@ export function SalaHilo({
               padding: '15px 36px',
               borderRadius: 100,
               fontSize: 'var(--fs-etiqueta)',
-              fontWeight: 700,
+              fontWeight: 600,
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
               cursor: 'none',
@@ -814,7 +814,7 @@ export function SalaHilo({
                       <h2
                         style={{
                           fontSize: 'var(--fs-titular)',
-                          fontWeight: 700,
+                          fontWeight: 600,
                           lineHeight: 1.1,
                           color: TEXT_PRIMARY,
                           maxWidth: 520,
@@ -864,7 +864,7 @@ export function SalaHilo({
                           padding: '12px 24px',
                           borderRadius: 100,
                           fontSize: 'var(--fs-etiqueta)',
-                          fontWeight: 700,
+                          fontWeight: 600,
                           letterSpacing: '0.12em',
                           textTransform: 'uppercase',
                           cursor: 'pointer' }}

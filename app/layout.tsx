@@ -94,7 +94,7 @@ export default async function RootLayout({
         <CursorGlobal />
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded text-[length:var(--fs-pequeno)] focus:font-bold"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:bg-black focus:text-white focus:px-4 focus:py-2 focus:rounded text-[length:var(--fs-pequeno)] focus:font-semibold"
         >
           {locale === 'pt'
             ? 'Ir para o conteúdo principal'

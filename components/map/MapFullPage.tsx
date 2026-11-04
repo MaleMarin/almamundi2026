@@ -517,14 +517,14 @@ const globalStyles = `
   .newsCard .newsCardBadge {
   display: inline-block;
   font-size: var(--fs-etiqueta);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.12em;
   color: rgba(var(--almamundi-orange-rgb), 0.95);
   margin-bottom: 10px;
   }
   .newsCard .newsTitle {
   color: #fff;
-  font-weight: 700;
+  font-weight: 600;
   font-size: var(--fs-texto);
   line-height: 1.35;
   margin: 0;
@@ -1418,7 +1418,7 @@ function RightPanel({
                 <div className="space-y-2 mb-4">
                   {selectedTopic && (
                     <div className="flex items-center justify-between gap-2">
-                      <span className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/45 tracking-[0.12em]">Tema</span>
+                      <span className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/45 tracking-[0.12em]">Tema</span>
                       <span className="text-[length:var(--fs-pequeno)] text-white/80 truncate flex-1 mx-2">{selectedTopic}</span>
                       <button type="button" onClick={onClearTopic} className="text-[length:var(--fs-etiqueta)] font-semibold text-orange-300/90 hover:text-orange-200 px-2.5 py-1.5 rounded-lg bg-orange-500/10 border border-orange-500/20">Limpiar</button>
                     </div>
@@ -1433,9 +1433,9 @@ function RightPanel({
               )}
               {selectedStory ? (
                 <>
-                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-1 tracking-[0.12em]">Autor / Lugar</div>
+                  <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/50 mb-1 tracking-[0.12em]">Autor / Lugar</div>
                   <p className="text-[length:var(--fs-pequeno)] font-semibold text-white/95 mb-3">{selectedStory.label}</p>
-                  <div className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-1 tracking-[0.12em]">Inicio del relato</div>
+                  <div className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/50 mb-1 tracking-[0.12em]">Inicio del relato</div>
                   <p className="text-[length:var(--fs-pequeno)] text-white/80 leading-relaxed">{selectedStory.description || 'Sin descripción.'}</p>
                 </>
               ) : (
@@ -1524,7 +1524,7 @@ function RightPanel({
                   )}
                   {newsList.length > 0 && (
                     <>
-                      <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">En el mapa</p>
+                      <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/50 mb-2 tracking-[0.12em]">En el mapa</p>
                       <div className="space-y-2 mb-4">
                         {newsOnMap.length === 0 ? (
                           <p className="text-white/40 text-[length:var(--fs-etiqueta)] py-2">Ninguna con ubicación.</p>
@@ -1543,7 +1543,7 @@ function RightPanel({
                       </div>
                       {newsNoLocation.length > 0 && (
                         <>
-                          <p className="text-[length:var(--fs-etiqueta)] font-bold uppercase text-white/50 mb-2 tracking-[0.12em]">Sin ubicación</p>
+                          <p className="text-[length:var(--fs-etiqueta)] font-semibold uppercase text-white/50 mb-2 tracking-[0.12em]">Sin ubicación</p>
                           <div className="space-y-2">
                             {newsNoLocation.map((item, idx) => (
                               <NewsListCard

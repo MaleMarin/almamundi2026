@@ -60,7 +60,7 @@ const okBtn = {
   border: '1px solid rgba(34,197,94,0.5)',
   background: 'rgba(34,197,94,0.2)',
   color: '#86efac',
-  fontWeight: 700,
+  fontWeight: 600,
   fontSize: 13,
   cursor: 'pointer',
   fontFamily: SITE_FONT_STACK,
@@ -75,7 +75,7 @@ const dangerBtn = {
   border: '1px solid rgba(239,68,68,0.5)',
   background: 'rgba(239,68,68,0.2)',
   color: '#fca5a5',
-  fontWeight: 700,
+  fontWeight: 600,
   fontSize: 13,
   cursor: 'pointer',
   fontFamily: SITE_FONT_STACK,
@@ -90,7 +90,7 @@ const neutralBtn = {
   border: '1px solid rgba(255,255,255,0.2)',
   background: 'rgba(255,255,255,0.08)',
   color: 'rgba(255,255,255,0.9)',
-  fontWeight: 700,
+  fontWeight: 600,
   fontSize: 13,
   cursor: 'pointer',
   fontFamily: SITE_FONT_STACK,
@@ -263,7 +263,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 6 }}>
-                      <span style={{ fontSize: 11, fontWeight: 700, color: '#fdba74' }}>{KIND_LABEL[item.kind]}</span>
+                      <span style={{ fontSize: 11, fontWeight: 600, color: '#fdba74' }}>{KIND_LABEL[item.kind]}</span>
                       {item.status === 'rejected' && (
                         <span style={{ fontSize: 11, color: '#fca5a5' }}>Rechazada</span>
                       )}
@@ -273,7 +273,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{place}</span>
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
                     </div>
-                    <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 700 }}>
+                    <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>
                       {item.questionText ? `Me pregunto: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
                     </p>
                     <SenderConsentBlocks

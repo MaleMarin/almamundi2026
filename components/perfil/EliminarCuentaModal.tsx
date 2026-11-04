@@ -69,7 +69,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
     borderRadius: 100,
     padding: '10px 24px',
     fontSize: 'var(--fs-etiqueta)',
-    fontWeight: 700,
+    fontWeight: 600,
     cursor: 'pointer' };
 
   const runDelete = useCallback(async () => {
@@ -165,7 +165,7 @@ export function EliminarCuentaModal({ onClose }: EliminarCuentaModalProps) {
 
   const titleStyle: CSSProperties = {
     fontSize: 'var(--fs-subtitulo)',
-    fontWeight: 700,
+    fontWeight: 600,
     color: '#1a1f2a',
     marginBottom: 16,
     marginTop: 0 };

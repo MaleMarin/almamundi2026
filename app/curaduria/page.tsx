@@ -351,7 +351,7 @@ export default function CuraduriaPage() {
             <button
               type="submit"
               disabled={loginLoading}
-              className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold disabled:opacity-50"
+              className="w-full py-3 rounded-xl bg-orange-500 hover:bg-orange-600 font-semibold disabled:opacity-50"
             >
               {loginLoading ? 'Entrando…' : 'Entrar'}
             </button>
@@ -385,7 +385,7 @@ export default function CuraduriaPage() {
             type="button"
             onClick={load}
             disabled={loading}
-            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[length:var(--fs-pequeno)] font-bold disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-[length:var(--fs-pequeno)] font-semibold disabled:opacity-50"
           >
             {loading ? 'Cargando…' : 'Actualizar lista'}
           </button>
@@ -405,7 +405,7 @@ export default function CuraduriaPage() {
         )}
 
         <section className="flex flex-col gap-4">
-          <h2 className="text-[length:var(--fs-texto)] font-bold">Mensajes a quien cuenta</h2>
+          <h2 className="text-[length:var(--fs-texto)] font-semibold">Mensajes a quien cuenta</h2>
           {messages.length === 0 && !loading && (
             <p className="text-white/60">No hay mensajes pendientes de revisión.</p>
           )}
@@ -417,7 +417,7 @@ export default function CuraduriaPage() {
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <div className="font-bold text-white">{m.storyTitle || 'Sin título'}</div>
+                    <div className="font-semibold text-white">{m.storyTitle || 'Sin título'}</div>
                     <div className="text-[length:var(--fs-pequeno)] text-white/60 mt-1">
                       {m.createdAt
                         ? new Date(m.createdAt).toLocaleString('es')
@@ -435,7 +435,7 @@ export default function CuraduriaPage() {
                         approvingMessageId === m.messageId ||
                         rejectingMessageId === m.messageId
                       }
-                      className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold text-[length:var(--fs-pequeno)] disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-50"
                     >
                       {approvingMessageId === m.messageId ? 'Enviando…' : 'Aprobar y enviar'}
                     </button>
@@ -446,7 +446,7 @@ export default function CuraduriaPage() {
                         approvingMessageId === m.messageId ||
                         rejectingMessageId === m.messageId
                       }
-                      className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-[length:var(--fs-pequeno)] disabled:opacity-50"
+                      className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-50"
                     >
                       {rejectingMessageId === m.messageId ? 'Rechazando…' : 'Rechazar'}
                     </button>
@@ -457,7 +457,7 @@ export default function CuraduriaPage() {
           </ul>
         </section>
 
-        <h2 className="text-[length:var(--fs-texto)] font-bold">Historias</h2>
+        <h2 className="text-[length:var(--fs-texto)] font-semibold">Historias</h2>
         {list.length === 0 && !loading && (
           <p className="text-white/60">No hay envíos pendientes para curar.</p>
         )}
@@ -470,7 +470,7 @@ export default function CuraduriaPage() {
             >
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <div className="font-bold text-white">{s.title || 'Sin título'}</div>
+                  <div className="font-semibold text-white">{s.title || 'Sin título'}</div>
                   {s.malwareScanStatus === 'infected' || s.malwareFlag ? (
                     <div className="mt-2 rounded-lg border border-red-400/50 bg-red-500/20 px-3 py-2 text-[length:var(--fs-pequeno)] text-red-100">
                       Malware: un archivo de este envío dio positivo. No se puede publicar.
@@ -537,7 +537,7 @@ export default function CuraduriaPage() {
                       s.malwareFlag === true ||
                       s.malwareScanStatus === 'pending'
                     }
-                    className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-bold text-[length:var(--fs-pequeno)] disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-orange-500 hover:bg-orange-600 font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-50"
                     title={
                       s.malwareScanStatus === 'infected' || s.malwareFlag
                         ? 'Bloqueado: el escaneo detectó malware'
@@ -553,7 +553,7 @@ export default function CuraduriaPage() {
                   {s.authorEmail ? (
                     <a
                       href={moreInfoMailto({ authorEmail: s.authorEmail, storyTitle: s.title })}
-                      className="px-5 py-2.5 rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-100 font-bold text-[length:var(--fs-pequeno)] text-center"
+                      className="px-5 py-2.5 rounded-xl border border-amber-400/40 bg-amber-500/10 hover:bg-amber-500/20 text-amber-100 font-semibold text-[length:var(--fs-pequeno)] text-center"
                     >
                       Pedir más información
                     </a>
@@ -581,7 +581,7 @@ export default function CuraduriaPage() {
 function EdgeCaseProtocol() {
   return (
     <details className="rounded-2xl border border-amber-400/40 bg-amber-500/10 p-4 text-[length:var(--fs-pequeno)] text-white/90">
-      <summary className="cursor-pointer font-bold text-amber-200">
+      <summary className="cursor-pointer font-semibold text-amber-200">
         Casos límite: no publicar si hay duda (menores, terceros)
       </summary>
       <div className="mt-3 space-y-2 text-white/80 leading-relaxed">
@@ -663,7 +663,7 @@ function RejectionControls({
         type="button"
         onClick={() => onReject(reasonId, detail, nota)}
         disabled={!canSubmit}
-        className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-bold text-[length:var(--fs-pequeno)] disabled:opacity-50"
+        className="px-5 py-2.5 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 font-semibold text-[length:var(--fs-pequeno)] disabled:opacity-50"
       >
         {busy ? 'Rechazando…' : 'Rechazar y avisar'}
       </button>

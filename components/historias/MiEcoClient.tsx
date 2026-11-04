@@ -129,7 +129,7 @@ export function MiEcoClient({
                 setErr('');
                 downloadPng('almamundi-resonancia-visual.png');
               }}
-              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-[length:var(--fs-pequeno)] font-bold uppercase text-white tracking-[0.12em]"
+              className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-6 py-3.5 text-[length:var(--fs-pequeno)] font-semibold uppercase text-white tracking-[0.12em]"
               style={{ background: orangeCta, boxShadow: '0 8px 24px rgba(255, 74, 28,0.32)' }}
             >
               <Download size={18} aria-hidden />

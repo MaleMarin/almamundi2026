@@ -39,7 +39,7 @@ export function HighContrastToggle() {
           borderRadius: '100px',
           padding: '8px 14px',
           fontSize: 'var(--fs-etiqueta)',
-          fontWeight: 700,
+          fontWeight: 600,
           cursor: 'pointer' }}
       >
         {on ? 'AA ✓' : 'AA'}

@@ -516,7 +516,7 @@ export function PerfilPage({ perfil, muestras: initialMuestras, guardadas, propi
                 borderRadius: 100,
                 padding: '10px 24px',
                 fontSize: 'var(--fs-etiqueta)',
-                fontWeight: 700,
+                fontWeight: 600,
                 cursor: 'pointer' }}
             >
               Eliminar mi cuenta

@@ -85,7 +85,7 @@ export function CameraDock({ camera, isOpen, onClose }: CameraDockProps) {
           <div className="flex items-start justify-between gap-4 p-4 border-b border-white/10 shrink-0">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-3 mb-2">
-                <h3 className="text-[length:var(--fs-texto)] font-bold text-white truncate">{camera.title}</h3>
+                <h3 className="text-[length:var(--fs-texto)] font-semibold text-white truncate">{camera.title}</h3>
                 <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-500/20 border border-red-500/40 text-red-300 text-[length:var(--fs-etiqueta)] font-semibold shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
                   LIVE

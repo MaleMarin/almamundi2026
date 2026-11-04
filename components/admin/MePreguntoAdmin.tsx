@@ -26,7 +26,7 @@ const btn = (tone: 'ok' | 'danger' | 'neutral') =>
       tone === 'ok' ? '1px solid rgba(34,197,94,0.5)' : tone === 'danger' ? '1px solid rgba(239,68,68,0.5)' : '1px solid rgba(255,255,255,0.2)',
     background: tone === 'ok' ? 'rgba(34,197,94,0.2)' : tone === 'danger' ? 'rgba(239,68,68,0.2)' : 'rgba(255,255,255,0.08)',
     color: tone === 'ok' ? '#86efac' : tone === 'danger' ? '#fca5a5' : 'rgba(255,255,255,0.9)',
-    fontWeight: 700,
+    fontWeight: 600,
     fontSize: 13,
     cursor: 'pointer',
     fontFamily: SITE_FONT_STACK,

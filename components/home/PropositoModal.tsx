@@ -166,7 +166,7 @@ function renderBlock(block: ManifiestoBlock, key: string) {
               className={
                 i === 0
                   ? 'text-[length:var(--fs-titular)] font-normal leading-tight '
-                  : 'text-[length:var(--fs-titular)] font-bold leading-tight '
+                  : 'text-[length:var(--fs-titular)] font-semibold leading-tight '
               }
               style={{ color: i === 0 ? soft.textBody : soft.textMain, fontFamily: SITE_FONT_STACK }}
             >

@@ -243,7 +243,7 @@ function KnotStoryLabel({
           <div
             style={{
               fontSize: 'var(--fs-etiqueta)',
-              fontWeight: 700,
+              fontWeight: 600,
               color: TEXT_PRIMARY,
               lineHeight: 1.2,
               overflow: 'hidden',
