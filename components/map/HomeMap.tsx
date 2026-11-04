@@ -1087,7 +1087,12 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
               selectedBitId={selectedGlobeMarkerId}
               layerVisibility={globeLayers}
               pauseEarthSpinForUi={
-                Boolean(openStory) || Boolean(openRespuesta) || surpriseFlying || (drawerOpen && drawerMode === 'bits')
+                Boolean(openStory) ||
+                Boolean(openRespuesta) ||
+                surpriseFlying ||
+                (drawerOpen && drawerMode === 'bits') ||
+                /* Con una pregunta abierta, el planeta no gira solo: las líneas quedan quietas y se recorren con el mouse o el dedo. */
+                preguntaArcs.length > 0
               }
               onBitClick={handleGlobeMarkerClick}
               arcs={preguntaArcs}
