@@ -2239,6 +2239,15 @@ a.cortina-formato:visited {
   }
 }
 
+/* Con el dedo: el nombre del tema más grande y bien arriba, para que el dedo no lo tape. */
+@media (hover: none) {
+  .cortina-nombre {
+    padding: 9px 16px;
+    font-size: 16px;
+    transform: translate(-50%, -230%);
+  }
+}
+
 .cortina-te-preguntan {
   display: flex;
   align-items: center;

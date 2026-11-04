@@ -108,6 +108,10 @@ const VIENTO = 1.6;
 const ATENUAR = 0.75;
 const ATENUAR_MS = 170;
 const ESPERA_TEMA_MS = 120;
+/** Margen para el dedo en pantallas táctiles. */
+const TOLERANCIA_DEDO_PX = 18;
+/** Con el dedo, el nombre del tema queda a la vista un momento después de levantarlo. */
+const NOMBRE_TRAS_DEDO_MS = 1800;
 
 function aleatorio(): number {
   return Math.floor(Math.random() * HILOS.length);
@@ -365,6 +369,23 @@ export function CortinaTemas({
       return cinta.x + desplazamiento + lado * apertura;
     }
 
+    /** Con el dedo: la cinta más cercana dentro de unos píxeles, para no tener que acertar a una franja fina. */
+    function temaCercano(mx: number, my: number, tiempo: number, quieto: boolean) {
+      const exacto = temaEn(mx, my, tiempo, quieto);
+      if (exacto >= 0) return exacto;
+      let mejor = -1;
+      let distancia = TOLERANCIA_DEDO_PX;
+      for (const cinta of cintasRef.current) {
+        if (!cinta || my > cinta.L) continue;
+        const d = Math.abs(mx - xEn(cinta, my, tiempo, quieto)) - cinta.w / 2;
+        if (d < distancia) {
+          distancia = d;
+          mejor = cinta.th;
+        }
+      }
+      return mejor;
+    }
+
     function temaEn(mx: number, my: number, tiempo: number, quieto: boolean) {
       const cintas = cintasRef.current;
       for (let i = cintas.length - 1; i >= 0; i -= 1) {
@@ -381,6 +402,15 @@ export function CortinaTemas({
     let punteroX = 0;
     let punteroY = 0;
 
+    /** Ubica el nombre sobre el puntero sin que se corte en los bordes. */
+    function ubicarNombre(nombre: HTMLDivElement, x: number, y: number) {
+      const ancho = nombre.offsetWidth;
+      const limite = canvas.clientWidth;
+      const izquierda = ancho > 0 && limite > 0 ? Math.max(ancho / 2 + 8, Math.min(limite - ancho / 2 - 8, x)) : x;
+      nombre.style.left = `${izquierda}px`;
+      nombre.style.top = `${y}px`;
+    }
+
     function mostrarNombre(tema: number) {
       const nombre = nombreRef.current;
       const hilo = TEMAS[tema];
@@ -388,8 +418,7 @@ export function CortinaTemas({
       if (tema >= 0 && hilo) {
         nombre.hidden = false;
         nombre.textContent = hilo.nombre[locale];
-        nombre.style.left = `${punteroX}px`;
-        nombre.style.top = `${punteroY}px`;
+        ubicarNombre(nombre, punteroX, punteroY);
       } else {
         nombre.hidden = true;
       }
@@ -619,6 +648,9 @@ export function CortinaTemas({
     tamanos.observe(stage);
     document.addEventListener('visibilitychange', seguir);
 
+    let conDedo = false;
+    let ocultarNombre = 0;
+
     function mover(event: PointerEvent) {
       if (metaRef.current > 0) return;
       const caja = canvas.getBoundingClientRect();
@@ -626,20 +658,29 @@ export function CortinaTemas({
       const my = event.clientY - caja.top;
       const quieto = reduceMotion();
       const tiempo = (performance.now() - inicioRef.current) / 1000;
-      const tema = temaEn(mx, my, tiempo, quieto);
+      conDedo = event.pointerType === 'touch' || event.pointerType === 'pen';
       punteroX = mx;
       punteroY = my;
-      pedirTema(tema);
-      const nombre = nombreRef.current;
-      if (nombre && !nombre.hidden) {
-        nombre.style.left = `${mx}px`;
-        nombre.style.top = `${my}px`;
+      if (conDedo) {
+        // Con el dedo no hay espera: el nombre sigue al dedo de inmediato.
+        window.clearTimeout(ocultarNombre);
+        const tema = temaCercano(mx, my, tiempo, quieto);
+        if (tema >= 0 && tema !== hoverRef.current) comprometer(tema);
+      } else {
+        pedirTema(temaEn(mx, my, tiempo, quieto));
       }
+      const nombre = nombreRef.current;
+      if (nombre && !nombre.hidden) ubicarNombre(nombre, mx, my);
     }
 
     function salir() {
       window.clearTimeout(esperaTema);
       temaPendiente = -1;
+      if (conDedo) {
+        window.clearTimeout(ocultarNombre);
+        ocultarNombre = window.setTimeout(() => comprometer(-1), NOMBRE_TRAS_DEDO_MS);
+        return;
+      }
       comprometer(-1);
     }
 
@@ -650,23 +691,45 @@ export function CortinaTemas({
       const my = event.clientY - caja.top;
       const quieto = reduceMotion();
       const tiempo = (performance.now() - inicioRef.current) / 1000;
-      const tema = temaEn(mx, my, tiempo, quieto);
-      if (tema >= 0) abrir(tema, mx);
+      const tema = conDedo ? temaCercano(mx, my, tiempo, quieto) : temaEn(mx, my, tiempo, quieto);
+      if (tema < 0) return;
+      // Con el dedo, el primer toque muestra el nombre; tocar de nuevo la misma cinta la abre.
+      if (conDedo && tema !== hoverRef.current) {
+        window.clearTimeout(ocultarNombre);
+        punteroX = mx;
+        punteroY = my;
+        comprometer(tema);
+        return;
+      }
+      abrir(tema, mx);
     }
 
+    function tocar(event: PointerEvent) {
+      if (event.pointerType === 'mouse') {
+        conDedo = false;
+        return;
+      }
+      mover(event);
+    }
+
+    canvas.addEventListener('pointerdown', tocar);
     canvas.addEventListener('pointermove', mover);
     canvas.addEventListener('pointerleave', salir);
+    canvas.addEventListener('pointercancel', salir);
     canvas.addEventListener('click', clic);
 
     return () => {
       window.clearTimeout(esperaTema);
+      window.clearTimeout(ocultarNombre);
       cancelarMarco();
       vista.disconnect();
       tamanos.disconnect();
       seguirRef.current = null;
       document.removeEventListener('visibilitychange', seguir);
+      canvas.removeEventListener('pointerdown', tocar);
       canvas.removeEventListener('pointermove', mover);
       canvas.removeEventListener('pointerleave', salir);
+      canvas.removeEventListener('pointercancel', salir);
       canvas.removeEventListener('click', clic);
     };
   }, [enPagina, locale]);
