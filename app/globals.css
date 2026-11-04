@@ -2823,3 +2823,5 @@ b {
   .story-map-panel__sheet--sin-medio .story-map-panel__cabecera { grid-row: 1; }
   .story-map-panel__sheet--sin-medio .story-map-panel__scroll { grid-row: 2; }
 }
+.story-map-panel--historia .btn-am-principal,
+.story-map-panel--historia .btn-am-secundario { white-space: nowrap; }

@@ -353,7 +353,8 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
   }, []);
 
   useLayoutEffect(() => {
-    if (!compact) return;
+    // La tarjeta de historia ya no se ubica junto al globo: va centrada en la pantalla con CSS (Ana, 4 nov 2026).
+    if (!compact || compact) return;
     const panel = panelRef.current;
     if (!panel) return;
 
