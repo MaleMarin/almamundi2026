@@ -2278,11 +2278,14 @@ a.cortina-formato:visited {
   width: min(100%, 1080px);
   margin: 20px auto 8px;
   padding: 16px 24px;
-  border: 1.5px solid transparent;
+  position: relative;
+  isolation: isolate;
+  border: 0;
   border-radius: 999px;
-  background:
-    linear-gradient(#fff, #fff) padding-box,
-    conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000) border-box;
+  /* Vidrio: translúcido, con desenfoque y un brillo arriba. El borde de colores va en ::before. */
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.16));
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
   color: #3c4655;
   font: inherit;
   font-size: 16px;
@@ -2290,7 +2293,23 @@ a.cortina-formato:visited {
   line-height: 1.35;
   text-align: center;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(60, 70, 85, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.25),
+    0 8px 26px rgba(60, 70, 85, 0.14);
+}
+.cortina-te-preguntan::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  padding: 1.5px;
+  border-radius: inherit;
+  background: conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 .cortina-te-preguntan i {
   flex: none;
@@ -2299,7 +2318,12 @@ a.cortina-formato:visited {
   border-radius: 50%;
   background: conic-gradient(#ffd000, #ff6200, #ff1a1a, #ff7eb6, #a8e000, #00b140, #00c2d6, #0047ff, #7a12e0, #b07cff, #ff0a8a, #a0003c, #ffd000);
 }
-.cortina-te-preguntan:hover { box-shadow: 0 8px 24px rgba(60, 70, 85, 0.2); }
+.cortina-te-preguntan:hover {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+    0 10px 30px rgba(60, 70, 85, 0.2);
+}
 .cortina-te-preguntan:focus-visible { outline: 3px solid #b8340f; outline-offset: 3px; }
 
 .cortina-azar {
