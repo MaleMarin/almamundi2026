@@ -50,6 +50,9 @@ function publicationCopy(locale: AlmaLocale) {
         `O botão abaixo leva você direto a ela. Se mais adiante quiser encontrá-la de novo, entre em almamundi.org, desça até o mapa e toque em “Buscar uma história”. Ali você pode escrever o título, “${title}”, ou algumas palavras do que contou.`,
       share: "Se quiser, compartilhe com quem você escolher.",
       see: "Ver minha história no mapa",
+      cinta: "Também enviamos a imagem com as cores da sua história, a mesma que você recebeu ao enviá-la. É sua: guarde ou compartilhe quando quiser.",
+      cintaBoton: "Baixar minha imagem",
+      cintaAlt: "As cores da sua história",
       another: "Conte outra história",
       thanks: "Agradecemos por contá-la.<br>Equipe AlmaMundi",
       thanksText: "Agradecemos por contá-la.",
@@ -70,6 +73,9 @@ function publicationCopy(locale: AlmaLocale) {
         `The button below takes you straight to it. If you want to find it again later, go to almamundi.org, scroll down to the map and tap “Search a story”. There you can type its title, “${title}”, or a few words from what you told.`,
       share: "If you'd like, share it with anyone you choose.",
       see: "See my story on the map",
+      cinta: "We are also sending you the image with the colors of your story, the same one you got when you sent it. It is yours: save it or share it whenever you like.",
+      cintaBoton: "Download my image",
+      cintaAlt: "The colors of your story",
       another: "Tell another story",
       thanks: "Thank you for telling it.<br>The AlmaMundi team",
       thanksText: "Thank you for telling it.",
@@ -89,6 +95,9 @@ function publicationCopy(locale: AlmaLocale) {
       `El botón de abajo te lleva directo a ella. Si más adelante quieres volver a encontrarla, entra a almamundi.org, baja al mapa y toca «Buscar una historia». Ahí puedes escribir su título, «${title}», o algunas palabras de lo que contaste.`,
     share: "Si quieres, compártela con quien tú elijas.",
     see: "Ver mi historia en el mapa",
+    cinta: "Te enviamos también la imagen con los colores de tu historia, la misma que recibiste al enviarla. Es tuya: guárdala o compártela cuando quieras.",
+    cintaBoton: "Descargar mi imagen",
+    cintaAlt: "Los colores de tu historia",
     another: "Contar otra historia",
     thanks: "Gracias por contarla.<br>Equipo AlmaMundi",
     thanksText: "Gracias por contarla.",
@@ -115,6 +124,11 @@ function publishedLead(title: string, place: string, locale: AlmaLocale): string
 
 export function publicationEmailSubject(storyTitle: string, locale: AlmaLocale = "es"): string {
   return publicationCopy(locale).subject(storyTitleLine(storyTitle, locale));
+}
+
+/** Imagen de cintas de la historia publicada (la misma de la pantalla final). */
+function cintaImageUrl(storyId: string): string {
+  return absoluteEmailUrl(`/og/cinta/${encodeURIComponent(storyId)}`);
 }
 
 function storyPublicUrl(shortCode: string): string {
@@ -150,6 +164,9 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     "",
     `${copy.see}: ${storyUrl}`,
     "",
+    copy.cinta,
+    `${copy.cintaBoton}: ${cintaImageUrl(params.storyId)}`,
+    "",
     copy.share,
     "",
     share.text,
@@ -178,12 +195,16 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const title = storyTitleLine(params.storyTitle, locale);
   const share = authorShareChannels(title, place, params.shortCode, locale);
   const lead = escapeHtml(publishedLead(title, place, locale));
+  const cintaUrl = cintaImageUrl(params.storyId);
 
   const bodyHtml = `
       ${greetingHtml(copy.hello(authorName))}
       ${paragraphHtml(lead)}
       ${paragraphHtml(escapeHtml(copy.find(title)))}
       ${primaryButtonHtml(copy.see, historiasUrl)}
+      ${paragraphHtml(escapeHtml(copy.cinta), "28px 0 16px")}
+      <p style="margin:0 0 16px;"><img src="${escapeHtml(cintaUrl)}" alt="${escapeHtml(copy.cintaAlt)}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:12px;border:0;" /></p>
+      ${primaryButtonHtml(copy.cintaBoton, cintaUrl)}
       ${paragraphHtml(copy.share, "28px 0 28px")}
       ${primaryButtonHtml("WhatsApp", share.whatsapp)}
       ${primaryButtonHtml("Facebook", share.facebook)}
