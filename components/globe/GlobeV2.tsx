@@ -1358,9 +1358,10 @@ function GlobeScene({
         /* El giro lo marca `planetSpinRef` (corteza + nubes + bits a la vez); evita doble rotación con la cámara. */
         autoRotate={false}
         enableDamping
-        dampingFactor={0.09}
-        /* Embebido: menos sensibilidad para no “pierder” el clic en bits frente a micro-arrastres. */
-        rotateSpeed={embedded ? 0.28 : 0.5}
+        /* Como una pelota (Ana, 5 nov 2026): al soltarlo sigue girando con el impulso y se frena de a poco (~2-3 s). Antes 0.09. */
+        dampingFactor={0.025}
+        /* Embebido: algo menos sensible que a pantalla completa para no perder el clic en los puntos. Antes 0.28. */
+        rotateSpeed={embedded ? 0.4 : 0.55}
         zoomSpeed={0.65}
       />
       {lockView && fixedCameraPreset ? (
