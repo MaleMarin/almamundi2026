@@ -1,6 +1,6 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
-/** Textos aprobados por Ana (3 nov 2026) para «Me pregunto…». */
+/** Textos de «Preguntas de las personas» (antes «Me pregunto…», nombre eliminado el 4 nov 2026). */
 export const ME_PREGUNTO_UI: Record<
   AlmaLocale,
   {
@@ -37,11 +37,11 @@ export const ME_PREGUNTO_UI: Record<
   }
 > = {
   es: {
-    nombre: 'Me pregunto…',
-    navTePreguntan: 'Te preguntan',
+    nombre: 'Preguntas de las personas',
+    navTePreguntan: 'Preguntas de las personas',
     botonTePreguntan: 'Otras personas te preguntan. ¿Les cuentas?',
-    capa: 'Me pregunto',
-    titulo: 'Me gustaría saber de ti',
+    capa: 'Preguntas de las personas',
+    titulo: 'Preguntas de las personas',
     respondeAqui: 'Respóndele aquí',
     bajada: 'Cada pregunta la dejó alguien que quiere conocer tu experiencia. Elige una y cuéntale lo tuyo.',
     invitaDejar: '¿Tú también quieres saber algo de otras personas? Deja tu pregunta.',
@@ -82,11 +82,11 @@ export const ME_PREGUNTO_UI: Record<
     },
   },
   pt: {
-    nombre: 'Me pergunto…',
-    navTePreguntan: 'Te perguntam',
+    nombre: 'Perguntas das pessoas',
+    navTePreguntan: 'Perguntas das pessoas',
     botonTePreguntan: 'Outras pessoas te perguntam. Você conta?',
-    capa: 'Me pergunto',
-    titulo: 'Eu gostaria de saber de você',
+    capa: 'Perguntas das pessoas',
+    titulo: 'Perguntas das pessoas',
     respondeAqui: 'Responda aqui',
     bajada: 'Cada pergunta foi deixada por alguém que quer conhecer a sua experiência. Escolha uma e conte a sua.',
     invitaDejar: 'Você também quer saber algo de outras pessoas? Deixe a sua pergunta.',
@@ -127,11 +127,11 @@ export const ME_PREGUNTO_UI: Record<
     },
   },
   en: {
-    nombre: 'I wonder…',
-    navTePreguntan: 'They ask you',
+    nombre: 'People’s questions',
+    navTePreguntan: 'People’s questions',
     botonTePreguntan: 'Other people are asking you. Will you tell them?',
-    capa: 'I wonder',
-    titulo: 'I’d love to hear from you',
+    capa: 'People’s questions',
+    titulo: 'People’s questions',
     respondeAqui: 'Answer here',
     bajada: 'Each question was left by someone who wants to hear about your experience. Pick one and tell them yours.',
     invitaDejar: 'Do you also want to know something from other people? Leave your question.',

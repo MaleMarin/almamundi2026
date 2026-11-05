@@ -8,12 +8,15 @@ import {
   EncabezadoInterno,
   GrillaTarjetas,
   PaginaInterna,
+  ResponderAqui,
   Tarjeta,
   TarjetaRespuesta,
   TextoVacio,
   enlaceInterno,
 } from '@/components/me-pregunto/PaginaInterna';
-import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
+import { hiloPorId, preguntaHiloPorId, preguntaParaFormulario } from '@/lib/hilos';
+import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
+import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
@@ -57,12 +60,11 @@ export function RespuestasPagina() {
           titulo={pregunta.texto[locale]}
           largo
         >
-          <a
-            href={`/preguntas?p=${encodeURIComponent(pregunta.id)}`}
-            className="btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6"
-          >
-            {copy.responderEsta}
-          </a>
+          <ResponderAqui
+            pregunta={preguntaParaFormulario(pregunta.id) as PreguntaSemana | null}
+            texto={copy.responderEsta}
+            cerrarTexto={ME_PREGUNTO_UI[locale].cancelar}
+          />
         </EncabezadoInterno>
         {todas && lista.length === 0 ? (
           <TextoVacio locale={locale} />

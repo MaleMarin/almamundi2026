@@ -270,7 +270,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
                     </div>
                     <p style={{ margin: '0 0 4px', fontSize: 15, fontWeight: 600 }}>
-                      {item.questionText ? `Me pregunto: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
+                      {item.questionText ? `Preguntas de las personas: ${item.questionText}` : preguntaAdminResumen(item.questionId, item.mode) ?? item.questionId}
                     </p>
                     <SenderConsentBlocks
                       sender={item.sender}

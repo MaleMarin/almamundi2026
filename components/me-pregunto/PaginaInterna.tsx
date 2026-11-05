@@ -4,7 +4,10 @@
  * Piezas comunes de las páginas internas de preguntas y respuestas (5 nov 2026):
  * mismo encabezado, ancho y tarjetas que /historias, sin negritas.
  */
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
+import { X } from 'lucide-react';
+import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
+import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import Link from 'next/link';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
@@ -91,5 +94,49 @@ export function TarjetaRespuesta({ item, locale }: { item: RespuestaPublica; loc
         <p className="m-0 whitespace-pre-line text-[length:var(--fs-texto)] leading-relaxed">{item.contenido}</p>
       ) : null}
     </Tarjeta>
+  );
+}
+
+/**
+ * «Responder esta pregunta» abre el formulario aquí mismo (decisión de Ana, 5 nov 2026):
+ * una página interna nunca manda al mapa ni a otra página para responder.
+ */
+export function ResponderAqui({
+  pregunta,
+  texto,
+  cerrarTexto,
+}: {
+  pregunta: PreguntaSemana | null;
+  texto: string;
+  cerrarTexto: string;
+}) {
+  const [abierto, setAbierto] = useState(false);
+  if (!pregunta) return null;
+  if (!abierto) {
+    return (
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6"
+      >
+        {texto}
+      </button>
+    );
+  }
+  return (
+    <div
+      className="relative mt-6 max-w-3xl rounded-2xl bg-[#F4F2EE] p-5 pt-12 text-[#1C1C2E] md:p-8 md:pt-12"
+      style={{ ['--cortina-texto' as string]: '#3C4655', ['--cortina-fondo' as string]: '#F4F2EE', boxShadow: '0 10px 30px rgba(60,70,85,0.12)' }}
+    >
+      <button
+        type="button"
+        onClick={() => setAbierto(false)}
+        aria-label={cerrarTexto}
+        className="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full text-[#3C4655]"
+      >
+        <X size={18} aria-hidden />
+      </button>
+      <PreguntaFormForQuestion pregunta={pregunta} onAnother={() => setAbierto(false)} />
+    </div>
   );
 }

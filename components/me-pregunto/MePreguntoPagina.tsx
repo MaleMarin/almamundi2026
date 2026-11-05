@@ -4,11 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import {
   EncabezadoInterno,
   GrillaTarjetas,
   PaginaInterna,
+  ResponderAqui,
   Tarjeta,
   TarjetaRespuesta,
   TextoVacio,
@@ -17,6 +17,7 @@ import {
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
+import { comoFormulario } from '@/components/hilos/MePreguntoPanel';
 import { esMePreguntaId, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
@@ -65,12 +66,7 @@ export function MePreguntoPagina() {
           bajada={ui.loPregunta(preguntaAlias(una.alias), formatPublicPlace(una.city, una.country, locale))}
           largo
         >
-          <HomeHardLink
-            href={`/?capa=me-pregunto&mp=${encodeURIComponent(una.id)}#mapa`}
-            className="btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6"
-          >
-            {copy.responderEnMapa}
-          </HomeHardLink>
+          <ResponderAqui pregunta={comoFormulario(una, locale)} texto={copy.responderEsta} cerrarTexto={ui.cancelar} />
         </EncabezadoInterno>
         {lista.length === 0 ? (
           <TextoVacio locale={locale} />
