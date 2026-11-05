@@ -1,5 +1,7 @@
 'use client';
 
+import { recordarMapa } from '@/components/map/recordarMapa';
+import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import { useMemo } from 'react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { Search } from 'lucide-react';
@@ -312,7 +314,16 @@ export function StoriesPanel({
               <a href="/historias" className="btn-am-secundario" style={{ marginTop: 12, minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontFamily: SITE_FONT_STACK }}>
                 {VER_TODAS[locale] ?? VER_TODAS.es}
               </a>
-            ) : null}
+            ) : (
+              <a
+                href="/respuestas"
+                onClick={() => recordarMapa('/?capa=respuestas#mapa')}
+                className="btn-am-secundario"
+                style={{ marginTop: 12, minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontFamily: SITE_FONT_STACK }}
+              >
+                {ME_PREGUNTO_MAPA[locale]?.verTodas ?? ME_PREGUNTO_MAPA.es.verTodas}
+              </a>
+            )}
           </>
         )}
       </div>

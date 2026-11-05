@@ -8,7 +8,10 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
-import { preguntaPageHref, preguntaPorId, preguntaTexto, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
+import { preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
+import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import { recordarMapa } from '@/components/map/recordarMapa';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { isShortCode } from '@/lib/short-code';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -225,7 +228,18 @@ export function RespuestaGlobeCard({
                   {SHARE_LABEL[locale]}
                 </button>
                 <Link
-                  href={preguntaPageHref(item.questionId)}
+                  href={
+                    esMePreguntaId(item.questionId)
+                      ? `/me-pregunto?p=${encodeURIComponent(item.questionId)}`
+                      : `/respuestas?p=${encodeURIComponent(item.questionId)}`
+                  }
+                  onClick={() =>
+                    recordarMapa(
+                      esMePreguntaId(item.questionId)
+                        ? `/?capa=me-pregunto&mp=${encodeURIComponent(item.questionId)}#mapa`
+                        : '/?capa=respuestas#mapa'
+                    )
+                  }
                   className="btn-am-secundario"
                   style={{
                     minHeight: 44,
@@ -236,7 +250,7 @@ export function RespuestaGlobeCard({
                     justifyContent: 'center',
                     textAlign: 'center' }}
                 >
-                  {RESPONDE_TU_LABEL[locale]}
+                  {ME_PREGUNTO_MAPA[locale].verYResponder}
                 </Link>
               </div>
             </div>

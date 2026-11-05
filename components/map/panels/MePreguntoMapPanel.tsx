@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown, Search, X } from 'lucide-react';
-import { comoFormulario } from '@/components/hilos/MePreguntoPanel';
-import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
+import { ChevronDown, Search } from 'lucide-react';
+import { recordarMapa } from '@/components/map/recordarMapa';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
@@ -19,7 +18,7 @@ function normalizar(texto: string): string {
   return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
 }
 
-/** Panel del mapa: las preguntas de «Me pregunto…» y, al desplegar cada una, sus respuestas. */
+/** Panel del mapa: preguntas de las personas y, al desplegar cada una, sus respuestas. Se responde en su página. */
 export function MePreguntoMapPanel({
   locale,
   respuestas,
@@ -42,8 +41,6 @@ export function MePreguntoMapPanel({
   const [query, setQuery] = useState('');
   const [abierta, setAbierta] = useState<string | null>(abrirId);
   const [limite, setLimite] = useState(POR_PAGINA);
-  /** Pregunta que se está respondiendo aquí mismo. */
-  const [respondiendo, setRespondiendo] = useState<string | null>(null);
   const [abrirVisto, setAbrirVisto] = useState<string | null>(null);
 
   // Al tocar un punto multicolor: se despliega su pregunta (patrón de estado derivado, sin efecto).
@@ -185,46 +182,17 @@ export function MePreguntoMapPanel({
                         </span>
                       </button>
                   ))}
-                  {lista.length > 5 ? (
-                    <Link
-                      href={`/me-pregunto?p=${encodeURIComponent(pregunta.id)}`}
-                      className="text-center text-[length:var(--fs-etiqueta)] font-semibold text-white underline underline-offset-4 visited:text-white"
-                    >
-                      {copy.verTodas}
-                    </Link>
-                  ) : null}
                 </div>
               ) : null}
-              {/* «Responder» siempre a la vista. Se responde aquí mismo, sin salir del mapa. */}
+              {/* Sobre el mapa no se responde: «Ver y responder» lleva a la página de la pregunta (Ana, 5 nov 2026). */}
               <div className="px-4 pb-4">
-                {respondiendo === pregunta.id ? (
-                  <div
-                    className="relative rounded-2xl bg-[#F4F2EE] p-4 pt-10 text-[#1C1C2E]"
-                    style={{ ['--cortina-texto' as string]: '#3C4655', ['--cortina-fondo' as string]: '#F4F2EE' }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setRespondiendo(null)}
-                      aria-label={ui.cancelar}
-                      className="absolute right-2 top-2 inline-flex h-9 w-9 items-center justify-center rounded-full text-[#3C4655]"
-                    >
-                      <X size={18} aria-hidden />
-                    </button>
-                    {/* El formulario trae su propia elección: texto, voz o foto. */}
-                    <PreguntaFormForQuestion
-                      pregunta={comoFormulario(pregunta, locale)}
-                      onAnother={() => setRespondiendo(null)}
-                    />
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setRespondiendo(pregunta.id)}
-                    className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] font-semibold text-white"
-                  >
-                    {copy.primera}
-                  </button>
-                )}
+                <Link
+                  href={`/me-pregunto?p=${encodeURIComponent(pregunta.id)}`}
+                  onClick={() => recordarMapa(`/?capa=me-pregunto&mp=${encodeURIComponent(pregunta.id)}#mapa`)}
+                  className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] text-white no-underline visited:text-white"
+                >
+                  {copy.verYResponder}
+                </Link>
               </div>
             </li>
           );
