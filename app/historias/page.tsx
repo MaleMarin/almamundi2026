@@ -4,7 +4,7 @@ import { cookies } from 'next/headers';
 import HistoriasCatalog from '@/components/historias/HistoriasCatalog';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 
-const TITULO = { es: 'Historias de vida · AlmaMundi', pt: 'Histórias de vida · AlmaMundi', en: 'Life stories · AlmaMundi' } as const;
+const TITULO = { es: 'Historias contadas · AlmaMundi', pt: 'Histórias contadas · AlmaMundi', en: 'Stories told · AlmaMundi' } as const;
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = parseAlmaLocale((await cookies()).get(ALMA_LOCALE_COOKIE)?.value);

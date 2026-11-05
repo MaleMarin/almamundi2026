@@ -2847,3 +2847,11 @@ b {
 @media (max-width: 520px) {
   .cortina-te-preguntan.btn-am-principal { flex-direction: column; gap: 2px; padding: 12px 28px; }
 }
+
+/* Nada de negritas en todo el sitio (decisión de Ana, 5 nov 2026).
+   Excepciones: los botones quedan en 500 y el ALMAMUNDI grande del cierre conserva su peso. */
+body * { font-weight: 400 !important; }
+body .btn-am-principal,
+body .btn-am-secundario,
+body .btn-am-neutro { font-weight: 500 !important; }
+body .almamundi-footer-title { font-weight: 900 !important; }

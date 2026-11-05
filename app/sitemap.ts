@@ -9,19 +9,16 @@ export const revalidate = 3600;
 
 /**
  * Rutas estáticas que responden 200. Sin /mapa ni /archivo (redirigen)
- * ni /muestras (recorrido demo).
+ * ni páginas antiguas fuera del menú (temas, exposiciones, recorridos, visión, educación mediática).
  */
 const STATIC_PATHS: string[] = [
   '/',
   '/historias',
   '/preguntas',
-  '/temas',
-  '/exposiciones',
-  '/educacion-mediatica',
-  '/recorridos',
+  '/respuestas',
+  '/me-pregunto',
   '/privacidad',
   '/terminos',
-  '/vision',
 ];
 
 /** Acepta Firestore Timestamp, ISO string o nada. Devuelve Date válida o null. */

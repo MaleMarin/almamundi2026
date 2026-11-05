@@ -21,7 +21,7 @@ type FormatKey = Exclude<Tab, 'todas'>;
 
 const COPY = {
   es: {
-    pageTitle: 'Historias',
+    pageTitle: 'Historias contadas',
     pageLead: 'Historias de vida contadas en primera persona, desde todo el mundo.',
     featured: 'Destacadas',
     tabs: { todas: 'Todas', video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Foto' } as const,
@@ -37,7 +37,7 @@ const COPY = {
     more: 'Ver más',
   },
   pt: {
-    pageTitle: 'Histórias',
+    pageTitle: 'Histórias contadas',
     pageLead: 'Histórias de vida contadas em primeira pessoa, do mundo todo.',
     featured: 'Destaques',
     tabs: { todas: 'Todas', video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Foto' } as const,
@@ -53,7 +53,7 @@ const COPY = {
     more: 'Ver mais',
   },
   en: {
-    pageTitle: 'Stories',
+    pageTitle: 'Stories told',
     pageLead: 'Life stories told in the first person, from all over the world.',
     featured: 'Featured',
     tabs: { todas: 'All', video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photo' } as const,

@@ -27,13 +27,13 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const locale = parseAlmaLocale(jar.get(ALMA_LOCALE_COOKIE)?.value);
   const copy = HILOS_UI[locale];
   const persona = esMePreguntaId(pedido) ? await mePreguntaAprobada(getAdminDb(), pedido).catch(() => null) : null;
-  const title = persona ? `${persona.texto} · AlmaMundi` : `${copy.ceja} · AlmaMundi`;
+  const title = persona ? `${persona.texto} · AlmaMundi` : `${copy.nav} · AlmaMundi`;
   const description = persona ? ME_PREGUNTO_UI[locale].bajada : copy.bajada;
   const image = {
     url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio?v=2',
     width: 1200,
     height: 630,
-    alt: copy.ceja,
+    alt: copy.nav,
   };
   return {
     title: { absolute: title },

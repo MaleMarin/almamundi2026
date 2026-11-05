@@ -43,7 +43,7 @@ type HilosCopy = {
 
 export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
   es: {
-    ceja: 'Preguntas que despiertan historias',
+    ceja: 'Inspírate',
     titulo: 'Elige un tema',
     bajada: 'y descubre las preguntas que guarda para ti.',
     tirar: 'Preguntas para ti',
@@ -80,7 +80,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     asunto: 'Una pregunta para ti',
   },
   pt: {
-    ceja: 'Perguntas que despertam histórias',
+    ceja: 'Inspire-se',
     titulo: 'Escolha um tema',
     bajada: 'e descubra as perguntas que ele guarda para você.',
     tirar: 'Perguntas para você',
@@ -117,7 +117,7 @@ export const HILOS_UI: Record<AlmaLocale, HilosCopy> = {
     asunto: 'Uma pergunta para você',
   },
   en: {
-    ceja: 'Questions that awaken stories',
+    ceja: 'Get inspired',
     titulo: 'Choose a theme',
     bajada: 'and discover the questions it holds for you.',
     tirar: 'Questions for you',

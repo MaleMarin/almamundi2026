@@ -10,7 +10,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
   es: {
     _inicio: 'Inicio',
     _historia: 'Historia',
-    historias: 'Historias',
+    historias: 'Historias contadas',
     videos: 'Videos',
     audios: 'Audios',
     escrito: 'Textos',
@@ -30,7 +30,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
   pt: {
     _inicio: 'Início',
     _historia: 'História',
-    historias: 'Histórias',
+    historias: 'Histórias contadas',
     videos: 'Vídeos',
     audios: 'Áudios',
     escrito: 'Textos',
@@ -50,7 +50,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
   en: {
     _inicio: 'Home',
     _historia: 'Story',
-    historias: 'Stories',
+    historias: 'Stories told',
     videos: 'Videos',
     audios: 'Audio',
     escrito: 'Texts',
