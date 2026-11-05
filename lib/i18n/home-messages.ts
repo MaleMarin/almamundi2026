@@ -156,7 +156,7 @@ const es: HomeMessages = {
   cardWriteTitle: 'Ponle palabras',
   cardWriteSubtitle: 'a tu memoria',
   cardWriteBody:
-    'Hay historias que no necesitan sonido ni imagen, solo palabras.',
+    'Escribir ordena la memoria. Tómate el tiempo que necesites.',
   cardWriteCta: 'Escribe una historia',
   cardPhotoTitle: 'Una imagen,',
   cardPhotoSubtitle: 'una vida',
@@ -235,7 +235,7 @@ const pt: HomeMessages = {
   cardWriteTitle: 'Dê palavras',
   cardWriteSubtitle: 'à sua memória',
   cardWriteBody:
-    'Há histórias que não precisam de som nem imagem, só de palavras.',
+    'Escrever organiza a memória. Leve o tempo que precisar.',
   cardWriteCta: 'Escreva uma história',
   cardPhotoTitle: 'Uma imagem,',
   cardPhotoSubtitle: 'uma vida',
@@ -314,7 +314,7 @@ const en: HomeMessages = {
   cardWriteTitle: 'Put words',
   cardWriteSubtitle: 'to your memory',
   cardWriteBody:
-    'Some stories need no sound or image, only words.',
+    'Writing brings order to memory. Take all the time you need.',
   cardWriteCta: 'Write a story',
   cardPhotoTitle: 'One image,',
   cardPhotoSubtitle: 'one life',
