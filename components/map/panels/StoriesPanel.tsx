@@ -10,6 +10,9 @@ import { foldText, haystackForStory } from '@/lib/historias/story-filter-helpers
 import { formatSiteDate } from '@/lib/i18n/site-intl';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 
+const HISTORIAS_EN_PANEL = 10;
+const VER_TODAS: Record<string, string> = { es: 'Ver todas las historias', pt: 'Ver todas as histórias', en: 'See all stories' };
+
 export type StoriesPanelProps = {
   stories: StoryPoint[];
   exploreQuery: string;
@@ -136,7 +139,8 @@ export function StoriesPanel({
   kicker,
   emptyText }: StoriesPanelProps) {
   const isSearchPanel = panelMode === 'search';
-  const copy = mapChrome(useHomeLocale().locale);
+  const { locale } = useHomeLocale();
+  const copy = mapChrome(locale);
   const qTrim = exploreQuery.trim();
   const searchMatches = useMemo(
     () => (isSearchPanel ? storiesMatchingQuery(stories, qTrim) : []),
@@ -293,7 +297,7 @@ export function StoriesPanel({
             <p style={{ fontSize: 'var(--fs-etiqueta)', letterSpacing: '0.12em', textTransform: 'uppercase', color: '#FF4A1C', margin: '4px 0 8px 4px', fontFamily: SITE_FONT_STACK }}>
               {kicker ?? copy.latest}
             </p>
-            {stories.map((s, i) => (
+            {(answerRows ? stories : stories.slice(0, HISTORIAS_EN_PANEL)).map((s, i) => (
               <StoryRow
                 key={s.id ?? i}
                 story={s}
@@ -303,6 +307,12 @@ export function StoriesPanel({
                 kind={answerRows ? s.format : undefined}
               />
             ))}
+            {/* Las 10 más recientes; el resto vive en la página Historias contadas (Ana, 4 nov 2026). */}
+            {!answerRows ? (
+              <a href="/historias" className="btn-am-secundario" style={{ marginTop: 12, minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontFamily: SITE_FONT_STACK }}>
+                {VER_TODAS[locale] ?? VER_TODAS.es}
+              </a>
+            ) : null}
           </>
         )}
       </div>
