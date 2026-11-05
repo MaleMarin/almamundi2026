@@ -70,7 +70,11 @@ function pagina(
     return publicItem;
   });
   const nextOffset = offset + page.length < items.length ? offset + page.length : null;
-  return NextResponse.json({ items: page, nextOffset, total: items.length });
+  // Caché en la red de Vercel: una lectura de Firestore sirve a todas las visitas durante un minuto (5 nov 2026).
+  return NextResponse.json(
+    { items: page, nextOffset, total: items.length },
+    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+  );
 }
 
 /** GET /api/respuestas/public?questionId= o ?banco=hilos — solo aprobadas, sin correo. */

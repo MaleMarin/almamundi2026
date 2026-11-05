@@ -483,8 +483,6 @@ function PreguntaFormInner({
               ['foto', copy.kindPhoto[locale], ImageIcon],
             ] as const
           )
-            // «Me pregunto…»: solo por escrito o con la voz.
-            .filter(([id]) => !(esMe && id === 'foto'))
             .map(([id, label, Icon]) => (
             <button
               key={id}

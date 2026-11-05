@@ -64,7 +64,7 @@ export async function GET(req: Request) {
     }
     return NextResponse.json(
       { items: items.slice(0, 80).map(({ t: _t, ...item }) => item) },
-      { headers: { "Cache-Control": "public, max-age=30, s-maxage=60" } }
+      { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } }
     );
   } catch (e) {
     console.error("[me-pregunto GET]", e instanceof Error ? e.message : "list");
