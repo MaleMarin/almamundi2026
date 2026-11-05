@@ -8,7 +8,6 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { NewsletterBand } from '@/components/newsletter/NewsletterBand';
 import { SITE_FOOTER_LEGAL_LINKS } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
-import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { SITE_FONT_STACK } from '@/lib/typography';
 
 const FOOTER_LINK =
@@ -31,7 +30,6 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
   const locale = localeCtx?.locale ?? initialLocale;
 
   const rowLinks: FooterPillItem[] = [
-    { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
     {
       id: 'mapa',
       kind: 'hard',
@@ -39,6 +37,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       label: t.navMap,
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
+    { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
     { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
   ];
 
@@ -91,7 +90,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
             href="/#cintas"
             className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3"
           >
-            {HILOS_UI[locale].nav}
+            {t.cejaInspira}
           </HomeHardLink>
         </div>
       </div>

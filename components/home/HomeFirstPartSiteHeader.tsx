@@ -265,12 +265,12 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
           {t.navTellStory}
         </HomeHardLink>
         <nav className="site-header-nav hidden flex-nowrap items-center gap-x-1.5 text-gray-600 md:ml-auto md:flex md:min-w-0 md:gap-x-2" aria-label={t.ariaMainNav}>
-          {/* Mismo orden que el pie: Cuenta tu historia · Preguntas para ti · Historias contadas · Mapa · Propósito */}
+          {/* Mismo orden que el pie: Cuenta tu historia · Inspírate · Descubre · Historias contadas · Propósito */}
           <PreguntasNavMenu />
-          {desktopHistoriasSegment}
           <HomeHardLink href={MAPA_HOME_LINK_HREF} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
             {t.navMap}
           </HomeHardLink>
+          {desktopHistoriasSegment}
           {desktopHowPurpose}
         </nav>
         <button
@@ -303,7 +303,6 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             aria-label={t.ariaMainNav}
           >
             <PreguntasNavMenu mobile onNavigate={closeMobileNav} />
-            {mobileHistoriasSegment}
             <HomeHardLink
               href={MAPA_HOME_LINK_HREF}
               className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
@@ -311,6 +310,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
             >
               {t.navMap}
             </HomeHardLink>
+            {mobileHistoriasSegment}
             {mobilePurposeHow}
             <div className="flex justify-center border-t border-white/20 pt-2 md:hidden">
               <HomeLanguageSwitcher />
