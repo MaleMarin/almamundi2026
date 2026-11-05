@@ -13,17 +13,19 @@ import { PUBLIC_SITE_ORIGIN } from '@/lib/site-origin';
 import type { Metadata } from 'next';
 import { cookies } from 'next/headers';
 import Script from 'next/script';
-import { Caveat, Montserrat } from 'next/font/google';
+import { Caveat, DM_Sans } from 'next/font/google';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import './globals.css';
 
-const montserrat = Montserrat({
-  weight: ['300', '400', '500', '600', '700'],
+/* DM Sans en todo el sitio (decisión de Ana, 5 nov 2026). Antes Montserrat. */
+const dmSans = DM_Sans({
   style: ['normal', 'italic'],
   subsets: ['latin', 'latin-ext'],
+  axes: ['opsz'],
   variable: '--font-interna',
   display: 'swap',
-  adjustFontFallback: true });
+  adjustFontFallback: true,
+});
 
 const caveat = Caveat({
   weight: '600',
@@ -88,7 +90,7 @@ export default async function RootLayout({
   return (
     <html
       lang={locale}
-      className={`${montserrat.variable} ${caveat.variable}`}
+      className={`${dmSans.variable} ${caveat.variable}`}
     >
       <body className="antialiased min-h-screen bg-[var(--home-bg)] text-gray-800 font-interna">
         <CursorGlobal />

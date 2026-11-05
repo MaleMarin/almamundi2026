@@ -86,7 +86,7 @@
   font-family: var(--font-sans);
 }
 
-/* Modales de envío: Montserrat aunque el ancestro sea la pila de la home. */
+/* Modales de envío: DM Sans aunque el ancestro sea la pila de la home. */
 .story-submit-modal {
   font-family: var(--font-interna), sans-serif;
 }
@@ -441,7 +441,7 @@ a.btn-am-neutro:focus-visible,
   border-color: rgba(var(--almamundi-orange-rgb), 0.5) !important;
 }
 
-/* Montserrat: título del mapa, cabecera /mapa y hero. */
+/* DM Sans: título del mapa, cabecera /mapa y hero. */
 .mapa-almamundi-title,
 .home-intro-avenir {
   font-family: var(--font-interna), sans-serif;
@@ -1123,7 +1123,7 @@ a.home-map-neu-pill.btn-almamundi[data-active='true'] {
   /* Compensa letter-spacing negativo para centrado óptico real */
   padding-inline-end: 0.06em;
   color: var(--home-bg);
-  /* Logotipo de texto: fuera de Montserrat y de la escala tipográfica (2766ae7b). */
+  /* Logotipo de texto: fuera de DM Sans y de la escala tipográfica (2766ae7b). */
   font-family: system-ui, -apple-system, "Segoe UI", Avenir, sans-serif;
   font-weight: 900;
   /* Tamaño atado al ancho del contenedor (cqi), no a --fs-portada.
@@ -2561,7 +2561,7 @@ header .site-header-nav .btn-am-neutro[aria-expanded='true'],
 }
 .me-pregunto-invita .cortina-indice-ayuda { margin-bottom: 12px; }
 
-/* Negritas más delgadas en todo el sitio (Montserrat 600 en vez de 700). */
+/* Negritas más delgadas en todo el sitio (600 en vez de 700). */
 strong,
 b {
   font-weight: 600;
@@ -2825,3 +2825,4 @@ b {
 }
 .story-map-panel--historia .btn-am-principal,
 .story-map-panel--historia .btn-am-secundario { white-space: nowrap; }
+

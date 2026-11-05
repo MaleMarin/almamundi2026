@@ -1,5 +1,5 @@
 /**
- * Montserrat en el sitio público, home incluida (`--font-interna` en el layout).
+ * DM Sans en el sitio público, home incluida (`--font-interna` en el layout).
  * El logotipo de texto del pie no usa esta pila.
  */
 export const SITE_FONT_STACK = 'var(--font-interna), sans-serif' as const;

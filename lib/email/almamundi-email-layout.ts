@@ -12,7 +12,7 @@ export const EMAIL_MUTED = "#4E5160";
 export const EMAIL_CANVAS = "#F2F3F7";
 export const EMAIL_CARD = "#FFFFFF";
 export const EMAIL_BOX = "#F6F7FA";
-export const EMAIL_FONT = "Montserrat, Arial, Helvetica, sans-serif";
+export const EMAIL_FONT = "'DM Sans', Arial, Helvetica, sans-serif";
 export const LOGO_CID = "almamundi-logo";
 export const EMAIL_CONTACT_ADDRESS = "hola@almamundi.org";
 /** Responder un correo dirigido a quien contó la historia llega al equipo. */
@@ -368,7 +368,7 @@ export function emailShell(opts: {
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="color-scheme" content="light dark">
   <meta name="supported-color-schemes" content="light dark">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;700&display=swap">
   <style>${darkModeCss()}</style>
 </head>
 <body class="email-bg" style="margin:0;padding:0;background:${EMAIL_CANVAS};font-family:${EMAIL_FONT};color:${EMAIL_INK};">
