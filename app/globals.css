@@ -2826,3 +2826,24 @@ b {
 .story-map-panel--historia .btn-am-principal,
 .story-map-panel--historia .btn-am-secundario { white-space: nowrap; }
 
+
+/* Botón de preguntas (decisión de Ana, 5 nov 2026): naranja como los demás, sin vidrio ni borde de colores. */
+.cortina-te-preguntan.btn-am-principal {
+  display: flex;
+  width: fit-content;
+  max-width: calc(100% - 32px);
+  margin: 24px auto 8px;
+  padding: 14px 28px;
+  background: #FF4A1C !important;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: 0 8px 22px rgba(255, 74, 28, 0.25);
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+.cortina-te-preguntan.btn-am-principal::before { content: none; }
+/* Celular: la pregunta va en su propia línea, sin cortar la frase. */
+.cortina-te-preguntan.btn-am-principal { gap: 0.3em; flex-wrap: wrap; }
+@media (max-width: 520px) {
+  .cortina-te-preguntan.btn-am-principal { flex-direction: column; gap: 2px; padding: 12px 28px; }
+}

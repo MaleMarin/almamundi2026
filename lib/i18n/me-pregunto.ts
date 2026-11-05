@@ -39,7 +39,7 @@ export const ME_PREGUNTO_UI: Record<
   es: {
     nombre: 'Me pregunto…',
     navTePreguntan: 'Te preguntan',
-    botonTePreguntan: 'Personas de distintos lugares quieren conocer tu experiencia. Mira lo que te preguntan.',
+    botonTePreguntan: 'Otras personas te preguntan. ¿Les cuentas?',
     capa: 'Me pregunto',
     titulo: 'Me gustaría saber de ti',
     respondeAqui: 'Respóndele aquí',
@@ -84,7 +84,7 @@ export const ME_PREGUNTO_UI: Record<
   pt: {
     nombre: 'Me pergunto…',
     navTePreguntan: 'Te perguntam',
-    botonTePreguntan: 'Pessoas de diferentes lugares querem conhecer a sua experiência. Veja o que te perguntam.',
+    botonTePreguntan: 'Outras pessoas te perguntam. Você conta?',
     capa: 'Me pergunto',
     titulo: 'Eu gostaria de saber de você',
     respondeAqui: 'Responda aqui',
@@ -129,7 +129,7 @@ export const ME_PREGUNTO_UI: Record<
   en: {
     nombre: 'I wonder…',
     navTePreguntan: 'They ask you',
-    botonTePreguntan: 'People from different places want to hear about your experience. See what they ask you.',
+    botonTePreguntan: 'Other people are asking you. Will you tell them?',
     capa: 'I wonder',
     titulo: 'I’d love to hear from you',
     respondeAqui: 'Answer here',

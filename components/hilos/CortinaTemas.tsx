@@ -927,9 +927,12 @@ export function CortinaTemas({
         ))}
       </div>
       {temaId ? null : (
-        <button type="button" className="cortina-te-preguntan" onClick={() => verTema(ME_INDICE)}>
-          <i aria-hidden />
-          {ME_PREGUNTO_UI[locale].botonTePreguntan}
+        <button type="button" className="cortina-te-preguntan btn-am-principal" onClick={() => verTema(ME_INDICE)}>
+          {ME_PREGUNTO_UI[locale].botonTePreguntan.split('. ').map((parte, i, todas) => (
+            <span key={i} className="cortina-te-preguntan__parte">
+              {i < todas.length - 1 ? `${parte}.` : parte}
+            </span>
+          ))}
         </button>
       )}
       {capitulo ? null : (
