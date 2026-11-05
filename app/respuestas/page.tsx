@@ -4,7 +4,7 @@ import { RespuestasPagina } from '@/components/me-pregunto/RespuestasPagina';
 
 export const metadata: Metadata = {
   title: 'Respuestas a las preguntas de AlmaMundi',
-  description: 'Lo que respondieron otras personas a las preguntas de las cintas.',
+  description: 'Lee lo que las personas respondieron a las preguntas de las cintas.',
 };
 
 /** Página interna: todas las respuestas publicadas de una pregunta de las cintas (?p=id). */
