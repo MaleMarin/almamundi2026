@@ -22,7 +22,10 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Mapa',
     contar: 'Cuenta tu historia',
     pregunta: 'Pregunta',
-    preguntas: 'Preguntas',
+    preguntas: 'Preguntas para ti',
+    'me-pregunto': 'Preguntas de las personas',
+    respuestas: 'Respuestas a las preguntas de AlmaMundi',
+    'codigo-de-conducta': 'Código de conducta',
   },
   pt: {
     _inicio: 'Início',
@@ -39,7 +42,10 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Mapa',
     contar: 'Conte sua história',
     pregunta: 'Pergunta',
-    preguntas: 'Perguntas',
+    preguntas: 'Perguntas para você',
+    'me-pregunto': 'Perguntas das pessoas',
+    respuestas: 'Respostas às perguntas do AlmaMundi',
+    'codigo-de-conducta': 'Código de conduta',
   },
   en: {
     _inicio: 'Home',
@@ -56,7 +62,10 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     mapa: 'Map',
     contar: 'Tell your story',
     pregunta: 'Question',
-    preguntas: 'Questions',
+    preguntas: 'Questions for you',
+    'me-pregunto': 'People’s questions',
+    respuestas: 'Answers to AlmaMundi’s questions',
+    'codigo-de-conducta': 'Code of conduct',
   },
 };
 

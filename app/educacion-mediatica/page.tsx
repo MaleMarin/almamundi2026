@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Educación mediática | AlmaMundi',
+  title: 'Educación mediática',
   description:
     'Marcos y recursos para analizar la información, la ciudadanía digital y el pensamiento crítico con enfoque en derechos humanos.' };
 

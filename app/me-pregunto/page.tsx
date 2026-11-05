@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { MePreguntoPagina } from '@/components/me-pregunto/MePreguntoPagina';
 
 export const metadata: Metadata = {
-  title: 'Me pregunto… · AlmaMundi',
+  title: 'Preguntas de las personas',
   description: 'Preguntas que dejaron personas de todo el mundo y lo que otras personas respondieron.',
 };
 

@@ -1,81 +1,112 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
-import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import {
+  EncabezadoInterno,
+  GrillaTarjetas,
+  PaginaInterna,
+  Tarjeta,
+  TarjetaRespuesta,
+  TextoVacio,
+  enlaceInterno,
+} from '@/components/me-pregunto/PaginaInterna';
 import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
-import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
-const enlace = 'font-semibold text-[#B8340F] underline underline-offset-4 visited:text-[#B8340F]';
-
-/** Todas las respuestas publicadas a una pregunta de AlmaMundi. */
+/**
+ * Respuestas a las preguntas de AlmaMundi (las de las cintas).
+ * Sin ?p: las preguntas que ya tienen respuestas. Con ?p=id: todas las respuestas de esa pregunta.
+ */
 export function RespuestasPagina() {
   const { locale } = useHomeLocale();
   const copy = ME_PREGUNTO_MAPA[locale];
-  const id = useSearchParams().get('p');
-  const pregunta = preguntaHiloPorId(id);
+  const pregunta = preguntaHiloPorId(useSearchParams().get('p'));
   const tema = hiloPorId(pregunta?.hiloId ?? null);
-  const [lista, setLista] = useState<RespuestaPublica[] | null>(null);
+  const [todas, setTodas] = useState<RespuestaPublica[] | null>(null);
 
   useEffect(() => {
-    if (!pregunta) return;
     let cancel = false;
     void fetch('/api/respuestas/public?banco=hilos&limit=500')
       .then((res) => (res.ok ? res.json() : { items: [] }))
       .then((data: { items?: RespuestaPublica[] }) => {
-        if (!cancel) setLista((data.items ?? []).filter((r) => r.questionId === pregunta.id));
+        if (!cancel) setTodas(data.items ?? []);
       })
-      .catch(() => !cancel && setLista([]));
+      .catch(() => !cancel && setTodas([]));
     return () => {
       cancel = true;
     };
-  }, [pregunta]);
+  }, []);
 
-  return (
-    <main className="mx-auto w-full max-w-[860px] px-6 pb-20 pt-10 text-[#1C1C2E] md:px-10">
-      <Link href="/#cintas" className={`text-[length:var(--fs-pequeno)] ${enlace}`}>
-        ← {copy.verPreguntasAlmaMundi}
-      </Link>
-      {pregunta ? (
-        <>
-          {tema ? (
-            <p className="mb-0 mt-6 text-[length:var(--fs-etiqueta)] font-semibold uppercase tracking-[0.12em] text-[#B8340F]">
-              {tema.nombre[locale]}
-            </p>
-          ) : null}
-          <h1 className="mb-2 mt-2 text-[length:var(--fs-h2,28px)] font-semibold leading-tight">{pregunta.texto[locale]}</h1>
+  const porPregunta = useMemo(() => {
+    const map = new Map<string, RespuestaPublica[]>();
+    for (const item of todas ?? []) map.set(item.questionId, [...(map.get(item.questionId) ?? []), item]);
+    return map;
+  }, [todas]);
+
+  if (pregunta) {
+    const lista = porPregunta.get(pregunta.id) ?? [];
+    return (
+      <PaginaInterna>
+        <EncabezadoInterno
+          volver={{ href: '/respuestas', texto: copy.dockAlmaMundi }}
+          ceja={tema?.nombre[locale]}
+          titulo={pregunta.texto[locale]}
+          largo
+        >
           <a
             href={`/preguntas?p=${encodeURIComponent(pregunta.id)}`}
-            className="btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6 text-[length:var(--fs-pequeno)] font-semibold"
+            className="btn-am-principal mt-6 inline-flex min-h-11 items-center justify-center px-6"
           >
             {copy.responderEsta}
           </a>
-          <ul className="m-0 mt-8 flex list-none flex-col gap-4 p-0">
-            {lista && lista.length === 0 ? <li className="text-[#4A5568]">{PREGUNTA_COPY.empty[locale]}</li> : null}
-            {(lista ?? []).map((item) => (
-              <li key={item.id} className="rounded-2xl border border-black/10 bg-white p-5">
-                <p className="m-0 mb-3 text-[length:var(--fs-etiqueta)] font-semibold text-[#4A5568]">
-                  {[preguntaAlias(item.alias), formatPublicPlace(item.city, item.country, locale)].filter(Boolean).join(' · ')}
-                </p>
-                {item.kind === 'voz' && item.previewUrl ? <audio controls preload="none" src={item.previewUrl} className="w-full" /> : null}
-                {item.kind === 'foto' && item.previewUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.previewUrl} alt="" className="mb-3 max-h-96 w-full rounded-xl object-contain" />
-                ) : null}
-                {item.contenido && item.kind !== 'voz' ? (
-                  <p className="m-0 whitespace-pre-line text-[length:var(--fs-texto)] leading-relaxed">{item.contenido}</p>
-                ) : null}
-              </li>
+        </EncabezadoInterno>
+        {todas && lista.length === 0 ? (
+          <TextoVacio locale={locale} />
+        ) : (
+          <GrillaTarjetas>
+            {lista.map((item) => (
+              <TarjetaRespuesta key={item.id} item={item} locale={locale} />
             ))}
-          </ul>
-        </>
-      ) : (
-        <p className="mt-8 text-[#4A5568]">{PREGUNTA_COPY.empty[locale]}</p>
-      )}
-    </main>
+          </GrillaTarjetas>
+        )}
+      </PaginaInterna>
+    );
+  }
+
+  const conRespuestas = [...porPregunta.entries()]
+    .map(([id, lista]) => ({ p: preguntaHiloPorId(id), n: lista.length }))
+    .filter((x): x is { p: NonNullable<ReturnType<typeof preguntaHiloPorId>>; n: number } => Boolean(x.p));
+
+  return (
+    <PaginaInterna>
+      <EncabezadoInterno titulo={copy.dockAlmaMundi} bajada={copy.introRespuestas}>
+        <Link href="/preguntas" className={`mt-4 inline-block text-[length:var(--fs-pequeno)] ${enlaceInterno}`}>
+          {copy.verPreguntasAlmaMundi}
+        </Link>
+      </EncabezadoInterno>
+      {todas && conRespuestas.length === 0 ? <TextoVacio locale={locale} /> : null}
+      <GrillaTarjetas>
+        {conRespuestas.map(({ p, n }) => (
+          <Tarjeta key={p.id}>
+            {hiloPorId(p.hiloId) ? (
+              <p className="m-0 mb-2 text-[length:var(--fs-etiqueta)] uppercase tracking-[0.12em] text-[#B8340F]">
+                {hiloPorId(p.hiloId)!.nombre[locale]}
+              </p>
+            ) : null}
+            <p className="m-0 text-[length:var(--fs-texto)] leading-snug">{p.texto[locale]}</p>
+            <Link
+              href={`/respuestas?p=${encodeURIComponent(p.id)}`}
+              className={`mt-auto inline-block pt-4 text-[length:var(--fs-pequeno)] ${enlaceInterno}`}
+            >
+              {`${copy.verRespuestas} (${n})`}
+            </Link>
+          </Tarjeta>
+        ))}
+      </GrillaTarjetas>
+    </PaginaInterna>
   );
 }
