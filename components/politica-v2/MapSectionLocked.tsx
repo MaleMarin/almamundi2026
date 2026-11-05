@@ -34,11 +34,10 @@ export function MapSectionLocked() {
           bajadaFuerte={t.heroSubBold}
           bajadaEnDosLineas
         />
-        <div className="map-section-editorial relative z-[1] w-full bg-[#F5F4F2]">
-          <div id="map-dock-slot" className="w-full bg-[#F5F4F2] px-2 pb-2 md:px-3" />
-        </div>
         <div className="home-noche" aria-hidden />
         <div className="map-section-atmosphere w-full">
+          {/* Menú del mapa, opción D (Ana, 5 nov 2026): flota en el espacio negro, arriba del globo, sin tocarlo. */}
+          <div id="map-dock-slot" className="map-dock-slot--noche relative z-[2] w-full px-2 md:px-3" />
           <div
             ref={globeUniverseRef}
             className="map-universe-stage relative z-[1] flex w-full min-h-[88vh] flex-col overflow-hidden pt-0"

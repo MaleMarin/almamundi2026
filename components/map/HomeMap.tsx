@@ -1216,7 +1216,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
                 title={dockCopy.searchTitle}
               >
                 <Search size={16} strokeWidth={2} aria-hidden />
-                {dockCopy.search}
+                <span className="map-dock-buscar-texto">{dockCopy.search}</span>
               </PillNavButton>
             </div>
           </div>

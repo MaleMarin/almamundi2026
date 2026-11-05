@@ -2855,3 +2855,80 @@ body .btn-am-principal,
 body .btn-am-secundario,
 body .btn-am-neutro { font-weight: 500 !important; }
 body .almamundi-footer-title { font-weight: 900 !important; }
+
+/* Menú del mapa, opción D (Ana, 5 nov 2026): vidrio oscuro en el espacio negro, arriba del globo y sin taparlo.
+   La opción activa va en blanco; Buscar queda al final, separado. */
+#map-dock-slot.map-dock-slot--noche {
+  padding-top: 20px;
+  padding-bottom: 28px;
+  background: transparent;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-row.map-dock-barra {
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(14px) saturate(140%);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi,
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi:active,
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi[data-layer-on='true'],
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi[data-layer-on='false'] {
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  color: #fff !important;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  background: #fff !important;
+  color: #3c4655 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3) !important;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra [data-active='true'] .map-dock-legend__dot {
+  box-shadow: none;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-legend__dot--bit {
+  background: transparent;
+  box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, 0.75);
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi,
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi:hover {
+  min-width: 0;
+  background: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2) !important;
+  color: rgba(255, 255, 255, 0.86) !important;
+}
+#map-dock-slot.map-dock-slot--noche .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi[data-active='true'] {
+  background: #fff !important;
+  box-shadow: none !important;
+  color: #3c4655 !important;
+}
+#map-dock-slot.map-dock-slot--noche {
+  background: linear-gradient(to bottom, #05070d, #000);
+}
+/* Escritorio: una sola fila al ancho de su contenido; Buscar queda como lupa redonda a la derecha. */
+@media (min-width: 768px) {
+  #map-dock-slot.map-dock-slot--noche .map-dock-row.map-dock-barra {
+    width: fit-content !important;
+    max-width: min(100%, 1180px) !important;
+    padding: 5px;
+    gap: 6px 4px;
+  }
+  #map-dock-slot.map-dock-slot--noche .map-dock-barra .map-dock-line--buscar .home-map-neu-pill.btn-almamundi {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 0 !important;
+    margin-left: 4px;
+    justify-content: center;
+  }
+  #map-dock-slot.map-dock-slot--noche .map-dock-buscar-texto {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
