@@ -199,7 +199,7 @@ export const ME_PREGUNTO_MAPA: Record<
   }
 > = {
   es: {
-    titulo: 'Respuestas a lo que preguntan las personas',
+    titulo: 'Preguntas de las personas',
     dockAlmaMundi: 'Respuestas a las preguntas de AlmaMundi',
     intro: 'Preguntas que dejaron otras personas, con lo que se les respondió.',
     vacio: 'Aquí aparecerán las preguntas de las personas y sus respuestas. ¿Te animas a dejar la primera?',
@@ -220,7 +220,7 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEnMapa: 'Responder en el mapa',
   },
   pt: {
-    titulo: 'Respostas ao que as pessoas perguntam',
+    titulo: 'Perguntas das pessoas',
     dockAlmaMundi: 'Respostas às perguntas do AlmaMundi',
     intro: 'Perguntas deixadas pelas pessoas e o que responderam pessoas do mundo todo.',
     vacio: 'Aqui vão aparecer as perguntas das pessoas e suas respostas. Que tal deixar a primeira?',
@@ -241,7 +241,7 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEnMapa: 'Responder no mapa',
   },
   en: {
-    titulo: 'Answers to what people ask',
+    titulo: 'People’s questions',
     dockAlmaMundi: 'Answers to AlmaMundi’s questions',
     intro: 'Questions people left and what people from all over the world answered.',
     vacio: 'Questions from people and their answers will appear here. Want to leave the first one?',

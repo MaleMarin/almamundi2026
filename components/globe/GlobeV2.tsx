@@ -14,6 +14,7 @@
 
 import type { RefObject } from 'react';
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { GlobeArcsLayer, type GlobeArc } from '@/components/globe/GlobeArcsLayer';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, OrbitControls, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -1076,7 +1077,9 @@ function GlobeScene({
   initialViewLng,
   layerVisibility,
   focusTarget,
-  onFocusArrived }: {
+  onFocusArrived,
+  arcs = [],
+  arcsMobile = false }: {
   urls: GlobeV2TextureUrls;
   embedded: boolean;
   bits: GlobeBitMarker[];
@@ -1098,6 +1101,8 @@ function GlobeScene({
   layerVisibility?: GlobeLayerVisibility;
   focusTarget?: { lat: number; lng: number; nonce: number } | null;
   onFocusArrived?: () => void;
+  arcs?: GlobeArc[];
+  arcsMobile?: boolean;
 }) {
   /** `forceDaylight` gana SIEMPRE a `viewerNight` (exposición, luces, nubes). */
   const viewerNight = globeNightLook(forceDaylight, viewerNightRaw);
@@ -1308,7 +1313,11 @@ function GlobeScene({
                 interactionStoreRef={bitInteractionStoreRef}
                 earthSpinGroupRef={planetSpinRef}
                 layerVisibility={layerVisibility}
+                dimOthers={arcs.length > 0}
               />
+            ) : null}
+            {layerBuildStage === 'full' && visualStage === 'full' ? (
+              <GlobeArcsLayer arcs={arcs} mobile={arcsMobile} />
             ) : null}
           </group>
         </group>
@@ -1445,6 +1454,9 @@ export type GlobeV2Props = {
   /** Ubicación aproximada de quien mira (GPS redondeado); si no hay, hora local del dispositivo. */
   viewerLat?: number;
   viewerLng?: number;
+  /** Constelación de una pregunta abierta: líneas hasta los lugares de quienes respondieron. */
+  arcs?: GlobeArc[];
+  arcsMobile?: boolean;
 };
 
 export default function GlobeV2({
@@ -1468,6 +1480,8 @@ export default function GlobeV2({
   initialViewLng,
   viewerLat,
   viewerLng,
+  arcs = [],
+  arcsMobile = false,
   focusTarget = null,
   onFocusArrived }: GlobeV2Props) {
   const urls: GlobeV2TextureUrls = {
@@ -1579,6 +1593,8 @@ export default function GlobeV2({
             layerVisibility={layerVisibility}
             focusTarget={focusTarget}
             onFocusArrived={onFocusArrived}
+            arcs={arcs}
+            arcsMobile={arcsMobile}
           />
         </Suspense>
       </Canvas>

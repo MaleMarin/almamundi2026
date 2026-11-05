@@ -540,7 +540,8 @@ export function GlobeBitsLayer({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
-  layerVisibility = DEFAULT_LAYER_VISIBILITY }: {
+  layerVisibility = DEFAULT_LAYER_VISIBILITY,
+  dimOthers = false }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
   onBitClick?: (id: number) => void;
@@ -548,6 +549,8 @@ export function GlobeBitsLayer({
   interactionStoreRef: MutableRefObject<GlobeBitInteractionStore>;
   earthSpinGroupRef: RefObject<THREE.Group | null>;
   layerVisibility?: GlobeLayerVisibility;
+  /** Con una pregunta abierta, el resto de los puntos se atenúa. */
+  dimOthers?: boolean;
 }) {
   if (!bits.length) return null;
   return (
@@ -559,6 +562,7 @@ export function GlobeBitsLayer({
       interactionStoreRef={interactionStoreRef}
       earthSpinGroupRef={earthSpinGroupRef}
       layerVisibility={layerVisibility}
+      dimOthers={dimOthers}
     />
   );
 }
@@ -579,7 +583,8 @@ function GlobeBitsLayerMounted({
   orbitControlsRef,
   interactionStoreRef,
   earthSpinGroupRef,
-  layerVisibility }: {
+  layerVisibility,
+  dimOthers }: {
   bits: GlobeBitMarker[];
   selectedBitId: number | null;
   onBitClick?: (id: number) => void;
@@ -587,6 +592,7 @@ function GlobeBitsLayerMounted({
   interactionStoreRef: MutableRefObject<GlobeBitInteractionStore>;
   earthSpinGroupRef: RefObject<THREE.Group | null>;
   layerVisibility: GlobeLayerVisibility;
+  dimOthers: boolean;
 }) {
   const bitsRootRef = useRef<THREE.Group>(null);
   const { camera, gl } = useThree();
@@ -672,9 +678,10 @@ function GlobeBitsLayerMounted({
     respuestaMat.uniforms.uTime.value = t;
     hiloRingMat.uniforms.uTime.value = t;
     const op = layerOpRef.current;
-    op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? 1 : 0, 7, dt);
-    op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? 1 : 0, 7, dt);
-    op.news = THREE.MathUtils.damp(op.news, layerVisibility.news ? 1 : 0, 7, dt);
+    const tenue = dimOthers ? 0.3 : 1;
+    op.stories = THREE.MathUtils.damp(op.stories, layerVisibility.stories ? tenue : 0, 7, dt);
+    op.bits = THREE.MathUtils.damp(op.bits, layerVisibility.bits ? tenue : 0, 7, dt);
+    op.news = THREE.MathUtils.damp(op.news, layerVisibility.news ? tenue : 0, 7, dt);
     op.respuestas = THREE.MathUtils.damp(op.respuestas, layerVisibility.respuestas ? 1 : 0, 7, dt);
     setMatLayerOpacity(starMatNormal, op.bits);
     setMatLayerOpacity(starMatSelected, op.bits);
@@ -683,7 +690,7 @@ function GlobeBitsLayerMounted({
     setMatLayerOpacity(storyRippleMat, op.stories);
     setMatLayerOpacity(storyRippleMatHover, op.stories);
     setMatLayerOpacity(newsMat, op.news);
-    setMatLayerOpacity(respuestaMat, op.respuestas);
+    setMatLayerOpacity(respuestaMat, op.respuestas * tenue);
     setMatLayerOpacity(hiloRingMat, op.stories);
     setBasicOpacity(preguntaMat, op.respuestas);
   });

@@ -136,23 +136,30 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   const headerStyle = soundsMode ? { background: 'transparent', borderBottom: 'none' } : glassHeaderBar;
 
   // MOBILE: bottom-sheet, contenido dentro del Universe (absolute, no fixed)
+  // Preguntas de las personas: sin velo, para poder mover el globo y recorrer las líneas mientras la tarjeta está abierta.
+  const globoLibre = mode === 'mepregunto';
+
   if (isMobile) {
     return (
-      <div className="absolute inset-0 z-30">
-        <div
-          className="absolute inset-0 bg-black/15"
-          onClick={onClose}
-          aria-hidden
-        />
+      <div className={`absolute inset-0 z-30${globoLibre ? ' pointer-events-none' : ''}`}>
+        {globoLibre ? null : (
+          <div
+            className="absolute inset-0 bg-black/15"
+            onClick={onClose}
+            aria-hidden
+          />
+        )}
         <div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label={dialogAriaLabel}
-          className={`absolute bottom-0 left-0 right-0 flex flex-col rounded-t-[28px] p-0 ${
+          className={`pointer-events-auto absolute bottom-0 left-0 right-0 flex flex-col rounded-t-[28px] p-0 ${
             soundsMode
               ? 'h-auto max-h-full'
-              : fitContent
+              : mode === 'mepregunto'
+                ? /* Preguntas de las personas: media pantalla, para ver arriba el globo con las líneas. */ 'h-[52vh] max-h-[52vh]'
+                : fitContent
                 ? 'h-auto max-h-[70vh]'
                 : innerScrollPanel
                   ? 'h-[70vh] max-h-[70vh]'
@@ -198,11 +205,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
 // DESKTOP: drawer derecho, slide in from right (misma animación que Noticias)
   return (
     <div className="absolute inset-0 z-30 pointer-events-none">
-      <div
-        className="absolute inset-0 bg-black/12 pointer-events-auto"
-        onClick={onClose}
-        aria-hidden
-      />
+      {globoLibre ? null : (
+        <div
+          className="absolute inset-0 bg-black/12 pointer-events-auto"
+          onClick={onClose}
+          aria-hidden
+        />
+      )}
       <aside
         ref={dialogRef}
         role="dialog"
