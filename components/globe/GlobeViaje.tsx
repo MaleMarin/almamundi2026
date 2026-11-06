@@ -2,9 +2,9 @@
 
 /**
  * Tomar el mundo y moverlo por el universo (Ana, 6 nov 2026).
- * - Arrastrar mueve el globo: lo sigue con un leve retraso, como algo que flota, y se inclina hacia donde va.
- * - Al tomarlo crece con un pequeño «pop»; al soltarlo vuelve al centro rebotando suave, como un elástico.
- * - Ya no se gira a mano: gira solo sobre su eje. Un toque sigue abriendo historias.
+ * - Arrastrar hace las dos cosas: el mundo gira (para buscar continentes, como siempre) y además se desplaza
+ *   hacia donde lo llevas, siguiendo al dedo con suavidad. Al soltarlo vuelve al centro con un rebote suave
+ *   y conserva el giro que le diste. Un toque sigue abriendo historias.
  * - En celular, deslizar vertical baja la página. Con «reducir movimiento» vuelve sin rebote.
  */
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
@@ -14,15 +14,17 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 const TOLERANCIA_PX = 7;
 /** Seguir al dedo: suave, con un poco de retraso. */
-const SIGUE_K = 70;
-const SIGUE_C = 13;
+const SIGUE_K = 34;
+const SIGUE_C = 10;
+/** Cuánto se desplaza respecto del arrastre (el resto es giro). */
+const DESPLAZA = 0.45;
 /** Volver al centro: elástico, con dos o tres rebotes que se apagan. */
-const VUELVE_K = 34;
-const VUELVE_C = 4.6;
+const VUELVE_K = 20;
+const VUELVE_C = 4.4;
 /** Tamaño al tomarlo, con resorte (sobrepasa un poco y se acomoda). */
-const POP_K = 220;
-const POP_C = 12;
-const INCLINA_MAX = 0.22;
+const POP_K = 160;
+const POP_C = 13;
+const INCLINA_MAX = 0.12;
 
 declare global {
   interface Window {
@@ -35,12 +37,12 @@ const EJE_Z = new THREE.Vector3(0, 0, 1);
 
 export function GlobeViaje({
   children,
-  controlsRef,
 }: {
   children: ReactNode;
   /** Se mantiene por compatibilidad con quien lo usa. */
   radio?: number;
-  controlsRef: RefObject<OrbitControlsImpl | null>;
+  /** Se mantiene por compatibilidad: el giro a mano lo sigue haciendo OrbitControls. */
+  controlsRef?: RefObject<OrbitControlsImpl | null>;
 }) {
   const { camera, gl } = useThree();
   const grupo = useRef<THREE.Group>(null);
@@ -83,7 +85,7 @@ export function GlobeViaje({
       s.volviendo = false;
       window.__almaGlobeTomado = true;
       s.meta.copy(s.pos);
-      if (!s.quieto) s.escalaVel += 1.2; // pequeño «pop»
+      if (!s.quieto) s.escalaVel += 0.6; // pequeño «pop»
       el.style.cursor = 'grabbing';
       el.style.touchAction = 'none';
       try {
@@ -120,7 +122,9 @@ export function GlobeViaje({
       const { derecha, arriba } = tmp.current;
       derecha.set(1, 0, 0).applyQuaternion(camera.quaternion);
       arriba.set(0, 1, 0).applyQuaternion(camera.quaternion);
-      s.meta.addScaledVector(derecha, (e.clientX - s.x) * k).addScaledVector(arriba, -(e.clientY - s.y) * k);
+      s.meta
+        .addScaledVector(derecha, (e.clientX - s.x) * k * DESPLAZA)
+        .addScaledVector(arriba, -(e.clientY - s.y) * k * DESPLAZA);
       s.x = e.clientX;
       s.y = e.clientY;
     };
@@ -169,9 +173,6 @@ export function GlobeViaje({
     const s = st.current;
     const dt = Math.min(delta, 1 / 30);
 
-    // Arrastrar es mover, no girar: la cámara no rota a mano.
-    const ctrl = controlsRef.current as (OrbitControlsImpl & { position0?: THREE.Vector3; target0?: THREE.Vector3 }) | null;
-    if (ctrl && ctrl.enableRotate) ctrl.enableRotate = false;
 
     // Posición con resorte: sigue al dedo, o vuelve al centro rebotando.
     const meta = s.tomado ? s.meta : CERO;
@@ -184,17 +185,6 @@ export function GlobeViaje({
     }
 
     if (s.volviendo) {
-      // La vista vuelve suave a la de siempre.
-      if (ctrl?.position0 && ctrl.target0) {
-        const f = 1 - Math.exp(-dt * 3);
-        ctrl.target.lerp(ctrl.target0, f);
-        const r = camera.position.distanceTo(ctrl.target);
-        const desde = camera.position.clone().sub(ctrl.target).normalize();
-        const hasta = ctrl.position0.clone().sub(ctrl.target0).normalize();
-        desde.lerp(hasta, f).normalize();
-        camera.position.copy(ctrl.target).addScaledVector(desde, THREE.MathUtils.lerp(r, ctrl.position0.distanceTo(ctrl.target0), f));
-        ctrl.update();
-      }
       if (s.pos.lengthSq() < 1e-6 && s.vel.lengthSq() < 1e-6) {
         s.pos.set(0, 0, 0);
         s.vel.set(0, 0, 0);
@@ -207,14 +197,14 @@ export function GlobeViaje({
     const rapidez = s.vel.length();
     if (!s.quieto && rapidez > 1e-4) {
       eje.copy(EJE_Z).applyQuaternion(camera.quaternion).cross(s.vel).normalize();
-      q.setFromAxisAngle(eje, Math.min(INCLINA_MAX, rapidez * 0.12));
+      q.setFromAxisAngle(eje, Math.min(INCLINA_MAX, rapidez * 0.06));
     } else {
       q.identity();
     }
     s.inclina.slerp(q, Math.min(1, dt * 8));
 
     // Tamaño con resorte: crece un poco al tomarlo, vuelve al soltarlo.
-    const escalaMeta = s.tomado ? 1.06 : 1;
+    const escalaMeta = s.tomado ? 1.04 : 1;
     const ae = (escalaMeta - s.escala) * POP_K - s.escalaVel * POP_C;
     s.escalaVel += ae * dt;
     s.escala += s.escalaVel * dt;
