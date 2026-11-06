@@ -2954,43 +2954,37 @@ body .almamundi-footer-title { font-weight: 900 !important; }
   }
 }
 
-/* Fotografía: en vez del barrido blanco brusco, una foto que «se revela»: colores cálidos que aparecen
-   y respiran despacio, con un reflejo suave que cruza cada tanto. */
-@keyframes home-foto-revelado {
-  0% { opacity: 0.55; transform: scale(1); filter: saturate(0.85); }
-  100% { opacity: 1; transform: scale(1.06); filter: saturate(1.15); }
+/* Fotografía (Ana, 6 nov 2026): mínimo, con luz. Un fondo apenas perla para que se vea la luz blanca
+   que recorre la foto despacio, y un brillo que la cruza en diagonal. Sin naranja. */
+@keyframes home-foto-luz {
+  0% { transform: translate(-28%, -18%) scale(0.9); opacity: 0.85; }
+  50% { transform: translate(22%, 12%) scale(1.15); opacity: 1; }
+  100% { transform: translate(-28%, -18%) scale(0.9); opacity: 0.85; }
 }
 @keyframes home-foto-reflejo {
-  0%, 35% { background-position: 160% 0; }
-  75%, 100% { background-position: -60% 0; }
+  0%, 30% { background-position: 160% 0; }
+  70%, 100% { background-position: -60% 0; }
 }
 .home-historias-card-photo-shine {
   overflow: hidden;
   isolation: isolate;
-  background: none !important;
   animation: none !important;
 }
 .home-historias-card-photo-shine::before {
   content: '';
   position: absolute;
-  inset: -4%;
-  border-radius: inherit;
-  /* Sin naranja (Ana, 6 nov 2026): luz y grises, como una foto en blanco y negro que se revela. */
-  background:
-    radial-gradient(circle at 35% 35%, #ffffff 0%, rgba(255, 255, 255, 0.95) 35%, transparent 70%),
-    radial-gradient(circle at 75% 75%, rgba(244, 246, 248, 0.9), transparent 60%),
-    linear-gradient(160deg, #ffffff, #f7f8f9);
-  animation: home-foto-revelado 4.5s ease-in-out infinite alternate;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, #ffffff 0%, rgba(255, 255, 255, 0.85) 30%, transparent 62%);
+  animation: home-foto-luz 3.2s ease-in-out infinite;
 }
 .home-historias-card-photo-shine::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(115deg, transparent 35%, rgba(255, 255, 255, 0.95) 50%, transparent 65%);
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 1) 50%, transparent 62%);
   background-size: 260% 100%;
-  mix-blend-mode: screen;
-  animation: home-foto-reflejo 6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: home-foto-reflejo 3.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 @media (prefers-reduced-motion: reduce) {
   .home-historias-card-photo-shine::before,
@@ -3000,7 +2994,7 @@ body .almamundi-footer-title { font-weight: 900 !important; }
 }
 /* Marco de la foto en gris suave, sin naranja. */
 .home-historias-card-photo-shine {
-  border: 1px solid rgba(255, 255, 255, 0.9);
-  background-color: #fff !important;
-  box-shadow: 0 0 24px 6px rgba(255, 255, 255, 0.95), 0 0 60px 12px rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: linear-gradient(160deg, #eef0f3, #e4e7eb) !important;
+  box-shadow: 0 0 22px 4px rgba(255, 255, 255, 0.9);
 }
