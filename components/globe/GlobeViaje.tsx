@@ -4,7 +4,7 @@
  * Tomar el mundo y moverlo por el universo (Ana, 6 nov 2026).
  * - Arrastrar normal: gira, como siempre.
  * - Mantener presionado ~0,5 s sin mover: el globo se «levanta» (crece un poco) y se lleva a cualquier parte.
- * - Al soltar: sigue con el impulso, rebota suave en los bordes y después vuelve flotando al centro.
+ * - Al soltar: vuelve suave a su posición inicial, al centro y con la vista de siempre (Ana, 6 nov 2026).
  * Mientras está tomado no se abren historias. Con «reducir movimiento» vuelve al centro sin viajar.
  */
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
@@ -14,16 +14,14 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
 const ESPERA_MS = 300;
 const TOLERANCIA_PX = 7;
-const ROCE = 1.6; // frena el viaje (por segundo)
-const VUELTA_TRAS_S = 6; // segundos quieto antes de volver al centro
-const VUELTA_RESORTE = 3.2;
-const VUELTA_AMORTIGUA = 3.4;
 
 declare global {
   interface Window {
     __almaGlobeTomado?: boolean;
   }
 }
+
+const CERO = new THREE.Vector3();
 
 export function GlobeViaje({
   children,
@@ -35,7 +33,7 @@ export function GlobeViaje({
   radio: number;
   controlsRef: RefObject<OrbitControlsImpl | null>;
 }) {
-  const { camera, gl, size } = useThree();
+  const { camera, gl } = useThree();
   const grupo = useRef<THREE.Group>(null);
   const st = useRef({
     pos: new THREE.Vector3(),
@@ -51,6 +49,7 @@ export function GlobeViaje({
     alzado: 0,
     quieto: false,
     rotacionPrevia: true,
+    volviendo: false,
   });
   const derecha = useRef(new THREE.Vector3());
   const arriba = useRef(new THREE.Vector3());
@@ -132,7 +131,8 @@ export function GlobeViaje({
       if (!s.tomado) return;
       s.tomado = false;
       s.soltadoHace = 0;
-      if (s.quieto) s.vel.set(0, 0, 0);
+      s.vel.set(0, 0, 0);
+      s.volviendo = true;
       const c = controlsRef.current;
       if (c) c.enableRotate = s.rotacionPrevia;
       el.style.cursor = '';
@@ -174,44 +174,26 @@ export function GlobeViaje({
     const s = st.current;
     const dt = Math.min(delta, 1 / 30);
 
-    if (!s.tomado) {
-      s.soltadoHace += dt;
-      // Viaje con el impulso y roce.
-      s.pos.addScaledVector(s.vel, dt);
-      s.vel.multiplyScalar(Math.max(0, 1 - ROCE * dt));
-      // Rebote suave en los bordes: el centro del globo puede llegar hasta el borde (esquinas incluidas).
-      const cam = camera as THREE.PerspectiveCamera;
-      const dist = cam.position.distanceTo(new THREE.Vector3());
-      const alto = dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
-      const ancho = alto * (size.width / Math.max(1, size.height));
-      derecha.current.set(1, 0, 0).applyQuaternion(camera.quaternion);
-      arriba.current.set(0, 1, 0).applyQuaternion(camera.quaternion);
-      const px = s.pos.dot(derecha.current);
-      const py = s.pos.dot(arriba.current);
-      const limX = Math.max(radio * 0.5, ancho);
-      const limY = Math.max(radio * 0.5, alto);
-      if (Math.abs(px) > limX) {
-        const vx = s.vel.dot(derecha.current);
-        if (Math.sign(vx) === Math.sign(px)) s.vel.addScaledVector(derecha.current, -1.6 * vx);
-        s.pos.addScaledVector(derecha.current, Math.sign(px) * limX - px);
+    if (!s.tomado && s.volviendo) {
+      // Vuelta suave (sin rebote) a la posición inicial: el globo al centro y la cámara a la vista de siempre.
+      const f = s.quieto ? 1 : 1 - Math.exp(-dt * 4.5);
+      s.pos.lerp(CERO, f);
+      const c = controlsRef.current as (OrbitControlsImpl & { position0?: THREE.Vector3; target0?: THREE.Vector3 }) | null;
+      let listo = s.pos.lengthSq() < 1e-6;
+      if (c?.position0 && c.target0) {
+        c.target.lerp(c.target0, f);
+        // Gira la cámara por la esfera (sin acercarla ni alejarla) hacia su punto de partida.
+        const r = camera.position.distanceTo(c.target);
+        const desde = camera.position.clone().sub(c.target).normalize();
+        const hasta = c.position0.clone().sub(c.target0).normalize();
+        desde.lerp(hasta, f).normalize();
+        camera.position.copy(c.target).addScaledVector(desde, THREE.MathUtils.lerp(r, c.position0.distanceTo(c.target0), f));
+        c.update();
+        listo = listo && desde.angleTo(hasta) < 0.002;
       }
-      if (Math.abs(py) > limY) {
-        const vy = s.vel.dot(arriba.current);
-        if (Math.sign(vy) === Math.sign(py)) s.vel.addScaledVector(arriba.current, -1.6 * vy);
-        s.pos.addScaledVector(arriba.current, Math.sign(py) * limY - py);
-      }
-      // Después de un rato, vuelve flotando al centro (de inmediato si se pide menos movimiento).
-      if (s.soltadoHace > (s.quieto ? 0 : VUELTA_TRAS_S) && s.pos.lengthSq() > 1e-8) {
-        const a = s.pos.clone().multiplyScalar(-VUELTA_RESORTE).addScaledVector(s.vel, -VUELTA_AMORTIGUA);
-        s.vel.addScaledVector(a, dt);
-        if (s.quieto) {
-          s.pos.set(0, 0, 0);
-          s.vel.set(0, 0, 0);
-        }
-      }
-      if (s.pos.lengthSq() < 1e-7 && s.vel.lengthSq() < 1e-7) {
+      if (listo) {
         s.pos.set(0, 0, 0);
-        s.vel.set(0, 0, 0);
+        s.volviendo = false;
       }
     }
 
