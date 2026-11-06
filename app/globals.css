@@ -2977,10 +2977,9 @@ body .almamundi-footer-title { font-weight: 900 !important; }
   border-radius: inherit;
   /* Sin naranja (Ana, 6 nov 2026): luz y grises, como una foto en blanco y negro que se revela. */
   background:
-    radial-gradient(circle at 32% 32%, rgba(255, 255, 255, 1), transparent 62%),
-    radial-gradient(circle at 74% 72%, rgba(150, 160, 172, 0.16), transparent 60%),
-    radial-gradient(circle at 76% 24%, rgba(232, 236, 240, 0.6), transparent 50%),
-    linear-gradient(160deg, rgba(255, 255, 255, 0.95), rgba(222, 226, 231, 0.45));
+    radial-gradient(circle at 35% 35%, #ffffff 0%, rgba(255, 255, 255, 0.95) 35%, transparent 70%),
+    radial-gradient(circle at 75% 75%, rgba(244, 246, 248, 0.9), transparent 60%),
+    linear-gradient(160deg, #ffffff, #f7f8f9);
   animation: home-foto-revelado 4.5s ease-in-out infinite alternate;
 }
 .home-historias-card-photo-shine::after {
@@ -3000,4 +2999,8 @@ body .almamundi-footer-title { font-weight: 900 !important; }
   }
 }
 /* Marco de la foto en gris suave, sin naranja. */
-.home-historias-card-photo-shine { border: 1.5px solid rgba(96, 108, 124, 0.18); box-shadow: 0 0 28px rgba(255, 255, 255, 0.9); }
+.home-historias-card-photo-shine {
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  background-color: #fff !important;
+  box-shadow: 0 0 24px 6px rgba(255, 255, 255, 0.95), 0 0 60px 12px rgba(255, 255, 255, 0.6);
+}

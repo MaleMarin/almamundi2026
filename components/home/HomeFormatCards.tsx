@@ -146,7 +146,6 @@ function HistoriasCardHoverDecor({
 
   return (
     <div className={wrap} aria-hidden>
-      <div className="absolute inset-[5%] rounded-xl bg-white/[0.12] shadow-[inset_0_2px_8px_rgba(255,255,255,0.45),0_4px_16px_rgba(74,85,104,0.12)]" />
       <div className="home-historias-card-photo-shine absolute inset-[5%] rounded-xl" />
     </div>
   );
