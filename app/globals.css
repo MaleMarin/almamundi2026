@@ -2998,3 +2998,59 @@ body .almamundi-footer-title { font-weight: 900 !important; }
   background: linear-gradient(160deg, #eef0f3, #e4e7eb) !important;
   box-shadow: 0 0 22px 4px rgba(255, 255, 255, 0.9);
 }
+
+/* Tarjetas de la hero como tela (Ana, 6 nov 2026, referencia: afiches de Justine Soulié).
+   Cada tarjeta se mece en 3D como un afiche colgado con brisa, y le cruzan pliegues de luz.
+   El texto no se deforma. La encendida se mece más. */
+@keyframes home-tela-mecer {
+  0%   { transform: perspective(900px) rotateX(1.2deg) rotateY(-1.6deg) translateY(0); }
+  25%  { transform: perspective(900px) rotateX(-0.8deg) rotateY(1.2deg) translateY(-3px); }
+  50%  { transform: perspective(900px) rotateX(1deg) rotateY(1.8deg) translateY(-5px); }
+  75%  { transform: perspective(900px) rotateX(-1.2deg) rotateY(-1deg) translateY(-2px); }
+  100% { transform: perspective(900px) rotateX(1.2deg) rotateY(-1.6deg) translateY(0); }
+}
+@keyframes home-tela-mecer-fuerte {
+  0%   { transform: perspective(900px) rotateX(2.4deg) rotateY(-3.2deg) translateY(0); }
+  25%  { transform: perspective(900px) rotateX(-1.8deg) rotateY(2.6deg) translateY(-4px); }
+  50%  { transform: perspective(900px) rotateX(2deg) rotateY(3.4deg) translateY(-7px); }
+  75%  { transform: perspective(900px) rotateX(-2.4deg) rotateY(-2.2deg) translateY(-3px); }
+  100% { transform: perspective(900px) rotateX(2.4deg) rotateY(-3.2deg) translateY(0); }
+}
+@keyframes home-tela-pliegues {
+  0%   { background-position: 0% 0%, 100% 0%; }
+  100% { background-position: 200% 100%, -100% 100%; }
+}
+.home-historias-card-float-wrap {
+  animation: home-tela-mecer 7s ease-in-out infinite !important;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.home-historias-card-float-wrap:nth-child(2) { animation-delay: -1.8s !important; }
+.home-historias-card-float-wrap:nth-child(3) { animation-delay: -3.5s !important; }
+.home-historias-card-float-wrap:nth-child(4) { animation-delay: -5.2s !important; }
+.home-historias-card-float-wrap:has(.encendida) {
+  animation-name: home-tela-mecer-fuerte !important;
+}
+.home-historias-card-surface::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: inherit;
+  background-image:
+    linear-gradient(105deg, transparent 20%, rgba(255, 255, 255, 0.55) 32%, transparent 44%, rgba(120, 110, 100, 0.10) 58%, transparent 70%),
+    linear-gradient(75deg, transparent 30%, rgba(120, 110, 100, 0.08) 45%, transparent 55%, rgba(255, 255, 255, 0.35) 68%, transparent 80%);
+  background-size: 220% 220%, 240% 240%;
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  animation: home-tela-pliegues 9s ease-in-out infinite alternate;
+  transition: opacity 0.6s ease;
+}
+.home-historias-card-surface.encendida::after { opacity: 1; }
+@media (prefers-reduced-motion: reduce) {
+  .home-historias-card-float-wrap,
+  .home-historias-card-surface::after {
+    animation: none !important;
+  }
+}
