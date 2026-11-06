@@ -6,7 +6,7 @@
  * Efecto por turnos (pedido de Ana, 4 nov 2026): se enciende una tarjeta a la vez, en ronda;
  * si el mouse pasa por una, se enciende esa y la ronda se detiene hasta que sale.
  */
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode, type RefObject } from 'react';
 import Link from 'next/link';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { contarHref, type ContarPregunta } from '@/lib/contar-routes';
@@ -273,9 +273,12 @@ export type HomeFormatCardsProps = {
 /** Cada tarjeta se queda encendida 2,5 s; el cambio es un fundido corto (Ana, 6 nov 2026). */
 const TURNO_MS = 2500;
 
-/** Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima. */
-function useTurnoTarjetas() {
-  /** Siempre hay una encendida: parte la primera, sin esperar el primer turno. */
+/**
+ * Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima.
+ * Cada vez que la persona llega a las tarjetas, la ronda parte de inmediato por la primera (Ana, 6 nov 2026).
+ * Fuera de la vista la ronda se detiene (no gasta).
+ */
+function useTurnoTarjetas(zona: RefObject<HTMLElement | null>) {
   const [ronda, setRonda] = useState(0);
   const [mouse, setMouse] = useState<number | null>(null);
 
@@ -287,12 +290,37 @@ function useTurnoTarjetas() {
       quieto = false;
     }
     if (quieto) return;
-    const id = window.setInterval(() => {
-      if (document.visibilityState === 'hidden') return;
-      setRonda((n) => (n + 1) % 4);
-    }, TURNO_MS);
-    return () => window.clearInterval(id);
-  }, []);
+    let id: number | undefined;
+    const parar = () => {
+      if (id !== undefined) window.clearInterval(id);
+      id = undefined;
+    };
+    const partir = () => {
+      parar();
+      setRonda(0);
+      id = window.setInterval(() => {
+        if (document.visibilityState === 'hidden') return;
+        setRonda((n) => (n + 1) % 4);
+      }, TURNO_MS);
+    };
+    const el = zona.current;
+    if (!el || typeof IntersectionObserver === 'undefined') {
+      partir();
+      return parar;
+    }
+    const obs = new IntersectionObserver(
+      ([entrada]) => {
+        if (entrada?.isIntersecting) partir();
+        else parar();
+      },
+      { threshold: 0.25 }
+    );
+    obs.observe(el);
+    return () => {
+      obs.disconnect();
+      parar();
+    };
+  }, [zona]);
 
   return {
     encendida: mouse ?? ronda,
@@ -313,10 +341,12 @@ export function HomeFormatCards({
   pregunta = null,
   sinEtiqueta = false }: HomeFormatCardsProps) {
   const { t } = useHomeLocale();
-  const turno = useTurnoTarjetas();
+  const zonaTarjetas = useRef<HTMLElement | null>(null);
+  const turno = useTurnoTarjetas(zonaTarjetas);
 
   return (
     <section
+      ref={zonaTarjetas}
       id={sectionId}
       aria-label="Formatos para compartir tu historia"
       className={
