@@ -198,10 +198,12 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEnMapa: string;
     introRespuestas: string;
     verYResponder: string;
+    respondele: (alias: string) => string;
   }
 > = {
   es: {
     titulo: 'Preguntas de las personas',
+    respondele: (alias) => `Respóndele a ${alias}`,
     verYResponder: 'Ver y responder',
     introRespuestas: 'Lee lo que las personas respondieron a las preguntas de las cintas.',
     dockAlmaMundi: 'Respuestas a las preguntas de AlmaMundi',
@@ -225,6 +227,7 @@ export const ME_PREGUNTO_MAPA: Record<
   },
   pt: {
     titulo: 'Perguntas das pessoas',
+    respondele: (alias) => `Responda para ${alias}`,
     verYResponder: 'Ver e responder',
     introRespuestas: 'Leia o que as pessoas responderam às perguntas das fitas.',
     dockAlmaMundi: 'Respostas às perguntas do AlmaMundi',
@@ -248,6 +251,7 @@ export const ME_PREGUNTO_MAPA: Record<
   },
   en: {
     titulo: 'People’s questions',
+    respondele: (alias) => `Answer ${alias}`,
     verYResponder: 'See and answer',
     introRespuestas: 'Read what people answered to the questions in the ribbons.',
     dockAlmaMundi: 'Answers to AlmaMundi’s questions',

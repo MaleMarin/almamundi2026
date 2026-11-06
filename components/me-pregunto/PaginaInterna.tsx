@@ -105,12 +105,15 @@ export function ResponderAqui({
   pregunta,
   texto,
   cerrarTexto,
+  abiertoInicial = false,
 }: {
   pregunta: PreguntaSemana | null;
   texto: string;
   cerrarTexto: string;
+  /** Llega desde el botón «Respóndele» de la lista: el formulario ya abierto. */
+  abiertoInicial?: boolean;
 }) {
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(abiertoInicial);
   if (!pregunta) return null;
   if (!abierto) {
     return (

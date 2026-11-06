@@ -26,7 +26,9 @@ export function MePreguntoPagina() {
   const { locale } = useHomeLocale();
   const ui = ME_PREGUNTO_UI[locale];
   const copy = ME_PREGUNTO_MAPA[locale];
-  const pedida = useSearchParams().get('p');
+  const params = useSearchParams();
+  const pedida = params.get('p');
+  const responder = params.get('responder') === '1';
   const [preguntas, setPreguntas] = useState<MePreguntaPublica[] | null>(null);
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
   const [dejando, setDejando] = useState(false);
@@ -67,7 +69,12 @@ export function MePreguntoPagina() {
           bajada={ui.loPregunta(preguntaAlias(una.alias), formatPublicPlace(una.city, una.country, locale))}
           largo
         >
-          <ResponderAqui pregunta={comoFormulario(una, locale)} texto={copy.responderEsta} cerrarTexto={ui.cancelar} />
+          <ResponderAqui
+            pregunta={comoFormulario(una, locale)}
+            texto={copy.responderEsta}
+            cerrarTexto={ui.cancelar}
+            abiertoInicial={responder}
+          />
         </EncabezadoInterno>
         {lista.length === 0 ? (
           <TextoVacio locale={locale} />
@@ -118,12 +125,20 @@ export function MePreguntoPagina() {
               <p className="m-0 mt-2 text-[length:var(--fs-etiqueta)] text-[#616C7C]">
                 {ui.loPregunta(preguntaAlias(p.alias), formatPublicPlace(p.city, p.country, locale))}
               </p>
-              <Link
-                href={`/me-pregunto?p=${encodeURIComponent(p.id)}`}
-                className={`mt-auto inline-block pt-4 text-[length:var(--fs-pequeno)] ${enlaceInterno}`}
-              >
-                {n > 0 ? `${copy.verRespuestas} (${n})` : copy.verRespuestas}
-              </Link>
+              <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-4">
+                <Link
+                  href={`/me-pregunto?p=${encodeURIComponent(p.id)}&responder=1`}
+                  className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 no-underline"
+                >
+                  {copy.respondele(preguntaAlias(p.alias))}
+                </Link>
+                <Link
+                  href={`/me-pregunto?p=${encodeURIComponent(p.id)}`}
+                  className={`inline-block text-[length:var(--fs-pequeno)] ${enlaceInterno}`}
+                >
+                  {n > 0 ? `${copy.verRespuestas} (${n})` : copy.verRespuestas}
+                </Link>
+              </div>
             </Tarjeta>
           );
         })}
