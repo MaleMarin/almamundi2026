@@ -14,6 +14,7 @@
 
 import type { RefObject } from 'react';
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { GlobeJelly } from '@/components/globe/GlobeJelly';
 import { GlobeArcsLayer, type GlobeArc } from '@/components/globe/GlobeArcsLayer';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, OrbitControls, useTexture } from '@react-three/drei';
@@ -1282,6 +1283,7 @@ function GlobeScene({
           - earthSpin: giro sidéreo en Y local (GMST) — no modificar aquí.
           Luna hermana (no hereda tilt).
         */}
+        <GlobeJelly>
         <group
           name="earthAxialTilt"
           rotation={embedded ? [0, 0, 0] : [0, 0, EARTH_AXIAL_TILT_RAD]}
@@ -1321,6 +1323,7 @@ function GlobeScene({
             ) : null}
           </group>
         </group>
+        </GlobeJelly>
 
         {/*
           Suspense propio: `MoonSatellite` usa `useTexture`. Si suspende, no debe activar el Suspense
