@@ -2,8 +2,8 @@
 
 /**
  * Tomar el mundo y moverlo por el universo (Ana, 6 nov 2026).
- * - Arrastrar normal: gira, como siempre.
- * - Mantener presionado ~0,5 s sin mover: el globo se «levanta» (crece un poco) y se lleva a cualquier parte.
+ * - Arrastrar mueve el globo de inmediato por el universo (Ana, 6 nov 2026). Ya no se gira a mano: gira solo sobre su eje.
+ * - Un toque (sin arrastrar) sigue abriendo historias. En celular, deslizar vertical baja la página.
  * - Al soltar: vuelve suave a su posición inicial, al centro y con la vista de siempre (Ana, 6 nov 2026).
  * Mientras está tomado no se abren historias. Con «reducir movimiento» vuelve al centro sin viajar.
  */
@@ -12,7 +12,6 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
-const ESPERA_MS = 300;
 const TOLERANCIA_PX = 7;
 
 declare global {
@@ -39,7 +38,8 @@ export function GlobeViaje({
     pos: new THREE.Vector3(),
     vel: new THREE.Vector3(),
     tomado: false,
-    esperando: 0 as number | ReturnType<typeof setTimeout>,
+    abajo: false,
+    tactil: false,
     x0: 0,
     y0: 0,
     x: 0,
@@ -48,7 +48,6 @@ export function GlobeViaje({
     soltadoHace: 99,
     alzado: 0,
     quieto: false,
-    rotacionPrevia: true,
     volviendo: false,
   });
   const derecha = useRef(new THREE.Vector3());
@@ -68,22 +67,12 @@ export function GlobeViaje({
       return (2 * dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2))) / Math.max(1, el.clientHeight);
     };
 
-    const cancelarEspera = () => {
-      if (st.current.esperando) clearTimeout(st.current.esperando);
-      st.current.esperando = 0;
-    };
 
     const tomar = () => {
       const s = st.current;
-      s.esperando = 0;
       s.tomado = true;
       window.__almaGlobeTomado = true;
       s.vel.set(0, 0, 0);
-      const c = controlsRef.current;
-      if (c) {
-        s.rotacionPrevia = c.enableRotate;
-        c.enableRotate = false;
-      }
       el.style.cursor = 'grabbing';
       el.style.touchAction = 'none';
       try {
@@ -99,15 +88,23 @@ export function GlobeViaje({
       s.x0 = s.x = e.clientX;
       s.y0 = s.y = e.clientY;
       s.t = performance.now();
-      cancelarEspera();
-      s.esperando = setTimeout(tomar, ESPERA_MS);
+      s.abajo = true;
+      s.tactil = e.pointerType === 'touch';
     };
 
     const mover = (e: PointerEvent) => {
       const s = st.current;
       if (!s.tomado) {
-        if (s.esperando && Math.hypot(e.clientX - s.x0, e.clientY - s.y0) > TOLERANCIA_PX) cancelarEspera();
-        return;
+        if (!s.abajo) return;
+        const dx0 = e.clientX - s.x0;
+        const dy0 = e.clientY - s.y0;
+        if (Math.hypot(dx0, dy0) <= TOLERANCIA_PX) return;
+        // En celular, deslizar hacia arriba o abajo es para bajar por la página.
+        if (s.tactil && Math.abs(dy0) > Math.abs(dx0)) {
+          s.abajo = false;
+          return;
+        }
+        tomar();
       }
       const ahora = performance.now();
       const dt = Math.max(0.008, (ahora - s.t) / 1000);
@@ -127,14 +124,12 @@ export function GlobeViaje({
 
     const soltar = () => {
       const s = st.current;
-      cancelarEspera();
+      s.abajo = false;
       if (!s.tomado) return;
       s.tomado = false;
       s.soltadoHace = 0;
       s.vel.set(0, 0, 0);
       s.volviendo = true;
-      const c = controlsRef.current;
-      if (c) c.enableRotate = s.rotacionPrevia;
       el.style.cursor = '';
       el.style.touchAction = '';
       // Deja pasar este «soltar» sin abrir historias y después vuelve a la normalidad.
@@ -147,7 +142,7 @@ export function GlobeViaje({
       if (st.current.tomado) e.preventDefault();
     };
     const sinMenu = (e: Event) => {
-      if (st.current.tomado || st.current.esperando) e.preventDefault();
+      if (st.current.tomado) e.preventDefault();
     };
 
     el.addEventListener('pointerdown', bajar);
@@ -157,7 +152,6 @@ export function GlobeViaje({
     el.addEventListener('touchmove', sinScroll, { passive: false });
     el.addEventListener('contextmenu', sinMenu);
     return () => {
-      cancelarEspera();
       el.removeEventListener('pointerdown', bajar);
       window.removeEventListener('pointermove', mover);
       window.removeEventListener('pointerup', soltar);
@@ -173,6 +167,9 @@ export function GlobeViaje({
     if (!g) return;
     const s = st.current;
     const dt = Math.min(delta, 1 / 30);
+    // Arrastrar es mover, no girar: la cámara no rota a mano.
+    const ctrl = controlsRef.current;
+    if (ctrl && ctrl.enableRotate) ctrl.enableRotate = false;
 
     if (!s.tomado && s.volviendo) {
       // Vuelta suave (sin rebote) a la posición inicial: el globo al centro y la cámara a la vista de siempre.
