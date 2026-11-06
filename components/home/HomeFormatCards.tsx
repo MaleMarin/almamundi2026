@@ -37,8 +37,8 @@ function HistoriasCardHoverDecor({
   enMedio?: boolean;
 }) {
   const wrap = enMedio
-    ? 'card-hover-decor pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100'
-    : 'card-hover-decor pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100';
+    ? 'card-hover-decor pointer-events-none absolute inset-0 z-0 h-full w-full overflow-hidden rounded-[22px] opacity-0'
+    : 'card-hover-decor pointer-events-none absolute inset-[5%] z-0 overflow-hidden rounded-[22px] opacity-0';
 
   if (kind === 'video') {
     return (
@@ -271,11 +271,13 @@ export type HomeFormatCardsProps = {
   sinEtiqueta?: boolean;
 };
 
-const TURNO_MS = 3200;
+/** Cada tarjeta se queda encendida 4,5 s; el cambio es un fundido largo (Ana, 6 nov 2026). */
+const TURNO_MS = 4500;
 
 /** Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima. */
 function useTurnoTarjetas() {
-  const [ronda, setRonda] = useState(-1);
+  /** Siempre hay una encendida: parte la primera, sin esperar el primer turno. */
+  const [ronda, setRonda] = useState(0);
   const [mouse, setMouse] = useState<number | null>(null);
 
   useEffect(() => {
