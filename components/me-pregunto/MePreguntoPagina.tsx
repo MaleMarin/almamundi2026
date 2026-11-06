@@ -17,7 +17,7 @@ import {
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
-import { comoFormulario } from '@/components/hilos/MePreguntoPanel';
+import { comoFormulario, DejarPregunta } from '@/components/hilos/MePreguntoPanel';
 import { esMePreguntaId, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 
@@ -29,6 +29,7 @@ export function MePreguntoPagina() {
   const pedida = useSearchParams().get('p');
   const [preguntas, setPreguntas] = useState<MePreguntaPublica[] | null>(null);
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
+  const [dejando, setDejando] = useState(false);
 
   useEffect(() => {
     let cancel = false;
@@ -83,7 +84,30 @@ export function MePreguntoPagina() {
 
   return (
     <PaginaInterna>
-      <EncabezadoInterno titulo={copy.titulo} bajada={copy.intro} />
+      <EncabezadoInterno titulo={copy.titulo} bajada={copy.intro}>
+        {/* Dejar una pregunta también se hace aquí (antes solo en el panel de la home). */}
+        {dejando ? (
+          <div
+            className="relative mt-6 max-w-3xl rounded-2xl bg-[#F4F2EE] p-5 md:p-8"
+            style={{ ['--cortina-texto' as string]: '#3C4655', ['--cortina-fondo' as string]: '#F4F2EE', boxShadow: '0 10px 30px rgba(60,70,85,0.12)' }}
+          >
+            <DejarPregunta
+              locale={locale}
+              onCancel={() => setDejando(false)}
+              onVolver={() => {
+                window.location.href = '/#cintas';
+              }}
+            />
+          </div>
+        ) : (
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
+            <p className="m-0 text-[length:var(--fs-pequeno)] text-[#616C7C]">{ui.invitaDejar}</p>
+            <button type="button" onClick={() => setDejando(true)} className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6">
+              {ui.dejar}
+            </button>
+          </div>
+        )}
+      </EncabezadoInterno>
       {preguntas && preguntas.length === 0 ? <TextoVacio locale={locale} /> : null}
       <GrillaTarjetas>
         {(preguntas ?? []).map((p) => {

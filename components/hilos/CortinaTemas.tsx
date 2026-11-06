@@ -927,13 +927,14 @@ export function CortinaTemas({
         ))}
       </div>
       {temaId ? null : (
-        <button type="button" className="cortina-te-preguntan btn-am-principal" onClick={() => verTema(ME_INDICE)}>
+        /* Lleva a la página «Preguntas de las personas»: ahí se leen, se responden y se deja una pregunta (Ana, 6 nov 2026). */
+        <a href="/me-pregunto" className="cortina-te-preguntan btn-am-principal no-underline">
           {ME_PREGUNTO_UI[locale].botonTePreguntan.split('. ').map((parte, i, todas) => (
             <span key={i} className="cortina-te-preguntan__parte">
               {i < todas.length - 1 ? `${parte}.` : parte}
             </span>
           ))}
-        </button>
+        </a>
       )}
       {capitulo ? null : (
         <button

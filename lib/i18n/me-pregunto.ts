@@ -39,7 +39,7 @@ export const ME_PREGUNTO_UI: Record<
   es: {
     nombre: 'Preguntas de las personas',
     navTePreguntan: 'Preguntas de las personas',
-    botonTePreguntan: 'Otras personas te preguntan. ¿Les cuentas?',
+    botonTePreguntan: 'Otras personas te preguntan. Cuéntales.',
     capa: 'Preguntas de las personas',
     titulo: 'Preguntas de las personas',
     respondeAqui: 'Respóndele aquí',
@@ -84,7 +84,7 @@ export const ME_PREGUNTO_UI: Record<
   pt: {
     nombre: 'Perguntas das pessoas',
     navTePreguntan: 'Perguntas das pessoas',
-    botonTePreguntan: 'Outras pessoas te perguntam. Você conta?',
+    botonTePreguntan: 'Outras pessoas te perguntam. Conte para elas.',
     capa: 'Perguntas das pessoas',
     titulo: 'Perguntas das pessoas',
     respondeAqui: 'Responda aqui',
@@ -129,7 +129,7 @@ export const ME_PREGUNTO_UI: Record<
   en: {
     nombre: 'People’s questions',
     navTePreguntan: 'People’s questions',
-    botonTePreguntan: 'Other people are asking you. Will you tell them?',
+    botonTePreguntan: 'Other people are asking you. Tell them.',
     capa: 'People’s questions',
     titulo: 'People’s questions',
     respondeAqui: 'Answer here',

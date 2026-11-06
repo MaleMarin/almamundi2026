@@ -132,7 +132,7 @@ export function MePreguntoMapPanel({
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 text-center">
           <p className="m-0 text-[length:var(--fs-pequeno)] leading-snug text-white/85">{copy.vacio}</p>
           <Link
-            href="/preguntas?p=me-pregunto"
+            href="/me-pregunto"
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-[length:var(--fs-etiqueta)] font-semibold text-[#3C4655] no-underline"
           >
             {copy.ir}

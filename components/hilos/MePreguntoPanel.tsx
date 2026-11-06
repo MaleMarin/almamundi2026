@@ -146,7 +146,7 @@ export function MePreguntoPanel({
   );
 }
 
-function DejarPregunta({
+export function DejarPregunta({
   locale,
   onCancel,
   onVolver,
