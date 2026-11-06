@@ -815,6 +815,8 @@ function GlobeBitsLayerMounted({
       }
 
       if (!onBitClick || !down) return;
+      // Se acaba de soltar el globo después de llevarlo: no abre historias.
+      if (typeof window !== 'undefined' && window.__almaGlobeTomado) return;
       const dx = e.clientX - down.x;
       const dy = e.clientY - down.y;
       if (dx * dx + dy * dy > CLICK_MAX_DRAG_PX * CLICK_MAX_DRAG_PX) return;

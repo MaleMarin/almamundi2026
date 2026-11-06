@@ -14,6 +14,7 @@
 
 import type { RefObject } from 'react';
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { GlobeViaje } from '@/components/globe/GlobeViaje';
 import { GlobeArcsLayer, type GlobeArc } from '@/components/globe/GlobeArcsLayer';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Environment, OrbitControls, useTexture } from '@react-three/drei';
@@ -1275,6 +1276,7 @@ function GlobeScene({
         />
       ) : null}
 
+      <GlobeViaje radio={GLOBE_V2_OCEAN_RADIUS * geoScale} controlsRef={orbitControlsRef}>
       <group scale={geoScale}>
         {/*
           Jerarquía Tierra:
@@ -1345,6 +1347,7 @@ function GlobeScene({
           </Suspense>
         ) : null}
       </group>
+      </GlobeViaje>
 
       {/* Home embebida: sin zoom con rueda/trackpad para no bloquear el scroll de la página (OrbitControls usa preventDefault en wheel). */}
       <OrbitControls
