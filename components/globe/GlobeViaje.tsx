@@ -12,10 +12,10 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 
-const ESPERA_MS = 500;
+const ESPERA_MS = 300;
 const TOLERANCIA_PX = 7;
 const ROCE = 1.6; // frena el viaje (por segundo)
-const VUELTA_TRAS_S = 2.2; // segundos quieto antes de volver al centro
+const VUELTA_TRAS_S = 6; // segundos quieto antes de volver al centro
 const VUELTA_RESORTE = 3.2;
 const VUELTA_AMORTIGUA = 3.4;
 
@@ -179,7 +179,7 @@ export function GlobeViaje({
       // Viaje con el impulso y roce.
       s.pos.addScaledVector(s.vel, dt);
       s.vel.multiplyScalar(Math.max(0, 1 - ROCE * dt));
-      // Rebote suave en los bordes visibles (siempre queda al menos media Tierra a la vista).
+      // Rebote suave en los bordes: el centro del globo puede llegar hasta el borde (esquinas incluidas).
       const cam = camera as THREE.PerspectiveCamera;
       const dist = cam.position.distanceTo(new THREE.Vector3());
       const alto = dist * Math.tan(THREE.MathUtils.degToRad(cam.fov / 2));
@@ -188,8 +188,8 @@ export function GlobeViaje({
       arriba.current.set(0, 1, 0).applyQuaternion(camera.quaternion);
       const px = s.pos.dot(derecha.current);
       const py = s.pos.dot(arriba.current);
-      const limX = Math.max(0, ancho - radio * 0.5);
-      const limY = Math.max(0, alto - radio * 0.5);
+      const limX = Math.max(radio * 0.5, ancho);
+      const limY = Math.max(radio * 0.5, alto);
       if (Math.abs(px) > limX) {
         const vx = s.vel.dot(derecha.current);
         if (Math.sign(vx) === Math.sign(px)) s.vel.addScaledVector(derecha.current, -1.6 * vx);

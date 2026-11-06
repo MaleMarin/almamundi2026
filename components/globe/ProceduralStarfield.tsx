@@ -99,7 +99,8 @@ export function ProceduralStarfield({
       `,
       transparent: true,
       depthWrite: false,
-      depthTest: false,
+      /* Con prueba de profundidad: la Tierra tapa las estrellas que quedan detrás (antes se veían encima al mover el globo). */
+      depthTest: true,
       blending: THREE.AdditiveBlending,
       toneMapped: false,
       vertexColors: true });
