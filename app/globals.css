@@ -2936,12 +2936,12 @@ body .almamundi-footer-title { font-weight: 900 !important; }
 /* Tarjetas de la hero (Ana, 6 nov 2026): siempre una encendida y el paso de una a otra es un fundido largo y parejo.
    El efecto solo depende de .encendida (sin :hover suelto), así nunca hay dos activas. */
 .home-historias-card-surface .card-hover-decor {
-  transition: opacity 1.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 .home-neu-card.home-historias-card-surface {
   transition:
-    box-shadow 1.4s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 1.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    box-shadow 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 @media (hover: hover) and (pointer: fine) {
   .home-neu-card.home-historias-card-surface:not(.encendida):hover {

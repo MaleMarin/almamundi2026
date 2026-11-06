@@ -270,8 +270,8 @@ export type HomeFormatCardsProps = {
   sinEtiqueta?: boolean;
 };
 
-/** Cada tarjeta se queda encendida 4,5 s; el cambio es un fundido largo (Ana, 6 nov 2026). */
-const TURNO_MS = 4500;
+/** Cada tarjeta se queda encendida 2,5 s; el cambio es un fundido corto (Ana, 6 nov 2026). */
+const TURNO_MS = 2500;
 
 /** Ronda del efecto: una tarjeta a la vez. El mouse manda mientras está encima. */
 function useTurnoTarjetas() {
