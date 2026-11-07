@@ -130,7 +130,7 @@ function respuestaCopy(locale: AlmaLocale) {
       another: "Responder outra pergunta",
       rejectedSubject: "Sobre sua resposta no AlmaMundi",
       reason: "Motivo",
-      again: "Responder de novo",
+      again: "Voltar ao AlmaMundi",
     };
   }
   if (locale === "en") {
@@ -149,7 +149,7 @@ function respuestaCopy(locale: AlmaLocale) {
       another: "Answer another question",
       rejectedSubject: "About your answer on AlmaMundi",
       reason: "Reason",
-      again: "Answer again",
+      again: "Back to AlmaMundi",
     };
   }
   return {
@@ -167,7 +167,7 @@ function respuestaCopy(locale: AlmaLocale) {
     another: "Responder otra pregunta",
     rejectedSubject: "Sobre tu respuesta en AlmaMundi",
     reason: "Motivo",
-    again: "Responder de nuevo",
+    again: "Volver a AlmaMundi",
   };
 }
 
