@@ -180,11 +180,6 @@ export function SimilarStories({ storyId, variant = 'dark' }: SimilarStoriesProp
         .am-related-stories-title { font-size: var(--fs-etiqueta); }
         .am-related-stories-desc { font-size: var(--fs-etiqueta); }
         @media (min-width: 640px) {
-          .am-related-stories[data-related-variant="light"] {
-            width: min(1160px, calc(100vw - 2.5rem));
-            max-width: min(1160px, calc(100vw - 2.5rem));
-            margin-left: calc(50% - min(580px, 50vw - 1.25rem));
-          }
           .am-related-stories-grid {
             grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
             gap: 18px;

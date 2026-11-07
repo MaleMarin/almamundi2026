@@ -52,16 +52,6 @@ function formatFecha(fecha: string, locale: AlmaLocale): string {
   return s === '—' ? fecha : s;
 }
 
-function getFirstParagraphDropAndRest(contenido: string): { drop: string; rest: string; otherParrafos: string[] } {
-  const parrafos = splitParrafos(contenido);
-  if (parrafos.length === 0) return { drop: '', rest: '', otherParrafos: [] };
-  const first = parrafos[0].trim();
-  const words = first.split(/\s+/);
-  const drop = words.length <= 2 ? first : words.slice(0, 2).join(' ');
-  const rest = words.length <= 2 ? '' : words.slice(2).join(' ');
-  return { drop, rest, otherParrafos: parrafos.slice(1) };
-}
-
 function splitParrafos(contenido: string): string[] {
   const trimmed = contenido.trim();
   if (!trimmed) return [];
@@ -81,7 +71,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
     return () => window.removeEventListener('resize', check);
   }, []);
 
-  const { drop, rest: restOfFirst, otherParrafos } = getFirstParagraphDropAndRest(historia.contenido);
+  const parrafos = splitParrafos(historia.contenido);
 
   const maxWidth = isMobile ? '100%' : '640px';
   const maxWidthDesktop = '720px';
@@ -123,7 +113,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
           background: PAPEL,
           minHeight: siteLayout ? 'min(88dvh, 48rem)' : '100vh',
           paddingTop: siteLayout ? '1.25rem' : '5rem',
-          paddingBottom: '6rem',
+          paddingBottom: '3rem',
           paddingLeft: paddingX,
           paddingRight: paddingX,
           maxWidth: isMobile ? '100%' : maxWidthDesktop,
@@ -222,82 +212,43 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
               </span>
             </>
           ) : null}
-          {historia.tiempoLectura != null && (
-            <>
-              <span style={{ color: TINTA_SOFT, opacity: 0.7 }}>·</span>
-              <span
-                style={{
-                  fontFamily: INTERIOR_FONT_STACK,
-                  fontWeight: 400,
-                  fontSize: 'var(--fs-etiqueta)',
-                  color: SEPIA }}
-              >
-                {copy.readingMinutes(historia.tiempoLectura)}
-              </span>
-            </>
-          )}
         </div>
         </StoryScrollBlock>
 
         <StoryScrollBlock>
-        {/* Cuerpo: drop cap + párrafos */}
+        {/* Cuerpo: párrafos separados por línea en blanco; salto simple = cambio de línea. */}
         <div lang="es">
-          {(drop || restOfFirst) && (
+          {parrafos.map((texto, i) => (
             <p
+              key={i}
               style={{
                 fontFamily: INTERIOR_FONT_STACK,
                 fontSize: 'var(--fs-texto)',
-                lineHeight: 1.7,
+                lineHeight: 1.6,
                 color: TINTA,
-                marginBottom: '1.6rem' }}
+                whiteSpace: 'pre-line',
+                margin: '0 0 1rem' }}
             >
-              {drop && (
-                <span
-                  style={{
-                    fontFamily: INTERIOR_FONT_STACK,
-                    fontStyle: 'italic',
-                    fontSize: 'var(--fs-titular)',
-                    color: SEPIA,
-                    float: 'left',
-                    lineHeight: 0.85,
-                    marginRight: 8,
-                    marginTop: 6 }}
-                >
-                  {drop}
-                </span>
-              )}
-              {restOfFirst}
+              {texto}
             </p>
-          )}
-
-          {otherParrafos.map((texto, i) => {
-            const idx = (drop || restOfFirst ? 1 : 0) + i;
-            return (
-              <p
-                key={idx}
-                style={{
-                  fontFamily: INTERIOR_FONT_STACK,
-                  fontSize: 'var(--fs-texto)',
-                  lineHeight: 1.7,
-                  color: TINTA,
-                  marginBottom: '1.6rem' }}
-              >
-                {texto}
-              </p>
-            );
-          })}
+          ))}
         </div>
         </StoryScrollBlock>
 
-        <StoryScrollBlock scene>
+        <StoryScrollBlock>
         <div style={{ textAlign: 'left', marginTop: '1rem' }}>
           <CancionRelacionadaLine value={historia.cancionRelacionada} />
         </div>
 
-        {/* El autor aparece una sola vez, arriba (docs/decisiones-cerradas.md). */}
-        <div style={{ marginTop: '3rem' }} />
-
-        <SimilarStories storyId={historia.id} variant="light" />
+        {/* Marca de cierre, igual a la línea bajo el título. */}
+        <div
+          aria-hidden
+          style={{
+            width: 60,
+            height: 1,
+            background: `linear-gradient(90deg, ${SEPIA_DK}, transparent)`,
+            marginTop: '1.5rem' }}
+        />
 
         {/* Navegación final */}
         <div
@@ -306,7 +257,7 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             flexWrap: 'wrap',
             gap: '1rem',
             justifyContent: 'center',
-            marginTop: '3rem' }}
+            marginTop: '2rem' }}
         >
           {onClose && (
             <button
@@ -339,6 +290,9 @@ export default function TextoReader({ historia, onClose, siteLayout = false }: T
             {copy.shareThisStory}
           </button>
         </div>
+
+        {/* El autor aparece una sola vez, arriba (docs/decisiones-cerradas.md). */}
+        <SimilarStories storyId={historia.id} variant="light" />
         </StoryScrollBlock>
       </div>
       <ShareAfterNotice
