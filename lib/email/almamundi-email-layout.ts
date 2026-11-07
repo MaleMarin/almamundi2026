@@ -213,7 +213,7 @@ function shareLinks(locale: AlmaLocale) {
 export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string {
   const c = actionsCopy(locale);
   const tell = absoluteEmailUrl("/contar");
-  const answer = absoluteEmailUrl("/preguntas");
+  const answer = absoluteEmailUrl("/#cintas");
   if (kind === "solo-historia") return primaryButtonHtml(c.tellAnother, tell);
   if (kind === "solo-respuesta") return primaryButtonHtml(c.answerAnother, answer);
   const buttons =
@@ -236,7 +236,7 @@ export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string
 export function emailActionsText(locale: AlmaLocale, kind: EmailActions): string[] {
   const c = actionsCopy(locale);
   const tell = absoluteEmailUrl("/contar");
-  const answer = absoluteEmailUrl("/preguntas");
+  const answer = absoluteEmailUrl("/#cintas");
   if (kind === "solo-historia") return [`${c.tellAnother}: ${tell}`];
   if (kind === "solo-respuesta") return [`${c.answerAnother}: ${answer}`];
   const share = shareLinks(locale);
