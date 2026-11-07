@@ -26,7 +26,6 @@ import {
 import { getTurnstileSiteKey, type TurnstileGate } from '@/lib/turnstile-client';
 import { esMePreguntaId } from '@/lib/me-pregunto/shared';
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
-import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { isValidRecipientEmail } from '@/lib/email-html';
 
 type Kind = 'texto' | 'voz' | 'foto';
@@ -385,16 +384,15 @@ function PreguntaFormInner({
               <HomeHardLink
                 href="/#cintas"
                 onClick={(event) => {
-                if (!onAnother) return;
-                event.preventDefault();
-                onAnother();
-                document.getElementById('cintas')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-              }}
+                  // Si las cintas están en esta página, solo baja; si no, va al inicio (Inspírate).
+                  const cintas = document.getElementById('cintas');
+                  if (!cintas) return;
+                  event.preventDefault();
+                  onAnother?.();
+                  cintas.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }}
                 className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
-                {HILOS_UI[locale].nav}
-              </HomeHardLink>
-              <HomeHardLink href="/?capa=me-pregunto#mapa" className="btn-am-secundario inline-flex min-h-11 w-full items-center justify-center px-5 text-[length:var(--fs-pequeno)] font-semibold md:w-auto">
-                {t.modalBackToMap}
+                {t.cejaInspira}
               </HomeHardLink>
               <button
                 type="button"
