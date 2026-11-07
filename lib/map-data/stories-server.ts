@@ -27,11 +27,13 @@ import { storyAccessibilityFieldsFromRecord } from "@/lib/historias/story-access
 import { resolveCintaColors } from "@/lib/cinta-colors";
 
 function publishedAtIso(d: Record<string, unknown>): string | undefined {
-  const p = d.publishedAt;
-  if (p && typeof (p as { toDate?: () => Date }).toDate === "function") {
-    return (p as { toDate: () => Date }).toDate().toISOString();
+  // Historias antiguas sin publishedAt: se usa la fecha de envío para mostrar el año.
+  for (const p of [d.publishedAt, d.createdAt]) {
+    if (p && typeof (p as { toDate?: () => Date }).toDate === "function") {
+      return (p as { toDate: () => Date }).toDate().toISOString();
+    }
+    if (typeof p === "string" && p.trim()) return p;
   }
-  if (typeof p === "string" && p.trim()) return p;
   return undefined;
 }
 
