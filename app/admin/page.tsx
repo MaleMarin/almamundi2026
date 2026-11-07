@@ -41,7 +41,7 @@ import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
 import MePreguntoAdmin from '@/components/admin/MePreguntoAdmin';
 import SonderAdmin from '@/components/admin/SonderAdmin';
 import { TemaSelector } from '@/components/admin/TemaSelector';
-import { getTema } from '@/lib/temas';
+import { getTema, TEMAS } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
 import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
 import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
@@ -146,13 +146,57 @@ function formatDate(ts: number | null): string {
   });
 }
 
-function daysRemaining(activeSince: number | null): number | null {
-  if (activeSince == null) return null;
-  const days = 15;
-  const end = activeSince + days * 24 * 60 * 60 * 1000;
-  const now = Date.now();
-  const left = Math.ceil((end - now) / (24 * 60 * 60 * 1000));
-  return Math.max(0, left);
+const campoFiltro: React.CSSProperties = {
+  padding: '10px 14px',
+  borderRadius: 12,
+  border: '1px solid rgba(255,255,255,0.2)',
+  background: 'rgba(255,255,255,0.06)',
+  color: '#fff',
+  fontSize: 14,
+  fontFamily: SITE_FONT_STACK,
+  outline: 'none',
+};
+
+type FiltroHistorias = {
+  q?: string;
+  topic?: string;
+  place?: string;
+  format?: StoryFormat;
+  estado?: 'mapa' | 'archivada';
+  desde?: string;
+  hasta?: string;
+};
+
+function nombreTemas(s: Story): string {
+  const ids = s.temas?.length ? s.temas : s.topic ?? [];
+  return ids.map((id) => getTema(id)?.es ?? id).join(', ');
+}
+
+/** Planilla CSV (se abre en Excel o Google Sheets) con las historias filtradas. Solo admin. */
+function descargarPlanilla(historias: Story[]) {
+  const celda = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
+  const filas = [
+    ['Título', 'Estado', 'Formato', 'Temas', 'Lugar', 'Alias', 'Fecha', 'Texto', 'Archivos', 'Id'],
+    ...historias.map((s) => [
+      s.title,
+      s.status === 'archived' ? 'Archivada' : 'En el mapa',
+      FORMAT_LABEL[s.format] ?? s.format,
+      nombreTemas(s),
+      s.place,
+      s.alias,
+      s.createdAt ? new Date(s.createdAt).toISOString().slice(0, 10) : '',
+      s.text ?? '',
+      [s.mediaUrl, ...(s.files ?? []).map((f) => f.url), ...(s.imagenes ?? []).map((i) => i.url)].filter(Boolean).join(' '),
+      s.id,
+    ]),
+  ];
+  const csv = '\uFEFF' + filas.map((f) => f.map(celda).join(',')).join('\r\n');
+  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `almamundi-historias-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
 }
 
 function StoryQuestionLine({ story }: { story: Story }) {
@@ -418,7 +462,7 @@ export default function AdminPage() {
   const [rejectDraft, setRejectDraft] = useState<Record<string, { reasonId: string; detail: string }>>({});
   const [themePick, setThemePick] = useState<Record<string, string[]>>({});
   const [toast, setToast] = useState<string | null>(null);
-  const [archivedFilter, setArchivedFilter] = useState<{ topic?: string; place?: string; format?: StoryFormat }>({});
+  const [archivedFilter, setArchivedFilter] = useState<FiltroHistorias>({});
   const [newCollectionTitle, setNewCollectionTitle] = useState('');
   const [newCollectionDesc, setNewCollectionDesc] = useState('');
 
@@ -801,7 +845,7 @@ export default function AdminPage() {
   const sections: { id: typeof section; label: string; icon: React.ReactNode }[] = [
     { id: 'pendientes', label: 'Historias pendientes', icon: <FileText size={18} /> },
     { id: 'mapa', label: 'En el mapa', icon: <MapPin size={18} /> },
-    { id: 'archivo', label: 'Archivo', icon: <Archive size={18} /> },
+    { id: 'archivo', label: 'Todas las historias', icon: <Archive size={18} /> },
     { id: 'respuestas', label: 'Respuestas', icon: <MessageCircle size={18} /> },
     { id: 'mepregunto', label: 'Me pregunto', icon: <MessageCircle size={18} /> },
     { id: 'colecciones', label: 'Colecciones', icon: <FolderOpen size={18} /> },
@@ -812,10 +856,17 @@ export default function AdminPage() {
     (item): item is (typeof sections)[number] => SHOW_RESPUESTAS_ADMIN || item.id !== 'respuestas'
   );
 
-  const filteredArchived = archivedStories.filter((s) => {
-    if (archivedFilter.topic && !s.topic?.includes(archivedFilter.topic)) return false;
-    if (archivedFilter.place && !s.place?.toLowerCase().includes(archivedFilter.place.toLowerCase())) return false;
-    if (archivedFilter.format && s.format !== archivedFilter.format) return false;
+  // «Todas las historias»: las del mapa y las archivadas, para muestras y exposiciones.
+  const filteredArchived = [...activeStories, ...archivedStories].filter((s) => {
+    const f = archivedFilter;
+    if (f.q && !`${s.title} ${s.text ?? ''}`.toLowerCase().includes(f.q.toLowerCase())) return false;
+    if (f.topic && !(s.temas ?? []).includes(f.topic) && !(s.topic ?? []).includes(f.topic)) return false;
+    if (f.place && !s.place?.toLowerCase().includes(f.place.toLowerCase())) return false;
+    if (f.format && s.format !== f.format) return false;
+    if (f.estado === 'mapa' && s.status === 'archived') return false;
+    if (f.estado === 'archivada' && s.status !== 'archived') return false;
+    if (f.desde && (!s.createdAt || s.createdAt < new Date(`${f.desde}T00:00:00`).getTime())) return false;
+    if (f.hasta && (!s.createdAt || s.createdAt > new Date(`${f.hasta}T23:59:59`).getTime())) return false;
     return true;
   });
 
@@ -1101,7 +1152,6 @@ export default function AdminPage() {
             <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 40 }}>No hay historias activas en el mapa.</p>
           )}
           {activeStories.map((s) => {
-            const days = daysRemaining(s.activeSince);
             return (
               <div key={s.id} style={glassCard}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
@@ -1112,9 +1162,6 @@ export default function AdminPage() {
                       </span>
                       {s.isFeatured && (
                         <span style={{ padding: '3px 10px', borderRadius: 999, fontSize: 11, fontWeight: 600, background: 'rgba(255,215,0,0.2)', color: '#fde047' }}>⭐ Destacada</span>
-                      )}
-                      {days != null && (
-                        <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{days} días restantes</span>
                       )}
                     </div>
                     <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
@@ -1228,64 +1275,80 @@ export default function AdminPage() {
       {/* 3. Archivo */}
       {section === 'archivo' && !loading && (
         <div>
-          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
             <input
-              type="text"
-              placeholder="Filtrar por tema"
-              value={archivedFilter.topic ?? ''}
-              onChange={(e) => setArchivedFilter((f) => ({ ...f, topic: e.target.value.trim() || undefined }))}
-              style={{
-                padding: '10px 14px',
-                borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.06)',
-                color: '#fff',
-                fontSize: 14,
-                width: 160,
-                fontFamily: APP_FONT,
-                outline: 'none',
-              }}
+              type="search"
+              placeholder="Buscar en título o texto"
+              value={archivedFilter.q ?? ''}
+              onChange={(e) => setArchivedFilter((f) => ({ ...f, q: e.target.value || undefined }))}
+              style={{ ...campoFiltro, width: 220 }}
             />
+            <select
+              value={archivedFilter.topic ?? ''}
+              onChange={(e) => setArchivedFilter((f) => ({ ...f, topic: e.target.value || undefined }))}
+              style={campoFiltro}
+            >
+              <option value="">Todos los temas</option>
+              {TEMAS.map((t) => (
+                <option key={t.id} value={t.id}>{t.es}</option>
+              ))}
+            </select>
             <input
               type="text"
-              placeholder="Filtrar por lugar"
+              placeholder="Lugar o país"
               value={archivedFilter.place ?? ''}
               onChange={(e) => setArchivedFilter((f) => ({ ...f, place: e.target.value.trim() || undefined }))}
-              style={{
-                padding: '10px 14px',
-                borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.06)',
-                color: '#fff',
-                fontSize: 14,
-                width: 160,
-                fontFamily: APP_FONT,
-                outline: 'none',
-              }}
+              style={{ ...campoFiltro, width: 160 }}
             />
             <select
               value={archivedFilter.format ?? ''}
               onChange={(e) => setArchivedFilter((f) => ({ ...f, format: (e.target.value || undefined) as StoryFormat | undefined }))}
-              style={{
-                padding: '10px 14px',
-                borderRadius: 12,
-                border: '1px solid rgba(255,255,255,0.2)',
-                background: 'rgba(255,255,255,0.06)',
-                color: '#fff',
-                fontSize: 14,
-                fontFamily: APP_FONT,
-                outline: 'none',
-              }}
+              style={campoFiltro}
             >
               <option value="">Todos los formatos</option>
               {(Object.keys(FORMAT_LABEL) as StoryFormat[]).map((f) => (
                 <option key={f} value={f}>{FORMAT_LABEL[f]}</option>
               ))}
             </select>
+            <select
+              value={archivedFilter.estado ?? ''}
+              onChange={(e) => setArchivedFilter((f) => ({ ...f, estado: (e.target.value || undefined) as FiltroHistorias['estado'] }))}
+              style={campoFiltro}
+            >
+              <option value="">En el mapa y archivadas</option>
+              <option value="mapa">Solo en el mapa</option>
+              <option value="archivada">Solo archivadas</option>
+            </select>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+              Desde
+              <input type="date" value={archivedFilter.desde ?? ''} onChange={(e) => setArchivedFilter((f) => ({ ...f, desde: e.target.value || undefined }))} style={campoFiltro} />
+            </label>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
+              Hasta
+              <input type="date" value={archivedFilter.hasta ?? ''} onChange={(e) => setArchivedFilter((f) => ({ ...f, hasta: e.target.value || undefined }))} style={campoFiltro} />
+            </label>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', marginBottom: 20 }}>
+            <span style={{ fontSize: 14, color: 'rgba(255,255,255,0.7)' }}>
+              {filteredArchived.length} {filteredArchived.length === 1 ? 'historia' : 'historias'}
+            </span>
+            <button
+              type="button"
+              disabled={filteredArchived.length === 0}
+              onClick={() => descargarPlanilla(filteredArchived)}
+              style={{ ...campoFiltro, cursor: 'pointer' }}
+            >
+              Descargar planilla ({filteredArchived.length})
+            </button>
+            {Object.values(archivedFilter).some(Boolean) ? (
+              <button type="button" onClick={() => setArchivedFilter({})} style={{ ...campoFiltro, cursor: 'pointer' }}>
+                Limpiar filtros
+              </button>
+            ) : null}
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {filteredArchived.length === 0 && (
-              <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 40 }}>No hay historias en el archivo con esos filtros.</p>
+              <p style={{ color: 'rgba(255,255,255,0.4)', textAlign: 'center', padding: 40 }}>No hay historias con esos filtros.</p>
             )}
             {filteredArchived.map((s) => (
               <div key={s.id} style={glassCard}>
@@ -1297,7 +1360,9 @@ export default function AdminPage() {
                     <p style={{ fontSize: 17, fontWeight: 600, margin: '0 0 4px', color: 'rgba(255,255,255,0.95)' }}>{s.title}</p>
                     <StoryReview story={s} />
                     <StoryQuestionLine story={s} />
-                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>{s.place} · {s.topic?.join(', ') || '—'}</p>
+                    <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.55)', margin: 0 }}>
+                      {s.place} · {nombreTemas(s) || '—'} · {formatDate(s.createdAt)}
+                    </p>
                     <SenderConsentBlocks
                       sender={s.sender}
                       consents={s.consents}
@@ -1307,7 +1372,7 @@ export default function AdminPage() {
                     <StoryPhotoFichas imagenes={s.imagenes} />
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <EstadoRevision estado={s.status === 'rejected' ? 'rechazada' : 'archivada'} />
+                    <EstadoRevision estado={s.status === 'rejected' ? 'rechazada' : s.status === 'archived' ? 'archivada' : 'aprobada'} />
                     <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.45)' }}>Agregar a colección:</span>
                     <select
                       onChange={(e) => {

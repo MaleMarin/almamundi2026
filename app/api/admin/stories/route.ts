@@ -333,12 +333,12 @@ export async function GET(request: NextRequest) {
         ? await col
             .where("status", "in", [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
             .orderBy("createdAt", "desc")
-            .limit(200)
+            .limit(1000)
             .get()
         : await col
             .where("status", "==", status)
             .orderBy("createdAt", "desc")
-            .limit(200)
+            .limit(1000)
             .get();
 
     const contactSnaps = snap.docs.length
