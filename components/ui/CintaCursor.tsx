@@ -108,20 +108,26 @@ export function CintaCursor() {
       ctx.closePath();
       ctx.fillStyle = color;
       ctx.fill();
-      // Brillo de tela por el centro, que va y viene a lo largo.
-      ctx.save();
-      ctx.clip();
-      ctx.lineCap = 'round';
-      for (let i = 0; i < PUNTOS - 1; i++) {
-        const luz = 0.5 + 0.5 * Math.sin(t * 5 - i * 0.6);
-        ctx.strokeStyle = `rgba(255,255,255,${0.12 + 0.28 * luz})`;
-        ctx.lineWidth = ANCHO * 0.28 * (1 - (i / PUNTOS) * 0.5);
+      // Volumen de tela: brillo ancho y suave en un borde, sombra leve en el otro.
+      const banda = (borde: { x: number; y: number }[], otro: { x: number; y: number }[], hasta: number) => {
         ctx.beginPath();
-        ctx.moveTo(pts[i]!.x, pts[i]!.y);
-        ctx.lineTo(pts[i + 1]!.x, pts[i + 1]!.y);
-        ctx.stroke();
-      }
-      ctx.restore();
+        ctx.moveTo(borde[0]!.x, borde[0]!.y);
+        for (const q of borde) ctx.lineTo(q.x, q.y);
+        for (let i = borde.length - 1; i >= 0; i--) {
+          const p = borde[i]!;
+          const o = otro[i]!;
+          ctx.lineTo(p.x + (o.x - p.x) * hasta, p.y + (o.y - p.y) * hasta);
+        }
+        ctx.closePath();
+        ctx.fill();
+      };
+      const pulso = 0.5 + 0.5 * Math.sin(t * 2.2);
+      ctx.fillStyle = `rgba(255,255,255,${0.1 + 0.06 * pulso})`;
+      banda(izq, der, 0.55);
+      ctx.fillStyle = `rgba(255,255,255,${0.12 + 0.08 * pulso})`;
+      banda(izq, der, 0.28);
+      ctx.fillStyle = 'rgba(0,0,0,0.12)';
+      banda(der, izq, 0.25);
       ctx.globalAlpha = 1;
     };
     raf = requestAnimationFrame(cuadro);
