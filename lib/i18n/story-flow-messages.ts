@@ -290,7 +290,7 @@ const es: StoryFlowMessages = {
   modalSectionAbout: 'Sobre ti',
   modalSectionWhere: 'Dónde estás y cómo avisarte',
   modalProfilePhotoNote:
-    'Una imagen que identifique tu historia (opcional, hasta 10 MB). Puede ser una foto tuya, de un lugar, de un objeto o de lo que quieras. Si no subes ninguna, usaremos la imagen de cintas que crea tu historia.',
+    'Una imagen que identifique tu historia (opcional, hasta 10 MB). Puede ser una foto tuya, de un lugar, de un objeto o de lo que quieras.',
   modalImprintHowTexto:
     'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales.',
   modalImprintHowFoto:
@@ -402,7 +402,7 @@ const pt: StoryFlowMessages = {
   modalSectionAbout: 'Sobre você',
   modalSectionWhere: 'Onde você está e como avisar você',
   modalProfilePhotoNote:
-    'Uma imagem que identifique sua história (opcional, até 10 MB). Pode ser uma foto sua, de um lugar, de um objeto ou do que você quiser. Se não enviar nenhuma, usaremos a imagem de fitas que sua história cria.',
+    'Uma imagem que identifique sua história (opcional, até 10 MB). Pode ser uma foto sua, de um lugar, de um objeto ou do que você quiser.',
   modalImprintHowTexto:
     'Suas cores saem da sua história. Do que você conta, de como ela termina e das cores que aparecem nela. Por isso não há duas iguais.',
   modalImprintHowFoto:
@@ -563,7 +563,7 @@ const en: StoryFlowMessages = {
   modalSectionAbout: 'About you',
   modalSectionWhere: 'Where you are and how to reach you',
   modalProfilePhotoNote:
-    'An image that identifies your story (optional, up to 10 MB). It can be a photo of you, a place, an object or anything you like. If you don\'t upload one, we\'ll use the ribbon image your story creates.',
+    'An image that identifies your story (optional, up to 10 MB). It can be a photo of you, a place, an object or anything you like.',
   modalImprintHowTexto:
     'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That’s why no two are alike.',
   modalImprintHowFoto:
