@@ -126,9 +126,12 @@ export function publicationEmailSubject(storyTitle: string, locale: AlmaLocale =
   return publicationCopy(locale).subject(storyTitleLine(storyTitle, locale));
 }
 
+const CINTA_VERSION = 2;
+
 /** Imagen de cintas de la historia publicada (la misma de la pantalla final). */
 function cintaImageUrl(storyId: string): string {
-  return absoluteEmailUrl(`/og/cinta/${encodeURIComponent(storyId)}`);
+  // v: subir el número cuando cambie la imagen, para no mostrar la copia guardada en Vercel.
+  return absoluteEmailUrl(`/og/cinta/${encodeURIComponent(storyId)}?v=${CINTA_VERSION}`);
 }
 
 function storyPublicUrl(shortCode: string): string {
@@ -165,7 +168,7 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     `${copy.see}: ${storyUrl}`,
     "",
     copy.cinta,
-    `${copy.cintaBoton}: ${cintaImageUrl(params.storyId)}?descargar=1`,
+    `${copy.cintaBoton}: ${cintaImageUrl(params.storyId)}&descargar=1`,
     "",
     copy.share,
     "",
@@ -204,7 +207,7 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
       ${primaryButtonHtml(copy.see, historiasUrl)}
       ${paragraphHtml(escapeHtml(copy.cinta), "28px 0 16px")}
       <p style="margin:0 0 16px;"><img src="${escapeHtml(cintaUrl)}" alt="${escapeHtml(copy.cintaAlt)}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:12px;border:0;" /></p>
-      ${primaryButtonHtml(copy.cintaBoton, `${cintaUrl}?descargar=1`)}
+      ${primaryButtonHtml(copy.cintaBoton, `${cintaUrl}&descargar=1`)}
       ${paragraphHtml(copy.share, "28px 0 28px")}
       ${primaryButtonHtml("WhatsApp", share.whatsapp)}
       ${primaryButtonHtml("Facebook", share.facebook)}
