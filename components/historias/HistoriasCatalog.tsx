@@ -33,7 +33,6 @@ const COPY = {
     oldest: 'Más antiguas',
     search: 'Buscar por título, ciudad o tema',
     by: 'Por',
-    onGlobe: 'En el globo',
     more: 'Ver más',
   },
   pt: {
@@ -49,7 +48,6 @@ const COPY = {
     oldest: 'Mais antigas',
     search: 'Buscar por título, cidade ou tema',
     by: 'Por',
-    onGlobe: 'No globo',
     more: 'Ver mais',
   },
   en: {
@@ -65,7 +63,6 @@ const COPY = {
     oldest: 'Oldest',
     search: 'Search by title, city, or theme',
     by: 'By',
-    onGlobe: 'On the globe',
     more: 'See more',
   },
 } as const;
@@ -168,11 +165,6 @@ function StoryCard({
           <p className="text-[length:var(--fs-etiqueta)] text-gray-600">{byline}</p>
         ) : null}
         {when ? <p className="text-[length:var(--fs-etiqueta)] text-[#646E7E]">{when}</p> : null}
-        {story.onGlobe ? (
-          <p className="mt-auto pt-2 text-[length:var(--fs-etiqueta)] font-semibold" style={{ color: 'var(--almamundi-orange)' }}>
-            {copy.onGlobe}
-          </p>
-        ) : null}
       </div>
     </Link>
   );
