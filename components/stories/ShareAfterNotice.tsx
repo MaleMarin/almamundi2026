@@ -152,8 +152,12 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       return;
     }
     if (props.kind === 'question') {
+      // «v=2»: WhatsApp guarda la vista previa por enlace; con esto toma el título nuevo
+      // (sin repetir la pregunta) aunque el enlace ya se haya compartido antes.
       const url = props.afterAnswer
-        ? publishedQuestionPageUrl(props.questionId)
+        ? esMePreguntaId(props.questionId)
+          ? `${publishedQuestionPageUrl(props.questionId)}&v=2`
+          : publishedQuestionPageUrl(props.questionId)
         : publishedQuestionShareUrl(props.questionId);
       setPacket(sharePacket(props, locale, url));
       return;
