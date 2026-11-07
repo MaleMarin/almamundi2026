@@ -249,9 +249,9 @@ export function StoriesCurvedCarousel({ stories, onSelectStory }: StoriesCurvedC
               )}
 
               <div className="flex items-center gap-4 text-gray-600">
-                <button type="button" className="btn-am-secundario flex items-center gap-1.5 px-3 py-1.5" aria-label="Compartir">
+                <button type="button" className="btn-am-secundario flex items-center gap-1.5 px-3 py-1.5" aria-label="Comparte o regala esta historia">
                   <span className="text-[length:var(--fs-texto)]">↗</span>
-                  <span className="text-[length:var(--fs-etiqueta)]">Compartir</span>
+                  <span className="text-[length:var(--fs-etiqueta)]">Comparte o regala</span>
                 </button>
               </div>
             </>

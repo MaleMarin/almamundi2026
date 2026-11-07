@@ -10,8 +10,8 @@ import type { ReactNode } from 'react';
 export function EthicalShareTriggerButton({
   onClick,
   className = '',
-  ariaLabel = 'Compartir esta historia',
-  title: titleProp = 'Compartir esta historia' }: {
+  ariaLabel = 'Comparte o regala esta historia',
+  title: titleProp = 'Comparte o regala esta historia' }: {
   onClick: () => void;
   className?: string;
   ariaLabel?: string;

@@ -262,7 +262,7 @@ const es: StoryFlowMessages = {
   modalShareImageFailed:
     'No pudimos compartir. Descarga la imagen y compártela desde tu dispositivo.',
   modalImprintAlt: 'Cintas de colores creadas a partir de tu historia «{titulo}»',
-  modalShareMenuTitle: 'Compartir',
+  modalShareMenuTitle: 'Comparte o regala esta historia',
   modalShareFacebook: 'Facebook',
   modalShareX: 'X',
   modalShareLinkedIn: 'LinkedIn',
@@ -429,7 +429,7 @@ const pt: StoryFlowMessages = {
   modalAudioLinkLabel: 'Ou cole um link público (SoundCloud, Google Drive, YouTube…)',
   modalCopyImageFailed: 'Não conseguimos copiar a imagem. Tente Baixar.',
   modalSaveImage: 'Salvar imagem',
-  modalShareMenuTitle: 'Compartilhar',
+  modalShareMenuTitle: 'Compartilhe ou presenteie esta história',
   modalConsentAdult:
     'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição, e tenho autorização de quem aparece nesta história.',
   modalConsentPublish: 'Autorizo que minha imagem, voz e nome ou apelido sejam publicados no AlmaMundi.',
@@ -536,7 +536,7 @@ const en: StoryFlowMessages = {
   modalShareEmailSubject: 'I told a story on AlmaMundi',
   modalShareImageFailed:
     "We couldn't share this. Download the image and share it from your device.",
-  modalShareMenuTitle: 'Share',
+  modalShareMenuTitle: 'Share or gift this story',
   modalShareInstagram: 'Instagram',
   modalShareTikTok: 'TikTok',
   modalShareAppHandoff:

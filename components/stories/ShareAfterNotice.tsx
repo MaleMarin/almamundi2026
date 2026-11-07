@@ -26,23 +26,28 @@ import {
 
 const NOTICE = {
   es: {
-    title: 'Compartir con cariño',
+    title: 'Comparte o regala esta historia',
     body: 'Alguien decidió contar esta historia en AlmaMundi. Si la compartes, que viaje con el mismo respeto con que fue contada.',
-    share: 'Compartir',
+    share: 'Comparte o regala',
     back: 'Volver',
   },
   pt: {
-    title: 'Compartilhar com carinho',
+    title: 'Compartilhe ou presenteie esta história',
     body: 'Alguém decidiu contar esta história no AlmaMundi. Se você a compartilhar, que ela viaje com o mesmo respeito com que foi contada.',
-    share: 'Compartilhar',
+    share: 'Compartilhe ou presenteie',
     back: 'Voltar',
   },
   en: {
-    title: 'Share with love',
+    title: 'Share or gift this story',
     body: 'Someone chose to tell this story on AlmaMundi. If you share it, let it travel with the same respect it was told with.',
-    share: 'Share',
+    share: 'Share or gift',
     back: 'Go back',
   },
+} as const;
+
+const OTRO_TITULO = {
+  answer: { es: 'Comparte o regala esta respuesta', pt: 'Compartilhe ou presenteie esta resposta', en: 'Share or gift this answer' },
+  question: { es: 'Comparte o regala esta pregunta', pt: 'Compartilhe ou presenteie esta pergunta', en: 'Share or gift this question' },
 } as const;
 
 const ANSWER_NOTICE_BODY = {
@@ -210,7 +215,11 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
   const shareTitle = props.kind === 'story' ? props.title : props.question;
   const storyNotice = NOTICE[locale];
   const notice =
-    props.kind === 'answer' ? { ...storyNotice, body: ANSWER_NOTICE_BODY[locale] } : storyNotice;
+    props.kind === 'answer'
+      ? { ...storyNotice, title: OTRO_TITULO.answer[locale], body: ANSWER_NOTICE_BODY[locale] }
+      : props.kind === 'question'
+        ? { ...storyNotice, title: OTRO_TITULO.question[locale] }
+        : storyNotice;
 
   return createPortal(
     <>

@@ -84,7 +84,7 @@ export default function MiColeccionPage() {
                       style={{ color: 'var(--almamundi-orange)', borderColor: 'rgba(255, 74, 28, 0.5)' }}
                       className="text-[length:var(--fs-etiqueta)] font-medium px-3 py-1.5 rounded-full border hover:bg-orange-50"
                     >
-                      {copiedId === s.id ? 'Copiado' : 'Compartir'}
+                      {copiedId === s.id ? 'Copiado' : 'Comparte o regala'}
                     </button>
                     <HomeHardLink
                       href="/#historias"

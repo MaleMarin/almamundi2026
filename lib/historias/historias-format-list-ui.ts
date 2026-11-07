@@ -18,8 +18,8 @@ export const HISTORIAS_FILTER_BLOCK_TITLE = 'Buscar por país, año o palabras c
 /** Tooltips (title) de los dos botones junto a «Limpiar filtros» en listados de historias. Orden: compartir, mensaje al autor. */
 export const HISTORIAS_SHARE_ICONS_LEGEND = [
   {
-    label: 'Compartir',
-    text: 'Compartir la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
+    label: 'Comparte o regala',
+    text: 'Comparte o regala la historia con respeto: crédito a quien la cuenta, enlace y tarjeta descargable.',
   },
   {
     label: 'Mensaje a quien cuenta',

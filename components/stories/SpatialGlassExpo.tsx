@@ -279,7 +279,7 @@ export function SpatialGlassExpo({
             type="button"
             onClick={() => void handleShare()}
             className="rounded-full p-2 text-white/90 transition hover:bg-white/10"
-            aria-label="Compartir"
+            aria-label="Comparte o regala esta historia"
           >
             <Share2 className="h-5 w-5" strokeWidth={1.75} />
           </button>
