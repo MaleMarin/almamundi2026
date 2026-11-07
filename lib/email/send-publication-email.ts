@@ -7,7 +7,8 @@ import {
   absoluteEmailUrl,
   authorEmailFooterNote,
   AUTHOR_REPLY_TO,
-  emailActionsText,
+  BRAND_ORANGE,
+  EMAIL_FONT,
   emailShell,
   greetingHtml,
   paragraphHtml,
@@ -44,14 +45,14 @@ function publicationCopy(locale: AlmaLocale) {
       subject: (title: string) => `Sua história “${title}” já está no AlmaMundi`,
       lead: (title: string, where: string) => {
         void where;
-        return `Sua história “${title}” já está no mapa do AlmaMundi, junto às histórias que outras pessoas contaram.`;
+        return `Sua história “${title}” já está no mapa do AlmaMundi, junto às histórias de outras pessoas.`;
       },
       find: (title: string) =>
         `O botão abaixo leva você direto a ela. Se mais adiante quiser encontrá-la de novo, entre em almamundi.org, desça até o mapa e toque em “Buscar uma história”. Ali você pode escrever o título, “${title}”, ou algumas palavras do que contou.`,
-      share: "Se quiser, compartilhe com quem você escolher.",
-      see: "Ver minha história no mapa",
-      cinta: "Também enviamos a imagem com as cores da sua história, a mesma que você recebeu ao enviá-la. É sua: guarde ou compartilhe quando quiser.",
-      cintaBoton: "Baixar minha imagem",
+      share: "Compartilhe ou presenteie sua história:",
+      see: "Ver minha história",
+      cinta: "Estas são as cores da sua história. São suas.",
+      cintaBoton: "Baixar imagem",
       cintaAlt: "As cores da sua história",
       another: "Conte outra história",
       thanks: "Agradecemos por contá-la.<br>Equipe AlmaMundi",
@@ -67,14 +68,14 @@ function publicationCopy(locale: AlmaLocale) {
       subject: (title: string) => `Your story “${title}” is now on AlmaMundi`,
       lead: (title: string, where: string) => {
         void where;
-        return `Your story “${title}” is now on the AlmaMundi map, alongside the stories other people have told.`;
+        return `Your story “${title}” is now on the AlmaMundi map, alongside the stories of other people.`;
       },
       find: (title: string) =>
         `The button below takes you straight to it. If you want to find it again later, go to almamundi.org, scroll down to the map and tap “Search a story”. There you can type its title, “${title}”, or a few words from what you told.`,
-      share: "If you'd like, share it with anyone you choose.",
-      see: "See my story on the map",
-      cinta: "We are also sending you the image with the colors of your story, the same one you got when you sent it. It is yours: save it or share it whenever you like.",
-      cintaBoton: "Download my image",
+      share: "Share or gift your story:",
+      see: "See my story",
+      cinta: "These are the colors of your story. They are yours.",
+      cintaBoton: "Download image",
       cintaAlt: "The colors of your story",
       another: "Tell another story",
       thanks: "Thank you for telling it.<br>The AlmaMundi team",
@@ -89,14 +90,14 @@ function publicationCopy(locale: AlmaLocale) {
     subject: (title: string) => `Tu historia «${title}» ya está en AlmaMundi`,
     lead: (title: string, where: string) => {
       void where;
-      return `Tu historia «${title}» ya está en el mapa de AlmaMundi, junto a las historias que han contado otras personas.`;
+      return `Tu historia «${title}» ya está en el mapa de AlmaMundi, junto a las historias de otras personas.`;
     },
     find: (title: string) =>
       `El botón de abajo te lleva directo a ella. Si más adelante quieres volver a encontrarla, entra a almamundi.org, baja al mapa y toca «Buscar una historia». Ahí puedes escribir su título, «${title}», o algunas palabras de lo que contaste.`,
-    share: "Si quieres, compártela con quien tú elijas.",
-    see: "Ver mi historia en el mapa",
-    cinta: "Te enviamos también la imagen con los colores de tu historia, la misma que recibiste al enviarla. Es tuya: guárdala o compártela cuando quieras.",
-    cintaBoton: "Descargar mi imagen",
+    share: "Comparte o regala tu historia:",
+    see: "Ver mi historia",
+    cinta: "Estos son los colores de tu historia. Son tuyos.",
+    cintaBoton: "Descargar imagen",
     cintaAlt: "Los colores de tu historia",
     another: "Contar otra historia",
     thanks: "Gracias por contarla.<br>Equipo AlmaMundi",
@@ -134,6 +135,13 @@ function cintaImageUrl(storyId: string): string {
   return absoluteEmailUrl(`/og/cinta/${encodeURIComponent(storyId)}?v=${CINTA_VERSION}`);
 }
 
+/** Instagram no permite compartir desde un enlace: abre Instagram y la persona sube la imagen. */
+const INSTAGRAM_URL = "https://www.instagram.com/";
+
+function enlace(label: string, href: string): string {
+  return `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:400;text-decoration:underline;font-family:${EMAIL_FONT};">${escapeHtml(label)}</a>`;
+}
+
 function storyPublicUrl(shortCode: string): string {
   return publishedStoryShortUrl(shortCode);
 }
@@ -163,26 +171,19 @@ export function buildPublicationEmailText(params: SendPublicationEmailParams): s
     "",
     publishedLead(title, params.placeName, locale),
     "",
-    copy.find(title),
-    "",
     `${copy.see}: ${storyUrl}`,
     "",
     copy.cinta,
     `${copy.cintaBoton}: ${cintaImageUrl(params.storyId)}&descargar=1`,
     "",
     copy.share,
-    "",
-    share.text,
-    "",
-    `WhatsApp: ${share.whatsapp}`,
-    `Facebook: ${share.facebook}`,
+    `Instagram: ${INSTAGRAM_URL}`,
     `X: ${share.x}`,
-    `LinkedIn: ${share.linkedin}`,
+    `Facebook: ${share.facebook}`,
+    `WhatsApp: ${share.whatsapp}`,
     "",
     copy.thanksText,
     copy.team,
-    "",
-    ...emailActionsText(locale, "historia"),
     "",
     authorEmailFooterNote(locale, "historia"),
     `${copy.privacy}: ${absoluteEmailUrl("/privacidad")}`,
@@ -203,19 +204,22 @@ export function buildPublicationEmailHtml(params: SendPublicationEmailParams): s
   const bodyHtml = `
       ${greetingHtml(copy.hello(authorName))}
       ${paragraphHtml(lead)}
-      ${paragraphHtml(escapeHtml(copy.find(title)))}
       ${primaryButtonHtml(copy.see, historiasUrl)}
-      ${paragraphHtml(escapeHtml(copy.cinta), "28px 0 16px")}
-      <p style="margin:0 0 16px;"><img src="${escapeHtml(cintaUrl)}" alt="${escapeHtml(copy.cintaAlt)}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:12px;border:0;" /></p>
-      ${primaryButtonHtml(copy.cintaBoton, `${cintaUrl}&descargar=1`)}
-      ${paragraphHtml(copy.share, "28px 0 28px")}
-      ${primaryButtonHtml("WhatsApp", share.whatsapp)}
-      ${primaryButtonHtml("Facebook", share.facebook)}
-      ${primaryButtonHtml("X", share.x)}
-      ${primaryButtonHtml("LinkedIn", share.linkedin)}
+      ${paragraphHtml(escapeHtml(copy.cinta), "32px 0 16px")}
+      <p style="margin:0 0 12px;"><img src="${escapeHtml(cintaUrl)}" alt="${escapeHtml(copy.cintaAlt)}" width="480" style="display:block;width:100%;max-width:480px;height:auto;border-radius:12px;border:0;" /></p>
+      ${paragraphHtml(enlace(copy.cintaBoton, `${cintaUrl}&descargar=1`), "0 0 28px")}
+      ${paragraphHtml(
+        `${escapeHtml(copy.share)} ${[
+          enlace("Instagram", INSTAGRAM_URL),
+          enlace("X", share.x),
+          enlace("Facebook", share.facebook),
+          enlace("WhatsApp", share.whatsapp),
+        ].join(" · ")}`,
+        "0 0 28px"
+      )}
       ${paragraphHtml(copy.thanks, "0")}`;
 
-  return emailShell({ bodyHtml, footer: "received", locale, actions: "historia" });
+  return emailShell({ bodyHtml, footer: "received", locale });
 }
 
 export type SendPublicationEmailResult =

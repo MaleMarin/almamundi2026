@@ -110,7 +110,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
   const reason = escapeHtml(reasonSentence(params.publicReason));
   const contact = escapeHtml(REJECTION_CONTACT_EMAIL);
   const retry = copy.retry(
-    `<a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${contact}</a>`
+    `<a href="mailto:${contact}" class="email-link" style="color:#FF4A1C;font-weight:400;text-decoration:underline;">${contact}</a>`
   );
 
   const bodyHtml = `

@@ -180,7 +180,7 @@ function summaryBoxHtml(params: ReceivedEmailContent): string {
 function contactHtml(locale: AlmaLocale): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
-    `${receivedCopy(locale).doubts} <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${mail}</a>.`,
+    `${receivedCopy(locale).doubts} <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:400;text-decoration:underline;">${mail}</a>.`,
     "0"
   );
 }
@@ -197,7 +197,7 @@ export function buildReceivedEmailHtml(params: ReceivedEmailContent): string {
       ${summaryBoxHtml(params)}`;
   const afterActionsHtml = `
       <p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
-        <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${copy.map}</a>
+        <a href="${escapeHtml(mapUrl)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:#FF4A1C;font-weight:400;text-decoration:underline;">${copy.map}</a>
       </p>
       ${contactHtml(locale)}`;
 

@@ -102,7 +102,7 @@ export function paragraphHtml(inner: string, margin = "0 0 16px"): string {
 }
 
 export function greetingHtml(inner: string): string {
-  return `<p class="email-text" style="margin:0 0 16px;font-size:20px;line-height:1.4;font-weight:700;color:${EMAIL_INK};font-family:${EMAIL_FONT};">
+  return `<p class="email-text" style="margin:0 0 16px;font-size:20px;line-height:1.4;font-weight:400;color:${EMAIL_INK};font-family:${EMAIL_FONT};">
         ${inner}
       </p>`;
 }
@@ -118,7 +118,7 @@ export function primaryButtonHtml(label: string, href: string): string {
           <td align="center" bgcolor="${BRAND_ORANGE}" height="48"
             style="height:48px;background-color:${BRAND_ORANGE};border-radius:8px;text-align:center;">
             <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="email-btn"
-              style="display:inline-block;height:48px;line-height:48px;padding:0 28px;background-color:${BRAND_ORANGE};color:#ffffff;text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:600;border-radius:8px;">
+              style="display:inline-block;height:48px;line-height:48px;padding:0 28px;background-color:${BRAND_ORANGE};color:#ffffff;text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:500;border-radius:8px;">
               ${safeLabel}
             </a>
           </td>
@@ -129,7 +129,7 @@ export function primaryButtonHtml(label: string, href: string): string {
 export function secondaryLinkHtml(label: string, href: string): string {
   return `<p class="email-text" style="margin:0 0 24px;text-align:center;font-size:16px;line-height:1.6;font-family:${EMAIL_FONT};">
         <a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link"
-          style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">
+          style="color:${BRAND_ORANGE};font-weight:400;text-decoration:underline;">
           ${escapeHtml(label)}
         </a>
       </p>`;
@@ -144,7 +144,7 @@ export function outlineButtonHtml(label: string, href: string): string {
           <td align="center" height="46"
             style="height:46px;border:2px solid ${BRAND_ORANGE};border-radius:8px;text-align:center;">
             <a href="${safeHref}" target="_blank" rel="noopener noreferrer" class="email-btn-outline"
-              style="display:inline-block;height:46px;line-height:46px;padding:0 26px;color:${BRAND_ORANGE};text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:600;border-radius:8px;">
+              style="display:inline-block;height:46px;line-height:46px;padding:0 26px;color:${BRAND_ORANGE};text-decoration:none;font-family:${EMAIL_FONT};font-size:16px;font-weight:500;border-radius:8px;">
               ${safeLabel}
             </a>
           </td>
@@ -224,7 +224,7 @@ export function emailActionsHtml(locale: AlmaLocale, kind: EmailActions): string
         : primaryButtonHtml(c.answerAnother, answer) + outlineButtonHtml(c.tellYours, tell);
   const share = shareLinks(locale);
   const link = (label: string, href: string) =>
-    `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(label)}</a>`;
+    `<a href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:400;text-decoration:underline;">${escapeHtml(label)}</a>`;
   return `<div style="margin:8px 0 0;padding-bottom:24px;border-bottom:1px solid #E6E3DF;">
         ${buttons}
         <p class="email-text" style="margin:8px 0 0;text-align:center;font-size:15px;line-height:1.6;color:${EMAIL_MUTED};font-family:${EMAIL_FONT};">
@@ -318,17 +318,17 @@ function darkModeCss(): string {
   return `
     :root { color-scheme: light dark; supported-color-schemes: light dark; }
     .email-btn:hover { filter: brightness(0.92); }
-    .email-link { font-weight: 600; }
+    .email-link { font-weight: 400; }
     @media (prefers-color-scheme: dark) {
       .email-bg { background: #12121C !important; }
       .email-card, .email-pad { background: #1C1C2E !important; }
       .email-text, .email-text p, .email-text li { color: #F7F8FC !important; }
       .email-box { background: #2A2A40 !important; }
-      .email-link { color: #FF4A1C !important; font-weight: 600 !important; }
+      .email-link { color: #FF4A1C !important; font-weight: 400 !important; }
       .email-footer, .email-footer-link { color: #D5D7E2 !important; }
       .email-brand { color: #FF4A1C !important; font-weight: 600 !important; }
       .email-btn:hover { filter: brightness(0.92); }
-      .email-btn, .email-btn span { color: #ffffff !important; background: #FF4A1C !important; font-weight: 600 !important; }
+      .email-btn, .email-btn span { color: #ffffff !important; background: #FF4A1C !important; font-weight: 500 !important; }
     }
     @media only screen and (max-width: 620px) {
       .email-card { width: 100% !important; }
@@ -408,7 +408,7 @@ export function conductaHtml(locale: AlmaLocale): string {
   const c = CONDUCTA_COPY[locale] ?? CONDUCTA_COPY.es;
   const url = escapeHtml(absoluteEmailUrl("/codigo-de-conducta"));
   return paragraphHtml(
-    `${escapeHtml(c.antes)}<a href="${url}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(c.enlace)}</a>${escapeHtml(c.despues)}`
+    `${escapeHtml(c.antes)}<a href="${url}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:400;text-decoration:underline;">${escapeHtml(c.enlace)}</a>${escapeHtml(c.despues)}`
   );
 }
 

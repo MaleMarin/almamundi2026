@@ -186,7 +186,7 @@ export function reasonSentence(reason: string): string {
 export function contactLine(locale: AlmaLocale): string {
   const mail = escapeHtml(EMAIL_CONTACT_ADDRESS);
   return paragraphHtml(
-    `${respuestaCopy(locale).doubts} <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:600;text-decoration:underline;">${mail}</a>.`,
+    `${respuestaCopy(locale).doubts} <a href="mailto:${mail}" class="email-link" style="color:#FF4A1C;font-weight:400;text-decoration:underline;">${mail}</a>.`,
     "0 0 16px"
   );
 }
