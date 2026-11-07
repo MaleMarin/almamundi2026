@@ -331,7 +331,7 @@ export async function sendRespuestaRejectedEmail(opts: {
   const copy = respuestaCopy(locale);
   const greeting = hello(opts.alias, locale);
   const body = rejectedBody(locale, opts.question, false);
-  const url = absoluteEmailUrl(`/preguntas?p=${encodeURIComponent(opts.questionId)}`);
+  const url = absoluteEmailUrl("/#cintas");
   const reason = escapeHtml(reasonSentence(opts.publicReason));
   const html = emailShell({
     preheader: copy.rejectedSubject,
