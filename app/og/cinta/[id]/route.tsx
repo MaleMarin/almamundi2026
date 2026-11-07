@@ -13,7 +13,18 @@ const PIE = 210;
  * La imagen de cintas de una historia publicada, igual a la de la pantalla final:
  * franjas arriba y, abajo, título, lugar y almamundi.org. Va en el correo de historia publicada.
  */
-export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+function nombreArchivo(title: string): string {
+  const base = title
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 50);
+  return base || 'mi-historia';
+}
+
+export async function GET(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const story = /^[A-Za-z0-9_-]{6,60}$/.test(id) ? await getStoryByIdAsync(id).catch(() => null) : null;
   const title = (story?.title || story?.label || '').trim();
@@ -49,6 +60,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
         </div>
       </div>
     ),
-    { width: W, height: H, headers: { 'Cache-Control': 'public, max-age=3600, s-maxage=86400' } }
+    {
+      width: W,
+      height: H,
+      headers: {
+        'Cache-Control': 'public, max-age=3600, s-maxage=86400',
+        // ?descargar=1: el botón del correo baja el archivo en vez de abrir la imagen.
+        ...(new URL(req.url).searchParams.has('descargar')
+          ? { 'Content-Disposition': `attachment; filename="almamundi-${nombreArchivo(title)}.png"` }
+          : {}),
+      },
+    }
   );
 }
