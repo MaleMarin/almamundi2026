@@ -42,13 +42,14 @@ export type DrawVadResonanceArgs = {
 };
 
 /** Valida franjas guardadas (hex y ancho) antes de dibujarlas. */
+/** Anchos en px sobre 1080: una franja ancha (más de 200) es válida. */
 export function franjasValidas(value: unknown): { hex: string; width: number }[] | null {
   if (!Array.isArray(value) || value.length === 0 || value.length > 400) return null;
   const out: { hex: string; width: number }[] = [];
   for (const item of value) {
     const hex = (item as { hex?: unknown })?.hex;
     const width = Number((item as { width?: unknown })?.width);
-    if (typeof hex !== 'string' || hex.length > 40 || !Number.isFinite(width) || width <= 0 || width > 200) return null;
+    if (typeof hex !== 'string' || hex.length > 40 || !Number.isFinite(width) || width <= 0 || width > 1080) return null;
     out.push({ hex, width });
   }
   return out;
