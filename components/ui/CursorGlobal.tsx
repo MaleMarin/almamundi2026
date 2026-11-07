@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { CintaCursor } from '@/components/ui/CintaCursor';
 
 export function CursorGlobal() {
   const dotRef = useRef<HTMLDivElement>(null);
@@ -113,9 +114,10 @@ export function CursorGlobal() {
 
   return (
     <>
+      <CintaCursor />
       <div ref={dotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={ringRef} className="cursor-ring" aria-hidden="true" />
-      <style>{`html:has(.story-submit-modal) .cursor-dot,html:has(.story-submit-modal) .cursor-ring{display:none !important}html[data-cursor-global="on"]:has(.story-submit-modal),html[data-cursor-global="on"]:has(.story-submit-modal) *,html[data-cursor-global="on"]:has(.story-submit-modal) *::before,html[data-cursor-global="on"]:has(.story-submit-modal) *::after{cursor:auto !important}`}</style>
+      <style>{`html:has(.story-submit-modal) .cinta-cursor,html:has(.story-submit-modal) .cursor-dot,html:has(.story-submit-modal) .cursor-ring{display:none !important}html[data-cursor-global="on"]:has(.story-submit-modal),html[data-cursor-global="on"]:has(.story-submit-modal) *,html[data-cursor-global="on"]:has(.story-submit-modal) *::before,html[data-cursor-global="on"]:has(.story-submit-modal) *::after{cursor:auto !important}`}</style>
     </>
   );
 }
