@@ -15,8 +15,8 @@ const STATIC_PATHS: string[] = [
   '/',
   '/historias',
   '/preguntas',
-  '/respuestas',
-  '/me-pregunto',
+  '/respuestas-a-almamundi',
+  '/preguntas-de-las-personas',
   '/privacidad',
   '/terminos',
 ];

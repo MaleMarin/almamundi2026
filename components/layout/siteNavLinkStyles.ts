@@ -22,7 +22,7 @@ export const SITE_HEADER_STORIES_LINKS = [
   { href: '/historias', label: 'Todas' },
   { href: '/historias/videos', label: 'Videos' },
   { href: '/historias/audios', label: 'Audios' },
-  { href: '/historias/escrito', label: 'Textos' },
+  { href: '/historias/textos', label: 'Textos' },
   { href: '/historias/fotos', label: 'Fotos' },
 ] as const;
 

@@ -75,6 +75,14 @@ const nextConfig: NextConfig = {
    */
   async redirects() {
     return [
+      { source: '/me-pregunto', destination: '/preguntas-de-las-personas', permanent: true },
+      { source: '/me-pregunto/:path*', destination: '/preguntas-de-las-personas/:path*', permanent: true },
+      { source: '/vision', destination: '/proposito', permanent: true },
+      { source: '/vision/:path*', destination: '/proposito/:path*', permanent: true },
+      { source: '/respuestas', destination: '/respuestas-a-almamundi', permanent: true },
+      { source: '/respuestas/:path*', destination: '/respuestas-a-almamundi/:path*', permanent: true },
+      { source: '/historias/escrito', destination: '/historias/textos', permanent: true },
+      { source: '/historias/escrito/:path*', destination: '/historias/textos/:path*', permanent: true },
       {
         source: '/mapa',
         destination: '/?section=mapa',

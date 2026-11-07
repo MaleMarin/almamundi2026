@@ -3,7 +3,7 @@ import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'La visión de AlmaMundi',
+  title: 'Propósito',
   description:
     'Hacia dónde va AlmaMundi: memoria viva de relatos, mapa y caminos futuros, con honestidad sobre lo que ya existe y lo que viene.' };
 
@@ -152,7 +152,7 @@ export default function VisionPage() {
               lineHeight: 1.2,
               color: TEXT_1 }}
           >
-            La visión de AlmaMundi
+            Propósito
           </h1>
           <p
             style={{

@@ -128,7 +128,7 @@ export function MePreguntoPanel({
         })}
       </ul>
       {items && items.length > 0 && !dejando ? (
-        <Link href="/me-pregunto" className="cortina-indice-ayuda font-semibold underline underline-offset-4" style={{ color: "inherit" }}>
+        <Link href="/preguntas-de-las-personas" className="cortina-indice-ayuda font-semibold underline underline-offset-4" style={{ color: "inherit" }}>
           {ME_PREGUNTO_MAPA[locale].verPreguntas}
         </Link>
       ) : null}

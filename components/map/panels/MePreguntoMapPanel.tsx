@@ -133,7 +133,7 @@ export function MePreguntoMapPanel({
         <div className="flex flex-col items-center gap-4 rounded-2xl border border-white/15 bg-white/5 p-5 text-center">
           <p className="m-0 text-[length:var(--fs-pequeno)] leading-snug text-white/85">{copy.vacio}</p>
           <Link
-            href="/me-pregunto"
+            href="/preguntas-de-las-personas"
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-white px-5 text-[length:var(--fs-etiqueta)] font-semibold text-[#3C4655] no-underline"
           >
             {copy.ir}
@@ -188,7 +188,7 @@ export function MePreguntoMapPanel({
               {/* Sobre el mapa no se responde: «Ver y responder» lleva a la página de la pregunta (Ana, 5 nov 2026). */}
               <div className="px-4 pb-4">
                 <Link
-                  href={`/me-pregunto?p=${encodeURIComponent(pregunta.id)}`}
+                  href={`/preguntas-de-las-personas?p=${encodeURIComponent(pregunta.id)}`}
                   onClick={() => recordarMapa(`/?capa=me-pregunto&mp=${encodeURIComponent(pregunta.id)}#mapa`)}
                   className="inline-flex min-h-11 w-full items-center justify-center rounded-full border border-white/40 px-4 text-[length:var(--fs-etiqueta)] text-white no-underline visited:text-white"
                 >
@@ -201,7 +201,7 @@ export function MePreguntoMapPanel({
       </ul>
       {preguntas.length > 0 ? (
         <Link
-          href="/me-pregunto"
+          href="/preguntas-de-las-personas"
           className="text-center text-[length:var(--fs-etiqueta)] font-semibold text-white underline underline-offset-4 visited:text-white"
         >
           {copy.verPreguntas}

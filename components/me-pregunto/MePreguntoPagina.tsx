@@ -64,7 +64,7 @@ export function MePreguntoPagina() {
     return (
       <PaginaInterna>
         <EncabezadoInterno
-          volver={{ href: '/me-pregunto', texto: copy.todasLasPreguntas }}
+          volver={{ href: '/preguntas-de-las-personas', texto: copy.todasLasPreguntas }}
           ceja={copy.titulo}
           titulo={una.texto}
           bajada={ui.loPregunta(preguntaAlias(una.alias), conAnio(formatPublicPlace(una.city, una.country, locale), una.anio))}
@@ -128,13 +128,13 @@ export function MePreguntoPagina() {
               </p>
               <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-4">
                 <Link
-                  href={`/me-pregunto?p=${encodeURIComponent(p.id)}&responder=1`}
+                  href={`/preguntas-de-las-personas?p=${encodeURIComponent(p.id)}&responder=1`}
                   className="btn-am-principal inline-flex min-h-11 items-center justify-center px-5 no-underline"
                 >
                   {copy.respondele(preguntaAlias(p.alias))}
                 </Link>
                 <Link
-                  href={`/me-pregunto?p=${encodeURIComponent(p.id)}`}
+                  href={`/preguntas-de-las-personas?p=${encodeURIComponent(p.id)}`}
                   className={`inline-block text-[length:var(--fs-pequeno)] ${enlaceInterno}`}
                 >
                   {n > 0 ? `${copy.verRespuestas} (${n})` : copy.verRespuestas}

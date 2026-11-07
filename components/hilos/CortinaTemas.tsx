@@ -854,7 +854,7 @@ export function CortinaTemas({
                     {abierta ? (
                       <div className="cortina-indice-respuesta">
                         <a
-                          href={`/respuestas?p=${encodeURIComponent(pregunta.id)}`}
+                          href={`/respuestas-a-almamundi?p=${encodeURIComponent(pregunta.id)}`}
                           className="cortina-indice-ayuda font-semibold underline underline-offset-4"
                           style={{ color: 'inherit', display: 'inline-block', marginBottom: 12 }}
                         >
@@ -928,7 +928,7 @@ export function CortinaTemas({
       </div>
       {temaId ? null : (
         /* Lleva a la página «Preguntas de las personas»: ahí se leen, se responden y se deja una pregunta (Ana, 6 nov 2026). */
-        <a href="/me-pregunto" className="cortina-te-preguntan btn-am-principal no-underline">
+        <a href="/preguntas-de-las-personas" className="cortina-te-preguntan btn-am-principal no-underline">
           {ME_PREGUNTO_UI[locale].botonTePreguntan.split('. ').map((parte, i, todas) => (
             <span key={i} className="cortina-te-preguntan__parte">
               {i < todas.length - 1 ? `${parte}.` : parte}

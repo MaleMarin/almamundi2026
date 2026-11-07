@@ -354,7 +354,7 @@ export function storiesLinkLabel(t: HomeMessages, href: string): string {
       return t.navHistoriasVideos;
     case '/historias/audios':
       return t.navHistoriasAudios;
-    case '/historias/escrito':
+    case '/historias/textos':
       return t.navHistoriasEscrito;
     case '/historias/fotos':
       return t.navHistoriasFotos;

@@ -35,7 +35,7 @@ function showGlobalSiteChrome(pathname: string): boolean {
   return true;
 }
 
-const ROUTES_WITHOUT_BREADCRUMBS = new Set(['/terminos', '/privacidad', '/vision']);
+const ROUTES_WITHOUT_BREADCRUMBS = new Set(['/terminos', '/privacidad', '/proposito']);
 
 /**
  * Audio / vídeo / texto / foto en rutas dedicadas se renderizan en modo `embed` bajo este chrome

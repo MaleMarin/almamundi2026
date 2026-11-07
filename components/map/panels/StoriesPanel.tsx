@@ -316,7 +316,7 @@ export function StoriesPanel({
               </a>
             ) : (
               <a
-                href="/respuestas"
+                href="/respuestas-a-almamundi"
                 onClick={() => recordarMapa('/?capa=respuestas#mapa')}
                 className="btn-am-secundario"
                 style={{ marginTop: 12, minHeight: 44, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textAlign: 'center', fontFamily: SITE_FONT_STACK }}

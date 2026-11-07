@@ -231,8 +231,8 @@ export function RespuestaGlobeCard({
                 <Link
                   href={
                     esMePreguntaId(item.questionId)
-                      ? `/me-pregunto?p=${encodeURIComponent(item.questionId)}`
-                      : `/respuestas?p=${encodeURIComponent(item.questionId)}`
+                      ? `/preguntas-de-las-personas?p=${encodeURIComponent(item.questionId)}`
+                      : `/respuestas-a-almamundi?p=${encodeURIComponent(item.questionId)}`
                   }
                   onClick={() =>
                     recordarMapa(

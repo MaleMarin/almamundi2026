@@ -55,7 +55,7 @@ export function RespuestasPagina() {
     return (
       <PaginaInterna>
         <EncabezadoInterno
-          volver={{ href: '/respuestas', texto: copy.dockAlmaMundi }}
+          volver={{ href: '/respuestas-a-almamundi', texto: copy.dockAlmaMundi }}
           ceja={tema?.nombre[locale]}
           titulo={pregunta.texto[locale]}
           largo
@@ -101,7 +101,7 @@ export function RespuestasPagina() {
             ) : null}
             <p className="m-0 text-[length:var(--fs-texto)] leading-snug">{p.texto[locale]}</p>
             <Link
-              href={`/respuestas?p=${encodeURIComponent(p.id)}`}
+              href={`/respuestas-a-almamundi?p=${encodeURIComponent(p.id)}`}
               className={`mt-auto inline-block pt-4 text-[length:var(--fs-pequeno)] ${enlaceInterno}`}
             >
               {`${copy.verRespuestas} (${n})`}

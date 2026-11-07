@@ -148,7 +148,7 @@ const HISTORIA_MEDIA_FORMAT_CRUMB: Record<string, [string, string]> = {
   audio: ['/historias/audios', 'Audios'],
   video: ['/historias/videos', 'Videos'],
   foto: ['/historias/fotos', 'Fotos'],
-  texto: ['/historias/escrito', 'Textos'],
+  texto: ['/historias/textos', 'Textos'],
 };
 
 /**
@@ -233,7 +233,7 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/privacidad') return false;
   if (p === '/terminos') return false;
   if (p === '/contacto') return false;
-  if (p === '/vision') return false;
+  if (p === '/proposito') return false;
   if (p === '/newsletter' || p.startsWith('/newsletter/')) return false;
   return true;
 }
