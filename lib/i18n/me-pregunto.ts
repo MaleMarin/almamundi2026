@@ -32,7 +32,12 @@ export const ME_PREGUNTO_UI: Record<
     consentPublicar: string;
     graciasRespuesta: string;
     respuestaDe: (alias: string, lugar: string) => string;
-    compartir: (pregunta: string) => string;
+    /** Para redes que muestran la imagen (la pregunta ya va en ella). */
+    compartir: string;
+    /** Para X, Instagram y TikTok, que no muestran la imagen. */
+    compartirConPregunta: (pregunta: string) => string;
+    ogTitulo: string;
+    ogBajada: string;
     errores: Record<string, string>;
   }
 > = {
@@ -67,7 +72,10 @@ export const ME_PREGUNTO_UI: Record<
     graciasRespuesta:
       'Una persona del equipo la leerá antes de publicarla. Cuando la publiquemos, quien dejó la pregunta recibirá un correo de AlmaMundi para leerla.',
     respuestaDe: (alias, lugar) => `Respuesta a una pregunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (pregunta) => `Respondí una pregunta que alguien dejó en AlmaMundi: ${pregunta} Respóndela tú en`,
+    compartir: 'Respondí esta pregunta que alguien dejó en AlmaMundi. ¿Tú qué le contarías?',
+    compartirConPregunta: (pregunta) => `Respondí en AlmaMundi esta pregunta que alguien dejó: «${pregunta}» ¿Tú qué le contarías?`,
+    ogTitulo: 'Una pregunta abierta en AlmaMundi',
+    ogBajada: 'Cualquier persona puede responderla con su propia experiencia.',
     errores: {
       question_required: 'Escribe tu pregunta (al menos 8 caracteres).',
       question_too_long: 'La pregunta puede tener hasta 140 caracteres.',
@@ -112,7 +120,10 @@ export const ME_PREGUNTO_UI: Record<
     graciasRespuesta:
       'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando a publicarmos, quem deixou a pergunta vai receber um e-mail do AlmaMundi para lê-la.',
     respuestaDe: (alias, lugar) => `Resposta a uma pergunta de ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (pergunta) => `Respondi uma pergunta que alguém deixou no AlmaMundi: ${pergunta} Responda você também em`,
+    compartir: 'Respondi esta pergunta que alguém deixou no AlmaMundi. O que você contaria?',
+    compartirConPregunta: (pergunta) => `Respondi no AlmaMundi esta pergunta que alguém deixou: “${pergunta}” O que você contaria?`,
+    ogTitulo: 'Uma pergunta aberta no AlmaMundi',
+    ogBajada: 'Qualquer pessoa pode respondê-la com a própria experiência.',
     errores: {
       question_required: 'Escreva sua pergunta (pelo menos 8 caracteres).',
       question_too_long: 'A pergunta pode ter até 140 caracteres.',
@@ -157,7 +168,10 @@ export const ME_PREGUNTO_UI: Record<
     graciasRespuesta:
       "Someone on our team will read it before it's published. Once we publish it, the person who asked will get an email from AlmaMundi to read it.",
     respuestaDe: (alias, lugar) => `Answer to a question from ${alias}${lugar ? ` · ${lugar}` : ''}`,
-    compartir: (question) => `I answered a question someone left on AlmaMundi: ${question} Answer it yourself at`,
+    compartir: 'I answered this question someone left on AlmaMundi. What would you tell them?',
+    compartirConPregunta: (question) => `I answered this question someone left on AlmaMundi: “${question}” What would you tell them?`,
+    ogTitulo: 'An open question on AlmaMundi',
+    ogBajada: 'Anyone can answer it with their own experience.',
     errores: {
       question_required: 'Write your question (at least 8 characters).',
       question_too_long: 'The question can be up to 140 characters.',

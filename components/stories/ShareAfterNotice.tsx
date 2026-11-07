@@ -72,7 +72,12 @@ type ShareAfterNoticeProps = {
     }
 );
 
-type SharePacket = { url: string; text: string; social: string };
+type SharePacket = { url: string; text: string; social: string; x?: string };
+
+function acortar(t: string, max = 180): string {
+  const s = t.trim();
+  return s.length <= max ? s : `${s.slice(0, max - 1).trimEnd()}…`;
+}
 
 /**
  * Instagram y TikTok: el enlace ahí no se puede tocar. Se cambia por «almamundi.org»,
@@ -99,10 +104,15 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
     const text = publishedAnswerShareText(locale, props.answerKind, question, url);
     return { url, text, social: sinEnlace(text, url) };
   }
+  if (props.kind === 'question' && props.afterAnswer && esMePreguntaId(props.questionId)) {
+    // La imagen ya muestra la pregunta: WhatsApp, Facebook y LinkedIn no la repiten.
+    // X, Instagram y TikTok no muestran la imagen, así que ahí sí va.
+    const ui = ME_PREGUNTO_UI[locale];
+    const conPregunta = `${ui.compartirConPregunta(acortar(props.question))} ${url}`;
+    return { url, text: `${ui.compartir} ${url}`, x: conPregunta, social: sinEnlace(conPregunta, url) };
+  }
   const text =
-    props.kind === 'question' && props.afterAnswer && esMePreguntaId(props.questionId)
-      ? `${ME_PREGUNTO_UI[locale].compartir(props.question)} ${url}`
-      : props.kind === 'question' && props.afterAnswer
+    props.kind === 'question' && props.afterAnswer
       ? preguntaShareText(locale, props.question, url)
       : preguntaInviteShareText(locale, props.question, url);
   return { url, text, social: sinEnlace(text, url) };
@@ -274,7 +284,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       ) : packet ? (
         <StoryShareMenu
           shareUrl={packet.url}
-          shareTextShort={packet.text}
+          shareTextShort={packet.x ?? packet.text}
           shareTextLong={packet.text}
           shareTextSocial={packet.social}
           emailSubject={emailSubject}
