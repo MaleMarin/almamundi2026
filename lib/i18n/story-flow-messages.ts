@@ -88,6 +88,8 @@ export type StoryFlowMessages = {
   /** Casilla opcional, debajo de los consentimientos. Solo /contar. */
   modalNewsletterOptIn: string;
   modalSonderYa: string;
+  modalBorradorRecuperado: string;
+  modalBorradorBorrar: string;
   modalSonderReciente: string;
   modalMarkThreeToSend: string;
   modalSubmitFailedKeep: string;
@@ -241,6 +243,8 @@ const es: StoryFlowMessages = {
   modalConsentPrivacyLink: 'Aviso de privacidad',
   modalNewsletterOptIn: 'Quiero recibir historias nuevas en mi correo',
   modalSonderYa: 'Ya recibes Sonder en este correo.',
+  modalBorradorRecuperado: 'Recuperamos el texto que habías empezado.',
+  modalBorradorBorrar: 'Borrar y empezar de nuevo',
   modalSonderReciente: 'Ya te enviamos el correo para confirmar Sonder. Revisa tu bandeja de entrada o la carpeta de spam.',
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
@@ -442,6 +446,8 @@ const pt: StoryFlowMessages = {
   modalConsentPrivacyLink: 'Aviso de privacidade',
   modalNewsletterOptIn: 'Quero receber novas histórias no meu e-mail',
   modalSonderYa: 'Você já recebe a Sonder neste e-mail.',
+  modalBorradorRecuperado: 'Recuperamos o texto que você tinha começado.',
+  modalBorradorBorrar: 'Apagar e começar de novo',
   modalSonderReciente: 'Já enviamos o e-mail para confirmar a Sonder. Confira sua caixa de entrada ou a pasta de spam.',
   modalMarkThreeToSend: 'Marque as três caixas para enviar.',
   modalSubmitFailedKeep:
@@ -604,6 +610,8 @@ const en: StoryFlowMessages = {
   modalConsentPrivacyLink: 'Privacy notice',
   modalNewsletterOptIn: 'I want to receive new stories by email',
   modalSonderYa: 'You already get Sonder at this email.',
+  modalBorradorRecuperado: 'We restored the text you had started.',
+  modalBorradorBorrar: 'Clear and start over',
   modalSonderReciente: 'We already sent you the email to confirm Sonder. Check your inbox or spam folder.',
   modalMarkThreeToSend: 'Check the three boxes to send.',
   modalSubmitFailedKeep:

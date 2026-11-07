@@ -341,10 +341,8 @@ export async function editorialPublishFromSubmission(
     sd.themeId && sd.themeId.trim().length > 0
       ? ([sd.themeId.trim()] as string[])
       : ([] as string[]);
-  const textParts = omitAntecedentesFromPublicText(
-    [sd.context ?? "", sd.payload?.textBody ?? ""].filter((t) => t && t.trim()).join("\n\n"),
-    normalizeAntecedentes(sd.antecedentes)
-  );
+  // Solo el relato. `context` es un campo técnico (resumen del envío) y repetía el comienzo del texto.
+  const textParts = omitAntecedentesFromPublicText(sd.payload?.textBody ?? "", normalizeAntecedentes(sd.antecedentes));
   const coords = await coordsForPlace(sd.placeLabel, sd.countryLabel, sd.lat, sd.lng);
   if (!coords) return { ok: false, httpStatus: 422, error: "location_not_found" };
   const rawMedia: Record<string, string> = {};

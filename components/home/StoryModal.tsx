@@ -400,6 +400,8 @@ export function StoryModal({
   const mediaRequestTokenRef = useRef(0);
 
   const [textBody, setTextBody] = useState('');
+  /** El texto vino de un borrador guardado en este navegador: se avisa para que no se pegue encima. */
+  const [borradorRecuperado, setBorradorRecuperado] = useState(false);
   /** Tras escribir, la persona confirma que leyó/revisó antes de Continuar (modo texto). */
   const [textoReviewAck, setTextoReviewAck] = useState(false);
   const [photos, setPhotos] = useState<StoryPhotoItem[]>([]);
@@ -642,6 +644,7 @@ export function StoryModal({
               ? chosenTopic.questions.map((q, i) => `${i + 1}. ${q}`).join('\n\n')
               : '';
           setTextBody(draft?.textBody || topicSeed);
+          setBorradorRecuperado(Boolean(draft?.textBody?.trim()));
         }
       }
     }
@@ -2384,6 +2387,22 @@ export function StoryModal({
                 </ul>
               </div>
             )}
+            {borradorRecuperado && textBody.trim() ? (
+              <p className="mb-2 mt-0 text-[length:var(--fs-etiqueta)] leading-snug text-[#5C5C52]">
+                {t.modalBorradorRecuperado}{' '}
+                <button
+                  type="button"
+                  className="underline"
+                  onClick={() => {
+                    setTextBody('');
+                    clearStoryDraft();
+                    setBorradorRecuperado(false);
+                  }}
+                >
+                  {t.modalBorradorBorrar}
+                </button>
+              </p>
+            ) : null}
             <textarea
               id="story-textarea"
               value={textBody}

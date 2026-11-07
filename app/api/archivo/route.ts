@@ -3,6 +3,7 @@
  * Para la página /archivo.
  */
 
+import { quitarRepeticionDelInicio } from "@/lib/antecedentes";
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 
@@ -45,7 +46,7 @@ export async function GET() {
       const d = doc.data();
       const createdAt = toMillis(d.createdAt);
       const media = (d.media as Record<string, string | null>) ?? {};
-      const text = (d.text as string) ?? "";
+      const text = quitarRepeticionDelInicio((d.text as string) ?? "");
       const format = (d.format as string) ?? "text";
       return {
         id: doc.id,

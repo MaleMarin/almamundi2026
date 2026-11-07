@@ -1,4 +1,5 @@
 import "server-only";
+import { quitarRepeticionDelInicio } from "@/lib/antecedentes";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { requireAdmin } from "@/lib/adminAuth";
@@ -426,7 +427,7 @@ export async function GET(request: NextRequest) {
         publicationMail: d.publicationMail ?? null,
         questionId: typeof d.questionId === "string" ? d.questionId : null,
         questionMode: d.questionMode === "tu" || d.questionMode === "alguien" ? d.questionMode : null,
-        text: typeof d.text === "string" ? d.text : "",
+        text: typeof d.text === "string" ? quitarRepeticionDelInicio(d.text) : "",
         antecedentes:
           priv?.antecedentes ||
           (source ? textField(source, "antecedentes") : "") ||
