@@ -8,6 +8,8 @@ import {
   absoluteEmailUrl,
   authorEmailFooterNote,
   AUTHOR_REPLY_TO,
+  conductaHtml,
+  conductaText,
   EMAIL_BOX,
   EMAIL_CONTACT_ADDRESS,
   EMAIL_FONT,
@@ -175,7 +177,7 @@ export function mailLang(locale: AlmaLocale | undefined): AlmaLocale {
   return locale === "pt" || locale === "en" ? locale : "es";
 }
 
-function reasonSentence(reason: string): string {
+export function reasonSentence(reason: string): string {
   const text = reason.trim();
   if (!text || /[.!?…]$/.test(text)) return text;
   return `${text}.`;
@@ -341,6 +343,7 @@ export async function sendRespuestaRejectedEmail(opts: {
       greetingHtml(escapeHtml(greeting)),
       paragraphHtml(rejectedBody(locale, opts.question, true)),
       `<p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${copy.reason}: ${reason}</p>`,
+      conductaHtml(locale),
       primaryButtonHtml(copy.again, url),
       contactLine(locale),
       paragraphHtml(copy.team, "0"),
@@ -352,6 +355,8 @@ export async function sendRespuestaRejectedEmail(opts: {
     body,
     "",
     `${copy.reason}: ${reasonSentence(opts.publicReason)}`,
+    "",
+    conductaText(locale),
     "",
     `${copy.again}: ${url}`,
     "",

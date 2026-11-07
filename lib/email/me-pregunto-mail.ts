@@ -7,6 +7,11 @@ import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
   authorEmailFooterNote,
+  conductaHtml,
+  conductaText,
+  EMAIL_BOX,
+  EMAIL_FONT,
+  EMAIL_INK,
   EMAIL_CONTACT_ADDRESS,
   emailActionsText,
   emailShell,
@@ -19,11 +24,12 @@ import {
   deliver,
   hello,
   mailLang,
+  reasonSentence,
   type RespuestaMailResult,
 } from "@/lib/email/respuesta-mail";
 import type { AlmaLocale } from "@/lib/i18n/locale";
 
-type Tipo = "recibida" | "publicada" | "respuesta";
+type Tipo = "recibida" | "publicada" | "respuesta" | "rechazada";
 
 function q(texto: string, html: boolean): string {
   const t = texto.trim();
@@ -37,7 +43,11 @@ function copy(locale: AlmaLocale) {
         recibida: "Recebemos sua pergunta",
         publicada: "Sua pergunta já está no AlmaMundi",
         respuesta: "Alguém respondeu sua pergunta",
+        rechazada: "Sobre sua pergunta no AlmaMundi",
       },
+      rechazada: (p: string) => `Revisamos sua pergunta ${p} e, desta vez, não vamos publicá-la.`,
+      motivo: "Motivo",
+      volver: "Voltar ao AlmaMundi",
       recibida: (p: string) => `Recebemos sua pergunta ${p}. Uma pessoa da equipe vai lê-la antes de publicá-la.`,
       publicada: (p: string) =>
         `Sua pergunta ${p} já está publicada no AlmaMundi. A partir de agora, outras pessoas podem respondê-la.`,
@@ -54,7 +64,11 @@ function copy(locale: AlmaLocale) {
         recibida: "We received your question",
         publicada: "Your question is now on AlmaMundi",
         respuesta: "Someone answered your question",
+        rechazada: "About your question on AlmaMundi",
       },
+      rechazada: (p: string) => `We reviewed your question ${p} and this time we will not publish it.`,
+      motivo: "Reason",
+      volver: "Back to AlmaMundi",
       recibida: (p: string) => `We received your question ${p}. Someone on our team will read it before it's published.`,
       publicada: (p: string) =>
         `Your question ${p} is now published on AlmaMundi. From now on, other people can answer it.`,
@@ -70,7 +84,11 @@ function copy(locale: AlmaLocale) {
       recibida: "Recibimos tu pregunta",
       publicada: "Tu pregunta ya está en AlmaMundi",
       respuesta: "Alguien respondió tu pregunta",
+      rechazada: "Sobre tu pregunta en AlmaMundi",
     },
+    rechazada: (p: string) => `Revisamos tu pregunta ${p} y esta vez no la publicaremos.`,
+    motivo: "Motivo",
+    volver: "Volver a AlmaMundi",
     recibida: (p: string) => `Recibimos tu pregunta ${p}. Una persona del equipo la leerá antes de publicarla.`,
     publicada: (p: string) =>
       `Tu pregunta ${p} ya está publicada en AlmaMundi. Desde ahora, otras personas pueden responderla.`,
@@ -93,10 +111,50 @@ export async function sendMePreguntaEmail(opts: {
   respuestaId?: string;
   /** `mp-<id>`: el botón del correo de pregunta publicada abre su punto en el globo. */
   preguntaId?: string;
+  /** Solo para «rechazada»: el motivo que verá la persona. */
+  publicReason?: string;
 }): Promise<RespuestaMailResult> {
   const locale = mailLang(opts.locale);
   const c = copy(locale);
   const greeting = hello(opts.alias, locale);
+  if (opts.tipo === "rechazada") {
+    const motivo = reasonSentence(opts.publicReason ?? "");
+    const volver = absoluteEmailUrl("/#cintas");
+    const subjectR = c.subject.rechazada;
+    const htmlR = emailShell({
+      preheader: subjectR,
+      footer: "respuesta",
+      locale,
+      bodyHtml: [
+        greetingHtml(escapeHtml(greeting)),
+        paragraphHtml(c.rechazada(q(opts.pregunta, true))),
+        motivo
+          ? `<p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">${c.motivo}: ${escapeHtml(motivo)}</p>`
+          : "",
+        conductaHtml(locale),
+        primaryButtonHtml(c.volver, volver),
+        contactLine(locale),
+        paragraphHtml(c.team, "0"),
+      ].join(""),
+    });
+    const textR = [
+      greeting,
+      "",
+      c.rechazada(q(opts.pregunta, false)),
+      ...(motivo ? ["", `${c.motivo}: ${motivo}`] : []),
+      "",
+      conductaText(locale),
+      "",
+      `${c.volver}: ${volver}`,
+      "",
+      `${c.doubts} ${EMAIL_CONTACT_ADDRESS}.`,
+      "",
+      c.team,
+      "",
+      authorEmailFooterNote(locale, "respuesta"),
+    ].join("\n");
+    return deliver({ to: opts.to, subject: subjectR, html: htmlR, text: textR });
+  }
   const lugar = (opts.lugar ?? "").trim();
   const bodyText =
     opts.tipo === "recibida"

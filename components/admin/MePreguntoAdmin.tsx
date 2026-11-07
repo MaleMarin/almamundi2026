@@ -4,6 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { Check, Trash2, X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { EstadoRevision } from '@/components/admin/EstadoRevision';
+import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
+import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
+import { parseAlmaLocale } from '@/lib/i18n/locale';
 
 type Item = {
   id: string;
@@ -53,6 +56,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState('');
+  const [motivo, setMotivo] = useState<Record<string, { reasonId: string; detail: string }>>({});
 
   const headers = useCallback(
     () => ({ Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' }),
@@ -76,15 +80,26 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
     void load();
   }, [load]);
 
-  async function act(id: string, action: 'approve' | 'reject') {
+  async function act(id: string, action: 'approve' | 'reject', locale = 'es') {
+    let reason: { reasonId: string; reasonDetail?: string } | null = null;
+    if (action === 'reject') {
+      const m = motivo[id] ?? { reasonId: '', detail: '' };
+      const resolved = resolvePublicRejectionText(m.reasonId, m.detail, locale);
+      if (!resolved.ok) {
+        setNotice(resolved.error);
+        return;
+      }
+      reason = { reasonId: resolved.reasonId, reasonDetail: resolved.detail || undefined };
+    }
     setBusy(id);
     try {
       const res = await fetch(`/api/admin/me-pregunto/${id}`, {
         method: 'PATCH',
         headers: headers(),
-        body: JSON.stringify({ action, texto: draft[id] }),
+        body: JSON.stringify({ action, texto: draft[id], ...(reason ?? {}) }),
       });
-      setNotice(res.ok ? (action === 'approve' ? 'Pregunta publicada' : 'Pregunta rechazada') : 'No se pudo guardar');
+      const data = (await res.json().catch(() => ({}))) as { error?: string };
+      setNotice(res.ok ? (action === 'approve' ? 'Pregunta publicada' : 'Pregunta rechazada') : (data.error ?? 'No se pudo guardar'));
       await load();
     } finally {
       setBusy(null);
@@ -139,6 +154,18 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
               {item.alias} · {[item.city, item.country].filter(Boolean).join(', ')} · {item.locale.toUpperCase()} · {fecha(item.createdAt)}
               {item.email ? ` · ${item.email}` : ' · sin correo'}
             </p>
+            {tab === 'pending' ? (
+              <div style={{ marginBottom: 12 }}>
+                <RejectionReasonFields
+                  locale={parseAlmaLocale(item.locale)}
+                  reasonId={motivo[item.id]?.reasonId ?? ''}
+                  detail={motivo[item.id]?.detail ?? ''}
+                  disabled={busy === item.id}
+                  onReasonId={(reasonId) => setMotivo((prev) => ({ ...prev, [item.id]: { reasonId, detail: prev[item.id]?.detail ?? '' } }))}
+                  onDetail={(detail) => setMotivo((prev) => ({ ...prev, [item.id]: { reasonId: prev[item.id]?.reasonId ?? '', detail } }))}
+                />
+              </div>
+            ) : null}
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
               <EstadoRevision estado={tab === 'approved' ? 'aprobada' : tab === 'rejected' ? 'rechazada' : 'pendiente'} el={item.approvedAt} />
               {tab !== 'approved' ? (
@@ -147,7 +174,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
                 </button>
               ) : null}
               {tab === 'pending' ? (
-                <button type="button" style={btn('neutral')} disabled={busy === item.id} onClick={() => void act(item.id, 'reject')}>
+                <button type="button" style={btn('neutral')} disabled={busy === item.id} onClick={() => void act(item.id, 'reject', item.locale)}>
                   <X size={16} /> Rechazar
                 </button>
               ) : null}

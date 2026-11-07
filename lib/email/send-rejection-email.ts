@@ -7,6 +7,8 @@ import { escapeHtml } from "@/lib/email-html";
 import {
   absoluteEmailUrl,
   authorEmailFooterNote,
+  conductaHtml,
+  conductaText,
   AUTHOR_REPLY_TO,
   EMAIL_BOX,
   EMAIL_FONT,
@@ -117,6 +119,7 @@ export function buildRejectionEmailHtml(params: SendRejectionEmailParams): strin
       <p class="email-text email-box" style="margin:0 0 24px;padding:16px 18px;background:${EMAIL_BOX};border-radius:8px;font-size:16px;line-height:1.6;color:${EMAIL_INK};font-family:${EMAIL_FONT};">
         ${copy.reason}: ${reason}
       </p>
+      ${conductaHtml(locale)}
       ${paragraphHtml(retry)}
       ${paragraphHtml(copy.thanks, "0")}`;
 
@@ -133,6 +136,8 @@ export function buildRejectionEmailText(params: SendRejectionEmailParams): strin
     copy.reviewed(storyTitle),
     "",
     `${copy.reason}: ${reasonSentence(params.publicReason)}`,
+    "",
+    conductaText(locale),
     "",
     copy.retry(REJECTION_CONTACT_EMAIL),
     "",

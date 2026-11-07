@@ -7,6 +7,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
 import { sendMePreguntaEmail } from "@/lib/email/me-pregunto-mail";
+import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { ME_PREGUNTAS_COLLECTION, ME_PREGUNTA_CONTACTS_COLLECTION } from "@/lib/me-pregunto/shared";
 
 export const runtime = "nodejs";
@@ -15,13 +16,18 @@ function validId(id: string): boolean {
   return /^[A-Za-z0-9]{8,40}$/.test(id);
 }
 
-/** PATCH /api/admin/me-pregunto/[id] { action: "approve" | "reject", texto? } */
+/** PATCH /api/admin/me-pregunto/[id] { action: "approve" | "reject", texto?, reasonId?, reasonDetail? } */
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await requireAdmin(request);
   if (auth instanceof NextResponse) return auth;
   const { id } = await params;
   if (!validId(id)) return NextResponse.json({ error: "invalid id" }, { status: 400 });
-  const body = (await request.json().catch(() => ({}))) as { action?: string; texto?: string };
+  const body = (await request.json().catch(() => ({}))) as {
+    action?: string;
+    texto?: string;
+    reasonId?: string;
+    reasonDetail?: string;
+  };
   if (body.action !== "approve" && body.action !== "reject") {
     return NextResponse.json({ error: "invalid action" }, { status: 400 });
   }
@@ -56,7 +62,33 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         }
       }
     } else {
-      await ref.update({ status: "rejected", updatedAt: FieldValue.serverTimestamp() });
+      const locale = parseAlmaLocale(typeof data.locale === "string" ? data.locale : undefined);
+      const reason = resolvePublicRejectionText(body.reasonId, body.reasonDetail, locale);
+      if (!reason.ok) return NextResponse.json({ error: reason.error }, { status: 400 });
+      await ref.update({
+        status: "rejected",
+        rejectionReasonId: reason.reasonId,
+        rejectionReason: reason.publicText,
+        rejectionReasonDetail: reason.detail || null,
+        updatedAt: FieldValue.serverTimestamp(),
+      });
+      if (from !== "rejected") {
+        const contact = await db.collection(ME_PREGUNTA_CONTACTS_COLLECTION).doc(id).get();
+        const to = contact.exists ? String((contact.data() ?? {}).email ?? "") : "";
+        const mailed = to
+          ? await sendMePreguntaEmail({
+              tipo: "rechazada",
+              to,
+              alias: String(data.alias ?? ""),
+              pregunta: String(data.texto ?? ""),
+              locale,
+              publicReason: reason.publicText,
+            })
+          : { ok: false as const };
+        await ref
+          .update({ rejectedMail: { status: to ? (mailed.ok ? "sent" : "failed") : "skipped_no_email", at: new Date().toISOString() } })
+          .catch(() => undefined);
+      }
     }
     await appendEditorialAuditLog(db, auth.email, body.action, { fromStatus: from, extras: { mePreguntaId: id } }).catch(() => undefined);
     return NextResponse.json({ ok: true });

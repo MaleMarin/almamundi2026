@@ -396,3 +396,23 @@ export function emailShell(opts: {
 </body>
 </html>`;
 }
+
+const CONDUCTA_COPY: Record<AlmaLocale, { antes: string; enlace: string; despues: string }> = {
+  es: { antes: "Antes de volver a contar o responder, te invitamos a leer el ", enlace: "Código de conducta", despues: " de AlmaMundi." },
+  pt: { antes: "Antes de contar ou responder de novo, convidamos você a ler o ", enlace: "Código de conduta", despues: " do AlmaMundi." },
+  en: { antes: "Before you tell or answer again, we invite you to read the AlmaMundi ", enlace: "Code of conduct", despues: "." },
+};
+
+/** Línea de los correos de rechazo que lleva al Código de conducta. */
+export function conductaHtml(locale: AlmaLocale): string {
+  const c = CONDUCTA_COPY[locale] ?? CONDUCTA_COPY.es;
+  const url = escapeHtml(absoluteEmailUrl("/codigo-de-conducta"));
+  return paragraphHtml(
+    `${escapeHtml(c.antes)}<a href="${url}" target="_blank" rel="noopener noreferrer" class="email-link" style="color:${BRAND_ORANGE};font-weight:600;text-decoration:underline;">${escapeHtml(c.enlace)}</a>${escapeHtml(c.despues)}`
+  );
+}
+
+export function conductaText(locale: AlmaLocale): string {
+  const c = CONDUCTA_COPY[locale] ?? CONDUCTA_COPY.es;
+  return `${c.antes}${c.enlace}${c.despues} ${absoluteEmailUrl("/codigo-de-conducta")}`;
+}
