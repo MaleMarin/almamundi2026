@@ -61,10 +61,8 @@ const ME_HILO = {
 } as unknown as Hilo;
 const TEMAS: Hilo[] = [...HILOS, ME_HILO];
 const ME_INDICE = TEMAS.length - 1;
-const SIN_CINTAS_ME = true;
 
 /** Rayas de la cinta multicolor: seis colores de los temas. */
-const MULTI = ['#FFD000', '#FF1A1A', '#FF0A8A', '#7A12E0', '#0047FF', '#00B140'];
 
 function marcaCasilla(color: string) {
   const tinta = color.replace('#', '%23');
@@ -283,6 +281,20 @@ export function CortinaTemas({
     let viva = true;
     let corriendo = false;
 
+    /** Reparte los 12 temas por turnos, en orden mezclado: todos salen las mismas veces (±1). */
+    function repartidor() {
+      let bolsa: number[] = [];
+      return () => {
+        if (!bolsa.length) {
+          bolsa = Array.from({ length: 12 }, (_, i) => i);
+          for (let i = bolsa.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(azar() * (i + 1));
+            [bolsa[i], bolsa[j]] = [bolsa[j], bolsa[i]];
+          }
+        }
+        return bolsa.pop() as number;
+      };
+    }
     function azar() {
       semillaRef.current = (semillaRef.current * 16807) % 2147483647;
       return (semillaRef.current - 1) / 2147483646;
@@ -300,6 +312,7 @@ export function CortinaTemas({
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       semillaRef.current = 7;
       const cintas: Cinta[] = [];
+      const temaFrente = repartidor();
       let x = -6;
       const base = ancho < 640 ? 9 : 13;
       while (x < ancho + 10) {
@@ -307,7 +320,7 @@ export function CortinaTemas({
         cintas.push({
           x: x + w / 2,
           w,
-          th: Math.floor(azar() * 12),
+          th: temaFrente(),
           L: alto * (0.92 + azar() * 0.08),
           curve: (azar() - 0.5) * 50,
           A: 3 + azar() * 6,
@@ -317,30 +330,17 @@ export function CortinaTemas({
         // Con aire entre cintas para que se vea la capa de atrás.
         x += w * (1.05 + azar() * 0.5);
       }
-      // «Me pregunto…»: pocas cintas multicolor, repartidas a lo ancho y un poco más anchas.
-      const puntos = ancho < 640 ? [0.25, 0.75] : [0.17, 0.5, 0.83];
-      // Las preguntas de las personas ya no son cintas de la cortina: se abren con el botón ancho «Te preguntan».
-      for (const punto of SIN_CINTAS_ME ? [] : puntos) {
-        const meta = ancho * punto;
-        let mejor = 0;
-        cintas.forEach((cinta, i) => {
-          if (Math.abs(cinta.x - meta) < Math.abs(cintas[mejor].x - meta)) mejor = i;
-        });
-        if (cintas[mejor]) {
-          cintas[mejor].th = ME_INDICE;
-          cintas[mejor].w = base * 2.8;
-        }
-      }
       cintasRef.current = cintas;
       semillaRef.current = 31;
       const atras: Cinta[] = [];
+      const temaAtras = repartidor();
       let xa = -6;
       while (xa < ancho + 10) {
         const w = base * 0.75 * (0.8 + azar() * 0.9);
         atras.push({
           x: xa + w / 2,
           w,
-          th: Math.floor(azar() * 12),
+          th: temaAtras(),
           L: alto * (0.92 + azar() * 0.08),
           curve: (azar() - 0.5) * 60,
           A: (3 + azar() * 6) * 1.4,
@@ -511,9 +511,7 @@ export function CortinaTemas({
         ctx.globalAlpha = alfas[cinta.th] ?? 1;
         dibujar(cinta, VIVO_ATRAS[cinta.th] ?? '#666');
       }
-      // Las cintas multicolor de «Me pregunto…» van encima, para que se vean completas.
-      const orden = cintasRef.current.filter((c) => c.th !== ME_INDICE).concat(cintasRef.current.filter((c) => c.th === ME_INDICE));
-      for (const cinta of orden) {
+      for (const cinta of cintasRef.current) {
         const tela = TELON[cinta.th];
         if (!tela) continue;
         ctx.globalAlpha = alfas[cinta.th] ?? 1;
@@ -530,26 +528,6 @@ export function CortinaTemas({
         ctx.closePath();
         ctx.fillStyle = VIVO[cinta.th] ?? tela.fondo;
         ctx.fill();
-        if (cinta.th === ME_INDICE) {
-          // Rayas verticales con los colores de los temas, a lo largo de la cinta.
-          const rayas = MULTI.length;
-          const ancho = cinta.w / rayas;
-          for (let k = 0; k < rayas; k += 1) {
-            const izquierda = -cinta.w / 2 + k * ancho;
-            ctx.beginPath();
-            for (let i = 0; i <= pasos; i += 1) {
-              const y = (cinta.L * i) / pasos;
-              ctx.lineTo(xEn(cinta, y, tiempo, quieto) + izquierda, y);
-            }
-            for (let i = pasos; i >= 0; i -= 1) {
-              const y = (cinta.L * i) / pasos;
-              ctx.lineTo(xEn(cinta, y, tiempo, quieto) + izquierda + ancho + 0.5, y);
-            }
-            ctx.closePath();
-            ctx.fillStyle = MULTI[k];
-            ctx.fill();
-          }
-        }
         ctx.strokeStyle = 'rgba(0,0,0,.07)';
         ctx.lineWidth = 1;
         ctx.stroke();
