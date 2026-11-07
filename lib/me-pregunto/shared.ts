@@ -17,6 +17,8 @@ export type MePreguntaPublica = {
   /** Punto público en el globo (ciudad y país con desplazamiento). Null si aún no se ubica. */
   lat?: number | null;
   lng?: number | null;
+  /** Año en que se envió (solo el año). */
+  anio?: string;
 };
 
 export function esMePreguntaId(value: unknown): value is string {

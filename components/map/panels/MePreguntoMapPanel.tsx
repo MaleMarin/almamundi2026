@@ -7,6 +7,7 @@ import { recordarMapa } from '@/components/map/recordarMapa';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { conAnio } from '@/lib/anio-publico';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { MePreguntaPublica } from '@/lib/me-pregunto/shared';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
@@ -142,7 +143,7 @@ export function MePreguntoMapPanel({
       <ul className="m-0 flex list-none flex-col gap-2 p-0">
         {visibles.map(({ pregunta, respuestas: lista }) => {
           const open = abierta === pregunta.id;
-          const lugar = formatPublicPlace(pregunta.city, pregunta.country, locale);
+          const lugar = conAnio(formatPublicPlace(pregunta.city, pregunta.country, locale), pregunta.anio);
           return (
             <li
               key={pregunta.id}
@@ -175,7 +176,7 @@ export function MePreguntoMapPanel({
                         }`}
                       >
                         <span className="block text-[length:var(--fs-etiqueta)] font-semibold">
-                          {[preguntaAlias(item.alias), formatPublicPlace(item.city, item.country, locale)].filter(Boolean).join(' · ')}
+                          {[preguntaAlias(item.alias), conAnio(formatPublicPlace(item.city, item.country, locale), item.anio)].filter(Boolean).join(' · ')}
                         </span>
                         <span className="mt-1 line-clamp-2 block text-[length:var(--fs-etiqueta)] text-white/75">
                           {item.kind === 'texto' ? item.contenido : item.kind === 'voz' ? copy.voz : item.contenido || copy.foto}

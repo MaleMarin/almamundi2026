@@ -17,4 +17,6 @@ export type RespuestaPublica = {
   askerAlias?: string;
   askerCity?: string;
   askerCountry?: string;
+  /** Año en que se envió (solo el año). */
+  anio?: string;
 };

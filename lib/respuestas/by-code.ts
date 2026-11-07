@@ -1,4 +1,5 @@
 import "server-only";
+import { anioDe } from "@/lib/anio-publico";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { RESPUESTAS_COLLECTION } from "@/lib/respuestas/constants";
 import type { RespuestaPublica } from "@/lib/respuestas/public";
@@ -93,6 +94,7 @@ export async function getRespuestaPublicById(id: string): Promise<RespuestaPubli
             askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",
           }
         : {}),
+      anio: anioDe(data.createdAt),
     };
   } catch (err) {
     console.error("[getRespuestaPublicById]", err);

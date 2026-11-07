@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { preguntaPageHref, preguntaPorId, RESPONDE_TU_LABEL } from '@/lib/pregunta-semana';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
+import { conAnio } from '@/lib/anio-publico';
 
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
   if (item.kind === 'voz' && item.previewUrl) {
@@ -118,8 +119,8 @@ export default function RespuestasMosaic({
                 className="rounded-2xl border border-black/10 bg-white p-4 text-left"
               >
                 <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{formatPublicName(item.alias)}</p>
-                {formatPublicPlace(item.city, item.country, locale) ? (
-                  <p className="mb-2 mt-0.5 text-[length:var(--fs-etiqueta)] text-[#4A5568]">{formatPublicPlace(item.city, item.country, locale)}</p>
+                {conAnio(formatPublicPlace(item.city, item.country, locale), item.anio) ? (
+                  <p className="mb-2 mt-0.5 text-[length:var(--fs-etiqueta)] text-[#4A5568]">{conAnio(formatPublicPlace(item.city, item.country, locale), item.anio)}</p>
                 ) : null}
                 <AnswerBody item={item} />
               </button>
@@ -139,8 +140,8 @@ export default function RespuestasMosaic({
             <div className="mb-3 flex items-start justify-between gap-3">
               <div>
                 <p className="m-0 text-[length:var(--fs-texto)] font-semibold">{formatPublicName(open.alias)}</p>
-                {formatPublicPlace(open.city, open.country, locale) ? (
-                  <p className="m-0 text-[length:var(--fs-pequeno)] text-[#4A5568]">{formatPublicPlace(open.city, open.country, locale)}</p>
+                {conAnio(formatPublicPlace(open.city, open.country, locale), open.anio) ? (
+                  <p className="m-0 text-[length:var(--fs-pequeno)] text-[#4A5568]">{conAnio(formatPublicPlace(open.city, open.country, locale), open.anio)}</p>
                 ) : null}
               </div>
               <button type="button" onClick={() => setOpen(null)} className="btn-am-neutro inline-flex min-h-11 items-center px-4 text-[length:var(--fs-pequeno)] font-semibold">

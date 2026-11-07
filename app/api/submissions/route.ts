@@ -25,7 +25,7 @@ import { appendEditorialAuditLog } from "@/lib/editorial/audit";
 import { notifyAuthorStoryReceived } from "@/lib/email/notify-author-received";
 import { enqueueMalwareScanAfterSave } from "@/lib/malware-scan";
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
-import { requestNewsletterConfirmation } from "@/lib/newsletter/service";
+import { newsletterEstadoPrevio, requestNewsletterConfirmation } from "@/lib/newsletter/service";
 import { randomShortCode } from "@/lib/short-code";
 
 export const runtime = "nodejs";
@@ -299,6 +299,9 @@ export async function POST(req: NextRequest) {
       console.warn("[submissions POST] audit log omitido:", auditErr);
     }
     const submissionId = ref.id;
+    // Sonder: avisar en la pantalla final si ya está inscrita o si la confirmación se envió hace poco.
+    const sonder =
+      data.newsletterOptIn === true ? await newsletterEstadoPrevio(String(data.email ?? "")).catch(() => null) : null;
     after(async () => {
       try {
         await writeCoordsIfMissing(ref, placeLabel, countryLabel ?? "");
@@ -343,7 +346,13 @@ export async function POST(req: NextRequest) {
       console.error("[submissions POST] share code", shareErr instanceof Error ? shareErr.message : "share");
       share = "";
     }
-    return NextResponse.json({ ok: true, id: submissionId, ...(share ? { share } : {}), ...(huellaUnits.length ? { units: huellaUnits } : {}) });
+    return NextResponse.json({
+      ok: true,
+      id: submissionId,
+      ...(share ? { share } : {}),
+      ...(huellaUnits.length ? { units: huellaUnits } : {}),
+      ...(sonder ? { sonder } : {}),
+    });
   } catch (e) {
     Sentry.captureException(e, {
       tags: { source: 'api.submissions.firestore_add' },

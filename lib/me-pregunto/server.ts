@@ -1,5 +1,6 @@
 import 'server-only';
 import type { Firestore } from 'firebase-admin/firestore';
+import { anioDe } from '@/lib/anio-publico';
 import {
   docIdDeMePregunta,
   esMePreguntaId,
@@ -21,6 +22,7 @@ export function mePreguntaPublica(docId: string, data: Record<string, unknown>):
     country: str(data.country),
     lat: typeof data.lat === 'number' && Number.isFinite(data.lat) ? data.lat : null,
     lng: typeof data.lng === 'number' && Number.isFinite(data.lng) ? data.lng : null,
+    anio: anioDe(data.createdAt),
   };
 }
 

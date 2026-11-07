@@ -15,6 +15,7 @@ import { ReadingChain } from '@/components/mapa/ReadingChain';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { useHomeLocaleOptional } from '@/components/i18n/LocaleProvider';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { anioDe, conAnio } from '@/lib/anio-publico';
 import { RespondeALine } from '@/components/historia/RespondeALine';
 import { preguntaPorId } from '@/lib/pregunta-semana';
 import { SITE_FONT_STACK } from '@/lib/typography';
@@ -418,7 +419,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
         ? 'photos'
         : 'text';
   const formatKey = format === 'photos' ? 'image' : format;
-  const place = formatPublicPlace(story.city, story.country, locale);
+  const place = conAnio(formatPublicPlace(story.city, story.country, locale), anioDe(story.publishedAt));
   const formatWord = FORMAT_LABEL[locale][formatKey];
   const kicker = formatWord;
   const temaPregunta = catalog ? null : preguntaPorId(story.questionId)?.tema[locale];

@@ -1,4 +1,5 @@
 import "server-only";
+import { anioDe } from "@/lib/anio-publico";
 import { NextRequest, NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { idPreguntaHilo, idsPreguntaBanco } from "@/lib/hilos";
@@ -54,6 +55,7 @@ function filaPublica(
           askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",
         }
       : {}),
+    anio: anioDe(data.createdAt),
     createdAt: toMillis(data.createdAt),
   };
 }

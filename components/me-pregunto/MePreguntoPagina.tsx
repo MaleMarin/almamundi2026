@@ -15,6 +15,7 @@ import {
   enlaceInterno,
 } from '@/components/me-pregunto/PaginaInterna';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { conAnio } from '@/lib/anio-publico';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { comoFormulario, DejarPregunta } from '@/components/hilos/MePreguntoPanel';
@@ -66,7 +67,7 @@ export function MePreguntoPagina() {
           volver={{ href: '/me-pregunto', texto: copy.todasLasPreguntas }}
           ceja={copy.titulo}
           titulo={una.texto}
-          bajada={ui.loPregunta(preguntaAlias(una.alias), formatPublicPlace(una.city, una.country, locale))}
+          bajada={ui.loPregunta(preguntaAlias(una.alias), conAnio(formatPublicPlace(una.city, una.country, locale), una.anio))}
           largo
         >
           <ResponderAqui
@@ -123,7 +124,7 @@ export function MePreguntoPagina() {
             <Tarjeta key={p.id}>
               <p className="m-0 text-[length:var(--fs-texto)] leading-snug">{p.texto}</p>
               <p className="m-0 mt-2 text-[length:var(--fs-etiqueta)] text-[#616C7C]">
-                {ui.loPregunta(preguntaAlias(p.alias), formatPublicPlace(p.city, p.country, locale))}
+                {ui.loPregunta(preguntaAlias(p.alias), conAnio(formatPublicPlace(p.city, p.country, locale), p.anio))}
               </p>
               <div className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-3 pt-4">
                 <Link

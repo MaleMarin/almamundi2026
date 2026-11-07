@@ -8,6 +8,7 @@ import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { conAnio } from '@/lib/anio-publico';
 import { preguntaPorId, preguntaTexto } from '@/lib/pregunta-semana';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import { esMePreguntaId } from '@/lib/me-pregunto/shared';
@@ -34,7 +35,7 @@ export function RespuestaGlobeCard({
   const [moreBelow, setMoreBelow] = useState(false);
   const pregunta = preguntaPorId(item.questionId);
   const question = item.questionText || preguntaTexto(item.questionId, 'tu', locale);
-  const place = formatPublicPlace(item.city, item.country, locale);
+  const place = conAnio(formatPublicPlace(item.city, item.country, locale), item.anio);
   // «Me pregunto…»: «Respuesta a una pregunta de [alias] · [lugar]».
   const kicker = item.questionText
     ? ME_PREGUNTO_UI[locale].respuestaDe(

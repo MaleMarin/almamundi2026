@@ -87,6 +87,8 @@ export type StoryFlowMessages = {
   modalConsentPrivacyLink: string;
   /** Casilla opcional, debajo de los consentimientos. Solo /contar. */
   modalNewsletterOptIn: string;
+  modalSonderYa: string;
+  modalSonderReciente: string;
   modalMarkThreeToSend: string;
   modalSubmitFailedKeep: string;
   modalCaptchaFailed: string;
@@ -238,6 +240,8 @@ const es: StoryFlowMessages = {
   modalConsentTermsLink: 'Términos de uso',
   modalConsentPrivacyLink: 'Aviso de privacidad',
   modalNewsletterOptIn: 'Quiero recibir historias nuevas en mi correo',
+  modalSonderYa: 'Ya recibes Sonder en este correo.',
+  modalSonderReciente: 'Ya te enviamos el correo para confirmar Sonder. Revisa tu bandeja de entrada o la carpeta de spam.',
   modalMarkThreeToSend: 'Marca las tres casillas para enviar.',
   modalSubmitFailedKeep:
     'No pudimos enviar tu historia. Lo que grabaste y escribiste sigue aquí. Revisa tu conexión e intenta de nuevo.',
@@ -437,6 +441,8 @@ const pt: StoryFlowMessages = {
   modalConsentTermsLink: 'Termos de uso',
   modalConsentPrivacyLink: 'Aviso de privacidade',
   modalNewsletterOptIn: 'Quero receber novas histórias no meu e-mail',
+  modalSonderYa: 'Você já recebe a Sonder neste e-mail.',
+  modalSonderReciente: 'Já enviamos o e-mail para confirmar a Sonder. Confira sua caixa de entrada ou a pasta de spam.',
   modalMarkThreeToSend: 'Marque as três caixas para enviar.',
   modalSubmitFailedKeep:
     'Não conseguimos enviar sua história. O que você gravou e escreveu continua aqui. Verifique sua conexão e tente de novo.',
@@ -597,6 +603,8 @@ const en: StoryFlowMessages = {
   modalConsentTermsLink: 'Terms of use',
   modalConsentPrivacyLink: 'Privacy notice',
   modalNewsletterOptIn: 'I want to receive new stories by email',
+  modalSonderYa: 'You already get Sonder at this email.',
+  modalSonderReciente: 'We already sent you the email to confirm Sonder. Check your inbox or spam folder.',
   modalMarkThreeToSend: 'Check the three boxes to send.',
   modalSubmitFailedKeep:
     "We couldn't send your story. What you recorded and wrote is still here. Check your connection and try again.",

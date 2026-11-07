@@ -53,6 +53,21 @@ async function sendConfirmation(email: string, locale: AlmaLocale, token: string
   }
 }
 
+/** Antes de pedir la confirmación: si ese correo ya recibe Sonder o se le envió la confirmación hace poco. */
+export async function newsletterEstadoPrevio(rawEmail: string): Promise<"ya" | "reciente" | null> {
+  const email = normalizeNewsletterEmail(rawEmail);
+  if (!email) return null;
+  const snap = await subscriberRef(email).get();
+  if (!snap.exists) return null;
+  const current = snap.data() as Partial<SubscriberDoc>;
+  if (current.estado === "confirmed") return "ya";
+  const sentAt = current.confirmSentAt ? Date.parse(current.confirmSentAt) : NaN;
+  if (current.estado === "pending" && Number.isFinite(sentAt) && Date.now() - sentAt < NEWSLETTER_RESEND_WINDOW_MS) {
+    return "reciente";
+  }
+  return null;
+}
+
 /**
  * Alta o reenvío de confirmación. Si el correo ya está confirmado, no cambia nada
  * y no revela si existe: la respuesta es la misma que la de un alta nueva.

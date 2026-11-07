@@ -423,6 +423,7 @@ export function StoryModal({
   const [acceptedPublicacion, setAcceptedPublicacion] = useState(false);
   const [acceptedTerminos, setAcceptedTerminos] = useState(false);
   const [newsletterOptIn, setNewsletterOptIn] = useState(false);
+  const [sonderAviso, setSonderAviso] = useState<'ya' | 'reciente' | null>(null);
   const [saving, setSaving] = useState(false);
   const submitInFlightRef = useRef(false);
   const extraUploadRef = useRef<{
@@ -1727,6 +1728,7 @@ export function StoryModal({
         id?: string;
         share?: string;
         units?: { hex: string; width: number }[];
+        sonder?: 'ya' | 'reciente';
       };
       if (!res.ok) {
         reportStorySubmitError(data.error || `submissions_${res.status}`, 'submissions', data.error);
@@ -1764,6 +1766,7 @@ export function StoryModal({
         country };
       setImprintStoryTitle(title);
       setImprintUnits(Array.isArray(data.units) && data.units.length ? data.units : null);
+      setSonderAviso(data.sonder === 'ya' || data.sonder === 'reciente' ? data.sonder : null);
       if ((mode === 'video' || mode === 'audio') && typeof data.id === 'string' && data.id) {
         // Transcribe la voz para que los colores salgan de lo que se contó. Máximo 30 segundos.
         setEscuchando(true);
@@ -3128,6 +3131,11 @@ export function StoryModal({
                 <p className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#5C5C52]">
                   {t.modalReviewInProgress}
                 </p>
+                {sonderAviso ? (
+                  <p className="text-[length:var(--fs-etiqueta)] font-normal leading-snug text-[#5C5C52]">
+                    {sonderAviso === 'ya' ? t.modalSonderYa : t.modalSonderReciente}
+                  </p>
+                ) : null}
               </div>
 
               <div className="mx-auto mt-4 aspect-square w-full shrink-0 overflow-hidden rounded-lg border border-[#e8e6e0] bg-[#F7F4EE] md:w-[420px]">

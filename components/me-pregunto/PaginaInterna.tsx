@@ -10,6 +10,7 @@ import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import Link from 'next/link';
 import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
+import { conAnio } from '@/lib/anio-publico';
 import { neu } from '@/lib/historias-neumorph';
 import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
@@ -83,7 +84,7 @@ export function TarjetaRespuesta({ item, locale }: { item: RespuestaPublica; loc
   return (
     <Tarjeta>
       <p className="m-0 mb-3 text-[length:var(--fs-etiqueta)] text-[#616C7C]">
-        {[preguntaAlias(item.alias), formatPublicPlace(item.city, item.country, locale)].filter(Boolean).join(' · ')}
+        {[preguntaAlias(item.alias), conAnio(formatPublicPlace(item.city, item.country, locale), item.anio)].filter(Boolean).join(' · ')}
       </p>
       {item.kind === 'voz' && item.previewUrl ? <audio controls preload="none" src={item.previewUrl} className="w-full" /> : null}
       {item.kind === 'foto' && item.previewUrl ? (
