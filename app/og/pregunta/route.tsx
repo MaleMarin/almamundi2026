@@ -25,7 +25,7 @@ export async function GET(req: Request) {
       ? `Alguien en ${lugar}, pregunta`
       : 'Alguien pregunta'
     : tema?.nombre.es ?? 'Preguntas para ti';
-  const pie = persona ? 'Respóndela tú en almamundi.org' : 'Tenemos una pregunta para ti · almamundi.org';
+  const pie = persona ? 'Respóndela tú en almamundi.org' : 'Cuéntalo tú en almamundi.org';
 
   return new ImageResponse(
     (

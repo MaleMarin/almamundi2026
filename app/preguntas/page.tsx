@@ -1,3 +1,4 @@
+import { preguntaOgCopy } from '@/lib/i18n/pregunta-messages';
 import type { Metadata } from 'next';
 import { getAdminDb } from '@/lib/firebase/admin';
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
@@ -28,10 +29,15 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
   const copy = HILOS_UI[locale];
   const persona = esMePreguntaId(pedido) ? await mePreguntaAprobada(getAdminDb(), pedido).catch(() => null) : null;
   // La imagen ya muestra la pregunta: el título y la bajada no la repiten.
-  const title = persona ? ME_PREGUNTO_UI[locale].ogTitulo : `${copy.nav} · AlmaMundi`;
-  const description = persona ? ME_PREGUNTO_UI[locale].ogBajada : copy.bajada;
+  const deAlmaMundi = !persona && Boolean(preguntaHiloPorId(pedido));
+  const title = persona
+    ? ME_PREGUNTO_UI[locale].ogTitulo
+    : deAlmaMundi
+      ? preguntaOgCopy(locale).titulo
+      : `${copy.nav} · AlmaMundi`;
+  const description = persona ? ME_PREGUNTO_UI[locale].ogBajada : deAlmaMundi ? preguntaOgCopy(locale).bajada : copy.bajada;
   const image = {
-    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}` : '/og/sitio?v=2',
+    url: pedido ? `/og/pregunta?p=${encodeURIComponent(pedido)}&v=2` : '/og/sitio?v=2',
     width: 1200,
     height: 630,
     alt: copy.nav,

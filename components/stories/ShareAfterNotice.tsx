@@ -8,7 +8,7 @@ import { X } from 'lucide-react';
 import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { interpolate } from '@/lib/i18n/locale';
-import { preguntaInviteShareText, preguntaShareText } from '@/lib/i18n/pregunta-messages';
+import { preguntaInviteShareText, preguntaShareText, preguntaShareTextConPregunta } from '@/lib/i18n/pregunta-messages';
 import { preguntaTexto } from '@/lib/pregunta-semana';
 import { isShortCode } from '@/lib/short-code';
 import {
@@ -111,6 +111,11 @@ function sharePacket(props: ShareAfterNoticeProps, locale: 'es' | 'pt' | 'en', u
     const conPregunta = `${ui.compartirConPregunta(acortar(props.question))} ${url}`;
     return { url, text: `${ui.compartir} ${url}`, x: conPregunta, social: sinEnlace(conPregunta, url) };
   }
+  if (props.kind === 'question' && props.afterAnswer) {
+    // Pregunta de AlmaMundi: la imagen ya la muestra; X, Instagram y TikTok la llevan en el texto.
+    const conPregunta = preguntaShareTextConPregunta(locale, acortar(props.question), url);
+    return { url, text: preguntaShareText(locale, props.question, url), x: conPregunta, social: sinEnlace(conPregunta, url) };
+  }
   const text =
     props.kind === 'question' && props.afterAnswer
       ? preguntaShareText(locale, props.question, url)
@@ -155,9 +160,7 @@ export function ShareAfterNotice(props: ShareAfterNoticeProps) {
       // «v=2»: WhatsApp guarda la vista previa por enlace; con esto toma el título nuevo
       // (sin repetir la pregunta) aunque el enlace ya se haya compartido antes.
       const url = props.afterAnswer
-        ? esMePreguntaId(props.questionId)
-          ? `${publishedQuestionPageUrl(props.questionId)}&v=2`
-          : publishedQuestionPageUrl(props.questionId)
+        ? `${publishedQuestionPageUrl(props.questionId)}&v=2`
         : publishedQuestionShareUrl(props.questionId);
       setPacket(sharePacket(props, locale, url));
       return;

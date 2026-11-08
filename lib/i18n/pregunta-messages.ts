@@ -187,9 +187,26 @@ export const PREGUNTA_COPY = {
     en: "If you'd like to know when we publish your answer, leave your email and we'll let you know. Your email won't be public.",
   },
   shareBody: {
-    es: 'AlmaMundi pregunta: [pregunta] Yo ya respondí. ¿Y tú? [enlace]',
-    pt: 'O AlmaMundi pergunta: [pergunta] Eu já respondi. E você? [enlace]',
-    en: 'AlmaMundi asks: [pregunta] I already answered. What about you? [enlace]',
+    es: 'Yo ya la respondí en AlmaMundi. ¿Tú qué contarías? [enlace]',
+    pt: 'Eu já respondi no AlmaMundi. O que você contaria? [enlace]',
+    en: 'I already answered it on AlmaMundi. What would you tell? [enlace]',
+  },
+  /** X, Instagram y TikTok no muestran la imagen: ahí sí va la pregunta. */
+  shareBodyConPregunta: {
+    es: 'Respondí esta pregunta en AlmaMundi: «[pregunta]» ¿Tú qué contarías? [enlace]',
+    pt: 'Respondi esta pergunta no AlmaMundi: “[pergunta]” O que você contaria? [enlace]',
+    en: 'I answered this question on AlmaMundi: “[pregunta]” What would you tell? [enlace]',
+  },
+  /** Vista previa del enlace (WhatsApp, Facebook, LinkedIn): la pregunta va en la imagen. */
+  ogTitulo: {
+    es: 'Hay una historia tuya en esta pregunta',
+    pt: 'Há uma história sua nesta pergunta',
+    en: 'There is a story of yours in this question',
+  },
+  ogBajada: {
+    es: 'Cada respuesta se vuelve parte de un mapa de historias del mundo.',
+    pt: 'Cada resposta passa a fazer parte de um mapa de histórias do mundo.',
+    en: 'Every answer becomes part of a map of stories from around the world.',
   },
   shareInvite: {
     es: 'AlmaMundi tiene una pregunta para ti: [pregunta] ¿Qué responderías? [enlace]',
@@ -220,6 +237,14 @@ function preguntaShareLine(template: string, pregunta: string, enlace: string): 
 /** Después de responder: la persona ya contestó. */
 export function preguntaShareText(locale: AlmaLocale, pregunta: string, enlace: string): string {
   return preguntaShareLine(PREGUNTA_COPY.shareBody[locale], pregunta, enlace);
+}
+
+export function preguntaShareTextConPregunta(locale: AlmaLocale, pregunta: string, enlace: string): string {
+  return preguntaShareLine(PREGUNTA_COPY.shareBodyConPregunta[locale], pregunta, enlace);
+}
+
+export function preguntaOgCopy(locale: AlmaLocale): { titulo: string; bajada: string } {
+  return { titulo: PREGUNTA_COPY.ogTitulo[locale], bajada: PREGUNTA_COPY.ogBajada[locale] };
 }
 
 /** Desde el mapa o la página de la pregunta, antes de responder. */
