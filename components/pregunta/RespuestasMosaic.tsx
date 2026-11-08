@@ -89,6 +89,12 @@ export default function RespuestasMosaic({
   }, [load, nextOffset]);
 
   if (!pregunta && !embedded) return null;
+  const editorialCount = items.filter((item) => item.editorial).length;
+  const avisoEditorial = locale === "en"
+    ? "Includes editorial sample responses, not visitor submissions."
+    : locale === "pt"
+      ? "Inclui respostas de exemplo editoriais, não depoimentos de visitantes."
+      : "Incluye respuestas editoriales de muestra, no enviadas por visitantes.";
 
   return (
     <div className={embedded ? 'mt-10 flex w-full flex-col gap-4 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]'}>
@@ -107,6 +113,7 @@ export default function RespuestasMosaic({
           {PREGUNTA_COPY.answers[locale]}
           {total != null ? ` (${total})` : ''}
         </h2>
+        {editorialCount > 0 ? <p className="text-[length:var(--fs-pequeno)] text-[#616C7C]">{avisoEditorial}</p> : null}
         {total === 0 && !loading ? (
           <p className="m-0 text-[length:var(--fs-texto)] leading-relaxed">{PREGUNTA_COPY.empty[locale]}</p>
         ) : (
