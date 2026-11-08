@@ -41,11 +41,18 @@ export function getRateLimiter(name: string, max: number, windowSeconds: number)
   return rl;
 }
 
+/**
+ * Límites de envíos apagados por decisión de Ana (8 nov 2026): «ni ningún freno por ahora».
+ * Para volver a activarlos en todo el sitio, cambiar a true. Turnstile (captcha) sigue activo.
+ */
+const LIMITES_ACTIVOS = false;
+
 export async function enforceRateLimit(
   limiter: Ratelimit | null,
   identifier: string,
   memoryFallback?: { max: number; windowMs: number }
 ): Promise<NextResponse | null> {
+  if (!LIMITES_ACTIVOS) return null;
   if (!limiter) {
     if (memoryFallback) {
       const { success, remaining } = memorySlidingWindowHit(
