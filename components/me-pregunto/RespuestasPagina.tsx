@@ -19,7 +19,6 @@ import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
-import { EDITORIAL_IMPORT_UI } from '@/lib/i18n/editorial-import';
 
 /**
  * Respuestas a las preguntas de AlmaMundi (las de las cintas).
@@ -45,8 +44,6 @@ export function RespuestasPagina() {
     };
   }, []);
 
-  const hayRespuestasEditoriales = (todas ?? []).some((item) => item.editorial);
-  const avisoEditorial = EDITORIAL_IMPORT_UI[locale].publicNote;
 
   const porPregunta = useMemo(() => {
     const map = new Map<string, RespuestaPublica[]>();
@@ -70,7 +67,6 @@ export function RespuestasPagina() {
             cerrarTexto={ME_PREGUNTO_UI[locale].cancelar}
           />
         </EncabezadoInterno>
-        {hayRespuestasEditoriales && lista.some((item) => item.editorial) ? <p className="mb-5 text-[length:var(--fs-pequeno)] text-[#616C7C]">{avisoEditorial}</p> : null}
         {todas && lista.length === 0 ? (
           <TextoVacio locale={locale} />
         ) : (
@@ -95,7 +91,6 @@ export function RespuestasPagina() {
           {copy.verPreguntasAlmaMundi}
         </Link>
       </EncabezadoInterno>
-      {hayRespuestasEditoriales ? <p className="mb-5 text-[length:var(--fs-pequeno)] text-[#616C7C]">{avisoEditorial}</p> : null}
       {todas && conRespuestas.length === 0 ? <TextoVacio locale={locale} /> : null}
       <GrillaTarjetas>
         {conRespuestas.map(({ p, n }) => (
