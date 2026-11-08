@@ -19,6 +19,7 @@ import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
+import { EDITORIAL_IMPORT_UI } from '@/lib/i18n/editorial-import';
 
 /**
  * Respuestas a las preguntas de AlmaMundi (las de las cintas).
@@ -45,11 +46,7 @@ export function RespuestasPagina() {
   }, []);
 
   const hayRespuestasEditoriales = (todas ?? []).some((item) => item.editorial);
-  const avisoEditorial = locale === "en"
-    ? "This section includes editorial sample responses created for AlmaMundi."
-    : locale === "pt"
-      ? "Esta seção inclui respostas de exemplo criadas pela equipe editorial do AlmaMundi."
-      : "Esta sección incluye respuestas de muestra creadas por el equipo editorial de AlmaMundi.";
+  const avisoEditorial = EDITORIAL_IMPORT_UI[locale].publicNote;
 
   const porPregunta = useMemo(() => {
     const map = new Map<string, RespuestaPublica[]>();
