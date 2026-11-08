@@ -8,7 +8,9 @@ export type EditorialAuditEventType =
   | "reject_moderation"
   | "publish_spanish_inplace"
   | "delete_story"
-  | "delete_respuesta";
+  | "delete_respuesta"
+  /** «Subir archivos»: registros guardados para revisión (no publica nada). */
+  | "carga_archivo";
 
 export type EditorialAuditPayload = {
   storyId?: string;
