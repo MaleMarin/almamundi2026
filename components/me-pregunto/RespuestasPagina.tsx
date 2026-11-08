@@ -44,6 +44,13 @@ export function RespuestasPagina() {
     };
   }, []);
 
+  const hayRespuestasEditoriales = (todas ?? []).some((item) => item.editorial);
+  const avisoEditorial = locale === "en"
+    ? "This section includes editorial sample responses created for AlmaMundi."
+    : locale === "pt"
+      ? "Esta seção inclui respostas de exemplo criadas pela equipe editorial do AlmaMundi."
+      : "Esta sección incluye respuestas de muestra creadas por el equipo editorial de AlmaMundi.";
+
   const porPregunta = useMemo(() => {
     const map = new Map<string, RespuestaPublica[]>();
     for (const item of todas ?? []) map.set(item.questionId, [...(map.get(item.questionId) ?? []), item]);
@@ -66,6 +73,7 @@ export function RespuestasPagina() {
             cerrarTexto={ME_PREGUNTO_UI[locale].cancelar}
           />
         </EncabezadoInterno>
+        {hayRespuestasEditoriales && lista.some((item) => item.editorial) ? <p className="mb-5 text-[length:var(--fs-pequeno)] text-[#616C7C]">{avisoEditorial}</p> : null}
         {todas && lista.length === 0 ? (
           <TextoVacio locale={locale} />
         ) : (
@@ -90,6 +98,7 @@ export function RespuestasPagina() {
           {copy.verPreguntasAlmaMundi}
         </Link>
       </EncabezadoInterno>
+      {hayRespuestasEditoriales ? <p className="mb-5 text-[length:var(--fs-pequeno)] text-[#616C7C]">{avisoEditorial}</p> : null}
       {todas && conRespuestas.length === 0 ? <TextoVacio locale={locale} /> : null}
       <GrillaTarjetas>
         {conRespuestas.map(({ p, n }) => (
