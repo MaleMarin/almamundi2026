@@ -8,6 +8,7 @@ import { preguntaPageHref, preguntaPorId, RESPONDE_TU_LABEL } from '@/lib/pregun
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import type { RespuestaPublica } from '@/lib/respuestas/public';
 import { conAnio } from '@/lib/anio-publico';
+import { EDITORIAL_IMPORT_UI } from '@/lib/i18n/editorial-import';
 
 function AnswerBody({ item, large }: { item: RespuestaPublica; large?: boolean }) {
   if (item.kind === 'voz' && item.previewUrl) {
@@ -90,11 +91,7 @@ export default function RespuestasMosaic({
 
   if (!pregunta && !embedded) return null;
   const editorialCount = items.filter((item) => item.editorial).length;
-  const avisoEditorial = locale === "en"
-    ? "Includes editorial sample responses, not visitor submissions."
-    : locale === "pt"
-      ? "Inclui respostas de exemplo editoriais, não depoimentos de visitantes."
-      : "Incluye respuestas editoriales de muestra, no enviadas por visitantes.";
+  const avisoEditorial = EDITORIAL_IMPORT_UI[locale].mosaicNote;
 
   return (
     <div className={embedded ? 'mt-10 flex w-full flex-col gap-4 text-[#1C1C2E]' : 'mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 pb-12 pt-12 text-[#1C1C2E]'}>
