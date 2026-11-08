@@ -73,7 +73,7 @@ function parseRow(value: unknown, fila: number): { row: ImportRow | null; issues
     issues.push({ fila, campo: "temas", mensaje: "Elige de 1 a 3 temas válidos." });
   }
   const age = raw.editorialAge;
-  if (age !== undefined && (!Number.isInteger(age) || Number(age) < 18 || Number(age) > 120)) {
+  if (age !== undefined && (typeof age !== "number" || !Number.isInteger(age) || age < 18 || age > 120)) {
     issues.push({ fila, campo: "editorialAge", mensaje: "La edad debe ser un entero de 18 a 120 años." });
   }
   const occupation = raw.editorialOccupation === undefined ? "" : cleaned(raw.editorialOccupation);
