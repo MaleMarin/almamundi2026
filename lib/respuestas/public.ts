@@ -3,6 +3,8 @@ export type RespuestaPublica = {
   /** Código público de /r/[código]. */
   shortCode?: string;
   questionId: string;
+  /** Respuesta de muestra redactada para el banco editorial; no es testimonio de un visitante. */
+  editorial?: boolean;
   mode: "tu" | "alguien";
   kind: "texto" | "voz" | "foto";
   contenido: string;
