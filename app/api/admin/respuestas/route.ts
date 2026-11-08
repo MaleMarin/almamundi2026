@@ -84,6 +84,7 @@ export async function GET(request: NextRequest) {
         const lng = typeof data.lng === "number" && Number.isFinite(data.lng) ? data.lng : null;
         return {
           id: doc.id,
+          sourceType: data.sourceType === "editorial" ? "editorial" : undefined,
           questionId: typeof data.questionId === "string" ? data.questionId : "",
           questionText: typeof data.questionText === "string" ? data.questionText : "",
           mode: data.mode === "alguien" ? "alguien" : "tu",
