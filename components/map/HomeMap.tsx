@@ -648,7 +648,11 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
     // 40 respuestas a preguntas de AlmaMundi. Las respuestas a preguntas de las personas no son puntos:
     // viven en la tarjeta de su pregunta y se ven como líneas al abrirla (constelación, 4 nov 2026).
     const conGeo = respuestas.filter((item) => storyHasValidGeo(item));
-    const list = conGeo.filter((item) => !esMePreguntaId(item.questionId)).slice(0, 40);
+    const respuestasDelBanco = conGeo.filter((item) => !esMePreguntaId(item.questionId));
+    // Prioridad a las contribuciones reales; las muestras editoriales completan los 40 lugares restantes.
+    const reales = respuestasDelBanco.filter((item) => !item.editorial);
+    const editoriales = respuestasDelBanco.filter((item) => item.editorial);
+    const list = [...reales, ...editoriales].slice(0, 40);
     if (
       pinnedRespuesta &&
       openRespuesta?.id === pinnedRespuesta.id &&
