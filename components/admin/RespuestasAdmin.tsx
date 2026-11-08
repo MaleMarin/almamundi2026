@@ -2,6 +2,7 @@
 
 import { EstadoRevision } from '@/components/admin/EstadoRevision';
 import ImportarRespuestas from '@/components/admin/ImportarRespuestas';
+import { EDITORIAL_IMPORT_UI } from '@/lib/i18n/editorial-import';
 import { useCallback, useEffect, useState } from 'react';
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
@@ -269,7 +270,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center', marginBottom: 6 }}>
                       <span style={{ fontSize: 11, fontWeight: 600, color: '#fdba74' }}>{KIND_LABEL[item.kind]}</span>
-                      {item.sourceType === 'editorial' ? <span style={{ fontSize: 11, color: '#fdba74' }}>Editorial</span> : null}
+                      {item.sourceType === 'editorial' ? <span style={{ fontSize: 11, color: '#fdba74' }}>{EDITORIAL_IMPORT_UI.es.statusEditorial}</span> : null}
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.5)' }}>{place}</span>
                       <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.4)' }}>{formatDate(item.createdAt)}</span>
                     </div>
