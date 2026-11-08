@@ -2,6 +2,7 @@
 
 import { useState, type ChangeEvent } from "react";
 import { SITE_FONT_STACK } from "@/lib/typography";
+import { EDITORIAL_IMPORT_UI } from "@/lib/i18n/editorial-import";
 
 type ImportItem = {
   id: string;
@@ -16,6 +17,7 @@ type ImportItem = {
 type ImportFile = { version: number; tipo: string; items: ImportItem[] };
 
 export default function ImportarRespuestas({ token, onImported }: { token: string; onImported: () => void }) {
+  const t = EDITORIAL_IMPORT_UI.es;
   const [payload, setPayload] = useState<ImportFile | null>(null);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -28,17 +30,17 @@ export default function ImportarRespuestas({ token, onImported }: { token: strin
     const file = event.target.files?.[0];
     if (!file) return;
     if (file.size > 512_000) {
-      setError("Archivo demasiado grande.");
+      setError(t.fileTooLarge);
       return;
     }
     try {
       const data = JSON.parse(await file.text()) as ImportFile;
       if (data?.version !== 1 || data.tipo !== "respuestas_editoriales" || !Array.isArray(data.items) || data.items.length < 1 || data.items.length > 100) {
-        throw new Error("El formato JSON no corresponde a las respuestas de AlmaMundi.");
+        throw new Error(t.invalidFile);
       }
       setPayload(data);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "No se pudo leer el archivo.");
+      setError(e instanceof Error ? e.message : t.unreadable);
     }
   }
 
@@ -54,8 +56,8 @@ export default function ImportarRespuestas({ token, onImported }: { token: strin
         body: JSON.stringify(payload),
       });
       const result = await response.json() as { error?: string; imported?: number; skippedExisting?: number };
-      if (!response.ok) throw new Error(result.error ?? "No se pudo importar.");
-      setNotice(`Se agregaron ${result.imported ?? 0} respuestas pendientes. Ya existían ${result.skippedExisting ?? 0}.`);
+      if (!response.ok) throw new Error(result.error ?? t.failed);
+      setNotice(`${t.imported} ${result.imported ?? 0} ${t.pending} ${t.existing} ${result.skippedExisting ?? 0}.`);
       onImported();
     } catch (e) {
       setError(e instanceof Error ? e.message : "No se pudo importar.");
@@ -66,15 +68,15 @@ export default function ImportarRespuestas({ token, onImported }: { token: strin
 
   return (
     <details style={{ fontFamily: SITE_FONT_STACK, border: "1px solid rgba(255,255,255,.18)", borderRadius: 16, padding: 16, marginBottom: 20, background: "rgba(255,255,255,.04)" }}>
-      <summary style={{ cursor: "pointer", fontWeight: 600, color: "#fff" }}>Importar respuestas desde JSON</summary>
+      <summary style={{ cursor: "pointer", fontWeight: 600, color: "#fff" }}>{t.title}</summary>
       <p style={{ fontSize: 13, color: "rgba(255,255,255,.8)", lineHeight: 1.5 }}>
-        Importa respuestas editoriales como pendientes. Nada se publica automáticamente. Se conservan los registros existentes.
+        {t.intro}
       </p>
       <input type="file" accept=".json,application/json" onChange={(event) => void openFile(event)}
-        aria-label="Archivo JSON de respuestas" style={{ display: "block", maxWidth: "100%", margin: "12px 0", color: "#fff" }} />
+        aria-label={t.fileLabel} style={{ display: "block", maxWidth: "100%", margin: "12px 0", color: "#fff" }} />
       {payload ? (
         <>
-          <p style={{ fontSize: 14, marginBottom: 8 }}>{payload.items.length} respuestas listas para revisión.</p>
+          <p style={{ fontSize: 14, marginBottom: 8 }}>{payload.items.length} {t.ready}</p>
           <ul style={{ paddingLeft: 20, fontSize: 13, color: "rgba(255,255,255,.78)", lineHeight: 1.5 }}>
             {payload.items.slice(0, 5).map((item) => (
               <li key={item.id}>{item.alias} · {item.city}, {item.country} · {item.questionId}</li>
@@ -82,7 +84,7 @@ export default function ImportarRespuestas({ token, onImported }: { token: strin
           </ul>
           <button type="button" onClick={() => void importar()} disabled={busy}
             style={{ borderRadius: 999, padding: "10px 16px", background: "#FF4A1C", border: 0, color: "#fff", fontWeight: 600, cursor: busy ? "wait" : "pointer" }}>
-            {busy ? "Importando…" : `Guardar ${payload.items.length} como pendientes`}
+            {busy ? t.importing : `${t.importButton} (${payload.items.length})`}
           </button>
         </>
       ) : null}
