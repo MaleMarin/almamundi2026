@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Install Playwright Chromium (system deps)
-        run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium --with-deps
+        run: PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install chromium webkit --with-deps
 
       - name: Build
         run: npm run build
