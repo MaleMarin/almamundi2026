@@ -2911,7 +2911,7 @@ body .almamundi-footer-title { font-weight: 900 !important; }
 @media (min-width: 768px) {
   #map-dock-slot.map-dock-slot--noche .map-dock-row.map-dock-barra {
     width: fit-content !important;
-    max-width: min(100%, 1180px) !important;
+    max-width: min(100% - 24px, 1280px) !important;
     padding: 5px;
     gap: 6px 4px;
   }
