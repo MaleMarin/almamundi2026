@@ -42,6 +42,8 @@ export function MePreguntoMapPanel({
   const [query, setQuery] = useState('');
   const [abierta, setAbierta] = useState<string | null>(abrirId);
   const [limite, setLimite] = useState(POR_PAGINA);
+  /** Celular: la hoja es baja; se muestra la pregunta más reciente completa y el botón para ver todas. */
+  const [enCel] = useState(() => typeof window !== 'undefined' && window.matchMedia('(max-width: 767px)').matches);
   const [abrirVisto, setAbrirVisto] = useState<string | null>(null);
 
   // Al tocar un punto multicolor: se despliega su pregunta (patrón de estado derivado, sin efecto).
@@ -99,14 +101,14 @@ export function MePreguntoMapPanel({
       const sola = grupos.find((g) => g.pregunta.id === abrirId);
       if (sola) return [sola];
     }
-    const page = grupos.slice(0, limite);
+    const page = grupos.slice(0, enCel && !query.trim() ? 1 : limite);
     // La pregunta tocada en el globo siempre se ve, aunque esté más abajo en la lista.
     if (abierta && !page.some((g) => g.pregunta.id === abierta)) {
       const extra = grupos.find((g) => g.pregunta.id === abierta);
       if (extra) return [extra, ...page];
     }
     return page;
-  }, [grupos, limite, abierta, abrirId]);
+  }, [grupos, limite, abierta, abrirId, enCel, query]);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
@@ -207,7 +209,7 @@ export function MePreguntoMapPanel({
           {abrirId ? copy.verOtras : copy.verPreguntas}
         </Link>
       ) : null}
-      {!abrirId && grupos.length > limite ? (
+      {!abrirId && !(enCel && !query.trim()) && grupos.length > limite ? (
         <button
           type="button"
           onClick={() => setLimite((n) => n + POR_PAGINA)}
