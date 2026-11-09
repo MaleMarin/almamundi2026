@@ -16,6 +16,7 @@ export type RespuestaCorta = {
   city: string;
   country: string;
   previewUrl: string | null;
+  editorial?: boolean;
 };
 
 function approvedPublic(data: Record<string, unknown>): boolean {
@@ -41,6 +42,7 @@ export async function getRespuestaByShortCode(code: string): Promise<RespuestaCo
       id: doc.id,
       shortCode: code,
       questionId,
+      ...(data.sourceType === "editorial" ? { editorial: true } : {}),
       mode: data.mode === "alguien" ? "alguien" : "tu",
       kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
       city: typeof data.city === "string" ? data.city : "",
@@ -78,6 +80,7 @@ export async function getRespuestaPublicById(id: string): Promise<RespuestaPubli
       id: doc.id,
       ...(isShortCode(code) ? { shortCode: code } : {}),
       questionId,
+      ...(data.sourceType === "editorial" ? { editorial: true } : {}),
       mode: data.mode === "alguien" ? "alguien" : "tu",
       kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
       contenido: typeof data.contenido === "string" ? comillasTipograficas(data.contenido) : "",

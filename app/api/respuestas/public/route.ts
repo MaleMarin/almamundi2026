@@ -39,6 +39,7 @@ function filaPublica(
     id: docId,
     ...(isShortCode(code) ? { shortCode: code } : {}),
     questionId,
+    ...(data.sourceType === "editorial" ? { editorial: true } : {}),
     mode: itemMode,
     kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
     contenido: typeof data.contenido === "string" ? comillasTipograficas(data.contenido) : "",

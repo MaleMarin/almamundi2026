@@ -44,6 +44,7 @@ export function RespuestasPagina() {
     };
   }, []);
 
+
   const porPregunta = useMemo(() => {
     const map = new Map<string, RespuestaPublica[]>();
     for (const item of todas ?? []) map.set(item.questionId, [...(map.get(item.questionId) ?? []), item]);

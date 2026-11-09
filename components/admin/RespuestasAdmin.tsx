@@ -1,6 +1,7 @@
 'use client';
 
 import { EstadoRevision } from '@/components/admin/EstadoRevision';
+import ImportarRespuestas from '@/components/admin/ImportarRespuestas';
 import { useCallback, useEffect, useState } from 'react';
 import { AdminBuscador, coincideBusqueda } from '@/components/admin/AdminBuscador';
 import { Archive, Check, Trash2, X } from 'lucide-react';
@@ -240,6 +241,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
 
   return (
     <div style={{ fontFamily: SITE_FONT_STACK }}>
+      <ImportarRespuestas token={token} onImported={() => { setTab('pending'); void load(); }} />
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
         {tabs.map((item) => (
           <button
