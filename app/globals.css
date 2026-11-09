@@ -2573,7 +2573,7 @@ b {
 @media (min-width: 768px) and (min-height: 600px) {
   .home-hero-pantalla #intro .home-capitulo-cita + .home-capitulo-bajada-elige { margin-top: clamp(40px, 6vh, 72px); }
 }
-.home-hero-pantalla #intro .home-capitulo-cita { margin-top: 14px; }
+.home-hero-pantalla #intro .home-capitulo-cita { margin-top: 4px; }
 
 /* Inspírate: el llamado va primero y la línea gris debajo. */
 #cintas .home-capitulo-bajada-elige + .home-capitulo-bajada-linea { margin-top: 8px; }
