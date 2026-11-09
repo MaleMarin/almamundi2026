@@ -1,6 +1,12 @@
 import { test, expect } from '@playwright/test';
 
 test.describe('contar en WebKit 390×844', () => {
+  // El formulario necesita la configuración pública de Firebase. En CI no está (no hay secretos cargados),
+  // así que ahí se omite; se corre contra el sitio con PLAYWRIGHT_BASE_URL=https://www.almamundi.org.
+  test.skip(
+    process.env.GITHUB_ACTIONS === 'true' && !process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    'Sin configuración pública de Firebase en CI'
+  );
   test('abre /contar/texto, guarda borrador y llega a datos', async ({ page }) => {
     await page.goto('/contar/texto', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveTitle(/Escribe lo que no le contaste a nadie/i);
