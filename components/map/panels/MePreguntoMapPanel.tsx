@@ -202,9 +202,9 @@ export function MePreguntoMapPanel({
       {preguntas.length > 0 ? (
         <Link
           href="/preguntas-de-las-personas"
-          className="text-center text-[length:var(--fs-etiqueta)] font-semibold text-white underline underline-offset-4 visited:text-white"
+          className="inline-flex min-h-11 w-full items-center justify-center rounded-full bg-white px-5 text-[length:var(--fs-etiqueta)] font-semibold text-[#3C4655] no-underline visited:text-[#3C4655]"
         >
-          {copy.verPreguntas}
+          {abrirId ? copy.verOtras : copy.verPreguntas}
         </Link>
       ) : null}
       {!abrirId && grupos.length > limite ? (

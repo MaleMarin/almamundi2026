@@ -207,6 +207,7 @@ export const ME_PREGUNTO_MAPA: Record<
     responderEsta: string;
     verTodas: string;
     verPreguntas: string;
+    verOtras: string;
     todasLasPreguntas: string;
     verRespuestas: string;
     responderEnMapa: string;
@@ -235,6 +236,7 @@ export const ME_PREGUNTO_MAPA: Record<
     verPreguntasAlmaMundi: 'Preguntas para ti',
     responderEsta: 'Responder esta pregunta',
     verPreguntas: 'Ver todas las preguntas',
+    verOtras: 'Ver otras preguntas',
     todasLasPreguntas: 'Todas las preguntas',
     verRespuestas: 'Ver respuestas',
     responderEnMapa: 'Responder en el mapa',
@@ -259,6 +261,7 @@ export const ME_PREGUNTO_MAPA: Record<
     verPreguntasAlmaMundi: 'Perguntas para você',
     responderEsta: 'Responder esta pergunta',
     verPreguntas: 'Ver todas as perguntas',
+    verOtras: 'Ver outras perguntas',
     todasLasPreguntas: 'Todas as perguntas',
     verRespuestas: 'Ver respostas',
     responderEnMapa: 'Responder no mapa',
@@ -283,6 +286,7 @@ export const ME_PREGUNTO_MAPA: Record<
     verPreguntasAlmaMundi: 'Questions for you',
     responderEsta: 'Answer this question',
     verPreguntas: 'See all questions',
+    verOtras: 'See other questions',
     todasLasPreguntas: 'All questions',
     verRespuestas: 'See answers',
     responderEnMapa: 'Answer on the map',
