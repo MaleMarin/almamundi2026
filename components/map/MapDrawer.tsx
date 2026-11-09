@@ -79,11 +79,14 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
   useEffect(() => {
     if (!open || !isMobile) return;
     const t = window.setTimeout(() => {
-      const r = dialogRef.current?.getBoundingClientRect();
-      if (!r) return;
-      const falta = r.bottom - window.innerHeight;
-      if (falta > 8 || r.top > window.innerHeight * 0.6) window.scrollBy({ top: falta + 8, behavior: 'smooth' });
-    }, 120);
+      const el = dialogRef.current;
+      const r = el?.getBoundingClientRect();
+      if (!el || !r) return;
+      // scrollIntoView mueve el contenedor que de verdad desplaza la página (no siempre es window).
+      if (r.bottom > window.innerHeight + 8 || r.top > window.innerHeight * 0.6) {
+        el.scrollIntoView({ block: 'end', behavior: 'smooth' });
+      }
+    }, 450);
     return () => window.clearTimeout(t);
   }, [open, mode, isMobile]);
 
