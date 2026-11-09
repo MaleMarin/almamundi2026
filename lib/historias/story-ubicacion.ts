@@ -1,4 +1,4 @@
-import { displayCountryName } from '@/lib/i18n/country-name';
+import { countryCodeFromStored, displayCountryName } from '@/lib/i18n/country-name';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { foldText } from '@/lib/historias/story-filter-helpers';
 
@@ -55,8 +55,8 @@ export function formatPublicPlace(
 ): string {
   const parts = publicCityCountry(city, country);
   const countryLabel =
-    locale && (country ?? '').trim() && parts.country
-      ? displayCountryName(country, locale)
+    locale && parts.country
+      ? displayCountryName(parts.country, locale)
       : parts.country;
   return [parts.city, countryLabel].filter(Boolean).join(', ');
 }
@@ -65,8 +65,12 @@ export function publicCityCountry(
   city?: string | null,
   country?: string | null
 ): { city?: string; country?: string } {
-  const cityRaw = (city ?? '').trim();
-  const countryRaw = (country ?? '').trim();
+  let cityRaw = (city ?? '').trim();
+  let countryRaw = (country ?? '').trim();
+  // Ciudad y país escritos al revés («Uruguay», «Mercedes»): se ordenan.
+  if (cityRaw && countryRaw && countryCodeFromStored(cityRaw) && !countryCodeFromStored(countryRaw)) {
+    [cityRaw, countryRaw] = [countryRaw, cityRaw];
+  }
   const countryOut = countryRaw ? capSegments(countryRaw) : undefined;
   if (!cityRaw) return { country: countryOut };
   if (countryRaw && cityNamesCountry(cityRaw, countryRaw)) {
