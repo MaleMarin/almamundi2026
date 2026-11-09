@@ -82,9 +82,13 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
       const el = dialogRef.current;
       const r = el?.getBoundingClientRect();
       if (!el || !r) return;
-      // scrollIntoView mueve el contenedor que de verdad desplaza la página (no siempre es window).
       if (r.bottom > window.innerHeight + 8 || r.top > window.innerHeight * 0.6) {
-        el.scrollIntoView({ block: 'end', behavior: 'smooth' });
+        // La página desplaza con Lenis: window.scrollBy y scrollIntoView no la mueven.
+        const destino = window.scrollY + r.bottom - window.innerHeight + 8;
+        const lenis = (window as unknown as { __almamundiLenis?: { scrollTo: (y: number, o?: { duration?: number }) => void } })
+          .__almamundiLenis;
+        if (lenis) lenis.scrollTo(destino, { duration: 0.6 });
+        else window.scrollTo({ top: destino, behavior: 'smooth' });
       }
     }, 450);
     return () => window.clearTimeout(t);
