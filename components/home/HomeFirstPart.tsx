@@ -64,8 +64,6 @@ export function HomeFirstPart({
           titulo={t.heroBeforeBold}
           tituloFuerte={`${t.heroBold},`}
           cita={t.citaCuenta}
-          bajadaFuerte={t.historiasLead2b}
-          bajadaEnDosLineas
         />
       </section>
 
