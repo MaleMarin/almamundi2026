@@ -170,7 +170,6 @@ export function StoriesPanel({
             type="search"
             value={exploreQuery}
             onChange={(e) => onExploreQueryChange(e.target.value)}
-            placeholder={copy.searchTitle}
             aria-label={copy.searchTitle}
             style={{
               width: '100%',
@@ -213,16 +212,6 @@ export function StoriesPanel({
                   fontFamily: SITE_FONT_STACK }}
               >
                 {copy.searchHint}
-              </p>
-              <p
-                style={{
-                  fontSize: 'var(--fs-etiqueta)',
-                  color: 'rgba(255,255,255,0.45)',
-                  margin: '12px 0 0',
-                  lineHeight: 1.45,
-                  fontFamily: SITE_FONT_STACK }}
-              >
-                {copy.searchUseTab}
               </p>
             </div>
           ) : searchMatches.length === 0 ? (
