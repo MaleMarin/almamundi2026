@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Check, Trash2, X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { EstadoRevision } from '@/components/admin/EstadoRevision';
+import { AdminBuscador, coincideBusqueda } from '@/components/admin/AdminBuscador';
 import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
 import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
 import { parseAlmaLocale } from '@/lib/i18n/locale';
@@ -56,6 +57,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [draft, setDraft] = useState<Record<string, string>>({});
   const [notice, setNotice] = useState('');
+  const [busqueda, setBusqueda] = useState('');
   const [motivo, setMotivo] = useState<Record<string, { reasonId: string; detail: string }>>({});
 
   const headers = useCallback(
@@ -118,6 +120,8 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
     }
   }
 
+  const visibles = items.filter((item) => coincideBusqueda(busqueda, [item.texto, item.alias, item.city, item.country]));
+
   return (
     <div style={{ fontFamily: SITE_FONT_STACK, color: '#fff' }}>
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -133,11 +137,18 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
           </button>
         ))}
       </div>
+      <AdminBuscador
+        value={busqueda}
+        onChange={setBusqueda}
+        placeholder="Buscar por pregunta, nombre o lugar"
+        total={items.length}
+        encontrados={visibles.length}
+      />
       {notice ? <p style={{ margin: '0 0 12px', opacity: 0.85 }}>{notice}</p> : null}
       {loading ? <p>Cargando…</p> : null}
       {!loading && items.length === 0 ? <p style={{ opacity: 0.7 }}>No hay preguntas en esta lista.</p> : null}
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 12 }}>
-        {items.map((item) => (
+        {visibles.map((item) => (
           <li key={item.id} style={{ padding: 20, borderRadius: 16, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
             {tab === 'pending' ? (
               <textarea

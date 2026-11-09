@@ -42,6 +42,7 @@ import RespuestasAdmin from '@/components/admin/RespuestasAdmin';
 import MePreguntoAdmin from '@/components/admin/MePreguntoAdmin';
 import SonderAdmin from '@/components/admin/SonderAdmin';
 import SubirArchivos from '@/components/admin/SubirArchivos';
+import { coincideBusqueda } from '@/components/admin/AdminBuscador';
 import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema, TEMAS } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
@@ -862,7 +863,7 @@ export default function AdminPage() {
   // «Todas las historias»: las del mapa y las archivadas, para muestras y exposiciones.
   const filteredArchived = [...activeStories, ...archivedStories].filter((s) => {
     const f = archivedFilter;
-    if (f.q && !`${s.title} ${s.text ?? ''}`.toLowerCase().includes(f.q.toLowerCase())) return false;
+    if (f.q && !coincideBusqueda(f.q, [s.title, s.text, s.alias, s.place])) return false;
     if (f.topic && !(s.temas ?? []).includes(f.topic) && !(s.topic ?? []).includes(f.topic)) return false;
     if (f.place && !s.place?.toLowerCase().includes(f.place.toLowerCase())) return false;
     if (f.format && s.format !== f.format) return false;
@@ -1282,7 +1283,7 @@ export default function AdminPage() {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
             <input
               type="search"
-              placeholder="Buscar en título o texto"
+              placeholder="Buscar por título, texto, nombre o lugar"
               value={archivedFilter.q ?? ''}
               onChange={(e) => setArchivedFilter((f) => ({ ...f, q: e.target.value || undefined }))}
               style={{ ...campoFiltro, width: 220 }}

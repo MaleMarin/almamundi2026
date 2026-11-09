@@ -2,6 +2,7 @@
 
 import { EstadoRevision } from '@/components/admin/EstadoRevision';
 import { useCallback, useEffect, useState } from 'react';
+import { AdminBuscador, coincideBusqueda } from '@/components/admin/AdminBuscador';
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
@@ -121,6 +122,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
   const [placePrompt, setPlacePrompt] = useState<Record<string, { city: string; country: string }>>({});
   const [rejectDraft, setRejectDraft] = useState<Record<string, { reasonId: string; detail: string }>>({});
   const [notice, setNotice] = useState<string | null>(null);
+  const [busqueda, setBusqueda] = useState('');
 
   const headers = useCallback((): HeadersInit => ({ Authorization: `Bearer ${token}` }), [token]);
 
@@ -226,6 +228,10 @@ export default function RespuestasAdmin({ token }: { token: string }) {
     { id: 'archivo' as const, label: 'Archivo' },
   ];
 
+  const visibles = items.filter((item) =>
+    coincideBusqueda(busqueda, [item.alias, item.contenido, item.city, item.country, item.questionText, item.questionId])
+  );
+
   return (
     <div style={{ fontFamily: SITE_FONT_STACK }}>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 16 }}>
@@ -250,6 +256,13 @@ export default function RespuestasAdmin({ token }: { token: string }) {
           </button>
         ))}
       </div>
+      <AdminBuscador
+        value={busqueda}
+        onChange={setBusqueda}
+        placeholder="Buscar por nombre, texto, lugar o pregunta"
+        total={items.length}
+        encontrados={visibles.length}
+      />
       {notice && <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: 14 }}>{notice}</p>}
       {loading && <p style={{ color: 'rgba(255,255,255,0.5)', textAlign: 'center', padding: 40 }}>Cargando…</p>}
       {!loading && items.length === 0 && (
@@ -257,7 +270,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
       )}
       {!loading && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {items.map((item) => {
+          {visibles.map((item) => {
             const busy = actionId === item.id;
             const place = [item.city, item.country].filter(Boolean).join(', ');
             return (
