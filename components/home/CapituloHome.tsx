@@ -43,7 +43,7 @@ export function CapituloHome({
         {/* «\n» en el texto = punto aparte. */}
         {titulo.split('\n').map((parte, i) => (
           <span key={i}>
-            {i > 0 ? <br /> : null}
+            {i > 0 ? <span aria-hidden className="home-capitulo-titulo-salto" /> : null}
             {parte}
           </span>
         ))}
