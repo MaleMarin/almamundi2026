@@ -81,8 +81,8 @@ const nextConfig: NextConfig = {
       { source: '/vision/:path*', destination: '/proposito/:path*', permanent: true },
       { source: '/respuestas', destination: '/respuestas-a-almamundi', permanent: true },
       { source: '/respuestas/:path*', destination: '/respuestas-a-almamundi/:path*', permanent: true },
-      { source: '/historias/escrito', destination: '/historias/textos', permanent: true },
-      { source: '/historias/escrito/:path*', destination: '/historias/textos/:path*', permanent: true },
+      { source: '/historias/escrito', destination: '/historias?formato=texto', permanent: true },
+      { source: '/historias/textos', destination: '/historias?formato=texto', permanent: true },
       {
         source: '/mapa',
         destination: '/?section=mapa',
@@ -106,7 +106,6 @@ const nextConfig: NextConfig = {
       { source: '/archivo/', destination: '/historias', permanent: true },
       { source: '/historias/videos', destination: '/historias?formato=video', permanent: true },
       { source: '/historias/audios', destination: '/historias?formato=audio', permanent: true },
-      { source: '/historias/escrito', destination: '/historias?formato=texto', permanent: true },
       { source: '/historias/fotos', destination: '/historias?formato=foto', permanent: true },
       {
         source: '/historias/videos/exhibicion-demo',

@@ -148,7 +148,7 @@ const HISTORIA_MEDIA_FORMAT_CRUMB: Record<string, [string, string]> = {
   audio: ['/historias/audios', 'Audios'],
   video: ['/historias/videos', 'Videos'],
   foto: ['/historias/fotos', 'Fotos'],
-  texto: ['/historias/textos', 'Textos'],
+  texto: ['/historias?formato=texto', 'Textos'],
 };
 
 /**
