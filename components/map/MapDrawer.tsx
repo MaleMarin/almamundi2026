@@ -177,7 +177,7 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
             soundsMode
               ? 'h-auto max-h-full'
               : mode === 'mepregunto'
-                ? /* Preguntas de las personas: media pantalla, para ver arriba el globo con las líneas. */ 'h-[52vh] max-h-[52vh]'
+                ? /* Preguntas de las personas: media pantalla, para ver arriba el globo con las líneas. */ 'h-[62vh] max-h-[62vh]'
                 : fitContent
                 ? 'h-auto max-h-[70vh]'
                 : innerScrollPanel
