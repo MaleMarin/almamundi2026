@@ -10,6 +10,8 @@ import { resolvePublicRejectionText } from '@/lib/editorial/rejection-reasons';
 import { parseAlmaLocale } from '@/lib/i18n/locale';
 
 type Item = {
+  /** Estado de la lista de donde vino (se usa al buscar en todas). */
+  _estado?: 'pending' | 'approved' | 'rejected';
   id: string;
   texto: string;
   alias: string;
@@ -65,18 +67,26 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
     [token]
   );
 
+  const buscando = busqueda.trim().length > 0;
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/me-pregunto?status=${tab}`, { headers: headers(), cache: 'no-store' });
-      const data = (await res.json()) as { items?: Item[] };
-      setItems(Array.isArray(data.items) ? data.items : []);
+      const estados: Array<'pending' | 'approved' | 'rejected'> = buscando ? ['pending', 'approved', 'rejected'] : [tab];
+      const listas = await Promise.all(
+        estados.map(async (estado) => {
+          const res = await fetch(`/api/admin/me-pregunto?status=${estado}`, { headers: headers(), cache: 'no-store' });
+          const data = (await res.json()) as { items?: Item[] };
+          return (Array.isArray(data.items) ? data.items : []).map((item) => ({ ...item, _estado: estado }));
+        })
+      );
+      setItems(listas.flat());
     } catch {
       setItems([]);
     } finally {
       setLoading(false);
     }
-  }, [tab, headers]);
+  }, [tab, headers, buscando]);
 
   useEffect(() => {
     void load();
@@ -140,7 +150,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
       <AdminBuscador
         value={busqueda}
         onChange={setBusqueda}
-        placeholder="Buscar por pregunta, nombre o lugar"
+        placeholder="Buscar en todas las preguntas: texto, nombre o lugar"
         total={items.length}
         encontrados={visibles.length}
       />
@@ -150,7 +160,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
       <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'grid', gap: 12 }}>
         {visibles.map((item) => (
           <li key={item.id} style={{ padding: 20, borderRadius: 16, border: '1px solid rgba(255,255,255,0.12)', background: 'rgba(255,255,255,0.04)' }}>
-            {tab === 'pending' ? (
+            {(item._estado ?? tab) === 'pending' ? (
               <textarea
                 value={draft[item.id] ?? item.texto}
                 onChange={(event) => setDraft((prev) => ({ ...prev, [item.id]: event.target.value }))}
@@ -165,7 +175,7 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
               {item.alias} · {[item.city, item.country].filter(Boolean).join(', ')} · {item.locale.toUpperCase()} · {fecha(item.createdAt)}
               {item.email ? ` · ${item.email}` : ' · sin correo'}
             </p>
-            {tab === 'pending' ? (
+            {(item._estado ?? tab) === 'pending' ? (
               <div style={{ marginBottom: 12 }}>
                 <RejectionReasonFields
                   locale={parseAlmaLocale(item.locale)}
@@ -178,13 +188,13 @@ export default function MePreguntoAdmin({ token }: { token: string }) {
               </div>
             ) : null}
             <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-              <EstadoRevision estado={tab === 'approved' ? 'aprobada' : tab === 'rejected' ? 'rechazada' : 'pendiente'} el={item.approvedAt} />
-              {tab !== 'approved' ? (
+              <EstadoRevision estado={(item._estado ?? tab) === 'approved' ? 'aprobada' : (item._estado ?? tab) === 'rejected' ? 'rechazada' : 'pendiente'} el={item.approvedAt} />
+              {(item._estado ?? tab) !== 'approved' ? (
                 <button type="button" style={btn('ok')} disabled={busy === item.id} onClick={() => void act(item.id, 'approve')}>
                   <Check size={16} /> Publicar
                 </button>
               ) : null}
-              {tab === 'pending' ? (
+              {(item._estado ?? tab) === 'pending' ? (
                 <button type="button" style={btn('neutral')} disabled={busy === item.id} onClick={() => void act(item.id, 'reject', item.locale)}>
                   <X size={16} /> Rechazar
                 </button>

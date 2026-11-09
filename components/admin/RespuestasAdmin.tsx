@@ -125,11 +125,17 @@ export default function RespuestasAdmin({ token }: { token: string }) {
   const [busqueda, setBusqueda] = useState('');
 
   const headers = useCallback((): HeadersInit => ({ Authorization: `Bearer ${token}` }), [token]);
+  /** Al buscar se revisan todas las respuestas, no solo las de la pestaña abierta. */
+  const buscando = busqueda.trim().length > 0;
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const statuses: Status[] = tab === 'archivo' ? ['archived', 'rejected'] : [tab];
+      const statuses: Status[] = buscando
+        ? ['pending', 'approved', 'archived', 'rejected']
+        : tab === 'archivo'
+          ? ['archived', 'rejected']
+          : [tab];
       const lists = await Promise.all(
         statuses.map(async (status) => {
           const res = await fetch(`/api/admin/respuestas?status=${status}`, { headers: headers() });
@@ -146,7 +152,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
     } finally {
       setLoading(false);
     }
-  }, [headers, tab]);
+  }, [headers, tab, buscando]);
 
   useEffect(() => {
     setNotice(null);
@@ -259,7 +265,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
       <AdminBuscador
         value={busqueda}
         onChange={setBusqueda}
-        placeholder="Buscar por nombre, texto, lugar o pregunta"
+        placeholder="Buscar en todas las respuestas: nombre, texto, lugar o pregunta"
         total={items.length}
         encontrados={visibles.length}
       />
