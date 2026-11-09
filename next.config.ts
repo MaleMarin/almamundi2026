@@ -90,6 +90,7 @@ const nextConfig: NextConfig = {
       { source: '/perfil/:path*', destination: '/', permanent: false },
       { source: '/mapa/historias', destination: '/historias', permanent: false },
       { source: '/temas', destination: '/preguntas', permanent: false },
+      { source: '/temas/:path*', destination: '/historias', permanent: false },
       { source: '/vision/:path*', destination: '/proposito/:path*', permanent: true },
       { source: '/respuestas', destination: '/respuestas-a-almamundi', permanent: true },
       { source: '/respuestas/:path*', destination: '/respuestas-a-almamundi/:path*', permanent: true },
