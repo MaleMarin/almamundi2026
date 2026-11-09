@@ -35,6 +35,7 @@ import {
 import { textoPreguntaHilo } from "@/lib/hilos";
 import { preguntaTexto } from "@/lib/pregunta-semana";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
+import { ocultarArchivosPublicados } from "@/lib/published-media-visibility";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -326,6 +327,8 @@ export async function PATCH(
         status: "archived",
         updatedAt: FieldValue.serverTimestamp(),
       });
+      // Archivada: su foto o audio publicado deja de abrir por enlace.
+      await ocultarArchivosPublicados(data).catch(() => 0);
     }
 
     const nextStatus = action === "approve" ? "approved" : action === "reject" ? "rejected" : "archived";

@@ -14,6 +14,7 @@ import { temasGuardados } from "@/lib/temas";
 import { resolvePublicRejectionText } from "@/lib/editorial/rejection-reasons";
 import { parseAlmaLocale } from "@/lib/i18n/locale";
 import { notifyAuthorStoryRejected } from "@/lib/email/notify-author-rejected";
+import { mostrarArchivosPublicados, ocultarArchivosPublicados } from "@/lib/published-media-visibility";
 
 export const runtime = "nodejs";
 
@@ -249,9 +250,11 @@ export async function PATCH(
       updates.rejectionReasonDetail = reason.detail || null;
       rejectionText = reason.publicText;
     }
-    if (action === "approve" && temas) {
-      updates.temas = temas.temas;
-      updates.ejes = temas.ejes;
+    if (action === "approve") {
+      if (temas) {
+        updates.temas = temas.temas;
+        updates.ejes = temas.ejes;
+      }
       updates.publishedAt = FieldValue.serverTimestamp();
       if (!isShortCode(typeof data.shortCode === "string" ? data.shortCode : "")) {
         updates.shortCode = await allocateShortCode(db, "stories");
@@ -267,6 +270,12 @@ export async function PATCH(
     }
 
     await ref.update(updates);
+
+    // Archivada o rechazada: sus archivos publicados dejan de abrir por enlace; al restaurarla vuelven.
+    const visibleAntes = ["approved", "featured", "published", "active"].includes(currentStatus);
+    const visibleAhora = ["approved", "featured", "published", "active"].includes(nextStatus);
+    if (visibleAntes && !visibleAhora) await ocultarArchivosPublicados(data).catch(() => 0);
+    if (!visibleAntes && visibleAhora) await mostrarArchivosPublicados(data).catch(() => 0);
 
     const auditEvent =
       action === "approve"
