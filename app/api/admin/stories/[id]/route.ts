@@ -151,7 +151,8 @@ export async function PATCH(
     return NextResponse.json({ error: "invalid action" }, { status: 400 });
   }
   const temas = action === "approve" || action === "themes" ? temasGuardados(body.temas) : null;
-  if ((action === "approve" || action === "themes") && !temas) {
+  // Los temas ya no se eligen en el admin (Ana, 9 nov 2026): al aprobar son opcionales.
+  if (action === "themes" && !temas) {
     return NextResponse.json({ error: "Elige de 1 a 3 temas" }, { status: 400 });
   }
 

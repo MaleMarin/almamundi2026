@@ -6,7 +6,6 @@ import { AdminBuscador, coincideBusqueda } from '@/components/admin/AdminBuscado
 import { Archive, Check, Trash2, X } from 'lucide-react';
 import { preguntaAdminResumen } from '@/lib/pregunta-semana';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
-import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema } from '@/lib/temas';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
@@ -381,29 +380,6 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                         </div>
                       </div>
                     ) : null}
-                    {item.status === 'pending' || item.status === 'approved' ? (
-                      <TemaSelector
-                        value={chosenTemas(item)}
-                        onChange={(ids) => setThemePick((prev) => ({ ...prev, [item.id]: ids }))}
-                      />
-                    ) : null}
-                    {item.status === 'approved' ? (
-                      <button
-                        type="button"
-                        disabled={busy}
-                        onClick={() => {
-                          const temas = chosenTemas(item);
-                          if (temas.length < 1 || temas.length > 3) {
-                            setNotice('Elige de 1 a 3 temas');
-                            return;
-                          }
-                          void patch(item.id, 'themes', undefined, temas);
-                        }}
-                        style={{ ...neutralBtn, marginTop: 10 }}
-                      >
-                        Guardar temas
-                      </button>
-                    ) : null}
                     {item.status === 'pending' ? (
                       <RejectionReasonFields
                         locale={item.locale ?? 'es'}
@@ -435,12 +411,7 @@ export default function RespuestasAdmin({ token }: { token: string }) {
                         type="button"
                         disabled={busy}
                         onClick={() => {
-                          const temas = chosenTemas(item);
-                          if (temas.length < 1 || temas.length > 3) {
-                            setNotice('Elige de 1 a 3 temas');
-                            return;
-                          }
-                          void patch(item.id, 'approve', placePrompt[item.id], temas);
+                          void patch(item.id, 'approve', placePrompt[item.id]);
                         }}
                         style={okBtn}
                       >

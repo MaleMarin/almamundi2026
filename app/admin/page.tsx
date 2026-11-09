@@ -12,6 +12,8 @@ import { auth } from '@/lib/firebase/client';
 import {
   signInWithEmailAndPassword,
   onAuthStateChanged,
+  setPersistence,
+  browserSessionPersistence,
   type User,
   signOut,
 } from 'firebase/auth';
@@ -43,7 +45,6 @@ import MePreguntoAdmin from '@/components/admin/MePreguntoAdmin';
 import SonderAdmin from '@/components/admin/SonderAdmin';
 import SubirArchivos from '@/components/admin/SubirArchivos';
 import { coincideBusqueda } from '@/components/admin/AdminBuscador';
-import { TemaSelector } from '@/components/admin/TemaSelector';
 import { getTema, TEMAS } from '@/lib/temas';
 import { SenderConsentBlocks, type ConsentInfo, type SenderInfo } from '@/components/admin/SenderConsent';
 import { RejectionReasonFields } from '@/components/admin/RejectionReasonFields';
@@ -440,6 +441,32 @@ function StoryReview({ story }: { story: Story }) {
   );
 }
 
+/** Minutos sin usar el admin antes de cerrar la sesión (Ana, 9 nov 2026). */
+const ADMIN_INACTIVIDAD_MS = 30 * 60 * 1000;
+const ADMIN_SESION_KEY = 'almamundi-admin-sesion';
+
+/** Respaldo si el navegador no deja usar sessionStorage. */
+let sesionEnMemoria = false;
+
+function sesionMarcada(): boolean {
+  if (sesionEnMemoria) return true;
+  try {
+    return sessionStorage.getItem(ADMIN_SESION_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+function marcarSesion(si: boolean) {
+  sesionEnMemoria = si;
+  try {
+    if (si) sessionStorage.setItem(ADMIN_SESION_KEY, '1');
+    else sessionStorage.removeItem(ADMIN_SESION_KEY);
+  } catch {
+    /* sin almacenamiento: la sesión igual se cierra al cerrar el navegador */
+  }
+}
+
 export default function AdminPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
@@ -486,6 +513,11 @@ export default function AdminPage() {
       return;
     }
     const unsub = onAuthStateChanged(auth, async (u) => {
+      // Sesión que quedó guardada de antes (sin la marca de esta pestaña): se cierra y se pide la clave.
+      if (u && !sesionMarcada()) {
+        await signOut(auth!).catch(() => undefined);
+        return;
+      }
       setUser(u);
       if (!u) {
         setIdToken(null);
@@ -518,6 +550,9 @@ export default function AdminPage() {
     }
     setLoginLoading(true);
     try {
+      // La sesión dura solo mientras el navegador esté abierto.
+      await setPersistence(auth, browserSessionPersistence);
+      marcarSesion(true);
       await signInWithEmailAndPassword(auth, email.trim(), password);
     } catch (err: unknown) {
       const msg = err && typeof err === 'object' && 'message' in err ? String((err as { message: string }).message) : 'Error al iniciar sesión';
@@ -527,12 +562,37 @@ export default function AdminPage() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
+    marcarSesion(false);
     if (auth) signOut(auth);
     setUser(null);
     setIdToken(null);
     setIsAdmin(false);
-  };
+  }, []);
+
+  // Se cierra sola después de 30 minutos sin usar el admin.
+  useEffect(() => {
+    if (!isAdmin) return;
+    let ultimo = Date.now();
+    const actividad = () => {
+      ultimo = Date.now();
+    };
+    const revisar = () => {
+      if (Date.now() - ultimo > ADMIN_INACTIVIDAD_MS) {
+        handleLogout();
+        setLoginError('La sesión se cerró por inactividad. Vuelve a entrar.');
+      }
+    };
+    const eventos = ['pointerdown', 'keydown', 'scroll', 'touchstart'] as const;
+    eventos.forEach((e) => window.addEventListener(e, actividad, { passive: true }));
+    document.addEventListener('visibilitychange', revisar);
+    const t = window.setInterval(revisar, 60_000);
+    return () => {
+      eventos.forEach((e) => window.removeEventListener(e, actividad));
+      document.removeEventListener('visibilitychange', revisar);
+      window.clearInterval(t);
+    };
+  }, [isAdmin, handleLogout]);
 
   // Fetch data
   const fetchPending = useCallback(async () => {
@@ -1057,10 +1117,6 @@ export default function AdminPage() {
                     </div>
                   ) : null}
                   <StoryPhotoFichas imagenes={s.imagenes} />
-                  <TemaSelector
-                    value={chosenTemas(s)}
-                    onChange={(ids) => setThemePick((prev) => ({ ...prev, [s.id]: ids }))}
-                  />
                   <RejectionReasonFields
                     locale={s.locale ?? 'es'}
                     reasonId={rejectDraft[s.id]?.reasonId ?? ''}
@@ -1086,12 +1142,7 @@ export default function AdminPage() {
                     type="button"
                     disabled={actionLoading === s.id}
                     onClick={() => {
-                      const temas = chosenTemas(s);
-                      if (temas.length < 1 || temas.length > 3) {
-                        showToast('Elige de 1 a 3 temas');
-                        return;
-                      }
-                      void patchStory(s.id, 'approve', placePrompt[s.id], temas);
+                      void patchStory(s.id, 'approve', placePrompt[s.id]);
                     }}
                     style={{
                       display: 'flex',
@@ -1180,36 +1231,6 @@ export default function AdminPage() {
                       token={idToken}
                     />
                     <StoryPhotoFichas imagenes={s.imagenes} />
-                    <TemaSelector
-                      value={chosenTemas(s)}
-                      onChange={(ids) => setThemePick((prev) => ({ ...prev, [s.id]: ids }))}
-                    />
-                    <button
-                      type="button"
-                      disabled={actionLoading === s.id}
-                      onClick={() => {
-                        const temas = chosenTemas(s);
-                        if (temas.length < 1 || temas.length > 3) {
-                          showToast('Elige de 1 a 3 temas');
-                          return;
-                        }
-                        void patchStory(s.id, 'themes', undefined, temas);
-                      }}
-                      style={{
-                        marginTop: 10,
-                        padding: '8px 14px',
-                        borderRadius: 999,
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        background: 'rgba(255,255,255,0.08)',
-                        color: 'rgba(255,255,255,0.9)',
-                        fontWeight: 600,
-                        fontSize: 13,
-                        cursor: 'pointer',
-                        fontFamily: APP_FONT,
-                      }}
-                    >
-                      Guardar temas
-                    </button>
                     {s.publicationMail?.status === 'sent' ? (
                       <p style={{ fontSize: 12, margin: '6px 0 0', color: '#86efac' }}>
                         Correo enviado a {s.publicationMail.to}

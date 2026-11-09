@@ -227,12 +227,8 @@ export function erroresDeCampos(
   }
   largo(datos.ciudad, 'la ciudad', 1, LIMITES.ciudadMax);
   largo(datos.pais, 'el país', 2, LIMITES.paisMax);
-  if (tipo !== 'pregunta') {
-    if (temasDesconocidos.length) {
-      errores.push(`Temas que no existen en AlmaMundi: ${temasDesconocidos.join(', ')}.`);
-    }
-    if (datos.temas.length < 1 || datos.temas.length > 3) errores.push('Elige de 1 a 3 temas.');
-  }
+  // Los temas ya no se piden en el admin (Ana, 9 nov 2026): si vienen en el archivo se guardan, si no, nada.
+  void temasDesconocidos;
   if (idiomaDesconocido) errores.push(`Idioma no reconocido: «${idiomaDesconocido}». Usa es, pt o en.`);
   return errores;
 }

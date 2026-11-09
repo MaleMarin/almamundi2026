@@ -3,8 +3,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Check, Pencil, RotateCcw, Upload, X } from 'lucide-react';
 import { SITE_FONT_STACK } from '@/lib/typography';
-import { TemaSelector } from '@/components/admin/TemaSelector';
-import { labelTema } from '@/lib/temas';
 import {
   CARGA_MAX_FILAS,
   ETIQUETA_TIPO,
@@ -163,7 +161,6 @@ function Editor({
           </select>
         </div>
       </div>
-      {tipo !== 'pregunta' && <TemaSelector value={d.temas} onChange={(ids) => set('temas', ids)} />}
       <div style={{ display: 'flex', gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
         <button type="button" disabled={ocupado} style={btn('ok', ocupado)} onClick={() => onGuardar(tipo, d)}>
           <Check size={16} /> Guardar cambios
@@ -387,18 +384,17 @@ export default function SubirArchivos({ token }: { token: string }) {
           <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.7)', lineHeight: 1.6, marginTop: 8 }}>
             <p style={{ margin: '0 0 6px' }}>
               Columnas (CSV) o campos (JSON): <b>tipo</b> (historia, respuesta o pregunta), <b>titulo</b>, <b>texto</b>,{' '}
-              <b>pregunta</b>, <b>nombre</b>, <b>ciudad</b>, <b>pais</b>, <b>temas</b> e <b>idioma</b> (es, pt o en; si falta,
+              <b>pregunta</b>, <b>nombre</b>, <b>ciudad</b>, <b>pais</b> e <b>idioma</b> (es, pt o en; si falta,
               es español).
             </p>
             <p style={{ margin: '0 0 6px' }}>
-              Historia: titulo, texto (hasta {LIMITES.historiaMax} caracteres), nombre, ciudad, pais y de 1 a 3 temas.
+              Historia: titulo, texto (hasta {LIMITES.historiaMax} caracteres), nombre, ciudad y pais.
               Respuesta: pregunta (escrita igual que en el sitio), texto (hasta {LIMITES.respuestaMax}), nombre, ciudad,
-              pais y de 1 a 3 temas. Pregunta: texto (de {LIMITES.preguntaMin} a {LIMITES.preguntaMax}), nombre, ciudad y
+              pais. Pregunta: texto (de {LIMITES.preguntaMin} a {LIMITES.preguntaMax}), nombre, ciudad y
               pais.
             </p>
             <p style={{ margin: 0 }}>
-              Los temas se escriben con su nombre, separados por punto y coma (por ejemplo «infancia; familia»). Un JSON
-              puede ser una lista de registros o tener las listas «historias», «respuestas» y «preguntas».
+              Un JSON puede ser una lista de registros o tener las listas «historias», «respuestas» y «preguntas».
             </p>
           </div>
         </details>
@@ -592,7 +588,6 @@ export default function SubirArchivos({ token }: { token: string }) {
               )}
               <p style={{ margin: 0, fontSize: 13, color: 'rgba(255,255,255,0.6)' }}>
                 {[item.datos.alias, [item.datos.ciudad, item.datos.pais].filter(Boolean).join(', ')].filter(Boolean).join(' · ') || '—'}
-                {item.datos.temas.length > 0 && ` · ${item.datos.temas.map((t) => labelTema(t, 'es')).join(', ')}`}
                 {item.datos.idioma !== 'es' && ` · ${item.datos.idioma.toUpperCase()}`}
               </p>
 
