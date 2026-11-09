@@ -3054,3 +3054,9 @@ body .almamundi-footer-title { font-weight: 900 !important; }
     animation: none !important;
   }
 }
+
+/* Hero: «La vida no es solo…» en su propia línea, separada de «AlmaMundi es el lugar…» (Ana, 9 nov 2026). */
+#intro .home-capitulo-titulo strong {
+  display: block;
+  margin-top: clamp(10px, 1.8vh, 22px);
+}
