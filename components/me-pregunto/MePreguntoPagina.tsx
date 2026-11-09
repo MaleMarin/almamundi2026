@@ -29,6 +29,8 @@ export function MePreguntoPagina() {
   const copy = ME_PREGUNTO_MAPA[locale];
   const params = useSearchParams();
   const pedida = params.get('p');
+  /** Respuesta compartida (?r=id): se muestra primero. */
+  const compartida = params.get('r');
   const responder = params.get('responder') === '1';
   const [preguntas, setPreguntas] = useState<MePreguntaPublica[] | null>(null);
   const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
@@ -81,7 +83,7 @@ export function MePreguntoPagina() {
           <TextoVacio locale={locale} />
         ) : (
           <GrillaTarjetas>
-            {lista.map((item) => (
+            {[...lista].sort((a, b) => Number(b.id === compartida) - Number(a.id === compartida)).map((item) => (
               <TarjetaRespuesta key={item.id} item={item} locale={locale} />
             ))}
           </GrillaTarjetas>

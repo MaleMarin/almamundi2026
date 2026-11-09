@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getAdminDb } from "@/lib/firebase/admin";
 import { normalizarEdicion, TIPOS_CARGA, type TipoCarga } from "@/lib/cargas/shared";
-import { cargarContexto, cargasRef, itemDesdeDoc, publicarItem, revisarItems } from "@/lib/cargas/server";
+import { buscarPublicado, cargarContexto, cargasRef, itemDesdeDoc, publicarItem, revisarItems } from "@/lib/cargas/server";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -66,6 +66,13 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       if (item.estado !== desde && !trabada) {
         return NextResponse.json({ error: "Este registro cambió. Actualiza la lista." }, { status: 409 });
       }
+      if (trabada) {
+        const ya = await buscarPublicado(db, item);
+        if (ya) {
+          await ref.update({ estado: "publicado", error: null, publicadoEn: ya, publicadoAt: Date.now(), updatedAt: Date.now() });
+          return NextResponse.json({ ok: true, publicadoEn: ya });
+        }
+      }
       await ref.update({ estado: accion === "descartar" ? "descartado" : "revision", updatedAt: Date.now() });
       return NextResponse.json({ ok: true });
     }
@@ -73,6 +80,11 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     // aprobar: se revisa otra vez con los datos actuales del sitio.
     if (item.estado !== "revision") {
       return NextResponse.json({ error: "Este registro ya no está por revisar." }, { status: 409 });
+    }
+    const yaPublicado = await buscarPublicado(db, item);
+    if (yaPublicado) {
+      await ref.update({ estado: "publicado", error: null, publicadoEn: yaPublicado, publicadoAt: Date.now(), updatedAt: Date.now() });
+      return NextResponse.json({ ok: true, publicadoEn: yaPublicado });
     }
     const ctx = await cargarContexto(db);
     const otros = await cargasRef(db).where("estado", "==", "revision").get();
@@ -116,10 +128,14 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     return NextResponse.json({ ok: true, publicadoEn: { coleccion: resultado.coleccion, id: resultado.id } });
   } catch (e) {
     console.error("[admin/cargas PATCH]", e instanceof Error ? e.message : "update");
-    // Si quedó tomado, se libera para poder reintentar.
+    // Si quedó tomado: si ya llegó al sitio se marca publicado; si no, se libera para reintentar.
     await ref
       .get()
-      .then((s) => (s.get("estado") === "publicando" ? ref.update({ estado: "revision" }) : undefined))
+      .then(async (s) => {
+        if (s.get("estado") !== "publicando") return;
+        const ya = await buscarPublicado(db, itemDesdeDoc(s.id, s.data() ?? {}));
+        await ref.update(ya ? { estado: "publicado", error: null, publicadoEn: ya, publicadoAt: Date.now() } : { estado: "revision" });
+      })
       .catch(() => undefined);
     return NextResponse.json({ error: "No se pudo completar la acción." }, { status: 500 });
   }

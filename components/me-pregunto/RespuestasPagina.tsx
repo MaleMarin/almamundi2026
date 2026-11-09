@@ -27,7 +27,10 @@ import type { RespuestaPublica } from '@/lib/respuestas/public';
 export function RespuestasPagina() {
   const { locale } = useHomeLocale();
   const copy = ME_PREGUNTO_MAPA[locale];
-  const pregunta = preguntaHiloPorId(useSearchParams().get('p'));
+  const params = useSearchParams();
+  const pregunta = preguntaHiloPorId(params.get('p'));
+  /** Respuesta compartida (?r=id): se muestra primero. */
+  const compartida = params.get('r');
   const tema = hiloPorId(pregunta?.hiloId ?? null);
   const [todas, setTodas] = useState<RespuestaPublica[] | null>(null);
 
@@ -51,7 +54,9 @@ export function RespuestasPagina() {
   }, [todas]);
 
   if (pregunta) {
-    const lista = porPregunta.get(pregunta.id) ?? [];
+    const lista = [...(porPregunta.get(pregunta.id) ?? [])].sort(
+      (a, b) => Number(b.id === compartida) - Number(a.id === compartida)
+    );
     return (
       <PaginaInterna>
         <EncabezadoInterno

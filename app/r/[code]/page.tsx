@@ -30,7 +30,7 @@ export default async function RespuestaCortaPage({ params }: PageProps) {
   const respuesta = await getRespuestaByShortCode(code);
   if (!respuesta) notFound();
   const locale = await requestLocale();
-  const q = encodeURIComponent(respuesta.questionId);
+  const q = `${encodeURIComponent(respuesta.questionId)}&r=${encodeURIComponent(respuesta.id)}`;
   return (
     <ShortLinkRedirect
       locale={locale}

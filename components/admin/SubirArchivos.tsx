@@ -27,6 +27,7 @@ type Item = {
   updatedAt: number;
   errores: string[];
   duplicado: string | null;
+  aviso?: string | null;
   preguntaVinculada: string | null;
   publicadoEn?: { coleccion: string; id: string } | null;
   error?: string | null;
@@ -595,7 +596,7 @@ export default function SubirArchivos({ token }: { token: string }) {
                 {item.datos.idioma !== 'es' && ` · ${item.datos.idioma.toUpperCase()}`}
               </p>
 
-              {item.estado === 'revision' && (item.errores.length > 0 || item.duplicado || item.error) && (
+              {item.estado === 'revision' && (item.errores.length > 0 || item.duplicado || item.aviso || item.error) && (
                 <ul style={{ margin: '10px 0 0', paddingLeft: 18, fontSize: 13, lineHeight: 1.5 }}>
                   {item.errores.map((e) => (
                     <li key={e} style={{ color: '#fca5a5' }}>
@@ -603,6 +604,7 @@ export default function SubirArchivos({ token }: { token: string }) {
                     </li>
                   ))}
                   {item.duplicado && <li style={{ color: '#fcd34d' }}>{item.duplicado}</li>}
+                  {item.aviso && <li style={{ color: '#93c5fd' }}>{item.aviso}</li>}
                   {item.error && !item.errores.length && (
                     <li style={{ color: '#fca5a5' }}>Último intento: {item.error}</li>
                   )}

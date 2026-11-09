@@ -48,6 +48,8 @@ export type ItemCarga = {
 export type ItemRevisado = ItemCarga & {
   errores: string[];
   duplicado: string | null;
+  /** Aviso que no bloquea: misma persona (nombre y lugar) que otro contenido. Ana decide. */
+  aviso: string | null;
   /** Texto de la pregunta vinculada (respuestas). */
   preguntaVinculada: string | null;
 };
@@ -63,7 +65,15 @@ export type Contexto = {
   mePreguntas: Map<string, { id: string; texto: string; alias: string; city: string; country: string }>;
   mePreguntasPorTexto: Map<string, string>;
   huellasSitio: Set<string>;
+  /** Nombre y lugar de quienes ya tienen contenido publicado o pendiente, con su tipo. */
+  personasSitio: Map<string, string>;
 };
+
+/** Misma persona: nombre, ciudad y país, sin tildes ni mayúsculas. */
+function clavePersona(alias: string, ciudad: string, pais: string): string {
+  const n = (v: string) => normalizarTexto(v);
+  return alias.trim() ? `${n(alias)}|${n(ciudad)}|${n(pais)}` : "";
+}
 
 function txt(value: unknown): string {
   return typeof value === "string" ? value : "";
@@ -115,15 +125,21 @@ export async function cargarContexto(db: Firestore): Promise<Contexto> {
   }
   const [preguntas, historias, envios, respuestas] = await Promise.all([
     db.collection(ME_PREGUNTAS_COLLECTION).select("texto", "status", "alias", "city", "country").get(),
-    db.collection("stories").select("text").get(),
-    db.collection("submissions").where("status", "==", "pending").select("payload").get(),
-    db.collection(RESPUESTAS_COLLECTION).select("questionId", "contenido", "status").get(),
+    db.collection("stories").select("text", "authorName", "city", "country", "status").get(),
+    db.collection("submissions").where("status", "==", "pending").select("payload", "alias", "placeLabel", "countryLabel").get(),
+    db.collection(RESPUESTAS_COLLECTION).select("questionId", "contenido", "status", "alias", "city", "country").get(),
   ]);
   const mePreguntas: Contexto["mePreguntas"] = new Map();
   const mePreguntasPorTexto = new Map<string, string>();
   const huellasSitio = new Set<string>();
+  const personasSitio = new Map<string, string>();
+  const persona = (alias: unknown, ciudad: unknown, pais: unknown, tipo: string) => {
+    const k = clavePersona(txt(alias), txt(ciudad), txt(pais));
+    if (k && !personasSitio.has(k)) personasSitio.set(k, tipo);
+  };
   for (const doc of preguntas.docs) {
     const d = doc.data();
+    if (d.status !== "rejected") persona(d.alias, d.city, d.country, "una pregunta");
     const texto = txt(d.texto);
     if (d.status !== "rejected") huellasSitio.add(huellaContenido("pregunta", texto));
     if (d.status !== "approved") continue;
@@ -133,17 +149,22 @@ export async function cargarContexto(db: Firestore): Promise<Contexto> {
     mePreguntasPorTexto.set(normalizarTexto(texto), id);
   }
   for (const key of banco.keys()) huellasSitio.add(`pregunta|${key}`);
-  for (const doc of historias.docs) huellasSitio.add(huellaContenido("historia", txt(doc.get("text"))));
+  for (const doc of historias.docs) {
+    huellasSitio.add(huellaContenido("historia", txt(doc.get("text"))));
+    if (doc.get("status") !== "rejected") persona(doc.get("authorName"), doc.get("city"), doc.get("country"), "una historia");
+  }
   for (const doc of envios.docs) {
     const payload = doc.get("payload") as { textBody?: unknown } | undefined;
     huellasSitio.add(huellaContenido("historia", txt(payload?.textBody)));
+    persona(doc.get("alias"), doc.get("placeLabel"), doc.get("countryLabel"), "una historia pendiente");
   }
   for (const doc of respuestas.docs) {
     if (doc.get("status") === "rejected") continue;
     huellasSitio.add(huellaContenido("respuesta", txt(doc.get("contenido")), txt(doc.get("questionId"))));
+    persona(doc.get("alias"), doc.get("city"), doc.get("country"), "una respuesta");
   }
   huellasSitio.delete("");
-  return { banco, mePreguntas, mePreguntasPorTexto, huellasSitio };
+  return { banco, mePreguntas, mePreguntasPorTexto, huellasSitio, personasSitio };
 }
 
 /** La pregunta de una respuesta: por identificador o por su texto, igual que el formulario del sitio. */
@@ -181,15 +202,18 @@ export function revisarItems(items: ItemCarga[], ctx: Contexto, enRevision: Item
     }
   }
   const primeraPorHuella = new Map<string, ItemCarga>();
+  const primeraPorPersona = new Map<string, ItemCarga>();
   const ordenados = [...enRevision].sort((a, b) => a.createdAt - b.createdAt || a.fila - b.fila);
   for (const it of ordenados) {
     if (it.estado !== "revision") continue;
     const h = huellaItem(it, ctx);
     if (h && !primeraPorHuella.has(h)) primeraPorHuella.set(h, it);
+    const kp = clavePersona(it.datos.alias, it.datos.ciudad, it.datos.pais);
+    if (kp && !primeraPorPersona.has(kp)) primeraPorPersona.set(kp, it);
   }
   return items.map((item) => {
     if (item.estado !== "revision") {
-      return { ...item, errores: [], duplicado: null, preguntaVinculada: null };
+      return { ...item, errores: [], duplicado: null, aviso: null, preguntaVinculada: null };
     }
     const errores = erroresDeCampos(item.tipo, item.datos, item.temasDesconocidos, item.idiomaDesconocido);
     let preguntaVinculada: string | null = null;
@@ -212,11 +236,40 @@ export function revisarItems(items: ItemCarga[], ctx: Contexto, enRevision: Item
         duplicado = `Repetida: es igual a la fila ${primera.fila} de «${primera.archivo}».`;
       }
     }
-    return { ...item, errores, duplicado, preguntaVinculada };
+    let aviso: string | null = null;
+    const kp = clavePersona(item.datos.alias, item.datos.ciudad, item.datos.pais);
+    if (kp && !duplicado) {
+      const enSitio = ctx.personasSitio.get(kp);
+      const otra = primeraPorPersona.get(kp);
+      if (enSitio) aviso = `${item.datos.alias} (${item.datos.ciudad}) ya tiene ${enSitio} en AlmaMundi. Revisa si es la misma persona.`;
+      else if (otra && otra.id !== item.id) aviso = `Mismo nombre y lugar que la fila ${otra.fila} de «${otra.archivo}». Revisa si es la misma persona.`;
+    }
+    return { ...item, errores, duplicado, aviso, preguntaVinculada };
   });
 }
 
 /* ───────────── Publicación ───────────── */
+
+/**
+ * ¿Este registro ya llegó al sitio? Sirve si una publicación terminó pero no alcanzó a anotarse
+ * (corte de red o del servidor): así no queda como pendiente ni se publica dos veces.
+ */
+export async function buscarPublicado(
+  db: Firestore,
+  item: ItemCarga
+): Promise<{ coleccion: string; id: string } | null> {
+  const porOrigen = (coleccion: string) =>
+    db.collection(coleccion).where("origenCarga.itemId", "==", item.id).limit(1).get();
+  if (item.tipo === "historia") {
+    const snap = await porOrigen("submissions");
+    const storyId = snap.empty ? "" : txt(snap.docs[0].get("publishedStoryId"));
+    return storyId ? { coleccion: "stories", id: storyId } : null;
+  }
+  const coleccion = item.tipo === "respuesta" ? RESPUESTAS_COLLECTION : ME_PREGUNTAS_COLLECTION;
+  const snap = await porOrigen(coleccion);
+  if (snap.empty || snap.docs[0].get("status") !== "approved") return null;
+  return { coleccion, id: snap.docs[0].id };
+}
 
 type Resultado = { ok: true; coleccion: string; id: string } | { ok: false; error: string };
 

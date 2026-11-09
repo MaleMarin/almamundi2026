@@ -35,6 +35,7 @@ export async function GET(request: NextRequest) {
       mePreguntas: new Map(),
       mePreguntasPorTexto: new Map(),
       huellasSitio: new Set(),
+      personasSitio: new Map(),
     });
     return NextResponse.json({
       items: revisados,
