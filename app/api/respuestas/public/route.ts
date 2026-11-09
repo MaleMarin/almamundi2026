@@ -1,3 +1,4 @@
+import { comillasTipograficas } from "@/lib/comillas";
 import "server-only";
 import { anioDe } from "@/lib/anio-publico";
 import { NextRequest, NextResponse } from "next/server";
@@ -40,7 +41,7 @@ function filaPublica(
     questionId,
     mode: itemMode,
     kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
-    contenido: typeof data.contenido === "string" ? data.contenido : "",
+    contenido: typeof data.contenido === "string" ? comillasTipograficas(data.contenido) : "",
     alias: typeof data.alias === "string" ? data.alias : "",
     city: typeof data.city === "string" ? data.city : "",
     country: typeof data.country === "string" ? data.country : "",
@@ -49,7 +50,7 @@ function filaPublica(
     lng,
     ...(typeof data.questionText === "string" && data.questionText
       ? {
-          questionText: data.questionText,
+          questionText: comillasTipograficas(data.questionText),
           askerAlias: typeof data.askerAlias === "string" ? data.askerAlias : "",
           askerCity: typeof data.askerCity === "string" ? data.askerCity : "",
           askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",

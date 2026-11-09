@@ -1,3 +1,4 @@
+import { comillasTipograficas } from "@/lib/comillas";
 import "server-only";
 import { anioDe } from "@/lib/anio-publico";
 import { getAdminDb } from "@/lib/firebase/admin";
@@ -79,7 +80,7 @@ export async function getRespuestaPublicById(id: string): Promise<RespuestaPubli
       questionId,
       mode: data.mode === "alguien" ? "alguien" : "tu",
       kind: data.kind === "voz" || data.kind === "foto" ? data.kind : "texto",
-      contenido: typeof data.contenido === "string" ? data.contenido : "",
+      contenido: typeof data.contenido === "string" ? comillasTipograficas(data.contenido) : "",
       alias: typeof data.alias === "string" ? data.alias : "",
       city: typeof data.city === "string" ? data.city : "",
       country: typeof data.country === "string" ? data.country : "",
@@ -88,7 +89,7 @@ export async function getRespuestaPublicById(id: string): Promise<RespuestaPubli
       lng,
       ...(typeof data.questionText === "string" && data.questionText
         ? {
-            questionText: data.questionText,
+            questionText: comillasTipograficas(data.questionText),
             askerAlias: typeof data.askerAlias === "string" ? data.askerAlias : "",
             askerCity: typeof data.askerCity === "string" ? data.askerCity : "",
             askerCountry: typeof data.askerCountry === "string" ? data.askerCountry : "",

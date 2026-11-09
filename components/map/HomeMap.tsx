@@ -128,6 +128,7 @@ function respuestaAsStory(item: RespuestaPublica, locale: keyof typeof RESPUESTA
     questionMode: item.mode,
     subtitle: tema && question ? `${tema} · ${question}` : question || tema,
     format: RESPUESTA_KIND[locale][item.kind],
+    ...(item.anio ? { publishedAt: `${item.anio}-07-01T12:00:00Z` } : {}),
   };
   if (item.kind === 'texto') {
     story.body = item.contenido;
