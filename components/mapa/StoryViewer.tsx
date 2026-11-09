@@ -662,7 +662,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 {alias ? (
                 <p
                   style={{
-                    fontSize: 'var(--fs-etiqueta)',
+                    fontSize: 'var(--fs-pequeno)',
                     color: compact ? tinta : 'rgba(255,255,255,0.72)',
                     fontWeight: compact ? 600 : undefined,
                     margin: 0,
@@ -674,7 +674,7 @@ export function StoryViewer({ story, onClose, isClosing, onSelectRelated, varian
                 {place ? (
                 <p
                   style={{
-                    fontSize: 'var(--fs-etiqueta)',
+                    fontSize: 'var(--fs-pequeno)',
                     color: tintaSuave,
                     margin: '2px 0 0',
                     fontFamily: SITE_FONT_STACK }}

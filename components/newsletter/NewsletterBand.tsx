@@ -78,7 +78,7 @@ export function NewsletterBand() {
       <div className="mx-auto w-full max-w-[min(100%,1080px)] rounded-[20px] border border-[#8A847C]/25 bg-[#FBFAF8] px-5 py-4 md:px-7 md:py-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between lg:gap-10">
           <div className="min-w-0 lg:max-w-[36rem]">
-            <p className="m-0 text-[12px] font-semibold uppercase tracking-[0.14em] text-[#B8340F]">{copy.eyebrow}</p>
+            <p className="m-0 text-[13px] font-semibold uppercase tracking-[0.14em] text-[#B8340F]">{copy.eyebrow}</p>
             <h2
               id="newsletter-band-title"
               className="mt-1 text-[18px] font-semibold leading-snug text-[#4A5568]"

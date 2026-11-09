@@ -18,8 +18,8 @@
   --fs-titular: clamp(1.75rem, 1.15rem + 1.6vw, 2.5rem);
   --fs-subtitulo: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
   --fs-texto: clamp(1rem, 0.96rem + 0.15vw, 1.0625rem);
-  --fs-pequeno: clamp(0.9375rem, 0.9375rem, 0.9375rem);
-  --fs-etiqueta: clamp(0.75rem, 0.75rem, 0.75rem);
+  --fs-pequeno: clamp(0.9375rem, 0.9rem + 0.2vw, 1.0625rem);
+  --fs-etiqueta: clamp(0.875rem, 0.85rem + 0.1vw, 0.9375rem);
   /* Alto del menú superior en escritorio. El celular conserva el suyo. */
   --header-h: 88px;
 }
@@ -1683,7 +1683,7 @@ a.cinta-pill {
 .cortina-ceja {
   margin: 0;
   color: #b8340f;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -1806,7 +1806,7 @@ a.cinta-pill {
 .home-capitulo-ceja {
   margin: 0;
   color: #b8340f;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;

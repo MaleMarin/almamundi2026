@@ -232,7 +232,7 @@ export function CintaTema({
           className="cinta-tela-img"
         />
       </span>
-      <span className="mt-2 text-[12px] font-semibold leading-tight text-[#4A5568] md:text-[13px]">{nombre}</span>
+      <span className="mt-2 text-[14px] font-semibold leading-tight text-[#4A5568] md:text-[15px]">{nombre}</span>
     </>
   );
 
