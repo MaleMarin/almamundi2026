@@ -242,7 +242,7 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
   const mobileNavSheetClass =
     scope === 'historias-interior' && overImmersiveMedia
       ? 'absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/30 bg-[var(--home-bg)] px-4 py-3 shadow-md md:hidden'
-      : 'absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[color-mix(in_srgb,var(--home-bg)_96%,transparent)] px-4 py-3 shadow-sm backdrop-blur-lg md:hidden';
+      : 'absolute left-0 right-0 top-full z-[102] flex flex-col gap-2 border-b border-white/25 bg-[var(--home-bg)] px-4 py-3 shadow-sm md:hidden';
 
   return (
     <header className={`${headerLayoutClass} ${zLayer}`}>
