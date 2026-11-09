@@ -83,6 +83,7 @@ function StoryRow({
       type="button"
       onClick={onClick}
       style={{
+        textShadow: '0 1px 2px rgba(0,0,0,0.45)',
         textAlign: 'left',
         padding: '15px 16px',
         background: 'transparent',
@@ -95,7 +96,7 @@ function StoryRow({
       <p style={{
         fontSize: 'var(--fs-pequeno)',
         fontWeight: isActive ? 600 : 400,
-        color: isActive ? 'rgba(255,255,255,0.96)' : 'rgba(255,255,255,0.80)',
+        color: isActive ? 'rgba(255,255,255,0.98)' : 'rgba(255,255,255,0.95)',
         margin: '0 0 4px',
         lineHeight: 1.35,
         overflow: 'hidden',
@@ -106,7 +107,7 @@ function StoryRow({
       {line ? (
         <p style={{
           fontSize: 'var(--fs-etiqueta)',
-          color: 'rgba(255,255,255,0.62)',
+          color: 'rgba(255,255,255,0.88)',
           margin: '0 0 4px',
           lineHeight: 1.35,
           overflow: 'hidden',
@@ -116,10 +117,10 @@ function StoryRow({
         </p>
       ) : null}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 4 }}>
-        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.35)' }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.85)' }}>
           {formatPublicPlace(story.city, story.country, locale)}
         </span>
-        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.45)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+        <span style={{ fontSize: 'var(--fs-etiqueta)', color: 'rgba(255,255,255,0.85)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
           {tipo}
           {ago ? ` · ${ago}` : ''}
         </span>

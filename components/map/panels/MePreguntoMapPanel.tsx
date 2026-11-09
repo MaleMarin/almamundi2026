@@ -110,7 +110,7 @@ export function MePreguntoMapPanel({
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 12, fontFamily: SITE_FONT_STACK }}>
-      <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-white/75">{copy.intro}</p>
+      <p className="m-0 text-[length:var(--fs-etiqueta)] leading-snug text-white/90">{copy.intro}</p>
       {abrirId || (grupos.length === 0 && !query.trim()) ? null : (
       <label className="flex items-center gap-2 rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
         <Search size={16} className="text-[#FF6E49]" aria-hidden />
@@ -158,7 +158,7 @@ export function MePreguntoMapPanel({
               >
                 <span className="min-w-0 flex-1">
                   <span className="block text-[length:var(--fs-pequeno)] font-semibold leading-snug">{pregunta.texto}</span>
-                  <span className="mt-1 block text-[length:var(--fs-etiqueta)] text-white/65">
+                  <span className="mt-1 block text-[length:var(--fs-etiqueta)] text-white/85">
                     {ui.loPregunta(preguntaAlias(pregunta.alias), lugar)} · {copy.cuantas(lista.length)}
                   </span>
                 </span>
@@ -178,7 +178,7 @@ export function MePreguntoMapPanel({
                         <span className="block text-[length:var(--fs-etiqueta)] font-semibold">
                           {[preguntaAlias(item.alias), conAnio(formatPublicPlace(item.city, item.country, locale), item.anio)].filter(Boolean).join(' · ')}
                         </span>
-                        <span className="mt-1 line-clamp-2 block text-[length:var(--fs-etiqueta)] text-white/75">
+                        <span className="mt-1 line-clamp-2 block text-[length:var(--fs-etiqueta)] text-white/90">
                           {item.kind === 'texto' ? item.contenido : item.kind === 'voz' ? copy.voz : item.contenido || copy.foto}
                         </span>
                       </button>

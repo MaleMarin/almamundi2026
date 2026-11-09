@@ -75,6 +75,18 @@ export function MapDrawer({ open, mode, onClose, children, isMobile, fitContent 
     }
   }, [open]);
 
+  // Celular: la hoja se abre al pie del globo; si la persona está mirando el menú, se lleva la hoja a la vista.
+  useEffect(() => {
+    if (!open || !isMobile) return;
+    const t = window.setTimeout(() => {
+      const r = dialogRef.current?.getBoundingClientRect();
+      if (!r) return;
+      const falta = r.bottom - window.innerHeight;
+      if (falta > 8 || r.top > window.innerHeight * 0.6) window.scrollBy({ top: falta + 8, behavior: 'smooth' });
+    }, 120);
+    return () => window.clearTimeout(t);
+  }, [open, mode, isMobile]);
+
   useEffect(() => {
     if (!open) return;
     const root = dialogRef.current;
