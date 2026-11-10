@@ -52,7 +52,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Tu historia no se pierde en el scroll',
         parrafos: [
           'Cada día compartimos imágenes, pensamientos y momentos en internet. Muchos quedan atrás rápidamente, desplazados por nuevas publicaciones.',
-          'AlmaMundi propone algo diferente: un espacio donde las historias de las personas se reúnen y organizan para que otras puedan encontrarlas, conocerlas y volver a ellas. Organizamos las historias para que las personas puedan encontrarlas y volver a ellas.',
+          'AlmaMundi propone algo diferente: un espacio donde las historias de las personas se reúnen y organizan para que otras puedan encontrarlas, conocerlas y volver a ellas.',
           'Aquí las historias valen por lo que cuentan, sin rankings de popularidad ni competencias por sumar reacciones.',
           'Nos interesa lo que las personas tienen para contar.',
           '**Tu historia no se pierde en el scroll.**',
@@ -158,7 +158,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Sua história não se perde no scroll',
         parrafos: [
           'Todos os dias compartilhamos imagens, pensamentos e momentos na internet. Muitos ficam para trás rapidamente, empurrados por novas publicações.',
-          'O AlmaMundi propõe algo diferente: um espaço onde as histórias das pessoas se reúnem e se organizam para que outras possam encontrá-las, conhecê-las e voltar a elas. Organizamos as histórias para que as pessoas possam encontrá-las e voltar a elas.',
+          'O AlmaMundi propõe algo diferente: um espaço onde as histórias das pessoas se reúnem e se organizam para que outras possam encontrá-las, conhecê-las e voltar a elas.',
           'Aqui as histórias valem pelo que contam, sem rankings de popularidade nem disputas por mais reações.',
           'O que nos interessa é o que as pessoas têm para contar.',
           '**Sua história não se perde no scroll.**',
@@ -264,7 +264,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Your story doesn’t get lost in the scroll',
         parrafos: [
           'Every day we share images, thoughts, and moments online. Many are quickly left behind, pushed aside by new posts.',
-          'AlmaMundi offers something different: a space where people’s stories are gathered and organized so others can find them, get to know them, and come back to them. We organize stories so people can find them and come back to them.',
+          'AlmaMundi offers something different: a space where people’s stories are gathered and organized so others can find them, get to know them, and come back to them.',
           'Here, stories matter for what they tell, with no popularity rankings and no race for more reactions.',
           'What interests us is what people have to tell.',
           '**Your story doesn’t get lost in the scroll.**',
