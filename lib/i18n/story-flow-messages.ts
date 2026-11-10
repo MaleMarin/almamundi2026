@@ -21,6 +21,7 @@ export type StoryFlowMessages = {
   modalChooseAudio: string;
   modalPasteLink: string;
   modalRecordOrChooseVideo: string;
+  modalRecordVideoPhone: string;
   modalTurnOnCamera: string;
   modalUploadVideoLink: string;
   modalUploadAudioLink: string;
@@ -168,6 +169,7 @@ const es: StoryFlowMessages = {
   modalChooseAudio: 'Elige un audio',
   modalPasteLink: 'o pega un enlace',
   modalRecordOrChooseVideo: 'Grabar o elegir video',
+  modalRecordVideoPhone: 'Grabar video',
   modalTurnOnCamera: 'Encender cámara',
   modalUploadVideoLink: 'o sube un video',
   modalUploadAudioLink: 'o sube un audio',
@@ -330,6 +332,7 @@ const pt: StoryFlowMessages = {
   modalChooseAudio: 'Escolha um áudio',
   modalPasteLink: 'ou cole um link',
   modalRecordOrChooseVideo: 'Gravar ou escolher vídeo',
+  modalRecordVideoPhone: 'Gravar vídeo',
   modalTurnOnCamera: 'Ligar câmera',
   modalUploadVideoLink: 'ou envie um vídeo',
   modalUploadAudioLink: 'ou envie um áudio',
@@ -494,6 +497,7 @@ const en: StoryFlowMessages = {
   modalChooseAudio: 'Choose audio',
   modalPasteLink: 'or paste a link',
   modalRecordOrChooseVideo: 'Record or choose a video',
+  modalRecordVideoPhone: 'Record a video',
   modalTurnOnCamera: 'Turn on camera',
   modalUploadVideoLink: 'or upload a video',
   modalUploadAudioLink: 'or upload audio',

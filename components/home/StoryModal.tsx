@@ -392,6 +392,7 @@ export function StoryModal({
   const chunksRef = useRef<BlobPart[]>([]);
   const videoLiveRef = useRef<HTMLVideoElement>(null);
   const videoFileRef = useRef<HTMLInputElement>(null);
+  const videoCaptureRef = useRef<HTMLInputElement>(null);
   const audioFileRef = useRef<HTMLInputElement>(null);
   const videoUrlRef = useRef<HTMLInputElement>(null);
   const fileProbeRef = useRef(0);
@@ -2159,18 +2160,23 @@ export function StoryModal({
                 <button
                   type="button"
                   className="btn-am-principal inline-flex min-h-11 w-full items-center justify-center px-5 py-3"
-                  onClick={() => videoFileRef.current?.click()}
+                  onClick={() => videoCaptureRef.current?.click()}
                 >
-                  {t.modalRecordOrChooseVideo}
+                  {t.modalRecordVideoPhone}
                 </button>
-                <button
-                  type="button"
-                  className={textLinkClass}
-                  aria-expanded={videoLinkOpen}
-                  onClick={openVideoLink}
-                >
-                  {t.modalPasteLink}
-                </button>
+                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+                  <button type="button" className={textLinkClass} onClick={() => videoFileRef.current?.click()}>
+                    {t.modalUploadVideoLink}
+                  </button>
+                  <button
+                    type="button"
+                    className={textLinkClass}
+                    aria-expanded={videoLinkOpen}
+                    onClick={openVideoLink}
+                  >
+                    {t.modalPasteLink}
+                  </button>
+                </div>
               </>
             ) : (
               <>
@@ -2277,6 +2283,24 @@ export function StoryModal({
                 ) : null}
               </div>
             ) : null}
+            <input
+              ref={videoCaptureRef}
+              id="story-video-capture"
+              type="file"
+              accept="video/*"
+              capture="user"
+              tabIndex={-1}
+              aria-label={t.modalRecordVideoPhone}
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                e.target.value = '';
+                if (!f) return;
+                discardRecording();
+                setShowVideoLink(false);
+                acceptUploadFile('video', f);
+              }}
+              className="sr-only"
+            />
             <input
               ref={videoFileRef}
               id="story-video-file"
