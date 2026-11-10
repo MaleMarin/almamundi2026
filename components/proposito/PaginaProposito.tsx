@@ -222,17 +222,6 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           </h2>
           <p style={P}>{c.cierreTexto}</p>
           <p style={{ ...P, fontStyle: 'italic', color: ORANGE }}>{c.cierreLema}</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.75rem', marginTop: '1.5rem' }}>
-            <HomeHardLink href="/#historias" className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 py-3">
-              {c.botones.contar}
-            </HomeHardLink>
-            <HomeHardLink href="/#cintas" className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3">
-              {c.botones.inspirate}
-            </HomeHardLink>
-            <Link href="/historias" className="btn-am-secundario inline-flex min-h-11 items-center justify-center px-6 py-3">
-              {c.botones.descubre}
-            </Link>
-          </div>
         </section>
       </article>
     </main>
