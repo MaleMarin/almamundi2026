@@ -212,12 +212,12 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           </section>
         ))}
 
-        {/* Cierre: la misma frase de la hero, con su mismo estilo. */}
-        <section className="proposito-cierre" style={{ marginTop: '3.5rem', paddingTop: '2.5rem', borderTop: '1px solid rgba(60,70,85,0.15)' }}>
-          <CapituloHome ceja="" titulo={hero.heroBeforeBold} tituloFuerte={`${hero.heroBold},`} cita={hero.citaCuenta} />
-        </section>
-        <style>{'.proposito-cierre .home-capitulo-ceja{display:none}.almamundi-footer{padding-top:2.5rem!important}'}</style>
       </article>
+      {/* Cierre: la misma frase de la hero, con su mismo ancho y estilo (reglas de #intro en globals.css). */}
+      <section className="proposito-cierre home-intro-avenir" style={{ margin: '3.5rem -1rem 0', padding: '2.5rem 0 0' }}>
+        <CapituloHome ceja={hero.cejaCuenta} titulo={hero.heroBeforeBold} tituloFuerte={`${hero.heroBold},`} cita={hero.citaCuenta} />
+      </section>
+      <style>{'.proposito-cierre .home-capitulo{display:flex;flex-direction:column;align-items:center;width:100%;max-width:100%;margin-inline:auto;text-align:center}.proposito-cierre .home-capitulo-ceja,.proposito-cierre .home-capitulo-cita{width:fit-content;max-width:100%;margin-inline:auto;text-align:center}.proposito-cierre .home-capitulo-titulo{width:100%;max-width:100%;margin-inline:auto;text-align:center;text-wrap:balance}@media (min-width:768px) and (min-height:600px){.proposito-cierre .home-capitulo-titulo{margin-top:14px;max-width:34em;font-size:clamp(22px,1.5vw + 0.8vh,34px);line-height:1.32}.proposito-cierre .home-capitulo-cita{font-size:clamp(28px,1.4vw + 1.2vh,38px);line-height:1.15}}.proposito-cierre .home-capitulo-cita{margin-top:4px}.proposito-cierre .home-capitulo-titulo-salto{height:clamp(10px,1.8vh,22px)}.almamundi-footer{padding-top:2.5rem!important}'}</style>
     </main>
   );
 }
