@@ -52,7 +52,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Tu historia no se pierde en el scroll',
         parrafos: [
           'Cada día compartimos imágenes, pensamientos y momentos en internet. Muchos quedan atrás rápidamente, desplazados por nuevas publicaciones.',
-          'AlmaMundi propone algo diferente: un espacio donde las historias de las personas se reúnen y organizan para que otras puedan encontrarlas, conocerlas y volver a ellas. Nuestro objetivo es que cada historia siga disponible y pueda volver a encontrarse con el tiempo.',
+          'AlmaMundi propone algo diferente: un espacio donde las historias de las personas se reúnen y organizan para que otras puedan encontrarlas, conocerlas y volver a ellas. Organizamos las historias para que las personas puedan encontrarlas y volver a ellas.',
           'Aquí las historias valen por lo que cuentan, sin rankings de popularidad ni competencias por sumar reacciones.',
           'Nos interesa lo que las personas tienen para contar.',
           '**Tu historia no se pierde en el scroll.**',
@@ -80,7 +80,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           { nombre: 'Fotografía.', texto: 'Comparte una imagen y la historia que hay detrás.' },
         ],
         parrafosFinales: [
-          'Cualquier persona puede contar, sin ser escritora, periodista ni tener experiencia creando contenidos.',
+          'Para compartir una historia basta con tener algo que contar. Puedes hacerlo con tus propias palabras y a tu manera.',
           'Lo importante es aquello que quieres contar.',
           'Antes de publicarse, cada envío lo revisa una persona del equipo, conforme a las normas editoriales del proyecto.',
         ],
@@ -115,7 +115,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           'AlmaMundi reúne experiencias personales para construir una memoria colectiva diversa y abierta a distintas voces.',
           'Nos interesan tanto los acontecimientos significativos como los momentos cotidianos: aquello que cada persona recuerda y considera importante compartir.',
           'El valor del proyecto está en la diversidad de historias, generaciones, experiencias y maneras de mirar la vida.',
-          'Buscamos muchas miradas sobre los acontecimientos, en lugar de una historia oficial contada por unos pocos.',
+          'Cada experiencia aporta una mirada distinta. Juntas, las historias permiten conocer diferentes maneras de vivir y recordar.',
           'Queremos que muchas personas puedan compartir sus propias experiencias y conocer las de otras.',
         ],
       },
@@ -158,7 +158,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Sua história não se perde no scroll',
         parrafos: [
           'Todos os dias compartilhamos imagens, pensamentos e momentos na internet. Muitos ficam para trás rapidamente, empurrados por novas publicações.',
-          'O AlmaMundi propõe algo diferente: um espaço onde as histórias das pessoas se reúnem e se organizam para que outras possam encontrá-las, conhecê-las e voltar a elas. Nosso objetivo é que cada história continue disponível e possa ser reencontrada com o tempo.',
+          'O AlmaMundi propõe algo diferente: um espaço onde as histórias das pessoas se reúnem e se organizam para que outras possam encontrá-las, conhecê-las e voltar a elas. Organizamos as histórias para que as pessoas possam encontrá-las e voltar a elas.',
           'Aqui as histórias valem pelo que contam, sem rankings de popularidade nem disputas por mais reações.',
           'O que nos interessa é o que as pessoas têm para contar.',
           '**Sua história não se perde no scroll.**',
@@ -186,7 +186,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           { nombre: 'Fotografia.', texto: 'Compartilhe uma imagem e a história por trás dela.' },
         ],
         parrafosFinales: [
-          'Qualquer pessoa pode contar, sem ser escritora, jornalista nem ter experiência criando conteúdo.',
+          'Para compartilhar uma história, basta ter algo para contar. Você pode fazer isso com suas próprias palavras e do seu jeito.',
           'O importante é aquilo que você quer contar.',
           'Antes de ser publicado, cada envio é revisado por uma pessoa da equipe, de acordo com as normas editoriais do projeto.',
         ],
@@ -221,7 +221,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           'O AlmaMundi reúne experiências pessoais para construir uma memória coletiva diversa e aberta a diferentes vozes.',
           'Interessam-nos tanto os acontecimentos marcantes quanto os momentos do dia a dia: aquilo que cada pessoa lembra e considera importante compartilhar.',
           'O valor do projeto está na diversidade de histórias, gerações, experiências e maneiras de olhar a vida.',
-          'Buscamos muitos olhares sobre os acontecimentos, em vez de uma história oficial contada por poucos.',
+          'Cada experiência traz um olhar diferente. Juntas, as histórias permitem conhecer diferentes maneiras de viver e lembrar.',
           'Queremos que muitas pessoas possam compartilhar suas próprias experiências e conhecer as de outras.',
         ],
       },
@@ -264,7 +264,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Your story doesn’t get lost in the scroll',
         parrafos: [
           'Every day we share images, thoughts, and moments online. Many are quickly left behind, pushed aside by new posts.',
-          'AlmaMundi offers something different: a space where people’s stories are gathered and organized so others can find them, get to know them, and come back to them. Our goal is for every story to remain available and to be found again over time.',
+          'AlmaMundi offers something different: a space where people’s stories are gathered and organized so others can find them, get to know them, and come back to them. We organize stories so people can find them and come back to them.',
           'Here, stories matter for what they tell, with no popularity rankings and no race for more reactions.',
           'What interests us is what people have to tell.',
           '**Your story doesn’t get lost in the scroll.**',
@@ -272,13 +272,13 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
       },
       {
         id: 'todas',
-        titulo: 'We all have something to tell',
+        titulo: 'We all have a story to tell',
         parrafos: [
           'A conversation you still remember. Something that happened at your first job. An unexpected trip. A friendship. A moment of joy, of learning, or of change.',
           'A single memory is enough: your story can be one moment, with no need to write an autobiography or tell a whole life.',
           'AlmaMundi welcomes stories, memories, anecdotes, and personal experiences. They can be major moments or seemingly small scenes from everyday life.',
           'Each person decides what to share and how to share it.',
-          'Because **a moment counts too**.',
+          '**Even a single moment matters.**',
         ],
       },
       {
@@ -292,7 +292,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           { nombre: 'Photography.', texto: 'Share an image and the story behind it.' },
         ],
         parrafosFinales: [
-          'Anyone can tell a story, with no need to be a writer, a journalist, or experienced at creating content.',
+          'To share a story, all you need is something to tell. You can do it in your own words, in your own way.',
           'What matters is what you want to tell.',
           'Before it is published, every submission is reviewed by a person on our team, following the project’s editorial guidelines.',
         ],
@@ -327,7 +327,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
           'AlmaMundi brings together personal experiences to build a collective memory that is diverse and open to many voices.',
           'We care about significant events as much as everyday moments: whatever each person remembers and finds important to share.',
           'The value of the project lies in the diversity of stories, generations, experiences, and ways of seeing life.',
-          'We seek many perspectives on events, rather than an official story told by a few.',
+          'Every experience brings a different perspective. Together, the stories reveal different ways of living and remembering.',
           'We want many people to be able to share their own experiences and discover those of others.',
         ],
       },
