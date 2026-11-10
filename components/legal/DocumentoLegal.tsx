@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import {
   LEGAL_CHROME,
@@ -79,10 +78,7 @@ export function DocumentoLegal({
   return (
     <main className="min-h-svh bg-[#F5F4F2] px-6 py-10" style={{ fontFamily: 'inherit' }}>
       <article className="mx-auto w-full max-w-[720px] text-[#3c4655]">
-        <HomeHardLink href="/" className="text-[length:var(--fs-pequeno)] font-medium text-[#3c4655]">
-          {chrome.back}
-        </HomeHardLink>
-        <h1 className="mt-6 text-[length:var(--fs-titular)] font-normal text-[#1a2332]">{doc.title}</h1>
+        <h1 className="text-[length:var(--fs-titular)] font-normal text-[#1a2332]">{doc.title}</h1>
         <p className="mt-2 text-[length:var(--fs-pequeno)] text-[#646E7E]">{doc.updated}</p>
         {indice ? (
           <nav className="mt-6" aria-label={doc.title}>

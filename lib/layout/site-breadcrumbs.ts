@@ -26,6 +26,13 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     'me-pregunto': 'Preguntas de las personas',
     respuestas: 'Respuestas a las preguntas de AlmaMundi',
     'codigo-de-conducta': 'Código de conducta',
+    'preguntas-de-las-personas': 'Preguntas de las personas',
+    'respuestas-a-almamundi': 'Respuestas a las preguntas de AlmaMundi',
+    'mis-datos-personales': 'Mis datos personales',
+    terminos: 'Términos de uso',
+    privacidad: 'Aviso de privacidad',
+    contacto: 'Contacto',
+    proposito: 'Propósito',
   },
   pt: {
     _inicio: 'Início',
@@ -46,6 +53,13 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     'me-pregunto': 'Perguntas das pessoas',
     respuestas: 'Respostas às perguntas do AlmaMundi',
     'codigo-de-conducta': 'Código de conduta',
+    'preguntas-de-las-personas': 'Perguntas das pessoas',
+    'respuestas-a-almamundi': 'Respostas às perguntas do AlmaMundi',
+    'mis-datos-personales': 'Meus dados pessoais',
+    terminos: 'Termos de uso',
+    privacidad: 'Aviso de privacidade',
+    contacto: 'Contato',
+    proposito: 'Propósito',
   },
   en: {
     _inicio: 'Home',
@@ -66,6 +80,13 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     'me-pregunto': 'People’s questions',
     respuestas: 'Answers to AlmaMundi’s questions',
     'codigo-de-conducta': 'Code of conduct',
+    'preguntas-de-las-personas': 'People’s questions',
+    'respuestas-a-almamundi': 'Answers to AlmaMundi’s questions',
+    'mis-datos-personales': 'My personal data',
+    terminos: 'Terms of use',
+    privacidad: 'Privacy notice',
+    contacto: 'Contact',
+    proposito: 'Purpose',
   },
 };
 
@@ -158,7 +179,12 @@ export function buildSiteBreadcrumbs(pathname: string, locale: AlmaLocale = 'es'
   const path = normalizePathnameForBreadcrumbs(pathname);
   if (path === '/') return [];
 
-  const segments = path.split('/').filter(Boolean);
+  const rawSegments = path.split('/').filter(Boolean);
+  // /pt/proposito y /en/proposito: el prefijo de idioma no es una miga.
+  const segments =
+    (rawSegments[0] === 'pt' || rawSegments[0] === 'en') && rawSegments[1] === 'proposito'
+      ? rawSegments.slice(1)
+      : rawSegments;
   const items: SiteBreadcrumbItem[] = [{ href: '/', label: crumb(locale, '_inicio') ?? 'Inicio' }];
 
   for (let i = 0; i < segments.length; i++) {
@@ -167,6 +193,16 @@ export function buildSiteBreadcrumbs(pathname: string, locale: AlmaLocale = 'es'
     const pathUpTo = `/${segments.slice(0, i + 1).join('/')}`;
     const isLast = i === segments.length - 1;
 
+    // /historias/:id/<formato>: el id no lleva miga propia (redirige a esta misma página).
+    if (
+      segments[0] === 'historias' &&
+      segments.length === 3 &&
+      i === 1 &&
+      isLikelyStoryId(seg) &&
+      HISTORIA_MEDIA_FORMAT_CRUMB[segments[2]]
+    ) {
+      continue;
+    }
     // /historias/:id/audio|video|foto|texto — enlace al índice por formato + página actual
     if (
       segments[0] === 'historias' &&
@@ -178,7 +214,7 @@ export function buildSiteBreadcrumbs(pathname: string, locale: AlmaLocale = 'es'
       if (pair) {
         const indexKey = seg === 'texto' ? 'escrito' : seg === 'foto' ? 'fotos' : `${seg}s`;
         items.push({ href: pair[0], label: crumb(locale, indexKey) ?? pair[1] });
-        items.push({ href: null, label: crumb(locale, seg) ?? STATIC_LABELS[seg] ?? humanizeSegment(seg) });
+        items.push({ href: null, label: crumb(locale, '_historia') ?? 'Historia' });
         break;
       }
     }
@@ -230,10 +266,6 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/mapa') return false;
   if (p === '/muestras' && !muestrasListMode) return false;
   if (p === '/cinematic' || p.startsWith('/cinematic/')) return false;
-  if (p === '/privacidad') return false;
-  if (p === '/terminos') return false;
-  if (p === '/contacto') return false;
-  if (p === '/proposito' || p === '/pt/proposito' || p === '/en/proposito') return false;
   if (p === '/newsletter' || p.startsWith('/newsletter/')) return false;
   return true;
 }

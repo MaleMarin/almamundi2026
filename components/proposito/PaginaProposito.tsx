@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import type { Metadata } from 'next';
-import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { CapituloHome } from '@/components/home/CapituloHome';
 import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
 import { PropositoLocaleSync } from '@/components/proposito/PropositoLocaleSync';
@@ -115,15 +114,12 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           style={{
             display: 'flex',
             flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            justifyContent: 'flex-end',
             alignItems: 'center',
             gap: '0.75rem',
             marginBottom: '2.5rem',
           }}
         >
-          <HomeHardLink href="/" className="btn-am-neutro" style={{ ...BOTON, padding: '0.45rem 0.9rem' }}>
-            {c.volver}
-          </HomeHardLink>
           <nav aria-label={c.idiomasAria} style={{ display: 'flex', gap: '0.9rem', fontSize: 'var(--fs-pequeno)' }}>
             {ALMA_LOCALES.map((code) =>
               code === locale ? (
