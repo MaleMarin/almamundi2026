@@ -9,6 +9,7 @@ import { NewsletterBand } from '@/components/newsletter/NewsletterBand';
 import { SITE_FOOTER_LEGAL_LINKS } from '@/components/layout/siteNavLinkStyles';
 import { MAPA_HOME_HREF, primeMapAmbientFromNavGesture } from '@/lib/mapa-home-nav';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import { propositoHref } from '@/lib/i18n/proposito-pagina';
 
 const FOOTER_LINK =
   'almamundi-footer-link font-normal leading-snug tracking-normal transition-colors';
@@ -38,7 +39,7 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
       onNavigate: () => primeMapAmbientFromNavGesture(),
     },
     { id: 'historias', kind: 'internal', href: '/historias', label: t.navStories },
-    { id: 'proposito', kind: 'hard', href: '/#proposito', label: t.navPurpose },
+    { id: 'proposito', kind: 'internal', href: propositoHref(locale), label: t.navPurpose },
   ];
 
   function renderTextLink(item: FooterPillItem) {

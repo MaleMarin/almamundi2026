@@ -9,6 +9,8 @@ import {
   type ManifiestoBlock,
   type ManifiestoSection } from '@/lib/i18n/proposito';
 import { SITE_FONT_STACK } from '@/lib/typography';
+import Link from 'next/link';
+import { PROPOSITO_LEER_MAS, propositoHref } from '@/lib/i18n/proposito-pagina';
 
 const soft = {
   bg: 'var(--home-bg)',
@@ -310,6 +312,15 @@ export function PropositoModal({
         ) : null}
         <p className="text-center text-[length:var(--fs-pequeno)] leading-relaxed" style={{ color: soft.textBody }}>
           {QUIEN[locale]}
+        </p>
+        <p className="text-center text-[length:var(--fs-pequeno)]">
+          <Link
+            href={propositoHref(locale)}
+            className="underline underline-offset-4"
+            style={{ color: soft.textMain }}
+          >
+            {PROPOSITO_LEER_MAS[locale]}
+          </Link>
         </p>
         {/* Propósito primero; debajo, cómo funciona (un solo ítem en el menú). */}
         <section aria-labelledby="proposito-como-funciona" className="border-t pt-8" style={{ borderColor: 'rgba(60,70,85,0.15)' }}>

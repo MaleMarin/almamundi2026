@@ -233,7 +233,7 @@ export function shouldShowSiteBreadcrumbs(pathname: string, muestrasListMode: bo
   if (p === '/privacidad') return false;
   if (p === '/terminos') return false;
   if (p === '/contacto') return false;
-  if (p === '/proposito') return false;
+  if (p === '/proposito' || p === '/pt/proposito' || p === '/en/proposito') return false;
   if (p === '/newsletter' || p.startsWith('/newsletter/')) return false;
   return true;
 }

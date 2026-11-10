@@ -8,7 +8,8 @@ import {
   useMemo,
   useState,
   type ReactNode } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { esRutaProposito, propositoHref } from '@/lib/i18n/proposito-pagina';
 import {
   ALMA_LOCALE_COOKIE,
   type AlmaLocale } from '@/lib/i18n/locale';
@@ -37,6 +38,7 @@ export function LocaleProvider({
   children: ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const [locale, setLocaleState] = useState<AlmaLocale>(initialLocale);
 
   useEffect(() => {
@@ -52,9 +54,12 @@ export function LocaleProvider({
       if (typeof document !== 'undefined') {
         document.documentElement.lang = next;
       }
-      router.refresh();
+      // En la página Propósito cada idioma tiene su URL: el selector lleva a esa versión.
+      const destino = esRutaProposito(pathname) ? propositoHref(next) : null;
+      if (destino && destino !== pathname) router.push(destino);
+      else router.refresh();
     },
-    [router]
+    [router, pathname]
   );
 
   const t = useMemo(() => uiMessages(locale), [locale]);
