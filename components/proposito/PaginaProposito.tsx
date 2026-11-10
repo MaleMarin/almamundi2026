@@ -2,6 +2,8 @@ import Link from 'next/link';
 import type { CSSProperties, ReactNode } from 'react';
 import type { Metadata } from 'next';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { CapituloHome } from '@/components/home/CapituloHome';
+import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
 import { PropositoLocaleSync } from '@/components/proposito/PropositoLocaleSync';
 import { ALMA_LOCALES, type AlmaLocale } from '@/lib/i18n/locale';
 import { PROPOSITO_PAGINA, PROPOSITO_RUTAS } from '@/lib/i18n/proposito-pagina';
@@ -98,9 +100,10 @@ function jsonLd(locale: AlmaLocale) {
 
 export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
   const c = PROPOSITO_PAGINA[locale];
+  const hero = HOME_MESSAGES[locale];
 
   return (
-    <main style={{ minHeight: '100vh', background: 'var(--home-bg)', padding: '2rem 1rem 4rem', fontFamily: SITE_FONT_STACK }}>
+    <main style={{ minHeight: '100vh', background: 'var(--home-bg)', padding: '2rem 1rem 1rem', fontFamily: SITE_FONT_STACK }}>
       <PropositoLocaleSync locale={locale} />
       <script
         type="application/ld+json"
@@ -213,16 +216,11 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           </section>
         ))}
 
-        <section
-          aria-labelledby="proposito-cierre"
-          style={{ marginTop: '3.5rem', paddingTop: '2.5rem', borderTop: '1px solid rgba(60,70,85,0.15)', textAlign: 'center' }}
-        >
-          <h2 id="proposito-cierre" style={{ ...H2, fontSize: 'var(--fs-titular)' }}>
-            {c.cierreTitulo}
-          </h2>
-          <p style={P}>{c.cierreTexto}</p>
-          <p style={{ ...P, fontStyle: 'italic', color: ORANGE }}>{c.cierreLema}</p>
+        {/* Cierre: la misma frase de la hero, con su mismo estilo. */}
+        <section className="proposito-cierre" style={{ marginTop: '3.5rem', paddingTop: '2.5rem', borderTop: '1px solid rgba(60,70,85,0.15)' }}>
+          <CapituloHome ceja="" titulo={hero.heroBeforeBold} tituloFuerte={`${hero.heroBold},`} cita={hero.citaCuenta} />
         </section>
+        <style>{'.proposito-cierre .home-capitulo-ceja{display:none}.almamundi-footer{padding-top:2.5rem!important}'}</style>
       </article>
     </main>
   );
