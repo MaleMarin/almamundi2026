@@ -136,7 +136,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     cierreTitulo: 'Tu historia también tiene un lugar.',
     cierreTexto:
       'Puedes contar algo que viviste, responder una pregunta que te inspire o conocer las experiencias que otras personas ya compartieron.',
-    cierreLema: 'Cuenta tu historia. Conoce otras historias.',
+    cierreLema: 'La vida no es solo la que viviste, sino cómo la recuerdas, y tú eliges cómo contarla',
     botones: { contar: 'Cuenta tu historia', inspirate: 'Inspírate', descubre: 'Descubre historias' },
     idiomasAria: 'Idioma de esta página',
     volver: '← Volver al inicio',
@@ -242,7 +242,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     cierreTitulo: 'Sua história também tem um lugar.',
     cierreTexto:
       'Você pode contar algo que viveu, responder a uma pergunta que te inspire ou conhecer as experiências que outras pessoas já compartilharam.',
-    cierreLema: 'Conte sua história. Conheça outras histórias.',
+    cierreLema: 'A vida não é só a que você viveu, mas como você se lembra dela, e você escolhe como contá-la',
     botones: { contar: 'Conte sua história', inspirate: 'Inspire-se', descubre: 'Descubra histórias' },
     idiomasAria: 'Idioma desta página',
     volver: '← Voltar ao início',
@@ -348,7 +348,7 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     cierreTitulo: 'Your story has a place here too.',
     cierreTexto:
       'You can tell something you lived, answer a question that inspires you, or discover the experiences other people have already shared.',
-    cierreLema: 'Tell your story. Discover other stories.',
+    cierreLema: 'Life is not only the one you lived, but how you remember it, and you choose how to tell it',
     botones: { contar: 'Tell your story', inspirate: 'Get inspired', descubre: 'Discover stories' },
     idiomasAria: 'Language of this page',
     volver: '← Back to home',
