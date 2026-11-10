@@ -51,7 +51,7 @@ const CONTAR_META: Record<
     },
     foto: {
       title: 'Una imagen puede guardar lo que las palabras no alcanzan',
-      description: 'Hasta 10 MB por foto.',
+      description: 'Hasta 8 fotos.',
     },
     texto: {
       title: 'Escribe lo que no le contaste a nadie',
@@ -73,7 +73,7 @@ const CONTAR_META: Record<
     },
     foto: {
       title: 'Uma imagem pode guardar o que as palavras não alcançam',
-      description: 'Até 10 MB por foto.',
+      description: 'Até 8 fotos.',
     },
     texto: {
       title: 'Escreva o que você não contou a ninguém',
@@ -95,7 +95,7 @@ const CONTAR_META: Record<
     },
     foto: {
       title: "An image can hold what words can't reach",
-      description: 'Up to 10 MB per photo.',
+      description: 'Up to 8 photos.',
     },
     texto: {
       title: 'Write what you never told anyone',

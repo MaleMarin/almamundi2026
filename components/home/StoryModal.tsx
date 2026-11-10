@@ -2079,7 +2079,9 @@ export function StoryModal({
         onClose={requestLeave}
         footnote={previewLine}
         continueEnabled={canContinueCapture()}
-        continueHint={captureFileWait()}
+        continueHint={
+          recording || (mode === 'foto' && photos.some((p) => p.converting)) ? captureFileWait() : null
+        }
         onContinue={goDetails}
         continueLabel={t.modalContinue}
         closeAriaLabel={t.modalClose}

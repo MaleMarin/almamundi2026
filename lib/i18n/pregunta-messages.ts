@@ -137,9 +137,9 @@ export const PREGUNTA_COPY = {
     en: 'The photo must be JPG, PNG, WEBP or HEIC.',
   },
   errPhotoSize: {
-    es: 'Esa foto pesa más de 10 MB.',
-    pt: 'A foto tem mais de 10 MB.',
-    en: 'The photo is larger than 10 MB.',
+    es: 'Esta foto es muy grande. Prueba con otra o súbele una captura de pantalla.',
+    pt: 'Esta foto é muito grande. Tente outra ou envie uma captura de tela dela.',
+    en: 'This photo is too large. Try another one or upload a screenshot of it.',
   },
   photoPreparing: {
     es: 'Preparando tu foto…',

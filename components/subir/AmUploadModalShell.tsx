@@ -59,7 +59,7 @@ export function AmUploadModalShell({
           </p>
         ) : null}
         <h2 className={styles.amModalTitle}>{title}</h2>
-        <p className={styles.amModalSubtitle}>{subtitle}</p>
+        {subtitle ? <p className={styles.amModalSubtitle}>{subtitle}</p> : null}
         {limit ? <p className={styles.amModalLimit}>{limit}</p> : null}
         {children}
       </div>

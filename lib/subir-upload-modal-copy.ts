@@ -12,26 +12,27 @@ export type UploadModalCopy = {
 
 export const UPLOAD_MODAL_COPY: Record<SubirHuellaFormat, UploadModalCopy> = {
   video: {
-    title: 'Graba el momento que todavía vive en ti',
-    subtitle: 'Tu historia merece verse.',
-    limit: 'Hasta 5 minutos de video.',
+    title: 'Graba tu historia en video',
+    subtitle: '',
+    limit: 'Hasta 5 minutos.',
     uploadLabel: 'o subir un video desde tu dispositivo',
   },
   audio: {
-    title: 'Hay historias que se cuentan mejor en voz alta',
-    subtitle: 'Tu voz guarda lo que las palabras escritas no siempre pueden.',
-    limit: 'Hasta 5 minutos de audio.',
+    title: 'Graba tu historia con tu voz',
+    subtitle: '',
+    limit: 'Hasta 5 minutos.',
     uploadLabel: 'o subir un audio desde tu dispositivo',
   },
   texto: {
-    title: 'Escribe lo que no le contaste a nadie,\no lo que le contaste a todos',
-    subtitle: 'Aquí no se pierde en el scroll. Queda.',
+    title: 'Escribe tu historia',
+    subtitle: '',
+    limit: 'Hasta 3000 caracteres.',
     uploadLabel: '',
   },
   foto: {
-    title: 'Una imagen puede guardar\nlo que las palabras no alcanzan',
-    subtitle: 'Sube hasta 8 fotos. Cada una lleva su nombre, el año y el lugar donde fue tomada.',
-    limit: 'Hasta 10 MB por foto.',
+    title: 'Cuenta tu historia con fotos',
+    subtitle: '',
+    limit: 'Hasta 8 fotos.',
     uploadLabel: '',
   },
 };
