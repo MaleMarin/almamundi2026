@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: site.description,
     alternates: { canonical: './' },
     openGraph: {
-      title: site.title,
+      title: site.shareTitle,
       description: site.description,
       url: './',
       type: 'website',
@@ -59,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
       siteName: 'AlmaMundi',
       images: [
         {
-          url: '/og/sitio?v=2',
+          url: '/og/sitio?v=3',
           width: 1200,
           height: 630,
           alt: site.ogAlt,
@@ -68,9 +68,9 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: 'summary_large_image',
-      title: site.title,
+      title: site.shareTitle,
       description: site.description,
-      images: ['/og/sitio?v=2'],
+      images: ['/og/sitio?v=3'],
     },
     icons: {
       icon: [{ url: '/icon.png', type: 'image/png', sizes: '32x32' }],

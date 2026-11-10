@@ -16,14 +16,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     alternates: { canonical: null },
     openGraph: {
-      title: site.title,
+      title: site.shareTitle,
       description: site.description,
       type: 'website',
       locale: PUBLIC_OG_LOCALE[locale],
       siteName: 'AlmaMundi',
       images: [
         {
-          url: '/og/sitio?v=2',
+          url: '/og/sitio?v=3',
           width: 1200,
           height: 630,
           alt: site.ogAlt,

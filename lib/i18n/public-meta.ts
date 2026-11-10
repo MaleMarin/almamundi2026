@@ -6,27 +6,27 @@ export const PUBLIC_OG_LOCALE: Record<AlmaLocale, string> = {
   en: 'en_US',
 };
 
-export function publicSiteMeta(locale: AlmaLocale): { title: string; description: string; ogAlt: string } {
+export function publicSiteMeta(locale: AlmaLocale): { title: string; shareTitle: string; description: string; ogAlt: string } {
   if (locale === 'pt') {
     return {
       title: 'AlmaMundi · Histórias que não se perdem no scroll',
-      description:
-        'AlmaMundi é o lugar onde suas histórias não se perdem no scroll. A vida não é só a que você viveu, mas como você a lembra, e há muitas formas de contá-la.',
+      shareTitle: 'AlmaMundi',
+      description: 'A vida não é só a que você viveu, mas como você a lembra, e você escolhe como contá-la.',
       ogAlt: 'AlmaMundi, histórias de vida em vídeo, áudio, texto e foto',
     };
   }
   if (locale === 'en') {
     return {
       title: 'AlmaMundi · Stories that don’t get lost in the scroll',
-      description:
-        'AlmaMundi is the place where your stories don’t get lost in the scroll. Life is not only what you lived, but how you remember it, and there are many ways to tell it.',
+      shareTitle: 'AlmaMundi',
+      description: 'Life is not only what you lived, but how you remember it, and you choose how to tell it.',
       ogAlt: 'AlmaMundi, life stories in video, audio, text, and photo',
     };
   }
   return {
     title: 'AlmaMundi · Historias que no se pierden en el scroll',
-    description:
-      'AlmaMundi es el lugar donde tus historias no se pierden en el scroll. La vida no es solo la que viviste, sino cómo la recuerdas, y hay muchas formas de contarla.',
+    shareTitle: 'AlmaMundi',
+    description: 'La vida no es solo la que viviste, sino cómo la recuerdas, y tú eliges cómo contarla.',
     ogAlt: 'AlmaMundi, historias de vida en video, audio, texto y foto',
   };
 }
