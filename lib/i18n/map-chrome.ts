@@ -36,6 +36,8 @@ export type MapChrome = {
   lluvia: string;
   mercado: string;
   bosque: string;
+  globeHintTitle: string;
+  globeHintText: string;
 };
 
 const es: MapChrome = {
@@ -74,6 +76,8 @@ const es: MapChrome = {
   lluvia: 'Lluvia',
   mercado: 'Mercado',
   bosque: 'Bosque',
+  globeHintTitle: 'El mundo está en tus manos.',
+  globeHintText: 'Arrastra el globo para girarlo y explorar. Elige un lugar y descubre las historias que guarda.',
 };
 
 const pt: MapChrome = {
@@ -112,6 +116,8 @@ const pt: MapChrome = {
   lluvia: 'Chuva',
   mercado: 'Mercado',
   bosque: 'Floresta',
+  globeHintTitle: 'O mundo está em suas mãos.',
+  globeHintText: 'Arraste o globo para girá-lo e explorar. Escolha um lugar e descubra as histórias que ele guarda.',
 };
 
 const en: MapChrome = {
@@ -150,6 +156,8 @@ const en: MapChrome = {
   lluvia: 'Rain',
   mercado: 'Market',
   bosque: 'Forest',
+  globeHintTitle: 'The world is in your hands.',
+  globeHintText: 'Drag the globe to spin it and explore. Choose a place and discover the stories it holds.',
 };
 
 const COPY: Record<AlmaLocale, MapChrome> = { es, pt, en };

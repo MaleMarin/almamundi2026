@@ -16,6 +16,7 @@ export const ME_PREGUNTO_UI: Record<
     vacio: string;
     loPregunta: (alias: string, lugar: string) => string;
     campo: string;
+    explica: string;
     ayuda: string;
     alias: string;
     pais: string;
@@ -53,8 +54,10 @@ export const ME_PREGUNTO_UI: Record<
     dejar: 'Dejar mi pregunta',
     vacio: 'Aquí aparecerán las preguntas que dejen otras personas.',
     loPregunta: (alias, lugar) => `Lo pregunta ${alias}${lugar ? ` desde ${lugar}` : ''}`,
-    campo: '¿Qué te preguntas?',
-    ayuda: 'Hasta 140 caracteres. Una pregunta que te gustaría que el mundo te respondiera.',
+    campo: '¿Qué te gustaría preguntarles a otras personas?',
+    explica:
+      'Escribe una pregunta abierta que invite a compartir experiencias. Antes de publicarla, la revisaremos para proteger la privacidad y favorecer una buena convivencia.',
+    ayuda: 'Hasta 140 caracteres.',
     alias: 'Nombre o alias',
     pais: 'País',
     ciudad: 'Ciudad o localidad',
@@ -101,8 +104,10 @@ export const ME_PREGUNTO_UI: Record<
     dejar: 'Deixar minha pergunta',
     vacio: 'Seja a primeira pessoa a deixar uma pergunta.',
     loPregunta: (alias, lugar) => `Pergunta de ${alias}${lugar ? `, de ${lugar}` : ''}`,
-    campo: 'O que você se pergunta?',
-    ayuda: 'Até 140 caracteres. Uma pergunta que você gostaria que o mundo respondesse.',
+    campo: 'O que você gostaria de perguntar a outras pessoas?',
+    explica:
+      'Escreva uma pergunta aberta que convide a compartilhar experiências. Antes de publicá-la, vamos revisá-la para proteger a privacidade e favorecer uma boa convivência.',
+    ayuda: 'Até 140 caracteres.',
     alias: 'Nome ou apelido',
     pais: 'País',
     ciudad: 'Cidade ou localidade',
@@ -149,8 +154,10 @@ export const ME_PREGUNTO_UI: Record<
     dejar: 'Leave my question',
     vacio: 'Be the first person to leave a question.',
     loPregunta: (alias, lugar) => `Asked by ${alias}${lugar ? ` from ${lugar}` : ''}`,
-    campo: 'What do you wonder?',
-    ayuda: 'Up to 140 characters. A question you would like the world to answer.',
+    campo: 'What would you like to ask other people?',
+    explica:
+      "Write an open question that invites others to share their experiences. Before publishing it, we'll review it to protect privacy and keep the conversation respectful.",
+    ayuda: 'Up to 140 characters.',
     alias: 'Name or nickname',
     pais: 'Country',
     ciudad: 'City or town',

@@ -1079,6 +1079,7 @@ function GlobeScene({
   layerVisibility,
   focusTarget,
   onFocusArrived,
+  onUserMove,
   arcs = [],
   arcsMobile = false }: {
   urls: GlobeV2TextureUrls;
@@ -1102,6 +1103,7 @@ function GlobeScene({
   layerVisibility?: GlobeLayerVisibility;
   focusTarget?: { lat: number; lng: number; nonce: number } | null;
   onFocusArrived?: () => void;
+  onUserMove?: () => void;
   arcs?: GlobeArc[];
   arcsMobile?: boolean;
 }) {
@@ -1114,6 +1116,20 @@ function GlobeScene({
   const lockView = fixedCameraPreset != null;
   const planetSpinRef = useRef<THREE.Group>(null);
   const orbitControlsRef = useRef<OrbitControlsImpl | null>(null);
+  /* Solo cuenta como interacción si el globo se mueve mientras la persona lo presiona
+     (los vuelos y encuadres automáticos de cámara no lo activan). */
+  const presionadoRef = useRef(false);
+  const onUserMoveRef = useRef(onUserMove);
+  onUserMoveRef.current = onUserMove;
+  const alPresionar = useCallback(() => {
+    presionadoRef.current = true;
+  }, []);
+  const alMover = useCallback(() => {
+    if (presionadoRef.current) onUserMoveRef.current?.();
+  }, []);
+  const alSoltar = useCallback(() => {
+    presionadoRef.current = false;
+  }, []);
   const camWorldRef = useRef(new THREE.Vector3());
 
   const sceneTimeMsRef = useRef<number | null>(null);
@@ -1352,6 +1368,9 @@ function GlobeScene({
       {/* Home embebida: sin zoom con rueda/trackpad para no bloquear el scroll de la página (OrbitControls usa preventDefault en wheel). */}
       <OrbitControls
         ref={orbitControlsRef}
+        onStart={alPresionar}
+        onChange={alMover}
+        onEnd={alSoltar}
         makeDefault={lockView}
         target={embedded ? GLOBE_V2_EMBEDDED_ORBIT_TARGET : [0, 0, 0]}
         enablePan={false}
@@ -1455,6 +1474,8 @@ export type GlobeV2Props = {
   /** Vuelo de cámara hacia una historia (Sorpréndeme). `nonce` fuerza un nuevo vuelo. */
   focusTarget?: { lat: number; lng: number; nonce: number } | null;
   onFocusArrived?: () => void;
+  /** La persona movió el globo con el dedo o el mouse (eventos de OrbitControls). */
+  onUserMove?: () => void;
   /** Ubicación aproximada de quien mira (GPS redondeado); si no hay, hora local del dispositivo. */
   viewerLat?: number;
   viewerLng?: number;
@@ -1487,7 +1508,8 @@ export default function GlobeV2({
   arcs = [],
   arcsMobile = false,
   focusTarget = null,
-  onFocusArrived }: GlobeV2Props) {
+  onFocusArrived,
+  onUserMove }: GlobeV2Props) {
   const urls: GlobeV2TextureUrls = {
     day: textureUrls?.day ?? GLOBE_V2_DEFAULT_TEXTURES.day,
     normal: textureUrls?.normal ?? GLOBE_V2_DEFAULT_TEXTURES.normal,
@@ -1597,6 +1619,7 @@ export default function GlobeV2({
             layerVisibility={layerVisibility}
             focusTarget={focusTarget}
             onFocusArrived={onFocusArrived}
+            onUserMove={onUserMove}
             arcs={arcs}
             arcsMobile={arcsMobile}
           />

@@ -16,6 +16,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useSyncExternalStore,
   type RefObject } from 'react';
 import { useSearchParams } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -184,6 +185,9 @@ import { resolveViewerAnchor } from '@/lib/viewer-solar-night';
 const HOME_GLOBE_FRAME_LAT = -15;
 const HOME_GLOBE_FRAME_LNG = -60;
 
+/** sessionStorage no avisa cambios dentro de la misma pestaña: basta leerlo al montar. */
+const sinSuscripcion = () => () => {};
+
 const GlobeV2Home = dynamic(() => import('@/components/globe/GlobeV2').then((m) => m.default), {
   ssr: false,
   loading: () => (
@@ -229,6 +233,28 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
   );
   const [surpriseFlying, setSurpriseFlying] = useState(false);
   const [surpriseNotice, setSurpriseNotice] = useState<string | null>(null);
+  /** Indicación para girar el globo: se ve al entrar y se va con el primer movimiento real; no vuelve en la sesión. */
+  const globeHintVisto = useSyncExternalStore(
+    sinSuscripcion,
+    () => {
+      try {
+        return sessionStorage.getItem('almaGlobeHintVisto') === '1';
+      } catch {
+        return false;
+      }
+    },
+    () => true
+  );
+  const [globeHintOculto, setGlobeHintOculto] = useState(false);
+  const globeHint = !globeHintVisto && !globeHintOculto;
+  const hideGlobeHint = useCallback(() => {
+    setGlobeHintOculto(true);
+    try {
+      sessionStorage.setItem('almaGlobeHintVisto', '1');
+    } catch {
+      /* sin almacenamiento */
+    }
+  }, []);
   const selectedTopicId: string | null = null;
   /** Portal del dock neumórfico bajo el título (`#map-dock-slot` en MapSectionLocked). */
   const [dockSlot, setDockSlot] = useState<HTMLElement | null>(null);
@@ -1086,8 +1112,22 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
         <div className="map-globe-home relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
+            {/* Sobre el globo, abajo al centro; mismo estilo que el aviso de «Sorpréndeme» y no se muestran juntos. */}
+            <div
+              aria-hidden={!globeHint}
+              className={`pointer-events-none absolute bottom-4 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-white/90 transition-opacity duration-500 ${
+                globeHint && !surpriseNotice && !openStory ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                background: 'rgba(15, 23, 42, 0.82)',
+                boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}
+            >
+              <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{dockCopy.globeHintTitle}</p>
+              <p className="m-0 mt-1 text-[length:var(--fs-etiqueta)] leading-snug">{dockCopy.globeHintText}</p>
+            </div>
             <GlobeV2Home
               embedded
+              onUserMove={globeHint ? hideGlobeHint : undefined}
               forceDaylight
               earthVisualTimeScale={1050}
               initialViewLat={tzFrame.lat}

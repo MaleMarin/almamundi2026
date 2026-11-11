@@ -1,7 +1,7 @@
 'use client';
 
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
 import { TurnstileWidget, type TurnstileWidgetHandle } from '@/components/home/TurnstileWidget';
@@ -159,6 +159,8 @@ export function DejarPregunta({
 }) {
   const { t } = useHomeLocale();
   const copy = ME_PREGUNTO_UI[locale];
+  const campoId = useId();
+  const explicaId = useId();
   const [texto, setTexto] = useState('');
   const [alias, setAlias] = useState('');
   const [country, setCountry] = useState('');
@@ -251,9 +253,25 @@ export function DejarPregunta({
 
   return (
     <form noValidate onSubmit={(event) => void enviar(event)} className="cortina-form me-pregunto-form flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
-        {copy.campo}
+      <div className="flex flex-col gap-1">
+        <label htmlFor={campoId} className="text-[length:var(--fs-pequeno)] font-semibold">
+          {copy.campo}
+        </label>
+        <p id={explicaId} className="m-0 text-[length:var(--fs-etiqueta)] leading-snug">
+          {copy.explica}
+        </p>
+        {/* Otra pestaña, como Términos y Privacidad, para no perder lo escrito. */}
+        <a
+          className="self-start text-[length:var(--fs-etiqueta)] underline"
+          href="/codigo-de-conducta"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {t.footerConductGuide}
+        </a>
         <textarea
+          id={campoId}
+          aria-describedby={explicaId}
           value={texto}
           maxLength={ME_PREGUNTA_MAX}
           rows={3}
@@ -263,7 +281,7 @@ export function DejarPregunta({
         <span className="text-[length:var(--fs-etiqueta)] font-normal leading-snug">
           {copy.ayuda} ({texto.length}/{ME_PREGUNTA_MAX})
         </span>
-      </label>
+      </div>
       <label className="flex flex-col gap-1 text-[length:var(--fs-pequeno)] font-semibold">
         {copy.alias}
         <input value={alias} onChange={(event) => setAlias(event.target.value)} autoComplete="nickname" className={campo} />
