@@ -1114,7 +1114,7 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
             {/* Debajo del globo, discreta: solo dice que se puede girar a mano. */}
             <p
-              aria-hidden={!globeHint}
+              aria-hidden={!(globeHint && !openStory)}
               className={`pointer-events-none absolute bottom-3 left-4 right-4 z-30 m-0 text-center text-[length:var(--fs-etiqueta)] leading-snug text-white/75 transition-opacity duration-500 ${
                 globeHint && !openStory ? 'opacity-100' : 'opacity-0'
               }`}
