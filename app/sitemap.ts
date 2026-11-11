@@ -1,6 +1,5 @@
 import type { MetadataRoute } from 'next';
-import { getAdminDb } from '@/lib/firebase/admin';
-import { FIRESTORE_AUDIENCE_PUBLIC_STATUSES } from '@/lib/editorial/status';
+import { getPublicStoryUrlsAsync } from '@/lib/map-data/stories-server';
 import { siteOrigin } from '@/lib/site-origin';
 
 // Regenerar la sitemap a lo sumo cada hora: balance entre frescura para
@@ -56,21 +55,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let storyEntries: MetadataRoute.Sitemap = [];
   try {
-    const db = getAdminDb();
-    const snap = await db
-      .collection('stories')
-      .where('status', 'in', [...FIRESTORE_AUDIENCE_PUBLIC_STATUSES])
-      .select('updatedAt', 'publishedAt', 'createdAt')
-      .get();
-
-    storyEntries = snap.docs.map((doc) => {
-      const data = doc.data() as Record<string, unknown>;
+    // Dirección canónica de cada historia (las de texto, /texto), sin pasar por redirecciones.
+    const items = await getPublicStoryUrlsAsync();
+    storyEntries = items.map((item) => {
       const lastModified =
-        toDateOrNull(data.updatedAt) ??
-        toDateOrNull(data.publishedAt) ??
-        toDateOrNull(data.createdAt);
+        toDateOrNull(item.updatedAt) ??
+        toDateOrNull(item.publishedAt) ??
+        toDateOrNull(item.createdAt);
       return {
-        url: `${base}/historias/${doc.id}`,
+        url: `${base}${item.path}`,
         ...(lastModified ? { lastModified } : {}),
         changeFrequency: 'monthly' as const,
         priority: 0.6,

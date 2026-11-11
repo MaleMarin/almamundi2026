@@ -10,6 +10,7 @@ import { franjasValidas } from "@/lib/huella/resonance-stripes";
 import "server-only";
 import type { DocumentData } from "firebase-admin/firestore";
 import type { StoryPoint } from "@/lib/map-data/stories";
+import { canonicalStoryPath, type ConRutaCanonica } from "@/lib/historias/story-canonical";
 import { normalizeCancionRelacionada } from "@/lib/cancion-relacionada";
 import { normalizeAntecedentes, omitAntecedentesFromPublicText } from "@/lib/antecedentes";
 import { publicCityCountry } from "@/lib/historias/story-ubicacion";
@@ -267,6 +268,25 @@ export async function getStoriesAsync(): Promise<StoryPoint[]> {
 }
 
 /** Todas las historias públicas, en el globo o no. Sin el texto del relato. */
+/** Para el sitemap: dirección canónica y fechas de cada historia pública (mismo filtro de estado que el catálogo). */
+export async function getPublicStoryUrlsAsync(): Promise<
+  { path: string; updatedAt: unknown; publishedAt: unknown; createdAt: unknown }[]
+> {
+  const docs = await loadAudienceStoryDocs();
+  const out: { path: string; updatedAt: unknown; publishedAt: unknown; createdAt: unknown }[] = [];
+  for (const doc of docs) {
+    const point = firestoreDocToStoryPoint(doc.id, doc.data, false);
+    if (!point) continue;
+    out.push({
+      path: canonicalStoryPath(doc.id, point),
+      updatedAt: doc.data.updatedAt,
+      publishedAt: doc.data.publishedAt,
+      createdAt: doc.data.createdAt,
+    });
+  }
+  return out;
+}
+
 export async function getPublicCatalogAsync(): Promise<StoryPoint[]> {
   try {
     const docs = await loadAudienceStoryDocs();
@@ -277,6 +297,8 @@ export async function getPublicCatalogAsync(): Promise<StoryPoint[]> {
       if (!point) continue;
       point.featured = isDestacadaRecord(doc.data);
       point.onGlobe = onGlobe.has(doc.id);
+      // Antes de quitar el texto: la tarjeta enlaza directo a la dirección canónica.
+      (point as StoryPoint & ConRutaCanonica).canonicalPath = canonicalStoryPath(doc.id, point);
       point.body = undefined;
       point.excerpt = undefined;
       point.quote = undefined;

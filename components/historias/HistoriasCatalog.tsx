@@ -13,6 +13,7 @@ import { formatStoryWhen } from '@/lib/i18n/site-intl';
 import { formatPublicName, formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { neu } from '@/lib/historias-neumorph';
 import type { StoryPoint } from '@/lib/map-data/stories';
+import type { ConRutaCanonica } from '@/lib/historias/story-canonical';
 
 const PAGE_SIZE = 24;
 
@@ -131,7 +132,7 @@ function StoryCard({
   const when = formatDate(story.publishedAt, locale);
   return (
     <Link
-      href={`/historias/${story.id}`}
+      href={(story as StoryPoint & ConRutaCanonica).canonicalPath ?? `/historias/${story.id}`}
       className="relative flex h-full flex-col overflow-hidden"
       style={{ ...neu.card, borderRadius: large ? 28 : 22 }}
     >
@@ -170,7 +171,7 @@ function StoryCard({
   );
 }
 
-export default function HistoriasCatalog() {
+export default function HistoriasCatalog({ initialStories = [] }: { initialStories?: StoryPoint[] }) {
   const { locale } = useHomeLocale();
   const copy = COPY[locale];
   const router = useRouter();
@@ -178,7 +179,7 @@ export default function HistoriasCatalog() {
   const tab = tabFromParam(searchParams.get('formato'));
   const ejeParam = searchParams.get('eje') ?? '';
   const eje = getEje(ejeParam) ? ejeParam : '';
-  const [stories, setStories] = useState<StoryPoint[]>([]);
+  const [stories, setStories] = useState<StoryPoint[]>(initialStories);
   const [country, setCountry] = useState('');
   const [order, setOrder] = useState<'newest' | 'oldest'>('newest');
   const [query, setQuery] = useState('');
