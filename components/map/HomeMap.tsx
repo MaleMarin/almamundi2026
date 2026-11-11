@@ -1112,19 +1112,15 @@ export default function HomeMap({ universeSectionRef }: HomeMapProps = {}) {
         {/* GlobeV2 embebido. Rollback vídeo: import NASAEpicEarthVideo y <NASAEpicEarthVideo source="spinning" />. */}
         <div className="map-globe-home relative flex w-full min-h-[58vh] flex-1 flex-col overflow-hidden bg-transparent pt-0 pb-0">
           <div className="relative min-h-[min(380px,48vh)] h-full w-full flex-1 overflow-hidden bg-transparent">
-            {/* Sobre el globo, abajo al centro; mismo estilo que el aviso de «Sorpréndeme» y no se muestran juntos. */}
-            <div
+            {/* Debajo del globo, discreta: solo dice que se puede girar a mano. */}
+            <p
               aria-hidden={!globeHint}
-              className={`pointer-events-none absolute bottom-4 left-1/2 z-30 w-[min(22rem,calc(100%-2rem))] -translate-x-1/2 rounded-2xl px-4 py-3 text-center text-white/90 transition-opacity duration-500 ${
-                globeHint && !surpriseNotice && !openStory ? 'opacity-100' : 'opacity-0'
+              className={`pointer-events-none absolute bottom-3 left-4 right-4 z-30 m-0 text-center text-[length:var(--fs-etiqueta)] leading-snug text-white/75 transition-opacity duration-500 ${
+                globeHint && !openStory ? 'opacity-100' : 'opacity-0'
               }`}
-              style={{
-                background: 'rgba(15, 23, 42, 0.82)',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }}
             >
-              <p className="m-0 text-[length:var(--fs-pequeno)] font-semibold">{dockCopy.globeHintTitle}</p>
-              <p className="m-0 mt-1 text-[length:var(--fs-etiqueta)] leading-snug">{dockCopy.globeHintText}</p>
-            </div>
+              {dockCopy.globeHintText}
+            </p>
             <GlobeV2Home
               embedded
               onUserMove={globeHint ? hideGlobeHint : undefined}
