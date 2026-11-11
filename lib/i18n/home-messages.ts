@@ -86,7 +86,7 @@ export type HomeMessages = {
 };
 
 const es: HomeMessages = {
-  navPurpose: 'Propósito',
+  navPurpose: 'Cómo funciona AlmaMundi',
   navHow: '¿Cómo funciona?',
   navStories: 'Historias contadas',
   navHistoriasColeccion: 'Mi colección',
@@ -165,7 +165,7 @@ const es: HomeMessages = {
 };
 
 const pt: HomeMessages = {
-  navPurpose: 'Propósito',
+  navPurpose: 'Como funciona o AlmaMundi',
   navHow: 'Como funciona?',
   navStories: 'Histórias contadas',
   navHistoriasColeccion: 'Minha coleção',
@@ -244,7 +244,7 @@ const pt: HomeMessages = {
 };
 
 const en: HomeMessages = {
-  navPurpose: 'Purpose',
+  navPurpose: 'How AlmaMundi works',
   navHow: 'How does it work?',
   navStories: 'Stories told',
   navHistoriasColeccion: 'My collection',
