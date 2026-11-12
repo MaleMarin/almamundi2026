@@ -13,7 +13,6 @@ export type PropositoPaginaCopy = {
   titulo: string;
   enlacesTitulo: string;
   enlaces: { precisar: string; terminos: string; privacidad: string; contacto: string };
-  idiomasAria: string;
 };
 
 export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
@@ -25,7 +24,6 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     titulo: 'Cómo funciona AlmaMundi',
     enlacesTitulo: 'Documentos y contacto',
     enlaces: { precisar: 'Precisar', terminos: 'Términos de uso', privacidad: 'Aviso de privacidad', contacto: 'Contacto' },
-    idiomasAria: 'Idioma de esta página',
   },
   pt: {
     metaTitulo: 'Como funciona o AlmaMundi: conte sua história e conheça outras',
@@ -35,7 +33,6 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     titulo: 'Como funciona o AlmaMundi',
     enlacesTitulo: 'Documentos e contato',
     enlaces: { precisar: 'Precisar', terminos: 'Termos de uso', privacidad: 'Aviso de privacidade', contacto: 'Contato' },
-    idiomasAria: 'Idioma desta página',
   },
   en: {
     metaTitulo: 'How AlmaMundi works: tell your story and discover others',
@@ -45,7 +42,6 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     titulo: 'How AlmaMundi works',
     enlacesTitulo: 'Documents and contact',
     enlaces: { precisar: 'Precisar', terminos: 'Terms of use', privacidad: 'Privacy notice', contacto: 'Contact' },
-    idiomasAria: 'Language of this page',
   },
 };
 

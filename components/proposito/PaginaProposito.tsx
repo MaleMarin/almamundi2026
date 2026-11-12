@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 import { CapituloHome } from '@/components/home/CapituloHome';
 import { HOME_MESSAGES } from '@/lib/i18n/home-messages';
 import { PropositoLocaleSync } from '@/components/proposito/PropositoLocaleSync';
-import { ALMA_LOCALES, type AlmaLocale } from '@/lib/i18n/locale';
+import type { AlmaLocale } from '@/lib/i18n/locale';
 import { CintaMini } from '@/components/hilos/CintaMini';
 import { HILOS, preguntasDelTema } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
@@ -29,10 +29,7 @@ import { SITE_FONT_STACK } from '@/lib/typography';
  */
 
 const TEXT_MAIN = '#3d4a5c';
-const TEXT_BODY = '#5c6b7e';
-const ORANGE = 'var(--almamundi-orange)';
 const LANG_HTML: Record<AlmaLocale, string> = { es: 'es', pt: 'pt-BR', en: 'en' };
-const LANG_LABEL: Record<AlmaLocale, string> = { es: 'Español', pt: 'Português', en: 'English' };
 
 export function metadataProposito(locale: AlmaLocale): Metadata {
   const c = PROPOSITO_PAGINA[locale];
@@ -193,20 +190,6 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(locale)).replace(/</g, '\\u003c') }}
       />
       <article lang={LANG_HTML[locale]} className={css.contenido}>
-        <nav aria-label={c.idiomasAria} className={css.idiomas}>
-          {ALMA_LOCALES.map((code) =>
-            code === locale ? (
-              <span key={code} aria-current="page" lang={LANG_HTML[code]} style={{ color: ORANGE }}>
-                {LANG_LABEL[code]}
-              </span>
-            ) : (
-              <Link key={code} href={PROPOSITO_RUTAS[code]} hrefLang={LANG_HTML[code]} lang={LANG_HTML[code]} style={{ color: TEXT_BODY }}>
-                {LANG_LABEL[code]}
-              </Link>
-            )
-          )}
-        </nav>
-
         <header className={css.cabecera}>
           <div>
             <p className={css.ceja}>{g.ceja}</p>
