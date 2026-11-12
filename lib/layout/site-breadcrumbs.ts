@@ -32,7 +32,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Términos de uso',
     privacidad: 'Aviso de privacidad',
     contacto: 'Contacto',
-    proposito: 'Propósito',
+    proposito: 'Cómo funciona AlmaMundi',
   },
   pt: {
     _inicio: 'Início',
@@ -59,7 +59,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Termos de uso',
     privacidad: 'Aviso de privacidade',
     contacto: 'Contato',
-    proposito: 'Propósito',
+    proposito: 'Como funciona o AlmaMundi',
   },
   en: {
     _inicio: 'Home',
@@ -86,7 +86,7 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Terms of use',
     privacidad: 'Privacy notice',
     contacto: 'Contact',
-    proposito: 'Purpose',
+    proposito: 'How AlmaMundi works',
   },
 };
 

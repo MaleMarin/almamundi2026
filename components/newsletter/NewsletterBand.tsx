@@ -71,8 +71,9 @@ export function NewsletterBand() {
 
   return (
     <section
+      id="sonder"
       aria-labelledby="newsletter-band-title"
-      className="relative z-20 w-full bg-transparent px-6 pb-4 pt-12 md:px-10 md:pb-6 md:pt-20"
+      className="scroll-mt-28 relative z-20 w-full bg-transparent px-6 pb-4 pt-12 md:px-10 md:pb-6 md:pt-20"
       style={{ fontFamily: SITE_FONT_STACK }}
     >
       <div className="mx-auto w-full max-w-[min(100%,1080px)] rounded-[20px] border border-[#8A847C]/25 bg-[#FBFAF8] px-5 py-4 md:px-7 md:py-5">

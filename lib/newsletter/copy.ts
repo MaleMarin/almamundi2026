@@ -42,7 +42,7 @@ const band = {
   es: {
     eyebrow: "Sonder",
     title: "Historias que llegan a tu correo",
-    text: "Una vez al mes, las historias nuevas del mapa y las cintas del mes.",
+    text: "Una vez al mes, recibe en tu correo una selección de historias de AlmaMundi.",
     email: "Tu correo electrónico",
     button: "Suscribirme",
     consentBefore: "Acepto recibir Sonder, la newsletter de AlmaMundi, y la ",
@@ -57,7 +57,7 @@ const band = {
   pt: {
     eyebrow: "Sonder",
     title: "Histórias que chegam ao seu e-mail",
-    text: "Uma vez por mês, as novas histórias do mapa e as fitas do mês.",
+    text: "Uma vez por mês, receba no seu e-mail uma seleção de histórias do AlmaMundi.",
     email: "Seu e-mail",
     button: "Assinar",
     consentBefore: "Aceito receber a Sonder, a newsletter do AlmaMundi, e a ",
@@ -72,7 +72,7 @@ const band = {
   en: {
     eyebrow: "Sonder",
     title: "Stories in your inbox",
-    text: "Once a month, the new stories on the map and the ribbons of the month.",
+    text: "Once a month, receive a selection of AlmaMundi stories in your inbox.",
     email: "Your email",
     button: "Subscribe",
     consentBefore: "I agree to receive Sonder, the AlmaMundi newsletter, and accept the ",
