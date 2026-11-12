@@ -21,6 +21,7 @@ import {
   SITE_NAV_LINK_CLASS,
   SITE_NAV_STORIES_ITEM_CLASS } from '@/components/layout/siteNavLinkStyles';
 import { storiesLinkLabel } from '@/lib/i18n/home-messages';
+import { propositoHref } from '@/lib/i18n/proposito-pagina';
 import { SITE_FONT_STACK } from '@/lib/typography';
 import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 
@@ -141,15 +142,15 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
 
   const desktopHowPurpose = scope === 'home' ? (
     <>
-      <button type="button" className={SITE_NAV_LINK_CLASS} onClick={() => { props.onShowPurpose(); closeMobileNav(); }}>
+      <Link href={propositoHref(locale)} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
         {t.navPurpose}
-      </button>
+      </Link>
     </>
   ) : (
     <>
-      <HomeHardLink href="/#proposito" className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
+      <Link href={propositoHref(locale)} className={SITE_NAV_LINK_CLASS} onClick={closeMobileNav}>
         {t.navPurpose}
-      </HomeHardLink>
+      </Link>
     </>
   );
 
@@ -188,22 +189,15 @@ export function HomeFirstPartSiteHeader(props: HomeFirstPartSiteHeaderProps) {
 
   const mobilePurposeHow = scope === 'home' ? (
     <>
-      <button
-        type="button"
-        className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`}
-        onClick={() => {
-          props.onShowPurpose();
-          closeMobileNav();
-        }}
-      >
+      <Link href={propositoHref(locale)} className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
         {t.navPurpose}
-      </button>
+      </Link>
     </>
   ) : (
     <>
-      <HomeHardLink href="/#proposito" className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
+      <Link href={propositoHref(locale)} className={`${SITE_NAV_LINK_CLASS} w-full justify-start text-left`} onClick={closeMobileNav}>
         {t.navPurpose}
-      </HomeHardLink>
+      </Link>
     </>
   );
 
