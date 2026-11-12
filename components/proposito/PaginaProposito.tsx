@@ -165,6 +165,12 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
   ];
   const primerTema = HILOS[0]!;
   const preguntaEjemplo = preguntasDelTema(primerTema.id)[0]!;
+  // «las respuestas publicadas» enlaza a la página de respuestas: mismo texto, partido en el tramo del enlace.
+  const textoAlmaMundi = g.inspirate.recorridos[0]!.texto;
+  const corte = textoAlmaMundi.indexOf(g.inspirate.tramoRespuestas);
+  const tramoRespuestas = corte >= 0 ? g.inspirate.tramoRespuestas : '';
+  const antesRespuestas = corte >= 0 ? textoAlmaMundi.slice(0, corte) : textoAlmaMundi;
+  const despuesRespuestas = corte >= 0 ? textoAlmaMundi.slice(corte + tramoRespuestas.length) : '';
   const opcionesMenu = [
     menu.stories,
     ME_PREGUNTO_MAPA[locale].dockAlmaMundi,
@@ -276,7 +282,11 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
                 </li>
               ))}
             </ul>
-            <p className={css.nota}>{g.inspirate.cintasAyuda}</p>
+            <p className={css.nota}>
+              <Link href="/preguntas" className={css.enlaceEnTexto}>
+                {g.inspirate.cintasAyuda}
+              </Link>
+            </p>
           </div>
           <div>
             <p className={css.ceja}>{g.inspirate.dosCeja}</p>
@@ -292,7 +302,15 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
               <div className={`${css.tarjeta} ${css.recorrido}`}>
                 <p className={css.ceja}>{g.inspirate.recorridos[0]!.ceja}</p>
                 <h4 className={css.h3}>{nombres.paraTi}</h4>
-                <p className={css.pChico}>{g.inspirate.recorridos[0]!.texto}</p>
+                <p className={css.pChico}>
+                  {antesRespuestas}
+                  {tramoRespuestas ? (
+                    <Link href="/respuestas-a-almamundi" className={css.enlaceEnTexto}>
+                      {tramoRespuestas}
+                    </Link>
+                  ) : null}
+                  {despuesRespuestas}
+                </p>
                 <HomeHardLink href="/#cintas" className={css.enlace}>
                   {g.inspirate.recorridos[0]!.enlace}
                 </HomeHardLink>

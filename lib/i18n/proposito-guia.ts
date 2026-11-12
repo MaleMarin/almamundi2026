@@ -34,6 +34,8 @@ export type PropositoGuiaCopy = {
     dosTitulo: string;
     tema: string;
     recorridos: { ceja: string; texto: string; enlace: string }[];
+    /** Tramo del texto del primer recorrido que enlaza a /respuestas-a-almamundi (debe aparecer tal cual en ese texto). */
+    tramoRespuestas: string;
     notas: string[];
   };
   descubre: {
@@ -125,6 +127,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
           enlace: 'Conocer preguntas',
         },
       ],
+      tramoRespuestas: 'las respuestas publicadas',
       notas: [
         'La pregunta permanece a la vista mientras respondes, y puedes volver atrás conservando lo que escribiste.',
         'Las respuestas pasan por revisión antes de publicarse.',
@@ -273,6 +276,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
           enlace: 'Conhecer perguntas',
         },
       ],
+      tramoRespuestas: 'as respostas publicadas',
       notas: [
         'A pergunta fica à vista enquanto você responde, e você pode voltar atrás mantendo o que escreveu.',
         'As respostas passam por revisão antes de serem publicadas.',
@@ -421,6 +425,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
           enlace: 'See the questions',
         },
       ],
+      tramoRespuestas: 'the published answers',
       notas: [
         'The question stays in view while you answer, and you can go back and keep what you wrote.',
         'Answers are reviewed before they are published.',

@@ -382,6 +382,12 @@
   text-decoration: underline;
   text-underline-offset: 0.25em;
 }
+/* Enlace dentro de un texto: misma letra, color y tamaño que el texto; solo se subraya. */
+.enlaceEnTexto {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
 
 /* 03 · Descubre: el universo, con glass */
 .universo {
