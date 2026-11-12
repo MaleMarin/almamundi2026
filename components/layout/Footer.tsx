@@ -4,6 +4,7 @@
 import { useHomeLocaleOptional, uiMessages } from '@/components/i18n/LocaleProvider';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import { ActiveInternalNavLink } from '@/components/layout/ActiveInternalNavLink';
+import { FooterCortina } from '@/components/layout/FooterCortina';
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
 import { NewsletterBand } from '@/components/newsletter/NewsletterBand';
 import { SITE_FOOTER_LEGAL_LINKS } from '@/components/layout/siteNavLinkStyles';
@@ -216,6 +217,9 @@ export function Footer({ embedded = false, initialLocale = 'es' }: FooterProps =
           </div>
         </div>
       </div>
+
+      {/* 4. Cortina de cintas: mismos colores que la tarjeta para compartir el sitio */}
+      <FooterCortina />
     </footer>
   );
 }
