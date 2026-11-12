@@ -76,12 +76,12 @@
   line-height: 1.2;
   margin-bottom: 1rem;
 }
-.lema {
-  margin: 0 0 1.05rem;
+.entrada {
+  max-width: 34rem;
+  margin: 0;
   font-size: var(--fs-subtitulo);
-  font-style: italic;
-  line-height: 1.4;
-  color: var(--naranja-texto);
+  line-height: 1.5;
+  color: var(--cuerpo);
 }
 .p {
   margin: 0 0 1.05rem;
@@ -180,9 +180,53 @@
 .bloqueCuerpo > :last-child {
   margin-bottom: 0;
 }
-.lectura {
-  max-width: 44rem;
-  margin: 2.5rem 0 0 auto;
+/* Propósito */
+.proposito {
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0 0;
+  margin-top: clamp(3.5rem, 8vw, 6.5rem);
+  border-top: 1px solid var(--linea);
+  scroll-margin-top: 6rem;
+}
+.propositoGrilla {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+}
+.propositoTarjeta {
+  padding: 2rem 1.75rem;
+}
+.propositoTarjeta > :last-child {
+  margin-bottom: 0;
+}
+.puntos {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--cuerpo);
+}
+.puntos li {
+  position: relative;
+  padding-left: 1.15rem;
+}
+.puntos li + li {
+  margin-top: 0.85rem;
+}
+.puntos li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.6em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--almamundi-orange);
+}
+.bloqueCuerpo > .puntos {
+  font-size: var(--fs-texto);
+  line-height: 1.7;
 }
 .destacado {
   margin: 2rem 0 0;
@@ -268,44 +312,42 @@
   align-items: start;
   margin-top: 3rem;
 }
-.cortina {
-  padding: 0 1.25rem 1.5rem;
-  overflow: hidden;
+.cortinaImagen {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 28px;
+  box-shadow: 14px 14px 34px rgba(120, 110, 100, 0.3), -14px -14px 34px #fff;
 }
-.cortinaCintas {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: 0.25rem;
-  margin: 0;
+.temas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1.5rem 0 0;
   padding: 0;
   list-style: none;
 }
-.cinta {
-  display: flex;
-  flex-direction: column;
+.tema {
+  display: inline-flex;
   align-items: center;
-  height: 100%;
-  text-decoration: none;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--linea);
+  background: #fbfaf8;
+  font-size: 0.875rem;
   color: var(--tinta);
-  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  text-decoration: none;
+  transition: border-color 0.2s ease;
 }
-.cinta:hover,
-.cinta:focus-visible {
-  transform: translateY(10px);
+.tema:hover,
+.tema:focus-visible {
+  border-color: rgba(var(--almamundi-orange-rgb), 0.6);
 }
-.cintaImagen {
-  width: 100%;
-  max-width: 34px;
-  height: 230px;
-  object-fit: cover;
-  object-position: top;
-}
-.cintaNombre {
-  margin-top: 0.75rem;
-  writing-mode: vertical-rl;
-  font-size: 0.8125rem;
-  line-height: 1.2;
-  white-space: nowrap;
+.temaColor {
+  width: 0.5rem;
+  height: 1.1rem;
+  border-radius: 2px;
 }
 .cita {
   margin: 0 0 1.5rem;
@@ -548,8 +590,8 @@
   .opciones {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .lectura {
-    margin-left: 0;
+  .propositoGrilla {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -572,13 +614,6 @@
     max-width: 15rem;
     margin: 0 auto;
   }
-  .cortinaCintas {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    row-gap: 1.5rem;
-  }
-  .cintaImagen {
-    height: 150px;
-  }
   .pasos {
     flex-direction: column;
     align-items: flex-start;
@@ -591,12 +626,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cinta,
+  .tema,
   .pastilla {
     transition: none;
-  }
-  .cinta:hover,
-  .cinta:focus-visible {
-    transform: none;
   }
 }

@@ -2,7 +2,7 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 
 /**
  * Bloques explicativos de «Cómo funciona AlmaMundi» (/proposito, /pt/proposito, /en/proposito).
- * Se suman a los textos institucionales de lib/i18n/proposito-pagina.ts dentro de la misma página.
+ * El Propósito y «Para que este sea un lugar seguro» se toman de lib/i18n/proposito.ts y lib/i18n/como-funciona.ts.
  * En los párrafos, **texto** se muestra destacado. {n} se reemplaza por el límite real del sitio.
  */
 
@@ -11,11 +11,13 @@ export type PropositoGuiaCopy = {
   tituloAntes: string;
   tituloMarca: string;
   navAria: string;
+  intro: string;
   tarjeta: { titulo: string; texto: string };
   cuenta: {
     ceja: string;
     intro: string;
     formatos: { video: string; audio: string; texto: string; foto: string };
+    textos: { video: string; audio: string; texto: string; foto: string };
     limites: { minutos: string; caracteres: string; fotos: string };
     cintas: { ceja: string; titulo: string; parrafos: string[]; nota: string; alt: string };
     pasosAria: string;
@@ -24,6 +26,9 @@ export type PropositoGuiaCopy = {
   };
   inspirate: {
     ceja: string;
+    intro: string;
+    cortinaAlt: string;
+    dosTexto: string;
     cintasAyuda: string;
     dosCeja: string;
     dosTitulo: string;
@@ -46,6 +51,7 @@ export type PropositoGuiaCopy = {
   construir: { ceja: string; titulo: string; parrafos: string[] };
   sonder: { ceja: string; titulo: string; texto: string; nota: string; boton: string };
   quienesCeja: string;
+  quienes: { titulo: string; parrafos: string[] };
 };
 
 export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
@@ -54,6 +60,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
     tituloAntes: 'Cómo funciona',
     tituloMarca: 'AlmaMundi',
     navAria: 'Secciones de esta página',
+    intro: 'Un espacio para compartir experiencias, responder preguntas y descubrir historias que amplían nuestra manera de mirar el mundo.',
     tarjeta: {
       titulo: 'Cuenta lo que quieras compartir.',
       texto: 'Un recuerdo, una conversación, una anécdota o una experiencia importante para ti. Tú eliges.',
@@ -63,6 +70,12 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       intro:
         'Tú decides qué contar y cómo hacerlo. Elige texto, audio, video o fotografía. Al enviar tu historia, podrás descargar una imagen de cintas creada a partir de tu relato.',
       formatos: { video: 'Video', audio: 'Audio', texto: 'Texto', foto: 'Fotografía' },
+      textos: {
+        video: 'Cuenta tu experiencia frente a una cámara.',
+        audio: 'Dale voz a lo que recuerdas.',
+        texto: 'Escribe con tus propias palabras.',
+        foto: 'Comparte una imagen y la historia que hay detrás.',
+      },
       limites: { minutos: 'Máx. {n} minutos', caracteres: 'Máx. {n} caracteres', fotos: 'Hasta {n} fotografías' },
       cintas: {
         ceja: 'Una imagen propia',
@@ -88,6 +101,11 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
     },
     inspirate: {
       ceja: '02 / Empezar por una pregunta',
+      intro:
+        'Una pregunta puede hacerte recordar algo que quieras contar. Las doce cintas de AlmaMundi reúnen preguntas sobre distintas experiencias de la vida.',
+      cortinaAlt: 'La cortina de cintas de colores de Inspírate.',
+      dosTexto:
+        'Entra a una de las doce cintas para responder preguntas de AlmaMundi y conocer lo que otras personas han contestado. También puedes explorar las preguntas que proponen las personas.',
       cintasAyuda: 'Elige una cinta para explorar el tema',
       dosCeja: '12 temas · Preguntas abiertas',
       dosTitulo: 'Hay dos maneras de participar.',
@@ -170,12 +188,24 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       boton: 'Suscribirme a Sonder',
     },
     quienesCeja: 'El proyecto y sus derechos',
+    quienes: {
+      titulo: 'Quiénes estamos detrás',
+      parrafos: [
+        'AlmaMundi es una iniciativa sin fines de lucro de Fundación Democracia Abierta, desarrollada por Precisar.',
+        'Fundación Democracia Abierta es una organización con domicilio en Santiago de Chile que trabaja en cultura digital y alfabetización mediática.',
+        'En Precisar trabajamos para que las personas comprendan mejor la información, desarrollen su propio criterio y participen con mayor autonomía.',
+        'Pero un proyecto como este no se construye solamente desde una organización. También lo hacen posible quienes comparten sus experiencias, hacen preguntas y nos permiten conocer sus historias.',
+        'Esa es la idea que impulsa AlmaMundi: que sean las propias personas quienes cuenten lo que han vivido y que otras puedan conocerlo.',
+        'Las historias, preguntas y respuestas se revisan antes de publicarse. Quienes participan conservan sus derechos sobre los contenidos que comparten y pueden solicitar su retiro conforme a las condiciones del proyecto.',
+      ],
+    },
   },
   pt: {
     ceja: 'Um guia para participar',
     tituloAntes: 'Como funciona o',
     tituloMarca: 'AlmaMundi',
     navAria: 'Seções desta página',
+    intro: 'Um espaço para compartilhar experiências, responder perguntas e descobrir histórias que ampliam nossa maneira de olhar o mundo.',
     tarjeta: {
       titulo: 'Conte o que quiser compartilhar.',
       texto: 'Uma lembrança, uma conversa, um episódio ou uma experiência importante para você. Você escolhe.',
@@ -185,6 +215,12 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       intro:
         'Você decide o que contar e como fazer isso. Escolha texto, áudio, vídeo ou fotografia. Ao enviar sua história, você poderá baixar uma imagem de fitas criada a partir do seu relato.',
       formatos: { video: 'Vídeo', audio: 'Áudio', texto: 'Texto', foto: 'Fotografia' },
+      textos: {
+        video: 'Conte sua experiência diante de uma câmera.',
+        audio: 'Dê voz ao que você lembra.',
+        texto: 'Escreva com suas próprias palavras.',
+        foto: 'Compartilhe uma imagem e a história por trás dela.',
+      },
       limites: { minutos: 'Máx. {n} minutos', caracteres: 'Máx. {n} caracteres', fotos: 'Até {n} fotografias' },
       cintas: {
         ceja: 'Uma imagem própria',
@@ -210,6 +246,11 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
     },
     inspirate: {
       ceja: '02 / Começar por uma pergunta',
+      intro:
+        'Uma pergunta pode fazer você lembrar algo que queira contar. As doze fitas do AlmaMundi reúnem perguntas sobre diferentes experiências da vida.',
+      cortinaAlt: 'A cortina de fitas coloridas do Inspire-se.',
+      dosTexto:
+        'Entre em uma das doze fitas para responder perguntas do AlmaMundi e conhecer o que outras pessoas responderam. Você também pode explorar as perguntas propostas pelas pessoas.',
       cintasAyuda: 'Escolha uma fita para explorar o tema',
       dosCeja: '12 temas · Perguntas abertas',
       dosTitulo: 'Há duas maneiras de participar.',
@@ -292,12 +333,24 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       boton: 'Assinar a Sonder',
     },
     quienesCeja: 'O projeto e seus direitos',
+    quienes: {
+      titulo: 'Quem está por trás',
+      parrafos: [
+        'O AlmaMundi é uma iniciativa sem fins lucrativos da Fundación Democracia Abierta, desenvolvida pela Precisar.',
+        'A Fundación Democracia Abierta é uma organização com sede em Santiago, no Chile, que atua em cultura digital e educação midiática.',
+        'Na Precisar trabalhamos para que as pessoas compreendam melhor a informação, desenvolvam seu próprio critério e participem com mais autonomia.',
+        'Mas um projeto como este não se constrói apenas a partir de uma organização. Também o tornam possível as pessoas que compartilham suas experiências, fazem perguntas e nos permitem conhecer suas histórias.',
+        'Essa é a ideia que move o AlmaMundi: que as próprias pessoas contem o que viveram e que outras possam conhecer.',
+        'As histórias, perguntas e respostas são revisadas antes de serem publicadas. Quem participa mantém seus direitos sobre o conteúdo que compartilha e pode pedir sua retirada conforme as condições do projeto.',
+      ],
+    },
   },
   en: {
     ceja: 'A guide to taking part',
     tituloAntes: 'How',
     tituloMarca: 'AlmaMundi works',
     navAria: 'Sections of this page',
+    intro: 'A space to share experiences, answer questions, and discover stories that broaden the way we see the world.',
     tarjeta: {
       titulo: 'Tell whatever you want to share.',
       texto: 'A memory, a conversation, an anecdote, or an experience that matters to you. You choose.',
@@ -307,6 +360,12 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       intro:
         'You decide what to tell and how to tell it. Choose text, audio, video, or photography. When you send your story, you can download a ribbon image created from it.',
       formatos: { video: 'Video', audio: 'Audio', texto: 'Text', foto: 'Photography' },
+      textos: {
+        video: 'Tell your experience in front of a camera.',
+        audio: 'Give voice to what you remember.',
+        texto: 'Write in your own words.',
+        foto: 'Share an image and the story behind it.',
+      },
       limites: { minutos: 'Max. {n} minutes', caracteres: 'Max. {n} characters', fotos: 'Up to {n} photos' },
       cintas: {
         ceja: 'An image of your own',
@@ -332,6 +391,11 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
     },
     inspirate: {
       ceja: '02 / Start with a question',
+      intro:
+        'A question can remind you of something you want to tell. AlmaMundi’s twelve ribbons gather questions about different life experiences.',
+      cortinaAlt: 'The curtain of colored ribbons in Get inspired.',
+      dosTexto:
+        'Enter one of the twelve ribbons to answer AlmaMundi’s questions and see what other people have answered. You can also explore the questions people propose.',
       cintasAyuda: 'Choose a ribbon to explore the theme',
       dosCeja: '12 themes · Open questions',
       dosTitulo: 'There are two ways to take part.',
@@ -414,5 +478,16 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
       boton: 'Subscribe to Sonder',
     },
     quienesCeja: 'The project and your rights',
+    quienes: {
+      titulo: 'Who is behind it',
+      parrafos: [
+        'AlmaMundi is a nonprofit initiative of Fundación Democracia Abierta, developed by Precisar.',
+        'Fundación Democracia Abierta is an organization based in Santiago, Chile, that works on digital culture and media literacy.',
+        'At Precisar we work so that people understand information better, develop their own judgment, and take part with greater autonomy.',
+        'But a project like this is not built by an organization alone. It is also made possible by those who share their experiences, ask questions, and let us know their stories.',
+        'That is the idea behind AlmaMundi: that people themselves tell what they have lived, and that others can come to know it.',
+        'Stories, questions, and answers are reviewed before they are published. Participants keep their rights over the content they share and can request its removal under the project’s conditions.',
+      ],
+    },
   },
 };

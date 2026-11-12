@@ -11,8 +11,10 @@ import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { mapChrome } from '@/lib/i18n/map-chrome';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
 import { PROPOSITO_GUIA } from '@/lib/i18n/proposito-guia';
-import { PROPOSITO_PAGINA, PROPOSITO_RUTAS, type PropositoSeccion } from '@/lib/i18n/proposito-pagina';
-import { cortinaSitioCss } from '@/lib/cortina-sitio';
+import { COMO_FUNCIONA } from '@/lib/i18n/como-funciona';
+import { PROPOSITO } from '@/lib/i18n/proposito';
+import { PROPOSITO_PAGINA, PROPOSITO_RUTAS } from '@/lib/i18n/proposito-pagina';
+import { CORTINA_SITIO_COLORES, cortinaSitioCss } from '@/lib/cortina-sitio';
 import { SUBIR_AV_MAX_MINUTES, SUBIR_PHOTO_MAX, SUBIR_TEXT_MAX_CHARS } from '@/lib/subir-limits';
 import css from '@/components/proposito/PaginaProposito.module.css';
 import { PUBLIC_OG_LOCALE } from '@/lib/i18n/public-meta';
@@ -142,6 +144,8 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
   const g = PROPOSITO_GUIA[locale];
   const hero = HOME_MESSAGES[locale];
   const menu = mapChrome(locale);
+  const proposito = PROPOSITO[locale];
+  const seguro = COMO_FUNCIONA[locale];
   const nombres = {
     cuenta: hero.navTellStory,
     inspirate: hero.cejaInspira,
@@ -150,21 +154,15 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
     paraTi: HILOS_UI[locale].nav,
     personas: ME_PREGUNTO_MAPA[locale].titulo,
   };
-  const seccion = (id: string): PropositoSeccion => c.secciones.find((s) => s.id === id)!;
-  const scroll = seccion('scroll');
-  const todas = seccion('todas');
-  const formatos = seccion('formatos');
-  const pregunta = seccion('pregunta');
-  const conoce = seccion('conoce');
-  const memorias = seccion('memorias');
-  const quienes = seccion('quienes');
+  // Propósito: los mismos textos de la ventana «Propósito» (sin su cierre con botón).
+  const propositoSecciones = proposito.sections.filter((s) => s.id !== 'cierre');
   const n = (valor: number) => valor.toLocaleString(NUMERO[locale]);
-  // Orden de los textos aprobados de «Elige cómo contarlo»: texto, audio, video, fotografía.
+  const minutos = g.cuenta.limites.minutos.replace('{n}', n(SUBIR_AV_MAX_MINUTES));
   const tarjetas = [
-    { nombre: g.cuenta.formatos.video, texto: formatos.formatos![2]!.texto, limite: g.cuenta.limites.minutos.replace('{n}', n(SUBIR_AV_MAX_MINUTES)) },
-    { nombre: g.cuenta.formatos.audio, texto: formatos.formatos![1]!.texto, limite: g.cuenta.limites.minutos.replace('{n}', n(SUBIR_AV_MAX_MINUTES)) },
-    { nombre: g.cuenta.formatos.texto, texto: formatos.formatos![0]!.texto, limite: g.cuenta.limites.caracteres.replace('{n}', n(SUBIR_TEXT_MAX_CHARS)) },
-    { nombre: g.cuenta.formatos.foto, texto: formatos.formatos![3]!.texto, limite: g.cuenta.limites.fotos.replace('{n}', n(SUBIR_PHOTO_MAX)) },
+    { nombre: g.cuenta.formatos.video, texto: g.cuenta.textos.video, limite: minutos },
+    { nombre: g.cuenta.formatos.audio, texto: g.cuenta.textos.audio, limite: minutos },
+    { nombre: g.cuenta.formatos.texto, texto: g.cuenta.textos.texto, limite: g.cuenta.limites.caracteres.replace('{n}', n(SUBIR_TEXT_MAX_CHARS)) },
+    { nombre: g.cuenta.formatos.foto, texto: g.cuenta.textos.foto, limite: g.cuenta.limites.fotos.replace('{n}', n(SUBIR_PHOTO_MAX)) },
   ];
   const primerTema = HILOS[0]!;
   const preguntaEjemplo = preguntasDelTema(primerTema.id)[0]!;
@@ -181,8 +179,8 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
     { href: '#descubre', texto: nombres.descubre },
     { href: '#historias-contadas', texto: nombres.historias },
   ];
-  // La imagen de cintas se genera con el algoritmo del sitio a partir de un texto aprobado de esta página.
-  const textoCintas = todas.parrafos.join(' ');
+  // La imagen de cintas se genera con el algoritmo del sitio a partir del texto de «Por qué existimos».
+  const textoCintas = propositoSecciones[0]!.blocks.map((b) => (b.type === 'p' ? b.text : '')).join(' ');
 
   return (
     <main className={css.pagina} style={{ fontFamily: SITE_FONT_STACK }}>
@@ -213,8 +211,7 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             <h1 className={css.h1} aria-label={c.titulo}>
               {g.tituloAntes} <span className={css.naranja}>{g.tituloMarca}</span>
             </h1>
-            <p className={css.lema}>{c.bajadaLema}</p>
-            <Parrafos textos={c.bajada} />
+            <p className={css.entrada}>{g.intro}</p>
             <nav aria-label={g.navAria}>
               <ol className={css.indice}>
                 {navegacion.map((item, i) => (
@@ -237,14 +234,6 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             />
           </div>
         </header>
-
-        <Bloque id={scroll.id} titulo={scroll.titulo}>
-          <Parrafos textos={scroll.parrafos} />
-        </Bloque>
-
-        <Bloque id={todas.id} titulo={todas.titulo}>
-          <Parrafos textos={todas.parrafos} />
-        </Bloque>
 
         {/* 01 · Cuenta tu historia */}
         <Bloque id="cuenta" ceja={g.cuenta.ceja} titulo={nombres.cuenta} grande>
@@ -282,35 +271,33 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           ))}
         </ol>
         <p className={css.nota}>{g.cuenta.pasosNota}</p>
-        <div className={css.lectura}>
-          <Parrafos textos={formatos.parrafosFinales ?? []} />
-        </div>
 
         {/* 02 · Inspírate */}
         <Bloque id="inspirate" ceja={g.inspirate.ceja} titulo={nombres.inspirate} grande>
-          <Parrafos textos={pregunta.parrafos.slice(0, 2)} />
+          <p className={css.p}>{g.inspirate.intro}</p>
         </Bloque>
         <div className={css.inspirateGrilla}>
-          <div className={`${css.tarjeta} ${css.cortina}`}>
-            <ul className={css.cortinaCintas}>
-              {HILOS.map((hilo) => (
+          <div>
+            {/* Captura de la cortina real de Inspírate (components/hilos/CortinaTemas). */}
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/proposito/cortina.webp" alt={g.inspirate.cortinaAlt} width={1600} height={900} loading="lazy" className={css.cortinaImagen} />
+            <ul className={css.temas}>
+              {HILOS.map((hilo, i) => (
                 <li key={hilo.id}>
-                  <Link href={`/preguntas?tema=${hilo.id}`} className={css.cinta}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={hilo.imagen} alt="" loading="lazy" className={css.cintaImagen} />
-                    <span className={css.cintaNombre}>{hilo.nombre[locale]}</span>
+                  <Link href={`/preguntas?tema=${hilo.id}`} className={css.tema}>
+                    <span aria-hidden className={css.temaColor} style={{ background: CORTINA_SITIO_COLORES[i] }} />
+                    {hilo.nombre[locale]}
                   </Link>
                 </li>
               ))}
             </ul>
-            <p className={css.nota} style={{ textAlign: 'center' }}>
-              {g.inspirate.cintasAyuda}
-            </p>
+            <p className={css.nota}>{g.inspirate.cintasAyuda}</p>
           </div>
           <div>
             <p className={css.ceja}>{g.inspirate.dosCeja}</p>
             <h3 className={css.h3Grande}>{g.inspirate.dosTitulo}</h3>
-            <blockquote className={css.cita} style={{ borderColor: primerTema.color }}>
+            <p className={css.pChico}>{g.inspirate.dosTexto}</p>
+            <blockquote className={css.cita} style={{ borderColor: CORTINA_SITIO_COLORES[0] }}>
               <span className={css.citaTema}>
                 {g.inspirate.tema} · {primerTema.nombre[locale]}
               </span>
@@ -334,15 +321,17 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
                 </Link>
               </div>
             </div>
+            {g.inspirate.notas.map((t) => (
+              <p key={t} className={css.nota}>
+                {t}
+              </p>
+            ))}
           </div>
-        </div>
-        <div className={css.lectura}>
-          <Parrafos textos={[...g.inspirate.notas, ...pregunta.parrafos.slice(4)]} />
         </div>
 
         {/* 03 · Descubre */}
         <Bloque id="descubre" ceja={g.descubre.ceja} titulo={nombres.descubre} grande>
-          <Parrafos textos={[...conoce.parrafos.slice(0, 2), g.descubre.intro]} />
+          <p className={css.p}>{g.descubre.intro}</p>
         </Bloque>
         <div className={css.universo}>
           <p className={css.universoCeja}>{g.descubre.capturaCeja}</p>
@@ -390,7 +379,6 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             </ul>
             <p className={css.buscador}>{menu.searchTitle}</p>
           </div>
-          <Parrafos textos={conoce.parrafos.slice(2)} />
           <p className={css.nota}>{g.historias.nota}</p>
           <Link href="/historias" className={css.boton}>
             {g.historias.enlace}
@@ -403,12 +391,55 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
           <p className={css.destacado}>{g.algoritmo.destacado}</p>
         </Bloque>
 
-        <Bloque id={memorias.id} titulo={memorias.titulo}>
-          <Parrafos textos={memorias.parrafos} />
-        </Bloque>
-
         <Bloque id="construir" ceja={g.construir.ceja} titulo={g.construir.titulo}>
           <Parrafos textos={g.construir.parrafos} />
+        </Bloque>
+
+        {/* Propósito: mismos textos de la ventana «Propósito» */}
+        <section id="proposito" aria-labelledby="proposito-titulo" className={css.proposito}>
+          <p className={css.ceja}>{proposito.brand}</p>
+          <h2 id="proposito-titulo" className={css.h2Grande}>
+            {proposito.title}
+          </h2>
+          <div className={css.propositoGrilla}>
+            {propositoSecciones.map((seccion) => (
+              <div key={seccion.id} className={`${css.tarjeta} ${css.propositoTarjeta}`}>
+                <h3 className={css.h3Grande}>{seccion.title}</h3>
+                {seccion.blocks.map((bloque) =>
+                  bloque.type === 'p' ? (
+                    <p key={bloque.text} className={css.pChico}>
+                      {bloque.text}
+                    </p>
+                  ) : bloque.type === 'beliefs' ? (
+                    <ul key={seccion.id} className={css.puntos}>
+                      {bloque.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* Para que este sea un lugar seguro: mismos textos de «¿Cómo funciona?» */}
+        <Bloque id="lugar-seguro" titulo={seguro.safeTitle}>
+          <ul className={css.puntos}>
+            {seguro.safe.map((item) =>
+              item.kind === 'text' ? (
+                <li key={item.text}>{item.text}</li>
+              ) : (
+                <li key={item.link}>
+                  {item.before}
+                  <Link href="/mis-datos-personales" style={ENLACE}>
+                    {item.link}
+                  </Link>
+                  {item.after}
+                </li>
+              )
+            )}
+          </ul>
         </Bloque>
 
         {/* Sonder */}
@@ -427,8 +458,8 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
         </section>
 
         {/* Quiénes estamos detrás */}
-        <Bloque id={quienes.id} ceja={g.quienesCeja} titulo={quienes.titulo}>
-          <Parrafos textos={quienes.parrafos} />
+        <Bloque id="quienes" ceja={g.quienesCeja} titulo={g.quienes.titulo}>
+          <Parrafos textos={g.quienes.parrafos} />
           <nav aria-label={c.enlacesTitulo}>
             <ul className={css.documentos}>
               <li>
