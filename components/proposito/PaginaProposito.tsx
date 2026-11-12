@@ -331,9 +331,12 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             ))}
           </dl>
           <div className={css.universoPie}>
-            <p>
-              {menu.sounds} {g.descubre.sonidos}
-            </p>
+            <div className={css.sonidos}>
+              <h3>{menu.sounds}</h3>
+              {g.descubre.sonidos.map((t) => (
+                <p key={t}>{t.replace('{nombre}', menu.sounds)}</p>
+              ))}
+            </div>
             <HomeHardLink href={MAPA_HOME_LINK_HREF} className={css.botonVidrio}>
               {g.descubre.enlace}
             </HomeHardLink>

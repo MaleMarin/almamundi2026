@@ -42,7 +42,8 @@ export type PropositoGuiaCopy = {
     capturaAlt: string;
     capturaCeja: string;
     opciones: string[];
-    sonidos: string;
+    /** {nombre} se reemplaza por el nombre del control en el menú del globo. */
+    sonidos: string[];
     pasos: { titulo: string; texto: string }[];
     enlace: string;
   };
@@ -142,7 +143,10 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         'Activa la capa de lugares que tienen su propia ficha. Selecciona uno de sus puntos para descubrir lo que cuenta ese lugar.',
         'Abre el buscador para localizar historias por título, ciudad o tema.',
       ],
-      sonidos: 'tiene su propio control, aparte del menú.',
+      sonidos: [
+        'Acompaña tu recorrido por el globo con seis ambientes sonoros: universo, mar, radio, lluvia, mercado y bosque.',
+        'Abre «{nombre}», reproduce los ambientes que quieras escuchar y ajusta el volumen de cada uno. Puedes apagarlos cuando prefieras.',
+      ],
       pasos: [
         { titulo: 'Elige una opción del menú', texto: 'Historias, respuestas, preguntas, lugares o búsqueda.' },
         { titulo: 'Selecciona un punto', texto: 'Abre el contenido asociado a ese lugar.' },
@@ -287,7 +291,10 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         'Ativa a camada de lugares que têm sua própria ficha. Selecione um de seus pontos para descobrir o que esse lugar conta.',
         'Abre o buscador para localizar histórias por título, cidade ou tema.',
       ],
-      sonidos: 'tem seu próprio controle, separado do menu.',
+      sonidos: [
+        'Acompanhe seu percurso pelo globo com seis ambientes sonoros: universo, mar, rádio, chuva, mercado e floresta.',
+        'Abra «{nombre}», reproduza os ambientes que quiser ouvir e ajuste o volume de cada um. Você pode desligá-los quando preferir.',
+      ],
       pasos: [
         { titulo: 'Escolha uma opção do menu', texto: 'Histórias, respostas, perguntas, lugares ou busca.' },
         { titulo: 'Selecione um ponto', texto: 'Abre o conteúdo associado a esse lugar.' },
@@ -432,7 +439,10 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         'Turns on the layer of places that have their own entry. Select one of its points to discover what that place tells.',
         'Opens the search to find stories by title, city, or theme.',
       ],
-      sonidos: 'has its own control, separate from the menu.',
+      sonidos: [
+        'Accompany your journey around the globe with six soundscapes: universe, sea, radio, rain, market, and forest.',
+        'Open “{nombre}”, play the soundscapes you want to hear, and adjust the volume of each one. You can turn them off whenever you like.',
+      ],
       pasos: [
         { titulo: 'Choose a menu option', texto: 'Stories, answers, questions, places, or search.' },
         { titulo: 'Select a point', texto: 'It opens the content linked to that place.' },
