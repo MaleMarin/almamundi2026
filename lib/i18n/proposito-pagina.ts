@@ -1,7 +1,8 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
 
 /**
- * Página institucional /proposito (es), /pt/proposito y /en/proposito.
+ * Página «Cómo funciona AlmaMundi»: /como-funciona (es), /pt/como-funciona y /en/how-it-works.
+ * Las direcciones anteriores (/proposito, /pt/proposito, /en/proposito) redirigen aquí (next.config.ts).
  * Aquí van el título, los metadatos y los enlaces. Los bloques están en lib/i18n/proposito-guia.ts.
  */
 
@@ -50,9 +51,9 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
 
 /** Ruta de la página institucional en cada idioma. */
 export const PROPOSITO_RUTAS: Record<AlmaLocale, string> = {
-  es: '/proposito',
-  pt: '/pt/proposito',
-  en: '/en/proposito',
+  es: '/como-funciona',
+  pt: '/pt/como-funciona',
+  en: '/en/how-it-works',
 };
 
 export function propositoHref(locale: AlmaLocale): string {
@@ -62,7 +63,7 @@ export function propositoHref(locale: AlmaLocale): string {
 /** true si la ruta es una de las tres versiones de la página institucional. */
 export function esRutaProposito(pathname: string | null | undefined): boolean {
   const p = (pathname ?? '').replace(/\/$/, '');
-  return p === '/proposito' || p === '/pt/proposito' || p === '/en/proposito';
+  return p === PROPOSITO_RUTAS.es || p === PROPOSITO_RUTAS.pt || p === PROPOSITO_RUTAS.en;
 }
 
 /** Texto del enlace del modal hacia la página. */

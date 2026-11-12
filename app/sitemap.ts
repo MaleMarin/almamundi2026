@@ -18,9 +18,9 @@ const STATIC_PATHS: string[] = [
   '/preguntas-de-las-personas',
   '/privacidad',
   '/terminos',
-  '/proposito',
-  '/pt/proposito',
-  '/en/proposito',
+  '/como-funciona',
+  '/pt/como-funciona',
+  '/en/how-it-works',
 ];
 
 /** Acepta Firestore Timestamp, ISO string o nada. Devuelve Date válida o null. */

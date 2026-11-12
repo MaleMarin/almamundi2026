@@ -32,7 +32,8 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Términos de uso',
     privacidad: 'Aviso de privacidad',
     contacto: 'Contacto',
-    proposito: 'Cómo funciona AlmaMundi',
+    'como-funciona': 'Cómo funciona AlmaMundi',
+    'how-it-works': 'Cómo funciona AlmaMundi',
   },
   pt: {
     _inicio: 'Início',
@@ -59,7 +60,8 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Termos de uso',
     privacidad: 'Aviso de privacidade',
     contacto: 'Contato',
-    proposito: 'Como funciona o AlmaMundi',
+    'como-funciona': 'Como funciona o AlmaMundi',
+    'how-it-works': 'Como funciona o AlmaMundi',
   },
   en: {
     _inicio: 'Home',
@@ -86,7 +88,8 @@ const PUBLIC_CRUMBS: Record<AlmaLocale, Record<string, string>> = {
     terminos: 'Terms of use',
     privacidad: 'Privacy notice',
     contacto: 'Contact',
-    proposito: 'How AlmaMundi works',
+    'como-funciona': 'How AlmaMundi works',
+    'how-it-works': 'How AlmaMundi works',
   },
 };
 
@@ -180,9 +183,9 @@ export function buildSiteBreadcrumbs(pathname: string, locale: AlmaLocale = 'es'
   if (path === '/') return [];
 
   const rawSegments = path.split('/').filter(Boolean);
-  // /pt/proposito y /en/proposito: el prefijo de idioma no es una miga.
+  // /pt/como-funciona y /en/how-it-works: el prefijo de idioma no es una miga.
   const segments =
-    (rawSegments[0] === 'pt' || rawSegments[0] === 'en') && rawSegments[1] === 'proposito'
+    (rawSegments[0] === 'pt' || rawSegments[0] === 'en') && (rawSegments[1] === 'como-funciona' || rawSegments[1] === 'how-it-works')
       ? rawSegments.slice(1)
       : rawSegments;
   const items: SiteBreadcrumbItem[] = [{ href: '/', label: crumb(locale, '_inicio') ?? 'Inicio' }];
