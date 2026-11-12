@@ -19,11 +19,12 @@ import { conAnio } from '@/lib/anio-publico';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import { comoFormulario, DejarPregunta } from '@/components/hilos/MePreguntoPanel';
-import { esMePreguntaId, type MePreguntaPublica } from '@/lib/me-pregunto/shared';
-import type { RespuestaPublica } from '@/lib/respuestas/public';
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
+import type { RespuestaTarjeta } from '@/lib/respuestas/public';
+import type { MePreguntaTarjeta, MePreguntoInicial } from '@/lib/respuestas/paginas-server';
 
 /** Preguntas de las personas; con ?p=mp-… muestra una pregunta con todas sus respuestas. */
-export function MePreguntoPagina() {
+export function MePreguntoPagina({ inicial = null }: { inicial?: MePreguntoInicial | null }) {
   const { locale } = useHomeLocale();
   const ui = ME_PREGUNTO_UI[locale];
   const copy = ME_PREGUNTO_MAPA[locale];
@@ -32,11 +33,13 @@ export function MePreguntoPagina() {
   /** Respuesta compartida (?r=id): se muestra primero. */
   const compartida = params.get('r');
   const responder = params.get('responder') === '1';
-  const [preguntas, setPreguntas] = useState<MePreguntaPublica[] | null>(null);
-  const [respuestas, setRespuestas] = useState<RespuestaPublica[]>([]);
+  const [preguntas, setPreguntas] = useState<MePreguntaTarjeta[] | null>(inicial?.preguntas ?? null);
+  const [respuestas, setRespuestas] = useState<RespuestaTarjeta[]>(inicial?.respuestas ?? []);
   const [dejando, setDejando] = useState(false);
 
   useEffect(() => {
+    // El servidor ya entregó preguntas y respuestas: no se piden de nuevo.
+    if (inicial) return;
     let cancel = false;
     const json = (url: string) =>
       fetch(url)
@@ -45,16 +48,16 @@ export function MePreguntoPagina() {
         .catch(() => []);
     void Promise.all([json('/api/me-pregunto'), json('/api/respuestas/public?banco=me-pregunto')]).then(([p, r]) => {
       if (cancel) return;
-      setPreguntas(p as MePreguntaPublica[]);
-      setRespuestas(r as RespuestaPublica[]);
+      setPreguntas(p as MePreguntaTarjeta[]);
+      setRespuestas(r as RespuestaTarjeta[]);
     });
     return () => {
       cancel = true;
     };
-  }, []);
+  }, [inicial]);
 
   const porPregunta = useMemo(() => {
-    const map = new Map<string, RespuestaPublica[]>();
+    const map = new Map<string, RespuestaTarjeta[]>();
     for (const item of respuestas) map.set(item.questionId, [...(map.get(item.questionId) ?? []), item]);
     return map;
   }, [respuestas]);

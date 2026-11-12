@@ -14,7 +14,7 @@ import { conAnio } from '@/lib/anio-publico';
 import { neu } from '@/lib/historias-neumorph';
 import { PREGUNTA_COPY, preguntaAlias } from '@/lib/i18n/pregunta-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
-import type { RespuestaPublica } from '@/lib/respuestas/public';
+import type { RespuestaTarjeta } from '@/lib/respuestas/public';
 
 export const enlaceInterno = 'text-[#B8340F] underline underline-offset-4 visited:text-[#B8340F]';
 
@@ -80,7 +80,7 @@ export function TextoVacio({ locale }: { locale: AlmaLocale }) {
 }
 
 /** Una respuesta publicada: quién y desde dónde, y su texto, voz o foto. */
-export function TarjetaRespuesta({ item, locale }: { item: RespuestaPublica; locale: AlmaLocale }) {
+export function TarjetaRespuesta({ item, locale }: { item: RespuestaTarjeta; locale: AlmaLocale }) {
   return (
     <Tarjeta>
       <p className="m-0 mb-3 text-[length:var(--fs-etiqueta)] text-[#616C7C]">
