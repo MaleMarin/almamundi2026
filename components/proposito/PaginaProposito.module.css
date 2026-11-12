@@ -117,9 +117,9 @@
 /* Cabecera */
 .cabecera {
   display: grid;
-  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.75fr);
-  gap: clamp(2rem, 5vw, 5rem);
-  align-items: center;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: clamp(2rem, 4vw, 4rem);
+  align-items: end;
 }
 .indice {
   display: flex;
@@ -167,26 +167,31 @@
   background-repeat: repeat-x;
 }
 
-/* Bloque en dos columnas */
-.bloque {
-  display: grid;
-  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
-  gap: clamp(1.5rem, 6vw, 6rem);
-  padding: clamp(3.5rem, 8vw, 6.5rem) 0 0;
-  margin-top: clamp(3.5rem, 8vw, 6.5rem);
+/* Bloques: separación común */
+.bloque,
+.bloqueApilado,
+.proposito {
+  padding-top: clamp(2.75rem, 5vw, 4.25rem);
+  margin-top: clamp(2.75rem, 5vw, 4.25rem);
   border-top: 1px solid var(--linea);
   scroll-margin-top: 6rem;
+}
+/* Texto solo: título a la izquierda, lectura a la derecha */
+.bloque {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  align-items: start;
+}
+/* Sección numerada: ceja, título e introducción juntos, en una sola columna */
+.bloqueApilado .bloqueCuerpo {
+  max-width: 44rem;
+  margin-top: 1.25rem;
 }
 .bloqueCuerpo > :last-child {
   margin-bottom: 0;
 }
 /* Propósito */
-.proposito {
-  padding: clamp(3.5rem, 8vw, 6.5rem) 0 0;
-  margin-top: clamp(3.5rem, 8vw, 6.5rem);
-  border-top: 1px solid var(--linea);
-  scroll-margin-top: 6rem;
-}
 .propositoGrilla {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -242,7 +247,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
   gap: 2rem;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
 }
 .formatos {
   display: grid;
@@ -291,8 +296,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.75rem 0;
-  margin: 3rem 0 0;
-  padding: 1.5rem 0;
+  margin: 2.5rem 0 0;
+  padding: 1.25rem 0;
   border-block: 1px solid var(--linea);
   list-style: none;
   font-size: 0.9375rem;
@@ -310,7 +315,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
   gap: clamp(2rem, 4vw, 3.5rem);
   align-items: start;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
 }
 .cortinaImagen {
   display: block;
@@ -388,7 +393,7 @@
 /* 03 · Descubre: el universo, con glass */
 .universo {
   position: relative;
-  margin-top: 3rem;
+  margin-top: 2.5rem;
   padding: clamp(1.25rem, 3vw, 2.25rem);
   border-radius: 32px;
   background: radial-gradient(120% 90% at 50% 0%, #10161f 0%, #05070b 70%);
@@ -582,7 +587,10 @@
 
 @media (max-width: 899px) {
   .cabecera,
-  .bloque,
+  .bloque {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+  }
   .cuentaGrilla,
   .inspirateGrilla {
     grid-template-columns: minmax(0, 1fr);

@@ -14,6 +14,8 @@ import { PROPOSITO_GUIA } from '@/lib/i18n/proposito-guia';
 import { COMO_FUNCIONA } from '@/lib/i18n/como-funciona';
 import { PROPOSITO } from '@/lib/i18n/proposito';
 import { PROPOSITO_PAGINA, PROPOSITO_RUTAS } from '@/lib/i18n/proposito-pagina';
+import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { MAPA_HOME_LINK_HREF } from '@/lib/mapa-home-nav';
 import { CORTINA_SITIO_COLORES, cortinaSitioCss } from '@/lib/cortina-sitio';
 import { SUBIR_AV_MAX_MINUTES, SUBIR_PHOTO_MAX, SUBIR_TEXT_MAX_CHARS } from '@/lib/subir-limits';
 import css from '@/components/proposito/PaginaProposito.module.css';
@@ -126,7 +128,7 @@ function Bloque({
   grande?: boolean;
 }) {
   return (
-    <section id={id} aria-labelledby={`proposito-${id}`} className={css.bloque}>
+    <section id={id} aria-labelledby={`proposito-${id}`} className={grande ? css.bloqueApilado : css.bloque}>
       <div className={css.bloqueCabeza}>
         {ceja ? <p className={css.ceja}>{ceja}</p> : null}
         <h2 id={`proposito-${id}`} className={grande ? css.h2Grande : css.h2}>
@@ -308,9 +310,9 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
                 <p className={css.ceja}>{g.inspirate.recorridos[0]!.ceja}</p>
                 <h4 className={css.h3}>{nombres.paraTi}</h4>
                 <p className={css.pChico}>{g.inspirate.recorridos[0]!.texto}</p>
-                <Link href="/#cintas" className={css.enlace}>
+                <HomeHardLink href="/#cintas" className={css.enlace}>
                   {g.inspirate.recorridos[0]!.enlace}
-                </Link>
+                </HomeHardLink>
               </div>
               <div className={`${css.tarjeta} ${css.recorrido}`}>
                 <p className={css.ceja}>{g.inspirate.recorridos[1]!.ceja}</p>
@@ -349,9 +351,9 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             <p>
               {menu.sounds} {g.descubre.sonidos}
             </p>
-            <Link href="/mapa" className={css.botonVidrio}>
+            <HomeHardLink href={MAPA_HOME_LINK_HREF} className={css.botonVidrio}>
               {g.descubre.enlace}
-            </Link>
+            </HomeHardLink>
           </div>
         </div>
         <ol className={css.tresPasos}>
@@ -452,9 +454,9 @@ export function PaginaProposito({ locale }: { locale: AlmaLocale }) {
             <p className={css.p}>{g.sonder.texto}</p>
             <p className={css.nota}>{g.sonder.nota}</p>
           </div>
-          <Link href="/#sonder" className={css.botonNaranja}>
+          <HomeHardLink href="/#sonder" className={css.botonNaranja}>
             {g.sonder.boton}
-          </Link>
+          </HomeHardLink>
         </section>
 
         {/* Quiénes estamos detrás */}

@@ -81,7 +81,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         ceja: 'Una imagen propia',
         titulo: 'Tu historia también tiene colores.',
         parrafos: [
-          'AlmaMundi crea una composición de cintas a partir de las palabras, los colores y el tono de tu relato. Si compartes fotografías, también considera sus colores; si envías audio o video, lo que cuentas con tu voz.',
+          'Tus colores salen de tu historia. De lo que cuentas, de cómo termina y de los colores que aparecen en ella. Por eso no hay dos iguales. Si compartes fotografías, también se consideran sus colores; si envías audio o video, lo que cuentas con tu voz.',
           '**La imagen es tuya:** puedes descargarla y compartirla al terminar el envío. La volverás a recibir por correo cuando se publique tu historia.',
         ],
         nota: 'Vista ilustrativa de una composición individual. Su distribución cambia según cada historia. Es distinta de la imagen de colores que identifica al sitio al compartirlo.',
@@ -226,7 +226,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         ceja: 'Uma imagem própria',
         titulo: 'Sua história também tem cores.',
         parrafos: [
-          'O AlmaMundi cria uma composição de fitas a partir das palavras, das cores e do tom do seu relato. Se você compartilha fotografias, também considera as cores delas; se envia áudio ou vídeo, o que você conta com a sua voz.',
+          'Suas cores saem da sua história. Do que você conta, de como termina e das cores que aparecem nela. Por isso não há duas iguais. Se você compartilha fotografias, também são consideradas as cores delas; se envia áudio ou vídeo, o que você conta com a sua voz.',
           '**A imagem é sua:** você pode baixá-la e compartilhá-la ao concluir o envio. Você a receberá de novo por e-mail quando sua história for publicada.',
         ],
         nota: 'Vista ilustrativa de uma composição individual. Sua distribuição muda conforme cada história. É diferente da imagem de cores que identifica o site ao compartilhá-lo.',
@@ -371,7 +371,7 @@ export const PROPOSITO_GUIA: Record<AlmaLocale, PropositoGuiaCopy> = {
         ceja: 'An image of your own',
         titulo: 'Your story has colors too.',
         parrafos: [
-          'AlmaMundi creates a ribbon composition from the words, colors, and tone of your story. If you share photos, it also considers their colors; if you send audio or video, what you tell with your voice.',
+          'Your colors come from your story. From what you tell, how it ends, and the colors that appear in it. That is why no two are alike. If you share photos, their colors are considered too; if you send audio or video, what you tell with your voice.',
           '**The image is yours:** you can download and share it when you finish sending. You will receive it again by email when your story is published.',
         ],
         nota: 'Illustrative view of an individual composition. Its layout changes with each story. It is different from the color image that identifies the site when it is shared.',

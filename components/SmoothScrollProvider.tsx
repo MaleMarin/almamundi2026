@@ -7,8 +7,10 @@ import {
   createContext,
   useEffect,
   useLayoutEffect,
+  useRef,
   useState,
   type ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import 'lenis/dist/lenis.css';
 import { installHomeReturnListener } from '@/lib/home-return';
 
@@ -18,12 +20,47 @@ if (typeof window !== 'undefined') {
 
 export const LenisContext = createContext<Lenis | null>(null);
 
+/**
+ * Al pasar a otra página con un enlace, la vista empieza arriba.
+ * Sin esto, el desplazamiento suave conserva la altura de la página anterior
+ * y la nueva puede abrirse a mitad de camino o en el pie.
+ * No actúa con «atrás/adelante» del navegador ni cuando el destino trae ancla (#) o ?section=.
+ */
+function useInicioAlNavegar(lenis: Lenis | null) {
+  const pathname = usePathname();
+  const anterior = useRef<string | null>(null);
+  const porHistorial = useRef(false);
+
+  useEffect(() => {
+    const marcar = () => {
+      porHistorial.current = true;
+    };
+    window.addEventListener('popstate', marcar);
+    return () => window.removeEventListener('popstate', marcar);
+  }, []);
+
+  useLayoutEffect(() => {
+    const previo = anterior.current;
+    anterior.current = pathname;
+    if (previo === null || previo === pathname) return;
+    if (porHistorial.current) {
+      porHistorial.current = false;
+      return;
+    }
+    if (window.location.hash || new URLSearchParams(window.location.search).has('section')) return;
+    if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
+    window.scrollTo(0, 0);
+  }, [pathname, lenis]);
+}
+
 export function SmoothScrollProvider({ children }: { children: ReactNode }) {
   const [lenis, setLenis] = useState<Lenis | null>(null);
 
   useEffect(() => {
     installHomeReturnListener();
   }, []);
+
+  useInicioAlNavegar(lenis);
 
   useLayoutEffect(() => {
     let lenisInstance: Lenis | null = null;
