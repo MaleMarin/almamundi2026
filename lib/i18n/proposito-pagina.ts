@@ -36,15 +36,15 @@ export type PropositoPaginaCopy = {
 
 export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
   es: {
-    metaTitulo: 'Propósito de AlmaMundi: cuenta tu historia y conoce otras',
+    metaTitulo: 'Cómo funciona AlmaMundi: cuenta tu historia y conoce otras',
     metaDescripcion:
-      'AlmaMundi es una iniciativa sin fines de lucro de Precisar para compartir historias personales en texto, audio, video o fotografía y conocer las de otras personas.',
+      'AlmaMundi es una iniciativa sin fines de lucro de Fundación Democracia Abierta, desarrollada por Precisar, para compartir historias personales en texto, audio, video o fotografía y conocer las de otras personas.',
     marca: 'AlmaMundi',
-    titulo: 'Propósito',
+    titulo: 'Cómo funciona AlmaMundi',
     bajadaLema: 'Cuenta tu historia. Conoce otras historias.',
     bajada: [
       'AlmaMundi es un espacio para compartir lo que vivimos, recordar lo que nos marcó y descubrir las experiencias de otras personas.',
-      'Aquí, una historia no necesita ser extraordinaria para merecer un lugar.',
+      'Todas las historias son extraordinarias.',
     ],
     secciones: [
       {
@@ -63,10 +63,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Todas las personas tenemos algo que contar',
         parrafos: [
           'Una conversación que todavía recuerdas. Algo que ocurrió en tu primer trabajo. Un viaje inesperado. Una amistad. Un momento de alegría, de aprendizaje o de cambio.',
-          'Basta con un recuerdo: tu historia puede ser un solo momento, sin necesidad de escribir una autobiografía ni de contar toda una vida.',
           'AlmaMundi recibe historias, recuerdos, anécdotas y experiencias personales. Pueden ser momentos importantes o escenas aparentemente pequeñas de la vida cotidiana.',
           'Cada persona decide qué quiere compartir y cómo hacerlo.',
-          'Porque **un momento también cuenta**.',
         ],
       },
       {
@@ -123,7 +121,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         id: 'quienes',
         titulo: 'Quiénes estamos detrás',
         parrafos: [
-          'AlmaMundi es una iniciativa sin fines de lucro de **Precisar, nombre de fantasía de la Fundación Democracia Abierta**, una organización con domicilio en Santiago de Chile que trabaja en cultura digital y alfabetización mediática.',
+          'AlmaMundi es una iniciativa sin fines de lucro de Fundación Democracia Abierta, desarrollada por Precisar.',
+          'Fundación Democracia Abierta es una organización con domicilio en Santiago de Chile que trabaja en cultura digital y alfabetización mediática.',
           'El proyecto busca ampliar las oportunidades de expresión, participación y encuentro mediante las experiencias compartidas por las personas.',
           'Las historias, preguntas y respuestas las revisan personas del equipo antes de publicarse.',
           'Quienes participan conservan sus derechos sobre los contenidos que comparten y pueden solicitar su retiro conforme a los términos de uso de la plataforma.',
@@ -142,15 +141,15 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     volver: '← Volver al inicio',
   },
   pt: {
-    metaTitulo: 'Propósito do AlmaMundi: conte sua história e conheça outras',
+    metaTitulo: 'Como funciona o AlmaMundi: conte sua história e conheça outras',
     metaDescripcion:
-      'O AlmaMundi é uma iniciativa sem fins lucrativos da Precisar para compartilhar histórias pessoais em texto, áudio, vídeo ou fotografia e conhecer as de outras pessoas.',
+      'O AlmaMundi é uma iniciativa sem fins lucrativos da Fundación Democracia Abierta, desenvolvida pela Precisar, para compartilhar histórias pessoais em texto, áudio, vídeo ou fotografia e conhecer as de outras pessoas.',
     marca: 'AlmaMundi',
-    titulo: 'Propósito',
+    titulo: 'Como funciona o AlmaMundi',
     bajadaLema: 'Conte sua história. Conheça outras histórias.',
     bajada: [
       'O AlmaMundi é um espaço para compartilhar o que vivemos, lembrar o que nos marcou e descobrir as experiências de outras pessoas.',
-      'Aqui, uma história não precisa ser extraordinária para merecer um lugar.',
+      'Todas as histórias são extraordinárias.',
     ],
     secciones: [
       {
@@ -169,10 +168,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'Todas as pessoas têm algo para contar',
         parrafos: [
           'Uma conversa que você ainda lembra. Algo que aconteceu no seu primeiro emprego. Uma viagem inesperada. Uma amizade. Um momento de alegria, de aprendizado ou de mudança.',
-          'Basta uma lembrança: sua história pode ser um único momento, sem precisar escrever uma autobiografia nem contar uma vida inteira.',
           'O AlmaMundi recebe histórias, lembranças, episódios e experiências pessoais. Podem ser momentos importantes ou cenas aparentemente pequenas do dia a dia.',
           'Cada pessoa decide o que quer compartilhar e como fazê-lo.',
-          'Porque **um momento também conta**.',
         ],
       },
       {
@@ -229,7 +226,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         id: 'quienes',
         titulo: 'Quem está por trás',
         parrafos: [
-          'O AlmaMundi é uma iniciativa sem fins lucrativos da **Precisar, nome fantasia da Fundación Democracia Abierta**, uma organização com sede em Santiago, no Chile, que atua em cultura digital e educação midiática.',
+          'O AlmaMundi é uma iniciativa sem fins lucrativos da Fundación Democracia Abierta, desenvolvida pela Precisar.',
+          'A Fundación Democracia Abierta é uma organização com sede em Santiago, no Chile, que atua em cultura digital e educação midiática.',
           'O projeto busca ampliar as oportunidades de expressão, participação e encontro por meio das experiências compartilhadas pelas pessoas.',
           'As histórias, perguntas e respostas são revisadas por pessoas da equipe antes de serem publicadas.',
           'Quem participa mantém seus direitos sobre o conteúdo que compartilha e pode pedir sua retirada conforme os termos de uso da plataforma.',
@@ -248,15 +246,15 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
     volver: '← Voltar ao início',
   },
   en: {
-    metaTitulo: 'AlmaMundi’s Purpose: tell your story and discover others',
+    metaTitulo: 'How AlmaMundi works: tell your story and discover others',
     metaDescripcion:
-      'AlmaMundi is a nonprofit initiative of Precisar where people share personal stories in text, audio, video, or photography and discover the stories of others.',
+      'AlmaMundi is a nonprofit initiative of Fundación Democracia Abierta, developed by Precisar, where people share personal stories in text, audio, video, or photography and discover the stories of others.',
     marca: 'AlmaMundi',
-    titulo: 'Purpose',
+    titulo: 'How AlmaMundi works',
     bajadaLema: 'Tell your story. Discover other stories.',
     bajada: [
       'AlmaMundi is a space to share what we have lived, remember what shaped us, and discover the experiences of other people.',
-      'Here, a story doesn’t have to be extraordinary to deserve a place.',
+      'All stories are extraordinary.',
     ],
     secciones: [
       {
@@ -275,10 +273,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         titulo: 'We all have a story to tell',
         parrafos: [
           'A conversation you still remember. Something that happened at your first job. An unexpected trip. A friendship. A moment of joy, of learning, or of change.',
-          'A single memory is enough: your story can be one moment, with no need to write an autobiography or tell a whole life.',
           'AlmaMundi welcomes stories, memories, anecdotes, and personal experiences. They can be major moments or seemingly small scenes from everyday life.',
           'Each person decides what to share and how to share it.',
-          '**Even a single moment matters.**',
         ],
       },
       {
@@ -335,7 +331,8 @@ export const PROPOSITO_PAGINA: Record<AlmaLocale, PropositoPaginaCopy> = {
         id: 'quienes',
         titulo: 'Who is behind it',
         parrafos: [
-          'AlmaMundi is a nonprofit initiative of **Precisar, the trade name of Fundación Democracia Abierta**, an organization based in Santiago, Chile, that works on digital culture and media literacy.',
+          'AlmaMundi is a nonprofit initiative of Fundación Democracia Abierta, developed by Precisar.',
+          'Fundación Democracia Abierta is an organization based in Santiago, Chile, that works on digital culture and media literacy.',
           'The project seeks to expand opportunities for expression, participation, and connection through the experiences people share.',
           'Stories, questions, and answers are reviewed by people on our team before they are published.',
           'Participants keep their rights over the content they share and can request its removal under the platform’s terms of use.',
