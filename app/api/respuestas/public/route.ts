@@ -19,8 +19,9 @@ export const runtime = "nodejs";
 function pagina(items: RespuestaPublicaFechada[], offset: number, limit: number) {
   recientesPrimero(items);
   const page = items.slice(offset, offset + limit).map((item) => {
-    const { createdAt: _created, ...publicItem } = item;
+    const { createdAt: _created, publishedAt: _published, ...publicItem } = item;
     void _created;
+    void _published;
     return publicItem;
   });
   const nextOffset = offset + page.length < items.length ? offset + page.length : null;

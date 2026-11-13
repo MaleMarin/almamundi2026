@@ -2,6 +2,7 @@ import "server-only";
 import type { Metadata } from "next";
 import type { AlmaLocale } from "@/lib/i18n/locale";
 import { PUBLIC_OG_LOCALE, publicSiteMeta } from "@/lib/i18n/public-meta";
+import { rutaDePregunta, type RutaDePreguntas } from "@/lib/respuestas/paginas-indexables";
 
 /** Primer valor de un parámetro de la URL (igual que `useSearchParams().get`). */
 export function primerParametro(value: string | string[] | undefined): string | null {
@@ -21,13 +22,13 @@ export function metadataDePregunta({
   descripcion,
   locale,
 }: {
-  ruta: "/respuestas-a-almamundi" | "/preguntas-de-las-personas";
+  ruta: RutaDePreguntas;
   id: string;
   titulo: string;
   descripcion: string;
   locale: AlmaLocale;
 }): Metadata {
-  const url = `${ruta}?p=${encodeURIComponent(id)}`;
+  const url = rutaDePregunta(ruta, id);
   return {
     title: titulo,
     description: descripcion,

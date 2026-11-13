@@ -1,10 +1,15 @@
 import type { MetadataRoute } from 'next';
-import { getPublicStoryUrlsAsync } from '@/lib/map-data/stories-server';
+import { contenidoPublicoParaSitemap, type EntradaSitemap } from '@/lib/sitemap/contenido-publico';
 import { siteOrigin } from '@/lib/site-origin';
 
-// Regenerar la sitemap a lo sumo cada hora: balance entre frescura para
-// historias recién publicadas y costo de lecturas a Firestore.
-export const revalidate = 3600;
+/**
+ * Se arma en cada petición (no en el build): las rutas fijas más el contenido público de Firestore,
+ * que se lee a lo sumo una vez por hora (caché en lib/sitemap/contenido-publico.ts).
+ *
+ * Si Firestore falla y no hay una lectura anterior guardada, la ruta responde con error del servidor:
+ * un sitemap con solo las rutas fijas le diría a los buscadores que el resto ya no existe.
+ */
+export const dynamic = 'force-dynamic';
 
 /**
  * Rutas estáticas que responden 200. Sin /mapa ni /archivo (redirigen)
@@ -21,27 +26,15 @@ const STATIC_PATHS: string[] = [
   '/como-funciona',
   '/pt/como-funciona',
   '/en/how-it-works',
+  '/contacto',
+  '/codigo-de-conducta',
 ];
 
-/** Acepta Firestore Timestamp, ISO string o nada. Devuelve Date válida o null. */
-function toDateOrNull(value: unknown): Date | null {
-  if (!value) return null;
-  if (typeof (value as { toDate?: () => Date }).toDate === 'function') {
-    try {
-      const d = (value as { toDate: () => Date }).toDate();
-      return Number.isFinite(d.getTime()) ? d : null;
-    } catch {
-      return null;
-    }
-  }
-  if (typeof value === 'string' && value.trim()) {
-    const d = new Date(value);
-    return Number.isFinite(d.getTime()) ? d : null;
-  }
-  if (value instanceof Date && Number.isFinite(value.getTime())) {
-    return value;
-  }
-  return null;
+function conFecha(base: string, item: EntradaSitemap) {
+  return {
+    url: `${base}${item.path}`,
+    ...(item.lastModified ? { lastModified: new Date(item.lastModified) } : {}),
+  };
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -53,27 +46,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path === '/' ? 1.0 : 0.7,
   }));
 
-  let storyEntries: MetadataRoute.Sitemap = [];
-  try {
-    // Dirección canónica de cada historia (las de texto, /texto), sin pasar por redirecciones.
-    const items = await getPublicStoryUrlsAsync();
-    storyEntries = items.map((item) => {
-      const lastModified =
-        toDateOrNull(item.updatedAt) ??
-        toDateOrNull(item.publishedAt) ??
-        toDateOrNull(item.createdAt);
-      return {
-        url: `${base}${item.path}`,
-        ...(lastModified ? { lastModified } : {}),
-        changeFrequency: 'monthly' as const,
-        priority: 0.6,
-      };
-    });
-  } catch (error) {
-    // Si Firestore falla (credenciales, red, índice), el sitemap igual responde
-    // con las rutas estáticas. No tiramos el endpoint por una lectura caída.
-    console.error('[sitemap] Error fetching published stories:', error);
-  }
+  // Sin try/catch a propósito: ver la nota de arriba.
+  const { historias, preguntas } = await contenidoPublicoParaSitemap();
 
-  return [...staticEntries, ...storyEntries];
+  const storyEntries: MetadataRoute.Sitemap = historias.map((item) => ({
+    ...conFecha(base, item),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
+
+  // Preguntas con respuestas publicadas: la misma dirección que cada página declara como canónica.
+  const questionEntries: MetadataRoute.Sitemap = preguntas.map((item) => conFecha(base, item));
+
+  return [...staticEntries, ...storyEntries, ...questionEntries];
 }
