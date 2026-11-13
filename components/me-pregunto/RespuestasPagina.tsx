@@ -18,13 +18,13 @@ import { hiloPorId, preguntaHiloPorId, preguntaParaFormulario } from '@/lib/hilo
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
 import { ME_PREGUNTO_MAPA } from '@/lib/i18n/me-pregunto';
-import type { RespuestaPublica } from '@/lib/respuestas/public';
+import type { RespuestaTarjeta } from '@/lib/respuestas/public';
 
 /**
  * Respuestas a las preguntas de AlmaMundi (las de las cintas).
  * Sin ?p: las preguntas que ya tienen respuestas. Con ?p=id: todas las respuestas de esa pregunta.
  */
-export function RespuestasPagina() {
+export function RespuestasPagina({ iniciales = null }: { iniciales?: RespuestaTarjeta[] | null }) {
   const { locale } = useHomeLocale();
   const copy = ME_PREGUNTO_MAPA[locale];
   const params = useSearchParams();
@@ -32,23 +32,25 @@ export function RespuestasPagina() {
   /** Respuesta compartida (?r=id): se muestra primero. */
   const compartida = params.get('r');
   const tema = hiloPorId(pregunta?.hiloId ?? null);
-  const [todas, setTodas] = useState<RespuestaPublica[] | null>(null);
+  const [todas, setTodas] = useState<RespuestaTarjeta[] | null>(iniciales);
 
   useEffect(() => {
+    // El servidor ya entregó las respuestas: no se piden de nuevo.
+    if (iniciales) return;
     let cancel = false;
     void fetch('/api/respuestas/public?banco=hilos&limit=500')
       .then((res) => (res.ok ? res.json() : { items: [] }))
-      .then((data: { items?: RespuestaPublica[] }) => {
+      .then((data: { items?: RespuestaTarjeta[] }) => {
         if (!cancel) setTodas(data.items ?? []);
       })
       .catch(() => !cancel && setTodas([]));
     return () => {
       cancel = true;
     };
-  }, []);
+  }, [iniciales]);
 
   const porPregunta = useMemo(() => {
-    const map = new Map<string, RespuestaPublica[]>();
+    const map = new Map<string, RespuestaTarjeta[]>();
     for (const item of todas ?? []) map.set(item.questionId, [...(map.get(item.questionId) ?? []), item]);
     return map;
   }, [todas]);

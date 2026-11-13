@@ -26,6 +26,33 @@ export function mePreguntaPublica(docId: string, data: Record<string, unknown>):
   };
 }
 
+function toMillis(value: unknown): number {
+  if (value && typeof value === 'object' && 'toMillis' in value && typeof (value as { toMillis: unknown }).toMillis === 'function') {
+    return (value as { toMillis: () => number }).toMillis();
+  }
+  return 0;
+}
+
+/** Tope de la lista pública de preguntas. */
+export const ME_PREGUNTAS_TOPE = 80;
+
+/** Consulta de las preguntas aprobadas: la misma para /api/me-pregunto y la página. Solo lectura. */
+export function consultaMePreguntasAprobadas(db: Firestore) {
+  return db.collection(ME_PREGUNTAS_COLLECTION).where('status', '==', 'approved');
+}
+
+/** Lista pública a partir de los documentos aprobados: más recientes primero, con tope y solo campos públicos. */
+export function listaMePreguntasPublicas(
+  docs: readonly { id: string; data: () => unknown }[]
+): MePreguntaPublica[] {
+  const items = docs.map((doc) => {
+    const data = (doc.data() ?? {}) as Record<string, unknown>;
+    return { item: mePreguntaPublica(doc.id, data), t: toMillis(data.approvedAt) || toMillis(data.createdAt) };
+  });
+  items.sort((a, b) => b.t - a.t);
+  return items.slice(0, ME_PREGUNTAS_TOPE).map(({ item }) => item);
+}
+
 /** Pregunta aprobada por su id `mp-…`, o null. */
 export async function mePreguntaAprobada(db: Firestore, id: unknown): Promise<MePreguntaPublica | null> {
   if (!esMePreguntaId(id)) return null;

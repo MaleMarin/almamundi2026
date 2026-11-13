@@ -20,3 +20,9 @@ export type RespuestaPublica = {
   /** Año en que se envió (solo el año). */
   anio?: string;
 };
+
+/** Lo que muestra una tarjeta de respuesta en las páginas internas: nada más llega al navegador desde el servidor. */
+export type RespuestaTarjeta = Pick<
+  RespuestaPublica,
+  "id" | "questionId" | "kind" | "contenido" | "alias" | "city" | "country" | "previewUrl" | "anio"
+>;

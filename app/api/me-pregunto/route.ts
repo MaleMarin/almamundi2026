@@ -12,9 +12,8 @@ import {
   ME_PREGUNTAS_COLLECTION,
   ME_PREGUNTA_CONTACTS_COLLECTION,
   ME_PREGUNTA_MAX,
-  type MePreguntaPublica,
 } from "@/lib/me-pregunto/shared";
-import { mePreguntaPublica } from "@/lib/me-pregunto/server";
+import { consultaMePreguntasAprobadas, listaMePreguntasPublicas } from "@/lib/me-pregunto/server";
 import { writeCoordsIfMissing } from "@/lib/respuestas/geocode";
 import { sendMePreguntaEmail } from "@/lib/email/me-pregunto-mail";
 
@@ -29,13 +28,6 @@ function cleanLine(value: unknown, max: number): string {
   return stripHtml(value).replace(/[\r\n]+/g, " ").trim().slice(0, max);
 }
 
-function toMillis(value: unknown): number {
-  if (value && typeof value === "object" && "toMillis" in value && typeof (value as { toMillis: unknown }).toMillis === "function") {
-    return (value as { toMillis: () => number }).toMillis();
-  }
-  return 0;
-}
-
 /** GET /api/me-pregunto — preguntas aprobadas, sin correo. */
 export async function GET(req: Request) {
   const ip = clientIpFromRequest(req);
@@ -45,12 +37,8 @@ export async function GET(req: Request) {
   });
   if (blocked) return blocked;
   try {
-    const snap = await getAdminDb().collection(ME_PREGUNTAS_COLLECTION).where("status", "==", "approved").get();
-    const items: (MePreguntaPublica & { t: number })[] = snap.docs.map((doc) => {
-      const data = doc.data() as Record<string, unknown>;
-      return { ...mePreguntaPublica(doc.id, data), t: toMillis(data.approvedAt) || toMillis(data.createdAt) };
-    });
-    items.sort((a, b) => b.t - a.t);
+    const snap = await consultaMePreguntasAprobadas(getAdminDb()).get();
+    const items = listaMePreguntasPublicas(snap.docs);
     // Las preguntas publicadas antes de tener punto se ubican de a poco, sin demorar la respuesta.
     const sinPunto = snap.docs
       .filter((doc) => typeof doc.get("lat") !== "number" || typeof doc.get("lng") !== "number")
@@ -63,7 +51,7 @@ export async function GET(req: Request) {
       });
     }
     return NextResponse.json(
-      { items: items.slice(0, 80).map(({ t: _t, ...item }) => item) },
+      { items },
       { headers: { "Cache-Control": "public, max-age=30, s-maxage=60, stale-while-revalidate=300" } }
     );
   } catch (e) {
