@@ -7,8 +7,8 @@ import { formatPublicPlace } from '@/lib/historias/story-ubicacion';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { preguntaAlias } from '@/lib/i18n/pregunta-messages';
-import { esMePreguntaId } from '@/lib/me-pregunto/shared';
 import { metadataDePregunta, primerParametro } from '@/lib/respuestas/metadata-detalle';
+import { preguntaDePersonaConPaginaPropia, RUTA_PREGUNTAS_PERSONAS } from '@/lib/respuestas/paginas-indexables';
 import { mePreguntoParaPagina } from '@/lib/respuestas/paginas-server';
 
 type Props = { searchParams: Promise<{ p?: string | string[] }> };
@@ -24,13 +24,14 @@ const METADATA: Metadata = {
  */
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const pedida = primerParametro((await searchParams).p);
-  if (!esMePreguntaId(pedida)) return METADATA;
-  const pregunta = (await mePreguntoParaPagina())?.preguntas.find((p) => p.id === pedida);
+  if (!pedida) return METADATA;
+  // Misma regla que el sitemap (lib/respuestas/paginas-indexables.ts).
+  const pregunta = preguntaDePersonaConPaginaPropia(pedida, (await mePreguntoParaPagina())?.preguntas);
   if (!pregunta) return METADATA;
   const locale = parseAlmaLocale((await cookies()).get(ALMA_LOCALE_COOKIE)?.value);
   const lugar = conAnio(formatPublicPlace(pregunta.city, pregunta.country, locale), pregunta.anio);
   return metadataDePregunta({
-    ruta: '/preguntas-de-las-personas',
+    ruta: RUTA_PREGUNTAS_PERSONAS,
     id: pregunta.id,
     titulo: pregunta.texto,
     descripcion: `${pregunta.texto} ${ME_PREGUNTO_UI[locale].loPregunta(preguntaAlias(pregunta.alias), lugar)}.`,

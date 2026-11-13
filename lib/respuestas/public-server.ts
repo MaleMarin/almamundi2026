@@ -13,7 +13,8 @@ import type { RespuestaPublica, RespuestaTarjeta } from "@/lib/respuestas/public
  * La usan /api/respuestas/public y las páginas que entregan las respuestas en el HTML.
  */
 
-export type RespuestaPublicaFechada = RespuestaPublica & { createdAt: number };
+/** `createdAt` ordena la lista; `publishedAt` (0 si no consta) fecha el sitemap. Ninguna de las dos sale al navegador. */
+export type RespuestaPublicaFechada = RespuestaPublica & { createdAt: number; publishedAt: number };
 
 /** Tope de los bancos completos (cintas y «Me pregunto…»). */
 export const BANCO_TOPE = 500;
@@ -61,6 +62,7 @@ export function filaPublica(
       : {}),
     anio: anioDe(data.createdAt),
     createdAt: toMillis(data.createdAt),
+    publishedAt: data.publishedAt ? toMillis(data.publishedAt) : 0,
   };
 }
 
@@ -98,13 +100,17 @@ export async function respuestasPublicasMePregunto(db: Firestore): Promise<Respu
   return items;
 }
 
+/** Las que muestran las páginas: más recientes primero, hasta el tope del banco. */
+export function enTope(items: RespuestaPublicaFechada[]): RespuestaPublicaFechada[] {
+  return recientesPrimero(items).slice(0, BANCO_TOPE);
+}
+
 /**
  * Para las páginas: el mismo orden y tope que la API, y solo lo que muestra la tarjeta
  * (sin punto en el mapa, código corto ni fecha exacta).
  */
 export function comoTarjetas(items: RespuestaPublicaFechada[]): RespuestaTarjeta[] {
-  return recientesPrimero(items)
-    .slice(0, BANCO_TOPE)
+  return enTope(items)
     .map((item) => ({
       id: item.id,
       questionId: item.questionId,
