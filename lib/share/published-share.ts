@@ -1,5 +1,6 @@
 import { publicCityCountry } from '@/lib/historias/story-ubicacion';
 import type { AlmaLocale } from '@/lib/i18n/locale';
+import { esMePreguntaId } from '@/lib/me-pregunto/shared';
 
 const ORIGIN = 'https://www.almamundi.org';
 
@@ -18,12 +19,14 @@ export function publishedAnswerShortUrl(shortCode: string): string {
 }
 
 export function publishedQuestionShareUrl(id: string): string {
-  return `${ORIGIN}/pregunta/${id}`;
+  return publishedQuestionPageUrl(id);
 }
 
 /** Enlace para compartir después de responder. */
 export function publishedQuestionPageUrl(id: string): string {
-  return `${ORIGIN}/preguntas?p=${encodeURIComponent(id)}`;
+  return esMePreguntaId(id)
+    ? `${ORIGIN}/preguntas-de-las-personas?p=${encodeURIComponent(id)}`
+    : `${ORIGIN}/preguntas?p=${encodeURIComponent(id)}`;
 }
 
 /** Ciudad pública, sin repetir el país si el nombre ya lo trae. */
