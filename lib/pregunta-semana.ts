@@ -317,7 +317,12 @@ export function preguntaAdminResumen(
   mode: string | null | undefined
 ): string | null {
   const q = preguntaPorId(id);
-  if (!q) return null;
+  if (!q) {
+    // El administrador también recibe respuestas de las 16 cintas. Sin este
+    // respaldo solo vería el ID (por ejemplo «musica-1»), no la pregunta.
+    const banco = preguntaParaFormulario(id);
+    return banco ? `${banco.tema.es} · ${banco.tu.es}` : null;
+  }
   const text = isQuestionMode(mode) ? q[mode].es : q.tu.es;
   return `${q.tema.es} · ${text}`;
 }
