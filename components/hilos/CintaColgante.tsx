@@ -25,7 +25,7 @@ import type { AlmaLocale } from '@/lib/i18n/locale';
 const FOCUS =
   'focus-visible:outline focus-visible:outline-[3px] focus-visible:outline-offset-[3px] focus-visible:outline-[#FF4A1C]';
 
-const ALTOS = [232, 246, 236, 250, 228, 244, 230, 242, 234, 248, 226, 240];
+const ALTOS = [232, 246, 236, 250, 228, 244, 230, 242, 234, 248, 226, 240, 238, 248, 232, 244];
 
 const RITMO = [
   { periodo: 6.4, fase: 0.4 },
