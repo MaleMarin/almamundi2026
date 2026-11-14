@@ -1,6 +1,7 @@
 'use client';
 
 import { HomeHardLink } from '@/components/layout/HomeHardLink';
+import { StoryShareMenu } from '@/components/home/StoryShareMenu';
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { Mic, PenLine } from 'lucide-react';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
@@ -172,6 +173,8 @@ export function DejarPregunta({
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [sentAlias, setSentAlias] = useState<string | null>(null);
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareNotice, setShareNotice] = useState<string | null>(null);
   const [captchaGate, setCaptchaGate] = useState<TurnstileGate>(getTurnstileSiteKey() ? 'wait' : 'skip');
   const tokenRef = useRef('');
   const turnstileRef = useRef<TurnstileWidgetHandle>(null);
@@ -229,6 +232,9 @@ export function DejarPregunta({
         <h3>{copy.gracias(nombre)}</h3>
         <p>{copy.graciasTexto}</p>
         <div className="cortina-formatos">
+          <button type="button" className="cortina-formato" onClick={() => setShareOpen(true)}>
+            {copy.compartirPreguntaEnviada}
+          </button>
           <HomeHardLink className="cortina-formato" href="/#historias">{t.navTellStory}</HomeHardLink>
           <HomeHardLink
             className="cortina-formato"
@@ -244,6 +250,41 @@ export function DejarPregunta({
           </HomeHardLink>
           <HomeHardLink className="cortina-formato" href="/?capa=me-pregunto#mapa">{t.modalBackToMap}</HomeHardLink>
         </div>
+        {shareNotice ? <p role="status" aria-live="polite" className="cortina-indice-ayuda">{shareNotice}</p> : null}
+        {shareOpen ? (
+          <StoryShareMenu
+            shareUrl="https://www.almamundi.org/preguntas-de-las-personas"
+            keepShareUrl
+            socialSinEnlace
+            shareTextShort={copy.compartirPreguntaEnviadaTexto}
+            shareTextLong={copy.compartirPreguntaEnviadaTexto}
+            shareTextSocial={`${copy.compartirPreguntaEnviadaTexto} almamundi.org`}
+            emailSubject={copy.compartirPreguntaEnviadaTitulo}
+            shareTitle={copy.compartirPreguntaEnviadaTitulo}
+            showDownload={false}
+            showImageApps={false}
+            imageFile={null}
+            labels={{
+              title: t.modalShareMenuTitle,
+              facebook: t.modalShareFacebook,
+              x: t.modalShareX,
+              linkedin: t.modalShareLinkedIn,
+              instagram: t.modalShareInstagram,
+              tiktok: t.modalShareTikTok,
+              email: t.modalShareEmail,
+              copyLink: t.modalCopyLink,
+              download: t.modalDownloadImprint,
+              close: t.modalClose,
+            }}
+            onCopied={() => { setShareNotice(t.modalShareLinkCopied); setShareOpen(false); }}
+            onTextCopied={() => { setShareNotice(t.modalShareTextCopied); setShareOpen(false); }}
+            onAppHandoff={() => { setShareNotice(t.modalShareTextCopied); setShareOpen(false); }}
+            onCopyFailed={() => { setShareNotice(t.modalShareCopyFailed); setShareOpen(false); }}
+            onDownload={() => undefined}
+            onEmail={() => { setShareNotice(t.modalShareEmailCopied); setShareOpen(false); }}
+            onClose={() => setShareOpen(false)}
+          />
+        ) : null}
       </div>
     );
   }
