@@ -95,3 +95,39 @@ test.describe('Administrador y flujo de compartir en celular', () => {
     expect(size.clientHeight).toBeLessThanOrEqual(size.viewport);
   });
 });
+
+
+test.describe('Difusión de pregunta propia pendiente', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test('la pantalla de recepción permite compartir la participación sin revelar el texto', async ({ page }) => {
+    await page.route('**/api/me-pregunto', async (route) => {
+      if (route.request().method() === 'POST') {
+        await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+        return;
+      }
+      await route.continue();
+    });
+    await page.goto('/preguntas-de-las-personas', { waitUntil: 'domcontentloaded' });
+    await page.getByRole('button', { name: 'Dejar mi pregunta' }).click();
+    const form = page.locator('form.me-pregunto-form');
+    const pendingQuestion = '¿Qué recuerdo te gustaría compartir con otras personas?';
+    await form.locator('textarea').fill(pendingQuestion);
+    await form.locator('input[autocomplete="nickname"]').fill('Prueba QA');
+    await form.locator('input[autocomplete="country-name"]').fill('Chile');
+    await form.locator('input[autocomplete="address-level2"]').fill('Santiago');
+    for (const checkbox of await form.locator('input[type="checkbox"]').all()) await checkbox.check();
+    await form.getByRole('button', { name: 'Enviar mi pregunta' }).click();
+    await expect(page.getByRole('button', { name: 'Compartir que dejé una pregunta' })).toBeVisible();
+    await page.getByRole('button', { name: 'Compartir que dejé una pregunta' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('button', { name: 'WhatsApp' })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /Instagram/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /TikTok/i })).toBeVisible();
+    // No se comparte el contenido en revisión ni se enlaza a una pregunta todavía privada.
+    await expect(dialog).not.toContainText(pendingQuestion);
+    const whatsApp = await dialog.getByRole('button', { name: 'WhatsApp' }).count();
+    expect(whatsApp).toBe(1);
+  });
+});
