@@ -1,4 +1,6 @@
 import type { AlmaLocale } from '@/lib/i18n/locale';
+import { HILOS_NUEVOS, PREGUNTAS_FUTURO } from '@/lib/hilos-editorial-2026';
+import { PREGUNTAS_NUEVAS } from '@/lib/hilos-preguntas-nuevas';
 
 export const HILO_IDS = [
   'infancia',
@@ -13,6 +15,12 @@ export const HILO_IDS = [
   'justicia',
   'viajes',
   'historia',
+  'musica',
+  'deportes',
+  'arte-cultura',
+  'tecnologia',
+  'actualidad',
+  'naturaleza-clima',
 ] as const;
 
 export type HiloId = (typeof HILO_IDS)[number];
@@ -34,7 +42,7 @@ export type PreguntaHilo = {
   texto: Record<AlmaLocale, string>;
 };
 
-export const HILOS: Hilo[] = [
+const HILOS_ORIGINALES: Hilo[] = [
   {
     id: 'infancia',
     nombre: {
@@ -169,7 +177,8 @@ export const HILOS: Hilo[] = [
   },
 ];
 
-const TEMAS: PreguntaHilo[] = [
+/** Banco antiguo completo para conservar enlaces, formularios y respuestas. */
+const TEMAS_HISTORICAS: PreguntaHilo[] = [
   {
     id: 'infancia-1',
     hiloId: 'infancia',
@@ -1132,6 +1141,19 @@ const TEMAS: PreguntaHilo[] = [
   },
 ];
 
+/** Las dos cintas retiradas siguen en el archivo, pero no se muestran en Inspírate. */
+export const HILOS: Hilo[] = [
+  ...HILOS_ORIGINALES.filter((hilo) => hilo.id !== 'creencias' && hilo.id !== 'ausentes'),
+  ...HILOS_NUEVOS,
+];
+const TODOS_HILOS: Hilo[] = [...HILOS_ORIGINALES, ...HILOS_NUEVOS];
+/** Cada cinta activa muestra ocho preguntas: siete originales y una de futuro, o las ocho nuevas. */
+const TEMAS: PreguntaHilo[] = [
+  ...TEMAS_HISTORICAS.filter((pregunta) => HILOS.some((hilo) => hilo.id === pregunta.hiloId) && !pregunta.id.endsWith('-8')),
+  ...PREGUNTAS_FUTURO,
+  ...PREGUNTAS_NUEVAS,
+];
+
 const AZAR: PreguntaHilo[] = [
   {
     id: 'azar-1',
@@ -1217,7 +1239,7 @@ const AZAR: PreguntaHilo[] = [
 
 export const PREGUNTAS_HILO: PreguntaHilo[] = TEMAS;
 
-const POR_ID = new Map<string, PreguntaHilo>([...TEMAS, ...AZAR].map((pregunta) => [pregunta.id, pregunta]));
+const POR_ID = new Map<string, PreguntaHilo>([...TEMAS_HISTORICAS, ...TEMAS, ...AZAR].map((pregunta) => [pregunta.id, pregunta]));
 
 const TEMA_NOMBRE: Record<AlmaLocale, string> = {
   es: 'Sorpréndeme',
@@ -1237,7 +1259,7 @@ export function preguntaHiloPorId(id: string | null | undefined): PreguntaHilo |
 
 export function hiloPorId(id: string | null | undefined): Hilo | null {
   if (!id) return null;
-  return HILOS.find((hilo) => hilo.id === id) ?? null;
+  return TODOS_HILOS.find((hilo) => hilo.id === id) ?? null;
 }
 
 export function idPreguntaHilo(value: unknown): string | null {
@@ -1292,6 +1314,12 @@ const COLOR_CINTA: Record<HiloId, string> = {
   justicia: '#FF0A8A',
   viajes: '#00C2D6',
   historia: '#A0003C',
+  musica: '#7A12E0',
+  deportes: '#B07CFF',
+  'arte-cultura': '#FFD000',
+  tecnologia: '#00B140',
+  actualidad: '#FF6200',
+  'naturaleza-clima': '#00C2D6',
 };
 
 /** Tema editorial público → cinta. Los ids que ya son una cinta se resuelven solos. */
@@ -1314,10 +1342,10 @@ const TEMA_A_CINTA: Record<string, HiloId> = {
   barrio: 'historia',
   ciudad: 'viajes',
   campo: 'viajes',
-  naturaleza: 'viajes',
+  naturaleza: 'naturaleza-clima',
   mar: 'viajes',
   montana: 'viajes',
-  clima: 'viajes',
+  clima: 'naturaleza-clima',
   partir: 'viajes',
   llegar: 'viajes',
   exilio: 'viajes',
@@ -1335,7 +1363,7 @@ const TEMA_A_CINTA: Record<string, HiloId> = {
   salud: 'crecer',
   enfermedad: 'crecer',
   'cuidado-de-otros': 'crecer',
-  deporte: 'crecer',
+  deporte: 'deportes',
   cuerpo: 'crecer',
   envejecer: 'crecer',
   duelo: 'ausentes',
@@ -1358,18 +1386,23 @@ const TEMA_A_CINTA: Record<string, HiloId> = {
   protesta: 'justicia',
   educacion: 'aprender',
   'vida-publica': 'justicia',
-  musica: 'historia',
-  arte: 'historia',
+  musica: 'musica',
+  arte: 'arte-cultura',
   comida: 'familia',
   fiestas: 'amistad',
   juego: 'infancia',
   humor: 'amistad',
-  'cine-lectura': 'aprender',
+  'cine-lectura': 'arte-cultura',
   esperanza: 'crecer',
   proyectos: 'aprender',
   deseos: 'crecer',
   'cartas-al-futuro': 'historia',
-  'lo-que-vendra': 'crecer',
+  'lo-que-vendra': 'actualidad',
+  tecnologia: 'tecnologia',
+  actualidad: 'actualidad',
+  deportes: 'deportes',
+  'arte-cultura': 'arte-cultura',
+  'naturaleza-clima': 'naturaleza-clima',
 };
 
 export function colorCintaDe(preguntaId?: string | null, temas?: string[] | null): string | null {
