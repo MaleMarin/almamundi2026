@@ -807,14 +807,16 @@ export function CortinaTemas({
         >
           <div className="cortina-cuerpo" ref={contenidoRef}>
             <div className="cortina-cabecera">
-              {hilo ? esMe && meEnviada ? <span /> : <h2>{hilo.nombre[locale]}</h2> : null}
+              <div className="cortina-identidad">
+                {hilo ? esMe && meEnviada ? <span /> : <h2>{hilo.nombre[locale]}</h2> : null}
+                {!esMe && temaId && fraseInteriorHilo(temaId, locale) ? (
+                  <p className="cortina-frase-editorial">{fraseInteriorHilo(temaId, locale)}</p>
+                ) : null}
+              </div>
               <button ref={volverRef} className="cortina-volver" type="button" onClick={cerrar}>
                 {copy.volver}
               </button>
             </div>
-            {!esMe && temaId && fraseInteriorHilo(temaId, locale) ? (
-              <p className="cortina-frase-editorial">{fraseInteriorHilo(temaId, locale)}</p>
-            ) : null}
             {esMe ? (
               <MePreguntoPanel
                 key={`me-${locale}`}
