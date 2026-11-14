@@ -179,7 +179,7 @@ export function StoryShareMenu({
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm rounded-2xl bg-[#F7F4EE] p-4 shadow-xl"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-sm overflow-y-auto overscroll-contain rounded-2xl bg-[#F7F4EE] p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-start justify-between gap-3">

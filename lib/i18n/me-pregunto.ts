@@ -28,6 +28,10 @@ export const ME_PREGUNTO_UI: Record<
     cancelar: string;
     gracias: (alias: string) => string;
     graciasTexto: string;
+    /** Se comparte la participación, no el contenido pendiente de moderación. */
+    compartirPreguntaEnviada: string;
+    compartirPreguntaEnviadaTexto: string;
+    compartirPreguntaEnviadaTitulo: string;
     respondesA: string;
     consentAdulto: string;
     consentPublicar: string;
@@ -69,6 +73,9 @@ export const ME_PREGUNTO_UI: Record<
     gracias: (alias) => `Tu pregunta llegó, ${alias}`,
     graciasTexto:
       'Una persona del equipo la leerá antes de publicarla. Cuando aparezca en «Me gustaría saber de ti», otras personas podrán responderla.',
+    compartirPreguntaEnviada: 'Compartir que dejé una pregunta',
+    compartirPreguntaEnviadaTexto: 'Dejé una pregunta en AlmaMundi. Está pendiente de revisión. ¿Qué te gustaría preguntar tú?',
+    compartirPreguntaEnviadaTitulo: 'Dejé una pregunta en AlmaMundi',
     respondesA: 'Respondes a:',
     consentAdulto: 'Soy mayor de 18 años, o adulto responsable o representante de una institución.',
     consentPublicar: 'Autorizo que mi pregunta y mi nombre o alias se publiquen en AlmaMundi.',
@@ -119,6 +126,9 @@ export const ME_PREGUNTO_UI: Record<
     gracias: (alias) => `Sua pergunta chegou, ${alias}`,
     graciasTexto:
       'Uma pessoa da equipe vai lê-la antes de publicá-la. Quando aparecer em «Eu gostaria de saber de você», outras pessoas poderão respondê-la.',
+    compartirPreguntaEnviada: 'Compartilhar que deixei uma pergunta',
+    compartirPreguntaEnviadaTexto: 'Deixei uma pergunta no AlmaMundi. Ela está aguardando revisão. O que você gostaria de perguntar?',
+    compartirPreguntaEnviadaTitulo: 'Deixei uma pergunta no AlmaMundi',
     respondesA: 'Você responde a:',
     consentAdulto: 'Tenho 18 anos ou mais, ou sou adulto responsável ou representante de uma instituição.',
     consentPublicar: 'Autorizo que minha pergunta e meu nome ou apelido sejam publicados no AlmaMundi.',
@@ -169,6 +179,9 @@ export const ME_PREGUNTO_UI: Record<
     gracias: (alias) => `Your question arrived, ${alias}`,
     graciasTexto:
       "Someone on our team will read it before it's published. Once it appears in I wonder…, anyone can answer it.",
+    compartirPreguntaEnviada: 'Share that I submitted a question',
+    compartirPreguntaEnviadaTexto: 'I submitted a question to AlmaMundi. It is awaiting review. What would you like to ask?',
+    compartirPreguntaEnviadaTitulo: 'I submitted a question to AlmaMundi',
     respondesA: "You're answering:",
     consentAdulto: 'I am 18 or older, or a responsible adult or institutional representative.',
     consentPublicar: 'I authorize my question and my name or alias to be published on AlmaMundi.',
