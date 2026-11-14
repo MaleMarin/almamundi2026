@@ -3091,3 +3091,22 @@ body .almamundi-footer-title { font-weight: 900 !important; }
   white-space: normal;
   text-align: center;
 }
+
+.cortina-identidad {
+  display: flex;
+  flex: 1 1 36rem;
+  min-width: 0;
+  align-items: baseline;
+  flex-wrap: wrap;
+  column-gap: clamp(1rem, 2vw, 2rem);
+  row-gap: 0.65rem;
+}
+.cortina-identidad .cortina-frase-editorial {
+  flex: 1 1 18rem;
+  margin: 0;
+  max-width: 42rem;
+}
+@media (max-width: 640px) {
+  .cortina-identidad { align-items: flex-start; flex-direction: column; }
+  .cortina-identidad .cortina-frase-editorial { flex-basis: auto; }
+}
