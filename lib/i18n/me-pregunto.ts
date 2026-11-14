@@ -74,7 +74,7 @@ export const ME_PREGUNTO_UI: Record<
     graciasTexto:
       'Una persona del equipo la leerá antes de publicarla. Cuando aparezca en «Me gustaría saber de ti», otras personas podrán responderla.',
     compartirPreguntaEnviada: 'Compartir que dejé una pregunta',
-    compartirPreguntaEnviadaTexto: 'Dejé una pregunta en AlmaMundi. Está pendiente de revisión. ¿Qué te gustaría preguntar tú?',
+    compartirPreguntaEnviadaTexto: 'Dejé una pregunta en AlmaMundi. Está pendiente de revisión. ¿Qué pregunta harías?',
     compartirPreguntaEnviadaTitulo: 'Dejé una pregunta en AlmaMundi',
     respondesA: 'Respondes a:',
     consentAdulto: 'Soy mayor de 18 años, o adulto responsable o representante de una institución.',
