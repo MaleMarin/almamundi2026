@@ -53,3 +53,45 @@ test.describe('Compartir y compatibilidad', () => {
     await expect(page).toHaveURL(/\/preguntas-de-las-personas\?p=mp-a1b2c3d4/);
   });
 });
+
+test.describe('Administrador y flujo de compartir en celular', () => {
+  test.use({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true });
+
+  test('login de administrador cabe en la pantalla móvil', async ({ page }) => {
+    await page.goto('/admin', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('heading', { name: /Panel Admin AlmaMundi/i })).toBeVisible();
+    const measures = await page.evaluate(() => ({
+      viewport: document.documentElement.clientWidth,
+      scroll: document.documentElement.scrollWidth,
+    }));
+    expect(measures.scroll).toBeLessThanOrEqual(measures.viewport + 2);
+  });
+
+  test('compartir después de responder abre menú social desplazable sin publicar datos reales', async ({ page }) => {
+    await page.route('**/api/respuestas', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, id: 'test-no-guardado' }) })
+    );
+    await page.goto('/preguntas?tema=musica', { waitUntil: 'domcontentloaded' });
+    await page.locator('.cortina-indice-pregunta').first().click();
+    await page.locator('.cortina-formato').filter({ hasText: /Escríbela/i }).first().click();
+    const form = page.locator('form.cortina-form');
+    await form.locator('textarea').fill('Una experiencia de prueba de interfaz. Este texto no se envía al servidor.');
+    await form.locator('input[autocomplete=nickname]').fill('Prueba QA');
+    await form.locator('input[autocomplete=country-name]').fill('Chile');
+    await form.locator('input[autocomplete=address-level2]').fill('Santiago');
+    for (const checkbox of await form.locator('input[type=checkbox]').all()) await checkbox.check();
+    await form.getByRole('button', { name: 'Enviar mi respuesta' }).click();
+    await expect(page.getByRole('button', { name: 'Comparte la pregunta' })).toBeVisible();
+    await page.getByRole('button', { name: 'Comparte la pregunta' }).click();
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByRole('button', { name: 'WhatsApp' })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /Instagram/i })).toBeVisible();
+    await expect(dialog.getByRole('button', { name: /TikTok/i })).toBeVisible();
+    const size = await dialog.evaluate((el) => {
+      const panel = el.querySelector('div')!;
+      return { scrollHeight: panel.scrollHeight, clientHeight: panel.clientHeight, viewport: window.innerHeight };
+    });
+    expect(size.clientHeight).toBeLessThanOrEqual(size.viewport);
+  });
+});
