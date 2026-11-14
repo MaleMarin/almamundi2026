@@ -1,3 +1,4 @@
+import { redirect } from 'next/navigation';
 import { preguntaOgCopy } from '@/lib/i18n/pregunta-messages';
 import type { Metadata } from 'next';
 import { getAdminDb } from '@/lib/firebase/admin';
@@ -5,7 +6,7 @@ import { ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { mePreguntaAprobada } from '@/lib/me-pregunto/server';
 import { cookies } from 'next/headers';
 import { PreguntasClient } from '@/components/hilos/PreguntasClient';
-import { hiloPorId, preguntaHiloPorId } from '@/lib/hilos';
+import { HILOS, hiloPorId, preguntaHiloPorId, preguntasDelTema } from '@/lib/hilos';
 import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import { ALMA_LOCALE_COOKIE, parseAlmaLocale } from '@/lib/i18n/locale';
 import { PUBLIC_OG_LOCALE } from '@/lib/i18n/public-meta';
@@ -72,6 +73,14 @@ export default async function PreguntasPage({ searchParams }: Props) {
   const porId = preguntaHiloPorId(pedido);
   const tema =
     porId?.hiloId ?? hiloPorId(pedido)?.id ?? hiloPorId(firstParam(params.tema))?.id ?? null;
+  // Mantener el acceso a respuestas antiguas, aunque su pregunta o su
+  // cinta ya no forme parte de las ocho preguntas visibles de Inspírate.
+  if (porId && (!tema || !HILOS.some((h) => h.id === tema) || !preguntasDelTema(tema).some((p) => p.id === porId.id))) {
+    redirect(`/respuestas-a-almamundi?p=${encodeURIComponent(porId.id)}`);
+  }
+  if (tema && !HILOS.some((h) => h.id === tema)) {
+    redirect('/respuestas-a-almamundi');
+  }
   const pregunta = porId && !hiloPorId(pedido) ? porId.id : null;
   return <PreguntasClient initialId={pregunta} initialTema={tema} />;
 }
