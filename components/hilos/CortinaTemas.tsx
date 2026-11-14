@@ -4,6 +4,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Camera, Mic, PenLine } from 'lucide-react';
 import { PreguntaFormForQuestion } from '@/components/pregunta/PreguntaForm';
 import { HILOS, preguntaParaFormulario, preguntasDelTema, type Hilo } from '@/lib/hilos';
+import { fraseInteriorHilo } from '@/lib/hilos-editorial-2026';
 import { ME_PREGUNTO_ID } from '@/lib/me-pregunto/shared';
 import { ME_PREGUNTO_MAPA, ME_PREGUNTO_UI } from '@/lib/i18n/me-pregunto';
 import { MePreguntoPanel } from '@/components/hilos/MePreguntoPanel';
@@ -11,30 +12,32 @@ import { HILOS_UI } from '@/lib/i18n/hilos-messages';
 import type { AlmaLocale } from '@/lib/i18n/locale';
 import type { PreguntaSemana } from '@/lib/pregunta-semana';
 
-/** Colores del prototipo, en el mismo orden que los 12 temas. */
+/** Colores en el orden de las 16 cintas visibles, seguidas por «Me pregunto…». */
 const TELON: { fondo: string; texto: string }[] = [
-  { fondo: '#FFD000', texto: '#3C2F00' },
-  { fondo: '#FF6200', texto: '#fff' },
-  { fondo: '#FF1A1A', texto: '#fff' },
-  { fondo: '#FF7EB6', texto: '#4A1A30' },
-  { fondo: '#A8E000', texto: '#2A3300' },
-  { fondo: '#00B140', texto: '#fff' },
-  { fondo: '#0047FF', texto: '#fff' },
-  { fondo: '#7A12E0', texto: '#fff' },
-  { fondo: '#B07CFF', texto: '#2A1B47' },
-  { fondo: '#FF0A8A', texto: '#fff' },
-  { fondo: '#00C2D6', texto: '#fff' },
-  { fondo: '#A0003C', texto: '#fff' },
-  // 13: «Me pregunto…» (en la cortina se dibuja multicolor).
-  { fondo: '#FF4A1C', texto: '#fff' },
+  { fondo: '#FFD000', texto: '#3C2F00' }, // Infancia
+  { fondo: '#FF6200', texto: '#fff' }, // Familia
+  { fondo: '#FF1A1A', texto: '#fff' }, // Amor
+  { fondo: '#FF7EB6', texto: '#4A1A30' }, // Amistad
+  { fondo: '#A8E000', texto: '#2A3300' }, // Crecer y criar
+  { fondo: '#00B140', texto: '#fff' }, // Aprender
+  { fondo: '#0047FF', texto: '#fff' }, // Trabajo
+  { fondo: '#FF0A8A', texto: '#fff' }, // Justicia
+  { fondo: '#00C2D6', texto: '#fff' }, // Viajes
+  { fondo: '#A0003C', texto: '#fff' }, // Historia
+  { fondo: '#7A12E0', texto: '#fff' }, // Música
+  { fondo: '#B07CFF', texto: '#2A1B47' }, // Deportes
+  { fondo: '#FFD000', texto: '#3C2F00' }, // Arte y cultura
+  { fondo: '#00B140', texto: '#fff' }, // Tecnología
+  { fondo: '#FF6200', texto: '#fff' }, // Actualidad
+  { fondo: '#00C2D6', texto: '#fff' }, // Naturaleza y clima
+  { fondo: '#FF4A1C', texto: '#fff' }, // Preguntas de las personas
 ];
 
-/** Colores de las cintas en la cortina: los 12 colores originales de los temas. */
+/** Colores de la cortina, sin filtros que cambien el tono. */
 const VIVO = TELON.map((t) => t.fondo);
-/** Capa de atrás: los mismos colores, sin oscurecer. */
 const VIVO_ATRAS = VIVO;
 
-/** Fondo del panel. Si el blanco no llega a 4.5 sobre la cinta, el mismo tono baja de luz. Las cintas siguen en TELON. */
+/** Contraste adecuado para los paneles abiertos. */
 const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#FFD000', texto: '#3C2F00', boton: '#3C2F00' },
   { fondo: '#CC4E00', texto: '#fff', boton: '#CC4E00' },
@@ -43,15 +46,18 @@ const PANEL: { fondo: string; texto: string; boton: string }[] = [
   { fondo: '#A8E000', texto: '#2A3300', boton: '#2A3300' },
   { fondo: '#008932', texto: '#fff', boton: '#008932' },
   { fondo: '#0047FF', texto: '#fff', boton: '#0047FF' },
-  { fondo: '#7A12E0', texto: '#fff', boton: '#7A12E0' },
-  { fondo: '#B07CFF', texto: '#2A1B47', boton: '#2A1B47' },
   { fondo: '#E60078', texto: '#fff', boton: '#E60078' },
   { fondo: '#008391', texto: '#fff', boton: '#008391' },
   { fondo: '#A0003C', texto: '#fff', boton: '#A0003C' },
+  { fondo: '#7A12E0', texto: '#fff', boton: '#7A12E0' },
+  { fondo: '#B07CFF', texto: '#2A1B47', boton: '#2A1B47' },
+  { fondo: '#FFD000', texto: '#3C2F00', boton: '#3C2F00' },
+  { fondo: '#008932', texto: '#fff', boton: '#008932' },
+  { fondo: '#CC4E00', texto: '#fff', boton: '#CC4E00' },
+  { fondo: '#008391', texto: '#fff', boton: '#008391' },
   { fondo: '#FF4A1C', texto: '#fff', boton: '#B8340F' },
 ];
-
-/** Los 12 temas y «Me pregunto…», la cinta multicolor de las preguntas de las personas. */
+/** Las 16 cintas visibles más el acceso a las preguntas de las personas. */
 const ME_HILO = {
   id: ME_PREGUNTO_ID,
   nombre: { es: ME_PREGUNTO_UI.es.titulo, pt: ME_PREGUNTO_UI.pt.titulo, en: ME_PREGUNTO_UI.en.titulo },
@@ -281,12 +287,12 @@ export function CortinaTemas({
     let viva = true;
     let corriendo = false;
 
-    /** Reparte los 12 temas por turnos, en orden mezclado: todos salen las mismas veces (±1). */
+    /** Reparte los 16 temas por turnos, en orden mezclado: todos salen las mismas veces (±1). */
     function repartidor() {
       let bolsa: number[] = [];
       return () => {
         if (!bolsa.length) {
-          bolsa = Array.from({ length: 12 }, (_, i) => i);
+          bolsa = Array.from({ length: HILOS.length }, (_, i) => i);
           for (let i = bolsa.length - 1; i > 0; i -= 1) {
             const j = Math.floor(azar() * (i + 1));
             [bolsa[i], bolsa[j]] = [bolsa[j], bolsa[i]];
@@ -806,6 +812,9 @@ export function CortinaTemas({
                 {copy.volver}
               </button>
             </div>
+            {!esMe && temaId && fraseInteriorHilo(temaId, locale) ? (
+              <p className="cortina-frase-editorial">{fraseInteriorHilo(temaId, locale)}</p>
+            ) : null}
             {esMe ? (
               <MePreguntoPanel
                 key={`me-${locale}`}
@@ -866,6 +875,14 @@ export function CortinaTemas({
                 );
               })}
             </ul>
+            {!esMe && temaId ? (
+              <div className="cortina-pregunta-propia">
+                <p>{locale === 'pt' ? 'Nenhuma destas perguntas combina com o que você quer contar?' : locale === 'en' ? 'None of these questions express what you want to share?' : '¿Ninguna de estas preguntas expresa lo que quieres contar?'}</p>
+                <a href="/preguntas-de-las-personas" className="btn-am-principal inline-flex min-h-11 items-center justify-center px-6 no-underline">
+                  {locale === 'pt' ? 'Deixe sua pergunta e responda também' : locale === 'en' ? 'Ask your own question and answer it' : 'Deja tu propia pregunta y respóndela'}
+                </a>
+              </div>
+            ) : null}
           </div>
         </section>
         <canvas ref={canvasRef} className="cortina-lienzo" aria-hidden />
