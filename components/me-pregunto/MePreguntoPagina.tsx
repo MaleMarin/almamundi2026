@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useHomeLocale } from '@/components/i18n/LocaleProvider';
+import { ShareAfterNotice } from '@/components/stories/ShareAfterNotice';
 import {
   EncabezadoInterno,
   GrillaTarjetas,
@@ -36,6 +37,7 @@ export function MePreguntoPagina({ inicial = null }: { inicial?: MePreguntoInici
   const [preguntas, setPreguntas] = useState<MePreguntaTarjeta[] | null>(inicial?.preguntas ?? null);
   const [respuestas, setRespuestas] = useState<RespuestaTarjeta[]>(inicial?.respuestas ?? []);
   const [dejando, setDejando] = useState(false);
+  const [compartirAbierto, setCompartirAbierto] = useState(false);
 
   useEffect(() => {
     // El servidor ya entregó preguntas y respuestas: no se piden de nuevo.
@@ -81,7 +83,18 @@ export function MePreguntoPagina({ inicial = null }: { inicial?: MePreguntoInici
             cerrarTexto={ui.cancelar}
             abiertoInicial={responder}
           />
+          <button type="button" className="btn-am-secundario mt-4 inline-flex min-h-11 items-center justify-center px-5"
+            onClick={() => setCompartirAbierto(true)}>
+            {locale === 'pt' ? 'Compartilhar esta pergunta' : locale === 'en' ? 'Share this question' : 'Compartir esta pregunta'}
+          </button>
         </EncabezadoInterno>
+        <ShareAfterNotice
+          open={compartirAbierto}
+          onClose={() => setCompartirAbierto(false)}
+          kind="question"
+          questionId={una.id}
+          question={una.texto}
+        />
         {lista.length === 0 ? (
           <TextoVacio locale={locale} />
         ) : (
